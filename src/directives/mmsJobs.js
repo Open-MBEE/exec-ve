@@ -51,10 +51,9 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             scope.createdRefs = refArr;
         }
 
-        var getJobInstances = function (jobId) {
-            // var deferred = $q.defer();
-            // var link = URLService.getJobInstancesURL(projectId, refId, $location.host()); // TODO create porxy in gruntfile for PMA
-            var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, 'opencae-int.jpl.nasa.gov');
+        var getJobInstances = function (jobId) {// TODO create porxy in gruntfile for PMA
+            var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, $location.host());
+            // var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, 'opencae-int.jpl.nasa.gov');
             scope.responseCleared = false;
             $http.get(link).then(function(data) {
                 var instances = data.data.jobInstances;
@@ -65,13 +64,12 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             }).finally(function() {
                 scope.responseCleared = true;
             });
-            // return deferred.promise;
         };
 
         // get all the jobs for current document
         var getJobs = function () {
-            // var link = URLService.getJobsURL(projectId, refId, $location.host()); // TODO create porxy in gruntfile for PMA
-            var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, 'opencae-int.jpl.nasa.gov');
+            var link = URLService.getJobsURL(projectId, refId, $location.host()); // TODO create porxy in gruntfile for PMA
+            // var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, 'opencae-int.jpl.nasa.gov');
             scope.jobs = [];
             scope.loading = true;
             scope.responseCleared = false;
@@ -82,29 +80,18 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
                         scope.jobs.push(jobs[i]);
                         var jobId = jobs[i].id;
                         getJobInstances(jobId);
-                        // .then(function (instances) {
-                            // for (var i = 0; i < instances.length; i++) {
-                                // scope.jobInstances[jobId] = instances;
-                            // }
-                //             for (var i = 0; i < jobInst.length; i++) {
-                //     var instance = jobInst[i];
-                //     scope.jobInstances[jobId] = instance;
-                // }
-                        // });
                     }
                 }
             }, function (error) {
-                // display some error?
                 growl.error('There was a error in retrieving your job: ' + error.status);
             }).finally(function () {
                 scope.loading = false;
                 scope.responseCleared = true;
-                //TODO might need digest to get jobs
             });
         };
 
         //Callback function for document change
-        var changeDocument = function (newVal, oldVal) { // check if the right pane is reloaded everytime
+        var changeDocument = function (newVal, oldVal) {
             if (!newVal || (newVal == oldVal && ran))
                 return;
             ran = true;
@@ -130,7 +117,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             scope.runCleared = false;
             var link = URLService.getRunJobURL(scope.mmsProjectId, scope.mmsRefId, id);
             var post = {
-                "mmsServer" : "opencae-int.jpl.nasa.gov", //TODO add
+                "mmsServer" : $location.host(), //"opencae-int.jpl.nasa.gov", //TODO create porxy in gruntfile for PMA
                 "alfrescoToken" : AuthService.getTicket()
             };
             var jobId = id;
@@ -138,10 +125,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
                 //TODO get instance and status
                 growl.success('Your job is running!');
                 var jobInst = data.data.jobInstances;
-                for (var i = 0; i < jobInst.length; i++) {
-                    var instance = jobInst[i];
-                    scope.jobInstances[jobId] = instance;
-                }
+                scope.jobInstances[jobId] = jobInst;
             }, function(fail) {
                 growl.error('Your job failed to run: ' + fail.data.message);
             }).finally(function() {
@@ -154,6 +138,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             if (!id) {
                 scope.runCleared = false;
                 scope.createJob().then(function (jobs) {
+                    scope.jobs = jobs;
                     for (var i = 0; i < jobs.length; i++) {
                         // scope.jobs.push(jobs[i]);
                         jenkinsRun(jobs[i].id);
@@ -188,7 +173,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
                 // "arguments" : ["arg1","arg2"],
                 "schedule" : thisSchedule,
                 "associatedElementID" : id,
-                "mmsServer" : "opencae-int.jpl.nasa.gov", //TODO add
+                "mmsServer" : $location.host(), //"opencae-int.jpl.nasa.gov", //TODO add
                 "alfrescoToken" : AuthService.getTicket()
             };
 
@@ -221,7 +206,8 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         //};
         
         scope.deleteJob = function(jobId) {
-           var link = URLService.getJobURL(scope.mmsProjectId, scope.mmsRefId, jobId, 'opencae-int.jpl.nasa.gov');
+           var link = URLService.getJobURL(scope.mmsProjectId, scope.mmsRefId, jobId, $location.host());
+        //    var link = URLService.getJobURL(scope.mmsProjectId, scope.mmsRefId, jobId, 'opencae-int.jpl.nasa.gov');
            scope.deleteCleared = false;
            $http.delete(link).then(function() {
                //TODO remove from jobs list
@@ -281,21 +267,11 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         });
 
 
-        //scope.$on("stomp.updateJob", function(event, updateJob){
-        //    for (var i = 0; i < updateJob.length; i++) {
-        //        if(updateJob[i].ownerId === scope.mmsDocId){
-        //            if(updateJob[i].status === 'completed' || updateJob[i].status === 'failed'){
-        //                    scope.buttonEnabled = true;
-        //            }else{
-        //                scope.buttonEnabled = false;
-        //            }
-        //            scope.job.name = updateJob[i].name;
-        //            scope.job.status = updateJob[i].status;
-        //            scope.job.url = updateJob[i].url;
-        //            scope.$apply();
-        //        }
-        //    }
-        //});
+        scope.$on("stomp.updateJob", function(event, updateJob) {
+            var jobId = updateJob.jobId;
+            scope.jobInstances[jobId] = [updateJob];
+        });
+    
         //scope.$on("stomp.deleteJob", function(event, deleteJob){
         //    for (var i = 0; i < deleteJob.length; i++) {
         //        if(deleteJob[i].ownerId === scope.mmsDocId){
@@ -305,7 +281,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         //            scope.$apply();
         //        }
         //    }
-        //});
+        // });
     };
     return {
         restrict: 'E',

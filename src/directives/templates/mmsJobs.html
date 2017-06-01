@@ -2,7 +2,7 @@
 <i class="pane-center-spinner fa fa-3x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
 
 <div id="ve-jobs-table">
-    <h3>View Editor</h3>
+    <!--<h3>View Editor</h3>
     <table class="table table-condensed">
         <thead>
             <tr>
@@ -12,26 +12,6 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>
-                    <div ng-hide="editorEnabled">
-                        PMA Smoke Test_job
-                        <a class="ng-binding" ng-click="enableEditor()">
-                            <i class="fa fa-pencil" aria-hidden="true"></i>
-                        </a>
-                    </div>
-                    <div class="ng-hide" ng-show="editorEnabled">
-                        <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
-                        <a ng-click="save()">Save</a>
-                        or
-                        <a ng-click="disableEditor()">Cancel</a>
-                    </div>
-                </td>
-                <td>
-                    <div class="ng-binding"><i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
-                </td>
-                <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
-            </tr>
             <tr>
                 <td>
                     <div ng-hide="editorEnabled">
@@ -95,7 +75,7 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                 <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
             </tr>
         </tbody>
-    </table>
+    </table>-->
 
 
 
@@ -133,16 +113,16 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                 <td>
                     <!--<div ng-show="job.latestStatus || jobInstances[job.id]">-->
                     <div ng-switch="jobInstances[job.id][0].jobStatus">
-                            <span ng-switch-when="pending|loading" ng-switch-when-separator="|">
-                                Created {{jobInstances[job.id][0].created}}
+                            <span ng-switch-when="pending|loading|running" ng-switch-when-separator="|">
+                                Created {{jobInstances[job.id][0].created}}<br>
                                 <i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>in progress
                             </span>
                             <span ng-switch-when="failed">
-                                Created {{jobInstances[job.id][0].created}}
+                                Created {{jobInstances[job.id][0].created}}<br>
                                 <i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed 
                             </span>
                             <span ng-switch-when="completed">
-                                Completed {{jobInstances[job.id][0].completed}}
+                                Completed {{jobInstances[job.id][0].completed}}<br>
                                 <i class="fa fa-circle completed-marker" aria-hidden="true"></i>success
                             </span>
                             <span class="animate-switch" ng-switch-default>No runs</span>

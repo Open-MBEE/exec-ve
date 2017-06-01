@@ -66,20 +66,20 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
             }
             $rootScope.$broadcast("stomp.branchCreated", createdRef, projectId);
         }
-        if (updateWebpage.refs) {
-            if (updateWebpage.refs.addedJobs && updateWebpage.refs.addedJobs.length > 0) {//check length of added jobs > 0
-                var newJob = updateWebpage.refs.addedJobs;
-                $rootScope.$broadcast("stomp.job", newJob);
-            }
-            if (updateWebpage.refs.updatedJobs && updateWebpage.refs.updatedJobs.length > 0) {//check length of added jobs > 0
-                var updateJob = updateWebpage.refs.updatedJobs;
-                $rootScope.$broadcast("stomp.updateJob", updateJob);
-            }
-            if (updateWebpage.refs.deletedJobs && updateWebpage.refs.deletedJobs.length > 0) {//check length of added jobs > 0
-                var deleteJob = updateWebpage.refs.deletedJobs;
-                $rootScope.$broadcast("stomp.deleteJob", deleteJob);
-            }
+        if (updateWebpage.updatedJobs) {
+            var updateJob = updateWebpage.updatedJobs;
+            $rootScope.$broadcast("stomp.updateJob", updateJob);
         }
+        // if (updateWebpage.refs) {
+            // if (updateWebpage.refs.addedJobs && updateWebpage.refs.addedJobs.length > 0) {//check length of added jobs > 0
+            //     var newJob = updateWebpage.refs.addedJobs;
+            //     $rootScope.$broadcast("stomp.job", newJob);
+            // }
+            // if (updateWebpage.refs.deletedJobs && updateWebpage.refs.deletedJobs.length > 0) {//check length of added jobs > 0
+            //     var deleteJob = updateWebpage.refs.deletedJobs;
+            //     $rootScope.$broadcast("stomp.deleteJob", deleteJob);
+            // }
+        // }
         // this should happen in where...
         $rootScope.$on('$destroy', function() {
             stompClient.unsubscribe('/topic/master'/*, whatToDoWhenUnsubscribe*/);
