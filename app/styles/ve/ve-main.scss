@@ -151,6 +151,7 @@ div.tooltip-inner {
 
   .btn-primary {
     background-color: $ve-teal-base;
+    color:white;
   }
 
   .btn-primary:hover {
@@ -220,7 +221,9 @@ div.tooltip-inner {
     margin: 0;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: .08em;
+    letter-spacing: 0.16em;
+    font-weight: 400;
+    color:$ve-white-text-lighter-2;
   }
 
   /*Clearing bootstrap*/
