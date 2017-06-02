@@ -20,7 +20,7 @@
     </div>
 
     <div ng-if="documentOb">
-        <div class="container-fluid" ng-show="show.history">
+        <div class="container-fluid" ng-if="show.history">
             <mms-history mms-element-id="{{specInfo.id}}" mms-ref-id="{{specInfo.refId}}"
                          mms-project-id="{{specInfo.projectId}}"></mms-history>
         </div>
