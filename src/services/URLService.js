@@ -3,18 +3,13 @@
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
     var baseUrl = '/alfresco/service';
-    var jobsUrl = 'http://cae-pma-int:8080/';
 
     this.setBaseUrl = function(base) {
         baseUrl = base;
     };
-
-    this.setJobsUrl = function(jobs) {
-        jobsUrl = jobs;
-    };
     
     this.$get = [function URLServiceFactory() {
-        return urlService(baseUrl, jobsUrl);
+        return urlService(baseUrl);
     }];
 });
 
@@ -40,9 +35,9 @@ angular.module('mms')
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
-function urlService(baseUrl, jobsUrl) {
+function urlService(baseUrl) {
     var root = baseUrl;
-    var jobsRoot = jobsUrl;
+    var jobsRoot = 'https://cae-pma-int:8080/';
     var ticket;
     /**
      * @ngdoc method
@@ -372,7 +367,7 @@ function urlService(baseUrl, jobsUrl) {
     };
     
     var setJobsUrl = function(jobUrl) {
-        jobsRoot = jobUrl + ':8080';
+        jobsRoot = jobUrl + ':8080/';
     };
 
     var getJobsURL = function(projectId, refId, machine) {
