@@ -552,10 +552,26 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var jsonType = realType;
         if (type === 'Comment' || type === 'Paragraph')
             jsonType = type;
+        var newDataId = UtilsService.createMmsId();
+        var newDataSInstanceId = UtilsService.createMmsId();
+        var newData = UtilsService.createClassElement({
+            id: newDataId,
+            name: name + '_' + newDataId,
+            ownerId: 'holding_bin_' + viewOrSectionOb._projectId,
+            documentation: '',
+            _appliedStereotypeIds: [UtilsService.BLOCK_SID],
+            appliedStereotypeInstanceId: newDataSInstanceId
+        });
+        var newDataSInstance = UtilsService.createInstanceElement({
+            id: newDataSInstanceId,
+            stereotypedElementId: newDataId,
+            ownerId: newDataId,
+            classifierIds: [UtilsService.BLOCK_SID]
+        });
         var instanceSpecSpec = {
             'type': jsonType, 
             'sourceType': 'reference', 
-            'source': newInstanceId, 
+            'source': newDataId, 
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
@@ -575,6 +591,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         if (type === 'Section') {
+            newData = newDataSInstance = null;
             instanceSpec.specification = UtilsService.createValueSpecElement({
                 operand: [],  
                 type: "Expression",
@@ -607,6 +624,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }
         clone[key].operand.push(UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
         var toCreate = [instanceSpec, clone];
+        if (newData && newDataSInstance) {
+            toCreate.push(newData);
+            toCreate.push(newDataSInstance);
+        }
         var reqOb = {
             projectId: viewOrSectionOb._projectId,
             refId: viewOrSectionOb._refId,
@@ -697,7 +718,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var instanceSpecSpec = {
             'type': 'Paragraph', 
             'sourceType': 'reference', 
-            'source': newInstanceId, 
+            'source': newViewId, 
             'sourceProperty': 'documentation'
         };
         var instanceSpec = UtilsService.createInstanceElement({

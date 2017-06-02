@@ -14,6 +14,7 @@ angular.module('mms')
 function UtilsService($q, $http, CacheService, URLService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
+    var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
         '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
     var CLASS_ELEMENT_TEMPLATE = {
@@ -712,6 +713,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     return {
         VIEW_SID: VIEW_SID,
         DOCUMENT_SID: DOCUMENT_SID,
+        BLOCK_SID: BLOCK_SID,
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
         createValueSpecElement: createValueSpecElement,
