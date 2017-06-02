@@ -47,6 +47,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
         var origNotFound = false;
         var compNotFound = false;
         var deletedFlag = false;
+        var deletedOrigin = false;
 
         if (mmsViewCtrl) {
             viewOrigin = mmsViewCtrl.getElementOrigin(); 
@@ -87,7 +88,11 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 }, 5000);
         }, function(reason) {
             // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ projectOneId + '<br> -- refId: ' +  refOneId+ ' <br>-- commitId: ' +commitOneId+'</span>');
+            
             origNotFound = true;
+            if(reason.status === 500) { 
+                deletedOrigin = true;
+            }
             if (reason.message.toLowerCase() == "not found") {
                 scope.origElem = '';
             } else {
@@ -112,9 +117,13 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             }, function(reason) {
                 // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
                 // scope.compElem = '';
-                console.log(reason.message);
-                if (reason.data.message.toLowerCase().includes("deleted") === true) {
+                // console.log(reason.data.message.toLowerCase());
+                // if(reason.data.message.toLowerCase().includes("deleted") === true) {
+                //     console.log("HEYYYY");
+                // }
+                if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
                     deletedFlag = true;
+                    console.log("print orig: " + origNotFound);
                 } else if (reason.message.toLowerCase() == "not found") {
                     compNotFound = true;
                     scope.compElem = '';
@@ -142,12 +151,14 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                     if (compNotFound === true) {
                         element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element not found. Might be due to invalid input. </span>');
                     } else if (deletedFlag === true) {
-                        console.log("hey again");
+                        // console.log("HEYYYY");
                         element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
                     }
                     break;
                 default:
-                    if (compNotFound === false) {
+                    if(deletedOrigin === true) {
+                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
+                    } else if (compNotFound === false) {
                         // if (scope.compElem === "") {
                         //     element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element with no content. </span>');
                         // } else {
