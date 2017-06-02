@@ -39,8 +39,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
-    var fixPreSpanRegex = /<\/span>\s*<mms-transclude/g;
-    var fixPostSpanRegex = /<\/mms-transclude-(name|doc|val|com)>\s*<span[^>]*>/g;
+    var fixPreSpanRegex = /<\/span>\s*<mms-cf/g;
+    var fixPostSpanRegex = /<\/mms-cf>\s*<span[^>]*>/g;
     var emptyRegex = /^\s*$/;
 
     var mmsTranscludeDocCtrl = function($scope) {
@@ -97,8 +97,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 doc = '<p>' + p + '</p>';
             }
             var fixSpan = /<span style="/;
-            doc = doc.replace(fixPreSpanRegex, "<mms-transclude");
-            doc = doc.replace(fixPostSpanRegex, "</mms-transclude-$1>");
+            doc = doc.replace(fixPreSpanRegex, "<mms-cf");
+            doc = doc.replace(fixPostSpanRegex, "</mms-cf>");
             if (preview) {
                 domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             } else {

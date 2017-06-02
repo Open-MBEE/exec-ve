@@ -559,7 +559,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             var cap2 = el.find('.mms-equation-caption');
             cap2.html(equationCap);
             if (cap2.length === 0) {
-                el.find('mms-view-equation > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
+                el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {

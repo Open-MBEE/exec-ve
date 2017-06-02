@@ -384,9 +384,9 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
 
         var mmsResetCallback = function(ed) {
             var body = ed.document.getBody();
-            resetCrossRef(body.find('mms-transclude-name').$, '.name]');
-            resetCrossRef(body.find('mms-transclude-doc').$, '.doc]');
-            resetCrossRef(body.find('mms-transclude-val').$, '.val]');
+            resetCrossRef(body.find("mms-cf[mms-cf-type='name']").$, '.name]');
+            resetCrossRef(body.find("mms-cf[mms-cf-type='doc']").$, '.doc]');
+            resetCrossRef(body.find("mms-cf[mms-cf-type='val']").$, '.val]');
             resetCrossRef(body.find('mms-view-link').$, '.vlink]');
             update();
         };
