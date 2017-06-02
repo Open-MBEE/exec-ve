@@ -20,7 +20,7 @@
     </div>
 
     <div ng-if="documentOb">
-        <div class="container-fluid" ng-show="show.history">
+        <div class="container-fluid" ng-if="show.history">
             <mms-history mms-element-id="{{specInfo.id}}" mms-ref-id="{{specInfo.refId}}"
                          mms-project-id="{{specInfo.projectId}}"></mms-history>
         </div>
@@ -30,9 +30,11 @@
         <h1>Tags</h1>
         <div ng-show="noTags">No tags in current project.</div>
         <div ng-hide="noTags">
-            <table class="snapshot-table table table-condensed">
+            <input class="form-control" ng-model="tagFilter" type="text" placeholder="Type here to filter tags">
+            <br />
+            <table ng-show="filteredTags.length" class="snapshot-table table table-condensed">
                 <tr><th>Name</th><th>Time</th></tr>
-                <tr ng-repeat="tag in tagObs | orderBy:'-_created'">
+                <tr ng-repeat="tag in filteredTags = (tagObs | orderBy:'-_created' | filter: {name : tagFilter})">
                     <td>
                         <a ui-sref="project.ref({refId: tag.id, search: undefined})">{{tag.name}}</a>
                     </td>
@@ -40,6 +42,7 @@
                     </td>
                 </tr>
             </table>
+            <div ng-hide="filteredTags.length">No tags found with that name.</div>
         </div>
     </div>
 
@@ -49,8 +52,8 @@
                           mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
     </div>
 
-    <div class="container-fluid" ng-show="show.jobs">
-        <mms-jobs mms-doc-id="{{documentOb.sysmlId}}" mms-project-id="{{projectOb.id}}"
+    <div class="container-fluid" ng-if="show.jobs">
+        <mms-jobs mms-doc-id="{{documentOb.id}}" mms-project-id="{{projectOb.id}}"
                   mms-ref-id="{{refOb.id}}"></mms-jobs>
     </div>
 </div>

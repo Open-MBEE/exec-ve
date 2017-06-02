@@ -44,7 +44,8 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                     $scope.selectedOrg = $scope.org.name;
                     $scope.selectedProject = $scope.project.name;
 
-                    var orgId, projectId;
+                    var orgId = $scope.org.id;
+                    var projectId = $scope.project.id;
 
                     $scope.selectOrg = function(org) { 
                         if(org) {
@@ -53,19 +54,29 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                             $scope.selectedProject = "";
                             ProjectService.getProjects(orgId).then(function(data) {
                                 $scope.projects = data;
+                                if (data.length > 0) {
+                                    $scope.selectProject(data[0]);
+                                } else {
+                                    //no projects
+                                }
                             });
                         }
                     }; 
                     $scope.selectProject = function(project) {
-                        if(project)
+                        if(project) {
                             projectId = project.id;
                             $scope.selectedProject = project.name;
+                        }
                     };
                     $scope.spin = false;
                     $scope.continue = function() {
-                        $scope.spin = true; //the continue button on the modal needs to be wider to show the spiral
-                        if(orgId && projectId)
-                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master', search: undefined});
+                        if(orgId && projectId) {
+                            $scope.spin = true;
+                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master', search: undefined}).then(function(data) {
+                            }, function(reject) {
+                                $scope.spin = false;
+                            });
+                        }
                     };
                     $scope.cancel = function() {
                         $uibModalInstance.dismiss();
@@ -77,7 +88,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.0.0-rc4';
+            scope.veV = '3.0.0';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
