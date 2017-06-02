@@ -26,7 +26,7 @@ angular.module('mmsApp')
  */
 function veMenu(CacheService, $state, $templateCache, $sce) {
     var template = $templateCache.get('partials/mms/veMenu.html');
-    var groupsMap = {};
+    
 
     var veMenuLink = function(scope, element, attrs) {
 
@@ -101,13 +101,12 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
         var bcrumbs = [];
         var child, parentId;
         var groups = scope.groups;
+        var groupsMap = {};
         if(scope.group !== undefined) {
-            child = scope.group; 
-            if (angular.equals({}, groupsMap)) {
-                for (var i = 0; i < groups.length; i++) {
-                    groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
-                }
+            for (var i = 0; i < groups.length; i++) {
+                groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
             }
+            child = scope.group;
         }
         if(scope.document !== undefined) {
             child = scope.document; 
