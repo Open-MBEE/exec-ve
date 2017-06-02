@@ -47,7 +47,6 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
         var origNotFound = false;
         var compNotFound = false;
         var deletedFlag = false;
-        var deletedCommOrigin = false;
 
         if (mmsViewCtrl) {
             viewOrigin = mmsViewCtrl.getElementOrigin(); 
