@@ -47,7 +47,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
         var origNotFound = false;
         var compNotFound = false;
         var deletedFlag = false;
-        var deletedOrigin = false;
+        var deletedCommOrigin = false;
 
         if (mmsViewCtrl) {
             viewOrigin = mmsViewCtrl.getElementOrigin(); 
@@ -88,16 +88,25 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 }, 5000);
         }, function(reason) {
             // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ projectOneId + '<br> -- refId: ' +  refOneId+ ' <br>-- commitId: ' +commitOneId+'</span>');
-            
+            // origNotFound = true;
+            // if(reason.status === 500) { 
+            //     deletedOrigin = true;
+            // } else if (reason.message.toLowerCase() == "not found") {
+            //     scope.origElem = '';
+            // } else {
+            //     invalidOrig = true;
+            // }
+
             origNotFound = true;
-            if(reason.status === 500) { 
-                deletedOrigin = true;
-            }
-            if (reason.message.toLowerCase() == "not found") {
-                scope.origElem = '';
+            if (reason.status === 500) { 
+                deletedCommOrigin = true;
+            } else if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
+                deletedFlag = true;
             } else {
+                scope.origElem = '';
                 invalidOrig = true;
             }
+            
         }).finally(function() {
             ElementService.getElement({
                 projectId:  projectTwoId, 
@@ -113,25 +122,29 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                     function() {
                         scope.compElem = angular.element(htmlData).text();
                     }, 5000);
-                checkElement(origNotFound, compNotFound, deletedFlag);
+                checkElement(origNotFound, compNotFound, deletedFlag); 
             }, function(reason) {
                 // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
                 // scope.compElem = '';
-                // console.log(reason.data.message.toLowerCase());
-                // if(reason.data.message.toLowerCase().includes("deleted") === true) {
-                //     console.log("HEYYYY");
+                // if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
+                //     deletedFlag = true;
+                // } else if (reason.message.toLowerCase() == "not found") {
+                //     compNotFound = true;
+                //     scope.compElem = '';
+                // } else {
+                //     compNotFound = true;
+                //     invalidComp = true;
                 // }
+
                 if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
                     deletedFlag = true;
-                    console.log("print orig: " + origNotFound);
-                } else if (reason.message.toLowerCase() == "not found") {
-                    compNotFound = true;
-                    scope.compElem = '';
                 } else {
                     compNotFound = true;
+                    scope.compElem = '';
                     invalidComp = true;
                 }
-                checkElement(origNotFound, compNotFound, deletedFlag);
+
+                checkElement(origNotFound, compNotFound, deletedFlag); 
                 checkValidity(invalidOrig, invalidComp);
             });
         });
@@ -150,13 +163,13 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 case false:
                     if (compNotFound === true) {
                         element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element not found. Might be due to invalid input. </span>');
-                    } else if (deletedFlag === true) {
-                        // console.log("HEYYYY");
-                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
-                    }
+                    } 
+                    // else if (deletedFlag === true) {
+                    //     element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
+                    // }
                     break;
                 default:
-                    if(deletedOrigin === true) {
+                    if (deletedCommOrigin === true) { //for 500 error on MMS tf
                         element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
                     } else if (compNotFound === false) {
                         // if (scope.compElem === "") {
@@ -167,6 +180,10 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                     } else if (compNotFound === true) {
                         element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
                     }
+            }
+
+            if(deletedFlag === true) {
+                element.html('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
             }
         };
 
