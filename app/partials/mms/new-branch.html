@@ -8,17 +8,17 @@
 
         <div class="form-group">
             <label>Name:</label>
-            <input class="form-control" ng-model="workspace.name" type="text"
-                   placeholder="Type a name for your task here" autofocus></input>
+            <input class="form-control" ng-model="branch.name" type="text"
+                   placeholder="Type a name for your branch here" autofocus></input>
         </div>
         <div class="form-group">
             <label>Description:</label>
-            <textarea mms-ckeditor class="form-control" ng-model="workspace.description"></textarea>
+            <textarea mms-ckeditor class="form-control" ng-model="branch.description"></textarea>
         </div>
         <div class="form-group">
             <label>Permission:</label>
-            <input ng-model="workspace.permission" value="read" type="radio"> Read</input>
-            <input ng-model="workspace.permission" value="write" type="radio"> Write</input>
+            <input ng-model="branch.permission" value="read" type="radio"> Read</input>
+            <input ng-model="branch.permission" value="write" type="radio"> Write</input>
         </div>
     </div>
 
