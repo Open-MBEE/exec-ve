@@ -371,6 +371,10 @@ function urlService(baseUrl, jobsUrl) {
         return addTicket(r);
     };
     
+    var setJobsUrl = function(jobUrl) {
+        jobsRoot = jobUrl + ':8080';
+    };
+
     var getJobsURL = function(projectId, refId, machine) {
         return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs', machine) );
     };
@@ -489,6 +493,7 @@ function urlService(baseUrl, jobsUrl) {
         getHtmlToPdfURL: getHtmlToPdfURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
+        setJobsUrl: setJobsUrl,
         getJobsURL: getJobsURL,
         getJobURL: getJobURL,
         getRunJobURL: getRunJobURL,

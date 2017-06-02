@@ -34,6 +34,15 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsJobsLink = function (scope, element, attrs) {
         var ran;
+        var host = $location.host();
+        if (host != 'localhost' || host != '0.0.0.0') {
+            var segments = host.split('-');
+            var env = segments[segments.length-1];
+            URLService.setJobsUrl('https://cae-pma-' + env);
+        } else {
+            //use default pma //TODO need to define env var when running dev
+        }
+        
         scope.jobs = [];
         scope.jobInstances = {};
         scope.editorEnabled = false;
