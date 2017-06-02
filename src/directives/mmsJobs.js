@@ -44,12 +44,13 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         scope.jobInput = {jobName: ''};
         scope.hasRefArr = false;
 
-        var refArrString = $window.localStorage.getItem('refArr');
-        var refArr = JSON.parse(refArrString);
-        if (refArr) {
-            scope.hasRefArr = true;
-            scope.createdRefs = refArr;
-        }
+        // TODO job for creating ref
+        // var refArrString = $window.localStorage.getItem('refArr');
+        // var refArr = JSON.parse(refArrString);
+        // if (refArr) {
+        //     scope.hasRefArr = true;
+        //     scope.createdRefs = refArr;
+        // }
 
         var getJobInstances = function (jobId) {// TODO create porxy in gruntfile for PMA
             var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, $location.host());
@@ -68,7 +69,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
 
         // get all the jobs for current document
         var getJobs = function () {
-            var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, $location.host()); // TODO create porxy in gruntfile for PMA
+            var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, $location.host()); // TODO create var in gruntfile for current server
             // var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, 'opencae-int.jpl.nasa.gov');
             scope.jobs = [];
             scope.loading = true;
@@ -117,7 +118,8 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             scope.runCleared = false;
             var link = URLService.getRunJobURL(scope.mmsProjectId, scope.mmsRefId, id);
             var post = {
-                "mmsServer" : $location.host(), //"opencae-int.jpl.nasa.gov", //TODO create porxy in gruntfile for PMA
+                "mmsServer" : $location.host(),
+                // "mmsServer" : "opencae-int.jpl.nasa.gov", //TODO create porxy in gruntfile for PMA
                 "alfrescoToken" : AuthService.getTicket()
             };
             var jobId = id;
@@ -169,11 +171,12 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             var post = {
                 "jobName" : defaultName,
                 //"command": 'Jenkins,DocWeb,' + id + ',' + project.projectId,
-                "command" : "docweb",
+                "command" : "docgen",
                 // "arguments" : ["arg1","arg2"],
                 "schedule" : thisSchedule,
                 "associatedElementID" : id,
-                "mmsServer" : $location.host(), //"opencae-int.jpl.nasa.gov", //TODO add
+                "mmsServer" : $location.host(), 
+                // "mmsServer": "opencae-int.jpl.nasa.gov", //TODO add
                 "alfrescoToken" : AuthService.getTicket()
             };
 

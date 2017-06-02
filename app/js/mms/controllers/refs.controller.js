@@ -254,8 +254,8 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 growl.success(displayName+" is being created.");
                 growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
                 refArr.push(refJson);
-                var storeArr = refArr.toString();
-                $window.localStorage.setItem('refArr', storeArr); 
+                // var storeArr = refArr.toString();
+                // $window.localStorage.setItem('refArr', storeArr); 
                 $uibModalInstance.close(data); //need to figure out a way to cache this stuff
             }, function(reason) {
                 growl.error("Create "+displayName+" Error: " + reason.message);
