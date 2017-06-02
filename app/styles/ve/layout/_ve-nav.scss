@@ -221,6 +221,10 @@ nav.project-level-header {
   position: relative;
 }
 
+.breadcrumbs #alfUploadLink:hover {
+  text-decoration: underline;
+}
+
 /*------------------------------------------------------------------
   3.3 Dropdowns
 -------------------------------------------------------------------*/

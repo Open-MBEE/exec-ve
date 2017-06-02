@@ -16,7 +16,7 @@
                     <a ui-sref="{{ breadcrumb.link }}">
                         <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
                     </a>
-                    <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a target="_blank" ng-href="{{breadcrumb.alfLink}}">Alfresco</a>)</span>
+                    <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span>
                     <span ng-show="!$last"> &#8250;</span>
                 </li>
             </ul>
