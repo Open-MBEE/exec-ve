@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Service: ElementService', function() {
+describe('Service: ElementService', function() {
 	beforeEach(module('mms'));
 
 	var root = '/alfresco/service';
@@ -17,6 +17,7 @@ xdescribe('Service: ElementService', function() {
 	beforeEach(inject(function($injector) {
 		$httpBackend 			= $injector.get('$httpBackend');
 		mockURLService			= $injector.get('URLService');
+		mockUtilsService		= $injector.get('UtilsService');
 		mockCacheService		= $injector.get('CacheService');
 		mockHttpService			= $injector.get('HttpService');
 		mockApplicationService	= $injector.get('ApplicationService');
@@ -415,7 +416,7 @@ xdescribe('Service: ElementService', function() {
 		// });
 	});
 
-	xdescribe('getElementForEdit', function() {
+	describe('getElementForEdit', function() {
 		it('should get an element', function() {
 			var elemOb;
 			var testElem = {
@@ -424,18 +425,18 @@ xdescribe('Service: ElementService', function() {
 				refId: 'master',
 				commitId: 'latest'
 			};
-			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements').respond(
-				function(method, url, data) {
-					return [200, elements];
-				}
-			);
+			// $httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(200, testElem);
+			
+			var key = mockUtilsService.makeElementKey(testElem);
+			var val = mockCacheService.put(key, testElem);
+
 			ElementServiceObj.getElementForEdit(testElem).then(function(data) {
 				elemOb = data;
 			}, function(reason) {
 				elemOb = reason.message;
 			});
 			$httpBackend.flush();
-			expect(elemOb).toEqual(result);
+			expect(elemOb).toEqual(testElem);
 		});
 	});
 
@@ -623,9 +624,21 @@ xdescribe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('getElementKey', function() {
+	describe('getElementKey', function() {
 		it('should get an element', function() {
-
+			var elemOb = {
+				projectId: "someprojectid",
+				elementId: "getelementhistory",
+				refId: "master",
+				commitId: "latest"
+			};
+			var genKey = mockUtilsService.makeElementKey(elemOb);
+			ElementServiceObj.getElementKey(elemOb).then(function(data) {
+				elemKey = data;
+			}, function(reason) {
+				elemKey = reason.message;
+			});
+			expect(elemKey).toEqual(genKey);
 		});
 	});
 
