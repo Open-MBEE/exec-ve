@@ -206,7 +206,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 var branchObj = {"name": $scope.branch.name, "type": "Branch", 
                                 "description": $scope.branch.description};
                 branchObj.parentRefId = $scope.createParentRefId;
-                branchObj.permission = $scope.workspace.permission;
+                branchObj.permission = $scope.branch.permission;
                 branchObj.id = ApplicationService.createUniqueId();
                 promise = ProjectService.createRef( branchObj, projectOb.id );
                 refJson = {
