@@ -262,18 +262,18 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
         scope.addValue = function(type) {
             if (type === 'LiteralBoolean')
-                scope.editValues.push({type: type, value: false});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralInteger')
-                scope.editValues.push({type: type, value: 0});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralString')
-                scope.editValues.push({type: type, value: ''});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralReal')
-                scope.editValues.push({type: type, value: 0.0});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
         };
         scope.addValueType = 'LiteralString';
         
         scope.addEnumerationValue = function() {
-          scope.editValues.push({type: "InstanceValue", instanceId: scope.options[0]});
+          scope.editValues.push(UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id}));
         };
 
         scope.removeVal = function(i) {
