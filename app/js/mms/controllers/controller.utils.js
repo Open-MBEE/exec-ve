@@ -515,13 +515,16 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             var childPromises = [];
             var childNodes = [];
+            var processedChildViews = [];
             for (i = 0; i < childIds.length; i++) {
                 var child = mapping[childIds[i]];
-                if (child) { //what if not found??
+                if (child && UtilsService.isView(child)) { //what if not found??
                     childPromises.push(handleChildViews(child, childAggrs[i], projectId, refId, curItemFunc, childrenFunc, seenViews));
                     childNodes.push(curItemFunc(child, childAggrs[i]));
+                    processedChildViews.push({id: child.id, aggregation: childAggrs[i]});
                 }
             }
+            v._childViews = processedChildViews;
             childrenFunc(curItem, childNodes);
             $q.all(childPromises).then(function(childNodes) {
                 deferred.resolve(curItem);
