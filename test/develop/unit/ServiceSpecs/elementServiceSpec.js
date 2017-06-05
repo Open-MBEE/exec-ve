@@ -1,8 +1,7 @@
 'use strict';
 
 describe('Service: ElementService', function() {
-	beforeEach(module('mms'));
-
+	
 	var root = '/alfresco/service';
 	var $httpBackend;
 	var mockURLService, mockUtilsService, mockCacheService, mockHttpService, mockApplicationService;
@@ -14,14 +13,17 @@ describe('Service: ElementService', function() {
 	var result = {};
 	var elementHistory;
 
-	beforeEach(inject(function($injector) {
-		$httpBackend 			= $injector.get('$httpBackend');
-		mockURLService			= $injector.get('URLService');
-		mockUtilsService		= $injector.get('UtilsService');
-		mockCacheService		= $injector.get('CacheService');
-		mockHttpService			= $injector.get('HttpService');
-		mockApplicationService	= $injector.get('ApplicationService');
-		ElementServiceObj		= $injector.get('ElementService');
+	beforeEach(module('mms'));
+	beforeEach(function() {
+		inject(function($injector) {
+			$httpBackend 			= $injector.get('$httpBackend');
+			mockURLService			= $injector.get('URLService');
+			mockUtilsService		= $injector.get('UtilsService');
+			mockCacheService		= $injector.get('CacheService');
+			mockHttpService			= $injector.get('HttpService');
+			mockApplicationService	= $injector.get('ApplicationService');
+			ElementServiceObj		= $injector.get('ElementService');
+		});
 
 		projects = {
 			projects: [
@@ -249,30 +251,36 @@ describe('Service: ElementService', function() {
 			_projectId 					: "heyaproject"
 		}
 
-		//GETELEMENTHISTORY:
-		elementHistory = {
-			commits: [
-			    {
-			        _created: "2017-04-27T16:23:44.357-0700",
-			        _creator: "admin",
-			        id: "someid1"
-			    },
-			    {
-			        _created: "2017-04-27T16:23:26.081-0700",
-			        _creator: "admin",
-			        id: "someid2"
-			    },
-			    {
-			        _created: "2017-04-27T16:23:06.540-0700",
-			        _creator: "admin",
-			        id: "someid3"
-			    }
-			]
-		}
+		// //GETELEMENTHISTORY:
+		// elementHistory = {
+		// 	commits: [
+		// 	    {
+		// 	        _created: "2017-04-27T16:23:44.357-0700",
+		// 	        _creator: "admin",
+		// 	        id: "someid1"
+		// 	    },
+		// 	    {
+		// 	        _created: "2017-04-27T16:23:26.081-0700",
+		// 	        _creator: "admin",
+		// 	        id: "someid2"
+		// 	    },
+		// 	    {
+		// 	        _created: "2017-04-27T16:23:06.540-0700",
+		// 	        _creator: "admin",
+		// 	        id: "someid3"
+		// 	    }
+		// 	]
+		// }
 
-		$httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, elementHistory);
+		// $httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, elementHistory);
 				
-	}));
+	});
+
+
+    afterEach(function () {
+        $httpBackend.verifyNoOutstandingExpectation();
+ 	    $httpBackend.verifyNoOutstandingRequest();
+    });
 
 	describe('getElement', function() { //problem with MMS with this, MMS-741
 		it('should get an element that is not in the cache', function() {
@@ -430,7 +438,7 @@ describe('Service: ElementService', function() {
 			
 			var key = mockUtilsService.makeElementKey(testElem);
 			var val = mockCacheService.put(key, testElem);
-			console.log(mockCacheService.get(key));
+			// console.log(mockCacheService.get(key));
 
 			ElementServiceObj.getElementForEdit(testElem).then(function(data) {
 				elemOb = data;
@@ -469,12 +477,12 @@ describe('Service: ElementService', function() {
 				_refId: 'master',
 				_commitId: 'latest'
 			};
-			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', testElem).respond(201, '');
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(201, '');
 			var testElem = {
-				_projectId: "heyaproject",
-				id: "heyanelement",
-				_refId: 'master',
-				_commitId: 'latest'
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
 			};
 			ElementServiceObj.updateElement(testElem, false).then(function(data) {
 				console.log("hi");
@@ -483,7 +491,7 @@ describe('Service: ElementService', function() {
 				console.log("hi you failed");
 				elemOb = reason.message;
 			});
-			console.log("hi after" + elemOb);
+			console.log("hi after: " + elemOb);
 			expect(elemOb).toEqual(testElem);
 			$httpBackend.flush();
 		});
@@ -587,7 +595,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	describe('getElementHistory', function() {
+	xdescribe('getElementHistory', function() { //gotta check out that lodash merge ( _.merge )
 		it('should get an element', function() {
 			var elemHistory;
 			var commitHistory = {
@@ -610,6 +618,8 @@ describe('Service: ElementService', function() {
 				]				
 			};
 
+			$httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, commitHistory);
+
 			var elemOb = {
 				projectId: "someprojectid",
 				elementId: "getelementhistory",
@@ -618,38 +628,15 @@ describe('Service: ElementService', function() {
 			};
 
 			ElementServiceObj.getElementHistory(elemOb).then(function(data) {
-				elemHistory = data;
+				// elemHistory = data;
+				console.log("data: " + data);
 			}, function(reason) {
-				elemHistory = reason.message;
+				// elemHistory = reason.message;
+				console.log("reason : " + reason);
+			}). finally(function() {
+				console.log("hey");
 			});
 			expect(elemHistory).toEqual(commitHistory);
-		});
-	});
-
-	xdescribe('getElementKey', function() {
-		it('should get an element', function() {
-			var elemKey; 
-			var serverElemOb = {
-				_projectId: "someprojectid",
-				id: "getelementhistory",
-				_refId: "master",
-				_commitId: "latest"
-			};
-			var elemOb = {
-				projectId: "someprojectid",
-				elementId: "getelementhistory",
-				refId: "master",
-				commitId: "latest",
-				edit: true
-			};
-			var genKey = mockUtilsService.makeElementKey(serverElemOb, serverElemOb.id, true);
-			console.log(genKey);
-			ElementServiceObj.getElementKey(elemOb, elemOb.elementId, elemOb.edit).then(function(data) {
-				elemKey = data;
-			}, function(reason) {
-				elemKey = reason.message;
-			});
-			expect(elemKey).toEqual(genKey);
 		});
 	});
 
