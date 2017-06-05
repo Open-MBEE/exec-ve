@@ -37,7 +37,7 @@ angular.module('mms')
  */
 function urlService(baseUrl) {
     var root = baseUrl;
-    var jobsRoot = 'https://cae-pma-int:8080/';
+    var jobsRoot = 'https://cae-pma-int:8443/';
     var ticket;
     /**
      * @ngdoc method
@@ -367,7 +367,7 @@ function urlService(baseUrl) {
     };
     
     var setJobsUrl = function(jobUrl) {
-        jobsRoot = jobUrl + ':8080/';
+        jobsRoot = jobUrl + ':8443/';
     };
 
     var getJobsURL = function(projectId, refId, machine) {
