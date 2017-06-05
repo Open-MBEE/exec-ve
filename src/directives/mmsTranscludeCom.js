@@ -101,21 +101,9 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 domElement.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
-            var projectId = scope.mmsProjectId;
-            var refId = scope.mmsRefId;
-            var commitId = scope.mmsCommitId;
-            if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = viewVersion.projectId;
-                if (!refId)
-                    refId = viewVersion.refId;
-                if (!commitId)
-                    commitId = viewVersion.commitId;
-            }
-            scope.projectId = projectId;
-            scope.refId = refId ? refId : 'master';
-            scope.commitId = commitId ? commitId : 'latest';
+            scope.projectId = scope.mmsProjectId;
+            scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
+            scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
@@ -191,7 +179,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
     return {
         restrict: 'E',
         scope: {
-            mmsElementId: '@mmsEid',
+            mmsElementId: '@',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',

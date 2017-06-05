@@ -12,6 +12,7 @@
 3. Project Level Header
 	3.1 Select Project Dropdown
 	3.2 Breadcrumbs
+  3.3 Dropdowns
 
 -------------------------------------------------------------------*/
 
@@ -220,3 +221,14 @@ nav.project-level-header {
   position: relative;
 }
 
+.breadcrumbs #alfUploadLink:hover {
+  text-decoration: underline;
+}
+
+/*------------------------------------------------------------------
+  3.3 Dropdowns
+-------------------------------------------------------------------*/
+
+.project-level-header .ve-dark-dropdown-nav ul.dropdown-menu{
+  width:300px;
+}

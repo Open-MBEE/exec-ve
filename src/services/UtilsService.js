@@ -14,6 +14,7 @@ angular.module('mms')
 function UtilsService($q, $http, CacheService, URLService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
+    var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
         '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
     var CLASS_ELEMENT_TEMPLATE = {
@@ -68,6 +69,20 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         deploymentIds: [],
         slotIds: [],
         stereotypedElementId: null
+    };
+    var VALUESPEC_ELEMENT_TEMPLATE = {
+        visibility: "public",
+        documentation: "",
+        mdExtensionsIds: [ ],
+        appliedStereotypeInstanceId: null,
+        templateParameterId: null,
+        clientDependencyIds: [ ],
+        syncElementId: null,
+        name: "",
+        typeId: null,
+        supplierDependencyIds: [ ],
+        _appliedStereotypeIds: [ ],
+        nameExpression: null
     };
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -379,7 +394,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                     } else if (thing.type === 'List') {
                         result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
-                        result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
+                        //todo use mmsCf
+                        result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                     }
                     result.push('</div>');
                 }
@@ -409,7 +425,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 } else if (thing.type === 'List') {
                     result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
+                    result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                 }
                 result.push('</div>');
             }
@@ -434,9 +450,10 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             t = 'val';
         }
         if (para.nonEditable) {
-            attr = ' data-non-editable="' + para.nonEditable + '"';
+            attr = ' non-editable="' + para.nonEditable + '"';
         }
-        return '<mms-transclude-' + t + ' mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
+        //TODO update these to match mmsCF
+        return '<mms-cf mms-cf-type="' + t + '" mms-element-id="' + para.source + '"' + attr + '></mms-cf>';
     };
 
     var makeHtmlTOC = function (tree) {
@@ -542,7 +559,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             var cap2 = el.find('.mms-equation-caption');
             cap2.html(equationCap);
             if (cap2.length === 0) {
-                el.find('mms-view-equation > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
+                el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
@@ -689,11 +706,19 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         Object.assign(o, obj);
         return o;
     };
+
+    var createValueSpecElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(VALUESPEC_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
     return {
         VIEW_SID: VIEW_SID,
         DOCUMENT_SID: DOCUMENT_SID,
+        BLOCK_SID: BLOCK_SID,
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
+        createValueSpecElement: createValueSpecElement,
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,

@@ -2,7 +2,7 @@
 <div class="modal-body transclude-modal">
     <div class="transclude-modal-input">
         <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
-            <div class="form-search input-group">
+            <div class="form-search input-group ve-search">
                 <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" autofocus/>
                 <span class="input-group-btn">                
                     <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
@@ -52,7 +52,7 @@
             <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
-                <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-eid="{{elem.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></a>
+                <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
             </div>
             <div class="elem-type-wrapper">
                 <label>LAST MODIFIED</label>
@@ -79,7 +79,7 @@
             <div class="elem-type-wrapper">
                 <label>STEREOTYPES</label>
                 <div ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
-                    <mms-transclude-name mms-eid="{{type}}" no-click="true" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name>
+                    <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
                 </div>
             </div>
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
@@ -113,13 +113,13 @@
                     </div>
                 </a>
             </div>
-            <div ng-if="elem._properties[0]" class="elem-properties-wrapper">
+            <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
                 <label>PROPERTIES</label>
                 <table>
                     <tbody>
                         <tr ng-repeat="row in elem._properties2">
                             <td ng-repeat="property in row">
-                                {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-eid="{{property.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>: 
+                                {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
                                 <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
                             </td>
                         </tr>
@@ -130,7 +130,7 @@
                 <label>RELATED DOCUMENTS</label>
                 <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
                     <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="project.ref.document.view({documentId: relatedDocument.id, viewId: relatedView.id, projectId: relatedDocument._projectId, refId: relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
-                        <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-did="{{relatedDocument.id}}" mms-vid="{{relatedDocument.id}}"></mms-view-link> > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-did="{{relatedDocument.id}}" mms-vid="{{relatedView.id}}"></mms-view-link><br/>
+                        <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}"></mms-view-link> > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}"></mms-view-link><br/>
                     </a>
                 </div>
             </div>
