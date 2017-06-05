@@ -1,172 +1,214 @@
 'use strict';
 
-xdescribe('mmsTranscludeVal directive', function () {
-    var scope; //scope when directive is called
-    jasmine.getFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
-    jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
-    var element; //dom element mms-transclude-name
+describe('Directive: mmsView', function () {
+    var scope,
+        element;
+    var $httpBackend;
     var $rootScope,
-        $compile,
-        CacheService,
-        UtilsService,
-        $httpBackend;
+        $compile;
+
+    beforeEach(module('mms.directives'));
+    beforeEach(module('mms'));
 
     beforeEach(function () {
-        module('mms.directives');
-        module('mms');
         inject(function ($injector) {
             $rootScope = $injector.get('$rootScope');
             $compile = $injector.get('$compile');
             $httpBackend = $injector.get('$httpBackend');
-            CacheService = $injector.get('CacheService');
-            UtilsService = $injector.get('UtilsService');
             scope = $rootScope.$new();
-            var tableJson = getJSONFixture('UtilsService/makeHtmlTable.json');
 
-            // This is regular view that contains a single element as a document
-            var testElement = {
-                elements: [{
-                    name: "Test Element",
-                    sysmlId: "8008",
-                    _modified: "2016-05-25T12:16:06.856-0700",
-                    _modifier: "catTester",
-                    documentation: '<mms-transclude-doc mms-eid="301"></mms-transclude-doc>',
-                    type: "Class",
-                    _contents: {
-                        valueExpression: null,
-                        operand: [{
-                            valueExpression: null,
-                            type: "InstanceValue",
-                            instanceId: "301"
-                        }],
-                        type: "Expression"
-                    },
-                    _view2view: [{childrenViews: [], id: "301"}]
-                }]
-            };
-
-            // This element reference another document
-            var element301 = {
-                elements: [{
-                    name: "301 Element",
-                    sysmlId: "301",
-                    documentation: '<mms-transclude-doc data-mms-eid="302"></mms-transclude-doc>',
-                    specification: {
-                        valueExpression: null,
-                        value: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
-                        type: "LiteralString"
-                    },
-                    classifierIds: ["Classify this!"],
-                    type: "InstanceSpecification",
-                    isMetatype: false
-                }]
-            };
-
-            var element302 = {
-                elements: [{
-                    name: "302 Element",
-                    sysmlId: "302",
-                    documentation: 'Omg I have this working\!\!\!\!',
-                    _appliedStereotypeIds: ["How Meta...."],
-                    specification: {
-                        valueExpression: null,
-                        value: "{\"sourceProperty\":\"documentation\",\"source\":\"302\",\"type\":\"Paragraph\"}",
-                        type: "LiteralString"
-                    },
-                    classifierIds: ["Too Classy for you"],
-                    type: "InstanceSpecification"
-                }]
-            };
-
-            var sectionView = {
-                elements: [{
-                    name: "Section View Element",
-                    sysmlId: "sectionView",
-                    _modified: "2016-05-25T12:16:06.856-0700",
-                    _modifier: "catTester",
-                    documentation: '<mms-tansclude-doc mms-eid="sectionElement"></mms-tansclude-doc>',
-                    type: "Class",
-                    _contents: {
-                        valueExpression: null,
-                        operand: [{
-                            valueExpression: null,
-                            type: "InstanceValue",
-                            instanceId: "sectionElement"
-                        }],
-                        type: "Expression"
+            var element = {
+                _allowedElements: [],
+                _modifier: "merp",
+                powertypeExtentIds: [],
+                representationId: null,
+                mdExtensionsIds: [],
+                _qualifiedId: "/opencae/someprojectid/someprojectid_pm/holding_bin_someprojectid/someelementid",
+                templateBindingIds: [],
+                appliedStereotypeInstanceId: "someappliedid",
+                templateParameterId: null,
+                ownerId: "someownerid",
+                isActive: false,
+                type: "Class",
+                isLeaf: false,
+                clientDependencyIds: [],
+                useCaseIds: [],
+                syncElementId: null,
+                classifierBehaviorId: null,
+                interfaceRealizationIds: [],
+                id: "someelementid",
+                _elasticId: "someelasticid",
+                _refId: "master",
+                supplierDependencyIds: [],
+                _modified: "2017-05-18T14:02:18.497-0700",
+                _appliedStereotypeIds: [
+                    "somestereotypeid"
+                ],
+                nameExpression: null,
+                ownedAttributeIds: [
+                    "someownedid"
+                ],
+                packageImportIds: [],
+                visibility: null,
+                substitutionIds: [],
+                documentation: "",
+                _qualifiedName: "//OpenCAE/Data/holding_bin/VE TEST",
+                redefinedClassifierIds: [],
+                _editable: true,
+                _contents: {
+                type: "Expression",
+                operand: [
+                  {
+                    instanceId: "instanceid1",
+                    type: "InstanceValue"
+                  },
+                  {
+                    instanceId: "instanceid2",
+                    type: "InstanceValue"
+                  },
+                  {
+                    instanceId: "instanceid3",
+                    type: "InstanceValue"
+                  },
+                  {
+                    instanceId: "instanceid4",
+                    type: "InstanceValue"
+                  },
+                  {
+                    instanceId: "instanceid5",
+                    type: "InstanceValue"
+                  },
+                  {
+                    instanceId: "instanceid6",
+                    type: "InstanceValue"
+                  },
+                  {
+                    instanceId: "instanceid7",
+                    type: "InstanceValue"
+                  }
+                ]
+                  },
+                  isAbstract: false,
+                  _commitId: "latest",
+                  _childViews: [
+                    {
+                      "aggregation": "composite",
+                      "id": "childid1"
                     }
-                }]
+                  ],
+                  generalizationIds: [],
+                  _displayedElementIds: [
+                    "somedisplayedid"
+                  ],
+                  _creator: "admin",
+                  ownedOperationIds: [],
+                  _created: "2017-04-27T16:22:52.518-0700",
+                  name: "This is a Name",
+                  elementImportIds: [],
+                  collaborationUseIds: [],
+                  isFinalSpecialization: false,
+                  _projectId: "someprojectid"                 
             };
 
-            var sectionElement = {
-                elements: [{
-                    name: "Section Element",
-                    sysmlId: "sectionElement",
-                    documentation: 'Super Sleezy Secular Section',
-                    _appliedStereotypeIds: ["How Meta...."],
-                    specification: {
-                        valueExpression: null,
+            var testElements = {
+                elements: [
+                    {
+                        _allowedElements: [],
+                        _modifier: "merp",
+                        powertypeExtentIds: [],
+                        representationId: null,
+                        mdExtensionsIds: [],
+                        _qualifiedId: "/opencae/someprojectid/someprojectid_pm/holding_bin_someprojectid/someelementid",
+                        templateBindingIds: [],
+                        appliedStereotypeInstanceId: "someappliedid",
+                        templateParameterId: null,
+                        ownerId: "someownerid",
+                        isActive: false,
+                        type: "Class",
+                        isLeaf: false,
+                        clientDependencyIds: [],
+                        useCaseIds: [],
+                        syncElementId: null,
+                        classifierBehaviorId: null,
+                        interfaceRealizationIds: [],
+                        id: "someelementid",
+                        _elasticId: "someelasticid",
+                        _refId: "master",
+                        supplierDependencyIds: [],
+                        _modified: "2017-05-18T14:02:18.497-0700",
+                        _appliedStereotypeIds: [
+                            "somestereotypeid"
+                        ],
+                        nameExpression: null,
+                        ownedAttributeIds: [
+                            "someownedid"
+                        ],
+                        packageImportIds: [],
+                        visibility: null,
+                        substitutionIds: [],
+                        documentation: "",
+                        _qualifiedName: "//OpenCAE/Data/holding_bin/VE TEST",
+                        redefinedClassifierIds: [],
+                        _editable: true,
+                        _contents: {
                         type: "Expression",
-                        operand: [{
-                            valueExpression: null,
-                            type: "InstanceValue",
-                            instanceId: "tableElement"
-                        }]
-                    },
-                    classifierIds: ["_17_0_5_1_407019f_1430628211976_255218_12002"],
-                    type: "InstanceSpecification"
-                }]
+                        operand: [
+                          {
+                            instanceId: "instanceid1",
+                            type: "InstanceValue"
+                          },
+                          {
+                            instanceId: "instanceid2",
+                            type: "InstanceValue"
+                          },
+                          {
+                            instanceId: "instanceid3",
+                            type: "InstanceValue"
+                          },
+                          {
+                            instanceId: "instanceid4",
+                            type: "InstanceValue"
+                          },
+                          {
+                            instanceId: "instanceid5",
+                            type: "InstanceValue"
+                          },
+                          {
+                            instanceId: "instanceid6",
+                            type: "InstanceValue"
+                          },
+                          {
+                            instanceId: "instanceid7",
+                            type: "InstanceValue"
+                          }
+                        ]
+                          },
+                          isAbstract: false,
+                          _commitId: "latest",
+                          _childViews: [
+                            {
+                              "aggregation": "composite",
+                              "id": "childid1"
+                            }
+                          ],
+                          generalizationIds: [],
+                          _displayedElementIds: [
+                            "somedisplayedid"
+                          ],
+                          _creator: "admin",
+                          ownedOperationIds: [],
+                          _created: "2017-04-27T16:22:52.518-0700",
+                          name: "This is a Name",
+                          elementImportIds: [],
+                          collaborationUseIds: [],
+                          isFinalSpecialization: false,
+                          _projectId: "someprojectid"
+                    }
+                ]
             };
 
-            var tableElement = {
-                elements: [{
-                    name: "Table Element",
-                    sysmlId: "tableElement",
-                    documentation: 'This is a table element\!',
-                    _appliedStereotypeIds: ["How Meta...."],
-                    specification: {
-                        // string: tableJson,
-                        value: JSON.stringify(tableJson),
-                        type: "LiteralString"
-                    },
-                    classifierIds: ["_17_0_5_1_407019f_1430628178633_708586_11903"],
-                    type: "InstanceSpecification"
-                }]
-            };
-
-
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/8008/).respond(200, testElement);
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/301/).respond(200, element301);
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/302/).respond(200, element302);
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/sectionView/).respond(200, sectionView);
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/sectionElement/).respond(200, sectionElement);
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/tableElement/).respond(200, tableElement);
-
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/views\/8008\/elements/).respond(200,
-                {elements: [element301.elements[0]]}
-            );
-
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/views\/sectionView\/elements/).respond(200,
-                {elements: [sectionElement.elements[0], tableElement.elements[0]]}
-            );
-
-            var cacheKey = UtilsService.makeElementKey(testElement.elements[0].sysmlId, 'master', 'latest', false);
-            CacheService.put(cacheKey, testElement.elements[0]);
-
-            cacheKey = UtilsService.makeElementKey(element301.elements[0].sysmlId, 'master', 'latest', false);
-            CacheService.put(cacheKey, element301.elements[0]);
-
-            cacheKey = UtilsService.makeElementKey(element302.elements[0].sysmlId, 'master', 'latest', false);
-            CacheService.put(cacheKey, element302.elements[0]);
-
-            cacheKey = UtilsService.makeElementKey(sectionView.elements[0].sysmlId, 'master', 'latest', false);
-            CacheService.put(cacheKey, sectionView.elements[0]);
-
-            cacheKey = UtilsService.makeElementKey(sectionElement.elements[0].sysmlId, 'master', 'latest', false);
-            CacheService.put(cacheKey, sectionElement.elements[0]);
-
-            cacheKey = UtilsService.makeElementKey(tableElement.elements[0].sysmlId, 'master', 'latest', false);
-            CacheService.put(cacheKey, tableElement.elements[0]);
+            $httpBackend.when('GET', '/alfresco/service/projects/someprojectid/refs/master/elements').respond(200, testElements);
+            $httpBackend.when('GET', '/alfresco/service/projects/someprojectid/refs/master/elements/someelementid').respond(200, element);
 
         });
     });
@@ -176,45 +218,20 @@ xdescribe('mmsTranscludeVal directive', function () {
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('mmsView should transclude a basic view', inject(function () {
+    it('mmsView should transclude a basic view', function () {
+        scope.api = $rootScope.viewApi;
         scope.view = {
-            sysmlid: "8008",
-            sectionNumber: "3241",
-            ws: "master",
-            version: "latest"
+            mmsElementId: "someelementid",
+            mmsProjectId: "someprojectid",
+            mmsRefId: "master",
+            mmsCommitId: "latest",
+            mmsNumber: 930429
         };
-
-        element = angular.element('<mms-view mms-vid="{{view.sysmlid}}" data-mms-section="{{view.sectionNumber}}" mms-version="{{view.version}}" mms-ws="{{view.ws}}" ></mms-view>');
+        element = angular.element('<mms-view mms-element-id="{{view.mmsElementId}}" mms-project-id="{{view.mmsProjectId}}" mms-ref-id="{{view.mmsRefId}}" mms-commit-id="{{view.mmsCommitId}}" mms-number="{{view.mmsViewNumber}}" mms-view-api="api"></mms-view>');
         $compile(element)(scope);
-
         scope.$apply();
         $httpBackend.flush();
-        expect(element.html()).toContain('data-mms-eid="8008"');
-        expect(element.html()).toContain(">Test Element<");
-        expect(element.html()).toContain("Last Modified");
-        expect(element.html()).toContain("by catTester");
-        expect(element.html()).toContain("5/25/16 12:16");
+        expect(element.html()).toContain('div id="someelementid"');
         // console.log(element.html());
-    }));
-
-    it('mmsView should transclude an view section with a table within it', inject(function () {
-        scope.view = {
-            sysmlid: "sectionView",
-            sectionNumber: "666",
-            ws: "master",
-            version: "latest"
-        };
-
-        element = angular.element('<mms-view mms-vid="{{view.sysmlid}}" mms-version="{{view.version}}" mms-ws="{{view.ws}}" ></mms-view>');
-        $compile(element)(scope);
-
-        scope.$apply();
-        $httpBackend.flush();
-        // console.log(element.html());
-        expect(element.html()).toContain('<mms-transclude-name data-mms-eid=\"sectionView\"');
-        expect(element.html()).toContain(">Section View Element<");
-        expect(element.html()).toContain("<mms-view-section data-mms-section=\"presentationElem\"");
-        expect(element.html()).toContain("<div id=\"tableElement\" ng-if=\"\!presentationElemLoading\"");
-        expect(element.html()).toContain("<mms-view-table data-mms-table=\"presentationElem\"");
-    }));
+    });
 });

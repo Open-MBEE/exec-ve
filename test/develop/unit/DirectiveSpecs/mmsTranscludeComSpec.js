@@ -1,45 +1,64 @@
-xdescribe('mmsTranscludeCom directive', function () {
-    var scope; //scope when directive is called
-    var element; //dom element mms-transclude-name
-    var $rootScope, $compile, CacheService, UtilsService, $httpBackend, requestHandler;
+'use strict';
 
+xdescribe('Directive: mmsTranscludeCom', function () {
+    var scope,
+        element; 
+    var $httpBackend;
+    var $rootScope, 
+        $compile;
+    var mockCacheService, 
+        mockUtilsService;
+
+    beforeEach(module('mms'));
+    beforeEach(module('mms.directives'));
     beforeEach(function () {
-        module('mms.directives');
         inject(function ($injector) {
             $rootScope   = $injector.get('$rootScope');
             $compile     = $injector.get('$compile');
             $httpBackend = $injector.get('$httpBackend');
-            CacheService = $injector.get('CacheService');
-            UtilsService = $injector.get('UtilsService');
+            mockCacheService = $injector.get('CacheService');
+            mockUtilsService = $injector.get('UtilsService');
             scope        = $rootScope.$new();
-
-            scope.version    = "latest";
-            scope.editValues = [43, 42, 55, 2532];
-            scope.view       = {
-                sysmlId: '_hidden_MMS_1472586299682_1122c2aa-9cab-41a9-b0b4-4a1fd9a9882f_pei',
-                name   : 'merpity'
-            };
-            scope.panelType  = "Comment";
         });
-    });
 
-    it('mmsTranscludeCom should translude a comment within the element', inject(function () {
-        var testElement = {
-            sysmlId      : "_hidden_MMS_1472586299682_1122c2aa-9cab-41a9-b0b4-4a1fd9a9882f_pei",
-            _editable     : true,
-            _creator      : "mmsadmin",
-            name         : "merp",
-            documentation: "<p>Putting some text in here!!!<\/p>\n"
+        var testElement       = {
+            id              : "fifthelementid",
+            _editable       : true,
+            _creator        : "theonetrueadmin",
+            name            : "merp",
+            documentation   : "<p>The rain in Spain falls mainly on the plain.<\/p>\n",
+            _projectId      : "yetanotherprojectid",
+            _refId          : "branchfive",
+            _commitId       : "latest",
+            panelType       : "Comment"
         };
 
-        var cacheKey = UtilsService.makeElementKey(testElement.sysmlId, 'master', 'latest', false);
-        CacheService.put(cacheKey, testElement);
+        $httpBackend.when('GET', '/alfresco/service/projects/' + testElement._projectId + '/refs/' + testElement._refId + '/elements/' + testElement.id).respond(200, testElement);
+    });
 
-        element = angular.element('<mms-transclude-com data-mms-eid="{{view.sysmlId}}"></mms-transclude-com>');
+    afterEach(function() {
+        $httpBackend.verifyNoOutstandingExpectation();
+        $httpBackend.verifyNoOutstandingRequest();
+    });
+
+    it('mmsTranscludeCom should translude a comment within the element', function () {
+        scope.element = {
+            mmsEid: "fifthelementid",
+            mmsRefId: "branchfive",
+            mmsCommitId: "latest",
+            mmsProjectId: "yetanotherprojectid",
+            editable: true     
+        };
+        element = angular.element('<mms-transclude-com mms-eid="{{element.mmsEid}}" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}" mms-commit-id="{{element.mmsCommitId}}"></mms-transclude-com>');
+        console.log("elem: " + element.text());
         $compile(element)(scope);
-        scope.$digest();
+        scope.$apply();
+        expect(element.html()).toContain("The rain in Spain falls mainly on the plain.");
 
-        expect(element.html()).toContain("Putting some text in here!!!");
-        expect(element.html()).toContain("- mmsadmin");
-    }));
+        console.log("text: " + element.html());
+        expect(element.html()).toContain("- theonetrueadmin");
+        $httpBackend.flush();
+    });
 });
+
+//DONE

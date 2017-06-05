@@ -1,153 +1,661 @@
 'use strict';
-/* ElementService Unit Tests: 
- * Includes: test get and update element, update element that results in 
- * server giving back conflict but in fact not a conflict
- * ElementService - gets:
- * getElement
- *   test inProgress - call getElement with the same arguments 2 times before 
- *   server returns, check the returned promise is the same
- *   test nominal getElement, cache gets populated
- * getElements
- *   avoid unnecessary queries - put some elements in cache, call getElements
- *   with new ids and existing ids together, it should only request the new ids 
- *   from server in the put request but include all elements in resolve
- */
 
-xdescribe('ElementService', function() {
+describe('Service: ElementService', function() {
 	beforeEach(module('mms'));
 
-	var ElementService, $httpBackend, $rootScope;
 	var root = '/alfresco/service';
-	var forceEmpty, forceFail, modElements;
-
+	var $httpBackend;
+	var mockURLService, mockUtilsService, mockCacheService, mockHttpService, mockApplicationService;
+	var ElementServiceObj;
+	var projects = {};
+	var ref = {};
+	var refs = {};
+	var elements = {};
+	var result = {};
+	var elementHistory;
 
 	beforeEach(inject(function($injector) {
-		ElementService = $injector.get('ElementService');
-		$httpBackend = $injector.get('$httpBackend');
-		$rootScope = $injector.get('$rootScope');
+		$httpBackend 			= $injector.get('$httpBackend');
+		mockURLService			= $injector.get('URLService');
+		mockUtilsService		= $injector.get('UtilsService');
+		mockCacheService		= $injector.get('CacheService');
+		mockHttpService			= $injector.get('HttpService');
+		mockApplicationService	= $injector.get('ApplicationService');
+		ElementServiceObj		= $injector.get('ElementService');
 
-		forceEmpty = false;
-		forceFail = false;
-		modElements = false;
+		projects = {
+			projects: [
+			    {
+			        _created	: "2017-04-18T14:56:57.635-0700",
+			        _creator	: "gandalf",
+			        _elasticId	: "elasticId",
+			        _modified	: "2017-04-18T14:56:57.635-0700",
+			        _modifier	: "gandalf",
+			        _mounts		: [],
+			        _projectId	: "projectId",
+			        _refId		: "master",
+			        categoryId	: "",
+			        id 			: "hereisanid",
+			        name		: "youshallnotpass",
+			        orgId 		: "minesofmoria",
+			        twcId 		: "",
+			        type 		: "Project",
+			        uri 		: "file:/Users/gandalf/Documents/youshallnotpass.mdzip"
+			    },
+			    {
+			        _created 	: "2017-04-19T11:31:07.968-0700",
+			        _creator	: "admin",
+			        _elasticId	: "elasticId2",
+			        _modified	: "2017-04-19T11:31:07.968-0700",
+			        _modifier	: "admin",
+			        _mounts		: [],
+			        _projectId	: "projectId2",
+			        _refId 		: "master",
+			        categoryId 	: "",
+			        id 			: "hereisanotherid",
+			        name 		: "thelonelymountain",
+			        orgId 		: "Erebor",
+			        twcId 		: "",
+			        type 		: "Project",
+			        uri 		: "file:/Users/admin/Downloads/thelonelymountain.mdzip"
+			    }
+			]
+		}
 
-		// GetElement responses
-		$httpBackend.whenGET(root + '/workspaces/master/elements/12345?timestamp=01-01-2014').respond(
-			{ elements: [ { sysmlId:12345, type:'Comment', _modified: '01-01-2014' } ] } );
-		$httpBackend.whenGET(root + '/workspaces/master/elements/12345').respond( function(method, url, data) {
-			var elements;
-			if (forceEmpty)
-				elements = { elements: [] };
-			else {
-				elements = {elements: [ { sysmlId:12345,  type:'Comment',
-					_modified: '07-30-2014'} ] };
-			}
-			return [200, elements];});
-		$httpBackend.whenGET(root + '/workspaces/master/elements/12346').respond( function(method, url, data) {
-			if (forceFail) {
-				return [500, undefined, {status: {code:500, name:'Internal Error',
-					description:'An error inside the HTTP server which prevented it from fulfilling the request.'}}];
-			} else {
-				return [200, { elements: [ { sysmlId: 12346, type:'Package' } ] } ];
-			}});
+		$httpBackend.when('GET', '/alfresco/service/projects').respond(200, projects);
 
-		// GetElement misc responses
-		$httpBackend.whenGET(root + '/workspaces/master/elements/badId').respond( function(method, url, data) {
-			var error = "[ERROR]: Element with id, badId not found\n[WARNING]: No elements found";
-			return [404, error];});
-		$httpBackend.whenGET(root + '/workspaces/master/elements/emptyId').respond( { elements: [] });
-		$httpBackend.whenGET(root + '/workspaces/master/elements').respond(
-			{elements:[ {sysmlId:12345, name:'commentElement', documentation:'old documentation',
-			type:'Comment'}, {sysmlId:12346, name:'packageElement',
-			type:'Package'}]});
-        $httpBackend.whenPUT(root + '/workspaces/master/elements').respond(
-    		{elements:[ {sysmlId:12345, name:'commentElement', documentation:'old documentation',
-    		type:'Comment'}, {sysmlId:12346, name:'packageElement',
-    		type:'Package'}]});
+		ref = [{
+			_elasticId: "refelastic3",
+			id: "thirdref",
+			name: "thirdref"
+		}]
 
-		$httpBackend.whenGET(root + '/workspaces/master/elements/noSpecialization').respond(
-			{ elements: [ { sysmlId: 'noSpecialization', documentation: 'has no specialization' } ] } );
-		$httpBackend.whenGET(root + '/workspaces/master/elements/operationId').respond(
-			{ elements: [ { sysmlId: 'operationId', type: 'Operation',
-			parameterIds: [ 'paramId', 'paramId2' ], expressionId: 'expressionId'  } ] } );
-		$httpBackend.whenGET(root + '/workspaces/master/elements/productId').respond(
-			{ elements: [ { sysmlId: 'productId', type: 'Class',
-			view2view: [ { sysmlId: 'viewId', childrenViews:[] } ]} ] } );
 
-		// UpdateElement response
-		$httpBackend.whenPOST(root + '/workspaces/master/elements').respond(function(method, url, data) {
-			if (forceEmpty) {
-				return [200, { elements: [] } ];
-			}
-
-			var json = JSON.parse(data);
-			if (json.elements[0].sysmlId === 'badId') {
-				return [500, 'Internal Server Error'];
-			} else {
-				if (json.elements[0]) {
-					if (json.elements[0].type  === 'Pop-Up') {
-						return [400, 'Invalid element type'];
-					}
+		refs = {
+			refs: [
+				{
+					_elasticId: "refelastic1",
+					id: "master",
+					name: "master"
+				},
+				{
+					_elasticId: "refelastic2",
+					id: "secondref",
+					name: "secondref"
 				}
-				if (!json.elements[0].sysmlId) {
-					json.elements[0].sysmlId = json.elements[0].name;
+			]
+		}
+
+		$httpBackend.when('GET', '/alfresco/service/projects/projectId/refs').respond(200, refs);
+
+		elements = {
+			elements: [
+				{
+					_allowedElements			: [],
+					_modifier					: "admin",
+					powertypeExtentIds			: [],
+					representationId			: null,
+					mdExtensionsIds				: [],
+					templateBindingIds			: [],
+					appliedStereotypeInstanceId	: "applid",
+					templateParameterId			: null,
+					isActive					: false,
+					ownerId 					: "ownerid",
+					type 						: "Class",
+					isLeaf 						: false,
+					clientDependencyIds 		: [],
+					_displayedElements 			: ["diselements"],
+					useCaseIds 					: [],
+					syncElementId 				: null,
+					classifierBehaviorId 		: null,
+					interfaceRealizationIds 	: [],
+					id 							: "heyanelement",
+					_elasticId 					: "elasticid",
+					_refId 						: "master",
+					supplierDependencyIds		: [],
+					_modified					: "2017-05-03T10:51:50.270-0700",
+					_appliedStereotypeIds		: ["stereotypeids"],
+					nameExpression				: null,
+					ownedAttributeIds			: ["ownedattr1","ownedattr2","ownedattr3","ownedattr4","ownedattr5"],
+					packageImportIds			: [],
+					visibility					: null,
+					substitutionIds				: [],
+					documentation				: "",
+					redefinedClassifierIds		: [],
+					_editable					: true,
+					isAbstract					: false,
+					_contents:
+						{
+							type: "Expression",
+							operand: [
+								{
+									instanceId: "instanceid",
+									type: "InstanceValue"
+								}
+							]
+						},
+					_commitId: "commitid",
+					_childViews: [
+						{
+							aggregation: "composite",
+							id: "child1"
+						},
+						{
+							aggregation: "composite",
+							id: "child2"
+						},
+						{
+							aggregation: "composite",
+							id: "child3"
+						},
+						{
+							aggregation: "composite",
+							id: "child4"
+						},
+						{
+							aggregation: "composite",
+							id: "child5"
+						}
+					],
+					generalizationIds: [],
+					_creator: "admin",
+					ownedOperationIds: [],
+					_created: "2017-05-01T13:43:19.571-0700",
+					name: "Krabby Patties",
+					elementImportIds: [],
+					collaborationUseIds: [],
+					isFinalSpecialization: false,
+					_projectId: "heyaproject"
 				}
-				return [200, json];
-			} });
+			]
+		}
+
+		$httpBackend.when('GET', '/alfresco/service/projects/projectId/refs/master/elements').respond(200, elements);
+
+		result = {
+			_modifier					: "admin",
+			powertypeExtentIds			: [],
+			representationId			: null,
+			mdExtensionsIds				: [],
+			templateBindingIds			: [],
+			appliedStereotypeInstanceId	: "applid",
+			templateParameterId			: null,
+			isActive					: false,
+			ownerId 					: "ownerid",
+			type 						: "Class",
+			isLeaf 						: false,
+			clientDependencyIds 		: [],
+			_displayedElements 			: ["diselements"],
+			useCaseIds 					: [],
+			syncElementId 				: null,
+			classifierBehaviorId 		: null,
+			interfaceRealizationIds 	: [],
+			id 							: "heyanelement",
+			_elasticId 					: "elasticid",
+			_refId 						: "master",
+			supplierDependencyIds 		: [],
+			_modified 					: "2017-05-03T10:51:50.270-0700",
+			_appliedStereotypeIds 		: ["stereotypeids"],
+			nameExpression 				: null,
+			ownedAttributeIds 			: ["ownedattr1","ownedattr2","ownedattr3","ownedattr4","ownedattr5"],
+			packageImportIds 			: [],
+			visibility 					: null,
+			substitutionIds 			: [],
+			documentation 				: "",
+			redefinedClassifierIds 		: [],
+			_editable 					: true,
+			isAbstract 					: false,
+			_contents:
+				{
+					type: "Expression",
+					operand: [
+						{
+							instanceId: "instanceid",
+							type: "InstanceValue"
+						}
+					]
+				},
+			_commitId 					: "commitid",
+			_childViews: [
+				{
+					aggregation: "composite",
+					id: "child1"
+				},
+				{
+					aggregation: "composite",
+					id: "child2"
+				},
+				{
+					aggregation: "composite",
+					id: "child3"
+				},
+				{
+					aggregation: "composite",
+					id: "child4"
+				},
+				{
+					aggregation: "composite",
+					id: "child5"
+				}
+			],
+			generalizationIds 			: [],
+			_creator 					: "admin",
+			ownedOperationIds 			: [],
+			_created 					: "2017-05-01T13:43:19.571-0700",
+			name 						: "Krabby Patties",
+			elementImportIds 			: [],
+			collaborationUseIds 		: [],
+			isFinalSpecialization 		: false,
+			_projectId 					: "heyaproject"
+		}
+
+		//GETELEMENTHISTORY:
+		elementHistory = {
+			commits: [
+			    {
+			        _created: "2017-04-27T16:23:44.357-0700",
+			        _creator: "admin",
+			        id: "someid1"
+			    },
+			    {
+			        _created: "2017-04-27T16:23:26.081-0700",
+			        _creator: "admin",
+			        id: "someid2"
+			    },
+			    {
+			        _created: "2017-04-27T16:23:06.540-0700",
+			        _creator: "admin",
+			        id: "someid3"
+			    }
+			]
+		}
+
+		$httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, elementHistory);
+				
 	}));
-    describe('ElementService.getElement() method', function() {
-    	it('should get an element not in the cache', inject(function() {
-            ElementService.getElement(12345, undefined, undefined, '01-01-2014').then(function(response) {
-				expect(response.sysmlId).toEqual( 12345 );
-				expect(response.type).toEqual('Comment');
-				expect(response._modified).toEqual( '01-01-2014' );
-			}); //$httpBackend.flush();
 
-    	}));
-    }); //elements: []
-    describe('ElementService.getElements() method', function() {
-        it('should get elements not in the cache', inject(function() {
-            var ids=[];
-            // Couple valid ids
-            ids = ['12345', '12346'];
-            ElementService.getElements(ids, undefined, undefined, undefined).then(function(response) {
-                //console.log(response);
-                expect(response.length).toEqual(2);
+	describe('getElement', function() { //problem with MMS with this, MMS-741
+		it('should get an element that is not in the cache', function() {
+			var elemOb;
+			var testElem = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			var result = {
+					_modifier					: "admin",
+					powertypeExtentIds			: [],
+					representationId			: null,
+					mdExtensionsIds				: [],
+					templateBindingIds			: [],
+					appliedStereotypeInstanceId	: "applid",
+					templateParameterId			: null,
+					isActive					: false,
+					ownerId 					: "ownerid",
+					type 						: "Class",
+					isLeaf 						: false,
+					clientDependencyIds 		: [],
+					_displayedElements 			: ["diselements"],
+					useCaseIds 					: [],
+					syncElementId 				: null,
+					classifierBehaviorId 		: null,
+					interfaceRealizationIds 	: [],
+					id 							: "heyanelement",
+					_elasticId 					: "elasticid",
+					_refId 						: "master",
+					supplierDependencyIds 		: [],
+					_modified 					: "2017-05-03T10:51:50.270-0700",
+					_appliedStereotypeIds 		: ["stereotypeids"],
+					nameExpression 				: null,
+					ownedAttributeIds 			: ["ownedattr1","ownedattr2","ownedattr3","ownedattr4","ownedattr5"],
+					packageImportIds 			: [],
+					visibility 					: null,
+					substitutionIds 			: [],
+					documentation 				: "",
+					redefinedClassifierIds 		: [],
+					_editable 					: true,
+					isAbstract 					: false,
+					_contents:
+						{
+							type: "Expression",
+							operand: [
+								{
+									instanceId: "instanceid",
+									type: "InstanceValue"
+								}
+							]
+						},
+					_commitId 					: "commitid",
+					_childViews: [
+						{
+							aggregation: "composite",
+							id: "child1"
+						},
+						{
+							aggregation: "composite",
+							id: "child2"
+						},
+						{
+							aggregation: "composite",
+							id: "child3"
+						},
+						{
+							aggregation: "composite",
+							id: "child4"
+						},
+						{
+							aggregation: "composite",
+							id: "child5"
+						}
+					],
+					generalizationIds 			: [],
+					_creator 					: "admin",
+					ownedOperationIds 			: [],
+					_created 					: "2017-05-01T13:43:19.571-0700",
+					name 						: "Krabby Patties",
+					elementImportIds 			: [],
+					collaborationUseIds 		: [],
+					isFinalSpecialization 		: false,
+					_projectId 					: "heyaproject"
+			};
+			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(
+				function(method, url, data) {
+					return [200, elements];
+				});
+			ElementServiceObj.getElement(testElem).then(function(data) {
+				elemOb = data;
+			}, function(reason) {
+				elemOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(elemOb).toEqual(result);
+		});
+	});
 
-                expect(response[0].sysmlId).toEqual(12345);
-                expect(response[0].type).toEqual('Comment');
-                //expect(response[0].lastModified).toEqual( '07-30-2014' );
+	describe('getElements', function() {
+		it('should get elements not in the cache', function() {
+			var elemsOb;
+			var testElem = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			
+			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(
+				function(method, url, data) {
+					return [200, elements];
+				});
+			ElementServiceObj.getElement(testElem).then(function(data) {
+				elemsOb = data;
+			}, function(reason) {
+				elemsOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(elemsOb).toEqual(result);
+		});
+	});
 
-                expect(response[1].sysmlId).toEqual(12346);
-                expect(response[1].type).toEqual( 'Package');
-            }); //$httpBackend.flush();
+	xdescribe('cacheElement', function() { //redundant test?
+		// it('should cache an element', function() {
+		// 	var elemOb;
+		// 	var testElem = {
+		// 		projectId: "heyaproject",
+		// 		elementId: "heyanelement",
+		// 		refId: 'master',
+		// 		commitId: 'latest'
+		// 	};
+		// 	ElementServiceObj.cacheElement(testElem).then(function(data) {
 
-        }));
-    });
-    describe('ElementService.updateElement() method', function() {  //--talk to doris
-        it('should update a element not in the cache without passing a workspace', inject(function() {
-            var elem = { sysmlId: '12345', _modified:'never' };
-    		ElementService.updateElement(elem, undefined).then(function(response) {
-    			expect(response).toEqual(elem);
-    		});
-            ElementService.getElement(12345).then(function(response) {
-				expect(response._modified).toEqual( 'never' );
-			}); //$httpBackend.flush();
-        }));
-    });
-		
-		describe('ElementService.getIdInfo() method', function () {
-        var element = getJSONFixture('UtilsService/getIdInfo.json'); //TODO move json to ElementService mock data
-        it('should generate a new element with holdingBin, projectId, siteId, and projectName', inject(function () {
-            var result = ElementService.getIdInfo(element, "MERP");
-            expect(result).toBeDefined();
+		// 	}, function(reason) {
+		// 		elemOb = reason.message;
+		// 	});
+		// 	httpBackend.flush();
+		// 	expect().toEqual();
+		// });
+	});
 
-            var baseline = {
-                holdingBinId: null,
-                projectId   : 'test-site_no_project',
-                siteId      : 'test-site',
-                projectName : null
-            };
-            expect(JSON.stringify(baseline)).toMatch(JSON.stringify(result["$$state"]["value"]));
-        }));
-    });
-});
+	xdescribe('getElementForEdit', function() {
+		it('should get an element', function() {
+			var elemOb;
+			var testElem = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			// $httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements').respond(200, elements.elements);
+			// $httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(200, testElem);
+			
+			var key = mockUtilsService.makeElementKey(testElem);
+			var val = mockCacheService.put(key, testElem);
+			console.log(mockCacheService.get(key));
+
+			ElementServiceObj.getElementForEdit(testElem).then(function(data) {
+				elemOb = data;
+			}, function(reason) {
+				elemOb = reason.message;
+			});
+			// $httpBackend.flush();
+			expect(elemOb).toEqual(testElem);
+		});
+	});
+
+	xdescribe('getOwnedElements', function() {
+		it('should get an elements owned element objects', function() {
+
+		});
+	});
+
+	xdescribe('getGenericElements', function() {
+		it('should get an element', function() {
+
+		});
+	});
+
+	xdescribe('fillInElement', function() {
+		it('should get an element', function() {
+
+		});
+	});
+
+	xdescribe('updateElement', function() {
+		it('it should save an element to MMS and update the cache if successful', function() {
+			var elemOb = null;
+			var testElem = {
+				_projectId: "heyaproject",
+				id: "heyanelement",
+				_refId: 'master',
+				_commitId: 'latest'
+			};
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', testElem).respond(201, '');
+			var testElem = {
+				_projectId: "heyaproject",
+				id: "heyanelement",
+				_refId: 'master',
+				_commitId: 'latest'
+			};
+			ElementServiceObj.updateElement(testElem, false).then(function(data) {
+				console.log("hi");
+				elemOb = 'hey';
+			}, function(reason) {
+				console.log("hi you failed");
+				elemOb = reason.message;
+			});
+			console.log("hi after" + elemOb);
+			expect(elemOb).toEqual(testElem);
+			$httpBackend.flush();
+		});
+	});
+
+	xdescribe('updateElements', function() {
+		it('should get an element', function() {
+
+		});
+	});
+
+	xdescribe('createElement', function() {
+		it('should get an element', function() {
+
+		});
+	});
+
+	xdescribe('createElements', function() {
+		it('should get an element', function() {
+
+		});
+	});
+
+	xdescribe('isCacheOutdated', function() {
+		it('should get an element', function() {
+
+		});
+	});
+
+	xdescribe('search', function() {
+		it('should get an element', function() {
+			var searchText = 'krabby patties';
+
+			var q = {
+				id: searchText
+			};
+			var q2 = {
+				query: searchText,
+				fields: ["defaultValue.value", "value.value", "specification.value", "name", "documentation"]
+			};
+			var allQuery = {
+				multi_match: q2
+			};
+			var idQuery = {
+				term: q
+			};
+			var mainQuery = {
+               "bool": {
+                    "should": [
+                        idQuery,
+                        allQuery
+                    ]
+                }				
+			};
+			var q3 = {
+				_projectId: ["heyaproject"]
+			}
+			var projectTermsOb = {
+				terms: q3
+			}
+			var mainBoolQuery =[];
+			mainBoolQuery.push(mainQuery, projectTermsOb);
+			var queryOb = { //assuming searchType is 'all'
+                "sort" : [
+                    "_score",
+                    { "_modified" : {"order" : "desc"}}
+                ],
+                "query": {
+                    "bool": {
+                        "must": mainBoolQuery
+                    }
+                },
+                "from": 21,
+                "size": 20
+			};
+			var testElem = {
+				_projectId: "heyaproject",
+				_refId: 'master'
+			};
+			var resultElem = {
+				_projectId: "heyaproject",
+				id: "heyanelement",
+				_refId: 'master',
+				_commitId: 'latest'
+			};
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master?search=' + searchText).respond(201, resultElem);
+			var reqOb = {
+				projectId: "heyaproject",
+				elementId: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+			var elemOb = null;
+			ElementServiceObj.search(reqOb, queryOb, null, null, null).then(function(data) {
+				elemOb = data;
+			}, function(reason) {
+				elemOb = reason.message;
+			});
+			expect(elemOb).toEqual(resultElem);
+			$httpBackend.flush();
+		});
+	});
+
+	describe('getElementHistory', function() {
+		it('should get an element', function() {
+			var elemHistory;
+			var commitHistory = {
+				commits: [
+				    {
+				        _created: "2017-04-27T16:23:44.357-0700",
+				        _creator: "admin",
+				        id: "someid1"
+				    },
+				    {
+				        _created: "2017-04-27T16:23:26.081-0700",
+				        _creator: "admin",
+				        id: "someid2"
+				    },
+				    {
+				        _created: "2017-04-27T16:23:06.540-0700",
+				        _creator: "admin",
+				        id: "someid3"
+				    }
+				]				
+			};
+
+			var elemOb = {
+				projectId: "someprojectid",
+				elementId: "getelementhistory",
+				refId: "master",
+				commitId: "latest"
+			};
+
+			ElementServiceObj.getElementHistory(elemOb).then(function(data) {
+				elemHistory = data;
+			}, function(reason) {
+				elemHistory = reason.message;
+			});
+			expect(elemHistory).toEqual(commitHistory);
+		});
+	});
+
+	xdescribe('getElementKey', function() {
+		it('should get an element', function() {
+			var elemKey; 
+			var serverElemOb = {
+				_projectId: "someprojectid",
+				id: "getelementhistory",
+				_refId: "master",
+				_commitId: "latest"
+			};
+			var elemOb = {
+				projectId: "someprojectid",
+				elementId: "getelementhistory",
+				refId: "master",
+				commitId: "latest",
+				edit: true
+			};
+			var genKey = mockUtilsService.makeElementKey(serverElemOb, serverElemOb.id, true);
+			console.log(genKey);
+			ElementServiceObj.getElementKey(elemOb, elemOb.elementId, elemOb.edit).then(function(data) {
+				elemKey = data;
+			}, function(reason) {
+				elemKey = reason.message;
+			});
+			expect(elemKey).toEqual(genKey);
+		});
+	});
+
+	xdescribe('reset', function() {
+		it('should get an element', function() {
+
+		});
+	});
+})

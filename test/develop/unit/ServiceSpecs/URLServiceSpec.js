@@ -1,21 +1,19 @@
-/**
- * Created by dank on 8/25/16.
- */
+
 "use strict";
 
-xdescribe("URLService", function () {
+describe("URLService", function () {
     beforeEach(module('mms'));
 
-    var ApplicationService, URLService, $httpBackend, $rootScope, $http, $q, root;
+    var mockApplicationService, URLServiceObj, $httpBackend, $rootScope, $http, $q, root;
 
     beforeEach(inject(function ($injector) {
-        URLService   = $injector.get('URLService');
+        URLServiceObj   = $injector.get('URLService');
         $http        = $injector.get('$http');
         $httpBackend = $injector.get('$httpBackend');
         $rootScope   = $injector.get('$rootScope');
         $q           = $injector.get('$q');
         it('should get the root url', inject(function () {
-            root = URLService.getRoot();
+            root = URLServiceObj.getRoot();
             expect(root).toBeDefined();
         }));
 
@@ -30,134 +28,270 @@ xdescribe("URLService", function () {
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-    describe("Method isTimestamp", function () {
-        // To test the timestamp function, the string below is the format it requires to actually be
-        // ^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim())
-        var myTimestamp = "8008-13-80T08:13:14.666-1232";
-        it('should test if the given string value is a timestamp and return false', inject(function () {
-            expect(URLService.isTimestamp("merp")).toBeFalsy();
-        }));
-
-        it('should test if the given timestamp is an actual timestamp and return true', inject(function () {
-            expect(URLService.isTimestamp(myTimestamp)).toBeTruthy();
-        }));
-    });
 
     describe('Method getMmsVersionURL', function () {
         it('should return the root url with /mmsversion appended to the string', inject(function () {
-            var mmsUrl = URLService.getMmsVersionURL();
+            var mmsUrl = URLServiceObj.getMmsVersionURL();
             expect('/alfresco/service/mmsversion').toMatch(mmsUrl.toString());
         }))
     });
 
-    describe('Method getConfigSnapshotsURL', function () {
-        var tmpId        = 1234;
-        var tmpWorkspace = "my_silly_workspace";
-        var configSnapshotUrl;
-        it('should generate a configuration snapshot url', inject(function () {
-            configSnapshotUrl = root + "/workspaces/" + tmpWorkspace + "/configurations/" + tmpId + "/snapshots";
-            expect(configSnapshotUrl).toMatch(URLService.getConfigSnapshotsURL(tmpId, tmpWorkspace));
-        }));
-    });
-
-    describe('Method getProductSnapshotsURL', function () {
-        var tmpId        = 1234;
-        var tmpWorkspace = "my_silly_workspace";
-        var tmpSite      = "Super_cat_memes_aahoooy";
-        var productSnapshotUrl;
-        it('should generate a Product snapshot url', inject(function () {
-            productSnapshotUrl = root + "/workspaces/" + tmpWorkspace + "/sites/" + tmpSite + "/products/" + tmpId + "/snapshots";
-            expect(productSnapshotUrl).toMatch(URLService.getProductSnapshotsURL(tmpId, tmpSite, tmpWorkspace));
-        }));
-    });
-
     describe('Method getHtmlToPdfURL', function () {
         var tmpId        = 1234;
-        var tmpWorkspace = "this_isnt_your_workspace";
-        var tmpSite      = "dont_go_to_this_site";
+        var project = "this_isnt_your_project";
+        var ref      = "dont_go_to_this_site";
         var htmlToPdfURL;
         it('should generate a Html to PDF url', inject(function () {
-            htmlToPdfURL = root + "/workspaces/" + tmpWorkspace + "/sites/" + tmpSite + "/documents/" + tmpId + "/htmlToPdf/123456789";
-            expect(htmlToPdfURL).toMatch(URLService.getHtmlToPdfURL(tmpId, tmpSite, tmpWorkspace));
+            htmlToPdfURL = root + "/projects/" + project + "/refs/" + ref + "/documents/" + tmpId + "/htmlToPdf/123456789";
+            expect(htmlToPdfURL).toMatch(URLServiceObj.getHtmlToPdfURL(tmpId, project, ref));
         }));
     });
 
     describe('Method getCheckLoginURL', function () {
         it("should create the checklogin url used to check login for Alfresco", inject(function () {
             var checkLoginUrl = root + '/checklogin';
-            expect(checkLoginUrl).toMatch(URLService.getCheckLoginURL());
+            expect(checkLoginUrl).toMatch(URLServiceObj.getCheckLoginURL());
         }));
     });
 
-    describe('Method getConfigsURL', function () {
-        it('should create a configs url', inject(function () {
-            var tmpWorkspace = "Mmmbop-ba-duba-dop";
-            expect(root + '/workspaces/' + tmpWorkspace + "/configurations").toMatch(URLService.getConfigsURL(tmpWorkspace));
-        }));
+    describe('Method getOrgsURL', function() {
+    	it("should create the url for organizations", function() {
+    		var orgsUrl = root + '/orgs';
+    		expect(orgsUrl).toMatch(URLServiceObj.getOrgsURL());
+    	});
     });
 
-    describe('Method getOwnedElementURL', function () {
-        it('should create the url for all owned elements', inject(function () {
-            var id        = "54352";
-            var workspace = "master";
-            var version   = "19";
-            var depth     = 15;
-            var url       = URLService.getOwnedElementURL(id, workspace, version, depth);
-            expect(url).toEqual("/alfresco/service/workspaces/" + workspace + "/elements/" + id + "/versions/" + version + "?depth=" + depth);
-
-            version = "latest";
-            url     = URLService.getOwnedElementURL(id, workspace, version, depth);
-            expect(url).toEqual("/alfresco/service/workspaces/" + workspace + "/elements/" + id + "?depth=" + depth);
-
-            version = "8008-13-80T08:13:14.666-1232";
-            url     = URLService.getOwnedElementURL(id, workspace, version, depth);
-            expect(url).toEqual("/alfresco/service/workspaces/" + workspace + "/elements/" + id + "?timestamp=" + version + "&depth=" + depth);
-        }));
+    describe('Method getProjectsURL', function() {
+    	var orgId = 'hereisanorg';
+    	var projectId = 'hereisaproject';
+    	it("should create the url for projects", function() {
+    		var projectsUrl = root + '/orgs/' + orgId + '/projects';
+    		expect(projectsUrl).toMatch(URLServiceObj.getProjectsURL(orgId));
+    	});
     });
+
+    describe('Method getProjectURL', function() {
+    	var projectId = 'hereisaproject';
+    	it("should create the url for a project", function() {
+    		var projectUrl = root + '/projects/' + projectId;
+    		expect(projectUrl).toMatch(URLServiceObj.getProjectURL(projectId));
+    	});
+    });
+
+    describe('Method getProjectMountsURL', function() {
+    	var projectId = 'hereisaproject';
+    	var refId = 'thisisaref';
+    	it("should create the url for the mounts of a project", function() {
+    		var projectMountsUrl = root + '/projects/' + projectId + '/refs/' + refId + '/mounts';
+    		expect(projectMountsUrl).toMatch(URLServiceObj.getProjectMountsURL(projectId, refId));
+    	});
+    });
+
+    describe('Method getRefsURL', function() {
+    	var projectId = 'hereisaproject';
+    	it("should create the url for the refs of a project", function() {
+    		var refsUrl = root + '/projects/' + projectId + '/refs';
+    		expect(refsUrl).toMatch(URLServiceObj.getRefsURL(projectId));
+    	});
+    });
+
+    describe('Method getRefURL', function() {
+    	var projectId = 'hereisaproject';
+    	var refId = 'thisisaref';
+    	it("should create the url for the refs of a project", function() {
+    		var refUrl = root + '/projects/' + projectId + '/refs/' + refId;
+    		expect(refUrl).toMatch(URLServiceObj.getRefURL(projectId, refId));
+    	});
+    });
+
+    describe('Method getGroupsURL', function() {
+    	var projectId = 'hereisaproject';
+    	var refId = 'thisisaref';
+    	it("should create the url for the groups of a project", function() {
+    		var groupsUrl = root + '/projects/' + projectId + '/refs/' + refId + '/groups';
+    		expect(groupsUrl).toMatch(URLServiceObj.getGroupsURL(projectId, refId));
+    	});
+    });
+
+    describe('Method getProjectDocumentsURL', function() {
+    	var reqOb = {
+			projectId: "heyaproject",
+			elementId: "heyanelement",
+			refId: 'master',
+			commitId: 'latest'
+		};
+    	it("should create the url for the refs of a project", function() {
+    		var projectDocumentsUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/documents';
+    		expect(projectDocumentsUrl).toMatch(URLServiceObj.getProjectDocumentsURL(reqOb));
+    	});
+    });
+
+    xdescribe('Method getImageURL', function() { //not sure what's happening with this
+    	var reqOb = {
+			projectId: "heyaproject",
+			elementId: "heyanelement",
+			refId: 'master',
+			commitId: 'latest',
+			accept: true
+		};
+    	it("should create the url for an image", function() {
+    		var imageUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.elementId + '?accept=' + reqOb.accept;
+    		expect(imageUrl).toMatch(URLServiceObj.getImageURL(reqOb));
+    	});
+    });
+
+    describe('Method getElementURL', function() { //not sure what's happening with this
+    	var reqOb = {
+			projectId: "heyaproject",
+			elementId: "heyanelement",
+			refId: 'master',
+			commitId: 'latest',
+			accept: true
+		};
+    	it("should create the url for an element", function() {
+    		var elementUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+    		expect(elementUrl).toMatch(URLServiceObj.getElementURL(reqOb));
+    	});
+    });
+
+  //   describe('Method getOwnedElementURL', function () {
+  //   	var reqOb = {
+		// 	projectId: "heyaproject",
+		// 	elementId: "heyanelement",
+		// 	refId: 'master',
+		// 	commitId: 'latest',
+		// 	depth: 15,
+		// 	extended: true
+		// };
+  //       it('should create the url for all owned elements', inject(function () {
+  //  			var ownedElementUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+  //           expect(ownedElementUrl).toEqual(URLServiceObj.getOwnedElementURL(reqOb));
+  //       }));
+  //   });
 
     describe('Method getDocumentViewsURL', function () {
-        it('should create the url for the document views', inject(function () {
-            var id        = "54352";
-            var workspace = "master";
-            var version   = "19";
-            var url       = URLService.getDocumentViewsURL(id, workspace, version, false);
-            expect(url).toBe(root + "/workspaces/" + workspace + "/products/" + id + "/views/versions/" + version);
-
-            url = URLService.getDocumentViewsURL(id, workspace, version, true);
-            expect(url).toBe(root + "/workspaces/" + workspace + "/products/" + id + "/views/versions/" + version + "?simple=true");
-        }));
+    	var reqOb = {
+			projectId: "heyaproject",
+			elementId: "heyanelement",
+			refId: 'master',
+			commitId: 'latest',
+			accept: true
+		};
+        it('should create the url for the document views', function () {
+        	var documentViewsUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/documents/' + reqOb.elementId + '/views';
+        	expect(documentViewsUrl).toMatch(URLServiceObj.getDocumentViewsURL(reqOb));
+        });
     });
 
-    describe('Method getViewsElementsURL', function () {
-        it('should create the url for the view elements', inject(function () {
-            var id        = "35881";
-            var workspace = "minion";
-            var version   = "latest";
-
-            var url = URLService.getViewElementsURL(id, workspace, version);
-            expect(url).toBe(root + "/workspaces/" + workspace + "/views/" + id + "/elements");
-
-            version = "666";
-            url     = URLService.getViewElementsURL(id, workspace, version);
-            expect(url).toBe(root + "/workspaces/" + workspace + "/views/" + id + "/elements/versions/" + version);
-        }));
+    describe('Method getElementHistoryURL', function () {
+    	var reqOb = {
+			projectId: "heyaproject",
+			elementId: "heyanelement",
+			refId: 'master',
+			commitId: 'latest',
+			accept: true
+		};
+        it('should create the url to query for element history', function () {
+        	var elementHistoryUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
+        	expect(elementHistoryUrl).toMatch(URLServiceObj.getElementHistoryURL(reqOb));
+        });
     });
 
-    xdescribe('Method handleHttpStatus', function () {
-        it('should do something silly', inject(function () {
-            var data     = "merp";
-            var statuses = [404, 500, 401, 403, 409, 400, 410, 408];
-            var header   = {"merp": "derp"};
-            var config   = "This is a config";
-            var deferred = $q.defer();
-            var promise = deferred.promise;
-            var result = [];
-            for (var i = 0; i < statuses.length; i++) {
-                console.log("Status " + statuses[i]);
-                URLService.handleHttpStatus(data, statuses[i], header, config, deferred);
-                console.log(JSON.stringify(deferred));
-                deferred.resolve();
-            }
-        }));
+    xdescribe('Method getPostElementsURL', function () {
+    	var reqOb = {
+			projectId: "heyaproject",
+			elementId: "heyanelement",
+			refId: 'master',
+			commitId: 'latest',
+			extended: true,
+			returnChildViews: true
+		};
+        it('should create the url for posting element changes', function () {
+        	var postElementsUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
+        	expect(postElementsUrl).toMatch(URLServiceObj.getPostElementsURL(reqOb));
+
+        	var postElementsUrlEx = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history' + '&extended=' + reqOb.extended;
+        	expect(postElementsUrlEx).toMatch(URLServiceObj.getPostElementsURL(reqOb));
+
+        	var postElementsUrlEx = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history' + '?extended=' + reqOb.extended;
+        	expect(postElementsUrlEx).toMatch(URLServiceObj.getPostElementsURL(reqOb));
+
+        	var postElementsUrlCh = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
+        	expect(postElementsUrl).toMatch(URLServiceObj.getPostElementsURL(reqOb));
+
+        	var postElementsUrlTk = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
+        	expect(postElementsUrl).toMatch(URLServiceObj.getPostElementsURL(reqOb));
+        });
     });
+
+    // xdescribe('Method handleHttpStatus', function () {
+    //     var data     = "merp";
+    //     var statuses = [404, 401, 403, 409, 400, 410, 408, 500, 501];
+    //     var header   = {"merp": "derp"};
+    //     var config   = "This is a config";
+        
+    //     it('set the state of a deferred object based on the status of http 404 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Not Found").toEqual(URLServiceObj.handleHttpStatus(data, 404, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    //     it('set the state of a deferred object based on the status of http 401 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Permission Error").toEqual(URLServiceObj.handleHttpStatus(data, 401, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    //     it('set the state of a deferred object based on the status of http 403 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Permission Error").toEqual(URLServiceObj.handleHttpStatus(data, 403, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    //     it('set the state of a deferred object based on the status of http 409 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Conflict").toEqual(URLServiceObj.handleHttpStatus(data, 409, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    //     it('set the state of a deferred object based on the status of http 400 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Bad Request").toEqual(URLServiceObj.handleHttpStatus(data, 400, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    //     it('set the state of a deferred object based on the status of http 410 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Deleted").toEqual(URLServiceObj.handleHttpStatus(data, 410, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    //     it('set the state of a deferred object based on the status of http 408 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Timed Out").toEqual(URLServiceObj.handleHttpStatus(data, 408, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    //     it('set the state of a deferred object based on the status of http 501 status', function () {
+    //     	var deferred = $q.defer();
+    //     	var promise = deferred.promise;
+    //         expect("Cacheing").toEqual(URLServiceObj.handleHttpStatus(data, 501, header, config, deferred));
+    //         deferred.resolve();
+    //     });
+    // });
+
+    xdescribe('Method getElementSearchURL', function () {
+    	var reqOb = {
+			projectId: "heyaproject",
+			elementId: "heyanelement",
+			refId: 'master',
+			commitId: 'latest',
+			accept: true
+		};
+        it('should create the url to query for element keyword search', function () {
+        	var elementSearchUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search';
+        	expect(elementSearchUrl).toMatch(URLServiceObj.getElementSearchURL(reqOb));
+        });
+    });
+
 });
