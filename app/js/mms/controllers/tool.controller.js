@@ -14,6 +14,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         projectId: projectOb.id,
         id: null
     };
+    $scope.projectOb = projectOb;
     $scope.editable = documentOb && documentOb._editable && refOb.type === 'Branch';
     $scope.viewOb = viewOb;
     $scope.documentOb = documentOb;

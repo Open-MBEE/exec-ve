@@ -18,7 +18,7 @@
               <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"></input> {{value.value}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
-                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-ref-id="{{mmsRef}}" mms-project-id="{{mmsProject}}" ng-model="value.value" mms-eid="{{element.id}}"></textarea>
+                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-ref-id="{{mmsRef}}" mms-project-id="{{mmsProject}}" ng-model="value.value" mms-element-id="{{element.id}}"></textarea>
                   <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                   <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
@@ -111,10 +111,10 @@
         </div>
         </div>
         <div ng-if="isRestrictedVal">
-            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{values[0].operand[1].elementId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></h3>
+            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{values[0].operand[1].elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
         </div>
         <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
-        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-eid="{{element.typeId}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
+        <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.typeId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Generalization' || element.type === 'Dependency'">
