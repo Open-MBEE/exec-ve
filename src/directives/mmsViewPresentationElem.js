@@ -104,7 +104,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
     return {
         restrict: 'E',
         template: template,
-        require: '?^mmsView',
+        require: '?^^mmsView',
         scope: {
             mmsInstanceVal: '<',
             mmsParentSection: '<',

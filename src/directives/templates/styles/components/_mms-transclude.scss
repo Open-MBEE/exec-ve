@@ -1,5 +1,6 @@
 /* Stylesheet for transclusion-related elements */
 
+
 mms-transclude-doc,
 mms-transclude-val,
 mms-transclude-name > span,
@@ -9,9 +10,11 @@ mms-transclude-img {
   border: 2px solid transparent;
 }
 
-// span > mms-transclude-doc, span > mms-transclude-val {
-//   background-color: inherit;
-//   color: inherit;
+
+//span > mms-cf, span > mms-cf > mms-transclude-doc, span > mms-cf > mms-transclude-val {
+//  background-color: inherit;
+//  color: inherit;
+
 
 //   > p, > h1, > h2, > h3, > h4, > h5, > h6, > ol, > ul, > pre {
 //     background-color: inherit;
@@ -129,11 +132,7 @@ mms-view:not(.reviewing) mms-transclude-com {
 }
 
 mms-spec div {
-  tms-timely,
-  mms-transclude-img,
-  mms-transclude-name,
-  mms-transclude-val,
-  mms-transclude-doc,
+  mms-cf,
   mms-view-link {
     background-color: $light_blue;
   }

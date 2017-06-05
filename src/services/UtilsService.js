@@ -394,7 +394,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                     } else if (thing.type === 'List') {
                         result.push(makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
-                        result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
+                        //todo use mmsCf
+                        result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                     }
                     result.push('</div>');
                 }
@@ -424,7 +425,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 } else if (thing.type === 'List') {
                     result.push(makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
-                    result.push('<mms-transclude-img mms-element-id="' + thing.id + '"></mms-transclude-img>');
+                    result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                 }
                 result.push('</div>');
             }
@@ -449,9 +450,10 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             t = 'val';
         }
         if (para.nonEditable) {
-            attr = ' data-non-editable="' + para.nonEditable + '"';
+            attr = ' non-editable="' + para.nonEditable + '"';
         }
-        return '<mms-transclude-' + t + ' mms-eid="' + para.source + '"' + attr + '></mms-transclude-' + t + '>';
+        //TODO update these to match mmsCF
+        return '<mms-cf mms-cf-type="' + t + '" mms-element-id="' + para.source + '"' + attr + '></mms-cf>';
     };
 
     var makeHtmlTOC = function (tree) {
@@ -557,7 +559,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             var cap2 = el.find('.mms-equation-caption');
             cap2.html(equationCap);
             if (cap2.length === 0) {
-                el.find('mms-view-equation > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
+                el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
             }
             // Change cap value based on showRefName true/false
             if (showRefName) {
