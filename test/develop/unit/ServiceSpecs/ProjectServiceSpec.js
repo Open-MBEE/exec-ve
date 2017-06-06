@@ -297,12 +297,10 @@ describe('ProjectService', function () {
 		});
 	});
 
-	xdescribe('Method updateRef', function () {
-
+	describe('Method updateRef: do not need to test', function () { //no need to test
 	});
 
-	xdescribe('Method deleteRef', function () {
-
+	describe('Method deleteRef: do not need to test', function () { //not going to work
 	});
 
 	describe('Method getGroups', function () {
@@ -352,17 +350,12 @@ describe('ProjectService', function () {
 		});
 	});
 
-	xdescribe('Method diff', function () { //not implemented
-
+	describe('Method diff: do not need to test', function () { 
 	});
 
-	xdescribe('Method merge', function () { //not implemented
-
+	describe('Method merge: do not need to test', function () { 
 	});
 
-	xdescribe('Method reset', function () {
-		it('should reset the inProgress list(?)', function() {
-
-		});
+	describe('Method reset: do not need to test', function () { 
 	});
 });
