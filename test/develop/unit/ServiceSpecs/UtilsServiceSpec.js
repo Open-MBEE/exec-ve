@@ -1,6 +1,7 @@
 'use strict';
 
-xdescribe('Service: UtilsService', function() { //TBD, pres elem refactor
+
+xdescribe('Service: UtilsService', function() { 
 
 	var table;
 
