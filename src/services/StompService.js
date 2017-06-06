@@ -18,7 +18,7 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
     $http.get(URLService.getJMSHostname()).then(function successCallback(response) {
         if(response.data.connections[0].hasOwnProperty("uri")){
             var removeProtocol = response.data.connections[0].uri.replace(/.*?:\/\//g, "");
-            host = 'wss://' + removeProtocol.substring(0, removeProtocol.length-6) + ':61614';
+            host = 'ws://' + removeProtocol.substring(0, removeProtocol.length-6) + ':61614';
             stompConnect();
         }else{
             console.log('JSON does not contain the right key.  STOMP failed.');
