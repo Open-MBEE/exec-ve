@@ -3,30 +3,33 @@
 describe('Service: CacheService', function () {
 	
 	var CacheServiceObj;
+	var mockUtilsService;
 	var $rootScope, $scope;
 
 	beforeEach(module('mms'));
 	beforeEach(function() {
 		inject(function ($injector) {
-			CacheServiceObj = $injector.get('CacheService');
-			$rootScope 		= $injector.get('$rootScope');
-			$scope 			= $rootScope.$new();
+			CacheServiceObj 	= $injector.get('CacheService');
+			$rootScope 			= $injector.get('$rootScope');
+			mockUtilsService	= $injector.get('UtilsService');
+			$scope 				= $rootScope.$new();
 		});
 	});
 
 	describe('Method: get: no need to test', function () {
 	});
 
-	describe('Method: put', function () { //getting a "not a function" error with this also
+	describe('Method: put', function () { 
 		it('should put an element in the cache', function () {
 			var val;
-			var key = 'key';
-			var value = 'One ring to rule them all';
-			CacheServiceObj.put(key, value).then(function(data) {
-				val = data;
-			}, function(reason) {
-				val = reason.message;
-			});
+			var value = {
+				projectId: 'heyaproject',
+				elementId: 'heyanelement',
+				refId: 'master',
+				commitId: 'latest'
+			};
+			var key = mockUtilsService.makeElementKey(value);
+			var val = CacheServiceObj.put(key, value);
 			expect(val).toEqual(value);
 		});
 	});
@@ -34,15 +37,36 @@ describe('Service: CacheService', function () {
 	describe('Method getLatestElements: no need to test', function () {
 	});
 
-	xdescribe('Method remove', function () {
-		it('should remove element', function () {
-
+	describe('Method remove', function () {
+		it('should remove element from the cache', function () {
+			var value = {
+				projectId: 'heyaproject',
+				elementId: 'heyanelement',
+				refId: 'master',
+				commitId: 'latest'
+			};
+			var key = mockUtilsService.makeElementKey(value);
+			var val = CacheServiceObj.put(key, value);
+			// spyOn(CacheServiceObj, "put").and.callFake(function(key, value) {
+			// 	return value;
+			// });
+			var result = CacheServiceObj.remove(key);
+			expect(result).toEqual(value);
 		});
 	});
 
 	describe('Method exists', function () {
-		it('should check if an element exists', function () {
-
+		it('should check if an element value exists for a key', function () {
+			var value = {
+				projectId: 'heyaproject',
+				elementId: 'heyanelement',
+				refId: 'master',
+				commitId: 'latest'
+			};
+			var key = mockUtilsService.makeElementKey(value);
+			var val = CacheServiceObj.put(key, value);
+			var result = CacheServiceObj.exists(key);
+			expect(result).toEqual(true);
 		});
 	});
 
