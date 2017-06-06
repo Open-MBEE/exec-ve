@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Directive: mmsSearch', function() {
+describe('Directive: mmsSearch', function() {
 	var scope,
 		element,
 		search;

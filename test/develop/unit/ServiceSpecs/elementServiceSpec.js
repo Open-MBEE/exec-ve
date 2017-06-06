@@ -449,10 +449,25 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('getGenericElements', function() {
-		it('should get an element', function() {
+	describe('getGenericElements', function() {
+		// it('should get an element', function() {
+		// 	var result;
+		// 	var url = '/alfresco/service/projects/heyaproject/refs/master/elements';
+		// 	var elemOb = {
+		// 		projectId: "heyaproject",
+		// 		elementId: "heyanelement",
+		// 		refId: 'master',
+		// 		commitId: 'latest'
+		// 	};
+		// 	var jsonKey = 'elements';
+		// 	$httpBackend.when('GET', url).respond(200, elements.elements);
 
-		});
+		// 	result = ElementServiceObj.getGenericElements(url, elemOb, jsonKey);
+		// 	console.log("result : " + result);
+		// 	$httpBackend.flush();
+		// 	expect(result).toEqual(elements.elements)
+
+		// });
 	});
 
 	xdescribe('fillInElement', function() {
@@ -461,7 +476,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	describe('updateElement', function() {
+	xdescribe('updateElement', function() {
 		it('it should save an element to MMS and update the cache if successful', function() {
 			var elemOb;
 			var testElem = {
@@ -473,9 +488,10 @@ describe('Service: ElementService', function() {
 			var key = mockUtilsService.makeElementKey(testElem);
 			mockCacheService.put(key, testElem);
 			$httpBackend.when('GET', '/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement').respond(200, testElem);
-			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(201, '');
 
-			var result = ElementServiceObj.updateElement(testElem, false).then(function(data) {
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(501, elements.elements);
+
+			ElementServiceObj.updateElement(testElem).then(function(data) {
 				elemOb = data;
 			}, function(reason) {
 				elemOb = reason.message;
@@ -493,7 +509,31 @@ describe('Service: ElementService', function() {
 
 	xdescribe('createElement', function() {
 		it('should get an element', function() {
+			var toCreate = {
+				id: 'mmsid',
+				ownerid: "holding_bin_heyaproject",
+				name: "New Element",
+				documentation: "Here is some text",
+				type: "Class"
+			};
 
+			var newElem = {
+				projectId: "heyaproject",
+				element: "heyanelement",
+				refId: 'master',
+				commitId: 'latest'
+			};
+
+			var reqOb = {
+				element: toCreate,
+				projectId: newElem.projectId,
+				refId: newElem.refId
+			};
+
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(201, elements.elements);
+
+			var result = ElementServiceObj.createElement(reqOb);		
+			console.log("result: " + result);
 		});
 	});
 

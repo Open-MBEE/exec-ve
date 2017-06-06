@@ -218,7 +218,7 @@ xdescribe('Service: ViewService', function() {
     	});
     });
 
-	xdescribe('Method CreateView', function() {
+	describe('Method CreateView', function() {
 			it('create a view similar to the workspace state in app.js', inject(function() {
 				ViewService.createView(undefined, 'Untitled View', undefined, 'master', 'viewDoc').then(function(data) {
 					//console.log(JSON.stringify(data));
