@@ -3,10 +3,12 @@
 describe('Directive: mmsSearch', function() {
 	var scope,
 		element,
-		search;
+		search,
+		template;
 	var $rootScope,
 		$compile;
-	var $httpBackend;
+	var $httpBackend,
+		$templateCache;
 
 	beforeEach(module('mms'));
 	beforeEach(module('mms.directives'));
@@ -16,9 +18,13 @@ describe('Directive: mmsSearch', function() {
 			$rootScope = $injector.get('$rootScope');
 			$compile = $injector.get('$compile');
 			$httpBackend = $injector.get('$httpBackend');
+			$templateCache = $injector.get('$templateCache');
 			scope = $rootScope.$new();
 		});
 
+		$templateCache.put('src/directives/templates/mmsSearch.html', 'Template to test');
+		template = $templateCache.get('src/directives/templates/mmsSearch.html');
+		// console.log(template);
 		var testElements = {
 			elements: [
 				{
@@ -77,8 +83,10 @@ describe('Directive: mmsSearch', function() {
 		scope.searchText = "First Element";
 		scope.itemsPerPage = 20;
 		var searchElement = angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"></button>');
-		search = $compile(searchElement)(scope);
-		scope = search.isolateScope().newSearch(scope.searchText, 1, scope.itemsPerPage);
+		searchElement = $compile(searchElement)(scope);
+		console.log(searchElement);
+		scope.$apply();
+		searchElement.isolateScope().newSearch(scope.searchText, 1, scope.itemsPerPage);
 	});
 
 	it('should search for an element', function() {
@@ -94,7 +102,7 @@ describe('Directive: mmsSearch', function() {
 		$compile(element)(scope);
 		$rootScope.$digest();
 
-		console.log(element.html());
+		// console.log(element.html());
 		// expect(element.html()).toContain('First Element');
 		// $httpBackend.flush();
 	});
