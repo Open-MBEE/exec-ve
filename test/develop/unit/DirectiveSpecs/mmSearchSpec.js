@@ -22,8 +22,8 @@ describe('Directive: mmsSearch', function() {
 			scope = $rootScope.$new();
 		});
 
-		$templateCache.put('src/directives/templates/mmsSearch.html', 'Template to test');
-		template = $templateCache.get('src/directives/templates/mmsSearch.html');
+		// $templateCache.put('src/directives/templates/mmsSearch.html', 'Template to test');
+		// template = $templateCache.get('src/directives/templates/mmsSearch.html');
 		// console.log(template);
 		var testElements = {
 			elements: [
@@ -78,15 +78,17 @@ describe('Directive: mmsSearch', function() {
 			]
 		};
 
-		$httpBackend.when('POST', '/alfresco/service/projects/someprojectid/refs/master/search').respond(200, testElements);
+		$httpBackend.when('GET', '/alfresco/service/projects/someprojectid/refs/master/search').respond(200, testElements);
+		// $httpBackend.when('POST', '/alfresco/service/projects/someprojectid/refs/master/search').respond(200, testElements);
+		$httpBackend.when('PUT', '/alfresco/service/projects/someprojectid/refs/master/search?extended=true', testElements.elements[0]).respond(200, testElements.elements[0]);
 
-		scope.searchText = "First Element";
-		scope.itemsPerPage = 20;
-		var searchElement = angular.element('<button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)"></button>');
-		searchElement = $compile(searchElement)(scope);
-		console.log(searchElement);
-		scope.$apply();
-		searchElement.isolateScope().newSearch(scope.searchText, 1, scope.itemsPerPage);
+		// scope.searchText = "First Element";
+		// scope.itemsPerPage = 20;
+		// var searchElement = angular.element(template);
+		// $compile(searchElement)(scope);
+		// // console.log(searchElement);
+		// scope.$apply();
+		// searchElement.isolateScope().newSearch(scope.searchText, 1, scope.itemsPerPage);
 	});
 
 	it('should search for an element', function() {
@@ -100,11 +102,16 @@ describe('Directive: mmsSearch', function() {
 
 		element = angular.element('<mms-search mms-options="searchOptions" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}"></mms-search>');
 		$compile(element)(scope);
-		$rootScope.$digest();
 
-		// console.log(element.html());
+		scope.searchText = "First Element";
+		scope.itemsPerPage = 20;
+
+		scope.$apply();
+
+		element.isolateScope().newSearch(scope.searchText, 1, scope.itemsPerPage);
+		console.log(element.html());
 		// expect(element.html()).toContain('First Element');
-		// $httpBackend.flush();
+		$httpBackend.flush();
 	});
 
 });
