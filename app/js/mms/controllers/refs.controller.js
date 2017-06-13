@@ -38,7 +38,8 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         $scope.fromParams = refOb;
         $scope.refSelected = refOb;
     }
-    $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br>Branch author will be notified by email upon completion.');
+    $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.');
+    // $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br>Branch author will be notified by email upon completion.');
     // var refPerm = projectOb && projectOb._editable;
 
     $scope.bbApi.init = function() {
@@ -236,7 +237,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             }
             promise.then(function(data) {
                 growl.success(displayName+" is being created.");
-                growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
+                // growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
                 refArr.push(refJson);
                 // var storeArr = refArr.toString();
                 // $window.localStorage.setItem('refArr', storeArr); 
