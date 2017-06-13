@@ -126,7 +126,7 @@ describe("URLService", function () {
     	});
     });
 
-    xdescribe('Method getImageURL', function() { //not sure what's happening with this
+    describe('Method getImageURL', function() { //not sure what's happening with this
     	var reqOb = {
 			projectId: "heyaproject",
 			elementId: "heyanelement",
@@ -197,7 +197,7 @@ describe("URLService", function () {
         });
     });
 
-    xdescribe('Method getPostElementsURL', function () {
+    describe('Method getPostElementsURL', function () {
     	var reqOb = {
 			projectId: "heyaproject",
 			elementId: "heyanelement",
@@ -280,7 +280,7 @@ describe("URLService", function () {
     //     });
     // });
 
-    xdescribe('Method getElementSearchURL', function () {
+    describe('Method getElementSearchURL', function () {
     	var reqOb = {
 			projectId: "heyaproject",
 			elementId: "heyanelement",

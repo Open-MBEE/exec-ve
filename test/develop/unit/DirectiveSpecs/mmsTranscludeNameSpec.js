@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('mmsTranscludeName Directive', function () {
+describe('mmsTranscludeName Directive', function () {
     var scope,
         element; 
     var $httpBackend;

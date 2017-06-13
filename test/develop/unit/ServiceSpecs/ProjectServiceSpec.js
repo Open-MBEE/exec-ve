@@ -158,7 +158,7 @@ describe('ProjectService', function () {
 		});
 	});
 
-	xdescribe('Method getProjects', function () { //why is ProjectService changing the orgId in the json??
+	describe('Method getProjects', function () { //why is ProjectService changing the orgId in the json??
 		it('should return an object of projects', function () {
 			var projectsOb;
 			var testProjects = [
@@ -278,7 +278,7 @@ describe('ProjectService', function () {
 		});
 	});
 
-	xdescribe('Method createRef', function () {
+	describe('Method createRef', function () {
 		it('should create a ref', function() {
 			var refOb;
 			var testRef = {

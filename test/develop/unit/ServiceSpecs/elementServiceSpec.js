@@ -405,7 +405,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('cacheElement', function() { //redundant test?
+	describe('cacheElement', function() { //redundant test?
 		// it('should cache an element', function() {
 		// 	var elemOb;
 		// 	var testElem = {
@@ -443,7 +443,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('getOwnedElements', function() {
+	describe('getOwnedElements', function() {
 		it('should get an elements owned element objects', function() {
 
 		});
@@ -470,13 +470,13 @@ describe('Service: ElementService', function() {
 		// });
 	});
 
-	xdescribe('fillInElement', function() {
+	describe('fillInElement', function() {
 		it('should get an element', function() {
 
 		});
 	});
 
-	xdescribe('updateElement', function() {
+	describe('updateElement', function() {
 		it('it should save an element to MMS and update the cache if successful', function() {
 			var elemOb;
 			var testElem = {
@@ -501,13 +501,13 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('updateElements', function() {
+	describe('updateElements', function() {
 		it('should get an element', function() {
 
 		});
 	});
 
-	xdescribe('createElement', function() {
+	describe('createElement', function() {
 		it('should get an element', function() {
 			var toCreate = {
 				id: 'mmsid',
@@ -537,7 +537,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('createElements', function() {
+	describe('createElements', function() {
 		it('should get an element', function() {
 
 		});
@@ -546,7 +546,7 @@ describe('Service: ElementService', function() {
 	describe('isCacheOutdated: do not need to test', function() {
 	});
 
-	xdescribe('search', function() {
+	describe('search', function() {
 		it('should get an element', function() {
 			var searchText = 'krabby patties';
 

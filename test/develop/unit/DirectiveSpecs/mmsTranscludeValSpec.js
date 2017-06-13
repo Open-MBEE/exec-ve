@@ -1,6 +1,6 @@
 'use strict';
 
-xdescribe('Directive: mmsTranscludeVal', function () {
+describe('Directive: mmsTranscludeVal', function () {
     var scope,
         element; 
     var $rootScope, 

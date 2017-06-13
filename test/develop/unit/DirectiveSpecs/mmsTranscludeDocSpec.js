@@ -48,7 +48,7 @@ describe('Directive: mmsTranscludeDoc', function() {
         element = angular.element('<mms-transclude-doc data-mms-eid="{{view.mmsEid}}" mms-project-id="{{view.mmsProjectId}}" mms-ref-id="{{view.mmsRefId}}"></mms-transclude-doc>');
 
         $compile(element)(scope);
-        scope.$apply();
-        // console.log(element.html());
+        scope.$digest();
+        console.log("doc " + element.html());
     });
 });
