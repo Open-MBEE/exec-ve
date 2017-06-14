@@ -169,7 +169,7 @@ function urlService(baseUrl) {
      */
     var getImageURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' +
-                       reqOb.elementId + '?accept=' + reqOb.accept;
+                       reqOb.elementId + '?extension=' + reqOb.accept;
         return addTicket(addVersion(r, reqOb.commitId));
     };
 

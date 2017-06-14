@@ -275,7 +275,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactoryUrl,
-        repository: 'libs-release-local',
+        repository: 'libs-snapshot-local',
         username: artifactoryUser,
         password: artifactoryPassword
       },
