@@ -23,6 +23,16 @@
 ## Problems?
 If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_
 
+### SASS Won't load
+If you get `Loading "sass.js" tasks...ERROR`
+
+Perform the following steps to resolve:
+1. cd to the project directory
+2. `npm update && npm install`
+3. Then `node ./node_modules/node-sass/scripts/install.js`
+4. Finally `npm rebuild node-sass`
+5. Execute Grunt
+
 ### Rendering problems - clear bower cache
 If you're sure everything is right, try running _bower cache clean_
 
