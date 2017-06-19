@@ -41,7 +41,8 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/svg'};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.svg'};
+
             element.addClass('isLoading');
             //TODO change when VizService is updated to use correct params
             VizService.getImageURL(reqOb)
@@ -55,12 +56,12 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             }).finally(function() {
                 element.removeClass('isLoading');
             });
-            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/png'};
+            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.png'};
             VizService.getImageURL(reqOb2)
             .then(function(data) {
                 scope.pngImgUrl = data;
             }, function(reason) {
-                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
             });
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
