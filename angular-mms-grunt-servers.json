@@ -1,1 +1,23 @@
-{}
+
+{
+    "ems": "cae-ems.jpl.nasa.gov",
+    "emsuat": "cae-ems-uat.jpl.nasa.gov",
+    "emsint": "cae-ems-int.jpl.nasa.gov",
+    "emstest": "cae-ems-test.jpl.nasa.gov",
+    "europaemsint": "europaems-int.jpl.nasa.gov",
+    "europaemsuat": "europaems-uat.jpl.nasa.gov",
+    "europaemstest": "europaems-test.jpl.nasa.gov",
+    "europaems": "europaems.jpl.nasa.gov",
+    "localhost": "localhost",
+    "fnems": "fn-cae-ems.jpl.nasa.gov",
+    "fnemsuat": "fn-cae-ems-uat.jpl.nasa.gov",
+    "arrmems": "arrmems.jpl.nasa.gov",
+    "arrmemsuat": "arrmems-uat.jpl.nasa.gov",
+    "msmems": "msmems.jpl.nasa.gov",
+    "msmemsuat": "msmems-uat.jpl.nasa.gov",
+    "opencaeint": "opencae-int.jpl.nasa.gov",
+    "opencaeuat": "opencae-uat.jpl.nasa.gov",
+    "opencaetest": "opencae-test.jpl.nasa.gov",
+    "opencae": "opencae.jpl.nasa.gov"
+
+}

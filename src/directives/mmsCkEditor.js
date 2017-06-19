@@ -414,7 +414,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
         var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink' ] };
+        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink', 'Mmssignature' ] };
         var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
 
         //Set toolbar based on editor type
