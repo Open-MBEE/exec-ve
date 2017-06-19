@@ -648,3 +648,19 @@ table caption {
     font-weight:700 !important;
   }
 }
+/*------------------------------------------------------------------
+4. Misc
+-------------------------------------------------------------------*/
+
+
+span {
+  -ms-word-break: break-all;
+  word-break: break-all;
+
+  /* Non standard for webkit */
+  word-wrap: break-word;
+
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
+}
