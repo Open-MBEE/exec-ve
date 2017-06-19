@@ -28,11 +28,10 @@ describe("URLService", function () {
         $httpBackend.verifyNoOutstandingRequest();
     });
 
-
     describe('Method getMmsVersionURL', function () {
         it('should return the root url with /mmsversion appended to the string', inject(function () {
             var mmsUrl = URLServiceObj.getMmsVersionURL();
-            expect('/alfresco/service/mmsversion').toMatch(mmsUrl.toString());
+            expect('/alfresco/service/mmsversion').toBe(mmsUrl.toString());
         }))
     });
 
@@ -43,21 +42,21 @@ describe("URLService", function () {
         var htmlToPdfURL;
         it('should generate a Html to PDF url', inject(function () {
             htmlToPdfURL = root + "/projects/" + project + "/refs/" + ref + "/documents/" + tmpId + "/htmlToPdf/123456789";
-            expect(htmlToPdfURL).toMatch(URLServiceObj.getHtmlToPdfURL(tmpId, project, ref));
+            expect(htmlToPdfURL).toBe(URLServiceObj.getHtmlToPdfURL(tmpId, project, ref));
         }));
     });
 
     describe('Method getCheckLoginURL', function () {
         it("should create the checklogin url used to check login for Alfresco", inject(function () {
             var checkLoginUrl = root + '/checklogin';
-            expect(checkLoginUrl).toMatch(URLServiceObj.getCheckLoginURL());
+            expect(checkLoginUrl).toBe(URLServiceObj.getCheckLoginURL());
         }));
     });
 
     describe('Method getOrgsURL', function() {
     	it("should create the url for organizations", function() {
     		var orgsUrl = root + '/orgs';
-    		expect(orgsUrl).toMatch(URLServiceObj.getOrgsURL());
+    		expect(orgsUrl).toBe(URLServiceObj.getOrgsURL());
     	});
     });
 
@@ -66,7 +65,7 @@ describe("URLService", function () {
     	var projectId = 'hereisaproject';
     	it("should create the url for projects", function() {
     		var projectsUrl = root + '/orgs/' + orgId + '/projects';
-    		expect(projectsUrl).toMatch(URLServiceObj.getProjectsURL(orgId));
+    		expect(projectsUrl).toBe(URLServiceObj.getProjectsURL(orgId));
     	});
     });
 
@@ -74,7 +73,7 @@ describe("URLService", function () {
     	var projectId = 'hereisaproject';
     	it("should create the url for a project", function() {
     		var projectUrl = root + '/projects/' + projectId;
-    		expect(projectUrl).toMatch(URLServiceObj.getProjectURL(projectId));
+    		expect(projectUrl).toBe(URLServiceObj.getProjectURL(projectId));
     	});
     });
 
@@ -83,7 +82,7 @@ describe("URLService", function () {
     	var refId = 'thisisaref';
     	it("should create the url for the mounts of a project", function() {
     		var projectMountsUrl = root + '/projects/' + projectId + '/refs/' + refId + '/mounts';
-    		expect(projectMountsUrl).toMatch(URLServiceObj.getProjectMountsURL(projectId, refId));
+    		expect(projectMountsUrl).toBe(URLServiceObj.getProjectMountsURL(projectId, refId));
     	});
     });
 
@@ -91,7 +90,7 @@ describe("URLService", function () {
     	var projectId = 'hereisaproject';
     	it("should create the url for the refs of a project", function() {
     		var refsUrl = root + '/projects/' + projectId + '/refs';
-    		expect(refsUrl).toMatch(URLServiceObj.getRefsURL(projectId));
+    		expect(refsUrl).toBe(URLServiceObj.getRefsURL(projectId));
     	});
     });
 
@@ -100,7 +99,7 @@ describe("URLService", function () {
     	var refId = 'thisisaref';
     	it("should create the url for the refs of a project", function() {
     		var refUrl = root + '/projects/' + projectId + '/refs/' + refId;
-    		expect(refUrl).toMatch(URLServiceObj.getRefURL(projectId, refId));
+    		expect(refUrl).toBe(URLServiceObj.getRefURL(projectId, refId));
     	});
     });
 
@@ -109,7 +108,7 @@ describe("URLService", function () {
     	var refId = 'thisisaref';
     	it("should create the url for the groups of a project", function() {
     		var groupsUrl = root + '/projects/' + projectId + '/refs/' + refId + '/groups';
-    		expect(groupsUrl).toMatch(URLServiceObj.getGroupsURL(projectId, refId));
+    		expect(groupsUrl).toBe(URLServiceObj.getGroupsURL(projectId, refId));
     	});
     });
 
@@ -122,7 +121,7 @@ describe("URLService", function () {
 		};
     	it("should create the url for the refs of a project", function() {
     		var projectDocumentsUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/documents';
-    		expect(projectDocumentsUrl).toMatch(URLServiceObj.getProjectDocumentsURL(reqOb));
+    		expect(projectDocumentsUrl).toBe(URLServiceObj.getProjectDocumentsURL(reqOb));
     	});
     });
 
@@ -136,7 +135,7 @@ describe("URLService", function () {
 		};
     	it("should create the url for an image", function() {
     		var imageUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.elementId + '?accept=' + reqOb.accept;
-    		expect(imageUrl).toMatch(URLServiceObj.getImageURL(reqOb));
+    		expect(imageUrl).toEqual(URLServiceObj.getImageURL(reqOb));
     	});
     });
 
@@ -150,7 +149,7 @@ describe("URLService", function () {
 		};
     	it("should create the url for an element", function() {
     		var elementUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
-    		expect(elementUrl).toMatch(URLServiceObj.getElementURL(reqOb));
+    		expect(elementUrl).toEqual(URLServiceObj.getElementURL(reqOb));
     	});
     });
 
@@ -179,7 +178,7 @@ describe("URLService", function () {
 		};
         it('should create the url for the document views', function () {
         	var documentViewsUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/documents/' + reqOb.elementId + '/views';
-        	expect(documentViewsUrl).toMatch(URLServiceObj.getDocumentViewsURL(reqOb));
+        	expect(documentViewsUrl).toBe(URLServiceObj.getDocumentViewsURL(reqOb));
         });
     });
 
@@ -193,7 +192,7 @@ describe("URLService", function () {
 		};
         it('should create the url to query for element history', function () {
         	var elementHistoryUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
-        	expect(elementHistoryUrl).toMatch(URLServiceObj.getElementHistoryURL(reqOb));
+        	expect(elementHistoryUrl).toBe(URLServiceObj.getElementHistoryURL(reqOb));
         });
     });
 
@@ -207,20 +206,8 @@ describe("URLService", function () {
 			returnChildViews: true
 		};
         it('should create the url for posting element changes', function () {
-        	var postElementsUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
-        	expect(postElementsUrl).toMatch(URLServiceObj.getPostElementsURL(reqOb));
-
-        	var postElementsUrlEx = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history' + '&extended=' + reqOb.extended;
-        	expect(postElementsUrlEx).toMatch(URLServiceObj.getPostElementsURL(reqOb));
-
-        	var postElementsUrlEx = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history' + '?extended=' + reqOb.extended;
-        	expect(postElementsUrlEx).toMatch(URLServiceObj.getPostElementsURL(reqOb));
-
-        	var postElementsUrlCh = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
-        	expect(postElementsUrl).toMatch(URLServiceObj.getPostElementsURL(reqOb));
-
-        	var postElementsUrlTk = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
-        	expect(postElementsUrl).toMatch(URLServiceObj.getPostElementsURL(reqOb));
+        	var postElementsUrlEx = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements?childviews=true&extended=' + reqOb.extended;
+        	expect(postElementsUrlEx).toBe(URLServiceObj.getPostElementsURL(reqOb));
         });
     });
 
@@ -289,8 +276,8 @@ describe("URLService", function () {
 			accept: true
 		};
         it('should create the url to query for element keyword search', function () {
-        	var elementSearchUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search';
-        	expect(elementSearchUrl).toMatch(URLServiceObj.getElementSearchURL(reqOb));
+            var elementSearchUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?extended=true';
+            expect(elementSearchUrl).toBe(URLServiceObj.getElementSearchURL(reqOb));
         });
     });
 
