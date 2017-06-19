@@ -1,5 +1,5 @@
 <h2 class="prop element-title">Element History <span ng-show="gettingHistory"><i class="fa fa-spin fa-spinner"></i></span></h2>
-<input class="form-control" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
+<input class="form-control" ng-model="historyFilter" type="text" placeholder="Filter history">
 <br />
 
 <select class="form-control" ng-options="version.id as version._creator + ' - ' + (version._created | date:'M/d/yy h:mm a') for version in history | filter:historyFilter" ng-model="selects.commitSelected" ng-change="commitClicked()">

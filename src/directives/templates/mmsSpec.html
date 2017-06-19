@@ -1,9 +1,9 @@
 <div ng-if="!noEdit && editing" class="editing">
 
-    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+    <h3 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h3>
 
     <h4 class="prop-title">Last Modification</h4>
-    <span class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</h3>
+    <span class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</span>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
         <h4 class="prop-title spec-view-value-heading">Property Value</h4>
@@ -68,7 +68,7 @@
         <h4 class="prop-title">Type</h4>
         <span class="prop">{{element.type}}</span>
         <h4 class="prop-title spec-view-type-heading">Metatypes</h4>
-        <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
+        <span ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></span>
         <h4 class="prop-title">Location <i class="fa fa-folder"></i></h4>
         <span class="prop">{{element._qualifiedName}}</span>
         <h4 class="prop-title">ID</h4>
@@ -90,7 +90,7 @@
     <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
 
     <div ng-hide="gettingSpec">
-    <h1 class="prop element-title">{{element.name}}</h1>
+    <h3 class="prop element-title">{{element.name}}</h3>
 
     <h4 class="prop-title">Last Modification</h4>
     <span class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</span>
@@ -158,13 +158,13 @@
     </div>
 
     <h4 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h4>
-    <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
+    <span ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></span>
     <div ng-show="showDocHTML">{{element.documentation}}</div>
 
     <h4 class="prop-title">Type</h4>
     <span class="prop">{{element.type}}</span>
     <h4 class="prop-title spec-view-type-heading">Metatypes</h4>
-    <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></span>
+    <span ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></span>
     <h4 class="prop-title">Location <i class="fa fa-folder"></i></h4>
     <span class="prop">{{element._qualifiedName}}</span>
     <h4 class="prop-title">ID</h4>

@@ -22,7 +22,6 @@
 -------------------------------------------------------------------*/
 
 .navbar {
-  color: white;
   margin: 0;
   font-weight: 300;
   letter-spacing: .05em;
@@ -32,24 +31,11 @@
   width: 100%;
   height: 36px;
   min-height: 30px;
-  border: 0;
-  background-color: $base_grey;
-
-  a,
-  a:hover,
-  a:visited {
-    text-decoration: none;
-    color:white;
-  }
 }
 
 /*------------------------------------------------------------------
 2. Org/Global Level Header
 -------------------------------------------------------------------*/
-
-nav.global-header {
-  background-color: $ve-slate-base;
-}
 
 /*------------------------------------------------------------------
 	2.1 Org Navigation
@@ -98,16 +84,6 @@ ul.global-menu {
   line-height: 36px;
 }
 
-.global-menu > li > a,
-.global-menu > li > span > a.dropdown-toggle {
-  color: $ve-white-text-lighter-2;
-}
-
-.global-menu > li > a:hover,
-.global-menu > li > span > a.dropdown-toggle:hover {
-  color: white;
-}
-
 /*------------------------------------------------------------------
 		2.2.2 Search
 -------------------------------------------------------------------*/
@@ -115,54 +91,6 @@ ul.global-menu {
 #global-search {
   display: inline;
   position: relative;
-}
-
-#global-search input {
-  background-color: $ve-slate-darker-2;
-  border: 1px solid $ve-slate-darker-2;
-  border-radius: 3px 0 0 3px;
-  width: 330px;
-  padding: 0 8px;
-  height: 26px;
-  margin: 5px 0 5px 10px;
-  font-weight: 300;
-  letter-spacing: .05em;
-  line-height: 1;
-}
-
-#global-search input:focus {
-  outline:none;
-  background-color: $ve-slate-darker-3;
-  border: 1px solid $ve-teal-base;
-}
-
-#global-search button{
-  border-radius: 0 3px 3px 0;
-  height: 26px;
-  padding: 0px 7px;
-  background-color: $ve-teal-base;
-  top: 0px;
-  position: relative;
-  box-sizing: border-box;
-  color: white;
-  border:none;
-  margin: 5px 0 5px -10px;
-  vertical-align: bottom;
-  -webkit-transition: background-color .1s ease-out;
-  -moz-transition: background-color .1s ease-out;
-  -o-transition: background-color .1s ease-out;
-  transition: background-color .1s ease-out;
-}
-
-#global-search button .fa-search{
-  position: relative;
-  color: white;
-  font-size:14px;
-  top:-1px; 
-}
-
-#global-search button:hover{
-  background-color:$ve-teal-darker-1;
 }
 
 
@@ -173,10 +101,6 @@ ul.global-menu {
 .project-level-header {
   z-index: 100;
   position: relative;
-}
-
-nav.project-level-header {
-  background-color: $ve-slate-darker-2;
 }
 
 /*------------------------------------------------------------------

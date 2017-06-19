@@ -17,6 +17,8 @@
 @import "layout/_ve-no-panes.scss";
 @import "layout/_ve-table-filter.scss";
 
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400,400i,500,500i,700,700i,900');
+
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
 .cke_button__mmsvlink_label, .cke_button__mmsreset_label {
   display: inline !important;
@@ -85,29 +87,11 @@ div.tooltip-inner {
 1. Typography
 -------------------------------------------------------------------*/
 
-#ve-login,
-#ve-origin-select,
-.ve-dark-modal,
-.ve-dark-dropdown-nav,
-.ve-dark-dropdown-menu,
-#ve-origin-select,
-#ve-login{
-
-  color: white;
-  font-weight: 300;
-  letter-spacing: .05em;
-
-  a,
-  a:hover,
-  a:visited {
-    text-decoration: none;
-    color:white;
-  }
+body{
+  font-family: 'Roboto', sans-serif;
 }
 
-.ve-secondary-text{
-  color:$ve-light-text;
-}
+
 
 /*------------------------------------------------------------------
 2. Global UI Elements
@@ -118,124 +102,6 @@ div.tooltip-inner {
 -------------------------------------------------------------------*/
 
 
-#ve-login,
-#ve-origin-select,
-.ve-dark-modal,
-.ve-dark-dropdown-nav,
-.ve-dark-dropdown-menu,
-.ve-table-buttons
-#ve-origin-select,
-#ve-login,
-.ve-table-filter,
-.ve-search
-{
-
-  .btn {
-    font-weight: 500;
-    letter-spacing: .14em;
-    font-size: 12px;
-    -webkit-transition: background-color .1s ease-out;
-    -moz-transition: background-color .1s ease-out;
-    -o-transition: background-color .1s ease-out;
-    transition: background-color .1s ease-out;
-    border: none;
-    text-transform: uppercase;
-    border-radius:3px;
-    box-shadow:none;
-    padding: 7px 12px;
-  }
-
-/*------------------------------------------------------------------
-    2.1.1 Primary Button
--------------------------------------------------------------------*/
-
-  .btn-primary {
-    background-color: $ve-teal-base;
-    color:white;
-  }
-
-  .btn-primary:hover {
-    background-color: $ve-teal-darker-1;
-    border: none;
-  }
-
-/*------------------------------------------------------------------
-    2.1.2 Small Button
--------------------------------------------------------------------*/
-
-  .btn-sm{
-    padding: 5px 10px;
-    font-size:11px;
-  }
-
-/*------------------------------------------------------------------
-    2.1.3 Warning Button
--------------------------------------------------------------------*/
-
-  /*Not sure where this came from*/
-
-  .btn-warning {
-    background-color: rgba(255, 255, 255, 0);
-    border: none;
-  }
-
-  .btn-warning:hover {
-    background-color: rgba(255, 255, 255, 0);
-  }
-
-/*------------------------------------------------------------------
-    2.1.4 Tertiary Button
--------------------------------------------------------------------*/
-
-  /*Discreet light grey button. Now just being used for filter table*/
-
-  .btn-tertiary{
-    color: $ve-light-text;
-    background-color:$ve-silver-base;
-  }
-
-  .btn-tertiary:hover{
-    background-color:$ve-silver-darker-2;
-    color:$ve-light-text-darker-1;
-  }
-}
-
-/*------------------------------------------------------------------
-  2.2 Modals
--------------------------------------------------------------------*/
-
-.ve-dark-modal {
-  background-color:$ve-slate-darker-2;
-
-  .modal-content {
-    background-color: $ve-slate-base;
-    border: none;
-    border-radius: 3px;
-  }
-
-  .modal-body {
-    padding: 16px 15px 30px;
-  }
-
-  .modal-title {
-    margin: 0;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-weight: 400;
-    color:$ve-white-text-lighter-2;
-  }
-
-  /*Clearing bootstrap*/
-  .modal-header {
-    border-bottom: 1px solid $ve-slate-darker-1;
-  }
-
-  /*Clearing bootstrap*/
-  .modal-footer {
-    border-top: 1px solid $ve-slate-darker-1;
-  }
-}
 
 /*------------------------------------------------------------------
   2.3 Dropdown
@@ -244,134 +110,6 @@ div.tooltip-inner {
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav {
 
-  /*Clearing bootstrap*/
-  ul.dropdown-menu {
-    min-height: 0;
-    overflow-y: auto;
-    max-height: 300px;
-  }
-
-  button.dropdown-toggle {
-    display: inline;
-    color: white;
-    border: none;
-    border-radius: 2px !important;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
-    letter-spacing: .05em; /*overwriting user agent stylesheet */
-  }
-
-  button.dropdown-toggle .fa-caret-down {
-    padding: 2px 4px 2px 10px;
-    color: $ve-white-text-darker-1;
-    float: right;
-  }
-
-  .dropdown-menu {
-    background-color: $ve-slate-lighter-1;
-    border: none;
-    min-width: 100%;
-  }
-
-  ul.dropdown-menu {
-    border-radius: 3px;
-    margin-top: 4px;
-    max-width: 300px;
-  }
-
-  .dropdown-menu li {
-    padding: 6px 8px;
-    word-wrap: break-word;
-    width: 100%;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
-    cursor: pointer;
-  }
-
-  .dropdown-menu li:hover {
-    background-color: $ve-slate-lighter-2;
-  }
-
-  .dropdown-menu li.divider {
-    height: 1px;
-    margin: 6px 0;
-    background-color: $ve-slate-lighter-2;
-    padding: 0;
-  }
-
-  /*Clearing bootstrap styling*/
-  .dropdown-menu > li > a:hover {
-    background-color: $ve-clear;
-    color: white;
-  }
-
-  /*Clearing bootstrap styling*/
-  .dropdown-menu > li > a {
-    padding: 1px 10px;
-    font-weight:300;
-    color:white;
-  }
-
-  button.dropdown-toggle:hover {
-    background-color: $ve-slate-darker-1;
-  }
-
-  .btn-group.open button.dropdown-toggle {
-    background-color: $ve-slate-darker-1;
-  }
-
-  /*When a list item is selected, include a check mark before it. Add additional padding to these lists*/
-  .dropdown-menu.list-with-selected-item li {
-    padding-left: 30px;
-    position: relative;
-  }
-
-  /*Clear hover on list items with buttons in them and disabled branches*/
-  .dropdown-menu li.button-item:hover,
-  .dropdown-menu li.branch-disabled:hover,{
-    background-color: $ve-slate-lighter-1;
-  }
-
-  /*Clear padding on top for lists with buttons*/
-  ul.list-with-button {
-    padding-top: 0;
-  }
-
-  /* set min width for button in a list*/
-  .btn-primary {
-    min-width: 260px;
-  }
-
-  /*Clear padding for check mark list items with buttons in them */
-  .dropdown-menu.list-with-selected-item li.button-item {
-    padding-left: 8px;
-  }
-
-  /*Clear padding for check mark list items with tabs in them */
-  .dropdown-menu.list-with-selected-item li.tab-item {
-    padding: 0px;
-  }
-
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color:$ve-green-lighter-1;
-  }
-
-  /*Styling for Branch that is being created. */
-
-  .branch-disabled{
-    color:$ve-white-text-darker-1;
-  }
 
   .branch-disabled::before{
     font-family:FontAwesome;
@@ -381,7 +119,21 @@ div.tooltip-inner {
     top: 3px;
     color:$ve-silver-base;
   }
+}
 
+.ve-dark-dropdown-nav .checked-list-item::before, .ve-dark-dropdown-wide .checked-list-item::before {
+  content: "\f00c";
+  font-family: FontAwesome;
+  height: 16px;
+  position: absolute;
+  left: 10px;
+  top: 6px;
+  width: 16px;
+  color: #60b9a6;
+}
+.ve-dark-dropdown-nav .dropdown-menu.list-with-selected-item li, .ve-dark-dropdown-wide .dropdown-menu.list-with-selected-item li {
+  padding-left: 30px;
+  position: relative;
 }
 
 /*------------------------------------------------------------------
@@ -396,25 +148,7 @@ div.tooltip-inner {
 
 .ve-dark-dropdown-wide {
 
-  button.dropdown-toggle {
-    width: 100%;
-    text-align: left;
-    font-size: 16px;
-    padding: 5px 8px;
-    height: 34px;
-    line-height: 18px;
-    margin-top: 6px;
-    background-color:$ve-slate-base;
-  }
-
-  .dropdown-menu {
-    min-width: 100%;
-    font-size: 16px !important;
-  }
-
   .label-dropdown {
-    color: $ve-white-text-lighter-2;
-    font-size: 15px;
     display: block; 
   }
 
@@ -429,34 +163,6 @@ div.tooltip-inner {
 }
 
 .ve-dark-dropdown-nav {
-
-  button.dropdown-toggle {
-    height: 24px;
-    background-color: $ve-slate-base;
-    font-size: 14px;
-    padding: 3px 4px;
-    line-height: 18px;
-  }
-
-  button.dropdown-toggle:hover {
-    background-color: $ve-slate-darker-1;
-  }
-
-  .label-dropdown {
-    color: $ve-white-text-lighter-2;
-    font-size: 14px;
-    padding: 0 0 0 4px;
-  }
-
-  .btn-group.open button.dropdown-toggle {
-    background-color: $ve-slate-darker-3;
-  }
-
-  /* over write bootstrap*/
-  li {
-    font-size: 14px;
-  }
-
   .selected-dropdown{
     font-weight: 500;
   }
@@ -471,11 +177,6 @@ div.tooltip-inner {
   border: 1px solid $ve-slate-lighter-2;
 }
 
-.fixed-content-dropdown.open > a.dropdown-toggle,
-.fixed-content-dropdown li > a.dropdown-toggle{
-  color: $white;
-}
-
 .fixed-content-dropdown .fa-caret-down {
   float: none;
 }
@@ -488,52 +189,7 @@ div.tooltip-inner {
     2.4.1 Dark Tabs
 -------------------------------------------------------------------*/
 
-.ve-dark-dropdown-wide,
-.ve-dark-dropdown-nav{
-  .nav-tabs {
-    background-color: $ve-slate-base;
-  }
 
-  .list-with-tabs .button-item {
-    background-color: $ve-slate-base;
-  }
-
-  .nav-tabs > li.uib-tab {
-    width: 50%;
-    text-align: center;
-  }
-
-  .nav-tabs > li.uib-tab:hover,
-  .list-with-tabs li.button-item:hover {
-    background-color: $ve-slate-base;
-  }
-
-  .nav-tabs > li.uib-tab:hover,
-  .list-with-tabs li.button-item:hover {
-    background-color: $ve-slate-base;
-  }
-
-  .nav-tabs > li.active.uib-tab > a {
-    background-color: $ve-slate-base;
-    border: none;
-    border-bottom: 3px solid $ve-teal-base;
-    color: white;
-    margin: 0;
-  }
-
-  .nav-tabs > li.uib-tab > a {
-    background-color: $ve-slate-base;
-    border: none;
-    border-bottom: 3px solid $ve-slate-base;
-    color: $ve-white-text-lighter-2;
-    margin: 0;
-  }
-
-  li.uib-tab > a:hover {
-    background-color: $ve-slate-base;
-    border-bottom: 3px solid $ve-teal-darker-1;
-  }
-}
 
 /*------------------------------------------------------------------
     2.4.2 Light Tabs
@@ -663,4 +319,18 @@ span {
   -webkit-hyphens: auto;
   -moz-hyphens: auto;
   hyphens: auto;
+}
+
+.pane-right.fa-pane-scroller{
+  background-color: rgba(0, 0, 0, 0.04);
+  border-left: 1px solid rgba(0,0,0,0.1);
+}
+
+.container-pane-left .fa-pane-scroller{
+  background-color: rgba(0, 0, 0, 0.04);
+  border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+h4.prop-title{
+  margin-bottom:0;
 }
