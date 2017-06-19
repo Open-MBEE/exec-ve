@@ -1,11 +1,15 @@
 
 <div class="signature-box">
-	<div class="signature-line"></div>
-	<div class="signature-info">
-		<span>
-			<p class="signature-name">{{ Name || signature.name }}</p>,
-			<p class="signature-title">{{ Title || signature.title }}</p>
-		</span>
-		<p class="signature-date">{{ Date || signature.date }}</p>
-	</div>
+	<table>
+		<tr>
+			<td class="signature-line-one">______________________________________	</td>
+			<td class="signature-line-two">________________</td>
+		</tr>
+		<tr>
+			<td><p class="signature-name">{{ Name || signature.name }}</p>,
+				<p class="signature-title">{{ Title || signature.title }}</p>
+			</td>
+			<td><p class="signature-date">{{ Date || signature.date }}</p></td>
+		</tr>
+	</table>
 </div>

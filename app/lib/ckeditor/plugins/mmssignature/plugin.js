@@ -7,38 +7,52 @@ CKEDITOR.plugins.add( 'mmssignature', {
 	requires: 'widget',
 	// Register the icons.
 	icons: 'mmssignature',
-	editables: {
-		name: {
-			selector: '.signature-name'
-		},
-		title: {
-			selector: '.signature-title'
-		},
-		date: {
-			selector: '.signature-date'
-		}
-	},
 
 	init: function( editor ) {
 		// TO DO: Explanation
 		editor.widgets.add( 'mmssignature', {
       		button: 'Insert Signature Template',
-      		allowedContent: 'mms-signature[*]',
+
+   //    		template: 
+			// 	'<div class="signature-box">' +
+			// 		'<div class="signature-line"></div>' +
+			// 		'<div class="signature-info">' +
+			// 			'<span>' +
+			// 				'<p class="signature-name">{{ Name || signature.name }}</p>,' +
+			// 				'<p class="signature-title">{{ Title || signature.title }}</p>' +
+			// 			'</span>' +
+			// 			'<p class="signature-date">{{ Date || signature.date }}</p>' +
+			// 		'</div>' +
+			// 	'</div>',
+
+			editables: {
+				name: {
+					selector: '.signature-name'
+				},
+				title: {
+					selector: '.signature-title'
+				},
+				date: {
+					selector: '.signature-date'
+				}
+			},
+
+      		allowedContent: 'mms-signature[*]; ',
 			insert: function() {
         		var defaultConfig = { 
-          			callbackModalFnc : function () {
-            			console.log("There is no callback function defined");
+          			callbackFnc : function () {
+            			
           			} 
         		};
         		var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmssignature || {}, true);
-        		var tag = config.callbackModalFnc(editor,false);
+        		var tag = config.callbackFnc(editor);
       		},
       // Check the elements that need to be converted to widgets.
 			upcast: function( element ) {
 				// Return "true" (that element needs to converted to a mmssignature widget)
 				// for all <mms-signature> elements.
 				return (element.name == 'mms-signature');
-			},
+			}
     });
     
 	}

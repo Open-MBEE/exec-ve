@@ -391,6 +391,12 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             update();
         };
         
+        var signatureCallback = function(ed) {
+            // //grab html and parse for signature fields
+            // var body = ed.document.getBody();
+            
+        };
+
         var update = function() {
             // getData() returns CKEditor's processed/clean HTML content.
             if (angular.isDefined(instance) && instance !== null)
@@ -414,7 +420,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
         var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink', 'Mmssignature' ] };
+        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink','Mmssignature' ] };
         var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
 
         //Set toolbar based on editor type
@@ -452,6 +458,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             mmscomment: {callbackModalFnc: commentCallback},
             mmsvlink: {callbackModalFnc: viewLinkCallback},
             mmsreset: {callback: mmsResetCallback},
+            mmssignature: {callback: signatureCallback},
             autoGrow_minHeight: 200,
             autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50, 
