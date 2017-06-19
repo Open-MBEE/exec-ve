@@ -121,7 +121,7 @@ body{
   }
 }
 
-.ve-dark-dropdown-nav .checked-list-item::before, .ve-dark-dropdown-wide .checked-list-item::before {
+.dropdown .checked-list-item::before{
   content: "\f00c";
   font-family: FontAwesome;
   height: 16px;
@@ -131,7 +131,7 @@ body{
   width: 16px;
   color: #60b9a6;
 }
-.ve-dark-dropdown-nav .dropdown-menu.list-with-selected-item li, .ve-dark-dropdown-wide .dropdown-menu.list-with-selected-item li {
+.dropdown .dropdown-menu.list-with-selected-item li{
   padding-left: 30px;
   position: relative;
 }
@@ -333,4 +333,24 @@ span {
 
 h4.prop-title{
   margin-bottom:0;
+}
+
+.element-viewer.tools::before{
+  content: "Detail";
+}
+
+.element-editor.tools::before{
+  content: "Edit";
+}
+
+.element-history.tools::before{
+  content: "History";
+}
+
+.tags.tools::before{
+  content: "Tags";
+}
+
+.jobs.tools::before{
+  content: "Jobs";
 }
