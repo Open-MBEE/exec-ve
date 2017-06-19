@@ -1,6 +1,6 @@
 'use strict';
 
-describe('mmsTranscludeImg Directive', function () {
+xdescribe('mmsTranscludeImg Directive', function () {
     var scope,
         element; 
     var $httpBackend;

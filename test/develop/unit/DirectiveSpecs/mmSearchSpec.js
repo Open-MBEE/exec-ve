@@ -114,7 +114,7 @@ xdescribe('Directive: mmsSearch', function() {
 		scope.$apply();
 
 		element.isolateScope().newSearch(scope.searchText, 1, scope.itemsPerPage);
-		console.log(element.html());
+		// console.log(element.html());
 		// expect(element.html()).toContain('First Element');
 		$httpBackend.flush();
 	});

@@ -119,26 +119,6 @@ xdescribe('Service: ViewService', function() {
  	    $httpBackend.verifyNoOutstandingRequest();
     });
 
-    // xdescribe('Method: processString', function() {
-    // 	it('it should process string', function() {
- 
-    // 	});
-    // });
-    // xdescribe('Method: processStrings', function() {
-    // 	it('it should process strings', function() {
- 
-    // 	});
-    // });
-    // xdescribe('Method: processPeople', function() {
-    // 	it('it should process people', function() {
- 
-    // 	});
-    // });
-    // xdescribe('Method: processRevisions', function() {
-    // 	it('it should process strings', function() {
- 
-    // 	});
-    // });
     describe('Method: downgradeDocument', function() {
     	it('it should demote an object to a view', function() {
     		var result;
@@ -157,7 +137,7 @@ xdescribe('Service: ViewService', function() {
     	});
     });
 
-    xdescribe('Method: getViewElements', function() {
+    describe('Method: getViewElements', function() {
     	it('it should get the element objects for elements allowed in the view', function() {
 			var result;
 			var testElem = {
@@ -180,7 +160,7 @@ xdescribe('Service: ViewService', function() {
     	});
     });
 
-    xdescribe('Method: getDocumentViews', function() {
+    describe('Method: getDocumentViews', function() {
     	it('it should get the view objects for a document', function() {
     		var result;
  			var testElem = {
@@ -199,7 +179,7 @@ xdescribe('Service: ViewService', function() {
     	});
     });
 
-    xdescribe('Method: addViewtToParentView', function() {
+    describe('Method: addViewtToParentView', function() {
     	it('it should get the view objects for a document', function() {
     		var result;
  			var testElem = {
@@ -339,60 +319,4 @@ xdescribe('Service: ViewService', function() {
 			$httpBackend.flush();
 		});	
 	});	
-
-		// beforeEach(inject(function($injector) {
-		// 	ViewService = $injector.get('ViewService');
-		// 	CacheService = $injector.get('CacheService');
-		// 	$httpBackend = $injector.get('$httpBackend');
-		// 	$rootScope = $injector.get('$rootScope');
-
-		// 	ownerId = getOwner();
-		// 	$httpBackend.whenGET(root + '/elements/idMatchDocId').respond(
-		// 		{elements: [{name:'doc with matching id', sysmlId:'idMatchDocId', type:'Class',
-		// 		_view2view:[{id:'nonMatchId', childrenViews:[]}, {id:'parentViewId', childrenViews:[]}]}]});
-		// 	$httpBackend.whenGET(root + '/elements/MMS_1442345799882_df10c451-ab83-4b99-8e40-0a8e04b38b9d').respond(
-		// 			{elements: [{_creator:'muschek', name:'doc with empty view2view', sysmlId:'emptyView2ViewDocId',
-		// 			type:'Class', _view2view:[]
-		// 	}]});
-		// 	$httpBackend.whenGET(root + '/views/elemId/elements').respond(
-		// 		{elements: [{_creator:'muschek', name:'view\'s element', sysmlId:12346, ownerId:12345, _modified:'01-01-2014'}, 
-		// 		{_creator:'muschek', name:'view\'s 2nd element', sysmlId:12347, ownerId:12345, _modified:'01-01-2014'}]});
-				
-		// 	$httpBackend.when('POST', root + '/elements').respond(function(method, url, data) {
-
-		// 		var json = JSON.parse(data);
-
-		// 		if (!json.elements[0].sysmlId) {
-		// 			json.elements[0].sysmlId = json.elements[0].name + 'Id';
-		// 		}
-		// 		return [200, json];
-		// 	});
-		// 	$httpBackend.when('POST', root + '/sites/siteId/elements').respond(function(method, url, data) {
-
-		// 		var json = JSON.parse(data);
-
-		// 		if (!json.elements[0].sysmlId) {
-		// 			json.elements[0].sysmlId = json.elements[0].name + 'Id';
-		// 		}
-		// 		return [200, json];
-		// 	});
-		// 	$httpBackend.when('POST', root + '/sites/vetest/elements').respond(function(method, url, data) {
-
-		// 		var json = JSON.parse(data);
-
-		// 		if (!json.elements[0].sysmlId) {
-		// 			json.elements[0].sysmlId = json.elements[0].name + 'Id';
-		// 		}
-		// 		return [200, json];
-		// 	});
-
-		// 	$httpBackend.whenGET(root + '/sites/ems/products').respond(function(method, url, data) {
-		// 		if (forceFail) { return [500, 'Internal Server Error']; }
-		// 		else {
-		// 			var products = { products: [ { id: 'productId', name: 'Product Name', snapshots: [ { created: '01-01-2014', creator: 'muschek',
-		// 			id: 'snapshotId' } ] } ] };
-		// 			return [200, products];
-		// 		}
-		// 	});
-		// }));
 });

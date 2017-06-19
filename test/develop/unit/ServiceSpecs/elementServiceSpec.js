@@ -405,7 +405,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	describe('cacheElement', function() { //redundant test?
+	xdescribe('cacheElement', function() { //redundant test?
 		// it('should cache an element', function() {
 		// 	var elemOb;
 		// 	var testElem = {
@@ -449,7 +449,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	describe('getGenericElements', function() {
+	xdescribe('getGenericElements', function() {
 		// it('should get an element', function() {
 		// 	var result;
 		// 	var url = '/alfresco/service/projects/heyaproject/refs/master/elements';
@@ -470,7 +470,7 @@ describe('Service: ElementService', function() {
 		// });
 	});
 
-	describe('fillInElement', function() {
+	xdescribe('fillInElement', function() {
 		it('should get an element', function() {
 
 		});
@@ -501,7 +501,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	describe('updateElements', function() {
+	xdescribe('updateElements', function() {
 		it('should get an element', function() {
 
 		});
@@ -533,17 +533,17 @@ describe('Service: ElementService', function() {
 			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(201, elements.elements);
 
 			var result = ElementServiceObj.createElement(reqOb);		
-			console.log("result: " + result);
+			// console.log("result: " + result);
 		});
 	});
 
-	describe('createElements', function() {
+	xdescribe('createElements', function() {
 		it('should get an element', function() {
 
 		});
 	});
 
-	describe('isCacheOutdated: do not need to test', function() {
+	xdescribe('isCacheOutdated: do not need to test', function() {
 	});
 
 	describe('search', function() {

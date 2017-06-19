@@ -37,7 +37,7 @@ describe('Directive: mmsValueLink', function() {
 		$compile(element)(scope);
 		scope.$apply();
 		expect(element.html()).toContain('JS Space');
-		console.log(element.html());
+		// console.log(element.html());
 	});
 
 
