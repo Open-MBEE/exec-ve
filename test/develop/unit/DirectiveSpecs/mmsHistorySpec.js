@@ -63,7 +63,6 @@ describe('Directive: mmsHistory', function () {
                             _refId: "master",
                             _projectId: "someproject",
                             name: "Recover",
-                            _modified: "2015-04-28T16:36:22.991-0700",
                             _creator: "someCrazyDude",
                             categoryId: "920384ijijroewiroie"
                         },
@@ -82,7 +81,6 @@ describe('Directive: mmsHistory', function () {
                             _refId: "anotherref",
                             _projectId: "anotherproject",
                             name: "Recover2",
-                            _modified: "2015-04-28T16:36:22.991-0700",
                             _creator: "AnotherCrazyDude",
                             categoryId: "299ufsjlkdlfsf"
                         }]
