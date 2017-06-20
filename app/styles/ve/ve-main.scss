@@ -337,11 +337,35 @@ Temp - color to panels
   border-left: 1px solid #e7e7e7;
 }
 
-.container-pane-left .fa-pane-scroller{
+.west-tabs.fa-pane-scroller{
   background-color: rgba(0, 0, 0, 0.04);
   border-right: 1px solid #e7e7e7;
 }
 
+.west-tabs .fa-pane-scroller{
+  padding-top:40px;
+}
+
+.toolbar.pane-left-btn-group{
+  padding: 10px;
+  margin-bottom: 4px;
+}
+
+
+/*------------------------------------------------------------------
+Temp - navbar shadow
+-------------------------------------------------------------------*/
+.navbar.project-level-header{
+  box-shadow: 0 2px 4px -1px rgba(0,0,0,0.06),0 4px 5px 0 rgba(0,0,0,0.06),0 1px 10px 0 rgba(0,0,0,0.08);
+}
+
+.pane-toolbar.fa-pane-orientation-horizontal{
+  background-color:rgba(0,0,0,0.2);
+}
+
+.switch-org{
+  display:none;
+}
 
 /*------------------------------------------------------------------
 Temp - break up properties in R panel
@@ -387,6 +411,8 @@ Temp - Lables to buttons
   top: 900%;
 }
 
+
+// Create Buttons
 .view-tools.show-edits,
 .view-tools.print,
 .pane-center .view-tools.dropdown-toggle,
@@ -403,7 +429,7 @@ Temp - Lables to buttons
   background-image: none;
   border: 1px solid #e7e7e7;
   white-space: nowrap;
-  padding: 6px 12px;
+  padding: 4px 12px;
   font-size: 14px;
   line-height: 1.428571429;
   border-radius: 4px;
@@ -412,15 +438,29 @@ Temp - Lables to buttons
   -ms-user-select: none;
   user-select: none;
   font-family: "Roboto";
-  margin: 3px 1px;
+  margin: 5px 1px;
   background-color:white;
 }
+
+
+//Add element- primary button
+
+.pane-center .view-tools.dropdown-toggle{
+  //background-color:#428bca;
+  //color:white !important;
+  //border: 1px solid #428bca;
+  margin-left: 60%;
+}
+
 
 .view-tools.word,
 .view-tools.tabletocsv,
 .view-tools.print,
 .view-tools.convert-pdf{
   float:right;
+  //background-color:#42b7ca;
+  //border: 1px solid #42b7ca;
+  //color:white;
 }
 
 
@@ -433,12 +473,12 @@ Temp - Lables to buttons
 
 
 .view-tools .fa-pencil-square-o::after{
-  content:"Previewing";
+  content:"Edit";
   font-family:"Roboto";
 }
 
 .view-tools .fa-pencil-square::after{
-  content:"Editing";
+  content:"Preview";
   font-family:"Roboto";
 }
 
@@ -488,6 +528,7 @@ Temp - Lables to buttons
 
 
 /* Hide extra html to whatever to mockup dropdown */
+
 .view-tools.tabletocsv,
 .view-tools.convert-pdf{
   display:none;
@@ -514,3 +555,19 @@ Temp - max height of documentation
   border-bottom: 1px solid #e7e7e7;
   height:100%;
 }
+
+
+
+/*------------------------------------------------------------------
+Temp - style form control
+-------------------------------------------------------------------*/
+.form-control{
+  border:1px solid transparent;
+  -webkit-box-shadow:none;
+  box-shadow:none;
+}
+
+
+
+
+

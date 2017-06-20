@@ -6,7 +6,7 @@
         <div id="global-navigation">
             <form id="global-search" ng-submit="search(searchText)">
                 <input placeholder="Search selected project" ng-model="searchText"/>
-                <button ng-click="search(searchText)">
+                <button ng-click="search(searchText)" class="btn btn-sm">
                     <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
             </form>
@@ -19,7 +19,7 @@
                     <a target="_blank" ng-href="/share/page/site/{{org.id}}/dashboard">Dashboard</a>
                 </li>
                 <li>
-                    <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown" uib-dropdown="" on-toggle="toggled(open)">
+                    <span class="dropdown" uib-dropdown="" on-toggle="toggled(open)">
                         <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" href="" uib-dropdown-toggle="">
                         Help <i class="fa fa-caret-down" aria-hidden="true"></i>
                         </a>
