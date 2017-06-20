@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Directive: mmsTranscludeDoc', function() {
+xdescribe('Directive: mmsTranscludeDoc', function() {
     var scope,
         element; 
     var $httpBackend;

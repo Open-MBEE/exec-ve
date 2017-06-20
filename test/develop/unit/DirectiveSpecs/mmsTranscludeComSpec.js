@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Directive: mmsTranscludeCom', function () {
+xdescribe('Directive: mmsTranscludeCom', function () {
     var scope,
         element; 
     var $httpBackend;
@@ -52,9 +52,9 @@ describe('Directive: mmsTranscludeCom', function () {
         element = angular.element('<mms-transclude-com mms-element-id="{{element.mmsElementId}}" mms-project-id="{{element.mmsProjectId}}" mms-ref-id="{{element.mmsRefId}}" mms-commit-id="{{element.mmsCommitId}}"></mms-transclude-com>');
         $compile(element)(scope);
         scope.$apply();
-        console.log("elem: " + element.val());        // expect(element.html()).toContain("The rain in Spain falls mainly on the plain.");
+        // console.log("elem: " + element.val());        // expect(element.html()).toContain("The rain in Spain falls mainly on the plain.");
 
-        console.log("text: " + element.html());
+        // console.log("text: " + element.html());
         expect(element.html()).toContain("- theonetrueadmin");
         $httpBackend.flush();
     });

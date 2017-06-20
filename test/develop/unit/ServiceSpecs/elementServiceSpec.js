@@ -27,40 +27,40 @@ describe('Service: ElementService', function() {
 
 		projects = {
 			projects: [
-			    {
-			        _created	: "2017-04-18T14:56:57.635-0700",
-			        _creator	: "gandalf",
-			        _elasticId	: "elasticId",
-			        _modified	: "2017-04-18T14:56:57.635-0700",
-			        _modifier	: "gandalf",
-			        _mounts		: [],
-			        _projectId	: "projectId",
-			        _refId		: "master",
-			        categoryId	: "",
-			        id 			: "hereisanid",
-			        name		: "youshallnotpass",
-			        orgId 		: "minesofmoria",
-			        twcId 		: "",
-			        type 		: "Project",
-			        uri 		: "file:/Users/gandalf/Documents/youshallnotpass.mdzip"
-			    },
-			    {
-			        _created 	: "2017-04-19T11:31:07.968-0700",
-			        _creator	: "admin",
-			        _elasticId	: "elasticId2",
-			        _modified	: "2017-04-19T11:31:07.968-0700",
-			        _modifier	: "admin",
-			        _mounts		: [],
-			        _projectId	: "projectId2",
-			        _refId 		: "master",
-			        categoryId 	: "",
-			        id 			: "hereisanotherid",
-			        name 		: "thelonelymountain",
-			        orgId 		: "Erebor",
-			        twcId 		: "",
-			        type 		: "Project",
-			        uri 		: "file:/Users/admin/Downloads/thelonelymountain.mdzip"
-			    }
+				{
+					_created	: "2017-04-18T14:56:57.635-0700",
+					_creator	: "gandalf",
+					_elasticId	: "elasticId",
+					_modified	: "2017-04-18T14:56:57.635-0700",
+					_modifier	: "gandalf",
+					_mounts		: [],
+					_projectId	: "projectId",
+					_refId		: "master",
+					categoryId	: "",
+					id 			: "hereisanid",
+					name		: "youshallnotpass",
+					orgId 		: "minesofmoria",
+					twcId 		: "",
+					type 		: "Project",
+					uri 		: "file:/Users/gandalf/Documents/youshallnotpass.mdzip"
+				},
+				{
+					_created 	: "2017-04-19T11:31:07.968-0700",
+					_creator	: "admin",
+					_elasticId	: "elasticId2",
+					_modified	: "2017-04-19T11:31:07.968-0700",
+					_modifier	: "admin",
+					_mounts		: [],
+					_projectId	: "projectId2",
+					_refId 		: "master",
+					categoryId 	: "",
+					id 			: "hereisanotherid",
+					name 		: "thelonelymountain",
+					orgId 		: "Erebor",
+					twcId 		: "",
+					type 		: "Project",
+					uri 		: "file:/Users/admin/Downloads/thelonelymountain.mdzip"
+				}
 			]
 		}
 
@@ -71,7 +71,6 @@ describe('Service: ElementService', function() {
 			id: "thirdref",
 			name: "thirdref"
 		}]
-
 
 		refs = {
 			refs: [
@@ -273,16 +272,15 @@ describe('Service: ElementService', function() {
 		// }
 
 		// $httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, elementHistory);
-				
 	});
 
 
-    afterEach(function () {
-        $httpBackend.verifyNoOutstandingExpectation();
- 	    $httpBackend.verifyNoOutstandingRequest();
-    });
+	afterEach(function () {
+		$httpBackend.verifyNoOutstandingExpectation();
+		$httpBackend.verifyNoOutstandingRequest();
+	});
 
-	describe('getElement', function() { 
+	describe('getElement', function() {
 		it('should get an element that is not in the cache', function() {
 			var elemOb;
 			var testElem = {
@@ -390,7 +388,6 @@ describe('Service: ElementService', function() {
 				refId: 'master',
 				commitId: 'latest'
 			};
-			
 			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(
 				function(method, url, data) {
 					return [200, elements];
@@ -405,7 +402,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	describe('cacheElement', function() { //redundant test?
+	xdescribe('cacheElement', function() { //redundant test?
 		// it('should cache an element', function() {
 		// 	var elemOb;
 		// 	var testElem = {
@@ -424,32 +421,40 @@ describe('Service: ElementService', function() {
 		// });
 	});
 
-	describe('getElementForEdit', function() { //getElementForEdit returns a promise, how to test?
-		it('should get an element', function() {
+	describe('getElementForEdit', function() {
+		it('should get an edit element from cache', function() {
 			var elemOb;
-			var testElem = {
+			var reqOb = {
 				projectId: "heyaproject",
 				elementId: "heyanelement",
 				refId: 'master',
 				commitId: 'latest'
 			};
-			$httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(200, testElem);
+			// var elemReturned = {};
+			// elemReturned.elements = [reqOb];
+			// $httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(200, elements);
 			
-			var key = mockUtilsService.makeElementKey(testElem);
-			var val = mockCacheService.put(key, testElem);
+			var key = mockUtilsService.makeElementKey({
+				_projectId: reqOb.projectId, 
+				id: reqOb.elementId, 
+				_commitId: reqOb.commitId, 
+				_refId: reqOb.refId
+			}, true);
+			var val = mockCacheService.put(key, reqOb);
 
-			var result = ElementServiceObj.getElementForEdit(testElem);
-			$httpBackend.flush();
+			ElementServiceObj.getElementForEdit(reqOb).then(function(data) {
+				elemOb = data;
+				expect(elemOb).toEqual(val);
+			});
 		});
 	});
 
-	describe('getOwnedElements', function() {
+//TODO either test getownedelements or getgenericelements
+	xdescribe('getOwnedElements', function() {
 		it('should get an elements owned element objects', function() {
-
 		});
 	});
-
-	describe('getGenericElements', function() {
+	xdescribe('getGenericElements', function() {
 		// it('should get an element', function() {
 		// 	var result;
 		// 	var url = '/alfresco/service/projects/heyaproject/refs/master/elements';
@@ -470,45 +475,44 @@ describe('Service: ElementService', function() {
 		// });
 	});
 
-	describe('fillInElement', function() {
-		it('should get an element', function() {
-
-		});
+	describe('fillInElement: do not need to test', function() {
 	});
 
 	describe('updateElement', function() {
 		it('it should save an element to MMS and update the cache if successful', function() {
-			var elemOb;
+			var elemObReturned;
 			var testElem = {
 				_projectId: "heyaproject",
 				id: "heyanelement",
 				_refId: 'master',
-				_commitId: 'latest'
+				_commitId: 'latest',
+				name: ''
 			};
+			var elemOb = {};
+			elemOb.elements = [testElem];
+			elemOb.source = mockApplicationService.getSource();
+
 			var key = mockUtilsService.makeElementKey(testElem);
 			mockCacheService.put(key, testElem);
-			$httpBackend.when('GET', '/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement').respond(200, testElem);
-
-			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(501, elements.elements);
-
+			$httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements', elemOb).respond(201, elemOb);
 			ElementServiceObj.updateElement(testElem).then(function(data) {
-				elemOb = data;
-			}, function(reason) {
-				elemOb = reason.message;
+				elemObReturned = data;
 			});
 			$httpBackend.flush();
-			expect(elemOb).toEqual();
+			expect(elemObReturned).toEqual(testElem);
+			expect(mockCacheService.get(key)).toEqual(testElem);
 		});
 	});
 
-	describe('updateElements', function() {
+	xdescribe('updateElements', function() {
 		it('should get an element', function() {
 
 		});
 	});
 
 	describe('createElement', function() {
-		it('should get an element', function() {
+		it('should get new element and add to cache', function() {
+			var elemOb = {};
 			var toCreate = {
 				id: 'mmsid',
 				ownerid: "holding_bin_heyaproject",
@@ -530,16 +534,29 @@ describe('Service: ElementService', function() {
 				refId: newElem.refId
 			};
 
-			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(201, elements.elements);
-
-			var result = ElementServiceObj.createElement(reqOb);		
-			console.log("result: " + result);
+			var key = mockUtilsService.makeElementKey({
+				_projectId: newElem.projectId,
+				id: toCreate.id,
+				_commitId: newElem.commitId,
+				_refId: newElem.refId
+			});
+			var responseOb = {};
+			responseOb.elements = [toCreate];
+			responseOb.source = mockApplicationService.getSource();
+			$httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements', responseOb).respond(201, responseOb);
+			var result = ElementServiceObj.createElement(reqOb).then(function(data) {
+				elemOb = data;
+			}, function(reason) {
+				elemOb = reason.message;
+			});
+			$httpBackend.flush();
+			expect(elemOb).toEqual(toCreate);
+			expect(mockCacheService.get(key)).toEqual(toCreate);
 		});
 	});
 
-	describe('createElements', function() {
+	xdescribe('createElements', function() {
 		it('should get an element', function() {
-
 		});
 	});
 
@@ -547,9 +564,8 @@ describe('Service: ElementService', function() {
 	});
 
 	describe('search', function() {
-		it('should get an element', function() {
+		it('should return an element that matches query', function() {
 			var searchText = 'krabby patties';
-
 			var q = {
 				id: searchText
 			};
@@ -564,12 +580,12 @@ describe('Service: ElementService', function() {
 				term: q
 			};
 			var mainQuery = {
-               "bool": {
-                    "should": [
-                        idQuery,
-                        allQuery
-                    ]
-                }				
+				"bool": {
+					"should": [
+						idQuery,
+						allQuery
+					]
+				}
 			};
 			var q3 = {
 				_projectId: ["heyaproject"]
@@ -580,17 +596,17 @@ describe('Service: ElementService', function() {
 			var mainBoolQuery =[];
 			mainBoolQuery.push(mainQuery, projectTermsOb);
 			var queryOb = { //assuming searchType is 'all'
-                "sort" : [
-                    "_score",
-                    { "_modified" : {"order" : "desc"}}
-                ],
-                "query": {
-                    "bool": {
-                        "must": mainBoolQuery
-                    }
-                },
-                "from": 21,
-                "size": 20
+				"sort" : [
+					"_score",
+					{ "_modified" : {"order" : "desc"}}
+				],
+				"query": {
+					"bool": {
+						"must": mainBoolQuery
+					}
+				},
+				"from": 21,
+				"size": 20
 			};
 			var testElem = {
 				_projectId: "heyaproject",
@@ -602,7 +618,7 @@ describe('Service: ElementService', function() {
 				_refId: 'master',
 				_commitId: 'latest'
 			};
-			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master?search=' + searchText).respond(201, resultElem);
+			$httpBackend.expectPUT('/alfresco/service/projects/heyaproject/refs/master/search?extended=true', queryOb).respond(201, {elements: resultElem});
 			var reqOb = {
 				projectId: "heyaproject",
 				elementId: "heyanelement",
@@ -612,11 +628,9 @@ describe('Service: ElementService', function() {
 			var elemOb = null;
 			ElementServiceObj.search(reqOb, queryOb, null, null, null).then(function(data) {
 				elemOb = data;
-			}, function(reason) {
-				elemOb = reason.message;
 			});
-			expect(elemOb).toEqual(resultElem);
 			$httpBackend.flush();
+			expect(elemOb).toEqual(resultElem);
 		});
 	});
 
@@ -624,26 +638,24 @@ describe('Service: ElementService', function() {
 		it('should get an element', function() {
 			var commitHistory = {
 				commits: [
-				    {
-				        _created: "2017-04-27T16:23:44.357-0700",
-				        _creator: "admin",
-				        id: "someid1"
-				    },
-				    {
-				        _created: "2017-04-27T16:23:26.081-0700",
-				        _creator: "admin",
-				        id: "someid2"
-				    },
-				    {
-				        _created: "2017-04-27T16:23:06.540-0700",
-				        _creator: "admin",
-				        id: "someid3"
-				    }
-				]				
+					{
+						_created: "2017-04-27T16:23:44.357-0700",
+						_creator: "admin",
+						id: "someid1"
+					},
+					{
+						_created: "2017-04-27T16:23:26.081-0700",
+						_creator: "admin",
+						id: "someid2"
+					},
+					{
+						_created: "2017-04-27T16:23:06.540-0700",
+						_creator: "admin",
+						id: "someid3"
+					}
+				]
 			};
-
 			$httpBackend.when('GET', '/alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, commitHistory);
-
 			var elemOb = {
 				projectId: "someprojectid",
 				elementId: "getelementhistory",
