@@ -191,7 +191,7 @@ describe('ProjectService', function () {
 			        categoryId 	: "",
 			        id 			: "hereisanotherid",
 			        name 		: "thelonelymountain",
-			        orgId 		: "Erebor",
+			        orgId 		: "minesofmoria",
 			        twcId 		: "",
 			        type 		: "Project",
 			        uri 		: "file:/Users/admin/Downloads/thelonelymountain.mdzip"
@@ -286,7 +286,11 @@ describe('ProjectService', function () {
 				id: "thirdref",
 				name: "thirdref"
 			};
-			$httpBackend.when('POST', root + '/projects/hereisanid/refs', testRef).respond(200, true);
+			var elemOb = {};
+			elemOb.refs = [testRef];
+			elemOb.source = mockApplicationService.getSource();
+
+			$httpBackend.expectPOST(root + '/projects/hereisanid/refs', elemOb).respond(200, elemOb);
 			ProjectServiceObj.createRef(testRef, 'hereisanid').then(function (data) {
 				refOb = data;
 			}, function (reason) {
