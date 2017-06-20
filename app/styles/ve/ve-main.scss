@@ -89,9 +89,12 @@ div.tooltip-inner {
 
 body{
   font-family: 'Roboto', sans-serif;
+  color: #424242;
 }
 
-
+a{
+  color:#424242;
+}
 
 /*------------------------------------------------------------------
 2. Global UI Elements
@@ -305,9 +308,13 @@ table caption {
   }
 }
 /*------------------------------------------------------------------
-4. Misc
+4. Misc : placeholder styling
 -------------------------------------------------------------------*/
 
+
+/*------------------------------------------------------------------
+Temp - add word wrap to right panel
+-------------------------------------------------------------------*/
 
 span {
   -ms-word-break: break-all;
@@ -321,19 +328,32 @@ span {
   hyphens: auto;
 }
 
+/*------------------------------------------------------------------
+Temp - color to panels
+-------------------------------------------------------------------*/
+
 .pane-right.fa-pane-scroller{
   background-color: rgba(0, 0, 0, 0.04);
-  border-left: 1px solid rgba(0,0,0,0.1);
+  border-left: 1px solid #e7e7e7;
 }
 
 .container-pane-left .fa-pane-scroller{
   background-color: rgba(0, 0, 0, 0.04);
-  border-right: 1px solid rgba(0,0,0,0.1);
+  border-right: 1px solid #e7e7e7;
 }
+
+
+/*------------------------------------------------------------------
+Temp - break up properties in R panel
+-------------------------------------------------------------------*/
 
 h4.prop-title{
   margin-bottom:0;
 }
+
+/*------------------------------------------------------------------
+Temp - Lables to buttons
+-------------------------------------------------------------------*/
 
 .element-viewer.tools::before{
   content: "Detail";
@@ -353,4 +373,144 @@ h4.prop-title{
 
 .jobs.tools::before{
   content: "Jobs";
+}
+
+.view-tools.center-previous{
+  position: absolute;
+  left: 0px;
+  top: 900%;
+}
+
+.view-tools.center-next{
+  position: absolute;
+  right: 0px;
+  top: 900%;
+}
+
+.view-tools.show-edits,
+.view-tools.print,
+.pane-center .view-tools.dropdown-toggle,
+.view-tools.show-comments,
+.view-tools.word,
+.view-tools.tabletocsv,
+.view-tools.convert-pdf{
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid #e7e7e7;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.428571429;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-family: "Roboto";
+  margin: 3px 1px;
+  background-color:white;
+}
+
+.view-tools.word,
+.view-tools.tabletocsv,
+.view-tools.print,
+.view-tools.convert-pdf{
+  float:right;
+}
+
+
+
+
+.view-tools .fa::before{
+  padding-right:4px;
+}
+
+
+
+.view-tools .fa-pencil-square-o::after{
+  content:"Previewing";
+  font-family:"Roboto";
+}
+
+.view-tools .fa-pencil-square::after{
+  content:"Editing";
+  font-family:"Roboto";
+}
+
+.view-tools .fa-comment-o::after{
+  content:"Show Comments";
+  font-family:"Roboto";
+}
+
+.view-tools .fa-comment::after{
+  content:"Hide Comments";
+  font-family:"Roboto";
+}
+
+.pane-center .view-tools .fa-plus::after{
+  content:"Element";
+  font-family:"Roboto";
+}
+
+.view-tools.show-elements{
+  display:none;
+}
+
+.view-tools .fa-file-word-o::after{
+  content:"HTML to Word";
+  font-family:"Roboto";
+}
+
+.view-tools .fa-file-word-o::after{
+  content:"HTML to Word";
+  font-family:"Roboto";
+}
+
+.view-tools .fa-table::after{
+  content:"Table to CSV";
+  font-family:"Roboto";
+}
+
+.view-tools .fa-print::after{
+  content:"Print";
+  font-family:"Roboto";
+}
+
+.view-tools .fa-file-pdf-o::after{
+  content:"HTML to PDF";
+  font-family:"Roboto";
+}
+
+
+/* Hide extra html to whatever to mockup dropdown */
+.view-tools.tabletocsv,
+.view-tools.convert-pdf{
+  display:none;
+}
+
+.view-tools .fa-file-word-o::after{
+  content:"Export";
+  font-family:"Roboto";
+}
+
+
+/**/
+
+/*------------------------------------------------------------------
+Temp - max height of documentation
+-------------------------------------------------------------------*/
+
+.doc-text{
+  max-height:68px;
+  overflow:hidden;
+}
+
+.pane-center-btn-group{
+  border-bottom: 1px solid #e7e7e7;
+  height:100%;
 }
