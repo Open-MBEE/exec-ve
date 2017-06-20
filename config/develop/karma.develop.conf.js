@@ -91,10 +91,10 @@ module.exports = function (config) {
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_INFO,
 
-        proxies:{
-            '/alfresco':'http://opencae-int.jpl.nasa.gov'
-        },
-        'changeOrigin':true,
+        // proxies:{
+        //     '/alfresco':'http://your-url.com'
+        // },
+        // 'changeOrigin':true,
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
