@@ -9,54 +9,51 @@ CKEDITOR.plugins.add( 'mmssignature', {
 	icons: 'mmssignature',
 
 	init: function( editor ) {
-		// TO DO: Explanation
 		editor.widgets.add( 'mmssignature', {
-			button: 'Insert Signature Template',
-      		// label: 'Insert Signature Template',
 
-   //    		template: 
-			// 	'<div class="signature-box">' +
-			// 		'<div class="signature-line"></div>' +
-			// 		'<div class="signature-info">' +
-			// 			'<span>' +
-			// 				'<p class="signature-name">{{ Name || signature.name }}</p>,' +
-			// 				'<p class="signature-title">{{ Title || signature.title }}</p>' +
-			// 			'</span>' +
-			// 			'<p class="signature-date">{{ Date || signature.date }}</p>' +
-			// 		'</div>' +
-			// 	'</div>',
+            button: 'Create Signature Template',
 
-			// editables: {
-			// 	name: {
-			// 		selector: '.signature-name'
-			// 	},
-			// 	title: {
-			// 		selector: '.signature-title'
-			// 	},
-			// 	date: {
-			// 		selector: '.signature-date'
-			// 	}
-			// },
+      		template: 
+				'<div class="signature-box">' +
+					'<table>' +
+						'<tr>' +
+							'<td><span class="signature-line-one">______________________________________</span></td>' +
+							'<td><span></span></td>' +
+							'<td><span class="signature-line-two">________________</span></td>' +
+						'</tr>' +
+						'<tr>' +
+							'<td><span class="signature-name">Name</span>,' +
+							'<span class="signature-title">Title</span></td>' +
+							'<td></td>' +
+							'<td><span class="signature-date">Date</span></td>' +
+						'</tr>' +
+					'</table>' +
+				'</div>',
 
-      		allowedContent: 'mms-signature[*];',
-      		inline: true,
-			insert: function() {
-        		var defaultConfig = { 
-          			callbackFnc : function () {
-            			
-          			} 
-        		};
-        		var config = CKEDITOR.tools.extend(defaultConfig, editor.config.mmssignature || {}, true);
-        		var tag = config.callbackFnc(editor);
-      		},
-      // Check the elements that need to be converted to widgets.
-			upcast: function( element ) {
-				// Return "true" (that element needs to converted to a mmssignature widget)
-				// for all <mms-signature> elements.
-				return (element.name == 'mms-signature');
-			},
+            editables: {
+                name: {
+                    selector: '.signature-name',
+                    allowedContent: 'br strong em'
+                },
+                title: {
+                    selector: '.signature-title',
+                    allowedContent: 'strong em'
+                },
+                date: {
+                	selector: '.signature-date',
+                	allowedContent: 'br strong em'
+                }
+            },
 
-    	});
+            allowedContent:
+                'div(!signature-box)',
+
+            requiredContent: 'div(signature-box)',
+
+            upcast: function( element ) {
+                return element.name == 'div' && element.hasClass( 'signature-box' );
+            }
+        } );
     }
     
 });

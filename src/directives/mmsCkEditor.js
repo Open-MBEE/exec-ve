@@ -390,12 +390,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             resetCrossRef(body.find('mms-view-link').$, '.vlink]');
             update();
         };
-        
-        var signatureCallback = function(ed) {
-            // //grab html and parse for signature fields
-            ed.insertHtml("hey");
-            
-        };
 
         var update = function() {
             // getData() returns CKEditor's processed/clean HTML content.
@@ -458,7 +452,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             mmscomment: {callbackModalFnc: commentCallback},
             mmsvlink: {callbackModalFnc: viewLinkCallback},
             mmsreset: {callback: mmsResetCallback},
-            mmssignature: {callback: signatureCallback},
             autoGrow_minHeight: 200,
             autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50, 
