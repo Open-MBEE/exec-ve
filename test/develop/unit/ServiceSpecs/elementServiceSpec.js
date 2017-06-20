@@ -278,6 +278,7 @@ describe('Service: ElementService', function() {
 
 
     afterEach(function () {
+    	// $httpBackend.flush();
         $httpBackend.verifyNoOutstandingExpectation();
  	    $httpBackend.verifyNoOutstandingRequest();
     });
@@ -443,7 +444,7 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	describe('getOwnedElements', function() {
+	xdescribe('getOwnedElements', function() {
 		it('should get an elements owned element objects', function() {
 
 		});
@@ -478,26 +479,33 @@ describe('Service: ElementService', function() {
 
 	describe('updateElement', function() {
 		it('it should save an element to MMS and update the cache if successful', function() {
-			var elemOb;
+			var elemObReturned;
 			var testElem = {
 				_projectId: "heyaproject",
 				id: "heyanelement",
 				_refId: 'master',
 				_commitId: 'latest'
 			};
+			var elemOb = {};
+			elemOb.elements = [testElem];
+			elemOb.source = mockApplicationService.getSource();
+
 			var key = mockUtilsService.makeElementKey(testElem);
 			mockCacheService.put(key, testElem);
-			$httpBackend.when('GET', '/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement').respond(200, testElem);
-
-			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(501, elements.elements);
+			$httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements', elemOb).respond(201, elemOb);
 
 			ElementServiceObj.updateElement(testElem).then(function(data) {
-				elemOb = data;
+				elemObReturned = data;
+				console.log(data);
 			}, function(reason) {
 				elemOb = reason.message;
+				console.log("err: " + reason.message);
 			});
+
+				console.log('hello');
+				console.log(elemObReturned);
 			$httpBackend.flush();
-			expect(elemOb).toEqual();
+			// expect(elemOb).toEqual();
 		});
 	});
 
@@ -531,7 +539,7 @@ describe('Service: ElementService', function() {
 			};
 
 			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements', elements.elements).respond(201, elements.elements);
-
+			$httpBackend.flush();
 			var result = ElementServiceObj.createElement(reqOb);		
 			// console.log("result: " + result);
 		});
