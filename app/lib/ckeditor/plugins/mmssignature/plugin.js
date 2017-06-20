@@ -11,7 +11,8 @@ CKEDITOR.plugins.add( 'mmssignature', {
 	init: function( editor ) {
 		// TO DO: Explanation
 		editor.widgets.add( 'mmssignature', {
-      		button: 'Insert Signature Template',
+			button: 'Insert Signature Template',
+      		// label: 'Insert Signature Template',
 
    //    		template: 
 			// 	'<div class="signature-box">' +
@@ -25,19 +26,20 @@ CKEDITOR.plugins.add( 'mmssignature', {
 			// 		'</div>' +
 			// 	'</div>',
 
-			editables: {
-				name: {
-					selector: '.signature-name'
-				},
-				title: {
-					selector: '.signature-title'
-				},
-				date: {
-					selector: '.signature-date'
-				}
-			},
+			// editables: {
+			// 	name: {
+			// 		selector: '.signature-name'
+			// 	},
+			// 	title: {
+			// 		selector: '.signature-title'
+			// 	},
+			// 	date: {
+			// 		selector: '.signature-date'
+			// 	}
+			// },
 
-      		allowedContent: 'mms-signature[*]; ',
+      		allowedContent: 'mms-signature[*];',
+      		inline: true,
 			insert: function() {
         		var defaultConfig = { 
           			callbackFnc : function () {
@@ -52,8 +54,9 @@ CKEDITOR.plugins.add( 'mmssignature', {
 				// Return "true" (that element needs to converted to a mmssignature widget)
 				// for all <mms-signature> elements.
 				return (element.name == 'mms-signature');
-			}
-    });
+			},
+
+    	});
+    }
     
-	}
 });

@@ -393,7 +393,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         
         var signatureCallback = function(ed) {
             // //grab html and parse for signature fields
-            // var body = ed.document.getBody();
+            ed.insertHtml("hey");
             
         };
 
