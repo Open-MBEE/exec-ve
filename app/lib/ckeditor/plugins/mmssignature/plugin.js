@@ -3,13 +3,16 @@
  */
 
 // Register the plugin within the editor.
-CKEDITOR.plugins.add( 'mmssignature', {
+CKEDITOR.plugins.add('mmssignature', {
 	requires: 'widget',
 	// Register the icons.
 	icons: 'mmssignature',
 
-	init: function( editor ) {
-		editor.widgets.add( 'mmssignature', {
+	init: function(editor) {
+
+		CKEDITOR.dialog.add('mmssignature', this.path + 'dialogs/mmssignature.js');
+
+		editor.widgets.add('mmssignature', {
 
             button: 'Create Signature Template',
 
@@ -17,42 +20,34 @@ CKEDITOR.plugins.add( 'mmssignature', {
 				'<div class="signature-box">' +
 					'<table>' +
 						'<tr>' +
-							'<td><span class="signature-line-one">______________________________________</span></td>' +
-							'<td><span></span></td>' +
-							'<td><span class="signature-line-two">________________</span></td>' +
+							'<td class="cell-left-fixed">____________________________________________</td>' +
+							'<td class="cell-mid-fixed"></td>' +
+							'<td class="signature-line-two">_______________________</td>' +
 						'</tr>' +
 						'<tr>' +
-							'<td><span class="signature-name">Name</span>,' +
-							'<span class="signature-title">Title</span></td>' +
-							'<td></td>' +
+							'<td><div class="cell-left-fixed signature-name">[Click to Add Name and Title]</div></td>' +
+							'<td class="cell-mid-fixed"></td>' +
 							'<td><span class="signature-date">Date</span></td>' +
 						'</tr>' +
 					'</table>' +
 				'</div>',
 
-            editables: {
-                name: {
-                    selector: '.signature-name',
-                    allowedContent: 'br strong em'
-                },
-                title: {
-                    selector: '.signature-title',
-                    allowedContent: 'strong em'
-                },
-                date: {
-                	selector: '.signature-date',
-                	allowedContent: 'br strong em'
-                }
-            },
-
-            allowedContent:
-                'div(!signature-box)',
+            allowedContent: 'div(!signature-box)',
 
             requiredContent: 'div(signature-box)',
 
-            upcast: function( element ) {
-                return element.name == 'div' && element.hasClass( 'signature-box' );
+            editables: {
+            	name: {
+            		selector: '.signature-name',
+            		allowedContent: 'br strong em'
+            	}
+            },
+
+            upcast: function(element) {
+                return element.name == 'div' && element.hasClass('signature-box');
             }
+
+
         } );
     }
     
