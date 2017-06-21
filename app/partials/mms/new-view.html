@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4>CREATE NEW VIEW</h4>
+    <h4>Create new view</h4>
 </div>
 
 <div class="modal-body transclude-modal" ng-show="createForm">
@@ -26,8 +26,8 @@
             Search for existing views</a>
     </div>
     <div class="pull-left" ng-show="!createForm"><a ng-click="createForm = true">Return to Create View</a></div>
-    <button class="btn btn-success" ng-show="createForm" ng-click="ok()">CREATE
+    <button class="btn btn-primary btn-sm" ng-show="createForm" ng-click="ok()">Create
         <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
     </button>
-    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+    <button class="btn btn-sm" ng-click="cancel()">Cancel</button>
 </div>
