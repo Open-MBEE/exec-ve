@@ -386,7 +386,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
      *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
-    var updateElement = function(elementOb) { //elementOb should have the keys needed to make url
+    var updateElement = function(elementOb, returnChildViews) { //elementOb should have the keys needed to make url
 
         var deferred = $q.defer();
         var handleSuccess = function(data) {
@@ -427,7 +427,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         .then(function(postElem) {
             $http.post(URLService.getPostElementsURL({
                     projectId: postElem._projectId, 
-                    refId: postElem._refId
+                    refId: postElem._refId,
+                    returnChildViews: returnChildViews
                 }), {
                     elements: [postElem],
                     source: ApplicationService.getSource()
@@ -453,7 +454,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     if (!UtilsService.hasConflict(postElem, origOb, serverOb)) {
                         elementOb._read = serverOb._read;
                         elementOb._modified = serverOb._modified;
-                        updateElement(elementOb)
+                        updateElement(elementOb, returnChildViews)
                         .then(function(good){
                             deferred.resolve(good);
                         }, function(reason) {
@@ -481,10 +482,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @returns {Promise} The promise will be resolved with an array of updated element references if 
      *      update is successful.
      */
-    var updateElements = function(elementObs) { //do individual updates for now since post need to be given canonical project and ref
+    var updateElements = function(elementObs, returnChildViews) { //do individual updates for now since post need to be given canonical project and ref
         var promises = [];
         for (var i = 0; i < elementObs.length; i++) {
-            promises.push(updateElement(elementObs[i]));
+            promises.push(updateElement(elementObs[i], returnChildViews));
         }
         return $q.all(promises);
     };
@@ -634,7 +635,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         UtilsService.normalize(reqOb);
         var url = URLService.getElementSearchURL(reqOb);
         var deferred = $q.defer();
-        $http.post(url, query)
+        $http.put(url, query)
             .then(function(data) {
                 //var result = [];
                 //for (var i = 0; i < data.data.elements.length; i++) {

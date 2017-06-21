@@ -55,22 +55,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }     
         };
-
-        //INFO this was this.getWsAndVersion
-        this.getElementOrigin = function() {
-            return {
-                projectId: $scope.projectId,
-                refId: $scope.refId,
-                commitId: $scope.commitId
-            };
-        };
     };
 
     var mmsTranscludeValLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
-        var mmsCfDocCtrl = controllers[2];
-        var mmsCfValCtrl = controllers[3];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'val';
@@ -177,39 +166,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
 
-            var projectId = scope.mmsProjectId;
-            var refId = scope.mmsRefId;
-            var commitId = scope.mmsCommitId;
-            if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = cfvVersion.projectId;
-                if (!refId)
-                    refId = cfvVersion.refId;
-                if (!commitId)
-                    commitId = cfvVersion.commitId;
-            }
-            if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = mmsCfDocCtrl.projectId;
-                if (!refId)
-                    refId = mmsCfDocCtrl.refId;
-                if (!commitId)
-                    commitId = mmsCfDocCtrl.commitId;
-            }
-            if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = viewVersion.projectId;
-                if (!refId)
-                    refId = viewVersion.refId;
-                if (!commitId)
-                    commitId = viewVersion.commitId;
-            }
-            scope.projectId = projectId;
-            scope.refId = refId ? refId : 'master';
-            scope.commitId = commitId ? commitId : 'latest';
+            scope.projectId = scope.mmsProjectId;
+            scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
+            scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
@@ -262,18 +221,18 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
         scope.addValue = function(type) {
             if (type === 'LiteralBoolean')
-                scope.editValues.push({type: type, value: false});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralInteger')
-                scope.editValues.push({type: type, value: 0});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralString')
-                scope.editValues.push({type: type, value: ''});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralReal')
-                scope.editValues.push({type: type, value: 0.0});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
         };
         scope.addValueType = 'LiteralString';
         
         scope.addEnumerationValue = function() {
-          scope.editValues.push({type: "InstanceValue", instanceId: scope.options[0]});
+          scope.editValues.push(UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id}));
         };
 
         scope.removeVal = function(i) {
@@ -352,13 +311,13 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         restrict: 'E',
         //template: template,
         scope: {
-            mmsElementId: '@mmsEid',
+            mmsElementId: '@',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
             nonEditable: '<'
         },
-        require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
+        require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeCtrl],
         link: mmsTranscludeValLink
     };

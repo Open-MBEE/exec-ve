@@ -150,7 +150,8 @@ mms-d3-parallel-axis-chart-io,
 mms-d3-radar-chart-io,
 mms-d3-grouped-horizontal-bar-chart-io,
 mms-site-docs,
-mms-workspace-docs {
+mms-workspace-docs,
+mms-cf {
 	background-color: lightblue;
 	margin-top: 0;
 	margin-bottom: 0 !important;
@@ -160,7 +161,8 @@ mms-workspace-docs {
 	cursor: not-allowed;
 }
 
-mms-transclude-com {
+mms-transclude-com,
+mms-cf[mms-cf-type="com"] {
 	background-color: yellow;
 	margin-top: 0;
 	margin-bottom: 0 !important;

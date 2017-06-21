@@ -132,7 +132,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
 
         scope.saveElement = function() {
             ElementService.updateElement({
-                "id": scope.mmsPeid,
+                "id": scope.mmsPeId,
                 _projectId: scope.mmsProjectId,
                 _refId: scope.mmsRefId,
                 "type": "InstanceSpecification",
@@ -455,7 +455,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
             });
         }
         mapping[id] = updateCommand;
-        projectId2Peid[id] = scope.mmsPeid;
+        projectId2Peid[id] = scope.mmsPeId;
         invokePerspectivesCommand(webProjectCommand);
     };
 
@@ -466,7 +466,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsTspSpec: '<',
-            mmsPeid: '@'
+            mmsPeId: '@'
         },
         link: mmsPerspectivesLink
     };

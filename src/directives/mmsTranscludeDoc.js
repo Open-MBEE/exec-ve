@@ -39,11 +39,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
-    var fixPreSpanRegex = /<\/span>\s*<mms-transclude/g;
-    var fixPostSpanRegex = /<\/mms-transclude-(name|doc|val|com)>\s*<span[^>]*>/g;
+    var fixPreSpanRegex = /<\/span>\s*<mms-cf/g;
+    var fixPostSpanRegex = /<\/mms-cf>\s*<span[^>]*>/g;
     var emptyRegex = /^\s*$/;
 
-    var mmsTranscludeDocCtrl = function ($scope) {
+    var mmsTranscludeDocCtrl = function($scope) {
 
         $scope.bbApi = {};
         $scope.buttons = [];
@@ -60,22 +60,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }
         };
-
-        //INFO this was this.getWsAndVersion
-        this.getElementOrigin = function() {
-            return {
-                projectId: $scope.projectId,
-                refId: $scope.refId,
-                commitId: $scope.commitId
-            };
-        };
     };
 
     var mmsTranscludeDocLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
-        var mmsCfDocCtrl = controllers[2];
-        var mmsCfValCtrl = controllers[3];
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
@@ -108,8 +97,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 doc = '<p>' + p + '</p>';
             }
             var fixSpan = /<span style="/;
-            doc = doc.replace(fixPreSpanRegex, "<mms-transclude");
-            doc = doc.replace(fixPostSpanRegex, "</mms-transclude-$1>");
+            doc = doc.replace(fixPreSpanRegex, "<mms-cf");
+            doc = doc.replace(fixPostSpanRegex, "</mms-cf>");
             if (preview) {
                 domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             } else {
@@ -118,7 +107,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
             MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             scope.recompileScope = scope.$new();
-            $compile(domElement.contents())(scope.recompileScope); 
+            $compile(domElement.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
                 mmsViewCtrl.elementTranscluded(scope.element);
             }
@@ -132,41 +121,11 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 domElement.html('<span class="mms-error">Circular Reference!</span>');
                 return;
             }
-            var projectId = scope.mmsProjectId;
-            var refId = scope.mmsRefId;
-            var commitId = scope.mmsCommitId;
-            if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = cfvVersion.projectId;
-                if (!refId)
-                    refId = cfvVersion.refId;
-                if (!commitId)
-                    commitId = cfvVersion.commitId;
-            }
-            if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = mmsCfDocCtrl.projectId;
-                if (!refId)
-                    refId = mmsCfDocCtrl.refId;
-                if (!commitId)
-                    commitId = mmsCfDocCtrl.commitId;
-            }
-            if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = viewVersion.projectId;
-                if (!refId)
-                    refId = viewVersion.refId;
-                if (!commitId)
-                    commitId = viewVersion.commitId;
-            }
+            scope.projectId = scope.mmsProjectId;
+            scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
+            scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
-            scope.projectId = projectId;
-            scope.refId = refId ? refId : 'master';
-            scope.commitId = commitId ? commitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
@@ -264,13 +223,13 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     return {
         restrict: 'E',
         scope: {
-            mmsElementId: '@mmsEid',
+            mmsElementId: '@',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
             nonEditable: '<'
         },
-        require: ['?^^mmsView','?^^mmsViewPresentationElem', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
+        require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeDocCtrl],
         link: mmsTranscludeDocLink
     };

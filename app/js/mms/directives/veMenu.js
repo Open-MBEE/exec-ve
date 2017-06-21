@@ -26,6 +26,7 @@ angular.module('mmsApp')
  */
 function veMenu(CacheService, $state, $templateCache, $sce) {
     var template = $templateCache.get('partials/mms/veMenu.html');
+    
 
     var veMenuLink = function(scope, element, attrs) {
 
@@ -42,14 +43,14 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
 
         scope.updateProject = function(project) {
             if (project) {
-                $state.go('project.ref', {projectId: project.id, refId: 'master'}, {reload: true});
+                $state.go('project.ref', {projectId: project.id, refId: 'master', search: undefined}, {reload: true});
             }
         };
         scope.updateBranch = function(branch) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id}, {reload: true});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id, search: undefined}, {reload: true});
         };
         scope.updateTag = function(tag) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id}, {reload: true});
+            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id, search: undefined}, {reload: true});
         };
         scope.refsView = function() {
             $state.go('project', {projectId: scope.project.id}, {reload: true});
@@ -101,19 +102,18 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
         var child, parentId;
         var groups = scope.groups;
         var groupsMap = {};
-
         if(scope.group !== undefined) {
             for (var i = 0; i < groups.length; i++) {
                 groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
             }
-            child = scope.group; 
+            child = scope.group;
         }
         if(scope.document !== undefined) {
             child = scope.document; 
         }
         if(child) {
             if(child.hasOwnProperty('_id')) {
-                bcrumbs.push({name: child._name, id: child._id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
+                bcrumbs.push({name: child._name, id: child._id, type: "group", alfLink: child._link, link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
                 if(child._parentId) {
                     parentId = child._parentId;   
                 }
@@ -131,6 +131,9 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
                 } 
             }
             scope.breadcrumbs = bcrumbs.reverse();
+            if (scope.breadcrumbs.length) {
+                scope.breadcrumbs[scope.breadcrumbs.length-1].showAlf = true;
+            }
             var eltWidth = element.parent().width();
             var crumbcount = scope.breadcrumbs.length;
             var liWidth = (eltWidth * 0.75)/crumbcount;

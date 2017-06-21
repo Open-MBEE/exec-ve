@@ -42,8 +42,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
-            $scope.bbApi.setPermission("tree-add-document", refOb.type === 'Tag' ? false : true);
-            $scope.bbApi.setPermission("tree-delete-document", refOb.type === 'Tag' ? false : true);
+            $scope.bbApi.setPermission( "tree-add-document", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
+            $scope.bbApi.setPermission( "tree-delete-document", documentOb._editable &&  (refOb.type === 'Tag' ? false : true) );
         } else if ($state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
             $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
@@ -183,6 +183,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
 
     var groupLevel2Func = function(groupOb, groupNode) {
+        groupNode.loading = true;
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
                     refId: refOb.id
@@ -205,6 +206,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     children: []
                 });
             }
+            groupNode.loading = false;
             if ($scope.treeApi.refresh) {
                 $scope.treeApi.refresh();
             }
@@ -221,7 +223,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 type: 'view',
                 data: v,
                 children: [],
-                loading: false,
+                loading: true,
                 aggr: aggr
             };
             viewId2node[v.id] = curNode;
@@ -241,6 +243,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             newChildNodes.push(node);
         }
         curNode.children.push.apply(curNode.children, newChildNodes);
+        curNode.loading = false;
         if ($scope.treeApi.refresh) {
             $scope.treeApi.refresh();
         }
@@ -321,18 +324,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     for (; k >= 0; k--) {
                         var instance = results[k];
                         var hide = !$rootScope.veTreeShowPe;
-                        instance._relatedDocuments = [
-                            {
-                                _parentViews: [{
-                                    name: viewNode.data.name,
-                                    id: viewNode.data.id
-                                }],
-                                name: documentOb.name,
-                                id: documentOb.id,
-                                projectId: projectOb.id,
-                                refId: refOb.id
-                            }
-                        ];
                         if (ViewService.isSection(instance)) {
                             var sectionTreeNode = {
                                 label : instance.name,
@@ -617,10 +608,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 parentViewId: $scope.parentBranchData.id,
                 viewId: viewId,
                 projectId: $scope.parentBranchData._projectId,
-                refId: $scope.parentBranchData._refId
+                refId: $scope.parentBranchData._refId,
+                aggr: $scope.newViewAggr.type
             }).then(function(data) {
                 growl.success("View Added");
-                $uibModalInstance.close('');
+                $uibModalInstance.close(view);
             }, function(reason) {
                 growl.error("View Add Error: " + reason.message);
             }).finally(function() {
@@ -810,16 +802,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             viewId = branch.data.id;
         }
         var viewNode = viewId2node[viewId];
-        instanceSpec._relatedDocuments = [{
-                _parentViews: [{
-                    name: viewNode.data.name,
-                    id: viewNode.data.id
-                }],
-                name: documentOb.name,
-                id: documentOb.id,
-                projectId: documentOb._projectId
-            }
-        ];
         var newbranch = {
             label: instanceSpec.name,
             type: (elemType === 'image' ? 'figure' : elemType),

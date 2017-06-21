@@ -3,7 +3,7 @@
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
     var baseUrl = '/alfresco/service';
-    
+
     this.setBaseUrl = function(base) {
         baseUrl = base;
     };
@@ -37,6 +37,7 @@ angular.module('mms')
  */
 function urlService(baseUrl) {
     var root = baseUrl;
+    var jobsRoot = 'https://cae-pma-int:8443/';
     var ticket;
     /**
      * @ngdoc method
@@ -86,9 +87,9 @@ function urlService(baseUrl) {
      * @param {string} workspace Workspace name
      * @returns {string} The url
      */
-    var getHtmlToPdfURL = function(docId, site, workspace) {
-        return addTicket(root + "/workspaces/" + workspace +
-                      "/sites/" + site +
+    var getHtmlToPdfURL = function(docId, projectId, refId) {
+        return addTicket(root + "/projects/" + projectId +
+                      "/refs/" + refId +
                       "/documents/" + docId +
                       "/htmlToPdf/123456789");  
     };
@@ -119,6 +120,10 @@ function urlService(baseUrl) {
 
     var getProjectURL = function(projectId) {
         return addTicket(root + "/projects/" + projectId);
+    };
+
+    var getProjectMountsURL = function(projectId, refId) {
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/mounts');
     };
 
     var getRefsURL = function(projectId) {
@@ -164,7 +169,7 @@ function urlService(baseUrl) {
      */
     var getImageURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' +
-                       reqOb.elementId + '?accept=' + reqOb.accept;
+                       reqOb.elementId + '?extension=' + reqOb.accept;
         return addTicket(addVersion(r, reqOb.commitId));
     };
 
@@ -257,7 +262,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
-        return addExtended(addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements'), reqOb.extended);
+        return addExtended(addChildViews(addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements'), reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -338,7 +343,7 @@ function urlService(baseUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search';
         return addExtended(addTicket(r), true);
     };
 
@@ -361,21 +366,28 @@ function urlService(baseUrl) {
         return addTicket(r);
     };
     
-    var getJobs = function(id) {
-        return addTicket(root + '/workspaces/master/jobs/' + id + '?recurse=1');
+    var setJobsUrl = function(jobUrl) {
+        jobsRoot = jobUrl + ':8443/';
     };
 
-    var getJob = function(jobSyml){
-        return addTicket(root + '/workspaces/master/jobs/' + jobSyml);
+    var getJobsURL = function(projectId, refId, machine) {
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs', machine) );
     };
 
-    var getJenkinsRun = function(jobSyml) {
-        return addTicket(root + '/workspaces/master/jobs/'+ jobSyml + '/execute');
+    var getJobURL = function(projectId, refId, jobId, machine){
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId , machine) );
+    };
+
+    var getRunJobURL = function(projectId, refId, jobId) {
+        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId + '/instances';
     };
     
-    var getCreateJob = function() {
-        var link = '/alfresco/service/workspaces/master/jobs';
-        return addTicket(root + '/workspaces/master/jobs');
+    var getCreateJobURL = function(projectId, refId) {
+        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs';
+    };
+
+    var getJobInstancesURL = function(projectId, refId, jobId, machine) {
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId + '/instances', machine) );
     };
 
     var getLogoutURL = function() {
@@ -384,6 +396,14 @@ function urlService(baseUrl) {
     
     var getCheckTicketURL = function(t) {
         return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
+    };
+
+    var addServer = function(url, server) {
+        var r = url;
+        if (url.indexOf('?') > 0)
+            return url + '&mmsServer=' + server;
+        else
+            return url + '?mmsServer=' + server;
     };
     
     var addVersion = function(url, version) {
@@ -422,6 +442,17 @@ function urlService(baseUrl) {
         return r;
     };
 
+    var addChildViews = function(url, add) {
+        var r = url;
+        if (!add)
+            return r;
+        if (r.indexOf('?') > 0)
+            r += '&childviews=true';
+        else
+            r += '?childviews=true';
+        return r;
+    };
+
     var getRoot = function() {
         return root;
     };
@@ -440,6 +471,7 @@ function urlService(baseUrl) {
         getOrgsURL: getOrgsURL,
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
+        getProjectMountsURL: getProjectMountsURL,
         getRefsURL: getRefsURL,
         getRefURL: getRefURL,
         getGroupsURL: getGroupsURL,
@@ -456,10 +488,12 @@ function urlService(baseUrl) {
         getHtmlToPdfURL: getHtmlToPdfURL,
         getWsDiffURL: getWsDiffURL,
         getPostWsDiffURL: getPostWsDiffURL,
-        getJobs: getJobs,
-        getJob: getJob,
-        getJenkinsRun: getJenkinsRun,
-        getCreateJob: getCreateJob,
+        setJobsUrl: setJobsUrl,
+        getJobsURL: getJobsURL,
+        getJobURL: getJobURL,
+        getRunJobURL: getRunJobURL,
+        getCreateJobURL: getCreateJobURL,
+        getJobInstancesURL: getJobInstancesURL,
         getCheckLoginURL: getCheckLoginURL,
         getCheckTicketURL: getCheckTicketURL,
         getLogoutURL: getLogoutURL,

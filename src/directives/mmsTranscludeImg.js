@@ -24,8 +24,6 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
-        var mmsCfDocCtrl = controllers[1];
-        var mmsCfValCtrl = controllers[2];
         var processed = false;
         element.click(function(e) {
             if (!mmsViewCtrl)
@@ -38,43 +36,13 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
         scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
-
             processed = true;
 
-            var projectId = scope.mmsProjectId;
-            var refId = scope.mmsRefId;
-            var commitId = scope.mmsCommitId;
-            if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = cfvVersion.projectId;
-                if (!refId)
-                    refId = cfvVersion.refId;
-                if (!commitId)
-                    commitId = cfvVersion.commitId;
-            }
-            if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = mmsCfDocCtrl.projectId;
-                if (!refId)
-                    refId = mmsCfDocCtrl.refId;
-                if (!commitId)
-                    commitId = mmsCfDocCtrl.commitId;
-            }
-            if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getElementOrigin();
-                if (!projectId)
-                    projectId = viewVersion.projectId;
-                if (!refId)
-                    refId = viewVersion.refId;
-                if (!commitId)
-                    commitId = viewVersion.commitId;
-            }
-            scope.projectId = projectId;
-            scope.refId = refId ? refId : 'master';
-            scope.commitId = commitId ? commitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/svg'};
+            scope.projectId = scope.mmsProjectId;
+            scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
+            scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.svg'};
+
             element.addClass('isLoading');
             //TODO change when VizService is updated to use correct params
             VizService.getImageURL(reqOb)
@@ -88,12 +56,12 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             }).finally(function() {
                 element.removeClass('isLoading');
             });
-            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/png'};
+            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.png'};
             VizService.getImageURL(reqOb2)
             .then(function(data) {
                 scope.pngImgUrl = data;
             }, function(reason) {
-                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
             });
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
@@ -111,7 +79,7 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             mmsRefId: '@',
             mmsCommitId: '@'
         },
-        require: ['?^^mmsView', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
+        require: ['?^^mmsView'],
         link: mmsTranscludeImgLink
     };
 }

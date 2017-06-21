@@ -4,7 +4,7 @@ angular.module('mms.directives')
 .directive('mmsViewImg', [mmsViewImg]);
 
 function mmsViewImg() {
-    var template = '<figure><mms-transclude-img mms-element-id="{{image.id}}"></mms-transclude-img><figcaption>{{image.title}}</figcaption></figure>';
+    var template = '<figure><mms-cf mms-cf-type="img" mms-element-id="{{image.id}}"></mms-cf><figcaption>{{image.title}}</figcaption></figure>';
     return {
         restrict: 'E',
         template: template,

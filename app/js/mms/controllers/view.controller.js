@@ -85,7 +85,7 @@ angular.module('mmsApp')
             if (viewOb && viewOb._editable && refOb.type === 'Branch') {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
             }
-            if ($state.includes('project.ref.preview')) {
+            if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
                 if ($state.includes('project.ref.document'))
                     $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));

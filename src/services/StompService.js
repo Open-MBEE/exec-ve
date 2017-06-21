@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', 'UtilsService', 'CacheService', StompService]);
+.factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', 'UtilsService', 'CacheService', '_', StompService]);
 
 /**
  * @ngdoc service
@@ -11,7 +11,7 @@ angular.module('mms')
  * @description
  * Provides messages from the activemq JMS bus
  */
-function StompService($rootScope, ApplicationService, ElementService, URLService, $http, UtilsService, CacheService) {
+function StompService($rootScope, ApplicationService, ElementService, URLService, $http, UtilsService, CacheService, _) {
      var stompClient = {};
      var host;
 
@@ -36,6 +36,9 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
             if (updateWebpage.refs) {
                 if (updateWebpage.refs.updatedElements && updateWebpage.refs.updatedElements.length > 0) {
                     angular.forEach(updateWebpage.refs.updatedElements, function (eltId) {
+                        if (eltId.startsWith("PMA")) {
+                            $rootScope.$broadcast("stomp.job", eltId);
+                        }
                         var key = UtilsService.makeElementKey({_projectId: projectId, _refId: refId, id: eltId});
                         if (!CacheService.exists(key)) {
                             return;
@@ -54,29 +57,33 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
         }
         if (updateWebpage.createdRef) {
             var createdRef = updateWebpage.createdRef;
-            if (updateWebpage.source !== ApplicationService.getSource()) {
-                var list = CacheService.get(['refs', projectId]);
+            var list = CacheService.get(['refs', projectId]);
+            // if (updateWebpage.source !== ApplicationService.getSource()) {
+                var index = -1;
                 if (list) {
-                    list.push(createdRef);
+                    index = _.findIndex(list, {id: createdRef.id});
+                    if ( index > -1 ) {
+                        Object.assign(list[index], createdRef);
+                    }
                 }
                 CacheService.put(['ref', projectId, createdRef.id], createdRef);
-            }
-            $rootScope.$broadcast("stomp.branchCreated", createdRef, projectId);
+            // }
+            $rootScope.$broadcast("stomp.branchCreated", list, createdRef);
         }
-        if (updateWebpage.refs) {
-            if (updateWebpage.refs.addedJobs && updateWebpage.refs.addedJobs.length > 0) {//check length of added jobs > 0
-                var newJob = updateWebpage.refs.addedJobs;
-                $rootScope.$broadcast("stomp.job", newJob);
-            }
-            if (updateWebpage.refs.updatedJobs && updateWebpage.refs.updatedJobs.length > 0) {//check length of added jobs > 0
-                var updateJob = updateWebpage.refs.updatedJobs;
-                $rootScope.$broadcast("stomp.updateJob", updateJob);
-            }
-            if (updateWebpage.refs.deletedJobs && updateWebpage.refs.deletedJobs.length > 0) {//check length of added jobs > 0
-                var deleteJob = updateWebpage.refs.deletedJobs;
-                $rootScope.$broadcast("stomp.deleteJob", deleteJob);
-            }
+        if (updateWebpage.updatedJobs) {
+            var updateJob = updateWebpage.updatedJobs;
+            $rootScope.$broadcast("stomp.updateJob", updateJob);
         }
+        // if (updateWebpage.refs) {
+            // if (updateWebpage.refs.addedJobs && updateWebpage.refs.addedJobs.length > 0) {//check length of added jobs > 0
+            //     var newJob = updateWebpage.refs.addedJobs;
+            //     $rootScope.$broadcast("stomp.job", newJob);
+            // }
+            // if (updateWebpage.refs.deletedJobs && updateWebpage.refs.deletedJobs.length > 0) {//check length of added jobs > 0
+            //     var deleteJob = updateWebpage.refs.deletedJobs;
+            //     $rootScope.$broadcast("stomp.deleteJob", deleteJob);
+            // }
+        // }
         // this should happen in where...
         $rootScope.$on('$destroy', function() {
             stompClient.unsubscribe('/topic/master'/*, whatToDoWhenUnsubscribe*/);
