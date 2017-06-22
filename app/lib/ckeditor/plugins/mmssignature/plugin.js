@@ -15,9 +15,9 @@ CKEDITOR.plugins.add('mmssignature', {
 		editor.widgets.add('mmssignature', {
 
             button: 'Create Signature Template',
-      		template: 
+      		template: //have to make the styling in-line else it won't work
 				'<div class="signature-box">' +
-					'<table border="0" style="border: 0px; border-collapse: collapse; table-layout: fixed; max-width: 705px; word-wrap: break-word;">' +
+					'<table border="0" style="border: 0px; border-collapse: collapse; table-layout: fixed; max-width: 702px; word-wrap: break-word;">' +
 						'<tr>' +
 							'<td><div style="width: 500px">____________________________________________</div></td>' +
 							'<td><div style="width: 2px"></div></td>' +
