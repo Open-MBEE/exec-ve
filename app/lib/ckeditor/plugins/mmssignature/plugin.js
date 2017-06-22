@@ -15,24 +15,23 @@ CKEDITOR.plugins.add('mmssignature', {
 		editor.widgets.add('mmssignature', {
 
             button: 'Create Signature Template',
-
       		template: 
 				'<div class="signature-box">' +
-					'<table>' +
+					'<table border="0" style="border: 0px; border-collapse: collapse; table-layout: fixed; max-width: 705px; word-wrap: break-word;">' +
 						'<tr>' +
-							'<td><div class="cell-left-fixed">____________________________________________</div></td>' +
-							'<td><div class="cell-mid-fixed"></div></td>' +
-							'<td><div class="cell-right-fixed signature-line-two">_______________________</div></td>' +
+							'<td><div style="width: 500px">____________________________________________</div></td>' +
+							'<td><div style="width: 2px"></div></td>' +
+							'<td><div style="width: 200px">_______________________</div></td>' +
 						'</tr>' +
 						'<tr>' +
-							'<td><div class="cell-left-fixed signature-name">[Click to Add Name and Title]</div></td>' +
-							'<td><div class="cell-mid-fixed"></div></td>' +
-							'<td><div class="cell-right-fixed signature-date">Date</div></td>' +
+							'<td><div style="width: 500px" class="signature-name">[Click to Add Name and Title]</div></td>' +
+							'<td><div style="width: 2px"></div></td>' +
+							'<td><div style="width: 200px">Date</div></td>' +
 						'</tr>' +
 					'</table>' +
 				'</div>',
 
-            allowedContent: 'div(!signature-box)',
+            allowedContent: 'div(!signature-box); table[border]{border, border-collapse, table-layout, max-width, word-wrap}; tr; td; div{width}; div(!signature-name)',
 
             requiredContent: 'div(signature-box)',
 
