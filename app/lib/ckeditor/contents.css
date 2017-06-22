@@ -176,12 +176,16 @@ mms-cf[mms-cf-type="com"] {
 
 .signature-box table {
 	table-layout: fixed;
+	max-width: 705px;
 	word-wrap:break-word;
 }
-.cell-left-fixed {
-	width: 500px;
+.signature-box table tr td div.cell-left-fixed {
+	max-width: 500px;
 }
-.cell-mid-fixed {
-	width: 5px;
+.signature-box table tr td div.cell-mid-fixed {
+	max-width: 5px;
+}
+.signature-box table tr td div.cell-right-fixed {
+	max-width: 200px;
 }
 

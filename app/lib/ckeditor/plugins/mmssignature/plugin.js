@@ -20,14 +20,14 @@ CKEDITOR.plugins.add('mmssignature', {
 				'<div class="signature-box">' +
 					'<table>' +
 						'<tr>' +
-							'<td class="cell-left-fixed">____________________________________________</td>' +
-							'<td class="cell-mid-fixed"></td>' +
-							'<td class="signature-line-two">_______________________</td>' +
+							'<td><div class="cell-left-fixed">____________________________________________</div></td>' +
+							'<td><div class="cell-mid-fixed"></div></td>' +
+							'<td><div class="cell-right-fixed signature-line-two">_______________________</div></td>' +
 						'</tr>' +
 						'<tr>' +
 							'<td><div class="cell-left-fixed signature-name">[Click to Add Name and Title]</div></td>' +
-							'<td class="cell-mid-fixed"></td>' +
-							'<td><span class="signature-date">Date</span></td>' +
+							'<td><div class="cell-mid-fixed"></div></td>' +
+							'<td><div class="cell-right-fixed signature-date">Date</div></td>' +
 						'</tr>' +
 					'</table>' +
 				'</div>',
