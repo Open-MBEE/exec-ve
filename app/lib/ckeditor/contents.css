@@ -172,3 +172,21 @@ mms-cf[mms-cf-type="com"] {
 	cursor: not-allowed;
 }
 
+/*mmssignature*/
+
+/*.signature-box table {
+	border: 0px;
+	border-collapse: collapse;
+	table-layout: fixed;
+	max-width: 702px;
+	word-wrap:break-word;
+}
+.cell-left-fixed {
+	width: 500px;
+}
+.cell-mid-fixed {
+	width: 5px;
+}
+.cell-right-fixed {
+	width: 200px;
+}*/
