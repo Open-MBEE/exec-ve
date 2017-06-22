@@ -115,12 +115,12 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
             viewName = "Sequence Diagram";
             viewType = "tsDrawingView";
             break;
-        case "Table":
+        /*case "Table":
             viewName = "Table";
             viewType = "tsTableView";
-            break;
+            break;*/
         default:
-        	viewName = "Drawing View 1";
+        	viewName = "Unsupported Diagram";
         	viewType = "tsDrawingView";
         }
       //scope.mmsTspSpec.tstype
@@ -422,7 +422,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                     },
                     "onfailure":"onPerspectivesCommandFailure",
                 });
-                initialIntegratorIds.push('int-context-' + id);
+                //initialIntegratorIds.push('int-context-' + id);
             }
             if (scope.initElements.length > 0) {
                 updateCommand.data.push({

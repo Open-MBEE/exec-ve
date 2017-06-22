@@ -95,7 +95,6 @@ function ApplicationService($q, $http, URLService) {
         getSource: getSource,
         createUniqueId: createUniqueId,
         getMmsVersion: getMmsVersion,
-        createUniqueId: createUniqueId,
         setUserName: setUserName,
         getUserName: getUserName
     };
