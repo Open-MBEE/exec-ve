@@ -34,13 +34,17 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsJobsLink = function (scope, element, attrs) {
         var ran;
+        var serverSentPMA = '';
         var host = $location.host();
-        if (host != 'localhost' || host != '0.0.0.0') {
+        if (host != 'localhost' && host != '0.0.0.0') {
             var segments = host.split('-');
             var env = segments[segments.length-1];
             URLService.setJobsUrl('https://cae-pma-' + env);
+            serverSentPMA = host;
         } else {
             //use default pma //TODO need to define env var when running dev
+            URLService.setJobsUrl('https://cae-pma-uat.jpl.nasa.gov');
+            serverSentPMA = 'opencae-uat.jpl.nasa.gov';
         }
         
         scope.jobs = [];
@@ -62,7 +66,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         // }
 
         var getJobInstances = function (jobId) {// TODO create porxy in gruntfile for PMA
-            var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, $location.host());
+            var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, serverSentPMA);
             // var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, 'opencae-int.jpl.nasa.gov');
             scope.responseCleared = false;
             $http.get(link).then(function(data) {
@@ -78,7 +82,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
 
         // get all the jobs for current document
         var getJobs = function () {
-            var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, $location.host()); // TODO create var in gruntfile for current server
+            var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, serverSentPMA); // TODO create var in gruntfile for current server
             // var link = URLService.getJobsURL(scope.mmsProjectId, scope.mmsRefId, 'opencae-int.jpl.nasa.gov');
             scope.jobs = [];
             scope.loading = true;
@@ -127,7 +131,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             scope.runCleared = false;
             var link = URLService.getRunJobURL(scope.mmsProjectId, scope.mmsRefId, id);
             var post = {
-                "mmsServer" : $location.host(),
+                "mmsServer" : serverSentPMA,
                 // "mmsServer" : "opencae-int.jpl.nasa.gov", //TODO create porxy in gruntfile for PMA
                 "alfrescoToken" : AuthService.getTicket()
             };
@@ -184,7 +188,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
                 // "arguments" : ["arg1","arg2"],
                 "schedule" : thisSchedule,
                 "associatedElementID" : id,
-                "mmsServer" : $location.host(), 
+                "mmsServer" : serverSentPMA, 
                 // "mmsServer": "opencae-int.jpl.nasa.gov", //TODO add
                 "alfrescoToken" : AuthService.getTicket()
             };
