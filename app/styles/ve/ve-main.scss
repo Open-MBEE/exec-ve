@@ -366,10 +366,6 @@ Temp - navbar shadow
   background-color:rgba(0,0,0,0.2);
 }
 
-.switch-org{
-  display:none;
-}
-
 /*------------------------------------------------------------------
 Temp - break up properties in R panel
 -------------------------------------------------------------------*/
@@ -571,6 +567,33 @@ Temp - style form control
 }
 
 
+.toolbox > .ng-scope{
+  padding:10px 0;
+  text-transform: uppercase;
+  text-align:center;
+  font-weight:500;
+  margin:2px 0;
+  font-size:12px;
+
+}
+
+.toolbox > .ng-scope .fa{
+  padding:0 4px;
+}
+
+.toolbox{
+  margin:10px 0;
+}
+
+mms-view.editing mms-transclude-doc, mms-view.editing mms-transclude-name > span, mms-view.editing mms-transclude-val {
+  transition-property: border-color;
+  -webkit-transition-duration: 1s;
+  transition-duration: 1s;
+  border: 1px solid #d3d3d3;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
 
 
 
