@@ -687,12 +687,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: UtilsService.createValueSpecElement({
-                operand: [UtilsService.createValueSpecElement({
-                    instanceId: newInstanceId,
-                    type:"InstanceValue",
-                    ownerId: newViewId + "_vc_expression",
-                    id: UtilsService.createMmsId()
-                })],
+                operand: [],
                 type: 'Expression',
                 id: newViewId + "_vc_expression",
                 ownerId: newViewId + "_vc"
@@ -718,28 +713,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
-        var instanceSpecDoc = '';
-        var instanceSpecSpec = {
-            'type': 'Paragraph', 
-            'sourceType': 'reference', 
-            'source': newViewId, 
-            'sourceProperty': 'documentation'
-        };
-        var instanceSpec = UtilsService.createInstanceElement({
-            id: newInstanceId,
-            ownerId: 'view_instances_bin_' + ownerOb._projectId,
-            name: "View Documentation",
-            documentation: instanceSpecDoc,
-            type: "InstanceSpecification",
-            classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
-            specification: UtilsService.createValueSpecElement({
-                value: JSON.stringify(instanceSpecSpec),
-                type: "LiteralString",
-                id: UtilsService.createMmsId(),
-                ownerId: newInstanceId
-            }),
-            _appliedStereotypeIds: [],
-        });
         var asi = UtilsService.createInstanceElement({ //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
@@ -750,7 +723,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         });
-        var toCreate = [instanceSpec, view, asi];
+        var toCreate = [view, asi];
         if (parentView)
             toCreate.push(parentView);
         var reqOb = {
