@@ -4,48 +4,45 @@
 
 // Register the plugin within the editor.
 CKEDITOR.plugins.add('mmssignature', {
-	requires: 'widget',
-	// Register the icons.
-	icons: 'mmssignature',
+    requires: 'widget',
+    // Register the icons.
+    icons: 'mmssignature',
 
-	init: function(editor) {
+    init: function(editor) {
 
-		CKEDITOR.dialog.add('mmssignature', this.path + 'dialogs/mmssignature.js');
-
-		editor.widgets.add('mmssignature', {
+        editor.widgets.add('mmssignature', {
 
             button: 'Create Signature Template',
-      		template: //have to make the styling in-line else it won't work
-				'<div class="signature-box">' +
-					'<table border="0" style="border: 0px; border-collapse: collapse; table-layout: fixed; max-width: 702px; word-wrap: break-word;">' +
-						'<tr>' +
-							'<td><div style="width: 500px" class="cell-styling">____________________________________________</div></td>' +
-							'<td><div style="width: 200px" class="cell-styling">_______________________</div></td>' +
-						'</tr>' +
-						'<tr>' +
-							'<td><div style="width: 500px" class="signature-name cell-styling">[Click to Add Name and Title]</div></td>' +
-							'<td><div style="width: 200px" class="cell-styling">Date</div></td>' +
-						'</tr>' +
-					'</table>' +
-				'</div>',
 
-            allowedContent: 'div(!signature-box){*}; table[border]{border, border-collapse, table-layout, max-width, word-wrap}{*}; tr{*}; td{*}; div{width}{*}; div(!signature-name){*}',
+            template: //have to make the styling in-line else it won't work
+                '<div class="signature-box">' +
+                    '<table border="0" style="border: 0px; border-collapse: collapse; table-layout: fixed; max-width: 702px; word-wrap: break-word;">' +
+                        '<tbody><tr>' +
+                            '<td><div style="width: 500px" class="cell-styling">____________________________________________</div></td>' +
+                            '<td><div style="width: 200px" class="cell-styling">_______________________</div></td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td><div style="width: 500px" class="signature-name cell-styling">[Click to Add Name and Title]</div></td>' +
+                            '<td><div style="width: 200px" class="cell-styling">Date</div></td>' +
+                        '</tr></tbody>' +
+                    '</table>' +
+                '</div>',
+
+            allowedContent: 'div(!signature-box){*}; table[*]{*}; tbody; tr; td; div{width, padding}; div(!signature-name){*}',
 
             requiredContent: 'div(signature-box)',
 
             editables: {
-            	name: {
-            		selector: '.signature-name',
-            		allowedContent: 'br strong em'
-            	}
+                name: {
+                    selector: '.signature-name',
+                    allowedContent: 'br strong em'
+                }
             },
 
             upcast: function(element) {
                 return element.name == 'div' && element.hasClass('signature-box');
             }
 
-
         } );
     }
-    
 });
