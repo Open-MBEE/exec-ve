@@ -19,12 +19,12 @@ CKEDITOR.plugins.add('mmssignature', {
 				'<div class="signature-box">' +
 					'<table border="0" style="border: 0px; border-collapse: collapse; table-layout: fixed; max-width: 702px; word-wrap: break-word;">' +
 						'<tr>' +
-							'<td><div style="width: 500px">____________________________________________</div></td>' +
-							'<td><div style="width: 200px">_______________________</div></td>' +
+							'<td><div style="width: 500px" class="cell-styling">____________________________________________</div></td>' +
+							'<td><div style="width: 200px" class="cell-styling">_______________________</div></td>' +
 						'</tr>' +
 						'<tr>' +
-							'<td><div style="width: 500px" class="signature-name">[Click to Add Name and Title]</div></td>' +
-							'<td><div style="width: 200px">Date</div></td>' +
+							'<td><div style="width: 500px" class="signature-name cell-styling">[Click to Add Name and Title]</div></td>' +
+							'<td><div style="width: 200px" class="cell-styling">Date</div></td>' +
 						'</tr>' +
 					'</table>' +
 				'</div>',

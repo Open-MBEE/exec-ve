@@ -172,8 +172,9 @@ mms-cf[mms-cf-type="com"] {
 	cursor: not-allowed;
 }
 
-/*mmssignature*/
-
+/*
+ * mmssignature
+ */
 .signature-box {
 	padding: 8px;
 	margin: 10px;
@@ -188,4 +189,8 @@ mms-cf[mms-cf-type="com"] {
 	border: 1px solid #cccccc;
 	border-radius: 5px;
 	background: #fff;
+}
+
+.signature-box td div.cell-styling {
+	padding: 0 8px;
 }
