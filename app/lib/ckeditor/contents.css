@@ -177,18 +177,7 @@ mms-cf[mms-cf-type="com"] {
  */
 .signature-box {
 	padding: 8px;
-	margin: 10px;
-	background: #eee;
-	border-radius: 8px;
 	border: 1px solid #ddd;
-	box-shadow: 0 1px 1px #fff inset, 0 -1px 0px #ccc inset;
-}
-
-.signature-box td {
-	box-shadow: 0 1px 1px #ddd inset;
-	border: 1px solid #cccccc;
-	border-radius: 5px;
-	background: #fff;
 }
 
 .signature-box td div.cell-styling {

@@ -12,7 +12,7 @@ CKEDITOR.plugins.add('mmssignature', {
 
         editor.widgets.add('mmssignature', {
 
-            button: 'Create Signature Template',
+            button: 'Insert Signature Template',
 
             template: //have to make the styling in-line else it won't work
                 '<div class="signature-box">' +
