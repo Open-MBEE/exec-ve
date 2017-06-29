@@ -589,11 +589,66 @@ mms-view.editing mms-transclude-doc, mms-view.editing mms-transclude-name > span
   transition-property: border-color;
   -webkit-transition-duration: 1s;
   transition-duration: 1s;
-  border: 1px solid #d3d3d3;
+  border: 2px solid rgba(118, 175, 205, 0.33);
   border-radius: 5px;
   cursor: pointer;
   margin-bottom: 5px;
+  -webkit-transition: background-color .05s ease-out;
+  -moz-transition: background-color .05s ease-out;
+  -o-transition: background-color .05s ease-out;
+  transition: background-color .05s ease-out;
+  position:relative;
+}
+
+mms-view.editing mms-transclude-doc:hover, mms-view.editing mms-transclude-name > span:hover, mms-view.editing mms-transclude-val:hover {
+  background-color:rgba(118, 175, 205, 0.13);
+}
+
+mms-view.editing mms-transclude-doc::after{
+  font-family: FontAwesome;
+  content: "\f055";
+  position: absolute;
+  right: 4px;
+  bottom: -15px;
+  font-size: 20px;
+  color: rgba(118,175,205,1);
+  background-color: white;
+  border-radius:100px;
+  padding:0;
 }
 
 
+/*------------------------------------------------------------------
+Temp - center align document
+-------------------------------------------------------------------*/
+
+.ve-secondary-text{
+  color:#a2a2a2;
+  font-size:13px;
+}
+
+.center-view p,
+.center-view tbody span,
+.center-view li span,
+.center-view li{
+  font-size:16px;
+  line-height:1.5em;
+  max-width: 800px;
+  margin: auto;
+
+}
+
+.center-view h1,
+.center-view h2,
+.center-view h3,
+mms-view mms-transclude-doc > p:first-child,
+.ve-secondary-text{
+  max-width: 800px;
+  margin: auto;
+  display:block;
+}
+
+.center-view table{
+  margin:auto;
+}
 
