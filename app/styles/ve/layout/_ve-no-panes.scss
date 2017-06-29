@@ -161,7 +161,7 @@ ul.ve-light-list {
     padding-bottom: 16px;
   }
 
-  dd.link-section > a {
+  dd.link-section > a, dd.link-section > span {
     color: $ve-link;
     font-weight: 700;
   }
@@ -253,7 +253,7 @@ ul.ve-light-list {
     text-decoration: none;
   }
 
-  a.branch-disabled::before{
+  span.branch-disabled::before{
     font-family:FontAwesome;
     content: "\2026";
     top: -4px;
@@ -264,11 +264,11 @@ ul.ve-light-list {
     position: relative;
   }
 
-  dd.link-section > a.branch-disabled{
+  dd.link-section > span.branch-disabled{
     color:$ve-light-text;
   }
 
-  dd.link-section > a.branch-disabled:hover{
+  dd.link-section > span.branch-disabled:hover{
     text-decoration:none;
   }
 }
