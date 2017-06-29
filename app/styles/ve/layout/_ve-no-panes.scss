@@ -161,7 +161,7 @@ ul.ve-light-list {
     padding-bottom: 16px;
   }
 
-  dd.link-section > a {
+  dd.link-section > a, dd.link-section > span {
     color: $ve-link;
     font-weight: 700;
   }
