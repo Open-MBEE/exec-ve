@@ -38,7 +38,7 @@
                                 <a ui-sref="project.ref({refId: refSelected.id, search: undefined})" ui-sref-opts="{reload:true}"
                                     uib-tooltip-html="htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"
                                     tooltip-append-to-body="refSelected.status == 'creating'" tooltip-enable="refSelected.status == 'creating'" 
-                                    ng-class="{'branch-disabled': refSelected.status == 'creating'}" >Project Documents</a>
+                                    ng-class="{'branch-disabled': refSelected.status == 'creating'}" ng-disabled="refSelected.status !== 'created'">Project Documents</a>
                             </dd>
                             <dt>Id</dt>
                             <dd>{{refSelected.id}}</dd>
