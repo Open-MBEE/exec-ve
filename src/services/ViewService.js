@@ -251,7 +251,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             var toGet = [];
             var results = [];
             if (view._displayedElementIds) {
-                var displayed = JSON.parse(view._displayedElementIds);
+                var displayed = view._displayedElementIds;
+                if (!angular.isArray(displayed)) {
+                    displayed = JSON.parse(displayed);
+                }
                 if (angular.isArray(displayed) && displayed.length > 0) {
                     toGet = displayed;
                 }
