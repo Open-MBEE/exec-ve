@@ -385,7 +385,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
-        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        if (genTotf) {
+            tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        }
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
