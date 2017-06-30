@@ -3,6 +3,7 @@
 
   .fa{
     padding-right:4px;
+    font-size:14px;
   }
 
   .add-element-button {
@@ -26,11 +27,20 @@
     -o-transition: background-color .1s ease-out;
     transition: background-color .1s ease-out;
     font-size:15px;
+    letter-spacing: .14em;
+    font-size: 12px;
+    border: none;
+    text-transform: uppercase;
+    border-radius: 3px;
+    box-shadow: none;
+    padding: 7px;
+    margin:10px 0;
   }
 
   a:hover {
     color:#296f83;
     text-decoration:none;
+    background-color: #f0f0f0;
   }
 
   // a.view-add-paragraph {
