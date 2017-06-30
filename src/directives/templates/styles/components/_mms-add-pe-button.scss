@@ -1,6 +1,10 @@
 .add-pe-buttons {
   margin: 10px 5px;
 
+  .fa{
+    padding-right:4px;
+  }
+
   .add-element-button {
     margin-right: 25px;
   }
@@ -9,13 +13,25 @@
     display: -webkit-inline-box;
 
     a {
-      color: #8792D0;
+      //color: #8792D0;
     }
   }
 
   a {
-    color: #8792D0;
+    color: #2F889A;
+    text-transform:uppercase;
+    font-weight:500;
+    -webkit-transition: background-color .1s ease-out;
+    -moz-transition: background-color .1s ease-out;
+    -o-transition: background-color .1s ease-out;
+    transition: background-color .1s ease-out;
   }
+
+  a:hover {
+    color:#296f83;
+    text-decoration:none;
+  }
+
   // a.view-add-paragraph {
   //   color: #B257C1;
   // }
