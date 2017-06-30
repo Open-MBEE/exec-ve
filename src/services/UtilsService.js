@@ -608,6 +608,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
                 "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
                 //"table p {word-break: break-all;}\n" + 
+                ".signature-box table {border-spacing: 50em 0;}\n" +
+                ".signature-box .signature-name-styling {width: 400px;}\n" +
+                ".signature-box .signature-date-styling {width: 200px;}\n" +
                 "th {background-color: #f2f3f2;}\n" + 
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
                 ".ng-hide {display: none;}\n" +
