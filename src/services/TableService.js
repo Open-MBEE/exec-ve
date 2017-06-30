@@ -125,7 +125,7 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                 var s = JSON.parse(values[k].specification.value);
                 if ( s.type === "Table"){
                   tableTitles.push(s.title !== undefined ? s.title : "");
-                  tableIds.push(values[k].sysmlId);
+                  tableIds.push(values[k].id);
                   var columnHeaders = [];
                   //ignore 1st column
                   if ( s.header !== undefined){

@@ -14,3 +14,4 @@ app/bower_components_target
 PhantomJS_*
 Chrome_*
 test-results/
+angular-mms-grunt-servers.json

@@ -1,32 +1,24 @@
-<div id="{{mmsVid}}">
+<div id="{{mmsElementId}}">
 
     <h1 ng-if="mmsLink" class="view-title">
-      {{mmsNumber}} <mms-view-link data-mms-did="{{view.sysmlId}}" data-mms-vid="{{view.sysmlId}}"></mms-view-link> 
+      {{mmsNumber}} <mms-view-link mms-element-id="{{view.id}}" mms-doc-id="{{view.id}}"></mms-view-link>
     </h1>
 
     <h1 ng-if="!mmsLink" class="view-title">
-      {{mmsNumber}} <mms-transclude-name data-mms-eid="{{view.sysmlId}}"></mms-transclude-name>
+      {{mmsNumber}} <mms-transclude-name mms-element-id="{{view.id}}" mms-project-id="{{view._projectId}}" mms-ref-id="{{view._refId}}"></mms-transclude-name>
     </h1>
 
-    <div ng-show="showElements">
+    <div ng-show="showElements" class="ve-secondary-text">
       Last Modified: {{modified | date:'M/d/yy h:mm a'}} by {{modifier}}
     </div>
 
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
-    <div ng-if="!isSection && !view._contents">
-        <div ng-repeat="contain in ::view.contains" ng-switch on="contain.type">  
-            <mms-view-para data-mms-para="::contain" ng-switch-when="Paragraph"></mms-view-para>
-            <mms-view-table data-mms-table="::contain" ng-switch-when="Table"></mms-view-table>
-            <mms-view-list data-mms-list="::contain" ng-switch-when="List"></mms-view-list>
-            <mms-view-img data-mms-image="::contain" ng-switch-when="Image"></mms-view-img>
-            <mms-view-section data-mms-section="::contain" ng-switch-when="Section"></mms-view-section>
-        </div>
-    </div>
     <div ng-if="view._contents">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
         <div class="add-buttons-container" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         <div ng-repeat="instanceVal in view._contents.operand"> 
+        <!--<div ng-repeat="instanceVal in view._contents.operand track by instanceVal.instanceId"> -->
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
             <div class="add-buttons-container" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         </div>
@@ -35,6 +27,7 @@
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
         <div class="add-buttons-container" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         <div ng-repeat="instanceVal in view.specification.operand"> 
+        <!--<div ng-repeat="instanceVal in view.specification.operand track by instanceVal.instanceId"> -->
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
             <div class="add-buttons-container" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         </div>

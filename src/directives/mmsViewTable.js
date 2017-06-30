@@ -1,13 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$templateCache', 'UtilsService', mmsViewTable]);
+.directive('mmsViewTable', ['$compile', '$timeout', '$document', 'UtilsService', mmsViewTable]);
 
-function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsService) {
-    var template = $templateCache.get('mms/templates/mmsViewTable.html');
-    
-    var mmsViewTableCtrl = function ($scope, $rootScope) {
-    };
+function mmsViewTable($compile, $timeout, $document, UtilsService) {
 
     var mmsViewTableLink = function(scope, element, attrs) {
         if (!scope.table.showIfEmpty && scope.table.body.length === 0)
@@ -15,13 +11,14 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         scope.searchTerm = '';
         scope.showFilter = false;
         var html = UtilsService.makeHtmlTable(scope.table);
-        html = '<div class="tableSearch">' +
-                '<button class="btn btn-sm btn-primary" ng-click="doClick()">Export CSV</button> ' +
-                '<button class="btn btn-sm btn-primary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
-                '<span ng-show="showFilter"><span>Showing {{numFiltered}} of {{numTotal}} Rows </span>' + 
-                    '<form style="display: inline" ng-submit="search()"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
-                '<button class="btn btn-sm btn-primary" ng-click="search()">Apply</button>' + 
-                '<button class="btn btn-sm btn-danger" ng-click="resetSearch()">Reset</button></span></div>' + html;
+        html = '<div class="tableSearch ve-table-filter">' +
+                '<button class="btn btn-sm export-csv-button btn-tertiary" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm filter-table-button btn-tertiary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
+                '<span class = "ve-show-filter" ng-show="showFilter">' + 
+                    '<form style="display: inline" ng-submit="search()" class="ve-filter-table-form"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
+                '<button class="ve-reset-search" ng-click="resetSearch()"><i class="fa fa-times" aria-hidden="true"></i></button>' + 
+                '<button class="btn btn-sm btn-primary ve-apply-filter" ng-click="search()">Apply</button>' + 
+                '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + html;
 
         scope.doClick = function() {
             var csvString = element.children('table').table2CSV({delivery:'value'});
@@ -65,9 +62,9 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
                 var first = nextIndex;
                 if (first > lastIndex)
                     return;
-                var now = trs.slice(first, first + 100);
+                var now = trs.slice(first, first + 300);
                 $compile(now)(scope);
-                nextIndex = first + 100;
+                nextIndex = first + 300;
                 if (nextIndex < lastIndex)
                     compile();
             }, 100, false);
@@ -98,31 +95,13 @@ function mmsViewTable($compile, $timeout, $document, $templateCache, UtilsServic
         };
 
         return;
-
-        /*scope.tableLimit = 20;
-
-        var addLimit = function() {
-            if (scope.tableLimit < scope.table.body.length) {
-                scope.tableLimit += 25;
-                $timeout(addLimit, 100);
-            }
-        };
-
-        element.append(template);
-        $timeout(function() {
-            $compile(element.contents())(scope);
-            addLimit();
-            }, 100);
-*/
     };
 
     return {
         restrict: 'E',
-        //template: template,
         scope: {
             table: '<mmsTable'
         },
-        controller: ['$scope', '$rootScope', mmsViewTableCtrl],
         link: mmsViewTableLink
     };
 }

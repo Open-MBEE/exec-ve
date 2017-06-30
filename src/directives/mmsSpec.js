@@ -1,17 +1,18 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils','ElementService', 'WorkspaceService', 'ConfigService', 'UtilsService', '$compile', '$templateCache', '$uibModal', '$q', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils','ElementService', 'UtilsService', '$compile', '$templateCache', '$uibModal', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsSpec
  *
  * @requires mms.ElementService
+ * @requires mms.UtilsService
+ * @requires mms.Utils
  * @requires $compile
  * @requires $templateCache
  * @requires $uibModal
- * @requires $q
  * @requires growl
  * @requires _
  *
@@ -62,27 +63,27 @@ angular.module('mms.directives')
     <mms-spec mms-eid="element_id" mms-edit-field="none"></mms-spec>
     </pre>
  *
- * @param {string} mmsEid The id of the element
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
- * @param {string=all} mmsEditField "all" or "none"
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
+ * @param {string=latest} mmsCommitId Commit ID, default is latest
  * @param {Object=} mmsSpecApi An empty object that'll be populated with api methods
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsService, $compile, $templateCache, $uibModal, $q, growl, _) {
-    //var readTemplate = $templateCache.get('mms/templates/mmsSpec.html');
-    //var editTemplate = $templateCache.get('mms/templates/mmsSpecEdit.html');
+function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, $uibModal, growl, _) {
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
-    var mmsSpecLink = function(scope, element, attrs) {
+    var mmsSpecLink = function(scope, domElement, attrs) {
         var ran = false;
         var lastid = null; //race condition check
         var keepMode = false;
         scope.editing = false;
         scope.editable = true;
+        scope.gettingSpec = false;
         scope.isRestrictedVal = false;
         scope.isEnumeration = false;
+        //TODO pass proper args
         scope.propertyTypeClicked = function() {
             scope.$emit('elementSelected', scope.element.typeId, 'element');
         };
@@ -90,18 +91,14 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             scope.element = scope.mmsElement;
             if(scope.element.type === 'Expression'){
                 scope.values = null;
-                scope.value = null;
             }
             if (scope.element.type === 'Property' || scope.element.type === 'Port')
                 scope.values = [scope.element.defaultValue];
             if (scope.element.type === 'Slot')
                 scope.values = scope.element.value;
             if (scope.element.type === 'Constraint')
-                scope.value = scope.element.specification;
+                scope.values = [scope.element.specification];
             scope.editable = false;
-            //element.empty();
-            //element.append(readTemplate);
-            //$compile(element.contents())(scope);
             return;
         }
         scope.addHtml = function(value) {
@@ -120,97 +117,51 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          */
         var changeElement = function(newVal, oldVal) {
             if (!newVal || newVal === oldVal && ran) {
-                //element.empty();
                 return;
             }
             ran = true;
             lastid = newVal;
-            WorkspaceService.getWorkspace(scope.mmsWs)
-            .then(function(data) {
-                if (newVal !== lastid)
-                    return;
-                scope.workspace = data;
-            }, function(reason) {scope.workspace = null;});
-            if (scope.edit && scope.editorApi.save)
+            if (scope.edit && scope.editorApi.save) {
                 scope.editorApi.save();
-            if (scope.mmsType === 'workspace') {
-                WorkspaceService.getWorkspace(scope.mmsEid)
-                .then(function(data) {
-                    if (newVal !== lastid)
-                        return;
-                    scope.element = data;
-                    scope.editable = true;
-                    WorkspaceService.getWorkspaceForEdit(scope.mmsEid)
-                    .then(function(data) {
-                        if (newVal !== lastid)
-                            return;
-                        scope.edit = data;
-                        scope.editable = true;
-                        if (!keepMode)
-                            scope.editing = false;
-                        keepMode = false;
-                    });
-                });
-            } else if (scope.mmsType === 'tag') {
-                ConfigService.getConfig(scope.mmsEid, scope.mmsWs, false)
-                .then(function(data) {
-                    if (newVal !== lastid)
-                        return;
-                    scope.element = data;
-                    scope.editable = true;
-                    ConfigService.getConfigForEdit(scope.mmsEid, scope.mmsWs)
-                    .then(function(data) {
-                        if (newVal !== lastid)
-                            return;
-                        scope.edit = data;
-                        scope.editable = true;
-                        if (!keepMode)
-                            scope.editing = false;
-                        keepMode = false;
-                    });
-                });
-            } else {
-                scope.isEnumeration = false;
-                scope.isSlot = false;
-            ElementService.getElement(scope.mmsEid, false, scope.mmsWs, scope.mmsVersion, 2, true)
+            }
+            scope.isEnumeration = false;
+            scope.isSlot = false;
+            scope.gettingSpec = true;
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: true};
+            ElementService.getElement(reqOb, 2, false)
             .then(function(data) {
-                //element.empty();
-                //var template = null;
-                if (newVal !== lastid)
+                if (newVal !== lastid) {
                     return;
+                }
                 scope.element = data;
                 if (scope.element.type === 'Property' || scope.element.type === 'Port') {
-                    if (scope.element.defaultValue)
+                    if (scope.element.defaultValue) {
                         scope.values = [scope.element.defaultValue];
-                    else
+                    } else {
                         scope.values = [];
-                    if (UtilsService.isRestrictedValue(scope.values))
+                    }
+                    if (UtilsService.isRestrictedValue(scope.values)) {
                         scope.isRestrictedVal = true;
-                    else {
+                    } else {
                         scope.isRestrictedVal = false;
-                    } //End of Else
-                }
-                if (scope.element.type === 'Slot') {
+                    }
+                } else if (scope.element.type === 'Slot') {
                     scope.values = scope.element.value;
-                    if (UtilsService.isRestrictedValue(scope.values))
+                    if (UtilsService.isRestrictedValue(scope.values)) {
                         scope.isRestrictedVal = true;
-                    else 
+                    } else {
                         scope.isRestrictedVal = false;
+                    }
+                } else if (scope.element.type === 'Constraint') {
+                    scope.values = [scope.element.specification];
                 }
-                if (scope.element.type === 'Constraint')
-                    scope.value = scope.element.specification;
-                if (scope.mmsEditField === 'none' ||
-                        !scope.element._editable ||
-                        (scope.mmsVersion !== 'latest' && scope.mmsVersion)) {
+                if (!scope.element._editable ||
+                        (scope.mmsCommitId !== 'latest' && scope.mmsCommitId)) {
                     scope.editable = false;
                     scope.edit = null;
                     scope.editing = false;
-                    //scope.$emit('elementEditability', scope.editable);
-                    //template = readTemplate;
-                    //element.append(template);
-                    //$compile(element.contents())(scope);
                 } else {
-                    ElementService.getElementForEdit(scope.mmsEid, false, scope.mmsWs)
+                    ElementService.getElementForEdit(reqOb)
                     .then(function(data) {
                         if (newVal !== lastid)
                             return;
@@ -219,8 +170,6 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                         if (!keepMode)
                             scope.editing = false;
                         keepMode = false;
-                        //template = editTemplate;
-                        //scope.$emit('elementEditability', scope.editable);
                         if (scope.edit.type === 'Property' || scope.edit.type === 'Port' || scope.edit.type === 'Slot') {// angular.isArray(scope.edit.value)) {
                             if (scope.edit.defaultValue)
                                 scope.editValues = [scope.edit.defaultValue];
@@ -233,40 +182,40 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
                                 scope.values[0].operand[2].operand.forEach(function(o) {
                                     options.push(o.elementId);
                                 });
-                                ElementService.getElements(options, false, scope.mmsWs, scope.mmsVersion)
+                                reqOb.elementIds = options;
+                                ElementService.getElements(reqOb)
                                 .then(function(elements) {
                                     if (newVal !== lastid)
                                         return;
                                     scope.options = elements;
                                 });
                             } else {
-                                //The editor check occurs here; should get "not supported for now" from here
-                                  
-                                Utils.getPropertySpec(scope.element, scope.mmsWs, scope.mmsVersion)
+                                Utils.getPropertySpec(scope.element)
                                 .then( function(value) {
                                     scope.isEnumeration = value.isEnumeration;
                                     scope.isSlot = value.isSlot;
                                     scope.options = value.options;
                                 }, function(reason) {
-                                    // Utils.addFrame(scope, mmsViewCtrl, element, frameTemplate);
                                     growl.error('Failed to get property spec: ' + reason.message);
                                 });
                             }
                         }
                         if (scope.edit.type === 'Constraint' && scope.edit.specification) {
-                            scope.editValue = scope.edit.specification;
+                            scope.editValues = [scope.edit.specification];
                         }
                     });
                 }
+                scope.gettingSpec = false;
             }, function(reason) {
+                scope.gettingSpec = false;
                 //growl.error("Getting Element Error: " + reason.message);
             });
-            }
         };
         scope.changeElement = changeElement;
-        scope.$watch('mmsEid', changeElement);
-        scope.$watch('mmsVersion', changeElement);
-        scope.$watch('mmsWs', changeElement);
+        scope.$watch('mmsElementId', changeElement);
+        scope.$watch('mmsProjectId', changeElement);
+        scope.$watch('mmsCommitId', changeElement);
+        scope.$watch('mmsRefId', changeElement);
         
         /**
          * @ngdoc function
@@ -278,22 +227,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          *
          */
         scope.revertEdits = function() {
-            Utils.revertEdits(scope, null, true);
-        };
-
-        var conflictCtrl = function($scope, $uibModalInstance) {
-            $scope.ok = function() {
-                $uibModalInstance.close('ok');
-            };
-            $scope.cancel = function() {
-                $uibModalInstance.close('cancel');
-            };
-            $scope.force = function() {
-                $uibModalInstance.close('force');
-            };
-            $scope.merge = function() {
-                $uibModalInstance.close('merge');
-            };
+            Utils.revertEdits(scope, scope.edit, scope.editorApi);
         };
 
         /**
@@ -311,7 +245,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          *      the original save failed. Error means an actual error occured.
          */
         scope.save = function() {
-            return Utils.save(scope.edit, scope.mmsWs, scope.mmsType, scope.mmsEid, scope.editorApi, scope, 'all');
+            return Utils.save(scope.edit, scope.editorApi, scope, false);
         };
 
         scope.hasHtml = function(s) {
@@ -331,24 +265,24 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
          * @return {boolean} has changes or not
          */
         scope.hasEdits = function() {
-            return Utils.hasEdits(scope, null, true);
+            return Utils.hasEdits(scope.edit);
         };
 
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
         scope.addValue = function(type) {
             if (type === 'LiteralBoolean')
-                scope.editValues.push({type: type, value: false});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralInteger')
-                scope.editValues.push({type: type, value: 0});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralString')
-                scope.editValues.push({type: type, value: ''});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id}));
             else if (type === 'LiteralReal')
-                scope.editValues.push({type: type, value: 0.0});
+                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
         };
         scope.addValueType = 'LiteralString';
 
         scope.addEnumerationValue = function() {
-          scope.editValues.push({type: "InstanceValue", instanceId: scope.options[0]});
+          scope.editValues.push(UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id}));
         };
 
         scope.removeVal = function(i) {
@@ -432,7 +366,7 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
             };
 
             api.setEdit = function(id) {
-                scope.mmsEid = id;
+                scope.mmsElementId = id;
             };
 
             api.keepMode = function() {
@@ -450,14 +384,12 @@ function mmsSpec(Utils, ElementService, WorkspaceService, ConfigService, UtilsSe
         restrict: 'E',
         template: template,
         scope: {
-            mmsEid: '@',
-            mmsEditField: '@', //all or none or individual field
-            mmsWs: '@',
-            mmsSite: '@',
-            mmsVersion: '@',
+            mmsElementId: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
+            mmsCommitId: '@',
             mmsElement: '<?',
             mmsSpecApi: '<?',
-            mmsType: '@',
             noEdit: '@'
         },
         link: mmsSpecLink

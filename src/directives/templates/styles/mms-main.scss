@@ -16,10 +16,6 @@
 /* App level customizations */
 @import "base/_mms-globals.scss";
 
-/* Layout directive customizations */
-@import "layout/_mms-nav.scss";
-@import "layout/_mms-footer.scss";
-
 /* Other customizations */
 @import "components/_mms-add-pe-button.scss";
 @import "components/_mms-buttons.scss";
@@ -37,3 +33,4 @@
 @import "components/_mms-autocomplete-modal.scss";
 @import "components/_mms-history.scss";
 @import "../../charts/_mms-d3-chart.scss";
+@import "components/_mms-ve-jobs-table.scss";

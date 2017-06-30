@@ -251,7 +251,7 @@ describe('UtilsService', function () {
     describe('Method normalize', function () {
         it('normalize() should normalize common arguments on an object with all null values', inject(function () {
             var someSillyNullRiddenObject = {update: null, workspace: null, ver: null};
-            var compareObject             = JSON.stringify({update: false, ws: 'master', ver: 'latest'});
+            var compareObject             = JSON.stringify({update: false, ws: 'master', ver: 'latest', extended: false});
             var res                       = JSON.stringify(UtilsService.normalize(someSillyNullRiddenObject));
 
             expect(res).toMatch(compareObject);
@@ -260,7 +260,7 @@ describe('UtilsService', function () {
         it('normalize() should normalize common arguments on an object with some null values', inject(function () {
             var someSillyPartialNullRiddenObject = {update: null, workspace: "not-master", version: null};
             var wrongObject                      = JSON.stringify({update: false, ws: 'master', ver: 'not-latest'});
-            var correctObject                    = JSON.stringify({update: false, ws: 'not-master', ver: 'latest'});
+            var correctObject                    = JSON.stringify({update: false, ws: 'not-master', ver: 'latest', extended: false});
             var res                              = JSON.stringify(UtilsService.normalize(someSillyPartialNullRiddenObject));
 
             expect(res).toMatch(correctObject);
@@ -270,7 +270,7 @@ describe('UtilsService', function () {
         it('normalize() should NOT normalize common arguments on an object with all given values', inject(function () {
             var someSillyObject = {update: true, workspace: "not-master", version: "not-latest"};
             var wrongObject     = JSON.stringify({update: false, ws: null, ver: 'latest'});
-            var correctObject   = JSON.stringify({update: true, ws: 'not-master', ver: 'not-latest'});
+            var correctObject   = JSON.stringify({update: true, ws: 'not-master', ver: 'not-latest', extended: false});
             var res             = JSON.stringify(UtilsService.normalize(someSillyObject));
 
             expect(res).toEqual(correctObject);
@@ -392,21 +392,6 @@ describe('UtilsService', function () {
         }));
     });
 
-    describe('Method getIdInfo', function () {
-        var element = getJSONFixture('UtilsService/getIdInfo.json');
-        it('should generate a new element with holdingBin, projectId, siteId, and projectName', inject(function () {
-            var result = UtilsService.getIdInfo(element, "MERP");
-            expect(result).toBeDefined();
-
-            var baseline = {
-                holdingBinId: null,
-                projectId   : 'test-site_no_project',
-                siteId      : 'test-site',
-                projectName : null
-            };
-            expect(JSON.stringify(baseline)).toMatch(JSON.stringify(result));
-        }));
-    });
 
     /*
      xdescribe('Method makeHtmlTOC', function () {

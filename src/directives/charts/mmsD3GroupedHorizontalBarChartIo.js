@@ -362,7 +362,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
                 var sysmlIds = [];
 
                 for ( var j = 0; j < dataValuesPerTable[i].length; j++){
-                  sysmlIds[j] =  dataValuesPerTable[i][j].sysmlId;
+                  sysmlIds[j] =  dataValuesPerTable[i][j].id;
                   var datavalue = null;
                   if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
                     datavalue = dataValuesPerTable[i][j].defaultValue;

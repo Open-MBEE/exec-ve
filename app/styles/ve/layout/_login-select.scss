@@ -1,0 +1,138 @@
+/*------------------------------------------------------------------
+[Login Table of contents]
+
+1. Layout
+2. Typography
+3. UI Elements
+  3.1 Text Input
+4. Animation
+
+-------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------
+1. Layout
+-------------------------------------------------------------------*/
+
+#ve-origin-select,
+#ve-login {
+
+  background-color: $ve-slate-darker-2;
+  height:100%;
+
+  .account-wall {
+    width: 320px;
+    margin: 120px auto;
+    height: 320px;
+    position: relative;
+  }
+
+  .account-wall .btn-block {
+    margin-top: 34px;
+    position: absolute;
+    bottom: 0;
+    padding: 10px;
+  }
+
+  @media (max-height:500px){
+    .account-wall{
+      margin: 40px auto;    
+    }
+  }
+
+/*------------------------------------------------------------------
+2. Typography
+-------------------------------------------------------------------*/
+
+  .account-wall h2 {
+    margin-bottom: 32px;
+    font-size: 44px;
+    text-align: center;
+    font-weight: 100;
+  }
+
+  .module-disabled {
+    opacity: .3;
+  }
+
+  .back-to-account{
+    float: left;
+    position: absolute;
+    top: 18px;
+    font-size: 18px;
+  }
+
+/*------------------------------------------------------------------
+3. Input
+-------------------------------------------------------------------*/
+
+  .form-control {
+    display: inline;
+    border: none;
+    font-size: 16px;
+    padding: 6px 10px;
+    border-radius: 2px !important;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
+    background-color: $ve-slate-base;
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    padding: 5px 8px;
+    height: 34px;
+    line-height: 18px;
+    margin: 6px 0 18px;
+    color:white;
+    letter-spacing:.05em;
+  }
+
+  .form-control:focus {
+    box-shadow: none;
+    border: 1px solid $ve-teal-base;
+  }
+
+  .form-control {
+    border: 1px solid $ve-slate-base;
+    box-shadow: none;
+  }
+
+  .label-text {
+    color: $ve-white-text-lighter-2;
+    font-size: 14px;
+  }
+
+}
+
+/*------------------------------------------------------------------
+4. Animation
+-------------------------------------------------------------------*/
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(16%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animated-fade-in-slide {
+  animation: .3s ease-out 0s 1 slideInFromLeft;
+}
+
+.fade-in{
+  animation: .7s ease-out 0s 1 fadeIn;
+}

@@ -1,0 +1,234 @@
+
+/*------------------------------------------------------------------
+[Navigation Table of Contents]
+
+1. General
+  1.1 Typography/Layout
+2. Org/global Level Header
+	2.1 Org Navigation
+	2.2 Global Navigation
+		2.2.1 Menu
+		2.2.2 Search
+3. Project Level Header
+	3.1 Select Project Dropdown
+	3.2 Breadcrumbs
+  3.3 Dropdowns
+
+-------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------
+	1.1 General Typography/Layout
+-------------------------------------------------------------------*/
+
+.navbar {
+  color: white;
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: .05em;
+  font-size: 14px;
+  z-index: 200;
+  position: relative;
+  width: 100%;
+  height: 36px;
+  min-height: 30px;
+  border: 0;
+  background-color: $base_grey;
+
+  a,
+  a:hover,
+  a:visited {
+    text-decoration: none;
+    color:white;
+  }
+}
+
+/*------------------------------------------------------------------
+2. Org/Global Level Header
+-------------------------------------------------------------------*/
+
+nav.global-header {
+  background-color: $ve-slate-base;
+}
+
+/*------------------------------------------------------------------
+	2.1 Org Navigation
+-------------------------------------------------------------------*/
+
+a.switch-org,
+a.switch-org:hover {
+  font-size: 11px;
+  text-decoration: underline !important;
+}
+
+.logotype {
+  font-weight: 200;
+  line-height: 36px;
+  padding: 0 5px 0 13px;
+}
+
+.org-title {
+  font-weight: 600;
+  padding-right: 4px;
+}
+
+/*------------------------------------------------------------------
+	2.2 Global Navigation
+-------------------------------------------------------------------*/
+
+#global-navigation {
+  float: right;
+}
+
+/*------------------------------------------------------------------
+		2.2.1 Menu
+-------------------------------------------------------------------*/
+
+ul.global-menu {
+  list-style: none;
+  float: right;
+  margin: 0;
+  padding: 0 10px 0 20px;
+}
+
+.global-menu > li {
+  display: inline;
+  padding: 0 8px;
+  height: 36px;
+  line-height: 36px;
+}
+
+.global-menu > li > a,
+.global-menu > li > span > a.dropdown-toggle {
+  color: $ve-white-text-lighter-2;
+}
+
+.global-menu > li > a:hover,
+.global-menu > li > span > a.dropdown-toggle:hover {
+  color: white;
+}
+
+/*------------------------------------------------------------------
+		2.2.2 Search
+-------------------------------------------------------------------*/
+
+#global-search {
+  display: inline;
+  position: relative;
+}
+
+#global-search input {
+  background-color: $ve-slate-darker-2;
+  border: 1px solid $ve-slate-darker-2;
+  border-radius: 3px 0 0 3px;
+  width: 330px;
+  padding: 0 8px;
+  height: 26px;
+  margin: 5px 0 5px 10px;
+  font-weight: 300;
+  letter-spacing: .05em;
+  line-height: 1;
+}
+
+#global-search input:focus {
+  outline:none;
+  background-color: $ve-slate-darker-3;
+  border: 1px solid $ve-teal-base;
+}
+
+#global-search button{
+  border-radius: 0 3px 3px 0;
+  height: 26px;
+  padding: 0px 7px;
+  background-color: $ve-teal-base;
+  top: 0px;
+  position: relative;
+  box-sizing: border-box;
+  color: white;
+  border:none;
+  margin: 5px 0 5px -10px;
+  vertical-align: bottom;
+  -webkit-transition: background-color .1s ease-out;
+  -moz-transition: background-color .1s ease-out;
+  -o-transition: background-color .1s ease-out;
+  transition: background-color .1s ease-out;
+}
+
+#global-search button .fa-search{
+  position: relative;
+  color: white;
+  font-size:14px;
+  top:-1px; 
+}
+
+#global-search button:hover{
+  background-color:$ve-teal-darker-1;
+}
+
+
+/*------------------------------------------------------------------
+3. Project Level Header
+-------------------------------------------------------------------*/
+
+.project-level-header {
+  z-index: 100;
+  position: relative;
+}
+
+nav.project-level-header {
+  background-color: $ve-slate-darker-2;
+}
+
+/*------------------------------------------------------------------
+	3.1 Select Project Dropdown
+-------------------------------------------------------------------*/
+
+.select-project-dropdown {
+	float:left;
+}
+
+/*------------------------------------------------------------------
+	3.2 Breadcrumbs
+-------------------------------------------------------------------*/
+
+.breadcrumbs {
+  display: inline;
+}
+
+.breadcrumbs ul {
+  list-style: none;
+  display: inline;
+  margin: 0;
+  padding-left: 10px;
+  position: relative;
+}
+
+.breadcrumbs li {
+  display: inline;
+  height: 36px;
+	line-height: 36px;
+}
+
+.breadcrumbs .fa-folder,
+.breadcrumbs .fa-file {
+  font-size: 12px;
+  padding: 6px 4px 6px 6px;
+}
+
+.breadcrumbs .fa-file {
+  font-size: 11px;
+  top: -.1em;
+  position: relative;
+}
+
+.breadcrumbs #alfUploadLink:hover {
+  text-decoration: underline;
+}
+
+/*------------------------------------------------------------------
+  3.3 Dropdowns
+-------------------------------------------------------------------*/
+
+.project-level-header .ve-dark-dropdown-nav ul.dropdown-menu{
+  width:300px;
+}

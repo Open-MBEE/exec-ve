@@ -1,95 +1,85 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['VizService', 'growl', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['VizService','ElementService','URLService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeImg
  *
  * @requires mms.VizService
+ * @requires mms.ElementService
  *
  * @restrict E
  *
  * @description
  * Given an image id, puts in an img tag for the image url. 
  *
- * @param {string} mmsEid The id of the image to show
- * @param {string=master} mmsWs Workspace to use, defaults to master
- * @param {string=latest} mmsVersion Version can be alfresco version number or timestamp, default is latest
+ * @param {string} mmsElementId The id of the view
+ * @param {string} mmsProjectId The project id for the view
+ * @param {string=master} mmsRefId Reference to use, defaults to master
+ * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeImg(VizService, growl) {
+function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
-        var mmsCfDocCtrl = controllers[1];
-        var mmsCfValCtrl = controllers[2];
         var processed = false;
         element.click(function(e) {
             if (!mmsViewCtrl)
                 return false;
-            mmsViewCtrl.transcludeClicked(scope.mmsEid, scope.ws, scope.version);
+            //TODO get element somehow
+            mmsViewCtrl.transcludeClicked(scope.element);
             return false;
         });
 
-        scope.$watch('mmsEid', function(newVal, oldVal) {
+        scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
             processed = true;
-            var ws = scope.mmsWs;
-            var version = scope.mmsVersion;
-            if (mmsCfValCtrl) {
-                var cfvVersion = mmsCfValCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = cfvVersion.workspace;
-                if (!version)
-                    version = cfvVersion.version;
-            }
-            if (mmsCfDocCtrl) {
-                var cfdVersion = mmsCfDocCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = cfdVersion.workspace;
-                if (!version)
-                    version = cfdVersion.version;
-            }
-            if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = viewVersion.workspace;
-                if (!version)
-                    version = viewVersion.version;
-            }
-            scope.ws = ws;
-            scope.version = version;
+
+            scope.projectId = scope.mmsProjectId;
+            scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
+            scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.svg'};
+
             element.addClass('isLoading');
-            VizService.getImageURL(scope.mmsEid, 'svg', false, ws, version)
+            //TODO change when VizService is updated to use correct params
+            VizService.getImageURL(reqOb)
             .then(function(data) {
                 scope.svgImgUrl = data;
+            //scope.svgImgUrl = URLService.getImageURL(reqOb);
+            //reqOb.accept = 'image/png';
+            //scope.pngImgUrl = URLService.getImageURL(reqOb);
             }, function(reason) {
-                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
+                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
                 element.removeClass('isLoading');
             });
-            VizService.getImageURL(scope.mmsEid, 'png', false, ws, version)
+            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.png'};
+            VizService.getImageURL(reqOb2)
             .then(function(data) {
                 scope.pngImgUrl = data;
             }, function(reason) {
-                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsEid);
+                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+            });
+            ElementService.getElement(reqOb, 1, false)
+            .then(function(data) {
+                scope.element = data;
             });
         });
     };
 
     return {
         restrict: 'E',
-        //template: '<figure><img ng-src="{{imgUrl}}"></img><figcaption><mms-transclude-name mms-eid="{{mmsEid}}" mms-ws="{{mmsWs}}" mms-version="{{mmsVersion}}"></mms-transclude-name></figcaption></figure>',
         template: '<img class="mms-svg" ng-src="{{svgImgUrl}}"></img><img class="mms-png" ng-src="{{pngImgUrl}}"></img>',
         scope: {
-            mmsEid: '@',
-            mmsVersion: '@',
-            mmsWs: '@'
+            mmsElementId: '@',
+            mmsProjectId: '@',
+            mmsRefId: '@',
+            mmsCommitId: '@'
         },
-        require: ['?^^mmsView', '?^^mmsTranscludeDoc', '?^^mmsTranscludeVal'],
-        //controller: ['$scope', controller]
+        require: ['?^^mmsView'],
         link: mmsTranscludeImgLink
     };
 }

@@ -16,7 +16,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
         var ownedElementsMap = {};
 
         for (var i = 0; i < data.length; i++) {
-          ownedElementsMap[data[i].sysmlId] = data[i];
+          ownedElementsMap[data[i].id] = data[i];
         }
 
         // create a list of all the nodes
@@ -29,7 +29,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
           if (elem.type === 'Element') {
 
-            var node = { key: elem.sysmlId ,iskey: true, figure: "Decision", label: elem.name, children: [] };
+            var node = { key: elem.id ,iskey: true, figure: "Decision", label: elem.name, children: [] };
             
             // does it have an owner and is the owner a member of this model?
             if (elem.hasOwnProperty('ownerId') && 
@@ -44,8 +44,8 @@ function mmsDiagramBlock(go, growl, ElementService) {
         // associate children nodes with all the nodes and
         var nodes = [];
  
-        for (var elem_sysmlId in nodesMap) {
-          var elem_node = nodesMap[elem_sysmlId];
+        for (var elem_id in nodesMap) {
+          var elem_node = nodesMap[elem_id];
           nodes.push(elem_node);
           if (elem_node.parent) {
             nodesMap[elem_node.parent].children.push(elem_node);

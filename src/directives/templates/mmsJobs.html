@@ -1,44 +1,161 @@
 <h2>Jobs</h2>
-<i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
-<table class="snapshot-table table table-condensed" ng-if="!loading && hasJobs">
-    <thead>
-        <tr>
-            <td>Name</td>
-            <td>Status</td>
-            <td>Created</td>
-            <td></td>
-            <td></td>
-        </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td>
-            <div ng-hide="editorEnabled">
-                <a ng-click="enableEditor()">{{job.name}}</a>
-            </div>
-            <div ng-show="editorEnabled">
-                <input ng-model="jobInput.jobName" ng-show="editorEnabled">
-                <a ng-click="save()">Save</a>
-                or
-                <a ng-click="disableEditor()">Cancel</a>
-            </div>
-        </td>
-        <td>
-            <div>{{job.status}} <a ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
-        </td>
-        <td>{{job.create}}</td>
-        <td><button class="btn-link" ng-click="deleteJob()"><strong><span ng-show="deleteCleared">DELETE JOB</span></stong></button><i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></td>
-        <td>
-            <div ng-if="buttonEnabled && deleteCleared">
-                <button type="submit" class="btn-link" ng-click="runNow()"><strong><span ng-show="runCleared">RUN NOW</span></stong></button><i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
-            </div>
-        </td>
-        
-    </tr>
-    </tbody>
-</table>
-<h3 ng-if="!hasJobs && !loading"> No Current Jobs</h3>
-<hr>
-<div class="row" style="margin-right:0px;">
-<button type="submit"  class="btn-link pull-right" ng-if="!hasJobs && !loading" ng-click="runNow()" style="text-transform: uppercase;"><strong><span ng-show="responseCleared">RUN JOB FOR {{docName}}</span></stong><i ng-show="!responseCleared" class="fa fa-spin fa-spinner"></i></button>
+<i class="pane-center-spinner fa fa-3x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
+
+<div id="ve-jobs-table">
+    <!--<h3>View Editor</h3>
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Status</td>
+                <td>Created</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div ng-hide="editorEnabled">
+                        PMA Smoke Test_job
+                        <a class="ng-binding" ng-click="enableEditor()">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="ng-hide" ng-show="editorEnabled">
+                        <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                        <a ng-click="save()">Save</a>
+                        or
+                        <a ng-click="disableEditor()">Cancel</a>
+                    </div>
+                </td>
+                <td>
+                    <div class="ng-binding"><i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed 
+                    <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+                </td>
+                <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
+            </tr>
+            <tr>
+                <td>
+                    <div ng-hide="editorEnabled">
+                        PMA Smoke Test_job
+                        <a class="ng-binding" ng-click="enableEditor()">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="ng-hide" ng-show="editorEnabled">
+                        <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                        <a ng-click="save()">Save</a>
+                        or
+                        <a ng-click="disableEditor()">Cancel</a>
+                    </div>
+                </td>
+                <td>
+                    <div class="ng-binding"><i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>
+in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+                </td>
+                <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
+            </tr>
+            <tr>
+                <td>
+                    <div ng-hide="editorEnabled">
+                        PMA Smoke Test_job
+                        <a class="ng-binding" ng-click="enableEditor()">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="ng-hide" ng-show="editorEnabled">
+                        <input class="ng-pristine ng-untouched ng-valid ng-empty ng-hide" ng-model="jobInput.jobName" ng-show="editorEnabled">
+                        <a ng-click="save()">Save</a>
+                        or
+                        <a ng-click="disableEditor()">Cancel</a>
+                    </div>
+                </td>
+                <td>
+                    <div class="ng-binding"><i class="fa fa-circle completed-marker" aria-hidden="true"></i>success <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914676e-c0b0-4e54-b902-bd446afab02c/lastBuild/artifact/MDNotificationWindowText.html" ng-attr-href="{{job.url}}" target="_blank" ng-show="buttonEnabled">log</a></div> 
+                </td>
+                <td class="ng-binding">Tue Mar 21 15:06:32 PDT 2017</td>
+            </tr>
+        </tbody>
+    </table>-->
+
+
+
+    <h3>PMA</h3>
+    <table class="table table-condensed" ng-if="!loading && jobs.length">
+        <thead>
+            <tr>
+                <td>Name</td>
+                <!--<td>Created</td>-->
+                <td>Status</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="job in jobs">
+                <td>
+                    <div ng-hide="editorEnabled">
+                        {{job.name}}
+                        <!--<a class="ng-binding" ng-click="enableEditor()">-->
+                            <!--<i class="fa fa-pencil" aria-hidden="true"></i>-->
+                        <!--</a>-->
+                    </div>
+                    <!--<div ng-show="editorEnabled">
+                        <input ng-model="jobInput.jobName" ng-show="editorEnabled">
+                        <a ng-click="save()">Save</a>
+                        or
+                        <a ng-click="disableEditor()">Cancel</a>
+                    </div>-->
+                </td>
+                <!--<td>
+                    <select class = "form-control">
+                        {{job.create}}
+                    </select>
+                </td>-->
+                <td>
+                    <div ng-show="job.latestStatus || jobInstances[job.id]">
+                        Build {{jobInstances[job.id][0].buildNumber}}
+                        <div ng-switch="jobInstances[job.id][0].jobStatus">
+                            <span ng-switch-when="pending|loading|running|started" ng-switch-when-separator="|">
+                                Created {{jobInstances[job.id][0].created}}<br>
+                                <i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>in progress
+                            </span>
+                            <span ng-switch-when="failed">
+                                Created {{jobInstances[job.id][0].created}}<br>
+                                <i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed 
+                            </span>
+                            <span ng-switch-when="completed">
+                                Completed {{jobInstances[job.id][0].completed}}<br>
+                                <i class="fa fa-circle completed-marker" aria-hidden="true"></i>success
+                            </span>
+                            <span class="animate-switch" ng-switch-default>{{jobInstances[job.id][0].jobStatus}}</span>
+                        <!--<a ng-attr-href="{{job.url}}" target="_blank" ng-show="job.url">log</a>-->
+                        </div>
+                    </div>
+                    <div ng-if="!jobInstances[job.id]">
+                        <h4>No runs.</h4>
+                    </div>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-tertiary" ng-class="{'disabled': !docEditable || !deleteCleared}" ng-click="deleteJob(job.id)">
+                        <span>DELETE <i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></span>
+                    </button>
+                    <button class="btn btn-sm btn-primary" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="runNow(job.id)">
+                        <span>RUN NOW <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div ng-if="!jobs.length && !loading" class="text-center empty-state">
+        <h4 ng-if="!jobs.length && !loading">No Current PMA Jobs</h4>
+        <p><i>What's PMA?</i> PMA regenerates Magicdraw views for the current document. 
+        <a target="_blank" href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
+        <p ng-if="mmsRefId != 'master'">PMA is currently only available on the <strong>master</strong> branch.</p>
+        <button class="btn btn-primary" ng-if="mmsRefId === 'master'" ng-click="runNow()" ng-class="{'disabled': !docEditable || !runCleared}">
+            Run DocGen <i ng-hide="runCleared" class="fa fa-spin fa-spinner"></i>
+        </button>
+    </div>
+    <!--<div class="pull-right" ng-if="docEditable">
+        <a href="/share/page/document-details?nodeRef={{doc.nodeRefId}}" target="_blank">Edit Permissions</a>
+    </div>-->
 </div>
+

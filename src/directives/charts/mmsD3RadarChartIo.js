@@ -57,7 +57,7 @@
                     var tvalues = [];
                     //var sysmlIds = []; //not used but possible to use for filter
                     for ( j = 0; j < dataValuesPerTable[i].length; j++){
-                      //sysmlIds[j] =  dataValuesPerTable[i][j].sysmlId;
+                      //sysmlIds[j] =  dataValuesPerTable[i][j].id;
                       var datavalue = null;
                       if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
                           datavalue = dataValuesPerTable[i][j].defaultValue;
