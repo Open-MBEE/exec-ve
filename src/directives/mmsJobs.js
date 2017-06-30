@@ -38,8 +38,12 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         var host = $location.host();
         if (host != 'localhost' && host != '0.0.0.0') {
             var segments = host.split('-');
-            var env = segments[segments.length-1];
-            URLService.setJobsUrl('https://cae-pma-' + env);
+            if (segments.length === 1) {
+                URLService.setJobsUrl('https://cae-pma.jpl.nasa.gov');
+            } else{
+                var env = segments[segments.length-1];
+                URLService.setJobsUrl('https://cae-pma-' + env);
+            }
             serverSentPMA = host;
         } else {
             //use default pma //TODO need to define env var when running dev
