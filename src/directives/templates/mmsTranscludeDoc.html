@@ -1,26 +1,13 @@
 <div class="panel panel-default">
     <div class="panel-heading clearfix">
-    <div class="row">
-        <div class="col-sm-8">
-            <div class="input-group input-group">
-            <span class="input-group-addon">{{panelType}}</span>
-                <input ng-if="!isDirectChildOfPresentationElement" class="form-control" type="text" ng-model="panelTitle" disabled/>
-                <input ng-if="isDirectChildOfPresentationElement" class="form-control" type="text" ng-model="edit.name" />
-            </div>
-
-            <!--<h3 class="panel-title pull-left">{{panelType}} :
-                <span ng-if="!isDirectChildOfPresentationElement">{{panelTitle}}</span>
-                <span ng-if="isDirectChildOfPresentationElement"><input type="text" ng-model="edit.name" /></span>
-            </h3>-->
-        </div>
-        <div class="col-sm-4">
-            <div class="btn-group pull-right">
-                <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
-            </div>
+        <h3 class="panel-title pull-left">{{panelType}} :
+            <span ng-if="!isDirectChildOfPresentationElement">{{panelTitle}}</span>
+            <span ng-if="isDirectChildOfPresentationElement"><input type="text" ng-model="edit.name"/></span>
+        </h3>
+        <div class="btn-group pull-right">
+            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
         </div>
     </div>
-    </div>
-
     <div class="inner panel-body">
         <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-type="{{editorType}}" mms-editor-api="editorApi" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}"></textarea>
     </div>
