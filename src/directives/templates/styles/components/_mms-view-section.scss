@@ -1,0 +1,30 @@
+mms-view-section {
+  .add-buttons-container-section {
+    display: none;
+    margin: 10px 0;
+  }
+}
+
+mms-view-section > div.section-editing {
+  .add-buttons-container-section {
+    display: block;
+  }
+}
+
+mms-view.editing {
+    mms-view-section {
+        display: block;
+        border: 1px solid black;
+        border-radius: 5px;
+
+    }
+}
+
+mms-view-section {
+    .panel-heading {
+        padding: 0;
+    }
+    .transclude-doc-bb {
+      margin: 8px 0;
+    }
+}

@@ -36,7 +36,8 @@
 
   .back-to-docs{
     color:$ve-link;
-    font-weight: 700;
+    font-weight: 500;
+    font-size: 16px;
   }
 
   h1 {
@@ -123,7 +124,7 @@ ul.ve-light-list {
   }
 
   .ve-light-panels-detail-header {
-    background-color: $ve-silver-lighter-1;
+    background-color: $ve-silver-lighter-0;
     height: 45px;
     border-bottom: 1px solid $ve-silver-darker-1;
   }
@@ -163,7 +164,7 @@ ul.ve-light-list {
 
   dd.link-section > a, dd.link-section > span {
     color: $ve-link;
-    font-weight: 700;
+    font-weight: 500;
   }
 
   dd.link-section > a::after {

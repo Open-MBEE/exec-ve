@@ -76,7 +76,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name)
+            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
             .then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
                 $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);

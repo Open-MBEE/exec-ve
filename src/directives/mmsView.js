@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['ViewService', 'ElementService', '$templateCache', '$rootScope', 'growl', mmsView]);
+.directive('mmsView', ['MmsAppUtils', 'ViewService', 'ElementService', '$templateCache', '$rootScope', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -54,7 +54,7 @@ angular.module('mms.directives')
  *              view being clicked, this should be a function whose argument is 'elementId'
  */
 
-function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl) {
+function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $rootScope, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
@@ -182,6 +182,20 @@ function mmsView(ViewService, ElementService, $templateCache, $rootScope, growl)
         scope.showComments = false;
         scope.showEdits = false;
 
+
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsView#addEltAction
+         * @methodOf mms.directives.directive:mmsView
+         * 
+         * @description 
+         * Add specified element at the defined 'index' 
+         */
+        scope.addEltAction = function (index, type) {
+             scope.ws = scope.mmsWs;
+             scope.addPeIndex = index;
+             MmsAppUtils.addPresentationElement(scope, type, scope.view);
+        };
 
         /**
          * @ngdoc function

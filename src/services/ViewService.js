@@ -412,13 +412,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @description
      * This updates a view or section to include a new element, the new element must be a child
      * of an existing element in the view
-     * 
+     *
      * @param {object} reqOb see ElementService.getElement for description, elementId is the view
      *                          or section instance element id
      * @param {object} elementOb the element object to add (this should be an instanceValue)
+     * @param {number} addPeIndex the index of where to add view or section (instance spec) object
      * @returns {Promise} The promise would be resolved with updated view or section object
      */
-    var addElementToViewOrSection = function(reqOb, elementOb) {
+    var addElementToViewOrSection = function(reqOb, elementOb, addPeIndex) {
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
         ElementService.getElement({
@@ -456,7 +457,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (!elementOb.id) {
                 elementOb.id = UtilsService.createMmsId();
             }
-            clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
+            if (addPeIndex >= -1)
+                clone[key].operand.splice(addPeIndex+1, 0, UtilsService.createValueSpecElement(elementOb));
+            else
+                clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
+            // clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
             ElementService.updateElement(clone)
             .then(function(data2) {
                 deferred.resolve(data2);
@@ -545,7 +550,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var createInstanceSpecification = function(viewOrSectionOb, type, name) {
+    var createInstanceSpecification = function(viewOrSectionOb, type, name, addPeIndex) {
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
@@ -627,6 +632,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone[key].ownerId = isSection(viewOrSectionOb) ? viewOrSectionOb.id : viewOrSectionOb.id + "_vc";
             }
         }
+        if (addPeIndex >= -1)
+            clone[key].operand.splice(addPeIndex+1, 0, UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
+        else
         clone[key].operand.push(UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
         var toCreate = [instanceSpec, clone];
         /*
