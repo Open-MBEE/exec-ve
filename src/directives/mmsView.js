@@ -192,7 +192,6 @@ function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $root
          * Add specified element at the defined 'index' 
          */
         scope.addEltAction = function (index, type) {
-             scope.ws = scope.mmsWs;
              scope.addPeIndex = index;
              MmsAppUtils.addPresentationElement(scope, type, scope.view);
         };

@@ -30,7 +30,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 instanceId: elementOb.id,
                 type: "InstanceValue"
             };
-            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal)
+            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
                 .then(function(data) {
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
