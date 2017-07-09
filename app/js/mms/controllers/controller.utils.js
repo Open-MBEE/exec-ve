@@ -34,6 +34,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 .then(function(data) {
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
+                    $rootScope.$broadcast('view-reorder.refresh');
                     growl.success("Adding "+$scope.presentationElemType+"  Successful");
                     $uibModalInstance.close(data);
                 }, function(reason) {

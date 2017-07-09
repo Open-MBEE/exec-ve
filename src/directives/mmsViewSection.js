@@ -125,7 +125,8 @@ function mmsViewSection($compile, $templateCache, $rootScope, MmsAppUtils, ViewS
          * @description
          * Add specified element at the defined 'index'
          */
-        scope.addEltAction = function(index, type) {
+        scope.addEltAction = function(index, type, e) {
+            e.stopPropagation();
             scope.addPeIndex = index;
             MmsAppUtils.addPresentationElement(scope, type, scope.section);
         };
