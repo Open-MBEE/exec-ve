@@ -117,14 +117,6 @@ function mmsViewSection($compile, $templateCache, $rootScope, MmsAppUtils, ViewS
             };
         }
 
-        /**
-         * @ngdoc function
-         * @name mms.directives.directive:mmsViewSection#addEltAction
-         * @methodOf mms.directives.directive:mmsViewSection
-         *
-         * @description
-         * Add specified element at the defined 'index'
-         */
         scope.addEltAction = function(index, type, e) {
             e.stopPropagation();
             scope.addPeIndex = index;
