@@ -390,7 +390,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             resetCrossRef(body.find('mms-view-link').$, '.vlink]');
             update();
         };
-        
+
         var update = function() {
             // getData() returns CKEditor's processed/clean HTML content.
             if (angular.isDefined(instance) && instance !== null)
@@ -407,14 +407,14 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             { name: 'document',    items : [ 'Maximize', 'Source' ] },
             '/',
             { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
-            // { name: 'insert',      items : [ 'PageBreak','HorizontalRule','CodeSnippet' ] },
+            { name: 'insert',      items : [ 'PageBreak','HorizontalRule' ] },
         ];
         var justifyToolbar =  { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] };
         var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
         var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink' ] };
+        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink','Mmssignature' ] };
         var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
 
         //Set toolbar based on editor type

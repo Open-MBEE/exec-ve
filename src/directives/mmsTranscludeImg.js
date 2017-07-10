@@ -41,7 +41,7 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.svg'};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/svg'};
 
             element.addClass('isLoading');
             //TODO change when VizService is updated to use correct params
@@ -56,7 +56,7 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             }).finally(function() {
                 element.removeClass('isLoading');
             });
-            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: '.png'};
+            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/png'};
             VizService.getImageURL(reqOb2)
             .then(function(data) {
                 scope.pngImgUrl = data;

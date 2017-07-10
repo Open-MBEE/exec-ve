@@ -171,3 +171,15 @@ mms-cf[mms-cf-type="com"] {
 	z-index: 0;
 	cursor: not-allowed;
 }
+
+/*
+ * mmssignature
+ */
+.signature-box {
+	padding: 8px;
+	border: 1px solid #ddd;
+}
+
+.signature-box td div.cell-styling {
+	padding: 0 8px;
+}
