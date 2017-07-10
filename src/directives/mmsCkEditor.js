@@ -407,7 +407,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             { name: 'document',    items : [ 'Maximize', 'Source' ] },
             '/',
             { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
-            // { name: 'insert',      items : [ 'PageBreak','HorizontalRule','CodeSnippet' ] },
+            { name: 'insert',      items : [ 'PageBreak','HorizontalRule' ] },
         ];
         var justifyToolbar =  { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] };
         var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
