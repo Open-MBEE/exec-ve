@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'MmsAppUtils', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils) {
+function mmsViewSection($compile, $templateCache, $rootScope, MmsAppUtils, ViewService, UxService, Utils) {
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
@@ -73,7 +73,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         scope.commitId = commitId ? commitId : 'latest';
 
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
-            
+
             scope.isEditing = false;
             scope.inPreviewMode = false;
             scope.elementSaving = false;
@@ -105,7 +105,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             };
 
             scope.delete = function() {
-                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
+                Utils.deleteAction(scope, scope.bbApi, mmsViewPresentationElemCtrl.getParentSection());
             };
 
             scope.startEdit = function() {
@@ -115,7 +115,22 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             scope.preview = function() {
                 Utils.previewAction(scope, recompileEdit, recompile, type);
             };
-        } 
+        }
+
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsViewSection#addEltAction
+         * @methodOf mms.directives.directive:mmsViewSection
+         *
+         * @description
+         * Add specified element at the defined 'index'
+         */
+        scope.addEltAction = function(index, type, e) {
+            e.stopPropagation();
+            scope.addPeIndex = index;
+            MmsAppUtils.addPresentationElement(scope, type, scope.section);
+        };
+
     };
 
     return {

@@ -18,7 +18,7 @@
 @import "layout/_ve-table-filter.scss";
 
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
-.cke_button__mmsvlink_label, .cke_button__mmsreset_label {
+.cke_button__mmsvlink_label, .cke_button__mmsreset_label, .cke_button__mmssignature_label {
   display: inline !important;
 }
 
@@ -541,7 +541,7 @@ div.tooltip-inner {
 
 .ve-light-tabs {
 
-  background-color: $ve-silver-lighter-1;
+  background-color: $ve-silver-lighter-0;
 
   .nav-tabs > li.uib-tab {
     text-align: center;
@@ -561,10 +561,10 @@ div.tooltip-inner {
 
   .nav-tabs > li.uib-tab > a {
     border: none;
-    border-bottom: 3px solid $ve-silver-lighter-1;
+    border-bottom: 3px solid $ve-silver-lighter-0;
     color: #333;
     margin: 0;
-    background-color: $ve-silver-lighter-1;
+    background-color: $ve-silver-lighter-0;
     line-height: 21px;
   }
 
@@ -575,7 +575,7 @@ div.tooltip-inner {
 
   .nav > li > a:focus, 
   .nav > li > a:hover {
-    background-color: $ve-silver-lighter-1;
+    background-color: $ve-silver-lighter-0;
     border-bottom: 3px solid $ve-teal-lighter-1;
   }
 }

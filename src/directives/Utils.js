@@ -397,7 +397,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                     $rootScope.$broadcast('presentationElem.save', scope.edit);
                 }
                 growl.success('Save Successful');
-                scrollToElement(domElement);
+                //scrollToElement(domElement);
             }, function(reason) {
                 scope.elementSaving = false;
                 handleError(reason);

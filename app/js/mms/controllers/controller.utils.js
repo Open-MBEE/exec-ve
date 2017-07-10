@@ -30,10 +30,11 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 instanceId: elementOb.id,
                 type: "InstanceValue"
             };
-            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal)
+            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
                 .then(function(data) {
                     // Broadcast message to TreeCtrl:
                     $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
+                    $rootScope.$broadcast('view-reorder.refresh');
                     growl.success("Adding "+$scope.presentationElemType+"  Successful");
                     $uibModalInstance.close(data);
                 }, function(reason) {
@@ -76,7 +77,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             $scope.oking = true;
 
-            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name)
+            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
             .then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
                 $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
@@ -385,7 +386,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
-        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        if (genTotf) {
+            tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        }
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;

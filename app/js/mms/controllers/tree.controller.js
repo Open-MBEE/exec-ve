@@ -287,10 +287,25 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
         MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
         .then(function(node) {
+            var bulkGet = [];
             for (var i in viewId2node) {
-                addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                var view = viewId2node[i].data;
+                if (view._contents && view._contents.operand) {
+                    for (var j = 0; j < view._contents.operand.length; j++) {
+                        bulkGet.push(view._contents.operand[j].instanceId);
+                    }
+                }
             }
-            $scope.treeApi.refresh();
+            ElementService.getElements({
+                elementIds: bulkGet,
+                projectId: projectOb.id,
+                refId: refOb.id
+            }, 0).finally(function() {
+                for (var i in viewId2node) {
+                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                }
+                $scope.treeApi.refresh();
+            });
         }, function(reason) {
             console.log(reason);
         });

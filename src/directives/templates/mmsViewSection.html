@@ -1,4 +1,3 @@
-
 <div ng-if="section.specification">
     <div ng-show="! isEditing">
         <h4 ng-hide="inPreviewMode">{{section.name}}</h4>
@@ -7,15 +6,17 @@
     <div ng-class="{'panel panel-default' : isEditing}">
         <div ng-class="{'no-display' : ! isEditing}" class="panel-heading clearfix no-print">
             <h3 class="panel-title pull-left">
-                <div ng-class="{prop: isEditing}"><input class="form-control" type="text" ng-model="edit.name"></input></div>
+                <div ng-class="{prop: isEditing}"><input class="form-control" type="text" ng-model="edit.name"/></div>
             </h3>
             <div class="btn-group pull-right">
                 <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
-          </div>
+            </div>
         </div>
         <div ng-class="{'panel-body' :  isEditing}" class="inner">
+            <div class="add-buttons-container no-print" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
             <div ng-repeat="instanceVal in section.specification.operand track by instanceVal.instanceId">
                 <mms-view-presentation-elem data-mms-instance-val="::instanceVal" data-mms-parent-section="::section"></mms-view-presentation-elem>
+                 <div class="add-buttons-container no-print" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
             </div>
         </div>
     </div>

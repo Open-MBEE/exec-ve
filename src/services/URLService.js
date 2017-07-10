@@ -168,8 +168,8 @@ function urlService(baseUrl) {
      * @returns {string} The path for image url queries.
      */
     var getImageURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' +
-                       reqOb.elementId + '?extension=' + reqOb.accept;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
+                       reqOb.elementId;
         return addTicket(addVersion(r, reqOb.commitId));
     };
 

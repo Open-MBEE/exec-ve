@@ -251,7 +251,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             var toGet = [];
             var results = [];
             if (view._displayedElementIds) {
-                var displayed = JSON.parse(view._displayedElementIds);
+                var displayed = view._displayedElementIds;
+                if (!angular.isArray(displayed)) {
+                    displayed = JSON.parse(displayed);
+                }
                 if (angular.isArray(displayed) && displayed.length > 0) {
                     toGet = displayed;
                 }
@@ -409,13 +412,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @description
      * This updates a view or section to include a new element, the new element must be a child
      * of an existing element in the view
-     * 
+     *
      * @param {object} reqOb see ElementService.getElement for description, elementId is the view
      *                          or section instance element id
      * @param {object} elementOb the element object to add (this should be an instanceValue)
+     * @param {number} addPeIndex the index of where to add view or section (instance spec) object
      * @returns {Promise} The promise would be resolved with updated view or section object
      */
-    var addElementToViewOrSection = function(reqOb, elementOb) {
+    var addElementToViewOrSection = function(reqOb, elementOb, addPeIndex) {
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
         ElementService.getElement({
@@ -453,7 +457,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             if (!elementOb.id) {
                 elementOb.id = UtilsService.createMmsId();
             }
-            clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
+            if (addPeIndex >= -1)
+                clone[key].operand.splice(addPeIndex+1, 0, UtilsService.createValueSpecElement(elementOb));
+            else
+                clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
+            // clone[key].operand.push(UtilsService.createValueSpecElement(elementOb));
             ElementService.updateElement(clone)
             .then(function(data2) {
                 deferred.resolve(data2);
@@ -542,7 +550,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {Promise} The promise would be resolved with updated View object if addToView is true
      *                    otherwise the created InstanceSpecification
     */
-    var createInstanceSpecification = function(viewOrSectionOb, type, name) {
+    var createInstanceSpecification = function(viewOrSectionOb, type, name, addPeIndex) {
         var deferred = $q.defer();
 
         var newInstanceId = UtilsService.createMmsId();
@@ -552,6 +560,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var jsonType = realType;
         if (type === 'Comment' || type === 'Paragraph')
             jsonType = type;
+        /*
         var newDataId = UtilsService.createMmsId();
         var newDataSInstanceId = UtilsService.createMmsId();
         var newData = UtilsService.createClassElement({
@@ -568,10 +577,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             ownerId: newDataId,
             classifierIds: [UtilsService.BLOCK_SID]
         });
+        */
         var instanceSpecSpec = {
             'type': jsonType, 
             'sourceType': 'reference', 
-            'source': newDataId, 
+            'source': newInstanceId, 
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
@@ -591,7 +601,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         instanceSpec = UtilsService.createInstanceElement(instanceSpec);
         if (type === 'Section') {
-            newData = newDataSInstance = null;
+            //newData = newDataSInstance = null;
             instanceSpec.specification = UtilsService.createValueSpecElement({
                 operand: [],  
                 type: "Expression",
@@ -622,12 +632,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone[key].ownerId = isSection(viewOrSectionOb) ? viewOrSectionOb.id : viewOrSectionOb.id + "_vc";
             }
         }
+        if (addPeIndex >= -1)
+            clone[key].operand.splice(addPeIndex+1, 0, UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
+        else
         clone[key].operand.push(UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
         var toCreate = [instanceSpec, clone];
+        /*
         if (newData && newDataSInstance) {
             toCreate.push(newData);
             toCreate.push(newDataSInstance);
         }
+        */
         var reqOb = {
             projectId: viewOrSectionOb._projectId,
             refId: viewOrSectionOb._refId,
@@ -683,12 +698,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: UtilsService.createValueSpecElement({
-                operand: [UtilsService.createValueSpecElement({
-                    instanceId: newInstanceId,
-                    type:"InstanceValue",
-                    ownerId: newViewId + "_vc_expression",
-                    id: UtilsService.createMmsId()
-                })],
+                operand: [],
                 type: 'Expression',
                 id: newViewId + "_vc_expression",
                 ownerId: newViewId + "_vc"
@@ -714,28 +724,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
-        var instanceSpecDoc = '';
-        var instanceSpecSpec = {
-            'type': 'Paragraph', 
-            'sourceType': 'reference', 
-            'source': newViewId, 
-            'sourceProperty': 'documentation'
-        };
-        var instanceSpec = UtilsService.createInstanceElement({
-            id: newInstanceId,
-            ownerId: 'view_instances_bin_' + ownerOb._projectId,
-            name: "View Documentation",
-            documentation: instanceSpecDoc,
-            type: "InstanceSpecification",
-            classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
-            specification: UtilsService.createValueSpecElement({
-                value: JSON.stringify(instanceSpecSpec),
-                type: "LiteralString",
-                id: UtilsService.createMmsId(),
-                ownerId: newInstanceId
-            }),
-            _appliedStereotypeIds: [],
-        });
         var asi = UtilsService.createInstanceElement({ //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
@@ -746,7 +734,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         });
-        var toCreate = [instanceSpec, view, asi];
+        var toCreate = [view, asi];
         if (parentView)
             toCreate.push(parentView);
         var reqOb = {
