@@ -2,7 +2,7 @@
     <div class="block">
         <a class="logotype" ui-sref="project.ref({projectId: project.id, refId: ref.id})">VE</a>
         <span class="org-title">{{ title }}</span>
-        <a class="switch-org" ng-click="updateOrg()">Switch Org</a>
+        <a class="switch-org" ng-click="updateOrg()"><i class="fa fa-caret-down" aria-hidden="true"></i></a>
         <div id="global-navigation">
             <form id="global-search" ng-submit="search(searchText)">
                 <input placeholder="Search selected project" ng-model="searchText"/>

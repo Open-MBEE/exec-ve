@@ -342,10 +342,6 @@ Temp - color to panels
   border-right: 1px solid #e7e7e7;
 }
 
-.west-tabs .fa-pane-scroller{
-  padding:20px 10px;
-}
-
 .toolbar.pane-left-btn-group{
   padding: 10px;
   margin-bottom: 4px;
@@ -353,6 +349,15 @@ Temp - color to panels
 
 .pane-center{
   padding-top:20px;
+}
+
+.toolbar-right{
+  overflow: hidden;
+}
+
+mms-toolbar .selected::before{
+  background-color:#f5f5f5;
+  padding: 8px 0 20px;
 }
 
 /*------------------------------------------------------------------
@@ -418,7 +423,8 @@ Temp - Lables to buttons
 .view-tools.show-comments,
 .view-tools.word,
 .view-tools.tabletocsv,
-.view-tools.convert-pdf{
+.view-tools.convert-pdf,
+.west-tabs .view-tools .fa-plus{
   display: inline-block;
   margin-bottom: 0;
   font-weight: 400;
@@ -428,7 +434,7 @@ Temp - Lables to buttons
   background-image: none;
   border: 1px solid #e7e7e7;
   white-space: nowrap;
-  padding: 4px 12px;
+  padding: 4px 12px 4px 9px;
   font-size: 14px;
   line-height: 1.428571429;
   border-radius: 4px;
@@ -436,9 +442,8 @@ Temp - Lables to buttons
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  font-family: "Roboto";
   margin: 5px 1px;
-  background-color:white;
+  background-color:transparent;
 }
 
 
@@ -455,7 +460,9 @@ Temp - Lables to buttons
 .view-tools.word,
 .view-tools.tabletocsv,
 .view-tools.print,
-.view-tools.convert-pdf{
+.view-tools.convert-pdf,
+.view-tools.center.tree-expand,
+.view-tools.center.tree-collapse{
   float:right;
   //background-color:#42b7ca;
   //border: 1px solid #42b7ca;
@@ -463,13 +470,9 @@ Temp - Lables to buttons
 }
 
 
-
-
 .view-tools .fa::before{
   padding-right:4px;
 }
-
-
 
 .view-tools .fa-pencil-square-o::after{
   content:"Edit";
@@ -525,6 +528,16 @@ Temp - Lables to buttons
   font-family:"Roboto";
 }
 
+.west-tabs .view-tools .fa-plus::after{
+  content:"Doc";
+  font-family:"Roboto";
+}
+
+
+.view-tools.center.tree-expand,
+.view-tools.center.tree-collapse{
+  padding: 10px 4px;
+}
 
 /* Hide extra html to whatever to mockup dropdown */
 
@@ -536,6 +549,10 @@ Temp - Lables to buttons
 .view-tools .fa-file-word-o::after{
   content:"Export";
   font-family:"Roboto";
+}
+
+.toolbar.pane-left-btn-group{
+  padding:0 4px;
 }
 
 
@@ -627,13 +644,24 @@ Temp - center align document
   font-size:13px;
 }
 
+.ve-placeholder-text{
+  color:#a2a2a2;
+  font-style: italic;
+  display:none;
+}
+
+mms-view.editing .ve-placeholder-text{
+  display:block;
+}
+
+
 .center-view p,
 .center-view tbody span,
 .center-view li span,
 .center-view li{
   font-size:16px;
   line-height:1.5em;
-  max-width: 800px;
+  //max-width: 800px;
   margin: auto;
 
 }
@@ -643,12 +671,66 @@ Temp - center align document
 .center-view h3,
 mms-view mms-transclude-doc > p:first-child,
 .ve-secondary-text{
-  max-width: 800px;
+  //max-width: 800px;
   margin: auto;
   display:block;
+  cursor:text;
+}
+
+mms-view-presentation-elem{
+  margin-top:14px;
 }
 
 .center-view table{
   margin:auto;
 }
 
+/*------------------------------------------------------------------
+List L Panel
+-------------------------------------------------------------------*/
+
+.nav-list.nav-pills {
+  li{
+    padding:3.5px 6px;
+    width:100%;
+    margin:0 !important;
+  }
+
+  li:nth-child(odd){
+    background-color:rgba(0,0,0,0.014);
+  }
+}
+
+.pane-left, mms-tree{
+  width:100%;
+}
+
+/*------------------------------------------------------------------
+Tree Indentation
+-------------------------------------------------------------------*/
+
+ul.abn-tree {
+  i.indented {
+    padding: 2px;
+  }
+
+  @for $i from 1 through 25 { 
+    .level-#{$i} .tree-item {
+      position: relative;
+      padding-left: 20px * ($i - 1);
+    }
+  }
+}
+
+.arrow {
+  position: relative;
+  width: 100%;
+  clear: left;
+}
+
+.tree-icon.fa-caret-down,
+.tree-icon.fa-caret-right,
+.tree-icon.fa-folder,
+.tree-icon.fa-file{
+  color:rgba(0,0,0,0.3);
+}
