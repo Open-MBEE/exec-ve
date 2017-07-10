@@ -130,9 +130,8 @@ function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $root
     var mmsViewLink = function(scope, element, attrs) {
         // Build request object
         var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId};
-
         var processed = false;
-        
+
         scope.isSection = false;
         var changeView = function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
