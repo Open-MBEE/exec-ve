@@ -1,9 +1,6 @@
-/**
- * Created by dank on 9/7/16.
- */
 'use strict';
 
-describe('mmsHistory', function () {
+describe('Directive: mmsHistory', function () {
     var scope; //scope when directive is called
     var element; //dom element mms-transclude-name
     var $rootScope,
@@ -24,82 +21,99 @@ describe('mmsHistory', function () {
             CacheService = $injector.get('CacheService');
             scope = $rootScope.$new();
 
-            // $httpBackend.when('GET', /alfresco\/service\/workspaces/).respond(200, {elements: [{sysmlid: "MerpId"}]});
-
+            jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data/';
             someElement = getJSONFixture('mmsHistory/historyElement.json');
-            var workspaceObject = {
-                    qualifiedId: "master",
-                    id: "master",
-                    workspaceOperationsPermission: true,
-                    qualifiedName: "master",
-                    name: "master"
+            // $.getJSON('/owner.json');
+
+            var refObject = {
+                _commitId: "acommitid",
+                _created: "2017-05-10T15:59:33.857-0700",
+                _creator: "merp",
+                _elasticId: "9203rusfjdjflsk",
+                _modified: "2017-05-10T15:59:33.857-0700",
+                _modifier: "merp",
+                description: "",
+                id: "anotherref",
+                name: "master2",
+                parentRefId: "master",
+                permission: "write",
+                type: "Branch"
             };
 
 
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/elements\/someElement/).respond(200,
+            $httpBackend.when('GET', /alfresco\/service\/projects\/someproject\/refs\/master\/elements\/someElement/).respond(200,
                 {elements:[someElement]}
             );
 
-            $httpBackend.when('GET', /alfresco\/service\/workspaces/).respond(200,
+            $httpBackend.when('GET', /alfresco\/service\/projects/).respond(200,
                 {
-                    workspaces: [
-                        workspaceObject,
+                    projects: [
                         {
+                            twcId: "ksdlfskj1232839204",
+                            _modifier: "merp",
+                            type: "Project",
+                            uri: "twcloud:/82934782479wieisuro",
+                            orgId: "someorg",
+                            _created: "2017-04-26T13:37:34.179-0700",
                             qualifiedId: "master/6f86c76e-3919-4285-84c1-9c5786809590",
-                            id: "6f86c76e-3919-4285-84c1-9c5786809590",
+                            id: "someproject",
                             created: "2015-04-28T16:36:22.991-0700",
-                            description: "",
-                            qualifiedName: "master/Recover",
+                            _elasticId: "293u4sjfdkjsfldfdlf",
+                            _modified: "2017-04-26T13:37:34.179-0700",
+                            _refId: "master",
+                            _projectId: "someproject",
                             name: "Recover",
-                            parent: "master",
-                            permission: "read",
-                            branched: "2015-04-23T12:20:10.381-0700",
-                            modified: "2015-04-28T16:36:22.991-0700",
-                            creator: "someCrazyDude"
+                            _creator: "someCrazyDude",
+                            categoryId: "920384ijijroewiroie"
                         },
                         {
-                            qualifiedId: "master/f6753422-efbc-4a98-a766-81bb90c532d7",
-                            id: "f6753422-efbc-4a98-a766-81bb90c532d7",
-                            created: "2015-04-28T17:06:09.237-0700",
-                            description: "",
-                            qualifiedName: "master/Recover2",
+                            twcId: "kdlsfkls2934829847",
+                            _modifier: "merp",
+                            type: "Project",
+                            uri: "twcloud:/82394ieoriwflkdsf",
+                            orgId: "someorg",
+                            _created: "2017-04-26T13:37:34.179-0700",
+                            qualifiedId: "master/kslf8239489sfjdkfos",
+                            id: "anotherproject",
+                            created: "2015-04-28T16:36:22.991-0700",
+                            _elasticId: "839jkdfsljfkdls",
+                            _modified: "2017-04-26T13:37:34.179-0700",
+                            _refId: "anotherref",
+                            _projectId: "anotherproject",
                             name: "Recover2",
-                            parent: "master",
-                            permission: "read",
-                            branched: "2015-04-23T11:20:41.445-0700",
-                            modified: "2015-04-28T17:06:09.237-0700",
-                            creator: "theDude"
+                            _creator: "AnotherCrazyDude",
+                            categoryId: "299ufsjlkdlfsf"
                         }]
                 }
             );
 
-            $httpBackend.when('GET', /alfresco\/service\/workspaces\/master\/history\/someElement/).respond(200,
+            $httpBackend.when('GET', /alfresco\/service\/projects\/someproject\/refs\/master\/history\/someElement/).respond(200,
                 {
-                    "versions": [
+                    "commits": [
                         {
-                            "modifier": "merp",
-                            "timestamp": "2015-12-14T15:28:09.000-0800",
-                            "label": "1.12"
+                            "_creator": "merp",
+                            "_created": "2015-12-14T15:28:09.000-0800",
+                            "id": "19203943028493840"
                         },
                         {
-                            "modifier": "flerp",
-                            "timestamp": "2015-09-09T09:22:47.000-0700",
-                            "label": "1.11"
+                            "_creator": "flerp",
+                            "_created": "2015-09-09T09:22:47.000-0700",
+                            "id": "29348075382939204"
                         },
                         {
-                            "modifier": "derp",
-                            "timestamp": "2015-09-03T11:16:07.000-0700",
-                            "label": "1.10"
+                            "_creator": "derp",
+                            "_created": "2015-09-03T11:16:07.000-0700",
+                            "id": "23840293048230493"
                         },
                         {
-                            "modifier": "frankenfurter",
-                            "timestamp": "2015-07-22T09:56:40.000-0700",
-                            "label": "1.9"
+                            "_creator": "frankenfurter",
+                            "_created": "2015-07-22T09:56:40.000-0700",
+                            "id": "839248932478234792"
                         }]
                 }
             );
 
-            var cacheKey = UtilsService.makeElementKey(someElement.elements[0].sysmlId, 'master', 'latest', false);
+            var cacheKey = UtilsService.makeElementKey(someElement.elements[0].id, 'master', 'latest', false);
             CacheService.put(cacheKey, someElement.elements[0]);
         });
     });
@@ -112,16 +126,16 @@ describe('mmsHistory', function () {
 
     it('should get the history for a specific element', function () {
         scope.view = {
-            sysmlid: "someElement",
-            ws: "master",
-            version: "latest"
+            mmsElementId: "someElement",
+            mmsRefId: "master",
+            mmsProjectId: "someproject"
         };
 
-        element = angular.element('<mms-history mms-eid="{{view.sysmlid}}" mms-ws="{{view.ws}}" mms-version="{{view.version}}"></mms-history>');
+        element = angular.element('<mms-history mms-element-id="{{view.mmsElementId}}" mms-project-id="{{view.mmsProjectId}}" mms-ref-id="{{view.mmsRefId}}"></mms-history>');
         $compile(element)(scope);
 
         scope.$apply();
         $httpBackend.flush();
-        console.log(element.html());
+        // console.log(element.html());
     });
 });

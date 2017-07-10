@@ -1,35 +1,30 @@
-/**
- * Created by dank on 8/29/16.
- */
-
 'use strict';
 
-// TODO: Check with Doris to see if this directive is actually being tested
-xdescribe('mmsButtonBarSpec directive', function () {
-    var $rootScope, $compile, $scope;
+describe('Directive: mmsButtonBar', function() {
 
-    beforeEach(function () {
-        // Load the module
-        module('mms.directives');
+	var $rootScope, 
+		scope, 
+		element,
+		$compile;
+	var $httpBackend;
 
-        // Inject the scopes required
-        inject(function (_$rootScope_, _$compile_, $injector, UtilsService, CacheService) {
-            jasmine.getFixtures().fixturesPath = 'base/src/directives/templates';
-            // jasmine.getJSONFixtures().fixturesPath = 'base/test/mock-data/UtilsService';
-            //CacheService = $injector.get('CacheService');
-            $rootScope = _$rootScope_;
-            $scope     = _$rootScope_.$new();
-            $compile   = _$compile_;
-        })
-    });
+	beforeEach(module('mms'));
+	beforeEach(module('mms.directives'));
 
-    it('should test the mmsButtonBarCtrl', inject(function () {
-        var $scope               = $rootScope.mms_bbApi;
-        var mmsButtonBarTemplate = jasmine.getFixtures().read('mmsButtonBar.html');
-        var buttonBar            = $compile(mmsButtonBarTemplate)($rootScope);
-        $rootScope.$digest();
+	beforeEach(function() {
+		inject(function($injector) {
+		
+		$rootScope		= $injector.get('$rootScope');
+		$compile		= $injector.get('$compile');
+		scope 			= $rootScope.$new();
+		});
+	});
 
-        // console.log("MMS BUTTON BAR TEMPLATE " + JSON.stringify(buttonBar));
-        // console.log("Contents " + JSON.stringify(contents));
-    }));
+	it('should test the mmsButtonBar Directive', function() {
+		scope.bbApi = $rootScope.mmsBbApi;
+		scope.buttons = $rootScope.buttons;
+		element = angular.element('<mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>');
+		$compile(element)(scope);
+		scope.$apply();
+	});
 });

@@ -1,64 +1,54 @@
-/**
- * Created by dank on 8/25/16.
- */
+'use strict';
 
-
-
-describe('ApplicationService', function () {
+describe('Service: ApplicationService', function () {
     beforeEach(module('mms'));
 
-    var ApplicationService, URLService, $httpBackend, $rootScope, $http;
+    var ApplicationServiceObj;
+    var $httpBackend, $rootScope;
     var root = '/alfresco/service';
 
     beforeEach(inject(function ($injector) {
-        ApplicationService = $injector.get('ApplicationService');
-        $http              = $injector.get('$http');
-        URLService         = $injector.get('URLService');
-        $httpBackend       = $injector.get('$httpBackend');
-        $rootScope         = $injector.get('$rootScope');
-
-        $httpBackend.when('GET', root + '/mmsversion').respond(
-            function (method, url, data) {
-                return [200, {mmsVersion: "2.3.8"}];
-            }
-        );
+        ApplicationServiceObj = $injector.get('ApplicationService');
     }));
 
-    afterEach(function () {
-        $httpBackend.verifyNoOutstandingRequest();
-    });
-
-    describe('Method CreateUniqueId', function () {
+    describe('Method: createUniqueId', function () {
         it('should create a unique id by retrieving the source object from ApplicationService', function () {
-            var source = ApplicationService.getSource();
+            var source = ApplicationServiceObj.getSource();
             expect(source).toBeDefined();
             expect(source[14]).toMatch("4");
-            expect(source[13]).toMatch("-");
-            expect(source[18]).toMatch("-");
-            expect(source[23]).toMatch("-");
         });
     });
 
-    xdescribe('Method getMmsVersion', function () {
-        "use strict";
-        var mmsV;
+    describe('Method: getMmsVersion', function () {
+        beforeEach(inject(function ($injector) {
+            ApplicationServiceObj = $injector.get('ApplicationService');
+            $httpBackend          = $injector.get('$httpBackend');
+            var mmsV = { mmsVersion: "3.0.0-rc4" };
+
+            $httpBackend.whenGET(root + '/mmsversion').respond(
+            function(method, url, data) {
+                return [200, mmsV];
+            });
+        }));
+
+        afterEach(function () {
+            $httpBackend.verifyNoOutstandingExpectation();
+     	    $httpBackend.verifyNoOutstandingRequest();
+        });
 
         it('should retrieve the mmsVersion from the application', inject(function () {
-            ApplicationService.getMmsVersion().then(function (data, response) {
-                mmsV = data;
+            var mmsVersion;
+            var mmsVersionData = "3.0.0-rc4";
+            ApplicationServiceObj.getMmsVersion().then(function (data) {
+                mmsVersion = data;
+                // console.log('inside success',data);
             }, function (reason) {
-                mmsV = "Could not retrieve due to failure: " + reason.message;
+                //TODOTEST Should have a test with failure response
+                mmsVersion = "Could not retrieve due to failure: " + reason.message;
+                // console.log('inside success',mmsVersion);
             });
-            console.log("MMS Version " + mmsV);
-            // var instance = $uibModal.open({
-            //     templateUrl: 'partials/mms/about.html',
-            //     scope: scope,
-            //     controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-            //         $scope.cancel = function() {
-            //             $uibModalInstance.dismiss();
-            //         };
-            //     }]
-            // });
+            $httpBackend.flush(); 
+            expect(mmsVersion).toEqual(mmsVersionData);
         }));
     });
 });
