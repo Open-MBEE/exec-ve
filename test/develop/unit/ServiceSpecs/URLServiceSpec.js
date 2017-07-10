@@ -134,7 +134,7 @@ describe("URLService", function () {
 			accept: true
 		};
 		it("should create the url for an image", function() {
-			var imageUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.elementId + '?extension=' + reqOb.accept;
+			var imageUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
 			expect(imageUrl).toEqual(URLServiceObj.getImageURL(reqOb));
 		});
 	});
