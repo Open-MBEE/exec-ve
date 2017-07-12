@@ -135,14 +135,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
             window.open(address ,'_blank');
         };
-        scope.displayUsername = function(){
-            var username = AuthService.checkLogin();
-            if (username) {
-                return username;
-            } else {
-                return 'Logged Out'; //what to display for this?
-            }       
-        };
+        scope.username = AuthService.checkLogin();
     };
 
     return {
