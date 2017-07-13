@@ -43,7 +43,21 @@
                     </span>
                 </li>
                 <li>
-                    <a ng-click="logout()">Log Out</a>
+                    <!--<a ng-click="logout()">Log Out</a>-->
+                    <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown" uib-dropdown="" on-toggle="toggled(open)" style="padding: 4px;background-color: #2f889a;border-radius: 300px;">
+                        <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" href="" uib-dropdown-toggle="" style="padding: 4px;background-color: #2f889a;border-radius: 300px;font-weight: 300;color: white;text-transform: uppercase;display:inline-block;">
+                        e
+                        </a>
+                        <ul class="dropdown-menu pull-right" uib-dropdown-menu="" aria-labelledby="simple-dropdown" style="white-space: nowrap">
+                            <li>
+                                Logged in as <b>ewyk</b>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <a ng-click="logout()">Log Out</a>
+                            </li>
+                         </ul>
+                    </span>
                 </li>
             </ul>
         </div>
