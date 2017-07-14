@@ -358,6 +358,10 @@ Temp - color to panels
 mms-toolbar .selected::before{
   background-color:#f5f5f5;
   padding: 8px 0 20px;
+  border-right: 12px solid #f5f5f5;
+  border-left: 12px solid #f5f5f5;
+  border-bottom: 4px solid #f5f5f5;
+
 }
 
 /*------------------------------------------------------------------
@@ -590,12 +594,11 @@ Temp - style form control
   text-align:center;
   font-weight:500;
   margin:2px 0;
-  font-size:12px;
-
+  font-size:11px;
 }
 
 .toolbox > .ng-scope .fa{
-  padding:0 4px;
+  padding:0 10px;
 }
 
 .toolbox{
@@ -734,3 +737,4 @@ ul.abn-tree {
 .tree-icon.fa-file{
   color:rgba(0,0,0,0.3);
 }
+
