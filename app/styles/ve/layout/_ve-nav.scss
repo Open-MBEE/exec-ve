@@ -9,6 +9,7 @@
 	2.2 Global Navigation
 		2.2.1 Menu
 		2.2.2 Search
+  2.3 User Profile
 3. Project Level Header
 	3.1 Select Project Dropdown
 	3.2 Breadcrumbs
@@ -94,8 +95,8 @@ ul.global-menu {
 .global-menu > li {
   display: inline-block;
   padding: 0 8px;
-  height: 36px;
-  line-height: 36px;
+  height: 26px;
+  line-height: 25px;
 }
 
 .global-menu > li > a,
@@ -165,6 +166,18 @@ ul.global-menu {
   background-color:$ve-teal-darker-1;
 }
 
+/*------------------------------------------------------------------
+  2.3 user Profile
+-------------------------------------------------------------------*/
+
+.user-profile{
+   border-radius: 50%;
+   width: 35px;
+   height: 35px;
+   background: $ve-teal-base;
+   border: 5px solid $ve-slate-base;
+   text-align: center;
+}
 
 /*------------------------------------------------------------------
 3. Project Level Header
