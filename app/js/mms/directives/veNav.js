@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veNav', ['$q', '$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', 'ProjectService', veNav]);
+.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', 'ProjectService', veNav]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mmsApp')
     </pre>
  * @param {string} mmsTitle Title to display
  */
-function veNav($q, $templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
+function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
     var template = $templateCache.get('partials/mms/veNav.html');
 
     var veNavLink = function(scope, element, attrs) {
@@ -135,12 +135,13 @@ function veNav($q, $templateCache, $rootScope, $state, hotkeys, growl, $location
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
             window.open(address ,'_blank');
         };
-
-        scope.username = AuthService.getUsername();
-        // AuthService.getUsername().then(function(data) {
-        //     scope.username = data;
-        // }, function(fail) {
-        // });
+        var getUsername = function() {
+            AuthService.checkLogin().then(function(data) {
+                scope.username = data;
+            }, function(fail) {
+            });
+        };
+        getUsername();
         
     };
 

@@ -20,7 +20,6 @@ angular.module('mms')
 function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window) {
     
     var ticket = $window.localStorage.getItem('ticket');
-    var username = "";
     var getAuthorized = function (credentials) {
         var deferred = $q.defer();
         var loginURL = '/alfresco/service/api/login';
@@ -51,27 +50,6 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         return ticket;
     };
 
-    // var setUsername = function(user) {
-    //     username = user;
-    // };
-
-    var getUsername = function() {
-        return username;
-    };
-
-    // var getUsername = function() {
-    //     if (!ticket) {
-    //         return;
-    //     } else {
-    //         $http.get(URLService.getCheckTicketURL(ticket)).then(function (success) {
-    //             return success.data.username;
-    //         }, function(fail){
-    //             removeTicket();
-    //             return;
-    //         });  
-    //     }
-    // };
-
     var checkLogin = function(){
         var deferred = $q.defer();
         if (!ticket) {
@@ -80,7 +58,6 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         }
 
         $http.get(URLService.getCheckTicketURL(ticket)).then(function (success) {
-            username = success.data.username;
             deferred.resolve(success.data.username);
         }, function(fail){
             deferred.reject(fail);
