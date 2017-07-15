@@ -135,13 +135,9 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
             window.open(address ,'_blank');
         };
-        var getUsername = function() {
-            AuthService.checkLogin().then(function(data) {
-                scope.username = data;
-            }, function(fail) {
-            });
-        };
-        getUsername();
+        AuthService.checkLogin().then(function(data) {
+            scope.username = data;
+        });
         
     };
 
