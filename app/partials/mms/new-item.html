@@ -1,7 +1,7 @@
 <div ng-switch-on="itemType">
     <div ng-switch-when="Workspace">
         <div class="modal-header">
-            <h4>CREATE NEW TASK FROM {{from}}</h4>
+            <h4>Create new task {{from}}</h4>
         </div>
 
         <div class="modal-body comment-modal">
@@ -22,9 +22,9 @@
         </div>
 
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="ok()">CREATE <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
+            <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+            <button class="btn btn-primary" ng-click="ok()">Create <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
             </button>
-            <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
         </div>
     </div>
 </div>
