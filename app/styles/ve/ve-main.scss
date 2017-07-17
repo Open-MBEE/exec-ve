@@ -176,12 +176,12 @@ div.tooltip-inner {
   /*Not sure where this came from*/
 
   .btn-warning {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: $ve-warning;
     border: none;
   }
 
   .btn-warning:hover {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: $ve-warning-darker-1;
   }
 
 /*------------------------------------------------------------------
