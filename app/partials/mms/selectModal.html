@@ -1,9 +1,9 @@
-<div id="modal-window">
+<div id="modal-window" class="ve-dark-modal ng-scope">
     <div class="modal-header">
         <h3 class="modal-title" id="modal-title">Switch Org</h3>
     </div>
     <div class="modal-body" id="modal-body">
-        <div class="btn-group" uib-dropdown>
+        <div class="btn-group ve-dark-dropdown-wide dropdown" uib-dropdown>
             <span class="label-dropdown">Org:</span>
             <button id="project-btn-keyboard-nav btn" type="button" class="dropdown-toggle" uib-dropdown-toggle>
                 <span>{{ selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
@@ -15,7 +15,7 @@
                 </li>
             </ul>
         </div>
-        <div class="btn-group" uib-dropdown keyboard-nav>
+        <div class="btn-group ve-dark-dropdown-wide dropdown" uib-dropdown keyboard-nav>
             <span class="label-dropdown">Project:</span>
             <button id="module-btn-keyboard-nav btn" type="button" class="dropdown-toggle" uib-dropdown-toggle
                     ng-disabled="!selectedOrg || !projects.length">
@@ -32,7 +32,8 @@
     </div>
     <div class="modal-footer ng-scope">
         <button class="btn btn-primary" type="button" ng-click="continue()" ng-disabled="!selectedProject || !selectedOrg">
-            Continue<span ng-if="spin"><i class="fa fa-spin fa-spinner"></i></span></button>
+            Continue<span ng-if="spin"><i class="fa fa-spin fa-spinner"></i></span>
+        </button>
         <button class="btn btn-tertiary" type="button" ng-click="cancel()">Cancel</button>
     </div>
 </div>
