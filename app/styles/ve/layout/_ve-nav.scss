@@ -174,7 +174,8 @@ ul.global-menu {
    border-radius: 50%;
    width: 24px;
    height: 24px;
-   background: #37b283;
+   background:#3fa67f;
+   background:#466c9a;
    text-align: center;
   -webkit-transition: background-color .1s ease-out;
   -moz-transition: background-color .1s ease-out;
@@ -184,8 +185,12 @@ ul.global-menu {
   color:white;
 }
 
+.user-profile>a>div>span{
+  text-shadow: 1px 1px 3px #00355f;
+}
+
 .user-profile >a>div:hover{
-  background-color:#309b72;
+  background-color:#328f79;
 }
 
 .global-menu>li:last-child{
