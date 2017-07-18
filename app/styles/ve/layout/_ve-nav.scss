@@ -9,6 +9,7 @@
 	2.2 Global Navigation
 		2.2.1 Menu
 		2.2.2 Search
+  2.3 User Profile
 3. Project Level Header
 	3.1 Select Project Dropdown
 	3.2 Breadcrumbs
@@ -92,10 +93,10 @@ ul.global-menu {
 }
 
 .global-menu > li {
-  display: inline;
+  display: inline-block;
   padding: 0 8px;
-  height: 36px;
-  line-height: 36px;
+  height: 24px;
+  line-height: 24px;
 }
 
 .global-menu > li > a,
@@ -165,6 +166,39 @@ ul.global-menu {
   background-color:$ve-teal-darker-1;
 }
 
+/*------------------------------------------------------------------
+  2.3 user Profile
+-------------------------------------------------------------------*/
+
+.user-profile > div{
+   border-radius: 50%;
+   width: 24px;
+   height: 24px;
+   background: #37b283;
+   text-align: center;
+  -webkit-transition: background-color .1s ease-out;
+  -moz-transition: background-color .1s ease-out;
+  -o-transition: background-color .1s ease-out;
+  transition: background-color .1s ease-out;
+  margin:6px;
+}
+
+.user-profile > div:hover{
+  background-color:#309b72;
+}
+
+.global-menu>li:last-child{
+  padding:0;
+}
+
+.user-profile>ul>li:first-child{
+  padding: 7px 18px;
+  color:$ve-white-text-lighter-2;
+}
+
+.user-profile>ul>li:first-child:hover{
+  background-color:$ve-slate-lighter-1;
+}
 
 /*------------------------------------------------------------------
 3. Project Level Header
