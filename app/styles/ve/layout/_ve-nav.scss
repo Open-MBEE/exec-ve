@@ -175,7 +175,6 @@ ul.global-menu {
    width: 24px;
    height: 24px;
    background:#3fa67f;
-   background:#466c9a;
    text-align: center;
   -webkit-transition: background-color .1s ease-out;
   -moz-transition: background-color .1s ease-out;
@@ -184,11 +183,11 @@ ul.global-menu {
   margin:6px;
   color:white;
 }
-
+/*
 .user-profile>a>div>span{
   text-shadow: 1px 1px 3px #00355f;
 }
-
+*/
 .user-profile >a>div:hover{
   background-color:#328f79;
 }
@@ -204,6 +203,11 @@ ul.global-menu {
 
 .user-profile>ul>li:first-child:hover{
   background-color:$ve-slate-lighter-1;
+}
+
+/*Hack for fixing dropdown position originating at left side*/
+.user-profile>.dropdown-menu.pull-right{
+  right:-30px;
 }
 
 /*------------------------------------------------------------------
