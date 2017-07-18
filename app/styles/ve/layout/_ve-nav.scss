@@ -170,7 +170,7 @@ ul.global-menu {
   2.3 user Profile
 -------------------------------------------------------------------*/
 
-.user-profile > div{
+.user-profile>a>div{
    border-radius: 50%;
    width: 24px;
    height: 24px;
@@ -181,9 +181,10 @@ ul.global-menu {
   -o-transition: background-color .1s ease-out;
   transition: background-color .1s ease-out;
   margin:6px;
+  color:white;
 }
 
-.user-profile > div:hover{
+.user-profile >a>div:hover{
   background-color:#309b72;
 }
 
