@@ -11,7 +11,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     orgOb, projectOb, refOb, refObs, groupObs) {
 
     $rootScope.mms_refOb = refOb;
-    $rootScope.mms_bbApi = $scope.bbApi = {};
+    $rootScope.ve_bbApi = $scope.bbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
     $rootScope.ve_tree_pane = $scope.$pane;
     if (!$rootScope.veTreeShowPe) {
