@@ -626,8 +626,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
                 .then(function(data) {
                     // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
+                    // $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
                     $rootScope.$broadcast('view-reorder.refresh');
+                    $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
                     growl.success("Adding "+$scope.presentationElemType+"  Successful");
                     $uibModalInstance.close(data);
                 }, function(reason) {
@@ -672,8 +673,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
             .then(function(data) {
                 var elemType = $scope.presentationElemType.toLowerCase();
-                $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
+                // $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
                 $rootScope.$broadcast('view-reorder.refresh');
+                $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
                 growl.success("Adding "+$scope.presentationElemType+"  Successful");
                 $uibModalInstance.close(data);
             }, function(reason) {
