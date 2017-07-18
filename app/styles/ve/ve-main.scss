@@ -241,8 +241,9 @@ div.tooltip-inner {
   margin:0;
   font-weight: 500;
   letter-spacing: .14em;
-  font-size: 12px;
+  font-size: 13px;
   text-transform: uppercase;
+  display:inline-block;
 }
 
 /*------------------------------------------------------------------
@@ -658,7 +659,7 @@ table caption {
 }
 
 .commit-table{
-  width:100%;
+  width:calc(100%-28px)s;
   td{
     padding:4px;
     border:none;
