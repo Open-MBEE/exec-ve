@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4>CREATE NEW BRANCH FROM {{from}}</h4>
+    <h4>Create a new branch from {{from}}</h4>
 </div>
 
 <div class="modal-body comment-modal">
@@ -8,19 +8,143 @@
 
         <div class="form-group">
             <label>Name:</label>
-            <input class="form-control" ng-model="branch.name" type="text"
-                   placeholder="Type a name for your branch here" autofocus></input>
+            <input class="form-control" ng-model="branch.name" type="text" placeholder="Type a name for your branch here" autofocus></input>
         </div>
         <div class="form-group">
             <label>Description:</label>
-            <textarea mms-ckeditor class="form-control" ng-model="branch.description"></textarea>
+            <textarea class="form-control" ng-model="configuration.name"></textarea>
         </div>
         <div class="form-group">
             <label>Permission:</label>
-            <input ng-model="branch.permission" value="read" type="radio"> Read</input>
-            <input ng-model="branch.permission" value="write" type="radio"> Write</input>
+            <br />
+            <input ng-model="branch.permission" value="read" type="radio" style="margin-right:10px;"> Read</input>
+             <br />
+            <input ng-model="branch.permission" value="write" type="radio" style="margin-right:10px;"> Write</input>
         </div>
     </div>
+    <div>
+      <label>Point in History:</label>
+        <div ng-app="">
+            <form> 
+              <input id="most-recent" type="radio" name="content" ng-model="content" value="most-recent" style="margin-right:10px;">
+              <label for="most-recent" style="font-weight:400;">Most Recent</label>
+              <br />
+              <input id="specify-point" type="radio" name="content" ng-model="content" value="specify-point" style="margin-right:10px;">
+              <label for="specify-point" style="font-weight:400;">Specify a timestamp</label>
+              <div ng-show="content == 'specify-point'" style="margin-left:28px;">   
+                <div class="form-group" style="margin-bottom:0;">
+                  <input class="form-control" ng-model="configuration.timestamp" type="datetime-local" ng-change="updateTimeOpt()"
+                  placeholder="YYYY-MM-DDTHH:MM:SS"></input>
+
+                </div>
+              </div>
+              <br />
+              <input id="browse-history" type="radio" name="content" ng-model="content" value="browse-history" style="margin-right:10px;">
+              <label for="specify-point" style="font-weight:400;">Browse history</label>
+            </form>
+            
+            <div class="wrapper">
+              <div ng-show="content == 'most-recent'" style="margin-left:28px"></div>
+              <div ng-show="content == 'browse-history'" style="margin-left:28px">
+                <table class="commit-table">
+                    <tbody>
+                        <tr style="font-weight:600;border:none;">
+                            <td>
+                                Author
+                            </td>
+                            <td>
+                                Timestamp
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user1
+                            </td>
+                            <td>
+                                5/6/17 5:05 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user3
+                            </td>
+                            <td>
+                                5/2/17 11:28 AM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user3
+                            </td>
+                            <td>
+                                11/12/16 3:27 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user2
+                            </td>
+                            <td>
+                                1/29/16 3:16 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user2
+                            </td>
+                            <td>
+                                1/29/16 2:41 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user2
+                            </td>
+                            <td>
+                                1/29/16 1:06 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user2
+                            </td>
+                            <td>
+                                1/28/16 7:54 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user2
+                            </td>
+                            <td>
+                                1/28/16 7:53 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user2
+                            </td>
+                            <td>
+                                1/28/16 7:53 PM
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                user2
+                            </td>
+                            <td>
+                                1/28/16 7:53 PM
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
 
 </div>
 
