@@ -588,6 +588,21 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return 'MMS_' + Date.now() + '_' + uuid;
     };
 
+
+    var convertViewLink = function(tree, printElement) {
+        var root_branch = tree[0].branch;
+        var i = 0;
+        for (i = 0; i < root_branch.children.length; i++) {
+            convertViewLinkChild(root_branch.children[i], printElement);
+        }
+    };
+
+    var convertViewLinkChild = function(child, printElement) {
+        var sysmlId = child.data.id;
+        var viewLink = printElement.find('mms-view-link mms-doc-id="' + sysmlId + '"');
+
+        viewLink.html('<a href="#' + sysmlId + '">' + child.data.name + '</a>');
+    };
     /*
     header = header slot on doc
     footer = footer slot on doc
