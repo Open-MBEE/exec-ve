@@ -170,21 +170,26 @@ ul.global-menu {
   2.3 user Profile
 -------------------------------------------------------------------*/
 
-.user-profile > div{
+.user-profile>a>div{
    border-radius: 50%;
    width: 24px;
    height: 24px;
-   background: #37b283;
+   background:#459d85;
    text-align: center;
   -webkit-transition: background-color .1s ease-out;
   -moz-transition: background-color .1s ease-out;
   -o-transition: background-color .1s ease-out;
   transition: background-color .1s ease-out;
   margin:6px;
+  color:white;
 }
-
-.user-profile > div:hover{
-  background-color:#309b72;
+/*
+.user-profile>a>div>span{
+  text-shadow: 1px 1px 3px #00355f;
+}
+*/
+.user-profile >a>div:hover{
+  background-color:#37887d;
 }
 
 .global-menu>li:last-child{
@@ -192,12 +197,17 @@ ul.global-menu {
 }
 
 .user-profile>ul>li:first-child{
-  padding: 7px 18px;
+  padding: 0 18px;
   color:$ve-white-text-lighter-2;
 }
 
 .user-profile>ul>li:first-child:hover{
   background-color:$ve-slate-lighter-1;
+}
+
+/*Hack for fixing dropdown position originating at left side*/
+.user-profile>.dropdown-menu.pull-right{
+  right:-30px;
 }
 
 /*------------------------------------------------------------------

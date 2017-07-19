@@ -30,7 +30,7 @@
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="">View Editor Help</a> <!-- Need new link with donbot changes, tbd -->
+                                <a ng-href="">View Editor Help</a> <!-- Need new link with donbot changes, tbd -->
                             </li>
                             <li>
                                 <a href="https://cae-jira.jpl.nasa.gov/browse/SSCAES" class="ng-binding" href="">Report Issue</a> <!-- Need new link with   donbot changes, tbd -->
@@ -44,11 +44,11 @@
                 </li>
                 <li>
                     <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown user-profile" uib-dropdown="" on-toggle="toggled(open)">
-                        <div>
-                            <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" href="" uib-dropdown-toggle="">
-                                {{ username | limitTo:1 | uppercase }}
-                            </a>
-                        </div>
+                        <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" href="" uib-dropdown-toggle="">
+                            <div>
+                                <span>{{ username | limitTo:1 | uppercase }}</span>
+                            </div>
+                        </a>
                         <ul class="dropdown-menu pull-right" uib-dropdown-menu="" aria-labelledby="simple-dropdown" style="white-space: nowrap">
                             <li ng-if="username">
                                 Logged in as <b>{{ username }}</b>
