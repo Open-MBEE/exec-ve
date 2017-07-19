@@ -589,7 +589,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     };
 
 
-    var convertViewLink = function(tree, printElement) {
+    var convertViewLinks = function(tree, printElement) {
         var root_branch = tree[0].branch;
         var i = 0;
         for (i = 0; i < root_branch.children.length; i++) {

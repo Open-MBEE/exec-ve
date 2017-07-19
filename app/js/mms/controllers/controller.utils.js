@@ -409,6 +409,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 return absurl.substring(0, mmsIndex) + old;
             return old;
         });
+
+        UtilsService.convertViewLinks($rootScope.ve_treeApi.get_rows(), printElementCopy);
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
