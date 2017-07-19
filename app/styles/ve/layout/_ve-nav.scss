@@ -170,7 +170,7 @@ ul.global-menu {
   2.3 user Profile
 -------------------------------------------------------------------*/
 
-.user-profile > a {
+#login-dropdown {
   display: inline-block;
   border-radius: 50%;
   width: 24px;
@@ -185,7 +185,7 @@ ul.global-menu {
   color:white;
 }
 
-.user-profile > a > div:hover {
+#login-dropdown:hover {
   background-color:$ve-accent-green-darker;
 }
 
