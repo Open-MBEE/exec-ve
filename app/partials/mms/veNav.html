@@ -19,12 +19,11 @@
                     <a target="_blank" ng-href="/share/page/site/{{org.id}}/dashboard">Dashboard</a>
                 </li>
                 <li>
-                    <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown" uib-dropdown="" on-toggle="toggled(open)">
-                        <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" href="" uib-dropdown-toggle="">
+                    <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown" uib-dropdown on-toggle="toggled(open)">
+                        <a href id="help-dropdown" class="dropdown-toggle" uib-dropdown-toggle>
                         Help <i class="fa fa-caret-down" aria-hidden="true"></i>
                         </a>
-                        <ul class="dropdown-menu pull-right" uib-dropdown-menu="" aria-labelledby="simple-dropdown">
-
+                        <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="help-dropdown">
                             <li>
                                 <a href="" ng-click="toggleHelp()">Keyboard Shortcuts</a>
                             </li>
@@ -43,13 +42,11 @@
                     </span>
                 </li>
                 <li>
-                    <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown user-profile" uib-dropdown="" on-toggle="toggled(open)">
-                        <a aria-expanded="false" aria-haspopup="true" class="dropdown-toggle" href="" uib-dropdown-toggle="">
-                            <div>
-                                <span>{{ username | limitTo:1 | uppercase }}</span>
-                            </div>
+                    <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown user-profile" uib-dropdown on-toggle="toggled(open)">
+                        <a href id="login-dropdown" class="dropdown-toggle" uib-dropdown-toggle>
+                            {{ username | limitTo:1 | uppercase }}
                         </a>
-                        <ul class="dropdown-menu pull-right" uib-dropdown-menu="" aria-labelledby="simple-dropdown" style="white-space: nowrap">
+                        <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap">
                             <li ng-if="username">
                                 Logged in as <b>{{ username }}</b>
                             </li>
