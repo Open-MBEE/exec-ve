@@ -174,7 +174,7 @@ ul.global-menu {
    border-radius: 50%;
    width: 24px;
    height: 24px;
-   background:#3fa67f;
+   background:#459d85;
    text-align: center;
   -webkit-transition: background-color .1s ease-out;
   -moz-transition: background-color .1s ease-out;
@@ -189,7 +189,7 @@ ul.global-menu {
 }
 */
 .user-profile >a>div:hover{
-  background-color:#328f79;
+  background-color:#37887d;
 }
 
 .global-menu>li:last-child{
@@ -197,7 +197,7 @@ ul.global-menu {
 }
 
 .user-profile>ul>li:first-child{
-  padding: 7px 18px;
+  padding: 0 18px;
   color:$ve-white-text-lighter-2;
 }
 
