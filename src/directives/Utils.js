@@ -692,8 +692,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
 
     /**
      * @ngdoc method
-     * @name mms.UtilsService#addPresentationElement
-     * @methodOf mms.UtilsService
+     * @name mms.directives.Utils#addPresentationElement
+     * @methodOf mms.directives.Utils
      *
      * @description
      * Utility to add a new presentation element to view or section

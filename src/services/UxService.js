@@ -127,10 +127,6 @@ function UxService($rootScope) {
       case "tree-full-document":
         return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
                 spinner: false, togglable: true, toggle_icon: 'fa-file-text', toggle_tooltip: 'View Mode', action: function() {$rootScope.$broadcast(button);}};
-      case "tree-showall-sites":
-        return {id: button, icon: 'fa-eye', selected: true, active: true, permission: true, tooltip: 'Show Alfresco Sites',
-                spinner: false, togglable: true, toggle_icon: 'fa-eye-slash', toggle_tooltip: 'Hide Alfresco Sites',
-                action: function() {$rootScope.$broadcast(button);}};
       case "view-mode-dropdown":
         return {id: button, icon: 'fa-gear', selected: true, active: true, permission: true, tooltip: 'View Mode',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
@@ -185,27 +181,6 @@ function UxService($rootScope) {
       case "generate-zip":
         return {id: button, icon: 'fa-file-zip-o', selected: true, active: true, permission: true, tooltip: 'Generate ZIP',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "view-add-table":
-        return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "view-add-list":
-        return {id: button, icon: 'fa-list', selected: true, active: true, permission: true, tooltip: 'Add List',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "view-add-equation":
-        return {id: button, icon: 'fa-superscript', selected: true, active: true, permission: true, tooltip: 'Add Equation',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "view-add-paragraph":
-        return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "view-add-image":
-        return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "view-add-section":
-        return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "view-add-comment":
-        return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "presentation-element-delete":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete',
                 spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.delete();}};
@@ -221,27 +196,6 @@ function UxService($rootScope) {
       case "presentation-element-preview":
         return {id: button, icon: 'fa-file-powerpoint-o', selected: true, active: true, permission: true, tooltip: 'Preview Changes',
                 spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.preview();}};
-      case "section-add-table":
-        return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Add Table',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
-      case "section-add-list":
-        return {id: button, icon: 'fa-list', selected: true, active: true, permission: true, tooltip: 'Add List',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
-      case "section-add-equation":
-        return {id: button, icon: 'fa-superscript', selected: true, active: true, permission: true, tooltip: 'Add Equation',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
-      case "section-add-paragraph":
-        return {id: button, icon: 'fa-paragraph', selected: true, active: true, permission: true, tooltip: 'Add Text',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
-      case "section-add-image":
-        return {id: button, icon: 'fa-image', selected: true, active: true, permission: true, tooltip: 'Add Image',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
-      case "section-add-section":
-        return {id: button, icon: 'fa-list-alt', selected: true, active: true, permission: true, tooltip: 'Add Section',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
-      case "section-add-comment":
-        return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Add Comment',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button, scope.section);}};
       case "print":
         return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
