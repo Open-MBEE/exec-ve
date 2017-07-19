@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'MmsAppUtils', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, MmsAppUtils, ViewService, UxService, Utils) {
+function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils) {
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
@@ -13,18 +13,17 @@ function mmsViewSection($compile, $templateCache, $rootScope, MmsAppUtils, ViewS
         $scope.bbApi = {};
         $scope.buttons = [];
         $scope.buttonsInit = false;
-        $scope.element = $scope.section;  // This is for methods in Utils 
+        $scope.element = $scope.section;  // This is for methods in Utils
 
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("section-add-dropdown", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
-            }     
+            }
         };
 
     };
@@ -53,7 +52,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, MmsAppUtils, ViewS
         };
 
         domElement.append(defaultTemplate);
-        $compile(domElement.contents())(scope); 
+        $compile(domElement.contents())(scope);
 
         var projectId = scope.mmsProjectId;
         var refId = scope.mmsRefId;
@@ -120,7 +119,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, MmsAppUtils, ViewS
         scope.addEltAction = function(index, type, e) {
             e.stopPropagation();
             scope.addPeIndex = index;
-            MmsAppUtils.addPresentationElement(scope, type, scope.section);
+            Utils.addPresentationElement(scope, type, scope.section);
         };
 
     };

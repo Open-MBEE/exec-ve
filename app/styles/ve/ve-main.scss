@@ -127,7 +127,9 @@ div.tooltip-inner {
 #ve-origin-select,
 #ve-login,
 .ve-table-filter,
-.ve-search
+.ve-search,
+.modal-dialog,
+.container-tree-reorder
 {
 
   .btn {
@@ -175,12 +177,12 @@ div.tooltip-inner {
   /*Not sure where this came from*/
 
   .btn-warning {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: $ve-warning;
     border: none;
   }
 
   .btn-warning:hover {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: $ve-warning-darker-1;
   }
 
 /*------------------------------------------------------------------
@@ -221,7 +223,7 @@ div.tooltip-inner {
     margin: 0;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     font-weight: 400;
     color:$ve-white-text-lighter-2;
   }
@@ -244,6 +246,7 @@ div.tooltip-inner {
   font-size: 13px;
   text-transform: uppercase;
   display:inline-block;
+  color:$ve-light-text-darker-1;
 }
 
 /*------------------------------------------------------------------
@@ -489,6 +492,10 @@ div.tooltip-inner {
   float: none;
 }
 
+span.fixed-content-dropdown{
+  padding-bottom:12px;
+}
+
 /*------------------------------------------------------------------
   2.4 Tab System
 -------------------------------------------------------------------*/
@@ -657,3 +664,4 @@ table caption {
     font-weight:700 !important;
   }
 }
+

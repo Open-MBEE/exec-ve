@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['MmsAppUtils', 'ViewService', 'ElementService', '$templateCache', '$rootScope', 'growl', mmsView]);
+.directive('mmsView', ['Utils', 'ViewService', 'ElementService', '$templateCache', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -16,8 +16,8 @@ angular.module('mms.directives')
  *
  * @description
  * Given a view id, renders the view according to the json given by mms.ViewService
- * The view has a text edit mode, where transclusions can be clicked. The view's last 
- * modified time and author is the latest of any transcluded element modified time. 
+ * The view has a text edit mode, where transclusions can be clicked. The view's last
+ * modified time and author is the latest of any transcluded element modified time.
  * For available api methods, see methods section.
  *
  * ## Example
@@ -54,7 +54,7 @@ angular.module('mms.directives')
  *              view being clicked, this should be a function whose argument is 'elementId'
  */
 
-function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $rootScope, growl) {
+function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
@@ -186,22 +186,22 @@ function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $root
          * @ngdoc function
          * @name mms.directives.directive:mmsView#addEltAction
          * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
-         * Add specified element at the defined 'index' 
+         *
+         * @description
+         * Add specified element at the defined 'index'
          */
         scope.addEltAction = function (index, type) {
              scope.addPeIndex = index;
-             MmsAppUtils.addPresentationElement(scope, type, scope.view);
+             Utils.addPresentationElement(scope, type, scope.view);
         };
 
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowElements
          * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
-         * toggle elements highlighting 
+         *
+         * @description
+         * toggle elements highlighting
          */
         scope.toggleShowElements = function() {
             scope.showElements = !scope.showElements;
@@ -212,8 +212,8 @@ function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $root
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowComments
          * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
+         *
+         * @description
          * toggle comments visibility
          */
         scope.toggleShowComments = function() {
@@ -225,9 +225,9 @@ function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $root
          * @ngdoc function
          * @name mms.directives.directive:mmsView#toggleShowEdits
          * @methodOf mms.directives.directive:mmsView
-         * 
-         * @description 
-         * toggle elements editing panel 
+         *
+         * @description
+         * toggle elements editing panel
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
@@ -249,8 +249,8 @@ function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $root
              * @ngdoc function
              * @name mms.directives.directive:mmsView#setShowElements
              * @methodOf mms.directives.directive:mmsView
-             * 
-             * @description 
+             *
+             * @description
              * self explanatory
              *
              * @param {boolean} mode arg
@@ -267,14 +267,14 @@ function mmsView(MmsAppUtils, ViewService, ElementService, $templateCache, $root
              * @ngdoc function
              * @name mms.directives.directive:mmsView#setShowComments
              * @methodOf mms.directives.directive:mmsView
-             * 
-             * @description 
+             *
+             * @description
              * self explanatory
              *
              * @param {boolean} mode arg
              */
             api.setShowComments = function(mode) {
-                scope.showComments = mode; 
+                scope.showComments = mode;
                 if (mode)
                     element.addClass('reviewing');
                 else
