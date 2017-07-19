@@ -7,7 +7,7 @@ angular.module('mmsApp')
     'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb',
 function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
     MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb) {
-    
+
     $rootScope.ve_fullDocMode = true;
 
     function isPageLoading() {
@@ -129,7 +129,7 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         var sibIndex = _.findIndex(views, {id: prevSibId});
         views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
     });
-    
+
     $scope.bbApi = {
         init: function() {
             if (documentOb && documentOb._editable && refOb.type === 'Branch') {
@@ -164,34 +164,6 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
             });
         }
     };
-
-    $scope.$on('section-add-paragraph', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Paragraph', sectionOb);
-    });
-
-    $scope.$on('section-add-list', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'List', sectionOb);
-    });
-
-    $scope.$on('section-add-table', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Table', sectionOb);
-    });
-
-    $scope.$on('section-add-equation', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Equation', sectionOb);
-    });
-
-    $scope.$on('section-add-section', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Section', sectionOb);
-    });
-
-    $scope.$on('section-add-comment', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Comment', sectionOb);
-    });
-
-    $scope.$on('section-add-image', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Image', sectionOb);
-    });
 
     $scope.$on('show-comments', function() {
         for (var i = 0; i < $scope.views.length; i++) {
