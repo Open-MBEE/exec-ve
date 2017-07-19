@@ -5,20 +5,21 @@
 1. General
   1.1 Typography/Layout
 2. Org/global Level Header
-	2.1 Org Navigation
-	2.2 Global Navigation
-		2.2.1 Menu
-		2.2.2 Search
+  2.1 Org Navigation
+  2.2 Global Navigation
+    2.2.1 Menu
+    2.2.2 Search
+  2.3 User Profile
 3. Project Level Header
-	3.1 Select Project Dropdown
-	3.2 Breadcrumbs
+  3.1 Select Project Dropdown
+  3.2 Breadcrumbs
   3.3 Dropdowns
 
 -------------------------------------------------------------------*/
 
 
 /*------------------------------------------------------------------
-	1.1 General Typography/Layout
+  1.1 General Typography/Layout
 -------------------------------------------------------------------*/
 
 .navbar {
@@ -52,7 +53,7 @@ nav.global-header {
 }
 
 /*------------------------------------------------------------------
-	2.1 Org Navigation
+  2.1 Org Navigation
 -------------------------------------------------------------------*/
 
 a.switch-org,
@@ -73,7 +74,7 @@ a.switch-org:hover {
 }
 
 /*------------------------------------------------------------------
-	2.2 Global Navigation
+  2.2 Global Navigation
 -------------------------------------------------------------------*/
 
 #global-navigation {
@@ -81,7 +82,7 @@ a.switch-org:hover {
 }
 
 /*------------------------------------------------------------------
-		2.2.1 Menu
+    2.2.1 Menu
 -------------------------------------------------------------------*/
 
 ul.global-menu {
@@ -92,10 +93,10 @@ ul.global-menu {
 }
 
 .global-menu > li {
-  display: inline;
+  display: inline-block;
   padding: 0 8px;
-  height: 36px;
-  line-height: 36px;
+  height: 24px;
+  line-height: 24px;
 }
 
 .global-menu > li > a,
@@ -109,7 +110,7 @@ ul.global-menu {
 }
 
 /*------------------------------------------------------------------
-		2.2.2 Search
+    2.2.2 Search
 -------------------------------------------------------------------*/
 
 #global-search {
@@ -136,7 +137,7 @@ ul.global-menu {
   border: 1px solid $ve-teal-base;
 }
 
-#global-search button{
+#global-search button {
   border-radius: 0 3px 3px 0;
   height: 26px;
   padding: 0px 7px;
@@ -154,17 +155,52 @@ ul.global-menu {
   transition: background-color .1s ease-out;
 }
 
-#global-search button .fa-search{
+#global-search button .fa-search {
   position: relative;
   color: white;
   font-size:14px;
-  top:-1px; 
+  top:-1px;
 }
 
-#global-search button:hover{
+#global-search button:hover {
   background-color:$ve-teal-darker-1;
 }
 
+/*------------------------------------------------------------------
+  2.3 user Profile
+-------------------------------------------------------------------*/
+
+.user-profile > a {
+  display: inline-block;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  background:$ve-accent-green;
+  text-align: center;
+  -webkit-transition: background-color .1s ease-out;
+  -moz-transition: background-color .1s ease-out;
+  -o-transition: background-color .1s ease-out;
+  transition: background-color .1s ease-out;
+  margin:6px;
+  color:white;
+}
+
+.user-profile > a > div:hover {
+  background-color:$ve-accent-green-darker;
+}
+
+.global-menu > li:last-child {
+  padding:0;
+}
+
+.user-profile > ul > li:first-child {
+  padding: 0 18px;
+  color:$ve-white-text-lighter-2;
+}
+
+.user-profile > ul > li:first-child:hover {
+  background-color:$ve-slate-lighter-1;
+}
 
 /*------------------------------------------------------------------
 3. Project Level Header
@@ -180,15 +216,15 @@ nav.project-level-header {
 }
 
 /*------------------------------------------------------------------
-	3.1 Select Project Dropdown
+  3.1 Select Project Dropdown
 -------------------------------------------------------------------*/
 
 .select-project-dropdown {
-	float:left;
+  float:left;
 }
 
 /*------------------------------------------------------------------
-	3.2 Breadcrumbs
+  3.2 Breadcrumbs
 -------------------------------------------------------------------*/
 
 .breadcrumbs {
@@ -205,8 +241,7 @@ nav.project-level-header {
 
 .breadcrumbs li {
   display: inline;
-  height: 36px;
-	line-height: 36px;
+  line-height: 36px;
 }
 
 .breadcrumbs .fa-folder,
@@ -229,6 +264,6 @@ nav.project-level-header {
   3.3 Dropdowns
 -------------------------------------------------------------------*/
 
-.project-level-header .ve-dark-dropdown-nav ul.dropdown-menu{
+.project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
   width:300px;
 }
