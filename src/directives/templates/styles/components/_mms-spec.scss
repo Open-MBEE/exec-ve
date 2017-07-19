@@ -10,7 +10,7 @@ mms-spec {
 
   h1.prop {
     width: 100%;
-    min-width: 420px;
+    min-width: 280px;
     word-wrap: break-word;
   }
 
@@ -19,12 +19,12 @@ mms-spec {
     margin-top: 5px;
     margin-bottom: 5px;
     margin-left: 15px;
-    width: 420px;
+    min-width: 280px;
     word-wrap: break-word;
   }
 
   h1.element-title {
-    width: 420px;
+    min-width: 280px;
     word-wrap: break-word;
   }
 
@@ -47,6 +47,7 @@ mms-spec {
   h2.spec-view-doc-heading, h2.spec-view-value-heading, h2.spec-view-type-heading {
     margin-top: 32px;
   }
+
   table {
     @extend .content-table;
   }

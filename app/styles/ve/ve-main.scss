@@ -127,7 +127,9 @@ div.tooltip-inner {
 #ve-origin-select,
 #ve-login,
 .ve-table-filter,
-.ve-search
+.ve-search,
+.modal-dialog,
+.container-tree-reorder
 {
 
   .btn {
@@ -175,12 +177,12 @@ div.tooltip-inner {
   /*Not sure where this came from*/
 
   .btn-warning {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: $ve-warning;
     border: none;
   }
 
   .btn-warning:hover {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: $ve-warning-darker-1;
   }
 
 /*------------------------------------------------------------------
@@ -221,7 +223,7 @@ div.tooltip-inner {
     margin: 0;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     font-weight: 400;
     color:$ve-white-text-lighter-2;
   }
@@ -235,6 +237,15 @@ div.tooltip-inner {
   .modal-footer {
     border-top: 1px solid $ve-slate-darker-1;
   }
+}
+
+.modal-header>h4{
+  margin:0;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:$ve-light-text-darker-1;
 }
 
 /*------------------------------------------------------------------
