@@ -272,7 +272,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
 
             var mainSearchFilter = function() {
                 var stereoQuery = {};
-                stereoQuery.terms = {"_appliedStereotypeIds": [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID]};
+                stereoQuery.terms = {"_appliedStereotypeIds": [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)};
 
                 var classifierList = [];
                 var allClassifierIds = ViewService.TYPE_TO_CLASSIFIER_ID;
