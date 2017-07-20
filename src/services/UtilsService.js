@@ -593,7 +593,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id');
             var name = $this.find('a').text();
-            $this.html('<a href="#' + elementId + '">' + name + '</a>');
+            $this.find('a').replaceWith('<a href="#' + elementId + '">' + name + '</a>');
         });
     };
     /*
