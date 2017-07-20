@@ -652,10 +652,15 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     };
 
     var isView = function(e) {
-        if (e._appliedStereotypeIds && (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || 
-                e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) ||
-                OTHER_VIEW_SID.indexOf(e._appliedStereotypeIds) ) {
-            return true;
+        if (e._appliedStereotypeIds) {
+            if (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
+                return true;
+            }
+            for (var i = 0; i < OTHER_VIEW_SID.length; i++) {
+                if (e._appliedStereotypeIds.indexOf(OTHER_VIEW_SID[i]) >= 0) {
+                    return true;
+                }
+            }
         }
         return false;
     };
