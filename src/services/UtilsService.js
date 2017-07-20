@@ -720,6 +720,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     };
     return {
         VIEW_SID: VIEW_SID,
+        OTHER_VIEW_SID: OTHER_VIEW_SID,
         DOCUMENT_SID: DOCUMENT_SID,
         BLOCK_SID: BLOCK_SID,
         createClassElement: createClassElement,
