@@ -3,7 +3,7 @@ mms-toolbar {
 		width: 41px;
 		height: 100%;
 		float: right;
-		background-color: $base_grey;
+		background-color: $ve-slate-darker-2;
 		padding-top: 75px;
 		position: fixed;
 		@include calc(left, "100% - 41px");

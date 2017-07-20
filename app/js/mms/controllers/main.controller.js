@@ -67,10 +67,10 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                 return;
             modalOpen = true;
             var instance = $uibModal.open({
-                template: '<div class="modal-header">You have been logged out, please login again.</div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
-                                '<input type="text" class="form-control login-icons" ng-model="credentials.username" placeholder="&#xf007; Username" style="margin-bottom: 1.5em;" autofocus>' + 
-                                '<input type="password" class="form-control login-icons" ng-model="credentials.password" placeholder="&#xf084; Password" style="margin-bottom: 1.5em;">' + 
-                                '<button class="btn btn-block" type="submit" style="background: #2f889a; color:white;">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' + 
+                template: '<div class="modal-header"><h4>You have been logged out, please login again.</h4></div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
+                                '<input type="text" class="form-control" ng-model="credentials.username" placeholder="Username" style="margin-bottom: 1.5em;" autofocus>' + 
+                                '<input type="password" class="form-control" ng-model="credentials.password" placeholder="Password" style="margin-bottom: 1.5em;">' + 
+                                '<button class="btn btn-block btn-primary" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' + 
                             '</span></button></form></div>',
                 scope: $scope,
                 backdrop: 'static',
