@@ -13,6 +13,8 @@ angular.module('mms')
  */
 function UtilsService($q, $http, CacheService, URLService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
+    var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
+        '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
@@ -651,7 +653,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
 
     var isView = function(e) {
         if (e._appliedStereotypeIds && (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || 
-                e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0)) {
+                e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) ||
+                OTHER_VIEW_SID.indexOf(e._appliedStereotypeIds) ) {
             return true;
         }
         return false;
@@ -717,6 +720,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     };
     return {
         VIEW_SID: VIEW_SID,
+        OTHER_VIEW_SID: OTHER_VIEW_SID,
         DOCUMENT_SID: DOCUMENT_SID,
         BLOCK_SID: BLOCK_SID,
         createClassElement: createClassElement,
