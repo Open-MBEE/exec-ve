@@ -588,20 +588,13 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return 'MMS_' + Date.now() + '_' + uuid;
     };
 
-
-    var convertViewLinks = function(tree, printElement) {
-        var root_branch = tree[0].branch;
-        var i = 0;
-        for (i = 0; i < root_branch.children.length; i++) {
-            convertViewLinkChild(root_branch.children[i], printElement);
-        }
-    };
-
-    var convertViewLinkChild = function(child, printElement) {
-        var sysmlId = child.data.id;
-        var viewLink = printElement.find('mms-view-link mms-doc-id="' + sysmlId + '"');
-
-        viewLink.html('<a href="#' + sysmlId + '">' + child.data.name + '</a>');
+    var convertViewLinks = function(printElement) {
+        printElement.find('mms-view-link').each(function(index) {
+            var $this = $(this);
+            var elementId = $this.attr('mms-element-id');
+            var name = $this.find('a').text();
+            $this.html('<a href="#' + elementId + '">' + name + '</a>');
+        });
     };
     /*
     header = header slot on doc
@@ -751,6 +744,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
         makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
+        convertViewLinks: convertViewLinks,
         createMmsId: createMmsId,
         getPrintCss: getPrintCss,
         isView: isView,
