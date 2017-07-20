@@ -135,11 +135,11 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                     </div>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-tertiary" ng-class="{'disabled': !docEditable || !deleteCleared}" ng-click="deleteJob(job.id)">
-                        <span>DELETE <i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></span>
+                    <button class="btn btn-tertiary" ng-class="{'disabled': !docEditable || !deleteCleared}" ng-click="deleteJob(job.id)">
+                        DELETE <i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i>
                     </button>
-                    <button class="btn btn-sm btn-primary" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="runNow(job.id)">
-                        <span>RUN NOW <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i></span>
+                    <button class="btn btn-primary" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="runNow(job.id)">
+                        RUN NOW <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
                     </button>
                 </td>
             </tr>

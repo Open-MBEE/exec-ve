@@ -117,58 +117,43 @@ div.tooltip-inner {
   2.1 Buttons
 -------------------------------------------------------------------*/
 
-
-#ve-login,
-#ve-origin-select,
-.ve-dark-modal,
-.ve-dark-dropdown-nav,
-.ve-dark-dropdown-menu,
-.ve-table-buttons
-#ve-origin-select,
-#ve-login,
-.ve-table-filter,
-.ve-search,
-.modal-dialog,
-.container-tree-reorder
-{
-
-  .btn {
-    font-weight: 500;
-    letter-spacing: .14em;
-    font-size: 12px;
-    -webkit-transition: background-color .1s ease-out;
-    -moz-transition: background-color .1s ease-out;
-    -o-transition: background-color .1s ease-out;
-    transition: background-color .1s ease-out;
-    border: none;
-    text-transform: uppercase;
-    border-radius:3px;
-    box-shadow:none;
-    padding: 7px 12px;
-  }
+.btn {
+  font-weight: 500;
+  letter-spacing: .14em;
+  font-size: 12px;
+  -webkit-transition: background-color .1s ease-out;
+  -moz-transition: background-color .1s ease-out;
+  -o-transition: background-color .1s ease-out;
+  transition: background-color .1s ease-out;
+  border: none;
+  text-transform: uppercase;
+  border-radius:3px;
+  box-shadow:none;
+  padding: 7px 12px;
+}
 
 /*------------------------------------------------------------------
     2.1.1 Primary Button
 -------------------------------------------------------------------*/
 
-  .btn-primary {
-    background-color: $ve-teal-base;
-    color:white;
-  }
+.btn-primary {
+  background-color: $ve-teal-base;
+  color:white;
+}
 
-  .btn-primary:hover {
-    background-color: $ve-teal-darker-1;
-    border: none;
-  }
+.btn-primary:hover {
+  background-color: $ve-teal-darker-1;
+  border: none;
+}
 
 /*------------------------------------------------------------------
     2.1.2 Small Button
 -------------------------------------------------------------------*/
 
-  .btn-sm{
-    padding: 5px 10px;
-    font-size:11px;
-  }
+.btn-sm{
+  padding: 5px 10px;
+  font-size:11px;
+}
 
 /*------------------------------------------------------------------
     2.1.3 Warning Button
@@ -176,14 +161,14 @@ div.tooltip-inner {
 
   /*Not sure where this came from*/
 
-  .btn-warning {
-    background-color: $ve-warning;
-    border: none;
-  }
+.btn-warning {
+  background-color: $ve-warning;
+  border: none;
+}
 
-  .btn-warning:hover {
-    background-color: $ve-warning-darker-1;
-  }
+.btn-warning:hover {
+  background-color: $ve-warning-darker-1;
+}
 
 /*------------------------------------------------------------------
     2.1.4 Tertiary Button
@@ -191,15 +176,14 @@ div.tooltip-inner {
 
   /*Discreet light grey button. Now just being used for filter table*/
 
-  .btn-tertiary{
-    color: $ve-light-text;
-    background-color:$ve-silver-base;
-  }
+.btn-tertiary{
+  color: $ve-light-text;
+  background-color:$ve-silver-base;
+}
 
-  .btn-tertiary:hover{
-    background-color:$ve-silver-darker-2;
-    color:$ve-light-text-darker-1;
-  }
+.btn-tertiary:hover{
+  background-color:$ve-silver-darker-2;
+  color:$ve-light-text-darker-1;
 }
 
 /*------------------------------------------------------------------
