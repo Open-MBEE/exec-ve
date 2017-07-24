@@ -334,6 +334,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     //called by updateElement, fills in all keys for element to be updated
     //will also send any cached edited field for the element to be updated
     var fillInElement = function(elementOb) {
+        /*
         var deferred = $q.defer();
         getElement({
             projectId: elementOb._projectId, 
@@ -342,14 +343,15 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             refId: elementOb._refId
         }, 2)
         .then(function(data) {
-            var ob = JSON.parse(JSON.stringify(data)); //make a copy
+        */
+            var ob = JSON.parse(JSON.stringify(elementOb)); //make a copy
             ob._commitId = 'latest';
             var editOb = CacheService.get(UtilsService.makeElementKey(ob, true));
-            for (var key in elementOb) {
-                ob[key] = elementOb[key];
-            }
+            //for (var key in elementOb) {
+            //    ob[key] = elementOb[key];
+            //}
             if (editOb) {
-                for (key in editOb) {
+                for (var key in editOb) {
                     if (!elementOb.hasOwnProperty(key)) {
                         ob[key] = editOb[key];
                     }
@@ -358,17 +360,20 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             if (ob._displayedElementIds) {
                 delete ob._displayedElementIds;
             }
-            if (ob._allowedElements) {
-                delete ob._allowedElements;
+            if (ob._allowedElementIds) {
+                delete ob._allowedElementIds;
             }
             if (ob._childViews && !elementOb._childViews) {
                 delete ob._childViews;
             }
+            return ob;
+        /*
             deferred.resolve(ob);
         }, function() {
             deferred.resolve(elementOb);
         });
         return deferred.promise;
+        */
     };
 
     /**
@@ -423,8 +428,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.reject({status: 400, data: '', message: 'Element id not found, create element first!'});
             return deferred.promise;
         }
-        fillInElement(elementOb)
-        .then(function(postElem) {
+        var postElem = fillInElement(elementOb);
+        //.then(function(postElem) {
             $http.post(URLService.getPostElementsURL({
                     projectId: postElem._projectId, 
                     refId: postElem._refId,
@@ -466,7 +471,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 } else
                     URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
             });
-        }); 
+        //}); 
         return deferred.promise;
     };
 
@@ -714,6 +719,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         updateElements: updateElements,
         createElement: createElement,
         createElements: createElements,
+        fillInElement: fillInElement,
         getGenericElements: getGenericElements,
         getElementHistory: getElementHistory,
         isCacheOutdated: isCacheOutdated,
