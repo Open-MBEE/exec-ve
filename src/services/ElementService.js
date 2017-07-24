@@ -719,6 +719,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         updateElements: updateElements,
         createElement: createElement,
         createElements: createElements,
+        fillInElement: fillInElement,
         getGenericElements: getGenericElements,
         getElementHistory: getElementHistory,
         isCacheOutdated: isCacheOutdated,
