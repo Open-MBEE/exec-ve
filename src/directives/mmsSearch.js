@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['CacheService', 'ElementService', 'growl', '$templateCache', mmsSearch]);
+.directive('mmsSearch', ['CacheService', 'ElementService', 'UtilsService', 'growl', '$templateCache', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -13,7 +13,7 @@ angular.module('mms.directives')
  * TBA
  *
  */
-function mmsSearch(CacheService, ElementService, growl, $templateCache) {
+function mmsSearch(CacheService, ElementService, UtilsService, growl, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -27,6 +27,9 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
         scope.itemsPerPage = 50;
+        scope.docsviews = {
+            selected: false
+        };
         scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
 
         scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
@@ -333,6 +336,13 @@ function mmsSearch(CacheService, ElementService, growl, $templateCache) {
                 });
             }
 
+            var viewsAndDocs = {
+                terms : {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)}
+            };
+
+            if (scope.docsviews.selected) {
+                filterList.push(viewsAndDocs);
+            }
             var jsonQueryOb = {
                 "sort" : [
                     "_score",
