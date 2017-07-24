@@ -18,7 +18,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
-        '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
+        '_allowedElementIds', '_contents', '_relatedDocuments', '_childViews', 'ownedAttributeIds',
+        '_qualifiedName', '_qualifiedId', '_commitId', '_creator', '_created', '_modifier', '_modified'];
+    var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
         appliedStereotypeInstanceId: null,
@@ -151,19 +153,28 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             if (Array.isArray(elem._displayedElementIds)) {
                 elem._displayedElementIds = JSON.stringify(elem._displayedElementIds);
             }
-            if (elem._allowedElements) {
-                delete elem._allowedElements;
+            if (elem._allowedElementIds) {
+                delete elem._allowedElementIds;
             }
         }
         if (elem.hasOwnProperty('specialization')) {
             delete elem.specialization;
         }
-        if (forEdit) {
+        if (forEdit) { //only keep editable or needed keys in edit object instead of everything
+            var keys = Object.keys(elem);
+            for (i in keys) {
+                if (editKeys.indexOf(keys[i]) >= 0) {
+                    continue;
+                }
+                delete elem[keys[i]];
+            }
+            /*
             for (i = 0; i < nonEditKeys.length; i++) {
                 if (elem.hasOwnProperty(nonEditKeys[i])) {
                     delete elem[nonEditKeys[i]];
                 }
             }
+            */
         }
         return elem;
     };

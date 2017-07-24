@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', '$interval',
-function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, $interval) {
+.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', '$interval',
+function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, ElementService, CacheService, $interval) {
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
@@ -160,5 +160,15 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         }).result.finally(function(){
             workingModalOpen = false;
         });
+    });
+
+    $rootScope.$on('element.updated', function(event, element) {
+        //if element is not being edited and there's a cached edit object, update the edit object also
+        //so next time edit forms will show updated data (mainly for stomp updates)
+        var editKey = UtilsService.makeElementKey(element, true);
+        var veEditsKey = element.id + '|' + element._projectId + '|' + element._refId;
+        if ($rootScope.ve_edits && !$rootScope.ve_edits[veEditsKey] && CacheService.exists(editKey)) {
+            ElementService.cacheElement(JSON.parse(JSON.stringify(element)), true);
+        }
     });
 }]);
