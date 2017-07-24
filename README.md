@@ -1,4 +1,8 @@
 # angular-mms
+
+## Usage
+https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUserGuide-OpenMBEE.pdf
+
 ## File Structure
 * /package.json - node module dependencies for building
 * /Gruntfile.js - buildfile
@@ -11,14 +15,30 @@
 
 ## Building and Running (also see links below)
 
-* install node.js
-* install grunt (_sudo npm install -g grunt-cli_)
-* install bower (_sudo npm install -g bower_)
-* cd into angular-mms root dir
-* _npm install_ (install all node module dependencies specified in package.json - these will install into a local node_modules folder)
-* _grunt_ - default task - this will create a dist and build directory, the dist contains concatenated and minified versions of our module js code and css, build directory contains all necessary files to run the application from a server
-* _grunt server:ems_ - does the default, plus runs a webserver at localhost:9000 out of /build and a proxy server that proxies to ems for any path starting with /alfresco. This allows us to test with real service endpoint (there are other options like server:a, server:b that proxies to dev-staging-a and dev-staging-b)
-* _grunt clean_ - deletes dist and build folders
+1. install node.js at version 4 (this project is not proven compatible with v7+ yet) and its associated version of npm
+2. install grunt (_sudo npm install -g grunt-cli_)
+3. install bower (_sudo npm install -g bower_)
+4. cd into angular-mms root dir
+5. _npm install_ (install all node module dependencies specified in package.json - these will install into a local node_modules folder)
+6. add file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.  
+    * The _grunt_ command will build with these default and fake values, but will not be runnable.  
+    * You should update "ems" key to point to the value of the **actual** hostname serving the Model Management Server (MMS).
+```json
+{
+  "ems": "hostnameurl"
+}
+```
+7. 
+  * _grunt_ - default task - this will create a dist and build directory, the dist contains concatenated and minified versions of our module js code and css, build directory contains all necessary files to run the application from a server
+  * _grunt server:ems_ - does the default, plus runs a webserver at localhost:9000 out of /build and a proxy server that proxies to ems for any path starting with /alfresco. This allows us to test with real service endpoints when defined in `angular-mms-grunt-servers.json` like _grunt server:a_ or _grunt server:b_ .  e.g.:
+```json
+{
+  "ems": "hostnameurl",
+   "a": "staging-a",
+   "b": "staging-b"
+}
+```
+8. (optional) _grunt clean_ - deletes dist and build folders
 
 ## Problems?
 If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_
@@ -158,8 +178,11 @@ Put test pages under /app. The current build will look through bower dependencie
         angular.module('myApp', ['mms', 'mms.directives']);
         //declare module dependencies
 
+### customize pdf css
+see src/services/UtilsService.getPrintCss
+[princexml](https://www.princexml.com/)
+
 ## Links
-* [EMS Web Apps Alfresco Site](https://ems.jpl.nasa.gov/share/page/site/ems-web-apps/dashboard)
 * [node.js](http://nodejs.org/)
 * [grunt](http://gruntjs.com/)
 * [sass](http://sass-lang.com/)
@@ -167,4 +190,3 @@ Put test pages under /app. The current build will look through bower dependencie
 * [grunt-ngdocs](https://github.com/m7r/grunt-ngdocs)
 * [jasmine](http://jasmine.github.io/)
 * [karma](http://karma-runner.github.io/0.12/index.html)# angularLessons
-# angularLessons

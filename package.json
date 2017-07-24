@@ -1,8 +1,8 @@
 {
+
   "name": "mms-ve",
-  "description": "MMS View Editor",
-  "repository": "https://github.jpl.nasa.gov/mbee-dev/angular-mms",
-  "license": "MIT",
+  "description": "mms ve module",
+  "repository": "https://github.com/Open-MBEE/EMS-Webapp.git",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-artifactory-artifact": "~1.0.1",
