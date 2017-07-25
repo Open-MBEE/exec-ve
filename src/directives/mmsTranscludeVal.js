@@ -48,7 +48,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
-                // $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
@@ -262,7 +262,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 if (scope.isRestrictedVal) {
                     var options = [];
                     scope.values[0].operand[2].operand.forEach(function(o) {
-                        options.push(o.element);
+                        options.push(o.elementId);
                     });
                     var reqOb = {elementIds: options, projectId: scope.projectId, refId: scope.refId};
 

@@ -93,9 +93,9 @@ function CacheService(_) {
         var val = get(realkey);
         if (val && m && angular.isObject(value)) {
             _.merge(val, value, function(a,b,id) {
-                if ((id === '_contents' || id === 'contains' || id === 'specification') && b && b.type === 'Expression') {
-                    return b;
-                }
+                //if ((id === '_contents' || id === 'contains' || id === 'specification') && b && b.type === 'Expression') {
+                //    return b;
+                //}
                 if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
                     a.length = 0;
                     Array.prototype.push.apply(a, b);

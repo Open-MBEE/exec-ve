@@ -1,7 +1,7 @@
 <!-- TODO: This is almost the same as new-view.html.  Should be combined if possible -->
 
 <div class="modal-header">
-  <h4>ADD NEW {{presentationElemType | uppercase}}</h4>
+  <h4>Add New {{presentationElemType | uppercase}}</h4>
 </div>
 
 <div class="modal-body comment-modal" ng-show="createForm">
@@ -22,6 +22,6 @@
       <a ng-click="createForm = false" class="create-element-link">Search for existing item</a>
     </div>
     <div class="pull-left" ng-show="!createForm"><a ng-click="createForm = true">Return to Create {{presentationElemType}}</a></div>
-    <button class="btn btn-success" ng-show="createForm" ng-click="ok()">CREATE <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
-    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+    <button class="btn btn-primary" ng-show="createForm" ng-click="ok()">Create <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
 </div>

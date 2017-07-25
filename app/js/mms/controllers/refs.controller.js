@@ -224,8 +224,8 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 tagObj.id = ApplicationService.createUniqueId();
                 promise = ProjectService.createRef( tagObj, projectOb.id );
                 refJson = {
-                    name: $scope.tag.name,
-                    id: $scope.tag.id,
+                    name: tagObj.name,
+                    id: tagObj.id,
                     type: $scope.itemType, 
                     status: 'in progress', //will get status from JMS?
                     start_time: (date.getMonth() + 1) + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()

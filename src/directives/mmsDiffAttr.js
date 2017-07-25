@@ -163,8 +163,8 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
     return {
         restrict: 'E',
         scope: {
-            mmsEidOne: '@',
-            mmsEidTwo: '@',
+            mmsEidOne: '@mmsElementOneId',
+            mmsEidTwo: '@mmsElementTwoId',
             mmsAttr: '@',
             mmsProjectOneId: '@',
             mmsProjectTwoId: '@',
