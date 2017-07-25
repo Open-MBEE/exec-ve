@@ -205,7 +205,7 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
          */
         scope.toggleShowElements = function() {
             scope.showElements = !scope.showElements;
-            element.toggleClass('editing');
+            element.toggleClass('outline');
         };
 
         /**
@@ -231,7 +231,7 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
          */
         scope.toggleShowEdits = function() {
             scope.showEdits = !scope.showEdits;
-
+            element.toggleClass('editing');
             // Call the callback functions to clean up frames, show edits, and
             // re-open frames when needed:
             for (var i = 0; i < scope.presentationElemCleanUpFncs.length; i++) {
@@ -258,9 +258,9 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
             api.setShowElements = function(mode) {
                 scope.showElements = mode;
                 if (mode)
-                    element.addClass('editing');
+                    element.addClass('outline');
                 else
-                    element.removeClass('editing');
+                    element.removeClass('outline');
             };
 
             /**
