@@ -6,7 +6,7 @@ module.exports = function (config) {
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '../../',
-        urlRoot:'/',
+        urlRoot:'/base',
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
@@ -46,7 +46,7 @@ module.exports = function (config) {
             'build/js/mms/app.js',
             'build/js/mms/controllers.js',
             'test/develop/unit/**/*.js',
-            'test/mock-data/*.js',
+            'test/mock-data/**/*.js',
             // Fixtures -- This is how you can load JSON Data as mock data
             {pattern: 'test/mock-data/**/*.json', watched: true, served: true, included: false},
             {pattern: 'test/mock-data/**/*.html', watched: true, served: true, included: false},
@@ -91,10 +91,10 @@ module.exports = function (config) {
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_INFO,
 
-        proxies:{
-            '/alfresco':'http://ems-test.jpl.nasa.gov'
-        },
-        'changeOrigin':true,
+        // proxies:{
+        //     '/alfresco':'http://your-url.com'
+        // },
+        // 'changeOrigin':true,
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,

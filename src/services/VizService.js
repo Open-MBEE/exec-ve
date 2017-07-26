@@ -34,7 +34,7 @@ function VizService($q, $http, URLService, CacheService, UtilsService, AuthServi
             deferred.resolve(CacheService.get(n.cacheKey + '|' + ext));
             return deferred.promise;
         }*/
-        $http.get(URLService.getImageURL(reqOb))
+        $http.get(URLService.getImageURL(reqOb), {headers: {Accept: reqOb.accept}})
         .then(function(data) {
             var root = URLService.getRoot();
             var newroot = '';

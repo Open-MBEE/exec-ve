@@ -13,10 +13,14 @@ angular.module('mms')
  */
 function UtilsService($q, $http, CacheService, URLService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
+    var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
+        '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
     var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
-        '_allowedElements', '_contents', '_relatedDocuments', '_childViews'];
+        '_allowedElementIds', '_contents', '_relatedDocuments', '_childViews', 'ownedAttributeIds',
+        '_qualifiedName', '_qualifiedId', '_commitId', '_creator', '_created', '_modifier', '_modified'];
+    var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
         appliedStereotypeInstanceId: null,
@@ -149,19 +153,28 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             if (Array.isArray(elem._displayedElementIds)) {
                 elem._displayedElementIds = JSON.stringify(elem._displayedElementIds);
             }
-            if (elem._allowedElements) {
-                delete elem._allowedElements;
+            if (elem._allowedElementIds) {
+                delete elem._allowedElementIds;
             }
         }
         if (elem.hasOwnProperty('specialization')) {
             delete elem.specialization;
         }
-        if (forEdit) {
+        if (forEdit) { //only keep editable or needed keys in edit object instead of everything
+            var keys = Object.keys(elem);
+            for (i in keys) {
+                if (editKeys.indexOf(keys[i]) >= 0) {
+                    continue;
+                }
+                delete elem[keys[i]];
+            }
+            /*
             for (i = 0; i < nonEditKeys.length; i++) {
                 if (elem.hasOwnProperty(nonEditKeys[i])) {
                     delete elem[nonEditKeys[i]];
                 }
             }
+            */
         }
         return elem;
     };
@@ -608,6 +621,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
                 "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
                 //"table p {word-break: break-all;}\n" + 
+                ".signature-box td.signature-name-styling {width: 60%;}\n" + 
+                ".signature-box td.signature-space-styling {width: 1%;}\n" + 
+                ".signature-box td.signature-date-styling {width: 39%;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
                 "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
                 ".ng-hide {display: none;}\n" +
@@ -647,9 +663,15 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     };
 
     var isView = function(e) {
-        if (e._appliedStereotypeIds && (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || 
-                e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0)) {
-            return true;
+        if (e._appliedStereotypeIds) {
+            if (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
+                return true;
+            }
+            for (var i = 0; i < OTHER_VIEW_SID.length; i++) {
+                if (e._appliedStereotypeIds.indexOf(OTHER_VIEW_SID[i]) >= 0) {
+                    return true;
+                }
+            }
         }
         return false;
     };
@@ -714,6 +736,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     };
     return {
         VIEW_SID: VIEW_SID,
+        OTHER_VIEW_SID: OTHER_VIEW_SID,
         DOCUMENT_SID: DOCUMENT_SID,
         BLOCK_SID: BLOCK_SID,
         createClassElement: createClassElement,

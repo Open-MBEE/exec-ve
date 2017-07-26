@@ -18,7 +18,7 @@
 @import "layout/_ve-table-filter.scss";
 
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
-.cke_button__mmsvlink_label, .cke_button__mmsreset_label {
+.cke_button__mmsvlink_label, .cke_button__mmsreset_label, .cke_button__mmssignature_label {
   display: inline !important;
 }
 
@@ -117,56 +117,43 @@ div.tooltip-inner {
   2.1 Buttons
 -------------------------------------------------------------------*/
 
-
-#ve-login,
-#ve-origin-select,
-.ve-dark-modal,
-.ve-dark-dropdown-nav,
-.ve-dark-dropdown-menu,
-.ve-table-buttons
-#ve-origin-select,
-#ve-login,
-.ve-table-filter,
-.ve-search
-{
-
-  .btn {
-    font-weight: 500;
-    letter-spacing: .14em;
-    font-size: 12px;
-    -webkit-transition: background-color .1s ease-out;
-    -moz-transition: background-color .1s ease-out;
-    -o-transition: background-color .1s ease-out;
-    transition: background-color .1s ease-out;
-    border: none;
-    text-transform: uppercase;
-    border-radius:3px;
-    box-shadow:none;
-    padding: 7px 12px;
-  }
+.btn {
+  font-weight: 500;
+  letter-spacing: .14em;
+  font-size: 12px;
+  -webkit-transition: background-color .1s ease-out;
+  -moz-transition: background-color .1s ease-out;
+  -o-transition: background-color .1s ease-out;
+  transition: background-color .1s ease-out;
+  border: none;
+  text-transform: uppercase;
+  border-radius:3px;
+  box-shadow:none;
+  padding: 7px 12px;
+}
 
 /*------------------------------------------------------------------
     2.1.1 Primary Button
 -------------------------------------------------------------------*/
 
-  .btn-primary {
-    background-color: $ve-teal-base;
-    color:white;
-  }
+.btn-primary {
+  background-color: $ve-teal-base;
+  color:white;
+}
 
-  .btn-primary:hover {
-    background-color: $ve-teal-darker-1;
-    border: none;
-  }
+.btn-primary:hover {
+  background-color: $ve-teal-darker-1;
+  border: none;
+}
 
 /*------------------------------------------------------------------
     2.1.2 Small Button
 -------------------------------------------------------------------*/
 
-  .btn-sm{
-    padding: 5px 10px;
-    font-size:11px;
-  }
+.btn-sm{
+  padding: 5px 10px;
+  font-size:11px;
+}
 
 /*------------------------------------------------------------------
     2.1.3 Warning Button
@@ -174,14 +161,14 @@ div.tooltip-inner {
 
   /*Not sure where this came from*/
 
-  .btn-warning {
-    background-color: rgba(255, 255, 255, 0);
-    border: none;
-  }
+.btn-warning {
+  background-color: $ve-warning;
+  border: none;
+}
 
-  .btn-warning:hover {
-    background-color: rgba(255, 255, 255, 0);
-  }
+.btn-warning:hover {
+  background-color: $ve-warning-darker-1;
+}
 
 /*------------------------------------------------------------------
     2.1.4 Tertiary Button
@@ -189,15 +176,14 @@ div.tooltip-inner {
 
   /*Discreet light grey button. Now just being used for filter table*/
 
-  .btn-tertiary{
-    color: $ve-light-text;
-    background-color:$ve-silver-base;
-  }
+.btn-tertiary{
+  color: $ve-light-text;
+  background-color:$ve-silver-base;
+}
 
-  .btn-tertiary:hover{
-    background-color:$ve-silver-darker-2;
-    color:$ve-light-text-darker-1;
-  }
+.btn-tertiary:hover{
+  background-color:$ve-silver-darker-2;
+  color:$ve-light-text-darker-1;
 }
 
 /*------------------------------------------------------------------
@@ -221,7 +207,7 @@ div.tooltip-inner {
     margin: 0;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.14em;
     font-weight: 400;
     color:$ve-white-text-lighter-2;
   }
@@ -235,6 +221,16 @@ div.tooltip-inner {
   .modal-footer {
     border-top: 1px solid $ve-slate-darker-1;
   }
+}
+
+.modal-header>h4{
+  margin:0;
+  font-weight: 500;
+  letter-spacing: .14em;
+  font-size: 13px;
+  text-transform: uppercase;
+  display:inline-block;
+  color:$ve-light-text-darker-1;
 }
 
 /*------------------------------------------------------------------
@@ -480,6 +476,10 @@ div.tooltip-inner {
   float: none;
 }
 
+span.fixed-content-dropdown{
+  padding-bottom:12px;
+}
+
 /*------------------------------------------------------------------
   2.4 Tab System
 -------------------------------------------------------------------*/
@@ -541,7 +541,7 @@ div.tooltip-inner {
 
 .ve-light-tabs {
 
-  background-color: $ve-silver-lighter-1;
+  background-color: $ve-silver-lighter-0;
 
   .nav-tabs > li.uib-tab {
     text-align: center;
@@ -561,10 +561,10 @@ div.tooltip-inner {
 
   .nav-tabs > li.uib-tab > a {
     border: none;
-    border-bottom: 3px solid $ve-silver-lighter-1;
+    border-bottom: 3px solid $ve-silver-lighter-0;
     color: #333;
     margin: 0;
-    background-color: $ve-silver-lighter-1;
+    background-color: $ve-silver-lighter-0;
     line-height: 21px;
   }
 
@@ -575,7 +575,7 @@ div.tooltip-inner {
 
   .nav > li > a:focus, 
   .nav > li > a:hover {
-    background-color: $ve-silver-lighter-1;
+    background-color: $ve-silver-lighter-0;
     border-bottom: 3px solid $ve-teal-lighter-1;
   }
 }
@@ -648,3 +648,4 @@ table caption {
     font-weight:700 !important;
   }
 }
+

@@ -19,7 +19,7 @@ angular.module('mms')
  */
 function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window, $cookies) {
     
-    var ticket= $window.localStorage.getItem('ticket');
+    var ticket = $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
         var deferred = $q.defer();
         var loginURL = '/alfresco/service/api/login';

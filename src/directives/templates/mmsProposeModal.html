@@ -1,14 +1,10 @@
 <div class="modal-header">
-
-    <h4>CREATE & CROSS-REFERENCE A NEW ELEMENT</h4>
-
+    <h4>Create & Cross-Reference A New Element</h4>
+</div>
+<div class="modal-body transclude-modal">
     <div class="transclude-modal-instructions">
         Name your new element, write optional documentation for it, and select a property to cross-reference.
     </div>
-
-</div>
-
-<div class="modal-body transclude-modal">
     <form>
         <div class="form-propose">
             <div>Name <span class="star-mandatory">*</span></div>
@@ -23,10 +19,9 @@
         <label class="radio-inline"><input type="radio" name="optradio" value="true" ng-click="toggleRadio('name')">Name</label>
         <label class="radio-inline"><input type="radio" name="optradio" value="true" ng-click="toggleRadio('documentation')">Documentation</label>
     </div>
-
-    <div class="modal-footer">
-        <span class="expl-mandatory pull-left">Fields marked with <span class="star-mandatory">*</span> are required</span>
-        <button class="btn btn-primary" type="button" ng-click="makeNewAndChoose()">CREATE & CROSS-REFERENCE <i class="{{proposeClass}}"></i></button>
-        <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
-    </div>
+    <p class="expl-mandatory pull-left">Fields marked with <span class="star-mandatory">*</span> are required</p>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="makeNewAndChoose()">Create & Cross Reference<i class="{{proposeClass}}"></i></button>
+    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
 </div>

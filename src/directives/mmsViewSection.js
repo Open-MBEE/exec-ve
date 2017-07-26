@@ -13,18 +13,17 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         $scope.bbApi = {};
         $scope.buttons = [];
         $scope.buttonsInit = false;
-        $scope.element = $scope.section;  // This is for methods in Utils 
+        $scope.element = $scope.section;  // This is for methods in Utils
 
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("section-add-dropdown", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
-            }     
+            }
         };
 
     };
@@ -53,7 +52,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         };
 
         domElement.append(defaultTemplate);
-        $compile(domElement.contents())(scope); 
+        $compile(domElement.contents())(scope);
 
         var projectId = scope.mmsProjectId;
         var refId = scope.mmsRefId;
@@ -73,7 +72,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         scope.commitId = commitId ? commitId : 'latest';
 
         if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
-            
+
             scope.isEditing = false;
             scope.inPreviewMode = false;
             scope.elementSaving = false;
@@ -105,7 +104,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             };
 
             scope.delete = function() {
-                Utils.deleteAction(scope,scope.bbApi,mmsViewPresentationElemCtrl.getParentSection());
+                Utils.deleteAction(scope, scope.bbApi, mmsViewPresentationElemCtrl.getParentSection());
             };
 
             scope.startEdit = function() {
@@ -115,7 +114,14 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             scope.preview = function() {
                 Utils.previewAction(scope, recompileEdit, recompile, type);
             };
-        } 
+        }
+
+        scope.addEltAction = function(index, type, e) {
+            e.stopPropagation();
+            scope.addPeIndex = index;
+            Utils.addPresentationElement(scope, type, scope.section);
+        };
+
     };
 
     return {

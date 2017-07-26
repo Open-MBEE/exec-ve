@@ -36,7 +36,8 @@
 
   .back-to-docs{
     color:$ve-link;
-    font-weight: 700;
+    font-weight: 500;
+    font-size: 16px;
   }
 
   h1 {
@@ -123,7 +124,7 @@ ul.ve-light-list {
   }
 
   .ve-light-panels-detail-header {
-    background-color: $ve-silver-lighter-1;
+    background-color: $ve-silver-lighter-0;
     height: 45px;
     border-bottom: 1px solid $ve-silver-darker-1;
   }
@@ -161,9 +162,9 @@ ul.ve-light-list {
     padding-bottom: 16px;
   }
 
-  dd.link-section > a {
+  dd.link-section > a, dd.link-section > span {
     color: $ve-link;
-    font-weight: 700;
+    font-weight: 500;
   }
 
   dd.link-section > a::after {
@@ -205,7 +206,7 @@ ul.ve-light-list {
     color: white;
     border-radius: 2px;
     padding: 4px 10px 4px 4px;
-    letter-spacing: .05em;
+    letter-spacing: .14em;
     box-shadow: none;
   }
 
@@ -253,7 +254,7 @@ ul.ve-light-list {
     text-decoration: none;
   }
 
-  a.branch-disabled::before{
+  span.branch-disabled::before{
     font-family:FontAwesome;
     content: "\2026";
     top: -4px;
@@ -264,11 +265,11 @@ ul.ve-light-list {
     position: relative;
   }
 
-  dd.link-section > a.branch-disabled{
+  dd.link-section > span.branch-disabled{
     color:$ve-light-text;
   }
 
-  dd.link-section > a.branch-disabled:hover{
+  dd.link-section > span.branch-disabled:hover{
     text-decoration:none;
   }
 }

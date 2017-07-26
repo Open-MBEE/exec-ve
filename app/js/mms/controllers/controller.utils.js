@@ -2,132 +2,17 @@
 
 angular.module('mmsApp')
 .factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', '$templateCache',
-    '$rootScope','$compile', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'growl','_', MmsAppUtils]);
+    '$rootScope','$compile', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service
  * @name mmsApp.MmsAppUtils
- * 
+ *
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache, 
-    $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, growl, _) {
-
-    var addPeCtrl = function($scope, $uibModalInstance, $filter) {
-
-        $scope.oking = false;        
-        $scope.tsMapping = {
-            "IBD": "Internal Block Diagram",
-            "BDD": "Block Definition Diagram",
-            "SMD": "State Machine Diagram",
-            "AD": "Activity Diagram",
-            "SD": "Sequence Diagram",
-        };
-        $scope.newPe = {name:'', tomsawyerType: 'IBD'};
-        $scope.createForm = true;
-
-        var addPECallback = function(elementOb) {
-            if ($scope.oking) {
-                growl.info("Please wait...");
-                return;
-            }
-            $scope.oking = true;
-            var instanceVal = {
-                instanceId: elementOb.id,
-                type: "InstanceValue"
-            };
-            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal)
-                .then(function(data) {
-                    // Broadcast message to TreeCtrl:
-                    $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
-                    growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                    $uibModalInstance.close(data);
-                }, function(reason) {
-                    growl.error($scope.presentationElemType+" Add Error: " + reason.message);
-                }).finally(function() {
-                $scope.oking = false;
-            });
-        };
-
-        var peFilterQuery = function () {
-            var classIdOb = {};
-            if ($scope.presentationElemType === 'Table') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.TableT;
-            } else if ($scope.presentationElemType === 'List') {
-                classIdOb.classifierIds  = ViewService.TYPE_TO_CLASSIFIER_ID.ListT;
-            } else if ($scope.presentationElemType === 'Image') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.Figure;
-            } else if ($scope.presentationElemType === 'Paragraph') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT;
-            } else if ($scope.presentationElemType === 'Section') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.SectionT;
-            } else {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType];
-            }
-            var obj = {};
-            obj.term = classIdOb;
-            return obj;
-        };
-
-        $scope.searchOptions = {
-            callback: addPECallback,
-            itemsPerPage: 200,
-            filterQueryList: [peFilterQuery]
-        };
-
-        $scope.ok = function() {
-            if ($scope.oking) {
-                growl.info("Please wait...");
-                return;
-            }
-            $scope.oking = true;
-
-            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.newPe.tomsawyerType).
-            then(function(data) {
-                var elemType = $scope.presentationElemType.toLowerCase();
-                $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
-                $rootScope.$broadcast('view-reorder.refresh');
-                growl.success("Adding "+$scope.presentationElemType+"  Successful");
-                $uibModalInstance.close(data);
-            }, function(reason) {
-                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
-            }).finally(function() {
-                $scope.oking = false;
-            }); 
-        };
-
-        $scope.cancel = function() {
-            $uibModalInstance.dismiss();
-        };
-    };
-
-    /**
-     * @ngdoc method
-     * @name mmsApp.MmsAppUtils#addPresentationElement
-     * @methodOf mmsApp.MmsAppUtils
-     *
-     * @description
-     * Utility to add a new presentation element to view or section
-     *
-     * @param {Object} $scope controller scope, expects $scope.ws (string) and $scope.site (object) to be there
-     * @param {string} type type of presentation element (Paragraph, Section)
-     * @param {Object} viewOrSection the view or section (instance spec) object
-     */
-    var addPresentationElement = function($scope, type, viewOrSectionOb) {
-        $scope.viewOrSectionOb = viewOrSectionOb;
-        $scope.presentationElemType = type;
-        var templateUrlStr = 'partials/mms/add-pe.html';
-
-        var instance = $uibModal.open({
-            templateUrl: templateUrlStr,
-            scope: $scope,
-            controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
-        });
-        instance.result.then(function(data) {
-              // TODO: do anything here?
-        });
-    };
+function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache,
+    $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, _) {
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
@@ -182,9 +67,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 angular.element('#print-div').find("table").each(function(elt){
                     var tableObj = {};
                     if (this.caption) {
-                      tableObj.caption = this.caption.innerHTML;                        
-                    } else 
-                      tableObj.caption = 'no caption';
+                        tableObj.caption = this.caption.innerHTML;
+                    } else {
+                        tableObj.caption = 'no caption';
+                    }
                     tableObj.val = angular.element(this).table2CSV({delivery:'value'});
                     tableCSV.push(tableObj);
                 });
@@ -240,8 +126,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         $scope.meta.bottom = metadata.footer ? metadata.footer : '';
                         $scope.meta['top-left'] = metadata.dnumber ? metadata.dnumber : '';
                         $scope.meta['top-right'] = metadata.version ? metadata.version : '';
-                        if (refOb && refOb.type === 'Tag')
+                        if (refOb && refOb.type === 'Tag') {
                             $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + refOb.name;
+                        }
                         var displayTime = refOb.type === 'Tag' ? refOb._timestamp : 'latest';
                         if (displayTime === 'latest') {
                             displayTime = new Date();
@@ -256,8 +143,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     });
                 }
                 $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
-                if (mode === 2)
+                if (mode === 2) {
                     $scope.action = 'save';
+                }
                 if (mode === 3) {
                     $scope.action = 'generate pdf';
                     $scope.genpdf = true;
@@ -302,7 +190,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                                 popupWin.print();
                             }, 1000, false);
                         }
-                    } else {//TODO server changes for doc object
+                    } else { //TODO server changes for doc object
                         var doc = {
                             docId: viewOrDocOb.id,
                             header: result.header,
@@ -392,7 +280,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
-        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        if (genTotf) {
+            tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        }
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
@@ -418,15 +309,17 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
-        if (mode === 2)
+        if (mode === 2) {
             printElementCopy.find('.mms-svg').remove();
-        else
+        } else {
             printElementCopy.find('.mms-png').remove();
+        }
         printElementCopy.find('p:empty').remove();
         printElementCopy.find('p').each(function() {
             var $this = $(this);
-            if ($this.html().replace(/\s|&nbsp;/g, '').length === 0)
+            if ($this.html().replace(/\s|&nbsp;/g, '').length === 0) {
                 $this.remove();
+            }
         });
         printElementCopy.find('[width]').not('img').removeAttr('width');
         printElementCopy.find('[style]').each(function() {
@@ -450,7 +343,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         printContents = printElementCopy[0].outerHTML;
         var header = '';
         var footer = '';
-        var displayTime = '';
+        var displayTime = '';   
         var dnum = '';
         var version = '';
         var tagname = '';
@@ -477,7 +370,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 dnum = metadata.dnumber;
             if (metadata.version)
                 version = metadata.version;
-            $compile(coverTemplateElement.contents())(newScope); 
+            $compile(coverTemplateElement.contents())(newScope);
         }).finally(function() {
             $timeout(function() {
                 if (genCover) {
@@ -549,11 +442,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     };
 
     return {
-        addPresentationElement: addPresentationElement,
         printModal: printModal,
         tableToCsv: tableToCsv,
         handleChildViews: handleChildViews,
         refreshNumbering: refreshNumbering
     };
 }
-    
+

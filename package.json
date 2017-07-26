@@ -1,8 +1,8 @@
 {
+
   "name": "mms-ve",
-  "description": "MMS View Editor",
-  "repository": "https://github.jpl.nasa.gov/mbee-dev/angular-mms",
-  "license": "MIT",
+  "description": "mms ve module",
+  "repository": "https://github.com/Open-MBEE/EMS-Webapp.git",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-artifactory-artifact": "~1.0.1",
@@ -18,7 +18,7 @@
     "grunt-contrib-uglify": "^2.3.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-html2js": "^0.3.8",
-    "grunt-karma": "~0.12.1",
+    "grunt-karma": "^2.0.0",
     "grunt-ngdocs": "~0.2.5",
     "grunt-protractor-runner": "^3.0.0",
     "grunt-sass": "^1.2.1",
@@ -26,16 +26,16 @@
     "grunt-wiredep": "~1.9.0",
     "jasmine-core": "~2.4.1",
     "jasmine-jquery": "^2.1.1",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "~0.2.2",
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.1.1",
     "karma-fixture": "^0.2.6",
     "karma-html2js-preprocessor": "^1.0.0",
-    "karma-jasmine": "^0.3.8",
+    "karma-jasmine": "^1.1.0",
     "karma-jasmine-jquery": "^0.1.1",
     "karma-json-fixtures-preprocessor": "0.0.6",
-    "karma-junit-reporter": "^0.3.8",
+    "karma-junit-reporter": "^1.2.0",
     "karma-nyan-reporter": "^0.2.3",
-    "karma-phantomjs-launcher": "^0.2.3",
+    "karma-phantomjs-launcher": "^1.0.4",
     "phantomjs": "^2.1.7",
     "protractor": "~3.0.0"
   }

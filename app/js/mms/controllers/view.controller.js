@@ -82,9 +82,6 @@ angular.module('mmsApp')
             }
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
             $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            if (viewOb && viewOb._editable && refOb.type === 'Branch') {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('view-add-dropdown'));
-            }
             if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
                 if ($state.includes('project.ref.document'))
@@ -130,66 +127,6 @@ angular.module('mmsApp')
             }
         }
     };
-
-    $scope.$on('view-add-paragraph', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Paragraph', viewOb);
-    });
-
-    $scope.$on('view-add-list', function() {
-        MmsAppUtils.addPresentationElement($scope, 'List', viewOb);
-    });
-
-    $scope.$on('view-add-table', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Table', viewOb);
-    });
-
-    $scope.$on('view-add-section', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Section', viewOb);
-    });
-
-    $scope.$on('view-add-comment', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Comment', viewOb);
-    });
-
-    $scope.$on('view-add-image', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Image', viewOb);
-    });
-
-    $scope.$on('view-add-equation', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Equation', viewOb);
-    });
-
-    $scope.$on('view-add-tsp', function() {
-        MmsAppUtils.addPresentationElement($scope, 'Tsp', viewOb);
-    });
-
-    $scope.$on('section-add-paragraph', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Paragraph', sectionOb);
-    });
-
-    $scope.$on('section-add-list', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'List', sectionOb);
-    });
-
-    $scope.$on('section-add-table', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Table', sectionOb);
-    });
-
-    $scope.$on('section-add-equation', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Equation', sectionOb);
-    });
-
-    $scope.$on('section-add-section', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Section', sectionOb);
-    });
-
-    $scope.$on('section-add-comment', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Comment', sectionOb);
-    });
-
-    $scope.$on('section-add-image', function(event, sectionOb) {
-        MmsAppUtils.addPresentationElement($scope, 'Image', sectionOb);
-    });
 
     $scope.$on('show-comments', function() {
         $scope.viewApi.toggleShowComments();

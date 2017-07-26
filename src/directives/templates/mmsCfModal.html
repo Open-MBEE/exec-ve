@@ -1,6 +1,7 @@
 <div class="modal-header">
     <h4>{{title}}</h4>
-
+</div>
+<div class="modal-body">
     <div class="transclude-modal-instructions">
         {{description}}
     </div>
@@ -10,10 +11,9 @@
     <label ng-show="showEditableOp">Restrict editing
         <input type="checkbox" ng-model="nonEditableCheckbox">
     </label>
+
+    <mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
 </div>
-
-<mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
-
 <div class="modal-footer">
-    <button class="btn btn-danger" ng-click="cancel()">CANCEL</button>
+    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
 </div>

@@ -11,7 +11,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     orgOb, projectOb, refOb, refObs, groupObs) {
 
     $rootScope.mms_refOb = refOb;
-    $rootScope.mms_bbApi = $scope.bbApi = {};
+    $rootScope.ve_bbApi = $scope.bbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
     $rootScope.ve_tree_pane = $scope.$pane;
     if (!$rootScope.veTreeShowPe) {
@@ -287,10 +287,25 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
         MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
         .then(function(node) {
+            var bulkGet = [];
             for (var i in viewId2node) {
-                addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                var view = viewId2node[i].data;
+                if (view._contents && view._contents.operand) {
+                    for (var j = 0; j < view._contents.operand.length; j++) {
+                        bulkGet.push(view._contents.operand[j].instanceId);
+                    }
+                }
             }
-            $scope.treeApi.refresh();
+            ElementService.getElements({
+                elementIds: bulkGet,
+                projectId: projectOb.id,
+                refId: refOb.id
+            }, 0).finally(function() {
+                for (var i in viewId2node) {
+                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                }
+                $scope.treeApi.refresh();
+            });
         }, function(reason) {
             console.log(reason);
         });
@@ -623,7 +638,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
         var queryFilter = function() {
             var obj = {};
-            obj.terms = {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID]};
+            obj.terms = {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)};
             return obj;
         };
 

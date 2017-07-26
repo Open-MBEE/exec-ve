@@ -111,9 +111,10 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                     </select>
                 </td>-->
                 <td>
-                    <!--<div ng-show="job.latestStatus || jobInstances[job.id]">-->
-                    <div ng-switch="jobInstances[job.id][0].jobStatus">
-                            <span ng-switch-when="pending|loading|running" ng-switch-when-separator="|">
+                    <div ng-show="job.latestStatus || jobInstances[job.id]">
+                        Build {{jobInstances[job.id][0].buildNumber}}
+                        <div ng-switch="jobInstances[job.id][0].jobStatus">
+                            <span ng-switch-when="pending|loading|running|started" ng-switch-when-separator="|">
                                 Created {{jobInstances[job.id][0].created}}<br>
                                 <i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>in progress
                             </span>
@@ -125,20 +126,20 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                                 Completed {{jobInstances[job.id][0].completed}}<br>
                                 <i class="fa fa-circle completed-marker" aria-hidden="true"></i>success
                             </span>
-                            <span class="animate-switch" ng-switch-default>No runs</span>
-                            
+                            <span class="animate-switch" ng-switch-default>{{jobInstances[job.id][0].jobStatus}}</span>
                         <!--<a ng-attr-href="{{job.url}}" target="_blank" ng-show="job.url">log</a>-->
+                        </div>
                     </div>
-                    <!--<div ng-if="!job.latestStatus">
+                    <div ng-if="!jobInstances[job.id]">
                         <h4>No runs.</h4>
-                    </div>-->
+                    </div>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-tertiary" ng-class="{'disabled': !docEditable || !deleteCleared}" ng-click="deleteJob(job.id)">
-                        <span>DELETE <i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i></span>
+                    <button class="btn btn-tertiary" ng-class="{'disabled': !docEditable || !deleteCleared}" ng-click="deleteJob(job.id)">
+                        DELETE <i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i>
                     </button>
-                    <button class="btn btn-sm btn-primary" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="runNow(job.id)">
-                        <span>RUN NOW <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i></span>
+                    <button class="btn btn-primary" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="runNow(job.id)">
+                        RUN NOW <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
                     </button>
                 </td>
             </tr>
@@ -147,7 +148,7 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
     <div ng-if="!jobs.length && !loading" class="text-center empty-state">
         <h4 ng-if="!jobs.length && !loading">No Current PMA Jobs</h4>
         <p><i>What's PMA?</i> PMA regenerates Magicdraw views for the current document. 
-        <a target="_blank" href="https://cae-ems.jpl.nasa.gov/alfresco/mmsapp/mms.html#/workspaces/master/sites/site__18_0_2_bec02f9_1446154915939_541002_41021/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
+        <a target="_blank" href="https://opencae.jpl.nasa.gov/alfresco/mmsapp/mms.html#/projects/PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85/master/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
         <p ng-if="mmsRefId != 'master'">PMA is currently only available on the <strong>master</strong> branch.</p>
         <button class="btn btn-primary" ng-if="mmsRefId === 'master'" ng-click="runNow()" ng-class="{'disabled': !docEditable || !runCleared}">
             Run DocGen <i ng-hide="runCleared" class="fa fa-spin fa-spinner"></i>
