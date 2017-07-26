@@ -23,119 +23,17 @@
         </div>
         <div class="form-group">
             <label>Point in History:</label>
-                <div ng-app="">
-                    <form> 
-                        <input id="most-recent" type="radio" name="content" ng-model="content" value="most-recent">
-                        <label for="most-recent">Most Recent</label>
-                        <br>
-                        <input id="specify-point" type="radio" name="content" ng-model="content" value="specify-point">
-                        <label for="specify-point">Specify a timestamp (YYYY-MM-DDTHH:MM:SS)</label>
-                        <div class="indent">
-                            <input class="form-control" ng-model="configuration.timestamp" type="datetime-local" ng-change="updateTimeOpt()" placeholder="YYYY-MM-DDTHH:MM:SS">
-                            </input>
-                        </div>
-                        <br>
-                        <input id="browse-history" type="radio" name="content" ng-model="content" value="browse-history">
-                        <label for="specify-point">Browse history</label>
-                    </form>
-                
-                    <div class="wrapper">
-                        <div ng-show="content == 'browse-history'" class="indent">
-                            <table class="commit-table">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            Author
-                                        </td>
-                                        <td>
-                                            Timestamp
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user1
-                                        </td>
-                                        <td>
-                                            5/6/17 5:05 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user3
-                                        </td>
-                                        <td>
-                                            5/2/17 11:28 AM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user3
-                                        </td>
-                                        <td>
-                                            11/12/16 3:27 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user2
-                                        </td>
-                                        <td>
-                                            1/29/16 3:16 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user2
-                                        </td>
-                                        <td>
-                                            1/29/16 2:41 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user2
-                                        </td>
-                                        <td>
-                                            1/29/16 1:06 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user2
-                                        </td>
-                                        <td>
-                                            1/28/16 7:54 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user2
-                                        </td>
-                                        <td>
-                                            1/28/16 7:53 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user2
-                                        </td>
-                                        <td>
-                                            1/28/16 7:53 PM
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            user2
-                                        </td>
-                                        <td>
-                                            1/28/16 7:53 PM
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <form> 
+                    <input id="most-recent" type="radio" name="history-point">
+                    <label for="most-recent">Most Recent</label>
+                    <br>
+                    <input id="specify-point" type="radio" name="history-point">
+                    <label for="specify-point">Specify a timestamp (YYYY-MM-DDTHH:MM:SS)</label>
+                    <div class="indent">
+                        <input class="form-control" ng-model="configuration.timestamp" type="datetime-local" ng-change="updateTimeOpt()" placeholder="YYYY-MM-DDTHH:MM:SS">
+                        </input>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
