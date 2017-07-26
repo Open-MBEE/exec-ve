@@ -75,8 +75,9 @@ div.tooltip-inner {
     2.4.1 Light tab system
     2.4.2 Dark Tab system
   2.5 Banners
-3. Table filtering stuff
+3. Table filtering
 4. Search
+5. Create branch
 
 -------------------------------------------------------------------*/
 
@@ -658,17 +659,48 @@ table caption {
   }
 }
 
-.commit-table{
-  width:calc(100%-28px)s;
-  td{
-    padding:4px;
-    border:none;
-  }
-  tr{
-    border:1px solid #eaeaea;
-  }
-  tr:hover{
-    background-color:#fbfbfb;
-  }
-}
 
+/*------------------------------------------------------------------
+5. New Branch
+-------------------------------------------------------------------*/
+
+.ve-new-branch{
+  input[type="radio"]{
+    margin:0 4px;
+  }
+
+  .indent{
+    margin-left:24px;
+  }
+
+  label{
+    font-weight:400;
+  }
+
+  .form-group>label{
+    font-weight:600;
+  }
+
+  .commit-table{
+
+    width:calc(100% - 24px);
+    td{
+      padding:4px;
+      border:none;
+    }
+
+    tr{
+      border:1px solid #eaeaea;
+    }
+
+    tr:hover{
+      background-color:#fbfbfb;
+      font-weight:400;
+    }
+
+    tr:first-child{
+      border:none;
+      font-weight:600;
+    }
+  }  
+}
