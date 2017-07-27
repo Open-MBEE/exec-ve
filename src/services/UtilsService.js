@@ -594,9 +594,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             var elementId = $this.attr('mms-element-id');
             var isElementInDoc = printElement.find("[id='" + elementId + "']");
             if (isElementInDoc.length) {
-                // var name = $this.find('a').text();
                 $this.find('a').attr('href','#' + elementId);
-                // $this.find('a').replaceWith('<a href="#' + elementId + '">' + name + '</a>');
             }
         });
     };
