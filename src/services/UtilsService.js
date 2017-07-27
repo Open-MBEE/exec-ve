@@ -601,6 +601,16 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return 'MMS_' + Date.now() + '_' + uuid;
     };
 
+    var convertViewLinks = function(printElement) {
+        printElement.find('mms-view-link').each(function(index) {
+            var $this = $(this);
+            var elementId = $this.attr('mms-element-id');
+            var isElementInDoc = printElement.find("[id='" + elementId + "']");
+            if (isElementInDoc.length) {
+                $this.find('a').attr('href','#' + elementId);
+            }
+        });
+    };
     /*
     header = header slot on doc
     footer = footer slot on doc
@@ -756,6 +766,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
         makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
+        convertViewLinks: convertViewLinks,
         createMmsId: createMmsId,
         getPrintCss: getPrintCss,
         isView: isView,
