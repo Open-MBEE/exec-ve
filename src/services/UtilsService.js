@@ -592,8 +592,11 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id');
-            var name = $this.find('a').text();
-            $this.find('a').replaceWith('<a href="#' + elementId + '">' + name + '</a>');
+            var isElementInDoc = printElement.find("mms-transclude-doc[mms-element-id='" + elementId + "']");
+            if (isElementInDoc.length) {
+                var name = $this.find('a').text();
+                $this.find('a').replaceWith('<a href="#' + elementId + '">' + name + '</a>');
+            }
         });
     };
     /*
