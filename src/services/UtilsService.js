@@ -605,7 +605,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id');
-            var isElementInDoc = printElement.find("[id='" + elementId + "']");
+            var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
             }
