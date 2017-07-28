@@ -520,7 +520,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
         var sysmlId = child.data.id;
         var el = printElement.find('#' + sysmlId);
-        var refs = printElement.find('mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
+        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"]');
         var cap = '';
         if (child.type === 'table') {
             ob.tableCount++;
