@@ -336,11 +336,11 @@ function mmsSearch(CacheService, ElementService, UtilsService, growl, $templateC
                 });
             }
 
-            var viewsAndDocs = {
-                terms : {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)}
-            };
-
+            // Add filter for all views and docs if selected
             if (scope.docsviews.selected) {
+                var viewsAndDocs = {
+                    terms : {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)}
+                };
                 filterList.push(viewsAndDocs);
             }
             var jsonQueryOb = {
