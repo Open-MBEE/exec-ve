@@ -15,7 +15,10 @@
                     <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
                     <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
                     <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
-                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">MDID</button>
+                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">ID</button>
+                </div>
+                <div class="search-filter-views-docs">
+                    <input type="checkbox" ng-model="docsviews.selected"> Search for Views and Documents<br>
                 </div>
             </div>
         </form>
@@ -36,12 +39,9 @@
                     </button>
                     <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
                     <button ng-click="setFilterFacet('id')" type="button"
-                            class="btn-filter-facet-id btn-search-type btn btn-default">MDID
+                            class="btn-filter-facet-id btn-search-type btn btn-default">ID
                     </button>
                 </div>
-            </div>
-            <div>
-                <input type="checkbox" name="docsviews" ng-model="docsviews.selected"> Search for Views and Documents<br>
             </div>
             <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
         </div>
