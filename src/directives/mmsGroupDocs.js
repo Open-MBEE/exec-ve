@@ -21,6 +21,16 @@ function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _)
 
     var mmsGroupDocsLink = function(scope, element, attrs, mmsViewCtrl) {
 
+        var update = function(documents) {
+            var docs = [];
+            for (var i = 0; i < documents.length; i++) {
+                if (documents[i]._groupId == scope.mmsGroupId) {
+                    docs.push(documents[i]);
+                }
+            }
+            scope.docs = docs;
+        };
+
         var projectId = scope.mmsProjectId;
         var refId = scope.mmsRefId;
             
@@ -39,13 +49,11 @@ function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _)
             projectId: scope.projectId,
             refId: scope.refId
         }, 2).then(function(documents) {
-            var docs = [];
-            for (var i = 0; i < documents.length; i++) {
-                if (documents[i]._groupId == scope.mmsGroupId) {
-                    docs.push(documents[i]);
-                }
-            }
-            scope.docs = docs;
+            update(documents);
+            scope.documents = documents;
+            scope.$watchCollection('documents', function(newVal, oldVal) {
+                update(newVal);
+            });
         });
     };
 
