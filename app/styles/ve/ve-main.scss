@@ -77,6 +77,7 @@ div.tooltip-inner {
   2.5 Banners
 3. Table filtering stuff
 4. Search
+5. Modal fixes
 
 -------------------------------------------------------------------*/
 
@@ -117,7 +118,7 @@ div.tooltip-inner {
   2.1 Buttons
 -------------------------------------------------------------------*/
 
-.btn {
+.btn{
   font-weight: 500;
   letter-spacing: .14em;
   font-size: 12px;
@@ -136,7 +137,10 @@ div.tooltip-inner {
     2.1.1 Primary Button
 -------------------------------------------------------------------*/
 
-.btn-primary {
+.btn-primary,
+.btn-primary.disabled,
+.btn-primary[disabled],
+.btn-primary:focus{
   background-color: $ve-teal-base;
   color:white;
 }
@@ -647,5 +651,74 @@ table caption {
     padding:7px 12px 7px !important;
     font-weight:700 !important;
   }
+}
+
+/*------------------------------------------------------------------
+5. Modal Dialog
+-------------------------------------------------------------------*/
+
+.modal-dialog{
+  max-height: 90%;
+  position: relative;
+  overflow: auto;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.modal-content{
+  position: relative;
+  border-radius: 6px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.modal-header{
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  min-height: 52px;
+}
+
+.modal-body{
+  position: relative;
+  -webkit-box-ordinal-group: 2;
+  -webkit-order: 1;
+  order: 1;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.modal-footer{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-ordinal-group: 3;
+  -webkit-order: 2;
+  order: 2;
+  box-sizing: border-box;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+  margin-bottom: 0;
+  padding-right: 8px;
+  padding-left: 16px;
+  min-height: 52px;
+  overflow: hidden;
 }
 
