@@ -197,7 +197,6 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 elementId: elementOb.id,
                 projectId: elementOb._projectId,
                 refId: elementOb._refId,
-                commitId: elementOb._commitId,
                 depth: 1
             };
             ElementService.getOwnedElements(reqOb).then(
