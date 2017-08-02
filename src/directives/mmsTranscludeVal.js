@@ -125,23 +125,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 }
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
                 $compile(domElement.contents())(scope.recompileScope);
-            } else if (UtilsService.isRestrictedValue(values)) {
-                var reqOb = {elementId: values[0].operand[1].elementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
-                ElementService.getElement(reqOb, 2)
-                .then(function(e) {
-                    scope.isRestrictedVal = true;
-                    domElement[0].innerHTML = "<span>" + e.name + "</span>";
-                });
-            //TODO check if this is needed or working
-            // } else if (isExpression) {
-            //     var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
-            //     $http.get(URLService.getElementURL(reqOb) + '&evaluate')
-            //     .success(function(data,status,headers,config) {
-            //         element[0].innerHTML = data.elements[0].evaluationResult;
-            //     }).error(function(data,status,headers,config){
-            //         //URLService.handleHttpStatus(data, status, headers, config, deferred);
-            //         //TODO: Needs case statement when .error is thrown
-            //     });
             } else {
                 if (preview) {
                     domElement[0].innerHTML = editTemplate;
@@ -173,22 +156,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
-                if (scope.element.type === 'Property' || scope.element.type === 'Port') {
-                    if (scope.element.defaultValue) {
-                        scope.values = [scope.element.defaultValue];
-                    } else {
-                        scope.values = [];
-                    }
-                }
-                if (scope.element.type === 'Slot') {
-                    scope.values = scope.element.value;
-                }
-                if (scope.element.type === 'Constraint' && scope.element.specification) {
-                    scope.values = [scope.element.specification];
-                }
-                if (scope.element.type === 'Expression') {
-                    scope.values = scope.element.operand;
-                }
+                Utils.setupValCf(data, scope);
                 recompile();
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
@@ -218,27 +186,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             return Utils.hasHtml(s);
         };
 
-        scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
-        scope.addValue = function(type) {
-            if (type === 'LiteralBoolean')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-            else if (type === 'LiteralInteger')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-            else if (type === 'LiteralString')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-            else if (type === 'LiteralReal')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-        };
-        scope.addValueType = 'LiteralString';
+        Utils.setupValEditFunctions(scope);
         
-        scope.addEnumerationValue = function() {
-          scope.editValues.push(UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-        };
-
-        scope.removeVal = function(i) {
-            scope.editValues.splice(i, 1);
-        };
-
         if (mmsViewCtrl) {
             scope.isEditing = false;
             scope.elementSaving = false;
@@ -259,19 +208,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             };
 
             scope.startEdit = function() {
-                if (scope.isRestrictedVal) {
-                    var options = [];
-                    scope.values[0].operand[2].operand.forEach(function(o) {
-                        options.push(o.elementId);
-                    });
-                    var reqOb = {elementIds: options, projectId: scope.projectId, refId: scope.refId};
-
-                    ElementService.getElements(reqOb)
-                    .then(function(elements) {
-                        scope.options = elements;
-                        Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
-                    });
-                } else {
                     var id = scope.element.typeId;
                     if (scope.element.type === 'Slot')
                         id = scope.element.definingFeatureId;
@@ -289,7 +225,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
                         growl.error('Failed to get property spec: ' + reason.message);
                     });
-                }
             };
 
             scope.preview = function() {
