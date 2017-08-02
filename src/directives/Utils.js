@@ -116,7 +116,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         ElementService.updateElement(edit)
         .then(function(data) {
             deferred.resolve(data);
-            setupValCf(data, scope);
+            setupValCf(scope);
             $rootScope.$broadcast('element.updated', data, continueEdit);
         }, function(reason) {
             if (reason.status === 409) {
