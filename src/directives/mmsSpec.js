@@ -88,15 +88,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         };
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
-            if(scope.element.type === 'Expression'){
-                scope.values = null;
-            }
-            if (scope.element.type === 'Property' || scope.element.type === 'Port')
-                scope.values = [scope.element.defaultValue];
-            if (scope.element.type === 'Slot')
-                scope.values = scope.element.value;
-            if (scope.element.type === 'Constraint')
-                scope.values = [scope.element.specification];
+            Utils.setupValCf(scope);
             scope.editable = false;
             return;
         }
@@ -133,7 +125,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                     return;
                 }
                 scope.element = data;
-                Utils.setupValCf(data, scope);
+                Utils.setupValCf(scope);
                 if (!scope.element._editable ||
                         (scope.mmsCommitId !== 'latest' && scope.mmsCommitId)) {
                     scope.editable = false;

@@ -71,7 +71,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         };
     };
 
-    var setupValCf = function(data, scope) {
+    var setupValCf = function(scope) {
+        var data = scope.element;
         if (data.type === 'Property' || data.type === 'Port') {
             if (data.defaultValue) {
                 scope.values = [data.defaultValue];
@@ -377,9 +378,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 if (!scope.editValues) {
                     scope.editValues = [];
                 }
+                /*
                 if (scope.isEnumeration && scope.editValues.length === 0) {
                     scope.editValues.push({type: 'InstanceValue', instanceId: null});
                 }
+                */
                 if (template) {
                     if (scope.recompileScope) {
                         scope.recompileScope.$destroy();

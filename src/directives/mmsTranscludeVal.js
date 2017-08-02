@@ -156,7 +156,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
-                Utils.setupValCf(data, scope);
+                Utils.setupValCf(scope);
                 recompile();
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
@@ -167,6 +167,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                                 growl.warning("This value has been changed: " + elementOb.name +
                                     " modified by: " + elementOb._modifier, {ttl: -1});
                             } else {
+                                Utils.setupValCf(scope);
                                 recompile();
                             }
                         }
