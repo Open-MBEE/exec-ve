@@ -727,9 +727,9 @@ table caption {
 6. 404 Bookmark
 -------------------------------------------------------------------*/
 .account-wall-lg{
-  max-width:800px;
+  max-width:820px;
   margin:100px auto;
-  padding:10px;
+  padding:0 40px;
 
   h1{
     margin: 30px 0;
@@ -758,7 +758,7 @@ table caption {
     padding:10px 0 0;
   }
 }
-@media (max-width: 500px){
+@media (max-width: 600px){
   .account-wall-lg .flex{
     flex-direction:column;
   }
