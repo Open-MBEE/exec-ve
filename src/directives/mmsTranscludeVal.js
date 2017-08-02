@@ -209,23 +209,23 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             };
 
             scope.startEdit = function() {
-                    var id = scope.element.typeId;
-                    if (scope.element.type === 'Slot')
-                        id = scope.element.definingFeatureId;
-                    if (!id || (scope.isEnumeration && scope.options)) {
-                        Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
-                        return;
-                    }
-                    Utils.getPropertySpec(scope.element)
-                    .then( function(value) {
-                        scope.isEnumeration = value.isEnumeration;
-                        scope.isSlot = value.isSlot;
-                        scope.options = value.options;
-                        Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
-                    }, function(reason) {
-                        Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
-                        growl.error('Failed to get property spec: ' + reason.message);
-                    });
+                var id = scope.element.typeId;
+                if (scope.element.type === 'Slot')
+                    id = scope.element.definingFeatureId;
+                if (!id || (scope.isEnumeration && scope.options)) {
+                    Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
+                    return;
+                }
+                Utils.getPropertySpec(scope.element)
+                .then( function(value) {
+                    scope.isEnumeration = value.isEnumeration;
+                    scope.isSlot = value.isSlot;
+                    scope.options = value.options;
+                    Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
+                }, function(reason) {
+                    Utils.startEdit(scope, mmsViewCtrl, domElement, frameTemplate, false);
+                    growl.error('Failed to get property spec: ' + reason.message);
+                });
             };
 
             scope.preview = function() {
