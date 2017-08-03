@@ -14,31 +14,14 @@
     }
   }
 
-  .container-snapshots {
-    h1 {
-      font-family: $light-font-family-sans-serif;
-      font-weight: 200;
-      font-size: 35px;
-      margin-top: 24px;
-      margin-bottom: 32px;
-      height: inherit;
-    }
-
-    .snapshot-table {
+  .container-tags {
+    .tags-table {
       font-size: 14px;
       margin-top: 24px;
+      width: 100%;
 
       a:hover {
         color: $base_blue;
-      }
-    }
-
-    .snapshot-btn-group {
-      margin-top: 24px;
-      margin-bottom: 20px;
-
-      .create-new-snapshot-btn {
-        margin-right: 4px;
       }
     }
   }

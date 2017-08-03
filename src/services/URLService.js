@@ -422,8 +422,8 @@ function urlService(baseUrl) {
         var r = url;
         if (!ticket)
             return r;
-        if (r.indexOf('commitId') > 0) //TODO check mms cache rules
-            return r;
+        // if (r.indexOf('commitId') > 0) //TODO check mms cache rules
+        //     return r;
         if (r.indexOf('?') > 0)
             r += '&alf_ticket=' + ticket;
         else
