@@ -78,6 +78,7 @@ div.tooltip-inner {
 3. Table filtering stuff
 4. Search
 5. Modal fixes
+6. 404 bookmark
 
 -------------------------------------------------------------------*/
 
@@ -721,4 +722,47 @@ table caption {
   min-height: 52px;
   overflow: hidden;
 }
+
+/*------------------------------------------------------------------
+6. 404 Bookmark
+-------------------------------------------------------------------*/
+.account-wall-lg{
+  max-width:820px;
+  margin:100px auto;
+  padding:0 40px;
+
+  h1{
+    margin: 30px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 20px;
+    font-weight: 200;
+    font-size: 44px;
+  }
+
+  h4{
+    font-weight: 300;
+    font-size: 20px;
+    margin:20px 0;
+  }
+
+  .flex{
+    display: flex;
+  }
+
+  .two-thirds-flex{
+    flex:3;
+    padding:0 28px 0 0;
+  }
+  .one-third-flex{
+    flex:2;
+    padding:10px 0 0;
+  }
+}
+@media (max-width: 600px){
+  .account-wall-lg .flex{
+    flex-direction:column;
+  }
+}
+
+
 
