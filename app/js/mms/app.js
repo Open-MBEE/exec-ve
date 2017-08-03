@@ -16,6 +16,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
     $urlRouterProvider.otherwise(function($injector, $location) {
+        var $rootScope = $injector.get('$rootScope');
+        if ($location.url().includes('workspace')) {
+            $rootScope.redirect_from_old_site = true;
+        } else {
+            $rootScope.redirect_from_old_site = false;
+        }
         var $state = $injector.get('$state');
         var checkLogin = $injector.get('AuthService').checkLogin();
         if (checkLogin) {
@@ -110,6 +116,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.continue = function() {
                         if (orgId && projectId) {
                             $scope.spin = true;
+                            $rootScope.redirect_from_old_site = false;
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'}).then(function(data) {
                             }, function(reject) {
                                 $scope.spin = false;
