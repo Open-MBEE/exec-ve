@@ -79,6 +79,7 @@ div.tooltip-inner {
 4. Search
 5. Modal fixes
 6. 404 bookmark
+7.Open document button
 
 -------------------------------------------------------------------*/
 
@@ -764,5 +765,24 @@ table caption {
   }
 }
 
+/*------------------------------------------------------------------
+7. Open document button styling
+-------------------------------------------------------------------*/
 
+.btn.open-document{
+  margin-left:10px;
+
+  a:visited,
+  a:hover,
+  a{
+    color:white;
+    text-decoration:none;
+  }
+}
+
+.btn.open-document::before{
+  content: "\f064"; 
+  font-family: FontAwesome;
+  padding-right:6px;
+}
 
