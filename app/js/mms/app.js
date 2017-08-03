@@ -5,13 +5,15 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 
     
     $urlRouterProvider.rule(function ($injector, $location) {
-         var locationPath = $location.url();
-         if (locationPath.indexOf('full%23') > 0)
-             locationPath = locationPath.replace('full%23', 'full#');
-         if (locationPath[0] !== '/')
-             locationPath = '/' + locationPath;
-         if (locationPath !== $location.url())
-             $location.url(locationPath);
+        var locationPath = $location.url();
+        if (locationPath.indexOf('full%23') > 0)
+            locationPath = locationPath.replace('full%23', 'full#');
+        if (locationPath[0] !== '/')
+            locationPath = '/' + locationPath;
+        if (locationPath[locationPath.length-1] == '/')
+            locationPath = locationPath.substring(0, locationPath.length-1);
+        if (locationPath !== $location.url())
+            $location.url(locationPath);
      });
 
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
