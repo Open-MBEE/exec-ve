@@ -81,7 +81,6 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         scope.editing = false;
         scope.editable = true;
         scope.gettingSpec = false;
-        scope.isRestrictedVal = false;
         scope.isEnumeration = false;
         //TODO pass proper args
         scope.propertyTypeClicked = function() {
@@ -89,15 +88,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         };
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
-            if(scope.element.type === 'Expression'){
-                scope.values = null;
-            }
-            if (scope.element.type === 'Property' || scope.element.type === 'Port')
-                scope.values = [scope.element.defaultValue];
-            if (scope.element.type === 'Slot')
-                scope.values = scope.element.value;
-            if (scope.element.type === 'Constraint')
-                scope.values = [scope.element.specification];
+            Utils.setupValCf(scope);
             scope.editable = false;
             return;
         }
@@ -134,27 +125,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                     return;
                 }
                 scope.element = data;
-                if (scope.element.type === 'Property' || scope.element.type === 'Port') {
-                    if (scope.element.defaultValue) {
-                        scope.values = [scope.element.defaultValue];
-                    } else {
-                        scope.values = [];
-                    }
-                    if (UtilsService.isRestrictedValue(scope.values)) {
-                        scope.isRestrictedVal = true;
-                    } else {
-                        scope.isRestrictedVal = false;
-                    }
-                } else if (scope.element.type === 'Slot') {
-                    scope.values = scope.element.value;
-                    if (UtilsService.isRestrictedValue(scope.values)) {
-                        scope.isRestrictedVal = true;
-                    } else {
-                        scope.isRestrictedVal = false;
-                    }
-                } else if (scope.element.type === 'Constraint') {
-                    scope.values = [scope.element.specification];
-                }
+                Utils.setupValCf(scope);
                 if (!scope.element._editable ||
                         (scope.mmsCommitId !== 'latest' && scope.mmsCommitId)) {
                     scope.editable = false;
@@ -177,19 +148,6 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                                 scope.editValues = scope.edit.value;
                             else
                                 scope.editValues = [];
-                            if (scope.isRestrictedVal) {
-                                var options = [];
-                                scope.values[0].operand[2].operand.forEach(function(o) {
-                                    options.push(o.elementId);
-                                });
-                                reqOb.elementIds = options;
-                                ElementService.getElements(reqOb)
-                                .then(function(elements) {
-                                    if (newVal !== lastid)
-                                        return;
-                                    scope.options = elements;
-                                });
-                            } else {
                                 Utils.getPropertySpec(scope.element)
                                 .then( function(value) {
                                     scope.isEnumeration = value.isEnumeration;
@@ -198,7 +156,6 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                                 }, function(reason) {
                                     growl.error('Failed to get property spec: ' + reason.message);
                                 });
-                            }
                         }
                         if (scope.edit.type === 'Constraint' && scope.edit.specification) {
                             scope.editValues = [scope.edit.specification];
@@ -268,26 +225,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             return Utils.hasEdits(scope.edit);
         };
 
-        scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
-        scope.addValue = function(type) {
-            if (type === 'LiteralBoolean')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-            else if (type === 'LiteralInteger')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-            else if (type === 'LiteralString')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-            else if (type === 'LiteralReal')
-                scope.editValues.push(UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-        };
-        scope.addValueType = 'LiteralString';
-
-        scope.addEnumerationValue = function() {
-          scope.editValues.push(UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id}));
-        };
-
-        scope.removeVal = function(i) {
-            scope.editValues.splice(i, 1);
-        };
+        Utils.setupValEditFunctions(scope);
         
         if (angular.isObject(scope.mmsSpecApi)) {
             var api = scope.mmsSpecApi;

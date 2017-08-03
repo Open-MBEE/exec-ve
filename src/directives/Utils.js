@@ -39,6 +39,58 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         };
     };
 
+    var setupValEditFunctions = function(scope) {
+        scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
+        scope.addValue = function(type) {
+            var newValueSpec = null;
+            if (type === 'LiteralBoolean')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            else if (type === 'LiteralInteger')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            else if (type === 'LiteralString')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            else if (type === 'LiteralReal')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            scope.editValues.push(newValueSpec);
+            if (scope.element.type == 'Property' || scope.element.type == 'Port') {
+                scope.edit.defaultValue = newValueSpec;
+            }
+        };
+        scope.addValueType = 'LiteralString';
+        
+        scope.addEnumerationValue = function() {
+            var newValueSpec = UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            scope.editValues.push(newValueSpec);
+            if (scope.element.type == 'Property' || scope.element.type == 'Port') {
+                scope.edit.defaultValue = newValueSpec;
+            }
+        };
+
+        scope.removeVal = function(i) {
+            scope.editValues.splice(i, 1);
+        };
+    };
+
+    var setupValCf = function(scope) {
+        var data = scope.element;
+        if (data.type === 'Property' || data.type === 'Port') {
+            if (data.defaultValue) {
+                scope.values = [data.defaultValue];
+            } else {
+                scope.values = [];
+            }
+        }
+        if (data.type === 'Slot') {
+            scope.values = data.value;
+        }
+        if (data.type === 'Constraint' && data.specification) {
+            scope.values = [data.specification];
+        }
+        if (data.type === 'Expression') {
+            scope.values = data.operand;
+        }
+    };
+
     /**
      * @ngdoc function
      * @name mms.directives.Utils#save
@@ -64,6 +116,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         ElementService.updateElement(edit)
         .then(function(data) {
             deferred.resolve(data);
+            setupValCf(scope);
             $rootScope.$broadcast('element.updated', data, continueEdit);
         }, function(reason) {
             if (reason.status === 409) {
@@ -325,9 +378,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 if (!scope.editValues) {
                     scope.editValues = [];
                 }
+                /*
                 if (scope.isEnumeration && scope.editValues.length === 0) {
                     scope.editValues.push({type: 'InstanceValue', instanceId: null});
                 }
+                */
                 if (template) {
                     if (scope.recompileScope) {
                         scope.recompileScope.$destroy();
@@ -729,7 +784,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         hasHtml: hasHtml,
         isEnumeration: isEnumeration,
         getPropertySpec: getPropertySpec,
-        addPresentationElement: addPresentationElement
+        addPresentationElement: addPresentationElement,
+        setupValCf: setupValCf,
+        setupValEditFunctions: setupValEditFunctions
     };
 
 }
