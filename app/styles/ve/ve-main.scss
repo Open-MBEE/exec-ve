@@ -771,8 +771,18 @@ table caption {
 
 .btn.open-document{
   margin-left:10px;
-  .fa{
-    padding-right:6px;
+
+  a:visited,
+  a:hover,
+  a{
+    color:white;
+    text-decoration:none;
   }
+}
+
+.btn.open-document::before{
+  content: "\f064"; 
+  font-family: FontAwesome;
+  padding-right:6px;
 }
 
