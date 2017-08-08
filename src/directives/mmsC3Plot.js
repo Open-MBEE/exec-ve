@@ -28,81 +28,14 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
       if (!commitId)
           commitId = viewVersion.commitId;
   }
-  function xx(values){
-    
-    console.log(values);
-    
-    var result = [];
-    for (var key in values){
-        var value = values[key];
-        if ( value.hasOwnProperty(key) && value.constructor === Array) {
-            for ( var cao = 0; cao < value.length; cao++){
-              result[cao + '[' + cao + ']'] = xx(value[cao]);
-            }
-        }
-      
-        else if ( typeof value === "object"){
-          for (var co in value){
-            result[key + "." + co ] = xx(value[co]);
-          }
-        }
-        else {
-          console.log("value===============");
-          console.log(value);
-          result[key] = value;
-        }
-    }
-    return result;
-  }
-  /*
-  function xx2(fs, allkeys){
-      console.log("========s======fs");
-      fs = eval(fs);
-      console.log(fs);
-      for (var key in fs){
-          console.log( "key = " + key);
-        if ( fs.hasOwnProperty(key)){
-          //console.log( fs[key]);
-          //for (var key1 in fs[key]){
-            //console.log("key1 = " + key1);
-          //}s 
-          
-          console.log(typeof fs[key]);
-          if ( typeof fs[key] === "object"){
-            allkeys = allkeys + "." + key;
-            return xx(fs[key], allkeys);
-          }
-          else
-            return allkeys + "." + key + "======" + fs[key];
-        }
-      }
-    }
-    */
-    function convertToEvalString(values, allkeys){
+   function convertToEvalString(values, allkeys){
       values = eval(values);
       var results = [];
       var counter = 0;
       for (var key in values){
         if ( values.hasOwnProperty(key)){
           var value = values[key];
-          //console.log(typeof value);
           if ( typeof value === "object"){
-            //console.log("!!!!!!!!!!!!!!!!111");
-            //console.log(allkeys + "." + key);
-            /*var aa = allkeys + "." + key;
-            var zz = aa.indexOf('.') +1;
-            var all = aa.substr(zz);
-            //console.log("all = " + all);
-            //console.log(c3json[all]);  
-                      
-            if (c3json[all] === undefined){
-                console.log("!!!!!!!!!!undefine!!!");
-                var evalString0 = ['c3json.'+ all, '=', '{}'].join(' ');
-                console.log(evalString0); 
-                //eval(evalString0);
-                console.log(c3json[all]);
-              }
-            */
             var resultValue = convertToEvalString(value, allkeys + "." + key);
             results[counter] = resultValue;
           }
@@ -157,6 +90,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
       svg.append('div').attr("id", 'c3chart' + scope.$id);
       c3json.bindto = '#c3chart' + scope.$id;
       
+
       c3json.data.columns = _columns;
       if ( scope.plot.functions !== undefined && scope.plot.functions.length !== 0){
         var c3jfunc = JSON.parse(scope.plot.functions.replace(/'/g, '"'));
@@ -179,11 +113,8 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
             //create a variable recursively
             if (parent[keysInArray[iii][jj]] === undefined){
               var evs_iijj = ['c3json.'+ keysInDot, '=', '{}'].join(' ');
-              console.log("!creating a variable: " + evs_iijj);
               eval(evs_iijj); 
             }
-            else
-              console.log(keysInDot + " is already defined.");
             parent = parent[keysInArray[iii][jj]];
             keysInDot += ".";
           }
@@ -191,41 +122,12 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
           var lastIndex_iijj = keysInArray[iii].length - 1 ;
           //create a function
           var evs2_iijj = "[c3json." + keysInDot + "= (" + keysInArray[iii][lastIndex_iijj] + ")]"; 
-          console.log("!executing a function: "+ evs2_iijj);
           eval(evs2_iijj);
         }
     }
     
     var json = JSON.stringify(c3json);
-    console.log(json);
     var chart = c3.generate(c3json);
-    
-    /*var zz2 = {bindto:'#c3chart' + scope.$id + _index,
-    data: {
-        type: 'line',
-        types: {
-            data3: 'bar',
-            data4: 'bar',
-            data6: 'area',
-        },
-        groups: [
-            ['data3','data4']
-        ],
-        columns: [
-            ['data1', 30, 20, 50, 40, 60, 50],
-            ['data2', 200, 130, 90, 240, 130, 220],
-            ['data3', 300, 200, 160, 400, 250, 250],
-            ['data4', 200, 130, 90, 240, 130, 220],
-            ['data5', 130, 120, 150, 140, 160, 150],
-            ['data6', 90, 70, 20, 50, 60, 120],
-        ]
-        
-    }
-  };
-    var json2 = JSON.stringify(zz2);
-    console.log(json2);
-    var chart = c3.generate(zz2);
-    */
 
 	}//end of vf_pplot()
   scope.render = function() {
@@ -243,22 +145,18 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
       if ( scope.plot.options === undefined || scope.plot.options.length === 0 ){
         if (scope.tableColumnHeadersLabel && scope.tableColumnHeadersLabel.length !== 0){
           c3options = JSON.parse('{"data": {"x": "x", "type": "line"},"axis" : {"x": {"type":"category", "tick":{"centered":true}}}}');
-          //c3options = JSON.parse('{"data": {"x": "x"}}'); //nothing displayed
-          //c3options = JSON.parse('{"data": {"x": "x"}, "axis" : {"x": {}}}'); //nothing displayed  
-          //c3options = JSON.parse('{"data": {"x": "x"}, "axis" : {"x": {"type" : "category"}}}');
         }
         else
           c3options = JSON.parse('{"data": {}}');  
       }
-      else 
+      else {
         c3options = JSON.parse(scope.plot.options.replace(/'/g, '"'));
+      }
  
       if ( c3options.data.xs === undefined && scope.tableColumnHeadersLabel.length !== 0){
           c3_data[0] = ['x'].concat(scope.tableColumnHeadersLabel);
           start_index = 0;
           has_column_header = true;
-          //if (isNaN(scope.tableColumnHeadersLabel[0]))        
-            //is_x_value_number = false;
       }
       else { //xs defined, then column headers are ignored even they exist.
         has_column_header = false;
