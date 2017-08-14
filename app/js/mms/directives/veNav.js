@@ -88,7 +88,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.0.0';
+            scope.veV = '3.0.3';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
@@ -135,6 +135,10 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
             window.open(address ,'_blank');
         };
+        AuthService.checkLogin().then(function(data) {
+            scope.username = data;
+        });
+        
     };
 
     return {

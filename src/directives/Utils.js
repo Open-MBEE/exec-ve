@@ -20,10 +20,10 @@ angular.module('mms.directives')
  *
  */
 function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, CacheService, ElementService, ViewService, UtilsService, growl, _) {
-  
+
     var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
-  
+
     var conflictCtrl = function($scope, $uibModalInstance) {
         $scope.ok = function() {
             $uibModalInstance.close('ok');
@@ -39,22 +39,74 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         };
     };
 
+    var setupValEditFunctions = function(scope) {
+        scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
+        scope.addValue = function(type) {
+            var newValueSpec = null;
+            if (type === 'LiteralBoolean')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            else if (type === 'LiteralInteger')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            else if (type === 'LiteralString')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            else if (type === 'LiteralReal')
+                newValueSpec = UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            scope.editValues.push(newValueSpec);
+            if (scope.element.type == 'Property' || scope.element.type == 'Port') {
+                scope.edit.defaultValue = newValueSpec;
+            }
+        };
+        scope.addValueType = 'LiteralString';
+        
+        scope.addEnumerationValue = function() {
+            var newValueSpec = UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id});
+            scope.editValues.push(newValueSpec);
+            if (scope.element.type == 'Property' || scope.element.type == 'Port') {
+                scope.edit.defaultValue = newValueSpec;
+            }
+        };
+
+        scope.removeVal = function(i) {
+            scope.editValues.splice(i, 1);
+        };
+    };
+
+    var setupValCf = function(scope) {
+        var data = scope.element;
+        if (data.type === 'Property' || data.type === 'Port') {
+            if (data.defaultValue) {
+                scope.values = [data.defaultValue];
+            } else {
+                scope.values = [];
+            }
+        }
+        if (data.type === 'Slot') {
+            scope.values = data.value;
+        }
+        if (data.type === 'Constraint' && data.specification) {
+            scope.values = [data.specification];
+        }
+        if (data.type === 'Expression') {
+            scope.values = data.operand;
+        }
+    };
+
     /**
      * @ngdoc function
      * @name mms.directives.Utils#save
      * @methodOf mms.directives.Utils
-     * 
-     * @description 
+     *
+     * @description
      * save edited element
-     * 
+     *
      * @param {object} edit the edit object to save
      * @param {object} [editorApi=null] optional editor api
      * @param {object} scope angular scope that has common functions
      * @return {Promise} promise would be resolved with updated element if save is successful.
      *      For unsuccessful saves, it will be rejected with an object with type and message.
      *      Type can be error or info. In case of conflict, there is an option to discard, merge,
-     *      or force save. If the user decides to discord or merge, type will be info even though 
-     *      the original save failed. Error means an actual error occured. 
+     *      or force save. If the user decides to discord or merge, type will be info even though
+     *      the original save failed. Error means an actual error occured.
      */
     var save = function(edit, editorApi, scope, continueEdit) {
         var deferred = $q.defer();
@@ -64,6 +116,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         ElementService.updateElement(edit)
         .then(function(data) {
             deferred.resolve(data);
+            setupValCf(scope);
             $rootScope.$broadcast('element.updated', data, continueEdit);
         }, function(reason) {
             if (reason.status === 409) {
@@ -102,12 +155,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
      * @ngdoc function
      * @name mms.directives.Utils#hasEdits
      * @methodOf  mms.directives.Utils
-     * 
-     * @description 
+     *
+     * @description
      * whether editing object has changes compared to base element,
-     * currently compares name, doc, property values, if element is not 
+     * currently compares name, doc, property values, if element is not
      * editable, returns false
-     * 
+     *
      * @param {object} editOb edit object
      * @return {boolean} has changes or not
      */
@@ -135,10 +188,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
      * @ngdoc function
      * @name mms.directives.Utils#revertEdits
      * @methodOf mms.directives.Utils
-     * 
-     * @description 
+     *
+     * @description
      * reset editing object back to base element values for name, doc, values
-     * 
+     *
      * @param {object} editOb scope with common properties
      * @param {object} editorApi editor api to kill editor if reverting changes
      */
@@ -181,10 +234,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
      * @ngdoc function
      * @name mms.directives.Utils#isEnumeration
      * @methodOf mms.directives.Utils
-     * 
-     * @description 
-     * Check if element is enumeration and if true get enumerable options 
-     * 
+     *
+     * @description
+     * Check if element is enumeration and if true get enumerable options
+     *
      * @param {object} elementOb element object
      * @return {Promise} promise would be resolved with options and if object is enumerable.
      *      For unsuccessful saves, it will be rejected with an object with reason.
@@ -195,9 +248,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             var isEnumeration = true;
             var reqOb = {
                 elementId: elementOb.id,
-                projectId: elementOb._projectId, 
-                refId: elementOb._refId, 
-                commitId: elementOb._commitId,
+                projectId: elementOb._projectId,
+                refId: elementOb._refId,
                 depth: 1
             };
             ElementService.getOwnedElements(reqOb).then(
@@ -235,7 +287,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
             return deferred.promise;
         }
-        // Get defining feature or type info 
+        // Get defining feature or type info
         var reqOb = {elementId: id, projectId: elementOb._projectId, refId: elementOb._refId};
         ElementService.getElement(reqOb)
         .then(function(value) {
@@ -244,7 +296,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                     deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
                     return;
                 }
-                //if it is a slot 
+                //if it is a slot
                 reqOb.elementId = value.typeId;
                 ElementService.getElement(reqOb) //this gets tyep of defining feature
                 .then(function(val) {
@@ -276,14 +328,14 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         });
         return deferred.promise;
     };
-    
+
     /**
     * @ngdoc function
     * @name mms.directives.Utils#startEdit
     * @methodOf mms.directives.Utils
     * @description
     * called by transcludes and section, adds the editing frame
-    * uses these in the scope: 
+    * uses these in the scope:
     *   element - element object for the element to edit (for sections it's the instance spec)
     *   isEditing - boolean
     *   commitId - calculated commit id
@@ -326,9 +378,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 if (!scope.editValues) {
                     scope.editValues = [];
                 }
+                /*
                 if (scope.isEnumeration && scope.editValues.length === 0) {
                     scope.editValues.push({type: 'InstanceValue', instanceId: null});
                 }
+                */
                 if (template) {
                     if (scope.recompileScope) {
                         scope.recompileScope.$destroy();
@@ -364,7 +418,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
     * @methodOf mms.directives.Utils
     * @description
     * called by transcludes and section, saves edited element
-    * uses these in the scope: 
+    * uses these in the scope:
     *   element - element object for the element to edit (for sections it's the instance spec)
     *   elementSaving - boolean
     *   isEditing - boolean
@@ -418,7 +472,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
     * @methodOf mms.directives.Utils
     * @description
     * called by transcludes and section, cancels edited element
-    * uses these in the scope: 
+    * uses these in the scope:
     *   element - element object for the element to edit (for sections it's the instance spec)
     *   edit - edit object
     *   elementSaving - boolean
@@ -537,7 +591,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
     * @methodOf mms.directives.Utils
     * @description
     * called by transcludes and section, previews edited element
-    * uses these in the scope: 
+    * uses these in the scope:
     *   element - element object for the element to edit (for sections it's the instance spec)
     *   edit - edit object
     *   elementSaving - boolean
@@ -608,6 +662,115 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         }, 500, false);
     };
 
+    var addPeCtrl = function($scope, $uibModalInstance, $filter) {
+        $scope.oking = false;
+        $scope.newPe = {name:''};
+        $scope.createForm = true;
+
+        var addPECallback = function(elementOb) {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+            var instanceVal = {
+                instanceId: elementOb.id,
+                type: "InstanceValue"
+            };
+            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
+                .then(function(data) {
+                    // Broadcast message to TreeCtrl:
+                    // $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
+                    $rootScope.$broadcast('view-reorder.refresh');
+                    $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
+                    growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                    $uibModalInstance.close(data);
+                }, function(reason) {
+                    growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                }).finally(function() {
+                $scope.oking = false;
+            });
+        };
+
+        var peFilterQuery = function () {
+            var classIdOb = {};
+            if ($scope.presentationElemType === 'Table') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.TableT;
+            } else if ($scope.presentationElemType === 'List') {
+                classIdOb.classifierIds  = ViewService.TYPE_TO_CLASSIFIER_ID.ListT;
+            } else if ($scope.presentationElemType === 'Image') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.Figure;
+            } else if ($scope.presentationElemType === 'Paragraph') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT;
+            } else if ($scope.presentationElemType === 'Section') {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.SectionT;
+            } else {
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType];
+            }
+            var obj = {};
+            obj.term = classIdOb;
+            return obj;
+        };
+
+        $scope.searchOptions = {
+            callback: addPECallback,
+            itemsPerPage: 200,
+            filterQueryList: [peFilterQuery]
+        };
+
+        $scope.ok = function() {
+            if ($scope.oking) {
+                growl.info("Please wait...");
+                return;
+            }
+            $scope.oking = true;
+            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
+            .then(function(data) {
+                var elemType = $scope.presentationElemType.toLowerCase();
+                // $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
+                $rootScope.$broadcast('view-reorder.refresh');
+                $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
+                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                $uibModalInstance.close(data);
+            }, function(reason) {
+                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });
+        };
+
+        $scope.cancel = function() {
+            $uibModalInstance.dismiss();
+        };
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.directives.Utils#addPresentationElement
+     * @methodOf mms.directives.Utils
+     *
+     * @description
+     * Utility to add a new presentation element to view or section
+     *
+     * @param {Object} scope controller scope, expects $scope.ws (string) and $scope.site (object) to be there
+     * @param {string} type type of presentation element (Paragraph, Section)
+     * @param {Object} viewOrSection the view or section (instance spec) object
+     */
+    var addPresentationElement = function($scope, type, viewOrSectionOb) {
+        $scope.viewOrSectionOb = viewOrSectionOb;
+        $scope.presentationElemType = type;
+        var templateUrlStr = 'partials/mms/add-pe.html';
+
+        var instance = $uibModal.open({
+            templateUrl: templateUrlStr,
+            scope: $scope,
+            controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
+        });
+        instance.result.then(function(data) {
+              // TODO: do anything here?
+        });
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -620,7 +783,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
         hasHtml: hasHtml,
         isEnumeration: isEnumeration,
-        getPropertySpec: getPropertySpec
+        getPropertySpec: getPropertySpec,
+        addPresentationElement: addPresentationElement,
+        setupValCf: setupValCf,
+        setupValEditFunctions: setupValEditFunctions
     };
 
 }

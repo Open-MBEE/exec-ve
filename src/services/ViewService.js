@@ -632,10 +632,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 clone[key].ownerId = isSection(viewOrSectionOb) ? viewOrSectionOb.id : viewOrSectionOb.id + "_vc";
             }
         }
-        if (addPeIndex >= -1)
+        if (addPeIndex >= -1) {
             clone[key].operand.splice(addPeIndex+1, 0, UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
-        else
-        clone[key].operand.push(UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
+        } else {
+            clone[key].operand.push(UtilsService.createValueSpecElement({instanceId: newInstanceId, type: "InstanceValue", id: UtilsService.createMmsId(), ownerId: clone[key].id}));
+        }
+        clone = ElementService.fillInElement(clone);
         var toCreate = [instanceSpec, clone];
         /*
         if (newData && newDataSInstance) {
@@ -735,8 +737,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             stereotypedElementId: newViewId
         });
         var toCreate = [view, asi];
-        if (parentView)
+        if (parentView) {
+            parentView = ElementService.fillInElement(parentView);
             toCreate.push(parentView);
+        }
         var reqOb = {
             projectId: ownerOb._projectId,
             refId: ownerOb._refId,
@@ -775,9 +779,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         docOb.isDoc = true;
         createView(ownerOb, docOb)
             .then(function(data2) {
+                if (ownerOb && ownerOb.id.indexOf("holding_bin") < 0) {
+                    data2._groupId = ownerOb.id;
+                }
                 var cacheKey = ['documents', ownerOb._projectId, ownerOb._refId];
-                if (CacheService.exists(cacheKey))
+                if (CacheService.exists(cacheKey)) {
                     CacheService.get(cacheKey).push(data2);
+                }
                 deferred.resolve(data2);
             }, function(reason) {
                 deferred.reject(reason);
