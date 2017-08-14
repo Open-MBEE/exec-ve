@@ -12,7 +12,7 @@
         </div>
         <div class="form-group">
             <label>Description:</label>
-            <textarea class="form-control" ng-model="configuration.description"></textarea>
+            <textarea class="form-control" ng-model="branch.description"></textarea>
         </div>
         <div class="form-group">
             <label>Permission:</label>
@@ -24,14 +24,13 @@
         <div class="form-group">
             <label>Point in History:</label>
                 <form> 
-                    <input id="most-recent" type="radio" name="history-point">
+                    <input id="most-recent" type="radio" name="most recent" ng-model="branch.lastCommit" value="true">
                     <label for="most-recent">Most Recent</label>
                     <br>
-                    <input id="specify-point" type="radio" name="history-point">
+                    <input id="specify-point" type="radio" name="specify point" ng-model="branch.lastCommit" value="false">
                     <label for="specify-point">Specify a timestamp (YYYY-MM-DDTHH:MM:SS)</label>
                     <div class="indent">
-                        <input class="form-control" ng-model="configuration.timestamp" type="datetime-local" ng-change="updateTimeOpt()" placeholder="YYYY-MM-DDTHH:MM:SS">
-                        </input>
+                        <input class="form-control" ng-model="branch.timestamp" type="datetime-local" ng-change="updateTimeOpt()" placeholder="YYYY-MM-DDTHH:MM:SS">
                     </div>
                 </form>
             </div>

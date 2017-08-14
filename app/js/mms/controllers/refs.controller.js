@@ -186,6 +186,12 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             $scope.branch.name = "";
             $scope.branch.description = "";
             $scope.branch.permission = "read";
+            $scope.branch.lastCommit = "true";
+            $scope.branch.timestamp = new Date();
+            displayName = "Tag";
+            $scope.updateTimeOpt = function () {
+                $scope.branch.lastCommit ='false';
+            };
             displayName = "Branch";
         } else if ($scope.itemType === 'Tag') {
             $scope.configuration = {};
