@@ -8,27 +8,24 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     var c3 = $window.c3;
     scope.rowHeaders=[]; //not null when render is called 1st time.      
     var d3 = $window.d3;  
-    var svg = d3.select(element[0])
-      .append('div');
+    var svg = d3.select(element[0]).append('div');
     
     var processed = false;
-    var ws = scope.mmsWs;
-    var version = scope.mmsVersion;
  
-  var projectId;
-  var refId;
-  var commitId;
-        
-  if (mmsViewCtrl) {
-      var viewVersion = mmsViewCtrl.getElementOrigin();
-      if (!projectId)
-          projectId = viewVersion.projectId;
-      if (!refId)
-          refId = viewVersion.refId;
-      if (!commitId)
-          commitId = viewVersion.commitId;
-  }
-   function convertToEvalString(values, allkeys){
+    var projectId;
+    var refId;
+    var commitId;
+          
+    if (mmsViewCtrl) {
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (!projectId)
+            projectId = viewVersion.projectId;
+        if (!refId)
+            refId = viewVersion.refId;
+        if (!commitId)
+            commitId = viewVersion.commitId;
+    }
+    function convertToEvalString(values, allkeys){
       values = eval(values);
       var results = [];
       var counter = 0;
@@ -141,27 +138,25 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     var start_index; //0 if column header is included as data, -1 if column header is not included as data
     var c3_data=[];
 
-      var c3options;    
-      if ( scope.plot.options === undefined || scope.plot.options.length === 0 ){
-        if (scope.tableColumnHeadersLabel && scope.tableColumnHeadersLabel.length !== 0){
-          c3options = JSON.parse('{"data": {"x": "x", "type": "line"},"axis" : {"x": {"type":"category", "tick":{"centered":true}}}}');
-        }
-        else
-          c3options = JSON.parse('{"data": {}}');  
-      }
-      else {
-        c3options = JSON.parse(scope.plot.options.replace(/'/g, '"'));
-      }
- 
-      if ( c3options.data.xs === undefined && scope.tableColumnHeadersLabel.length !== 0){
-          c3_data[0] = ['x'].concat(scope.tableColumnHeadersLabel);
-          start_index = 0;
-          has_column_header = true;
-      }
-      else { //xs defined, then column headers are ignored even they exist.
-        has_column_header = false;
-        start_index = -1;
-      }
+    var c3options;    
+    if ( scope.plot.options === undefined || scope.plot.options.length === 0 ){
+      if (scope.tableColumnHeadersLabel && scope.tableColumnHeadersLabel.length !== 0)
+        c3options = {data: {x: "x", type: "line"}, axis : {x: {type:"category", tick:{centered:true}}}};
+      else 
+        c3options = {data: {}};
+    }
+    else 
+      c3options = JSON.parse(scope.plot.options.replace(/'/g, '"'));
+
+    if ( c3options.data.xs === undefined && scope.tableColumnHeadersLabel.length !== 0){
+        c3_data[0] = ['x'].concat(scope.tableColumnHeadersLabel);
+        start_index = 0;
+        has_column_header = true;
+    }
+    else { //xs defined, then column headers are ignored even they exist.
+      has_column_header = false;
+      start_index = -1;
+    }
 
     for ( var i = 0; i < scope.datavalues.length; i++){
 	     var c3_data_row=[];
@@ -192,7 +187,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
    
     var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};
 
-    TableService.readTable (reqOb, ws, version)
+    TableService.readTable (reqOb)
       .then(function(value) {
         scope.tableColumnHeadersLabel = value.tableColumnHeadersLabels;
         scope.tableRowHeaders = value.tableRowHeaders;
