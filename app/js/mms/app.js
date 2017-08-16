@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     
@@ -89,30 +89,58 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl) {
+                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
+                    // Note: localStorage and sessionStorage both extend Storage. There is no difference 
+                    // between them except for the intended "non-persistence" of sessionStorage.
+                    // That is, the data stored in localStorage persists until explicitly deleted. 
+                    // Changes made are saved and available for all current and future visits to the site.
+                    // For sessionStorage, changes are only available per window
+                    //  (or tab in browsers like Chrome and Firefox). Changes made are saved and available for
+                    //  the current page, as well as future visits to the site on the same window. 
+                    //  Once the window is closed, the storage is deleted.
+                    //  https://stackoverflow.com/questions/5523140/html5-local-storage-vs-session-storage
                     $rootScope.ve_title = 'View Editor'; //what to name this?
                     $scope.orgs = orgObs; 
                     var orgId, projectId;
                     $scope.selectOrg = function(org) {
                         if (org) {
-                            orgId = org.id;
-                            $scope.selectedOrg = org.name;
-                            $scope.selectedProject = "";
+                            $localStorage.org = org;
+                            orgId = $localStorage.org.id;
+                            $localStorage.org.orgName = org.name;
+                            $scope.selectedOrg = $localStorage.org.orgName;
+                            $scope.selectedProject = ($localStorage.project) ? $localStorage.project.name: ""; // default here?
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
                                 if (data.length > 0) {
-                                    $scope.selectProject(data[0]);
-                                } else {
-                                    //no projects
+                                    if($localStorage.project && checkForProject(data, $localStorage.project) === 1){
+                                        $scope.selectedProject = $localStorage.project.name;
+                                    }else{
+                                        $scope.selectProject(data[0]);
+                                    }
                                 }
                             });
                         }
                     };
                     $scope.selectProject = function(project) { 
                         if (project) {
-                            $scope.selectedProject = project.name;
-                            projectId = project.id;
+                            $localStorage.project = project;
+                            $scope.selectedProject = $localStorage.project.name;
+                            projectId = $localStorage.project.id;
                         }
+                    };
+                    if($localStorage.org){
+                        $scope.selectOrg($localStorage.org);
+                    }
+                    if($localStorage.project){
+                        $scope.selectProject($localStorage.project);
+                    }
+                    var checkForProject = function(projectArray, project) {
+                        for (var i = 0; i < projectArray.length; i++) {
+                            if(projectArray[i].id === project.id){
+                                return 1;
+                            } 
+                        }
+                        return 0;
                     };
                     $scope.spin = false; 
                     $scope.continue = function() {
