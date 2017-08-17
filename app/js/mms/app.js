@@ -91,10 +91,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 templateUrl: 'partials/mms/select.html',
                 controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
+                    $localStorage.$default({org: orgObs[0]});
                     $scope.orgs = orgObs;
                     var orgId, projectId;
-                    orgId = $scope.orgs[0].id; 
-                    $scope.selectedOrg = $scope.orgs[0].name;  
                     $scope.selectOrg = function(org) {
                         if (org) {
                             $localStorage.org = org;
@@ -123,11 +122,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     };
                     if($localStorage.org){
                         $scope.selectOrg($localStorage.org);
-                    }else{
-                        $scope.selectOrg($scope.orgs[0]);
-                    }
-                    if($localStorage.project){
-                        $scope.selectProject($localStorage.project);
                     }
                     var checkForProject = function(projectArray, project) {
                         for (var i = 0; i < projectArray.length; i++) {
