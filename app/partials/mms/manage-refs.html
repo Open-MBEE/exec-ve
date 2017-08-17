@@ -42,7 +42,7 @@
                             <dd ng-hide="refSelected.status === 'creating'" class="link-section">
                                 <a ui-sref="project.ref({refId: refSelected.id, search: undefined})" ui-sref-opts="{reload:true}">Project Documents</a>
                             </dd>
-                            <dd ng-hide="refSelected.status !== 'creating'" class="link-section">
+                            <dd ng-show="refSelected.status === 'creating'" class="link-section">
                                 <span uib-tooltip-html="htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"
                                     tooltip-append-to-body="refSelected.status == 'creating'" tooltip-enable="refSelected.status == 'creating'" 
                                     ng-class="{'branch-disabled': refSelected.status == 'creating'}">Project Documents</span>
