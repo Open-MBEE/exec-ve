@@ -100,7 +100,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             orgId = org.id;
                             $localStorage.org.orgName = org.name;
                             $scope.selectedOrg = ($localStorage.org) ? $localStorage.org.name: $scope.orgs[0].name;
-                            $scope.selectedProject = ($localStorage.project) ? $localStorage.project.name: ""; // default here?
+                            $scope.selectedProject = ""; // default here?
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
                                 if (data.length > 0) {
