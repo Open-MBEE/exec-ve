@@ -106,6 +106,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 if (data.length > 0) {
                                     if($localStorage.project && checkForProject(data, $localStorage.project) === 1){
                                         $scope.selectedProject = $localStorage.project.name;
+                                        projectId = $localStorage.project.id;
                                     }else{
                                         $scope.selectProject(data[0]);
                                     }
