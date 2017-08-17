@@ -214,46 +214,6 @@ ul.ve-light-list {
     padding: 4px;
   }
 
-  /* Add labels to icons*/
-  .tree-add-branch:after {
-    content: "Branch";
-  }
-
-  .tree-add-tag:after {
-    content: "Tag";
-  }
-
-  .tree-add-tag .fa:before {
-    content: "\f067";
-  }
-
-  .tree-delete:after {
-    content: "Delete";
-  }
-
-  .tree-add-tag,
-  .tree-add-branch {
-    background-color: $ve-green-base;
-    float: right;
-  }
-
-  .tree-add-tag:hover,
-  .tree-add-branch:hover {
-    background-color: $ve-green-darker-1;
-    text-decoration: none;
-  }
-
-  .tree-delete {
-    color: $ve-teal-darker-1;
-    float: left;
-  }
-
-  .tree-delete:hover {
-    color: $ve-teal-darker-2;
-    background-color: white;
-    text-decoration: none;
-  }
-
   span.branch-disabled::before{
     font-family:FontAwesome;
     content: "\2026";

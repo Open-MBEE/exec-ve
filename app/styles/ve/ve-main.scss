@@ -78,7 +78,7 @@ div.tooltip-inner {
 3. Table filtering
 4. Search
 5. Modal fixes
-6. Create branch
+6. Create ref
 7. 404 bookmark
 8. Open document button
 
@@ -725,10 +725,10 @@ table caption {
 }
 
 /*------------------------------------------------------------------
-6. New Branch
+6. New Ref
 -------------------------------------------------------------------*/
 
-.ve-new-branch{
+.ve-new-ref{
   input[type="radio"]{
     margin:0 4px;
   }

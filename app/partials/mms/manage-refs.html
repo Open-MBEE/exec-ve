@@ -30,11 +30,16 @@
                     <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
                         <div class="panels-detail-title">
                             <h3>{{refSelected.name}}</h3>
-                            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+                            <span class="" style="float:right">
+                            <button class="btn btn-tertiary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="deleteRef()" ng-if="refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
+                            <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addTag()"><i class="fa fa-plus"></i> Tag</button>
+                            <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addBranch()"><i class="fa fa-plus"></i> Branch</button>
+                            </span>
+                            <!-- <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar> -->
                         </div>
                         <dl class="dl-horizontal">
                             <dt></dt>
-                            <dd ng-hide="refSelected.status == 'creating'" class="link-section">
+                            <dd ng-hide="refSelected.status === 'creating'" class="link-section">
                                 <a ui-sref="project.ref({refId: refSelected.id, search: undefined})" ui-sref-opts="{reload:true}">Project Documents</a>
                             </dd>
                             <dd ng-hide="refSelected.status !== 'creating'" class="link-section">
@@ -52,8 +57,8 @@
                             <dd>{{refSelected._created}}</dd>
                             <dt>Creator</dt>
                             <dd>{{refSelected._creator}}</dd>
-                            <dt>Last Modified</dt>
-                            <dd>{{refSelected._modified}}</dd>
+                            <!-- <dt>Last Modified</dt>
+                            <dd>{{refSelected._modified}}</dd> -->
                             <dt>Modifier</dt>
                             <dd>{{refSelected._modifier}}</dd>
                             <dt>Parent Ref</dt>
