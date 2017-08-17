@@ -207,6 +207,7 @@ div.tooltip-inner {
 
   .modal-body {
     padding: 16px 15px 30px;
+    overflow:visible;
   }
 
   .modal-title {
@@ -586,6 +587,10 @@ span.fixed-content-dropdown{
   }
 }
 
+.modal-body>.ve-light-tabs{
+  margin:-15px -15px 20px;
+}
+
 /*------------------------------------------------------------------
   2.5 Banners
 -------------------------------------------------------------------*/
@@ -682,6 +687,12 @@ table caption {
   -webkit-flex-direction: column;
   flex-direction: column;
   overflow: auto;
+}
+
+/*hack for overriding cut off content in dropdown modal*/
+.ve-dropdown-short-modal .modal-dialog,
+.ve-dropdown-short-modal .modal-content{
+  overflow: visible;
 }
 
 .modal-header{
