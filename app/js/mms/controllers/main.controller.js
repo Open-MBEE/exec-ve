@@ -99,10 +99,10 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             });
         });
     });
-    // broadcast mms.unauthorized every minute with interval service
+    // broadcast mms.unauthorized every 10 minutes with interval service
     $interval(function() {
         $rootScope.$broadcast("mms.unauthorized");
-    }, 60000, 0, false);
+    }, 600000, 0, false);
 
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
