@@ -92,6 +92,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
                     $localStorage.$default({org: orgObs[0]});
+                    $scope.spin = false;
                     $scope.orgs = orgObs;
                     var orgId, projectId;
                     $scope.selectOrg = function(org) {
@@ -99,7 +100,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             $localStorage.org = org;
                             orgId = org.id;
                             $localStorage.org.orgName = org.name;
-                            $scope.selectedOrg = ($localStorage.org) ? $localStorage.org.name: $scope.orgs[0].name;
+                            $scope.selectedOrg = $localStorage.org.name;
                             $scope.selectedProject = ""; // default here?
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
@@ -114,14 +115,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             });
                         }
                     };
-                    $scope.selectProject = function(project) { 
+                    $scope.selectProject = function(project) {
                         if (project) {
                             $localStorage.project = project;
                             $scope.selectedProject = $localStorage.project.name;
                             projectId = $localStorage.project.id;
                         }
                     };
-                    if($localStorage.org){
+                    if ($localStorage.org) {
                         $scope.selectOrg($localStorage.org);
                     }
                     var checkForProject = function(projectArray, project) {
@@ -132,7 +133,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         }
                         return 0;
                     };
-                    $scope.spin = false; 
+                    
                     $scope.continue = function() {
                         if (orgId && projectId) {
                             $scope.spin = true;
