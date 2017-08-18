@@ -229,24 +229,18 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         } else {
             url = URLService.getRefHistoryURL(projectId, refId);
         }
-        var cacheKey = ['history', projectId, refId];
-        if (CacheService.exists(cacheKey)) {
-            deferred.resolve(CacheService.get(cacheKey));
-        } else {
-            inProgress[url] = deferred.promise;
-            $http.get(url).then(function(response) {
-                if (!angular.isArray(response.data.commits) || response.data.commits.length === 0) {
-                    deferred.reject({status: 500, data: '', message: "Error: Project does not exist at specified time."});
-                    return;
-                }
-                CacheService.put(cacheKey, response.data.commits, true);
-                deferred.resolve(CacheService.get(cacheKey));
-            }, function(response) {
-                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-            }).finally(function() {
-                delete inProgress[url];
-            });
-        }
+        inProgress[url] = deferred.promise;
+        $http.get(url).then(function(response) {
+            if (!angular.isArray(response.data.commits) || response.data.commits.length === 0) {
+                deferred.reject({status: 500, data: '', message: "Error: Project does not exist at specified time."});
+                return;
+            }
+            deferred.resolve(response.data.commits);
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        }).finally(function() {
+            delete inProgress[url];
+        });
         return deferred.promise;
     };
 
