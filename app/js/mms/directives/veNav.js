@@ -38,6 +38,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         scope.updateOrg = function() {
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
+                windowClass: 've-dropdown-short-modal',
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
 
