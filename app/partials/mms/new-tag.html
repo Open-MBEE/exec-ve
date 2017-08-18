@@ -23,7 +23,10 @@
                 <label for="most-recent">Most Recent</label>
                 <br>
                 <input id="specify-point" type="radio" name="specify point" ng-model="tag.lastCommit" ng-value="false">
-                <label for="specify-point">Specify a timestamp (YYYY-MM-DDTHH:MM:SS)</label>
+                <label for="specify-point">Specify a timestamp</label>
+                <div class="indent ve-secondary-text timestamp-format">
+                    <i>(YYYY-MM-DDTHH:MM:SS)</i>
+                </div>
                 <div class="indent">
                     <input class="form-control" ng-model="tag.timestamp" type="datetime-local" ng-change="updateTimeOpt()" placeholder="YYYY-MM-DDTHH:MM:SS">
                 </div>

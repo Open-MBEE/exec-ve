@@ -58,6 +58,7 @@
   .nav-tabs{
     border-color: $ve-silver-darker-1;
   }
+
 }
 
 
@@ -109,6 +110,14 @@ ul.ve-light-list {
     a {
       font-weight: 600;
     }
+  }
+
+  /*Indicates progress*/
+  a.ref-duplicating::after{
+    content:"(In Progress)";
+    font-style:italic;
+    font-weight:400;
+    padding-left:6px;
   }
 }
 
@@ -194,26 +203,6 @@ ul.ve-light-list {
       2.3.2.1 Buttons
 -------------------------------------------------------------------*/
 
-  /* Clearing icon row styling and adding labels for usability.*/
-  .view-tools {
-    border: none !important;
-    width: auto;
-    margin: 0 0 0 4px !important;
-    font-size: 12px;
-    margin-top: 4px;
-    text-transform: uppercase;
-    font-weight: 500;
-    color: white;
-    border-radius: 2px;
-    padding: 4px 10px 4px 4px;
-    letter-spacing: .14em;
-    box-shadow: none;
-  }
-
-  .view-tools .fa:before {
-    padding: 4px;
-  }
-
   span.branch-disabled::before{
     font-family:FontAwesome;
     content: "\2026";
@@ -232,4 +221,5 @@ ul.ve-light-list {
   dd.link-section > span.branch-disabled:hover{
     text-decoration:none;
   }
+
 }
