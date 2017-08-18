@@ -221,6 +221,29 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         return deferred.promise;
     };
 
+    var getRefHistory = function(refId, projectId, timestamp) {
+        var deferred = $q.defer();
+        var url;
+        if (timestamp !== null) {
+            url = URLService.getRefHistoryURL(projectId, refId, timestamp);
+        } else {
+            url = URLService.getRefHistoryURL(projectId, refId);
+        }
+        inProgress[url] = deferred.promise;
+        $http.get(url).then(function(response) {
+            if (!angular.isArray(response.data.commits) || response.data.commits.length === 0) {
+                deferred.reject({status: 500, data: '', message: "Error: Project does not exist at specified time."});
+                return;
+            }
+            deferred.resolve(response.data.commits);
+        }, function(response) {
+            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        }).finally(function() {
+            delete inProgress[url];
+        });
+        return deferred.promise;
+    };
+
     var createRef = function(refOb, projectId) {
         var deferred = $q.defer();
         var url = URLService.getRefsURL(projectId);
@@ -387,6 +410,7 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         getOrg: getOrg,
         getRefs: getRefs,
         getRef: getRef,
+        getRefHistory: getRefHistory,
         getGroups: getGroups,
         getGroup: getGroup,
         createRef: createRef,

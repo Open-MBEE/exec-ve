@@ -134,6 +134,13 @@ function urlService(baseUrl) {
         return addTicket(root + '/projects/' + projectId + '/refs/' + refId);
     };
 
+    var getRefHistoryURL = function(projectId, refId, timestamp) {
+        if (timestamp !== '' && isTimestamp(timestamp)) {
+            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history') + '&maxTimestamp=' + timestamp;
+        }
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history');
+    };
+
     var getGroupsURL = function(projectId, refId) {
         return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/groups');
     };
@@ -428,7 +435,7 @@ function urlService(baseUrl) {
             r += '&alf_ticket=' + ticket;
         else
             r += '?alf_ticket=' + ticket;
-        return r;    
+        return r;
     };
 
     var addExtended = function(url, extended) {
@@ -474,6 +481,7 @@ function urlService(baseUrl) {
         getProjectMountsURL: getProjectMountsURL,
         getRefsURL: getRefsURL,
         getRefURL: getRefURL,
+        getRefHistoryURL: getRefHistoryURL,
         getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
         getPutElementsURL: getPutElementsURL,

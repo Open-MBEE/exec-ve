@@ -58,6 +58,7 @@
   .nav-tabs{
     border-color: $ve-silver-darker-1;
   }
+
 }
 
 
@@ -109,6 +110,14 @@ ul.ve-light-list {
     a {
       font-weight: 600;
     }
+  }
+
+  /*Indicates progress*/
+  a.ref-duplicating::after{
+    content:"(In Progress)";
+    font-style:italic;
+    font-weight:400;
+    padding-left:6px;
   }
 }
 
@@ -194,66 +203,6 @@ ul.ve-light-list {
       2.3.2.1 Buttons
 -------------------------------------------------------------------*/
 
-  /* Clearing icon row styling and adding labels for usability.*/
-  .view-tools {
-    border: none !important;
-    width: auto;
-    margin: 0 0 0 4px !important;
-    font-size: 12px;
-    margin-top: 4px;
-    text-transform: uppercase;
-    font-weight: 500;
-    color: white;
-    border-radius: 2px;
-    padding: 4px 10px 4px 4px;
-    letter-spacing: .14em;
-    box-shadow: none;
-  }
-
-  .view-tools .fa:before {
-    padding: 4px;
-  }
-
-  /* Add labels to icons*/
-  .tree-add-branch:after {
-    content: "Branch";
-  }
-
-  .tree-add-tag:after {
-    content: "Tag";
-  }
-
-  .tree-add-tag .fa:before {
-    content: "\f067";
-  }
-
-  .tree-delete:after {
-    content: "Delete";
-  }
-
-  .tree-add-tag,
-  .tree-add-branch {
-    background-color: $ve-green-base;
-    float: right;
-  }
-
-  .tree-add-tag:hover,
-  .tree-add-branch:hover {
-    background-color: $ve-green-darker-1;
-    text-decoration: none;
-  }
-
-  .tree-delete {
-    color: $ve-teal-darker-1;
-    float: left;
-  }
-
-  .tree-delete:hover {
-    color: $ve-teal-darker-2;
-    background-color: white;
-    text-decoration: none;
-  }
-
   span.branch-disabled::before{
     font-family:FontAwesome;
     content: "\2026";
@@ -272,4 +221,5 @@ ul.ve-light-list {
   dd.link-section > span.branch-disabled:hover{
     text-decoration:none;
   }
+
 }
