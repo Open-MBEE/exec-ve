@@ -267,7 +267,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     refId: refOb.id
         }, 2).then(function(documentObs) {
             for (var i = 0; i < documentObs.length; i++) {
-                if (!documentObs[i]._groupId) {
+                if (!documentObs[i]._groupId || documentObs[i]._groupId == projectOb.id) {
                     $scope.treeData.push({
                         label: documentObs[i].name,
                         type: 'view',
