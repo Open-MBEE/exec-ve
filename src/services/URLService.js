@@ -51,6 +51,8 @@ function urlService(baseUrl) {
      * @returns {boolean} Returns true if the string has '-' in it
      */
     var isTimestamp = function(version) {
+        if (!version)
+            return false;
         if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim()))
             return true;
         return false;
