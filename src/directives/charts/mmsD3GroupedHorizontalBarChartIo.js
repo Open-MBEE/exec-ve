@@ -35,16 +35,21 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
         return data.colors !== undefined ? d3colorR[data.colors[i]] : d3colorR[i];
       }
       scopetableColumnHeadersLabel=[];                   
-      var processed = false;
-      var ws = scope.mmsWs;
-      var version = scope.mmsVersion;
-      if (mmsViewCtrl) {
-          var viewVersion = mmsViewCtrl.getWsAndVersion();
-          if (!ws)
-              ws = viewVersion.workspace;
-          if (!version)
-              version = viewVersion.version;
-      }
+    var processed = false;
+    var projectId;
+    var refId;
+    var commitId;
+          
+    if (mmsViewCtrl) {
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (!projectId)
+            projectId = viewVersion.projectId;
+        if (!refId)
+            refId = viewVersion.refId;
+        if (!commitId)
+            commitId = viewVersion.commitId;
+    }
+
       var opacitydefault = 1,//0.7,
           opacityselected = 1.0,
           opacitynotselected = 0.3;
@@ -86,9 +91,9 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
 
       function createFilters(data){
             //create only one filter display
-            d3.selectAll('.graphFilter.'+data.id).remove();
-            var graphFilter = d3.select('div.'+data.id).append('div')
-              .attr("class", 'graphFilter '+ data.id)
+            d3.selectAll('.graphFilter.'+data.id + scope.$id).remove();
+            var graphFilter = d3.select('div.'+data.id + scope.$id).append('div')
+              .attr("class", 'graphFilter '+ data.id + scope.$id)
               .style('margin-left', '10px');
             var filterLegendsDiv = graphFilter.append('div')
               .append('label').style('border', '1px solid #ddd')
@@ -99,10 +104,10 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
                 .data(data.legends)
                 .enter()  
                 .append("div")
-                .attr("class", function(d,i){return "legentFilter "+ data.id + " " + TableService.toValidId(d);} )
+                .attr("class", function(d,i){return "legentFilter "+ data.id +scope.$id + " " + TableService.toValidId(d);} )
                 .attr("style", function(d,i){return "opacity: " + opacitydefault + ";background-color:" + getColor(data,i) + ";";})
                 .on('mouseover', function (d, i) {
-                    mouseover("."+data.id+"." + TableService.toValidId(d));
+                    mouseover("."+data.id+scope.$id+"." + TableService.toValidId(d));
                 })
                 .on('mouseout', function (d, i) {
                     mouseout();
@@ -175,11 +180,12 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
               if ( dataIdDiv !== null)
                 dataIdDiv.append("h3").text(data.title);
 
-              d3.select(".ghbchart." + data.id).selectAll('*').remove();
-              var svg = d3.select(".ghbchart." + data.id);
+              d3.select(".ghbchart." + data.id + scope.$id).selectAll('*').remove();
+              var svg = d3.select(".ghbchart." + data.id + scope.$id);
+              //svg.selectAll('*').remove();
               if ( svg[0][0] === null) //first time
-                svg = dataIdDiv.append("svg").attr("class", "ghbchart " + data.id);
-              
+                svg = dataIdDiv.append("svg").attr("class", "ghbchart " + data.id + scope.$id);
+                //svg = dataIdDiv.append("svg").attr("class", "ghbchart " + data.id + scope.$id);
              
               var filteredDataValues = [];
               var filteredDataSysmlids=[];
@@ -253,7 +259,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
                   .attr("fill", function(d,i) { return filteredDataColors[i]; })
                   .style("fill-opacity", opacitydefault)
                   .attr("class", function(d,i){ 
-                    return "ghbbar "+ data.id + " " + filteredDataLegends[i] + " " + TableService.toValidId(filteredDataLabels[Math.floor(i/filteredDataLegends.length)]);
+                    return "ghbbar "+ data.id + scope.$id + " " + filteredDataLegends[i] + " " + TableService.toValidId(filteredDataLabels[Math.floor(i/filteredDataLegends.length)]);
                     })
                   .attr("width", x)
                   .attr("height", barHeight - 1)
@@ -276,7 +282,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
               // Add text label in bar
               bar.append("text")
                   //.attr("class", function(d,i){ return "ghbbar"+data.id + "-" +(i % data.series.length);})
-                  .attr("class", function(d,i){ return "ghbbar "+data.id + " " + filteredDataLegends[i];})
+                  .attr("class", function(d,i){ return "ghbbar "+data.id+scope.$id + " " + filteredDataLegends[i];})
                   .attr("x", function(d) { return x(d) - 3; })
                   .attr("y", barHeight / 2)
                   .attr("dy", ".35em")
@@ -318,7 +324,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
                   })
                   //.attr("class", function(d,i){ return "ghbbar"+(i % data.series.length);})
                   .on('mouseover', function (d, i){
-                     mouseover("."+ data.id+"."+ TableService.toValidId(d));
+                     mouseover("."+ data.id+scope.$id+"."+ TableService.toValidId(d));
                   })
                   .on('mouseout', function (d, i){
                     mouseout();
@@ -327,7 +333,7 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
              
               legend.append('rect')
                   //.attr('class', function(d,i){ return 'legendRect' + data.id+ "-" + (i % data.series.length);})
-                  .attr('class', function(d,i){ return 'legendRect ' + data.id+ " " + TableService.toValidId(d);})
+                  .attr('class', function(d,i){ return 'legendRect ' + data.id+scope.$id+ " " + TableService.toValidId(d);})
                   .attr('width', legendRectSize)
                   .attr('height', legendRectSize)
                   .style("fill-opacity", opacitydefault)
@@ -407,8 +413,12 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
                   values: [31, 28, 14, 8, 15, 21]
                 },]
             };*/
-            d3.select("."+ achartdata.id).remove();
-            var dataIdDiv = divchart.append('div').attr("class", achartdata.id)
+            d3.select("."+ achartdata.id + scope.$id).remove();
+            //console.log("scope.id==================");
+            //console.log(scope.$id);
+            //divchart.selectAll('*').remove();
+            var dataIdDiv = divchart.append('div')//.attr("id", achartdata.id+scope.$id)
+                                .attr("class", achartdata.id + scope.$id)
                                 .attr("style", 'border:1px solid #ddd');
             createGroupedHorizontalBarChart(achartdata, dataIdDiv);
             createFilters(achartdata);
@@ -441,8 +451,8 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
           d3.selectAll("rect").transition(200).style("fill-opacity", opacitynotselected);
           d3.selectAll("#"+eid).transition(200).style("fill-opacity", opacityselected);
       });
-      
-      TableService.readTables (scope.mmsEid,ws, version)
+      var reqOb = {elementId: scope.mmsEid, projectId: projectId, refId: refId, commitId: commitId};
+      TableService.readTables (reqOb)
          .then(function(value) {
             scopeTableTitles = value.tableTitles;
             scopeTableIds = value.tableIds;
@@ -464,6 +474,3 @@ function mmsD3GroupedHorizontalBarChartIo(ElementService, UtilsService, TableSer
       link: mmsChartLink
     }; //return
 }
-
-
-

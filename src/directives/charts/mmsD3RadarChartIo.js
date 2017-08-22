@@ -22,7 +22,7 @@
           .attr("width", w + 200);
         */
  
-          var divchart = d3.select(element[0]).append('div');
+        var divchart = d3.select(element[0]).append('div');
 
            /*var divchart = d3.select(element[0]) 
           .append("div")
@@ -34,16 +34,20 @@
             .attr("width", w + 200);
           */
          
-           var processed = false;
-            var ws = scope.mmsWs;
-            var version = scope.mmsVersion;
-            if (mmsViewCtrl) {
-                var viewVersion = mmsViewCtrl.getWsAndVersion();
-                if (!ws)
-                    ws = viewVersion.workspace;
-                if (!version)
-                    version = viewVersion.version;
-            }
+        var processed = false;
+        var projectId;
+        var refId;
+        var commitId;
+          
+    if (mmsViewCtrl) {
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (!projectId)
+            projectId = viewVersion.projectId;
+        if (!refId)
+            refId = viewVersion.refId;
+        if (!commitId)
+            commitId = viewVersion.commitId;
+    }
             scope.render = function() {
               if (scopetableColumnHeadersLabel.length === 0) return;
               var i, j, k;
@@ -90,9 +94,10 @@
              scope.$watch('legends', function(newVals, oldVals) {
                   return scope.render();
                   }, true);
-            
 
-             TableService.readTables (scope.mmsEid,ws, version)
+            var reqOb = {elementId: scope.mmsEid, projectId: projectId, refId: refId, commitId: commitId};
+
+             TableService.readTables (reqOb)
                .then(function(value) {
                   scopeTableTitles = value.tableTitles;
                   scopeTableIds = value.tableIds;
@@ -416,15 +421,10 @@
       restrict: 'EA',
       require: '?^mmsView',
        scope: {
-        /*data: '=', bidirectional
-        label: '@',  copied */
         mmsEid: '@',
-        //xx: '@',
         onClick: '&'
       },
-      //template:"<h3'>test</h3>",
       link: mmsRadarChartLink
-      //template: '<span>{{title}}{{labels}}{{values}}</span>'
     }; //return
  }
 

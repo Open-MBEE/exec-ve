@@ -12,16 +12,22 @@ function mmsD3ParallelAxisChartIo(ElementService, UtilsService, TableService, $c
       .append("svg:svg")
       .attr("class", "papchart");
         
-    var processed = false;
-    var ws = scope.mmsWs;
-    var version = scope.mmsVersion;
+    var projectId;
+    var refId;
+    var commitId;
+          
     if (mmsViewCtrl) {
-        var viewVersion = mmsViewCtrl.getWsAndVersion();
-        if (!ws)
-            ws = viewVersion.workspace;
-        if (!version)
-            version = viewVersion.version;
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (!projectId)
+            projectId = viewVersion.projectId;
+        if (!refId)
+            refId = viewVersion.refId;
+        if (!commitId)
+            commitId = viewVersion.commitId;
     }
+
+    var processed = false;
+    
     function vf_pplot(_out) {
         var outputs = _out;
         var width =900;
@@ -386,7 +392,9 @@ function mmsD3ParallelAxisChartIo(ElementService, UtilsService, TableService, $c
     var scopetableColumnHeadersLabel= [];
     var dataIdFilters = [];
 
-    TableService.readTables (scope.mmsEid,ws, version)
+    var reqOb = {elementId: scope.mmsEid, projectId: projectId, refId: refId, commitId: commitId};
+
+    TableService.readTables (reqOb)
       .then(function(value) {
         scopeTableTitles = value.tableTitles;
         scopeTableIds = value.tableIds;
