@@ -123,9 +123,9 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         }
     }
     
-    var json = JSON.stringify(c3json);
+    //var json = JSON.stringify(c3json);
+    //console.log(json);
     var chart = c3.generate(c3json);
-
 	}//end of vf_pplot()
   scope.render = function() {
 
@@ -157,21 +157,39 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
       has_column_header = false;
       start_index = -1;
     }
-
     for ( var i = 0; i < scope.datavalues.length; i++){
 	     var c3_data_row=[];
        
       for ( var j = 0; j < scope.datavalues[i].length; j++){
         var datavalue = null;
-
-        if (scope.datavalues[i][j].vatype === "Property" || scope.datavalues[i][j].type === "Port")
-          datavalue = scope.datavalues[i][j].defaultValue;
-        else if (scope.datavalues[i][j].type === "Slot")
-          datavalue = scope.datavalues[i][j].value[0];
-        if (datavalue && datavalue.type === "LiteralString")
-          c3_data_row[j] = Number(datavalue.value);
-        else if (datavalue && (datavalue.type === "LiteralReal" || datavalue.type === "LiteralInteger"))
-          c3_data_row[j] = datavalue.value;
+        
+        //not a number - it should be reference
+        if (isNaN(scope.datavalues[i][j])){
+          if ( scope.datavalues[i][j].type === "Class"){ //sourceProperty = "documentation"
+          
+            if ( scope.indexDocumentation.includes(i+","+j)){
+              if ( !isNaN(scope.datavalues[i][j].documentation))
+                c3_data_row[j] = Number(scope.datavalues[i][j].documentation);
+            }
+            else if (scope.indexName.includes(i+","+j)){
+              if ( !isNaN(scope.datavalues[i][j].name))
+                c3_data_row[j] = Number(scope.datavalues[i][j].name);
+            }
+          }
+          else {
+            if (scope.datavalues[i][j].type === "Property" || scope.datavalues[i][j].type === "Port")
+              datavalue = scope.datavalues[i][j].defaultValue;
+            else if (scope.datavalues[i][j].type === "Slot") //sourceProperty = "value"
+              datavalue = scope.datavalues[i][j].value[0];
+            
+            if (datavalue && datavalue.type === "LiteralString")
+              c3_data_row[j] = Number(datavalue.value);
+            else if (datavalue && (datavalue.type === "LiteralReal" || datavalue.type === "LiteralInteger"))
+              c3_data_row[j] = datavalue.value;
+          }
+        } //it is number
+        else
+          c3_data_row[j] = scope.datavalues[i][j];
       } //end of j
      	c3_data[1+start_index++] = [scope.tableRowHeaders[i].name].concat(c3_data_row);
     } //end of i
@@ -192,6 +210,8 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         scope.tableColumnHeadersLabel = value.tableColumnHeadersLabels;
         scope.tableRowHeaders = value.tableRowHeaders;
         scope.datavalues = value.datavalues; //[][] - array
+        scope.indexDocumentation = value.indexDocumentation;
+        scope.indexName = value.indexName;
       });
   }; //end of link
 
