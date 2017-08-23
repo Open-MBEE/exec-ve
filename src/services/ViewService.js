@@ -789,9 +789,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         docOb.isDoc = true;
         createView(ownerOb, docOb)
             .then(function(data2) {
+                if (ownerOb && ownerOb.id.indexOf("holding_bin") < 0) {
+                    data2._groupId = ownerOb.id;
+                }
                 var cacheKey = ['documents', ownerOb._projectId, ownerOb._refId];
-                if (CacheService.exists(cacheKey))
+                if (CacheService.exists(cacheKey)) {
                     CacheService.get(cacheKey).push(data2);
+                }
                 deferred.resolve(data2);
             }, function(reason) {
                 deferred.reject(reason);

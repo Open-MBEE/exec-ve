@@ -38,6 +38,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         scope.updateOrg = function() {
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
+                windowClass: 've-dropdown-short-modal',
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
 
@@ -88,7 +89,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.0.0';
+            scope.veV = '3.1.0';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;

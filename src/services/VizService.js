@@ -28,34 +28,37 @@ function VizService($q, $http, URLService, CacheService, UtilsService, AuthServi
      * @returns {Promise} The promise will be resolved with the latest image url
      */
     var getImageURL = function(reqOb) {
-        //var n = normalize(id, update, workspace, version);
         var deferred = $q.defer();
-        /*if (CacheService.exists(n.cacheKey + '|' + ext) && !n.update) {
-            deferred.resolve(CacheService.get(n.cacheKey + '|' + ext));
+        var cacheKey = createImageCacheKey(reqOb);
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(makeImageUrl(CacheService.get(cacheKey)));
             return deferred.promise;
-        }*/
+        }
         $http.get(URLService.getImageURL(reqOb), {headers: {Accept: reqOb.accept}})
         .then(function(data) {
-            var root = URLService.getRoot();
-            var newroot = '';
-            if (root.indexOf('http') > -1) {
-                var parts = root.split('/');
-                if (parts.length >= 3)
-                    newroot = parts[0] + '/' + parts[1] + '/' + parts[2];
-            }
-            //var url = CacheService.put(n.cacheKey + '|' + ext, newroot + '/alfresco' + data.artifacts[0].url, false);
-            var url = newroot + '/alfresco' + data.data.artifacts[0].url;
-            deferred.resolve(url + '?alf_ticket=' + AuthService.getTicket());
+            CacheService.put(cacheKey, data.data.artifacts[0], false);
+            deferred.resolve(makeImageUrl(data.data.artifacts[0]));
         }, function(data) {
             URLService.handleHttpStatus(data.data, data.status, data.headers, data.config, deferred);
         });
         return deferred.promise;
     };
 
-    var normalize = function(id, update, workspace, version) {
-        var res = UtilsService.normalize({update: update, workspace: workspace, version: version});
-        res.cacheKey = ['artifactUrl', id, res.ws, res.ver];
-        return res;
+    var makeImageUrl = function(data) {
+        var root = URLService.getRoot();
+        var newroot = '';
+        if (root.indexOf('http') > -1) {
+            var parts = root.split('/');
+            if (parts.length >= 3)
+                newroot = parts[0] + '/' + parts[1] + '/' + parts[2];
+        }
+        return newroot + '/alfresco' + data.url + '?alf_ticket=' + AuthService.getTicket();
+    };
+
+    var createImageCacheKey = function(reqOb) {
+        var refId = !reqOb.refId ? 'master' : reqOb.refId;
+        var commitId = !reqOb.commitId ? 'latest' : reqOb.commitId;
+        return ['image', reqOb.projectId, refId, reqOb.elementId, commitId, reqOb.accept];
     };
 
     return {

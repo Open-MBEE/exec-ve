@@ -1,22 +1,31 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngCookies'])
+
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngCookies'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     
     $urlRouterProvider.rule(function ($injector, $location) {
-         var locationPath = $location.url();
-         if (locationPath.indexOf('full%23') > 0)
-             locationPath = locationPath.replace('full%23', 'full#');
-         if (locationPath[0] !== '/')
-             locationPath = '/' + locationPath;
-         if (locationPath !== $location.url())
-             $location.url(locationPath);
+        var locationPath = $location.url();
+        if (locationPath.indexOf('full%23') > 0)
+            locationPath = locationPath.replace('full%23', 'full#');
+        if (locationPath[0] !== '/')
+            locationPath = '/' + locationPath;
+        if (locationPath[locationPath.length-1] == '/')
+            locationPath = locationPath.substring(0, locationPath.length-1);
+        if (locationPath !== $location.url())
+            $location.url(locationPath);
      });
 
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
     $urlRouterProvider.otherwise(function($injector, $location) {
+        var $rootScope = $injector.get('$rootScope');
+        if ($location.url().includes('workspace')) {
+            $rootScope.redirect_from_old_site = true;
+        } else {
+            $rootScope.redirect_from_old_site = false;
+        }
         var $state = $injector.get('$state');
         var checkLogin = $injector.get('AuthService').checkLogin();
         if (checkLogin) {
@@ -89,35 +98,55 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl) {
+                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
-                    $scope.orgs = orgObs; 
+                    $localStorage.$default({org: orgObs[0]});
+                    $scope.spin = false;
+                    $scope.orgs = orgObs;
                     var orgId, projectId;
                     $scope.selectOrg = function(org) {
                         if (org) {
+                            $localStorage.org = org;
                             orgId = org.id;
-                            $scope.selectedOrg = org.name;
-                            $scope.selectedProject = "";
+                            $localStorage.org.orgName = org.name;
+                            $scope.selectedOrg = $localStorage.org.name;
+                            $scope.selectedProject = ""; // default here?
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
                                 if (data.length > 0) {
-                                    $scope.selectProject(data[0]);
-                                } else {
-                                    //no projects
+                                    if($localStorage.project && checkForProject(data, $localStorage.project) === 1){
+                                        $scope.selectedProject = $localStorage.project.name;
+                                        projectId = $localStorage.project.id;
+                                    }else{
+                                        $scope.selectProject(data[0]);
+                                    }
                                 }
                             });
                         }
                     };
-                    $scope.selectProject = function(project) { 
+                    $scope.selectProject = function(project) {
                         if (project) {
-                            $scope.selectedProject = project.name;
-                            projectId = project.id;
+                            $localStorage.project = project;
+                            $scope.selectedProject = $localStorage.project.name;
+                            projectId = $localStorage.project.id;
                         }
                     };
-                    $scope.spin = false; 
+                    if ($localStorage.org) {
+                        $scope.selectOrg($localStorage.org);
+                    }
+                    var checkForProject = function(projectArray, project) {
+                        for (var i = 0; i < projectArray.length; i++) {
+                            if(projectArray[i].id === project.id){
+                                return 1;
+                            } 
+                        }
+                        return 0;
+                    };
+                    
                     $scope.continue = function() {
                         if (orgId && projectId) {
                             $scope.spin = true;
+                            $rootScope.redirect_from_old_site = false;
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'}).then(function(data) {
                             }, function(reject) {
                                 $scope.spin = false;
