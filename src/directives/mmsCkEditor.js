@@ -315,13 +315,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
 
         var commentCtrl = function($scope, $uibModalInstance) {
             var id = UtilsService.createMmsId();
-            $scope.comment = {
+            $scope.comment = UtilsService.createClassElement({
                 id: id,
                 name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 type: 'Class',
                 _appliedStereotypeIds: []
-            };
+            });
             $scope.oking = false;
             $scope.ok = function() {
                 if ($scope.oking) {
