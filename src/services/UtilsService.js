@@ -52,7 +52,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         templateParameterId: null,
         type: "Class",
         useCaseIds: [],
-        visibility: null
+        visibility: 'public'
     };
     var INSTANCE_ELEMENT_TEMPLATE = {
         ownerId: null,
