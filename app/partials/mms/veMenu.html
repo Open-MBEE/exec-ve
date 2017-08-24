@@ -12,9 +12,15 @@
         </div>
         <div class="breadcrumbs">
             <ul>
+                <li ng-style="truncateStyle"><i class="fa fa-cubes" aria-hidden="true"></i>
+                    <a class="back-to-proj" ui-sref="project.ref({refId: branch.id, search: undefined})">
+                            {{currentProject}}</a>
+                    <span ng-show="breadcrumbs.length"> &#8250;</span>
+                </li>
                 <li ng-style="truncateStyle" ng-show="!isRefsView()" ng-repeat="breadcrumb in breadcrumbs track by $index">
                     <a ui-sref="{{ breadcrumb.link }}">
-                        <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
+                        <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" 
+                        uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
                     </a>
                     <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span>
                     <span ng-show="!$last"> &#8250;</span>
