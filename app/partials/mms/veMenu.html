@@ -13,7 +13,7 @@
         <div class="breadcrumbs">
             <ul>
                 <li ng-style="truncateStyle">
-                    <a class="back-to-proj" ui-sref="project.ref({refId: branch.id, search: undefined})" ui-sref-opts="{reload:true}">
+                    <a class="back-to-proj" ui-sref="project.ref({refId: branch.id? branch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}">
                         <i class="fa fa-home" aria-hidden="true"></i>
                     </a>
                     <span ng-show="breadcrumbs.length"> &#8250;</span>
