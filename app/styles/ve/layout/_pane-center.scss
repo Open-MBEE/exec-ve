@@ -39,7 +39,7 @@ tr {
   .pane-center-btn-group {
     float: right;
     padding-top: 9px;
-    padding-right: 75px;
+    padding-right: 12px;
     min-width: $pane_center_btn_group_width;
   }
 
@@ -130,6 +130,10 @@ tr {
       }
     }
   }
+}
+
+.doclib-link {
+    margin: 5px 8px 5px 0;
 }
 
 @media screen and (min-width: 768px) {
