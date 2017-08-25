@@ -122,7 +122,7 @@ div.tooltip-inner {
 -------------------------------------------------------------------*/
 
 .btn{
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: .14em;
   font-size: 12px;
   -webkit-transition: background-color .1s ease-out;
@@ -134,6 +134,10 @@ div.tooltip-inner {
   border-radius:3px;
   box-shadow:none;
   padding: 7px 12px;
+}
+
+.btn:active{
+  box-shadow: none;
 }
 
 /*------------------------------------------------------------------
@@ -690,9 +694,12 @@ table caption {
 }
 
 /*hack for overriding cut off content in dropdown modal*/
-.ve-dropdown-short-modal .modal-dialog,
-.ve-dropdown-short-modal .modal-content{
-  overflow: visible;
+.ve-dropdown-short-modal{
+  .modal-dialog,
+  .modal-content,
+  .modal-body{
+    overflow: visible;
+  }
 }
 
 .modal-header{

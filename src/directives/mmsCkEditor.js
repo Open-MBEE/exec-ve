@@ -166,6 +166,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         var autocompleteCallback = function(ed) {
             var instance = $uibModal.open({
                 template: autocompleteModalTemplate,
+                windowClass: 've-dropdown-short-modal',
                 scope: scope,
                 resolve: {autocomplete: true},
                 controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
