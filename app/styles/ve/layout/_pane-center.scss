@@ -139,7 +139,9 @@ tr {
   float:right;
 
   img{
-    padding-right:5px
+    padding-right:5px;
+    top: -1px;
+    position: relative;
   }
 }
 
