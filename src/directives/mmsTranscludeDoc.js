@@ -105,7 +105,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.isEditing = false;
                 domElement[0].innerHTML = doc;
             }
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+            if (MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+            }
             scope.recompileScope = scope.$new();
             $compile(domElement.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
