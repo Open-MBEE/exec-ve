@@ -83,9 +83,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.cancel = function() {
                 $uibModalInstance.dismiss();
             };
-            $scope.openProposeModal = function() {
-                $uibModalInstance.close(false);
-            };
 
              // Set search result options
             $scope.searchOptions= {};
@@ -166,6 +163,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         var autocompleteCallback = function(ed) {
             var instance = $uibModal.open({
                 template: autocompleteModalTemplate,
+                windowClass: 've-dropdown-short-modal',
                 scope: scope,
                 resolve: {autocomplete: true},
                 controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
@@ -193,10 +191,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                if (!tag) {
-                    proposeCallback(ed);
-                    return;
-                }
                 if (fromAutocomplete) {
                     ed.execCommand('undo');
                 }
@@ -204,18 +198,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             }, function() {
                 var focusManager = new CKEDITOR.focusManager( ed );
                 focusManager.focus();
-            });
-        };
-
-        var proposeCallback = function(ed) {
-            var instance = $uibModal.open({
-                template: proposeModalTemplate,
-                scope: scope,
-                controller: ['$scope', '$uibModalInstance', transcludeCtrl],
-                size: 'lg'
-            });
-            instance.result.then(function(tag) {
-                ed.insertHtml( tag );
             });
         };
 
