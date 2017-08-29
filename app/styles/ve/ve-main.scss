@@ -693,6 +693,13 @@ table caption {
   overflow: auto;
 }
 
+.modal-body{
+  .transclude-modal .transclude-modal-input {
+    width: 80%;
+    margin: 0 auto;
+  }
+}
+
 /*hack for overriding cut off content in dropdown modal*/
 .ve-dropdown-short-modal{
   .modal-dialog,
