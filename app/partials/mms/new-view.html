@@ -1,33 +1,48 @@
 <div class="modal-header">
-    <h4>Create New View</h4>
+    <h4>Add View</h4>
 </div>
 
-<div class="modal-body transclude-modal" ng-show="createForm">
-    <div class="comment-modal-input">
-        <div class="form-group">
-            <label>Name:</label>
-            <input class="form-control" ng-model="newView.name" type="text" placeholder="Type a name for your view here"
-                   autofocus></input>
+<div class="modal-body">
+    <div ng-show="createForm">
+        <div class="ve-light-tabs">
+            <ul class="nav nav-tabs">
+                  <li class="uib-tab nav-item active tab-item">
+                        <a class="nav-link">Create New</a>
+                  </li>
+                  <li class="uib-tab nav-item tab-item">
+                        <a ng-click="createForm = false" class="create-element-link nav-link" ng-show="createForm">Search for existing</a>
+                  </li>
+            </ul>
+        </div>
+        <div class="comment-modal-input">
+            <div class="form-group">
+                <label>Name:</label>
+                <input class="form-control" ng-model="newView.name" type="text" placeholder="Type a name for your view here" autofocus>
+            </div>
         </div>
     </div>
+
+    <div ng-show="!createForm">
+        <div class="ve-light-tabs">
+            <ul class="nav nav-tabs" ng-show="!createForm">
+                <li class="uib-tab nav-item tab-item">
+                    <a class="nav-link" ng-click="createForm = true">Create New</a>
+                </li>
+                <li class="uib-tab nav-item tab-item active">
+                    <a class="nav-link">Search for existing</a>
+                </li>
+            </ul>
+        </div>
+        <div class="radio">
+            <label><input type="radio" ng-model="newViewAggr.type" value="shared">SHARED - Add view and its children</label><br>
+            <label><input type="radio" ng-model="newViewAggr.type" value="none">NONE - Add view only</label>
+        </div>
+        <mms-search mms-options="searchOptions" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}"></mms-search>
+    </div>
 </div>
 
-<div ng-show="!createForm">
-    <div class="radio" style="text-align:center;">
-        <label><input type="radio" ng-model="newViewAggr.type" value="shared">SHARED - Add view and its children</label>
-        <label><input type="radio" ng-model="newViewAggr.type" value="none">NONE - Add view only</label>
-    </div>
-    <mms-search mms-options="searchOptions" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}"></mms-search>
-</div>
 
 <div class="modal-footer">
-    <div>
-        <a ng-click="createForm = false" class="create-element-link pull-left" ng-show="createForm">
-            Search for existing views</a>
-    </div>
-    <div class="pull-left" ng-show="!createForm">
-        <a ng-click="createForm = true">Return to Create View</a>
-    </div>
     <button class="btn btn-primary" ng-show="createForm" ng-click="ok()">Create
         <i ng-show="oking" class="fa fa-spin fa-spinner"></i>
     </button>

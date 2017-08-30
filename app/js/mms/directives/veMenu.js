@@ -26,11 +26,10 @@ angular.module('mmsApp')
  */
 function veMenu(CacheService, $state, $templateCache, $sce) {
     var template = $templateCache.get('partials/mms/veMenu.html');
-    
 
     var veMenuLink = function(scope, element, attrs) {
 
-        scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br><br>Branch author will be notified by email upon completion.');
+        scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.');
         scope.currentProject = scope.project.name;
         if (scope.ref) {
             scope.currentRef = scope.ref;
@@ -47,10 +46,14 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
             }
         };
         scope.updateBranch = function(branch) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id, search: undefined}, {reload: true});
+            if (branch.status != 'creating') {
+                $state.go($state.current.name, {projectId: scope.project.id, refId: branch.id, search: undefined}, {reload: true});
+            }
         };
         scope.updateTag = function(tag) {
-            $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id, search: undefined}, {reload: true});
+            if (tag.status != 'creating') {
+                $state.go($state.current.name, {projectId: scope.project.id, refId: tag.id, search: undefined}, {reload: true});
+            }
         };
         scope.refsView = function() {
             $state.go('project', {projectId: scope.project.id}, {reload: true});
@@ -72,30 +75,13 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
                         tag.push(refObs[i]);
                 }
                 scope.tags = tag;
-
                 var branches = [];
                 for (var j = 0; j < refObs.length; j++) {
                     if (refObs[j].type === "Branch")
                         branches.push(refObs[j]);
                 }
                 scope.branches = branches;
-
             }
-
-            //var index = -1;
-            //if (createdRef.type === 'Branch') {
-            //    index = _.findIndex(scope.branches, {name: createdRef.id});
-            //    if ( index > -1 ) {
-            //        scope.branches[index].loading = false;
-            //        // scope.branches[index] = createdRef;
-            //    }
-            //} else if (createdRef.type === 'Tag') {
-            //    index = _.findIndex(scope.tags, {name: createdRef.id});
-            //    if ( index > -1 ) {
-            //        scope.tags[index].loading = false;
-            //        // scope.tags[index] = createdRef;
-            //    }
-            //}
         });
 
         var bcrumbs = [];

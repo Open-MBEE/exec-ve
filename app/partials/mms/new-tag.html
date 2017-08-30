@@ -3,30 +3,37 @@
     <span class="ve-notify-banner">Tags are read only</span>
 </div>
 
-<div class="modal-body comment-modal">
+<div class="modal-body comment-modal ve-new-ref">
 
     <div class="comment-modal-input">
 
         <div class="form-group">
             <label>Name:</label>
-            <input class="form-control" ng-model="configuration.name" type="text"
-                   placeholder="Type a name for your tag here" autofocus></input>
+            <input class="form-control" ng-model="tag.name" type="text"
+                placeholder="Type a name for your tag here" autofocus>
         </div>
         <div class="form-group">
             <label>Description:</label>
-            <textarea mms-ckeditor class="form-control" ng-model="configuration.description"></textarea>
+            <textarea class="form-control" ng-model="tag.description"></textarea>
         </div>
-        <!--
-            <div class="form-group">
-              <label>Timestamp:</label>
-              <input ng-model="configuration.now" value="true" type="radio"> Now</input>
-              <input ng-model="configuration.now" value="false" type="radio"> Specified</input>
-              <input class="form-control" ng-model="configuration.timestamp" type="datetime-local" ng-change="updateTimeOpt()"
-              placeholder="Specify a timestamp in the following format yyyy-MM-ddTHH:mm:ss"></input>
-            </div>
-        -->
-    </div>
+        <div class="form-group">
+            <label>Point in History:</label>
+            <form>
+                <input id="most-recent" type="radio" name="most recent" ng-model="tag.lastCommit" ng-value="true">
+                <label for="most-recent">Most Recent</label>
+                <br>
+                <input id="specify-point" type="radio" name="specify point" ng-model="tag.lastCommit" ng-value="false">
+                <label for="specify-point">Specify a timestamp</label>
+                <div class="indent ve-secondary-text timestamp-format">
+                    <i>(YYYY-MM-DDTHH:MM:SS)</i>
+                </div>
+                <div class="indent">
+                    <input class="form-control" ng-model="tag.timestamp" type="datetime-local" ng-change="updateTimeOpt()" placeholder="YYYY-MM-DDTHH:MM:SS">
+                </div>
+            </form>
+        </div>
 
+    </div>
 </div>
 
 <div class="modal-footer">
