@@ -25,29 +25,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-    function convertToEvalString(values, allkeys){
-      values = eval(values);
-      var results = [];
-      var counter = 0;
-      for (var key in values){
-        if ( values.hasOwnProperty(key)){
-          var value = values[key];
-          if ( typeof value === "object"){
-            var resultValue = convertToEvalString(value, allkeys + "." + key);
-            results[counter] = resultValue;
-          }
-          else {
-            return "[" + allkeys + "." + key + "= (" + value + ")]"; 
-            //[c3json.axis.y.tick.format= (function(y){return y + "!";})]
-          }
-          counter++;
-        }
-      }
-      if ( results.length == 1)
-        return results[0];
-      else
-        return results;
-    }  
+      
     /*
     Convert a json definining functions in an array of keys (axis, x, tick, format, function(...))
     The last entry is a function value.
@@ -87,10 +65,10 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
       svg.append('div').attr("id", 'c3chart' + scope.$id);
       c3json.bindto = '#c3chart' + scope.$id;
       
-
+      
       c3json.data.columns = _columns;
-      if ( scope.plot.functions !== undefined && scope.plot.functions.length !== 0){
-        var c3jfunc = JSON.parse(scope.plot.functions.replace(/'/g, '"'));
+      if ( scope.plot.config.functions !== undefined && scope.plot.config.functions.length !== 0){
+        var c3jfunc = scope.plot.config.functions;//JSON.parse(scope.plot.config.functions.replace(/'/g, '"'));
         //finiding functions in .format (ie., axis.x.tick = function(...) in an array)
         var all = [];
         all = simplifyFunctions(c3jfunc, all);
@@ -137,16 +115,15 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
   	var has_column_header;
     var start_index; //0 if column header is included as data, -1 if column header is not included as data
     var c3_data=[];
-
     var c3options;    
-    if ( scope.plot.options === undefined || scope.plot.options.length === 0 ){
+    if ( scope.plot.config.options === undefined || scope.plot.config.options.length === 0 ){
       if (scope.tableColumnHeadersLabel && scope.tableColumnHeadersLabel.length !== 0)
         c3options = {data: {x: "x", type: "line"}, axis : {x: {type:"category", tick:{centered:true}}}};
       else 
         c3options = {data: {}};
     }
-    else 
-      c3options = JSON.parse(scope.plot.options.replace(/'/g, '"'));
+    else
+        c3options = scope.plot.config.options;
 
     if ( c3options.data.xs === undefined && scope.tableColumnHeadersLabel.length !== 0){
         c3_data[0] = ['x'].concat(scope.tableColumnHeadersLabel);
@@ -202,7 +179,13 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         return scope.render();
     }, true);
 
-   
+    console.log("C3==================");
+            console.log("projectId: " + projectId);
+            console.log("commitIt: " + commitId);
+            console.log("refId: " + refId);
+            
+    console.log(scope);
+    scope.plot = JSON.parse(scope.splot);
     var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};
 
     TableService.readTable (reqOb)
@@ -213,13 +196,17 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         scope.indexDocumentation = value.indexDocumentation;
         scope.indexName = value.indexName;
       });
+    if ( scope.plot.config.length !== 0){
+      scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
+    }
   }; //end of link
 
     return {
       restrict: 'EA',
       require: '?^mmsView',
        scope: {
-        plot: '<mmsPlot'
+        //plot: '<mmsPlot'
+        splot: '@'
       },
       link: mmsChartLink
     }; //return

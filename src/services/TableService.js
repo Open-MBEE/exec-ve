@@ -47,12 +47,12 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
           numOfDataColumn = reqOb.tableData.body[i].length - 1; //-1 to remove row header
       }
       var numOfRowHeadersPerTable = reqOb.tableData.body.length;
-      var eachRowHeader =[];
+      var tableRowHeaders =[];
       ElementService.getElements(rowHeadersMmsEid, 1)
         .then(function(rowHeaders) {
             var counter = 0;
             for ( i = 0; i < numOfRowHeadersPerTable; i++){
-              eachRowHeader.push(rowHeaders[counter++]);
+              tableRowHeaders.push(rowHeaders[counter++]);
             }
       });//ElementService.getElements - rowHeadersMmsEid
       
@@ -79,12 +79,29 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
           }
           datavalues.push(datarow);
         }
+
+        var filters = [];
+        var filterRowHeaders = [];
+        var filterColumnHeaders=[];
+        for ( i = 0; i < tableRowHeaders.length; i++){
+             filterRowHeaders[toValidId(tableRowHeaders[i].name)] = true;
+        }
+        if (tableColumnHeadersLabels !== undefined){
+          for ( i = 0; i < tableColumnHeadersLabels.length; i++){
+             filterColumnHeaders[toValidId(tableColumnHeadersLabels[i])] = true;
+          }
+        }
+        filters.push(filterRowHeaders);
+        filters.push(filterColumnHeaders); 
+        dataIdFilters =filters;
+
         var r =  {
                tableColumnHeadersLabels: tableColumnHeadersLabels, //[]
-               tableRowHeaders: eachRowHeader,
+               tableRowHeaders: tableRowHeaders,
                datavalues: datavalues, //[][] - array
                indexDocumentation: indexDocumentation,
-               indexName : indexName
+               indexName : indexName,
+               dataIdFilters : dataIdFilters
         };
         deferred.resolve(r);
       });
