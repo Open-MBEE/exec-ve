@@ -1,10 +1,25 @@
-<h2 class="prop element-title">Element History <span ng-show="gettingHistory"><i class="fa fa-spin fa-spinner"></i></span></h2>
-<input class="form-control" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
-<br />
+<h2 class="right-pane-title">Element History <span ng-show="gettingHistory"><i class="fa fa-spin fa-spinner"></i></span></h2>
 
-<select class="form-control" ng-options="version.id as version._creator + ' - ' + (version._created | date:'M/d/yy h:mm a') for version in history | filter:historyFilter" ng-model="selects.commitSelected" ng-change="commitClicked()">
-    <option value="">--- Latest ---</option>
-</select>
+
+
+<div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav>
+    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
+        Latest
+        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
+    </button>
+    <ul class="dropdown-menu" uib-dropdown-menu role="menu" style="min-width:100%">
+    	<li>
+    		<input class="ve-plain-input" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
+    	</li>
+        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
+        	<a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
+        </li>
+    </ul>
+</div>
+
+<input type="checkbox" style="margin-right: 4px;">Compare to an earlier version
 
 <!-- Spec window -->
 <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
+
+

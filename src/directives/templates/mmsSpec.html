@@ -2,11 +2,11 @@
 
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
-    <h2 class="prop-title">LAST MODIFICATION</h2>
+    <h2 class="prop-title">Last Modicication</h2>
     <h3 class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</h3>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
-        <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
+        <h2 class="prop-title spec-view-value-heading">Property Value</h2>
         <div ng-if="!isEnumeration">
             <div ng-if="editValues.length == 0">
               <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
@@ -41,7 +41,7 @@
     </div>
 
     <div ng-if="edit.type === 'Constraint'">
-        <h2 class="prop-title spec-view-value-heading">CONSTRAINT SPECIFICATION</h2>
+        <h2 class="prop-title spec-view-value-heading">Constraint Specification</h2>
         <div ng-switch on="editValues[0].type">
             <div ng-switch-when="LiteralInteger"><input type="number" ng-model="editValues[0].value"/></div>
             <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="editValues[0].value"/></div>
@@ -57,25 +57,25 @@
         </div>
     </div>
 
-    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION</h2>
+    <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
     <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></textarea>
 
     <div>
-        <h2 class="prop-title">TYPE</h2>
+        <h2 class="prop-title">Type</h2>
         <h3 class="prop">{{element.type}}</h3>
-        <h2 class="prop-title spec-view-type-heading">METATYPES</h2>
+        <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
         <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
-        <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
+        <h2 class="prop-title">Location</h2>
         <h3 class="prop">{{element._qualifiedName}}</h3>
         <h2 class="prop-title">ID</h2>
         <h3 class="prop id">{{element.id}}</h3>
-        <h2 class="prop-title">BRANCH/TAG</h2>
+        <h2 class="prop-title">Branch/Tag</h2>
         <h3 class="prop">{{element._refId}}</h3>
-        <h2 class="prop-title">PROJECT</h2>
+        <h2 class="prop-title">Project</h2>
         <h3 class="prop">{{element._projectId}}</h3>
-        <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
+        <h2 class="prop-title">Formatted Modified Time</h2>
         <h3 class="prop">{{element._modified}}</h3>
-        <h2 class="prop-title">COMMIT</h2>
+        <h2 class="prop-title">Commut</h2>
         <h3 class="prop">{{element._commitId}}</h3>
     </div>
 
@@ -88,11 +88,11 @@
     <div ng-hide="gettingSpec">
     <h1 class="prop element-title">{{element.name}}</h1>
 
-    <h2 class="prop-title">LAST MODIFICATION</h2>
+    <h2 class="prop-title">Last Modification</h2>
     <h3 class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</h3>
 
     <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
-        <h2 class="prop-title spec-view-value-heading">PROPERTY VALUE</h2>
+        <h2 class="prop-title spec-view-value-heading">Property Value</h2>
         <div ng-if="!isRestrictedVal">
         <div ng-repeat="value in values" ng-switch on="value.type">
             <h3 class="prop" ng-switch-when="LiteralInteger">{{value.value}}</h3>
@@ -109,33 +109,33 @@
         <div ng-if="isRestrictedVal">
             <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{values[0].operand[1].elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
         </div>
-        <h2 class="prop-title spec-view-value-heading">PROPERTY TYPE</h2>
+        <h2 class="prop-title spec-view-value-heading">Property Type</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.typeId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Generalization' || element.type === 'Dependency'">
-        <h2 class="prop-title">SOURCE</h2>
+        <h2 class="prop-title">Source</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element._sourceIds[0]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
-        <h2 class="prop-title">TARGET</h2>
+        <h2 class="prop-title">Target</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element._targetIds[0]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Connector'">
-        <h2 class="prop-title">PATH 1</h2>
+        <h2 class="prop-title">Path 1</h2>
         <h3 class="prop" ng-repeat="path in element._propertyPathIds[0]"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
-        <h2 class="prop-title">PATH 2</h2>
+        <h2 class="prop-title">Path 2</h2>
         <h3 class="prop" ng-repeat="path in element._propertyPathIds[1]"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Association'">
-        <h2 class="prop-title">ROLE 1</h2>
+        <h2 class="prop-title">ROle 1</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.memberEndIds[0]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
-        <h2 class="prop-title">ROLE 2</h2>
+        <h2 class="prop-title">Role 2</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.memberEndIds[1]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
     </div>
 
     <div ng-if="element.type === 'Constraint'">
-        <h2 class="prop-title">CONSTRAINT SPECIFICATION</h2>
+        <h2 class="prop-title">Constraint Specification</h2>
         <div ng-switch on="values[0].type">
             <h3 class="prop" ng-switch-when="LiteralInteger">{{values[0].value}}</h3>
             <h3 class="prop" ng-switch-when="LiteralBoolean">{{values[0].value}}</h3>
@@ -149,29 +149,29 @@
     </div>
 
     <div ng-if="element.type === 'InstanceSpecification'">
-        <h2 class="prop-title">CLASSIFIERS</h2>
+        <h2 class="prop-title">Classifiers</h2>
         <h3 class="prop" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
     </div>
 
-    <h2 class="prop-title spec-view-doc-heading">DOCUMENTATION <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
+    <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
     <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
     <div ng-show="showDocHTML">{{element.documentation}}</div>
 
-    <h2 class="prop-title">TYPE</h2>
+    <h2 class="prop-title">Type</h2>
     <h3 class="prop">{{element.type}}</h3>
-    <h2 class="prop-title spec-view-type-heading">METATYPES</h2>
+    <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
     <h3 ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></h3>
-    <h2 class="prop-title">LOCATION <i class="fa fa-folder"></i></h2>
+    <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
     <h3 class="prop">{{element._qualifiedName}}</h3>
     <h2 class="prop-title">ID</h2>
     <h3 class="prop id">{{element.id}}</h3>
-    <h2 class="prop-title">BRANCH/TAG</h2>
+    <h2 class="prop-title">Branch/Tag</h2>
     <h3 class="prop">{{element._refId}}</h3>
-    <h2 class="prop-title">PROJECT</h2>
+    <h2 class="prop-title">Project</h2>
     <h3 class="prop">{{element._projectId}}</h3>
-    <h2 class="prop-title">FORMATTED MODIFIED TIME</h2>
+    <h2 class="prop-title">Formatted Modified Time</h2>
     <h3 class="prop">{{element._modified}}</h3>
-    <h2 class="prop-title">COMMIT</h2>
+    <h2 class="prop-title">Commit</h2>
     <h3 class="prop">{{element._commitId}}</h3>
     </div>
 </div>

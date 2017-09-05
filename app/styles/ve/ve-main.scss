@@ -389,8 +389,33 @@ div.tooltip-inner {
     top: 3px;
     color:$ve-silver-base;
   }
-
 }
+
+.ve-light-dropdown{
+  display: block;
+  width: 100%;
+  margin: 0 0 18px;
+
+  .dropdown-toggle{
+    width: 100%;
+    text-align: left;
+    font-size: 16px;
+    padding: 5px 8px;
+    height: 34px;
+    line-height: 18px;
+    margin-top: 6px;
+    display: inline;
+    border: none;
+    border-radius: 2px !important;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
+    letter-spacing: .05em;
+    background-color:#f2f2f2" 
+  }
+}
+
 
 /*------------------------------------------------------------------
     2.3.1 Wide Dropdown
@@ -808,7 +833,6 @@ table caption {
 
   h1{
     margin: 30px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
     padding-bottom: 20px;
     font-weight: 200;
     font-size: 44px;
@@ -858,5 +882,18 @@ table caption {
   content: "\f064"; 
   font-family: FontAwesome;
   padding-right:6px;
+}
+
+/*------------------------------------------------------------------
+9. Right pane 
+-------------------------------------------------------------------*/
+
+h2.right-pane-title{
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: #6a6a6a;
+  margin-top: 16px;
 }
 

@@ -1,9 +1,8 @@
 mms-spec {
   h1.prop,
   h1.prop > .form-control {
-    font-size: 41px;
-    margin-top: 32px;
-    margin-bottom: 32px;
+    font-size: 32px;
+    margin:24px 0;
     height: inherit;
     width: 100%;
   }
@@ -15,12 +14,11 @@ mms-spec {
   }
 
   h3.prop {
-    font-size: 20px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 15px;
+    font-size: 14px;
+    margin:4px 0 24px;
     min-width: 280px;
     word-wrap: break-word;
+    font-weight:400;
   }
 
   h1.element-title {
@@ -30,10 +28,9 @@ mms-spec {
 
   .prop-title {
     font-family: $font-family-sans-serif;
-    font-weight: $bold_font_weight;
-    font-size: 12px;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    font-weight: 700;
+    font-size: 14px;
+    margin:24px 0 0;
     white-space: nowrap;
   }
 
