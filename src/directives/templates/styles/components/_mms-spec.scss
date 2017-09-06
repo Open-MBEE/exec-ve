@@ -1,4 +1,4 @@
-mms-spec {
+.pane-right {
   h1.prop,
   h1.prop > .form-control {
     font-size: 32px;
@@ -36,7 +36,6 @@ mms-spec {
 
   .doc-text {
     font-family: $font-family-sans-serif;
-    margin-right: 30px;
     max-width: $default-line-length;
     min-width: 15em;
   }

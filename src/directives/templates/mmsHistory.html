@@ -1,24 +1,155 @@
 <h2 class="right-pane-title">Element History <span ng-show="gettingHistory"><i class="fa fa-spin fa-spinner"></i></span></h2>
 
 
+<div style="position:relative;">
+	<div class="diff-dotted-connection" ng-show="ModelData.ShowDiffPrototype"></div>
+	<div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav>
+	    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
+	        <span ng-show="ModelData.ShowDiffPrototype">Compare: <b>Latest</b></span><span ng-hide="ModelData.ShowDiffPrototype">Latest</span>
+	        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
+	    </button>
+	    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+	    	<li class="dropdown-input">
+	    		<input class="ve-plain-input" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
+	    	</li>
+	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
+	        	<a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
+	        </li>
+	    </ul>
+	</div>
 
-<div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav>
-    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
-        Latest
-        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
-    </button>
-    <ul class="dropdown-menu" uib-dropdown-menu role="menu" style="min-width:100%">
-    	<li>
-    		<input class="ve-plain-input" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
-    	</li>
-        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
-        	<a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
-        </li>
-    </ul>
+	<input type="checkbox" style="margin-right: 4px;" ng-model="ModelData.ShowDiffPrototype">Compare to an earlier version
+
+	<div class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav>
+	    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
+	        Base: <b>6/13/17 11:40 AM by eherrick</b>
+	        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
+	    </button>
+	    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+	    	<li class="dropdown-input">
+	    		<input class="ve-plain-input" type="text" placeholder="Type here to filter history">
+	    	</li>
+	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
+	        	<a>admin - 3/10/17 4:34 PM</a>
+	        </li>
+	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
+	        	<a>admin - 3/10/17 4:34 PM</a>
+	        </li>
+	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
+	        	<a>admin - 3/10/17 4:34 PM</a>
+	        </li>
+	    </ul>
+	</div>
 </div>
 
-<input type="checkbox" style="margin-right: 4px;">Compare to an earlier version
+<hr style="margin-left:-20px;margin-right:-20px;">
 
+<!-- Placeholder data for prototype -->
+
+<div ng-hide="ModelData.ShowDiffPrototype">
+    <div>
+        <h1 class="prop element-title ng-binding">Block Operations</h1>
+
+        <h2 class="prop-title">Last Modification</h2>
+        <h3 class="prop ng-binding">8/23/17 2:12 PM by igomes</h3>
+
+        <!-- ngIf: element.type === 'Property' || element.type === 'Port' || element.type === 'Slot' -->
+
+        <!-- ngIf: element.type === 'Generalization' || element.type === 'Dependency' -->
+
+        <!-- ngIf: element.type === 'Connector' -->
+
+        <!-- ngIf: element.type === 'Association' -->
+
+        <!-- ngIf: element.type === 'Constraint' -->
+
+        <!-- ngIf: element.type === 'InstanceSpecification' --><div ng-if="element.type === 'InstanceSpecification'" class="ng-scope">
+            <h2 class="prop-title">Classifiers</h2>
+            <!-- ngRepeat: path in element.classifierIds --><h3 class="prop ng-scope" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="_17_0_5_1_407019f_1431903758416_800749_12055" mms-project-id="PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85" mms-ref-id="master" class="ng-isolate-scope"><!-- ngIf: element.name --><span ng-if="element.name" class="ng-binding ng-scope">Paragraph</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></h3><!-- end ngRepeat: path in element.classifierIds -->
+        </div><!-- end ngIf: element.type === 'InstanceSpecification' -->
+
+        <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
+        <p ng-show="!showDocHTML" class="doc-text ng-binding">Blocks may also specify 
+        operations or other features that describe the behavior of a system. 
+        Except for operations, this clause deals strictly with the definition of
+         properties to describe the state of a system at any given point in 
+        time, including relations between elements that define its structure. 
+        Clause 9, “Ports and Flows” specifies specific forms of interactions 
+        between blocks, and the Behavioral Constructs including activities, 
+        interactions, and state machines can be applied to blocks to specify 
+        their behavior. Clause <span class="view-link">[cf:Allocations.vlink]</span> describes ways to allocate behavior to parts and blocks. </p>
+
+        <h2 class="prop-title">Type</h2>
+        <h3 class="prop ng-binding">InstanceSpecification</h3>
+        <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
+        <!-- ngRepeat: type in element._appliedStereotypeIds -->
+        <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
+        <h3 class="prop ng-binding">//OpenCAE/View Instances Bin/Case Study Description</h3>
+        <h2 class="prop-title">ID</h2>
+        <h3 class="prop id ng-binding">MMS_1461856573929_49d387a5-053a-486f-94fe-e5f85d1b081b</h3>
+        <h2 class="prop-title">Branch/Tag</h2>
+        <h3 class="prop ng-binding">master</h3>
+        <h2 class="prop-title">Project</h2>
+        <h3 class="prop ng-binding">PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85</h3>
+        <h2 class="prop-title">Formatted Modified Time</h2>
+        <h3 class="prop ng-binding">2017-07-10T20:15:04.975-0700</h3>
+        <h2 class="prop-title">Commit</h2>
+        <h3 class="prop ng-binding">7dd4d0de-e88a-429e-a0c5-7532dc28e0ad</h3>
+    </div>
+</div>
+<div ng-show="ModelData.ShowDiffPrototype">
+    <div>
+        <h1 class="prop element-title ng-binding">Block Operations</h1>
+
+        <h2 class="prop-title">Last Modification</h2>
+        <h3 class="prop ng-binding"><del>6/13/17 11:40 AM by eherrick
+        </del><br><ins>8/23/17 2:12 PM by igomes
+        </ins></h3>
+
+        <!-- ngIf: element.type === 'Property' || element.type === 'Port' || element.type === 'Slot' -->
+
+        <!-- ngIf: element.type === 'Generalization' || element.type === 'Dependency' -->
+
+        <!-- ngIf: element.type === 'Connector' -->
+
+        <!-- ngIf: element.type === 'Association' -->
+
+        <!-- ngIf: element.type === 'Constraint' -->
+
+        <!-- ngIf: element.type === 'InstanceSpecification' --><div ng-if="element.type === 'InstanceSpecification'" class="ng-scope">
+            <h2 class="prop-title">Classifiers</h2>
+            <!-- ngRepeat: path in element.classifierIds --><h3 class="prop ng-scope" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="_17_0_5_1_407019f_1431903758416_800749_12055" mms-project-id="PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85" mms-ref-id="master" class="ng-isolate-scope"><!-- ngIf: element.name --><span ng-if="element.name" class="ng-binding ng-scope">Paragraph</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></h3><!-- end ngRepeat: path in element.classifierIds -->
+        </div><!-- end ngIf: element.type === 'InstanceSpecification' -->
+
+        <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
+        <p ng-show="!showDocHTML" class="doc-text ng-binding">Blocks may also specify 
+        operations or other features that describe the behavior of a system. 
+        Except for operations, this clause deals strictly with the definition of
+         properties to describe the state of a system at any given point in 
+        time, including relations between elements that define its structure. 
+        Clause 9, “Ports and Flows” specifies specific forms of interactions 
+        between blocks, and the Behavioral Constructs including activities, 
+        interactions, and state machines can be applied to blocks to specify 
+        their behavior. Clause <del>15, “Allocations”</del><ins class="ins-view-link">[cf:Allocations.vlink]</ins> describes ways to allocate behavior to parts and blocks. </p>
+
+        <h2 class="prop-title">Type</h2>
+        <h3 class="prop ng-binding">InstanceSpecification</h3>
+        <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
+        <!-- ngRepeat: type in element._appliedStereotypeIds -->
+        <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
+        <h3 class="prop ng-binding">//OpenCAE/View Instances Bin/Case Study Description</h3>
+        <h2 class="prop-title">ID</h2>
+        <h3 class="prop id ng-binding">MMS_1461856573929_49d387a5-053a-486f-94fe-e5f85d1b081b</h3>
+        <h2 class="prop-title">Branch/Tag</h2>
+        <h3 class="prop ng-binding">master</h3>
+        <h2 class="prop-title">Project</h2>
+        <h3 class="prop ng-binding">PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85</h3>
+        <h2 class="prop-title">Formatted Modified Time</h2>
+        <h3 class="prop ng-binding">2017-07-10T20:15:04.975-0700</h3>
+        <h2 class="prop-title">Commit</h2>
+        <h3 class="prop ng-binding">7dd4d0de-e88a-429e-a0c5-7532dc28e0ad</h3>
+    </div>
+</div>
 <!-- Spec window -->
 <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
 

@@ -75,6 +75,7 @@ div.tooltip-inner {
     2.4.1 Light tab system
     2.4.2 Dark Tab system
   2.5 Banners
+  2.6 Input
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -394,16 +395,15 @@ div.tooltip-inner {
 .ve-light-dropdown{
   display: block;
   width: 100%;
-  margin: 0 0 18px;
+  margin: 8px 0;
 
   .dropdown-toggle{
     width: 100%;
     text-align: left;
-    font-size: 16px;
-    padding: 5px 8px;
-    height: 34px;
-    line-height: 18px;
-    margin-top: 6px;
+    font-size: 14px;
+    padding: 6px 8px;
+    height: 30px;
+    line-height: 16px;
     display: inline;
     border: none;
     border-radius: 2px !important;
@@ -412,7 +412,17 @@ div.tooltip-inner {
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
     letter-spacing: .05em;
-    background-color:#f2f2f2" 
+    background-color:#f2f2f2;
+  }
+
+  li.dropdown-input{
+    border-bottom: 1px solid rgba(0,0,0,.15);
+    padding: 2px 0 6px;
+    margin-bottom: 6px;
+  }
+
+  ul{
+    min-width:100%;
   }
 }
 
@@ -633,6 +643,21 @@ span.fixed-content-dropdown{
   color: $ve-teal-base;
   margin: 4px 10px 14px;
 }
+
+/*------------------------------------------------------------------
+  2.5 Input
+-------------------------------------------------------------------*/
+
+.ve-plain-input{
+  background-color: #f4f4f4;
+  padding: 3px 6px;
+  border: none;
+  border-radius: 3px;
+  margin: 4px 10px;
+  width: calc(100% - 20px);
+}
+
+
 
 /*------------------------------------------------------------------
 3. Table Filtering
@@ -879,7 +904,7 @@ table caption {
 }
 
 .btn.open-document::before{
-  content: "\f064"; 
+  content:"\f064";
   font-family: FontAwesome;
   padding-right:6px;
 }
@@ -894,6 +919,44 @@ h2.right-pane-title{
   text-transform: uppercase;
   letter-spacing: .14em;
   color: #6a6a6a;
-  margin-top: 16px;
+  margin: 20px 0;
 }
 
+.pane-right .container-fluid{
+  padding:0 20px;
+}
+
+.pane-right del{
+  background-color: #ffe3e3;
+}
+
+.pane-right ins{
+  background-color: #dafde0;
+  text-decoration:none;
+}
+
+.pane-right ins.ins-view-link{
+  background-color: #dafde0;
+  text-decoration: none;
+  border: 1px solid #86d994;
+  border-radius: 2px;
+  padding: 1px 2px;
+}
+
+.pane-right .view-link{
+  background-color: #cfe7ec;
+  text-decoration: none;
+  border: 1px solid #2c7e8f;
+  border-radius: 2px;
+  padding: 1px 2px;  
+}
+
+.diff-dotted-connection{
+  position: absolute;
+  height: calc(100% - 26px);
+  border: 3px dotted #cacaca;
+  left: -11px;
+  width: 11px;
+  top: 12px;
+  border-right: none;
+}

@@ -1,4 +1,4 @@
-<div ng-if="!noEdit && editing" class="editing">
+<div ng-if="!noEdit && editing" class="editing" style="display:none;">
 
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
 
@@ -81,7 +81,7 @@
 
 </div>
 
-<div ng-hide="editing" class="reading">
+<div ng-hide="editing" class="reading" style="display:none;">
     <hr/>
     <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
 

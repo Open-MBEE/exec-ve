@@ -1,7 +1,6 @@
 <div class="pane-right">
     <div ng-if="documentOb">
         <div class="container-fluid" ng-show="show.element">
-            <br>
             <form class="form-horizontal">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
@@ -27,7 +26,7 @@
     </div>
 
     <div class="container-fluid container-tags" ng-show="show.tags">
-        <h2>Tags</h2>
+        <h2 class="right-pane-title">Tags</h2>
         <div ng-show="noTags">No tags in current project.</div>
         <div ng-hide="noTags">
             <input class="form-control" ng-model="tagFilter" type="text" placeholder="Type here to filter tags">
