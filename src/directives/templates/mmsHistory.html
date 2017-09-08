@@ -8,12 +8,31 @@
 	        <span ng-show="ModelData.ShowDiffPrototype">Compare: <b>Latest</b></span><span ng-hide="ModelData.ShowDiffPrototype">Latest</span>
 	        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
 	    </button>
+	    <!--
 	    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
 	    	<li class="dropdown-input">
 	    		<input class="ve-plain-input" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
 	    	</li>
 	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
 	        	<a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
+	        </li>
+	    </ul>
+	    -->
+	    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+	    	<li class="dropdown-input">
+	    		<input class="ve-plain-input" type="text" placeholder="Type here to filter history">
+	    	</li>
+	        <li class="checked-list-item">
+	        	<a>Latest | igomes - 8/23/17 2:12 PM</a>
+	        </li>
+	        <li class="disabled-list-item">
+	        	<a>eherrick - 6/13/17 11:40 AM</a>
+	        </li>
+	        <li class="disabled-list-item">
+	        	<a>eherrick - 6/7/17 2:40 PM</a>
+	        </li>
+	        <li class="disabled-list-item">
+	        	<a>eherrick - 2/18/17 8:23 AM</a>
 	        </li>
 	    </ul>
 	</div>
@@ -29,14 +48,17 @@
 	    	<li class="dropdown-input">
 	    		<input class="ve-plain-input" type="text" placeholder="Type here to filter history">
 	    	</li>
-	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
-	        	<a>admin - 3/10/17 4:34 PM</a>
+	        <li class="disabled-list-item">
+	        	<a>Latest | igomes - 8/23/17 2:12 PM</a>
 	        </li>
-	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
-	        	<a>admin - 3/10/17 4:34 PM</a>
+	        <li class="checked-list-item">
+	        	<a>eherrick - 6/13/17 11:40 AM</a>
 	        </li>
-	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
-	        	<a>admin - 3/10/17 4:34 PM</a>
+	        <li>
+	        	<a>eherrick - 6/7/17 2:40 PM</a>
+	        </li>
+	        <li>
+	        	<a>eherrick - 2/18/17 8:23 AM</a>
 	        </li>
 	    </ul>
 	</div>

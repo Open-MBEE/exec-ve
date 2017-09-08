@@ -421,6 +421,33 @@ div.tooltip-inner {
     margin-bottom: 6px;
   }
 
+  li a{
+    padding-left: 32px;
+  }
+
+  li.checked-list-item{
+    position:relative
+  }
+
+  li.disabled-list-item a{
+    color:$ve-light-text;
+  }
+
+  li.disabled-list-item a:hover{
+    background-color:white;
+  }
+
+  .checked-list-item::before {
+    content: "\f00c";
+    font-family: FontAwesome;
+    height: 16px;
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 16px;
+    color:$ve-green-lighter-1;
+  }
+
   ul{
     min-width:100%;
   }
