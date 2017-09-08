@@ -6,6 +6,7 @@ angular.module('mms')
 function TableService($q, $http, URLService, UtilsService, CacheService, _, ElementService) {
 
     var readTable = function(reqOb) {
+
       var deferred = $q.defer();
 
       var tableColumnHeadersLabels=[];
@@ -55,16 +56,19 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
               tableRowHeaders.push(rowHeaders[counter++]);
             }
       });//ElementService.getElements - rowHeadersMmsEid
-      
+     
+
       ElementService.getElements(dataValuesMmmEid, 1)
         .then(function(refValues) {
         var counter = 0;
         var values = [];
         dataValuesMmmEid.elementIds.forEach(function(elementId){
-          if (elementId.indexOf("_") === 0) //md id
+          if (elementId.indexOf("_") === 0) {//md id
             values.push(refValues[counter++]);
-          else
+          }
+          else {
             values.push(elementId);
+          }
         });
         var dataTableValues = [];
         var datavalues = [];
@@ -106,44 +110,6 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         deferred.resolve(r);
       });
       return deferred.promise;
-      //readTablesCommon();
-    
-      /*function readTablesCommon(){
-        
-            ElementService.getElements(dataValuesMmmEid, 1)
-              .then(function(values) {
-                console.log("!!!++++++++++++++++++++++++++");
-                console.log(dataValuesMmmEid);
-                console.log(values);
-                var dataTableValues = [];
-                var datavalues = [];
-                var startIndex = 0;
-                var dataIdFilters=[];
-                var counter = 0;
-                
-                var valueLength = numOfDataColumn* numOfRowHeadersPerTable;//rowHeadersMmsEid.length;
-                for (var i = 0; i < valueLength; i= i + numOfDataColumn){
-                  var datarow =[];// new Array(tableColumnHeadersLabels[k].length);
-                  for ( var j = 0; j < numOfDataColumn; j++){
-                    datarow.push(values[counter++]); 
-                  }
-                  datavalues.push(datarow);
-                }
-
-                var r =  {
-                   tableColumnHeadersLabels: tableColumnHeadersLabels, //[]
-                   tableRowHeaders: eachRowHeader,
-                   datavalues: datavalues, //[][] - array
-                   indexDocumentation: indexDocumentation,
-                   indexName : indexName
-                };
-              deferred.resolve(r);
-          });//ElementService.getElements - dataValuesMmEid
-        
-      } //end of readTableCommon function
-     
-      return deferred.promise;
-      */
     }; //end of readTable
 
 
@@ -301,9 +267,6 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
      
     var readTableCols = function(reqOb) {
       var deferred = $q.defer();
-      //ElementService.getElement(mmsEid, false, ws, version)
-      //console.log("1111111111111reqOb");
-      //console.log(reqOb);
       ElementService.getElement(reqOb, 1)
       .then(function(data) {
         var ids = [];
@@ -325,10 +288,6 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
             return cell.content[0].source;
           });
         });
-        console.log("==========ids");
-        console.log(ids);
-        console.log("=======reqOb");
-        console.log(reqOb);
         var promises = [];
         ids.forEach(function(col, i) {
           columns[i] = [];
@@ -339,8 +298,6 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
               var val;
               // LiteralReal => double
               // Number, integer, etc.?
-              console.log("celll=============");
-              console.log(cell);
               if (typeof cell.value !== 'undefined') {
 
                 if (cell.value[0].type === "LiteralString")
@@ -362,8 +319,6 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
             });
           }));
         });
-        console.log("========== columns");
-        console.log(columns);
         $q.all(promises).then(function(){
           // strip out non-value columns (these are just counters/indices generated from the row name)
           var cc = columns.length - 1;
@@ -381,7 +336,6 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
             columnKeys: keys,
             title: title
           };
-          console.log(value);
           deferred.resolve(value);
         });
       });

@@ -21,13 +21,10 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
         e.stopPropagation();
       });
 
-      var udcolors = [];
-      if (scope.color !== undefined){
-        scope.color.split(";").forEach( function(d){
-          var temp = d.split(':');
-          udcolors[Number(temp[0])] = temp[1].split(",");
-        });
-       }
+     
+      
+
+       //var udcolors.push{"colors":[0,3,4,7,8]}
       // Color scale
       //var color = d3.scale.category20();
       var d3colorR = d3.scale.category10().range();
@@ -349,7 +346,14 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       }
           
       scope.render = function() {
+          
           if (scopetableColumnHeadersLabel.length === 0) return;
+          
+          var udcolors = [];
+          if (scope.plot.config.colors !== undefined){
+            udcolors[0] = scope.plot.config.colors;
+           }
+
           var dataValuesPerTable;
           //dataValuesPerTable.length = legends.length
           for ( var k = 0; k < scope.datavalues.length; k++){
@@ -478,9 +482,12 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
           //scope.indexName = value.indexName;
         });    
     
+      scope.plot.config = "{'colors':[4,1,2,3,4]}";//;"0:9,1,3,4,5;1:1,2,3,4; 2:9,8,7,6,5,4,3,2,1";
       if ( scope.plot.config.length !== 0){
         scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
       } 
+      console.log("scope.plot.config=========================");
+      console.log(scope.plot.config);
     }; //end of link
 
     return {
