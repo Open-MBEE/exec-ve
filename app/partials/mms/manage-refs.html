@@ -7,26 +7,23 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
-                        <uib-tabset active="activeTab" type="tabs" justified="false" class="ve-light-tabs">
-                            <uib-tab index="0" classes="tab-item" heading="Branches">
-                                <ul class="ve-light-list">
-                                    <li ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)"
-                                        ng-class="{'selected': branch.id === refSelected.id}">
-                                        <a>{{ branch.name }}</a>
-                                    </li>
-                                </ul>
-                            </uib-tab>
-                            <uib-tab index="1" classes="tab-item" heading="Tags">
-                                <ul class="ve-light-list">
-                                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
-                                        ng-class="{'selected': tag.id === refSelected.id}">
-                                        <a>{{ tag.name }}</a>
-                                    </li>
-                                </ul>
-                            </uib-tab>
-                        </uib-tabset>
+                        <ul class="ve-light-list">
+                            <li>
+                                <h2>Branches</h2>
+                            </li>
+                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)"
+                                ng-class="{'selected': branch.id === refSelected.id}">
+                                <a>{{ branch.name }}</a>
+                            </li>
+                            <li>
+                                <h2>Tags</h2>
+                            </li>
+                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
+                                ng-class="{'selected': tag.id === refSelected.id}">
+                                <a>{{ tag.name }}</a>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="col-md-8 ve-light-panels-detail-header"></div>
                     <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
                         <div class="panels-detail-title">
                             <h3 class="{{refSelected.type}} ref-type">{{refSelected.name}}</h3>

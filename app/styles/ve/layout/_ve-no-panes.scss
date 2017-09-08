@@ -81,9 +81,18 @@ ul.ve-light-list {
   max-height: 300px;
   overflow-y: auto;
   width: 100%;
-  background-color: white;
+  background-color: $ve-silver-lighter-1;
   border-right: 1px solid $ve-silver-darker-1;
   margin-bottom: 0;
+
+  h2{
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: .14em;
+    font-size: 14px;
+    color: grey;
+  }
 
   li {
     padding: 8px 18px;
@@ -92,8 +101,8 @@ ul.ve-light-list {
     border-bottom: 1px solid $ve-silver-darker-1;
   }
 
-  li:hover {
-    background: $ve-silver-lighter-2;
+  li.ref-item:hover {
+    background: $ve-silver-darker-0;
   }
 
   li a,
@@ -103,7 +112,7 @@ ul.ve-light-list {
   }
 
   li.selected {
-    background-color: $ve-silver-lighter-1;
+    background-color: $ve-silver-base;
     box-shadow: 20px 0 0 0 $ve-green-lighter-1;
     width: calc(100% - 3px);
 
