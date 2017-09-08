@@ -2,6 +2,7 @@
 
     <h1 ng-if="mmsLink" class="view-title">
       {{mmsNumber}} <mms-view-link mms-element-id="{{view.id}}" mms-doc-id="{{view.id}}"></mms-view-link>
+      <mms-view-link mms-element-id="{{view.id}}" mms-doc-id="{{view.id}}" link-text="Open Document" class="btn btn-primary open-document"><i class="fa fa-share" aria-hidden="true"></i>Open Document</mms-view-link>
     </h1>
 
     <h1 ng-if="!mmsLink" class="view-title">

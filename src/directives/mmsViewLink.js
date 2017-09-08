@@ -89,10 +89,13 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsDocId: '@',
-            mmsPeId: '@'
+            mmsPeId: '@',
+            linkText: '@?'
         },
         require: '?^^mmsView',
-        template: '<a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a>',
+        template: ['<span ng-if="linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{linkText}}</a></span>',
+            '<span ng-if="!linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a></span>'
+        ].join(''),
         link: mmsViewLinkLink
     };
 }
