@@ -63,7 +63,7 @@
    * @TODO: Add data types support (spline, area-spline, area-line, etc.)
    * @TODO: Find way to avoid using onrendered callback for log scale
    */
-  function mmsLineGraph(TableService, $window, $q, $log) {
+  function mmsLineGraph(TableService, $window, $q, $log, mmsViewCtrl) {
 
     var graphCount = 0;
     var DEFAULT = {
@@ -131,11 +131,10 @@
     /**
      * Generate C3 configurations for the table
      */
-    function generateGraphSettings(scope) {
+    function generateGraphSettings(scope, projectId, refId, commitId) {
       var deferred = $q.defer();
 
-      var ws = scope.mmsWs;
-      var version = scope.mmsVersion;
+    
       var promises = [];
       var eids = scope.eid.split(',').map(function (val) {
         return val.trim();
@@ -149,8 +148,11 @@
 
       // Initiate REST calls
       eids.forEach(function(eid) {
-        promises.push(TableService.readTableCols(eid, ws, version));
+        var reqOb = {elementId: eid, projectId: projectId, refId: refId, commitId: commitId};
+        promises.push(TableService.readTableCols(reqOb));
       });
+      console.log("-----------------");
+      console.log(promises);
 
       // Collect column settings
       if (scope.xCols) {
@@ -583,7 +585,21 @@
       var d3 = $window.d3;
       var c3 = $window.c3;
 
-      generateGraphSettings(scope).then(function(_chart) {
+      var projectId;
+      var refId;
+      var commitId;
+          
+      if (mmsViewCtrl) {
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (!projectId)
+            projectId = viewVersion.projectId;
+        if (!refId)
+            refId = viewVersion.refId;
+        if (!commitId)
+            commitId = viewVersion.commitId;
+      }
+
+      generateGraphSettings(scope, projectId, refId, commitId).then(function(_chart) {
         // Handle logarithmic scales
         if (scope.logScale) {
           // Both axes use same log base
