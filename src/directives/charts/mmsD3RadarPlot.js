@@ -8,29 +8,10 @@
         var colorscale = d3.scale.category10();
         var w = 500, h = 500;
 
-       var scopeTableIds = [];
-       var scopetableColumnHeadersLabel= [];
-        //if no below div, the table will be on top of Radar chart.
-        /*  var xx = d3.select(element[0])
-          .append('div')
-          .append("svg")
-          .attr("height", h+200)
-          .attr("width", w + 200);
-        */
- 
+        var scopeTableIds = [];
+        var scopetableColumnHeadersLabel= [];
         var divchart = d3.select(element[0]).append('div');
-
-           /*var divchart = d3.select(element[0]) 
-          .append("div")
-          .attr("id", "chart");
  
-           var svg = divchart 
-            .append('svg')
-            .attr("height", h+200)
-            .attr("width", w + 200);
-          */
-         
-        var processed = false;
         var projectId;
         var refId;
         var commitId;
@@ -44,135 +25,128 @@
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-            scope.render = function() {
-              if (scopetableColumnHeadersLabel.length === 0) return;
-              var i, j, k;
-              var datatable = [];
-              var dataValuesPerTable;
-              for ( k = 0; k < scope.datavalues.length; k++){
-                dataValuesPerTable = scope.datavalues[k];
-                var rowvalues=[];
-                var rowsysmlIds=[];
-                for ( i = 0; i < dataValuesPerTable.length; i++){
-                    var tvalues = [];
-                    //var sysmlIds = []; //not used but possible to use for filter
-                    for ( j = 0; j < dataValuesPerTable[i].length; j++){
-                      //sysmlIds[j] =  dataValuesPerTable[i][j].id;
-                      var datavalue = null;
-                      if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
-                          datavalue = dataValuesPerTable[i][j].defaultValue;
-                      else if (dataValuesPerTable[i][j].type === 'Slot')
-                          datavalue = dataValuesPerTable[i][j].value[0];
-                      if (datavalue)
-                         tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value: datavalue.value};
-                    }
-                    rowvalues[i] = tvalues;
-                    //rowsysmlIds[i] =sysmlIds;
+   scope.render = function() {
+    if (scopetableColumnHeadersLabel.length === 0) return;
+    var i, j, k;
+    var datatable = [];
+    var dataValuesPerTable;
+    for ( k = 0; k < scope.datavalues.length; k++){
+      dataValuesPerTable = scope.datavalues[k];
+      var rowvalues=[];
+      var rowsysmlIds=[];
+      for ( i = 0; i < dataValuesPerTable.length; i++){
+          var tvalues = [];
+          for ( j = 0; j < dataValuesPerTable[i].length; j++){
+            var datavalue = null;
+            if (isNaN(dataValuesPerTable[i][j])){
+              if ( dataValuesPerTable[i][j].type === "Class"){ //sourceProperty = "documentation"
+                if ( scope.indexDocumentation.includes(i+","+j)){
+                  if ( !isNaN(dataValuesPerTable[i][j].documentation))
+                    datavalue = Number(dataValuesPerTable[i][j].documentation);
                 }
-                d3.select("."+ scopeTableIds[k]).remove();
-                var dataIdDiv = divchart.append('div').attr("class", scopeTableIds[k])
-                                                      .attr("style", 'border:1px solid #ddd');
-
-
-                RadarChart.draw(scopeTableIds[k], rowvalues, dataIdDiv);
-                //add legends
-                var legends = [];
-                for ( i = 0; i < scope.tableRowHeaders[k].length; i++){
-                  legends.push(scope.tableRowHeaders[k][i].name);
+                else if (scope.indexName.includes(i+","+j)){
+                  if ( !isNaN(dataValuesPerTable[i][j].name))
+                    datavalue =  Number(dataValuesPerTable[i][j].name);
                 }
-                initiateLegend(legends, scopeTableIds[k]);
-              } //end of loop k (per table)
-            }; //end of scope.render
- 
-            scope.$watch('datavalues', function(newVals, oldVals) {
-                  return scope.render();
-                  }, true);
-             scope.$watch('legends', function(newVals, oldVals) {
-                  return scope.render();
-                  }, true);
+              }
+              else {
+                if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
+                    datavalue = dataValuesPerTable[i][j].defaultValue.value;
+                else if (dataValuesPerTable[i][j].type === 'Slot')
+                    datavalue = dataValuesPerTable[i][j].value[0].value;
+              }
+            }
+            else
+              datavalue = dataValuesPerTable[i][j];
+            if( datavalue)
+             tvalues[j] = {axis: scopetableColumnHeadersLabel[k][j],  value: datavalue}; 
+          } //end of for loop j
+          rowvalues[i] = tvalues;
+      }
+      d3.select("."+ scopeTableIds[k]).remove();
+      var dataIdDiv = divchart.append('div').attr("class", scopeTableIds[k])
+                                            .attr("style", 'border:1px solid #ddd');
 
-            /*var reqOb = {elementId: scope.mmsEid, projectId: projectId, refId: refId, commitId: commitId};
+      RadarChart.draw(scopeTableIds[k], rowvalues, dataIdDiv);
+      //add legends
+      var legends = [];
+      for ( i = 0; i < scope.tableRowHeaders[k].length; i++){
+        legends.push(scope.tableRowHeaders[k][i].name);
+      }
+      initiateLegend(legends, scopeTableIds[k]);
+    } //end of loop k (per table)
+  }; //end of scope.render
 
-             TableService.readTables (reqOb)
-               .then(function(value) {
-                  scopeTableTitles = value.tableTitles;
-                  scopeTableIds = value.tableIds;
-                  scopetableColumnHeadersLabel= value.tableColumnHeadersLabels;
-                  scope.tableRowHeaders = value.tableRowHeaders;
-                  scope.datavalues = value.datavalues; //[][] - array
-                  dataIdFilters = value.dataIdFilters;
-            });
-            */
+  scope.$watch('datavalues', function(newVals, oldVals) {
+        return scope.render();
+        }, true);
+  scope.$watch('legends', function(newVals, oldVals) {
+        return scope.render();
+        }, true);
 
-            
-            scope.plot = JSON.parse(scope.splot); 
-            var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};   
-            TableService.readTable (reqOb)
-              .then(function(value) {
-                scopeTableIds.push('_'+scope.$id);
-                scopetableColumnHeadersLabel = [];
-                scopetableColumnHeadersLabel.push(value.tableColumnHeadersLabels);
-                scope.tableRowHeaders = [];
-                scope.tableRowHeaders.push(value.tableRowHeaders);
-                scope.datavalues = [];
-                scope.datavalues.push(value.datavalues); //[][] - array
-                //scope.indexDocumentation = value.indexDocumentation;
-                //scope.indexName = value.indexName;
-              });    
+  scope.plot = JSON.parse(scope.splot); 
+  var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};   
+  TableService.readTable (reqOb)
+    .then(function(value) {
+      scopeTableIds.push('_'+scope.$id);
+      scopetableColumnHeadersLabel = [];
+      scopetableColumnHeadersLabel.push(value.tableColumnHeadersLabels);
+      scope.tableRowHeaders = [];
+      scope.tableRowHeaders.push(value.tableRowHeaders);
+      scope.datavalues = [];
+      scope.datavalues.push(value.datavalues); //[][] - array
+      scope.indexDocumentation = value.indexDocumentation;
+      scope.indexName = value.indexName;
+    });    
 
 
 
-        var cfg;
-        var RadarChart = {
-        draw: function(id, d, dataIdDiv){
-          cfg = {
-           radius: 5,
-           w: 500,
-           h: 500,
-           factor: 1,
-           factorLegend: 0.85,
-           levels: 3,
-           maxValue: 0,
-           radians: 2 * Math.PI,
-           opacityArea: 0.5,
-           ToRight: 5,
-           TranslateX: 80,
-           TranslateY: 80,
-           ExtraWidthX: 100,
-           ExtraWidthY:  0, /*100 original */
-           color: d3.scale.category10()
-          };
-         
-
-        cfg.maxValue = Math.max(cfg.maxValue, 
-          d3.max(d, function(i){
-            return d3.max(i.map(
-              function(o){return Number(o.value);}));
-            })
-          );
-       
-        var allAxis = (d[0].map(function(i, j){return i.axis;}));
-        var total = allAxis.length;
-        var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
-        
-        //if ( dataIdDiv !== null)
-        //dataIdDiv.append("h3").text(title);
-        d3.select(".rdchart." + id).selectAll('*').remove();
-              var svg = d3.select(".rdchart." + id);
-        if ( svg[0][0] === null) //first time
-            svg = dataIdDiv.append("svg").attr("class", "rdchart " + id)
-                                         .attr("height", h+200)
-                                         .attr("width", w + 200);
-              
-
-        //d3.select('#chart').select("svg").selectAll('*').remove();
+    var cfg;
+    var RadarChart = {
+    draw: function(id, d, dataIdDiv){
+      cfg = {
+       radius: 5,
+       w: 500,
+       h: 500,
+       factor: 1,
+       factorLegend: 0.85,
+       levels: 3,
+       maxValue: 0,
+       radians: 2 * Math.PI,
+       opacityArea: 0.5,
+       ToRight: 5,
+       TranslateX: 80,
+       TranslateY: 80,
+       ExtraWidthX: 100,
+       ExtraWidthY:  0, /*100 original */
+       color: d3.scale.category10()
+      };
      
-        var g = svg
-          .append("g")
-          .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
-          
-         var tooltip;
 
+    cfg.maxValue = Math.max(cfg.maxValue, 
+      d3.max(d, function(i){
+        return d3.max(i.map(
+          function(o){return Number(o.value);}));
+        })
+      );
+   
+    var allAxis = (d[0].map(function(i, j){return i.axis;}));
+    var total = allAxis.length;
+    var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
+    
+    //if ( dataIdDiv !== null)
+    //dataIdDiv.append("h3").text(title);
+    d3.select(".rdchart." + id).selectAll('*').remove();
+          var svg = d3.select(".rdchart." + id);
+    if ( svg[0][0] === null) //first time
+        svg = dataIdDiv.append("svg").attr("class", "rdchart " + id)
+                                     .attr("height", h+200)
+                                     .attr("width", w + 200);
+    var g = svg
+      .append("g")
+      .attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
+      
+    var tooltip;
     //Text indicating at what % each level is
     for(var j=0; j<cfg.levels; j++){
       var levelFactor2 = cfg.factor*radius*((j+1)/cfg.levels);
