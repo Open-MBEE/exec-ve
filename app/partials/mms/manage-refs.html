@@ -8,17 +8,20 @@
                 <div class="panel-body">
                     <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
                         <ul class="ve-light-list">
+                            <li class="ve-light-input">
+                                <input placeholder="Filter Tags and Branches" class="ve-plain-input">
+                            </li>
                             <li class="ref-title">
                                 <h2><i class="fa fa-code-fork" aria-hidden="true"></i>Branches</h2>
                             </li>
-                            <li ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)"
+                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)"
                                 ng-class="{'selected': branch.id === refSelected.id}">
                                 <a>{{ branch.name }}</a>
                             </li>
                             <li class="ref-title">
                                 <h2><i class="fa fa-tag" aria-hidden="true"></i>Tags</h2>
                             </li>
-                            <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
+                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
                                 ng-class="{'selected': tag.id === refSelected.id}">
                                 <a>{{ tag.name }}</a>
                             </li>

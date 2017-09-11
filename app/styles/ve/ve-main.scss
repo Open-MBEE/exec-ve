@@ -75,6 +75,7 @@ div.tooltip-inner {
     2.4.1 Light tab system
     2.4.2 Dark Tab system
   2.5 Banners
+  2.6 Input
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -607,6 +608,20 @@ span.fixed-content-dropdown{
   border-radius: 3px;
   color: $ve-teal-base;
   margin: 4px 10px 14px;
+}
+
+
+/*------------------------------------------------------------------
+  2.6 Input
+-------------------------------------------------------------------*/
+
+.ve-plain-input{
+  background-color: $ve-silver-base;
+  padding: 3px 6px;
+  border: none;
+  border-radius: 3px;
+  margin: 4px 10px;
+  width: calc(100% - 20px);
 }
 
 /*------------------------------------------------------------------
