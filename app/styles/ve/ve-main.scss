@@ -429,14 +429,6 @@ div.tooltip-inner {
     position:relative
   }
 
-  li.disabled-list-item a{
-    color:$ve-light-text;
-  }
-
-  li.disabled-list-item a:hover{
-    background-color:white;
-  }
-
   .checked-list-item::before {
     content: "\f00c";
     font-family: FontAwesome;
