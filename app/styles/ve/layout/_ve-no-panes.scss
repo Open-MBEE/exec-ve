@@ -90,21 +90,33 @@ ul.ve-light-list {
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: .14em;
-    font-size: 14px;
+    font-size: 13px;
     color: grey;
   }
 
+  h2 .fa{
+    padding-right:4px;
+  }
+
+  li.ref-title{
+    padding: 8px 10px; 
+  }
+
   li {
-    padding: 8px 18px;
-    font-size: 14px;
+    padding: 8px 24px;
+    font-size: 16px;
     cursor: pointer;
     border-bottom: 1px solid $ve-silver-darker-1;
   }
 
-  li.ref-item:hover {
-    background: $ve-silver-darker-0;
+  li:hover {
+    background: $ve-silver-lighter-0;
   }
-
+  
+  li.ref-title:hover {
+    background: $ve-silver-lighter-1;
+  }
+  
   li a,
   li a:hover,
   li a:visited {
