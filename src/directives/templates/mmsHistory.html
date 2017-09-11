@@ -39,28 +39,31 @@
 
 	<input type="checkbox" style="margin-right: 4px;" ng-model="ModelData.ShowDiffPrototype">Compare versions
 
-	<div class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav>
-	    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
-	        Base: <b>6/13/17 11:40 AM by eherrick</b>
-	        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
-	    </button>
-	    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-	    	<li class="dropdown-input">
-	    		<input class="ve-plain-input" type="text" placeholder="Type here to filter history">
-	    	</li>
-	        <li>
-	        	<a>Latest | igomes - 8/23/17 2:12 PM</a>
-	        </li>
-	        <li class="checked-list-item">
-	        	<a>eherrick - 6/13/17 11:40 AM</a>
-	        </li>
-	        <li>
-	        	<a>eherrick - 6/7/17 2:40 PM</a>
-	        </li>
-	        <li>
-	        	<a>eherrick - 2/18/17 8:23 AM</a>
-	        </li>
-	    </ul>
+	<div>
+		<div style="width:calc(100% - 90px);display:inline-block;" class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav>
+		    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
+		        Base: <b>6/13/17 11:40 AM by eherrick</b>
+		        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
+		    </button>
+		    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+		    	<li class="dropdown-input">
+		    		<input class="ve-plain-input" type="text" placeholder="Type here to filter history">
+		    	</li>
+		        <li>
+		        	<a>Latest | igomes - 8/23/17 2:12 PM</a>
+		        </li>
+		        <li class="checked-list-item">
+		        	<a>eherrick - 6/13/17 11:40 AM</a>
+		        </li>
+		        <li>
+		        	<a>eherrick - 6/7/17 2:40 PM</a>
+		        </li>
+		        <li>
+		        	<a>eherrick - 2/18/17 8:23 AM</a>
+		        </li>
+		    </ul>
+		</div>
+		<button style="float:right;margin:8px 0;" ng-show="ModelData.ShowDiffPrototype" class="btn btn-primary">Revert</button>
 	</div>
 </div>
 
