@@ -32,17 +32,23 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
       var indexName = [];
       var indexText = [];
       var numOfDataColumn; 
+      
       for ( i = 0; i < reqOb.tableData.body.length; i++){ 
         rowHeadersMmsEid.elementIds.push(reqOb.tableData.body[i][0].content[0].source);
         for ( j = 1; j < reqOb.tableData.body[i].length; j++ ){
-          if( reqOb.tableData.body[i][j].content[0].sourceProperty === "name")
-            indexName.push(i + "," + (j-1)); //j-1 because rowheader is not included in datavalues
-          else if ( reqOb.tableData.body[i][j].content[0].sourceProperty === "documentation")
-            indexDocumentation.push(i + "," + (j-1));
-          if (reqOb.tableData.body[i][j].content[0].sourceType === "text")
-            dataValuesMmmEid.elementIds.push(reqOb.tableData.body[i][j].content[0].text.replace("<p>","").replace("</p>","").replace(" ", ""));
-          else  //sourceType = reference
-            dataValuesMmmEid.elementIds.push(reqOb.tableData.body[i][j].content[0].source);
+          if (reqOb.tableData.body[i][j].content.length == 0 ){
+            dataValuesMmmEid.elementIds.push("missing");
+          }
+          else {
+            if (reqOb.tableData.body[i][j].content[0].sourceProperty === "name")
+              indexName.push(i + "," + (j-1)); //j-1 because rowheader is not included in datavalues
+            else if ( reqOb.tableData.body[i][j].content[0].sourceProperty === "documentation")
+              indexDocumentation.push(i + "," + (j-1));
+            if (reqOb.tableData.body[i][j].content[0].sourceType === "text")
+              dataValuesMmmEid.elementIds.push(reqOb.tableData.body[i][j].content[0].text.replace("<p>","").replace("</p>","").replace(" ", ""));
+            else  //sourceType = reference
+              dataValuesMmmEid.elementIds.push(reqOb.tableData.body[i][j].content[0].source);
+          }
         }
         if (i === 0)
           numOfDataColumn = reqOb.tableData.body[i].length - 1; //-1 to remove row header

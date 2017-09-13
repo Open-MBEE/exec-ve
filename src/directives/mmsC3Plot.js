@@ -178,6 +178,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     scope.$watch('datavalues', function(newVals, oldVals) {
         return scope.render();
     }, true);
+
     scope.plot = JSON.parse(scope.splot);
     var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};
     TableService.readTable (reqOb)
@@ -188,21 +189,21 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         scope.indexDocumentation = value.indexDocumentation;
         scope.indexName = value.indexName;
       });
-
+   
     if ( scope.plot.config.length !== 0){
       scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
     }
   }; //end of link
 
-    return {
-      restrict: 'EA',
-      require: '?^mmsView',
-       scope: {
-        //plot: '<mmsPlot'
-        splot: '@'
-      },
-      link: mmsChartLink
-    }; //return
+  return {
+    restrict: 'EA',
+    require: '?^mmsView',
+     scope: {
+      //plot: '<mmsPlot'
+      splot: '@'
+    },
+    link: mmsChartLink
+  }; //return
 }
 
 
