@@ -1,6 +1,6 @@
 <div ng-if="!noEdit && editing" class="editing" style="display:none;">
 
-    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></input></h1>
+    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></h1>
 
     <h2 class="prop-title">Last Modicication</h2>
     <h3 class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</h3>
@@ -13,10 +13,10 @@
               <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
             </div>
             <div ng-repeat="value in editValues" ng-switch on="value.type">
-              <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.value"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-              <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.value"></input> <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-              <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"></input> {{value.value}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-              <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.value"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.value"> <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"> {{value.value}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+              <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
                   <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-ref-id="{{mmsRef}}" mms-project-id="{{mmsProject}}" ng-model="value.value" mms-element-id="{{element.id}}"></textarea>
                   <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
@@ -28,7 +28,7 @@
               <div ng-switch-default>Editing not supported for now</div>
             </div>
             <div ng-if="editValues.length != 0 && isSlot">
-            <button class="btn btn-sm" ng-click="addValue(editValues[0].type)">Add</button>
+              <button class="btn btn-sm" ng-click="addValue(editValues[0].type)">Add</button>
             </div>
         </div>
         <div ng-if="isEnumeration" ng-repeat="val in editValues">
@@ -43,10 +43,10 @@
     <div ng-if="edit.type === 'Constraint'">
         <h2 class="prop-title spec-view-value-heading">Constraint Specification</h2>
         <div ng-switch on="editValues[0].type">
-            <div ng-switch-when="LiteralInteger"><input type="number" ng-model="editValues[0].value"/></div>
-            <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="editValues[0].value"/></div>
-            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="editValues[0].value"/></div>
-            <div ng-switch-when="LiteralReal"><input type="number" ng-model="editValues[0].value" step="any"/></div>
+            <div ng-switch-when="LiteralInteger"><input type="number" ng-model="editValues[0].value"></div>
+            <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="editValues[0].value"></div>
+            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="editValues[0].value"></div>
+            <div ng-switch-when="LiteralReal"><input type="number" ng-model="editValues[0].value" step="any"></div>
             <div ng-switch-when="LiteralString">
                 <textarea ng-model="editValues[0].value"></textarea>
             </div>
@@ -93,7 +93,6 @@
 
     <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
         <h2 class="prop-title spec-view-value-heading">Property Value</h2>
-        <div ng-if="!isRestrictedVal">
         <div ng-repeat="value in values" ng-switch on="value.type">
             <h3 class="prop" ng-switch-when="LiteralInteger">{{value.value}}</h3>
             <h3 class="prop" ng-switch-when="LiteralBoolean">{{value.value}}</h3>
@@ -104,10 +103,6 @@
             <h3 class="prop" ng-switch-when="InstanceValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.instanceId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
             <h3 class="prop" ng-switch-when="OpaqueExpression">{{value.body[0]}}</h3>
             <h3 class="prop" ng-switch-default>{{value}}</h3>
-        </div>
-        </div>
-        <div ng-if="isRestrictedVal">
-            <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{values[0].operand[1].elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
         </div>
         <h2 class="prop-title spec-view-value-heading">Property Type</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.typeId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked()"></mms-transclude-name></h3>
@@ -128,7 +123,7 @@
     </div>
 
     <div ng-if="element.type === 'Association'">
-        <h2 class="prop-title">ROle 1</h2>
+        <h2 class="prop-title">Role 1</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.memberEndIds[0]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
         <h2 class="prop-title">Role 2</h2>
         <h3 class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.memberEndIds[1]}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></h3>
