@@ -1,70 +1,58 @@
 <h2 class="right-pane-title">Element History <span ng-show="gettingHistory"><i class="fa fa-spin fa-spinner"></i></span></h2>
 
-
 <div style="position:relative;">
-	<div class="diff-dotted-connection" ng-show="ModelData.ShowDiffPrototype"></div>
-	<div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav>
-	    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
-	        <span ng-show="ModelData.ShowDiffPrototype">Compare: <b>Latest</b></span><span ng-hide="ModelData.ShowDiffPrototype">Latest</span>
-	        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
-	    </button>
-	    <!--
-	    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-	    	<li class="dropdown-input">
-	    		<input class="ve-plain-input" ng-model="historyFilter" type="text" placeholder="Type here to filter history">
-	    	</li>
-	        <li  ng-model="selects.commitSelected" ng-repeat="version in history | filter:historyFilter">
-	        	<a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
-	        </li>
-	    </ul>
-	    -->
-	    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-	    	<li class="dropdown-input">
-	    		<input class="ve-plain-input" type="text" placeholder="Type here to filter history">
-	    	</li>
-	        <li class="checked-list-item">
-	        	<a>Latest | igomes - 8/23/17 2:12 PM</a>
-	        </li>
-	        <li>
-	        	<a>eherrick - 6/13/17 11:40 AM</a>
-	        </li>
-	        <li>
-	        	<a>eherrick - 6/7/17 2:40 PM</a>
-	        </li>
-	        <li>
-	        	<a>eherrick - 2/18/17 8:23 AM</a>
-	        </li>
-	    </ul>
-	</div>
+    <div class="diff-dotted-connection" ng-show="ModelData.ShowDiffPrototype"></div>
+    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick">
+        <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
+            <span ng-show="ModelData.ShowDiffPrototype">Compare: </span><span>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</span>
+            <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
+        </button>
+        <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+            <li class="dropdown-input">
+                <input class="ve-plain-input" type="text" placeholder="Type here to filter history" ng-model="historyFilter">
+            </li>
+            <li ng-click="commitClicked(version)" ng-model="compareCommit.commitSelected" ng-repeat="version in compareCommit.compareHistory | filter:historyFilter"
+                ng-class="{'checked-list-item': version === compareCommit.commitSelected}">
+                <a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
+            </li>
+        </ul>
+    </div>
 
-	<input type="checkbox" style="margin-right: 4px;" ng-model="ModelData.ShowDiffPrototype">Compare versions
+    <input type="checkbox" style="margin-right: 4px;" ng-model="ModelData.ShowDiffPrototype" ng-disabled="disableCompare">Compare versions
 
-	<div>
-		<div style="width:calc(100% - 90px);display:inline-block;" class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav>
-		    <button class="dropdown-toggle" type="button"  ng-click="updateProjectChecked()" uib-dropdown-toggle>
-		        Base: <b>6/13/17 11:40 AM by eherrick</b>
-		        <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
-		    </button>
-		    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-		    	<li class="dropdown-input">
-		    		<input class="ve-plain-input" type="text" placeholder="Type here to filter history">
-		    	</li>
-		        <li>
-		        	<a>Latest | igomes - 8/23/17 2:12 PM</a>
-		        </li>
-		        <li class="checked-list-item">
-		        	<a>eherrick - 6/13/17 11:40 AM</a>
-		        </li>
-		        <li>
-		        	<a>eherrick - 6/7/17 2:40 PM</a>
-		        </li>
-		        <li>
-		        	<a>eherrick - 2/18/17 8:23 AM</a>
-		        </li>
-		    </ul>
-		</div>
-		<button style="float:right;margin:8px 0;" ng-show="ModelData.ShowDiffPrototype" class="btn btn-primary">Revert</button>
-	</div>
+    <div>
+        <div class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick">
+            <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                Base: {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>
+                <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+                <li class="dropdown-input">
+                    <input class="ve-plain-input" type="text" placeholder="Type here to filter refs" ng-model="refFilter">
+                </li>
+                <li ng-click="getElementHistoryByRef(ref)" ng-model="baseCommit.refSelected" ng-repeat="ref in refList | filter:refFilter"
+                    ng-class="{'checked-list-item': ref.id === baseCommit.refSelected.id}">
+                    <a>{{ ref.type }} -- {{ref.name}}</a>
+                </li>
+            </ul>
+        </div>
+        <div style="width:calc(100% - 90px);display:inline-block;" class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav auto-close="outsideClick">
+            <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                <span>Commit: <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
+                <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+                <li class="dropdown-input">
+                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Type here to filter history">
+                </li>
+                <li ng-click="baseCommitClicked(version)" ng-model="baseCommit.commitSelected" ng-repeat="version in baseCommit.baseHistory | filter:compareHistoryFilter"
+                    ng-class="{'checked-list-item': version === baseCommit.commitSelected}" ng-disabled="$index === 0" >
+                    <a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
+                </li>
+            </ul>
+        </div>
+        <button style="float:right;margin:8px 0;" ng-show="ModelData.ShowDiffPrototype" class="btn btn-primary">Revert</button>
+    </div>
 </div>
 
 <hr style="margin-left:-20px;margin-right:-20px;">
@@ -104,18 +92,8 @@
         interactions, and state machines can be applied to blocks to specify 
         their behavior. Clause <span class="view-link">[cf:Allocations.vlink]</span> describes ways to allocate behavior to parts and blocks. </p>
 
-        <h2 class="prop-title">Type</h2>
-        <h3 class="prop ng-binding">InstanceSpecification</h3>
-        <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
-        <!-- ngRepeat: type in element._appliedStereotypeIds -->
-        <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
-        <h3 class="prop ng-binding">//OpenCAE/View Instances Bin/Case Study Description</h3>
-        <h2 class="prop-title">ID</h2>
-        <h3 class="prop id ng-binding">MMS_1461856573929_49d387a5-053a-486f-94fe-e5f85d1b081b</h3>
         <h2 class="prop-title">Branch/Tag</h2>
         <h3 class="prop ng-binding">master</h3>
-        <h2 class="prop-title">Project</h2>
-        <h3 class="prop ng-binding">PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85</h3>
         <h2 class="prop-title">Formatted Modified Time</h2>
         <h3 class="prop ng-binding">2017-07-10T20:15:04.975-0700</h3>
         <h2 class="prop-title">Commit</h2>
@@ -156,19 +134,8 @@
         between blocks, and the Behavioral Constructs including activities, 
         interactions, and state machines can be applied to blocks to specify 
         their behavior. Clause <del>15, “Allocations”</del><ins class="ins-view-link">[cf:Allocations.vlink]</ins> describes ways to allocate behavior to parts and blocks. </p>
-
-        <h2 class="prop-title">Type</h2>
-        <h3 class="prop ng-binding">InstanceSpecification</h3>
-        <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
-        <!-- ngRepeat: type in element._appliedStereotypeIds -->
-        <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
-        <h3 class="prop ng-binding">//OpenCAE/View Instances Bin/Case Study Description</h3>
-        <h2 class="prop-title">ID</h2>
-        <h3 class="prop id ng-binding">MMS_1461856573929_49d387a5-053a-486f-94fe-e5f85d1b081b</h3>
         <h2 class="prop-title">Branch/Tag</h2>
         <h3 class="prop ng-binding">master</h3>
-        <h2 class="prop-title">Project</h2>
-        <h3 class="prop ng-binding">PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85</h3>
         <h2 class="prop-title">Formatted Modified Time</h2>
         <h3 class="prop ng-binding">2017-07-10T20:15:04.975-0700</h3>
         <h2 class="prop-title">Commit</h2>
