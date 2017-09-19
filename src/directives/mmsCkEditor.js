@@ -456,8 +456,23 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             autoGrow_maxHeight: $window.innerHeight*0.65,
             autoGrow_bottomSpace: 50, 
             contentsCss: CKEDITOR.basePath+'contents.css',
-            toolbar: thisToolbar,
+            toolbar: thisToolbar
           });
+
+          // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
+          if ( attrs.autosaveKey ) {
+            // Configuration for autosave plugin
+            instance.config.autosave = {
+              SaveKey: attrs.autosaveKey,
+              delay: 20,
+              NotOlderThen: 10080, // 7 days in minutes
+              saveDetectionSelectors: '.presentation-element-saveC, .presentation-element-save, .presentation-element-cancel, .presentation-element-delete',
+              enableAutosave: true
+            };
+          } else {
+              instance.config.autosave = {enableAutosave: false};
+          }
+
           // CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
           // CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
           // CKEDITOR.plugins.addExternal('autogrow','/lib/ckeditor/plugins/autogrow/');
@@ -515,6 +530,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         scope: {
             mmsProjectId: '@',
             mmsRefId: '@',
+            autosaveKey: '@',
             mmsEditorType: '@',
             mmsEditorApi: '<?'
         },

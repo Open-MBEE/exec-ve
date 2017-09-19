@@ -3,6 +3,7 @@
  * For licensing, see LICENSE.html or http://ckeditor.com/license
  */
 
+CKEDITOR.MmsAutosavePlugin =
 (function() {
     if (!supportsLocalStorage()) {
         CKEDITOR.plugins.add("autosave", {}); //register a dummy plugin to pass CKEditor plugin initialization process
@@ -14,6 +15,9 @@
         requires: 'notification',
         version: "0.18.0",
         init: function (editor) {
+            if ( !editor.config.autosave.enableAutosave ) {
+                return;
+            }
             // Default Config
             var defaultConfig = {
                 delay: 10,
@@ -117,7 +121,7 @@
 
             editorInstance.config.autosave_timeOutId = null;
         }
-    };
+    }
 
     // localStorage detection
     function supportsLocalStorage() {
@@ -344,4 +348,78 @@
         }
         return quotaExceeded;
     }
+
+    /** Start of plugin custom modification **/
+    function _jsonParse(contentToParse) {
+        try {
+            var parseValue = JSON.parse(contentToParse.value);
+            if ( typeof parseValue === 'object' && parseValue !== null ) {
+                return { key: contentToParse.key, value: parseValue };
+            }
+        } catch(e) {}
+        return {};
+    }
+
+    function _removeAllExpiredAutosave(localStorage, listOfExpiredAutosave) {
+        listOfExpiredAutosave.forEach( function(expiredAutosave) {
+            localStorage.removeItem(expiredAutosave.key);
+        });
+    }
+
+    function _getAllExpiredAutosave( listOfAutosave, minutesTillExpired, currentDate, moment  ) {
+        return listOfAutosave.filter( function( autosave ) {
+            return moment(currentDate).diff(new Date(autosave.value.saveTime), 'minutes') > minutesTillExpired;
+        });
+    }
+
+    function _getAllAutosave(localStorage, LZString) {
+        return Object.keys(localStorage)
+            .map(function(autosaveKey) {
+                return {
+                    key: autosaveKey,
+                    value: LZString.decompressFromUTF16(localStorage.getItem(autosaveKey))
+                };
+            })
+            .map( _jsonParse )
+            .filter( function(jsonObj) { return jsonObj.value && jsonObj.value.isAutosaveContent });
+    }
+
+    function _clearExpiredLocalStorageContents(localStorage, moment, LZString, minutesTillExpired) {
+        var listOfAutosave = _getAllAutosave(localStorage, LZString);
+        var listOfExpiredAutosave = _getAllExpiredAutosave( listOfAutosave, minutesTillExpired, new Date(), moment );
+        _removeAllExpiredAutosave(localStorage, listOfExpiredAutosave);
+    }
+
+    function _trySavingContentToLocalStorage( localStorage, moment, LZString, minutesTillExpired, autosaveKey, compressedJSON  ) {
+        var quotaExceeded = false;
+        try {
+            localStorage.setItem(autosaveKey, compressedJSON);
+        } catch (e) {
+            quotaExceeded = isQuotaExceeded(e);
+            if (quotaExceeded) {
+                // need to use "customHelpers" at the front. If not, jasmine's spy wont work on this function
+                // since it will be "_clearExpiredLocalStorageContents" in this local scope and not "_clearExpiredLocalStorageContents"
+                // on "customHelpers" object where the spy is set
+                customHelpers._clearExpiredLocalStorageContents(localStorage, moment, LZString, minutesTillExpired );
+                try {
+                    localStorage.setItem(autosaveKey, compressedJSON);
+                } catch (e) {
+                quotaExceeded = true;
+            }
+          }
+        }
+        return quotaExceeded;
+    }
+
+    var customHelpers = {
+        _jsonParse: _jsonParse,
+        _removeExpiredAutosave: _removeAllExpiredAutosave,
+        _getAllExpiredAutosave: _getAllExpiredAutosave,
+        _getAllAutosave: _getAllAutosave,
+        _clearExpiredLocalStorageContents: _clearExpiredLocalStorageContents,
+        _trySavingContentToLocalStorage: _trySavingContentToLocalStorage
+    };
+    return customHelpers;
+    /** End of plugin custom modification **/
+
 })();

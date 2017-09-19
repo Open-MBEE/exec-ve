@@ -12,7 +12,7 @@
         <div class="form-group">
             <label>Comment</label>
             <textarea mms-ckeditor class="form-control" rows="3" ng-model="comment.documentation"
-                      mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"
+                      mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" autosave-key="{{projectId + refId + mmsElementId}}"
                       placeholder="Type your comment here"></textarea>
         </div>
     </div>
