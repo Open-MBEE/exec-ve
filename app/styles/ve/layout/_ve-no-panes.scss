@@ -120,11 +120,15 @@ ul.ve-light-list {
   }
 
   li.selected {
-    background-color: $ve-silver-base;
+    background-color: $ve-silver-darker-1;
 
     a {
       font-weight: 600;
     }
+  }
+
+  li.selected:hover{
+    background-color: $ve-silver-darker-1;
   }
 
   /*Indicates progress*/
