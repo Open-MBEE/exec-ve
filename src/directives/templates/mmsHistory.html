@@ -20,8 +20,8 @@
 
     <input type="checkbox" style="margin:0 4px;" ng-model="ModelData.ShowDiffPrototype" ng-disabled="disableCompare">Compare versions
 
-    <div>
-        <div class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="margin-bottom:2px;">
+    <div ng-show="ModelData.ShowDiffPrototype">
+        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="margin-bottom:2px;">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
@@ -36,7 +36,7 @@
                 </li>
             </ul>
         </div>
-        <div style="width:calc(100% - 90px);display:inline-block;margin-top:2px;"" class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav auto-close="outsideClick">
+        <div style="width:calc(100% - 90px);display:inline-block;margin-top:2px;" class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav auto-close="outsideClick">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <span>Commit: <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
@@ -51,80 +51,36 @@
                 </li>
             </ul>
         </div>
-        <button style="float:right;margin:2px 0 8px;" ng-show="ModelData.ShowDiffPrototype" class="btn btn-primary">Revert</button>
+        <button style="float:right;margin:2px 0 8px;" class="btn btn-primary">Revert</button>
     </div>
 </div>
 
-<hr style="margin-left:-20px;margin-right:-20px;">
-
-<!-- Placeholder data for prototype -->
-
-<div ng-hide="ModelData.ShowDiffPrototype">
-    <div>
-        <h1 class="prop element-title ng-binding">Block Operations</h1>
-
-        <h2 class="prop-title">Last Modification</h2>
-        <h3 class="prop ng-binding">8/23/17 2:12 PM by igomes</h3>
-
-        <!-- ngIf: element.type === 'Property' || element.type === 'Port' || element.type === 'Slot' -->
-
-        <!-- ngIf: element.type === 'Generalization' || element.type === 'Dependency' -->
-
-        <!-- ngIf: element.type === 'Connector' -->
-
-        <!-- ngIf: element.type === 'Association' -->
-
-        <!-- ngIf: element.type === 'Constraint' -->
-
-        <!-- ngIf: element.type === 'InstanceSpecification' --><div ng-if="element.type === 'InstanceSpecification'" class="ng-scope">
-            <h2 class="prop-title">Classifiers</h2>
-            <!-- ngRepeat: path in element.classifierIds --><h3 class="prop ng-scope" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="_17_0_5_1_407019f_1431903758416_800749_12055" mms-project-id="PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85" mms-ref-id="master" class="ng-isolate-scope"><!-- ngIf: element.name --><span ng-if="element.name" class="ng-binding ng-scope">Paragraph</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></h3><!-- end ngRepeat: path in element.classifierIds -->
-        </div><!-- end ngIf: element.type === 'InstanceSpecification' -->
-
-        <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
-        <p ng-show="!showDocHTML" class="doc-text ng-binding">Blocks may also specify 
-        operations or other features that describe the behavior of a system. 
-        Except for operations, this clause deals strictly with the definition of
-         properties to describe the state of a system at any given point in 
-        time, including relations between elements that define its structure. 
-        Clause 9, “Ports and Flows” specifies specific forms of interactions 
-        between blocks, and the Behavioral Constructs including activities, 
-        interactions, and state machines can be applied to blocks to specify 
-        their behavior. Clause <span class="view-link">[cf:Allocations.vlink]</span> describes ways to allocate behavior to parts and blocks. </p>
-
-        <h2 class="prop-title">Branch/Tag</h2>
-        <h3 class="prop ng-binding">master</h3>
-        <h2 class="prop-title">Formatted Modified Time</h2>
-        <h3 class="prop ng-binding">2017-07-10T20:15:04.975-0700</h3>
-        <h2 class="prop-title">Commit</h2>
-        <h3 class="prop ng-binding">7dd4d0de-e88a-429e-a0c5-7532dc28e0ad</h3>
-    </div>
-</div>
 <div ng-show="ModelData.ShowDiffPrototype">
-    <div>
-        <h1 class="prop element-title ng-binding">Block Operations</h1>
+    <hr style="margin-left:-20px;margin-right:-20px;">
+    <div ng-if="ModelData.ShowDiffPrototype">
+    <!-- <style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style>
+    <div class="textdiff" semantic-diff left-obj="origElem" right-obj="compElem" ></div> -->
+        
+        <!-- mmsEidOne: '@mmsElementOneId',
+        mmsEidTwo: '@mmsElementTwoId',
+        mmsAttr: '@',
+        mmsProjectOneId: '@',
+        mmsProjectTwoId: '@',
+        mmsRefOneId: '@',
+        mmsRefTwoId: '@',
+        mmsCommitOneId: '@',
+        mmsCommitTwoId: '@' -->
+        <h1 class="prop element-title ng-binding">
+            <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name" mms-project-one-id="{{mmsProjectId}}" mms-ref-one-id="{{mmsRefId}}" mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
+        </h1>
 
         <h2 class="prop-title">Last Modification</h2>
         <h3 class="prop ng-binding"><del>6/13/17 11:40 AM by eherrick
         </del><br><ins>8/23/17 2:12 PM by igomes
         </ins></h3>
-
-        <!-- ngIf: element.type === 'Property' || element.type === 'Port' || element.type === 'Slot' -->
-
-        <!-- ngIf: element.type === 'Generalization' || element.type === 'Dependency' -->
-
-        <!-- ngIf: element.type === 'Connector' -->
-
-        <!-- ngIf: element.type === 'Association' -->
-
-        <!-- ngIf: element.type === 'Constraint' -->
-
-        <!-- ngIf: element.type === 'InstanceSpecification' --><div ng-if="element.type === 'InstanceSpecification'" class="ng-scope">
-            <h2 class="prop-title">Classifiers</h2>
-            <!-- ngRepeat: path in element.classifierIds --><h3 class="prop ng-scope" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="_17_0_5_1_407019f_1431903758416_800749_12055" mms-project-id="PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85" mms-ref-id="master" class="ng-isolate-scope"><!-- ngIf: element.name --><span ng-if="element.name" class="ng-binding ng-scope">Paragraph</span><!-- end ngIf: element.name --><!-- ngIf: !element.name --></mms-transclude-name></h3><!-- end ngRepeat: path in element.classifierIds -->
-        </div><!-- end ngIf: element.type === 'InstanceSpecification' -->
-
+        
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
+        <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="doc" mms-project-one-id="{{mmsProjectId}}" mms-ref-one-id="{{mmsRefId}}" mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
         <p ng-show="!showDocHTML" class="doc-text ng-binding">Blocks may also specify 
         operations or other features that describe the behavior of a system. 
         Except for operations, this clause deals strictly with the definition of
@@ -143,6 +99,8 @@
     </div>
 </div>
 <!-- Spec window -->
-<mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
+<div ng-hide="ModelData.ShowDiffPrototype">
+    <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
+</div>
 
 
