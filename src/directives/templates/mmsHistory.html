@@ -4,12 +4,12 @@
     <div class="diff-dotted-connection" ng-show="ModelData.ShowDiffPrototype"></div>
     <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick">
         <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
-            <span ng-show="ModelData.ShowDiffPrototype">Compare: </span><span>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</span>
+            <span><b>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
             <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
             <li class="dropdown-input">
-                <input class="ve-plain-input" type="text" placeholder="Type here to filter history" ng-model="historyFilter">
+                <input class="ve-plain-input" type="text" placeholder="Filter history" ng-model="historyFilter">
             </li>
             <li ng-click="commitClicked(version)" ng-model="compareCommit.commitSelected" ng-repeat="version in compareCommit.compareHistory | filter:historyFilter"
                 ng-class="{'checked-list-item': version === compareCommit.commitSelected}">
@@ -18,17 +18,17 @@
         </ul>
     </div>
 
-    <input type="checkbox" style="margin-right: 4px;" ng-model="ModelData.ShowDiffPrototype" ng-disabled="disableCompare">Compare versions
+    <input type="checkbox" style="margin:0 4px;" ng-model="ModelData.ShowDiffPrototype" ng-disabled="disableCompare">Compare versions
 
     <div>
-        <div class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick">
+        <div class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="margin-bottom:2px;">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                Base: {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>
+                {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu" uib-dropdown-menu role="menu">
                 <li class="dropdown-input">
-                    <input class="ve-plain-input" type="text" placeholder="Type here to filter refs" ng-model="refFilter">
+                    <input class="ve-plain-input" type="text" placeholder="Filter refs" ng-model="refFilter">
                 </li>
                 <li ng-click="getElementHistoryByRef(ref)" ng-model="baseCommit.refSelected" ng-repeat="ref in refList | filter:refFilter"
                     ng-class="{'checked-list-item': ref.id === baseCommit.refSelected.id}">
@@ -36,14 +36,14 @@
                 </li>
             </ul>
         </div>
-        <div style="width:calc(100% - 90px);display:inline-block;" class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav auto-close="outsideClick">
+        <div style="width:calc(100% - 90px);display:inline-block;margin-top:2px;"" class="btn-group ve-light-dropdown" ng-show="ModelData.ShowDiffPrototype" uib-dropdown keyboard-nav auto-close="outsideClick">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <span>Commit: <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu" uib-dropdown-menu role="menu">
                 <li class="dropdown-input">
-                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Type here to filter history">
+                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Filter history">
                 </li>
                 <li ng-click="baseCommitClicked(version)" ng-model="baseCommit.commitSelected" ng-repeat="version in baseCommit.baseHistory | filter:compareHistoryFilter"
                     ng-class="{'checked-list-item': version === baseCommit.commitSelected}" ng-disabled="$index === 0" >
@@ -51,7 +51,7 @@
                 </li>
             </ul>
         </div>
-        <button style="float:right;margin:8px 0;" ng-show="ModelData.ShowDiffPrototype" class="btn btn-primary">Revert</button>
+        <button style="float:right;margin:2px 0 8px;" ng-show="ModelData.ShowDiffPrototype" class="btn btn-primary">Revert</button>
     </div>
 </div>
 

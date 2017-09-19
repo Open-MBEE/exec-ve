@@ -411,13 +411,14 @@ div.tooltip-inner {
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
     letter-spacing: .05em;
-    background-color:#f2f2f2;
+    background-color:$ve-silver-lighter-0;
   }
 
   li.dropdown-input{
     border-bottom: 1px solid rgba(0,0,0,.15);
     padding: 2px 0 6px;
     margin-bottom: 6px;
+    background:$ve-silver-lighter-1;
   }
 
   li a{
@@ -442,6 +443,15 @@ div.tooltip-inner {
   ul{
     min-width:100%;
   }
+}
+
+.ve-light-dropdown .dropdown-toggle:hover{
+  background-color:$ve-silver-base;  
+}
+
+
+.ve-light-dropdown.open .dropdown-toggle{
+  background-color:$ve-silver-darker-1;
 }
 
 
@@ -667,11 +677,11 @@ span.fixed-content-dropdown{
 -------------------------------------------------------------------*/
 
 .ve-plain-input{
-  background-color: #f4f4f4;
+  background-color: $ve-silver-base;
   padding: 3px 6px;
   border: none;
   border-radius: 3px;
-  margin: 4px 10px;
+  margin: 0 10px;
   width: calc(100% - 20px);
 }
 
@@ -971,10 +981,25 @@ h2.right-pane-title{
 
 .diff-dotted-connection{
   position: absolute;
-  height: calc(100% - 34px);
-  border: 3px dotted #cacaca;
-  left: -11px;
-  width: 11px;
+  height: calc(100% - 52px);
+  border: 2px solid #cacaca;
+  left: -12px;
+  width: 8px;
   top: 12px;
   border-right: none;
+  border-radius: 3px 0 0 3px;
 }
+
+.diff-dotted-connection:after{
+  background-image: url(../assets/arrowhead.svg);
+  position: absolute;
+  right: -8px;
+  top: calc(50% - 13px);
+  content: ' ';
+  background-size: 18px 24px;
+  height: 20px;
+  width: 24px;
+  background-repeat: no-repeat;
+}
+
+
