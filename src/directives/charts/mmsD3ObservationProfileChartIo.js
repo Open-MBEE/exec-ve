@@ -1,4 +1,5 @@
-'use strict';
+//not usable using stereotype <<Plot>> in mdk so commented out for now.
+/*'use strict';
  angular.module('mms.directives')
     .directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
 function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableService, $compile, growl, $window) {
@@ -495,7 +496,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
             ]
         }
         ]
-      };*/
+      };*//*
       obpchartPlot(modelData);
     };//end of render
  
@@ -530,6 +531,6 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
       link: mmsChartLink
     }; //return
 }
-
+*/
 
 

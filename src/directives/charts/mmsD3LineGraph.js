@@ -1,3 +1,5 @@
+//not usable using stereotype <<Plot>> in mdk so commented out for now.
+/*
 (function() {
   'use strict';
   angular.module('mms.directives')
@@ -63,6 +65,7 @@
    * @TODO: Add data types support (spline, area-spline, area-line, etc.)
    * @TODO: Find way to avoid using onrendered callback for log scale
    */
+   /*
   function mmsLineGraph(TableService, $window, $q, $log, mmsViewCtrl) {
 
     var graphCount = 0;
@@ -112,9 +115,7 @@
       }
       var res = label.match(/\((.+)\)/);
       if (res) {
-        /**
-         * @TODO: Add superscript support for SVG text (axes labels)
-         */
+        //@TODO: Add superscript support for SVG text (axes labels)
         var unit = res[1].replace(/\d/g, sup2('$&'));
         $log.log(label + " : " + unit);
         return ' ' + unit;
@@ -128,9 +129,8 @@
       xData, yData,                     // column data
       xColHeads, yColHeads;             // column headers
 
-    /**
-     * Generate C3 configurations for the table
-     */
+  
+    //Generate C3 configurations for the table
     function generateGraphSettings(scope, projectId, refId, commitId) {
       var deferred = $q.defer();
 
@@ -151,9 +151,7 @@
         var reqOb = {elementId: eid, projectId: projectId, refId: refId, commitId: commitId};
         promises.push(TableService.readTableCols(reqOb));
       });
-      console.log("-----------------");
-      console.log(promises);
-
+  
       // Collect column settings
       if (scope.xCols) {
         xCols = scope.xCols;
@@ -567,7 +565,7 @@
          * Generate a config object for a log gridline
          * @param {number} @pos Position/value of gridline
          */
-        function logGridLine(pos, className, text) {
+        /*function logGridLine(pos, className, text) {
           var posLog = logFn(pos);
           return {
             value: posLog,
@@ -670,3 +668,4 @@
     };
   }
 })();
+*/
