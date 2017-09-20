@@ -416,7 +416,7 @@ div.tooltip-inner {
 
   li.dropdown-input{
     border-bottom: 1px solid rgba(0,0,0,.15);
-    padding: 2px 0 6px;
+    padding: 8px 0;
     margin-bottom: 6px;
     background:$ve-silver-lighter-1;
   }
@@ -443,6 +443,11 @@ div.tooltip-inner {
   ul{
     min-width:100%;
   }
+}
+
+/*Clear padding at top of menu when there is input*/
+.dropdown-menu.menu-with-input{
+  padding-top:0px;
 }
 
 .ve-light-dropdown .dropdown-toggle:hover{
@@ -677,14 +682,13 @@ span.fixed-content-dropdown{
 -------------------------------------------------------------------*/
 
 .ve-plain-input{
-  background-color: $ve-silver-base;
+  background-color: white;
   padding: 3px 6px;
-  border: none;
+  border: 1px solid $ve-silver-darker-1;
   border-radius: 3px;
   margin: 0 10px;
   width: calc(100% - 20px);
 }
-
 
 
 /*------------------------------------------------------------------

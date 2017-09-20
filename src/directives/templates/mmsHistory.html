@@ -7,7 +7,7 @@
             <span><b>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
             <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
         </button>
-        <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+        <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
             <li class="dropdown-input">
                 <input class="ve-plain-input" type="text" placeholder="Filter history" ng-model="historyFilter">
             </li>
@@ -26,7 +26,7 @@
                 {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
-            <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+            <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
                 <li class="dropdown-input">
                     <input class="ve-plain-input" type="text" placeholder="Filter refs" ng-model="refFilter">
                 </li>
@@ -41,7 +41,7 @@
                 <span>Commit: <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
-            <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+            <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
                 <li class="dropdown-input">
                     <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Filter history">
                 </li>
