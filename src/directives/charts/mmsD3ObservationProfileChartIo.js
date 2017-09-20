@@ -261,7 +261,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
 
       //label for solid, opacity, white
       svg.selectAll(".bottomShadingLabelText")
-      .data(["On", "Standby", "Off"])
+      .data(["On(3)", "Standby(2)", "Off(1)"])
       .enter().append("g")
       .attr("transform", function(d,i){ 
         if ( i === 2)

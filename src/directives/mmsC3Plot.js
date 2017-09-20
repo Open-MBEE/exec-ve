@@ -62,6 +62,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     }
     function vf_pplot(_columns, c3json, _has_column_header) {
 
+      svg.selectAll('*').remove();
       svg.append('div').attr("id", 'c3chart' + scope.$id);
       c3json.bindto = '#c3chart' + scope.$id;
       
@@ -110,7 +111,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     if (scope.plot.table === undefined || scope.datavalues === undefined) { //data is not from table
       return;
     }
-    svg.selectAll('*').remove();
+    
 	
   	var has_column_header;
     var start_index; //0 if column header is included as data, -1 if column header is not included as data

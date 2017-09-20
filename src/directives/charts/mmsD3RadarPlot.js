@@ -8,7 +8,6 @@
       var colorscale = d3.scale.category10();
       var w = 500, h = 500;
 
-      var scopeTableId;// = [];
       var scopetableColumnHeadersLabel= [];
       var divchart = d3.select(element[0]).append('div');
 
@@ -63,17 +62,17 @@
         rowvalues[i] = tvalues;
       }
 
-      d3.select("."+ scopeTableId).remove();
-      var dataIdDiv = divchart.append('div').attr("class", scopeTableId)
+      d3.select(".radar"+ scope.$id).remove();
+      var dataIdDiv = divchart.append('div').attr("class", "radar" + scope.$id)
                                             .attr("style", 'border:1px solid #ddd');
 
-      RadarChart.draw(scopeTableId, rowvalues, dataIdDiv);
+      RadarChart.draw("radar" + scope.$id, rowvalues, dataIdDiv);
       //add legends
       var legends = [];
       for ( i = 0; i < scope.tableRowHeaders.length; i++){
         legends.push(scope.tableRowHeaders[i].name);
       }
-      initiateLegend(legends, scopeTableId);
+      initiateLegend(legends, "radar" + scope.$id);
     }; //end of scope.render
 
     scope.$watch('datavalues', function(newVals, oldVals) {
@@ -87,7 +86,6 @@
     var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};   
     TableService.readTable (reqOb)
       .then(function(value) {
-        scopeTableId ='_'+scope.$id;
         scopetableColumnHeadersLabel = value.tableColumnHeadersLabels;
         scope.tableRowHeaders = value.tableRowHeaders;
         scope.datavalues = value.datavalues; //[][] - array
