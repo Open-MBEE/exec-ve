@@ -7,10 +7,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
    
     scope.rowHeaders=[]; //not null when render is called 1st time.      
     var d3 = $window.d3;  
-    var svg = d3.select(element[0])
-      .append('div')
-      .append("svg:svg")
-      .attr("class", "papchart");
+    var divchart = d3.select(element[0]).append('div');  
         
     var projectId;
     var refId;
@@ -29,8 +26,8 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
     var processed = false;
     
     function vf_pplot(_out) {
-        var outputs = _out;
-        var width =900;
+      var outputs = _out;
+      var width =900;
       var m = [0, 0, 25, 60]; //top, right, bottom, left
       
       var maxSize = 0;
@@ -61,17 +58,18 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
       
       var line = d3.svg.line(),
       axis = d3.svg.axis().ticks(5).orient("left"),foreground;
-      //axis = d3.svg.axis().scale(y).ticks(5).orient("left");
-      
       var colorscale = d3.scale.category10();
     
-      var svg = d3.select(".papchart")
-             
+      divchart.selectAll('*').remove();
+      var svg = divchart
+        .append("svg:svg")
+        .attr("class", "papchart" + scope.$id + " papchart")
+        .attr("style", 'border:1px solid #ddd')
         .attr("width", w + m[1] + m[3])
         .attr("height", h + m[0] + m[2])
         .append("svg:g")
         .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-      
+        
       //Need to create a temporary object with the data, objectives, and threshold values
       //to scale the axes properly
       var minMax = {};
@@ -256,8 +254,6 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
 
     scope.render = function() {
       if (scopetableColumnHeadersLabel === undefined) return;
-      svg.selectAll('*').remove();
-      
       var  dataseries= [];
       var tickColor;
       for ( var i = 0; i < scope.datavalues.length; i++){
