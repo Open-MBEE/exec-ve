@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsHistory', ['ElementService', 'ProjectService', '$templateCache', '$q', '_', mmsHistory]);
+.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '$uibModal', '_', mmsHistory]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the element
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsHistory(ElementService, ProjectService, $templateCache, $q, _) {
+function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $uibModal, _) {
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {
@@ -140,13 +140,17 @@ function mmsHistory(ElementService, ProjectService, $templateCache, $q, _) {
         };
 
         scope.changeElement = changeElement;
-        scope.$watch('mmsElementId', changeElement);
+            scope.$watch('mmsElementId', changeElement);
         scope.$watch('mmsRefId', changeElement);
 
 
         //TODO
         // check if commit ids are the same - display to user that they are comparing same or disable the commit that matches
         // show diff or name, time, branch, doc, value, slots - will have multi values
+        scope.revert = function() {
+            Utils.revertAction(scope, changeElement, element);
+        };
+
     };
 
     return {

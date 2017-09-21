@@ -402,7 +402,7 @@ div.tooltip-inner {
     text-align: left;
     font-size: 14px;
     padding: 7px 8px;
-    line-height: 16px;
+    line-height: 13px;
     display: inline;
     border: none;
     border-radius: 2px !important;
@@ -412,11 +412,12 @@ div.tooltip-inner {
     transition: background-color .1s ease-out !important;
     letter-spacing: .05em;
     background-color:$ve-silver-lighter-0;
+    height: 28px;
   }
 
   li.dropdown-input{
     border-bottom: 1px solid rgba(0,0,0,.15);
-    padding: 2px 0 6px;
+    padding: 8px 0;
     margin-bottom: 6px;
     background:$ve-silver-lighter-1;
   }
@@ -445,6 +446,11 @@ div.tooltip-inner {
   }
 }
 
+/*Clear padding at top of menu when there is input*/
+.dropdown-menu.menu-with-input{
+  padding-top:0px;
+}
+
 .ve-light-dropdown .dropdown-toggle:hover{
   background-color:$ve-silver-base;  
 }
@@ -453,6 +459,22 @@ div.tooltip-inner {
 .ve-light-dropdown.open .dropdown-toggle{
   background-color:$ve-silver-darker-1;
 }
+
+/*Special height for button that is inline with dropdown*/
+.inline-dropdown-btn.btn-primary{
+  float:right;
+  margin:2px 0 8px;
+  height:28px;
+  line-height:13px;
+  width:78px;
+}
+
+.inline-dropdown-btn.ve-light-dropdown{
+  width:calc(100% - 82px);
+  display:inline-block;
+  margin-top:2px;
+}
+
 
 
 /*------------------------------------------------------------------
@@ -677,14 +699,13 @@ span.fixed-content-dropdown{
 -------------------------------------------------------------------*/
 
 .ve-plain-input{
-  background-color: $ve-silver-base;
+  background-color: white;
   padding: 3px 6px;
-  border: none;
+  border: 1px solid $ve-silver-darker-1;
   border-radius: 3px;
   margin: 0 10px;
   width: calc(100% - 20px);
 }
-
 
 
 /*------------------------------------------------------------------
@@ -985,11 +1006,12 @@ h2.right-pane-title{
   border: 2px solid #cacaca;
   left: -12px;
   width: 8px;
-  top: 12px;
+  top: 14px;
   border-right: none;
-  border-radius: 3px 0 0 3px;
+  border-radius: 8px 0 0 8px;
 }
 
+/*SVG arrow for pointing from history to present*/
 .diff-dotted-connection:after{
   background-image: url(../assets/arrowhead.svg);
   position: absolute;
@@ -1002,4 +1024,23 @@ h2.right-pane-title{
   background-repeat: no-repeat;
 }
 
+.revert-dialogue.modal-body{
+  p{
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  h1{
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+
+.element-preview-box{
+  padding: 0 20px;
+  background-color: $ve-silver-lighter-1;
+  border-radius: 3px;
+  border: 1px solid $ve-silver-darker-1;
+
+}
 
