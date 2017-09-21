@@ -412,7 +412,7 @@ div.tooltip-inner {
     transition: background-color .1s ease-out !important;
     letter-spacing: .05em;
     background-color:$ve-silver-lighter-0;
-    height: 28px;
+    min-height: 28px;
   }
 
   li.dropdown-input{
@@ -1002,11 +1002,11 @@ h2.right-pane-title{
 
 .diff-dotted-connection{
   position: absolute;
-  height: calc(100% - 52px);
+  height: calc(100% - 38px);
   border: 2px solid #cacaca;
   left: -12px;
   width: 8px;
-  top: 14px;
+  top: 20px;
   border-right: none;
   border-radius: 8px 0 0 8px;
 }
@@ -1035,6 +1035,13 @@ h2.right-pane-title{
   }
 }
 
+span.inline-btn-label{
+  min-height: 28px;
+  margin: 8px 0;
+  padding: 7px 4px;
+  line-height: 13px;
+  color:$ve-light-text;
+}
 
 .element-preview-box{
   padding: 0 20px;
