@@ -3,13 +3,13 @@
 </div>
 
 <div class="modal-body revert-dialogue">
-    <p>Revert this element from <b>--commit 1---</b> to <b>--commit 2---</b></p>
-    <p>This will create a new commit under your user name on <b>---current branch---</b></p>
+    <p>Revert this element from <b>---{{compareCommit.commitSelected}}---</b> to <b>---{{baseCommit.commitSelected}}---</b></p>
+    <p>This will create a new commit under your user name on <b>---{{compareCommit.ref.name}}---</b></p>
     <p>Cross reference contents will NOT be reverted</p>
 
     <h2>Preview Element</h2>
     <div class="element-preview-box">
-        <mms-spec mms-type="element" mms-element="latest" no-edit="true"></mms-spec>
+        <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}" no-edit="true"></mms-spec>
     </div>
 </div>
 
