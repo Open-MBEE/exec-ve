@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h4>Revert --Element Name--</h4>
+</div>
+
+<div class="modal-body revert-dialogue">
+    <p>Revert this element from <b>--commit 1---</b> to <b>--commit 2---</b></p>
+    <p>This will create a new commit under your user name on <b>---current branch---</b></p>
+    <p>Cross reference contents will NOT be reverted</p>
+
+    <h2>Preview Element</h2>
+    <div class="element-preview-box">
+        <mms-spec mms-type="element" mms-element="latest" no-edit="true"></mms-spec>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-warning " ng-click="">Revert</button>
+    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+</div>

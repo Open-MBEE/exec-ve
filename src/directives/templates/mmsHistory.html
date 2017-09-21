@@ -36,7 +36,7 @@
                 </li>
             </ul>
         </div>
-        <div style="width:calc(100% - 90px);display:inline-block;margin-top:2px;" class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav auto-close="outsideClick">
+        <div class="btn-group ve-light-dropdown inline-dropdown-btn" uib-dropdown keyboard-nav auto-close="outsideClick">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <span>Commit: <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
@@ -51,7 +51,7 @@
                 </li>
             </ul>
         </div>
-        <button style="float:right;margin:2px 0 8px;" class="btn btn-primary">Revert</button>
+        <button class="btn btn-primary inline-dropdown-btn" ng-click="revert()">Revert</button>
     </div>
 </div>
 

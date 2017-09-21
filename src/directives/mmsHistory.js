@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '_', mmsHistory]);
+.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '$uibModal', '_', mmsHistory]);
 
 /**
  * @ngdoc directive
@@ -28,7 +28,7 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, _) {
+function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $uibModal, _) {
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {
@@ -131,9 +131,42 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, _
         scope.$watch('mmsRefId', changeElement);
 
 
-        //TODO
-        //  check if commit ids are the same - display to use that they are comparing same or disable the commit that matches
-        // show diff or name, time, branch, doc, value, slots - will have multi values
+        scope.revert = function() {
+            Utils.revertAction(scope, changeElement, element);
+        };
+
+
+        scope.changeBase = function () {
+            var templateUrlStr = 'mms/templates/selectDiffVersion.html';
+    
+            var instance = $uibModal.open({
+                templateUrl: templateUrlStr,
+                scope: scope,
+                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                    $scope.ok = function() {
+                        $uibModalInstance.close('ok');
+                    };
+                    $scope.cancel = function() {
+                        $uibModalInstance.dismiss();
+                    };
+                }]
+            });
+            instance.result.then(function(data) {
+                  // TODO: do anything here?
+            });
+        };
+        // var instance = $uibModal.open({
+        //     templateUrl: 'partials/mms/revertConfirm.html',
+        //     scope: scope,
+        //     controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+        //         $scope.ok = function() {
+        //             $uibModalInstance.close('ok');
+        //         };
+        //         $scope.cancel = function() {
+        //             $uibModalInstance.dismiss();
+        //         };
+        //     }]
+        // });
     };
 
     return {
