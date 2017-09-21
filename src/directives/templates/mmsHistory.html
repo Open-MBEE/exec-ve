@@ -36,7 +36,7 @@
                 </li>
             </ul>
         </div>
-        <div class="btn-group ve-light-dropdown inline-dropdown-btn" uib-dropdown keyboard-nav auto-close="outsideClick">
+        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav auto-close="outsideClick">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <span>Commit: <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
                 <i style="float:right;" class="fa fa-caret-down" aria-hidden="true"></i>
@@ -51,12 +51,10 @@
                 </li>
             </ul>
         </div>
-        <button class="btn btn-primary inline-dropdown-btn" ng-click="revert()">Revert</button>
     </div>
 </div>
-
+<hr style="margin-left:-20px;margin-right:-20px;">
 <div ng-show="ModelData.ShowDiffPrototype">
-    <hr style="margin-left:-20px;margin-right:-20px;">
     <div ng-if="ModelData.ShowDiffPrototype">
     <!-- <style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style>
     <div class="textdiff" semantic-diff left-obj="origElem" right-obj="compElem" ></div> -->
@@ -77,8 +75,8 @@
         </h1>
 
         <h2 class="prop-title">Last Modification</h2>
-        <h3 class="prop ng-binding"><del>{{baseCommit.commitSelected}}</del><br>
-            <ins>{{compareCommit.commitSelected}}</ins></h3>
+        <h3 class="prop ng-binding"><del>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</del><br>
+            <ins>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</ins></h3>
         
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
         <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="doc" mms-project-one-id="{{mmsProjectId}}"
@@ -100,6 +98,8 @@
         <h2 class="prop-title">Commit</h2>
         <h3 class="prop ng-binding">Original commit made by: <del>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected.id}}</del><br>
             Change made by: <ins>{{compareCommit.commitSelected._creator}} -- {{compareCommit.commitSelected.id}}</ins></h3>
+        <hr>
+        <button class="btn btn-warning btn-sm" style="float:right;margin: 0 0 20px 0;" ng-click="revert()">Revert to Base</button>
     </div>
 </div>
 <!-- Spec window -->

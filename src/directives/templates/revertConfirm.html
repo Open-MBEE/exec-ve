@@ -1,10 +1,10 @@
 <div class="modal-header">
-    <h4>Revert --Element Name--</h4>
+    <h4>Revert {{compareCommit.ref.id}}</h4>
 </div>
 
 <div class="modal-body revert-dialogue">
-    <p>Revert this element from <b>---{{compareCommit.commitSelected}}---</b> to <b>---{{baseCommit.commitSelected}}---</b></p>
-    <p>This will create a new commit under your user name on <b>---{{compareCommit.ref.name}}---</b></p>
+    <p>Revert this element from <b>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> to <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></p>
+    <p>This will create a new commit under your user name on <b>{{compareCommit.ref.name}}</b></p>
     <p>Cross reference contents will NOT be reverted</p>
 
     <h2>Preview Element</h2>
