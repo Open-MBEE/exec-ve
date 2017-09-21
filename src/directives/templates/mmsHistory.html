@@ -71,31 +71,35 @@
         mmsCommitOneId: '@',
         mmsCommitTwoId: '@' -->
         <h1 class="prop element-title ng-binding">
-            <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name" mms-project-one-id="{{mmsProjectId}}" mms-ref-one-id="{{mmsRefId}}" mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
+            <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name" mms-project-one-id="{{mmsProjectId}}"
+            mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}" 
+            mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
         </h1>
 
         <h2 class="prop-title">Last Modification</h2>
-        <h3 class="prop ng-binding"><del>6/13/17 11:40 AM by eherrick
-        </del><br><ins>8/23/17 2:12 PM by igomes
-        </ins></h3>
+        <h3 class="prop ng-binding"><del>{{baseCommit.commitSelected}}</del><br>
+            <ins>{{compareCommit.commitSelected}}</ins></h3>
         
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
-        <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="doc" mms-project-one-id="{{mmsProjectId}}" mms-ref-one-id="{{mmsRefId}}" mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
-        <p ng-show="!showDocHTML" class="doc-text ng-binding">Blocks may also specify 
-        operations or other features that describe the behavior of a system. 
-        Except for operations, this clause deals strictly with the definition of
-         properties to describe the state of a system at any given point in 
-        time, including relations between elements that define its structure. 
-        Clause 9, “Ports and Flows” specifies specific forms of interactions 
-        between blocks, and the Behavioral Constructs including activities, 
-        interactions, and state machines can be applied to blocks to specify 
-        their behavior. Clause <del>15, “Allocations”</del><ins class="ins-view-link">[cf:Allocations.vlink]</ins> describes ways to allocate behavior to parts and blocks. </p>
-        <h2 class="prop-title">Branch/Tag</h2>
-        <h3 class="prop ng-binding">master</h3>
-        <h2 class="prop-title">Formatted Modified Time</h2>
-        <h3 class="prop ng-binding">2017-07-10T20:15:04.975-0700</h3>
+        <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="doc" mms-project-one-id="{{mmsProjectId}}"
+        mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
+        mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
+        
+        <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
+        <h2 class="prop-title">val</h2>
+        <h3 class="prop ng-binding">
+            <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="val" mms-project-one-id="{{mmsProjectId}}"
+            mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
+            mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr></h3>
+        </div>
+
+        <h2 class="prop-title">Change Branch/Tag</h2>
+        <h3 class="prop ng-binding">{{compareCommit.ref.name}}</h3>
+        <h2 class="prop-title">Original Branch/Tag</h2>
+        <h3 class="prop ng-binding">{{baseCommit.refSelected.name}}</h3>
         <h2 class="prop-title">Commit</h2>
-        <h3 class="prop ng-binding">7dd4d0de-e88a-429e-a0c5-7532dc28e0ad</h3>
+        <h3 class="prop ng-binding">Original commit made by: <del>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected.id}}</del><br>
+            Change made by: <ins>{{compareCommit.commitSelected._creator}} -- {{compareCommit.commitSelected.id}}</ins></h3>
     </div>
 </div>
 <!-- Spec window -->

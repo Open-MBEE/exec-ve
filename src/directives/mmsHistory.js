@@ -1,15 +1,16 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '_', mmsHistory]);
+.directive('mmsHistory', ['ElementService', 'ProjectService', '$templateCache', '$q', '_', mmsHistory]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsHistory
  *
  * @requires mms.ElementService
- * @requires $compile
+ * @requires mms.ProjectService
  * @requires $templateCache
+ * @requires $q
  * @requires _
  *
  * @restrict E
@@ -21,14 +22,15 @@ angular.module('mms.directives')
  * ### template (html)
  * ## Example for showing an element history
  *  <pre>
-    <mms-history mms-eid="element_id" mms-version="2014-07-01T08:57:36.915-0700"></mms-history>
+    <mms-history mms-element-id="{{id}}" mms-ref-id="{{refId}}"
+                         mms-project-id="{{projectId}}"></mms-history>
     </pre>
  *
- * @param {string} mmsElementId The id of the view
- * @param {string} mmsProjectId The project id for the view
+ * @param {string} mmsElementId The id of the element
+ * @param {string} mmsProjectId The project id for the element
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, _) {
+function mmsHistory(ElementService, ProjectService, $templateCache, $q, _) {
     var template = $templateCache.get('mms/templates/mmsHistory.html');
 
     var mmsHistoryLink = function(scope, element, attrs) {
@@ -36,6 +38,7 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, _
         var lastid = null;
         scope.historyVer = 'latest';
         scope.compareCommit = {
+            ref: {id: scope.mmsRefId},
             compareHistory: null,
             commitSelected: null,
             isopen: false
@@ -45,11 +48,19 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, _
         // base data
         scope.refList = [];
         scope.baseCommit = {
-            refSelected: {id: 'master'},
+            refSelected: {id: scope.mmsRefId},
             baseHistory: null,
             commitSelected: null,
             isopen: false
         };
+
+
+        // Get current scope element info
+        var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId};
+        ElementService.getElement(reqOb, 2, false)
+        .then(function(data) {
+            scope.element = data;
+        });
 
         /**
          * @ngdoc function
@@ -64,36 +75,38 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, _
                 return;
             ran = true;
             lastid = newVal;
-            // scope.disableCompare = true;
             scope.gettingHistory = true;
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId};
             ElementService.getElementHistory(reqOb, 2)
             .then(function(data) {
-                if (newVal !== lastid) 
+                if (newVal !== lastid)
                     return;
                 scope.historyVer = 'latest';
                 scope.compareCommit.compareHistory = data;
                 scope.compareCommit.commitSelected = scope.compareCommit.compareHistory[0];
-
                 getRefs();
+                scope.baseCommit.baseHistory = data;
                 if (data.length > 1) {
-                    // scope.disableCompare = false;
-                    scope.baseCommit.baseHistory = data;
                     scope.baseCommit.commitSelected = scope.compareCommit.compareHistory[1];
+                } else if (data.length > 0) {
+                    scope.baseCommit.commitSelected = scope.compareCommit.compareHistory[0];
+                } else {
+                    scope.baseCommit.commitSelected = '--- none ---';
                 }
             }).finally(function() {
                 scope.gettingHistory = false;
             });
         };
 
+        // Get ref list for project and details on 
         var getRefs = function() {
             ProjectService.getRefs(scope.mmsProjectId)
             .then(function(data) {
                 scope.refList = data;
-                scope.baseCommit.refSelected = _.find(data, function(item) {
+                scope.compareCommit.ref = _.find(data, function(item) {
                     return item.id == scope.mmsRefId;
                 });
-                // scope.getElementHistoryByRef(scope.baseCommit.refSelected);
+                scope.baseCommit.refSelected = scope.compareCommit.ref;
             });
         };
 
@@ -132,7 +145,7 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, _
 
 
         //TODO
-        //  check if commit ids are the same - display to use that they are comparing same or disable the commit that matches
+        // check if commit ids are the same - display to user that they are comparing same or disable the commit that matches
         // show diff or name, time, branch, doc, value, slots - will have multi values
     };
 
