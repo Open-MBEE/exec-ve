@@ -699,7 +699,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             } else if ($scope.presentationElemType === 'List') {
                 classIdOb.classifierIds  = ViewService.TYPE_TO_CLASSIFIER_ID.ListT;
             } else if ($scope.presentationElemType === 'Image') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.Figure;
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ImageT;
             } else if ($scope.presentationElemType === 'Paragraph') {
                 classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT;
             } else if ($scope.presentationElemType === 'Section') {

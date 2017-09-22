@@ -418,7 +418,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
           thisToolbar.push(equationToolbar);
           thisToolbar.push(customToolbar);
         }
-        if (scope.mmsEditorType === 'Figure') {
+        if (scope.mmsEditorType === 'Figure' || scope.mmsEditorType === 'ImageT') {
           thisToolbar = [sourceToolbar, justifyToolbar, imageToolbar];
         }
         if (scope.mmsEditorType === 'Equation') {
