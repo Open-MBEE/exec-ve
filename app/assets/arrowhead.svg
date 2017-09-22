@@ -6,7 +6,7 @@
 	.st0{fill:#FFFFFF;}
 	.st1{fill:#CACACA;stroke:#CACACA;stroke-width:4;stroke-linejoin:round;}
 </style>
-<polygon class="st0" points="48.3,48 26.3,41.8 4.3,48 4.3,4 48.3,4 "/>
+<polygon class="st0" points="4.3,4 26.3,10.2 48.3,4 48.3,48 4.3,48 "/>
 <title>arrowhead</title>
-<polygon class="st1" points="26.3,15.4 10.9,46.1 26.3,41.8 41.7,46.1 "/>
+<polygon class="st1" points="26.3,36.6 41.7,5.9 26.3,10.2 10.9,5.9 "/>
 </svg>

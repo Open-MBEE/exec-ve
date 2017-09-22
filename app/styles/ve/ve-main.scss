@@ -1002,13 +1002,22 @@ h2.right-pane-title{
 
 .diff-dotted-connection{
   position: absolute;
-  height: calc(100% - 38px);
+  height: calc(100% - 40px);
   border: 2px solid #cacaca;
-  left: -12px;
+  left: -10px;
   width: 8px;
   top: 20px;
   border-right: none;
   border-radius: 8px 0 0 8px;
+}
+
+.fade {
+    transition: all linear 500ms;
+    opacity: 1;
+}
+
+.fade.ng-hide {
+    opacity: 0;
 }
 
 /*SVG arrow for pointing from history to present*/
@@ -1016,7 +1025,7 @@ h2.right-pane-title{
   background-image: url(../assets/arrowhead.svg);
   position: absolute;
   right: -8px;
-  top: calc(50% - 13px);
+  top: calc(50% - 10px);
   content: ' ';
   background-size: 18px 24px;
   height: 20px;
@@ -1048,6 +1057,5 @@ span.inline-btn-label{
   background-color: $ve-silver-lighter-1;
   border-radius: 3px;
   border: 1px solid $ve-silver-darker-1;
-
 }
 
