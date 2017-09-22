@@ -9,19 +9,19 @@
                     <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
                         <ul class="ve-light-list">
                             <li class="ve-light-input">
-                                <input placeholder="Filter Tags and Branches" class="ve-plain-input">
+                                <input placeholder="Filter Tags and Branches" class="ve-plain-input" ng-model="refFilter">
                             </li>
                             <li class="ref-title">
                                 <h2><i class="fa fa-code-fork" aria-hidden="true"></i>Branches</h2>
                             </li>
-                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)"
+                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name' | filter:refFilter" ng-click="refClickHandler(branch)"
                                 ng-class="{'selected': branch.id === refSelected.id}">
                                 <a>{{ branch.name }}</a>
                             </li>
                             <li class="ref-title">
                                 <h2><i class="fa fa-tag" aria-hidden="true"></i>Tags</h2>
                             </li>
-                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
+                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name' | filter:refFilter" ng-click="refClickHandler(tag)"
                                 ng-class="{'selected': tag.id === refSelected.id}">
                                 <a>{{ tag.name }}</a>
                             </li>
@@ -44,7 +44,7 @@
                             </dd>
                             <dd ng-show="refSelected.status === 'creating'" class="link-section">
                                 <span uib-tooltip-html="htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"
-                                    tooltip-append-to-body="refSelected.status == 'creating'" tooltip-enable="refSelected.status == 'creating'" 
+                                    tooltip-append-to-body="refSelected.status == 'creating'" tooltip-enable="refSelected.status == 'creating'"
                                     ng-class="{'branch-disabled': refSelected.status == 'creating'}">Project Documents</span>
                             </dd>
                             <dt>Id</dt>
@@ -53,6 +53,7 @@
                             <dd>{{refSelected.type}}</dd>
                             <dt>Description</dt>
                             <dd>{{refSelected.description}}</dd>
+                            <span ng-if="refSelected.id != 'master'">
                             <dt>Time Created</dt>
                             <dd>{{refSelected._created}}</dd>
                             <dt>Creator</dt>
@@ -63,6 +64,7 @@
                             <dd>{{refSelected._modifier}}</dd>
                             <dt>Parent Ref</dt>
                             <dd>{{refSelected.parentRefId}}</dd>
+                            </span>
                         </dl>
                     </div>
                 </div>
