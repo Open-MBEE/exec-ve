@@ -36,7 +36,7 @@
                 </li>
                 <li ng-click="baseCommitClicked(version)" ng-model="baseCommit.commitSelected" ng-repeat="version in baseCommit.baseHistory | filter:compareHistoryFilter"
                     ng-class="{'checked-list-item': version === baseCommit.commitSelected}" ng-disabled="$index === 0" >
-                    <a>{{ version._creator }}</b> - <b>{{version._created | date:'M/d/yy h:mm a'}}</a>
+                    <a><b>{{ version._creator }}</b> - <b>{{version._created | date:'M/d/yy h:mm a'}}</b></a>
                 </li>
             </ul>
         </div>
