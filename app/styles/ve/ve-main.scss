@@ -395,7 +395,7 @@ div.tooltip-inner {
 .ve-light-dropdown{
   display: block;
   width: 100%;
-  margin: 8px 0;
+  margin: 6px 0;
 
   .dropdown-toggle{
     width: 100%;
@@ -1004,20 +1004,20 @@ h2.right-pane-title{
   position: absolute;
   height: calc(100% - 40px);
   border: 2px solid #cacaca;
-  left: -10px;
+  left: -12px;
   width: 8px;
   top: 20px;
   border-right: none;
   border-radius: 8px 0 0 8px;
 }
 
-.fade {
-    transition: all linear 500ms;
-    opacity: 1;
+.inline-diff-buttons{
+  display:flex;
+  align-items: center;
 }
 
-.fade.ng-hide {
-    opacity: 0;
+.inline-diff-buttons span:first-child{
+  padding-left:0;
 }
 
 /*SVG arrow for pointing from history to present*/
@@ -1033,6 +1033,11 @@ h2.right-pane-title{
   background-repeat: no-repeat;
 }
 
+/*SVG arrow for pointing from history to present in spec*/
+.change-connection{
+  height:20px;
+}
+
 .revert-dialogue.modal-body{
   p{
     font-size: 16px;
@@ -1046,7 +1051,7 @@ h2.right-pane-title{
 
 span.inline-btn-label{
   min-height: 28px;
-  margin: 8px 0;
+  margin: 6px 0;
   padding: 7px 4px;
   line-height: 13px;
   color:$ve-light-text;

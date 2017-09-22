@@ -3,11 +3,11 @@
 </div>
 
 <div class="modal-body revert-dialogue">
-    <p>Revert this element from <b>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> to <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></p>
+    <p>Revert documentation, value, and title of this element from <b>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> to <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></p>
     <p>This will create a new commit under your user name on <b>{{compareCommit.ref.name}}</b></p>
     <p>Cross reference contents will NOT be reverted</p>
 
-    <h2>Preview Element</h2>
+    <h1>Preview Element</h1>
     <div class="element-preview-box">
         <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}" no-edit="true"></mms-spec>
     </div>
