@@ -83,8 +83,8 @@
         </h1>
 
         <h2 class="prop-title">Last Modification</h2>
-        <h3 class="prop ng-binding">{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}
-        <img src="../assets/arrow-change.svg" class="change-connection">
+        <h3 class="prop ng-binding">{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}<br>
+        <img src="../assets/arrow-change.svg" class="change-connection"><br>
 		{{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{baseCommit.commitSelected._creator}}</h3>
         
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
@@ -101,12 +101,12 @@
         </div>
 
         <h2 class="prop-title">Branch/Tag</h2>
-        <h3 class="prop ng-binding">{{compareCommit.ref.name}}
-        <img src="../assets/arrow-change.svg" class="change-connection">
+        <h3 class="prop ng-binding">{{compareCommit.ref.name}}<br>
+        <img src="../assets/arrow-change.svg" class="change-connection"><br>
         {{baseCommit.refSelected.name}}</h3>
         <h2 class="prop-title">Commit</h2>
-        <h3 class="prop ng-binding">{{baseCommit.commitSelected.id}}
-        <img src="../assets/arrow-change.svg" class="change-connection">
+        <h3 class="prop ng-binding">{{baseCommit.commitSelected.id}}<br>
+        <img src="../assets/arrow-change.svg" class="change-connection"><br>
         {{compareCommit.commitSelected.id}}</h3>
         <hr>
         <button class="btn btn-warning btn-sm" style="float:right;margin: 0 0 20px 0;" ng-click="revert()">Revert to Base</button>

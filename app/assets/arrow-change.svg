@@ -7,6 +7,6 @@
 	.st1{fill:none;stroke:#CACACA;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;}
 </style>
 <title>arrowhead</title>
-<polygon class="st0" points="49,27.6 18.3,12.2 22.6,27.6 18.3,43 "/>
-<line class="st1" x1="5.2" y1="27.6" x2="33.7" y2="27.6"/>
+<polygon class="st0" points="27.1,49.5 42.5,18.8 27.1,23.1 11.7,18.8 "/>
+<line class="st1" x1="27.1" y1="5.7" x2="27.1" y2="34.2"/>
 </svg>
