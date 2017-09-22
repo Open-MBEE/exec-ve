@@ -109,7 +109,10 @@
         <img src="../assets/arrow-change.svg" class="change-connection"><br>
         {{compareCommit.commitSelected.id}}</h3>
         <hr>
-        <button class="btn btn-warning btn-sm" style="float:right;margin: 0 0 20px 0;" ng-click="revert()">Revert to Base</button>
+        <div style="float:right;margin: 0 0 20px 0;">
+	        <span class="ve-secondary-text">To revert <b>documentation</b>, <b>title</b>, and <b>value</b> to base content:</span>
+	        <button class="btn btn-warning btn-sm" ng-click="revert()">Revert</button>
+	    </div>
     </div>
 </div>
 <!-- Spec window -->
