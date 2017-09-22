@@ -4,7 +4,7 @@
 	<input type="checkbox" style="margin-right:4px;" ng-model="ModelData.ShowDiffPrototype" ng-disabled="disableCompare">Compare versions
 </div>
 <div style="position:relative;">
-   	<div ng-show="ModelData.ShowDiffPrototype" class="inline-diff-buttons">
+   	<div ng-show="ModelData.ShowDiffPrototype" class="inline-diff-buttons fade-in-out">
     	<span class="inline-btn-label">Base:</span>
         <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav auto-close="outsideClick" style="flex:2">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
@@ -109,11 +109,6 @@
         <h3 class="prop ng-binding">{{baseCommit.commitSelected.id}}<br>
         <img src="../assets/arrow-change.svg" class="change-connection"><br>
         {{compareCommit.commitSelected.id}}</h3>
-        <hr>
-        <div style="float:right;margin: 0 0 20px 0;">
-	        <span class="ve-secondary-text">To revert <b>documentation</b>, <b>title</b>, and <b>value</b> to base content:</span>
-	        <button class="btn btn-warning btn-sm" ng-click="revert()">Revert</button>
-	    </div>
     </div>
 </div>
 <!-- Spec window -->
@@ -121,4 +116,9 @@
     <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
 </div>
 
-
+<div ng-show="ModelData.ShowDiffPrototype" class="revert-section">
+	<div>
+	    <span class="ve-secondary-text">To revert <b>documentation</b>, <b>title</b>, and <b>value</b> to base content:</span>
+	    <button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
+	</div>
+</div>

@@ -76,6 +76,7 @@ div.tooltip-inner {
     2.4.2 Dark Tab system
   2.5 Banners
   2.6 Input
+  2.7 Animation
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -707,6 +708,17 @@ span.fixed-content-dropdown{
   width: calc(100% - 20px);
 }
 
+/*------------------------------------------------------------------
+  2.5 Animation
+-------------------------------------------------------------------*/
+
+.fade-in-out{
+  transition: 1s linear all;
+  opacity: 1;
+}
+.fade-in-out.ng-hide {
+  opacity: 0;
+}
 
 /*------------------------------------------------------------------
 3. Table Filtering
@@ -975,31 +987,32 @@ h2.right-pane-title{
   padding:0 20px;
 }
 
+/*------------------------------------------------------------------
+  9.1 Diff styling 
+-------------------------------------------------------------------*/
+
+/*Delete styling*/
 .pane-right del{
   background-color: #ffe3e3;
 }
 
+/*Insert styling*/
 .pane-right ins{
   background-color: #dafde0;
   text-decoration:none;
 }
 
-.pane-right ins.ins-view-link{
-  background-color: #dafde0;
-  text-decoration: none;
-  border: 1px solid #86d994;
-  border-radius: 2px;
-  padding: 1px 2px;
+/*SVG arrow for pointing from history to present in spec*/
+.change-connection{
+  height:20px;
+  margin: 6px 0 5px;
 }
 
-.pane-right .view-link{
-  background-color: #cfe7ec;
-  text-decoration: none;
-  border: 1px solid #2c7e8f;
-  border-radius: 2px;
-  padding: 1px 2px;  
-}
+/*------------------------------------------------------------------
+  9.2 Commit selection 
+-------------------------------------------------------------------*/
 
+/*Arrow connecting former commit to current*/
 .diff-dotted-connection{
   position: absolute;
   height: calc(100% - 40px);
@@ -1011,6 +1024,7 @@ h2.right-pane-title{
   border-radius: 8px 0 0 8px;
 }
 
+/*Flex styling to keep buttons and labels vertically aligned*/
 .inline-diff-buttons{
   display:flex;
   align-items: center;
@@ -1033,12 +1047,6 @@ h2.right-pane-title{
   background-repeat: no-repeat;
 }
 
-/*SVG arrow for pointing from history to present in spec*/
-.change-connection{
-  height:20px;
-  margin: 6px 0 5px;
-}
-
 .revert-dialogue.modal-body{
   p{
     font-size: 16px;
@@ -1050,6 +1058,7 @@ h2.right-pane-title{
   }
 }
 
+/*Custom styling to keep labels inline with dropdowns*/
 span.inline-btn-label{
   min-height: 28px;
   margin: 6px 0;
@@ -1058,12 +1067,39 @@ span.inline-btn-label{
   color:$ve-light-text;
 }
 
+/*------------------------------------------------------------------
+  9.3 Footer at bottom of right pane for reverting documentation
+-------------------------------------------------------------------*/
+
+/* Stick section to bottom of right pane*/
+.revert-section{
+  float: right;
+  padding: 10px;
+  position: absolute;
+  bottom: 1px;
+  right: 0;
+  width: 100%;
+  background-color: white;
+  border-top: 1px solid #eee;
+}
+
+.revert-section>div{
+  float:right;
+}
+
+.revert-section .btn{
+  margin:0 8px;
+}
+
+/*------------------------------------------------------------------
+  9.4 Modal for revert history 
+-------------------------------------------------------------------*/
+
+/* Special styling to preview element*/
 .element-preview-box{
   padding: 0 20px;
   background-color: $ve-silver-lighter-1;
   border-radius: 3px;
   border: 1px solid $ve-silver-darker-1;
 }
-
-
 
