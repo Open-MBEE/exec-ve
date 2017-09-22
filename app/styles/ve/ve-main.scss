@@ -75,6 +75,7 @@ div.tooltip-inner {
     2.4.1 Light tab system
     2.4.2 Dark Tab system
   2.5 Banners
+  2.6 Input
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -609,6 +610,20 @@ span.fixed-content-dropdown{
   margin: 4px 10px 14px;
 }
 
+
+/*------------------------------------------------------------------
+  2.6 Input
+-------------------------------------------------------------------*/
+
+.ve-plain-input{
+  background-color: white;
+  padding: 3px 6px;
+  border: 1px solid $ve-silver-darker-1;
+  border-radius: 3px;
+  margin: 2px 10px;
+  width: calc(100% - 20px);
+}
+
 /*------------------------------------------------------------------
 3. Table Filtering
 -------------------------------------------------------------------*/
@@ -698,6 +713,10 @@ table caption {
     width: 80%;
     margin: 0 auto;
   }
+}
+
+.modal-description{
+  margin-bottom:18px;
 }
 
 /*hack for overriding cut off content in dropdown modal*/
