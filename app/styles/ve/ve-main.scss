@@ -1004,8 +1004,8 @@ h2.right-pane-title{
 
 /*SVG arrow for pointing from history to present in spec*/
 .change-connection{
-  height:20px;
-  margin: 6px 0 5px;
+  height: 18px;
+  margin: 2px 0 3px;
 }
 
 /*------------------------------------------------------------------
@@ -1071,20 +1071,21 @@ span.inline-btn-label{
   9.3 Footer at bottom of right pane for reverting documentation
 -------------------------------------------------------------------*/
 
-/* Stick section to bottom of right pane*/
-.revert-section{
+/* Stick revert section to bottom of right pane*/
+  .revert-section{
   float: right;
-  padding: 10px;
-  position: absolute;
-  bottom: 1px;
-  right: 0;
   width: 100%;
-  background-color: white;
+  background-color: #fff;
   border-top: 1px solid #eee;
+  margin: 30px 0 0;
 }
 
 .revert-section>div{
   float:right;
+  display:flex;
+  padding:16px 0;
+  text-align:right;
+  align-items: center;
 }
 
 .revert-section .btn{

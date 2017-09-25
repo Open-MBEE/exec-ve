@@ -83,10 +83,10 @@
         </h1>
 
         <h2 class="prop-title">Last Modification</h2>
-        <h3 class="prop ng-binding">
+        <span class="prop ng-binding">
 		{{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{baseCommit.commitSelected._creator}}<br>
         <img src="../assets/arrow-change.svg" class="change-connection"><br>
-		{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}</h3>
+		{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}</span>
         
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
         <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="doc" mms-project-one-id="{{mmsProjectId}}"
@@ -95,20 +95,20 @@
         
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
         <h2 class="prop-title">val</h2>
-        <h3 class="prop ng-binding">
+        <span class="prop ng-binding">
             <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="val" mms-project-one-id="{{mmsProjectId}}"
             mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
-            mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr></h3>
+            mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr></span>
         </div>
 
         <h2 class="prop-title">Branch/Tag</h2>
-        <h3 class="prop ng-binding">{{baseCommit.refSelected.name}}<br>
+        <span class="prop ng-binding">{{baseCommit.refSelected.name}}<br>
         <img src="../assets/arrow-change.svg" class="change-connection"><br>
-        {{compareCommit.ref.name}}</h3>
+        {{compareCommit.ref.name}}</span>
         <h2 class="prop-title">Commit</h2>
-        <h3 class="prop ng-binding">{{baseCommit.commitSelected.id}}<br>
+        <span class="prop ng-binding">{{baseCommit.commitSelected.id}}<br>
         <img src="../assets/arrow-change.svg" class="change-connection"><br>
-        {{compareCommit.commitSelected.id}}</h3>
+        {{compareCommit.commitSelected.id}}</span>
     </div>
 </div>
 <!-- Spec window -->
@@ -119,6 +119,8 @@
 <div ng-show="ModelData.ShowDiffPrototype" class="revert-section">
 	<div>
 	    <span class="ve-secondary-text">To revert <b>documentation</b>, <b>title</b>, and <b>value</b> to base content:</span>
-	    <button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
+	   	<div>
+	    	<button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
+	    </div>
 	</div>
 </div>
