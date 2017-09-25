@@ -712,13 +712,30 @@ span.fixed-content-dropdown{
   2.5 Animation
 -------------------------------------------------------------------*/
 
-.fade-in-out{
+.fade-in-out.ng-hide-add,
+.fade-in-out.ng-hide-remove {
+  -webkit-transition:0.5s linear all;
   transition: 1s linear all;
+  /* remember to add this */
+  display: flex!important;
   opacity: 1;
 }
 .fade-in-out.ng-hide {
-  opacity: 0;
+  opacity:0;
 }
+// animate template - add class name to beginning 
+// .ng-hide-add,
+// .ng-hide-remove {
+//   -webkit-transition:0.5s linear all;
+//   transition:0.5s linear all;
+
+//   /* remember to add this */
+//   display:block!important;
+//   opacity:1;
+// }
+// .ng-hide {
+//   opacity:0;
+// }
 
 /*------------------------------------------------------------------
 3. Table Filtering
