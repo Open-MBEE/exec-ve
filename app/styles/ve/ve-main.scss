@@ -1010,6 +1010,12 @@ h2.right-pane-title{
   padding:0 20px;
 }
 
+hr.spec-title-divider{
+  margin-left:-20px;
+  margin-right:-20px;
+  border-color:#ddd;
+}
+
 /*------------------------------------------------------------------
   9.1 Diff styling 
 -------------------------------------------------------------------*/
@@ -1095,7 +1101,7 @@ span.inline-btn-label{
 -------------------------------------------------------------------*/
 
 /* Stick revert section to bottom of right pane*/
-  .revert-section{
+.revert-section{
   float: right;
   width: 100%;
   background-color: #fff;

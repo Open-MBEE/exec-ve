@@ -1,6 +1,10 @@
 <div class="pane-right">
     <div ng-if="documentOb">
         <div class="container-fluid" ng-show="show.element">
+            <h2 ng-if="specApi.getEditing()" class="right-pane-title">Edit Element
+            </h2>
+            <h2 ng-if="!specApi.getEditing()" class="right-pane-title">Preview Element
+            </h2>            
             <form class="form-horizontal">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
@@ -12,6 +16,7 @@
                     </div>
                 </div>
             </form>
+            <hr class="spec-title-divider">
             <mms-spec mms-element-id="{{specInfo.id}}" mms-commit-id="{{specInfo.commitId}}"
                       mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}"
                       mms-spec-api="specApi"></mms-spec>
@@ -27,6 +32,7 @@
 
     <div class="container-fluid container-tags" ng-show="show.tags">
         <h2 class="right-pane-title">Tags</h2>
+        <hr class="spec-title-divider">
         <div ng-show="noTags">No tags in current project.</div>
         <div ng-hide="noTags">
             <input class="form-control" ng-model="tagFilter" type="text" placeholder="Type here to filter tags">
