@@ -118,7 +118,11 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             scope.isEnumeration = false;
             scope.isSlot = false;
             scope.gettingSpec = true;
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: true};
+            var extended = true;
+            if (scope.mmsCommitId && scope.mmsCommitId !== 'latest') {
+                extended = false;
+            }
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: extended};
             ElementService.getElement(reqOb, 2, false)
             .then(function(data) {
                 if (newVal !== lastid) {

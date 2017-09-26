@@ -17,8 +17,9 @@ angular.module('mms.directives')
  * @description
  *  Compares a element at two different refs/commits and generates a pretty diff.
  * ## Example
- *
- * <mms-diff-attr mms-eid="element-id" mms-attr="name/doc/val" mms-ref-one="branch/tag" mms-ref-two="branch/tag"></mms-diff-attr>
+ * <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name/doc/val" mms-project-one-id="{{project1}}"
+ *  mms-project-two-id="{{project2}}" mms-ref-one-id="{{ref1}}" mms-ref-two-id="{{ref2}}"
+ *  mms-commit-one-id="{{history1}}" mms-commit-two-id="{{history2}}"></mms-diff-attr>
  *
  * @param {string} mmsEid The id of the element whose doc to transclude
  * @param {string} mmsAttr Attribute to use -  ie `name`, `doc` or `value`
@@ -32,6 +33,22 @@ angular.module('mms.directives')
 function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
 
     var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
+        var ran = false;
+        scope.options = {
+            editCost: 4
+        };
+
+        /**
+         * @ngdoc function
+         * @name mms.directives.directive:mmsDiffAttr#changeElement
+         * @methodOf mms.directives.directive:mmsDiffAttr
+         *
+         * @description
+         * Change scope for diff when there is a change in commit id
+         */
+        var changeElement = function(newVal, oldVal) {
+            if (!newVal || (newVal == oldVal && ran))
+                return;
         var projectOneId = scope.mmsProjectOneId;
         var projectTwoId = scope.mmsProjectTwoId;
         var elemOneId = scope.mmsEidOne;
@@ -73,18 +90,23 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
 
         ElementService.getElement({
             projectId:  projectOneId,
-            elementId:  elemOneId, 
-            refId:      refOneId, 
+            elementId:  elemOneId,
+            refId:      refOneId,
             commitId:   commitOneId
         }).then(function(data) {
             // element.prepend('<span class="text-info"> <br><b> Original data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
+            scope.element = data;
             var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
             $compile(htmlData)($rootScope.$new());
             scope.origElem = angular.element(htmlData).text();
             var promise1 = $interval(
                 function() {
                     scope.origElem = angular.element(htmlData).text();
-                }, 5000);
+                    if ( !scope.origElem.includes("(loading...)") && angular.isDefined(promise1) ) {
+                        $interval.cancel(promise1);
+                        promise1 = undefined;
+                    }
+                }, 50);
         }, function(reason) {
             // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ projectOneId + '<br> -- refId: ' +  refOneId+ ' <br>-- commitId: ' +commitOneId+'</span>');
             origNotFound = true;
@@ -96,9 +118,9 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             }
         }).finally(function() {
             ElementService.getElement({
-                projectId:  projectTwoId, 
-                elementId:  elemTwoId, 
-                refId:      refTwoId, 
+                projectId:  projectTwoId,
+                elementId:  elemTwoId,
+                refId:      refTwoId,
                 commitId:   commitTwoId
             }).then(function(data) {
                 // element.prepend('<span class="text-info"> <b> Comparison data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
@@ -108,7 +130,11 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 var promise2 = $interval(
                     function() {
                         scope.compElem = angular.element(htmlData).text();
-                    }, 5000);
+                        if ( !scope.compElem.includes("(loading...)") && angular.isDefined(promise2) ) {
+                            $interval.cancel(promise2);
+                            promise2 = undefined;
+                        }
+                    }, 50);
                 checkElement(origNotFound, compNotFound, deletedFlag); 
             }, function(reason) {
                 // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
@@ -123,6 +149,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 checkValidity(invalidOrig, invalidComp);
             });
         });
+    };
 
         var createTransclude = function(elementId, type, projectId, commitId, refId) {
             var transcludeElm = angular.element('<mms-cf>');
@@ -158,6 +185,10 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
             }
         };
+
+        scope.changeElement = changeElement;
+        scope.$watch('mmsCommitOneId', changeElement);
+        scope.$watch('mmsCommitTwoId', changeElement);
     };
 
     return {
@@ -173,7 +204,11 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             mmsCommitOneId: '@',
             mmsCommitTwoId: '@'
         },
-        template: '<style>del{color: black;background: #ffbbbb;} ins{color: black;background: #bbffbb;} .match,.textdiff span {color: gray;}</style><div class="textdiff" semantic-diff left-obj="origElem" right-obj="compElem" ></div>',
+        template: '<style>del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}' +
+            'ins, .ins{color: black;background: #dafde0;}' +
+            '.match,.textdiff span {color: gray;}</style>'+
+            '<div ng-if="element.type != \'Property\' && element.type != \'Port\' && element.type != \'Slot\'" class="textdiff" processing-diff options="options" left-obj="origElem" right-obj="compElem"></div>'+
+            '<div ng-if="element.type === \'Property\' || element.type === \'Port\' || element.type === \'Slot\'"class="textdiff" line-diff options="options" left-obj="origElem" right-obj="compElem"></div>',
         require: '?^^mmsView',
         link: mmsDiffAttrLink
     };
