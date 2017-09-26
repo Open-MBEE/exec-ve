@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch'])
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 
     
@@ -89,32 +89,51 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl) {
+                controller: function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
-                    $scope.orgs = orgObs; 
+                    $localStorage.$default({org: orgObs[0]});
+                    $scope.spin = false;
+                    $scope.orgs = orgObs;
                     var orgId, projectId;
                     $scope.selectOrg = function(org) {
                         if (org) {
+                            $localStorage.org = org;
                             orgId = org.id;
-                            $scope.selectedOrg = org.name;
-                            $scope.selectedProject = "";
+                            $localStorage.org.orgName = org.name;
+                            $scope.selectedOrg = $localStorage.org.name;
+                            $scope.selectedProject = ""; // default here?
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
                                 if (data.length > 0) {
-                                    $scope.selectProject(data[0]);
-                                } else {
-                                    //no projects
+                                    if($localStorage.project && checkForProject(data, $localStorage.project) === 1){
+                                        $scope.selectedProject = $localStorage.project.name;
+                                        projectId = $localStorage.project.id;
+                                    }else{
+                                        $scope.selectProject(data[0]);
+                                    }
                                 }
                             });
                         }
                     };
-                    $scope.selectProject = function(project) { 
+                    $scope.selectProject = function(project) {
                         if (project) {
-                            $scope.selectedProject = project.name;
-                            projectId = project.id;
+                            $localStorage.project = project;
+                            $scope.selectedProject = $localStorage.project.name;
+                            projectId = $localStorage.project.id;
                         }
                     };
-                    $scope.spin = false; 
+                    if ($localStorage.org) {
+                        $scope.selectOrg($localStorage.org);
+                    }
+                    var checkForProject = function(projectArray, project) {
+                        for (var i = 0; i < projectArray.length; i++) {
+                            if(projectArray[i].id === project.id){
+                                return 1;
+                            } 
+                        }
+                        return 0;
+                    };
+                    
                     $scope.continue = function() {
                         if (orgId && projectId) {
                             $scope.spin = true;

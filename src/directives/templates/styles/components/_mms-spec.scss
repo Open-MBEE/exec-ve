@@ -1,9 +1,9 @@
-mms-spec {
+.pane-right,
+.revert-spec {
   h1.prop,
   h1.prop > .form-control {
-    font-size: 41px;
-    margin-top: 32px;
-    margin-bottom: 32px;
+    font-size: 32px;
+    margin:32px 0;
     height: inherit;
     width: 100%;
   }
@@ -14,11 +14,9 @@ mms-spec {
     word-wrap: break-word;
   }
 
-  h3.prop {
-    font-size: 20px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 15px;
+  span.prop {
+    font-size: 15px;
+    margin:4px 0 24px;
     min-width: 280px;
     word-wrap: break-word;
   }
@@ -30,16 +28,14 @@ mms-spec {
 
   .prop-title {
     font-family: $font-family-sans-serif;
-    font-weight: $bold_font_weight;
-    font-size: 12px;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    font-weight: 700;
+    font-size: 15px;
+    margin:24px 0 0;
     white-space: nowrap;
   }
 
   .doc-text {
     font-family: $font-family-sans-serif;
-    margin-right: 30px;
     max-width: $default-line-length;
     min-width: 15em;
   }
