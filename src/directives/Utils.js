@@ -771,6 +771,75 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         });
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.directives.Utils#revertAction
+     * @methodOf mms.directives.Utils
+     * @description
+     * called by transcludes and section, cancels edited element
+     * uses these in the scope:
+     *   element - element object for the element to edit (for sections it's the instance spec)
+     *   edit - edit object
+     *   elementSaving - boolean
+     *   isEditing - boolean
+     *   bbApi - button bar api - handles spinny
+     * sets these in the scope:
+     *   isEditing - false
+     *
+     * @param {object} scope scope of the transclude directives or view section directive
+     * @param {object} recompile recompile function object
+     * @param {object} domElement dom of the directive, jquery wrapped
+     */
+    var revertAction = function($scope, preview, domElement) {
+        var templateUrlStr = 'mms/templates/revertConfirm.html';
+
+        var instance = $uibModal.open({
+            templateUrl: templateUrlStr,
+            scope: $scope,
+            size: 'lg',
+            windowClass: 'revert-spec',
+            controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                $scope.ok = function() {
+                    if ($scope.oking) {
+                        growl.info("Please wait...");
+                        return;
+                    }
+                    $scope.oking = true;
+                    var revertEltInfo = {id: $scope.mmsElementId, _projectId : $scope.mmsProjectId, _refId: $scope.mmsRefId};
+                    var reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.baseCommit.refSelected.id, commitId: $scope.baseCommit.commitSelected.id};
+                    ElementService.getElement(reqOb, 2, false)
+                    .then(function(data) {
+                        revertEltInfo.name = data.name;
+                        revertEltInfo.documentation = data.documentation;
+                        if (data.defaultValue) {
+                            revertEltInfo.defaultValue = data.defaultValue;
+                        }
+                        if (data.value) {
+                            revertEltInfo.value = data.value;
+                        }
+
+                        ElementService.updateElement(revertEltInfo)
+                        .then(function(data) {
+                            $rootScope.$broadcast('element.updated', data, false);
+                            $uibModalInstance.close();
+                            growl.success("Element reverted");
+                        }, function(reason) {
+                            growl.error("Revert not compeleted - Error: " + reason.message);
+                        }).finally(function() {
+                            $scope.oking = false;
+                        });
+                    });
+                };
+                $scope.cancel = function() {
+                    $uibModalInstance.dismiss();
+                };
+            }]
+        });
+        instance.result.then(function(data) {
+              // TODO: do anything here?
+        });
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -786,7 +855,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         getPropertySpec: getPropertySpec,
         addPresentationElement: addPresentationElement,
         setupValCf: setupValCf,
-        setupValEditFunctions: setupValEditFunctions
+        setupValEditFunctions: setupValEditFunctions,
+        revertAction: revertAction
     };
 
 }
