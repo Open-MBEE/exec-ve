@@ -446,7 +446,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             // Configuration for autosave plugin
             instance.config.autosave = {
               SaveKey: attrs.autosaveKey,
-              delay: 20,
+              delay: 5,
               NotOlderThen: 10080, // 7 days in minutes
               saveDetectionSelectors: '.presentation-element-saveC, .presentation-element-save, .presentation-element-cancel, .presentation-element-delete',
               enableAutosave: true

@@ -1,1 +1,7 @@
-{}
+{
+  "localhost": "localhost",
+  "opencaeint": "opencae-int.jpl.nasa.gov",
+  "opencaetest": "opencae-test.jpl.nasa.gov",
+  "opencaeuat": "opencae-uat.jpl.nasa.gov",
+  "opencae": "opencae.jpl.nasa.gov"
+}
