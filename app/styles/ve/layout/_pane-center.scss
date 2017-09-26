@@ -89,6 +89,12 @@ tr {
   .angular-ui-tree-handle {
     font-family: $font-family-sans-serif;
   }
+
+  .angular-ui-tree-placeholder:before{
+    background-image: url("../assets/location-feedback.svg");
+    height:30px;
+    width:100px;
+  }
 }
 
 .diff-pane-center {
