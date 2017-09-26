@@ -140,13 +140,12 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
         };
 
         scope.changeElement = changeElement;
-            scope.$watch('mmsElementId', changeElement);
+        scope.$watch('mmsElementId', changeElement);
         scope.$watch('mmsRefId', changeElement);
 
 
         //TODO
         // check if commit ids are the same - display to user that they are comparing same or disable the commit that matches
-        // show diff or name, time, branch, doc, value, slots - will have multi values
         scope.revert = function() {
             Utils.revertAction(scope, changeElement, element);
         };

@@ -45,7 +45,7 @@
     <div class="diff-dotted-connection fade-in-out" ng-show="ModelData.ShowDiffPrototype"></div>
     <div class="inline-diff-buttons">
         <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype">Change:</span>
-        <div class="btn-group ve-light-dropdown flex-grow-shrink" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick">
+        <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink':ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <span><b>{{compareCommit.commitSelected._creator}}</b> - <b>{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -66,7 +66,7 @@
 <hr class="spec-title-divider">
 
 <div ng-show="ModelData.ShowDiffPrototype">
-    <div ng-if="ModelData.ShowDiffPrototype" style="overflow: auto;">
+    <div ng-if="ModelData.ShowDiffPrototype">
         <h1 class="prop element-title">
             <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name" mms-project-one-id="{{mmsProjectId}}"
             mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
@@ -111,8 +111,6 @@
 <div ng-show="ModelData.ShowDiffPrototype" class="revert-section fade-in-out">
     <div>
         <span class="ve-secondary-text">To revert <b>documentation</b>, <b>title</b>, and <b>value</b> to base content:</span>
-           <div>
-            <button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
-        </div>
+        <button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
     </div>
 </div>
