@@ -76,6 +76,7 @@ div.tooltip-inner {
     2.4.2 Dark Tab system
   2.5 Banners
   2.6 Input
+  2.7 Animation
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -395,7 +396,7 @@ div.tooltip-inner {
 .ve-light-dropdown{
   display: block;
   width: 100%;
-  margin: 8px 0;
+  margin: 6px 0;
 
   .dropdown-toggle{
     width: 100%;
@@ -412,7 +413,7 @@ div.tooltip-inner {
     transition: background-color .1s ease-out !important;
     letter-spacing: .05em;
     background-color:$ve-silver-lighter-0;
-    height: 28px;
+    min-height: 28px;
   }
 
   li.dropdown-input{
@@ -443,6 +444,11 @@ div.tooltip-inner {
 
   ul{
     min-width:100%;
+  }
+
+  .fa-caret-down{
+    float:right;
+    color:$ve-white-text-darker-1
   }
 }
 
@@ -695,7 +701,7 @@ span.fixed-content-dropdown{
 }
 
 /*------------------------------------------------------------------
-  2.5 Input
+  2.6 Input
 -------------------------------------------------------------------*/
 
 .ve-plain-input{
@@ -707,6 +713,35 @@ span.fixed-content-dropdown{
   width: calc(100% - 20px);
 }
 
+/*------------------------------------------------------------------
+  2.7 Animation
+-------------------------------------------------------------------*/
+
+.fade-in-out.ng-hide-add,
+.fade-in-out.ng-hide-remove {
+  -webkit-transition:0.2s linear all;
+  transition: .2s linear all;
+  /* remember to add this */
+  display: flex!important;
+  opacity: 1;
+}
+.fade-in-out.ng-hide {
+  opacity:0;
+}
+
+// animate template - add class name to beginning 
+// .ng-hide-add,
+// .ng-hide-remove {
+//   -webkit-transition:0.5s linear all;
+//   transition:0.5s linear all;
+
+//   /* remember to add this */
+//   display:block!important;
+//   opacity:1;
+// }
+// .ng-hide {
+//   opacity:0;
+// }
 
 /*------------------------------------------------------------------
 3. Table Filtering
@@ -975,72 +1010,21 @@ h2.right-pane-title{
   padding:0 20px;
 }
 
-.pane-right del{
-  background-color: #ffe3e3;
+hr.spec-title-divider{
+  margin-left:-20px;
+  margin-right:-20px;
+  border-color:#ddd;
 }
 
-.pane-right ins{
-  background-color: #dafde0;
-  text-decoration:none;
-}
+/*------------------------------------------------------------------
+  9.4 Modal for revert history 
+-------------------------------------------------------------------*/
 
-.pane-right ins.ins-view-link{
-  background-color: #dafde0;
-  text-decoration: none;
-  border: 1px solid #86d994;
-  border-radius: 2px;
-  padding: 1px 2px;
-}
-
-.pane-right .view-link{
-  background-color: #cfe7ec;
-  text-decoration: none;
-  border: 1px solid #2c7e8f;
-  border-radius: 2px;
-  padding: 1px 2px;  
-}
-
-.diff-dotted-connection{
-  position: absolute;
-  height: calc(100% - 52px);
-  border: 2px solid #cacaca;
-  left: -12px;
-  width: 8px;
-  top: 14px;
-  border-right: none;
-  border-radius: 8px 0 0 8px;
-}
-
-/*SVG arrow for pointing from history to present*/
-.diff-dotted-connection:after{
-  background-image: url(../assets/arrowhead.svg);
-  position: absolute;
-  right: -8px;
-  top: calc(50% - 13px);
-  content: ' ';
-  background-size: 18px 24px;
-  height: 20px;
-  width: 24px;
-  background-repeat: no-repeat;
-}
-
-.revert-dialogue.modal-body{
-  p{
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  h1{
-    font-size: 18px;
-    font-weight: 600;
-  }
-}
-
-
+/* Special styling to preview element*/
 .element-preview-box{
   padding: 0 20px;
   background-color: $ve-silver-lighter-1;
   border-radius: 3px;
   border: 1px solid $ve-silver-darker-1;
-
 }
 

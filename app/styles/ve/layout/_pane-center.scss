@@ -76,6 +76,11 @@ tr {
     padding-top: 12px;
     padding-bottom: 24px;
     clear: both;
+    border: 1px solid $ve-silver-base;
+    border-radius: 3px;
+    background-color: $ve-silver-lighter-1;
+    padding: 8px;
+    margin: 18px 0;
   }
 
   .btn-tree-reorder-save {
@@ -88,7 +93,26 @@ tr {
 
   .angular-ui-tree-handle {
     font-family: $font-family-sans-serif;
+    font-weight: initial;
+    color:$ve-light-text;
+    padding:4px 6px;
+    border-radius: 2px;
   }
+
+  .angular-ui-tree-handle.grab,
+  .angular-ui-tree-placeholder>div{
+    color:$ve-slate-base;
+    font-weight:bold;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
+  }
+  .angular-ui-tree-handle.grab:hover{
+    background-color:$ve-silver-darker-1;
+  }
+
+
 }
 
 .diff-pane-center {

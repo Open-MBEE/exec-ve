@@ -3,7 +3,7 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 32px;
-    margin:24px 0;
+    margin:32px 0;
     height: inherit;
     width: 100%;
   }
@@ -14,12 +14,11 @@
     word-wrap: break-word;
   }
 
-  h3.prop {
-    font-size: 14px;
+  span.prop {
+    font-size: 15px;
     margin:4px 0 24px;
     min-width: 280px;
     word-wrap: break-word;
-    font-weight:400;
   }
 
   h1.element-title {
@@ -30,7 +29,7 @@
   .prop-title {
     font-family: $font-family-sans-serif;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 15px;
     margin:24px 0 0;
     white-space: nowrap;
   }
