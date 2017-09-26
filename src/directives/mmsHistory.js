@@ -140,7 +140,7 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
         };
 
         scope.changeElement = changeElement;
-            scope.$watch('mmsElementId', changeElement);
+        scope.$watch('mmsElementId', changeElement);
         scope.$watch('mmsRefId', changeElement);
 
 
