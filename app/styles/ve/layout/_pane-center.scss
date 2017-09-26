@@ -112,10 +112,20 @@ tr {
     background-color:$ve-silver-darker-1;
   }
 
+  .angular-ui-tree-placeholder{
+    margin:0;
+    min-height:0;
+  }
+
   .angular-ui-tree-placeholder:before{
-    background-image: url("../assets/location-feedback.svg");
-    height:30px;
-    width:100px;
+    background-image: url(../assets/location-feedback.svg);
+    content: ' ';
+    background-size: 70px 30px;
+    height: 30px;
+    width: 70px;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 4px;
   }
 }
 
