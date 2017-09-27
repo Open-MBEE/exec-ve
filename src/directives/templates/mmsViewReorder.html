@@ -1,6 +1,6 @@
 <!-- Nested node template -->
 <script type="text/ng-template" id="nodes_renderer2.html">
-    <div ui-tree-handle ng-class="{ 'text-success grab' : !element.isOpaque, 'no-grab': element.isOpaque }">
+    <div ui-tree-handle ng-class="{ 'grab' : !element.isOpaque, 'no-grab': element.isOpaque }">
         {{element.presentationElement.type === 'InstanceSpecification' ? 'Section' : element.presentationElement.type}} : {{element.instanceSpecification.name}}
     </div>
     <ol ui-tree-nodes ng-model="element.sectionElements">
@@ -8,16 +8,6 @@
         </li>
     </ol>
 </script>
-<style>
-    .angular-ui-tree-handle.grab{
-        cursor: move;
-        cursor: -moz-move;
-        cursor: -webkit-move;
-    }
-    .angular-ui-tree-handle.no-grab {
-        cursor: default;
-    }
-</style>
 <div class="container-tree-reorder">
     <h2 class="right-pane-title">Reorder contents</h2>
     <hr class="spec-title-divider">
