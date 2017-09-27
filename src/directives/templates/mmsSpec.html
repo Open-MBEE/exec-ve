@@ -2,7 +2,7 @@
 
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></h1>
 
-    <h2 class="prop-title">Last Modicication</h2>
+    <h2 class="prop-title">Last Modification</h2>
     <span class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</span>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
@@ -75,7 +75,7 @@
         <span class="prop">{{element._projectId}}</span>
         <h2 class="prop-title">Formatted Modified Time</h2>
         <span class="prop">{{element._modified}}</span>
-        <h2 class="prop-title">Commut</h2>
+        <h2 class="prop-title">Commit</h2>
         <span class="prop">{{element._commitId}}</span>
     </div>
 

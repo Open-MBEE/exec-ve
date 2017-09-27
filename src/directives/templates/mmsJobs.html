@@ -1,5 +1,6 @@
 <h2 class="right-pane-title">Jobs</h2>
-<i class="pane-center-spinner fa fa-3x fa-spinner fa-spin" style="margin-left: 50%;" ng-if="loading"></i>
+    <span ng-if="loading"><i class="fa fa-spin fa-spinner"></i></span>
+<hr class="spec-title-divider">
 
 <div id="ve-jobs-table">
     <!--<h3>View Editor</h3>
@@ -79,7 +80,7 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
 
 
 
-    <h3>PMA</h3>
+    <h3>PMA (Platform for Model Analysis)</h3>
     <table class="table table-condensed" ng-if="!loading && jobs.length">
         <thead>
             <tr>
@@ -93,7 +94,7 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
             <tr ng-repeat="job in jobs">
                 <td>
                     <div ng-hide="editorEnabled">
-                        {{job.name}}
+                        <b>{{job.name}}</b>
                         <!--<a class="ng-binding" ng-click="enableEditor()">-->
                             <!--<i class="fa fa-pencil" aria-hidden="true"></i>-->
                         <!--</a>-->
@@ -112,8 +113,8 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                 </td>-->
                 <td>
                     <div ng-show="job.latestStatus || jobInstances[job.id]">
-                        Build {{jobInstances[job.id][0].buildNumber}}
-                        <div ng-switch="jobInstances[job.id][0].jobStatus">
+                        <b>Build {{jobInstances[job.id][0].buildNumber}}</b>
+                        <div class="build-details" ng-switch="jobInstances[job.id][0].jobStatus">
                             <span ng-switch-when="pending|loading|running|started" ng-switch-when-separator="|">
                                 Created {{jobInstances[job.id][0].created | date:'M/d/yy h:mm a'}}<br>
                                 <i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>in progress
@@ -131,15 +132,12 @@ in progress <a href="https://cae-jenkins.jpl.nasa.gov/job/MMS_1490133988355_3914
                         </div>
                     </div>
                     <div ng-if="!jobInstances[job.id]">
-                        <h4>No runs.</h4>
+                        <span>No runs.</span>
                     </div>
                 </td>
                 <td>
-                    <button class="btn btn-tertiary" ng-class="{'disabled': !docEditable || !deleteCleared}" ng-click="deleteJob(job.id)">
-                        DELETE <i ng-show="!deleteCleared" class="fa fa-spin fa-spinner"></i>
-                    </button>
-                    <button class="btn btn-primary" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="runNow(job.id)">
-                        RUN NOW <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
+                    <button class="btn btn-primary btn-sm" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="runNow(job.id)">
+                        Run Now <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
                     </button>
                 </td>
             </tr>
