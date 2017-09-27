@@ -9,7 +9,7 @@
 <div style="position:relative;">
     <div ng-show="ModelData.ShowDiffPrototype" class="inline-diff-buttons fade-in-out">
         <span class="inline-btn-label">Base:</span>
-        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav auto-close="outsideClick" style="flex:2">
+        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="flex:2">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <b>{{baseCommit.commitSelected._creator}}</b> - <b>{{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -25,7 +25,7 @@
             </ul>
         </div>
         <span class="inline-btn-label">on</span>
-        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="flex:1">
+        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.refisopen" auto-close="outsideClick" style="flex:1">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -44,7 +44,7 @@
 
     <div class="diff-dotted-connection fade-in-out" ng-show="ModelData.ShowDiffPrototype"></div>
     <div class="inline-diff-buttons">
-        <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype">Change:</span>
+        <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype">Compare:</span>
         <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink':ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <span><b>{{compareCommit.commitSelected._creator}}</b> - <b>{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
