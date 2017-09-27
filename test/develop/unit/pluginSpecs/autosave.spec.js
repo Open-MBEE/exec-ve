@@ -1,4 +1,4 @@
-fdescribe("Autosave plugin", function() {
+describe("Autosave plugin", function() {
 
   function isEmptyObject(object) {
     return Object.keys(object).length === 0;
