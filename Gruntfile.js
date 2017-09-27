@@ -210,7 +210,7 @@ module.exports = function(grunt) {
       afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
       options: {
         reporterOutput: '',
-        // evil: true, //allow eval for timely integration
+        evil: true, //allow eval for plot integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -223,7 +223,7 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false
+          eval: true
         }
       }
     },
