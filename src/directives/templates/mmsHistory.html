@@ -36,7 +36,7 @@
                 </li>
                 <li ng-click="getElementHistoryByRef(ref)" ng-model="baseCommit.refSelected" ng-repeat="ref in refList | filter:refFilter"
                     ng-class="{'checked-list-item': ref.id === baseCommit.refSelected.id}">
-                    <a>{{ ref.type }} -- {{ref.name}}</a>
+                    <a>{{ ref.type }}: {{ref.name}}</a>
                 </li>
             </ul>
         </div>
