@@ -76,7 +76,7 @@
         <h2 class="prop-title">Last Modification</h2>
         <span class="prop">
         {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{baseCommit.commitSelected._creator}}<br>
-        <img src="../assets/arrow-change.svg" class="change-connection"><br>
+        <img src="assets/arrow-change.svg" class="change-connection"><br>
         {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}</span>
 
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
@@ -94,11 +94,11 @@
 
         <h2 class="prop-title">Branch/Tag</h2>
         <span class="prop">{{baseCommit.refSelected.name}}<br>
-        <img src="../assets/arrow-change.svg" class="change-connection"><br>
+        <img src="assets/arrow-change.svg" class="change-connection"><br>
         {{compareCommit.ref.name}}</span>
         <h2 class="prop-title">Commit</h2>
         <span class="prop">{{baseCommit.commitSelected.id}}<br>
-        <img src="../assets/arrow-change.svg" class="change-connection"><br>
+        <img src="assets/arrow-change.svg" class="change-connection"><br>
         {{compareCommit.commitSelected.id}}</span>
     </div>
 </div>
