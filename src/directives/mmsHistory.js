@@ -99,7 +99,7 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
             });
         };
 
-        // Get ref list for project and details on 
+        // Get ref list for project and details on
         var getRefs = function() {
             ProjectService.getRefs(scope.mmsProjectId)
             .then(function(data) {
