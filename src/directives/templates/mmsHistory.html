@@ -79,7 +79,7 @@
         <img src="assets/arrow-change.svg" class="change-connection"><br>
         {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}</span>
 
-        <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
+        <h2 class="prop-title spec-view-doc-heading">Documentation
         <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="doc" mms-project-one-id="{{mmsProjectId}}"
         mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
         mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
