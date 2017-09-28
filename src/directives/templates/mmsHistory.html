@@ -108,7 +108,12 @@
     <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
 </div>
 
-<div ng-show="ModelData.ShowDiffPrototype" class="revert-section fade-in-out">
+<div ng-show="compareCommit.ref.type === 'Tag'" class="revert-section fade-in-out">
+    <div>
+        <span class="ve-secondary-text">Cannot make changes on a <b>Tag</b>.</span>
+    </div>
+</div>
+<div ng-show="ModelData.ShowDiffPrototype && compareCommit.ref.type !== 'Tag'" class="revert-section fade-in-out">
     <div>
         <span class="ve-secondary-text">To revert <b>documentation</b>, <b>name</b>, and <b>value</b> to base content:</span>
         <button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
