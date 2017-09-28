@@ -89,7 +89,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             }
             if (!compareRefId && viewOrigin) {
                 compareRefId = viewOrigin.refId;
-            } else if (!compareRefId && viewOrigin) {
+            } else if (!compareRefId && !viewOrigin) {
                 compareRefId = 'master';
             }
             if (baseCommitId === compareCommitId) {
