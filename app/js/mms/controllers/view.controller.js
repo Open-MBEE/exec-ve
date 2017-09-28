@@ -5,9 +5,9 @@
 angular.module('mmsApp')
     .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout',
     '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'growl',
-    'search', 'orgOb', 'projectOb', 'documentOb', 'viewOb', 'refOb', 'groupOb',
+    'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
     function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, growl,
-             search, orgOb, projectOb, documentOb, viewOb, refOb, groupOb) {
+             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb) {
 
     function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
@@ -68,7 +68,6 @@ angular.module('mmsApp')
         map: {}
     };
 
-    var child;
     $scope.docLibLink = '';
     if (groupOb !== null) {
         $scope.docLibLink = groupOb._link;

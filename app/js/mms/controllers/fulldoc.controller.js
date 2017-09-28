@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', '$element', 'hotkeys', 'growl',
-    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb',
-function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
-    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$element', 'hotkeys', 'growl', '_',
+    'MmsAppUtils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
+function($scope, $rootScope, $state, $element, hotkeys, growl, _,
+    MmsAppUtils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
 
@@ -129,6 +129,17 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         var sibIndex = _.findIndex(views, {id: prevSibId});
         views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
     });
+
+    $scope.docLibLink = '';
+    if (groupOb !== null) {
+        $scope.docLibLink = groupOb._link;
+    } else if (documentOb !== null && documentOb._groupId !== undefined) {
+        $scope.docLibLink = '/share/page/repository#filter=path%7C%2FSites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id + '%2F' + documentOb._groupId;
+    } else {
+        $scope.docLibLink = '/share/page/repository#filter=path%7C%2FSites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id;
+    }
 
     $scope.bbApi = {
         init: function() {
