@@ -5,9 +5,9 @@
 angular.module('mmsApp')
     .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout',
     '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'growl',
-    'search', 'projectOb', 'documentOb', 'viewOb', 'refOb',
+    'search', 'orgOb', 'projectOb', 'documentOb', 'viewOb', 'refOb', 'groupOb',
     function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, growl,
-             search, projectOb, documentOb, viewOb, refOb) {
+             search, orgOb, projectOb, documentOb, viewOb, refOb, groupOb) {
 
     function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
@@ -67,6 +67,18 @@ angular.module('mmsApp')
         lastCommentedBy: '',
         map: {}
     };
+
+    var child;
+    $scope.docLibLink = '';
+    if (groupOb !== null) {
+        $scope.docLibLink = groupOb._link;
+    } else if (documentOb !== null && documentOb._groupId !== undefined) {
+        $scope.docLibLink = '/share/page/repository#filter=path%7C%2FSites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id + '%2F' + documentOb._groupId;
+    } else {
+        $scope.docLibLink = '/share/page/repository#filter=path%7C%2FSites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id;
+    }
 
     $scope.bbApi = {
         init: function() {
