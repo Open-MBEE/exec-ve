@@ -234,8 +234,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $rootScope.ve_bbApi.setToggleState('tree-full-document', true);
                 $state.go('project.ref.document.full', {search: undefined});
             }
-        }, function() {
-            deferred.reject();
         });
         return deferred.promise;
     };

@@ -259,6 +259,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     toGet = displayed;
                 }
             }
+            if (view._contents && view._contents.operand) {
+                var contents = view._contents.operand;
+                for (var i = 0; i < contents.length; i++) {
+                    if (contents[i] && contents[i].instanceId) {
+                        toGet.push(contents[i].instanceId);
+                    }
+                }
+            }
+            if (view.specification) {
+                var specContents = view.specification.operand;
+                for (var j = 0; j < specContents.length; j++) {
+                    if (specContents[j] && specContents[j].instanceId) {
+                        toGet.push(specContents[j].instanceId);
+                    }
+                }
+            }
             reqOb.elementIds = toGet;
             ElementService.getElements(reqOb, weight, update)
             .then(function(data) {

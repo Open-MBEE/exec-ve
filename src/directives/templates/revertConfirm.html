@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h4>Revert Element Documentation, Name, and Value</h4>
+</div>
+
+<div class="modal-body revert-dialogue">
+    <p>Revert documentation, name, and value of this element from 
+    <b>{{compareCommit.commitSelected._creator}} - {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> on {{compareCommit.ref.type}}: <b>{{compareCommit.ref.name}}</b>
+    to 
+    <b>{{baseCommit.commitSelected._creator}} - {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b>
+    on {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>.</p>
+    <p>This will create a new commit under your user name on <b>{{compareCommit.ref.name}}.</b></p>
+    <p>Cross reference contents will NOT be reverted.</p>
+
+    <h1>Preview Element</h1>
+    <div class="element-preview-box">
+        <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}" no-edit="true"></mms-spec>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-warning " ng-click="ok()">Revert</button>
+    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+</div>

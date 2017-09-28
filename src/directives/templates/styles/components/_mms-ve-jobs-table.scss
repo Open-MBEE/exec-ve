@@ -32,17 +32,17 @@ VE Jobs Table Table of contents
 -------------------------------------------------------------------*/
 
   .failed-marker{
-    padding-right:7px;
+    padding-right:4px;
     color: rgb(255, 107, 107);
   }
 
   .in-progress-marker{
-    color:#A1BCC2;
+    color:$tertiary_grey;
     padding-right:3px;
   }
 
   .completed-marker{
-    padding-right:7px;
+    padding-right:4px;
     color: #45c29d;
   }
 
@@ -57,7 +57,7 @@ VE Jobs Table Table of contents
   3.1 Table Layout
 -------------------------------------------------------------------*/
   td{
-    padding:10px;
+    padding:8px 10px;
     border: 1px solid $tertiary_grey;
   }
 
@@ -68,8 +68,13 @@ VE Jobs Table Table of contents
   }
 
   thead td{
-    font-weight:400;
+    font-weight:bolder;
     background-color: $quaternary_grey;
+    color:$medium_grey;
+  }
+
+  .build-details{
+    padding-left: 12px;
   }
 
 /*------------------------------------------------------------------

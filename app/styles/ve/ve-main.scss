@@ -75,6 +75,8 @@ div.tooltip-inner {
     2.4.1 Light tab system
     2.4.2 Dark Tab system
   2.5 Banners
+  2.6 Input
+  2.7 Animation
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -122,7 +124,7 @@ div.tooltip-inner {
 -------------------------------------------------------------------*/
 
 .btn{
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: .14em;
   font-size: 12px;
   -webkit-transition: background-color .1s ease-out;
@@ -134,6 +136,10 @@ div.tooltip-inner {
   border-radius:3px;
   box-shadow:none;
   padding: 7px 12px;
+}
+
+.btn:active{
+  box-shadow: none;
 }
 
 /*------------------------------------------------------------------
@@ -385,8 +391,97 @@ div.tooltip-inner {
     top: 3px;
     color:$ve-silver-base;
   }
-
 }
+
+.ve-light-dropdown{
+  display: block;
+  width: 100%;
+  margin: 6px 0;
+
+  .dropdown-toggle{
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    padding: 7px 8px;
+    line-height: 13px;
+    display: inline;
+    border: none;
+    border-radius: 2px !important;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
+    letter-spacing: .05em;
+    background-color:$ve-silver-lighter-0;
+    min-height: 28px;
+  }
+
+  li.dropdown-input{
+    border-bottom: 1px solid rgba(0,0,0,.15);
+    padding: 8px 0;
+    margin-bottom: 6px;
+    background:$ve-silver-lighter-1;
+  }
+
+  li a{
+    padding-left: 32px;
+  }
+
+  li.checked-list-item{
+    position:relative
+  }
+
+  .checked-list-item::before {
+    content: "\f00c";
+    font-family: FontAwesome;
+    height: 16px;
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 16px;
+    color:$ve-green-lighter-1;
+  }
+
+  ul{
+    min-width:100%;
+  }
+
+  .fa-caret-down{
+    float:right;
+    color:$ve-white-text-darker-1
+  }
+}
+
+/*Clear padding at top of menu when there is input*/
+.dropdown-menu.menu-with-input{
+  padding-top:0px;
+}
+
+.ve-light-dropdown .dropdown-toggle:hover{
+  background-color:$ve-silver-base;  
+}
+
+
+.ve-light-dropdown.open .dropdown-toggle{
+  background-color:$ve-silver-darker-1;
+}
+
+/*Special height for button that is inline with dropdown*/
+.inline-dropdown-btn.btn-primary{
+  float:right;
+  margin:2px 0 8px;
+  height:28px;
+  line-height:13px;
+  width:78px;
+}
+
+.inline-dropdown-btn.ve-light-dropdown{
+  width:calc(100% - 82px);
+  display:inline-block;
+  margin-top:2px;
+}
+
+
 
 /*------------------------------------------------------------------
     2.3.1 Wide Dropdown
@@ -605,6 +700,63 @@ span.fixed-content-dropdown{
   margin: 4px 10px 14px;
 }
 
+
+/*------------------------------------------------------------------
+  2.6 Input
+-------------------------------------------------------------------*/
+
+.ve-plain-input{
+  background-color: white;
+  padding: 3px 6px;
+  border: 1px solid $ve-silver-darker-1;
+  border-radius: 3px;
+  margin: 2px 10px;
+  width: calc(100% - 20px);
+}
+
+/*------------------------------------------------------------------
+  2.6 Input
+-------------------------------------------------------------------*/
+
+.ve-plain-input{
+  background-color: white;
+  padding: 3px 6px;
+  border: 1px solid $ve-silver-darker-1;
+  border-radius: 3px;
+  margin: 0 10px;
+  width: calc(100% - 20px);
+}
+
+/*------------------------------------------------------------------
+  2.7 Animation
+-------------------------------------------------------------------*/
+
+.fade-in-out.ng-hide-add,
+.fade-in-out.ng-hide-remove {
+  -webkit-transition:0.2s linear all;
+  transition: .2s linear all;
+  /* remember to add this */
+  display: flex!important;
+  opacity: 1;
+}
+.fade-in-out.ng-hide {
+  opacity:0;
+}
+
+// animate template - add class name to beginning 
+// .ng-hide-add,
+// .ng-hide-remove {
+//   -webkit-transition:0.5s linear all;
+//   transition:0.5s linear all;
+
+//   /* remember to add this */
+//   display:block!important;
+//   opacity:1;
+// }
+// .ng-hide {
+//   opacity:0;
+// }
+
 /*------------------------------------------------------------------
 3. Table Filtering
 -------------------------------------------------------------------*/
@@ -689,10 +841,24 @@ table caption {
   overflow: auto;
 }
 
+.modal-body{
+  .transclude-modal .transclude-modal-input {
+    width: 80%;
+    margin: 0 auto;
+  }
+}
+
+.modal-description{
+  margin-bottom:18px;
+}
+
 /*hack for overriding cut off content in dropdown modal*/
-.ve-dropdown-short-modal .modal-dialog,
-.ve-dropdown-short-modal .modal-content{
-  overflow: visible;
+.ve-dropdown-short-modal{
+  .modal-dialog,
+  .modal-content,
+  .modal-body{
+    overflow: visible;
+  }
 }
 
 .modal-header{
@@ -794,7 +960,6 @@ table caption {
 
   h1{
     margin: 30px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
     padding-bottom: 20px;
     font-weight: 200;
     font-size: 44px;
@@ -841,8 +1006,43 @@ table caption {
 }
 
 .btn.open-document::before{
-  content: "\f064"; 
+  content:"\f064";
   font-family: FontAwesome;
   padding-right:6px;
+}
+
+/*------------------------------------------------------------------
+9. Right pane 
+-------------------------------------------------------------------*/
+
+h2.right-pane-title{
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: #6a6a6a;
+  margin: 20px 0;
+}
+
+.pane-right .container-fluid{
+  padding:0 18px;
+}
+
+hr.spec-title-divider{
+  margin-left:-18px;
+  margin-right:-18px;
+  border-color:#ddd;
+}
+
+/*------------------------------------------------------------------
+  9.4 Modal for revert history 
+-------------------------------------------------------------------*/
+
+/* Special styling to preview element*/
+.element-preview-box{
+  padding: 0 20px;
+  background-color: $ve-silver-lighter-1;
+  border-radius: 3px;
+  border: 1px solid $ve-silver-darker-1;
 }
 
