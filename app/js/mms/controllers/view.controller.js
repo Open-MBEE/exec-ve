@@ -71,11 +71,11 @@ angular.module('mmsApp')
     $scope.docLibLink = '';
     if (groupOb !== null) {
         $scope.docLibLink = groupOb._link;
-    } else if (documentOb !== null && documentOb._groupId !== undefined) {
-        $scope.docLibLink = '/share/page/repository#filter=path%7C%2FSites/' + orgOb.id + '/documentLibrary/' +
-        projectOb.id + '%2F' + documentOb._groupId;
+    } else if (documentOb !== null && documentOb._groupId !== undefined && documentOb._groupId !== null) {
+        $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id + '/' + documentOb._groupId;
     } else {
-        $scope.docLibLink = '/share/page/repository#filter=path%7C%2FSites/' + orgOb.id + '/documentLibrary/' +
+        $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
         projectOb.id;
     }
 
