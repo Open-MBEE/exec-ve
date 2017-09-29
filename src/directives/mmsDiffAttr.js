@@ -35,6 +35,10 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
     var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
         var ran = false;
         var viewOrigin;
+        var origNotFound = false;
+        var compNotFound = false;
+        var origDeleted = false;
+        var compDeleted = false;
         if (mmsViewCtrl) {
             viewOrigin = mmsViewCtrl.getElementOrigin(); 
         } 
@@ -64,20 +68,18 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             var baseCommitId = scope.mmsBaseCommitId;
             var compareCommitId = scope.mmsCompareCommitId;
 
-            var invalidOrig = false;
-            var invalidComp = false;
-            var origNotFound = false;
-            var compNotFound = false;
-            var deletedFlag = false;
-
+            origNotFound = false;
+            compNotFound = false;
+            origDeleted = false;
+            compDeleted = false;
 
             if (!compareElementId) {
                 compareElementId = baseElementId;
             }
             if (!baseProjectId && viewOrigin) {
                 baseProjectId = viewOrigin.projectId;
-            } else {
-                // return
+            // } else {
+            //     // return
             }
             if (!compareProjectId) {
                 compareProjectId = baseProjectId;
@@ -97,68 +99,68 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
                 return;
             }
 
-        ElementService.getElement({
-            projectId:  baseProjectId,
-            elementId:  baseElementId,
-            refId:      baseRefId,
-            commitId:   baseCommitId
-        }).then(function(data) {
-            // element.prepend('<span class="text-info"> <br><b> Original data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
-            scope.element = data;
-            var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
-            $compile(htmlData)($rootScope.$new());
-            scope.origElem = angular.element(htmlData).text();
-            var promise1 = $interval(
-                function() {
-                    scope.origElem = angular.element(htmlData).text();
-                    if ( !scope.origElem.includes("(loading...)") && angular.isDefined(promise1) ) {
-                        $interval.cancel(promise1);
-                        promise1 = undefined;
-                    }
-                }, 50);
-        }, function(reason) {
-            // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ baseProjectId + '<br> -- refId: ' +  baseRefId+ ' <br>-- commitId: ' +baseCommitId+'</span>');
-            origNotFound = true;
-            if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
-                deletedFlag = true;
-            } else {
-                scope.origElem = '';
-                invalidOrig = true;
-            }
-        }).finally(function() {
             ElementService.getElement({
-                projectId:  compareProjectId,
-                elementId:  compareElementId,
-                refId:      compareRefId,
-                commitId:   compareCommitId
+                projectId:  baseProjectId,
+                elementId:  baseElementId,
+                refId:      baseRefId,
+                commitId:   baseCommitId
             }).then(function(data) {
-                // element.prepend('<span class="text-info"> <b> Comparison data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
+                // element.prepend('<span class="text-info"> <br><b> Original data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
+                scope.element = data;
                 var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
                 $compile(htmlData)($rootScope.$new());
-                scope.compElem = angular.element(htmlData).text();
-                var promise2 = $interval(
+                scope.origElem = angular.element(htmlData).text();
+                var promise1 = $interval(
                     function() {
-                        scope.compElem = angular.element(htmlData).text();
-                        if ( !scope.compElem.includes("(loading...)") && angular.isDefined(promise2) ) {
-                            $interval.cancel(promise2);
-                            promise2 = undefined;
+                        scope.origElem = angular.element(htmlData).text();
+                        if ( !scope.origElem.includes("(loading...)") && angular.isDefined(promise1) ) {
+                            $interval.cancel(promise1);
+                            promise1 = undefined;
                         }
                     }, 50);
-                checkElement(origNotFound, compNotFound, deletedFlag); 
             }, function(reason) {
-                // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ compareProjectId + '<br> -- refId: ' +  compareRefId+ ' <br>-- commitId: ' +compareCommitId+'</span>');
+                // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ baseProjectId + '<br> -- refId: ' +  baseRefId+ ' <br>-- commitId: ' +baseCommitId+'</span>');
                 if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
-                    deletedFlag = true;
+                    origDeleted = true;
                 } else {
-                    compNotFound = true;
-                    scope.compElem = '';
-                    invalidComp = true;
+                    scope.origElem = '';
+                    origNotFound = true;
+                    // invalidOrig = true;
                 }
-                checkElement(origNotFound, compNotFound, deletedFlag); 
-                checkValidity(invalidOrig, invalidComp);
+            }).finally(function() {
+                ElementService.getElement({
+                    projectId:  compareProjectId,
+                    elementId:  compareElementId,
+                    refId:      compareRefId,
+                    commitId:   compareCommitId
+                }).then(function(data) {
+                    // element.prepend('<span class="text-info"> <b> Comparison data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
+                    var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
+                    $compile(htmlData)($rootScope.$new());
+                    scope.compElem = angular.element(htmlData).text();
+                    var promise2 = $interval(
+                        function() {
+                            scope.compElem = angular.element(htmlData).text();
+                            if ( !scope.compElem.includes("(loading...)") && angular.isDefined(promise2) ) {
+                                $interval.cancel(promise2);
+                                promise2 = undefined;
+                            }
+                        }, 50);
+                    checkElement(origNotFound, compNotFound); 
+                }, function(reason) {
+                    // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ compareProjectId + '<br> -- refId: ' +  compareRefId+ ' <br>-- commitId: ' +compareCommitId+'</span>');
+                    if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
+                        compDeleted = true;
+                    } else {
+                        compNotFound = true;
+                        scope.compElem = '';
+                        // invalidComp = true;
+                    }
+                    checkElement(origNotFound, compNotFound); 
+                    // checkValidity(invalidOrig, invalidComp);
+                });
             });
-        });
-    };
+        };
 
         var createTransclude = function(elementId, type, projectId, commitId, refId) {
             var transcludeElm = angular.element('<mms-cf>');
@@ -170,30 +172,29 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
             return transcludeElm;
         };
 
-        var checkElement = function(origNotFound, compNotFound, deletedFlag) {
-            switch (origNotFound) {
-                case false:
-                    if (compNotFound === true) {
-                        element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element not found. Might be due to invalid input. </span>');
-                    } 
-                    break;
-                default:
-                    if (compNotFound === false) {
-                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element. </span>');
-                    } else if (compNotFound === true) {
-                        element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
-                    }
+        var checkElement = function(origNotFound, compNotFound) {
+            if (origNotFound && compNotFound) {
+                element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Both base and compare element do not exist.</span>');
+            } else if (origNotFound) {
+                // TODO add this in template - to resolve running twice
+                element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element. </span>');
+            } else if (compNotFound) {
+                element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element does not exist.</span>');
             }
-            if (deletedFlag === true) {
+            if (origDeleted && compDeleted) {
                 element.html('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
+            } else if (origDeleted){
+                element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Base element has been deleted. </span>');
+            } else if (compDeleted){
+                element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Compare element has been deleted. </span>');
             }
         };
 
-        var checkValidity = function(invalidOrig, invalidComp) {
-            if (invalidOrig && invalidComp) {
-                element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
-            }
-        };
+        // var checkValidity = function(invalidOrig, invalidComp) {
+        //     if (invalidOrig && invalidComp) {
+        //         element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
+        //     }
+        // };
 
         scope.changeElement = changeElement;
         scope.$watch('mmsBaseCommitId', changeElement);
