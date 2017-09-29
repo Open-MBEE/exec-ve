@@ -67,6 +67,9 @@
 
 <div ng-show="ModelData.ShowDiffPrototype">
     <div ng-if="ModelData.ShowDiffPrototype">
+        <div class="ve-notify-banner fade-in-out" ng-show="disableRevert">
+            <span>Element does not exist on <strong>{{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}</strong></span>
+        </div>
         <h1 class="prop element-title">
             <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name" mms-project-one-id="{{mmsProjectId}}"
             mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
@@ -113,7 +116,7 @@
         <span class="ve-secondary-text">Cannot make changes on a <b>Tag</b>.</span>
     </div>
 </div>
-<div ng-show="ModelData.ShowDiffPrototype && compareCommit.ref.type !== 'Tag'" class="revert-section fade-in-out">
+<div ng-show="ModelData.ShowDiffPrototype && !disableRevert && compareCommit.ref.type !== 'Tag'" class="revert-section fade-in-out">
     <div>
         <span class="ve-secondary-text">To revert <b>documentation</b>, <b>name</b>, and <b>value</b> to base content:</span>
         <button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
