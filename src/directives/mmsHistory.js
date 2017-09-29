@@ -51,7 +51,8 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
             refSelected: {id: scope.mmsRefId},
             baseHistory: null,
             commitSelected: null,
-            isopen: false
+            isopen: false,
+            refisopen: false
         };
 
 
@@ -98,7 +99,7 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
             });
         };
 
-        // Get ref list for project and details on 
+        // Get ref list for project and details on
         var getRefs = function() {
             ProjectService.getRefs(scope.mmsProjectId)
             .then(function(data) {
@@ -118,6 +119,7 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
 
         scope.getElementHistoryByRef = function(ref) {
             if (ref) {
+                scope.disableRevert = false;
                 // scope.gettingCompareHistory = true;
                 scope.baseCommit.refSelected = ref;
                 var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: ref.id};
@@ -127,9 +129,13 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
                     if (data.length > 0) {
                         scope.baseCommit.commitSelected = scope.baseCommit.baseHistory[0];
                     }
+                }, function(error) {
+                    scope.baseCommit.baseHistory = [];
+                    scope.baseCommit.commitSelected = '';
+                    scope.disableRevert = true;
                 }).finally(function() {
                     // scope.gettingCompareHistory = false;
-                    scope.baseCommit.isopen = !scope.baseCommit.isopen;
+                    scope.baseCommit.refisopen = !scope.baseCommit.refisopen;
                 });
             }
         };
