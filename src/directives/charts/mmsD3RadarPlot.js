@@ -70,7 +70,10 @@
       //add legends
       var legends = [];
       for ( i = 0; i < scope.tableRowHeaders.length; i++){
-        legends.push(scope.tableRowHeaders[i].name);
+        if ( scope.tableRowHeaders[i].type === "InstanceSpecification")
+          legends.push(scope.tableRowHeaders[i].name);
+        else
+          legends.push(scope.tableRowHeaders[i].defaultValue.value);
       }
       initiateLegend(legends, "radar" + scope.$id);
     }; //end of scope.render

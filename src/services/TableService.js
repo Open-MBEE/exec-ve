@@ -94,7 +94,11 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         var filterRowHeaders = [];
         var filterColumnHeaders=[];
         for ( i = 0; i < tableRowHeaders.length; i++){
+          if ( tableRowHeaders[i].type === "InstanceSpecification")
              filterRowHeaders[toValidId(tableRowHeaders[i].name)] = true;
+          else
+             filterRowHeaders[toValidId(tableRowHeaders[i].defaultValue.value)] = true;
+
         }
         if (tableColumnHeadersLabels !== undefined){
           for ( i = 0; i < tableColumnHeadersLabels.length; i++){
@@ -230,7 +234,10 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                     var filterRowHeaders = [];
                     var filterColumnHeaders=[];
                     for ( i = 0; i < tableRowHeaders[k].length; i++){
+                      if ( tableRowHeaders[k][i].type === "InstanceSpecification")
                          filterRowHeaders[toValidId(tableRowHeaders[k][i].name)] = true;
+                      else //Property
+                        filterRowHeaders[toValidId(tableRowHeaders[k][i].defaultValue.value)] = true;
                     }
                     if (tableColumnHeadersLabels[k] !== undefined){
                       for ( i = 0; i < tableColumnHeadersLabels[k].length; i++){
