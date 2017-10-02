@@ -143,6 +143,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         
         //not a number - it should be reference
         if (isNaN(scope.datavalues[i][j])){
+
           if ( scope.datavalues[i][j].type === "Class"){ //sourceProperty = "documentation"
           
             if ( scope.indexDocumentation.includes(i+","+j)){
@@ -169,7 +170,10 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         else
           c3_data_row[j] = scope.datavalues[i][j];
       } //end of j
-     	c3_data[1+start_index++] = [scope.tableRowHeaders[i].name].concat(c3_data_row);
+      if ( scope.tableRowHeaders[i].type === "InstanceSpecification")
+        c3_data[1+start_index++] = [scope.tableRowHeaders[i].name].concat(c3_data_row);
+      else //property
+        c3_data[1+start_index++] = [scope.tableRowHeaders[i].defaultValue.value].concat(c3_data_row);
     } //end of i
     //////////////////////////////////
     vf_pplot(c3_data, c3options, has_column_header); //c3_columns
@@ -190,7 +194,6 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         scope.indexDocumentation = value.indexDocumentation;
         scope.indexName = value.indexName;
       });
-   
     if ( scope.plot.config.length !== 0){
       scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
     }

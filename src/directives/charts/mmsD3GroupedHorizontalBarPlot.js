@@ -326,8 +326,12 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
          var dataValuesPerTable;
           dataValuesPerTable = scope.datavalues;//[k];
           var legends = [];
+
           for ( i = 0; i < scope.tableRowHeaders.length; i++){
-            legends.push(scope.tableRowHeaders[i].name);
+            if ( scope.tableRowHeaders[i].type === "InstanceSpecification")
+              legends.push(scope.tableRowHeaders[i].name);
+            else //property
+              legends.push(scope.tableRowHeaders[i].defaultValue.value);
           }
           var rowvalues=[];
           var rowsysmlIds=[];
@@ -387,11 +391,20 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
         if ( oldRowHeaders !== undefined){
           for ( var i = 0; i < newRowHeaders.length; i++ ){
             for ( var j = 0; j < newRowHeaders[i].length; j++){
-              if ( newRowHeaders[i][j].name !== oldRowHeaders[i][j].name){
-                 //add new one.
-                 dataIdFilters[0][newRowHeaders[i][j].name] = dataIdFilters[0][oldRowHeaders[i][j].name];
-                 //delete old one
-                 delete dataIdFilters[0][oldRowHeaders[i][j].name];
+              if ( oldRowHeaders[i].type === "InstanceSpecification"){
+                if ( newRowHeaders[i][j].name !== oldRowHeaders[i][j].name){
+                   //add new one.
+                   dataIdFilters[0][newRowHeaders[i][j].name] = dataIdFilters[0][oldRowHeaders[i][j].name];
+                   //delete old one
+                   delete dataIdFilters[0][oldRowHeaders[i][j].name];
+                }
+              } else { //oldRowHeaders[i].type === Property
+                if ( newRowHeaders[i][j].defaultValue.value !== oldRowHeaders[i][j].defaultValue.value){
+                   //add new one.
+                   dataIdFilters[0][newRowHeaders[i][j].defaultValue.value] = dataIdFilters[0][oldRowHeaders[i][j].defaultValue.value];
+                   //delete old one
+                   delete dataIdFilters[0][oldRowHeaders[i][j].defaultValue.value];
+                }
               }
             }
           }

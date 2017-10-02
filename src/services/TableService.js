@@ -17,12 +17,12 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
           tableColumnHeadersLabels.push(reqOb.tableData.header[0][i].content[0].text.replace("<p>","").replace("</p>","").replace(" ", ""));    
         }
        }
-      var rowHeadersMmsEid = {};
+      var rowHeadersMmsEid = [];
       rowHeadersMmsEid.elementIds =[];
       rowHeadersMmsEid.projectId = reqOb.projectId;
       rowHeadersMmsEid.refId = reqOb.refId;
       rowHeadersMmsEid.commitId = reqOb.commitId;
-      var dataValuesMmmEid = {};
+      var dataValuesMmmEid = [];
       dataValuesMmmEid.elementIds = [];
       dataValuesMmmEid.projectId = reqOb.projectId;
       dataValuesMmmEid.refId = reqOb.refId;
@@ -36,7 +36,7 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
       for ( i = 0; i < reqOb.tableData.body.length; i++){ 
         rowHeadersMmsEid.elementIds.push(reqOb.tableData.body[i][0].content[0].source);
         for ( j = 1; j < reqOb.tableData.body[i].length; j++ ){
-          if (reqOb.tableData.body[i][j].content.length === 0 ){
+          if (reqOb.tableData.body[i][j].content.length == 0 ){
             dataValuesMmmEid.elementIds.push("missing");
           }
           else {
@@ -94,7 +94,11 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
         var filterRowHeaders = [];
         var filterColumnHeaders=[];
         for ( i = 0; i < tableRowHeaders.length; i++){
+          if ( tableRowHeaders[i].type === "InstanceSpecification")
              filterRowHeaders[toValidId(tableRowHeaders[i].name)] = true;
+          else
+             filterRowHeaders[toValidId(tableRowHeaders[i].defaultValue.value)] = true;
+
         }
         if (tableColumnHeadersLabels !== undefined){
           for ( i = 0; i < tableColumnHeadersLabels.length; i++){
@@ -230,7 +234,10 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
                     var filterRowHeaders = [];
                     var filterColumnHeaders=[];
                     for ( i = 0; i < tableRowHeaders[k].length; i++){
+                      if ( tableRowHeaders[k][i].type === "InstanceSpecification")
                          filterRowHeaders[toValidId(tableRowHeaders[k][i].name)] = true;
+                      else //Property
+                        filterRowHeaders[toValidId(tableRowHeaders[k][i].defaultValue.value)] = true;
                     }
                     if (tableColumnHeadersLabels[k] !== undefined){
                       for ( i = 0; i < tableColumnHeadersLabels[k].length; i++){

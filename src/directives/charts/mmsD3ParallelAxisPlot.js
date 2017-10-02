@@ -289,13 +289,25 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
 
           if (scope.plot.config.ticks !== undefined){
             for ( var kk = 0; kk < scope.plot.config.ticks.length; kk++){
-              if (scope.tableRowHeaders[i].name === scope.plot.config.ticks[kk].name)
-                tickColor = scope.plot.config.ticks[kk].color;  
+              if ( scope.tableRowHeaders[i].type === "InstanceSpecification"){
+                if (scope.tableRowHeaders[i].name === scope.plot.config.ticks[kk].name)
+                  tickColor = scope.plot.config.ticks[kk].color; 
+              } else {
+                if (scope.tableRowHeaders[i].defaultValue.value === scope.plot.config.ticks[kk].name)
+                  tickColor = scope.plot.config.ticks[kk].color; 
+              }
+
             }
           }
-          dataseries[i] = { row: scope.tableRowHeaders[i].name, 
+          if ( scope.tableRowHeaders[i].type === "InstanceSpecification"){
+            dataseries[i] = { row: scope.tableRowHeaders[i].name, 
                             tickColor: tickColor,
                           values:tvalues}; 
+          } else {
+            dataseries[i] = { row: scope.tableRowHeaders[i].defaultValue.value, 
+                            tickColor: tickColor,
+                          values:tvalues}; 
+          }
       }
       var modelData = {
            variables: scopetableColumnHeadersLabel,
