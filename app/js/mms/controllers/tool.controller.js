@@ -201,6 +201,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.info('Please Wait...');
             return;
         }
+        var edit = $scope.specApi.getEdits();
+        Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
         elementSaving = true;
         if (!continueEdit)
             $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save');
@@ -259,10 +261,16 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.info('Please wait...');
             return;
         }
-        if (Object.keys($rootScope.ve_edits).length === 0) {
+        var ve_edits = $rootScope.ve_edits;
+        if (Object.keys(ve_edits).length === 0) {
             growl.info('Nothing to save');
             return;
         }
+
+        Object.values(ve_edits).forEach(function(ve_edit) {
+           Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
+        });
+
         if ($scope.specApi && $scope.specApi.editorSave)
             $scope.specApi.editorSave();
         savingAll = true;
@@ -340,6 +348,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 scope: $scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
+                        var edit = $scope.specApi.getEdits();
+                        Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
+
                         $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {
