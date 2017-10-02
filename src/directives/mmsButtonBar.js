@@ -161,7 +161,8 @@ function mmsButtonBar($templateCache) {
         scope: {
             buttons: '<',
             mmsBbApi: '<',
-            direction: '@'
+            direction: '@',
+            autosaveKey: '@'
         }
     };
 }

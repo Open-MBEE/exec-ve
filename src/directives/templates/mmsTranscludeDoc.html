@@ -5,7 +5,7 @@
             <span ng-if="isDirectChildOfPresentationElement"><input type="text" ng-model="edit.name"/></span>
         </h3>
         <div class="btn-group pull-right">
-            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+            <mms-button-bar buttons="buttons" mms-bb-api="bbApi" autosave-key="{{projectId + refId + mmsElementId}}"></mms-button-bar>
         </div>
     </div>
     <div class="inner panel-body">

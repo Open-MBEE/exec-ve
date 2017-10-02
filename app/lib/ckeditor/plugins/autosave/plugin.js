@@ -18,6 +18,9 @@ CKEDITOR.MmsAutosavePlugin =
         requires: 'notification',
         version: "0.18.0",
         init: function (editor) {
+            if ( !editor.config.autosave.enableAutosave ) {
+                return;
+            }
 
             // Look for autosave from config.js - this is a bit redundant but necessary
             editor.config.autosave = 'autosave' in editor.config ? editor.config.autosave : {};
@@ -231,7 +234,7 @@ CKEDITOR.MmsAutosavePlugin =
             var editorLoadedContent = editorInstance.getData();
 
             // check if the loaded editor content is the same as the autosaved content
-            if (editorLoadedContent == autoSavedContent) {
+            if (editorLoadedContent === autoSavedContent) {
                 localStorage.removeItem(autoSaveKey);
                 return;
             }
@@ -245,9 +248,7 @@ CKEDITOR.MmsAutosavePlugin =
 
             if (config.autoLoad) {
                 if (localStorage.getItem(autoSaveKey)) {
-                    var jsonSavedContent = LoadData(autoSaveKey);
-                    editorInstance.setData(jsonSavedContent.data);
-
+                    editorInstance.setData(autoSavedContent);
                     RemoveStorage(autoSaveKey, editorInstance);
                 }
             } else {
@@ -272,7 +273,7 @@ CKEDITOR.MmsAutosavePlugin =
 
     function SaveData(autoSaveKey, editorInstance, config) {
 
-        var compressedJSON = LZString.compressToUTF16(JSON.stringify({ data: editorInstance.getData(), saveTime: new Date() }));
+        var compressedJSON = LZString.compressToUTF16(JSON.stringify({ data: editorInstance.getData(), saveTime: new Date(), isAutosaveContent: true }));
 
         var quotaExceeded = _trySavingContentToLocalStorage(localStorage, moment, LZString, config.NotOlderThen, autoSaveKey, compressedJSON);
 
@@ -432,8 +433,7 @@ CKEDITOR.MmsAutosavePlugin =
         try {
             localStorage.setItem(autosaveKey, compressedJSON);
         } catch (e) {
-            quotaExceeded = isQuotaExceeded(e);
-            if (quotaExceeded) {
+            if (isQuotaExceeded(e)) {
                 // need to use "customHelpers" at the front. If not, jasmine's spy wont work on this function
                 // since it will be "_clearExpiredLocalStorageContents" in this local scope and not "_clearExpiredLocalStorageContents"
                 // on "customHelpers" object where the spy is set

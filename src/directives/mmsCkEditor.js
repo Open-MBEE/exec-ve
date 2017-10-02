@@ -444,11 +444,23 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
           // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
           if ( attrs.autosaveKey ) {
             // Configuration for autosave plugin
+            // When dealing with slot table, get rid of the slot index: before using it as a selector
+            // Since the whole slot table share only one set of (save, delete, .. buttons )
+            var autosavekeyAttr = attrs.autosaveKey;
+            var slotIndex = attrs.autosaveKey.indexOf('index:');
+            if ( slotIndex !== -1 ) {
+              autosavekeyAttr = autosavekeyAttr.substring(0, slotIndex);
+            }
+            var autosaveAttrSelector = '[autosave-key=' + autosavekeyAttr + ']';
             instance.config.autosave = {
               SaveKey: attrs.autosaveKey,
               delay: 5,
               NotOlderThen: 10080, // 7 days in minutes
-              saveDetectionSelectors: '.presentation-element-saveC, .presentation-element-save, .presentation-element-cancel, .presentation-element-delete',
+              saveDetectionSelectors:
+              '.presentation-element-saveC' + autosaveAttrSelector +
+              ', .presentation-element-save' + autosaveAttrSelector +
+              ', .presentation-element-cancel' + autosaveAttrSelector +
+              ', .presentation-element-delete' + autosaveAttrSelector,// should use this one? coz it shows popup
               enableAutosave: true
             };
           } else {
