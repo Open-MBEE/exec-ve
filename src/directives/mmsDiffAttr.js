@@ -128,7 +128,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval, $templateC
                         }
                     }, 50);
             }, function(reason) {
-                if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
+                if (reason.data.message && reason.data.message.toLowerCase().includes("deleted")) {
                     baseDeleted = true;
                 } else {
                     scope.origElem = '';
