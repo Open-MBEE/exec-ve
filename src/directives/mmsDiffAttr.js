@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffAttr', ['ElementService', '$compile', '$rootScope', '$interval', mmsDiffAttr]);
+.directive('mmsDiffAttr', ['ElementService', '$compile', '$rootScope', '$interval', '$templateCache', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
@@ -17,23 +17,32 @@ angular.module('mms.directives')
  * @description
  *  Compares a element at two different refs/commits and generates a pretty diff.
  * ## Example
- * <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name/doc/val" mms-project-one-id="{{project1}}"
- *  mms-project-two-id="{{project2}}" mms-ref-one-id="{{ref1}}" mms-ref-two-id="{{ref2}}"
- *  mms-commit-one-id="{{history1}}" mms-commit-two-id="{{history2}}"></mms-diff-attr>
+ * <mms-diff-attr mms-base-element-id="" (mms-compare-element-id="") mms-attr="name|doc|val"
+ * (mms-base-project-id="" mms-compare-project-id="" mms-base-ref-id="" mms-compare-ref-id=""
+ * mms-base-commit-id="" mms-compare-commit-id="")></mms-diff-attr>
  *
- * @param {string} mmsEid The id of the element whose doc to transclude
+ * @param {string} mmsBaseElementId The id of the element to do comparison of
  * @param {string} mmsAttr Attribute to use -  ie `name`, `doc` or `value`
- * @param {string} mmsProjectOneId Project for original data
- * @param {string} mmsProjectTwoId Project for comparisson data
- * @param {string=master} mmsRefOneId Ref to use, defaults to current ref or master
- * @param {string=master} mmsRefTwoId Ref to use, defaults to current ref or master
- * @param {string=latest} mmsCommitOneId  can be 'latest' or commit id, default is latest
- * @param {string=latest} mmsCommitTwoId  can be 'latest' or commit id, default is latest
+ * @param {string} mmsBaseProjectId Base project ID for original/base element
+ * @param {string} mmsCompareProjectId Compare project ID for compare element
+ * @param {string=master} mmsBaseRefId Base ref ID or master, defaults to current ref or master
+ * @param {string=master} mmsCompareRefId Compare ref ID or master, defaults to base ref ID
+ * @param {string=latest} mmsBaseCommitId Base commit id, default is latest
+ * @param {string=latest} mmsCompareCommitId Compare commit id, default is latest
  */
-function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
+function mmsDiffAttr(ElementService, $compile, $rootScope, $interval, $templateCache) {
+    var template = $templateCache.get('mms/templates/mmsDiffAttr.html');
 
     var mmsDiffAttrLink = function(scope, element, attrs, mmsViewCtrl) {
         var ran = false;
+        var viewOrigin;
+        var baseNotFound = false;
+        var compNotFound = false;
+        var baseDeleted = false;
+        var compDeleted = false;
+        if (mmsViewCtrl) {
+            viewOrigin = mmsViewCtrl.getElementOrigin();
+        }
         scope.options = {
             editCost: 4
         };
@@ -47,168 +56,172 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval) {
          * Change scope for diff when there is a change in commit id
          */
         var changeElement = function(newVal, oldVal) {
-            if (!newVal || (newVal == oldVal && ran))
+            if (!newVal || (newVal == oldVal && ran)) {
                 return;
-        var projectOneId = scope.mmsProjectOneId;
-        var projectTwoId = scope.mmsProjectTwoId;
-        var elemOneId = scope.mmsEidOne;
-        var elemTwoId = scope.mmsEidTwo;
-        var refOneId = scope.mmsRefOneId;
-        var refTwoId = scope.mmsRefTwoId;
-        var commitOneId = scope.mmsCommitOneId;
-        var commitTwoId = scope.mmsCommitTwoId;
-        var viewOrigin = null;
-
-        var invalidOrig = false;
-        var invalidComp = false;
-        var origNotFound = false;
-        var compNotFound = false;
-        var deletedFlag = false;
-
-        if (mmsViewCtrl) {
-            viewOrigin = mmsViewCtrl.getElementOrigin(); 
-        } 
-        if (!elemTwoId) {
-            elemTwoId = elemOneId;
-        }
-        if (!projectOneId && viewOrigin) {
-            projectOneId = viewOrigin.projectId;
-        }
-        if (!projectTwoId) {
-            projectTwoId = projectOneId;
-        }
-        if (!refOneId && viewOrigin) {
-            refOneId = viewOrigin.refId;
-        } else if (!refOneId && !viewOrigin) {
-            refOneId = 'master';
-        }
-        if (!refTwoId && viewOrigin) {
-            refTwoId = viewOrigin.refId;
-        } else if (!refTwoId && !viewOrigin) {
-            refTwoId = 'master';
-        }
-
-        ElementService.getElement({
-            projectId:  projectOneId,
-            elementId:  elemOneId,
-            refId:      refOneId,
-            commitId:   commitOneId
-        }).then(function(data) {
-            // element.prepend('<span class="text-info"> <br><b> Original data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
-            scope.element = data;
-            var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
-            $compile(htmlData)($rootScope.$new());
-            scope.origElem = angular.element(htmlData).text();
-            var promise1 = $interval(
-                function() {
-                    scope.origElem = angular.element(htmlData).text();
-                    if ( !scope.origElem.includes("(loading...)") && angular.isDefined(promise1) ) {
-                        $interval.cancel(promise1);
-                        promise1 = undefined;
-                    }
-                }, 50);
-        }, function(reason) {
-            // element.prepend('<span class="text-info"> <br>Error: <b> Original data: </b> '+ projectOneId + '<br> -- refId: ' +  refOneId+ ' <br>-- commitId: ' +commitOneId+'</span>');
-            origNotFound = true;
-            if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
-                deletedFlag = true;
-            } else {
-                scope.origElem = '';
-                invalidOrig = true;
             }
-        }).finally(function() {
+
+            scope.message = '';
+            scope.origElem = '';
+            scope.compElem = '';
+            scope.diffLoading = true;
+            var baseElementId = scope.mmsBaseElementId;
+            var compareElementId = scope.mmsCompareElementId;
+            var baseProjectId = scope.mmsBaseProjectId;
+            var compareProjectId = scope.mmsCompareProjectId;
+            var baseRefId = scope.mmsBaseRefId;
+            var compareRefId = scope.mmsCompareRefId;
+            var baseCommitId = scope.mmsBaseCommitId;
+            var compareCommitId = scope.mmsCompareCommitId;
+
+            baseNotFound = false;
+            compNotFound = false;
+            baseDeleted = false;
+            compDeleted = false;
+
+            if (!compareElementId) {
+                compareElementId = baseElementId;
+            }
+            if (!baseProjectId && viewOrigin) {
+                baseProjectId = viewOrigin.projectId;
+            // } else {
+            //     // return
+            }
+            if (!compareProjectId) {
+                compareProjectId = baseProjectId;
+            }
+            if (!baseRefId && viewOrigin) {
+                baseRefId = viewOrigin.refId;
+            } else if (!baseRefId && !viewOrigin) {
+                baseRefId = 'master';
+            }
+            if (!compareRefId) {
+                compareRefId = baseRefId;
+            }
+            if (!baseCommitId) {
+                baseCommitId = 'latest';
+            }
+            if (!compareCommitId) {
+                compareCommitId = 'latest';
+            }
+            if (baseCommitId === compareCommitId) {
+                scope.message = ' Comparing same commit.';
+                scope.diffLoading = false;
+                return;
+            }
+
             ElementService.getElement({
-                projectId:  projectTwoId,
-                elementId:  elemTwoId,
-                refId:      refTwoId,
-                commitId:   commitTwoId
+                projectId:  baseProjectId,
+                elementId:  baseElementId,
+                refId:      baseRefId,
+                commitId:   baseCommitId
             }).then(function(data) {
-                // element.prepend('<span class="text-info"> <b> Comparison data: </b> '+ data._projectId + '<br> -- refId: ' +  data._refId+ ' <br>-- commitId: ' +data._commitId+'</span>');
-                var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._commitId, data._refId);
+                scope.element = data;
+                var htmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._refId, data._commitId);
                 $compile(htmlData)($rootScope.$new());
-                scope.compElem = angular.element(htmlData).text();
-                var promise2 = $interval(
+                scope.origElem = angular.element(htmlData).text();
+                var promise1 = $interval(
                     function() {
-                        scope.compElem = angular.element(htmlData).text();
-                        if ( !scope.compElem.includes("(loading...)") && angular.isDefined(promise2) ) {
-                            $interval.cancel(promise2);
-                            promise2 = undefined;
+                        scope.origElem = angular.element(htmlData).text();
+                        if ( !scope.origElem.includes("(loading...)") && angular.isDefined(promise1) ) {
+                            $interval.cancel(promise1);
+                            promise1 = undefined;
                         }
                     }, 50);
-                checkElement(origNotFound, compNotFound, deletedFlag); 
             }, function(reason) {
-                // element.prepend('<span class="text-info"> <br>Error: <b> Comparison data: </b> '+ projectTwoId + '<br> -- refId: ' +  refTwoId+ ' <br>-- commitId: ' +commitTwoId+'</span>');
-                if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
-                    deletedFlag = true;
+                if (reason.data.message && reason.data.message.toLowerCase().includes("deleted")) {
+                    baseDeleted = true;
                 } else {
-                    compNotFound = true;
-                    scope.compElem = '';
-                    invalidComp = true;
+                    scope.origElem = '';
+                    baseNotFound = true;
+                    // invalidOrig = true;
                 }
-                checkElement(origNotFound, compNotFound, deletedFlag); 
-                checkValidity(invalidOrig, invalidComp);
+            }).finally(function() {
+                ElementService.getElement({
+                    projectId:  compareProjectId,
+                    elementId:  compareElementId,
+                    refId:      compareRefId,
+                    commitId:   compareCommitId
+                }).then(function(data) {
+                    var comphtmlData = createTransclude(data.id, scope.mmsAttr, data._projectId, data._refId, data._commitId);
+                    $compile(comphtmlData)($rootScope.$new());
+                    scope.compElem = angular.element(comphtmlData).text();
+                    var promise2 = $interval(
+                        function() {
+                            scope.compElem = angular.element(comphtmlData).text();
+                            if ( !scope.compElem.includes("(loading...)") && angular.isDefined(promise2) ) {
+                                $interval.cancel(promise2);
+                                promise2 = undefined;
+                            }
+                        }, 50);
+                    checkElement(baseNotFound, compNotFound);
+                }, function(reason) {
+                    if (reason.data.message && reason.data.message.toLowerCase().includes("deleted") === true) {
+                        compDeleted = true;
+                    } else {
+                        compNotFound = true;
+                        scope.compElem = '';
+                        // invalidComp = true;
+                    }
+                    checkElement(baseNotFound, compNotFound);
+                    // checkValidity(invalidOrig, invalidComp);
+                }).finally(function() {
+                    scope.diffLoading = false;
+                });
             });
-        });
-    };
+        };
 
-        var createTransclude = function(elementId, type, projectId, commitId, refId) {
+        var createTransclude = function(elementId, type, projectId, refId, commitId) {
             var transcludeElm = angular.element('<mms-cf>');
             transcludeElm.attr("mms-cf-type", type);
             transcludeElm.attr("mms-element-id", elementId);
             transcludeElm.attr("mms-project-id", projectId);
-            transcludeElm.attr("mms-commit-id", commitId);
             transcludeElm.attr("mms-ref-id", refId);
+            transcludeElm.attr("mms-commit-id", commitId);
             return transcludeElm;
         };
 
-        var checkElement = function(origNotFound, compNotFound, deletedFlag) {
-            switch (origNotFound) {
-                case false:
-                    if (compNotFound === true) {
-                        element.html('<span class="text-info"><i class="fa fa-info-circle"></i> Comparison element not found. Might be due to invalid input. </span>');
-                    } 
-                    break;
-                default:
-                    if (compNotFound === false) {
-                        element.prepend('<span class="text-info"><i class="fa fa-info-circle"></i> This element is a new element. </span>');
-                    } else if (compNotFound === true) {
-                        element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
-                    }
+        var checkElement = function(baseNotFound, compNotFound) {
+            if (baseNotFound && compNotFound) {
+                scope.message = ' Both base and compare elements do not exist.';
+            } else if (baseNotFound) {
+                scope.message = ' This is a new element.';
+            } else if (compNotFound) {
+                scope.message = ' Comparison element does not exist.';
             }
-            if (deletedFlag === true) {
-                element.html('<span class="text-info"><i class="fa fa-info-circle"></i> This element has been deleted. </span>');
+            if (baseDeleted && compDeleted) {
+                scope.message = ' This element has been deleted.';
+            } else if (baseDeleted){
+                scope.message = ' Base element has been deleted.';
+            } else if (compDeleted){
+                scope.message = ' Comparison element has been deleted.';
             }
         };
 
-        var checkValidity = function(invalidOrig, invalidComp) {
-            if (invalidOrig && invalidComp) {
-                element.html('<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.</span>');
-            }
-        };
+        // var checkValidity = function(invalidOrig, invalidComp) {
+        //     if (invalidOrig && invalidComp) {
+        //         scope.message = '<span class="mms-error"><i class="fa fa-info-circle"></i> Invalid Project, Branch/Tag, Commit, or Element IDs. Check entries.');
+        //     }
+        // };
 
         scope.changeElement = changeElement;
-        scope.$watch('mmsCommitOneId', changeElement);
-        scope.$watch('mmsCommitTwoId', changeElement);
+        scope.$watch('mmsBaseCommitId', changeElement);
+        scope.$watch('mmsCompareCommitId', changeElement);
     };
 
     return {
         restrict: 'E',
         scope: {
-            mmsEidOne: '@mmsElementOneId',
-            mmsEidTwo: '@mmsElementTwoId',
+            mmsBaseElementId: '@',
+            mmsCompareElementId: '@',
             mmsAttr: '@',
-            mmsProjectOneId: '@',
-            mmsProjectTwoId: '@',
-            mmsRefOneId: '@',
-            mmsRefTwoId: '@',
-            mmsCommitOneId: '@',
-            mmsCommitTwoId: '@'
+            mmsBaseProjectId: '@',
+            mmsCompareProjectId: '@',
+            mmsBaseRefId: '@',
+            mmsCompareRefId: '@',
+            mmsBaseCommitId: '@',
+            mmsCompareCommitId: '@'
         },
-        template: '<style>del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}' +
-            'ins, .ins{color: black;background: #dafde0;}' +
-            '.match,.textdiff span {color: gray;}</style>'+
-            '<div ng-if="element.type != \'Property\' && element.type != \'Port\' && element.type != \'Slot\'" class="textdiff" processing-diff options="options" left-obj="origElem" right-obj="compElem"></div>'+
-            '<div ng-if="element.type === \'Property\' || element.type === \'Port\' || element.type === \'Slot\'"class="textdiff" line-diff options="options" left-obj="origElem" right-obj="compElem"></div>',
+        template: template,
         require: '?^^mmsView',
         link: mmsDiffAttrLink
     };
