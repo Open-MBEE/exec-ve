@@ -15,7 +15,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
                 '<button class="btn btn-sm export-csv-button btn-tertiary" ng-click="doClick()">Export CSV</button> ' +
                 '<button class="btn btn-sm filter-table-button btn-tertiary" ng-click="showFilter = !showFilter">Filter Table</button> ' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' + 
-                    '<form style="display: inline" ng-submit="search()" class="ve-filter-table-form"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></input></form>' +
+                    '<form style="display: inline" ng-submit="search()" class="ve-filter-table-form"><input type="text" size="75" placeholder="regex filter" ng-model="searchTerm"></form>' +
                 '<button class="ve-reset-search" ng-click="resetSearch()"><i class="fa fa-times" aria-hidden="true"></i></button>' + 
                 '<button class="btn btn-sm btn-primary ve-apply-filter" ng-click="search()">Apply</button>' + 
                 '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + html;

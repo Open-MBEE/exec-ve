@@ -13,10 +13,10 @@
                 <button class="btn btn-sm" ng-click="addValue(addValueType)">Add</button>
             </div>
             <span ng-repeat="value in editValues" ng-switch on="value.type">
-                <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.value"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-                <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.value"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"> {{value.value}}</input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-                <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"></input><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+                <div ng-switch-when="LiteralInteger"><input type="number" ng-model="value.value"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+                <div ng-switch-when="LiteralUnlimitedNatural"><input type="number" ng-model="value.value"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"> {{value.value}}<a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
+                <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
                 <div ng-switch-when="LiteralString">
                     <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" ng-model="value.value"></textarea>
                     <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
