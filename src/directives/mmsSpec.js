@@ -84,7 +84,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         scope.isEnumeration = false;
         //TODO pass proper args
         scope.propertyTypeClicked = function() {
-            scope.$emit('elementSelected', scope.element.typeId, 'element');
+            scope.$emit('elementSelected', scope.element.definingFeatureId, 'element');
         };
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
