@@ -20,7 +20,7 @@
                 </li>
                 <li ng-click="baseCommitClicked(version)" ng-model="baseCommit.commitSelected" ng-repeat="version in baseCommit.baseHistory | filter:compareHistoryFilter"
                     ng-class="{'checked-list-item': version === baseCommit.commitSelected}" ng-disabled="$index === 0" >
-                    <a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
+                    <a><span ng-if="$index == 0">Latest -- </span>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
                 </li>
             </ul>
         </div>
@@ -56,7 +56,7 @@
                 </li>
                 <li ng-click="commitClicked(version)" ng-model="compareCommit.commitSelected" ng-repeat="version in compareCommit.compareHistory | filter:historyFilter"
                     ng-class="{'checked-list-item': version === compareCommit.commitSelected}">
-                    <a>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
+                    <a><span ng-if="$index == 0">Latest -- </span>{{ version._creator }} - {{version._created | date:'M/d/yy h:mm a'}}</a>
                 </li>
             </ul>
         </div>
@@ -65,45 +65,45 @@
 
 <hr class="spec-title-divider">
 
-<div ng-show="ModelData.ShowDiffPrototype">
-    <div ng-if="ModelData.ShowDiffPrototype">
-        <div class="ve-notify-banner fade-in-out" ng-show="disableRevert">
-            <span>Element does not exist on <strong>{{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}</strong></span>
-        </div>
-        <h1 class="prop element-title">
-            <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="name" mms-project-one-id="{{mmsProjectId}}"
-            mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
-            mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
-        </h1>
-
-        <h2 class="prop-title">Last Modification</h2>
-        <span class="prop">
-        {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{baseCommit.commitSelected._creator}}<br>
-        <img src="assets/arrow-change.svg" class="change-connection"><br>
-        {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}</span>
-
-        <h2 class="prop-title spec-view-doc-heading">Documentation
-        <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="doc" mms-project-one-id="{{mmsProjectId}}"
-        mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
-        mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr>
-
-        <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
-        <h2 class="prop-title">val</h2>
-        <span class="prop">
-            <mms-diff-attr mms-element-one-id="{{mmsElementId}}" mms-attr="val" mms-project-one-id="{{mmsProjectId}}"
-            mms-ref-one-id="{{baseCommit.refSelected.id}}" mms-ref-two-id="{{mmsRefId}}"
-            mms-commit-one-id="{{baseCommit.commitSelected.id}}" mms-commit-two-id="{{historyVer}}"></mms-diff-attr></span>
-        </div>
-
-        <h2 class="prop-title">Branch/Tag</h2>
-        <span class="prop">{{baseCommit.refSelected.name}}<br>
-        <img src="assets/arrow-change.svg" class="change-connection"><br>
-        {{compareCommit.ref.name}}</span>
-        <h2 class="prop-title">Commit</h2>
-        <span class="prop">{{baseCommit.commitSelected.id}}<br>
-        <img src="assets/arrow-change.svg" class="change-connection"><br>
-        {{compareCommit.commitSelected.id}}</span>
+<div ng-if="ModelData.ShowDiffPrototype">
+    <div class="ve-notify-banner fade-in-out" ng-show="disableRevert">
+        <span>Element does not exist on <strong>{{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}</strong></span>
     </div>
+    <h1 class="prop element-title">
+        <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="name" mms-base-project-id="{{mmsProjectId}}"
+        mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
+        mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
+    </h1>
+
+    <h2 class="prop-title">Last Modification</h2>
+    <span class="prop">
+    {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{baseCommit.commitSelected._creator}}<br>
+    <img src="assets/arrow-change.svg" class="change-connection"><br>
+    {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}
+    </span>
+
+    <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
+    <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="doc" mms-base-project-id="{{mmsProjectId}}"
+    mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
+    mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
+
+    <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
+    <h2 class="prop-title">val</h2>
+    <span class="prop">
+        <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="val" mms-base-project-id="{{mmsProjectId}}"
+        mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
+        mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
+    </span>
+    </div>
+
+    <h2 class="prop-title">Branch/Tag</h2>
+    <span class="prop">{{baseCommit.refSelected.name}}<br>
+    <img src="assets/arrow-change.svg" class="change-connection"><br>
+    {{compareCommit.ref.name}}</span>
+    <h2 class="prop-title">Commit</h2>
+    <span class="prop">{{baseCommit.commitSelected.id}}<br>
+    <img src="assets/arrow-change.svg" class="change-connection"><br>
+    {{compareCommit.commitSelected.id}}</span>
 </div>
 
 <!-- Spec window -->
@@ -111,7 +111,7 @@
     <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
 </div>
 
-<div ng-show="compareCommit.ref.type === 'Tag'" class="revert-section fade-in-out">
+<div ng-show="ModelData.ShowDiffPrototype && compareCommit.ref.type === 'Tag'" class="revert-section fade-in-out">
     <div>
         <span class="ve-secondary-text">Cannot make changes on a <b>Tag</b>.</span>
     </div>
