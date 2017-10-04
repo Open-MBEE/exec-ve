@@ -105,7 +105,8 @@
             <span class="prop" ng-switch-default>{{value}}</span>
         </div>
         <h2 class="prop-title spec-view-value-heading">Property Type</h2>
-        <span class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked()"></mms-transclude-name></span>
+        <span class="prop" ng-if="element.type === 'Property'"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.typeId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked(element.typeId)"></mms-transclude-name></span>
+        <span class="prop" ng-if="element.type === 'Slot'"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked(element.definingFeatureId)"></mms-transclude-name></span>
     </div>
 
     <div ng-if="element.type === 'Generalization' || element.type === 'Dependency'">
