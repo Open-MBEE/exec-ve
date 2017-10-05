@@ -39,7 +39,7 @@ tr {
   .pane-center-btn-group {
     float: right;
     padding-top: 9px;
-    padding-right: 75px;
+    padding-right: 12px;
     min-width: $pane_center_btn_group_width;
   }
 
@@ -76,6 +76,11 @@ tr {
     padding-top: 12px;
     padding-bottom: 24px;
     clear: both;
+    border: 1px solid $ve-silver-darker-1;
+    border-radius: 3px;
+    background-color: $ve-silver-lighter-1;
+    padding: 8px;
+    margin: 18px 0;
   }
 
   .btn-tree-reorder-save {
@@ -88,6 +93,50 @@ tr {
 
   .angular-ui-tree-handle {
     font-family: $font-family-sans-serif;
+    color:$ve-slate-base;
+    padding:4px 6px;
+    border-radius: 2px;
+    font-weight:bold;
+    -webkit-transition: background-color .1s ease-out !important;
+    -moz-transition: background-color .1s ease-out !important;
+    -o-transition: background-color .1s ease-out !important;
+    transition: background-color .1s ease-out !important;
+  }
+
+  .angular-ui-tree-handle.grab{
+    cursor: move;
+    cursor: -moz-move;
+    cursor: -webkit-move;
+  }
+
+  .angular-ui-tree-handle.no-grab{
+    font-weight: initial;
+    color:$ve-light-text;
+    cursor: default;
+  }
+
+  .angular-ui-tree-handle:hover{
+    background-color:$ve-silver-darker-1;
+  }
+
+  .angular-ui-tree-placeholder{
+    margin:0;
+    min-height:0;
+  }
+
+  .angular-ui-tree-handle.no-grab:hover{
+    background-color:transparent;
+  }
+
+  .angular-ui-tree-placeholder:before{
+    background-image: url(../assets/location-feedback.svg);
+    content: ' ';
+    background-size: 70px 30px;
+    height: 30px;
+    width: 70px;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 4px;
   }
 }
 
@@ -131,6 +180,20 @@ tr {
     }
   }
 }
+
+/* styling for doclib link to the right of the button bar*/
+
+.doclib-link {
+  margin: 5px 8px 5px 0;
+  float:right;
+
+  img{
+    padding-right:5px;
+    top: -1px;
+    position: relative;
+  }
+}
+
 
 @media screen and (min-width: 768px) {
   .diff-pane-center {

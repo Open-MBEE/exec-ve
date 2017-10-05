@@ -123,7 +123,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     domElement[0].innerHTML = toCompile;
                 }
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+                if (MathJax) {
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+                }
                 $compile(domElement.contents())(scope.recompileScope);
             } else {
                 if (preview) {

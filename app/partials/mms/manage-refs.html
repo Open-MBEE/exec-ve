@@ -7,29 +7,29 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
-                        <uib-tabset active="activeTab" type="tabs" justified="false" class="ve-light-tabs">
-                            <uib-tab index="0" classes="tab-item" heading="Branches">
-                                <ul class="ve-light-list">
-                                    <li ng-repeat="branch in branches | orderBy:'name'" ng-click="refClickHandler(branch)"
-                                        ng-class="{'selected': branch.id === refSelected.id}">
-                                        <a>{{ branch.name }}</a>
-                                    </li>
-                                </ul>
-                            </uib-tab>
-                            <uib-tab index="1" classes="tab-item" heading="Tags">
-                                <ul class="ve-light-list">
-                                    <li ng-repeat="tag in tags | orderBy:'name'" ng-click="refClickHandler(tag)"
-                                        ng-class="{'selected': tag.id === refSelected.id}">
-                                        <a>{{ tag.name }}</a>
-                                    </li>
-                                </ul>
-                            </uib-tab>
-                        </uib-tabset>
+                        <ul class="ve-light-list">
+                            <li class="ve-light-input">
+                                <input placeholder="Filter Tags and Branches" class="ve-plain-input" ng-model="refFilter">
+                            </li>
+                            <li class="ref-title">
+                                <h2><i class="fa fa-code-fork" aria-hidden="true"></i>Branches</h2>
+                            </li>
+                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name' | filter:refFilter" ng-click="refClickHandler(branch)"
+                                ng-class="{'selected': branch.id === refSelected.id}">
+                                <a>{{ branch.name }}</a>
+                            </li>
+                            <li class="ref-title">
+                                <h2><i class="fa fa-tag" aria-hidden="true"></i>Tags</h2>
+                            </li>
+                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name' | filter:refFilter" ng-click="refClickHandler(tag)"
+                                ng-class="{'selected': tag.id === refSelected.id}">
+                                <a>{{ tag.name }}</a>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="col-md-8 ve-light-panels-detail-header"></div>
                     <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
                         <div class="panels-detail-title">
-                            <h3>{{refSelected.name}}</h3>
+                            <h3 class="{{refSelected.type}} ref-type">{{refSelected.name}}</h3>
                             <span class="" style="float:right">
                             <button class="btn btn-tertiary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="deleteRef()" ng-if="refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
                             <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addTag()"><i class="fa fa-plus"></i> Tag</button>
@@ -37,14 +37,14 @@
                             </span>
                             <!-- <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar> -->
                         </div>
-                        <dl class="dl-horizontal">
+                        <dl class="dl-horizontal ve-light-panels-detail-content">
                             <dt></dt>
                             <dd ng-hide="refSelected.status === 'creating'" class="link-section">
                                 <a ui-sref="project.ref({refId: refSelected.id, search: undefined})" ui-sref-opts="{reload:true}">Project Documents</a>
                             </dd>
                             <dd ng-show="refSelected.status === 'creating'" class="link-section">
                                 <span uib-tooltip-html="htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"
-                                    tooltip-append-to-body="refSelected.status == 'creating'" tooltip-enable="refSelected.status == 'creating'" 
+                                    tooltip-append-to-body="refSelected.status == 'creating'" tooltip-enable="refSelected.status == 'creating'"
                                     ng-class="{'branch-disabled': refSelected.status == 'creating'}">Project Documents</span>
                             </dd>
                             <dt>Id</dt>
@@ -53,6 +53,7 @@
                             <dd>{{refSelected.type}}</dd>
                             <dt>Description</dt>
                             <dd>{{refSelected.description}}</dd>
+                            <span ng-if="refSelected.id != 'master'">
                             <dt>Time Created</dt>
                             <dd>{{refSelected._created}}</dd>
                             <dt>Creator</dt>
@@ -63,6 +64,7 @@
                             <dd>{{refSelected._modifier}}</dd>
                             <dt>Parent Ref</dt>
                             <dd>{{refSelected.parentRefId}}</dd>
+                            </span>
                         </dl>
                     </div>
                 </div>

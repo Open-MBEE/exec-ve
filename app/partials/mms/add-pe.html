@@ -4,40 +4,42 @@
   <h4>Add {{presentationElemType | uppercase}}</h4>
 </div>
 
-<div class="modal-body comment-modal" ng-show="createForm">
-  <div class="ve-light-tabs">
-    <ul class="nav nav-tabs" ng-show="presentationElemType != 'Comment' && createForm">
-      <li class="uib-tab nav-item active tab-item">
-        <a class="nav-link">Create New</a>
-      </li>
-      <li class="uib-tab nav-item tab-item">
-        <a ng-click="createForm = false" class="create-element-link" class="nav-link">Search for existing</a>
-      </li>
-    </ul>
-  </div>
-  <div class="comment-modal-input">
-    <div class="form-group">
-      <label>Name:</label>
-      <input class="form-control" ng-model="newPe.name" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus></input>
+<div class="modal-body">
+  <div ng-show="createForm">
+    <div class="ve-light-tabs">
+      <ul class="nav nav-tabs" ng-show="presentationElemType != 'Comment' && createForm">
+        <li class="uib-tab nav-item active tab-item">
+          <a class="nav-link">Create New</a>
+        </li>
+        <li class="uib-tab nav-item tab-item">
+          <a ng-click="createForm = false" class="create-element-link" class="nav-link">Search for existing</a>
+        </li>
+      </ul>
+    </div>
+    <div class="comment-modal-input">
+      <div class="form-group">
+        <label>Name:</label>
+        <input class="form-control" ng-model="newPe.name" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus>
+      </div>
     </div>
     <div ng-show="presentationElemType === 'Tsp'">
       <select ng-options="key as val for (key, val) in tsMapping" ng-model="newPe.tomsawyerType"></select>
     </div>  
   </div>
-</div>
 
-<div ng-show="!createForm">
-  <div class="ve-light-tabs">
-    <ul class="nav nav-tabs" ng-show="!createForm">
-      <li class="uib-tab nav-item tab-item">
-        <a class="nav-link" ng-click="createForm = true">Create New</a>
-      </li>
-      <li class="uib-tab nav-item tab-item active">
-        <a class="nav-link">Search for existing</a>
-      </li>
-    </ul>
-  </div>
+  <div ng-show="!createForm">
+    <div class="ve-light-tabs">
+      <ul class="nav nav-tabs" ng-show="!createForm">
+        <li class="uib-tab nav-item tab-item">
+          <a class="nav-link" ng-click="createForm = true">Create New</a>
+        </li>
+        <li class="uib-tab nav-item tab-item active">
+          <a class="nav-link">Search for existing</a>
+        </li>
+      </ul>
+    </div>
     <mms-search mms-options="searchOptions" mms-project-id="{{viewOrSectionOb._projectId}}" mms-ref-id="{{viewOrSectionOb._refId}}"></mms-search>
+  </div>
 </div>
 
 <div class="modal-footer">

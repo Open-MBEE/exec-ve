@@ -17,11 +17,11 @@
         <div class="comment-modal-input">
             <div class="form-group">
                 <label>Name:</label>
-                <input class="form-control" ng-model="newView.name" type="text" placeholder="Type a name for your view here"
-                       autofocus></input>
+                <input class="form-control" ng-model="newView.name" type="text" placeholder="Type a name for your view here" autofocus>
             </div>
         </div>
     </div>
+
     <div ng-show="!createForm">
         <div class="ve-light-tabs">
             <ul class="nav nav-tabs" ng-show="!createForm">
@@ -33,8 +33,8 @@
                 </li>
             </ul>
         </div>
-        <div class="radio" style="text-align:center;">
-            <label><input type="radio" ng-model="newViewAggr.type" value="shared">SHARED - Add view and its children</label>
+        <div class="radio">
+            <label><input type="radio" ng-model="newViewAggr.type" value="shared">SHARED - Add view and its children</label><br>
             <label><input type="radio" ng-model="newViewAggr.type" value="none">NONE - Add view only</label>
         </div>
         <mms-search mms-options="searchOptions" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}"></mms-search>

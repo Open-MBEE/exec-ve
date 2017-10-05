@@ -24,7 +24,9 @@ angular.module('mms.directives')
  */
 function mmsViewLink(ElementService, UtilsService, $compile, growl) {
 
-    var mmsViewLinkLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsViewLinkLink = function(scope, element, attrs, controllers) {
+        var mmsCfCtrl = controllers[0];
+        var mmsViewCtrl = controllers[1];
         var processed = false;
         scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
@@ -35,6 +37,15 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             var refId = scope.mmsRefId;
             var commitId = scope.mmsCommitId;
             var docid = scope.mmsDocId;
+            if (mmsCfCtrl) {
+                var cfVersion = mmsCfCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = cfVersion.projectId;
+                if (!refId)
+                    refId = cfVersion.refId;
+                if (!commitId)
+                    commitId = cfVersion.commitId;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getElementOrigin();
                 if (!projectId)
@@ -92,7 +103,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             mmsPeId: '@',
             linkText: '@?'
         },
-        require: '?^^mmsView',
+        require: ['?^^mmsCf', '?^^mmsView'],
         template: ['<span ng-if="linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{linkText}}</a></span>',
             '<span ng-if="!linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a></span>'
         ].join(''),
