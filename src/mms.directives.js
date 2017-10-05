@@ -24,7 +24,6 @@
  * * [jQueryUI](http://jqueryui.com/)
  * * [bootstrap](http://getbootstrap.com/) (for styling and css)
  * * [angular-growl](https://github.com/JanStevens/angular-growl-2)
- * * [redactor](http://imperavi.com/redactor/) (we have redactor oem license)
  * * [font awesome](http://fortawesome.github.io/Font-Awesome/)
  *
  * ## Example app that uses this module
@@ -41,7 +40,6 @@
             <link rel="stylesheet" href="mms.css"/> <!-- mms directives css stylings -->
             <link rel="stylesheet" href="font-awesome.css"/>
             <link rel="stylesheet" href="angular-growl.css"/>
-            <link rel="stylesheet" href="redactor.css"/> 
         </head>
         <body>
             <div growl></div> <!-- for notifications -->
@@ -57,10 +55,6 @@
         <script src="sortable.js"></script>
         <script src="ui-bootstrap-tpls.js"></script>
         <script src="angular-growl.js"></script>
-
-        <!-- redactor -->
-        <script src="redactor.js"></script>
-        <script src="fontcolor.js"></script> <!-- redactor plugin -->
 
         <!-- mms -->
         <script src="mms.js"></script>

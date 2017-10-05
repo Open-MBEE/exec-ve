@@ -15,20 +15,17 @@
 
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
+    <div class="add-buttons-container no-print" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
     <div ng-if="view._contents">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
-        <div class="add-buttons-container no-print" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         <div ng-repeat="instanceVal in view._contents.operand track by instanceVal.instanceId"> 
-        <!--<div ng-repeat="instanceVal in view._contents.operand track by instanceVal.instanceId"> -->
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
             <div class="add-buttons-container no-print" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         </div>
     </div>
     <div ng-if="view.specification">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
-        <div class="add-buttons-container no-print" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         <div ng-repeat="instanceVal in view.specification.operand track by instanceVal.instanceId"> 
-        <!--<div ng-repeat="instanceVal in view.specification.operand track by instanceVal.instanceId"> -->
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
             <div class="add-buttons-container no-print" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         </div>

@@ -39,7 +39,7 @@ tr {
   .pane-center-btn-group {
     float: right;
     padding-top: 9px;
-    padding-right: 75px;
+    padding-right: 12px;
     min-width: $pane_center_btn_group_width;
   }
 
@@ -102,6 +102,7 @@ tr {
     -o-transition: background-color .1s ease-out !important;
     transition: background-color .1s ease-out !important;
   }
+
   .angular-ui-tree-handle.grab{
     cursor: move;
     cursor: -moz-move;
@@ -118,10 +119,25 @@ tr {
     background-color:$ve-silver-darker-1;
   }
 
+  .angular-ui-tree-placeholder{
+    margin:0;
+    min-height:0;
+  }
+
   .angular-ui-tree-handle.no-grab:hover{
     background-color:transparent;
   }
 
+  .angular-ui-tree-placeholder:before{
+    background-image: url(../assets/location-feedback.svg);
+    content: ' ';
+    background-size: 70px 30px;
+    height: 30px;
+    width: 70px;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 4px;
+  }
 }
 
 .diff-pane-center {
@@ -164,6 +180,20 @@ tr {
     }
   }
 }
+
+/* styling for doclib link to the right of the button bar*/
+
+.doclib-link {
+  margin: 5px 8px 5px 0;
+  float:right;
+
+  img{
+    padding-right:5px;
+    top: -1px;
+    position: relative;
+  }
+}
+
 
 @media screen and (min-width: 768px) {
   .diff-pane-center {
