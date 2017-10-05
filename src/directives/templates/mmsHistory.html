@@ -45,7 +45,7 @@
     <div class="diff-dotted-connection fade-in-out" ng-show="ModelData.ShowDiffPrototype"></div>
     <div class="inline-diff-buttons">
         <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype">Compare:</span>
-        <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink':ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick">
+        <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink':ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick" style="flex:2">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 <span><b>{{compareCommit.commitSelected._creator}}</b> - <b>{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b></span>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -60,6 +60,8 @@
                 </li>
             </ul>
         </div>
+        <span class="inline-btn-label" ng-show="ModelData.ShowDiffPrototype">on</span>
+        <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype" style="flex:1">{{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b></span>
     </div>
 </div>
 
@@ -75,13 +77,6 @@
         mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
     </h1>
 
-    <h2 class="prop-title">Last Modification</h2>
-    <span class="prop">
-    {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{baseCommit.commitSelected._creator}}<br>
-    <img src="assets/arrow-change.svg" class="change-connection"><br>
-    {{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by {{compareCommit.commitSelected._creator}}
-    </span>
-
     <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
     <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="doc" mms-base-project-id="{{mmsProjectId}}"
     mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
@@ -95,11 +90,6 @@
         mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
     </span>
     </div>
-
-    <h2 class="prop-title">Branch/Tag</h2>
-    <span class="prop">{{baseCommit.refSelected.name}}<br>
-    <img src="assets/arrow-change.svg" class="change-connection"><br>
-    {{compareCommit.ref.name}}</span>
     <h2 class="prop-title">Commit</h2>
     <span class="prop">{{baseCommit.commitSelected.id}}<br>
     <img src="assets/arrow-change.svg" class="change-connection"><br>
