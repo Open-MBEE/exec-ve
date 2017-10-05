@@ -707,31 +707,17 @@ span.fixed-content-dropdown{
   2.6 Input
 -------------------------------------------------------------------*/
 
-/*Magnifying glass search placed in right of input box
-.ve-dark-minor-search:after,
-.ve-plain-input:after{
-  content: "\f002";
-  font-family: FontAwesome;
-  position: absolute;
-  right: 10px;
-}
-
 /*------------------------------------------------------------------
     2.6.1 Light Input
 -------------------------------------------------------------------*/
 
-.ve-plain-input input{
+.ve-plain-input{
   background-color: white;
-  padding: 2px 22px 2px 6px;
+  padding: 2px 6px;
   border: 1px solid $ve-silver-darker-1;
   border-radius: 3px;
   margin: 2px 10px;
   width: calc(100% - 20px);
-}
-
-.ve-plain-input:after{
-  padding: 4px 4px 4px 0;
-  color:$ve-silver-darker-3;
 }
 
 /*------------------------------------------------------------------
@@ -743,13 +729,8 @@ span.fixed-content-dropdown{
   border: none;
   border-radius: 3px;
   background-color: $ve-slate-darker-2;
-  padding: 2px 22px 2px 6px;
+  padding: 3px 6px;
   letter-spacing: .05em;
-}
-
-.ve-dark-minor-search:after{
-  padding: 2px 4px 4px 0;
-  color:$ve-slate-lighter-2;
 }
 
 /*------------------------------------------------------------------
