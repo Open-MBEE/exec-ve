@@ -43,6 +43,11 @@
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches/Tags
                         </button>
                     </li>
+                    <li class="button-item">
+                        <form class="ve-dark-minor-search">
+                            <input placeholder="Filter branches/tags">
+                        </form>
+                    </li>
                     <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
                             <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"

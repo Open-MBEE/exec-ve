@@ -15,8 +15,8 @@
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
-                <li class="dropdown-input">
-                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Filter history">
+                <li class="dropdown-input ve-plain-input">
+                    <input  ng-model="compareHistoryFilter" type="text" placeholder="Filter history">
                 </li>
                 <li ng-click="baseCommitClicked(version)" ng-model="baseCommit.commitSelected" ng-repeat="version in baseCommit.baseHistory | filter:compareHistoryFilter"
                     ng-class="{'checked-list-item': version === baseCommit.commitSelected}" ng-disabled="$index === 0" >
@@ -31,8 +31,8 @@
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu menu-with-input pull-right" uib-dropdown-menu role="menu">
-                <li class="dropdown-input">
-                    <input class="ve-plain-input" type="text" placeholder="Filter refs" ng-model="refFilter">
+                <li class="dropdown-input ve-plain-input">
+                    <input type="text" placeholder="Filter refs" ng-model="refFilter">
                 </li>
                 <li ng-click="getElementHistoryByRef(ref)" ng-model="baseCommit.refSelected" ng-repeat="ref in refList | filter:refFilter"
                     ng-class="{'checked-list-item': ref.id === baseCommit.refSelected.id}">
@@ -51,8 +51,8 @@
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
-                <li class="dropdown-input">
-                    <input class="ve-plain-input" type="text" placeholder="Filter history" ng-model="historyFilter">
+                <li class="dropdown-input ve-plain-input">
+                    <input type="text" placeholder="Filter history" ng-model="historyFilter">
                 </li>
                 <li ng-click="commitClicked(version)" ng-model="compareCommit.commitSelected" ng-repeat="version in compareCommit.compareHistory | filter:historyFilter"
                     ng-class="{'checked-list-item': version === compareCommit.commitSelected}">
