@@ -730,11 +730,17 @@ span.fixed-content-dropdown{
 
 .ve-dark-minor-search input{
   width: 100%;
-  border: none;
+  border: 1px solid $ve-slate-darker-2;
   border-radius: 3px;
   background-color: $ve-slate-darker-2;
-  padding: 3px 6px;
+  padding: 3px 5px;
   letter-spacing: .05em;
+}
+
+.ve-dark-minor-search input:focus {
+  outline:none;
+  background-color: $ve-slate-darker-3;
+  border: 1px solid $ve-teal-base;
 }
 
 /*------------------------------------------------------------------
