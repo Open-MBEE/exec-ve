@@ -42,6 +42,10 @@
     text-decoration: none;
     color:white;
   }
+
+  .navbar-nav {
+    margin: 0;
+  }
 }
 
 /*------------------------------------------------------------------
@@ -78,7 +82,13 @@ a.switch-org:hover {
 -------------------------------------------------------------------*/
 
 #global-navigation {
+  background-color: #404040;
   float: right;
+}
+
+.main-nav-toggle {
+  margin: 2px 15px;
+  padding: 5px 10px;
 }
 
 /*------------------------------------------------------------------
@@ -86,85 +96,98 @@ a.switch-org:hover {
 -------------------------------------------------------------------*/
 
 ul.global-menu {
-  list-style: none;
-  float: right;
-  margin: 0;
-  padding: 0 10px 0 20px;
+  // list-style: none;
+  // float: right;
+  // margin: 0;
+  // padding: 0 10px 0 20px;
+  min-height: 30px;
+  color: white;
+  height: 36px;
+  min-height: 30px;
+  background-color: $base_grey;
 }
 
 .global-menu > li {
-  display: inline-block;
-  padding: 0 8px;
+  // display: inline-block;
+  padding: 6px 12px;
   height: 24px;
   line-height: 24px;
+
+  span a,
+  span a:visited,
+  span > a {
+    color: $ve-white-text-lighter-2;
+    background-color: transparent;
+    // padding: 5px 10px;
+  }
+
+  span a:hover,
+  span > a:hover {
+    color: white;
+  }
+
 }
 
-.global-menu > li > a,
-.global-menu > li > a:visited,
-.global-menu > li > span > a.dropdown-toggle {
-  color: $ve-white-text-lighter-2;
+.open>a, .nav .open>a:focus, .nav .open>a:hover {
+  background-color: transparent;
+  border: none;
 }
-
-.global-menu > li > a:hover,
-.global-menu > li > span > a.dropdown-toggle:hover {
-  color: white;
-}
-
 /*------------------------------------------------------------------
     2.2.2 Search
 -------------------------------------------------------------------*/
 
 #global-search {
-  display: inline;
-  position: relative;
-}
+  // display: inline;
+  // position: relative;
+  margin: 0;
 
-#global-search input {
-  background-color: $ve-slate-darker-2;
-  border: 1px solid $ve-slate-darker-2;
-  border-radius: 3px 0 0 3px;
-  width: 330px;
-  padding: 0 8px;
-  height: 26px;
-  margin: 5px 0 5px 10px;
-  font-weight: 300;
-  letter-spacing: .05em;
-  line-height: 1;
-}
+  input {
+    background-color: $ve-slate-darker-2;
+    border: 1px solid $ve-slate-darker-2;
+    border-radius: 3px 0 0 3px;
+    width: 330px;
+    padding: 0 8px;
+    height: 26px;
+    margin: 5px 0 5px 10px;
+    font-weight: 300;
+    letter-spacing: .05em;
+    line-height: 1;
+  }
 
-#global-search input:focus {
-  outline:none;
-  background-color: $ve-slate-darker-3;
-  border: 1px solid $ve-teal-base;
-}
+  input:focus {
+    outline: none;
+    background-color: $ve-slate-darker-3;
+    border: 1px solid $ve-teal-base;
+  }
 
-#global-search button {
-  border-radius: 0 3px 3px 0;
-  height: 26px;
-  padding: 0px 7px;
-  background-color: $ve-teal-base;
-  top: 0px;
-  position: relative;
-  box-sizing: border-box;
-  color: white;
-  border:none;
-  margin: 5px 0 5px -10px;
-  vertical-align: bottom;
-  -webkit-transition: background-color .1s ease-out;
-  -moz-transition: background-color .1s ease-out;
-  -o-transition: background-color .1s ease-out;
-  transition: background-color .1s ease-out;
-}
+  button {
+    border-radius: 0 3px 3px 0;
+    height: 26px;
+    padding: 0px 7px;
+    background-color: $ve-teal-base;
+    top: 0px;
+    position: relative;
+    box-sizing: border-box;
+    color: white;
+    border:none;
+    margin: 5px 0 5px -10px;
+    vertical-align: bottom;
+    -webkit-transition: background-color .1s ease-out;
+    -moz-transition: background-color .1s ease-out;
+    -o-transition: background-color .1s ease-out;
+    transition: background-color .1s ease-out;
+  }
 
-#global-search button .fa-search {
-  position: relative;
-  color: white;
-  font-size:14px;
-  top:-1px;
-}
+  button .fa-search {
+    position: relative;
+    color: white;
+    font-size:14px;
+    top:-1px;
+  }
 
-#global-search button:hover {
-  background-color:$ve-teal-darker-1;
+  button:hover {
+    background-color:$ve-teal-darker-1;
+  }
 }
 
 /*------------------------------------------------------------------
@@ -259,6 +282,12 @@ nav.project-level-header {
 
 .breadcrumbs #alfUploadLink:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+  .breadcrumbs {
+     display: none;
+  }
 }
 
 /*------------------------------------------------------------------
