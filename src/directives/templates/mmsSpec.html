@@ -2,7 +2,7 @@
 
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></h1>
 
-    <h2 class="prop-title">Last Modicication</h2>
+    <h2 class="prop-title">Last Modification</h2>
     <span class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</span>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
@@ -18,7 +18,7 @@
               <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"> {{value.value}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
-                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-ref-id="{{mmsRef}}" mms-project-id="{{mmsProject}}" ng-model="value.value" mms-element-id="{{element.id}}"></textarea>
+                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-ref-id="{{mmsRefId}}" mms-project-id="{{mmsProjectId}}" ng-model="value.value" mms-element-id="{{element.id}}"></textarea>
                   <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                   <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
@@ -75,7 +75,7 @@
         <span class="prop">{{element._projectId}}</span>
         <h2 class="prop-title">Formatted Modified Time</h2>
         <span class="prop">{{element._modified}}</span>
-        <h2 class="prop-title">Commut</h2>
+        <h2 class="prop-title">Commit</h2>
         <span class="prop">{{element._commitId}}</span>
     </div>
 
@@ -105,7 +105,8 @@
             <span class="prop" ng-switch-default>{{value}}</span>
         </div>
         <h2 class="prop-title spec-view-value-heading">Property Type</h2>
-        <span class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.typeId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked()"></mms-transclude-name></span>
+        <span class="prop" ng-if="element.type === 'Property'"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.typeId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked(element.typeId)"></mms-transclude-name></span>
+        <span class="prop" ng-if="element.type === 'Slot'"><mms-transclude-name mms-watch-id="true" mms-element-id="{{element.definingFeatureId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" click-handler="propertyTypeClicked(element.definingFeatureId)"></mms-transclude-name></span>
     </div>
 
     <div ng-if="element.type === 'Generalization' || element.type === 'Dependency'">

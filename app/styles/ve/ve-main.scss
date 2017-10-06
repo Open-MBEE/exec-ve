@@ -464,7 +464,7 @@ div.tooltip-inner {
 }
 
 .ve-light-dropdown .dropdown-toggle:hover{
-  background-color:$ve-silver-base;  
+  background-color:$ve-silver-base;
 }
 
 
@@ -520,7 +520,7 @@ div.tooltip-inner {
   .label-dropdown {
     color: $ve-white-text-lighter-2;
     font-size: 15px;
-    display: block; 
+    display: block;
   }
 
 }
@@ -682,7 +682,7 @@ span.fixed-content-dropdown{
     border-bottom: 3px solid $ve-teal-lighter-2;
   }
 
-  .nav > li > a:focus, 
+  .nav > li > a:focus,
   .nav > li > a:hover {
     background-color: $ve-silver-lighter-0;
     border-bottom: 3px solid $ve-teal-lighter-1;
@@ -753,7 +753,7 @@ span.fixed-content-dropdown{
   opacity:0;
 }
 
-// animate template - add class name to beginning 
+// animate template - add class name to beginning
 // .ng-hide-add,
 // .ng-hide-remove {
 //   -webkit-transition:0.5s linear all;
@@ -1022,7 +1022,7 @@ table caption {
 }
 
 /*------------------------------------------------------------------
-9. Right pane 
+9. Right pane
 -------------------------------------------------------------------*/
 
 h2.right-pane-title{
@@ -1035,17 +1035,17 @@ h2.right-pane-title{
 }
 
 .pane-right .container-fluid{
-  padding:0 20px;
+  padding:0 18px;
 }
 
 hr.spec-title-divider{
-  margin-left:-20px;
-  margin-right:-20px;
+  margin-left:-18px;
+  margin-right:-18px;
   border-color:#ddd;
 }
 
 /*------------------------------------------------------------------
-  9.4 Modal for revert history 
+  9.4 Modal for revert history
 -------------------------------------------------------------------*/
 
 /* Special styling to preview element*/
@@ -1056,3 +1056,11 @@ hr.spec-title-divider{
   border: 1px solid $ve-silver-darker-1;
 }
 
+/*Custom styling to keep labels inline with dropdowns*/
+span.inline-btn-label{
+  min-height: 28px;
+  margin: 6px 0;
+  padding: 7px 4px;
+  line-height: 13px;
+  color:$ve-light-text;
+}
