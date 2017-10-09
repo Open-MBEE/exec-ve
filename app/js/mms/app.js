@@ -3,7 +3,7 @@
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate'])
 .config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 
-    
+
     $urlRouterProvider.rule(function ($injector, $location) {
         var locationPath = $location.url();
         if (locationPath.indexOf('full%23') > 0)
@@ -64,7 +64,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             growl.error(reason.message);
                         });
                     };
-                }   
+                }
             }
         }
     })
@@ -82,7 +82,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 });
                 return deferred.promise;
             },
-            orgObs: function($stateParams, ProjectService, ticket) { 
+            orgObs: function($stateParams, ProjectService, ticket) {
                 return ProjectService.getOrgs();
             }
         },
@@ -129,11 +129,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         for (var i = 0; i < projectArray.length; i++) {
                             if(projectArray[i].id === project.id){
                                 return 1;
-                            } 
+                            }
                         }
                         return 0;
                     };
-                    
+
                     $scope.continue = function() {
                         if (orgId && projectId) {
                             $scope.spin = true;
@@ -209,7 +209,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'nav@': {
-                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>', 
+                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
                 controller: function ($scope, $rootScope, orgOb, orgObs, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
@@ -271,6 +271,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             groupObs: function($stateParams, ProjectService, ticket) {
                 return ProjectService.getGroups($stateParams.projectId, $stateParams.refId);
             },
+            groupOb: function(){ return null;},
             documentOb: function($stateParams, $q, ElementService, ViewService, refOb, projectOb, ticket) {
                 var deferred = $q.defer();
                 var eid = $stateParams.projectId + '_cover';
@@ -287,11 +288,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             deferred.resolve(null);
                         } else {
                             ViewService.createView({
-                                _projectId: $stateParams.projectId, 
+                                _projectId: $stateParams.projectId,
                                 _refId: $stateParams.refId,
                                 id: 'holding_bin_' + $stateParams.projectId
                             },{
-                                viewName: projectOb.name + ' Cover Page', 
+                                viewName: projectOb.name + ' Cover Page',
                                 viewId: eid
                             }, 2).then(function(data) {
                                 deferred.resolve(data);
@@ -317,7 +318,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'nav@': {
-                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>', 
+                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-orgs="orgs" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
                 controller: function ($scope, $rootScope, orgOb, orgObs, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
                     $rootScope.ve_title = orgOb.name;
                     $scope.org = orgOb;
@@ -363,7 +364,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'toolbar-right@': {
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
-            } 
+            }
         }
     })
     .state('project.ref.manage', { //not needed right now, for managing mounts
@@ -393,11 +394,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 ElementService.getElement({projectId: $stateParams.projectId, refId: $stateParams.refId, elementId: groupId})
                                 .then(function(groupElement) {
                                     ViewService.createView({
-                                        _projectId: $stateParams.projectId, 
+                                        _projectId: $stateParams.projectId,
                                         _refId: $stateParams.refId,
                                         id: groupId
                                     },{
-                                        viewName: groupElement.name + ' Cover Page', 
+                                        viewName: groupElement.name + ' Cover Page',
                                         viewId: eid
                                     }, 2)
                                     .then(function(data) {
@@ -473,7 +474,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('project.ref.document', {
-        url: '/documents/:documentId', 
+        url: '/documents/:documentId',
         resolve: {
             documentOb: function($stateParams, ElementService, ticket) {
                 return ElementService.getElement({
@@ -486,7 +487,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewOb: function(documentOb) {
                 return documentOb;
             },
-            groupOb: function(groupObs, documentOb, ProjectService, ticket) {
+            groupOb: function(groupObs, documentOb) {
             var group = null;
             if(documentOb) {
                 for(var i = 0; i < groupObs.length; i++) {
@@ -521,7 +522,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'pane-left@': {
                 templateUrl: 'partials/mms/pane-left.html',
                 controller: 'TreeCtrl'
-            },          
+            },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
                 controller: 'ViewCtrl'
@@ -546,7 +547,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     elementId: $stateParams.viewId
                 }, 2);
             },
-            groupOb: function(groupObs, documentOb, ProjectService, ticket) {
+            groupOb: function(groupObs, documentOb) {
                 var group = null;
                 if(documentOb) {
                     for(var i = 0; i < groupObs.length; i++) {
@@ -586,7 +587,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     })
     .state('project.ref.document.order', {
         url: '/order',
-        views: {      
+        views: {
             'pane-center@': {
                 templateUrl: 'partials/mms/reorder-views.html',
                 controller: 'ReorderCtrl'
@@ -595,7 +596,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     })
     .state('project.ref.document.full', {
         url: '/full',
-        views: {      
+        views: {
             'pane-center@': {
                 templateUrl: 'partials/mms/full-doc.html',
                 controller: 'FullDocCtrl'
@@ -608,7 +609,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         return {
             'responseError': function(rejection) {
                 if(rejection.status === 401){ //rejection.config.url
-                    $rootScope.$broadcast("mms.unauthorized", rejection); 
+                    $rootScope.$broadcast("mms.unauthorized", rejection);
                 }
                 return $q.reject(rejection);
             },
