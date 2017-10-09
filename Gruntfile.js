@@ -275,7 +275,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactoryUrl,
-        repository: 'libs-snapshot-local',
+        repository: 'libs-release-local',
         username: artifactoryUser,
         password: artifactoryPassword
       },
@@ -286,7 +286,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '3.2.0-SNAPSHOT',
+            version: '3.2.0',
             path: 'deploy/'
           }]
         }
