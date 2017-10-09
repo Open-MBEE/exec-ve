@@ -51,6 +51,8 @@ function urlService(baseUrl) {
      * @returns {boolean} Returns true if the string has '-' in it
      */
     var isTimestamp = function(version) {
+        if (!version)
+            return false;
         if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim()))
             return true;
         return false;
@@ -132,6 +134,13 @@ function urlService(baseUrl) {
 
     var getRefURL = function(projectId, refId) {
         return addTicket(root + '/projects/' + projectId + '/refs/' + refId);
+    };
+
+    var getRefHistoryURL = function(projectId, refId, timestamp) {
+        if (timestamp !== '' && isTimestamp(timestamp)) {
+            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history') + '&maxTimestamp=' + timestamp;
+        }
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history');
     };
 
     var getGroupsURL = function(projectId, refId) {
@@ -371,23 +380,23 @@ function urlService(baseUrl) {
     };
 
     var getJobsURL = function(projectId, refId, machine) {
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs', machine) );
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs', machine) );
     };
 
     var getJobURL = function(projectId, refId, jobId, machine){
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId , machine) );
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId , machine) );
     };
 
     var getRunJobURL = function(projectId, refId, jobId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId + '/instances';
+        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances';
     };
     
     var getCreateJobURL = function(projectId, refId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/master/jobs';
+        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs';
     };
 
     var getJobInstancesURL = function(projectId, refId, jobId, machine) {
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/master/jobs/' + jobId + '/instances', machine) );
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine) );
     };
 
     var getLogoutURL = function() {
@@ -428,7 +437,7 @@ function urlService(baseUrl) {
             r += '&alf_ticket=' + ticket;
         else
             r += '?alf_ticket=' + ticket;
-        return r;    
+        return r;
     };
 
     var addExtended = function(url, extended) {
@@ -474,6 +483,7 @@ function urlService(baseUrl) {
         getProjectMountsURL: getProjectMountsURL,
         getRefsURL: getRefsURL,
         getRefURL: getRefURL,
+        getRefHistoryURL: getRefHistoryURL,
         getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
         getPutElementsURL: getPutElementsURL,
