@@ -29,7 +29,7 @@ angular.module('mms')
  *  <pre>
         angular.module('myApp', ['mms'])
         .config(function(URLServiceProvider) {
-            URLServiceProvider.setBaseUrl('https://ems.jpl.nasa.gov/alfresco/service');
+            URLServiceProvider.setBaseUrl('https://url/alfresco/service');
         });
     </pre>
  * (You may run into problems like cross origin security policy that prevents it from

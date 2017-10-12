@@ -254,7 +254,6 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         //actions for stomp
         // scope.$on("stomp.job", function (event, newJobId) {
             // var link = URLService.getJobURL(projectId, refId, newJobId, $location.host()); // TODO create porxy in gruntfile for PMA
-            // var link = URLService.getJobURL(scope.mmsProjectId, scope.mmsRefId, newJobId, 'opencae-int.jpl.nasa.gov');
             // $http.get(link).then( function (data) {
             //     var jobs = data.data.jobs; // get jobs json
             //     var job = {};

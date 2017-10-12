@@ -18,7 +18,6 @@ angular.module('mms')
  * Similar to the ElementService and proxies a lot of functions to it, this provides
  * CRUD for views and products/documents
  *
- * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
 function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService) {
     var inProgress = {}; //only used for view elements over limit

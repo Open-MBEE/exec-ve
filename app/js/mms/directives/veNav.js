@@ -131,7 +131,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         };
         scope.stagingView = function(){ //changing to something "opencae"?
             var hostName = $location.host();
-            var address = "https://cae-ems-uat.jpl.nasa.gov";
+            var address = "https://uatlinkhere";
             if (hostName !== 'localhost' && hostName.split('.')[0].substr(-3) !== 'uat')
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
             window.open(address ,'_blank');
