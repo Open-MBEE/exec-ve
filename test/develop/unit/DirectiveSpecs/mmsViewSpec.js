@@ -7,10 +7,9 @@ describe('Directive: mmsView', function () {
     var $rootScope,
         $compile;
 
-    beforeEach(module('mms.directives'));
-    beforeEach(module('mms'));
-
-    beforeEach(function () {
+    beforeEach(function() {
+        module('mms.directives');
+        module('mms');
         inject(function ($injector) {
             $rootScope = $injector.get('$rootScope');
             $compile = $injector.get('$compile');
@@ -233,5 +232,29 @@ describe('Directive: mmsView', function () {
         $httpBackend.flush();
         expect(element.html()).toContain('div id="someelementid"');
         // console.log(element.html());
+    });
+
+    it('mmsView Controller transcludeClicked should not run when the given an undefined object ', function() {
+        scope.api = {elementClicked: function(){}};
+        scope.view = {
+          mmsElementId: "someelementid",
+          mmsProjectId: "someprojectid",
+          mmsRefId: "master",
+          mmsCommitId: "latest",
+          mmsNumber: 930429
+        };
+        element = angular.element('<mms-view mms-element-id="{{view.mmsElementId}}" mms-project-id="{{view.mmsProjectId}}" mms-ref-id="{{view.mmsRefId}}" mms-commit-id="{{view.mmsCommitId}}" mms-number="{{view.mmsViewNumber}}" mms-view-api="api"></mms-view>');
+        $compile(element)(scope);
+        scope.$digest();
+        $httpBackend.flush();
+        var mmsViewController = element.controller('mmsView');
+        spyOn(scope.api, 'elementClicked');
+
+
+        mmsViewController.transcludeClicked(undefined);
+        expect(scope.api.elementClicked).not.toHaveBeenCalled();
+
+        mmsViewController.transcludeClicked({});
+        expect(scope.api.elementClicked).toHaveBeenCalled();
     });
 });

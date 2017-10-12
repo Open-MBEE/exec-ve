@@ -96,7 +96,7 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
         };
 
         this.transcludeClicked = function(elementOb) {
-            if ($scope.mmsViewApi && $scope.mmsViewApi.elementClicked)
+            if ($scope.mmsViewApi && $scope.mmsViewApi.elementClicked && elementOb)
                 $scope.mmsViewApi.elementClicked(elementOb);
         };
 
