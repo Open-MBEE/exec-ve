@@ -38,7 +38,7 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
             } else if (scope.ref.type === 'Tag') {
                 scope.currentTag = scope.tag.name;
             }
-        } 
+        }
 
         scope.updateProject = function(project) {
             if (project) {
@@ -88,20 +88,20 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
         var child, parentId;
         var groups = scope.groups;
         var groupsMap = {};
-        if(scope.group !== undefined) {
+        if (scope.group !== undefined) {
             for (var i = 0; i < groups.length; i++) {
                 groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
             }
             child = scope.group;
         }
-        if(scope.document !== undefined) {
-            child = scope.document; 
+        if (scope.document !== undefined) {
+            child = scope.document;
         }
-        if(child) {
-            if(child.hasOwnProperty('_id')) {
+        if (child) {
+            if (child.hasOwnProperty('_id')) {
                 bcrumbs.push({name: child._name, id: child._id, type: "group", alfLink: child._link, link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
                 if(child._parentId) {
-                    parentId = child._parentId;   
+                    parentId = child._parentId;
                 }
             } else {
                 bcrumbs.push({name: child.name, id: child.id, type: "doc", link: "project.ref.document({documentId: breadcrumb.id, search: undefined})"});
@@ -109,17 +109,17 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
                     parentId = child._groupId;
                 }
             }
-            if(parentId) {
+            if (parentId) {
                 while(groupsMap[parentId] !== undefined) {
                     var id = groupsMap[parentId].id;
                     bcrumbs.push({name: groupsMap[id].name, id: id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
-                    parentId = groupsMap[id].parentId;   
-                } 
+                    parentId = groupsMap[id].parentId;
+                }
             }
             scope.breadcrumbs = bcrumbs.reverse();
-            if (scope.breadcrumbs.length) {
-                scope.breadcrumbs[scope.breadcrumbs.length-1].showAlf = true;
-            }
+            // if (scope.breadcrumbs.length) {
+            //     scope.breadcrumbs[scope.breadcrumbs.length-1].showAlf = true;
+            // }
             var eltWidth = element.parent().width();
             var crumbcount = scope.breadcrumbs.length;
             var liWidth = (eltWidth * 0.75)/crumbcount;

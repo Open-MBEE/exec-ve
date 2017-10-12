@@ -7,7 +7,7 @@
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
                 <li ng-repeat="project in projects | orderBy: 'name'" ng-click="updateProject(project)"
-                       ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
+                    ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
             </ul>
         </div>
         <div class="breadcrumbs">
@@ -23,7 +23,7 @@
                         <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" 
                         uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
                     </a>
-                    <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span>
+                    <!-- <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span> -->
                     <span ng-show="!$last"> &#8250;</span>
                 </li>
             </ul>
