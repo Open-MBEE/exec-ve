@@ -249,6 +249,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(view) {
             var toGet = [];
             var results = [];
+            var toGetSet;
             if (view._displayedElementIds) {
                 var displayed = view._displayedElementIds;
                 if (!angular.isArray(displayed)) {
@@ -274,15 +275,23 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     }
                 }
             }
-            reqOb.elementIds = toGet;
-            ElementService.getElements(reqOb, weight, update)
-            .then(function(data) {
-                results = data;
-            }, function(reason) {
+            toGetSet = new Set(toGet);
+            $http.get(URLService.getViewElementIdsURL(reqOb))
+            .then(function(response) {
+                var data = response.data.elementIds;
+                for (var i = 0; i < data.length; i++) {
+                    toGetSet.add(data[i]);
+                }
             }).finally(function() {
-                CacheService.put(requestCacheKey, results);
-                deferred.resolve(results);
-                delete inProgress[key];
+                reqOb.elementIds = Array.from(toGetSet);
+                ElementService.getElements(reqOb, weight, update)
+                .then(function(data) {
+                    results = data;
+                }).finally(function() {
+                    CacheService.put(requestCacheKey, results);
+                    deferred.resolve(results);
+                    delete inProgress[key];
+                });
             });
         }, function(reason) {
             deferred.reject(reason);

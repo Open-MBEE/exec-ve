@@ -213,6 +213,11 @@ function urlService(baseUrl) {
         return addExtended(addTicket(addVersion(r, reqOb.commitId)), reqOb.extended);
     };
 
+    var getViewElementIdsURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
+        return addTicket(r);
+    };
+
     var getOwnedElementURL = function(reqOb) {
         var recurseString = 'recurse=true';
         if (reqOb.depth)
@@ -486,6 +491,7 @@ function urlService(baseUrl) {
         getRefHistoryURL: getRefHistoryURL,
         getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
+        getViewElementIdsURL: getViewElementIdsURL,
         getPutElementsURL: getPutElementsURL,
         getPostElementsURL: getPostElementsURL,
         getOwnedElementURL: getOwnedElementURL,
