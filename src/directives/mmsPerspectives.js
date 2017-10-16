@@ -89,27 +89,33 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
     var mmsPerspectivesLink = function(scope, element, attrs) {
         var id = ApplicationService.createUniqueId();
         scope.viewId = "view-" + id;
+        scope.tableId = "table-" + id;
         //var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
         scope.initElements = [];
         var viewName;
         var viewType;
+        var tableName;
         
         switch(scope.mmsTspSpec.tstype) {
         case "IBD":
             viewName = "Internal Block Diagram";
             viewType = "tsDrawingView";
+            tableName = 'Classifiers';
             break;
         case "BDD":
             viewName = "Block Definition Diagram";
             viewType = "tsDrawingView";
+            tableName = 'Classifiers';
             break;
         case "SMD":
             viewName = "State Machine";
             viewType = "tsDrawingView";
+            tableName = 'Classifiers';
             break;
         case "AD":
             viewName = "Activity Diagram";
             viewType = "tsDrawingView";
+            tableName = 'Classifiers';
             break;
         case "SD":
             viewName = "Sequence Diagram";
@@ -120,8 +126,9 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
             viewType = "tsTableView";
             break;*/
         default:
-        	viewName = "Unsupported Diagram";
-        	viewType = "tsDrawingView";
+        	viewName = "Blcok Definition Diagram";
+            viewType = "tsDrawingView";
+            tableName = "Classifiers";
         }
       //scope.mmsTspSpec.tstype
         
@@ -331,6 +338,20 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                         "viewID":"view-" + id,
                         "viewName": viewName,
                         "viewClass":viewType,
+                        "onload":"onPerspectivesViewLoaded",
+                        "onupdate":"onPerspectivesViewUpdated",
+                        "oncanvasrendered":"onPerspectivesViewCanvasRendered"
+                    }
+                },
+                {
+                    "command":"NewView",
+                    "data": {
+                        "project": id,
+                        "module": "SysML",
+                        "modelID":"model-" + id,
+                        "viewID":"table-" + id,
+                        "viewName": tableName,
+                        "viewClass": 'tsTableView',
                         "onload":"onPerspectivesViewLoaded",
                         "onupdate":"onPerspectivesViewUpdated",
                         "oncanvasrendered":"onPerspectivesViewCanvasRendered"
