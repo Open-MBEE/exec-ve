@@ -51,14 +51,14 @@
                     </li>
                     <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
-                            <li ng-repeat="branch in branches | orderBy:'name' | filter:refFilter " ng-click="updateBranch(branch)"
+                            <li ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter} " ng-click="updateBranch(branch)"
                                 ng-class="{'checked-list-item': branch.name === currentBranch, 'branch-disabled': branch.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">{{ branch.name }}
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
-                            <li ng-repeat="tag in tags | orderBy:'name' | filter:refFilter" ng-click="updateTag(tag)"
+                            <li ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
                                 ng-class="{'checked-list-item': tag.name === currentTag, 'branch-disabled': tag.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">{{ tag.name }}
