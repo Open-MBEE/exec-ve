@@ -137,132 +137,6 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
         if (scope.mmsTspSpec && scope.mmsTspSpec.context)
             scope.context = scope.mmsTspSpec.context;
 
-        scope.saveElement = function() {
-            ElementService.updateElement({
-                "id": scope.mmsPeId,
-                _projectId: scope.mmsProjectId,
-                _refId: scope.mmsRefId,
-                "type": "InstanceSpecification",
-                "specification": {
-                    "type": "LiteralString",
-                    "value": JSON.stringify({context: scope.context, type: "Tsp", tstype: scope.mmsTspSpec.tstype, elements: scope.initElements})
-                }
-            }).then(function() {
-                growl.info("saved!");
-            });
-        };
-
-        scope.useContext = function() {
-            var instance = $uibModal.open({
-                template: '<mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search><div class="modal-footer"></span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button></div>',
-                scope: scope,
-                controller: ['$scope', '$uibModalInstance', tspAddElementCtrl],
-                size: 'lg'
-            });
-            instance.result.then(function(eid) {
-                console.log("element chosen: " + eid);
-                console.log("project id: " + id);
-                scope.context = eid;
-                var groupCommand = {
-                    "command": "Group",
-                    "data": [
-                        {
-                            "command": "SetModelAttribute",
-                            "data": {
-                                "attributeName": "Context",
-                                "attributeValue": eid,
-                                "modelID": 'model-' + id,
-                                "module": "SysML",
-                                "project": id,
-                                "viewID": "view-" + id,
-                                "viewName": viewName
-                            },
-                            "onsuccess":"onPerspectivesAddElementSuccess",
-                            "onfailure":"onPerspectivesCommandFailure",
-                        },
-                        {
-                            "command": "Custom",
-                            "data": {
-                                "serverClassName": "gov.nasa.jpl.mbee.ems.action.ResetIntegratorCommandImpl",
-                                "args": ["int-context-" + id],
-                                "modelID": 'model-' + id,
-                                "module": "SysML",
-                                "project": id,
-                                "viewID": "view-" + id,
-                                "viewName": viewName
-                            }
-                        },
-                        {
-                            "command":"Update",
-                            "onsuccess":"onPerspectivesAddElementSuccess",
-                            "onfailure":"onPerspectivesCommandFailure",
-                            "data": {
-                                "project": id,
-                                "module": "SysML",
-                                "integratorIDs":["int-context-" + id]
-                            }
-                        },
-                    ]
-                };
-                invokePerspectivesCommand(groupCommand);
-            });
-        };
-
-        scope.addElement = function() {
-            var instance = $uibModal.open({
-                template: '<mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search><div class="modal-footer"></span><button class="btn btn-danger" ng-click="cancel()">CANCEL</button></div>',
-                scope: scope,
-                controller: ['$scope', '$uibModalInstance', tspAddElementCtrl],
-                size: 'lg'
-            });
-            instance.result.then(function(eid) {
-                console.log("element chosen: " + eid);
-                console.log("project id: " + id);
-                scope.initElements.push(eid);
-                var groupCommand = {
-                    "command": "Group",
-                    "data": [
-                        {
-                            "command": "SetModelAttribute",
-                            "data": {
-                                "attributeName": "AddElements",
-                                "attributeValue": getElementsArrayString([eid]),
-                                "modelID": 'model-' + id,
-                                "module": "SysML",
-                                "project": id,
-                                "viewID": "view-" + id,
-                                "viewName": viewName
-                            },
-                            "onsuccess":"onPerspectivesAddElementSuccess",
-                            "onfailure":"onPerspectivesCommandFailure",
-                        },
-                        {
-                            "command": "Custom",
-                            "data": {
-                                "serverClassName": "gov.nasa.jpl.mbee.ems.action.ResetIntegratorCommandImpl",
-                                "args": ["int-add-" + id],
-                                "modelID": 'model-' + id,
-                                "module": "SysML",
-                                "project": id,
-                                "viewID": "view-" + id,
-                                "viewName": viewName
-                            }
-                        },
-                        {
-                            "command":"Update",
-                            "onsuccess":"onPerspectivesAddElementSuccess",
-                            "onfailure":"onPerspectivesCommandFailure",
-                            "data": {
-                                "project": id,
-                                "module": "SysML",
-                                "integratorIDs":["int-add-" + id]
-                            }
-                        },
-                    ]
-                };
-                invokePerspectivesCommand(groupCommand);
-            });
-        };
         var webProjectCommand = {
             "command":"WebProject",
             "onload":"onPerspectivesProjectLoad",
@@ -293,31 +167,8 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                         "modelID":"model-" + id,
                         "integratorName":"MMS ADD",
                         "integratorID":"int-add-" + id
-                        //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
                     }
                 },
-                {
-                    "command":"NewIntegrator",
-                    "data": {
-                        "project": id,
-                        "module": "SysML",
-                        "modelID":"model-" + id,
-                        "integratorName":"MMS Recurse",
-                        "integratorID":"int-context-" + id
-                        //"integratorFileLocation": "https://cae-ems.jpl.nasa.gov/alfresco/service"
-                    }
-                },
-                //temporary until new json format is implemented 
-                /*{
-                    "command":"NewIntegrator",
-                    "data": {
-                        "project": id,
-                        "module": "SysML",
-                        "modelID":"model-" + id,
-                        "integratorName":"System Model Data",
-                        "integratorID":"int-smd-" + id
-                    }
-                },*/
                 {
                     "command":"NewIntegrator",
                     "data": {
@@ -375,18 +226,6 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                     }
                 }, 
                 {
-                    "command": "Custom",
-                    "data": {
-                        "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-context-" + id, "https://opencae-uat.jpl.nasa.gov/alfresco/service"],
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    }
-                },
-                {
                     "command": "SetModelAttribute",
                     "data": {
                         "attributeName": "Ticket",
@@ -443,7 +282,6 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                     },
                     "onfailure":"onPerspectivesCommandFailure",
                 });
-                //initialIntegratorIds.push('int-context-' + id);
             }
             if (scope.initElements.length > 0) {
                 updateCommand.data.push({
@@ -470,8 +308,6 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                     "project": id,
                     "module": "SysML",
                     "integratorIDs": initialIntegratorIds
-                    //"integratorIDs":["int-add-" + id, 'int-context-' + id, 'int-fcd-' + id]
-                    //"integratorIDs":["int-smd-" + id, "int-fcd-" + id]
                 }
             });
         }
