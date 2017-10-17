@@ -520,7 +520,7 @@ body.tsPrintPreview img.notLastImage
 	cursor: pointer;
 	width: 10px;
 	height: 10px;
-	background: url("/Basic/SysML/images/cross.png");
+	background: url("/Basic/tsperspectives/images/cross.png");
 }
 
 /* The close button for an overview panel placed in the bottom right of the 
@@ -570,7 +570,7 @@ body.tsPrintPreview img.notLastImage
 .tsOverviewResizeButton-bottomRight
 {
 	cursor: nw-resize;
-	background: url("/Basic/SysML/images/resize.nw.png");
+	background: url("/Basic/tsperspectives/images/resize.nw.png");
 }
 
 /* The resize button for an overview panel placed in the bottom left of the drawing
@@ -578,7 +578,7 @@ body.tsPrintPreview img.notLastImage
 .tsOverviewResizeButton-bottomLeft
 {
 	cursor: ne-resize;
-	background: url("/Basic/SysML/images/resize.ne.png");
+	background: url("/Basic/tsperspectives/images/resize.ne.png");
 }
 
 /* The resize button for an overview panel placed in the top left of the drawing
@@ -586,7 +586,7 @@ body.tsPrintPreview img.notLastImage
 .tsOverviewResizeButton-topLeft
 {
 	cursor: se-resize;
-	background: url("/Basic/SysML/images/resize.se.png");
+	background: url("/Basic/tsperspectives/images/resize.se.png");
 }
 
 /* The resize button for an overview panel placed in the top right of the drawing
@@ -594,7 +594,7 @@ body.tsPrintPreview img.notLastImage
 .tsOverviewResizeButton-topRight
 {
 	cursor: sw-resize;
-	background: url("/Basic/SysML/images/resize.sw.png");
+	background: url("/Basic/tsperspectives/images/resize.sw.png");
 }
 
 /* An overview marquee element that shows the current viewport in the drawing 
@@ -612,42 +612,42 @@ body.tsPrintPreview img.notLastImage
 /* The cursor specified by the pan tool. */
 .tsPan
 {
-	cursor: url(/Basic/SysML/images/OpenHand.cur),
+	cursor: url(/Basic/tsperspectives/images/OpenHand.cur),
 		default;
 }
 
 /* The cursor specified by the pan tool while panning is taking place. */
 .tsPanning
 {
-	cursor: url(/Basic/SysML/images/ClosedHand.cur),
+	cursor: url(/Basic/tsperspectives/images/ClosedHand.cur),
 		pointer;
 }
 
 /* The cursor specified when moving objects in a drawing. */
 .tsMoving
 {
-	cursor: url(/Basic/SysML/images/ClassicMove.cur),
+	cursor: url(/Basic/tsperspectives/images/ClassicMove.cur),
 		pointer;
 }
 
 /* The cursor specified by the marquee zoom tool. */
 .tsMarqueeZoom
 {
-	cursor: url(/Basic/SysML/images/MarqueeZoom.cur),
+	cursor: url(/Basic/tsperspectives/images/MarqueeZoom.cur),
 		default;
 }
 
 /* The cursor specified by the link navigation tool. */
 .tsLinkNavigation
 {
-	cursor: url(/Basic/SysML/images/LinkNavigation.cur),
+	cursor: url(/Basic/tsperspectives/images/LinkNavigation.cur),
 		default;
 }
 
 /* The cursor specified by the interactive zoom tool. */
 .tsInteractiveZoom
 {
-	cursor: url(/Basic/SysML/images/InteractiveZoom.cur),
+	cursor: url(/Basic/tsperspectives/images/InteractiveZoom.cur),
 		crosshair;
 }
 
@@ -655,7 +655,7 @@ body.tsPrintPreview img.notLastImage
    place. */
 .tsInteractiveZooming
 {
-	cursor: url(/Basic/SysML/images/InteractiveZooming.cur),
+	cursor: url(/Basic/tsperspectives/images/InteractiveZooming.cur),
 		crosshair;
 }
 
@@ -663,7 +663,7 @@ body.tsPrintPreview img.notLastImage
    place. */
 .tsReconnect
 {
-	cursor: url(/Basic/SysML/images/Reconnect.cur),
+	cursor: url(/Basic/tsperspectives/images/Reconnect.cur),
 		crosshair;
 }
 
@@ -671,7 +671,7 @@ body.tsPrintPreview img.notLastImage
    place. */
 .tsTransfer
 {
-	cursor: url(/Basic/SysML/images/TransferSelected.cur),
+	cursor: url(/Basic/tsperspectives/images/TransferSelected.cur),
 		crosshair;
 }
 
@@ -679,7 +679,7 @@ body.tsPrintPreview img.notLastImage
 	possible. */
 .tsInvalid
 {
-	cursor: url(/Basic/SysML/images/Invalid.cur),
+	cursor: url(/Basic/tsperspectives/images/Invalid.cur),
 		crosshair;
 }
 
@@ -742,7 +742,7 @@ body.tsPrintPreview img.notLastImage
 /* The cursor specified when using an At Tool on a drawing canvas. */
 .tsAddAt
 {
-	cursor: url(/Basic/SysML/images/AddNode.cur),
+	cursor: url(/Basic/tsperspectives/images/AddNode.cur),
 		default;
 }
 
@@ -750,14 +750,14 @@ body.tsPrintPreview img.notLastImage
    itself is being performed. */
 .tsAddingAt
 {
-	cursor: url(/Basic/SysML/images/AddingNode.cur),
+	cursor: url(/Basic/tsperspectives/images/AddingNode.cur),
 		default;
 }
 
 /* The cursor specified when using a Between Tool on a drawing canvas. */
 .tsAddBetween
 {
-	cursor: url(/Basic/SysML/images/AddEdge.cur),
+	cursor: url(/Basic/tsperspectives/images/AddEdge.cur),
 		default;
 }
 
@@ -775,7 +775,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsPan
 {
 	cursor: url(/Basic/perspectivesviewer/images/OpenHand.cur),
-		url(/Basic/SysML/images/OpenHand.cur),
+		url(/Basic/tsperspectives/images/OpenHand.cur),
 		default;
 }
 
@@ -783,7 +783,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsPanning
 {
 	cursor: url(/Basic/perspectivesviewer/images/ClosedHand.cur),
-		url(/Basic/SysML/images/ClosedHand.cur),
+		url(/Basic/tsperspectives/images/ClosedHand.cur),
 		pointer;
 }
 
@@ -791,7 +791,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsMoving
 {
 	cursor: url(/Basic/perspectivesviewer/images/ClassicMove.cur),
-		url(/Basic/SysML/images/ClassicMove.cur),
+		url(/Basic/tsperspectives/images/ClassicMove.cur),
 		pointer;
 }
 
@@ -799,7 +799,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsMarqueeZoom
 {
 	cursor: url(/Basic/perspectivesviewer/images/MarqueeZoom.cur),
-		url(/Basic/SysML/images/MarqueeZoom.cur),
+		url(/Basic/tsperspectives/images/MarqueeZoom.cur),
 		default;
 }
 
@@ -807,7 +807,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsLinkNavigation
 {
 	cursor: url(/Basic/perspectivesviewer/images/LinkNavigation.cur),
-		url(/Basic/SysML/images/LinkNavigation.cur),
+		url(/Basic/tsperspectives/images/LinkNavigation.cur),
 		default;
 }
 
@@ -815,7 +815,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsInteractiveZoom
 {
 	cursor: url(/Basic/perspectivesviewer/images/InteractiveZoom.cur),
-		url(/Basic/SysML/images/InteractiveZoom.cur),
+		url(/Basic/tsperspectives/images/InteractiveZoom.cur),
 		crosshair;
 }
 
@@ -824,7 +824,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsInteractiveZooming
 {
 	cursor: url(/Basic/perspectivesviewer/images/InteractiveZooming.cur),
-		url(/Basic/SysML/images/InteractiveZooming.cur),
+		url(/Basic/tsperspectives/images/InteractiveZooming.cur),
 		crosshair;
 }
 
@@ -833,7 +833,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsReconnect
 {
 	cursor: url(/Basic/perspectivesviewer/images/Reconnect.cur),
-		url(/Basic/SysML/images/Reconnect.cur),
+		url(/Basic/tsperspectives/images/Reconnect.cur),
 		crosshair;
 }
 
@@ -842,7 +842,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsTransfer
 {
 	cursor: url(/Basic/perspectivesviewer/images/TransferSelected.cur),
-		url(/Basic/SysML/images/TransferSelected.cur),
+		url(/Basic/tsperspectives/images/TransferSelected.cur),
 		crosshair;
 }
 
@@ -851,7 +851,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsInvalid
 {
 	cursor:  url(/Basic/perspectivesviewer/images/Invalid.cur),
-		url(/Basic/SysML/images/Invalid.cur),
+		url(/Basic/tsperspectives/images/Invalid.cur),
 		crosshair;
 }
 
@@ -859,7 +859,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsAddAt
 {
 	cursor: url(/Basic/perspectivesviewer/images/AddNode.cur),
-		url(/Basic/SysML/images/AddNode.cur),
+		url(/Basic/tsperspectives/images/AddNode.cur),
 		default;
 }
 
@@ -868,7 +868,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsAddingAt
 {
 	cursor: url(/Basic/perspectivesviewer/images/AddingNode.cur),
-		url(/Basic/SysML/images/AddingNode.cur),
+		url(/Basic/tsperspectives/images/AddingNode.cur),
 		default;
 }
 
@@ -876,7 +876,7 @@ body.tsPrintPreview img.notLastImage
 .ie.tsAddBetween
 {
 	cursor: url(/Basic/perspectivesviewer/images/AddEdge.cur),
-		url(/Basic/SysML/images/AddEdge.cur),
+		url(/Basic/tsperspectives/images/AddEdge.cur),
 		default;
 }
 
@@ -916,7 +916,7 @@ body.tsPrintPreview img.notLastImage
 	border-width:0px 0px 1px 0px;
 	width: 100%;
 	margin: 2px 2px 0px 2px;
-	background: #ebebd6 url(/Basic/SysML/images/hToolBar.gif) repeat-x bottom left !important;
+	background: #ebebd6 url(/Basic/tsperspectives/images/hToolBar.gif) repeat-x bottom left !important;
 }
 
 /* A container panel for horizontal toolbars placed at the bottom of a view. */
@@ -925,7 +925,7 @@ body.tsPrintPreview img.notLastImage
 	border-width:1px 0px 0px 0px;
 	width: 100%;
 	margin: 0px 2px 2px 2px;
-	background: #ebebd6 url(/Basic/SysML/images/hToolBar.gif) repeat-x bottom left;
+	background: #ebebd6 url(/Basic/tsperspectives/images/hToolBar.gif) repeat-x bottom left;
 }
 
 /* A container panel for vertical toolbars placed on the left of a view. */
@@ -936,7 +936,7 @@ body.tsPrintPreview img.notLastImage
 	height: 100%;
 	padding: 0px;
 	float: left;
-	background: #ebebd6 url(/Basic/SysML/images/vToolBar.gif) repeat-y top right;
+	background: #ebebd6 url(/Basic/tsperspectives/images/vToolBar.gif) repeat-y top right;
 }
 
 /* A container panel for vertical toolbars placed on the right of a view. */
@@ -947,7 +947,7 @@ body.tsPrintPreview img.notLastImage
 	padding: 0px;
 	height: 100%;
 	float: left;
-	background: #ebebd6 url(/Basic/SysML/images/vToolBar.gif) repeat-y top right;
+	background: #ebebd6 url(/Basic/tsperspectives/images/vToolBar.gif) repeat-y top right;
 }
 
 /* A toolbar. */
@@ -1120,15 +1120,15 @@ body.tsPrintPreview img.notLastImage
 /* The top left corner of a tab panel. */
 .tsTabPanel .gwt-DecoratedTabBar .tabTopLeft
 {
-	background: url(/Basic/SysML/images/corner.png) no-repeat 0px -55px;
-	-background: url(/Basic/SysML/images/corner_ie6.png) no-repeat 0px -55px;
+	background: url(/Basic/tsperspectives/images/corner.png) no-repeat 0px -55px;
+	-background: url(/Basic/tsperspectives/images/corner_ie6.png) no-repeat 0px -55px;
 }
 
 /* The top right corner of a tab panel. */
 .tsTabPanel .gwt-DecoratedTabBar .tabTopRight
 {
-	background: url(/Basic/SysML/images/corner.png) no-repeat -9px -55px;
-	-background: url(/Basic/SysML/images/corner_ie6.png) no-repeat -9px -55px;
+	background: url(/Basic/tsperspectives/images/corner.png) no-repeat -9px -55px;
+	-background: url(/Basic/tsperspectives/images/corner_ie6.png) no-repeat -9px -55px;
 }
 
 /* The top center of the selected item within a tab panel. */
@@ -1790,14 +1790,14 @@ td.tsCaptionText
 {
 	width: 40px;
 	height: 40px;
-	background: url("/Basic/SysML/images/navigation/pan.png");
+	background: url("/Basic/tsperspectives/images/navigation/pan.png");
 	background-size: 40px 40px;
 	background-repeat: no-repeat;
 
 }
 
 .tsNavigationControlPanButton:hover{
-	background: url("/Basic/SysML/images/navigation/panHovered.png");
+	background: url("/Basic/tsperspectives/images/navigation/panHovered.png");
 	background-size: 40px 40px;
 	background-repeat: no-repeat;
 }
@@ -1807,14 +1807,14 @@ td.tsCaptionText
 {
 	width: 25px;
 	height: 25px;
-	background: url("/Basic/SysML/images/navigation/zoomIn.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomIn.png");
 	background-size: 25px 25px;
 	background-repeat: no-repeat;
 }
 
 .tsNavigationControlZoomInButton:hover
 {
-	background: url("/Basic/SysML/images/navigation/zoomInHovered.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomInHovered.png");
 	background-size: 25px 25px;
 	background-repeat: no-repeat;
 }
@@ -1824,14 +1824,14 @@ td.tsCaptionText
 {
 	width: 25px;
 	height: 25px;
-	background: url("/Basic/SysML/images/navigation/zoomOut.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomOut.png");
 	background-size: 25px 25px;
 	background-repeat: no-repeat;
 }
 
 .tsNavigationControlZoomOutButton:hover
 {
-	background: url("/Basic/SysML/images/navigation/zoomOutHovered.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomOutHovered.png");
 	background-size: 25px 25px;
 	background-repeat: no-repeat;
 }
@@ -1839,14 +1839,14 @@ td.tsCaptionText
 .tsNavigationControlZoomFitButton{
 	width: 25px;
 	height: 25px;
-	background: url("/Basic/SysML/images/navigation/zoomFit.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomFit.png");
 	background-size: 25px 25px;
 	background-repeat: no-repeat;
 }
 
 .tsNavigationControlZoomFitButton:hover
 {
-	background: url("/Basic/SysML/images/navigation/zoomFitHovered.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomFitHovered.png");
 	background-size: 25px 25px;
 	background-repeat: no-repeat;
 }
@@ -1856,11 +1856,11 @@ td.tsCaptionText
 {
 	width: 40px;
 	height: 40px;
-	background: url("/Basic/SysML/images/navigation/pan40x40.png");
+	background: url("/Basic/tsperspectives/images/navigation/pan40x40.png");
 }
 
 .tsNavigationControlPanButtonIE8:hover{
-	background: url("/Basic/SysML/images/navigation/panHovered40x40.png");
+	background: url("/Basic/tsperspectives/images/navigation/panHovered40x40.png");
 }
 
 /* A navigation control zoom in button for IE8 */
@@ -1868,12 +1868,12 @@ td.tsCaptionText
 {
 	width: 25px;
 	height: 25px;
-	background: url("/Basic/SysML/images/navigation/zoomIn25x25.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomIn25x25.png");
 }
 
 .tsNavigationControlZoomInButtonIE8:hover
 {
-	background: url("/Basic/SysML/images/navigation/zoomInHovered25x25.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomInHovered25x25.png");
 }
 
 /* A navigation control zoom out button for IE8. */
@@ -1881,24 +1881,24 @@ td.tsCaptionText
 {
 	width: 25px;
 	height: 25px;
-	background: url("/Basic/SysML/images/navigation/zoomOut25x25.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomOut25x25.png");
 }
 
 .tsNavigationControlZoomOutButtonIE8:hover
 {
-	background: url("/Basic/SysML/images/navigation/zoomOutHovered25x25.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomOutHovered25x25.png");
 }
 
 /* A navigation control zoom fit button for IE8. */
 .tsNavigationControlZoomFitButtonIE8{
 	width: 25px;
 	height: 25px;
-	background: url("/Basic/SysML/images/navigation/zoomFit25x25.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomFit25x25.png");
 }
 
 .tsNavigationControlZoomFitButtonIE8:hover
 {
-	background: url("/Basic/SysML/images/navigation/zoomFitHovered25x25.png");
+	background: url("/Basic/tsperspectives/images/navigation/zoomFitHovered25x25.png");
 }
 
 
