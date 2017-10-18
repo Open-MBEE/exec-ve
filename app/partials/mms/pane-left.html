@@ -11,9 +11,6 @@
                    ng-change="treeApi.expand_all()">
         </div>
     </div>
-</div>
-
-<div fa-pane pane-anchor="center" pane-no-toggle="true">
     <div class="pane-left" style="display:table;">
         <mms-tree ng-show="'showTree'==(activeMenu)" search="treeFilter.search" tree-data="treeData"
                   section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="treeClickHandler(branch)"

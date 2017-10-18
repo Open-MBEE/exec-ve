@@ -35,6 +35,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
 
     var veNavLink = function(scope, element, attrs) {
 
+        scope.isNavCollapsed = true;
         scope.updateOrg = function() {
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',

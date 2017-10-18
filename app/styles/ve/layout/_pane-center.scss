@@ -2,7 +2,7 @@
   Styles for the View Editor center pane
 *************************/
 
-$pane_center_btn_group_width: 120px;
+$pane_center_btn_group_width: 418px;
 
 /* start of fullDoc page styles */
 body.fullDoc {
@@ -65,6 +65,14 @@ tr {
 
   .pane-center-inner {
     padding-top: 9px;
+  }
+}
+@media (max-width: 720px) {
+  .pane-center-btn-group {
+    margin-top: 26px;
+  }
+  .pane-center-inner {
+    margin-top: 22px;
   }
 }
 
@@ -146,7 +154,6 @@ tr {
   > .pane-center {
     @include box-shadow(-4px 0px 2px -2px rgba(0, 0, 0, .24));
     margin-right: 0;
-
   }
 
   .pane-center-header,
@@ -184,7 +191,7 @@ tr {
 /* styling for doclib link to the right of the button bar*/
 
 .doclib-link {
-  margin: 5px 8px 5px 0;
+  margin: 0 8px;
   float:right;
 
   img{
