@@ -223,7 +223,8 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false
+          eval: false,
+          Set: true
         }
       }
     },
