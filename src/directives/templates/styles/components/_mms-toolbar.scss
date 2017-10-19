@@ -4,7 +4,7 @@ mms-toolbar {
 		height: 100%;
 		float: right;
 		background-color: $ve-slate-darker-2;
-		padding-top: 75px;
+		padding-top: 24px;
 		position: fixed;
 		@include calc(left, "100% - 41px");
 	}
@@ -113,14 +113,6 @@ mms-toolbar {
 	}
 
 	.pulldown {
-		margin-top: 75px;
-	}
-}
-
-@media screen and (max-width: 45em) {
-	@-moz-document url-prefix() {
-		.right-toolbar {
-			top: -56px;
-		}
+		margin-top: 50px;
 	}
 }

@@ -39,14 +39,12 @@
   overflow: hidden;
   width: 100%;
   height: 100vh;
-  padding-bottom: 14px;
 }
 
 #inner-wrap {
   position: relative;
   width: 100%;
-  height: 98.2vh;
-  @include calc(height, "100vh - 14px");
+  height: 100vh;
 }
 
 .fa-pane-orientation-vertical,
@@ -91,19 +89,14 @@
 }
 
 @media screen and (max-width: 45em) {
-  #main-pane {
-    top: 46px;
-  }
 
   #main-pane > div {
     z-index: 0; //TODO was 1000
   }
 }
 
-@media screen and (min-width: 45.0625em) {
-  #main-pane {
-    top: 72px;
-  }
+#main-pane {
+  top: 72px;
 }
 
 .diff-pane-left,
