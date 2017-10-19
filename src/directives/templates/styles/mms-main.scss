@@ -11,7 +11,7 @@
 
 /* A minimal Bootstrap file */
 @import "base/_mms-bootstrap-variable-overrides.scss";
-@import "vendor/bootstrap-sass-official/assets/stylesheets/bootstrap-custom.scss";
+@import "vendor/bootstrap-sass-3.3.7/assets/stylesheets/bootstrap.scss";
 
 /* App level customizations */
 @import "base/_mms-globals.scss";
