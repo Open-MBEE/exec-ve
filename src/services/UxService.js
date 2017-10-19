@@ -118,9 +118,6 @@ function UxService($rootScope) {
       case "tree-delete-view":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete View', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-merge":
-        return {id: button, icon: 'fa-share-alt fa-flip-horizontal', selected: true, active: true, permission: true, tooltip: 'Compare', 
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-reorder-view":
         return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
@@ -152,7 +149,7 @@ function UxService($rootScope) {
 
       case "show-edits":
         return {id: button, icon: 'fa-pencil-square-o', selected: true, active: true, permission: true, tooltip: 'Enable Edits',
-                spinner: false, togglable: true, toggle_icon: 'fa-pencil-square', toggle_tooltip: 'Disable Edits',
+                spinner: false, togglable: true, toggle_icon: 'fa-pencil-square', toggle_tooltip: 'Disable Edits', text: 'Edits',
                 action: function() {$rootScope.$broadcast(button);}};
       case "show-elements":
         return {id: button, icon: 'fa-codepen', selected: true, active: true, permission: true, tooltip: 'Show Elements',
