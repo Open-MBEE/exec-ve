@@ -9,6 +9,6 @@
         </div>
     </div>
     <div class="inner panel-body">
-        <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-type="{{editorType}}" mms-editor-api="editorApi" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}"></textarea>
+        <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-type="{{editorType}}" mms-editor-api="editorApi" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" autosave-key="{{projectId + refId + mmsElementId}}"></textarea>
     </div>
 </div>

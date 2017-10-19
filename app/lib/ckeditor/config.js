@@ -13,7 +13,7 @@ CKEDITOR.editorConfig = function( config ) {
   config.removePlugins = 'resize';
 	config.tabSpaces = 4;
 	// config.extraPlugins = 'iframe,mediaembed,embed,
-	config.extraPlugins = 'font,image2,imagedrop,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,tableresize';
+	config.extraPlugins = 'autosave,font,image2,imagedrop,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,tableresize';
   config.mathJaxLib = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
 	config.extraAllowedContent = 'p[class]{*}; a[class,href,alt]{*}; i[class,aria-hidden]{*}; span[class]{*}; audio[*]; video[*]; source[*]; mms-group-docs[*]; mms-cf[*]; mms-value-link[*]; mms-line-graph[*]; mms-diff-attr[*]; jira-issue-collector[*]; mms-maturity-bar[*]; tms-timely[*]; mms-d3-observation-profile-chart-io[*]; mms-d3-parallel-axis-chart-io[*]; mms-d3-radar-chart-io[*]; mms-d3-grouped-horizontal-bar-chart-io[*]; mms-site-docs[*]; mms-workspace-docs[*]; mms-diagram-block[*]; mms-view-link[*]; mms-transclude-doc[*]; mms-transclude-name[*]; mms-transclude-com[*]; mms-transclude-val[*]; mms-transclude-img[*]; math[*]; maction[*]; maligngroup[*]; malignmark[*]; menclose[*]; merror[*]; mfenced[*]; mfrac[*]; mglyph[*]; mi[*]; mlabeledtr[*]; mlongdiv[*]; mmultiscripts[*]; mn[*]; mo[*]; mover[*]; mpadded[*]; mphantom[*]; mroot[*]; mrow[*]; ms[*]; mscarries[*]; mscarry[*]; msgroup[*]; mstack[*]; msline[*]; mspace[*]; msqrt[*]; msrow[*]; mstyle[*]; msub[*]; msup[*]; msubsup[*]; mtable[*]; mtd[*]; mtext[*]; mtr[*]; munder[*]; munderover[*];';
 	config.disallowedContent = 'script';
