@@ -2,7 +2,7 @@
   Styles for the View Editor left pane
 *************************/
 
-$pane_left_btn_group_width: 150px;
+$pane_left_btn_group_width: 315px;
 
 #main-pane {
   > .west-tabs {
@@ -23,9 +23,8 @@ $pane_left_btn_group_width: 150px;
   width: 100%;
 
   .pane-left {
-    // TODO -This was originally commented, uncommented to make styles work for diff/merge area
-    // height: 100%;
     width: 100%;
+    min-width: 250px;
 
     .pane-left-toolbar-wrap {
       padding: 9px 0px 30px 8px;
