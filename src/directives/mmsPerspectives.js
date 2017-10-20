@@ -268,21 +268,6 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
         };
         if (scope.context || (scope.initElements.length > 0)) {
             var initialIntegratorIds = [];
-            if (scope.context) {
-                updateCommand.data.push({
-                    "command": "SetModelAttribute",
-                    "data": {
-                        "attributeName": "Context",
-                        "attributeValue": scope.context,
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    },
-                    "onfailure":"onPerspectivesCommandFailure",
-                });
-            }
             if (scope.initElements.length > 0) {
                 updateCommand.data.push({
                     "command": "SetModelAttribute",
@@ -310,6 +295,21 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                     "integratorIDs": initialIntegratorIds
                 }
             });
+            if (scope.context) {
+                updateCommand.data.push({
+                    "command": "Custom",
+                            "data":{
+                                "project":id,
+                                "module":"SysML",
+                                "modelID":'model-' + id,
+                                "serverClassName":"gov.nasa.jpl.mbee.ems.command.NewContextCommand",
+                                "viewID":"view-" + id,
+                                "viewName":viewName,
+                                "args":[""+scope.context]
+                            },
+                    "onfailure":"onPerspectivesCommandFailure",
+                });
+            }
         }
         mapping[id] = updateCommand;
         projectId2Peid[id] = scope.mmsPeId;
