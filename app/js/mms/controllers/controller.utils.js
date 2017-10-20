@@ -169,7 +169,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             if (choice[0] === 'ok') {
                 printOrGenerate(viewOrDocOb, refOb, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4], choice[5]);
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3], choice[4], choice[5]);
                     var cover = result.cover;
                     var toc = result.toc;
                     var tof = result.tof;
