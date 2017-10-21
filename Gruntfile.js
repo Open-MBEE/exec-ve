@@ -183,7 +183,7 @@ module.exports = function(grunt) {
     sass: {
       dist : {
         files: {
-          'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
+          'dist/css/partials/mms.css': 'src/assets/styles/mms-main.scss',
           'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
         }
       }
@@ -341,7 +341,7 @@ module.exports = function(grunt) {
           'app/js': [ '**.js'],
           'app': [ '*.html', 'partials/**', 'styles/**'],
           'src/directives': [ '**.js', '**.html'],
-          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**'],
+          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**'],
           'src/services': [ '**']
         },
       },
@@ -354,7 +354,7 @@ module.exports = function(grunt) {
       'mms-directives': {
         files: {
           'src/directives': [ '**.js', '**.html'],
-          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**']
+          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**']
         },
       },
       'mms-services': {

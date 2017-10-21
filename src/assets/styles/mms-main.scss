@@ -10,8 +10,8 @@
 @import "base/_mms-typography.scss";
 
 /* A minimal Bootstrap file */
+@import "../../lib/bootstrap-sass-3.3.7/assets/stylesheets/bootstrap.scss";
 @import "base/_mms-bootstrap-variable-overrides.scss";
-@import "vendor/bootstrap-sass-3.3.7/assets/stylesheets/bootstrap.scss";
 
 /* App level customizations */
 @import "base/_mms-globals.scss";
@@ -30,5 +30,5 @@
 @import "components/_mms-misc-components.scss";
 @import "components/_mms-autocomplete-modal.scss";
 @import "components/_mms-history.scss";
-@import "../../charts/_mms-d3-chart.scss";
 @import "components/_mms-ve-jobs-table.scss";
+@import "../../directives/charts/_mms-d3-chart.scss";
