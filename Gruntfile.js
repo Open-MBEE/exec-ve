@@ -2,7 +2,7 @@ var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
 module.exports = function(grunt) {
 
-  var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
+  var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
 
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
   var artifactoryUser = grunt.option('ARTIFACTORY_USER');
@@ -269,6 +269,12 @@ module.exports = function(grunt) {
         files:[
           {expand: true, src: '**', cwd: 'dist', dest: 'build/'},
           {expand: true, src: '**', cwd: 'app', dest: 'build/'},
+        ]
+      },
+      src: {
+        files:[
+          {expand: true, src: '**', cwd: 'src/assets', dest: 'build/assets/'},
+          {expand: true, src: '**', cwd: 'src/lib', dest: 'build/lib/'},
         ]
       }
     },
