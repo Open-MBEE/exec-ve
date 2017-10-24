@@ -4,6 +4,7 @@
 mms-transclude-doc,
 mms-transclude-val > span,
 mms-transclude-name > span,
+mms-transclude-val > p,
 mms-transclude-com,
 mms-transclude-img {
   cursor: pointer;
@@ -28,7 +29,8 @@ mms-view.editing {
  /* Transclusions borders when editing mode */
   mms-transclude-doc,
   mms-transclude-name > span,
-  mms-transclude-val > span {
+  mms-transclude-val > span,
+  mms-transclude-val > p {
     @include transition(border, .5s);
     border: 2px solid $tertiary_grey;
     border-radius: 5px;
@@ -109,4 +111,8 @@ mms-transclude-img img {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+.no-padding-panel {
+  padding: 0px;
 }
