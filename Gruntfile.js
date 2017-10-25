@@ -53,7 +53,7 @@ module.exports = function(grunt) {
           },
           {
             context: '/Basic',
-            host: 'localhost',
+            host: 'localhost',//'100.64.243.161',
             port: 8080
           },
           {
