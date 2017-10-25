@@ -174,8 +174,7 @@ function UxService($rootScope) {
       case "export":
         return {id: button, icon: 'fa-gear', selected: true, active: true, permission: true, tooltip: 'Export',
               spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
-              dropdown_buttons: [ getButtonBarButton("convert-pdf"), getButtonBarButton("word"),
-                  getButtonBarButton("tabletocsv")]};
+              dropdown_buttons: [ getButtonBarButton("word"), getButtonBarButton("tabletocsv")]};
       case "print":
         return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};

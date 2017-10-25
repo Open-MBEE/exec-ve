@@ -116,10 +116,12 @@ angular.module('mmsApp')
 
             if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
+                // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('export'));
                 if ($state.includes('project.ref.document')) {
+                    var exportButtons = UxService.getButtonBarButton('export');
+                    exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
+                    $scope.bbApi.addButton(exportButtons);
                     $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
                     $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
                     hotkeys.bindTo($scope)
@@ -132,6 +134,8 @@ angular.module('mmsApp')
                         description: 'previous',
                         callback: function() {$scope.$broadcast('center-previous');}
                     });
+                } else {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('export'));
                 }
                 if ($rootScope.ve_treeApi && $rootScope.ve_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.ve_treeApi.get_selected_branch();
