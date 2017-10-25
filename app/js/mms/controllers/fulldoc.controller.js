@@ -154,14 +154,15 @@ function($scope, $rootScope, $state, $element, hotkeys, growl, _,
                 });
             }
 
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
+            // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            var exportButtons = UxService.getButtonBarButton('export');
+            exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
+            $scope.bbApi.addButton(exportButtons);
+            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
             $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
             hotkeys.bindTo($scope)
             .add({
