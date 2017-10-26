@@ -1,0 +1,50 @@
+.pane-right,
+.revert-spec {
+  h1.prop,
+  h1.prop > .form-control {
+    font-size: 32px;
+    margin:32px 0;
+    height: inherit;
+    width: 100%;
+  }
+
+  h1.prop {
+    width: 100%;
+    min-width: 280px;
+    word-wrap: break-word;
+  }
+
+  span.prop {
+    font-size: 15px;
+    margin:4px 0 24px;
+    min-width: 280px;
+    word-wrap: break-word;
+  }
+
+  h1.element-title {
+    min-width: 280px;
+    word-wrap: break-word;
+  }
+
+  .prop-title {
+    font-family: $font-family-sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    margin:28px 0 2px;
+    white-space: nowrap;
+  }
+
+  .doc-text {
+    font-family: $font-family-sans-serif;
+    max-width: $default-line-length;
+    min-width: 15em;
+  }
+
+  h2.spec-view-doc-heading, h2.spec-view-value-heading, h2.spec-view-type-heading {
+    margin-top: 32px;
+  }
+
+  table {
+    @extend .content-table;
+  }
+}
