@@ -41,9 +41,9 @@ img {
   }
 }
 
-table {
-  @extend .table;
-}
+// table {
+//   @extend .table;
+// }
 
 thead td, table caption {
   font-weight: bold;
