@@ -1,0 +1,34 @@
+/*************************
+  Main combinator file for MMS
+  stylesheets. Comforms to the
+  MMS app design guide
+*************************/
+
+/* Variables & mixins */
+@import "base/_mms-mixins.scss";
+@import "base/_mms-colors.scss";
+@import "base/_mms-typography.scss";
+
+/* A minimal Bootstrap file */
+@import "../../lib/bootstrap-sass-3.3.7/assets/stylesheets/bootstrap.scss";
+@import "base/_mms-bootstrap-variable-overrides.scss";
+
+/* App level customizations */
+@import "base/_mms-globals.scss";
+
+/* Other customizations */
+@import "components/_mms-add-pe-button.scss";
+@import "components/_mms-buttons.scss";
+@import "components/_mms-tree.scss";
+@import "components/_mms-transclude.scss";
+@import "components/_mms-toolbar.scss";
+@import "components/_mms-spec.scss";
+@import "components/_mms-view.scss";
+@import "components/_mms-view-section.scss";
+@import "components/_mms-cf-modal.scss";
+@import "components/_mms-editor.scss";
+@import "components/_mms-misc-components.scss";
+@import "components/_mms-autocomplete-modal.scss";
+@import "components/_mms-history.scss";
+@import "components/_mms-ve-jobs-table.scss";
+@import "../../directives/charts/_mms-d3-chart.scss";
