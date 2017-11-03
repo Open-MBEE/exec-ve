@@ -125,6 +125,13 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
             // scope view gets set in the viewlink fnc
             return $scope.view;
         };
+
+        $scope.hoverIn = function() {
+            $scope.isHover = true;
+        };
+        $scope.hoverOut = function() {
+            $scope.isHover = false;
+        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
