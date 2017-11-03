@@ -18,7 +18,7 @@
               <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"> {{value.value}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
-                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor ng-model="value.value" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-element-id="{{element.id}}" autosave-key="{{mmsProjectId + mmsRefId + mmsElementId + 'index:' + $index}}"></textarea>
+                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor ng-model="value.value" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-element-id="{{element.id}}" autosave-key="{{element._projectId + element._refId + element.id + 'index:' + $index}}"></textarea>
                   <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                   <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
@@ -58,7 +58,7 @@
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" autosave-key="{{mmsProjectId + mmsRefId + mmsElementId}}"></textarea>
+    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" autosave-key="{{element._projectId + element._refId + element.id}}"></textarea>
 
     <div>
         <h2 class="prop-title">Type</h2>
