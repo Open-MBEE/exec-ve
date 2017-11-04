@@ -5,9 +5,9 @@
 angular.module('mmsApp')
     .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout',
     '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'growl',
-    'search', 'projectOb', 'documentOb', 'viewOb', 'refOb',
+    'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
     function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, growl,
-             search, projectOb, documentOb, viewOb, refOb) {
+             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb) {
 
     function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
@@ -68,6 +68,17 @@ angular.module('mmsApp')
         map: {}
     };
 
+    $scope.docLibLink = '';
+    if (groupOb !== null) {
+        $scope.docLibLink = groupOb._link;
+    } else if (documentOb !== null && documentOb._groupId !== undefined && documentOb._groupId !== null) {
+        $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id + '/' + documentOb._groupId;
+    } else {
+        $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id;
+    }
+
     $scope.bbApi = {
         init: function() {
             if (viewOb && viewOb._editable && refOb.type === 'Branch') {
@@ -80,17 +91,18 @@ angular.module('mmsApp')
                     callback: function() {$scope.$broadcast('show-edits');}
                 });
             }
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-                if ($state.includes('project.ref.document'))
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-            }
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
             $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
+            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
+            // if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
+            //     $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+                // if ($state.includes('project.ref.document'))
+                    // $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
+                // $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
+                // $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
+            // }
+
             hotkeys.bindTo($scope)
             .add({
                 combo: 'alt+c',
@@ -102,20 +114,29 @@ angular.module('mmsApp')
                 callback: function() {$scope.$broadcast('show-elements');}
             });
 
-            if ($state.includes('project.ref.document')) {
+            if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
-                hotkeys.bindTo($scope)
-                .add({
-                    combo: 'alt+.',
-                    description: 'next',
-                    callback: function() {$scope.$broadcast('center-next');}
-                }).add({
-                    combo: 'alt+,',
-                    description: 'previous',
-                    callback: function() {$scope.$broadcast('center-previous');}
-                });
+                // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+                if ($state.includes('project.ref.document')) {
+                    var exportButtons = UxService.getButtonBarButton('export');
+                    exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
+                    $scope.bbApi.addButton(exportButtons);
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
+                    hotkeys.bindTo($scope)
+                    .add({
+                        combo: 'alt+.',
+                        description: 'next',
+                        callback: function() {$scope.$broadcast('center-next');}
+                    }).add({
+                        combo: 'alt+,',
+                        description: 'previous',
+                        callback: function() {$scope.$broadcast('center-previous');}
+                    });
+                } else {
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('export'));
+                }
                 if ($rootScope.ve_treeApi && $rootScope.ve_treeApi.get_selected_branch) {
                     var selected_branch = $rootScope.ve_treeApi.get_selected_branch();
                     while (selected_branch && selected_branch.type !== 'view' && viewOb.type !== 'InstanceSpecification') {

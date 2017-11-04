@@ -14,7 +14,7 @@
  * 
  * ## Links
  * * [angular.js](http://angularjs.org)
- * * [mms rest api and json schema](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
+ * * [mms](https://github.com/Open-MBEE/mms)
  * * {@link mms.URLService#methods_handleHttpStatus Promise rejected object}
  * * [lodash](http://lodash.com)
  *

@@ -2,7 +2,7 @@ var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
 module.exports = function(grunt) {
 
-  var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
+  var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
 
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
   var artifactoryUser = grunt.option('ARTIFACTORY_USER');
@@ -183,8 +183,8 @@ module.exports = function(grunt) {
     sass: {
       dist : {
         files: {
-          'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
+          'dist/css/partials/mms.css': 'src/assets/styles/mms-main.scss',
+          'dist/css/partials/ve-main.css': 'app/assets/styles/ve/ve-main.scss'
         }
       }
     },
@@ -223,7 +223,8 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false
+          eval: false,
+          Set: true
         }
       }
     },
@@ -269,6 +270,12 @@ module.exports = function(grunt) {
           {expand: true, src: '**', cwd: 'dist', dest: 'build/'},
           {expand: true, src: '**', cwd: 'app', dest: 'build/'},
         ]
+      },
+      src: {
+        files:[
+          {expand: true, src: '**', cwd: 'src/assets', dest: 'build/assets/'},
+          {expand: true, src: '**', cwd: 'src/lib', dest: 'build/lib/'},
+        ]
       }
     },
 
@@ -286,7 +293,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '3.2.0-SNAPSHOT',
+            version: '3.2.1-SNAPSHOT',
             path: 'deploy/'
           }]
         }
@@ -332,22 +339,22 @@ module.exports = function(grunt) {
         files: {
           // Target-specific file lists and/or options go here.
           'app/js': [ '**.js'],
-          'app': [ '*.html', 'partials/**', 'styles/**'],
+          'app': [ '*.html', 'partials/**', 'assets/styles/**'],
           'src/directives': [ '**.js', '**.html'],
-          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**'],
+          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**'],
           'src/services': [ '**']
         },
       },
       'mms-app': {
         files: {
           'app/js': [ '**.js'],
-          'app': [ '*.html', 'partials/**', 'styles/**'],
+          'app': [ '*.html', 'partials/**', 'assets/styles/**'],
         },
       },
       'mms-directives': {
         files: {
           'src/directives': [ '**.js', '**.html'],
-          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**']
+          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**']
         },
       },
       'mms-services': {

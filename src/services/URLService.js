@@ -29,7 +29,7 @@ angular.module('mms')
  *  <pre>
         angular.module('myApp', ['mms'])
         .config(function(URLServiceProvider) {
-            URLServiceProvider.setBaseUrl('https://ems.jpl.nasa.gov/alfresco/service');
+            URLServiceProvider.setBaseUrl('https://url/alfresco/service');
         });
     </pre>
  * (You may run into problems like cross origin security policy that prevents it from
@@ -211,6 +211,11 @@ function urlService(baseUrl) {
     var getElementURL = function(reqOb) {        
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addExtended(addTicket(addVersion(r, reqOb.commitId)), reqOb.extended);
+    };
+
+    var getViewElementIdsURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
+        return addTicket(r);
     };
 
     var getOwnedElementURL = function(reqOb) {
@@ -486,6 +491,7 @@ function urlService(baseUrl) {
         getRefHistoryURL: getRefHistoryURL,
         getGroupsURL: getGroupsURL,
         getElementURL: getElementURL,
+        getViewElementIdsURL: getViewElementIdsURL,
         getPutElementsURL: getPutElementsURL,
         getPostElementsURL: getPostElementsURL,
         getOwnedElementURL: getOwnedElementURL,

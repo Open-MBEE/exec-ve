@@ -96,7 +96,7 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
         };
 
         this.transcludeClicked = function(elementOb) {
-            if ($scope.mmsViewApi && $scope.mmsViewApi.elementClicked)
+            if ($scope.mmsViewApi && $scope.mmsViewApi.elementClicked && elementOb)
                 $scope.mmsViewApi.elementClicked(elementOb);
         };
 
@@ -125,6 +125,13 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
             // scope view gets set in the viewlink fnc
             return $scope.view;
         };
+
+        $scope.hoverIn = function() {
+            $scope.isHover = true;
+        };
+        $scope.hoverOut = function() {
+            $scope.isHover = false;
+        };
     };
 
     var mmsViewLink = function(scope, element, attrs) {
@@ -143,12 +150,8 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
                 //view accepts a section element
                 if (data.type === 'InstanceSpecification') {
                     scope.isSection = true;
-                    scope.view = data;
-                    scope.modified = data._modified;
-                    scope.modifier = data._modifier;
-                    return;
                 }
-                if (data._numElements && data._numElements > 5000 &&
+                if (//data._numElements && data._numElements > 5000 &&
                         scope.mmsCommitId && scope.mmsCommitId !== 'latest') {
                     //threshold where getting view elements in bulk takes too long and it's not latest
                     //getting cached individual elements should be faster
@@ -158,15 +161,10 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
                     return;
                 }
                 ViewService.getViewElements(reqOb, 1)
-                .then(function(data2) {
+                .finally(function() {
                     scope.view = data;
                     scope.modified = data._modified;
                     scope.modifier = data._modifier;
-                }, function(reason) {
-                    scope.view = data;
-                    scope.modified = data._modified;
-                    scope.modifier = data._modifier;
-                }).finally(function() {
                     element.removeClass('isLoading');
                 });
             }, function(reason) {

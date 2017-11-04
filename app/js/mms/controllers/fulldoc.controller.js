@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', '$element', 'hotkeys', 'growl',
-    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb',
-function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
-    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$element', 'hotkeys', 'growl', '_',
+    'MmsAppUtils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
+function($scope, $rootScope, $state, $element, hotkeys, growl, _,
+    MmsAppUtils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
 
@@ -130,6 +130,17 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
     });
 
+    $scope.docLibLink = '';
+    if (groupOb !== null) {
+        $scope.docLibLink = groupOb._link;
+    } else if (documentOb !== null && documentOb._groupId !== undefined && documentOb._groupId !== null) {
+        $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id + '/' + documentOb._groupId;
+    } else {
+        $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
+        projectOb.id;
+    }
+
     $scope.bbApi = {
         init: function() {
             if (documentOb && documentOb._editable && refOb.type === 'Branch') {
@@ -143,14 +154,15 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
                 });
             }
 
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
+            // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            var exportButtons = UxService.getButtonBarButton('export');
+            exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
+            $scope.bbApi.addButton(exportButtons);
+            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
             $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
             hotkeys.bindTo($scope)
             .add({

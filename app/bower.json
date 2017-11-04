@@ -1,7 +1,8 @@
 {
   "name": "mms",
-  "version": "0.2.0",
+  "version": "3.2.0",
   "authors": [
+    "Shakeh E Brys <skhudiky@jpl.nasa.gov",
     "Raffi P Tikidjian <raffi@jpl.nasa.gov>"
   ],
   "description": "Model Management System",
@@ -13,7 +14,7 @@
     "mms"
   ],
   "license": "MIT",
-  "homepage": "ems.jpl.nasa.gov",
+  "homepage": "http://www.openmbee.org/",
   "private": true,
   "ignore": [
     "**/.*",

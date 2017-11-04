@@ -50,7 +50,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $rootScope.ve_edits = {};
     $scope.presentElemEditCnts = {};
 
-    // Set edit count for tracker view 
+    // Set edit count for tracker view
     $scope.veEditsLength = function() {
         return Object.keys($rootScope.ve_edits).length;
     };
@@ -132,7 +132,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     $scope.$on('presentationElem.cancel', function(event, editOb) {
-        cleanUpEdit(editOb);           
+        cleanUpEdit(editOb);
     });
 
     var elementSelected = function(event, elementOb, commitId) {
@@ -141,7 +141,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
         $rootScope.ve_tbApi.select('element-viewer');
-        
+
         showPane('element');
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
@@ -188,7 +188,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.viewContentsOrderApi.setEditing(true);
         showPane('reorder');
     });
-    
+
     var elementSaving = false;
     $scope.$on('element-editor-save', function() {
         save(false);
@@ -212,7 +212,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
-            if (continueEdit) 
+            if (continueEdit)
                 return;
             var edit = $scope.specApi.getEdits();
             var key = edit.id + '|' + edit._projectId + '|' + edit._refId;

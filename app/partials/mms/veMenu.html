@@ -7,7 +7,7 @@
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
                 <li ng-repeat="project in projects | orderBy: 'name'" ng-click="updateProject(project)"
-                       ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
+                    ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
             </ul>
         </div>
         <div class="breadcrumbs">
@@ -23,7 +23,7 @@
                         <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" 
                         uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
                     </a>
-                    <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span>
+                    <!-- <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span> -->
                     <span ng-show="!$last"> &#8250;</span>
                 </li>
             </ul>
@@ -31,7 +31,7 @@
 
         <ul ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 25px">
             <li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="disabled">
+            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
                 <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
                     <span class="label-dropdown">{{ currentRef.type }}:</span>
                     <span class = "selected-dropdown">{{ currentRef.name }}</span>
@@ -43,16 +43,21 @@
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches/Tags
                         </button>
                     </li>
+                    <li class="button-item">
+                        <form class="ve-dark-minor-search">
+                            <input placeholder="Filter branches/tags" ng-model="refFilter">
+                        </form>
+                    </li>
                     <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
-                            <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
+                            <li ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter} " ng-click="updateBranch(branch)"
                                 ng-class="{'checked-list-item': branch.name === currentBranch, 'branch-disabled': branch.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">{{ branch.name }}
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
-                            <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
+                            <li ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
                                 ng-class="{'checked-list-item': tag.name === currentTag, 'branch-disabled': tag.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">{{ tag.name }}
