@@ -28,7 +28,7 @@
   letter-spacing: .05em;
   font-size: 14px;
   z-index: 200;
-  position: relative;
+  // position: relative;
   width: 100%;
   height: 36px;
   min-height: 30px;
@@ -40,10 +40,6 @@
   a:visited {
     text-decoration: none;
     color:white;
-  }
-
-  .navbar-nav {
-    margin: 0;
   }
 }
 
@@ -82,12 +78,13 @@ a.switch-org:hover {
 
 #global-navigation {
   background-color: #404040;
+  border: none;
   float: right;
 }
 
 .main-nav-toggle {
-  margin: 2px 15px;
-  padding: 5px 10px;
+  margin: 4px 12px;
+  padding: 3px 8px;
 }
 
 /*------------------------------------------------------------------
@@ -95,20 +92,15 @@ a.switch-org:hover {
 -------------------------------------------------------------------*/
 
 ul.global-menu {
-  // list-style: none;
-  // float: right;
-  // margin: 0;
-  // padding: 0 10px 0 20px;
+  padding: 0 10px 0 20px;
   min-height: 30px;
   color: white;
-  height: 36px;
   min-height: 30px;
   background-color: $base_grey;
 }
 
 .global-menu > li {
-  // display: inline-block;
-  padding: 6px 12px;
+  margin: 6px 12px;
   height: 24px;
   line-height: 24px;
 
@@ -125,6 +117,13 @@ ul.global-menu {
     color: white;
   }
 
+// .global-menu > li > a,
+// .global-menu > li > a:visited,
+// .global-menu > li > span > a.dropdown-toggle {
+//   color: $ve-white-text-lighter-2;
+//   padding: 5px 10px;
+// }
+
 }
 
 .open>a, .nav .open>a:focus, .nav .open>a:hover {
@@ -138,6 +137,7 @@ ul.global-menu {
 #global-search {
   // display: inline;
   // position: relative;
+  border: none;
   margin: 0;
 
   input {
@@ -203,7 +203,6 @@ ul.global-menu {
   -moz-transition: background-color .1s ease-out;
   -o-transition: background-color .1s ease-out;
   transition: background-color .1s ease-out;
-  margin:6px;
   color:white;
 }
 
@@ -229,8 +228,13 @@ ul.global-menu {
 -------------------------------------------------------------------*/
 
 .project-level-header {
-  z-index: 100;
-  position: relative;
+  top: 36px;
+  z-index: 150;
+
+  .navbar-nav {
+    margin: 0;
+  }
+
 }
 
 nav.project-level-header {
@@ -278,9 +282,6 @@ nav.project-level-header {
   position: relative;
 }
 
-.breadcrumbs #alfUploadLink:hover {
-  text-decoration: underline;
-}
 
 @media (max-width: 1024px) {
   .breadcrumbs {

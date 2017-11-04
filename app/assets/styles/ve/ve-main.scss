@@ -394,6 +394,14 @@ div.tooltip-inner {
   }
 }
 
+@media (max-width: 767px) {
+  .ve-dark-dropdown-nav {
+    .dropdown-menu li.divider {
+      background-color: $ve-slate-lighter-2 !important;
+    }
+  }
+}
+
 .ve-light-dropdown{
   display: block;
   width: 100%;
@@ -1026,7 +1034,7 @@ table caption {
   padding-right:6px;
 }
 
-.docTitle-underlined  {
+.docTitle-underlined{
   text-decoration: underline;
   text-decoration-color: rgb(72, 133, 189);
 }
