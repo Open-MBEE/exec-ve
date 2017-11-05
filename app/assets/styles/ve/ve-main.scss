@@ -856,6 +856,16 @@ table caption {
   overflow: auto;
 }
 
+.modal.autosave {
+ background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content.autosave {
+  width: 50%;
+  margin: auto;
+  top: 100px;
+}
+
 .modal-body{
   .transclude-modal .transclude-modal-input {
     width: 80%;

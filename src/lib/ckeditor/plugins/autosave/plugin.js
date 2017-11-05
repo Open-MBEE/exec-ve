@@ -256,14 +256,52 @@ CKEDITOR.MmsAutosavePlugin =
                     moment(autoSavedContentDate).locale(editorInstance.config.language)
                     .format(editorInstance.lang.autosave.dateFormat));
 
-                if (confirm(confirmMessage)) {
-                    // Open DIFF Dialog
-                    editorInstance.openDialog('autosaveDialog');
-                } else {
-                    RemoveStorage(autoSaveKey, editorInstance);
-                }
+                _handleAutosaveConfirmationDialog(confirmMessage, editorInstance, autoSaveKey);
+
             }
         }
+    }
+
+    function _handleAutosaveConfirmationDialog(confirmMessage, editorInstance, autoSaveKey) {
+        var autosaveModalId = 'autosaveModal';
+        var autosaveMessageId = 'autosaveMessage';
+        var autosaveModal = $('#' + autosaveModalId);
+        if ( autosaveModal.length) {
+            autosaveModal.find('#' + autosaveMessageId).text(confirmMessage);
+        } else {
+            var dialogDom = _createDialogHtml(confirmMessage, autosaveModalId, autosaveMessageId );
+            $(dialogDom).appendTo('body');
+            autosaveModal = $('#' + autosaveModalId);
+        }
+
+        $('#autosave-confirm').unbind('click').click(function() {
+            autosaveModal.css('display', 'none');
+            editorInstance.openDialog('autosaveDialog');
+        });
+        $('#autosave-cancel').unbind('click').click(function() {
+            RemoveStorage(autoSaveKey, editorInstance);
+            autosaveModal.css('display', 'none');
+        });
+        autosaveModal.css('display', 'block');
+    }
+
+    function _createDialogHtml(message, autosaveModalId, autosaveMessageId) {
+        var dialogHtml =
+           '<div id=\"'+ autosaveModalId + '\" class="modal autosave">\n' +
+            '    <div class="modal-content autosave">\n' +
+            '        <div class="modal-header">\n' +
+            '            <h1>Do you want to load autosave content?</h1>\n' +
+            '        </div>\n' +
+            '        <div class="modal-body">\n' +
+            '            <p id=\"'+ autosaveMessageId + '\">'+ message +'</p>\n' +
+            '        </div>\n' +
+            '        <div class="modal-footer">\n' +
+            '                <button id="autosave-confirm" class="btn btn-primary">Confirm</button>\n' +
+            '                <button id="autosave-cancel" class="btn btn-secondary">Cancel</button>\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>';
+        return $(dialogHtml);
     }
 
     function LoadData(autoSaveKey) {
