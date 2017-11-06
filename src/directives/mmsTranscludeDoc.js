@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -35,7 +35,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $templateCache, growl, _, MathJax) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, $compile, $templateCache, growl, _, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -105,6 +105,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.isEditing = false;
                 domElement[0].innerHTML = doc;
             }
+            $(domElement[0]).find('img').each(function(index) {
+                var src = $(this).attr('src');
+                if (src && src.startsWith('/alfresco')) {
+                    $(this).attr('src', src + '?alf_ticket=' + AuthService.getTicket());
+                }
+            });
             if (MathJax) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             }
