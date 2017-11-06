@@ -25,6 +25,7 @@
                                 ng-class="{'selected': tag.id === refSelected.id}">
                                 <a>{{ tag.name }}</a>
                             </li>
+                            <li ng-if="!tags.length">No Tags</li>
                         </ul>
                     </div>
                     <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
