@@ -2,7 +2,7 @@
   Styles for the View Editor center pane
 *************************/
 
-$pane_center_btn_group_width: 418px;
+$pane_center_btn_group_width: 120px;
 
 /* start of fullDoc page styles */
 body.fullDoc {
@@ -28,7 +28,7 @@ tr {
 
   .pane-center {
     margin-right: 0;
-    margin-bottom: 30px;
+    padding-bottom: 30px;
   }
 
   .pane-center-spinner {

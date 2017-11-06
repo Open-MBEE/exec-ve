@@ -33,7 +33,7 @@
   height: 36px;
   min-height: 30px;
   border: 0;
-  background-color: $base_grey;
+  background-color: $ve-slate-base;
 
   a,
   a:hover,
@@ -77,7 +77,7 @@ a.switch-org:hover {
 -------------------------------------------------------------------*/
 
 #global-navigation {
-  background-color: #404040;
+  background-color: $ve-slate-base;
   border: none;
   float: right;
 }
@@ -92,11 +92,11 @@ a.switch-org:hover {
 -------------------------------------------------------------------*/
 
 ul.global-menu {
-  padding: 0 10px 0 20px;
+  padding: 0 10px;
   min-height: 30px;
   color: white;
   min-height: 30px;
-  background-color: $base_grey;
+  background-color: $ve-slate-base;
 }
 
 .global-menu > li {
@@ -106,30 +106,23 @@ ul.global-menu {
 
   span a,
   span a:visited,
-  span > a {
+  span > a,
+  .dropdown-menu > li > a {
     color: $ve-white-text-lighter-2;
     background-color: transparent;
-    // padding: 5px 10px;
   }
 
   span a:hover,
   span > a:hover {
     color: white;
   }
-
-// .global-menu > li > a,
-// .global-menu > li > a:visited,
-// .global-menu > li > span > a.dropdown-toggle {
-//   color: $ve-white-text-lighter-2;
-//   padding: 5px 10px;
-// }
-
 }
 
 .open>a, .nav .open>a:focus, .nav .open>a:hover {
   background-color: transparent;
   border: none;
 }
+
 /*------------------------------------------------------------------
     2.2.2 Search
 -------------------------------------------------------------------*/
@@ -137,7 +130,6 @@ ul.global-menu {
 #global-search {
   // display: inline;
   // position: relative;
-  border: none;
   margin: 0;
 
   input {
@@ -147,7 +139,7 @@ ul.global-menu {
     width: 330px;
     padding: 0 8px;
     height: 26px;
-    margin: 5px 0 5px 10px;
+    margin: 5px 0;
     letter-spacing: .05em;
     line-height: 1;
   }
@@ -170,10 +162,6 @@ ul.global-menu {
     border:none;
     margin: 5px 0 5px -10px;
     vertical-align: bottom;
-    -webkit-transition: background-color .1s ease-out;
-    -moz-transition: background-color .1s ease-out;
-    -o-transition: background-color .1s ease-out;
-    transition: background-color .1s ease-out;
   }
 
   button .fa-search {
@@ -199,19 +187,11 @@ ul.global-menu {
   height: 24px;
   background:$ve-accent-green;
   text-align: center;
-  -webkit-transition: background-color .1s ease-out;
-  -moz-transition: background-color .1s ease-out;
-  -o-transition: background-color .1s ease-out;
-  transition: background-color .1s ease-out;
   color:white;
 }
 
 #login-dropdown:hover {
   background-color:$ve-accent-green-darker;
-}
-
-.global-menu > li:last-child {
-  padding:0;
 }
 
 .user-profile > ul > li:first-child {
@@ -227,18 +207,14 @@ ul.global-menu {
 3. Project Level Header
 -------------------------------------------------------------------*/
 
-.project-level-header {
+nav.project-level-header {
+  background-color: $ve-slate-darker-2;
   top: 36px;
   z-index: 150;
 
   .navbar-nav {
     margin: 0;
   }
-
-}
-
-nav.project-level-header {
-  background-color: $ve-slate-darker-2;
 }
 
 /*------------------------------------------------------------------
@@ -246,7 +222,7 @@ nav.project-level-header {
 -------------------------------------------------------------------*/
 
 .select-project-dropdown {
-  float:left;
+  float: left;
 }
 
 /*------------------------------------------------------------------
@@ -294,5 +270,5 @@ nav.project-level-header {
 -------------------------------------------------------------------*/
 
 .project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
-  width:300px;
+  max-width: 300px;
 }
