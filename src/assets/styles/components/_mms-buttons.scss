@@ -101,6 +101,14 @@ mms-button-bar>span:first-child>a{
     .fa{
       padding-right:4px;
     }
+
   }
 }
 
+/*Pull center button dropdowns to the right*/
+.view-tools.center.btn-group{
+  .dropdown-menu{
+    right: 0;
+    left: auto;
+  }
+}
