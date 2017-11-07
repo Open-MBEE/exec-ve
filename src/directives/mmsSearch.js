@@ -62,7 +62,7 @@ function mmsSearch(CacheService, ElementService, UtilsService, growl, $templateC
                             var properties = [];
                             //TODO might not be elements
                             angular.forEach(data, function (elt) {
-                                if (elt.type === 'Property' && elt.ownerId == elem.classId) {
+                                if (elt.type === 'Property' && elt.ownerId == elem.id) {
                                     properties.push(elt);
                                 } else if (elt.type === 'Slot') {
                                     properties.push(elt);
