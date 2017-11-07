@@ -122,8 +122,8 @@
                     <tbody>
                         <tr ng-repeat="row in elem._properties2">
                             <td ng-repeat="property in row">
-                                {{property.name}}<span ng-show="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
-                                <a ng-click="userResultClick(property, 'val')"><span ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
+                                {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
+                                <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}<span ng-if="property.type === 'Slot'" ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
                             </td>
                         </tr>
                     </tbody>
