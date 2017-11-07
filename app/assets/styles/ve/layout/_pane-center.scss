@@ -193,8 +193,14 @@ tr {
 /* styling for doclib link to the right of the button bar*/
 
 .doclib-link {
-  margin: 0 8px;
+  margin: 0 4px;
   float:right;
+  line-height: 1.1;
+
+  a{
+    padding:3px 4px 2px;
+    border-radius:0;
+  }
 
   img{
     padding-right:5px;

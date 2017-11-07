@@ -37,7 +37,11 @@
   a:hover {
     color:#296f83;
     text-decoration:none;
-    background-color: #f0f0f0;
+    background-color: $tertiary_grey;
+  }
+
+  a:focus{
+    text-decoration:none;
   }
 
 }
