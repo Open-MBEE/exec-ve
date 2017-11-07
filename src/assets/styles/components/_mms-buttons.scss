@@ -106,7 +106,7 @@ mms-button-bar>span:first-child>a{
 }
 
 /*Pull center button dropdowns to the right*/
-.view-tools.center.btn-group{
+.pane-center .view-tools.center.btn-group{
   .dropdown-menu{
     right: 0;
     left: auto;
