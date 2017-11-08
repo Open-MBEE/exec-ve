@@ -118,8 +118,6 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
                 toSave.push({
                     id: id,
                     //name: orig.name,
-                    _read: orig._read,
-                    _modified: orig._modified,
                     _childViews: childViews,
                     _projectId: orig._projectId,
                     _refId: orig._refId,
