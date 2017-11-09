@@ -276,7 +276,10 @@ CKEDITOR.MmsAutosavePlugin =
 
         $('#autosave-confirm').unbind('click').click(function() {
             autosaveModal.css('display', 'none');
-            editorInstance.openDialog('autosaveDialog');
+            var dialog = editorInstance.openDialog('autosaveDialog');
+               var dialogDom = dialog.getElement()['$'];
+               var contentDom = $(dialogDom).children(":first");
+               contentDom.addClass('autosave');
         });
         $('#autosave-cancel').unbind('click').click(function() {
             RemoveStorage(autoSaveKey, editorInstance);
@@ -345,7 +348,7 @@ CKEDITOR.MmsAutosavePlugin =
                 editorElement.css('position', 'relative');
 
                 autosavePopupElement.css({
-                    position: 'absolute',
+                   position: 'absolute',
                    zIndex: 5000
                 });
                 autosavePopupElement.css( {
