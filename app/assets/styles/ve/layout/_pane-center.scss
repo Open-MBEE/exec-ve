@@ -2,7 +2,7 @@
   Styles for the View Editor center pane
 *************************/
 
-$pane_center_btn_group_width: 120px;
+$pane_center_btn_group_width: 340px;
 
 /* start of fullDoc page styles */
 body.fullDoc {
@@ -42,6 +42,10 @@ tr {
     padding-top: 9px;
     padding-right: 12px;
     min-width: $pane_center_btn_group_width;
+
+    .bordered-button-bar {
+      float: right;
+    }
   }
 
   .center-view {
@@ -65,17 +69,12 @@ tr {
   }
 
   .pane-center-inner {
-    padding-top: 9px;
+    padding-top: 14px;
     padding-bottom:40px;
   }
 }
 @media (max-width: 720px) {
-  // .pane-center-btn-group {
-  //   margin-top: 26px;
-  // }
-  .pane-center-inner {
-    margin-top: 22px;
-  }
+
 }
 
 .container-tree-reorder {
