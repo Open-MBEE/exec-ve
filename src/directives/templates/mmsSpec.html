@@ -64,7 +64,7 @@
         <h2 class="prop-title">Type</h2>
         <span class="prop">{{element.type}}</span>
         <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
-        <span ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></span>
+        <div ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
         <h2 class="prop-title">Location</h2>
         <span class="prop">{{element._qualifiedName}}</span>
         <h2 class="prop-title">ID</h2>
@@ -156,7 +156,7 @@
     <h2 class="prop-title">Type</h2>
     <span class="prop">{{element.type}}</span>
     <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
-    <span ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></span>
+    <div ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
     <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
     <span class="prop">{{element._qualifiedName}}</span>
     <h2 class="prop-title">ID</h2>
