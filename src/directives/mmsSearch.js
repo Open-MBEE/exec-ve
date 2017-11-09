@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['CacheService', 'ElementService', 'UtilsService', 'growl', '$templateCache', mmsSearch]);
+.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'growl', '$templateCache', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -13,7 +13,7 @@ angular.module('mms.directives')
  * TBA
  *
  */
-function mmsSearch(CacheService, ElementService, UtilsService, growl, $templateCache) {
+function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, growl, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -31,7 +31,7 @@ function mmsSearch(CacheService, ElementService, UtilsService, growl, $templateC
             selected: false
         };
         scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
-
+        ProjectService.getProjectMounts(scope.mmsProjectId, scope.refId); //ensure project mounts object is cached
         scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
             scope.resultFilter = {};
             scope.resultFilter[scope.facet] = scope.filterQuery.query;
@@ -203,7 +203,7 @@ function mmsSearch(CacheService, ElementService, UtilsService, growl, $templateC
         var getProjectMountsQuery = function () {
             var projList = [];
             var projectTermsOb = {};
-            var cacheKey = ['project', scope.mmsProjectId, scope.mmsRefId];
+            var cacheKey = ['project', scope.mmsProjectId, scope.refId];
             var cachedProj = CacheService.get(cacheKey);
             if (cachedProj) {
                 getAllMountsAsArray(cachedProj, projList);
@@ -219,7 +219,7 @@ function mmsSearch(CacheService, ElementService, UtilsService, growl, $templateC
                                 }
                             }, {
                                 term:{
-                                    _inRefIds: scope.mmsRefId
+                                    _inRefIds: scope.refId
                                 }
                             }
                         ]
