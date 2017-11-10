@@ -1,4 +1,4 @@
-<nav class="project-level-header navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+<nav class="project-level-header navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="block">
         <div class="btn-group ve-dark-dropdown-nav select-project-dropdown" uib-dropdown keyboard-nav>
             <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" ng-click="updateProjectChecked()" uib-dropdown-toggle>
@@ -29,9 +29,9 @@
             </ul>
         </div>
 
-        <ul ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 25px">
+        <ul ng-show="!isRefsView()" class="nav navbar-nav pull-right" style="padding-right: 25px">
             <li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="disabled">
+            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
                 <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
                     <span class="label-dropdown">{{ currentRef.type }}:</span>
                     <span class = "selected-dropdown">{{ currentRef.name }}</span>
@@ -43,16 +43,21 @@
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches/Tags
                         </button>
                     </li>
+                    <li class="button-item">
+                        <form class="ve-dark-minor-search">
+                            <input placeholder="Filter branches/tags" ng-model="refFilter">
+                        </form>
+                    </li>
                     <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
-                            <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
+                            <li ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter} " ng-click="updateBranch(branch)"
                                 ng-class="{'checked-list-item': branch.name === currentBranch, 'branch-disabled': branch.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">{{ branch.name }}
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
-                            <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
+                            <li ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
                                 ng-class="{'checked-list-item': tag.name === currentTag, 'branch-disabled': tag.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">{{ tag.name }}

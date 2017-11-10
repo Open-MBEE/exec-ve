@@ -8,7 +8,7 @@
             <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
         </div>
     </div>
-    <div class="inner panel-body">
-        <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-type="{{editorType}}" mms-editor-api="editorApi" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}"></textarea>
+    <div class="panel-body no-padding-panel">
+        <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-type="{{editorType}}" mms-editor-api="editorApi" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" autosave-key="{{element._projectId + element._refId + element.id}}"></textarea>
     </div>
 </div>

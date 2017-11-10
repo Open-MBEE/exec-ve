@@ -35,6 +35,7 @@ module.exports = function (config) {
             "build/lib/jquery.isonscreen.js",
             "build/lib/table2CSV.js",
             "build/lib/ckeditor/ckeditor.js",
+            "build/lib/ckeditor/plugins/autosave/plugin.js",
             //"build/lib/ckeditor/plugins/mathjax/dialogs/mathjax.js",
             "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML",
 

@@ -35,6 +35,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
 
     var veNavLink = function(scope, element, attrs) {
 
+        scope.isNavCollapsed = true;
         scope.updateOrg = function() {
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
@@ -89,7 +90,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.2.0';
+            scope.veV = '3.2.1';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
@@ -131,7 +132,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         };
         scope.stagingView = function(){ //changing to something "opencae"?
             var hostName = $location.host();
-            var address = "https://cae-ems-uat.jpl.nasa.gov";
+            var address = "https://uatlinkhere";
             if (hostName !== 'localhost' && hostName.split('.')[0].substr(-3) !== 'uat')
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
             window.open(address ,'_blank');

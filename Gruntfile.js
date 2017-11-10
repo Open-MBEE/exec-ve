@@ -2,12 +2,11 @@ var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 
 module.exports = function(grunt) {
 
-  var jsFiles = ['app/js/**/*.js', 'src/**/*.js'];
+  var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
 
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
   var artifactoryUser = grunt.option('ARTIFACTORY_USER');
   var artifactoryPassword = grunt.option('ARTIFACTORY_PASSWORD');
-  var servers = grunt.file.readJSON('angular-mms-grunt-servers.json');
   var connectObject = {
     'static': {
       options: {
@@ -24,40 +23,44 @@ module.exports = function(grunt) {
         }
     }};
 
-  // Set proxie info for server list
-  for (var key in servers) {
-    var serverPort = 443;
-    var serverHttps = true;
-    if (key == "localhost") {
-       serverPort = 8080;
-       serverHttps = false;
-    }
-    connectObject[key] = {
-        options: {
-          hostname: '*',
-          port: 9000,
-          open: true,
-          base: '/mms.html',
-          livereload: true,
-          middleware: function(connect) {
-            return [proxySnippet];
-          }
-        },
-        proxies: [
-          {
-            context: '/alfresco',  // '/api'
-            host: servers[key],
-            changeOrigin: true,
-            https: serverHttps,
-            port: serverPort
+  if (grunt.file.exists('angular-mms-grunt-servers.json')) {
+    var servers = grunt.file.readJSON('angular-mms-grunt-servers.json');
+
+    // Set proxie info for server list
+    for (var key in servers) {
+      var serverPort = 443;
+      var serverHttps = true;
+      if (key == "localhost") {
+        serverPort = 8080;
+        serverHttps = false;
+      }
+      connectObject[key] = {
+          options: {
+            hostname: '*',
+            port: 9000,
+            open: true,
+            base: '/mms.html',
+            livereload: true,
+            middleware: function(connect) {
+              return [proxySnippet];
+            }
           },
-          {
-            context: '/',
-            host: 'localhost',
-            port: 9001
-          }
-        ]
-    };
+          proxies: [
+            {
+              context: '/alfresco',  // '/api'
+              host: servers[key],
+              changeOrigin: true,
+              https: serverHttps,
+              port: serverPort
+            },
+            {
+              context: '/',
+              host: 'localhost',
+              port: 9001
+            }
+          ]
+      };
+    }
   }
 
   // Project configuration.
@@ -183,8 +186,8 @@ module.exports = function(grunt) {
     sass: {
       dist : {
         files: {
-          'dist/css/partials/mms.css': 'src/directives/templates/styles/mms-main.scss',
-          'dist/css/partials/ve-main.css': 'app/styles/ve/ve-main.scss'
+          'dist/css/partials/mms.css': 'src/assets/styles/mms-main.scss',
+          'dist/css/partials/ve-main.css': 'app/assets/styles/ve/ve-main.scss'
         }
       }
     },
@@ -223,7 +226,8 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false
+          eval: false,
+          Set: true
         }
       }
     },
@@ -269,6 +273,12 @@ module.exports = function(grunt) {
           {expand: true, src: '**', cwd: 'dist', dest: 'build/'},
           {expand: true, src: '**', cwd: 'app', dest: 'build/'},
         ]
+      },
+      src: {
+        files:[
+          {expand: true, src: '**', cwd: 'src/assets', dest: 'build/assets/'},
+          {expand: true, src: '**', cwd: 'src/lib', dest: 'build/lib/'},
+        ]
       }
     },
 
@@ -286,7 +296,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '3.2.0',
+            version: '3.2.1',
             path: 'deploy/'
           }]
         }
@@ -332,22 +342,22 @@ module.exports = function(grunt) {
         files: {
           // Target-specific file lists and/or options go here.
           'app/js': [ '**.js'],
-          'app': [ '*.html', 'partials/**', 'styles/**'],
+          'app': [ '*.html', 'partials/**', 'assets/styles/**'],
           'src/directives': [ '**.js', '**.html'],
-          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**'],
+          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**'],
           'src/services': [ '**']
         },
       },
       'mms-app': {
         files: {
           'app/js': [ '**.js'],
-          'app': [ '*.html', 'partials/**', 'styles/**'],
+          'app': [ '*.html', 'partials/**', 'assets/styles/**'],
         },
       },
       'mms-directives': {
         files: {
           'src/directives': [ '**.js', '**.html'],
-          'src/directives/templates/styles': [ 'base/**', 'components/**', 'layout/**']
+          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**']
         },
       },
       'mms-services': {
