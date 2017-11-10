@@ -122,7 +122,7 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
             // }
             var eltWidth = element.parent().width();
             var crumbcount = scope.breadcrumbs.length;
-            var liWidth = (eltWidth * 0.75)/crumbcount;
+            var liWidth = (eltWidth * 0.65)/crumbcount;
             scope.truncateStyle={'max-width': liWidth, 'white-space': 'nowrap', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'display': 'inline-block'};
         }
     };

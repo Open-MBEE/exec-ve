@@ -25,8 +25,10 @@
 
 .ve-no-panes {
 
-  margin-top: 40px;
+  margin-top: 90px;
   letter-spacing: .05em;
+  overflow: auto;
+  height: 90vh;
 
   a {
     color: #333;
