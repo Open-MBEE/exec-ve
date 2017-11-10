@@ -82,6 +82,10 @@ a.switch-org:hover {
   float: right;
 }
 
+.navbar-collapse.in {
+  width: 100%;
+}
+
 .main-nav-toggle {
   margin: 4px 12px;
   padding: 3px 8px;
@@ -173,6 +177,11 @@ ul.global-menu {
 
   button:hover {
     background-color:$ve-teal-darker-1;
+  }
+}
+@media (max-width: 720px) {
+  #global-search input {
+    width: 92%;
   }
 }
 
