@@ -317,8 +317,9 @@ CKEDITOR.MmsAutosavePlugin =
 
         if (quotaExceeded) {
             console.log(editorInstance.lang.autosave.localStorageFull);
-            var notificationError = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.localStorageFull, type: 'warning' });
+            var notificationError = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.localStorageFull, type: 'warning',  duration:5000 });
             notificationError.show();
+            _changeAutosavePopupStyle(editorInstance, notificationError);
         } else {
             var messageType = config.messageType != null ? config.messageType : "notification";
 
@@ -337,10 +338,26 @@ CKEDITOR.MmsAutosavePlugin =
                     }, 2000);
                 }
             } else if (messageType == "notification") {
-                var notification = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.autoSaveMessage, type: 'success' });
+                var notification = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.autoSaveMessage, type: 'success',  duration:5000 });
                 notification.show();
+                _changeAutosavePopupStyle(editorInstance, notification);
             }
         }
+    }
+
+    function _changeAutosavePopupStyle(editorInstance, notification) {
+        // Allow changing style for "autosave" popup
+        var editorElement = $(editorInstance.container['$']);
+        editorElement.css('position', 'relative');
+        var autosavePopupElement = $('#' + notification.id);
+        autosavePopupElement.appendTo(editorElement);
+        autosavePopupElement.css({
+            position: 'absolute'
+        });
+        autosavePopupElement.css({
+            left: editorElement.outerWidth(true) - autosavePopupElement.outerWidth(true),
+            top: editorElement.outerHeight(true) - autosavePopupElement.outerHeight(true)
+        });
     }
 
     function RemoveStorage(autoSaveKey, editor) {
