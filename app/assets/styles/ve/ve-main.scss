@@ -16,6 +16,8 @@
 @import "layout/_ve-footer.scss";
 @import "layout/_ve-no-panes.scss";
 @import "layout/_ve-table-filter.scss";
+/* Third party customizations */
+@import "thirdparty/_autosave-plugin.scss";
 
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
 .cke_button__mmsvlink_label, .cke_button__mmsreset_label, .cke_button__mmssignature_label {
@@ -717,7 +719,7 @@ span.fixed-content-dropdown{
 .ve-plain-input{
   background-color: white;
   padding: 2px 6px;
-  border: 1px solid $ve-silver-base;
+  border: 1px solid $ve-silver-darker-1;
   border-radius: 3px;
   margin: 2px 10px;
   width: calc(100% - 20px);
@@ -1084,3 +1086,4 @@ span.inline-btn-label{
   line-height: 13px;
   color:$ve-light-text;
 }
+
