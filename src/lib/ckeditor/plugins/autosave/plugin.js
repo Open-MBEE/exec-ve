@@ -306,7 +306,7 @@ CKEDITOR.MmsAutosavePlugin =
             '</div>';
         var dialogDom = $(dialogHtml);
         dialogDom.find('#' + autosaveMessageId).html(message);
-        return dialogDom
+        return dialogDom;
     }
 
     function LoadData(autoSaveKey) {
