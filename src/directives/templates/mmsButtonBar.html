@@ -8,9 +8,9 @@
 
   <!-- Button with dropdown buttons -->
   <span ng-if="button.dropdown_buttons" class="view-tools center btn-group" uib-dropdown>
-    <a type="button" class="view-tools dropdown-toggle" uib-dropdown-toggle uib-tooltip="{{button.tooltip}}"
+    <a type="button" class="dropdown-toggle {{button.id}}" uib-dropdown-toggle uib-tooltip="{{button.tooltip}}"
         tooltip-append-to-body="false" tooltip-trigger="mouseenter" tooltip-popup-delay="400"
-        tooltip-placement="{{button.placement}}"><i class="fa {{button.icon}}"></i></a>
+        tooltip-placement="{{button.placement}}"><i class="fa {{button.icon}}"></i>{{button.button_content}}</a>
       <!-- <a type="button" class="view-tools dropdown-toggle" dropdown-toggle>
         <span class="caret"></span>
         <span class="sr-only">Split button!</span>

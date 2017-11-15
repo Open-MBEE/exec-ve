@@ -449,7 +449,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             growl.info('Please Wait...');
             return;
         }
-        clearAutosaveContent(scope.mmsProjectId + scope.mmsRefId + scope.mmsElementId, scope.edit.type);
+        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
         if (!continueEdit) {
             scope.bbApi.toggleButtonSpinner('presentation-element-save');
         } else {
@@ -520,7 +520,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
-                        clearAutosaveContent(scope.mmsProjectId + scope.mmsRefId + scope.mmsElementId, scope.edit.type);
+                        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
                         $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {
@@ -569,7 +569,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
-                        clearAutosaveContent(scope.mmsProjectId + scope.mmsRefId + scope.mmsElementId, scope.edit.type);
+                        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
                         $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {

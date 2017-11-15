@@ -285,13 +285,10 @@ div.tooltip-inner {
   .dropdown-menu {
     background-color: $ve-slate-lighter-1;
     border: none;
-    min-width: 100%;
-  }
-
-  ul.dropdown-menu {
     border-radius: 3px;
     margin-top: 4px;
     max-width: 300px;
+    min-width: 100%;
   }
 
   .dropdown-menu li {
@@ -396,13 +393,20 @@ div.tooltip-inner {
   }
 }
 
+@media (max-width: 767px) {
+  .ve-dark-dropdown-nav {
+    .dropdown-menu li.divider {
+      background-color: $ve-slate-lighter-2 !important;
+    }
+  }
+}
+
 .ve-light-dropdown{
   display: block;
   width: 100%;
   margin: 6px 0;
 
   .dropdown-toggle{
-    width: 100%;
     text-align: left;
     font-size: 14px;
     padding: 7px 8px;
@@ -417,6 +421,7 @@ div.tooltip-inner {
     letter-spacing: .05em;
     background-color:$ve-silver-lighter-0;
     min-height: 28px;
+    width:100%;
   }
 
   ul{
@@ -805,7 +810,7 @@ table caption {
 }
 
 /*------------------------------------------------------------------
-4. Table Filtering
+4. Search
 -------------------------------------------------------------------*/
 
 .ve-search{
@@ -1038,7 +1043,7 @@ table caption {
   padding-right:6px;
 }
 
-.docTitle-underlined  {
+.docTitle-underlined{
   text-decoration: underline;
   text-decoration-color: rgb(72, 133, 189);
 }

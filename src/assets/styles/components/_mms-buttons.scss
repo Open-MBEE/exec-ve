@@ -44,30 +44,30 @@
   }
 }
 
-.view-tools {
+/* Style link part of view tools */
+.view-tools,
+.view-tools>a {
   color: $black;
   font-size: 16px;
-  line-height: 20px;
-  border-left: 1px solid $tertiary_grey;
-  border-right: 1px solid $tertiary_grey;
-  margin-left: -2px;
   position: relative;
   float: left;
-  width: 32px;
+  min-width: 33px;
   @include transition($background_hover_transition);
 
-  &:first-child {
-    margin-left: none;
-    border-left: 1px solid $tertiary_grey !important;
+  &:hover {
+    text-decoration:none;
   }
+}
 
-  &:last-child {
-    border-right: 1px solid $tertiary_grey !important;
-  }
+/* Add border to left of first span in button bar */
+mms-button-bar>span:first-child>a{
+  border-left:2px solid $tertiary_grey;
+}
 
-  &:nth-child(even) {
-    border: 0;
-  }
+/* Add borders to right of every other button in button bar */
+.view-tools{
+  border-right: 2px solid $tertiary_grey;
+  line-height: 20px;
 
   &:hover {
     background-color: $tertiary_grey;
@@ -78,5 +78,37 @@
 
   &.center {
     text-align: center;
+  }
+
+  /* font awesome caret to dropdown menus in view tools*/
+  .dropdown-toggle:after{
+    font-family:FontAwesome;
+    content: "\f0d7";
+    padding-left: 3px;
+    font-size:12px;
+    opacity:0.5;
+  }
+  /*VE button styling for export dropdown*/
+  .dropdown-toggle.export{
+    letter-spacing: .14em;
+    font-size: 12px;
+    border: none;
+    text-transform: uppercase;
+    padding: 0 4px 0 6px;
+    font-weight: 600;
+    text-decoration: none;
+
+    .fa{
+      padding-right:4px;
+    }
+
+  }
+}
+
+/*Pull center button dropdowns to the right*/
+.pane-center .view-tools.center.btn-group{
+  .dropdown-menu{
+    right: 0;
+    left: auto;
   }
 }

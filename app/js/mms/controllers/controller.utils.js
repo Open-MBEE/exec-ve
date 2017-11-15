@@ -279,6 +279,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
         var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        UtilsService.convertViewLinks(printElementCopy);
         if (genTotf) {
             tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         }
@@ -302,7 +303,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return old;
         });
 
-        UtilsService.convertViewLinks(printElementCopy);
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
