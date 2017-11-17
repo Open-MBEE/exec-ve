@@ -24,77 +24,46 @@
           if (!commitId)
               commitId = viewVersion.commitId;
       }
+      scope.plot = JSON.parse(scope.splot); 
+
      scope.render = function() {
-      if (scopetableColumnHeadersLabel.length === 0) return;
-      var i, j;//, k;
-      var datatable = [];
-      var dataValuesPerTable;
-      dataValuesPerTable = scope.datavalues;//[k];
-      var rowvalues=[];
-      var rowsysmlIds=[];
-      for ( i = 0; i < dataValuesPerTable.length; i++){
-        var tvalues = [];
-        for ( j = 0; j < dataValuesPerTable[i].length; j++){
-          var datavalue = null;
-          if (isNaN(dataValuesPerTable[i][j])){
-            if ( dataValuesPerTable[i][j].type === "Class"){ //sourceProperty = "documentation"
-              if ( scope.indexDocumentation.includes(i+","+j)){
-                if ( !isNaN(dataValuesPerTable[i][j].documentation))
-                  datavalue = Number(dataValuesPerTable[i][j].documentation);
-              }
-              else if (scope.indexName.includes(i+","+j)){
-                if ( !isNaN(dataValuesPerTable[i][j].name))
-                  datavalue =  Number(dataValuesPerTable[i][j].name);
-              }
-            }
-            else {
-              if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
-                  datavalue = dataValuesPerTable[i][j].defaultValue.value;
-              else if (dataValuesPerTable[i][j].type === 'Slot')
-                  datavalue = dataValuesPerTable[i][j].value[0].value;
-            }
-          }
-          else 
-            datavalue = dataValuesPerTable[i][j]; //for text value by oclexpression44
-          if(datavalue !== null) 
-            tvalues[j] = {axis: scopetableColumnHeadersLabel[j],  value: datavalue}; 
-        } //end of for loop j
-        rowvalues[i] = tvalues;
-      }
 
-      d3.select(".radar"+ scope.$id).remove();
-      var dataIdDiv = divchart.append('div').attr("class", "radar" + scope.$id)
-                                            .attr("style", 'border:1px solid #ddd');
+      TableService.readvalues(scope.splot, projectId, refId, commitId)
+       .then( function(value){
+        scope.tablebody = value.tablebody;
+        scope.tableheader = value.tableheader;
+        scope.isHeader = value.isHeader;
+        scope.valuesO = value.tablebody.valuesO; //value objects used in watch
+        if (scope.tablebody.c3_data.length === 0) { //no data
+          return;
+        }
+        var rowvalues = []; //[][] {{axis: p2, value: 15}, {axis: p3: value: 1}}...
+        scope.tablebody.c3_data.forEach( function (row){
+          var rowvalue = [];
+          for (var i = 1; i < row.length; i++) //ignore row header
+            rowvalue.push({axis: scope.tableheader[i-1], value: row[i]});
+          rowvalues.push(rowvalue);
+        });
+      
+        d3.select(".radar"+ scope.$id).remove();
+        var dataIdDiv = divchart.append('div').attr("class", "radar" + scope.$id)
+                                              .attr("style", 'border:1px solid #ddd');
 
-      RadarChart.draw("radar" + scope.$id, rowvalues, dataIdDiv);
-      //add legends
-      var legends = [];
-      for ( i = 0; i < scope.tableRowHeaders.length; i++){
-        if ( scope.tableRowHeaders[i].type === "InstanceSpecification")
-          legends.push(scope.tableRowHeaders[i].name);
-        else
-          legends.push(scope.tableRowHeaders[i].defaultValue.value);
-      }
-      initiateLegend(legends, "radar" + scope.$id);
+        RadarChart.draw("radar" + scope.$id, rowvalues, dataIdDiv);
+        //add legends from tableheader
+        var legends = [];
+        scope.tablebody.c3_data.forEach( function(item){
+          legends.push(item[0]);
+        });
+      
+        initiateLegend(legends, "radar" + scope.$id);
+      });  //TableService
     }; //end of scope.render
 
-    scope.$watch('datavalues', function(newVals, oldVals) {
-          return scope.render();
-          }, true);
-    scope.$watch('legends', function(newVals, oldVals) {
-          return scope.render();
-          }, true);
-
-    scope.plot = JSON.parse(scope.splot); 
-    var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};   
-    TableService.readTable (reqOb)
-      .then(function(value) {
-        scopetableColumnHeadersLabel = value.tableColumnHeadersLabels;
-        scope.tableRowHeaders = value.tableRowHeaders;
-        scope.datavalues = value.datavalues; //[][] - array
-        scope.indexDocumentation = value.indexDocumentation;
-        scope.indexName = value.indexName;
-    });    
+    scope.$watch('valuesO', function(newVals, oldVals) {
+        return scope.render();
+    }, true);
+   
 
     var cfg;
     var RadarChart = {

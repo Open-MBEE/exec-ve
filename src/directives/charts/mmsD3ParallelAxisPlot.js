@@ -22,8 +22,13 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         if (!commitId)
             commitId = viewVersion.commitId;
     }
+    scope.plot = JSON.parse(scope.splot); 
+    if ( scope.plot.config.length !== 0){
+      //{{name: "A", color: "Green"}, {name: "B", color:"Red"}}
+      scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); 
+    }
 
-    var processed = false;
+    
     
     function vf_pplot(_out) {
       var outputs = _out;
@@ -252,90 +257,50 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
       }
     }//end of vf_pplot()
 
-    scope.render = function() {
-      if (scopetableColumnHeadersLabel === undefined) return;
-      var  dataseries= [];
-      var tickColor;
-      for ( var i = 0; i < scope.datavalues.length; i++){
-          tickColor = undefined; //reset
-          var tvalues = [];
-          for ( var j = 0; j < scope.datavalues[i].length; j++){
-            var datavalue = null;
-            if (isNaN(scope.datavalues[i][j])){
-              if (scope.datavalues[i][j].type === "Property" || scope.datavalues[i][j].type === "Port")
-                  datavalue = scope.datavalues[i][j].defaultValue;
-              else if (scope.datavalues[i][j].type === 'Slot')
-                  datavalue = scope.datavalues[i][j].value[0];
-              else if (scope.datavalues[i][j].type === 'Class'){
-                if ( scope.indexDocumentation.includes(i+","+j)){
-                  if ( !isNaN(scope.datavalues[i][j].documentation))
-                  datavalue = Number(scope.datavalues[i][j].documentation);
-                }
-                else if (scope.indexName.includes(i+","+j)){
-                if ( !isNaN(scope.datavalues[i][j].name))
-                  datavalue =  Number(scope.datavalues[i][j].name);
-                }
-              }
-              if (datavalue && datavalue.type === 'LiteralString')
-                 tvalues[scopetableColumnHeadersLabel[j]] = Number(datavalue.value);
-              else if (datavalue && (datavalue.type === 'LiteralReal' || datavalue.type === 'LiteralInteger'))
-                 tvalues[scopetableColumnHeadersLabel[j]] = datavalue.value;
-              else 
-                tvalues[scopetableColumnHeadersLabel[j]] = datavalue;
-            }
-            else
-             tvalues[scopetableColumnHeadersLabel[j]] = scope.datavalues[i][j];   
-          }
-
-          if (scope.plot.config.ticks !== undefined){
-            for ( var kk = 0; kk < scope.plot.config.ticks.length; kk++){
-              if ( scope.tableRowHeaders[i].type === "InstanceSpecification"){
-                if (scope.tableRowHeaders[i].name === scope.plot.config.ticks[kk].name)
-                  tickColor = scope.plot.config.ticks[kk].color; 
-              } else {
-                if (scope.tableRowHeaders[i].defaultValue.value === scope.plot.config.ticks[kk].name)
-                  tickColor = scope.plot.config.ticks[kk].color; 
-              }
-
-            }
-          }
-          if ( scope.tableRowHeaders[i].type === "InstanceSpecification"){
-            dataseries[i] = { row: scope.tableRowHeaders[i].name, 
-                            tickColor: tickColor,
-                          values:tvalues}; 
-          } else {
-            dataseries[i] = { row: scope.tableRowHeaders[i].defaultValue.value, 
-                            tickColor: tickColor,
-                          values:tvalues}; 
-          }
+    function getTickColor(rowHeaderName){
+      if (scope.plot.config.ticks !== undefined){
+        for ( var kk = 0; kk < scope.plot.config.ticks.length; kk++){
+            if( scope.plot.config.ticks[kk].name === rowHeaderName )
+                return scope.plot.config.ticks[kk].color; 
+         }
       }
-      var modelData = {
-           variables: scopetableColumnHeadersLabel,
+      return undefined;
+    }
+
+    scope.render = function() {
+      TableService.readvalues(scope.splot, projectId, refId, commitId)
+       .then( function(value){
+        scope.tablebody = value.tablebody;
+        scope.tableheader = value.tableheader;
+        scope.isHeader = value.isHeader;
+        scope.valuesO = value.tablebody.valuesO; //value objects used in watch
+        if (scope.tablebody.c3_data.length === 0) { //no data
+          return;
+        }
+        var  dataseries= [];
+        var tickColor;
+      
+        scope.tablebody.c3_data.forEach( function (row){
+            var values = [];
+            for (var i = 1; i < row.length; i++) {
+              values[scope.tableheader[i-1]] = row[i];
+              tickColor = getTickColor(row[0]);
+            }
+            dataseries.push( {row: row[0], tickColor: tickColor, values: values});
+        });
+        var modelData = {
+           variables: scope.tableheader,
            table: dataseries //columnHeader and values
-      };
-      vf_pplot(modelData);
+        };
+        vf_pplot(modelData);
+      }); //end of TableService
     };//end of render
  
-    scope.$watch('datavalues', function(newVals, oldVals) {
+    scope.$watch('valuesO', function(newVals, oldVals) {
         return scope.render();
     }, true);
       
-    var scopetableColumnHeadersLabel;
-
-    scope.plot = JSON.parse(scope.splot); 
-    var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};   
-      TableService.readTable (reqOb)
-        .then(function(value) {
-          scopetableColumnHeadersLabel =value.tableColumnHeadersLabels;
-          scope.tableRowHeaders = value.tableRowHeaders;
-          scope.datavalues = value.datavalues; //[][] - array
-          scope.indexDocumentation = value.indexDocumentation;
-          scope.indexName = value.indexName;
-        });    
     
-    if ( scope.plot.config.length !== 0){
-      scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
-    }
   }; //end of link
 
   return {
