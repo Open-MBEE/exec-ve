@@ -604,7 +604,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var convertViewLinks = function(printElement) {
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
-            var elementId = $this.attr('mms-element-id');
+            var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
@@ -619,7 +619,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
     var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block; margin-left: auto; margin-right: auto;}\n" +
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
                 ".view-title {margin-top: 10pt}\n" +
