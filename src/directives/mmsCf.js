@@ -22,6 +22,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  * @param {boolean=false} nonEditable can edit inline or not
+ * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  */
 function mmsCf($compile) {
 
@@ -44,7 +45,9 @@ function mmsCf($compile) {
             if (!newVal) {
                 return;
             }
-            idwatch();
+            if (!scope.mmsWatchId) {
+                idwatch();
+            }
             var projectId = scope.mmsProjectId;
             var refId = scope.mmsRefId;
             var commitId = scope.mmsCommitId;
@@ -84,6 +87,7 @@ function mmsCf($compile) {
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsCfType: '@',
+            mmsWatchId: '@',
             nonEditable: '<',
         },
         require: ['?^^mmsCf', '?^^mmsView'],
