@@ -5,10 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>View Editor | {{ve_title}}</title>
-    <!-- bower:css -->
-    <!-- endbower -->
-
-    <link href="css/ve-mms.styles.min.css" rel="stylesheet" type="text/css">
+    <!--build:css css/vendor.min.css-->
+    <!--bower:css -->
+    <!--endbower -->
+    <!--endbuild-->
+    <link rel="stylesheet"  href="css/ve-mms.min.css" type="text/css">
 </head>
 
 <body ng-controller="MainCtrl" ng-cloak>
@@ -48,8 +49,10 @@
 
 <script src="lib/modernizr/modernizr.custom.61017.min.js"></script>
 
+<!--build:js js/vendor.min.js-->
 <!-- bower:js -->
 <!-- endbower -->
+<!--endbuild-->
 
 <!-- GoJS and table export-->
 <script src="lib/jquery.isonscreen.js"></script>
@@ -63,16 +66,8 @@
 <script src="lib/ckeditor/ckeditor.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
-<!-- MMS Services and Directives-->
-<script src="mms.js"></script>
-<script src="mms.directives.tpls.js"></script>
-<script src="mms.directives.js"></script>
 
-<!-- MMS Application-->
-<script src="js/mms/app.tpls.js"></script>
-<script src="js/mms/app.js"></script>
-<script src="js/mms/controllers.js"></script>
-<script src="js/mms/directives.js"></script>
+<script src="js/ve-mms.min.js"></script>
 
 <script type="text/javascript">
     function getHostname() {

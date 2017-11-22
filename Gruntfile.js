@@ -12,16 +12,17 @@ module.exports = function(grunt) {
       options: {
         hostname: 'localhost',
         port: 9001,
-        base: './build'
+        base: './dist'
       }
     },
     docs: {
-        options: {
-          hostname: 'localhost',
-          port: 10000,
-          base: './build/docs',
-        }
-    }};
+      options: {
+        hostname: 'localhost',
+        port: 10000,
+        base: './dist/docs'
+      }
+    }
+  };
 
   if (grunt.file.exists('angular-mms-grunt-servers.json')) {
     var servers = grunt.file.readJSON('angular-mms-grunt-servers.json');
@@ -30,7 +31,7 @@ module.exports = function(grunt) {
     for (var key in servers) {
       var serverPort = 443;
       var serverHttps = true;
-      if (key == "localhost") {
+      if (key === "localhost") {
         serverPort = 8080;
         serverHttps = false;
       }
@@ -68,45 +69,114 @@ module.exports = function(grunt) {
 
     pkg: grunt.file.readJSON('package.json'),
 
+    clean: {
+      before: {
+        src: ['dist']
+      },
+      releaseAfter: {
+        src: ['dist/bower_components', 'dist/concat', 'dist/cssTemp', 'dist/jsTemp']
+      },
+      devAfter: {
+        src: ['dist/concat', 'dist/cssTemp', 'dist/jsTemp']
+      }
+    },
+
+    /** Install bower dependencies **/
     'bower-install-simple': {
       options: {
         color: true,
-        cwd: './app',
-        directory: 'bower_components'
+        cwd: './app', // where to look for bower.json
+        directory: 'bower_components' // where to save,
       },
-      prod: {
+      release: {
         options: {
           production: true
         }
-      }
-    },
-
-    cacheBust: {
-      assets: {
-        files: {
-          src: ['build/mms.html', 'build/mmsFullDoc.html']
+      },
+      dev: {
+        options: {
+          production: false
         }
       }
     },
 
+    /** Move files around **/
+    copy: {
+      all: {
+        files: [
+
+          // Entry html files
+          {expand: true, cwd: 'app', src: ['mms.html', 'index.html'], dest: 'dist/'},
+
+          // External deps
+          {expand: true, cwd: 'app', src: ['bower.json', 'bower_components/**'], dest: 'dist/'},
+
+          // Internal deps
+          {expand: true, cwd: 'app/lib', src: '**', dest: 'dist/lib'},
+          {expand: true, cwd: 'src/lib/', src: '**', dest: 'dist/lib'},
+
+          // Assets
+          {expand: true, cwd: 'app/bower_components/font-awesome-bower/fonts', src: '**', dest: 'dist/fonts'},
+          {expand: true, cwd: 'app/assets', src: ['*', '!styles'], dest: 'dist/assets'},
+          {expand: true, cwd: 'src/assets', src: ['images/**'], dest: 'dist/assets'}
+        ]
+      },
+      dev: {
+        // move file from to the right folder
+        files: [
+          {expand: true, cwd: 'dist/concat/js', src: ['vendor.min.js'], dest: 'dist/js'}
+        ]
+      }
+    },
+
+    /** wiredep will look at dist/bower.json & all bower_components 's bower.json to determine what to add first **/
     wiredep: {
-      target: {
-        src: [
-          'build/*.html'
-        ],
+      all: {
         options: {
-          cwd: 'build',
-          directory:'',
+          cwd: 'dist',
+          directory: '',
           dependencies: true,
           devDependencies: false,
           exclude: [],
           fileTypes: {},
           ignorePath: '',
           overrides: {}
+        },
+        src: ['dist/*.html']
+      }
+    },
+
+    /** concat and minify external libs css and js. I guess we can also add custom js and css to it, but maybe not coz we want to separate them
+     * for caching purpose ( dont want to bust vendor cache all the times ) **/
+    useminPrepare: {
+      options: {
+        staging: 'dist'
+      },
+      html: 'dist/mms.html'
+    },
+    usemin: {
+      html: ['dist/mms.html']
+    },
+
+    sass: {
+      all: {
+        files: {
+          'dist/cssTemp/mms.css': 'src/assets/styles/mms-main.scss',
+          'dist/cssTemp/ve-main.css': 'app/assets/styles/ve/ve-main.scss'
         }
       }
     },
 
+    cssmin: {
+      // Combine + Minify
+      all: {
+        files: {
+          'dist/css/ve-mms.min.css': ['dist/cssTemp/mms.css', 'dist/cssTemp/ve-main.css']
+        }
+      }
+    },
+
+    /** Transpile html into angularJs modules **/
     html2js: {
       options: {
         module: function(modulePath, taskName) {
@@ -114,8 +184,7 @@ module.exports = function(grunt) {
             return 'mms.directives.tpls';
           return 'app.tpls';
         },
-        //module: 'mms.directives.tpls',
-        rename: function(modulePath) {
+        rename: function (modulePath) {
           if (modulePath.indexOf('directives/templates') > -1) {
             var moduleName = modulePath.replace('directives/templates/', '');
             return 'mms/templates/' + moduleName;
@@ -123,94 +192,68 @@ module.exports = function(grunt) {
           return modulePath.replace('app/', '').replace('../', '');
         }
       },
+      // This need name to match with taskName above.
+      // Turn all html into angular moodule, then add it as deps to mms.directives.tpls module specify above
       directives: {
         src: ['src/directives/templates/*.html'],
-        dest: 'dist/mms.directives.tpls.js'
+        dest: 'dist/jsTemp/mms.directives.tpls.js'
       },
-      main: {
+      app: {
         src: ['app/partials/mms/*.html'],
-        dest: 'build/js/mms/app.tpls.js'
+        dest: 'dist/jsTemp/app.tpls.js'
       }
     },
 
-    concat: {
-      options: {
-        //separator: ';',
-        banner: "'use strict';\n",
-        process: function(src, filepath) {
-          return '\n // Source: ' + filepath + '\n' +
-            src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
-        }
-      },
-      mms: {
-        src: ['src/mms.js', 'src/services/*.js'],
-        dest: 'dist/mms.js'
-      },
-      mmsdirs: {
-        src: ['src/mms.directives.js', 'src/directives/**/*.js'],
-        dest: 'dist/mms.directives.js'
-      },
-      mmsapp: {
-        src: ['app/js/mms/controllers/*.js'],
-        dest: 'build/js/mms/controllers.js'
-      },
-      mmsappdir: {
-          src: ['app/js/mms/directives/*.js'],
-          dest: 'build/js/mms/directives.js'
-      }
-    },
-
+    /** Concat and Minify files **/
     uglify: {
-      options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
-        mangle: true,
-        wrap: 'mms'
-      },
-      mms: {
+      combineCustomJS: {
         options: {
-          wrap: 'mms'
-        },
-        files: {'dist/mms.min.js': ['dist/mms.js']}
-      },
-      mmsdirs: {
-        options: {
-          wrap: 'mmsdirs'
+          banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
+          wrap: 'mms',
+          // TODO:HONG need to set mangle to false. Otherwise, issue with angular injector
+          // TODO:HONG if update to newer version, need to change the syntax below
+          mangle: false,
+          sourceMap: true,
+          sourceMapIncludeSources: true
         },
         files: {
-          'dist/mms.directives.min.js': ['dist/mms.directives.js'],
-          'dist/mms.directives.tpls.min.js': ['dist/mms.directives.tpls.js']
-        }
-      }
-    },
+          'dist/js/ve-mms.min.js': [
+            // mms module
+            'src/mms.js',
+            'src/services/*.js',
 
-    sass: {
-      dist : {
-        files: {
-          'dist/css/partials/mms.css': 'src/assets/styles/mms-main.scss',
-          'dist/css/partials/ve-main.css': 'app/assets/styles/ve/ve-main.scss'
-        }
-      }
-    },
+            // mms.directives module (need mms, mms.directives.tpls.js module )
+            'dist/jsTemp/mms.directives.tpls.js',
+            'src/mms.directives.js',
+            'src/directives/**/*.js',
 
-    cssmin: {
-      minify: {
-        expand: true,
-        cwd: 'dist/css/partials',
-        src: ['*.css', '!*.min.css'],
-        dest: 'dist/css/partials',
-        ext: '.min.css'
+            // app module ( need app.tpls.js, mms, mms.directives module )
+            'dist/jsTemp/app.tpls.js',
+            'app/js/mms/app.js',
+            'app/js/mms/controllers/*.js',
+            'app/js/mms/directives/*.js'
+          ]
+        }
       },
-      combine: {
-        files: {
-          'dist/css/ve-mms.styles.min.css':
-            ['dist/css/partials/mms.min.css', 'dist/css/partials/ve-main.min.css']
+
+      generated: {
+        options: {
+          mangle: true
         }
       }
     },
 
-    jshint : {
+    cacheBust: {
+      all: {
+        files: {
+          src: ['dist/*.html']
+        }
+      }
+    },
+
+    jshint: {
       beforeconcat: jsFiles,
-      afterconcat: ['dist/mms.js', 'dist/mms.directives.js'],
+      afterconcat: ['dist/js/ve-mms-min.js'],
       options: {
         reporterOutput: '',
         // evil: true, //allow eval for timely integration
@@ -219,7 +262,7 @@ module.exports = function(grunt) {
           angular: true,
           window: true,
           console: true,
-          Stomp:true,
+          Stomp: true,
           Timely: true,
           jQuery: true,
           $: true,
@@ -234,7 +277,7 @@ module.exports = function(grunt) {
 
     ngdocs: {
       options: {
-        dest: 'build/docs',
+        dest: 'dist/docs',
         html5Mode: false,
         title: 'MMS',
         startPage: '/api'
@@ -258,27 +301,10 @@ module.exports = function(grunt) {
       },
       docs: {
         files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
-        tasks: ['docs-build']
+        tasks: ['ngdocs']
       },
       options: {
-        livereload: true,
-      },
-    },
-
-    clean: ["app/bower_components", "build", "dist", "docs"],
-
-    copy: {
-      main: {
-        files:[
-          {expand: true, src: '**', cwd: 'dist', dest: 'build/'},
-          {expand: true, src: '**', cwd: 'app', dest: 'build/'},
-        ]
-      },
-      src: {
-        files:[
-          {expand: true, src: '**', cwd: 'src/assets', dest: 'build/assets/'},
-          {expand: true, src: '**', cwd: 'src/lib', dest: 'build/lib/'},
-        ]
+        livereload: true
       }
     },
 
@@ -291,7 +317,7 @@ module.exports = function(grunt) {
       },
       client: {
         files: [{
-          src: ['build/**/*']
+          src: ['dist/**/*']
         }],
         options: {
           publish: [{
@@ -319,7 +345,7 @@ module.exports = function(grunt) {
     protractor: {
       options: {
         keepAlive: true, // If false, the grunt process stops when the test fails.
-        noColor: false, // If true, protractor will not use colors in its output.
+        noColor: false // If true, protractor will not use colors in its output.
       },
       develop: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
         options: {
@@ -346,74 +372,47 @@ module.exports = function(grunt) {
           'src/directives': [ '**.js', '**.html'],
           'src/assets/styles': [ 'base/**', 'components/**', 'layout/**'],
           'src/services': [ '**']
-        },
+        }
       },
       'mms-app': {
         files: {
           'app/js': [ '**.js'],
-          'app': [ '*.html', 'partials/**', 'assets/styles/**'],
-        },
+          'app': [ '*.html', 'partials/**', 'assets/styles/**']
+        }
       },
       'mms-directives': {
         files: {
           'src/directives': [ '**.js', '**.html'],
           'src/assets/styles': [ 'base/**', 'components/**', 'layout/**']
-        },
+        }
       },
       'mms-services': {
         files: {
-          'src/services': [ '**']
-        },
-      },
-    },
-
-  //  plato: {
-  //     options: {
-  //       // Task-specific options go here.
-  //     },
-  //     your_target: {
-  //       // Target-specific file lists and/or options go here.
-  //       files: {
-  //         'reports/plato': [ 'app/js/**/*.js', 'src/directives/**/*.js', 'src/directives/**/*.js','src/services/**/*.js' ],
-  //       }
-  //     }
-  //   }
-
+          'src/services': ['**']
+        }
+      }
+    }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-connect-proxy');
-  grunt.loadNpmTasks('grunt-sass');
-  grunt.loadNpmTasks('grunt-ngdocs');
-  grunt.loadNpmTasks('grunt-html2js');
-  grunt.loadNpmTasks('grunt-bower-install-simple');
-  grunt.loadNpmTasks('grunt-wiredep');
-  grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-protractor-runner');
-  grunt.loadNpmTasks('grunt-artifactory-artifact');
-  grunt.loadNpmTasks('grunt-sloc');
-  // grunt.loadNpmTasks('grunt-plato');
-  grunt.loadNpmTasks('grunt-cache-bust');
+  // inject all deps that start with grunt-*
+  require('matchdep').filterAll('grunt-*').forEach(grunt.loadNpmTasks);
 
-  // grunt.registerTask('install', ['npm-install', 'bower']);
-  grunt.registerTask('install', ['bower-install-simple']);
-  grunt.registerTask('compile', ['html2js', 'sass']);
-  grunt.registerTask('lint',    ['jshint:beforeconcat']);
-  grunt.registerTask('minify',  ['cssmin', 'uglify']);
-  grunt.registerTask('wire',    ['wiredep']);
+  grunt.registerTask('lint', ['jshint:beforeconcat']);
+  grunt.registerTask('processAppStyleSheets', ['sass', 'cssmin']);
+  grunt.registerTask('processAppJS', ['html2js', 'uglify:combineCustomJS']);
+  grunt.registerTask('processExternalDeps', ['useminPrepare', 'concat:generated', 'cssmin:generated', 'uglify:generated', 'usemin']);
+  grunt.registerTask('processExternalDepsDevMode', ['useminPrepare', 'concat:generated', 'cssmin:generated', 'usemin']);
 
-  grunt.registerTask('dev-build',     ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
-  grunt.registerTask('release-build', ['install', 'compile', 'lint', 'concat', 'minify', 'copy', 'wire', 'cacheBust']);
-  grunt.registerTask('docs-build',    ['ngdocs']);
+  grunt.registerTask('release-build', ['lint', 'clean:before', 'processAppStyleSheets', 'processAppJS',
+    'bower-install-simple:release', 'copy:all', 'wiredep', 'processExternalDeps', 'clean:releaseAfter', "cacheBust"
+  ]);
+
+  grunt.registerTask('dev-build', ['lint', 'clean:before', 'processAppStyleSheets', 'processAppJS',
+    'bower-install-simple:dev', 'copy:all', 'wiredep', 'processExternalDepsDevMode', 'copy:dev', 'clean:devAfter', "cacheBust"
+  ]);
+
   grunt.registerTask('default', ['dev-build']);
-  grunt.registerTask('deploy', ['dev-build', 'ngdocs', 'artifactory:client:publish']);
+  grunt.registerTask('deploy', ['release-build', 'ngdocs', 'artifactory:client:publish']);
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('continuous', ['karma:continuous']);
   grunt.registerTask('e2e-test', ['protractor']);
