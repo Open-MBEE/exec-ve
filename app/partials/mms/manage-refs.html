@@ -5,7 +5,7 @@
                ui-sref-opts="{reload:true}">Back to Project Documents ({{fromParams.name}})</a>
             <h1 class="panel-title">Manage branches/tags</h1>
             <div class="panel panel-default">
-                <div class="panel-body">
+                <div class="panel-body no-padding-panel">
                     <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
                         <ul class="ve-light-list">
                             <li class="ve-light-input">
@@ -14,27 +14,27 @@
                             <li class="ref-title">
                                 <h2><i class="fa fa-code-fork" aria-hidden="true"></i>Branches</h2>
                             </li>
-                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name' | filter:refFilter" ng-click="refClickHandler(branch)"
+                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter}" ng-click="refClickHandler(branch)"
                                 ng-class="{'selected': branch.id === refSelected.id}">
                                 <a>{{ branch.name }}</a>
                             </li>
                             <li class="ref-title">
                                 <h2><i class="fa fa-tag" aria-hidden="true"></i>Tags</h2>
                             </li>
-                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name' | filter:refFilter" ng-click="refClickHandler(tag)"
+                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="refClickHandler(tag)"
                                 ng-class="{'selected': tag.id === refSelected.id}">
                                 <a>{{ tag.name }}</a>
                             </li>
                         </ul>
                     </div>
                     <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
-                        <div class="panels-detail-title">
+                        <div class="panels-detail-title clearfix">
                             <h3 class="{{refSelected.type}} ref-type">{{refSelected.name}}</h3>
-                            <span class="" style="float:right">
+                            <div class="ref-button-options" style="float:right">
                             <button class="btn btn-tertiary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="deleteRef()" ng-if="refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
                             <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addTag()"><i class="fa fa-plus"></i> Tag</button>
                             <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addBranch()"><i class="fa fa-plus"></i> Branch</button>
-                            </span>
+                            </div>
                             <!-- <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar> -->
                         </div>
                         <dl class="dl-horizontal ve-light-panels-detail-content">

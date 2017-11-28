@@ -58,32 +58,23 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
         if (updateWebpage.createdRef) {
             var createdRef = updateWebpage.createdRef;
             var list = CacheService.get(['refs', projectId]);
-            // if (updateWebpage.source !== ApplicationService.getSource()) {
-                var index = -1;
-                if (list) {
-                    index = _.findIndex(list, {id: createdRef.id});
-                    if ( index > -1 ) {
-                        Object.assign(list[index], createdRef);
-                    }
+            var index = -1;
+            if (list) {
+                index = _.findIndex(list, {id: createdRef.id});
+                if ( index > -1 ) {
+                    Object.assign(list[index], createdRef);
+                } else {
+                    list.push(createdRef);
                 }
-                CacheService.put(['ref', projectId, createdRef.id], createdRef);
-            // }
-            $rootScope.$broadcast("stomp.branchCreated", list, createdRef);
+            }
+            CacheService.put(['ref', projectId, createdRef.id], createdRef);
+            $rootScope.$broadcast("stomp.branchCreated", createdRef, projectId);
         }
         if (updateWebpage.updatedJobs) {
             var updateJob = updateWebpage.updatedJobs;
             $rootScope.$broadcast("stomp.updateJob", updateJob);
         }
-        // if (updateWebpage.refs) {
-            // if (updateWebpage.refs.addedJobs && updateWebpage.refs.addedJobs.length > 0) {//check length of added jobs > 0
-            //     var newJob = updateWebpage.refs.addedJobs;
-            //     $rootScope.$broadcast("stomp.job", newJob);
-            // }
-            // if (updateWebpage.refs.deletedJobs && updateWebpage.refs.deletedJobs.length > 0) {//check length of added jobs > 0
-            //     var deleteJob = updateWebpage.refs.deletedJobs;
-            //     $rootScope.$broadcast("stomp.deleteJob", deleteJob);
-            // }
-        // }
+
         // this should happen in where...
         $rootScope.$on('$destroy', function() {
             stompClient.unsubscribe('/topic/master'/*, whatToDoWhenUnsubscribe*/);

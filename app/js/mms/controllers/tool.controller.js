@@ -48,7 +48,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.tracker = {};
     if (!$rootScope.ve_edits)
         $rootScope.ve_edits = {};
-    $scope.presentElemEditCnts = {};
 
     // Set edit count for tracker view
     $scope.veEditsLength = function() {
@@ -102,28 +101,15 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
 
     var cleanUpEdit = function(editOb, cleanAll) {
         var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-        var currentCnt = 0;
-
-        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
-            currentCnt = $scope.presentElemEditCnts[key];
-        }
-        if ((currentCnt <= 1 && !Utils.hasEdits(editOb)) || cleanAll) {//TODO Utils.hasEdits
+        if (!Utils.hasEdits(editOb) || cleanAll) {//TODO Utils.hasEdits
             delete $rootScope.ve_edits[key];
-            delete $scope.presentElemEditCnts[key];
             cleanUpSaveAll();
-        } else {
-            $scope.presentElemEditCnts[key] = currentCnt - 1;
         }
     };
 
     $scope.$on('presentationElem.edit', function(event, editOb) {
         var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-        var currentCnt = 1;
         $rootScope.ve_edits[key] = editOb;
-        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
-            currentCnt = $scope.presentElemEditCnts[key] + 1;
-        }
-        $scope.presentElemEditCnts[key] = currentCnt;
         cleanUpSaveAll();
     });
 
@@ -201,6 +187,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.info('Please Wait...');
             return;
         }
+        var edit = $scope.specApi.getEdits();
+        Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
         elementSaving = true;
         if (!continueEdit)
             $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save');
@@ -259,10 +247,16 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.info('Please wait...');
             return;
         }
-        if (Object.keys($rootScope.ve_edits).length === 0) {
+        var ve_edits = $rootScope.ve_edits;
+        if (Object.keys(ve_edits).length === 0) {
             growl.info('Nothing to save');
             return;
         }
+
+        Object.values(ve_edits).forEach(function(ve_edit) {
+           Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
+        });
+
         if ($scope.specApi && $scope.specApi.editorSave)
             $scope.specApi.editorSave();
         savingAll = true;
@@ -340,6 +334,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 scope: $scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
+                        var edit = $scope.specApi.getEdits();
+                        Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
+
                         $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {

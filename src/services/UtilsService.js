@@ -604,7 +604,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var convertViewLinks = function(printElement) {
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
-            var elementId = $this.attr('mms-element-id');
+            var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
@@ -618,8 +618,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     tag = ve tag name if available
     displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
     */
-    var getPrintCss = function(header, footer, dnum, tag, displayTime, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block; margin-left: auto; margin-right: auto;}\n" + 
+    var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
                 ".view-title {margin-top: 10pt}\n" +
@@ -655,6 +655,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
+
+        if(htmlFlag) {
+            ret += ".toc { counter-reset: table-counter figure-counter;}\n" +
+                "figure { counter-increment: figure-counter; }\n" +
+                "figcaption::before {content: \"Figure \" counter(figure-counter) \": \"; }\n" +
+                "table { counter-increment: table-counter; }\n" +
+                "caption::before {content: \"Table \" counter(table-counter) \": \"; }\n";
+        }
         Object.keys(meta).forEach(function(key) {
             var content = '""';
             if (meta[key]) {
