@@ -1,7 +1,10 @@
-var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
-
 module.exports = function(grunt) {
-
+  require('time-grunt')(grunt);
+  // static mapping for tasks that don't match their modules' name
+  require('jit-grunt')(grunt, {
+    useminPrepare: 'grunt-usemin',
+    setupProxies: 'grunt-middleware-proxy'
+  });
   var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
 
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
@@ -36,30 +39,36 @@ module.exports = function(grunt) {
         serverHttps = false;
       }
       connectObject[key] = {
-          options: {
-            hostname: '*',
-            port: 9000,
-            open: true,
-            base: '/mms.html',
-            livereload: true,
-            middleware: function(connect) {
-              return [proxySnippet];
+        options: {
+          hostname: '*',
+          port: 9000,
+          open: true,
+          base: {
+            path: './dist',
+            options: {
+              // Add 7 days cache to improve load speed
+              maxAge: 1000 * 604800
             }
           },
-          proxies: [
-            {
-              context: '/alfresco',  // '/api'
-              host: servers[key],
-              changeOrigin: true,
-              https: serverHttps,
-              port: serverPort
-            },
-            {
-              context: '/',
-              host: 'localhost',
-              port: 9001
-            }
-          ]
+          middleware: function (connect, options, middlewares) {
+            middlewares.unshift(
+              require('grunt-middleware-proxy/lib/Utils').getProxyMiddleware(),
+              // add gzip compression to local server to reduce static resources' size and improve load speed
+              require('compression')(),
+              // need to add livereload as a middleware at this specific order to avoid issues with other middlewares
+              require('connect-livereload')());
+            return middlewares;
+          }
+        },
+        proxies: [
+          {
+            context: '/alfresco',  // '/api'
+            host: servers[key],
+            changeOrigin: true,
+            https: serverHttps,
+            port: serverPort
+          }
+        ]
       };
     }
   }
@@ -68,6 +77,17 @@ module.exports = function(grunt) {
   grunt.initConfig({
 
     pkg: grunt.file.readJSON('package.json'),
+
+    concurrent: {
+      devStep1: ['install', 'lint', 'clean:before'],
+      devStep2: [['copy:all', 'processExternalDepsDevMode'], 'processAppStyleSheets', 'processAppJS' ],
+      devStep3: ['copy:dev'],
+      devStep4: ['clean:devAfter', 'cacheBust'],
+
+      releaseStep1: ['install', 'lint', 'clean:before'],
+      releaseStep2: [['copy:all', 'processExternalDeps'], 'processAppStyleSheets', 'processAppJS' ],
+      releaseStep3: ['clean:releaseAfter', 'cacheBust']
+    },
 
     clean: {
       before: {
@@ -81,26 +101,15 @@ module.exports = function(grunt) {
       }
     },
 
-    /** Install bower dependencies **/
     'bower-install-simple': {
       options: {
         color: true,
         cwd: './app', // where to look for bower.json
-        directory: 'bower_components' // where to save,
+        directory: 'bower_components' // where to store these libs,
       },
-      release: {
-        options: {
-          production: true
-        }
-      },
-      dev: {
-        options: {
-          production: false
-        }
-      }
+      all: {}
     },
 
-    /** Move files around **/
     copy: {
       all: {
         files: [
@@ -122,21 +131,20 @@ module.exports = function(grunt) {
         ]
       },
       dev: {
-        // move file from to the right folder
         files: [
           {expand: true, cwd: 'dist/concat/js', src: ['vendor.min.js'], dest: 'dist/js'}
         ]
       }
     },
 
-    /** wiredep will look at dist/bower.json & all bower_components 's bower.json to determine what to add first **/
+    /** Looks at dist/bower.json & all bower_components's bower.json to determine the order at which to include external libs **/
     wiredep: {
       all: {
         options: {
           cwd: 'dist',
           directory: '',
           dependencies: true,
-          devDependencies: false,
+          devDependencies: false, // so that our final vendor bundle doesn't include devDep libs
           exclude: [],
           fileTypes: {},
           ignorePath: '',
@@ -146,18 +154,21 @@ module.exports = function(grunt) {
       }
     },
 
-    /** concat and minify external libs css and js. I guess we can also add custom js and css to it, but maybe not coz we want to separate them
-     * for caching purpose ( dont want to bust vendor cache all the times ) **/
+    /** Work on top of wiredep to know which external libs to bundle.
+     *  ( delegate the concatenation and minification steps to other plugins ) **/
     useminPrepare: {
       options: {
         staging: 'dist'
       },
       html: 'dist/mms.html'
     },
+
+    /** Inject the final bundle into the corresponding html files **/
     usemin: {
       html: ['dist/mms.html']
     },
 
+    /** Transpile Sass to Css **/
     sass: {
       all: {
         files: {
@@ -167,8 +178,8 @@ module.exports = function(grunt) {
       }
     },
 
+    /** Concat + Minify CSS **/
     cssmin: {
-      // Combine + Minify
       all: {
         files: {
           'dist/css/ve-mms.min.css': ['dist/cssTemp/mms.css', 'dist/cssTemp/ve-main.css']
@@ -176,7 +187,7 @@ module.exports = function(grunt) {
       }
     },
 
-    /** Transpile html into angularJs modules **/
+    /** Transpile html into angularJs modules (js files) **/
     html2js: {
       options: {
         module: function(modulePath, taskName) {
@@ -193,7 +204,7 @@ module.exports = function(grunt) {
         }
       },
       // This need name to match with taskName above.
-      // Turn all html into angular moodule, then add it as deps to mms.directives.tpls module specify above
+      // Turn all html into angular modules, then add it as deps to mms.directives.tpls module specified above
       directives: {
         src: ['src/directives/templates/*.html'],
         dest: 'dist/jsTemp/mms.directives.tpls.js'
@@ -204,20 +215,21 @@ module.exports = function(grunt) {
       }
     },
 
-    /** Concat and Minify files **/
+    /** Concat + Minify JS **/
     uglify: {
       combineCustomJS: {
         options: {
           banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
           wrap: 'mms',
           // TODO:HONG need to set mangle to false. Otherwise, issue with angular injector
-          // TODO:HONG if update to newer version, need to change the syntax below
           mangle: false,
-          sourceMap: true,
-          sourceMapIncludeSources: true
+          sourceMap: {
+            includeSources: true
+          }
         },
         files: {
           'dist/js/ve-mms.min.js': [
+
             // mms module
             'src/mms.js',
             'src/services/*.js',
@@ -243,17 +255,19 @@ module.exports = function(grunt) {
       }
     },
 
+    /** Add hasing to static resources' names so that the browser doesn't use the stale cached resources **/
     cacheBust: {
       all: {
-        files: {
-          src: ['dist/*.html']
-        }
+        options: {
+          assets: ['dist/css/*', 'dist/js/*'],
+          deleteOriginals: false // set to false so that it doesn't affect sourcemapping
+        },
+        src: ['dist/*.html']
       }
     },
 
     jshint: {
       beforeconcat: jsFiles,
-      afterconcat: ['dist/js/ve-mms-min.js'],
       options: {
         reporterOutput: '',
         // evil: true, //allow eval for timely integration
@@ -331,8 +345,7 @@ module.exports = function(grunt) {
     
     karma: {
         unit:{
-            configFile:'config/develop/karma.develop.conf.js',
-            // frameworks: ['jasmine']
+            configFile:'config/develop/karma.develop.conf.js'
         },
         continuous:{
           configFile:'config/develop/karma.develop.conf.js',
@@ -341,6 +354,7 @@ module.exports = function(grunt) {
           logLevel: 'ERROR'
         }
     },
+
 
     protractor: {
       options: {
@@ -358,72 +372,35 @@ module.exports = function(grunt) {
           configFile: "config/master/protractor.master.conf.js" // Target-specific config file
         }
       }
-    },
-
-    sloc: {
-      options: {
-        // Task-specific options go here.
-      },
-      'all-files': {
-        files: {
-          // Target-specific file lists and/or options go here.
-          'app/js': [ '**.js'],
-          'app': [ '*.html', 'partials/**', 'assets/styles/**'],
-          'src/directives': [ '**.js', '**.html'],
-          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**'],
-          'src/services': [ '**']
-        }
-      },
-      'mms-app': {
-        files: {
-          'app/js': [ '**.js'],
-          'app': [ '*.html', 'partials/**', 'assets/styles/**']
-        }
-      },
-      'mms-directives': {
-        files: {
-          'src/directives': [ '**.js', '**.html'],
-          'src/assets/styles': [ 'base/**', 'components/**', 'layout/**']
-        }
-      },
-      'mms-services': {
-        files: {
-          'src/services': ['**']
-        }
-      }
     }
   });
 
-  // inject all deps that start with grunt-*
-  require('matchdep').filterAll('grunt-*').forEach(grunt.loadNpmTasks);
-
-  grunt.registerTask('lint', ['jshint:beforeconcat']);
+  grunt.registerTask('install', 'bower-install-simple');
+  grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('processAppStyleSheets', ['sass', 'cssmin']);
   grunt.registerTask('processAppJS', ['html2js', 'uglify:combineCustomJS']);
-  grunt.registerTask('processExternalDeps', ['useminPrepare', 'concat:generated', 'cssmin:generated', 'uglify:generated', 'usemin']);
-  grunt.registerTask('processExternalDepsDevMode', ['useminPrepare', 'concat:generated', 'cssmin:generated', 'usemin']);
+  grunt.registerTask('processExternalDeps', ['wiredep', 'useminPrepare', 'concat:generated', 'cssmin:generated', 'uglify:generated', 'usemin']);
 
-  grunt.registerTask('release-build', ['lint', 'clean:before', 'processAppStyleSheets', 'processAppJS',
-    'bower-install-simple:release', 'copy:all', 'wiredep', 'processExternalDeps', 'clean:releaseAfter', "cacheBust"
-  ]);
+  // for dev mode, we don't need to minify vendor files because it slows down the build process
+  // but we still concat and minify our app codes so that our prod and dev builds are as similar as possible. That way,
+  // we can catch issues that may arise during the concatenation and minification steps asap.
+  grunt.registerTask('processExternalDepsDevMode', ['wiredep', 'useminPrepare', 'concat:generated', 'cssmin:generated', 'usemin']);
 
-  grunt.registerTask('dev-build', ['lint', 'clean:before', 'processAppStyleSheets', 'processAppJS',
-    'bower-install-simple:dev', 'copy:all', 'wiredep', 'processExternalDepsDevMode', 'copy:dev', 'clean:devAfter', "cacheBust"
-  ]);
 
   grunt.registerTask('default', ['dev-build']);
+  grunt.registerTask('dev-build', ['build:dev']);
+  grunt.registerTask('release-build', ['build:release']);
+  grunt.registerTask('build', function(buildType) {
+    if ( buildType === 'release' ) {
+      grunt.task.run(['concurrent:releaseStep1', 'concurrent:releaseStep2', 'concurrent:releaseStep3']);
+    } else {
+      grunt.task.run(['concurrent:devStep1', 'concurrent:devStep2', 'concurrent:devStep3', 'concurrent:devStep4']);
+    }
+  });
   grunt.registerTask('deploy', ['release-build', 'ngdocs', 'artifactory:client:publish']);
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('continuous', ['karma:continuous']);
   grunt.registerTask('e2e-test', ['protractor']);
-
-  grunt.registerTask('dev', function(arg1) {
-      grunt.task.run('dev-build', 'connect:static');
-      if (arguments.length !== 0)
-        grunt.task.run('launch:dev:' + arg1);
-      else
-        grunt.task.run('launch:dev');
-  });
 
   grunt.registerTask('release', function(arg1) {
       grunt.task.run('release-build', 'connect:static');
@@ -434,10 +411,11 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('server', function(arg1) {
-      if (arguments.length !== 0)
-        grunt.task.run('dev:' + arg1);
-      else
-        grunt.task.run('dev');
+    grunt.task.run('dev-build', 'connect:static');
+    if (arguments.length !== 0)
+      grunt.task.run('launch:dev:' + arg1);
+    else
+      grunt.task.run('launch:dev');
   });
 
   grunt.registerTask('docs', function() {
@@ -447,15 +425,15 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('launch', function(build, arg1) {
-      if (arg1) {
-        grunt.log.writeln("Launching server with proxy");
-        //grunt.task.run('connect:restServer', 'configureProxies:mockServer', 'connect:mockServer');
-        grunt.task.run('configureProxies:' + arg1, 'connect:' + arg1);
-      } else {
-        grunt.log.writeln("Launching server with proxy API");
-        grunt.task.run('configureProxies:emsstg', 'connect:emsstg');
-      }
-      grunt.task.run('watch:' + build);
+    if (arg1) {
+      grunt.log.writeln("Launching server with proxy");
+
+      grunt.task.run('setupProxies:' + arg1, 'connect:' + arg1);
+    } else {
+      grunt.log.writeln("Launching server with proxy API");
+      grunt.task.run('setupProxies:emsstg', 'connect:emsstg');
+    }
+    grunt.task.run('watch:' + build);
   });
 
   grunt.registerTask('debug', function () {
