@@ -262,6 +262,7 @@ div.tooltip-inner {
     min-height: 0;
     overflow-y: auto;
     max-height: 300px;
+    overflow-x:hidden;
   }
 
   button.dropdown-toggle {
