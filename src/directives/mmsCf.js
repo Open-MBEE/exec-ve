@@ -41,7 +41,7 @@ function mmsCf($compile) {
         var mmsCfCtrl = controllers[0];
         var mmsViewCtrl = controllers[1];
 
-        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
+        var changeElement = function(newVal, oldVal) {
             if (!newVal) {
                 return;
             }
@@ -76,7 +76,11 @@ function mmsCf($compile) {
                 domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable"></<mms-transclude-'+scope.mmsCfType+'>';
                 $compile(domElement.contents())(scope);
             }
-        });
+        };
+
+        scope.changeElement = changeElement;
+        var idwatch = scope.$watch('mmsElementId', changeElement);
+        scope.$watch('mmsCommitId', changeElement);
     };
 
     return {
