@@ -47,6 +47,7 @@ function mmsCf($compile) {
             }
             if (!scope.mmsWatchId) {
                 idwatch();
+                commitwatch();
             }
             var projectId = scope.mmsProjectId;
             var refId = scope.mmsRefId;
@@ -78,9 +79,8 @@ function mmsCf($compile) {
             }
         };
 
-        scope.changeElement = changeElement;
         var idwatch = scope.$watch('mmsElementId', changeElement);
-        scope.$watch('mmsCommitId', changeElement);
+        var commitwatch = scope.$watch('mmsCommitId', changeElement);
     };
 
     return {
