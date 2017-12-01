@@ -53,7 +53,7 @@ module.exports = function(grunt) {
           },
           {
             context: '/Basic',
-            host: 'localhost',//'100.64.243.161',
+            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
             port: 8080
           },
           {
