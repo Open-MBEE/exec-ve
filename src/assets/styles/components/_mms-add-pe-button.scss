@@ -1,0 +1,53 @@
+.add-pe-buttons,
+.doclib-link {
+  margin: 10px 0;
+
+  .fa{
+    padding-right:4px;
+    font-size:14px;
+  }
+
+  .add-element-button {
+    margin-right: 25px;
+  }
+
+  .open>.dropdown-menu {
+    display: -webkit-inline-box;
+  }
+
+  a {
+    color: #2F889A;
+    text-transform:uppercase;
+    font-weight:600;
+    -webkit-transition: background-color .1s ease-out;
+    -moz-transition: background-color .1s ease-out;
+    -o-transition: background-color .1s ease-out;
+    transition: background-color .1s ease-out;
+    font-size:15px;
+    letter-spacing: .14em;
+    font-size: 12px;
+    border: none;
+    text-transform: uppercase;
+    border-radius: 3px;
+    box-shadow: none;
+    padding: 7px;
+    margin:10px 0;
+  }
+
+  a:hover {
+    color:#296f83;
+    text-decoration:none;
+    background-color: $tertiary_grey;
+  }
+
+  a:focus{
+    text-decoration:none;
+  }
+
+}
+
+@media (max-width: 640px) {
+  .add-pe-buttons {
+    span.icon-title {display:none;}
+  } 
+}

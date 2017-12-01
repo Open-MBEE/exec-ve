@@ -6,7 +6,7 @@
             <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
         </div>
     </div>
-    <div class="inner panel-body">
+    <div class="panel-body">
         <div ng-if="!isEnumeration">
             <div ng-if="editValues.length == 0">
                 <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
@@ -18,7 +18,7 @@
                 <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"> {{value.value}}<a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
                 <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
                 <div ng-switch-when="LiteralString">
-                    <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" ng-model="value.value"></textarea>
+                    <textarea ng-if="hasHtml(value.value)" mms-ckeditor mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" autosave-key="{{element._projectId + element._refId + element.id + 'index:' + $index}}" ng-model="value.value"></textarea>
                     <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                     <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
                 </div>

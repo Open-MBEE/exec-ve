@@ -62,13 +62,16 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
         scope.hasRefArr = false;
         scope.docEditable = false;
 
-        // TODO job for creating ref
-        // var refArrString = $window.localStorage.getItem('refArr');
-        // var refArr = JSON.parse(refArrString);
-        // if (refArr) {
-        //     scope.hasRefArr = true;
-        //     scope.createdRefs = refArr;
-        // }
+        // Get ref list for project and details on
+        var getRefsInProgress = function() {
+            ProjectService.getRefs(scope.mmsProjectId)
+            .then(function(data) {
+                scope.refList = data.filter(function(ref) {
+                    if (ref.status === 'creating')
+                        return true;
+                });
+            });
+        };
 
         var getJobInstances = function (jobId) {// TODO create porxy in gruntfile for PMA
             var link = URLService.getJobInstancesURL(scope.mmsProjectId, scope.mmsRefId, jobId, serverSentPMA);
@@ -114,6 +117,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             ran = true;
             var lastid = newVal;
             var refOb = null;
+            getRefsInProgress();
             ProjectService.getRef(scope.mmsRefId, scope.mmsProjectId).then(function(data) {
                 refOb = data;
                 scope.mmsRefType = refOb.type;
@@ -235,52 +239,9 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             scope.jobInstances[jobId] = [updateJob];
         });
 
-
-        //scope.enableEditor = function() {
-        //    if (!scope.docEditable)
-        //        return;
-        //    scope.editorEnabled = true;
-        //    scope.jobInput.jobName = scope.job.name.replace('_job','');
-        //};
-        //scope.disableEditor = function() {
-        //    scope.editorEnabled = false;
-        //};
-        //scope.save = function() {
-        //    scope.job.name = scope.jobInput.jobName+'_job';
-        //    updateJob();
-        //    scope.disableEditor();
-        //};
-
-        //actions for stomp
-        // scope.$on("stomp.job", function (event, newJobId) {
-            // var link = URLService.getJobURL(projectId, refId, newJobId, $location.host()); // TODO create porxy in gruntfile for PMA
-            // var link = URLService.getJobURL(scope.mmsProjectId, scope.mmsRefId, newJobId, 'opencae-int.jpl.nasa.gov');
-            // $http.get(link).then( function (data) {
-            //     var jobs = data.data.jobs; // get jobs json
-            //     var job = {};
-            //     for (var i = 0; i < jobs.length; i++) {
-            //         if (jobs[i].associatedElementID === scope.mmsDocId) {
-            //             // check if job already is in scope and update status
-            //             job = {
-            //                 name: jobs[i].name,
-            //                 status: jobs[i].status,
-            //                 schedule: jobs[i].schedule,
-            //                 url: jobs[i].url,
-            //                 command: jobs[i].command,
-            //                 //create: jobs[i].created,
-            //                 id: jobs[i].id
-            //             };
-            //             scope.jobs.push(job);
-            //         }
-            //     }
-            // }, function (error) {
-            //     // display some error?
-            //     //growl.error('There was a error in retrieving your job: ' + error.status);
-            // });
-            // getJobs();
-            // scope.$apply();
-        // });
-
+        scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
+            getRefsInProgress();
+        });
     };
     return {
         restrict: 'E',

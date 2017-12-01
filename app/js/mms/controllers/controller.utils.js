@@ -169,7 +169,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             if (choice[0] === 'ok') {
                 printOrGenerate(viewOrDocOb, refOb, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4], choice[5]);
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3], choice[4], choice[5]);
                     var cover = result.cover;
                     var toc = result.toc;
                     var tof = result.tof;
@@ -279,6 +279,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
         var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        UtilsService.convertViewLinks(printElementCopy);
         if (genTotf) {
             tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         }
@@ -302,7 +303,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return old;
         });
 
-        UtilsService.convertViewLinks(printElementCopy);
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();

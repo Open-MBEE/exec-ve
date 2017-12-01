@@ -15,8 +15,6 @@ angular.module('mms')
  * 
  * @description
  * An element CRUD service with additional convenience methods for managing edits.
- *
- * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
 function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService) {
     

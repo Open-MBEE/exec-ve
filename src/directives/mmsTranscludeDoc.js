@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -34,8 +34,10 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
+ * @param {bool} mmsWatchId set to true to not destroy element ID watcher
+ * @param {boolean=false} nonEditable can edit inline or not
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $templateCache, growl, _, MathJax) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, $compile, $templateCache, growl, _, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -105,6 +107,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.isEditing = false;
                 domElement[0].innerHTML = doc;
             }
+            $(domElement[0]).find('img').each(function(index) {
+                var src = $(this).attr('src');
+                if (src && src.startsWith('/alfresco')) {
+                    $(this).attr('src', src + '?alf_ticket=' + AuthService.getTicket());
+                }
+            });
             if (MathJax) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             }
@@ -118,7 +126,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal)
                 return;
-            idwatch();
+            if (!scope.mmsWatchId) {
+                idwatch();
+            }
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'doc')) {
                 domElement.html('<span class="mms-error">Circular Reference!</span>');
                 return;
@@ -229,6 +239,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
+            mmsWatchId: '@',
             nonEditable: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem'],

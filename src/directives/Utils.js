@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', 'CacheService', 'ElementService','ViewService','UtilsService','growl','_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'CacheService', 'ElementService','ViewService','UtilsService','growl', '_',Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,20 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, CacheService, ElementService, ViewService, UtilsService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, CacheService, ElementService, ViewService, UtilsService, growl, _) {
+
+    function clearAutosaveContent(autosaveKey, elementType) {
+        if ( elementType === 'Slot' ) {
+            Object.keys($window.localStorage)
+                .forEach(function(key){
+                    if ( key.indexOf(autosaveKey) !== -1 ) {
+                        $window.localStorage.removeItem(key);
+                    }
+                });
+        } else {
+            $window.localStorage.removeItem(autosaveKey);
+        }
+    }
 
     var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
@@ -355,7 +368,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
     * @param {boolean} doNotScroll whether to scroll to element
     */
     var startEdit = function(scope, mmsViewCtrl, domElement, template, doNotScroll) {
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element._editable && scope.commitId === 'latest') {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element && scope.element._editable && scope.commitId === 'latest') {
             var elementOb = scope.element;
             var reqOb = {elementId: elementOb.id, projectId: elementOb._projectId, refId: elementOb._refId};
             ElementService.getElementForEdit(reqOb)
@@ -436,6 +449,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
             growl.info('Please Wait...');
             return;
         }
+        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
         if (!continueEdit) {
             scope.bbApi.toggleButtonSpinner('presentation-element-save');
         } else {
@@ -506,6 +520,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
+                        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
                         $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {
@@ -554,6 +569,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
+                        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
                         $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {
@@ -856,7 +872,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, Ca
         addPresentationElement: addPresentationElement,
         setupValCf: setupValCf,
         setupValEditFunctions: setupValEditFunctions,
-        revertAction: revertAction
+        revertAction: revertAction,
+        clearAutosaveContent: clearAutosaveContent
     };
 
 }
