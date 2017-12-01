@@ -150,7 +150,9 @@
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
-    <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
+    <p ng-show="!showDocHTML" class="doc-text">
+        <mms-cf mms-cf-type="doc" mms-element-id="{{element.id}}" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-commit-id="{{element._commitId}}" mms-watch-id="true"></mms-cf>
+    </p>
     <div ng-show="showDocHTML">{{element.documentation}}</div>
 
     <h2 class="prop-title">Type</h2>

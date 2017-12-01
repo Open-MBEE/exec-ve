@@ -22,6 +22,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  * @param {boolean=false} nonEditable can edit inline or not
+ * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  */
 function mmsCf($compile) {
 
@@ -40,11 +41,14 @@ function mmsCf($compile) {
         var mmsCfCtrl = controllers[0];
         var mmsViewCtrl = controllers[1];
 
-        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
+        var changeElement = function(newVal, oldVal) {
             if (!newVal) {
                 return;
             }
-            idwatch();
+            if (!scope.mmsWatchId) {
+                idwatch();
+                commitwatch();
+            }
             var projectId = scope.mmsProjectId;
             var refId = scope.mmsRefId;
             var commitId = scope.mmsCommitId;
@@ -73,7 +77,10 @@ function mmsCf($compile) {
                 domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable"></<mms-transclude-'+scope.mmsCfType+'>';
                 $compile(domElement.contents())(scope);
             }
-        });
+        };
+
+        var idwatch = scope.$watch('mmsElementId', changeElement);
+        var commitwatch = scope.$watch('mmsCommitId', changeElement);
     };
 
     return {
@@ -84,6 +91,7 @@ function mmsCf($compile) {
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsCfType: '@',
+            mmsWatchId: '@',
             nonEditable: '<',
         },
         require: ['?^^mmsCf', '?^^mmsView'],
