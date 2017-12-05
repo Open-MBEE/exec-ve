@@ -50,6 +50,8 @@ RUN git config --global url."https://".insteadOf git://
 # Install dependencies
 RUN npm install -g grunt-cli
 RUN npm install 
+RUN node ./node_modules/node-sass/scripts/install.js
+RUN npm rebuild node-sass
 
 # Expose ports
 EXPOSE 9000
