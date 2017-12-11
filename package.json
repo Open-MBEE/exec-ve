@@ -9,6 +9,7 @@
     "grunt-artifactory-artifact": "~1.0.1",
     "grunt-bower-install-simple": "1.2.4",
     "grunt-cache-bust": "^1.6.0",
+    "grunt-concurrent": "^2.3.1",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-connect": "~1.0.2",
