@@ -359,7 +359,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return false;
     }
 
-    var makeHtmlTable = function(table) {
+    var makeHtmlTable = function(table, isFilterable, isSortable) {
         var result = ['<table class="table table-bordered table-condensed">'];
         if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
@@ -376,8 +376,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             result.push('</colgroup>');
         }
         if (table.header) {
-            result.push('<thead>');
-            result.push(makeTableBody(table.header, true));
+            // only add styling to the filterable or sortable header
+            if ( isFilterable || isSortable ) {
+                result.push('<thead class="doc-table-header" >');
+            } else {
+                result.push('<thead>');
+            }
+
+            result.push(makeTableBody(table.header, true, isFilterable, isSortable));
             result.push('</thead>');
         }
         result.push('<tbody>');
@@ -388,9 +394,45 @@ function UtilsService($q, $http, CacheService, URLService, _) {
 
     };
 
-    var makeTableBody = function(body, header) {
+    var tableConfig = {
+        sortByColumnFn: 'sortByColumnFn',
+        showBindingForSortIcon: 'sortColumnNum',
+        filterDebounceRate: 200,
+        filterTermColumnPrefixBinding: 'filterTermForColumn'
+    };
+
+
+    /** Include row and column number for table's header data object **/
+    var _generateRowColNumber = function(header) {
+      header.forEach(function (row, rowIndex) {
+          var startCol = 0;
+          var colCounter = 0;
+          row.forEach(function (cell, cellIndex) {
+              // startCol is always 0 except when row > 0th and on cell === 0th && rowSpan of the previous row's first element is larger than 1
+              // This is the only time when we need to offset the starting colNumber for cells under merged column(s)
+              if ( rowIndex !== 0 && cellIndex === 0 && Number(header[rowIndex - 1][0].rowspan) > 1 ) {
+                  startCol = Number(header[rowIndex - 1][0].colspan);
+              }
+              var colSpan = Number(cell.colspan);
+              cell.startRow = rowIndex;
+              cell.endRow = cell.startRow + Number(cell.rowspan) - 1;
+              cell.startCol = startCol + colCounter;
+              cell.endCol = cell.startCol +  colSpan - 1;
+              colCounter += colSpan;
+          });
+          startCol = 0;
+          colCounter = 0;
+      });
+    };
+
+
+    var makeTableBody = function(body, isHeader, isFilterable, isSortable) {
+        if ( isHeader && (isFilterable || isSortable ) ) {
+            _generateRowColNumber(body);
+        }
+
         var result = [], i, j, k, row, cell, thing;
-        var dtag = (header ? 'th' : 'td');
+        var dtag = (isHeader ? 'th' : 'td');
         for (i = 0; i < body.length; i++) {
             result.push('<tr>');
             row = body[i];
@@ -399,9 +441,19 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 result.push('<' + dtag + ' colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
                 for (k = 0; k < cell.content.length; k++) {
                     thing = cell.content[k];
-                    result.push('<div>');
+                    if ( isFilterable || isSortable ) {
+                        result.push('<div ng-style="{display: \'inline\'}">');
+                    } else {
+                        result.push('<div>');
+                    }
+
                     if (thing.type === 'Paragraph') {
-                        result.push(makeHtmlPara(thing));
+                        var para = makeHtmlPara(thing);
+                        // add special styling for header's title
+                        if ( ( isFilterable || isSortable ) && thing.sourceType === 'text' ) {
+                            para = para.replace('<p>', '<p ng-style="{display: \'inline\'}">' );
+                        }
+                        result.push(para);
                     } else if (thing.type === 'Table') {
                         result.push(makeHtmlTable(thing));
                     } else if (thing.type === 'List') {
@@ -411,6 +463,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                         result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                     }
                     result.push('</div>');
+                    if ( isHeader ) {
+                        if ( isSortable && Number(cell.colspan) === 1 ) {
+                            result.push('<span' + ' ng-click=\"'+ tableConfig.sortByColumnFn + "(" + cell.startCol + ")" + '\"' + ' ng-class=\"'+ 'getSortIconClass('+ cell.startCol + ')' + '\"></span>');
+                        }
+                        if ( isFilterable ) {
+                            result.push('<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column"' + ' ng-show="showFilter" ng-model-options=\"{debounce: '+ tableConfig.filterDebounceRate  + '}\"' + ' ng-model=\"' + tableConfig.filterTermColumnPrefixBinding + cell.startCol + cell.endCol + '\">');
+                        }
+                    }
                 }
                 result.push('</' + dtag + '>');
             }
@@ -779,6 +839,8 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,
-        convertHtmlToPdf: convertHtmlToPdf
+        convertHtmlToPdf: convertHtmlToPdf,
+        tableConfig: tableConfig,
+        _generateRowColNumber: _generateRowColNumber
     };
 }
