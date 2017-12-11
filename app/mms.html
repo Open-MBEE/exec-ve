@@ -47,25 +47,26 @@
     </div>
 </div>
 
-<script src="lib/modernizr/modernizr.custom.61017.min.js"></script>
-
 <!--build:js js/vendor.min.js-->
 <!-- bower:js -->
 <!-- endbower -->
 <!--endbuild-->
 
-<!-- GoJS and table export-->
-<script src="lib/jquery.isonscreen.js"></script>
-<script src="lib/table2CSV.js"></script>
 
-<!-- CKEDITOR Settings -->
+<!-- CKEDITOR Settings. Let the browser know where to find the rest of CKEDITOR codes -->
 <script type="text/javascript">
     var url_root = location.pathname.split("mms.html")[0];
     var CKEDITOR_BASEPATH = url_root + 'lib/ckeditor/';
 </script>
-<script src="lib/ckeditor/ckeditor.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+<!-- GoJS and table export-->
+<!--build:js js/vendor-internal.min.js-->
+<script src="lib/jquery.isonscreen.js"></script>
+<script src="lib/table2CSV.js"></script>
+<script src="../src/lib/ckeditor/ckeditor.js"></script>
+<!--endbuild-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
 <script src="js/ve-mms.min.js"></script>
 

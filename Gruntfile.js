@@ -46,8 +46,9 @@ module.exports = function(grunt) {
           base: {
             path: './dist',
             options: {
-              // Add 7 days cache to improve load speed
-              maxAge: 1000 * 604800
+              // Add this so that the browser doesn't re-validate static resources
+              // Also, we have cache-busting, so we don't have to worry about stale resources
+              maxAge: 31536000000
             }
           },
           middleware: function (connect, options, middlewares) {
@@ -132,7 +133,8 @@ module.exports = function(grunt) {
       },
       dev: {
         files: [
-          {expand: true, cwd: 'dist/concat/js', src: ['vendor.min.js'], dest: 'dist/js'}
+          {expand: true, cwd: 'dist/concat/js', src: ['vendor.min.js'], dest: 'dist/js'},
+          {expand: true, cwd: 'dist/concat/js', src: ['vendor-internal.min.js'], dest: 'dist/js'}
         ]
       }
     },

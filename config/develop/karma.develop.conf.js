@@ -30,9 +30,7 @@ module.exports = function (config) {
             "dist/bower_components/d3/d3.js",
             "dist/bower_components/c3/c3.js",
 
-            "dist/lib/jquery.isonscreen.js",
-            "dist/lib/table2CSV.js",
-            "dist/lib/ckeditor/ckeditor.js",
+            'dist/js/vendor-internal.min.js',
             "dist/lib/ckeditor/plugins/autosave/plugin.js",
             "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML",
 
