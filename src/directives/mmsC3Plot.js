@@ -23,7 +23,6 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-    scope.plot = JSON.parse(scope.splot);
     if ( scope.plot.config.length !== 0){
       scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
     } 
@@ -102,7 +101,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     }//end of vf_pplot()
   
     scope.render = function() {
-      TableService.readvalues(scope.splot, projectId, refId, commitId)
+      TableService.readvalues(scope.plot, projectId, refId, commitId)
        .then( function(value){
           scope.valuesO = value.tablebody.valuesO; //value objects used in watch
           var c3options;
@@ -145,7 +144,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     restrict: 'EA',
     require: '?^mmsView',
      scope: {
-      splot: '@'
+      plot: '<'
     },
     link: mmsChartLink
   }; //return

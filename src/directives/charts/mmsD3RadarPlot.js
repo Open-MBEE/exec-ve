@@ -24,11 +24,12 @@
           if (!commitId)
               commitId = viewVersion.commitId;
       }
-      scope.plot = JSON.parse(scope.splot); 
-
+      if ( scope.plot.config.length !== 0){ 
+        scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); //{"colors: [5,6,7,8,9]"}
+      } 
      scope.render = function() {
 
-      TableService.readvalues(scope.splot, projectId, refId, commitId)
+      TableService.readvalues(scope.plot, projectId, refId, commitId)
        .then( function(value){
         scope.tablebody = value.tablebody;
         scope.tableheader = value.tableheader;
@@ -364,7 +365,7 @@
       restrict: 'EA',
       require: '?^mmsView',
        scope: {
-        splot: '@'
+        plot: '<'
       },
       link: mmsRadarChartLink
     }; //return

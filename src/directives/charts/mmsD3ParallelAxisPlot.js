@@ -22,7 +22,6 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-    scope.plot = JSON.parse(scope.splot); 
     if ( scope.plot.config.length !== 0){
       //{{name: "A", color: "Green"}, {name: "B", color:"Red"}}
       scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); 
@@ -268,7 +267,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
     }
 
     scope.render = function() {
-      TableService.readvalues(scope.splot, projectId, refId, commitId)
+      TableService.readvalues(scope.plot, projectId, refId, commitId)
        .then( function(value){
         scope.tablebody = value.tablebody;
         scope.tableheader = value.tableheader;
@@ -307,7 +306,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
     restrict: 'EA',
     require: '?^mmsView',
      scope: {
-      splot: '@'
+      plot: '<'
     },
     link: mmsChartLink
   }; //return

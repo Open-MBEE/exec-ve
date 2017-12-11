@@ -34,7 +34,6 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
               commitId = viewVersion.commitId;
       }
 
-      scope.plot = JSON.parse(scope.splot); 
       if ( scope.plot.config.length !== 0){ 
         scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); //{"colors: [5,6,7,8,9]"}
       } 
@@ -322,7 +321,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
           
       scope.render = function() {
 
-        TableService.readvalues(scope.splot, projectId, refId, commitId)
+        TableService.readvalues(scope.plot, projectId, refId, commitId)
        .then( function(value){
         
         var tablebody = value.tablebody;
@@ -399,7 +398,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       restrict: 'EA',
       require: '?^mmsView',
        scope: {
-          splot: '@' 
+          plot: '<' 
       },
       link: mmsChartLink
     }; //return

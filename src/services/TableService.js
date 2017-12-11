@@ -5,17 +5,13 @@ angular.module('mms')
 
 function TableService($q, $http, URLService, UtilsService, CacheService, _, ElementService) {
 
-  function readvalues(splot, projectId, refId, commitId){ 
+  function readvalues(plot, projectId, refId, commitId){ 
 
     var deferred = $q.defer();
-    var plot = JSON.parse(splot);
 
     var aMmsEid = {projectId: projectId, refId: refId, commitId: commitId};
     var isHeader = (plot.table.header !== undefined && plot.table.header.length > 0 ? true : false);
 
-    if (plot.config.length !== 0){
-      plot.config = JSON.parse(plot.config.replace(/'/g, '"'));
-    }
     if (isHeader) {
       var aheader = asyncReadTableHeader(aMmsEid, plot.table.header[0]);
       aheader.then( function(tableheader){
