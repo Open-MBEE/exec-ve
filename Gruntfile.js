@@ -221,8 +221,7 @@ module.exports = function(grunt) {
         options: {
           banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
           wrap: 'mms',
-          // TODO:HONG need to set mangle to false. Otherwise, issue with angular injector
-          mangle: false,
+          mangle: true,
           sourceMap: {
             includeSources: true
           }
