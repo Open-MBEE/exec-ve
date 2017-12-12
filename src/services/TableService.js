@@ -150,21 +150,27 @@ function TableService($q, $http, URLService, UtilsService, CacheService, _, Elem
       var valuesO = [];
       var index = 0;
       row.forEach(function(e){
-      //  console.log(e);
-       if (e.content[0].type == 'Paragraph'){
-          readParagraphValue(e, aMmsEid, index++)
-          .then( function(r){
-            values[r.index] =r.value;
-            valuesO[r.index] = r.valueO;
-            if ( values.length === row.length){
-              var result = {
-                  values: values,
-                  valuesO: valuesO 
-              };
-              resolve(result);
-            }
-          });
-        } //Paragraph
+       if (e.content.length === 0){
+          values[index] = null;
+          valuesO[index] = null;
+          index++;
+       }
+       else {
+         if (e.content[0].type == 'Paragraph'){
+            readParagraphValue(e, aMmsEid, index++)
+            .then( function(r){
+              values[r.index] =r.value;
+              valuesO[r.index] = r.valueO;
+              if ( values.length === row.length){
+                var result = {
+                    values: values,
+                    valuesO: valuesO 
+                };
+                resolve(result);
+              }
+            });
+          } // Paragraph
+        } //end of else
       }); //for each row
     });
   } //end of function
