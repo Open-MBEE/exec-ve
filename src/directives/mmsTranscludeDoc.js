@@ -123,7 +123,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
         };
 
-        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
+        var idwatch = scope.$watch('mmsElementId', function(newVal) {
             if (!newVal)
                 return;
             if (!scope.mmsWatchId) {
@@ -147,6 +147,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = "Text";
                 }
                 recompile();
+                Utils.reopenUnsavedElts(scope, "documentation");
+
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&

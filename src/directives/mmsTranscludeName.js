@@ -111,6 +111,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             .then(function(data) {
                 scope.element = data;
                 recompile();
+                Utils.reopenUnsavedElts(scope, "name");
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
