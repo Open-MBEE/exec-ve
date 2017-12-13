@@ -236,12 +236,12 @@ module.exports = function(grunt) {
       options: {
         dest: 'build/docs',
         html5Mode: false,
-        title: 'MMS',
+        title: 'View Editor',
         startPage: '/api'
       },
       api: {
-        src: ['src/**/*.js'],
-        title: 'MMS API'
+        src: ['src/**/*.js', 'app/js/**/*.js'],
+        title: 'MMS/VE API'
       }
     },
 

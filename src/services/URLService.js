@@ -19,13 +19,13 @@ angular.module('mms')
  * 
  * @description
  * This utility service gives back url paths for use in other services in communicating
- * with the server, arguments like workspace, version are expected to be strings and
+ * with the server, arguments like projectId, refId, commitId are expected to be strings and
  * not null or undefined. This service is usually called by higher level services and
  * should rarely be used directly by applications.
  *
- * To configure the base url of the ems server, you can use the URLServiceProvider
- * in your application module's config. By default, the baseUrl is '/alfresco/service' 
- * which assumes your application is hosted on the same machine as the ems. 
+ * To configure the base url of the mms server, you can use the URLServiceProvider
+ * in your application module's config. By default, the baseUrl is '/alfresco/service'
+ * which assumes your application is hosted on the same machine as the mms and ve.
  *  <pre>
         angular.module('myApp', ['mms'])
         .config(function(URLServiceProvider) {
@@ -432,6 +432,17 @@ function urlService(baseUrl) {
         return url;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addTicket
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds alf_ticket parameter to URL string
+     *
+     * @param {String} url The url string for which to add als_ticket parameter argument.
+     * @returns {string} The url with alf_ticket parameter added.
+     */
     var addTicket = function(url) {
         var r = url;
         if (!ticket)
