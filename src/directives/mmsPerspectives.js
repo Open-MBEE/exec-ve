@@ -388,6 +388,16 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                 });
             }
         }
+        scope.$on('$destroy', function() {
+            invokePerspectivesCommand({
+                "command": "CloseProject",
+                "onsuccess":"onPerspectivesCommandSuccess",
+                "onfailure":"onPerspectivesCommandFailure",
+                "data": {
+                    "project": id
+                }
+            });
+        });
         mapping[id] = updateCommand;
         projectId2Peid[id] = scope.mmsPeId;
         invokePerspectivesCommand(webProjectCommand);
