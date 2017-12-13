@@ -680,6 +680,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     */
     var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
+                "figure img {display: block;}\n" +
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
                 ".view-title {margin-top: 10pt}\n" +
