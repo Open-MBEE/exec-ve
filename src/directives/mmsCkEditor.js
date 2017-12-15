@@ -302,6 +302,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 name: 'Comment ' + new Date().toISOString(), 
                 documentation: '', 
                 type: 'Class',
+                ownerId: "holding_bin_" + scope.mmsProjectId,
                 _appliedStereotypeIds: []
             });
             $scope.oking = false;

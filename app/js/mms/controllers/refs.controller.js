@@ -58,22 +58,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             $scope.fromParams = refObs[index];
         }
     });
-    $scope.$on("stomp.branchCreated", function(event, refList, updateRef) {
-        // var index = -1;
-        // if (updateRef.type === 'Branch') {
-        //     index = _.findIndex($scope.branches, {id: updateRef.id});
-        //     if ( index > -1 ) {
-        //         // $scope.branches[index].loading = false;
-        //         $scope.branches[index] = updateRef;
-        //     }
-        // } else if (updateRef.type === 'Tag') {
-        //     index = _.findIndex($scope.tags, {id: updateRef.id});
-        //     if ( index > -1 ) {
-        //         // $scope.tags[index].loading = false;
-        //         $scope.tags[index] = updateRef;
-        //     }
-        // }
-
+    $scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
         growl.success(updateRef.name + " " + updateRef.type + " Created");
     });
 

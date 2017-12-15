@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService', '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -32,7 +32,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, $http, _, $compile, $templateCache, growl, MathJax) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http, _, $compile, $templateCache, growl, MathJax) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -123,6 +123,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     domElement[0].innerHTML = toCompile;
                 }
+                $(domElement[0]).find('img').each(function(index) {
+                    var src = $(this).attr('src');
+                    if (src && src.startsWith('/alfresco')) {
+                        $(this).attr('src', src + '?alf_ticket=' + AuthService.getTicket());
+                    }
+                });
                 if (MathJax) {
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
                 }
@@ -160,6 +166,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.element = data;
                 Utils.setupValCf(scope);
                 recompile();
+                Utils.reopenUnsavedElts(scope, 'value');
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&

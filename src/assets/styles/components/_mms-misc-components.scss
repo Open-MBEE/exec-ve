@@ -43,6 +43,7 @@ img {
 
 table {
   @extend .table;
+  width: auto!important;
 }
 
 thead td, table caption {
@@ -59,6 +60,7 @@ thead td, table caption {
   @extend .table;
   @extend .table-condensed;
   @extend .table-bordered;
+  width: auto!important;
   p {
     margin: 0px 0px 5px;
   }

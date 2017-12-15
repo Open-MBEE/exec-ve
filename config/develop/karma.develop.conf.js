@@ -42,7 +42,7 @@ module.exports = function (config) {
             'build/mms.js',
             'build/mms.directives.tpls.js',
             'build/mms.directives.js',
-            
+
             'build/js/mms/app.tpls.js',
             'build/js/mms/app.js',
             'build/js/mms/controllers.js',
@@ -71,16 +71,16 @@ module.exports = function (config) {
         //reporters: ['progress'],
         reporters: ['nyan','junit'],
         nyanReporter: {
-        //   // suppress the error report at the end of the test run 
+        //   // suppress the error report at the end of the test run
         //   suppressErrorReport: true,
-          // 
-        //   // suppress the red background on errors in the error 
-        //   // report at the end of the test run 
+          //
+        //   // suppress the red background on errors in the error
+        //   // report at the end of the test run
         //   suppressErrorHighlighting: true,
- 
-          // increase the number of rainbow lines displayed 
-          // enforced min = 4, enforced max = terminal height - 1 
-        //   numberOfRainbowLines: 25, // default is 4 
+
+          // increase the number of rainbow lines displayed
+          // enforced min = 4, enforced max = terminal height - 1
+        //   numberOfRainbowLines: 25, // default is 4
         },
         // web server port
         port: 9876,

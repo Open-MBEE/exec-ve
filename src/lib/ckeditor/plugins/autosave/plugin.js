@@ -256,14 +256,57 @@ CKEDITOR.MmsAutosavePlugin =
                     moment(autoSavedContentDate).locale(editorInstance.config.language)
                     .format(editorInstance.lang.autosave.dateFormat));
 
-                if (confirm(confirmMessage)) {
-                    // Open DIFF Dialog
-                    editorInstance.openDialog('autosaveDialog');
-                } else {
-                    RemoveStorage(autoSaveKey, editorInstance);
-                }
+                _handleAutosaveConfirmationDialog(confirmMessage, editorInstance, autoSaveKey);
+
             }
         }
+    }
+
+    function _handleAutosaveConfirmationDialog(confirmMessage, editorInstance, autoSaveKey) {
+        var autosaveModalId = 'autosaveModal';
+        var autosaveMessageId = 'autosaveMessage';
+        var autosaveModal = $('#' + autosaveModalId);
+        if ( autosaveModal.length) {
+            autosaveModal.find('#' + autosaveMessageId).html(confirmMessage);
+        } else {
+            var dialogDom = _createDialogDom(confirmMessage, autosaveModalId, autosaveMessageId );
+            dialogDom.appendTo('body');
+            autosaveModal = $('#' + autosaveModalId);
+        }
+
+        $('#autosave-confirm').unbind('click').click(function() {
+            autosaveModal.css('display', 'none');
+            var dialog = editorInstance.openDialog('autosaveDialog');
+               var dialogDom = dialog.getElement()['$'];
+               var contentDom = $(dialogDom).children(":first");
+               contentDom.addClass('autosave');
+        });
+        $('#autosave-cancel').unbind('click').click(function() {
+            RemoveStorage(autoSaveKey, editorInstance);
+            autosaveModal.css('display', 'none');
+        });
+        autosaveModal.css('display', 'block');
+    }
+
+    function _createDialogDom(message, autosaveModalId, autosaveMessageId) {
+        var dialogHtml =
+           '<div id=\"'+ autosaveModalId + '\" class="modal autosave">\n' +
+            '    <div class="modal-content autosave">\n' +
+            '        <div class="modal-header">\n' +
+            '            <h4>Recovered Version Found <a href="https://opencae.jpl.nasa.gov/alfresco/mmsapp/mms.html#/projects/PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85/master/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1506985433518_b5775631-5dce-484b-abea-2f4860a23b36" target="_blank"><i class="fa fa-info-circle" aria-hidden="true"></i></a></h4>\n' +
+            '        </div>\n' +
+            '        <div class="modal-body">\n' +
+            '            <p id=\"'+ autosaveMessageId + '\"></p>\n' +
+            '        </div>\n' +
+            '        <div class="modal-footer">\n' +
+            '                <button id="autosave-confirm" class="btn btn-primary">Review</button>\n' +
+            '                <button id="autosave-cancel" class="btn btn-tertiary">Discard</button>\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>';
+        var dialogDom = $(dialogHtml);
+        dialogDom.find('#' + autosaveMessageId).html(message);
+        return dialogDom;
     }
 
     function LoadData(autoSaveKey) {
@@ -279,8 +322,9 @@ CKEDITOR.MmsAutosavePlugin =
 
         if (quotaExceeded) {
             console.log(editorInstance.lang.autosave.localStorageFull);
-            var notificationError = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.localStorageFull, type: 'warning' });
+            var notificationError = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.localStorageFull, type: 'warning',  duration:5000 });
             notificationError.show();
+            _changeAutosavePopupStyle(editorInstance, notificationError);
         } else {
             var messageType = config.messageType != null ? config.messageType : "notification";
 
@@ -299,10 +343,26 @@ CKEDITOR.MmsAutosavePlugin =
                     }, 2000);
                 }
             } else if (messageType == "notification") {
-                var notification = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.autoSaveMessage, type: 'success' });
+                var notification = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.autoSaveMessage, type: 'success',  duration:5000 });
                 notification.show();
+                _changeAutosavePopupStyle(editorInstance, notification);
             }
         }
+    }   
+
+    function _changeAutosavePopupStyle(editorInstance, notification) {
+        // Allow changing style for "autosave" popup
+        var editorElement = $(editorInstance.container['$']);
+        editorElement.css('position', 'relative');
+        var autosavePopupElement = $('#' + notification.id);
+        autosavePopupElement.appendTo(editorElement);
+        autosavePopupElement.css({
+            position: 'absolute'
+        });
+        autosavePopupElement.css({
+            left: editorElement.outerWidth(true) - autosavePopupElement.outerWidth(true),
+            top: editorElement.outerHeight(true) - autosavePopupElement.outerHeight(true)
+        });
     }
 
     function RemoveStorage(autoSaveKey, editor) {

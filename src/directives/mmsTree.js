@@ -701,6 +701,10 @@ function mmsTree($timeout, $log, $templateCache) {
                 on_treeData_change();
             };
 
+            tree.initialSelect = function() {
+                on_initialSelection_change();
+            };
+
             tree.sort_branch = function(b, sortFunction) {
                 b.children.sort(sortFunction);
             };

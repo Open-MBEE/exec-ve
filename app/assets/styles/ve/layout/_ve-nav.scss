@@ -28,12 +28,12 @@
   letter-spacing: .05em;
   font-size: 14px;
   z-index: 200;
-  position: relative;
+  // position: relative;
   width: 100%;
   height: 36px;
   min-height: 30px;
   border: 0;
-  background-color: $base_grey;
+  background-color: $ve-slate-base;
 
   a,
   a:hover,
@@ -77,7 +77,18 @@ a.switch-org:hover {
 -------------------------------------------------------------------*/
 
 #global-navigation {
+  background-color: $ve-slate-base;
+  border: none;
   float: right;
+}
+
+.navbar-collapse.in {
+  width: 100%;
+}
+
+.main-nav-toggle {
+  margin: 4px 12px;
+  padding: 3px 8px;
 }
 
 /*------------------------------------------------------------------
@@ -85,28 +96,35 @@ a.switch-org:hover {
 -------------------------------------------------------------------*/
 
 ul.global-menu {
-  list-style: none;
-  float: right;
-  margin: 0;
-  padding: 0 10px 0 20px;
+  padding: 0 10px;
+  min-height: 30px;
+  color: white;
+  min-height: 30px;
+  background-color: $ve-slate-base;
 }
 
 .global-menu > li {
-  display: inline-block;
-  padding: 0 8px;
+  margin: 6px 12px;
   height: 24px;
   line-height: 24px;
+
+  span a,
+  span a:visited,
+  span > a,
+  .dropdown-menu > li > a {
+    color: $ve-white-text-lighter-2;
+    background-color: transparent;
+  }
+
+  span a:hover,
+  span > a:hover {
+    color: white;
+  }
 }
 
-.global-menu > li > a,
-.global-menu > li > a:visited,
-.global-menu > li > span > a.dropdown-toggle {
-  color: $ve-white-text-lighter-2;
-}
-
-.global-menu > li > a:hover,
-.global-menu > li > span > a.dropdown-toggle:hover {
-  color: white;
+.open>a, .nav .open>a:focus, .nav .open>a:hover {
+  background-color: transparent;
+  border: none;
 }
 
 /*------------------------------------------------------------------
@@ -114,55 +132,57 @@ ul.global-menu {
 -------------------------------------------------------------------*/
 
 #global-search {
-  display: inline;
-  position: relative;
-}
+  // display: inline;
+  // position: relative;
+  margin: 0;
 
-#global-search input {
-  background-color: $ve-slate-darker-2;
-  border: 1px solid $ve-slate-darker-2;
-  border-radius: 3px 0 0 3px;
-  width: 330px;
-  padding: 0 8px;
-  height: 26px;
-  margin: 5px 0 5px 10px;
-  letter-spacing: .05em;
-  line-height: 1;
-}
+  input {
+    background-color: $ve-slate-darker-2;
+    border: 1px solid $ve-slate-darker-2;
+    border-radius: 3px 0 0 3px;
+    width: 330px;
+    padding: 0 8px;
+    height: 26px;
+    margin: 5px 0;
+    letter-spacing: .05em;
+    line-height: 1;
+  }
 
-#global-search input:focus {
-  outline:none;
-  background-color: $ve-slate-darker-3;
-  border: 1px solid $ve-teal-base;
-}
+  input:focus {
+    outline: none;
+    background-color: $ve-slate-darker-3;
+    border: 1px solid $ve-teal-base;
+  }
 
-#global-search button {
-  border-radius: 0 3px 3px 0;
-  height: 26px;
-  padding: 0px 7px;
-  background-color: $ve-teal-base;
-  top: 0px;
-  position: relative;
-  box-sizing: border-box;
-  color: white;
-  border:none;
-  margin: 5px 0 5px -10px;
-  vertical-align: bottom;
-  -webkit-transition: background-color .1s ease-out;
-  -moz-transition: background-color .1s ease-out;
-  -o-transition: background-color .1s ease-out;
-  transition: background-color .1s ease-out;
-}
+  button {
+    border-radius: 0 3px 3px 0;
+    height: 26px;
+    padding: 0px 7px;
+    background-color: $ve-teal-base;
+    top: 0px;
+    position: relative;
+    box-sizing: border-box;
+    color: white;
+    border:none;
+    margin: 5px 0 5px -10px;
+    vertical-align: bottom;
+  }
 
-#global-search button .fa-search {
-  position: relative;
-  color: white;
-  font-size:14px;
-  top:-1px;
-}
+  button .fa-search {
+    position: relative;
+    color: white;
+    font-size:14px;
+    top:-1px;
+  }
 
-#global-search button:hover {
-  background-color:$ve-teal-darker-1;
+  button:hover {
+    background-color:$ve-teal-darker-1;
+  }
+}
+@media (max-width: 720px) {
+  #global-search input {
+    width: 92%;
+  }
 }
 
 /*------------------------------------------------------------------
@@ -176,20 +196,11 @@ ul.global-menu {
   height: 24px;
   background:$ve-accent-green;
   text-align: center;
-  -webkit-transition: background-color .1s ease-out;
-  -moz-transition: background-color .1s ease-out;
-  -o-transition: background-color .1s ease-out;
-  transition: background-color .1s ease-out;
-  margin:6px;
   color:white;
 }
 
 #login-dropdown:hover {
   background-color:$ve-accent-green-darker;
-}
-
-.global-menu > li:last-child {
-  padding:0;
 }
 
 .user-profile > ul > li:first-child {
@@ -205,13 +216,14 @@ ul.global-menu {
 3. Project Level Header
 -------------------------------------------------------------------*/
 
-.project-level-header {
-  z-index: 100;
-  position: relative;
-}
-
 nav.project-level-header {
   background-color: $ve-slate-darker-2;
+  top: 36px;
+  z-index: 150;
+
+  .navbar-nav {
+    margin: 0;
+  }
 }
 
 /*------------------------------------------------------------------
@@ -219,7 +231,7 @@ nav.project-level-header {
 -------------------------------------------------------------------*/
 
 .select-project-dropdown {
-  float:left;
+  float: left;
 }
 
 /*------------------------------------------------------------------
@@ -255,8 +267,11 @@ nav.project-level-header {
   position: relative;
 }
 
-.breadcrumbs #alfUploadLink:hover {
-  text-decoration: underline;
+
+@media (max-width: 1024px) {
+  .breadcrumbs {
+     display: none;
+  }
 }
 
 /*------------------------------------------------------------------
@@ -264,5 +279,6 @@ nav.project-level-header {
 -------------------------------------------------------------------*/
 
 .project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
-  width:300px;
+  background-color: #404040;
+  max-width: 300px;
 }

@@ -16,6 +16,8 @@
 @import "layout/_ve-footer.scss";
 @import "layout/_ve-no-panes.scss";
 @import "layout/_ve-table-filter.scss";
+/* Third party customizations */
+@import "thirdparty/_autosave-plugin.scss";
 
 .cke_button__mmscf_label, .cke_button__mmscomment_label,
 .cke_button__mmsvlink_label, .cke_button__mmsreset_label, .cke_button__mmssignature_label {
@@ -260,6 +262,7 @@ div.tooltip-inner {
     min-height: 0;
     overflow-y: auto;
     max-height: 300px;
+    overflow-x:hidden;
   }
 
   button.dropdown-toggle {
@@ -283,13 +286,10 @@ div.tooltip-inner {
   .dropdown-menu {
     background-color: $ve-slate-lighter-1;
     border: none;
-    min-width: 100%;
-  }
-
-  ul.dropdown-menu {
     border-radius: 3px;
     margin-top: 4px;
     max-width: 300px;
+    min-width: 100%;
   }
 
   .dropdown-menu li {
@@ -394,13 +394,20 @@ div.tooltip-inner {
   }
 }
 
+@media (max-width: 767px) {
+  .ve-dark-dropdown-nav {
+    .dropdown-menu li.divider {
+      background-color: $ve-slate-lighter-2 !important;
+    }
+  }
+}
+
 .ve-light-dropdown{
   display: block;
   width: 100%;
   margin: 6px 0;
 
   .dropdown-toggle{
-    width: 100%;
     text-align: left;
     font-size: 14px;
     padding: 7px 8px;
@@ -415,6 +422,7 @@ div.tooltip-inner {
     letter-spacing: .05em;
     background-color:$ve-silver-lighter-0;
     min-height: 28px;
+    width:100%;
   }
 
   ul{
@@ -717,10 +725,11 @@ span.fixed-content-dropdown{
 .ve-plain-input{
   background-color: white;
   padding: 2px 6px;
-  border: 1px solid $ve-silver-base;
+  border: 1px solid $ve-silver-darker-1;
   border-radius: 3px;
   margin: 2px 10px;
   width: calc(100% - 20px);
+  font-weight: normal;
 }
 
 /*------------------------------------------------------------------
@@ -773,7 +782,7 @@ span.fixed-content-dropdown{
 // }
 
 /*------------------------------------------------------------------
-3. Table Filtering
+3. Table Filtering & Sorting
 -------------------------------------------------------------------*/
 
 .tableSearch > span {
@@ -784,6 +793,34 @@ table caption {
   font-size: 20px;
   text-align: left;
   padding: 8px 0 14px;
+}
+
+.doc-table-header {
+  background-color:$ve-silver-lighter-1;
+}
+
+.filter-input {
+  margin: 0;
+  width: 100%
+}
+
+.sort-default {
+  color: $ve-silver-darker-3;
+  float: right;
+}
+
+.sort-activated {
+  color: $ve-slate-darker-2;
+  float: right;
+}
+
+.sort-default, .sort-activated {
+  margin: 5px;
+}
+
+.sort-default:hover,
+.sort-activated:hover {
+  cursor: pointer;
 }
 
 .export-csv-button::before {
@@ -798,12 +835,28 @@ table caption {
   padding: 2px 4px;
 }
 
+.reset-sort-button::before {
+  content: "\f0e2";
+  font-family: FontAwesome;
+  padding: 2px 4px;
+}
+
+.reset-sort-fade.ng-hide {
+  opacity: 0;
+}
+
+.reset-sort-fade.ng-hide-remove,
+.reset-sort-fade.ng-hide-add {
+  display: inline-block !important;
+  transition: all linear 100ms;
+}
+
 .ve-filter-table-form .btn-sm {
   margin: 0 4px;
 }
 
 /*------------------------------------------------------------------
-4. Table Filtering
+4. Search
 -------------------------------------------------------------------*/
 
 .ve-search{
@@ -854,6 +907,16 @@ table caption {
   -webkit-flex-direction: column;
   flex-direction: column;
   overflow: auto;
+}
+
+.modal.autosave {
+ background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content.autosave {
+  width: 50%;
+  margin: auto;
+  top: 100px;
 }
 
 .modal-body{
@@ -1026,7 +1089,7 @@ table caption {
   padding-right:6px;
 }
 
-.docTitle-underlined  {
+.docTitle-underlined{
   text-decoration: underline;
   text-decoration-color: rgb(72, 133, 189);
 }
@@ -1074,3 +1137,4 @@ span.inline-btn-label{
   line-height: 13px;
   color:$ve-light-text;
 }
+

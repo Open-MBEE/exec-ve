@@ -168,7 +168,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         var editKey = UtilsService.makeElementKey(element, true);
         var veEditsKey = element.id + '|' + element._projectId + '|' + element._refId;
         if ($rootScope.ve_edits && !$rootScope.ve_edits[veEditsKey] && CacheService.exists(editKey)) {
-            ElementService.cacheElement(JSON.parse(JSON.stringify(element)), true);
+            ElementService.cacheElement({projectId: element._projectId, refId: element._refId, elementId: element.id, commitId: 'latest'}, JSON.parse(JSON.stringify(element)), true);
         }
     });
 }]);

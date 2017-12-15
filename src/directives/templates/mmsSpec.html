@@ -18,7 +18,7 @@
               <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value"> {{value.value}} <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralReal"><input type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
               <div ng-switch-when="LiteralString">
-                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor ng-model="value.value" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-element-id="{{element.id}}" autosave-key="{{mmsProjectId + mmsRefId + mmsElementId + 'index:' + $index}}"></textarea>
+                  <textarea ng-if="hasHtml(value.value)" mms-ckeditor ng-model="value.value" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-element-id="{{element.id}}" autosave-key="{{element._projectId + element._refId + element.id + 'index:' + $index}}"></textarea>
                   <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
                   <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
               </div>
@@ -58,13 +58,13 @@
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" autosave-key="{{mmsProjectId + mmsRefId + mmsElementId}}"></textarea>
+    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" autosave-key="{{element._projectId + element._refId + element.id}}"></textarea>
 
     <div>
         <h2 class="prop-title">Type</h2>
         <span class="prop">{{element.type}}</span>
         <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
-        <span ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></span>
+        <div ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
         <h2 class="prop-title">Location</h2>
         <span class="prop">{{element._qualifiedName}}</span>
         <h2 class="prop-title">ID</h2>
@@ -150,13 +150,15 @@
     </div>
 
     <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
-    <p ng-show="!showDocHTML" ng-bind-html="element.documentation" class="doc-text"></p>
+    <p ng-show="!showDocHTML" class="doc-text">
+        <mms-cf mms-cf-type="doc" mms-element-id="{{element.id}}" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-commit-id="{{element._commitId}}" mms-watch-id="true"></mms-cf>
+    </p>
     <div ng-show="showDocHTML">{{element.documentation}}</div>
 
     <h2 class="prop-title">Type</h2>
     <span class="prop">{{element.type}}</span>
     <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
-    <span ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></span>
+    <div ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
     <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
     <span class="prop">{{element._qualifiedName}}</span>
     <h2 class="prop-title">ID</h2>

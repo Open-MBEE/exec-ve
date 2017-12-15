@@ -97,13 +97,22 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         });
     };
 
-    /*
-        ob = document or view object
-        refOb = reference object
-        refOb = reference object
-        isDoc = if ob is view or doc
-        mode: 1 = browser print, 2 = word, 3 = pdf
-    */
+    /**
+     * @ngdoc method
+     * @name mmsApp.MmsAppUtils#printModal
+     * @methodOf mmsApp.MmsAppUtils
+     *
+     * @description
+     * Click handler for print and export buttons. Opens modal or print 
+     * confirmation and options to select from
+     *
+     * @param {Object} viewOrDocOb current document or view object
+     * @param {Object} refOb current branch/tag object
+     * @param {Boolean} isDoc viewOrDocOb is view or doc
+     * @param {Number} mode 1 = print, 2 = word, 3 = pdf
+     * @returns {Promise} The promise returned from UtilsService.convertHtmlToPdf - server response
+     *
+     */
     var printModal = function(viewOrDocOb, refOb, isDoc, mode) {
         var deferred = $q.defer();
         var modalInstance = $uibModal.open({
@@ -165,6 +174,16 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             backdrop: 'static',
             keyboard: false
         });
+        /* choice:
+        ['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]
+        [0] 'ok' - modal button to confirm print/export
+        [1] Generate cover page option
+        [2] Generate List of Tables and Figures option
+        [3] HTML option checked - used to generate ToC from html
+        [4] Landscape option
+        [5] metadata:
+            bottom, bottom-left, bottom-right, top, top-left, top-right
+        */
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
                 printOrGenerate(viewOrDocOb, refOb, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
@@ -175,6 +194,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     var tof = result.tof;
                     var tot = result.tot;
                     var toe = result.toe;
+                    if (choice[3]) {
+                        toe = '';
+                        result.toe = '';
+                    }
                     var contents = result.contents;
                     if (mode === 1 || mode === 2) {
                         var inst = '';
@@ -212,9 +235,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         if (!choice[2]) {
                             doc.tof = '<div style="display:none;"></div>';
                             doc.tot = '<div style="display:none;"></div>';
-                        } else if (choice[3]) { //let server scrape html for now
-                            doc.tof = '';
-                            doc.tot = '';
                         }
                         //TODO this might need to be updated
                         if (refOb.type != 'Tag')
@@ -238,28 +258,40 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         return deferred.promise;
     };
 
-    /*
-        ob = document or view object
-        ws = workspace id
-        time = timestamp or latest
-        tag = tag object
-        isDoc = ob is view or doc
-        genCover = generate default cover page
-        genTotf = whether to gen table of figures and tables
-        mode: 1 = print, 2 = word, 3 = pdf
-        returns promise that resolves with
-        {
-            cover: cover page html
-            contents: main content html
-            header: header string or ''
-            footer: footer string or ''
-            displayTime: human readable time
-            dnum: document d number
-            version: version string from doc tag
-            toc: toc html
-            tag: tagname or ''
-        }
-    */
+
+    /**
+     * @ngdoc method
+     * @name mmsApp.MmsAppUtils#printOrGenerate
+     * @methodOf mmsApp.MmsAppUtils
+     *
+     * @description
+     * Called by printModal to handle cleanup and building content needed for 
+     * print, PDF or word export.
+     * Cleansup html i.e. removes mms errors, no-print, ng-hide
+     *
+     * @param {Object} viewOrDocOb current document or view object
+     * @param {Object} refOb current branch/tag object
+     * @param {Boolean} isDoc viewOrDocOb is view or doc
+     * @param {Boolean} genCover generate default cover page (option from the modal form)
+     * @param {Boolean} genTotf whether to gen table of figures and tables (option from the modal form)
+     * @param {Boolean} htmlTotf include DocGen generated tables and rapid tables (option from the modal form)
+     * @param {Number} mode 1 = print, 2 = word, 3 = pdf
+     * @param {Boolean} landscape PDF in lanscape vie (option from the modal form)
+     * @returns {Promise} The promise returns object with content needed for print/word export/PDf generation
+     * <pre>
+     * {
+     *      cover: cover page html
+     *      contents: main content html
+     *      header: header string or ''
+     *      footer: footer string or ''
+     *      displayTime: human readable time
+     *      dnum: document d number
+     *      version: version string from doc tag
+     *      toc: toc html
+     *      tag: tagname or ''
+     * }
+     * </pre>
+     */
     var printOrGenerate = function(viewOrDocOb, refOb, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
         var deferred = $q.defer();
         var printContents = '';
@@ -279,6 +311,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
         var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        UtilsService.convertViewLinks(printElementCopy);
         if (genTotf) {
             tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         }
@@ -302,7 +335,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return old;
         });
 
-        UtilsService.convertViewLinks(printElementCopy);
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
