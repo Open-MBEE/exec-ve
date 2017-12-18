@@ -102,10 +102,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @description
      * Tells whether or not there exists a circular reference
      *
-     * @param {Object} scope
-     * @param {string} curId
-     * @param {string} curType
-     * @returns {void}
+     * @param {Object} scope scope
+     * @param {string} curId current id
+     * @param {string} curType current type
+     * @returns {boolean} true or false
      */
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
@@ -126,8 +126,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @description
      * Cleans value specification
      *
-     * @param {Object} vs
-     * @returns {void}
+     * @param {Object} vs value spec object
+     * @returns {void} nothing
      */
     var cleanValueSpec = function(vs) {
         if (vs.hasOwnProperty('valueExpression'))
@@ -209,19 +209,20 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return elem;
     };
 
-    /** todo add in description
+    /**
      * @ngdoc method
      * @name mms.UtilsService#buildTreeHierarchy
      * @methodOf mms.UtilsService
      *
      * @description
+     * builds hierarchy of tree branch objects
      *
-     * @param {array} array
-     * @param {stringnoCaption = figcap.length === 0 || figca} id
-     * @param {string} type
-     * @param {object} parent
-     * @param {callback} level2_Func
-     * @returns {void}
+     * @param {array} array array of objects
+     * @param {string} id key of id field
+     * @param {string} type type of object
+     * @param {object} parent key of parent field
+     * @param {callback} level2_Func function to get childen objects
+     * @returns {void} root node
      */
     var buildTreeHierarchy = function (array, id, type, parent, level2_Func) {
         var rootNodes = [];
@@ -394,15 +395,16 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return false;
     };
 
-    /** todo - add in the method description
+    /**
      * @ngdoc method
      * @name mms.UtilsService#isRestrictedValue
      * @methodOf mms.UtilsService
      *
      * @description
+     * deprecated
      *
      * @param {string} table table content
-     * @returns {boolean}
+     * @returns {boolean} boolean
      */
     function isRestrictedValue(values) {
         if (values.length > 0 && values[0].type === 'Expression' &&
@@ -414,14 +416,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return false;
     }
 
-    /** todo - add in the method description and parameter description
+    /**
      * @ngdoc method
      * @name mms.UtilsService#makeHtmlTable
      * @methodOf mms.UtilsService
      *
      * @description
+     * make html table based on table spec object
      *
-     * @param {string} table table content
+     * @param {object} table table content
      * @param {boolean} isFilterable table content
      * @param {boolean} isSortable table content
      * @returns {string} generated html string
@@ -490,16 +493,18 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
       });
     };
 
-    /** todo - add in the method description and parameter description
+    /**
      * @ngdoc method
      * @name mms.UtilsService#makeTableBody
      * @methodOf mms.UtilsService
      *
      * @description
+     * make html table body based on body spec object
      *
-     * @param {string} body body content
-     * @param {boolean} isFilterable
-     * @param {boolean} isSortable
+     * @param {object} body body content
+     * @param {boolean} isHeader is header
+     * @param {boolean} isFilterable is filterable
+     * @param {boolean} isSortable is sortable
      * @returns {string} generated html string
      */
     var makeTableBody = function(body, isHeader, isFilterable, isSortable) {
@@ -554,14 +559,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return result.join('');
     };
 
-    /** todo - add in the method description and parameter description
+    /**
      * @ngdoc method
      * @name mms.UtilsService#makeHtmlList
      * @methodOf mms.UtilsService
      *
      * @description
+     * make html list string based on list spec object
      *
-     * @param {string} list
+     * @param {object} list list specification object
      * @returns {string} generated html string
      */
     var makeHtmlList = function(list) {
@@ -596,14 +602,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return result.join('');
     };
 
-    /** todo - add in the method description and parameter description
+    /**
      * @ngdoc method
      * @name mms.UtilsService#makeHtmlPara
      * @methodOf mms.UtilsService
      *
      * @description
+     * make html para string based on para spec object
      *
-     * @param {string} para
+     * @param {object} para paragraph spec object
      * @returns {string} generated html string
      */
     var makeHtmlPara = function(para) {
@@ -633,7 +640,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Generates table of contents for the document/views.
      *
      * @param {string} tree the root element (document or view)
-     * @returns {void}
+     * @returns {string} toc string
      */
     var makeHtmlTOC = function (tree) {
         var result = '<div class="toc"><div class="header">Table of Contents</div>';
@@ -655,7 +662,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Generates table of contents for the document/views.
      *
      * @param {string} child the view to be referenced in the table of content
-     * @returns {void}
+     * @returns {string} toc string
      */
     var makeHtmlTOCChild = function(child) {
         if (child.type !== 'view' && child.type !== 'section')
@@ -683,7 +690,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {string} printElement contents to be printed (what is displayed in the center pane)
      * @param {boolean} live true only if a specific sorting is required
      * @param {boolean} user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not
-     * @returns {void}
+     * @returns {object} results
      */
     var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
         var ob = {
@@ -724,7 +731,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {string} ob an object that stores the html list of tables, figures, and equations as well as the counts of those
      * @param {boolean} live true when user would like to preview numbering in the app
      * @param {boolean} showRefName the tree hierarchy of the document or view (what is displayed in the left pane)
-     * @returns {void}
+     * @returns {void} nothing
      */
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
         var sysmlId = child.data.id;
@@ -930,7 +937,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Link the element to the document/view in VE (add an anchor tag)
      *
      * @param {string} printElement the content of the view/document currently selected on the center pane
-     * @returns {void}
+     * @returns {void} nothing
      */
     var convertViewLinks = function(printElement) {
         printElement.find('mms-view-link').each(function(index) {
@@ -1036,7 +1043,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Evaluates if an given element is a view or not
      *
      * @param {Object} e element
-     * @returns {boolean}
+     * @returns {boolean} boolean
      */
     var isView = function(e) {
         if (e._appliedStereotypeIds) {
@@ -1061,7 +1068,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Evaluates if an given element is a document or not
      *
      * @param {Object} e element
-     * @returns {boolean}
+     * @returns {boolean} boolean
      */
     var isDocument = function(e) {
         if (e._appliedStereotypeIds && e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
