@@ -41,10 +41,10 @@ img {
   }
 }
 
-// table {
-//   @extend .table;
-//   width: auto!important;
-// }
+ table {
+   @extend .table;
+   width: auto!important;
+ }
 
 thead td, table caption {
   font-weight: bold;
