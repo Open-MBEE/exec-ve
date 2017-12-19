@@ -629,8 +629,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 refId: $scope.parentBranchData._refId,
                 aggr: $scope.newViewAggr.type
             }).then(function(data) {
-                growl.success("View Added");
-                $uibModalInstance.close(view);
+                ElementService.getElement({
+                    elementId: viewId,
+                    projectId: view._projectId,
+                    refId: view._refId
+                }, 2, false)
+                .then(function(realView) {
+                    $uibModalInstance.close(realView);
+                }, function() {
+                    $uibModalInstance.close(view);
+                }).finally(function() {
+                    growl.success("View Added");
+                });
             }, function(reason) {
                 growl.error("View Add Error: " + reason.message);
             }).finally(function() {
