@@ -904,6 +904,25 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         });
     };
 
+    var checkForDuplicateInstances = function(operand) {
+        var seen = {}, dups = [], curr;
+        for (var i = 0; i < operand.length; i++) {
+            curr = operand[i].instanceId;
+            if (curr) {
+                if (seen[curr]) {
+                    dups.push(operand[i]);
+                    operand.splice(i, 1);
+                    i--;
+                    continue;
+                }
+                seen[curr] = true;
+            } else {
+                //instanceId is invalid?
+            }
+        }
+        return dups;
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -922,7 +941,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         setupValEditFunctions: setupValEditFunctions,
         revertAction: revertAction,
         clearAutosaveContent: clearAutosaveContent,
-        reopenUnsavedElts: reopenUnsavedElts
+        reopenUnsavedElts: reopenUnsavedElts,
+        checkForDuplicateInstances: checkForDuplicateInstances
     };
 
 }
