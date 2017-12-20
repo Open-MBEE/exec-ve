@@ -12,9 +12,11 @@ mms-transclude-img {
 }
 
 mms-view {
-  mms-transclude-doc {
-    > p:first-child {
-      display: inline;
+  mms-cf mms-cf{
+    mms-transclude-doc {
+      > p:first-child {
+        display: inline;
+      }
     }
   }
 
