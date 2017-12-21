@@ -16,6 +16,10 @@
 /* App level customizations */
 @import "base/_mms-globals.scss";
 
+/* Tom Sawyer Perspectives View customizations */
+@import "components/_mms-tsp-view.scss";
+
+
 /* Other customizations */
 @import "components/_mms-add-pe-button.scss";
 @import "components/_mms-buttons.scss";
