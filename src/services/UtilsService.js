@@ -736,12 +736,19 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
         var sysmlId = child.data.id;
         var el = printElement.find('#' + sysmlId);
-        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"]');
+        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
+        var name = '';
         if (child.type === 'table') {
             ob.tableCount++;
             var capTbl = el.find('table > caption');
-            cap = (capTbl.text() !== "") ? ob.tableCount + '. ' + capTbl.text() : ob.tableCount + '. ' + child.data.name;
+            name = capTbl.text();
+            if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf('. ') + 2);
+            } else if (name === "") {
+                name = child.data.name;
+            }
+            cap = ob.tableCount + '. ' + name;
             ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capTbl.html('Table ' + cap);
             // If caption does not exist, add to html
@@ -763,7 +770,13 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         if (child.type === 'figure') {
             ob.figureCount++;
             var capFig = el.find('figure > figcaption');
-            cap = (capFig.text() !== "") ? ob.figureCount + '. ' + capFig.text() : ob.figureCount + '. ' + child.data.name;
+            name = capFig.text();
+            if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf('. ') + 2);
+            } else if (name === "") {
+                name = child.data.name;
+            }
+            cap = ob.figureCount + '. ' + name;
             ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capFig.html('Figure ' + cap);
             // If caption does not exist, add to html
