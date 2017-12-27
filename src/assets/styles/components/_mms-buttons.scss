@@ -80,28 +80,29 @@ mms-button-bar>span:first-child>a{
     text-align: center;
   }
 
-  /* font awesome caret to dropdown menus in view tools*/
-  .dropdown-toggle:after{
-    font-family:FontAwesome;
-    content: "\f0d7";
-    padding-left: 3px;
-    font-size:12px;
-    opacity:0.5;
-  }
-  /*VE button styling for export dropdown*/
-  .dropdown-toggle.export{
-    letter-spacing: .14em;
-    font-size: 12px;
-    border: none;
-    text-transform: uppercase;
-    padding: 0 4px 0 6px;
-    font-weight: 600;
-    text-decoration: none;
-
-    .fa{
-      padding-right:4px;
+  .dropdown-toggle{
+    /* font awesome caret to dropdown menus in view tools*/
+    &:after{
+      font-family:FontAwesome;
+      content: "\f0d7";
+      padding-left: 3px;
+      font-size:12px;
+      opacity:0.5;
     }
+    /*VE button styling for export dropdown*/
+    &.export{
+      letter-spacing: .14em;
+      font-size: 12px;
+      border: none;
+      text-transform: uppercase;
+      padding: 0 4px 0 6px;
+      font-weight: 600;
+      text-decoration: none;
 
+      .fa{
+        padding-right:4px;
+      }
+    }
   }
 }
 

@@ -7,7 +7,22 @@ mms-view {
     margin-bottom: 15px;
   }
 
+  &.editing {
+    mms-view-section {
+      display: block;
+      border: 2px solid $tertiary_grey;
+      border-radius: 5px;
+    }
+  }
+
   table {
     @extend .content-table;
   }
 }
+
+mms-view-section {
+  .panel-heading {
+    padding: 0;
+  }
+}
+
