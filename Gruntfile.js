@@ -1,10 +1,12 @@
 module.exports = function(grunt) {
+
   require('time-grunt')(grunt);
-  // static mapping for tasks that don't match their modules' name
   require('jit-grunt')(grunt, {
+    // static mapping for tasks that don't match their modules' name
     useminPrepare: 'grunt-usemin',
     setupProxies: 'grunt-middleware-proxy'
   });
+
   var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
 
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
@@ -157,7 +159,7 @@ module.exports = function(grunt) {
     },
 
     /** Work on top of wiredep to know which external libs to bundle.
-     *  ( delegate the concatenation and minification steps to other plugins ) **/
+     *  Delegate the concatenation and minification steps to other plugins **/
     useminPrepare: {
       options: {
         staging: 'dist'
@@ -189,7 +191,9 @@ module.exports = function(grunt) {
       }
     },
 
-    /** Transpile html into angularJs modules (js files) **/
+    /** This task is for turning all html files into angularjs modules which are included as dependencies
+     * for a particular module specified in the module function below
+     * **/
     html2js: {
       options: {
         module: function(modulePath, taskName) {
@@ -205,8 +209,7 @@ module.exports = function(grunt) {
           return modulePath.replace('app/', '').replace('../', '');
         }
       },
-      // This need name to match with taskName above.
-      // Turn all html into angular modules, then add it as deps to mms.directives.tpls module specified above
+      // This task name need to match with taskName param above.
       directives: {
         src: ['src/directives/templates/*.html'],
         dest: 'dist/jsTemp/mms.directives.tpls.js'
@@ -217,7 +220,7 @@ module.exports = function(grunt) {
       }
     },
 
-    /** Concat + Minify JS **/
+    /** Concat + Minify JS files **/
     uglify: {
       combineCustomJS: {
         options: {
@@ -248,15 +251,19 @@ module.exports = function(grunt) {
           ]
         }
       },
-
+      // this target is for files handled by usemin task.
       generated: {
         options: {
           mangle: true
+          // uncomment below codes to get source map files for vendor codes
+          // sourceMap: {
+          //     includeSources: true
+          // }
         }
       }
     },
 
-    /** Add hasing to static resources' names so that the browser doesn't use the stale cached resources **/
+    /** Add hashing to static resources' names so that the browser doesn't use the stale cached resources **/
     cacheBust: {
       all: {
         options: {
