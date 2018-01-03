@@ -255,7 +255,8 @@ module.exports = function(grunt) {
       generated: {
         options: {
           mangle: true
-          // uncomment below codes to get source map files for vendor codes
+          // Uncomment below codes to get source map files for vendor codes if desired ( no need to enable this for during
+          // development since vendor files are not minified for dev-build )
           // sourceMap: {
           //     includeSources: true
           // }
