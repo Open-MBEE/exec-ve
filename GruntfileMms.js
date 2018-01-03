@@ -12,20 +12,17 @@ module.exports = function(grunt) {
          * **/
         html2js: {
             options: {
+                // All the templates converted to angularjs modules will belong to the module with the name returned
+                // by the following function
                 module: function(modulePath, taskName) {
                     return 'mms.directives.tpls';
                 },
+                // Change the module name to the string returned by the following function
                 rename: function (modulePath) {
                     var moduleName = modulePath.replace('directives/templates/', '');
                     return 'mms/templates/' + moduleName;
-                    // if (modulePath.indexOf('directives/templates') > -1) {
-                    //     var moduleName = modulePath.replace('directives/templates/', '');
-                    //     return 'mms/templates/' + moduleName;
-                    // }
-                    // return modulePath.replace('app/', '').replace('../', '');
                 }
             },
-            // This task name need to match with taskName param above.
             directives: {
                 src: ['src/directives/templates/*.html'],
                 dest: 'dist/temp/js/mms.directives.tpls.js'
@@ -55,8 +52,9 @@ module.exports = function(grunt) {
                     ]
                 }
             }
-        }
+        },
+        clean: ['dist/temp']
     });
 
-    grunt.registerTask('default', ['html2js', 'uglify']);
+    grunt.registerTask('default', ['html2js', 'uglify', 'clean']);
 };
