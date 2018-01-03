@@ -37,6 +37,15 @@ module.exports = function(grunt) {
                 }
             },
 
+            mms: {
+                options: {
+                    wrap: 'mms'
+                },
+                files: {
+                    'dist/mms.js': ['src/mms.js', 'src/services/*.js']
+                }
+            },
+
             mmsdirs: {
                 options: {
                     wrap: 'mmsdirs'
