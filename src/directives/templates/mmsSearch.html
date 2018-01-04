@@ -1,54 +1,37 @@
 
-<div class="transclude-modal">
-    <div class="transclude-modal-input">
-        <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
-            <div class="form-search input-group ve-search">
-                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" autofocus/>
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
-                    <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
-                </span>
+<div class="mms-search">
+    <div class="mms-search-input">
+        <form class="form-inline" ng-submit="newSearch(searchText, 0, itemsPerPage)">
+            <!-- search type menu -->
+            <div class="form-group">
+                <label class="sr-only" for="searchTypeSelect">Search type menu</label>
+                <select class="form-control" id="searchTypeSelect" ng-model="searchType">
+                    <option value="all">All Fields</option>
+                    <option value="name">Name</option>
+                    <option value="documentation">Documentation</option>
+                    <option value="value">Value</option>
+                    <option value="id">ID</option>
+                    <option value="metatype">Metatype</option>
+                </select>
             </div>
-            <div class="container-search-type">
-                <div class="btn-group btn-group-xs">
-                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default active">ALL</button>
-                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
-                    <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
-                    <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
-                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">ID</button>
-                </div>
-                <div class="search-filter-views-docs">
-                    <input type="checkbox" ng-model="docsviews.selected"> Search for Views and Documents<br>
-                </div>
+            <!-- search keyword input -->
+            <div class="form-group">
+                <label class="sr-only" for="searchText">Search keyword</label>
+                <input class="form-control" type="text" id="searchText" ng-model="searchText" placeholder="Search for an element" autofocus/>
+            </div>
+            <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
+                <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i>
+            </button>
+            <div class="search-filter-views-docs">
+                <input type="checkbox" ng-model="docsviews.selected"> Search for Views and Documents<br>
             </div>
         </form>
-        <div class="misc-form-field" ng-show="searchResults">
-            <div class="form-filter">
-                <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
-            </div>
-            <div class="container-search-type">
-                <div class="btn-group btn-group-xs search-filter-type">
-                    <button ng-click="setFilterFacet('all')" type="button"
-                            class="btn-filter-facet-all btn-search-type btn btn-default active">ALL
-                    </button>
-                    <button ng-click="setFilterFacet('name')" type="button"
-                            class="btn-filter-facet-name btn-search-type btn btn-default">NAME
-                    </button>
-                    <button ng-click="setFilterFacet('documentation')" type="button"
-                            class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION
-                    </button>
-                    <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
-                    <button ng-click="setFilterFacet('id')" type="button"
-                            class="btn-filter-facet-id btn-search-type btn btn-default">ID
-                    </button>
-                </div>
-            </div>
-            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
+        <div class="misc-form-field">
+            <a class="pull-right">Advanced</a>
         </div>
     </div>
-    <div class="container-fluid">
-        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
-        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+    <div class="misc-form-field" ng-show="searchResults">
+        <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
     </div>
     <div class="container-fluid" ng-show="searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
@@ -57,17 +40,13 @@
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
                 <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
             </div>
-            <div class="elem-type-wrapper">
-                <label>Last Modified</label>
-                <div>{{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
-            </div>
             <div class="elem-qualified-name-wrapper">
                 <div class="elem-qualified-name">
-                        {{elem._qualifiedName}}
+                    {{elem._qualifiedName}}
                 </div>
             </div>
             <div class="elem-documentation-wrapper">
-                <label>Documentation</label>
+                <label>Documentation:</label>
                 <div class="elem-documentation">
                     <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
                     <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem, 'doc')">
@@ -76,17 +55,20 @@
                 </div>
             </div>
             <div class="elem-type-wrapper">
-                <label>Metatypes</label>
-                <div class="elem-type">{{elem.type}}</div>
-                <div ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
-                    <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
-                </div>
+                <label>Metatypes:</label>
+                <span class="elem-type">{{elem.type}}</span><span ng-if="elem._appliedStereotypeIds.length">,</span>
+                <span ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
+                    <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name><span ng-if="!$last">,</span>
+                </span>
+            </div>
+            <div class="elem-updated-wrapper">
+                <div>Updated {{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
             </div>
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
                 <label>Value</label>
                 <div class="elem-properties">
                     <a ng-click="userResultClick(elem, 'val')">
-                            {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
+                        {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
                     </a>
                 </div>
             </div>
@@ -120,7 +102,15 @@
                         <tr ng-repeat="row in elem._properties2">
                             <td ng-repeat="property in row">
                                 {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
-                                <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}<span ng-if="property.type === 'Slot'" ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
+                                <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}
+                                    <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value|limitTo:4">
+                                        <span ng-bind-html="val.value | limitTo:300"></span>
+                                        <span ng-bind-html="val.body[0] | limitTo:300"></span>
+                                        <span ng-if="!val.value && !val.body[0]">Default Value</span>
+                                        <!-- {{$last ? '' : ', '}} -->
+                                    </span>
+                                    <span class="ellipses" ng-if="property.value.length > 10">...</span>
+                                </a>
                             </td>
                         </tr>
                     </tbody>
@@ -135,7 +125,11 @@
                 </div>
             </div>
         </div>
-        <hr/>
+        <hr>
+    </div>
+    <div class="container-fluid">
+        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
     </div>
 
     <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">

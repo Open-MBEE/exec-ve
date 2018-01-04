@@ -1,0 +1,66 @@
+.mms-search {
+  padding: 35px 60px;
+
+  hr {
+    border-color: $light_grey;
+  }
+
+  .elem-wrapper {
+    margin: 20px 0;
+
+    .elem-name {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .elem-qualified-name {
+      font-size: 14px;
+      font-style: italic;
+      color: $medium_grey;
+    }
+
+    .elem-documentation {
+      color: $base_blue !important;
+      table {
+        @extend .content-table;
+      }
+    }
+
+    label {
+      font-size: 16px;
+      margin: 10px 0 0 0;
+    }
+
+    .elem-properties-wrapper {
+      table > tbody > tr > td {
+        padding: 0;
+        border: 0;
+        min-width: 150px;
+        overflow: hidden;
+        border-right: 25px solid white;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .ellipses {
+      color: $base_blue;
+    }
+
+    .elem-updated-wrapper {
+      color: $medium_grey;
+      margin-top: 10px;
+    }
+
+  }
+
+  // No restults styles
+  .container-no-results {
+    color: $medium_grey;
+
+    h3 {
+      font-weight: 500;
+      margin: 40px auto;
+      width: 290px;
+    }
+  }
+}

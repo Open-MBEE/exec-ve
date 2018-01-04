@@ -107,28 +107,6 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSearch#setSearchType
-         * @methodOf mms.directives.directive:mmsSearch
-         *
-         * @description
-         * Activate selected filter facet button and set searchType scope variable which will be
-         * used to build query.
-         *
-         * @param {string} searchType search filter type i.e. all, name, id
-         */
-        scope.setSearchType = function(searchType) {
-            scope.searchType = searchType;
-            angular.element('.btn-search-all').removeClass('active');
-            angular.element('.btn-search-name').removeClass('active');
-            angular.element('.btn-search-documentation').removeClass('active');
-            angular.element('.btn-search-value').removeClass('active');
-            angular.element('.btn-search-id').removeClass('active');
-            angular.element('.btn-search-' + searchType).addClass('active');
-        };
-
-
-        /**
-         * @ngdoc function
          * @name mms.directives.directive:mmsSearch#setFilterFacet
          * @methodOf mms.directives.directive:mmsSearch
          *
@@ -185,7 +163,6 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
 
         scope.newSearch = function(searchText, page, numItems){
             scope.paginationCache = [];
-            // console.log(scope.paginationCache.length);
             scope.search(searchText, page, numItems);
         };
 
@@ -326,6 +303,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
                 q.fields = valueSearchFields;
                 mainQuery.multi_match = q;
             }
+            // TODO need to add metatype
 
             var projectTermsOb = getProjectMountsQuery();
             var mainBoolQuery = [mainQuery];
@@ -367,7 +345,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
         }
         if (scope.mmsOptions.searchInput) {
             scope.searchText = scope.mmsOptions.searchInput;
-            scope.newSearch(scope.searchText, 0, 50 , 2);
+            scope.newSearch(scope.searchText, 0, scope.itemsPerPage);
         }
         if (scope.mmsOptions.itemsPerPage) {
             scope.itemsPerPage = scope.mmsOptions.itemsPerPage;
