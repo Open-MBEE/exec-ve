@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -16,8 +16,8 @@ angular.module('mms')
  * @description
  * An element CRUD service with additional convenience methods for managing edits.
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService) {
-    
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
+
     var inProgress = {};// leave for now
     /**
      * @ngdoc method
@@ -473,24 +473,104 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         return deferred.promise;
     };
 
+    function _groupElementsByProjectIdAndRefId(elementObs) {
+        return _.groupBy(elementObs, function(element) {
+            return element._projectId + '|' + element._refId;
+        });
+    }
+
+    function _ensureElementObsHasId(elementObs) {
+        return _.every(elementObs, function(elementOb) {
+            return elementOb.hasOwnProperty('id');
+        });
+    }
+
+    function _createMetaOb(element) {
+        return {
+            projectId: element._projectId,
+            refId: element._refId,
+            commitId: 'latest',
+            elementId: element.id
+        };
+    }
+
+    function _bulkUpdateFailHandler(response, deferred) {
+        /** For now, do not need to handle conflict error **/
+        URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+    }
+
+    function _bulkUpdateSuccessHandler(serverResponse, deferred) {
+        var results = [];
+        var elements = serverResponse.data.elements;
+        elements.forEach(function (e) {
+            var metaOb = _createMetaOb(e);
+            var editCopy = JSON.parse(JSON.stringify(e));
+            results.push(cacheElement(metaOb, e));
+
+            cacheElement(metaOb, editCopy, true); // TODO:HONG what is this for?
+
+            var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
+            if (history) {
+                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
+            }
+        });
+        deferred.resolve(results);
+    }
+
+    function _bulkUpdate(elements, returnChildViews) {
+        var deferred = $q.defer();
+        $http.post(URLService.getPostElementsURL({
+            projectId: elements[0].projectId,
+            refId: elements[0].refId,
+            returnChildViews: returnChildViews
+        }), {
+            elements: elements,
+            source: ApplicationService.getSource()
+        }, {timeout: 60000})
+            .then(function (response) {
+                _bulkUpdateSuccessHandler(response, deferred);
+            }, function (response) {
+                _bulkUpdateFailHandler(response, deferred);
+            });
+
+        return deferred.promise;
+    }
     /**
-     * @ngdoc method
-     * @name mms.ElementService#updateElements
-     * @methodOf mms.ElementService
-     * 
-     * @description
-     * Save elements to alfresco and update the cache if successful.
-     * 
-     * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved.
-     * @returns {Promise} The promise will be resolved with an array of updated element references if 
-     *      update is successful.
-     */
-    var updateElements = function(elementObs, returnChildViews) { //do individual updates for now since post need to be given canonical project and ref
-        var promises = [];
-        for (var i = 0; i < elementObs.length; i++) {
-            promises.push(updateElement(elementObs[i], returnChildViews));
+     * 1. Ensure that every single elementOb has id. If not, reject the whole operation
+     * 2. Call fillInElement to store whatever need to be saved to the server
+     * 3. Group the elementObs by projectId and refId into different lists in order to do bulk updates
+     * 4. Make one http post for each group
+     * 5. Wait for all out them to finish by calling $q.all
+     *      - $q.all will fail when one of the http call fails meaning we can get into a state where some http calls
+     *      are successful, one http call fails ( the one that stops the rest ), and some other http calls fail, but
+     *      we are not aware of because of the stop. This is why we should use the allSettle function of Q lib but
+     *      to use it, we need to install new module
+     *      - for now just assume that everything works fine.
+     * **/
+    var updateElements = function(elementObs, returnChildViews) {
+        if ( !_ensureElementObsHasId(elementObs) ) {
+            var deferred = $q.defer();
+            deferred.reject({status: 400, data: '', message: '1 or more of the elements does not have an id.'});
+            return deferred.promise;
+        } else {
+            var postElements = elementObs.map(function(elementOb) {
+                return fillInElement(elementOb);
+            });
+
+            var groupOfElements = _groupElementsByProjectIdAndRefId(postElements);
+
+            var promises = [];
+
+            Object.keys(groupOfElements).forEach(function (key) {
+                promises.push(_bulkUpdate(groupOfElements[key], returnChildViews));
+            });
+
+            /** If we were to use allSettled instead, we have to be a bit more sophisticated here because
+             * allSettle will continue to work even after one request got rejected, so we have to handle that
+             * and report to the user of this method that way so that they can throw appropriate error.
+             **/
+            return $q.all(promises);
         }
-        return $q.all(promises);
     };
 
     /**
