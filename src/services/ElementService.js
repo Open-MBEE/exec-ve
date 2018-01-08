@@ -487,9 +487,17 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * **/
     var updateElements = function(elementObs, returnChildViews) {
         var deferred = $q.defer();
-        // TODO:HONG should we continue even if some of the elementObs do not have id?
-        if ( !_ensureElementObsHasId(elementObs) ) {
-            deferred.reject({status: 400, data: '', message: '1 or more of the elements does not have an id.'});
+        var elementsWithId = elementObs.filter(function(elementOb) {
+            return elementOb.hasOwnProperty('id');
+        });
+        // If all of the elementObs don't have id
+        if ( elementsWithId.length === 0 ) {
+            deferred.reject( {
+                failedRequests: [{
+                    status: 400, data: [elementObs], message: 'All of the elements do not have an id.'
+                }],
+                successfulRequests: []
+            });
             return deferred.promise;
         } else {
             var postElements = elementObs.map(function(elementOb) {
@@ -537,6 +545,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     var rejectionReasons = failedRequests.map(function(response) {
                        return response.reason;
                     });
+
+                    // if some elementObs do not have id, report that as well
+                    var elementsWithNoId = elementObs.filter(function(elementOb) {
+                        return !elementOb.hasOwnProperty('id');
+                    });
+                    if ( elementsWithNoId.length !== 0) {
+                        rejectionReasons.push({
+                            status: 400, data: [elementsWithNoId], message: 'All of these elements do not have an id.'
+                        });
+                    }
 
                     // If failedRequests.length > 1, different failed requests could have multiple rejection reasons
                     // return this format so that the client can decides what to do with these different reasons
@@ -767,12 +785,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     function _groupElementsByProjectIdAndRefId(elementObs) {
         return _.groupBy(elementObs, function(element) {
             return element._projectId + '|' + element._refId;
-        });
-    }
-
-    function _ensureElementObsHasId(elementObs) {
-        return _.every(elementObs, function(elementOb) {
-            return elementOb.hasOwnProperty('id');
         });
     }
 
