@@ -473,68 +473,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         return deferred.promise;
     };
 
-    function _groupElementsByProjectIdAndRefId(elementObs) {
-        return _.groupBy(elementObs, function(element) {
-            return element._projectId + '|' + element._refId;
-        });
-    }
-
-    function _ensureElementObsHasId(elementObs) {
-        return _.every(elementObs, function(elementOb) {
-            return elementOb.hasOwnProperty('id');
-        });
-    }
-
-    function _createMetaOb(element) {
-        return {
-            projectId: element._projectId,
-            refId: element._refId,
-            commitId: 'latest',
-            elementId: element.id
-        };
-    }
-
-    function _bulkUpdateFailHandler(response, deferred) {
-        /** For now, do not need to handle conflict error **/
-        URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-    }
-
-    function _bulkUpdateSuccessHandler(serverResponse, deferred) {
-        var results = [];
-        var elements = serverResponse.data.elements;
-        elements.forEach(function (e) {
-            var metaOb = _createMetaOb(e);
-            var editCopy = JSON.parse(JSON.stringify(e));
-            results.push(cacheElement(metaOb, e));
-
-            cacheElement(metaOb, editCopy, true); // TODO:HONG what is this for?
-
-            var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
-            if (history) {
-                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
-            }
-        });
-        deferred.resolve(results);
-    }
-
-    function _bulkUpdate(elements, returnChildViews) {
-        var deferred = $q.defer();
-        $http.post(URLService.getPostElementsURL({
-            projectId: elements[0].projectId,
-            refId: elements[0].refId,
-            returnChildViews: returnChildViews
-        }), {
-            elements: elements,
-            source: ApplicationService.getSource()
-        }, {timeout: 60000})
-            .then(function (response) {
-                _bulkUpdateSuccessHandler(response, deferred);
-            }, function (response) {
-                _bulkUpdateFailHandler(response, deferred);
-            });
-
-        return deferred.promise;
-    }
     /**
      * 1. Ensure that every single elementOb has id. If not, reject the whole operation
      * 2. Call fillInElement to store whatever need to be saved to the server
@@ -548,8 +486,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      *      - for now just assume that everything works fine.
      * **/
     var updateElements = function(elementObs, returnChildViews) {
+        var deferred = $q.defer();
+        // TODO:HONG should we continue even if some of the elementObs do not have id?
         if ( !_ensureElementObsHasId(elementObs) ) {
-            var deferred = $q.defer();
             deferred.reject({status: 400, data: '', message: '1 or more of the elements does not have an id.'});
             return deferred.promise;
         } else {
@@ -564,12 +503,49 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             Object.keys(groupOfElements).forEach(function (key) {
                 promises.push(_bulkUpdate(groupOfElements[key], returnChildViews));
             });
+            /**
+             * responses is an array of either one of the following element:
+             * {
+             *      state: 'fulfilled',
+              *     value: the value returned by the server
+             * } or
+             * {
+             *      state: 'rejected',
+             *      reason: {status, data, message} -- Specified by handleHttpStatus method above
+             * }
+             * **/
+            $q.allSettled(promises).then(function(responses) {
+                // get all the successful requests
+                var successfulRequests = responses.filter(function(response) {
+                    return response.state === 'fulfilled';
+                });
 
-            /** If we were to use allSettled instead, we have to be a bit more sophisticated here because
-             * allSettle will continue to work even after one request got rejected, so we have to handle that
-             * and report to the user of this method that way so that they can throw appropriate error.
-             **/
-            return $q.all(promises);
+                var successValues = successfulRequests.map(function(response){
+                    return response.value;
+                });
+
+                if ( successfulRequests.length === promises.length ) {
+                    // All requests succeeded
+                    deferred.resolve(successValues);
+                } else {
+                    // Some or all of the requests failed
+                    var failedRequests = responses.filter(function(response) {
+                        return response.state === 'rejected';
+                    });
+                    console.log( successfulRequests.length + " requests succeeded");
+                    console.log( failedRequests.length + " requests failed");
+                    var rejectionReasons = failedRequests.map(function(response) {
+                       return response.reason;
+                    });
+
+                    // If failedRequests.length > 1, different failed requests could have multiple rejection reasons
+                    // return this format so that the client can decides what to do with these different reasons
+                    deferred.reject({
+                        failedRequests: rejectionReasons,
+                        successfulRequests: successValues
+                    });
+                }
+            });
         }
     };
 
@@ -787,6 +763,70 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var reset = function() {
         inProgress = {};
     };
+
+    function _groupElementsByProjectIdAndRefId(elementObs) {
+        return _.groupBy(elementObs, function(element) {
+            return element._projectId + '|' + element._refId;
+        });
+    }
+
+    function _ensureElementObsHasId(elementObs) {
+        return _.every(elementObs, function(elementOb) {
+            return elementOb.hasOwnProperty('id');
+        });
+    }
+
+    function _createMetaOb(element) {
+        return {
+            projectId: element._projectId,
+            refId: element._refId,
+            commitId: 'latest',
+            elementId: element.id
+        };
+    }
+
+    /** For now, not doing anything special there is a "conflict" error **/
+    function _bulkUpdateFailHandler(response, deferred) {
+        URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+    }
+
+    function _bulkUpdateSuccessHandler(serverResponse, deferred) {
+        var results = [];
+        var elements = serverResponse.data.elements;
+        elements.forEach(function (e) {
+            var metaOb = _createMetaOb(e);
+            var editCopy = JSON.parse(JSON.stringify(e));
+            results.push(cacheElement(metaOb, e));
+
+            cacheElement(metaOb, editCopy, true);
+
+            var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
+            if (history) {
+                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
+            }
+        });
+        deferred.resolve(results);
+    }
+
+    function _bulkUpdate(elements, returnChildViews) {
+        var deferred = $q.defer();
+        $http.post(URLService.getPostElementsURL({
+            projectId: elements[0].projectId,
+            refId: elements[0].refId,
+            returnChildViews: returnChildViews
+        }), {
+            elements: elements,
+            source: ApplicationService.getSource()
+        }, {timeout: 60000})
+            .then(function (response) {
+                _bulkUpdateSuccessHandler(response, deferred);
+            }, function (response) {
+                _bulkUpdateFailHandler(response, deferred);
+            });
+
+        return deferred.promise;
+    }
+
 
     return {
         getElement: getElement,

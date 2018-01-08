@@ -241,7 +241,76 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         description: 'save all',
         callback: function() {$scope.$broadcast('element-editor-saveall');}
     });
+
+
+    // TODO:HONG saveAll
     var savingAll = false;
+    // $scope.$on('element-editor-saveall', function() {
+    //     if (savingAll) {
+    //         growl.info('Please wait...');
+    //         return;
+    //     }
+    //     var ve_edits = $rootScope.ve_edits;
+    //     if (Object.keys(ve_edits).length === 0) {
+    //         growl.info('Nothing to save');
+    //         return;
+    //     }
+    //
+    //     Object.values(ve_edits).forEach(function(ve_edit) {
+    //        Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
+    //     });
+    //
+    //     if ($scope.specApi && $scope.specApi.editorSave)
+    //         $scope.specApi.editorSave();
+    //     savingAll = true;
+    //     $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
+    //     var promises = [];
+    //     angular.forEach($rootScope.ve_edits, function(value, key) {
+    //         var defer = $q.defer();
+    //         promises.push(defer.promise);
+    //         ElementService.updateElement(value)
+    //         .then(function(e) {
+    //             defer.resolve({status: 200, ob: value});
+    //         }, function(reason) {
+    //             defer.resolve({status: reason.status, ob: value});
+    //         });
+    //     });
+    //     $q.all(promises).then(function(results) {
+    //         var somefail = false;
+    //         var failed = null;
+    //         for (var i = 0; i < results.length; i++) {
+    //             var ob = results[i];
+    //             if (ob.status === 200) {
+    //                 delete $rootScope.ve_edits[ob.ob.id + '|' + ob.ob._projectId + '|' + ob.ob._refId];
+    //                 $rootScope.$broadcast('element.updated', ob.ob, 'all');
+    //             } else {
+    //                 somefail = true;
+    //                 failed = ob.ob;
+    //             }
+    //         }
+    //         if (!somefail) {
+    //             growl.success("Save All Successful");
+    //             $rootScope.ve_tbApi.select('element-viewer');
+    //             $scope.specApi.setEditing(false);
+    //         } else {
+    //             $scope.tracker.etrackerSelected = failed.id + '|' + failed._projectId + '|' + failed._refId;
+    //             $scope.specApi.keepMode();
+    //             $scope.specInfo.id = failed.id;
+    //             $scope.specInfo.projectId = failed._projectId;
+    //             $scope.specInfo.refId = failed._refId;
+    //             $scope.specInfo.commitId = 'latest';
+    //             growl.error("Some elements failed to save, resolve individually in edit pane");
+    //         }
+    //         $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
+    //         savingAll = false;
+    //         cleanUpSaveAll();
+    //
+    //         if (Object.keys($rootScope.ve_edits).length === 0) {
+    //             $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+    //         }
+    //     });
+    // });
+
     $scope.$on('element-editor-saveall', function() {
         if (savingAll) {
             growl.info('Please wait...');
@@ -261,51 +330,40 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             $scope.specApi.editorSave();
         savingAll = true;
         $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
-        var promises = [];
-        angular.forEach($rootScope.ve_edits, function(value, key) {
-            var defer = $q.defer();
-            promises.push(defer.promise);
-            ElementService.updateElement(value)
-            .then(function(e) {
-                defer.resolve({status: 200, ob: value});
-            }, function(reason) {
-                defer.resolve({status: reason.status, ob: value});
-            });
-        });
-        $q.all(promises).then(function(results) {
-            var somefail = false;
-            var failed = null;
-            for (var i = 0; i < results.length; i++) {
-                var ob = results[i];
-                if (ob.status === 200) {
+        ElementService.updateElements($rootScope.ve_edits)
+            .then(function(responses) {
+                // all requests succeeded
+                responses.forEach(function(ob) {
                     delete $rootScope.ve_edits[ob.ob.id + '|' + ob.ob._projectId + '|' + ob.ob._refId];
                     $rootScope.$broadcast('element.updated', ob.ob, 'all');
-                } else {
-                    somefail = true;
-                    failed = ob.ob;
-                }
-            }
-            if (!somefail) {
-                growl.success("Save All Successful");
-                $rootScope.ve_tbApi.select('element-viewer');
-                $scope.specApi.setEditing(false);
-            } else {
-                $scope.tracker.etrackerSelected = failed.id + '|' + failed._projectId + '|' + failed._refId;
-                $scope.specApi.keepMode();
-                $scope.specInfo.id = failed.id;
-                $scope.specInfo.projectId = failed._projectId;
-                $scope.specInfo.refId = failed._refId;
-                $scope.specInfo.commitId = 'latest';
-                growl.error("Some elements failed to save, resolve individually in edit pane");
-            }
-            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
-            savingAll = false;
-            cleanUpSaveAll();
+                    growl.success("Save All Successful");
+                    $rootScope.ve_tbApi.select('element-viewer');
+                    $scope.specApi.setEditing(false);
+                });
 
-            if (Object.keys($rootScope.ve_edits).length === 0) {
-                $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
-            }
-        });
+            }, function(response) {
+                // at least one request has failed
+                // TODO:HONG we could have multiple group of failed requests ( each group is a list of elements grouped by projectId and refId )
+                // TODO:HONG so what to report here?
+
+
+                // $scope.tracker.etrackerSelected = failed.id + '|' + failed._projectId + '|' + failed._refId;
+                // $scope.specApi.keepMode();
+                // $scope.specInfo.id = failed.id;
+                // $scope.specInfo.projectId = failed._projectId;
+                // $scope.specInfo.refId = failed._refId;
+                // $scope.specInfo.commitId = 'latest';
+                // growl.error("Some elements failed to save, resolve individually in edit pane");
+
+
+            }).finally(function() {
+                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
+                savingAll = false;
+                cleanUpSaveAll();
+                if (Object.keys($rootScope.ve_edits).length === 0) {
+                    $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+                }
+            });
     });
     $scope.$on('element-editor-cancel', function() {
         var go = function() {

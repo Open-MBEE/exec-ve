@@ -124,6 +124,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                         updateSectionElementOrder(elementReference.sectionElements[i]);
                 }
                 if (!angular.equals(operand, origOperand))
+                                                // TODO:HONG the second parameter is wrong. it should be a boolean value
                     promises.push(ElementService.updateElement(sectionEdit, scope.mmsRefId));
             };
 
