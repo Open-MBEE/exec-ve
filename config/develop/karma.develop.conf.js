@@ -17,6 +17,7 @@ module.exports = function (config) {
         files: [
             "build/bower_components/jquery/dist/jquery.js",
             "build/bower_components/angular/angular.js",
+            "build/bower_components/angular-promise-extras/angular-promise-extras.js",
             'build/bower_components/angular-mocks/angular-mocks.js',
             "build/bower_components/angular-animate/angular-animate.js",
             "build/bower_components/angular-borderlayout/src/borderLayout.js",
@@ -25,6 +26,12 @@ module.exports = function (config) {
             "build/bower_components/angular-ui-tree/dist/angular-ui-tree.js",
             "build/bower_components/angular-growl-v2/build/angular-growl.js",
             "build/bower_components/angular-hotkeys/build/hotkeys.min.js",
+
+            "build/bower_components/angulartics/dist/angulartics.min.js",
+            "build/bower_components/angulartics-piwik/dist/angulartics-piwik.min.js",
+            "build/bower_components/angular-diff-match-patch/angular-diff-match-patch.js",
+            "build/bower_components/ngStorage/ngStorage.min.js",
+
             "build/bower_components/lodash/lodash.js",
             "build/bower_components/stompjs/lib/stomp.min.js",
             "build/bower_components/d3/d3.js",

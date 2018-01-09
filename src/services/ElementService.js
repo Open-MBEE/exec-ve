@@ -540,7 +540,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             });
         } else {
             deferred.reject( {
-                failedRequests: [ { status: 400, data: [], message: 'Some of the elements do not have id, _projectId, _refId' } ],
+                failedRequests: [ { status: 400, data: elementObs, message: 'Some of the elements do not have id, _projectId, _refId' } ],
                 successfulRequests: []
             });
         }
