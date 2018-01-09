@@ -129,12 +129,13 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
         .then(function() {
             growl.success('Reorder Successful');
             $state.go('project.ref.document', {}, {reload:true});
-        }, function(reason) {
-            // TODO:HONG how do we want to report all the errors
+        }, function(response) {
+            var reason = response.failedRequests[0];
+            var errorMessage = reason.message;
             if (reason.status === 409) {
                 growl.error("There's a conflict in the views you're trying to change!");
             } else {
-                growl.error(reason.message);
+                growl.error(errorMessage);
             }
         }).finally(function() {
             $scope.saveClass = "";
