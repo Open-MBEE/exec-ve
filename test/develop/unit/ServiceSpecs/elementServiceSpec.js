@@ -13,9 +13,8 @@ describe('Service: ElementService', function() {
 	var result = {};
 	var elementHistory;
 
-	beforeEach(module('mms')); // TODO:HONG probably dont need to load this because mmsApp already has is a dep
-    beforeEach(module('mmsApp'));
 	beforeEach(function() {
+		module('mmsApp');
 		inject(function($injector) {
 			$httpBackend 			= $injector.get('$httpBackend');
 			mockURLService			= $injector.get('URLService');
@@ -275,9 +274,9 @@ describe('Service: ElementService', function() {
 		// $httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, elementHistory);
 	});
 
-	describe('updateElement', function() {
-        /** 1. test a case where all the elementObs do not have the required fields (id or _refId or _projectId) **/
-        fit('1', function() {
+	describe('updateElements', function() {
+        it('should respond with the appropriately formatted response when updating elements that do not have the' +
+			' required fields (id, _refId, _projectId)', function() {
             var elementObs = [
                 {
                     _projectId: "heyaproject",
@@ -289,23 +288,20 @@ describe('Service: ElementService', function() {
                 }
             ];
             ElementServiceObj.updateElements(elementObs).then(function() {
-                new Error("Promise should not be resolved because elementObs do not have id, _projectId, _refId");
+                fail("Promise should not be resolved because elementObs do not have id, _projectId, _refId");
             }, function(response) {
-                // Assert to make sure that the response structure is as followed
-                expect(response.successfulRequests).toBeDefined();
-                expect(response.successfulRequests.length).toEqual(0);
+                // Assert to make sure that the response is format correctly, because users of this method expect this
                 var failedRequests = response.failedRequests[0];
-                expect(failedRequests).toBeDefined();
+                expect(response.successfulRequests.length).toEqual(0);
+                expect(response.failedRequests.length).toEqual(1);
                 expect(failedRequests.message).toEqual('Some of the elements do not have id, _projectId, _refId');
                 expect(failedRequests.status).toEqual(400);
                 expect(failedRequests.data).toEqual(elementObs);
             });
         });
 
-        /** 2. test a case where all the elementObs have required fields (id or _refId or _projectId),
-         * have the same _refId and _projectId, and the call is successful
-         **/
-        fit('2', function() {
+        it('should respond with the appropriately formatted response when updating elements that have all the' +
+			' required fields', function() {
             var elementObs = [
                 {
                     id: 1,
@@ -327,18 +323,18 @@ describe('Service: ElementService', function() {
                 elements: elementObs
             };
 
-            // assert to make sure that updateElements success callback is called
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(200, mockedData);
+            // Ensure that the success handler is triggered correctly
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(200, mockedData);
             ElementServiceObj.updateElements(elementObs).then(function(responses) {
                 expect(responses.length).toEqual(2);
             }, function() {
-                new Error("Promise should be resolved successfully");
+                fail("Promise should be resolved successfully");
             });
 
-            // assert to make sure that updateElements can handle error
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(500, mockedData);
+            // Ensure that the error handler is triggered correctly
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(500, mockedData);
             ElementServiceObj.updateElements(elementObs).then(function() {
-                new Error("Promise should not be resolved successfully");
+                fail("Promise should not be resolved successfully");
             }, function(response) {
                 expect(response.failedRequests[0].status).toEqual(500);
                 expect(response.failedRequests[0].data).toEqual(elementObs);
@@ -346,53 +342,8 @@ describe('Service: ElementService', function() {
             $httpBackend.flush();
         });
 
-        /** 3. test a case where all the elementObs have required fields (id or _refId or _projectId),
-         * have the same _projectId, but different _refId and the call is successful
-         **/
-        fit('3', function() {
-            var element1 = {
-                id: 1,
-                _projectId: "heyaproject",
-                _refId: 'ref1',
-                _commitId: 'latest',
-                name: '1'
-            };
-            var element2 = {
-                id: 2,
-                _projectId: "heyaproject",
-                _refId: 'ref2',
-                _commitId: 'latest',
-                name: '2'
-            };
-            var elementObs = [ element1, element2 ];
-
-            var mockedData1 = {
-                elements: [element1]
-            };
-
-            var mockedData2 = {
-                elements: [element2]
-            };
-
-            // Since these two element have different _refId, we expect two post requests
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/ref1/elements').respond(200, mockedData1);
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/ref2/elements').respond(200, mockedData2);
-
-            // updateElements however will wait for both requests and consolidate the result
-            ElementServiceObj.updateElements(elementObs).then(function(responses) {
-                expect(responses.length).toEqual(2);
-                expect(responses).toEqual(elementObs);
-            }, function() {
-                new Error("Promise should be resolved successfully");
-            });
-            $httpBackend.flush();
-        });
-
-        /** 3. test a case where all the elementObs have required fields (id or _refId or _projectId),
-         * some elementObs have the same _refId and _projectId and some don't. Make sure multiple call were made.
-         * Assume all calls are successful
-         **/
-        fit('3', function() {
+        it('should respond with the appropriately formatted response when updating elements where some of them share' +
+			' the same _refId and _projectId and some do not', function() {
             var element1 = {
                 id: 1,
                 _projectId: "heyaproject",
@@ -424,27 +375,24 @@ describe('Service: ElementService', function() {
                 elements: [element2, element3]
             };
 
-            // There should be two different post requests because element2 and element3 same _refId and _projectId
+            // There should be two different post requests because element2 and element3 have same _refId and _projectId
             // while element1 has different _refId from the other two
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/ref1/elements').respond(200, mockedData1);
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/ref2/elements').respond(200, mockedData2);
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref1/elements').respond(200, mockedData1);
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref2/elements').respond(200, mockedData2);
 
             // updateElements however will wait for both requests and consolidate the result
             ElementServiceObj.updateElements(elementObs).then(function(responses) {
                 expect(responses.length).toEqual(3);
                 expect(responses).toEqual(elementObs);
             }, function() {
-                new Error("Promise should be resolved successfully");
+                fail("Promise should be resolved successfully");
             });
             $httpBackend.flush();
 
         });
 
-        /** 4. test a case where all the elementObs have required fields (id or _refId or _projectId),
-         * some elementObs have the same _refId and _projectId and some don't. Make sure multiple call were made.
-         * Assume some calls are successful while some are not
-         **/
-        fit('4', function() {
+        it('should respond with the appropriately formatted response when updating elements where some of them share' +
+			' the same _refId and _projectId and some do not and when one of the requests fails', function() {
             var element1 = {
                 id: 1,
                 _projectId: "heyaproject",
@@ -467,14 +415,14 @@ describe('Service: ElementService', function() {
                 name: '3'
             };
 
-            // There should be two different post requests because element2 and element3 same _refId and _projectId
-            // while element1 has different _refId from the other two
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/ref1/elements').respond(500, { elements: [element1]});
-            $httpBackend.whenPOST('/alfresco/service/projects/heyaproject/refs/ref2/elements').respond(200, { elements: [element2, element3]});
+            // There should be two different post requests because element2 and element3 have the same _refId and _projectId
+            // while element1 has different _refId from the other two. Fail one of the requests
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref1/elements').respond(500, { elements: [element1]});
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref2/elements').respond(200, { elements: [element2, element3]});
 
             // updateElements however will wait for both requests and consolidate the result
             ElementServiceObj.updateElements([ element1, element2, element3 ]).then(function(responses) {
-                new Error("Promise should be resolved successfully because 1 of the requests failed with status code 500");
+                fail("Promise should be resolved successfully because 1 of the requests failed with status code 500");
             }, function(response) {
                 // one failed request
                 expect(response.failedRequests.length).toEqual(1);
@@ -485,7 +433,6 @@ describe('Service: ElementService', function() {
             });
             $httpBackend.flush();
         });
-
     });
 
 	afterEach(function () {
