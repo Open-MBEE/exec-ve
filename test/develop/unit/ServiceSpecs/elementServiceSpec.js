@@ -25,6 +25,13 @@ describe('Service: ElementService', function() {
 			ElementServiceObj		= $injector.get('ElementService');
 		});
 
+        $httpBackend.whenGET(function(url) {
+        	return url.indexOf('/alfresco/service/mms/login/ticket/') !== -1;
+		} ).respond(200, {username: 'fakeUser'});
+        $httpBackend.whenGET(function(url) {
+            return url.indexOf('/alfresco/service/orgs?alf_ticket') !== -1;
+        } ).respond(200, {orgs: ['org1']});
+
 		projects = {
 			projects: [
 				{
@@ -248,7 +255,7 @@ describe('Service: ElementService', function() {
 			collaborationUseIds 		: [],
 			isFinalSpecialization 		: false,
 			_projectId 					: "heyaproject"
-		}
+		};
 
 		// //GETELEMENTHISTORY:
 		// elementHistory = {
@@ -298,6 +305,7 @@ describe('Service: ElementService', function() {
                 expect(failedRequests.status).toEqual(400);
                 expect(failedRequests.data).toEqual(elementObs);
             });
+            $httpBackend.flush();
         });
 
         it('should respond with the appropriately formatted response when updating elements that have all the' +

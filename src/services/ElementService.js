@@ -520,12 +520,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     // All requests succeeded
                     deferred.resolve(successValues);
                 } else {
-                    // get all the failed requests
-                    var failedRequests = responses.filter(function(response) {
+                    // some requests failed
+                    var rejectionReasons = responses.filter(function(response) {
                         return response.state === 'rejected';
-                    });
-
-                    var rejectionReasons = failedRequests.map(function(response) {
+                    }).map(function(response) {
                         return response.reason;
                     });
 
