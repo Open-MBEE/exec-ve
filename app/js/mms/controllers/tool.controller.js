@@ -348,15 +348,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.success('Save Succesful');
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
             $rootScope.$broadcast('view.reorder.saved', $scope.viewId);
-        }, function(reason) {
+        }, function(response) {
             $scope.viewContentsOrderApi.refresh();
             viewSaving = false;
-            if (reason.type === 'info')
-                growl.info(reason.message);
-            else if (reason.type === 'warning')
-                growl.warning(reason.message);
-            else if (reason.type === 'error')
-                growl.error(reason.message);
+            var reason = response.failedRequests[0];
+            growl.error(reason.message);
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
         });
         $rootScope.ve_tbApi.select('view-reorder');
