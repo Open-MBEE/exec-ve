@@ -12,6 +12,8 @@ mms-transclude-img {
 }
 
 mms-view {
+  //set display inline for nested transcluded paragraphs and first p in table cells
+  //to prevent unwanted newlines and excessive spacing in table cells
   mms-cf mms-cf{
     mms-transclude-doc {
       > p:first-child {
@@ -19,7 +21,11 @@ mms-view {
       }
     }
   }
-
+  table td mms-transclude-doc {
+    > p:first-child, > div:first-child {
+      display: inline;
+    }
+  }
   .add-buttons-container {
     display: none;
   }
