@@ -297,7 +297,7 @@ describe('Service: ElementService', function() {
             ElementServiceObj.updateElements(elementObs).then(function() {
                 fail("Promise should not be resolved because elementObs do not have id, _projectId, _refId");
             }, function(response) {
-                // Assert to make sure that the response is format correctly, because users of this method expect this
+                // Assert to make sure that the response is formatted correctly, because users of this method expect this
                 var failedRequests = response.failedRequests[0];
                 expect(response.successfulRequests.length).toEqual(0);
                 expect(response.failedRequests.length).toEqual(1);
@@ -396,7 +396,6 @@ describe('Service: ElementService', function() {
                 fail("Promise should be resolved successfully");
             });
             $httpBackend.flush();
-
         });
 
         it('should respond with the appropriately formatted response when updating elements where some of them share' +

@@ -817,9 +817,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         deferred.resolve(results);
     }
 
-    /** For now, not doing anything special there is a "conflict" error **/
+    /** For now, not doing anything special when there is a "conflict" error **/
     function _bulkUpdateFailHandler(response, deferred, elementObs) {
-        // for now the server doesn't return anything for the data properties, so override it
+        // for now the server doesn't return anything for the data properties, so override with the input
         response.data = elementObs;
         URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
     }
