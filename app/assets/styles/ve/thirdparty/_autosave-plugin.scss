@@ -147,6 +147,11 @@
     }
   }
 
+  /* Set width to 100% when there is no initial content*/
+  table.diff{
+    width: 100%;
+    box-sizing: border-box;
+  }
 
   /* Hide credits for plugin author*/
   table.diff th.author{

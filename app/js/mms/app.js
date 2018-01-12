@@ -19,19 +19,22 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
     $urlRouterProvider.otherwise(function($injector, $location) {
         var $rootScope = $injector.get('$rootScope');
-        if ($location.url().includes('workspace')) {
-            $rootScope.redirect_from_old_site = true;
-        } else {
-            $rootScope.redirect_from_old_site = false;
-        }
         var $state = $injector.get('$state');
         var checkLogin = $injector.get('AuthService').checkLogin();
         if (checkLogin) {
-            $state.go('login.select');
+            if ($location.url().includes('workspace')) {
+                $rootScope.redirect_from_old_site = true;
+                $rootScope.crush_url = $location.path();
+                $state.go('login.redirect');
+            } else {
+                $rootScope.redirect_from_old_site = false;
+                $state.go('login.select');
+            }
         } else {
             $state.go('login');
         }
     });
+
 
     $stateProvider
     .state('login', {
@@ -65,6 +68,31 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         });
                     };
                 }
+            }
+        }
+    })
+    .state('login.redirect', {
+        url: '/redirect',
+        resolve: {
+            ticket: function($window, URLService, AuthService, $q, ApplicationService) {
+                var deferred = $q.defer();
+                AuthService.checkLogin().then(function(data) {
+                    ApplicationService.setUserName(data);
+                    URLService.setTicket($window.localStorage.getItem('ticket'));
+                    deferred.resolve($window.localStorage.getItem('ticket'));
+                }, function(rejection) {
+                    deferred.reject(rejection);
+                });
+                return deferred.promise;
+            },
+            projectObs: function(ProjectService) {
+                return ProjectService.getProjects();
+            }
+        },
+        views: {
+            'login@': {
+                templateUrl: 'partials/mms/redirect.html',
+                controller: 'RedirectCtrl'
             }
         }
     })

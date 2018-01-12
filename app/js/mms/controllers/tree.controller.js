@@ -207,8 +207,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 });
             }
             groupNode.loading = false;
-            if ($scope.treeApi.refresh) {
-                $scope.treeApi.refresh();
+            if ($scope.treeApi.initialSelect) {
+                $scope.treeApi.initialSelect();
             }
         });
     };
@@ -276,8 +276,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     });
                 }
             }
-            if ($scope.treeApi.refresh) {
-                $scope.treeApi.refresh();
+            if ($scope.treeApi.initialSelect) {
+                $scope.treeApi.initialSelect();
             }
         });
     } else {
@@ -302,7 +302,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 refId: refOb.id
             }, 0).finally(function() {
                 for (var i in viewId2node) {
-                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i], true);
                 }
                 $scope.treeApi.refresh();
             });
@@ -312,7 +312,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeData = [viewId2node[documentOb.id]];
     }
 
-    function addSectionElements(element, viewNode, parentNode) {
+    function addSectionElements(element, viewNode, parentNode, initial) {
         var contents = null;
 
         var addContentsSectionTreeNode = function(operand) {
@@ -349,7 +349,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                             };
                             viewId2node[instance.id] = sectionTreeNode;
                             parentNode.children.unshift(sectionTreeNode);
-                            addSectionElements(instance, viewNode, sectionTreeNode);
+                            addSectionElements(instance, viewNode, sectionTreeNode, initial);
                         } else if (ViewService.getTreeType(instance)) {
                             var otherTreeNode = {
                                 label : instance.name,
@@ -363,6 +363,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         }
                     }
                     $scope.treeApi.refresh();
+                    if (initial) {
+                        $scope.treeApi.initialSelect();
+                    }
                     resetPeTreeList('all');
                 }, function(reason) {
                     //view is bad
@@ -626,8 +629,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 refId: $scope.parentBranchData._refId,
                 aggr: $scope.newViewAggr.type
             }).then(function(data) {
-                growl.success("View Added");
-                $uibModalInstance.close(view);
+                ElementService.getElement({
+                    elementId: viewId,
+                    projectId: view._projectId,
+                    refId: view._refId
+                }, 2, false)
+                .then(function(realView) {
+                    $uibModalInstance.close(realView);
+                }, function() {
+                    $uibModalInstance.close(view);
+                }).finally(function() {
+                    growl.success("View Added");
+                });
             }, function(reason) {
                 growl.error("View Add Error: " + reason.message);
             }).finally(function() {

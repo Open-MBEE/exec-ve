@@ -25,6 +25,8 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
+ * @param {bool} mmsWatchId set to true to not destroy element ID watcher
+ * @param {boolean=false} nonEditable can edit inline or not
  */
 function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils) {
 
@@ -95,8 +97,9 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal)
                 return;
-            if (!scope.mmsWatchId)
+            if (!scope.mmsWatchId) {
                 idwatch();
+            }
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
@@ -108,6 +111,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             .then(function(data) {
                 scope.element = data;
                 recompile();
+                Utils.reopenUnsavedElts(scope, "name");
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }

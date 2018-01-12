@@ -236,12 +236,12 @@ module.exports = function(grunt) {
       options: {
         dest: 'build/docs',
         html5Mode: false,
-        title: 'MMS',
+        title: 'View Editor',
         startPage: '/api'
       },
       api: {
-        src: ['src/**/*.js'],
-        title: 'MMS API'
+        src: ['src/**/*.js', 'app/js/**/*.js'],
+        title: 'MMS/VE API'
       }
     },
 
@@ -296,7 +296,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '3.2.1',
+            version: '3.2.2',
             path: 'deploy/'
           }]
         }

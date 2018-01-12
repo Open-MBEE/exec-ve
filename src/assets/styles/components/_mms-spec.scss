@@ -47,4 +47,24 @@
   table {
     @extend .content-table;
   }
+
+  mms-spec div {
+    mms-transclude-doc {
+      cursor: auto;
+    }
+
+    mms-view-link {
+      background-color: $light_blue;
+    }
+
+    mms-transclude-com {
+      background-color: $yellow;
+      cursor: auto;
+      display: block;
+      border-radius: 5px;
+      padding: 2px;
+      margin-bottom: 5px;
+    }
+  }
+
 }

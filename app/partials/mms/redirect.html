@@ -1,0 +1,38 @@
+<div id="ve-origin-select" class="row">
+    <div class="account-wall-lg" ng-if="redirect_from_old_site">
+            <div ng-if="!redirect_element && !redirect_noResults && !redirect_relatedDocs.length">
+                <h2>This link is not valid</h2>
+                <h4><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> We are searching for your content</h4>
+            </div>
+            <!-- Content moved and results found -->
+            <div ng-if="!redirect_noResults && redirect_element.link">
+                <h2>This content has moved</h2>
+                <h4>You will be redirected to the new location at 
+                    <a style="text-decoration:underline;" ng-if="redirect_element.link" ui-sref="{{ redirect_element.link }}">
+                    <!-- <i ng-class="{'fa fa-folder': redirect_element.type === 'group', 'fa fa-file': $last && redirect_element.type === 'doc'}"></i> -->
+                    {{ redirect_element.name }}</a> in 10 seconds.
+                </h4>
+                <!-- <button class="btn btn-primary"><i class="fa fa-bookmark" aria-hidden="true" style="padding-right:10px;"></i>Bookmark New Link</button> -->
+                <button style="margin-top:60px;" class="btn btn-primary" ng-click="resetSelectPage()">View Editor Home</button>
+            </div>
+            <!-- no content found -->
+            <div ng-if="redirect_noResults">
+                <h2>This link is not valid</h2>
+                <h4>Related content not found for this link. If you believe your content was not moved or deleted, please navigate to it in View Editor and rebookmark.</h4>
+                <button style="margin-top:60px;" class="btn btn-primary" ng-click="resetSelectPage()">View Editor Home</button>
+            </div>
+            <!-- views found in docs - allow user to select -->
+            <div ng-if="redirect_relatedDocs.length">
+                <h2>This link is not valid</h2>
+                <h4>Here are documents related to the content you are looking for:</h4>
+                <div ng-repeat="relatedDocument in redirect_relatedDocs" class="elem-documentation">
+                    <a style="text-decoration:underline;" ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="project.ref.document.view({documentId: relatedDocument.id, viewId: relatedView.id, projectId: relatedDocument._projectId, refId: relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}"></mms-view-link> > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}"></mms-view-link><br/>
+                    </a>
+                </div>
+                <button style="margin-top:60px;" class="btn btn-primary" ng-click="resetSelectPage()">View Editor Home</button>
+                <!-- <h4 style="margin-top:60px;"><a style="text-decoration:underline;" ng-click="resetSelectPage()">View Editor home</a></h4> -->
+            </div>
+    </div>
+</div>
