@@ -126,6 +126,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
             tableName = 'Classifiers';
             edgeTableName = "Associations";
             inspectorName = "Details";
+            controlsTreeName = "Controls";
             break;
         case "AD":
             viewName = "Activity Diagram";
