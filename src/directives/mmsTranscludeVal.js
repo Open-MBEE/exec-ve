@@ -124,10 +124,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     domElement[0].innerHTML = toCompile;
                 }
                 $(domElement[0]).find('img').each(function(index) {
-                    var src = $(this).attr('src');
-                    if (src && src.startsWith('/alfresco')) {
-                        $(this).attr('src', src + '?alf_ticket=' + AuthService.getTicket());
-                    }
+                    Utils.fixImgSrc($(this));
                 });
                 if (MathJax) {
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
