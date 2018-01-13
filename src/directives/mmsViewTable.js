@@ -367,9 +367,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
                 var cf = 'mms-cf';
                 var contentTag = containerDivContent.prop('tagName').toLowerCase();
                 var contentTagAttr = containerDivContent.attr('mms-cf-type');
-                if ( contentTag === 'img'
-                    || contentTag === 'table'
-                    || contentTag === cf && ( contentTagAttr === 'img' || contentTagAttr === 'table' )) {
+                if ( contentTag === 'img' || contentTag === 'table' || contentTag === cf && ( contentTagAttr === 'img' || contentTagAttr === 'table' )) {
                     return null;
                 } else {
                     return cell.text().trim();
