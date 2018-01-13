@@ -249,27 +249,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         /** Return the content of a cell given a row & columnIndex **/
         function _getCellValueForFiltering(row, columnIndex) {
             var cell = $(row).children('td').eq(columnIndex);
-            var containerDivContent = cell.children('div').contents();
-            // if there is no content, think of it as empty string
-            if (containerDivContent.length === 0) {
-                return '';
-            } else {
-                var cf = 'mms-cf';
-                var contentTagName = containerDivContent.prop('tagName').toLowerCase();
-                var contentTagAttr = containerDivContent.attr('mms-cf-type');
-                var textNodeTypeVal = 3;
-                if (containerDivContent[0].nodeType === textNodeTypeVal || (contentTagName === cf &&
-                        ( contentTagAttr === 'name' || contentTagAttr === 'doc' || contentTagAttr === 'val' ) ) ||
-                    contentTagName === 'ol' || contentTagName === 'ul' || contentTagName === 'table'
-                ) {
-                    return cell.text().trim();
-                    // return '' so that images only show up when there is no search term
-                } else if ( contentTagName === cf && contentTagAttr === 'img' ) {
-                    return '';
-                } else {
-                    return '';
-                }
-            }
+            return cell.text().trim();
         }
 
         /** Clear out filter term(s) for all header's columns that used to be filtered by before **/
@@ -387,11 +367,12 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
                 var cf = 'mms-cf';
                 var contentTag = containerDivContent.prop('tagName').toLowerCase();
                 var contentTagAttr = containerDivContent.attr('mms-cf-type');
-                var textNodeTypeVal = 3;
-                if (containerDivContent[0].nodeType === textNodeTypeVal || (contentTag === cf && ( contentTagAttr === 'name' || contentTagAttr === 'doc' || contentTagAttr === 'val' ) )) {
-                    return cell.text().trim();
-                } else {
+                if ( contentTag === 'img'
+                    || contentTag === 'table'
+                    || contentTag === cf && ( contentTagAttr === 'img' || contentTagAttr === 'table' )) {
                     return null;
+                } else {
+                    return cell.text().trim();
                 }
             }
         }
