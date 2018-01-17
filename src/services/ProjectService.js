@@ -1,20 +1,23 @@
 'use strict';
 
 angular.module('mms')
-.factory('ProjectService', ['$q', '$http', 'URLService', 'CacheService', 'ApplicationService', ProjectService]);
+.factory('ProjectService', ['$q','$http','ApplicationService','CacheService','ElementService','URLService','_', ProjectService]);
 
 /**
  * @ngdoc service
  * @name mms.ProjectService
  * @requires $q
  * @requires $http
- * @requires mms.URLService
+ * @requires mms.ApplicationService
  * @requires mms.CacheService
+ * @requires mms.ElementService
+ * @requires mms.URLService
+ * @requires _
  *
  * @description
  * This is a utility service for getting project, ref, commit information
  */
-function ProjectService($q, $http, URLService, CacheService, ApplicationService) {
+function ProjectService($q, $http,ApplicationService,CacheService,ElementService,URLService,_) {
     var inProgress = {};
 
     /**
@@ -356,6 +359,43 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         return deferred.promise;
     };
 
+    var getMetatypes = function(projectId, refId, query) {
+        refId = refId ? refId : 'master';
+        var cacheKey = ['metatypes', projectId, refId];
+        var url = URLService.getElementSearchDefaultURL(projectId, refId, 'literal=true');
+        if (inProgress.hasOwnProperty(url)) {
+            return inProgress[url];
+        }
+        var deferred = $q.defer();
+        if (CacheService.exists(cacheKey)) {
+            deferred.resolve(CacheService.get(cacheKey));
+        } else {
+            inProgress[url] = deferred.promise;
+            $http.put(url, query).then(function(response) {
+                var aggregations = response.data.aggregations;
+                if (!angular.isDefined(aggregations)) {
+                    deferred.reject({status: 500, data: '', message: "Could not find metatypes"});
+                    return;
+                }
+                var metatypeList = [];
+                var metatypeIds = aggregations.stereotypedElements.stereotypeIds.buckets;
+                var keyList = _.pluck(metatypeIds, 'key');
+                var reqOb = {elementIds: keyList, projectId: projectId, refId: refId};
+                ElementService.getElements(reqOb,2).then(function(data) {
+                    metatypeList = data;
+                    CacheService.put(cacheKey, metatypeList, false);
+                    deferred.resolve(CacheService.get(cacheKey));
+                });
+            }, function(response) {
+                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+            }).finally(function() {
+                delete inProgress[url];
+            });
+        }
+        return deferred.promise;
+    };
+
+
     /** TODO not supported
      */
     var diff = function(ws1, ws2, ws1time, ws2time, recalc) {
@@ -416,6 +456,7 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         createRef: createRef,
         updateRef: updateRef,
         deleteRef: deleteRef,
+        getMetatypes: getMetatypes,
         reset: reset
     };
 }

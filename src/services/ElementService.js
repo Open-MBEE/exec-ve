@@ -628,13 +628,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * 
      * @param {object} reqOb see description of getElement
      * @param {object} query JSON object with Elastic query format
-     * @param {integer} [page=null] page
-     * @param {integer} [items=null] items per page
      * @param {integer} [weight=1] priority
      * @returns {Promise} The promise will be resolved with an array of element objects.
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(reqOb, query, page, items, weight) {
+    var search = function(reqOb, query, weight) {
         UtilsService.normalize(reqOb);
         var url = URLService.getElementSearchURL(reqOb);
         var deferred = $q.defer();
