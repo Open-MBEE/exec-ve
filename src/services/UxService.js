@@ -97,15 +97,25 @@ function UxService($rootScope) {
       case "tree-filter":
         return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter', 
                 spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-add-document":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-document-or-group":
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Group or Document',
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete Document', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-view":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-group":
+        return {id: button, icon: 'fa-folder', selected: true, active: true, permission: true, tooltip: 'Add Group',
+              spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-document":
+        return {id: button, icon: 'fa-file', selected: true, active: true, permission: true, tooltip: 'Add Document',
+            spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
+
+
+
       case "tree-add-tag":
         return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Tag', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
