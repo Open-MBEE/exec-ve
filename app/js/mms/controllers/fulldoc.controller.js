@@ -16,7 +16,6 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
     if (!$rootScope.ve_editmode)
         $rootScope.ve_editmode = false;
 
-    // var lazyLoadingApi = addLazyLoading();
     $scope.search = search;
     $scope.buttons = [];
     $scope.refOb = refOb;
@@ -29,11 +28,11 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
                 $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
                 $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
                 hotkeys.bindTo($scope)
-                    .add({
-                        combo: 'alt+d',
-                        description: 'toggle edit mode',
-                        callback: function() {$scope.$broadcast('show-edits');}
-                    });
+                .add({
+                    combo: 'alt+d',
+                    description: 'toggle edit mode',
+                    callback: function() {$scope.$broadcast('show-edits');}
+                });
             }
 
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
@@ -47,11 +46,11 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
             $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
             $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
             hotkeys.bindTo($scope)
-                .add({
-                    combo: 'alt+c',
-                    description: 'toggle show comments',
-                    callback: function() {$scope.$broadcast('show-comments');}
-                }).add({
+            .add({
+                combo: 'alt+c',
+                description: 'toggle show comments',
+                callback: function() {$scope.$broadcast('show-comments');}
+            }).add({
                 combo: 'alt+e',
                 description: 'toggle show elements',
                 callback: function() {$scope.$broadcast('show-elements');}
@@ -80,8 +79,8 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
     view2children[documentOb.id] = [];
     var fullDocumentService;
 
-    var loadingViewsFromServer = growl.info('Loading data from server', {ttl: -1});
-    createViews().then(function(views) {
+
+    createViews().then(function() {
         // 1. instantiate documentService
         // 2. setup the scroll event
         // 3. load views until the scrollbar show up
@@ -90,26 +89,19 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
         fullDocumentService = new FullDocumentService(views);
         _startUpScroll();
         $scope.views = fullDocumentService.viewsBuffer;
-    }).finally(function() {
-        loadingViewsFromServer.destroy();
     });
 
     initializeDocLibLink();
 
     $scope.$on('mms-tree-click', function(e, branch) {
-        var message = _createGrowlMessage('Loading views!');
         fullDocumentService.handleClickOnBranch(branch, function() {
             $location.hash(branch.data.id);
             $anchorScroll();
-            message.destroy();
         });
     });
 
-    // TODO:HONG for some reason after printing, the click on the tree hierarchy doesn't work anymore
-    // TODO:HONG what happen when we add new stuffs
     $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
-        var sibIndex = _.findIndex(views, {id: prevSibId});
-        views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
+        fullDocumentService.handleViewAdd(buildViewElt(vId, curSec), prevSibId);
     });
 
     $scope.$on('show-comments', function() {
@@ -145,9 +137,7 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
     });
 
     $scope.$on('convert-pdf', function() {
-        var message = _createGrowlMessage('Preparing views for generating pdf file!');
-        fullDocumentService.handleContentExport(function() {
-            message.destroy();
+        fullDocumentService.loadRemainingViews(function() {
             var converting = false;
             if (converting) {
                 growl.info("Please wait...");
@@ -168,39 +158,31 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
     });
 
     $scope.$on('print', function() {
-        var message = _createGrowlMessage('Preparing views for printing!');
-        fullDocumentService.handleContentExport(function() {
-            message.destroy();
+        fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.printModal(documentOb, refOb, true, 1);
         });
     });
 
     $scope.$on('word', function() {
-        var message = _createGrowlMessage('Preparing views for to generate word document!');
-        fullDocumentService.handleContentExport(function() {
-            message.destroy();
+        fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.printModal(documentOb, refOb, true, 2);
         });
     });
 
     $scope.$on('tabletocsv', function() {
-        var message = _createGrowlMessage('Preparing views for converting table to csv!');
-        fullDocumentService.handleContentExport(function() {
-            message.destroy();
+        fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.tableToCsv(true);
         });
     });
 
     $scope.$on('refresh-numbering', function() {
-        var message = _createGrowlMessage('Preparing views for refresh numbering!');
-        fullDocumentService.handleContentExport(function() {
-            message.destroy();
-            var printElementCopy = angular.element("#print-div");
-            MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
+        fullDocumentService.loadRemainingViews(function() {
+            MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), angular.element("#print-div"));
         });
     });
 
     function createViews() {
+        var loadingViewsFromServer = growl.info('Loading data from server', {ttl: -1});
         views.push({id: documentOb.id, api: {
             init: function(dis) {
                 if ($rootScope.veCommentsOn) {
@@ -225,7 +207,7 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
                     addToArray(childIds[i], num);
                     num = num + 1;
                 }
-            });
+            }).finally(loadingViewsFromServer.destroy);
     }
 
     function initializeDocLibLink() {
@@ -304,15 +286,12 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
         return childIds;
     }
 
-    function _createGrowlMessage(message) {
-        return growl.info(message, {ttl: -1});
-    }
-
     function _startUpScroll() {
         var element;
         var childElement;
         var visibleHeight;
         var thresholdBetweenScrollBarAndBottom = 2000;
+        var waiting = false;
 
         // use timeout to wait for angularjs to attach element to DOM
         $timeout(function() {
@@ -320,26 +299,36 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
             element = window.document.querySelector('#bingo');
             childElement = $(element).find('#bingo');
             visibleHeight = childElement.height();
-            element.addEventListener('scroll', function() {
-                // this scrollHeight(total height including the inivisible part) changes as more views are added
+            element.addEventListener('scroll', _scrollEventHandler , true);
+
+            console.log('loading initial views');
+            fullDocumentService.addInitialViews(_isScrollbarVisible);
+        }, 0);
+
+        function _scrollEventHandler() {
+            if (waiting) {
+                return;
+            }
+            waiting = true;
+            $timeout(function() {
+                // this scrollHeight(total height including the invisible part) changes as more views are added
                 var totalHeight = childElement.prop('scrollHeight');
                 var hiddenContentHeight = totalHeight - visibleHeight;
 
                 // Scroll is almost at the bottom. Load more one more view
                 if (hiddenContentHeight - childElement.scrollTop() <= thresholdBetweenScrollBarAndBottom) {
-                    $scope.apply(fullDocumentService.handleDocumentScrolling);
+                    // $scope.apply(fullDocumentService.handleDocumentScrolling);
+                    var isLoadedBefore = fullDocumentService.handleDocumentScrolling();
+                    if (isLoadedBefore) {
+                        element.removeEventListener('scroll', _scrollEventHandler, true );
+                    }
                 }
-            }, true);
-
-            console.log('load initial views');
-            fullDocumentService.addInitialViews(_isScrollbarVisible);
-        }, 0);
-
-
+                waiting = false;
+            }, 50);
+        }
 
         function _isScrollbarVisible() {
             return childElement.prop('scrollHeight') > visibleHeight;
         }
     }
 }]);
-
