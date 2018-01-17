@@ -52,7 +52,7 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             //reqOb.accept = 'image/png';
             //scope.pngImgUrl = URLService.getImageURL(reqOb);
             }, function(reason) {
-                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+                // growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
                 element.removeClass('isLoading');
             });

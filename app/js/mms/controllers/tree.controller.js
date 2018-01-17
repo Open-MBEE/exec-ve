@@ -398,8 +398,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var sectionId = branch.type === 'section' ? branch.data.id : null;
             var hash = branch.data.id;
             if ($rootScope.ve_fullDocMode) {
-                $location.hash(hash);
-                $anchorScroll();
+                $rootScope.$broadcast('mms-tree-click', branch);
             } else if (branch.type === 'view' || branch.type === 'section') {
                 $state.go('project.ref.document.view', {viewId: branch.data.id, search: undefined});
             } else {
