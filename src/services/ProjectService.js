@@ -362,7 +362,7 @@ function ProjectService($q, $http,ApplicationService,CacheService,ElementService
     var getMetatypes = function(projectId, refId, query) {
         refId = refId ? refId : 'master';
         var cacheKey = ['metatypes', projectId, refId];
-        var url = URLService.getElementSearchDefaultURL(projectId, refId, 'literal=true');
+        var url = URLService.getSearchURL(projectId, refId, 'literal=true');
         if (inProgress.hasOwnProperty(url)) {
             return inProgress[url];
         }
