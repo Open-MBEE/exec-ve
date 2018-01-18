@@ -24,7 +24,7 @@ function FullDocumentService($timeout, $http, _, growl) {
             if (isViewLoadedBefore) {
                 callback();
             } else {
-                var message = growl.info('Preparing Views!', {ttl: -1});
+                var message = growl.info('Loading more views!', {ttl: -1});
                 _waitTillAfterDigestCycle(function() { // wait for digest to finish and for content to finish rendering
                     message.destroy();
                     callback();
@@ -40,7 +40,7 @@ function FullDocumentService($timeout, $http, _, growl) {
                     callback();
                     self._isLoadingRemaingViews = false;
                 } else {
-                    var message = growl.info('Preparing Views!', {ttl: -1});
+                    var message = growl.info('Loading more views!', {ttl: -1});
                     _waitTillAfterDigestCycle(function() {
                         self._isLoadingRemaingViews = false;
                         message.destroy();
@@ -56,7 +56,7 @@ function FullDocumentService($timeout, $http, _, growl) {
         }
 
         function addInitialViews(isScrollbarVisible) {
-            var message = growl.info('Load initial view!', {ttl: -1});
+            var message = growl.info('Loading initial view!', {ttl: -1});
             _incrementallyAddViewTillScroll(message.destroy, isScrollbarVisible);
         }
 
