@@ -265,11 +265,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             .then(function(responses) {
                 responses.forEach(function(elementOb) {
                     delete $rootScope.ve_edits[elementOb.id + '|' + elementOb._projectId + '|' + elementOb._refId];
-                    $rootScope.$broadcast('element.updated', elementOb, 'all');
-                    growl.success("Save All Successful");
+                    $rootScope.$broadcast('element.updated', elementOb, false);
                     $rootScope.ve_tbApi.select('element-viewer');
                     $scope.specApi.setEditing(false);
                 });
+                growl.success("Save All Successful");
 
             }, function(responses) {
                 // reset the last edit elementOb to one of the existing element
