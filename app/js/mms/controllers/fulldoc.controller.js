@@ -3,9 +3,9 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$element', '$interval', '$timeout', '$anchorScroll', '$location', '$http', 'FullDocumentService',
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', 'FullDocumentService',
     'hotkeys', 'growl', '_', 'MmsAppUtils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
-function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScroll, $location, $http, FullDocumentService, hotkeys, growl, _,
+function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentService, hotkeys, growl, _,
     MmsAppUtils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
@@ -71,6 +71,14 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
         }
     };
     $scope.views = [];
+    // api to communicate with borderlayout lib
+    $scope.scrollApi = {
+        notifyOnScroll: notifyOnScroll,
+        isScrollVisible: function(){}, // hook to borderlayout lib
+        scrollThrottleRate: 500,
+        thresholdBetweenScrollbarAndBottom : 2000
+    };
+
 
     var views = [];
     var view2children = {};
@@ -79,19 +87,13 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
     view2children[documentOb.id] = [];
     var fullDocumentService;
 
-
-    createViews().then(function() {
-        // 1. instantiate documentService
-        // 2. setup the scroll event
-        // 3. load views until the scrollbar show up
-        // 4. after that if user scroll, incrementally load one more views at a time
-        // 5. respond to content export, refresh numbering, branch click
+    _createViews().then(function() {
         fullDocumentService = new FullDocumentService(views);
-        _startUpScroll();
+        fullDocumentService.addInitialViews($scope.scrollApi.isScrollVisible);
         $scope.views = fullDocumentService.viewsBuffer;
     });
 
-    initializeDocLibLink();
+    _initializeDocLibLink();
 
     $scope.$on('mms-tree-click', function(e, branch) {
         fullDocumentService.handleClickOnBranch(branch, function() {
@@ -101,7 +103,7 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
     });
 
     $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
-        fullDocumentService.handleViewAdd(buildViewElt(vId, curSec), prevSibId);
+        fullDocumentService.handleViewAdd(_buildViewElement(vId, curSec), prevSibId);
     });
 
     $scope.$on('show-comments', function() {
@@ -181,7 +183,7 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
         });
     });
 
-    function createViews() {
+    function _createViews() {
         var loadingViewsFromServer = growl.info('Loading data from server', {ttl: -1});
         views.push({id: documentOb.id, api: {
             init: function(dis) {
@@ -195,22 +197,22 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
                     dis.toggleShowEdits();
                 }
             },
-            elementTranscluded: elementTranscluded,
-            elementClicked: elementClicked
+            elementTranscluded: _elementTranscluded,
+            elementClicked: _elementClicked
         }});
         if (!documentOb._childViews) {
             documentOb._childViews = [];
         }
-        return MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
+        return MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, _handleSingleView, _handleChildren)
             .then(function(childIds) {
                 for (var i = 0; i < childIds.length; i++) {
-                    addToArray(childIds[i], num);
+                    _constructViews(childIds[i], num);
                     num = num + 1;
                 }
             }).finally(loadingViewsFromServer.destroy);
     }
 
-    function initializeDocLibLink() {
+    function _initializeDocLibLink() {
         if (groupOb !== null) {
             $scope.docLibLink = groupOb._link;
         } else if (documentOb !== null && documentOb._groupId !== undefined && documentOb._groupId !== null) {
@@ -222,18 +224,18 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
         }
     }
 
-    function elementTranscluded(elementOb, type) {
+    function _elementTranscluded(elementOb, type) {
         if (elementOb && type !== 'Comment') {
             if (elementOb._modified > $scope.latestElement)
                 $scope.latestElement = elementOb._modified;
         }
     }
 
-    function elementClicked(elementOb) {
+    function _elementClicked(elementOb) {
         $rootScope.$broadcast('elementSelected', elementOb, 'latest');
     }
 
-    function buildViewElt(vId, curSec) {
+    function _buildViewElement(vId, curSec) {
         return {id: vId, api: {
             init: function(dis) {
                 if ($rootScope.veCommentsOn) {
@@ -246,24 +248,24 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
                     dis.toggleShowEdits();
                 }
             },
-            elementTranscluded: elementTranscluded,
-            elementClicked: elementClicked
+            elementTranscluded: _elementTranscluded,
+            elementClicked: _elementClicked
         }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
     }
 
-    function addToArray(viewId, curSection) {
-        views.push(buildViewElt(viewId, curSection));
+    function _constructViews(viewId, curSection) {
+        views.push(_buildViewElement(viewId, curSection));
 
         if (view2children[viewId]) {
             var num = 1;
             for (var i = 0; i < view2children[viewId].length; i++) {
-                addToArray(view2children[viewId][i], curSection + '.' + num);
+                _constructViews(view2children[viewId][i], curSection + '.' + num);
                 num = num + 1;
             }
         }
     }
 
-    function handleSingleView(v, aggr) {
+    function _handleSingleView(v, aggr) {
         var childIds = view2children[v.id];
         if (!childIds) {
             childIds = [];
@@ -282,53 +284,11 @@ function($scope, $rootScope, $state, $element, $interval, $timeout, $anchorScrol
         return childIds;
     }
 
-    function handleChildren(childIds, childNodes) {
+    function _handleChildren(childIds, childNodes) {
         return childIds;
     }
 
-    function _startUpScroll() {
-        var element;
-        var childElement;
-        var visibleHeight;
-        var thresholdBetweenScrollBarAndBottom = 2000;
-        var waiting = false;
-
-        // use timeout to wait for angularjs to attach element to DOM
-        $timeout(function() {
-            console.log('Set up scroll event');
-            element = window.document.querySelector('#bingo');
-            childElement = $(element).find('#bingo');
-            visibleHeight = childElement.height();
-            element.addEventListener('scroll', _scrollEventHandler , true);
-
-            console.log('loading initial views');
-            fullDocumentService.addInitialViews(_isScrollbarVisible);
-        }, 0);
-
-        function _scrollEventHandler() {
-            if (waiting) {
-                return;
-            }
-            waiting = true;
-            $timeout(function() {
-                // this scrollHeight(total height including the invisible part) changes as more views are added
-                var totalHeight = childElement.prop('scrollHeight');
-                var hiddenContentHeight = totalHeight - visibleHeight;
-
-                // Scroll is almost at the bottom. Load more one more view
-                if (hiddenContentHeight - childElement.scrollTop() <= thresholdBetweenScrollBarAndBottom) {
-                    // $scope.apply(fullDocumentService.handleDocumentScrolling);
-                    var isLoadedBefore = fullDocumentService.handleDocumentScrolling();
-                    if (isLoadedBefore) {
-                        element.removeEventListener('scroll', _scrollEventHandler, true );
-                    }
-                }
-                waiting = false;
-            }, 50);
-        }
-
-        function _isScrollbarVisible() {
-            return childElement.prop('scrollHeight') > visibleHeight;
-        }
+    function notifyOnScroll() {
+        return fullDocumentService.handleDocumentScrolling();
     }
 }]);
