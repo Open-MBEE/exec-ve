@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'growl', '$templateCache', mmsSearch]);
+.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', '_', 'growl', '$templateCache', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -13,7 +13,7 @@ angular.module('mms.directives')
  * TBA
  *
  */
-function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, growl, $templateCache) {
+function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _, growl, $templateCache) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -27,6 +27,8 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
         scope.itemsPerPage = 50;
+        scope.advanceSearch = false;
+        scope.advanceSearchRows = [];
         scope.docsviews = {
             selected: false
         };
@@ -37,6 +39,58 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
             scope.resultFilter[scope.facet] = scope.filterQuery.query;
         });
 
+        scope.selectedSearchMetatypes = [];
+        scope.metatypeSettings = {
+            scrollableHeight: '300px',
+            scrollable: true,
+            enableSearch: true,
+            displayProp: 'name',
+            smartButtonMaxItems: 3
+        };
+        // Get metatypes
+        var metatypes = {
+            "size": 0,
+            "aggs": {
+                "stereotypedElements": {
+                    "filter": { "bool": {
+                        "must": [
+                          {"term": {"_projectId": scope.mmsProjectId}},
+                          {"term": {"_inRefIds": scope.refId}},
+                          {"exists": {"field": "_appliedStereotypeIds"}}
+                        ],
+                        "must_not": {
+                            "terms": {
+                              "_appliedStereotypeIds": ["TBD list of irrelevant ids"]
+                            }
+                        }
+                    }},
+                    "aggs": {
+                        "stereotypeIds": {
+                            "terms": {
+                                "field": "_appliedStereotypeIds",
+                                "size": 50
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        var getMetaTypes = function(metatypes) {
+            scope.metatypeSearch = "fa fa-spin fa-spinner";
+            var queryOb = metatypes;
+            ProjectService.getMetatypes(scope.mmsProjectId, scope.refId, queryOb)
+            .then(function(data) {
+                // cache metatypes
+                scope.metatypeList = data;
+            }, function(reason) {
+                growl.error("Search Error: " + reason.message);
+            }).finally(function() {
+                scope.metatypeSearch = "";
+            });
+        };
+
+        getMetaTypes(metatypes);
         scope.$watch('searchResults', function(newVal) {
             if (!newVal)
                 return;
@@ -85,22 +139,24 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
             });
         });
 
+        scope.removeRowAdvanceSearch = function(row) {
+            scope.advanceSearchRows = _.without(scope.advanceSearchRows, row);
+        };
+
         scope.next = function() {
-            if(scope.paginationCache[scope.currentPage+1]){
+            if (scope.paginationCache[scope.currentPage+1]) {
                 scope.searchResults= scope.paginationCache[scope.currentPage+1];
                 scope.currentPage += 1;
-            }
-            else{
+            } else{
                 scope.search(scope.searchText, scope.currentPage + 1, scope.itemsPerPage);
             }
         };
 
         scope.prev = function() {
-            if(scope.paginationCache[scope.currentPage-1]){
+            if (scope.paginationCache[scope.currentPage-1]) {
                 scope.searchResults= scope.paginationCache[scope.currentPage-1];
                 scope.currentPage -= 1;
-            }
-            else{
+            } else {
                 scope.search(scope.searchText, scope.currentPage - 1, scope.itemsPerPage);
             }
         };
@@ -145,7 +201,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
             queryOb.from = page*numItems + page;
             queryOb.size = numItems;
             var reqOb = {projectId: scope.mmsProjectId, refId: scope.refId};
-            ElementService.search(reqOb, queryOb, page, numItems, 2)
+            ElementService.search(reqOb, queryOb, 2)
             .then(function(data) {
                 if (scope.mmsOptions.filterCallback) {
                   scope.searchResults = scope.mmsOptions.filterCallback(data);
@@ -161,9 +217,9 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
             });
         };
 
-        scope.newSearch = function(searchText, page, numItems){
+        scope.newSearch = function(searchText) {
             scope.paginationCache = [];
-            scope.search(searchText, page, numItems);
+            scope.search(searchText, 0, scope.itemsPerPage);
         };
 
         /**
@@ -345,7 +401,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
         }
         if (scope.mmsOptions.searchInput) {
             scope.searchText = scope.mmsOptions.searchInput;
-            scope.newSearch(scope.searchText, 0, scope.itemsPerPage);
+            scope.newSearch(scope.searchText);
         }
         if (scope.mmsOptions.itemsPerPage) {
             scope.itemsPerPage = scope.mmsOptions.itemsPerPage;

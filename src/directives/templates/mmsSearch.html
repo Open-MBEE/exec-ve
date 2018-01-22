@@ -1,7 +1,7 @@
 
 <div class="mms-search">
-    <div class="mms-search-input">
-        <form class="form-inline" ng-submit="newSearch(searchText, 0, itemsPerPage)">
+    <div class="mms-search-input" ng-hide="advanceSearch">
+        <form class="form-inline" ng-submit="newSearch(searchText)">
             <!-- search type menu -->
             <div class="form-group">
                 <label class="sr-only" for="searchTypeSelect">Search type menu</label>
@@ -15,11 +15,19 @@
                 </select>
             </div>
             <!-- search keyword input -->
-            <div class="form-group">
-                <label class="sr-only" for="searchText">Search keyword</label>
-                <input class="form-control" type="text" id="searchText" ng-model="searchText" placeholder="Search for an element" autofocus/>
+            <div class="form-group" ng-show="searchType != 'metatype'">
+                <label class="sr-only" for="searchInput">Search keyword</label>
+                <input class="form-control" type="text" id="searchInput" ng-model="searchText" autofocus/>
             </div>
-            <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
+            <div class="form-group" ng-if="searchType === 'metatype'">
+                <label class="sr-only" for="searchMetatypeSelect">Search metatype menu</label>
+                <!-- <select class="form-control" id="searchMetatypeSelect" ng-model="searchMetatype">
+                    <i class="{{metatypeSearch}}"></i>
+                    <option ng-repeat="metatype in metatypeList" value="metatype.id">{{metatype.name}}</option>
+                </select> -->
+                <div id="searchMetatypeSelect" ng-dropdown-multiselect="" options="metatypeList" selected-model="selectedSearchMetatypes" extra-settings="metatypeSettings"></div>
+            </div>
+            <button class="btn btn-primary" type="button" ng-click="newSearch(searchText)">
                 <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i>
             </button>
             <div class="search-filter-views-docs">
@@ -27,9 +35,96 @@
             </div>
         </form>
         <div class="misc-form-field">
-            <a class="pull-right">Advanced</a>
+            <a class="pull-right" ng-click="advanceSearch = !advanceSearch">Advanced</a>
         </div>
     </div>
+    <div class="mms-search-input" ng-if="advanceSearch">
+        <div class="misc-form-field">
+            <a ng-click="advanceSearch = !advanceSearch">Basic Search</a>
+        </div>
+        <h3>Advanced Search</h3>
+        <!-- submit change -->
+        <form class="form-inline" ng-submit="newSearch(searchText)">
+            <!-- advanced search query input -->
+            <div class="form-group">
+                <label class="sr-only" for="searchText">Advanced search query (disabled)</label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="text" id="searchText" ng-model="searchText" disabled />
+                </div>
+            </div>
+            <button class="btn btn-primary" type="button" ng-click="newSearch(searchText)">
+                <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i>
+            </button>
+        </form>
+        <br>
+
+        <div class="form-inline">
+            <!-- search type menu -->
+            <div class="form-group">
+                <label class="sr-only" for="searchTypeSelect">Search type menu</label>
+                <select class="form-control" id="searchTypeSelect" ng-model="searchType">
+                    <option value="all">All Fields</option>
+                    <option value="name">Name</option>
+                    <option value="documentation">Documentation</option>
+                    <option value="value">Value</option>
+                    <option value="id">ID</option>
+                    <option value="metatype">Metatype</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <label class="sr-only" for="searchText">Advanced search query</label>
+                    <input class="form-control" type="text" id="searchText" ng-model="searchText" autofocus/>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <!-- Advanced search rows -->
+        <div ng-repeat="row in advanceSearchRows">
+        <div class="form-inline">
+            <!-- operator -->
+            <div class="form-group">
+                <label class="sr-only" for="operator-{{$index}}">Search row operator</label>
+                <select class="form-control" id="operator-{{$index}}" ng-model="row.operator">
+                    <option value="and">And</option>
+                    <option value="or">Or</option>
+                    <option value="not">Not</option>
+                </select>
+            </div>
+            <!-- search type menu -->
+            <div class="form-group">
+                <label class="sr-only" for="searchTypeSelect-{{$index}}">Search type menu</label>
+                <select class="form-control" id="searchTypeSelect-{{$index}}" ng-model="row.searchType">
+                    <option value="all">All Fields</option>
+                    <option value="name">Name</option>
+                    <option value="documentation">Documentation</option>
+                    <option value="value">Value</option>
+                    <option value="id">ID</option>
+                    <option value="metatype">Metatype</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-10">
+                    <label class="sr-only" for="searchText-{{$index}}">Advanced search query</label>
+                    <input class="form-control" type="text" id="searchText-{{$index}}" ng-model="row.searchText" autofocus/>
+                </div>
+            </div>
+            <a type="button" ng-click="removeRowAdvanceSearch(row)">
+                <i class="fa fa-times"></i>
+            </a>
+            <!-- <a type="button" ng-click="advanceSearchRows.push({operator:'and',searchType:'all'})">
+                <i class="fa fa-plus"></i>Add Row
+            </a> -->
+        </div>
+        <br>
+        </div>
+        <a type="button" ng-click="advanceSearchRows.push({operator:'and',searchType:'all'})">
+            <i class="fa fa-plus"></i>Add Row
+        </a>
+    </div>
+
+
     <div class="misc-form-field" ng-show="searchResults">
         <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
     </div>
@@ -60,9 +155,6 @@
                 <span ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
                     <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name><span ng-if="!$last">,</span>
                 </span>
-            </div>
-            <div class="elem-updated-wrapper">
-                <div>Updated {{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
             </div>
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
                 <label>Value</label>
@@ -109,7 +201,8 @@
                                         <span ng-if="!val.value && !val.body[0]">Default Value</span>
                                         <!-- {{$last ? '' : ', '}} -->
                                     </span>
-                                    <span class="ellipses" ng-if="property.value.length > 10">...</span>
+                                    <!-- set variable for limit -->
+                                    <span class="ellipses" ng-if="property.value.length > 4">...</span>
                                 </a>
                             </td>
                         </tr>
@@ -123,6 +216,9 @@
                         <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}"></mms-view-link> > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}"></mms-view-link><br/>
                     </a>
                 </div>
+            </div>
+            <div class="elem-updated-wrapper">
+                <div>Updated {{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
             </div>
         </div>
         <hr>
