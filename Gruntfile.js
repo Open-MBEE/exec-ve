@@ -13,13 +13,6 @@ module.exports = function(grunt) {
   var artifactoryUser = grunt.option('ARTIFACTORY_USER');
   var artifactoryPassword = grunt.option('ARTIFACTORY_PASSWORD');
   var connectObject = {
-    'static': {
-      options: {
-        hostname: 'localhost',
-        port: 9001,
-        base: './dist'
-      }
-    },
     docs: {
       options: {
         hostname: 'localhost',
@@ -412,7 +405,7 @@ module.exports = function(grunt) {
   grunt.registerTask('e2e-test', ['protractor']);
 
   grunt.registerTask('release', function(arg1) {
-      grunt.task.run('release-build', 'connect:static');
+      grunt.task.run('release-build');
       if (arguments.length !== 0)
         grunt.task.run('launch:release:' + arg1);
       else
@@ -420,7 +413,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('server', function(arg1) {
-    grunt.task.run('dev-build', 'connect:static');
+    grunt.task.run('dev-build');
     if (arguments.length !== 0)
       grunt.task.run('launch:dev:' + arg1);
     else
