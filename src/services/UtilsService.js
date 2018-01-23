@@ -60,38 +60,82 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         visibility: 'public'
     };
     var INSTANCE_ELEMENT_TEMPLATE = {
-        ownerId: null,
-        name: '',
-        documentation: '',
-        type: "InstanceSpecification",
-        classifierIds: [],
-        specification: null,
-        _appliedStereotypeIds: [],
         appliedStereotypeInstanceId: null,
-        mdExtensionsIds: [],
-        syncElementId: null,
+        classifierIds: [],
         clientDependencyIds: [],
-        supplierDependencyIds: [],
-        nameExpression: null,
-        visibility: "public",
-        templateParameterId: null,
         deploymentIds: [],
+        documentation: '',
+        mdExtensionsIds: [],
+        name: '',
+        nameExpression: null,
+        ownerId: null,
         slotIds: [],
-        stereotypedElementId: null
+        specification: null,
+        stereotypedElementId: null,
+        supplierDependencyIds: [],
+        syncElementId: null,
+        templateParameterId: null,
+        type: "InstanceSpecification",
+        visibility: "public",
+        _appliedStereotypeIds: [],
     };
     var VALUESPEC_ELEMENT_TEMPLATE = {
-        visibility: "public",
+        appliedStereotypeInstanceId: null,
+        clientDependencyIds: [ ],
         documentation: "",
         mdExtensionsIds: [ ],
-        appliedStereotypeInstanceId: null,
-        templateParameterId: null,
-        clientDependencyIds: [ ],
-        syncElementId: null,
         name: "",
-        typeId: null,
+        nameExpression: null,
         supplierDependencyIds: [ ],
+        syncElementId: null,
+        templateParameterId: null,
+        typeId: null,
+        visibility: "public",
         _appliedStereotypeIds: [ ],
-        nameExpression: null
+    };
+    var PACKAGE_ELEMENT_TEMPLATE = {
+        _appliedStereotypeIds : [ ],
+        documentation : "",
+        type : "Package",
+        mdExtensionsIds : [ ],
+        syncElementId : null,
+        appliedStereotypeInstanceId : null,
+        clientDependencyIds : [ ],
+        supplierDependencyIds : [ ],
+        name : "",
+        nameExpression : null,
+        visibility : null,
+        templateParameterId : null,
+        elementImportIds : [ ],
+        packageImportIds : [ ],
+        templateBindingIds : [ ],
+        URI : "",
+        packageMergeIds : [ ],
+        profileApplicationIds : [ ]
+    };
+    var GENERALIZATION_ELEMENT_TEMPLATE = {
+        appliedStereotypeInstanceId : null,
+        documentation : "",
+        generalizationSetIds : [ ],
+        isSubstitutable : true,
+        mdExtensionsIds : [ ],
+        syncElementId : null,
+        type : "Generalization",
+        _appliedStereotypeIds : [ ],
+    };
+    var DEPENDENCY_ELEMENT_TEMPLATE = {
+        _appliedStereotypeIds : [ ],
+        appliedStereotypeInstanceId : null,
+        clientDependencyIds : [ ],
+        documentation : "",
+        mdExtensionsIds : [ ],
+        name : "",
+        nameExpression : null,
+        supplierDependencyIds : [ ],
+        syncElementId : null,
+        templateParameterId : null,
+        type : "Dependency",
+        visibility : null,
     };
 
     /**
@@ -736,12 +780,19 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
         var sysmlId = child.data.id;
         var el = printElement.find('#' + sysmlId);
-        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"]');
+        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
+        var name = '';
         if (child.type === 'table') {
             ob.tableCount++;
             var capTbl = el.find('table > caption');
-            cap = (capTbl.text() !== "") ? ob.tableCount + '. ' + capTbl.text() : ob.tableCount + '. ' + child.data.name;
+            name = capTbl.text();
+            if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf('. ') + 2);
+            } else if (name === "") {
+                name = child.data.name;
+            }
+            cap = ob.tableCount + '. ' + name;
             ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capTbl.html('Table ' + cap);
             // If caption does not exist, add to html
@@ -763,7 +814,13 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         if (child.type === 'figure') {
             ob.figureCount++;
             var capFig = el.find('figure > figcaption');
-            cap = (capFig.text() !== "") ? ob.figureCount + '. ' + capFig.text() : ob.figureCount + '. ' + child.data.name;
+            name = capFig.text();
+            if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf('. ') + 2);
+            } else if (name === "") {
+                name = child.data.name;
+            }
+            cap = ob.figureCount + '. ' + name;
             ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capFig.html('Figure ' + cap);
             // If caption does not exist, add to html
@@ -1087,7 +1144,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      *
      * @param {Object} doc The document object with Id and HTML payload that will be converted to PDF
      * @param {string} site The site name
-     * @param {string} [workspace=master] Workspace name
+     * @param {string} refId [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
     var convertHtmlToPdf = function(doc, projectId, refId){ //TODO fix
@@ -1129,6 +1186,25 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return o;
     };
 
+    var createGeneralizationElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(GENERALIZATION_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+    var createPackageElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(PACKAGE_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+    var createDependencyElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(DEPENDENCY_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+
     return {
         VIEW_SID: VIEW_SID,
         OTHER_VIEW_SID: OTHER_VIEW_SID,
@@ -1137,6 +1213,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
         createValueSpecElement: createValueSpecElement,
+        createGeneralizationElement: createGeneralizationElement,
+        createDependencyElement: createDependencyElement,
+        createPackageElement: createPackageElement,
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
@@ -1160,6 +1239,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         generateTOCHtmlOption: generateTOCHtmlOption,
         generateAnchorId: generateAnchorId,
         tableConfig: tableConfig,
-        _generateRowColNumber: _generateRowColNumber
+        _generateRowColNumber: _generateRowColNumber,
     };
 }

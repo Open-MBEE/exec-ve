@@ -28,6 +28,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
         var mmsCfCtrl = controllers[0];
         var mmsViewCtrl = controllers[1];
         var processed = false;
+        scope.loading = true;
         scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
@@ -86,8 +87,10 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 } else {
                     element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                 }
+                scope.loading = false;
             }, function(reason) {
                 element.html('<span class="mms-error">view link not found</span>');
+                scope.loading = false;
             });
         });
     };
@@ -101,12 +104,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             mmsCommitId: '@',
             mmsDocId: '@',
             mmsPeId: '@',
-            linkText: '@?'
+            linkText: '@?',
+            linkClass: '@?',
+            linkIconClass: '@?'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
-        template: ['<span ng-if="linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{linkText}}</a></span>',
-            '<span ng-if="!linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a></span>'
-        ].join(''),
+        template: '<a ng-if="!loading" ng-class="linkClass" href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText">{{name || "Unnamed View"}}</span></a>',
         link: mmsViewLinkLink
     };
 }
