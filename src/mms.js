@@ -60,4 +60,4 @@ angular.module('mms', ['angularjs-dropdown-multiselect'])
 .config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
 }])
-.constant('_', window.lodash || window._);
+.constant('_', window._);
