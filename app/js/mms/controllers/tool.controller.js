@@ -100,8 +100,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     var cleanUpEdit = function(editOb, cleanAll) {
-        var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
         if (!Utils.hasEdits(editOb) || cleanAll) {//TODO Utils.hasEdits
+            var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
             delete $rootScope.ve_edits[key];
             cleanUpSaveAll();
         }
@@ -363,7 +363,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             $scope.viewContentsOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
-            $rootScope.$broadcast('view.reorder.saved', $scope.viewId);
+            $rootScope.$broadcast('view.reorder.saved', $scope.viewOb.id);
         }, function(reason) {
             $scope.viewContentsOrderApi.refresh();
             viewSaving = false;

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', '$rootScope','URLService', 'ElementService', 'UtilsService', 'CacheService', ViewService]);
+.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', ViewService]);
 
 /**
  * @ngdoc service
@@ -16,10 +16,10 @@ angular.module('mms')
  * 
  * @description
  * Similar to the ElementService and proxies a lot of functions to it, this provides
- * CRUD for views and products/documents
+ * CRUD for views and products/documents/group
  *
  */
-function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService) {
+function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService ) {
     var inProgress = {}; //only used for view elements over limit
 
     // The type of opaque element to the sysmlId of the classifierIds:
@@ -189,7 +189,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {Object} elementOb A document object
      * @returns {Promise} The promise will be resolved with the downgraded view
      */
-    var downgradeDocument = function(elementOb) { //TODO fix this to update the aplied stereotype instance
+    var downgradeDocument = function(elementOb) { //TODO fix this to update the applied stereotype instance
         var clone = JSON.parse(JSON.stringify(elementOb));
         clone._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
         return ElementService.updateElement(clone)
@@ -819,6 +819,123 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#createGroup
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * create a group depending on what the user has selected:
+     *   - if the user has not selected anything, create a group at the root level of the project
+     *   - if the user has selected a group, create a child group
+     *   - if the user has selected anything else, let the user know that they must select a group
+     * owner must be specified (parent view/document)
+     * id cannot be specified (automatically generated)
+     * if name isn't specified, "Untitled" will be used.
+     *
+     * @param {object} siteName the value the user input on the form, new-doc-or-group.html
+     * @param {object} parent currently selected project and Org.
+     * @returns {Promise} The promise will be resolved with the new view.
+     */
+    var createGroup = function(siteName, ownerOb) {
+        var deferred = $q.defer();
+
+        var PACKAGE_ID =  UtilsService.createMmsId(), OWNER_ID = ownerOb.id, DEPENDENCY_ID = UtilsService.createMmsId(),
+            GENERALIZATION_ID = UtilsService.createMmsId(), SITE_CHAR_BLOCK_ID = UtilsService.createMmsId(),
+            DEPENDENCY_ASI_ID = DEPENDENCY_ID + "_asi", SITE_CHAR_BLOCK_ASI_ID = SITE_CHAR_BLOCK_ID + "_asi";
+
+        // Our Group package element
+        var group = UtilsService.createPackageElement(
+            {
+                "id" : PACKAGE_ID,
+                "name" : (siteName) ? siteName : "Untitled",
+                "ownerId" : OWNER_ID,
+                "supplierDependencyIds" : [ DEPENDENCY_ID ],
+                "_isSite": true
+            }
+        );
+
+        // Our Site Characterization Block for this group
+        var siteCharBlk = UtilsService.createClassElement(
+            {
+                "appliedStereotypeInstanceId" : SITE_CHAR_BLOCK_ASI_ID,
+                "clientDependencyIds" : [ DEPENDENCY_ID ],
+                "generalizationIds" : [ GENERALIZATION_ID ],
+                "id" : SITE_CHAR_BLOCK_ID,
+                "name" : siteName + " Site Characterization",
+                "ownerId" : PACKAGE_ID,
+                "_appliedStereotypeIds" : [ "_11_5EAPbeta_be00301_1147424179914_458922_958" ],
+            }
+        );
+        // Our Site Characterization Block's Applied Stereotype Instance
+        var SiteCharBlkStereotypeApplied = UtilsService.createInstanceElement(
+            {
+                "classifierIds" : [ "_11_5EAPbeta_be00301_1147424179914_458922_958" ],
+                "id" : SITE_CHAR_BLOCK_ASI_ID,
+                "ownerId" : SITE_CHAR_BLOCK_ID,
+                "visibility" : null,
+                "stereotypedElementId" : SITE_CHAR_BLOCK_ID
+            }
+        );
+        // Generalization from our Site Characterization Block to the General Site Characterization Block
+        var generalizationFromSiteCharBlkToGeneralSiteChar = UtilsService.createGeneralizationElement(
+            {
+                "generalId" : "_17_0_5_1_8660276_1415063844134_132446_18688",
+                "id" : GENERALIZATION_ID,
+                "ownerId" : SITE_CHAR_BLOCK_ID,
+                "specificId" : SITE_CHAR_BLOCK_ID,
+                "_sourceIds" : [ SITE_CHAR_BLOCK_ID ],
+                "_targetIds" : [ "_17_0_5_1_8660276_1415063844134_132446_18688" ],
+            }
+        );
+        // Dependency from Package to our Site Characterization Block
+        var dependencyFromPkgToSiteChar = UtilsService.createDependencyElement(
+            {
+                "_appliedStereotypeIds" : [ "_17_0_5_1_8660276_1407362513794_939259_26181" ],
+                "id" : DEPENDENCY_ID,
+                "mdExtensionsIds" : [ ],
+                "ownerId" : PACKAGE_ID,
+                "appliedStereotypeInstanceId" : DEPENDENCY_ASI_ID,
+                "_sourceIds" : [ SITE_CHAR_BLOCK_ID ],
+                "_targetIds" : [ PACKAGE_ID ],
+                "clientIds" : [ SITE_CHAR_BLOCK_ID ],
+                "supplierIds" : [ PACKAGE_ID ]
+            }
+        );
+        // Dependency's Applied Stereotype Instance
+        var dependencyFromPkgToSiteCharStereoType = UtilsService.createInstanceElement(
+            {
+                "id" : DEPENDENCY_ASI_ID,
+                "ownerId" : DEPENDENCY_ID,
+                "visibility" : null,
+                "classifierIds" : [ "_17_0_5_1_8660276_1407362513794_939259_26181" ],
+                "stereotypedElementId" : DEPENDENCY_ID
+            }
+        );
+
+        var toCreate = [group, siteCharBlk, SiteCharBlkStereotypeApplied,
+            generalizationFromSiteCharBlkToGeneralSiteChar, dependencyFromPkgToSiteChar,
+            dependencyFromPkgToSiteCharStereoType];
+        var reqOb = {
+            projectId: ownerOb._projectId,
+            refId: ownerOb._refId,
+            elements: toCreate
+        };
+        ElementService.createElements(reqOb)
+            .then(function(data) {
+                var cacheKey = ['groups', ownerOb._projectId, ownerOb._refId],
+                    groupObj = { _id: group.id, _name: group.name, _parentId: (group.ownerId.includes("holding_bin_")) ?  null : group.ownerId };
+                if (CacheService.exists(cacheKey)) {
+                    CacheService.get(cacheKey).push(groupObj);
+                }
+                deferred.resolve(groupObj);
+            }, function(reason) {
+                console.log('POST failed:', reason);
+                deferred.reject(reason);
+            });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#getSiteDocuments
      * @methodOf mms.ViewService
      * 
@@ -1059,6 +1176,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
+        createGroup: createGroup,
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
         getDocumentViews: getDocumentViews,

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'CacheService', 'ElementService','ViewService','UtilsService','growl', '_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, CacheService, ElementService, ViewService, UtilsService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -789,6 +789,54 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
      * @ngdoc method
+     * @name mms.directives.Utils#reopenUnsavedElts
+     * @methodOf mms.directives.Utils
+     * @description
+     * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
+     * the editor will reopen if there are unsaved edits.
+     * assumes no reload.
+     * uses these in the scope:
+     *   element - element object for the element to edit (for sections it's the instance spec)
+     *   ve_edits - unsaved edits object
+     *   startEdit - pop open the editor window
+     * @param {object} scope scope of the transclude directives or view section directive
+     * @param {String} transcludeType name, documentation, or value
+     */
+    var reopenUnsavedElts = function(scope, transcludeType){
+        var unsavedEdits = scope.$root.ve_edits;
+        var key = scope.element.id + '|' + scope.element._projectId + '|' + scope.element._refId;
+        var thisEdits = unsavedEdits[key];
+        if (!thisEdits || scope.commitId !== 'latest') {
+            return;
+        }
+        if (transcludeType === 'value') {
+            if (scope.element.type === 'Property' || scope.element.type === 'Port') {
+                if (scope.element.defaultValue.value !== thisEdits.defaultValue.value ||
+                        scope.element.defaultValue.instanceId !== thisEdits.defaultValue.instanceId) {
+                    scope.startEdit();
+                }
+            } else if (scope.element.type === 'Slot') {
+                var valList1 = thisEdits.value;
+                var valList2 = scope.element.value;
+
+                // Check if the lists' lengths are the same
+                if (valList1.length !== valList2.length) {
+                    scope.startEdit();
+                } else {
+                    for (var j = 0; j < valList1.length; j++) {
+                        if (valList1[j].value !== valList2[j].value || valList1[j].instanceId !== valList2[j].instanceId) {
+                            scope.startEdit();
+                            break;
+                        }
+                    }
+                }
+            }
+        } else if (scope.element[transcludeType] !== thisEdits[transcludeType]) {
+            scope.startEdit();
+        }
+    };
+    /**
+     * @ngdoc method
      * @name mms.directives.Utils#revertAction
      * @methodOf mms.directives.Utils
      * @description
@@ -856,6 +904,35 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         });
     };
 
+    var checkForDuplicateInstances = function(operand) {
+        var seen = {}, dups = [], curr;
+        for (var i = 0; i < operand.length; i++) {
+            curr = operand[i].instanceId;
+            if (curr) {
+                if (seen[curr]) {
+                    dups.push(operand[i]);
+                    operand.splice(i, 1);
+                    i--;
+                    continue;
+                }
+                seen[curr] = true;
+            } else {
+                //instanceId is invalid?
+            }
+        }
+        return dups;
+    };
+
+    var fixImgSrc = function(imgDom) {
+        var src = imgDom.attr('src');
+        if (src && src.startsWith('/alfresco')) {
+            imgDom.attr('src', src + '?alf_ticket=' + AuthService.getTicket());
+        }
+        if (src && src.startsWith('../')) {
+            imgDom.attr('src', src.replace('../', '/alfresco/') + '?alf_ticket=' + AuthService.getTicket());
+        }
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -873,7 +950,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         setupValCf: setupValCf,
         setupValEditFunctions: setupValEditFunctions,
         revertAction: revertAction,
-        clearAutosaveContent: clearAutosaveContent
+        clearAutosaveContent: clearAutosaveContent,
+        reopenUnsavedElts: reopenUnsavedElts,
+        checkForDuplicateInstances: checkForDuplicateInstances,
+        fixImgSrc: fixImgSrc
     };
 
 }

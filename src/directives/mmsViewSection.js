@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', 'growl', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils) {
+function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils, growl) {
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
@@ -52,6 +52,12 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             // do nothing
         };
 
+        if (scope.section.specification && scope.section.specification.operand) {
+            var dups = Utils.checkForDuplicateInstances(scope.section.specification.operand);
+            if (dups.length > 0) {
+                growl.warning("There are duplicates in this section, dupilcates ignored!");
+            }
+        }
         domElement.append(defaultTemplate);
         $compile(domElement.contents())(scope);
 

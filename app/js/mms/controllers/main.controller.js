@@ -110,7 +110,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             $rootScope.hidePanes = false;
             $rootScope.showManageRefs = false;
             $rootScope.showLogin = false;
-            if ($state.current.name === 'login' || $state.current.name === 'login.select') {
+            if ($state.current.name === 'login' || $state.current.name === 'login.select' || $state.current.name === 'login.redirect') {
                 $rootScope.hidePanes = true;
                 $rootScope.showLogin = true;
             } else if ( $state.includes('project') && !($state.includes('project.ref')) ) {
@@ -133,11 +133,11 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                     $rootScope.ve_treeInitial = toParams.documentId;
             }
             $rootScope.ve_viewContentLoading = false;
-            if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project')) {
+            if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project' || fromState.name === 'login.redirect')) {
                 $timeout(function() {
                     $rootScope.ve_tree_pane.toggle();
                     $rootScope.ve_tree_pane.toggle();
-                }, 0, false);
+                }, 1, false);
             }
         }
     );

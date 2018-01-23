@@ -81,6 +81,8 @@ div.tooltip-inner {
     2.6.1 Light input
     2.6.2 Minor dark input
   2.7 Animation
+  2.8 Special Icons
+    2.8.1 Section
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -262,6 +264,7 @@ div.tooltip-inner {
     min-height: 0;
     overflow-y: auto;
     max-height: 300px;
+    overflow-x:hidden;
   }
 
   button.dropdown-toggle {
@@ -728,6 +731,7 @@ span.fixed-content-dropdown{
   border-radius: 3px;
   margin: 2px 10px;
   width: calc(100% - 20px);
+  font-weight: normal;
 }
 
 /*------------------------------------------------------------------
@@ -780,7 +784,27 @@ span.fixed-content-dropdown{
 // }
 
 /*------------------------------------------------------------------
-3. Table Filtering
+  2.8 Special Icons
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+    2.8.1 Section icon
+-------------------------------------------------------------------*/
+
+/*set pseudoclass and reset italic from <i>*/
+.section-icon::before{
+  content:"\00a7";
+  font-style: normal;
+  font-weight: bold;
+}
+
+/*display inline block to be same width in tree*/
+.section-icon{
+  display:inline-block;
+}
+
+/*------------------------------------------------------------------
+3. Table Filtering & Sorting
 -------------------------------------------------------------------*/
 
 .tableSearch > span {
@@ -793,6 +817,34 @@ table caption {
   padding: 8px 0 14px;
 }
 
+.doc-table-header {
+  background-color:$ve-silver-lighter-1;
+}
+
+.filter-input {
+  margin: 0;
+  width: 100%
+}
+
+.sort-default {
+  color: $ve-silver-darker-3;
+  float: right;
+}
+
+.sort-activated {
+  color: $ve-slate-darker-2;
+  float: right;
+}
+
+.sort-default, .sort-activated {
+  margin: 5px;
+}
+
+.sort-default:hover,
+.sort-activated:hover {
+  cursor: pointer;
+}
+
 .export-csv-button::before {
   content: "\f045";
   font-family: FontAwesome;
@@ -803,6 +855,22 @@ table caption {
   content: "\f0b0";
   font-family: FontAwesome;
   padding: 2px 4px;
+}
+
+.reset-sort-button::before {
+  content: "\f0e2";
+  font-family: FontAwesome;
+  padding: 2px 4px;
+}
+
+.reset-sort-fade.ng-hide {
+  opacity: 0;
+}
+
+.reset-sort-fade.ng-hide-remove,
+.reset-sort-fade.ng-hide-add {
+  display: inline-block !important;
+  transition: all linear 100ms;
 }
 
 .ve-filter-table-form .btn-sm {

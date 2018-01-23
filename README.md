@@ -40,6 +40,10 @@ https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUser
 ```
 8. (optional) _grunt clean_ - deletes dist and build folders
 
+## Building and Running with Docker
+To build the container, run the following command: `docker build -t ve .`.
+To run the container, run `docker run -it -p 80:9000 --name ve ve`.
+
 ## Problems?
 If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_
 
