@@ -12,9 +12,6 @@ angular.module('mmsApp')
 * @description
 * Displays the current tag in which the view resides
 *
-* ##Example
-* <mms-current-tag></mms-current-tag>
-*
 */
 function mmsCurrentTag($rootScope){
 

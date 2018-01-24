@@ -48,7 +48,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.tracker = {};
     if (!$rootScope.ve_edits)
         $rootScope.ve_edits = {};
-    $scope.presentElemEditCnts = {};
 
     // Set edit count for tracker view
     $scope.veEditsLength = function() {
@@ -101,29 +100,16 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     var cleanUpEdit = function(editOb, cleanAll) {
-        var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-        var currentCnt = 0;
-
-        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
-            currentCnt = $scope.presentElemEditCnts[key];
-        }
-        if ((currentCnt <= 1 && !Utils.hasEdits(editOb)) || cleanAll) {//TODO Utils.hasEdits
+        if (!Utils.hasEdits(editOb) || cleanAll) {//TODO Utils.hasEdits
+            var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
             delete $rootScope.ve_edits[key];
-            delete $scope.presentElemEditCnts[key];
             cleanUpSaveAll();
-        } else {
-            $scope.presentElemEditCnts[key] = currentCnt - 1;
         }
     };
 
     $scope.$on('presentationElem.edit', function(event, editOb) {
         var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-        var currentCnt = 1;
         $rootScope.ve_edits[key] = editOb;
-        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
-            currentCnt = $scope.presentElemEditCnts[key] + 1;
-        }
-        $scope.presentElemEditCnts[key] = currentCnt;
         cleanUpSaveAll();
     });
 
@@ -377,7 +363,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             $scope.viewContentsOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
-            $rootScope.$broadcast('view.reorder.saved', $scope.viewId);
+            $rootScope.$broadcast('view.reorder.saved', $scope.viewOb.id);
         }, function(reason) {
             $scope.viewContentsOrderApi.refresh();
             viewSaving = false;

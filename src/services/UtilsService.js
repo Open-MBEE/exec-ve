@@ -1,17 +1,22 @@
 'use strict';
 
 angular.module('mms')
-.factory('UtilsService', ['$q', '$http', 'CacheService', 'URLService', '_', UtilsService]);
+.factory('UtilsService', ['$q', '$http', 'CacheService', 'URLService', 'ApplicationService', '_', UtilsService]);
 
 /**
  * @ngdoc service
  * @name mms.UtilsService
+ * @requires $q
+ * @requires $http
+ * @requires CacheService
+ * @requires URLService
+ * @requires ApplicationService
  * @requires _
  * 
  * @description
  * Utilities
  */
-function UtilsService($q, $http, CacheService, URLService, _) {
+function UtilsService($q, $http, CacheService, URLService, ApplicationService, _) {
     var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
     var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
         '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
@@ -55,39 +60,97 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         visibility: 'public'
     };
     var INSTANCE_ELEMENT_TEMPLATE = {
-        ownerId: null,
-        name: '',
-        documentation: '',
-        type: "InstanceSpecification",
-        classifierIds: [],
-        specification: null,
-        _appliedStereotypeIds: [],
         appliedStereotypeInstanceId: null,
-        mdExtensionsIds: [],
-        syncElementId: null,
+        classifierIds: [],
         clientDependencyIds: [],
-        supplierDependencyIds: [],
-        nameExpression: null,
-        visibility: "public",
-        templateParameterId: null,
         deploymentIds: [],
+        documentation: '',
+        mdExtensionsIds: [],
+        name: '',
+        nameExpression: null,
+        ownerId: null,
         slotIds: [],
-        stereotypedElementId: null
+        specification: null,
+        stereotypedElementId: null,
+        supplierDependencyIds: [],
+        syncElementId: null,
+        templateParameterId: null,
+        type: "InstanceSpecification",
+        visibility: "public",
+        _appliedStereotypeIds: [],
     };
     var VALUESPEC_ELEMENT_TEMPLATE = {
-        visibility: "public",
+        appliedStereotypeInstanceId: null,
+        clientDependencyIds: [ ],
         documentation: "",
         mdExtensionsIds: [ ],
-        appliedStereotypeInstanceId: null,
-        templateParameterId: null,
-        clientDependencyIds: [ ],
-        syncElementId: null,
         name: "",
-        typeId: null,
+        nameExpression: null,
         supplierDependencyIds: [ ],
+        syncElementId: null,
+        templateParameterId: null,
+        typeId: null,
+        visibility: "public",
         _appliedStereotypeIds: [ ],
-        nameExpression: null
     };
+    var PACKAGE_ELEMENT_TEMPLATE = {
+        _appliedStereotypeIds : [ ],
+        documentation : "",
+        type : "Package",
+        mdExtensionsIds : [ ],
+        syncElementId : null,
+        appliedStereotypeInstanceId : null,
+        clientDependencyIds : [ ],
+        supplierDependencyIds : [ ],
+        name : "",
+        nameExpression : null,
+        visibility : null,
+        templateParameterId : null,
+        elementImportIds : [ ],
+        packageImportIds : [ ],
+        templateBindingIds : [ ],
+        URI : "",
+        packageMergeIds : [ ],
+        profileApplicationIds : [ ]
+    };
+    var GENERALIZATION_ELEMENT_TEMPLATE = {
+        appliedStereotypeInstanceId : null,
+        documentation : "",
+        generalizationSetIds : [ ],
+        isSubstitutable : true,
+        mdExtensionsIds : [ ],
+        syncElementId : null,
+        type : "Generalization",
+        _appliedStereotypeIds : [ ],
+    };
+    var DEPENDENCY_ELEMENT_TEMPLATE = {
+        _appliedStereotypeIds : [ ],
+        appliedStereotypeInstanceId : null,
+        clientDependencyIds : [ ],
+        documentation : "",
+        mdExtensionsIds : [ ],
+        name : "",
+        nameExpression : null,
+        supplierDependencyIds : [ ],
+        syncElementId : null,
+        templateParameterId : null,
+        type : "Dependency",
+        visibility : null,
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#hasCircularReference
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Tells whether or not there exists a circular reference
+     *
+     * @param {Object} scope scope
+     * @param {string} curId current id
+     * @param {string} curType current type
+     * @returns {boolean} true or false
+     */
     var hasCircularReference = function(scope, curId, curType) {
         var curscope = scope;
         while (curscope.$parent) {
@@ -99,6 +162,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return false;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#cleanValueSpec
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Cleans value specification
+     *
+     * @param {Object} vs value spec object
+     * @returns {void} nothing
+     */
     var cleanValueSpec = function(vs) {
         if (vs.hasOwnProperty('valueExpression'))
             delete vs.valueExpression;
@@ -108,7 +182,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             }
         }
     };
-    
+
     /**
      * @ngdoc method
      * @name mms.UtilsService#cleanElement
@@ -179,6 +253,21 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return elem;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#buildTreeHierarchy
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * builds hierarchy of tree branch objects
+     *
+     * @param {array} array array of objects
+     * @param {string} id key of id field
+     * @param {string} type type of object
+     * @param {object} parent key of parent field
+     * @param {callback} level2_Func function to get childen objects
+     * @returns {void} root node
+     */
     var buildTreeHierarchy = function (array, id, type, parent, level2_Func) {
         var rootNodes = [];
         var data2Node = {};
@@ -291,6 +380,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
     var mergeElement = function(source, updateEdit) {
         //TODO remove calls to this, shoudl use ElementService.cacheElement
     };
+
     /**
      * @ngdoc method
      * @name mms.UtilsService#filterProperties
@@ -349,6 +439,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return false;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#isRestrictedValue
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * deprecated
+     *
+     * @param {string} table table content
+     * @returns {boolean} boolean
+     */
     function isRestrictedValue(values) {
         if (values.length > 0 && values[0].type === 'Expression' &&
                 values[0].operand.length === 3 && values[0].operand[0].value === 'RestrictedValue' &&
@@ -359,7 +460,20 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return false;
     }
 
-    var makeHtmlTable = function(table) {
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeHtmlTable
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * make html table based on table spec object
+     *
+     * @param {object} table table content
+     * @param {boolean} isFilterable table content
+     * @param {boolean} isSortable table content
+     * @returns {string} generated html string
+     */
+    var makeHtmlTable = function(table, isFilterable, isSortable) {
         var result = ['<table class="table table-bordered table-condensed">'];
         if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
@@ -376,8 +490,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             result.push('</colgroup>');
         }
         if (table.header) {
-            result.push('<thead>');
-            result.push(makeTableBody(table.header, true));
+            // only add styling to the filterable or sortable header
+            if ( isFilterable || isSortable ) {
+                result.push('<thead class="doc-table-header" >');
+            } else {
+                result.push('<thead>');
+            }
+
+            result.push(makeTableBody(table.header, true, isFilterable, isSortable));
             result.push('</thead>');
         }
         result.push('<tbody>');
@@ -385,12 +505,58 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         result.push('</tbody>');
         result.push('</table>');
         return result.join('');
-
     };
 
-    var makeTableBody = function(body, header) {
+    var tableConfig = {
+        sortByColumnFn: 'sortByColumnFn',
+        showBindingForSortIcon: 'sortColumnNum',
+        filterDebounceRate: 200,
+        filterTermColumnPrefixBinding: 'filterTermForColumn'
+    };
+
+    /** Include row and column number for table's header data object **/
+    var _generateRowColNumber = function(header) {
+      header.forEach(function (row, rowIndex) {
+          var startCol = 0;
+          var colCounter = 0;
+          row.forEach(function (cell, cellIndex) {
+              // startCol is always 0 except when row > 0th and on cell === 0th && rowSpan of the previous row's first element is larger than 1
+              // This is the only time when we need to offset the starting colNumber for cells under merged column(s)
+              if ( rowIndex !== 0 && cellIndex === 0 && Number(header[rowIndex - 1][0].rowspan) > 1 ) {
+                  startCol = Number(header[rowIndex - 1][0].colspan);
+              }
+              var colSpan = Number(cell.colspan);
+              cell.startRow = rowIndex;
+              cell.endRow = cell.startRow + Number(cell.rowspan) - 1;
+              cell.startCol = startCol + colCounter;
+              cell.endCol = cell.startCol +  colSpan - 1;
+              colCounter += colSpan;
+          });
+          startCol = 0;
+          colCounter = 0;
+      });
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeTableBody
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * make html table body based on body spec object
+     *
+     * @param {object} body body content
+     * @param {boolean} isHeader is header
+     * @param {boolean} isFilterable is filterable
+     * @param {boolean} isSortable is sortable
+     * @returns {string} generated html string
+     */
+    var makeTableBody = function(body, isHeader, isFilterable, isSortable) {
+        if ( isHeader && (isFilterable || isSortable ) ) {
+            _generateRowColNumber(body);
+        }
         var result = [], i, j, k, row, cell, thing;
-        var dtag = (header ? 'th' : 'td');
+        var dtag = (isHeader ? 'th' : 'td');
         for (i = 0; i < body.length; i++) {
             result.push('<tr>');
             row = body[i];
@@ -399,9 +565,19 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                 result.push('<' + dtag + ' colspan="' + cell.colspan + '" rowspan="' + cell.rowspan + '">');
                 for (k = 0; k < cell.content.length; k++) {
                     thing = cell.content[k];
-                    result.push('<div>');
+                    if ( isFilterable || isSortable ) {
+                        result.push('<div ng-style="{display: \'inline\'}">');
+                    } else {
+                        result.push('<div>');
+                    }
+
                     if (thing.type === 'Paragraph') {
-                        result.push(makeHtmlPara(thing));
+                        var para = makeHtmlPara(thing);
+                        // add special styling for header's title
+                        if ( ( isFilterable || isSortable ) && thing.sourceType === 'text' ) {
+                            para = para.replace('<p>', '<p ng-style="{display: \'inline\'}">' );
+                        }
+                        result.push(para);
                     } else if (thing.type === 'Table') {
                         result.push(makeHtmlTable(thing));
                     } else if (thing.type === 'List') {
@@ -411,6 +587,14 @@ function UtilsService($q, $http, CacheService, URLService, _) {
                         result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                     }
                     result.push('</div>');
+                    if ( isHeader ) {
+                        if ( isSortable && Number(cell.colspan) === 1 ) {
+                            result.push('<span' + ' ng-click=\"'+ tableConfig.sortByColumnFn + "(" + cell.startCol + ")" + '\"' + ' ng-class=\"'+ 'getSortIconClass('+ cell.startCol + ')' + '\"></span>');
+                        }
+                        if ( isFilterable ) {
+                            result.push('<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column"' + ' ng-show="showFilter" ng-model-options=\"{debounce: '+ tableConfig.filterDebounceRate  + '}\"' + ' ng-model=\"' + tableConfig.filterTermColumnPrefixBinding + cell.startCol + cell.endCol + '\">');
+                        }
+                    }
                 }
                 result.push('</' + dtag + '>');
             }
@@ -419,6 +603,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return result.join('');
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeHtmlList
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * make html list string based on list spec object
+     *
+     * @param {object} list list specification object
+     * @returns {string} generated html string
+     */
     var makeHtmlList = function(list) {
         var result = [], i, j, item, thing;
         if (list.ordered)
@@ -451,6 +646,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return result.join('');
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeHtmlPara
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * make html para string based on para spec object
+     *
+     * @param {object} para paragraph spec object
+     * @returns {string} generated html string
+     */
     var makeHtmlPara = function(para) {
         if (para.sourceType === 'text')
             return para.text;
@@ -469,6 +675,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return '<mms-cf mms-cf-type="' + t + '" mms-element-id="' + para.source + '"' + attr + '></mms-cf>';
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeHtmlTOCChild
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Generates table of contents for the document/views.
+     *
+     * @param {string} tree the root element (document or view)
+     * @returns {string} toc string
+     */
     var makeHtmlTOC = function (tree) {
         var result = '<div class="toc"><div class="header">Table of Contents</div>';
         var root_branch = tree[0].branch;
@@ -480,6 +697,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return result;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeHtmlTOCChild
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Generates table of contents for the document/views.
+     *
+     * @param {string} child the view to be referenced in the table of content
+     * @returns {string} toc string
+     */
     var makeHtmlTOCChild = function(child) {
         if (child.type !== 'view' && child.type !== 'section')
             return '';
@@ -490,10 +718,24 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         for (i = 0; i < child.children.length; i++) {
             result += makeHtmlTOCChild(child.children[i]);
         }
-        result += '</ul>'; 
+        result += '</ul>';
         return result;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeTablesAndFiguresTOC
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Generates a list of tables, figures, and equations. It also appends the captions to the figures and tables.
+     *
+     * @param {string} tree the document/view to be printed (what is on the left pane)
+     * @param {string} printElement contents to be printed (what is displayed in the center pane)
+     * @param {boolean} live true only if a specific sorting is required
+     * @param {boolean} user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not
+     * @returns {object} results
+     */
     var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
         var ob = {
             tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
@@ -503,12 +745,15 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             figureCount: 0,
             equationCount: 0
         };
-        if (html) {
-            return ob; //let server handle it for now
-        }
         var root_branch = tree[0].branch;
-        var i = 0;
-        for (i = 0; i < root_branch.children.length; i++) {
+
+        // If both "Generate List of Tables and Figures" && "Use HTML for List of Tables and Figures " options are checked...
+        if (html) {
+            var obHTML = generateTOCHtmlOption(ob,tree, printElement, live, html);
+            return obHTML;
+        }
+
+        for (var i = 0; i < root_branch.children.length; i++) {
             makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
         }
         ob.tables += '</ul></div>';
@@ -517,18 +762,41 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return ob;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeTablesAndFiguresTOCChild
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Generates a list of tables, figures, and equations of the none root node of he tree (containment tree on the left pane). It also appends the captions to the figures and tables.
+     *
+     * @param {string} child presentation element
+     * @param {string} printElement contents to be printed (what is displayed in the center pane)
+     * @param {string} ob an object that stores the html list of tables, figures, and equations as well as the counts of those
+     * @param {boolean} live true when user would like to preview numbering in the app
+     * @param {boolean} showRefName the tree hierarchy of the document or view (what is displayed in the left pane)
+     * @returns {void} nothing
+     */
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
         var sysmlId = child.data.id;
         var el = printElement.find('#' + sysmlId);
-        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"]');
+        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
+        var name = '';
         if (child.type === 'table') {
             ob.tableCount++;
-            cap = ob.tableCount + '. ' + child.data.name;
+            var capTbl = el.find('table > caption');
+            name = capTbl.text();
+            if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf('. ') + 2);
+            } else if (name === "") {
+                name = child.data.name;
+            }
+            cap = ob.tableCount + '. ' + name;
             ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
-            var cap1 = el.find('table > caption');
-            cap1.html('Table ' + cap);//cap.html());
-            if (cap1.length === 0) {
+            capTbl.html('Table ' + cap);
+            // If caption does not exist, add to html
+            if (capTbl.length === 0) {
                 el.find('table').prepend('<caption>Table ' + cap + '</caption>');
             }
             // Change cap value based on showRefName true/false
@@ -545,11 +813,18 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         }
         if (child.type === 'figure') {
             ob.figureCount++;
-            cap = ob.figureCount + '. ' + child.data.name;
+            var capFig = el.find('figure > figcaption');
+            name = capFig.text();
+            if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf('. ') + 2);
+            } else if (name === "") {
+                name = child.data.name;
+            }
+            cap = ob.figureCount + '. ' + name;
             ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
-            var cap3 = el.find('figure > figcaption');
-            cap3.html('Figure ' + cap);
-            if (cap3.length === 0) {
+            capFig.html('Figure ' + cap);
+            // If caption does not exist, add to html
+            if (capFig.length === 0) {
                 el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
             }
             // Change cap value based on showRefName true/false
@@ -569,9 +844,10 @@ function UtilsService($q, $http, CacheService, URLService, _) {
             cap = ob.equationCount + '. ' + child.data.name;
             ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var equationCap = '(' + ob.equationCount + ')';
-            var cap2 = el.find('.mms-equation-caption');
-            cap2.html(equationCap);
-            if (cap2.length === 0) {
+            var capEq = el.find('.mms-equation-caption');
+            capEq.html(equationCap);
+            // If caption does not exist, add to html
+            if (capEq.length === 0) {
                 el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
             }
             // Change cap value based on showRefName true/false
@@ -591,6 +867,114 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         }
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#generateAnchorId
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Generates a unique ID to be used in TOC anchor tags (e.g. <a name='tbl_xxxxx...x'>, <a href='#tbl_xxxxx...x'>)
+     *
+     * @param {string} prefix "tbl_" when creating an id for a table, "fig_" when creating an id for a figuer
+     * @returns {string} unique ID wit prefix, tbl_ or fig_
+     */
+    var generateAnchorId = function(prefix){
+        return prefix + ApplicationService.createUniqueId();
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#generateTOCHtmlOption
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Generates a list of tables, figures, and equations. It also appends the captions to the figures and tables.
+     *
+     * @param {string} ob an object that stores the html list of tables, figures, and equations as well as the counts of those
+     * @param {string} tree the tree hierarchy of the document or view (what is displayed in the left pane)
+     * @param {string} printElement contents to be printed (what is displayed in the center pane)
+     * @returns {string} populates the object fed to the function (the first argument) and return
+     */
+    var generateTOCHtmlOption = function(ob, tree, printElement){
+        // Grab all existing tables and figures inside the center pane, and assign them to tables and figures
+        var tables = printElement.find('table'),
+            figures = printElement.find('figure');
+            // equations = printElement.find('.math-tex');
+        var anchorId = '', thisCap='', tblCap, tbl, fig, eq, j;
+
+        ob.tableCount = tables.length;
+        ob.figureCount = figures.length;
+
+        // Tables
+        for ( j = 0; j < tables.length; j++) {
+            tbl = $(tables[j]);
+            tblCap = $('caption', tbl);
+
+            // Set the link from the List of Tables to the actual tables
+            anchorId = generateAnchorId('tbl_');
+            tbl.attr('id', anchorId);
+
+            // Append li to the List of Tables
+            thisCap = (tblCap && tblCap.text() !== '') ? (j+1) + ". " + tblCap.text() : (j+1) + ". ";
+            ob.tables += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>';
+
+            // If no caption exists, add empty caption for numbering
+            if (tblCap.length === 0) {
+                tbl.prepend('<caption> </caption>');
+            }
+        }
+
+        // Figures
+        for ( j = 0; j < figures.length; j++) {
+            fig = $(figures[j]);
+            var figcap = $('figcaption',fig);
+
+            // Set the link from the List of Tables to the actual tables
+            anchorId = generateAnchorId('fig_');
+            fig.attr('id', anchorId);
+
+            // Append li to the List of Figures
+            thisCap = (figcap && figcap.text() !== '') ? (j + 1) + ". " + figcap.text() : (j+1);
+            ob.figures += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>';
+
+            // If no caption exists, add empty caption for numbering
+            if (figcap.length === 0) {
+                fig.append('<figcaption>&nbsp;</figcaption>');
+            }
+        }
+
+        // We will not add List of Equations for now
+        // for ( j = 0; j < equations.length; j++) {
+        //     // Grab all equations from the center pane
+        //     eq = $(equations[j]);
+        //
+        //     // Set the link from the List of Tables to the actual tables
+        //     anchorId = generateAnchorId('eq_');
+        //     eq.attr('id', anchorId);
+        //
+        //     // Append li to the List of Equations
+        //     ob.equations += '<li><a href="#' + anchorId + '">' + j + '. </a></li>';
+        //     if(noCaption){ // If user did not add the caption, add a mock caption
+        //         eq.append('<caption>&nbsp;</caption>');
+        //     }
+        // }
+
+        ob.tables += '</ul></div>';
+        ob.figures += '</ul></div>';
+        ob.equations += '</ul></div>';
+        return ob;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#createMmsId
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Generate unique SysML element ID
+     *
+     * @returns {string} unique SysML element ID
+     */
     var createMmsId = function() {
         var d = Date.now();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -601,25 +985,52 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return 'MMS_' + Date.now() + '_' + uuid;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#convertViewLinks
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Link the element to the document/view in VE (add an anchor tag)
+     *
+     * @param {string} printElement the content of the view/document currently selected on the center pane
+     * @returns {void} nothing
+     */
     var convertViewLinks = function(printElement) {
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
-            var elementId = $this.attr('mms-element-id');
+            var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
             }
         });
     };
-    /*
-    header = header slot on doc
-    footer = footer slot on doc
-    dnum = dnumber slot on doc
-    tag = ve tag name if available
-    displayTime = tag time or generation time as mm/dd/yy hh:mm am/pm
-    */
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#getPrintCss
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Typeset HTML to PDF (resource: https://www.princexml.com/)
+     *
+     * @param {string} header header slot on doc
+     * @param {string} footer footer slot on doc
+     * @param {string} dnum dnumber slot on doc
+     * @param {string} tag ve tag name if available
+     * @param {string} site the site name
+     * @param {string} htmlFlag user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not(<-- this comment needs to be approved by Shakeh)
+     * @param {string} landscape user input taken from the printConfirm modal
+     * @param {string} meta $scope.meta (in controller.utils.js) = {
+                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
+                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
+                };
+     * @returns {string} document/view content string to be passed to the server for conversion
+     */
     var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; display: block; margin-left: auto; margin-right: auto;}\n" +
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
+                "figure img {display: block;}\n" +
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
                 ".view-title {margin-top: 10pt}\n" +
@@ -659,9 +1070,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         if(htmlFlag) {
             ret += ".toc { counter-reset: table-counter figure-counter;}\n" +
                 "figure { counter-increment: figure-counter; }\n" +
-                "figcaption::before {content: \"Figure \" counter(figure-counter) \": \"; }\n" +
+                "figcaption::before {content: \"Figure \" counter(figure-counter) \". \"; }\n" +
                 "table { counter-increment: table-counter; }\n" +
-                "caption::before {content: \"Table \" counter(table-counter) \": \"; }\n";
+                "caption::before {content: \"Table \" counter(table-counter) \". \"; }\n";
         }
         Object.keys(meta).forEach(function(key) {
             var content = '""';
@@ -680,6 +1091,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return ret;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#isView
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Evaluates if an given element is a view or not
+     *
+     * @param {Object} e element
+     * @returns {boolean} boolean
+     */
     var isView = function(e) {
         if (e._appliedStereotypeIds) {
             if (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
@@ -694,6 +1116,17 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         return false;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#isDocument
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Evaluates if an given element is a document or not
+     *
+     * @param {Object} e element
+     * @returns {boolean} boolean
+     */
     var isDocument = function(e) {
         if (e._appliedStereotypeIds && e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
             return true;
@@ -711,7 +1144,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      *
      * @param {Object} doc The document object with Id and HTML payload that will be converted to PDF
      * @param {string} site The site name
-     * @param {string} [workspace=master] Workspace name
+     * @param {string} refId [workspace=master] Workspace name
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
     var convertHtmlToPdf = function(doc, projectId, refId){ //TODO fix
@@ -729,7 +1162,7 @@ function UtilsService($q, $http, CacheService, URLService, _) {
      * @ngdoc method
      * @name mms.UtilsService#createClassElement
      * @methodOf mms.UtilsService
-     * 
+     *
      * @description
      * returns a class json object with all emf fields set to default, with
      * fields from passed in object substituted
@@ -752,6 +1185,26 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         Object.assign(o, obj);
         return o;
     };
+
+    var createGeneralizationElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(GENERALIZATION_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+    var createPackageElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(PACKAGE_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+    var createDependencyElement = function(obj) {
+        var o = JSON.parse(JSON.stringify(DEPENDENCY_ELEMENT_TEMPLATE));
+        Object.assign(o, obj);
+        return o;
+    };
+
+
     return {
         VIEW_SID: VIEW_SID,
         OTHER_VIEW_SID: OTHER_VIEW_SID,
@@ -760,6 +1213,9 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         createClassElement: createClassElement,
         createInstanceElement: createInstanceElement,
         createValueSpecElement: createValueSpecElement,
+        createGeneralizationElement: createGeneralizationElement,
+        createDependencyElement: createDependencyElement,
+        createPackageElement: createPackageElement,
         hasCircularReference: hasCircularReference,
         cleanElement: cleanElement,
         normalize: normalize,
@@ -779,6 +1235,10 @@ function UtilsService($q, $http, CacheService, URLService, _) {
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,
-        convertHtmlToPdf: convertHtmlToPdf
+        convertHtmlToPdf: convertHtmlToPdf,
+        generateTOCHtmlOption: generateTOCHtmlOption,
+        generateAnchorId: generateAnchorId,
+        tableConfig: tableConfig,
+        _generateRowColNumber: _generateRowColNumber,
     };
 }
