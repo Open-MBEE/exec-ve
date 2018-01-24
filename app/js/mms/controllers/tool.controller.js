@@ -348,7 +348,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.success('Save Succesful');
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
             $rootScope.$broadcast('view.reorder.saved', $scope.viewOb.id);
-        }, function(reason) {
+        }, function(response) {
             $scope.viewContentsOrderApi.refresh();
             viewSaving = false;
             var reason = response.failedRequests[0];
