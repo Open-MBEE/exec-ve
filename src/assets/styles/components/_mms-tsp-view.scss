@@ -13,6 +13,7 @@
 {
 	height: 14px;
 	width: 14px;
+	max-width: none;
 }
 /* An input element within a search box. */
 input[type="text"].tsSearchBoxInput
@@ -37,7 +38,14 @@ input[type="text"].tsSearchBoxInput-watermark
 	background-color : transparent;
 	color: DarkGray;
 }
-
+.tsToolBarItem img
+{
+	max-width: none;
+}
+.tsToolBar-horizontal .tsToolBarSeparator
+{
+	border-right: 0;
+}
 table.tsToolbarWidget
 {
 	border:0px;
@@ -135,4 +143,33 @@ table.tsSearchResultTable
 table.tsSearchResultTable tbody>tr>td
 {
 	padding:0!important;
+}
+.gwt-MenuBarPopup div>table
+{
+	margin: 0;
+}
+.tsMenuBarItem table
+{
+	margin: 0;
+	border: #fff;
+}
+.tsMenuBarItem table>tbody>tr>td
+{
+	padding: 2px;
+	border: #fff;
+	vertical-align: middle;
+}
+.tsMenuBarItem
+{
+	padding: 2px!important;
+}
+.gwt-MenuBarPopup div>table>tbody>tr>td
+{
+	padding: 0;
+	border: #fff;
+}
+.gwt-MenuBar table
+{
+	padding: 0;
+	border: #fff;
 }
