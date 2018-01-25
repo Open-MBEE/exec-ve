@@ -4,7 +4,8 @@ module.exports = function(grunt) {
   require('jit-grunt')(grunt, {
     // static mapping for tasks that don't match their modules' name
     useminPrepare: 'grunt-usemin',
-    setupProxies: 'grunt-middleware-proxy'
+    setupProxies: 'grunt-middleware-proxy',
+    artifactory: 'grunt-artifactory-artifact'
   });
 
   var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
@@ -433,7 +434,7 @@ module.exports = function(grunt) {
       grunt.task.run('setupProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('setupProxies:emsstg', 'connect:emsstg');
+      grunt.task.run('setupProxies:opencaeuat', 'connect:opencaeuat');
     }
     grunt.task.run('watch:' + build);
   });
