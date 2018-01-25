@@ -71,14 +71,7 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         checkLogin().then(function() {
             var logouturl = URLService.getLogoutURL();
             removeTicket();
-            //var logoutService = '/alfresco/service/api/login/ticket/'+ AuthService.getTicket() + '?alf_ticket=' + AuthService.getTicket();
-            $http.post('/Basic/mms/cookieAuth?op=Sign Out').then(
-                function(data){
-                    $cookies.remove('com.tomsawyer.web.license.user');
-                }, function(failure) {
-                    URLService.handleHttpStatus(failure.data, failure.status, failure.headers, failure.config, deferred);
-                }
-            );
+            //$cookies.remove('com.tomsawyer.web.license.user');
             $http.delete(logouturl).then(function(success) {
                 deferred.resolve(true);
             }, function(failure) {
