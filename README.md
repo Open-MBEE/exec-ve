@@ -15,7 +15,7 @@ https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUser
 
 ## Installation and Building
 
-1. install the latest stable version of Node ( at the time of this writing 8.9.4 )
+1. Install the latest stable version of Node ( at the time of this writing 8.9.4 )
 2. _npm install -g grunt-cli_ : to install grunt cli
 3. cd into angular-mms directory
 4. _npm install_ : to install all node module dependencies specified in package.json
@@ -27,17 +27,15 @@ https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUser
   "ems": "hostnameurl"
 }
 ```
-6.
+6. In the angular-mms directory, run:
   * _grunt_ :  to build and bundle the app in development mode. The final artifact will be available in the dist folder.
   * _grunt release-build_ :  to build and bundle the app in production mode. The final artifact will be available in the dist folder.
   * _grunt server_ : to build and bundle the app in development mode. This will also launch a web server at localhost:9000 for serving static resources from dist folder and a proxy server for any other resources with path starting with /alfresco. This allows us to test with real service endpoints defined in `angular-mms-grunt-servers.json`. The default server is opencaeuat.
-  * _grunt server:a_ : "a" is the key from the angular-mms-grunt-servers.json. Its value is the server's base url that you would like to the proxy to forward requests to
-  * _grunt release_ : to build and bundle the app in production mode as well as launching the web server locally and a proxy as mentioned above
-  * _grunt release:a_ : same thing as above but with a different server's url that you want. Make sure that "a" exists in the angular-mms-grunt-servers.json
-  * _grunt deploy_ : to build and bundle the app in production modes, generate documentation and publish to the final artifact to Artifactory
+  * _grunt server:a_ : "a" is the key from the angular-mms-grunt-servers.json. Its value is the server's base url that you would like the proxy to forward requests to.
+  * _grunt release_ : to build and bundle the app in production mode as well as launching a web server locally and a proxy.
+  * _grunt release:a_ : same thing as above but with a different server's url that you want. Make sure that "a" exists in the angular-mms-grunt-servers.json.
+  * _grunt deploy_ : to build and bundle the app in production modes, generate documentation and publish the final artifact to Artifactory.
   * _grunt test_ : to run unit tests
-
-7. (optional) _grunt clean_ - deletes dist and build folders
 
 For more information, please consult the Gruntfile.js and the links at the bottom.
 
