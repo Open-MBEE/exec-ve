@@ -20,7 +20,7 @@ function FullDocumentService($timeout, $http, _, growl) {
 
         function handleClickOnBranch(branch, callback) {
             var viewId = branch.type === 'view' ? branch.data.id : branch.viewId;
-            var isViewLoadedBefore =_loadViewsUntilViewWith(viewId); // load some views if neccessary
+            var isViewLoadedBefore =_loadViewsUntilViewWith(viewId); // load some views if necessary
             if (isViewLoadedBefore) {
                 callback();
             } else {
@@ -30,6 +30,7 @@ function FullDocumentService($timeout, $http, _, growl) {
                     callback();
                 });
             }
+            return isViewLoadedBefore;
         }
 
         function loadRemainingViews(callback) {

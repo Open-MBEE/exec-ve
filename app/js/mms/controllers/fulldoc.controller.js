@@ -71,12 +71,13 @@ function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentServi
         }
     };
     $scope.views = [];
-    // api to communicate with borderlayout lib
+    // api to communicate with borderlayout library
     $scope.scrollApi = {
         notifyOnScroll: notifyOnScroll,
-        isScrollVisible: function(){}, // hook to borderlayout lib
-        scrollThrottleRate: 500,
-        thresholdBetweenScrollbarAndBottom : 2000
+        isScrollVisible: function(){}, // borderlayout resets this to a function we can use
+        throttleRate: 500, // how often should the wheel event triggered
+        threshold : 2000, // how far from the bottom of the page before adding more views
+        frequency: 100 // how fast to add more views
     };
 
 
@@ -184,7 +185,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentServi
     });
 
     function _createViews() {
-        var loadingViewsFromServer = growl.info('Loading data from server', {ttl: -1});
+        var loadingViewsFromServer = growl.info('Loading data from server!', {ttl: -1});
         views.push({id: documentOb.id, api: {
             init: function(dis) {
                 if ($rootScope.veCommentsOn) {
