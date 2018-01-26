@@ -76,7 +76,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentServi
         notifyOnScroll: notifyOnScroll,
         isScrollVisible: function(){}, // borderlayout resets this to a function we can use
         throttleRate: 500, // how often should the wheel event triggered
-        threshold : 2000, // how far from the bottom of the page before adding more views
+        threshold : 3000, // how far from the bottom of the page before adding more views
         frequency: 100 // how fast to add more views
     };
 
@@ -87,7 +87,6 @@ function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentServi
     var seenViewIds = {};
     view2children[documentOb.id] = [];
     var fullDocumentService;
-
     _createViews().then(function() {
         fullDocumentService = new FullDocumentService(views);
         fullDocumentService.addInitialViews($scope.scrollApi.isScrollVisible);

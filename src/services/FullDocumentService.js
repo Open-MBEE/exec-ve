@@ -52,7 +52,6 @@ function FullDocumentService($timeout, $http, _, growl) {
         }
 
         function handleDocumentScrolling() {
-            console.log('handle document scrolling');
             return _pushNewViewsToBuffer(self.viewsBuffer.length, self.viewsBuffer.length);
         }
 
@@ -78,7 +77,6 @@ function FullDocumentService($timeout, $http, _, growl) {
         }
 
         function _addNewViewToBufferAt(index) {
-            console.log('load new view at #' + index);
             self.viewsBuffer.splice(index, 0, self._views[index]);
         }
 
@@ -86,7 +84,6 @@ function FullDocumentService($timeout, $http, _, growl) {
         function _pushNewViewsToBuffer(startIndex, endIndex) {
             var isLoadedBefore = true;
             if (startIndex < self._views.length && endIndex < self._views.length) {
-                console.log('loading views from: ' + startIndex + 'to:' + (endIndex));
                 Array.prototype.push.apply(self.viewsBuffer, self._views.slice(startIndex, endIndex + 1));
                 isLoadedBefore = false;
             }
