@@ -3,9 +3,9 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', 'FullDocumentService',
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', '$timeout', 'FullDocumentService',
     'hotkeys', 'growl', '_', 'MmsAppUtils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
-function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentService, hotkeys, growl, _,
+function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDocumentService, hotkeys, growl, _,
     MmsAppUtils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
@@ -74,7 +74,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentServi
     // api to communicate with borderlayout library
     $scope.scrollApi = {
         notifyOnScroll: notifyOnScroll,
-        isScrollVisible: function(){}, // borderlayout resets this to a function we can use
+        isScrollVisible: function(){}, // pane's directive (in borderlayout) resets this to the right function
         throttleRate: 500, // how often should the wheel event triggered
         threshold : 3000, // how far from the bottom of the page before adding more views
         frequency: 100 // how fast to add more views
@@ -88,9 +88,16 @@ function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentServi
     view2children[documentOb.id] = [];
     var fullDocumentService;
     _createViews().then(function() {
-        fullDocumentService = new FullDocumentService(views);
-        fullDocumentService.addInitialViews($scope.scrollApi.isScrollVisible);
-        $scope.views = fullDocumentService.viewsBuffer;
+        // Normally the controller codes get executed before all the directives'
+        // code in its template ( full-doc.html ). As a result, we
+        // need to use $timeout here, to let them finish first because in this case
+        // we rely on fa-pane directive to setup isScrollVisible
+        $timeout(function() {
+            fullDocumentService = new FullDocumentService(views);
+            fullDocumentService.addInitialViews($scope.scrollApi.isScrollVisible);
+            $scope.views = fullDocumentService.viewsBuffer;
+        });
+
     });
 
     _initializeDocLibLink();
