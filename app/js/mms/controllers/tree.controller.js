@@ -570,7 +570,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     var num = 1;
                     for (var i = 0; i < node.children.length; i++) {
                         var cNode = node.children[i];
-                        $rootScope.$broadcast('newViewAdded', cNode.data.id, curSection + '.' + num, lastChild);
+                        $rootScope.$broadcast('mms-new-view-added', cNode.data.id, curSection + '.' + num, lastChild);
                         lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.id);
                         num = num + 1;
                     }
@@ -599,9 +599,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     $state.go('project.ref.document.view', {viewId: data.id, search: undefined});
                 } else {
                     if (prevBranch) {
-                        $rootScope.$broadcast('newViewAdded', data.id, curNum, prevBranch.data.id);
+                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, prevBranch.data.id);
                     } else {
-                        $rootScope.$broadcast('newViewAdded', data.id, curNum, branch.data.id);
+                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, branch.data.id);
                     }
                 }
             }

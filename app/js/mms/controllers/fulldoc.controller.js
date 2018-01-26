@@ -103,7 +103,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, FullDocumentServi
         });
     });
 
-    $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
+    $scope.$on('mms-new-view-added', function(event, vId, curSec, prevSibId) {
         fullDocumentService.handleViewAdd(_buildViewElement(vId, curSec), prevSibId);
     });
 
