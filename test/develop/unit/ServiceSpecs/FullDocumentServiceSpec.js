@@ -22,7 +22,7 @@ describe('Service: FullDocumentService', function() {
     }));
 
     afterEach(function() {
-        // $timeout.verifyNoPendingTasks();
+        $timeout.verifyNoPendingTasks();
     });
 
     it('should add as many views as it can until the scrollbar shows up', function() {
@@ -49,6 +49,8 @@ describe('Service: FullDocumentService', function() {
         expect(service.viewsBuffer.length).toEqual(3);
         // when there is no more view, scrolling doesn't do anything
         service.handleDocumentScrolling();
+        $timeout.flush();
+
         expect(service.viewsBuffer.length).toEqual(mockedViews.length);
     });
 
@@ -97,6 +99,8 @@ describe('Service: FullDocumentService', function() {
         // load all the views before users click on a view in the tree
         service.loadRemainingViews(function(){});
         var noNeedToLoadMoreViews = service.handleClickOnBranch(branch, this.success);
+        $timeout.flush();
+
         expect(noNeedToLoadMoreViews).toBeTruthy();
         expect(this.success).toHaveBeenCalled();
     });
@@ -109,6 +113,8 @@ describe('Service: FullDocumentService', function() {
         // load all the views before users click on a an element under a view in the tree
         service.loadRemainingViews(function(){});
         var noNeedToLoadMoreViews = service.handleClickOnBranch(branch, this.success);
+        $timeout.flush();
+
         expect(noNeedToLoadMoreViews).toBeTruthy();
         expect(this.success).toHaveBeenCalled();
     });
@@ -121,6 +127,8 @@ describe('Service: FullDocumentService', function() {
         var viewToAdd = {id: 4};
         var prevSiblingViewId = 2;
         service.handleViewAdd(viewToAdd, prevSiblingViewId);
+        $timeout.flush();
+
         expect(service.viewsBuffer.length).toEqual(3);
     });
 
@@ -132,6 +140,8 @@ describe('Service: FullDocumentService', function() {
         var viewToAdd = {id: 4};
         var prevSiblingViewId = 1;
         service.handleViewAdd(viewToAdd, prevSiblingViewId);
+        $timeout.flush();
+
         expect(service.viewsBuffer.length).toEqual(2);
     });
 });
