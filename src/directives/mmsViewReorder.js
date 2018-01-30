@@ -102,7 +102,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
         };
 
         scope.save = function() {
-            var promises = [];
+            var elementObsToUpdate = [];
             var updateSectionElementOrder = function(elementReference) {
                 var sectionEdit = {
                     id: elementReference.instanceId,
@@ -123,8 +123,9 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                     if (elementReference.sectionElements[i].sectionElements.length > 0)
                         updateSectionElementOrder(elementReference.sectionElements[i]);
                 }
-                if (!angular.equals(operand, origOperand))
-                    promises.push(ElementService.updateElement(sectionEdit, scope.mmsRefId));
+                if (!angular.equals(operand, origOperand)) {
+                    elementObsToUpdate.push(sectionEdit);
+                }
             };
 
             var deferred = $q.defer();
@@ -160,14 +161,16 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             }
             if (viewEdit.view2view)
                 delete viewEdit.view2view;
-            if (contents && !angular.equals(contents.operand, origContents.operand))
-                promises.push(ElementService.updateElement(viewEdit));
+            if (contents && !angular.equals(contents.operand, origContents.operand)) {
+                elementObsToUpdate.push(viewEdit);
+            }
                 // promises.push(ViewService.updateView(viewEdit, scope.mmsRefId));
             for (var j = 0; j < scope.elementReferenceTree.length; j++) {
                 if (scope.elementReferenceTree[j].sectionElements.length > 0)
                     updateSectionElementOrder(scope.elementReferenceTree[j]);
             }
-            return $q.all(promises);
+
+            return ElementService.updateElements(elementObsToUpdate, false);
         };
 
         scope.revert = function() {

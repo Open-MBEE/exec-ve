@@ -15,27 +15,21 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         // Take note of the order of how each JS file is placed.
         files: [
-            "dist/bower_components/jquery/dist/jquery.js",
-            "dist/bower_components/angular/angular.js",
-            'dist/bower_components/angular-mocks/angular-mocks.js',
-            "dist/bower_components/angular-animate/angular-animate.js",
-            "dist/bower_components/angular-borderlayout/src/borderLayout.js",
-            "dist/bower_components/angular-ui-router/release/angular-ui-router.js",
-            "dist/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js",
-            "dist/bower_components/angular-ui-tree/dist/angular-ui-tree.js",
-            "dist/bower_components/angular-growl-v2/build/angular-growl.js",
-            "dist/bower_components/angular-hotkeys/build/hotkeys.min.js",
-            "dist/bower_components/lodash/lodash.js",
-            "dist/bower_components/stompjs/lib/stomp.min.js",
-            "dist/bower_components/d3/d3.js",
-            "dist/bower_components/c3/c3.js",
+             // external libs
+            'dist/js/vendor.min.js',
 
+            // external dev dependency libs
+            'dist/bower_components/angular-mocks/angular-mocks.js',
+
+             // internally maintained libs
             'dist/js/vendor-internal.min.js',
             "dist/lib/ckeditor/plugins/autosave/plugin.js",
             "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML",
 
+             // our codes
             'dist/js/ve-mms.min.js',
 
+             // test codes
             'test/develop/unit/**/*.js',
             'test/mock-data/**/*.js',
             // Fixtures -- This is how you can load JSON Data as mock data
