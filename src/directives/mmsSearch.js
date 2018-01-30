@@ -55,7 +55,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
                     // Call ElementService.getOwnedElements with depth of 2
                     // filter out results that have type = to Property and Slot
                     // for Property check that ownerId is same as the class id
-                if (elem.type === 'Class') {
+                if (elem.type === 'Class' || elem.type === 'Component') {
                     var reqOb = {elementId: elem.id, projectId: elem._projectId, refId: elem._refId, depth: 2};
                     ElementService.getOwnedElements(reqOb, 2)
                         .then(function (data) {

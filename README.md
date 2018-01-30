@@ -4,23 +4,22 @@
 https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUserGuide-OpenMBEE.pdf
 
 ## File Structure
-* /package.json - node module dependencies for building
-* /Gruntfile.js - buildfile
+* /package.json - Manifest file specifying node module dependencies required to build and bundle the app
+* /app/bower.json - Manifest file specifying bower dependencies (js/css library dependencies)
+* /Gruntfile.js - build file
 * /src/services - services for the mms module, these mostly wrap the rest services of the EMS
 * /src/directives - common components for mms.directives module, these provide common ui and behavior
 * /src/directives/templates - html templates for our directives plus common styling
 * /app - MDEV developed application, this will be separated out in the future
-* /app/bower.json - bower dependencies (js/css library dependencies)
 
 
-## Building and Running (also see links below)
+## Installation and Building
 
-1. install node.js at version 4 (this project is not proven compatible with v7+ yet) and its associated version of npm
-2. install grunt (_sudo npm install -g grunt-cli_)
-3. install bower (_sudo npm install -g bower_)
-4. cd into angular-mms root dir
-5. _npm install_ (install all node module dependencies specified in package.json - these will install into a local node_modules folder)
-6. add file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.  
+1. Install the latest stable version of Node ( at the time of this writing 8.9.4 )
+2. _npm install -g grunt-cli_ : to install grunt cli
+3. cd into angular-mms directory
+4. _npm install_ : to install all node module dependencies specified in package.json
+5. Create a file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.
     * The _grunt_ command will build with these default and fake values, but will not be runnable.  
     * You should update "ems" key to point to the value of the **actual** hostname serving the Model Management Server (MMS).
 ```json
@@ -28,17 +27,21 @@ https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUser
   "ems": "hostnameurl"
 }
 ```
-7. 
-  * _grunt_ - default task - this will create a dist and build directory, the dist contains concatenated and minified versions of our module js code and css, build directory contains all necessary files to run the application from a server
-  * _grunt server:ems_ - does the default, plus runs a webserver at localhost:9000 out of /build and a proxy server that proxies to ems for any path starting with /alfresco. This allows us to test with real service endpoints when defined in `angular-mms-grunt-servers.json` like _grunt server:a_ or _grunt server:b_ .  e.g.:
-```json
-{
-  "ems": "hostnameurl",
-   "a": "staging-a",
-   "b": "staging-b"
-}
-```
-8. (optional) _grunt clean_ - deletes dist and build folders
+6. In the angular-mms directory, run:
+  * _grunt_ :  to build and bundle the app in development mode. The final artifact will be available in the dist folder.
+  * _grunt release-build_ :  to build and bundle the app in production mode. The final artifact will be available in the dist folder.
+  * _grunt server_ : to build and bundle the app in development mode. This will also launch a web server at localhost:9000 for serving static resources from dist folder and a proxy server for any other resources with path starting with /alfresco. This allows us to test with real service endpoints defined in `angular-mms-grunt-servers.json`. The default server is opencaeuat.
+  * _grunt server:a_ : "a" is the key from the angular-mms-grunt-servers.json. Its value is the server's base url that you would like the proxy to forward requests to.
+  * _grunt release_ : to build and bundle the app in production mode as well as launching a web server locally and a proxy.
+  * _grunt release:a_ : same thing as above but with a different server's url that you want. Make sure that "a" exists in the angular-mms-grunt-servers.json.
+  * _grunt deploy_ : to build and bundle the app in production modes, generate documentation and publish the final artifact to Artifactory.
+  * _grunt test_ : to run unit tests
+
+For more information, please consult the Gruntfile.js and the links at the bottom.
+
+## Building and Running with Docker
+To build the container, run the following command: `docker build -t ve .`.
+To run the container, run `docker run -it -p 80:9000 --name ve ve`.
 
 ## Problems?
 If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_
@@ -55,6 +58,11 @@ Perform the following steps to resolve:
 
 ### Rendering problems - clear bower cache
 If you're sure everything is right, try running _bower cache clean_
+
+## Note on debugging
+VE has source-mapping enabled. When developing and debugging it using Chrome, make sure to disable caching in the
+Chrome's developer tool network tab to ensure that the source-mapping is updated when constantly modifying codes. ( Chrome caches source-mapping file by default ).
+Firefox by default doesn't do that, so if you don't want to disable caching, use Firefox.
 
 ## Testing
 Run:
