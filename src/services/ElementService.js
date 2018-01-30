@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -16,8 +16,8 @@ angular.module('mms')
  * @description
  * An element CRUD service with additional convenience methods for managing edits.
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService) {
-    
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
+
     var inProgress = {};// leave for now
     /**
      * @ngdoc method
@@ -477,20 +477,72 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @ngdoc method
      * @name mms.ElementService#updateElements
      * @methodOf mms.ElementService
-     * 
+     *
      * @description
      * Save elements to alfresco and update the cache if successful.
-     * 
-     * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved.
-     * @returns {Promise} The promise will be resolved with an array of updated element references if 
-     *      update is successful.
+     *
+     * @param {Array.<Object>} elementObs, array of element objects that contains element id and any property changes to be saved.
+     * @param {boolean} returnChildViews, whether to include childViews
+     * @returns {Promise} The promise will be resolved with an array of updated element references if
+     *      update is successful and will be rejected with an object with the following format:
+     *      {failedRequests: list of rejection reasons, successfulRequests: array of updated elements }
      */
-    var updateElements = function(elementObs, returnChildViews) { //do individual updates for now since post need to be given canonical project and ref
-        var promises = [];
-        for (var i = 0; i < elementObs.length; i++) {
-            promises.push(updateElement(elementObs[i], returnChildViews));
+    var updateElements = function(elementObs, returnChildViews) {
+        var deferred = $q.defer();
+        if ( _validate(elementObs) ) {
+            var postElements = elementObs.map(function(elementOb) {
+                return fillInElement(elementOb);
+            });
+
+            var groupOfElements = _groupElementsByProjectIdAndRefId(postElements);
+
+            var promises = [];
+
+            Object.keys(groupOfElements).forEach(function (key) {
+                promises.push(_bulkUpdate(groupOfElements[key], returnChildViews));
+            });
+
+             // responses is an array of response corresponding to both successful and failed requests with the following format
+             // [ { state: 'fulfilled', value: the value returned by the server },
+             //   { state: 'rejected', reason: {status, data, message} -- Specified by handleHttpStatus method }
+             // ]
+            $q.allSettled(promises).then(function(responses) {
+                // get all the successful requests
+                var successfulRequests = responses.filter(function(response) {
+                    return response.state === 'fulfilled';
+                });
+
+                var successValues = _.flatten( successfulRequests.map(function(response){
+                    return response.value;
+                }));
+
+                if ( successfulRequests.length === promises.length ) {
+                    // All requests succeeded
+                    deferred.resolve(successValues);
+                } else {
+                    // some requests failed
+                    var rejectionReasons = responses.filter(function(response) {
+                        return response.state === 'rejected';
+                    }).map(function(response) {
+                        return response.reason;
+                    });
+
+                    // since we could have multiple failed requests when having some successful requests,
+                    // reject with the following format so that the client can deal with them at a granular level if
+                    // desired
+                    deferred.reject({
+                        failedRequests: rejectionReasons,
+                        successfulRequests: successValues
+                    });
+                }
+            });
+        } else {
+            deferred.reject( {
+                failedRequests: [ { status: 400, data: elementObs, message: 'Some of the elements do not have id, _projectId, _refId' } ],
+                successfulRequests: []
+            });
         }
-        return $q.all(promises);
+        return deferred.promise;
     };
 
     /**
@@ -707,6 +759,70 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var reset = function() {
         inProgress = {};
     };
+
+    function _groupElementsByProjectIdAndRefId(elementObs) {
+        return _.groupBy(elementObs, function(element) {
+            return element._projectId + '|' + element._refId;
+        });
+    }
+
+    function _createMetaOb(element) {
+        return {
+            projectId: element._projectId,
+            refId: element._refId,
+            commitId: 'latest',
+            elementId: element.id
+        };
+    }
+
+    function _validate(elementObs) {
+        return _.every( elementObs, function( elementOb ) {
+            return elementOb.hasOwnProperty('id') && elementOb.hasOwnProperty('_projectId') && elementOb.hasOwnProperty('_refId');
+        });
+    }
+
+    function _bulkUpdate(elements, returnChildViews) {
+        var deferred = $q.defer();
+        $http.post(URLService.getPostElementsURL({
+            projectId: elements[0]._projectId,
+            refId: elements[0]._refId,
+            returnChildViews: returnChildViews
+        }), {
+            elements: elements,
+            source: ApplicationService.getSource()
+        }, {timeout: 60000})
+            .then(function (response) {
+                _bulkUpdateSuccessHandler(response, deferred);
+            }, function (response) {
+                _bulkUpdateFailHandler(response, deferred, elements);
+            });
+        return deferred.promise;
+    }
+
+    function _bulkUpdateSuccessHandler(serverResponse, deferred) {
+        var results = [];
+        var elements = serverResponse.data.elements;
+        elements.forEach(function (e) {
+            var metaOb = _createMetaOb(e);
+            var editCopy = JSON.parse(JSON.stringify(e));
+            results.push(cacheElement(metaOb, e));
+
+            cacheElement(metaOb, editCopy, true);
+
+            var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
+            if (history) {
+                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
+            }
+        });
+        deferred.resolve(results);
+    }
+
+    /** For now, not doing anything special when there is a "conflict" error **/
+    function _bulkUpdateFailHandler(response, deferred, elementObs) {
+        // for now the server doesn't return anything for the data properties, so override with the input
+        response.data = elementObs;
+        URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+    }
 
     return {
         getElement: getElement,

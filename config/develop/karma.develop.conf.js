@@ -15,14 +15,21 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         // Take note of the order of how each JS file is placed.
         files: [
+             // external libs
             'dist/js/vendor.min.js',
+
+            // external dev dependency libs
             'dist/bower_components/angular-mocks/angular-mocks.js',
+
+             // internally maintained libs
             'dist/js/vendor-internal.min.js',
             "dist/lib/ckeditor/plugins/autosave/plugin.js",
             "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML",
 
+             // our codes
             'dist/js/ve-mms.min.js',
 
+             // test codes
             'test/develop/unit/**/*.js',
             'test/mock-data/**/*.js',
             // Fixtures -- This is how you can load JSON Data as mock data

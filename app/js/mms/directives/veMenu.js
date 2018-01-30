@@ -5,23 +5,21 @@ angular.module('mmsApp')
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:veMenu
+ * @name mmsApp.directive:veMenu
  *
- * @requires mms.ProjectService
+ * @requires mms.CacheService
  * @requires $state
  * @requires $templateCache
- * @requires growl
+ * @requires $sce
  *
  * @restrict E
  *
  * @description
- * //TODO - update
  * veMenu is responsible for gathering all breadcrumbs for current view and
- * displaying breadcrumbs accordingly. When a specific product is selected,
- * the product name will be displayed as well. Breadcrumb list is truncated to
+ * displaying breadcrumbs accordingly. Breadcrumb list is truncated to
  * to fit window width.
- * veMenu is also repsonsible for gathering and displaying all tasks and tags
- * for specific view.
+ * veMenu is also repsonsible for gathering and displaying all projects, branches
+ * and tags for selected view.
  *
  */
 function veMenu(CacheService, $state, $templateCache, $sce) {

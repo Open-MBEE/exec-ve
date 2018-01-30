@@ -29,8 +29,7 @@
             </ul>
         </div>
 
-        <ul ng-show="!isRefsView()" class="nav navbar-nav pull-right" style="padding-right: 25px">
-            <li>
+        <div ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 25px">
             <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
                 <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
                     <span class="label-dropdown">{{ currentRef.type }}:</span>
@@ -57,16 +56,16 @@
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
-                            <li ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
+                            <li ng-if="tags.length" ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
                                 ng-class="{'checked-list-item': tag.name === currentTag, 'branch-disabled': tag.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">{{ tag.name }}
                             </li>
+                            <li ng-if="!tags.length">No Tags</li>
                         </uib-tab>
                     </uib-tabset>
                 </ul>
             </div>
-            </li>
-        </ul>
+        </div>
     </div>
 </nav>

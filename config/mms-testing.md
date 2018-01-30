@@ -13,9 +13,6 @@ Structure
        |-- develop
           |-- karma.develop.conf.js
           |-- protractor.develop.conf.js
-       |-- master
-          |-- karma.develop.conf.js
-          |-- protractor.develop.conf.js
     .
     |-- mocks
        |-- JSON 
@@ -23,11 +20,6 @@ Structure
     |-- test
        |-- archive
        |-- develop
-          |-- e2e
-          |-- unit
-             |-- DirectiveSpecs
-             |-- ServiceSpecs
-       |-- master
           |-- e2e
           |-- unit
              |-- DirectiveSpecs
