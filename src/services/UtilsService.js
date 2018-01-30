@@ -1033,10 +1033,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "figure img {display: block;}\n" +
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
-                ".view-title {margin-top: 10pt}\n" +
                 ".chapter {page-break-before: always}\n" + 
+                ".chapter h1.view-title {font-size: 20pt; }\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
-                "table, th, td {border: 1px solid black; padding: 4px;}\n" +
+                "table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}\n" +
                 "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
@@ -1046,9 +1046,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".signature-box td.signature-space-styling {width: 1%;}\n" + 
                 ".signature-box td.signature-date-styling {width: 39%;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
-                "h1 {font-size: 20px; padding: 0px; margin: 4px;}\n" +
+                "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0;}\n" +
+                "h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
                 ".ng-hide {display: none;}\n" +
-                "body {font-size: 9pt; font-family: 'Times New Roman', Times, serif; }\n" + 
+                "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
                 "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
