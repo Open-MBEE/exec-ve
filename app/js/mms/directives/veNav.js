@@ -12,23 +12,11 @@ angular.module('mmsApp')
  * @restrict E
  *
  * @description
- * A prebuilt nav bar that's customizable with current page title,
- * and the "type" of page/app. Include navigation to other sites' dashboard
- * and docweb pages.
- * ## Example
- *  <pre>
-    <mms-nav mms-title="Model Manager"></mms-nav>
-    </pre>
- * ## Support for responsive sliding pane on small browser
- *  <pre>
-    <div id="outer-wrap">
-        <div id="inner-wrap">
-            <mms-nav mms-title="Model Manager"></mms-nav>
-            <!-- everything visible on the page should go in here -->
-        </div>
-    </div>
-    </pre>
- * @param {string} mmsTitle Title to display
+ * A navbar that include navigation to other Organizations/Project along with helpful
+ * links for the application. i.e. version, shortcut keys, about...
+ * 
+ * The navbar is mobile friendly.
+ * 
  */
 function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
     var template = $templateCache.get('partials/mms/veNav.html');
@@ -120,9 +108,9 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             if ($state.includes('project.ref.document.order')) {
                 growl.warning("Please finish reorder action first.");
                 return;
-            } else if ($state.includes('project.diff')) {
-                growl.warning("Please finish diff action first.");
-                return;
+            // } else if ($state.includes('project.diff')) {
+            //     growl.warning("Please finish diff action first.");
+            //     return;
             } else {
                 if ($state.params.search === searchText)
                     return;
