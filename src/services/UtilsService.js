@@ -1033,7 +1033,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "figure img {display: block;}\n" +
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
-                ".view-title, .section-title {margin-top: 10pt; font-family: 'Arial', sans-serif; }\n" +
+                ".view-title, .section-title {margin-top: 10pt;}\n" +
                 ".chapter {page-break-before: always}\n" + 
                 ".chapter h1.view-title {font-size: 20pt; }\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
