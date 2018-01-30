@@ -88,16 +88,15 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
     view2children[documentOb.id] = [];
     var fullDocumentService;
     _createViews().then(function() {
-        // Normally the controller codes get executed before all the directives'
-        // code in its template ( full-doc.html ). As a result, we
-        // need to use $timeout here, to let them finish first because in this case
+        // The Controller codes get executed before all the directives'
+        // code in its template ( full-doc.html ). As a result, use $timeout here
+        // to let them finish first because in this case
         // we rely on fa-pane directive to setup isScrollVisible
         $timeout(function() {
             fullDocumentService = new FullDocumentService(views);
             fullDocumentService.addInitialViews($scope.scrollApi.isScrollVisible);
             $scope.views = fullDocumentService.viewsBuffer;
         });
-
     });
 
     _initializeDocLibLink();

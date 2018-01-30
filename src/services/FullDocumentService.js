@@ -80,7 +80,7 @@ function FullDocumentService($timeout, $http, _, growl) {
             self.viewsBuffer.splice(index, 0, self._views[index]);
         }
 
-        /** Add to the viewsBuffer views staring at startIndex to endIndex(inclusive) **/
+
         function _pushNewViewsToBuffer(startIndex, endIndex) {
             var isLoadedBefore = true;
             if (startIndex < self._views.length && endIndex < self._views.length) {
@@ -130,7 +130,7 @@ function FullDocumentService($timeout, $http, _, growl) {
                 } else {
                     _waitTillAfterDigestCycle(callback);
                 }
-            }, 0);
+            });
         }
 
         function _isViewsFullyLoaded() {
