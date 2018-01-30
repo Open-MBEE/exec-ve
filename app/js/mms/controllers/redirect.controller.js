@@ -13,8 +13,8 @@
 
 angular.module('mmsApp')
 .controller('RedirectCtrl', ['$scope', '$rootScope', '$state', '$location', '$timeout',
-    'projectObs', 'ProjectService', 'ElementService', 'growl', 
-    function($scope, $rootScope, $state, $location, $timeout, projectObs, ProjectService, ElementService, growl) {
+        'ProjectService', 'ElementService', 'growl', 
+    function($scope, $rootScope, $state, $location, $timeout, ProjectService, ElementService, growl) {
         $rootScope.ve_title = 'View Editor'; //what to name this?
         $scope.redirect_noResults = false;
         $scope.redirect_element = null;
@@ -189,8 +189,11 @@ angular.module('mmsApp')
             });
         };
 
-        var projectList = projectObs.map(function(a) {return a.id;});
-        var reqOb = {projectId: projectList[0], refId: 'master'};
-        oldUrlTest($scope.crush_url);
-
+        var projectList = [];
+        var reqOb = {};
+        ProjectService.getProjects().then(function(projectObs) {
+            projectList = projectObs.map(function(a) {return a.id;});
+            reqOb = {projectId: projectList[0], refId: 'master'};
+            oldUrlTest($scope.crush_url);
+        });
 }]);
