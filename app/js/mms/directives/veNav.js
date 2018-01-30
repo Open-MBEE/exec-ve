@@ -108,9 +108,9 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             if ($state.includes('project.ref.document.order')) {
                 growl.warning("Please finish reorder action first.");
                 return;
-            } else if ($state.includes('project.diff')) {
-                growl.warning("Please finish diff action first.");
-                return;
+            // } else if ($state.includes('project.diff')) {
+            //     growl.warning("Please finish diff action first.");
+            //     return;
             } else {
                 if ($state.params.search === searchText)
                     return;
