@@ -74,7 +74,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('login.redirect', {
         url: '/redirect',
         resolve: {
-            ticket: function($window, URLService, AuthService, $q, ApplicationService) {
+            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
@@ -84,10 +84,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     deferred.reject(rejection);
                 });
                 return deferred.promise;
-            },
-            projectObs: function(ProjectService) {
-                return ProjectService.getProjects();
-            }
+            }]
         },
         views: {
             'login@': {
