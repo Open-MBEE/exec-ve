@@ -1,6 +1,15 @@
 .mms-search {
   padding: 35px 60px;
 
+  .form-inline {
+    display: flex;
+    align-items: center;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
   hr {
     border-color: $light_grey;
   }

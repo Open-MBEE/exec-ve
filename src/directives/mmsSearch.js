@@ -217,6 +217,11 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
             scope.stringQueryUpdate();
         };
 
+        scope.modifyAdvanceSearch = function() {
+            scope.advanceSearch = !scope.advanceSearch;
+            scope.advancedSearchResults = !scope.advancedSearchResults;
+        };
+
         scope.next = function() {
             if (scope.paginationCache[scope.currentPage+1]) {
                 scope.searchResults= scope.paginationCache[scope.currentPage+1];
@@ -285,6 +290,10 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 scope.searchClass = "";
                 scope.currentPage = page;
                 scope.paginationCache.push(scope.searchResults);
+                if (scope.advanceSearch) {
+                    scope.advanceSearch = !scope.advanceSearch;
+                    scope.advancedSearchResults = true;
+                }
             }, function(reason) {
                 growl.error("Search Error: " + reason.message);
                 scope.searchClass = "";
