@@ -173,3 +173,38 @@ table.tsSearchResultTable tbody>tr>td
 	padding: 0;
 	border: #fff;
 }
+.tsDialogBox table
+{
+	margin: 0;
+}
+.tsDialogBox div>table>tbody>tr>td
+{
+	padding: 0;
+	margin: 0;
+}
+td.tsCaptionText
+{
+    padding: 0;
+    border: 0;
+}
+.tsDialogPanel legend
+{
+    margin: 0;
+    width: auto;
+    border-bottom: 0;
+}
+.tsDialogBox table>tbody>tr>td {
+    padding: 2px;
+    border-top: 0;
+}
+.tsDialogBox select.gwt-ListBox
+{
+	height: 15px!important;
+	font-size: 10px;
+}
+.tsDialogBox input.gwt-TextBox {
+    height: 15px!important;
+}
+.tsDialogBox label {
+    margin: 0;
+}
