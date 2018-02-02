@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms')
-    .factory('FullDocumentService', ['$timeout', '$http', '_', 'growl', FullDocumentService]);
+    .factory('FullDocumentService', ['$timeout', "$interval", '$http', '_', 'growl', FullDocumentService]);
 
-function FullDocumentService($timeout, $http, _, growl) {
+function FullDocumentService($timeout, $interval, $http, _, growl) {
     return function (views) {
         var self = this;
         // public api
@@ -13,10 +13,12 @@ function FullDocumentService($timeout, $http, _, growl) {
         this.handleDocumentScrolling = handleDocumentScrolling;
         this.addInitialViews = addInitialViews;
         this.handleViewAdd = handleViewAdd;
+        this.handleViewDelete = handleViewDelete;
 
         // internal states
         this._views = views;
         this._isLoadingRemaingViews = false;
+        this._isFullDocFullyLoaded = false;
 
         function handleClickOnBranch(branch, callback) {
             var viewId = branch.type === 'view' ? branch.data.id : branch.viewId;
@@ -34,19 +36,33 @@ function FullDocumentService($timeout, $http, _, growl) {
         }
 
         function loadRemainingViews(callback) {
-            if (!self._isLoadingRemaingViews) {
-                self._isLoadingRemaingViews = true;
-                var isAlreadyLoaded = _pushNewViewsToBuffer(self.viewsBuffer.length, self._views.length - 1); // load all the views if necessary
-                if (isAlreadyLoaded) {
-                    callback();
-                    self._isLoadingRemaingViews = false;
-                } else {
-                    var message = growl.info('Loading more views!', {ttl: -1});
-                    _waitTillAfterDigestCycle(function() {
-                        self._isLoadingRemaingViews = false;
-                        message.destroy();
-                        callback();
-                    });
+            if (self._isFullDocFullyLoaded) {
+                callback();
+            } else {
+                var handler;
+                if (!self._loadingRemainingViewsMessage) {
+                    self._loadingRemainingViewsMessage = growl.info('Loading more views!', { ttl: -1, onclose: function() { delete self._loadingRemainingViewsMessage; } } );
+                }
+                if (!self._isLoadingRemaingViews) {
+                    self._isLoadingRemaingViews = true;
+                    handler = $interval(function() {
+                        var nextIndex = self.viewsBuffer.length + 9;
+                        if (nextIndex >= self._views.length) {
+                            nextIndex = self._views.length - 1;
+                        }
+                        _pushNewViewsToBuffer(self.viewsBuffer.length, nextIndex);
+                        if (nextIndex === self._views.length - 1) {
+                            $interval.cancel(handler);
+                            _waitTillAfterDigestCycle(function() {
+                                callback();
+                                self._isLoadingRemaingViews = false;
+                                if (self._loadingRemainingViewsMessage) {
+                                    self._loadingRemainingViewsMessage.destroy();
+                                    delete self._loadingRemainingViewsMessage;
+                                }
+                            });
+                        }
+                    }, 1000);
                 }
             }
         }
@@ -76,16 +92,27 @@ function FullDocumentService($timeout, $http, _, growl) {
             }
         }
 
+        function handleViewDelete(deletedBranch) {
+            var viewIdsToDelete = [];
+            _getAllViewsStartingAt(deletedBranch, viewIdsToDelete);
+            _deleteViewsFrom(self._views, viewIdsToDelete);
+            _deleteViewsFrom(self.viewsBuffer, viewIdsToDelete);
+        }
+
         function _addNewViewToBufferAt(index) {
             self.viewsBuffer.splice(index, 0, self._views[index]);
         }
-
 
         function _pushNewViewsToBuffer(startIndex, endIndex) {
             var isLoadedBefore = true;
             if (startIndex < self._views.length && endIndex < self._views.length) {
                 Array.prototype.push.apply(self.viewsBuffer, self._views.slice(startIndex, endIndex + 1));
                 isLoadedBefore = false;
+                if (endIndex === self._views.length - 1) {
+                    _waitTillAfterDigestCycle(function() {
+                        self._isFullDocFullyLoaded = true;
+                    });
+                }
             }
             return isLoadedBefore;
         }
@@ -104,14 +131,29 @@ function FullDocumentService($timeout, $http, _, growl) {
         }
 
         function _incrementallyAddViewTillScroll(callback, isScrollbarVisible) {
-            _pushNewViewsToBuffer(self.viewsBuffer.length, self.viewsBuffer.length);
+            var isNoMoreToLoad = _pushNewViewsToBuffer(self.viewsBuffer.length, self.viewsBuffer.length);
             _waitTillAfterDigestCycle(function() {
                 var isScrollBarVisible = isScrollbarVisible();
-                if (!isScrollBarVisible) {
-                    _incrementallyAddViewTillScroll(callback, isScrollbarVisible);
-                } else {
+                if (isScrollBarVisible || isNoMoreToLoad) {
                     callback();
+                } else {
+                    _incrementallyAddViewTillScroll(callback, isScrollbarVisible);
                 }
+            });
+        }
+
+        function _getAllViewsStartingAt(branch, results) {
+            results.push(branch.data.id);
+            branch.children.forEach(function(childBranch) {
+                _getAllViewsStartingAt(childBranch, results);
+            });
+        }
+
+        function _deleteViewsFrom(viewListToDeleteFrom, viewIdsToDelete) {
+            _.remove(viewListToDeleteFrom, function(view) {
+                return _.findIndex(viewIdsToDelete, function(viewId) {
+                    return viewId === view.id;
+                }) !== -1;
             });
         }
 
@@ -124,13 +166,13 @@ function FullDocumentService($timeout, $http, _, growl) {
         }
 
         function _waitTillAfterDigestCycle(callback) {
-            $timeout(function () {
+            $timeout(function() {
                 if (_isViewsFullyLoaded()) {
                     callback();
                 } else {
                     _waitTillAfterDigestCycle(callback);
                 }
-            });
+            }, 500);
         }
 
         function _isViewsFullyLoaded() {

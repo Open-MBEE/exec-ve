@@ -108,6 +108,10 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
         });
     });
 
+    $scope.$on('mms-full-doc-view-deleted', function(event, deletedBranch) {
+       fullDocumentService.handleViewDelete(deletedBranch);
+    });
+
     $scope.$on('mms-new-view-added', function(event, vId, curSec, prevSibId) {
         fullDocumentService.handleViewAdd(_buildViewElement(vId, curSec), prevSibId);
     });
@@ -146,20 +150,13 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
 
     $scope.$on('convert-pdf', function() {
         fullDocumentService.loadRemainingViews(function() {
-            var converting = false;
-            if (converting) {
-                growl.info("Please wait...");
-                return;
-            }
-            converting = true;
             $scope.bbApi.toggleButtonSpinner('convert-pdf');
             MmsAppUtils.printModal(documentOb, refOb, true, 3)
                 .then(function(ob) {
-                    growl.info('Converting HTML to PDF...Please wait for a completion email.',{ttl: -1});
+                    growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
                 }, function(reason){
-                    growl.error("Failed to convert HTML to PDF: " + reason.message);
+                    growl.error("Exporting as PDF file Failed: " + reason.message);
                 }).finally(function() {
-                converting = false;
                 $scope.bbApi.toggleButtonSpinner('convert-pdf');
             });
         });

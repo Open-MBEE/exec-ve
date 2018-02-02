@@ -1,14 +1,15 @@
 describe('Service: FullDocumentService', function() {
     var service;
     var $timeout;
+    var $interval;
     var $httpBackend;
     var mockedViews;
-
 
     beforeEach(module('mmsApp'));
     beforeEach(inject(function ($injector) {
         $httpBackend = $injector.get('$httpBackend');
         $timeout = $injector.get('$timeout');
+        $interval = $injector.get('$interval');
 
         mockedViews = [{id: 1}, {id: 2}, {id: 3}];
         service = new ($injector.get('FullDocumentService'))(mockedViews);
@@ -20,10 +21,6 @@ describe('Service: FullDocumentService', function() {
             return url.indexOf('/alfresco/service/orgs?alf_ticket') !== -1;
         } ).respond(200, {orgs: ['org1']});
     }));
-
-    afterEach(function() {
-        $timeout.verifyNoPendingTasks();
-    });
 
     it('should add as many views as it can until the scrollbar shows up', function() {
         this.isScrollbarVisible = function(){};
@@ -54,10 +51,11 @@ describe('Service: FullDocumentService', function() {
         expect(service.viewsBuffer.length).toEqual(mockedViews.length);
     });
 
-    it('should add all the remaining views when users want to do content export or other actions that require all the views to be loaded', function() {
+    it('should add all the remaining views incrementally when users want to do content export or other actions that require all the views to be loaded', function() {
         this.success = function() {}; // method to be called after all the views are loaded successfully
         spyOn(this, 'success');
         service.loadRemainingViews(this.success);
+        $interval.flush(1000);
         $timeout.flush();
 
         expect(service.viewsBuffer.length).toEqual(mockedViews.length);
@@ -98,6 +96,7 @@ describe('Service: FullDocumentService', function() {
 
         // load all the views before users click on a view in the tree
         service.loadRemainingViews(function(){});
+        $interval.flush(1000);
         var noNeedToLoadMoreViews = service.handleClickOnBranch(branch, this.success);
         $timeout.flush();
 
@@ -112,6 +111,7 @@ describe('Service: FullDocumentService', function() {
 
         // load all the views before users click on a an element under a view in the tree
         service.loadRemainingViews(function(){});
+        $interval.flush(1000);
         var noNeedToLoadMoreViews = service.handleClickOnBranch(branch, this.success);
         $timeout.flush();
 
@@ -143,5 +143,78 @@ describe('Service: FullDocumentService', function() {
         $timeout.flush();
 
         expect(service.viewsBuffer.length).toEqual(2);
+    });
+
+    describe('should handle view deletion correctly', function() {
+        it('when all the views are already loaded and when the deleted view does not have children', function() {
+            // load all the 3 views we have
+            service.handleDocumentScrolling();
+            service.handleDocumentScrolling();
+            service.handleDocumentScrolling();
+            var branchToDelete = {type: 'view', data: {id: 2}, children:[]};
+            service.handleViewDelete(branchToDelete);
+            expect(service.viewsBuffer.length).toEqual(2);
+            expect(service._views.length).toEqual(2);
+        });
+
+        it('when all the views are already loaded and when the deleted view has 1 child', function() {
+            // load all the 3 views we have
+            service.handleDocumentScrolling();
+            service.handleDocumentScrolling();
+            service.handleDocumentScrolling();
+            var branchToDelete = {type: 'view', data: {id: 2}, children:[{type: 'view', data: {id: 3}, children:[]}]};
+            service.handleViewDelete(branchToDelete);
+            expect(service.viewsBuffer.length).toEqual(1);
+            expect(service._views.length).toEqual(1);
+        });
+
+        it('when only some views are loaded and the view to be deleted is not yet loaded', function() {
+            // the total views should be three
+            expect(service._views.length).toEqual(3);
+
+            // load view 1
+            service.handleDocumentScrolling();
+            // there should only be one view in the viewsBuffer
+            expect(service.viewsBuffer.length).toEqual(1);
+
+            // delete view with id = 2
+            var branchToDelete = {type: 'view', data: {id: 2}, children:[]};
+            service.handleViewDelete(branchToDelete);
+
+            // should be 1 coz the view is not yet buffered
+            expect(service.viewsBuffer.length).toEqual(1);
+
+            // there should only be two views left
+            expect(service._views.length).toEqual(2);
+            expect(service._views[0].id).toEqual(1);
+            expect(service._views[1].id).toEqual(3);
+
+            service.handleDocumentScrolling();
+            expect(service.viewsBuffer.length).toEqual(2);
+            expect(service.viewsBuffer[0].id).toEqual(1);
+            expect(service.viewsBuffer[1].id).toEqual(3);
+        });
+        
+        it('when only some views are loaded and the view (with nested children) to be deleted is not yet loaded', function() {
+            // load view 1
+            service.handleDocumentScrolling();
+            // there should only be one view in the viewsBuffer
+            expect(service.viewsBuffer.length).toEqual(1);
+
+            // delete view with id = 2
+            var branchToDelete = {type: 'view', data: {id: 2}, children:[{type: 'view', data: {id: 3}, children:[]}]};
+            service.handleViewDelete(branchToDelete);
+
+            // should be 1 coz the view is not yet buffered
+            expect(service.viewsBuffer.length).toEqual(1);
+
+            // there should only be 1 view left
+            expect(service._views.length).toEqual(1);
+            expect(service._views[0].id).toEqual(1);
+
+            service.handleDocumentScrolling();
+            expect(service.viewsBuffer.length).toEqual(1);
+            expect(service.viewsBuffer[0].id).toEqual(1);
+        });
     });
 });

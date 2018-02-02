@@ -89,7 +89,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-delete-view', function() {
-        $scope.deleteItem();
+        $scope.deleteItem(function(deleteBranch) {
+            $rootScope.$broadcast('mms-full-doc-view-deleted', deleteBranch);
+        });
     });
 
     $scope.$on('tree-reorder-view', function() {
@@ -735,7 +737,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
     };
 
-    $scope.deleteItem = function() {
+    $scope.deleteItem = function(cb) {
         var branch = $scope.treeApi.get_selected_branch();
         if (!branch) {
             growl.warning("Delete Error: Select item to delete.");
@@ -769,8 +771,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
             if ($rootScope.ve_fullDocMode) {
-                $state.go('project.ref.document.full', {search: undefined});
-                $state.reload();
+                cb(branch);
             } else {
                 $state.go('^', {search: undefined});
             }
