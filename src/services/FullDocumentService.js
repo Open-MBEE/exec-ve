@@ -143,10 +143,12 @@ function FullDocumentService($timeout, $interval, $http, _, growl) {
         }
 
         function _getAllViewsStartingAt(branch, results) {
-            results.push(branch.data.id);
-            branch.children.forEach(function(childBranch) {
-                _getAllViewsStartingAt(childBranch, results);
-            });
+            if (branch.type === 'view') {
+                results.push(branch.data.id);
+                branch.children.forEach(function(childBranch) {
+                    _getAllViewsStartingAt(childBranch, results);
+                });
+            }
         }
 
         function _deleteViewsFrom(viewListToDeleteFrom, viewIdsToDelete) {

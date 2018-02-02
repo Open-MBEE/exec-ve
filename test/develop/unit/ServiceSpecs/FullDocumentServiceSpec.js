@@ -194,7 +194,7 @@ describe('Service: FullDocumentService', function() {
             expect(service.viewsBuffer[0].id).toEqual(1);
             expect(service.viewsBuffer[1].id).toEqual(3);
         });
-        
+
         it('when only some views are loaded and the view (with nested children) to be deleted is not yet loaded', function() {
             // load view 1
             service.handleDocumentScrolling();
