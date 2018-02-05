@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsPerspectives', ['ElementService', '$templateCache', '$window', 'growl', 'ApplicationService', 'AuthService', '$uibModal', '$q', mmsPerspectives]);
+.directive('mmsPerspectives', ['ElementService', '$templateCache', '$window', '$timeout', 'growl', 'ApplicationService', 'AuthService', 'URLService', mmsPerspectives]);
 
 /**
  * @ngdoc directive
@@ -13,8 +13,6 @@ angular.module('mms.directives')
  * @requires growl
  * @requires ApplicationService
  * @requires AuthService
- * @requires $uibModal
- * @requires $q
  *
  * @restrict E
  *
@@ -24,27 +22,41 @@ angular.module('mms.directives')
  * Tom Saywer Persectives JS library.
  *
  */
-function mmsPerspectives(ElementService, $templateCache, $window, growl, ApplicationService, AuthService, $uibModal, $q) {
+function mmsPerspectives(ElementService, $templateCache, $window, $timeout, growl, ApplicationService, AuthService, URLService) {
     var template = $templateCache.get('mms/templates/mmsPerspectives.html');
     var mapping = {};
     var deferreds = {};
-    var projectId2Peid = {};
+    var projectId2PeId = {};
+    var peId2projectId = {};
+    var projectIdLoaded = {};
+    var viewNameMapping = {
+        IBD: 'Internal Block Diagram',
+        BDD: 'Block Definition Diagram',
+        SMD: 'State Machine',
+        AD: 'Activity Diagram',
+        SD: 'Sequence Diagram'
+    };
+    var controlMapping = {
+        IBD: 'IBD Controls',
+        BDD: 'BDD Controls',
+        SMD: 'Controls',
+        AD: 'Activity Controls',
+        SD: 'Controls'
+    };
+    $('body').append(
+    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/tsperspectives.nocache.js"></script>\n' +
+    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
+    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/TSHovering.js"></script>\n' +
+    '<script language="javascript" type="text/javascript" src="/Basic/tsperspectives/TSButtonTooltip.js"></script>');
+
     function getElementsArrayString(elements) {
         return '[{"id": "' + elements.join('"}, {"id": "') + '"}]';
     }
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
-        console.log("Perspectives command: " +
-           successfulCommand.command +
-           " completed successfully");
-    };
-    $window.onPerspectivesAddElementSuccess = function(successfulCommand) {
-        console.log("Perspectives command: " +
-           successfulCommand.command +
-           " completed successfully");
+        console.log("Perspectives command: " + successfulCommand.command + " completed successfully");
     };
     $window.onPerspectivesCommandFailure = function(failedCommand, message, callstack) {
-        console.log("Perspectives command " + failedCommand.commmand +
-            " failed. Reason is: " + message);
+        console.log("Perspectives command " + failedCommand.commmand + " failed. Reason is: " + message);
         console.log(callstack);
     };
     $window.onPerspectivesProjectLoad = function(projectID) {
@@ -52,7 +64,10 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
     };
     $window.onPerspectivesProjectReady = function(projectID) {
         console.log("All project RPC calls are complete and you can now access all project resources via the DOM. " + projectID);
-        invokePerspectivesCommand(mapping[projectID]);
+        if (!projectIdLoaded[projectID]) {
+            invokePerspectivesCommand(mapping[projectID]);
+            projectIdLoaded[projectID] = true;
+        }
     };
     $window.onPerspectivesViewLoaded = function(projectID, moduleName, modelID, viewID, viewName) {
         console.log("The Perspectives view " + viewID + " is now on the DOM.");
@@ -74,88 +89,30 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
         }
     };
 
-    function tspAddElementCtrl($scope, $uibModalInstance) {
-        $scope.choose = function(elem, property) {
-            $uibModalInstance.close(elem.id);
-        };
-        $scope.cancel = function() {
-            $uibModalInstance.dismiss();
-        };
-        $scope.searchOptions= {};
-        $scope.searchOptions.callback = $scope.choose;
-        $scope.searchOptions.emptyDocTxt = 'This field is empty';
-    }
     //store global mapping of project name to hash, on*** functions can lookup the hash 
     var mmsPerspectivesLink = function(scope, element, attrs) {
         var id = ApplicationService.createUniqueId();
+        if (peId2projectId[scope.mmsPeId]) {
+            id = peId2projectId[scope.mmsPeId];
+        } else {
+            peId2projectId[scope.mmsPeId] = id;
+        }
+
         scope.containerId = "tabContainer-" + id;
         scope.viewId = "view-" + id;
         scope.tableId = "table-" + id;
         scope.edgeTableId = "edgeTable-" + id;
         scope.inspectorId = "inspector-" + id;
         scope.controlsId = "controls-" + id;
-        //var initElements = ["_17_0_5_1_407019f_1402422711365_292853_16371"];
         scope.initElements = [];
-        var viewName;
-        var viewType;
-        var tableName;
-        var edgeTableName;
-        var inspectorName;
-        var controlsTreeName;
-        
-        switch(scope.mmsTspSpec.tstype) {
-        case "IBD":
-            viewName = "Internal Block Diagram";
-            viewType = "tsDrawingView";
-            tableName = 'Classifiers';
-            edgeTableName = "Associations";
-            inspectorName = "Details";
-            controlsTreeName = "IBD Controls";
-            break;
-        case "BDD":
-            viewName = "Block Definition Diagram";
-            viewType = "tsDrawingView";
-            tableName = 'Classifiers';
-            edgeTableName = "Associations";
-            inspectorName = "Details";
-            controlsTreeName = "BDD Controls";
-            break;
-        case "SMD":
-            viewName = "State Machine";
-            viewType = "tsDrawingView";
-            tableName = 'Classifiers';
-            edgeTableName = "Associations";
-            inspectorName = "Details";
-            controlsTreeName = "Controls";
-            break;
-        case "AD":
-            viewName = "Activity Diagram";
-            viewType = "tsDrawingView";
-            tableName = 'Classifiers';
-            edgeTableName = "Associations";
-            inspectorName = "Details";
-            controlsTreeName = "Activity Controls";
-            break;
-        case "SD":
-            viewName = "Sequence Diagram";
-            viewType = "tsDrawingView";
-            edgeTableName = "Associations";
-            inspectorName = "Details";
-            break;
-        /*case "Table":
-            viewName = "Table";
-            viewType = "tsTableView";
-            break;*/
-        default:
-        	viewName = "Blcok Definition Diagram";
-            viewType = "tsDrawingView";
-            tableName = "Classifiers";
-            edgeTableName = "Associations";
-            inspectorName = "Details";
-        }
-      //scope.mmsTspSpec.tstype
-            	
-        
+
+        var viewName = viewNameMapping[scope.mmsTspSpec.tstype];
+        var viewType = 'tsDrawingView';
+        var tableName = 'Classifiers';
+        var edgeTableName = 'Associations';
+        var inspectorName = 'Details';
+        var controlsTreeName = controlMapping[scope.mmsTspSpec.tstype];
+
         if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
             scope.initElements = scope.mmsTspSpec.elements;
         if (scope.mmsTspSpec && scope.mmsTspSpec.context)
@@ -295,7 +252,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-add-" + id, "https://opencae-uat.jpl.nasa.gov/alfresco/service"],
+                        "args": ["int-add-" + id, 'https://opencae-uat.jpl.nasa.gov/alfresco/service'],//ApplicationService.getAppBaseUrl() + URLService.getRoot()],
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,
@@ -389,19 +346,15 @@ function mmsPerspectives(ElementService, $templateCache, $window, growl, Applica
                 });
             }
         }
-        scope.$on('$destroy', function() {
-            invokePerspectivesCommand({
-                "command": "CloseProject",
-                "onsuccess":"onPerspectivesCommandSuccess",
-                "onfailure":"onPerspectivesCommandFailure",
-                "data": {
-                    "project": id
-                }
-            });
-        });
         mapping[id] = updateCommand;
-        projectId2Peid[id] = scope.mmsPeId;
-        invokePerspectivesCommand(webProjectCommand);
+        projectId2PeId[id] = scope.mmsPeId;
+        function tryInvokeCommand() {
+            if (!$window.invokePerspectivesCommand) {
+                $timeout(tryInvokeCommand, 1000, false);
+            }
+            invokePerspectivesCommand(webProjectCommand);
+        }
+        tryInvokeCommand();
     };
 
     return {
