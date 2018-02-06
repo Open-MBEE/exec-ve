@@ -153,9 +153,7 @@ function FullDocumentService($timeout, $interval, $http, _, growl) {
 
         function _deleteViewsFrom(viewListToDeleteFrom, viewIdsToDelete) {
             _.remove(viewListToDeleteFrom, function(view) {
-                return _.findIndex(viewIdsToDelete, function(viewId) {
-                    return viewId === view.id;
-                }) !== -1;
+                return viewIdsToDelete.indexOf(view.id) !== -1;
             });
         }
 
