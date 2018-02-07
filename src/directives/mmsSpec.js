@@ -108,7 +108,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
          * @param {string} newVal new element id
          */
         var changeElement = function(newVal, oldVal) {
-            if (!newVal || newVal === oldVal && ran) {
+            if (!newVal || (newVal === oldVal && ran) || !scope.mmsProjectId) {
                 return;
             }
             ran = true;

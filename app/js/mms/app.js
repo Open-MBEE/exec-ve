@@ -94,7 +94,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('login.select', {
-        url: '/select/:fromLogin',
+        url: '/select?fromLogin',
         resolve: {
             ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();

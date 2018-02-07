@@ -34,8 +34,9 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
         });
 
         scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal || (newVal === oldVal && processed))
+            if (!newVal || (newVal === oldVal && processed) || !scope.mmsProjectId) {
                 return;
+            }
             processed = true;
 
             scope.projectId = scope.mmsProjectId;

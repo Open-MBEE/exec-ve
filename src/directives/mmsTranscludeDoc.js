@@ -121,8 +121,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             if (!scope.mmsWatchId) {
                 idwatch();
             }
