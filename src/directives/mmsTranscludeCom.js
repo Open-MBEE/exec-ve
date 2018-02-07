@@ -121,10 +121,12 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                     });
                 }
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                domElement.html('<span class="mms-error">comment ' + newVal + status + '</span>');
+                var recentElement = reason.recentVersionOfElement;
+                if (recentElement) {
+                    domElement.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
+                } else {
+                    domElement.html('<span class="mms-error">no value available</span>');
+                }
             });
         });
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$rootScope', '$timeout', '$location', '$anchorScroll', 'growl', mmsViewPresentationElem]);
+.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$timeout', '$location', '$anchorScroll', mmsViewPresentationElem]);
 
 /**
  * @ngdoc directive
@@ -26,10 +26,10 @@ angular.module('mms.directives')
  * @param {Object} mmsInstanceVal A InstanceValue json object 
  * @param {Object} mmsParentSection the parent section if available
  */
-function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $rootScope, $timeout, $location, $anchorScroll, growl) {
+function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $timeout, $location, $anchorScroll) {
     var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');
 
-    var mmsViewPresentationElemCtrl = function($scope, $rootScope) {
+    var mmsViewPresentationElemCtrl = function($scope) {
         
         $scope.presentationElemLoading = true;
         this.getInstanceSpec = function() {
@@ -90,10 +90,12 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
                 if (reason.status === 500) {
                     element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' invalid specification</span>');
                 } else {
-                    var status = ' not found';
-                    if (reason.status === 410)
-                        status = ' deleted';
-                    element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' ' + status + '</span>');
+                    var recentElement = reason.recentVersionOfElement;
+                    if (recentElement) {
+                        element.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
+                    } else {
+                        element.html('<span class="mms-error">no value available</span>');
+                    }
                 }
             }).finally(function() {
                 element.removeClass("isLoading");
@@ -109,7 +111,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $r
             mmsInstanceVal: '<',
             mmsParentSection: '<',
         },
-        controller: ['$scope', '$rootScope', mmsViewPresentationElemCtrl],
+        controller: ['$scope', mmsViewPresentationElemCtrl],
         link: mmsViewPresentationElemLink
     };
 }

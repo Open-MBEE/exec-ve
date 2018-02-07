@@ -101,7 +101,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete inProgress[key];
             },
             function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                var cloneReqOb = _.clone(reqOb);
+                _getLatestVersionOfElement(cloneReqOb).then(function(element){
+                    deferred.reject({recentVersionOfElement: cacheElement(cloneReqOb, element)});
+                }, function() {
+                    URLService.handleHttpStatus(data, status, headers, config, deferred);
+                });
                 delete inProgress[key];
             },
             weight
@@ -822,6 +827,26 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         // for now the server doesn't return anything for the data properties, so override with the input
         response.data = elementObs;
         URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+    }
+
+    function _getLatestVersionOfElement(reqOb) {
+        var deferred = $q.defer();
+        getElementHistory(reqOb).then(function(elementHistory) {
+            var lastHistory;
+            if (elementHistory.length > 1) {
+                lastHistory = elementHistory[1];
+            } else {
+                // should never get here coz this method is only called if the element is already deleted ( and with that there will be at least two commits,
+                // one for the add at the very beginning and one for the deletion )
+                lastHistory = elementHistory[0];
+            }
+            reqOb.commitId = lastHistory.id;
+            getElement(reqOb).then(function(element) {
+                deferred.resolve(element);
+            }, deferred.reject);
+
+        }, deferred.reject);
+        return deferred.promise;
     }
 
     return {

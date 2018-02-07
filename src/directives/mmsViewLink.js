@@ -89,7 +89,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 }
                 scope.loading = false;
             }, function(reason) {
-                element.html('<span class="mms-error">view link not found</span>');
+                var recentElement = reason.recentVersionOfElement;
+                if (recentElement) {
+                    element.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
+                } else {
+                    element.html('<span class="mms-error">no value available</span>');
+                }
                 scope.loading = false;
             });
         });
