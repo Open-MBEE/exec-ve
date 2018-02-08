@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'CacheService', 'ElementService','ViewService','UtilsService','growl', '_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, CacheService, ElementService, ViewService, UtilsService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -923,6 +923,16 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         return dups;
     };
 
+    var fixImgSrc = function(imgDom) {
+        var src = imgDom.attr('src');
+        if (src && src.startsWith('/alfresco')) {
+            imgDom.attr('src', src + '?alf_ticket=' + AuthService.getTicket());
+        }
+        if (src && src.startsWith('../')) {
+            imgDom.attr('src', src.replace('../', '/alfresco/') + '?alf_ticket=' + AuthService.getTicket());
+        }
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -942,7 +952,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         revertAction: revertAction,
         clearAutosaveContent: clearAutosaveContent,
         reopenUnsavedElts: reopenUnsavedElts,
-        checkForDuplicateInstances: checkForDuplicateInstances
+        checkForDuplicateInstances: checkForDuplicateInstances,
+        fixImgSrc: fixImgSrc
     };
 
 }

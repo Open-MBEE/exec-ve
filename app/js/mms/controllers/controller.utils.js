@@ -17,7 +17,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/tableExport.html',
-            controller: function($scope, $uibModalInstance, type) {
+            controller: ["$scope", "$uibModalInstance", "type", function($scope, $uibModalInstance, type) {
                 $scope.type = type;
                 $scope.export = function() {
                     $uibModalInstance.close('export');
@@ -25,7 +25,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.cancel = function() {
                     $uibModalInstance.dismiss();
                 };
-            },
+            }],
             resolve: {
                 type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';}
             },
@@ -117,7 +117,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var deferred = $q.defer();
         var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/printConfirm.html',
-            controller: function($scope, $uibModalInstance) {
+            controller: ["$scope", "$uibModalInstance", function($scope, $uibModalInstance) {
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
                 $scope.action = 'print';
                 $scope.genpdf = false;
@@ -170,7 +170,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.cancel = function() {
                     $uibModalInstance.dismiss();
                 };
-            },
+            }],
             backdrop: 'static',
             keyboard: false
         });
