@@ -841,11 +841,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 // Index 0 is the deletion commit, 0 index is the the commit before deletion
                 var commitBeforeDelete = elementHistory[1];
                 reqOb.commitId = commitBeforeDelete.id;
+                reqOb.includeRecentVersionElement = false;
                 getElement(reqOb).then(function(element) {
                     deferred.resolve(element);
                 }, deferred.reject);
             } else {
-                // should not get here coz this method is only called if the element is already deleted
+                // this case is not possible coz this method should only be called if the element is already deleted
                 // ( and with that there will be at least two commits, one for the add at the very beginning and one for the deletion )
                 deferred.reject();
             }
