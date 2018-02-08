@@ -356,48 +356,6 @@ function ProjectService($q, $http, URLService, CacheService, ApplicationService)
         return deferred.promise;
     };
 
-    /** TODO not supported
-     */
-    var diff = function(ws1, ws2, ws1time, ws2time, recalc) {
-        /*var deferred = $q.defer();
-        deferred.resolve(dummy);
-        return deferred.promise;*/
-        
-        if(recalc !== true) recalc = false;
-
-        var w1time = !ws1time ? 'latest' : ws1time;
-        var w2time = !ws2time ? 'latest' : ws2time;
-        var key = 'diff' + ws1 + ws2 + w1time + w2time;
-        if (inProgress.hasOwnProperty(key)) {
-            return inProgress[key];
-        }
-        var deferred = $q.defer();
-        inProgress[key] = deferred.promise;
-        
-        $http.get(URLService.getWsDiffURL(ws1, ws2, w1time, w2time, recalc))
-        .success(function(data, status, headers, config) {
-            deferred.resolve(data);
-            delete inProgress[key];
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-            delete inProgress[key];
-        });
-        
-        return deferred.promise;
-    };
-
-    //TODO not supported
-    var merge = function(changes, sourcetime) {
-        var deferred = $q.defer();
-        $http.post(URLService.getPostWsDiffURL(sourcetime), changes)
-        .success(function(data, status, headers, config) {
-            deferred.resolve(data);
-        }).error(function(data, status, headers, config) {
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
-        });
-        return deferred.promise;
-    };
-
     var reset = function() {
         inProgress = {};
     };
