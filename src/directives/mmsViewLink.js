@@ -60,7 +60,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
 
-            var reqOb = {elementId: scope.mmsElementId, projectId: projectId, refId: refId, commitId: commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: projectId, refId: refId, commitId: commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
@@ -89,7 +89,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 }
                 scope.loading = false;
             }, function(reason) {
-                var recentElement = reason.recentVersionOfElement;
+                var recentElement = reason.data.recentVersionOfElement;
                 if (recentElement) {
                     element.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
                 } else {

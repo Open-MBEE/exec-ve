@@ -106,7 +106,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
@@ -130,7 +130,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     });
                 }
             }, function(reason) {
-                var recentElement = reason.recentVersionOfElement;
+                var recentElement = reason.data.recentVersionOfElement;
                 if (recentElement) {
                     domElement.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
                 } else {

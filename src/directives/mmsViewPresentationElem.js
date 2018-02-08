@@ -66,7 +66,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $t
             }
             // Parse the element reference tree for the presentation element:
             element.addClass("isLoading");
-            var reqOb = {elementId: scope.mmsInstanceVal.instanceId, projectId: projectId, refId: refId, commitId: commitId};
+            var reqOb = {elementId: scope.mmsInstanceVal.instanceId, projectId: projectId, refId: refId, commitId: commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)
             .then(function(instanceSpec) {
                 scope.presentationElem = ViewService.getPresentationElementSpec(instanceSpec);
@@ -90,7 +90,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $t
                 if (reason.status === 500) {
                     element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' invalid specification</span>');
                 } else {
-                    var recentElement = reason.recentVersionOfElement;
+                    var recentElement = reason.data.recentVersionOfElement;
                     if (recentElement) {
                         element.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
                     } else {

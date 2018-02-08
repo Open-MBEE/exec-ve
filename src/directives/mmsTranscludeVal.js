@@ -157,7 +157,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
@@ -180,7 +180,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     });
                 }
             }, function(reason) {
-                var recentElement = reason.recentVersionOfElement;
+                var recentElement = reason.data.recentVersionOfElement;
                 if (recentElement) {
                     domElement.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
                 } else {

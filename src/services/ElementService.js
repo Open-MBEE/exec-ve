@@ -101,12 +101,17 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete inProgress[key];
             },
             function(data, status, headers, config) {
-                var cloneReqOb = _.clone(reqOb);
-                _getLatestVersionOfElement(cloneReqOb).then(function(element){
-                    deferred.reject({recentVersionOfElement: cacheElement(cloneReqOb, element)});
-                }, function() {
+                if (reqOb.includeRecentVersionElement) {
+                    _getLatestVersionOfElement(_.clone(reqOb)).then(function(element){
+                        data.recentVersionOfElement = element;
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    }, function() {
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    });
+                } else {
                     URLService.handleHttpStatus(data, status, headers, config, deferred);
-                });
+                }
+
                 delete inProgress[key];
             },
             weight
@@ -832,19 +837,18 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     function _getLatestVersionOfElement(reqOb) {
         var deferred = $q.defer();
         getElementHistory(reqOb).then(function(elementHistory) {
-            var lastHistory;
             if (elementHistory.length > 1) {
-                lastHistory = elementHistory[1];
+                // Index 0 is the deletion commit, 0 index is the the commit before deletion
+                var commitBeforeDelete = elementHistory[1];
+                reqOb.commitId = commitBeforeDelete.id;
+                getElement(reqOb).then(function(element) {
+                    deferred.resolve(element);
+                }, deferred.reject);
             } else {
-                // should never get here coz this method is only called if the element is already deleted ( and with that there will be at least two commits,
-                // one for the add at the very beginning and one for the deletion )
-                lastHistory = elementHistory[0];
+                // should not get here coz this method is only called if the element is already deleted
+                // ( and with that there will be at least two commits, one for the add at the very beginning and one for the deletion )
+                deferred.reject();
             }
-            reqOb.commitId = lastHistory.id;
-            getElement(reqOb).then(function(element) {
-                deferred.resolve(element);
-            }, deferred.reject);
-
         }, deferred.reject);
         return deferred.promise;
     }
