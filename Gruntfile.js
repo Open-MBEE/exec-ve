@@ -291,7 +291,6 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          invokePerspectivesCommand: true,
           eval: false,
           Set: true
         }

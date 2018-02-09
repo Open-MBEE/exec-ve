@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsPerspectives', ['ElementService', '$templateCache', '$window', '$timeout', 'growl', 'ApplicationService', 'AuthService', 'URLService', mmsPerspectives]);
+.directive('mmsTsDiagram', ['ElementService', '$templateCache', '$window', '$timeout', 'growl', 'ApplicationService', 'AuthService', 'URLService', mmsTsDiagram]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsPerspectives
+ * @name mms.directives.directive:mmsTsDiagram
  *
  * @requires mms.ElementService
  * @requires $templateCache
@@ -18,12 +18,10 @@ angular.module('mms.directives')
  *
  * @description
  * //TODO - update
- * mmsPerspectives is responsible for gathering server-side tsp file to display using
- * Tom Saywer Persectives JS library.
  *
  */
-function mmsPerspectives(ElementService, $templateCache, $window, $timeout, growl, ApplicationService, AuthService, URLService) {
-    var template = $templateCache.get('mms/templates/mmsPerspectives.html');
+function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, ApplicationService, AuthService, URLService) {
+    var template = $templateCache.get('mms/templates/mmsTsDiagram.html');
     var mapping = {};
     var deferreds = {};
     var projectId2PeId = {};
@@ -32,26 +30,31 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
     var viewNameMapping = {
         IBD: 'Internal Block Diagram',
         BDD: 'Block Definition Diagram',
-        SMD: 'State Machine',
-        AD: 'Activity Diagram',
-        SD: 'Sequence Diagram'
+        STM: 'State Machine',
+        ACT: 'Activity Diagram',
+        SD: 'Sequence Diagram',
+        PKG: 'Package Diagram',
+        PAR: 'Parametric Diagram',
+        REQ: 'Requirement Diagram',
+        UC: 'Use Case Diagram'
     };
     var controlMapping = {
         IBD: 'IBD Controls',
         BDD: 'BDD Controls',
-        SMD: 'Controls',
-        AD: 'Activity Controls',
-        SD: 'Controls'
+        STM: 'Controls',
+        ACT: 'Activity Controls',
+        SD: 'Controls',
+        PKG: 'Controls',
+        PAR: 'Controls',
+        REQ: 'Controls',
+        UC: 'Controls'
     };
     $('body').append(
     '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/tsperspectives.nocache.js"></script>\n' +
     '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
     '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/TSHovering.js"></script>\n' +
-    '<script language="javascript" type="text/javascript" src="/Basic/tsperspectives/TSButtonTooltip.js"></script>');
+    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/TSButtonTooltip.js"></script>');
 
-    function getElementsArrayString(elements) {
-        return '[{"id": "' + elements.join('"}, {"id": "') + '"}]';
-    }
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " + successfulCommand.command + " completed successfully");
     };
@@ -65,7 +68,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
     $window.onPerspectivesProjectReady = function(projectID) {
         console.log("All project RPC calls are complete and you can now access all project resources via the DOM. " + projectID);
         if (!projectIdLoaded[projectID]) {
-            invokePerspectivesCommand(mapping[projectID]);
+            $window.invokePerspectivesCommand(mapping[projectID]);
             projectIdLoaded[projectID] = true;
         }
     };
@@ -90,13 +93,14 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
     };
 
     //store global mapping of project name to hash, on*** functions can lookup the hash 
-    var mmsPerspectivesLink = function(scope, element, attrs) {
+    var mmsTsDiagramLink = function(scope, element, attrs) {
         var id = ApplicationService.createUniqueId();
         if (peId2projectId[scope.mmsPeId]) {
             id = peId2projectId[scope.mmsPeId];
         } else {
             peId2projectId[scope.mmsPeId] = id;
         }
+        projectId2PeId[id] = scope.mmsPeId;
 
         scope.containerId = "tabContainer-" + id;
         scope.viewId = "view-" + id;
@@ -106,138 +110,159 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
         scope.controlsId = "controls-" + id;
         scope.initElements = [];
 
-        var viewName = viewNameMapping[scope.mmsTspSpec.tstype];
-        var viewType = 'tsDrawingView';
-        var tableName = 'Classifiers';
-        var edgeTableName = 'Associations';
-        var inspectorName = 'Details';
-        var controlsTreeName = controlMapping[scope.mmsTspSpec.tstype];
+        var params = {
+            viewName: viewNameMapping[scope.mmsTspSpec.tstype],
+            viewType: 'tsDrawingView',
+            tableName: 'Classifiers',
+            edgeTableName: 'Associations',
+            inspectorName: 'Details',
+            controlsName: controlMapping[scope.mmsTspSpec.tstype]
+        };
 
         if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
             scope.initElements = scope.mmsTspSpec.elements;
         if (scope.mmsTspSpec && scope.mmsTspSpec.context)
             scope.context = scope.mmsTspSpec.context;
 
+        
+        var webProjectCommand = _createWebProjectCommand(scope, params, id);
+        mapping[id] = _createUpdateCommand(scope, params.viewName, id);
+        
+        function tryInvokeCommand() {
+            if (!$window.invokePerspectivesCommand) {
+                $timeout(tryInvokeCommand, 1000, false);
+            } else {
+                $window.invokePerspectivesCommand(webProjectCommand);
+            }
+        }
+        tryInvokeCommand();
+    };
+
+    function _getElementsArrayString(elements) {
+        return '[{"id": "' + elements.join('"}, {"id": "') + '"}]';
+    }
+
+    function _createWebProjectCommand(scope, params, id) {
         var webProjectCommand = {
-            "command":"WebProject",
-            "onload":"onPerspectivesProjectLoad",
-            "onready":"onPerspectivesProjectReady", //quirk?
-            "onfailure":"onPerspectivesCommandFailure",
-            "onsuccess":"onPerspectivesCommandSuccess",
+            "command": "WebProject",
+            "onload": "onPerspectivesProjectLoad",
+            "onready": "onPerspectivesProjectReady", //quirk?
+            "onfailure": "onPerspectivesCommandFailure",
+            "onsuccess": "onPerspectivesCommandSuccess",
             "data": [
                 {
-                    "command":"LoadProject",
+                    "command": "LoadProject",
                     "data": {
                         "project": id,
-                        "filename":"project/MMS.tsp"
+                        "filename": "project/MMS.tsp"
                     }
                 },
                 {
-                    "command":"NewDefaultModel",
+                    "command": "NewDefaultModel",
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "modelID":"model-" + id
+                        "modelID": "model-" + id
                     }
                 },
                 {
-                    "command":"NewIntegrator",
+                    "command": "NewIntegrator",
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "modelID":"model-" + id,
-                        "integratorName":"MMS ADD",
-                        "integratorID":"int-add-" + id
+                        "modelID": "model-" + id,
+                        "integratorName": "MMS ADD",
+                        "integratorID": "int-add-" + id
                     }
                 },
                 {
-                    "command":"NewIntegrator",
+                    "command": "NewIntegrator",
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "modelID":"model-" + id,
-                        "integratorName":"Filter Control Data",
-                        "integratorID":"int-fcd-" + id,
+                        "modelID": "model-" + id,
+                        "integratorName": "Filter Control Data",
+                        "integratorID": "int-fcd-" + id,
                         "integratorFileLocation": "data/SysMLFilterDefaults.xlsx"
                     }
                 },
                 {
-                    "command":"NewView",
+                    "command": "NewView",
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "modelID":"model-" + id,
-                        "viewID":"view-" + id,
-                        "viewName": viewName,
-                        "viewClass":viewType,
-                        "onload":"onPerspectivesViewLoaded",
-                        "onupdate":"onPerspectivesViewUpdated",
-                        "oncanvasrendered":"onPerspectivesViewCanvasRendered"
+                        "modelID": "model-" + id,
+                        "viewID": "view-" + id,
+                        "viewName": params.viewName,
+                        "viewClass": params.viewType,
+                        "onload": "onPerspectivesViewLoaded",
+                        "onupdate": "onPerspectivesViewUpdated",
+                        "oncanvasrendered": "onPerspectivesViewCanvasRendered"
                     }
                 },
                 {
-                    "command":"NewView",
+                    "command": "NewView",
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "modelID":"model-" + id,
-                        "viewID":"table-" + id,
-                        "viewName": tableName,
+                        "modelID": "model-" + id,
+                        "viewID": "table-" + id,
+                        "viewName": params.tableName,
                         "viewClass": 'tsTableView',
-                        "onload":"onPerspectivesViewLoaded",
-                        "onupdate":"onPerspectivesViewUpdated",
-                        "oncanvasrendered":"onPerspectivesViewCanvasRendered"
+                        "onload": "onPerspectivesViewLoaded",
+                        "onupdate": "onPerspectivesViewUpdated",
+                        "oncanvasrendered": "onPerspectivesViewCanvasRendered"
                         }
                 },
                 {
-                    "command":"NewView",
+                    "command": "NewView",
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "modelID":"model-" + id,
-                        "viewID":"edgeTable-" + id,
-                        "viewName": edgeTableName,
+                        "modelID": "model-" + id,
+                        "viewID": "edgeTable-" + id,
+                        "viewName": params.edgeTableName,
                         "viewClass": 'tsTableView',
-                        "onload":"onPerspectivesViewLoaded",
-                        "onupdate":"onPerspectivesViewUpdated",
-                        "oncanvasrendered":"onPerspectivesViewCanvasRendered"
+                        "onload": "onPerspectivesViewLoaded",
+                        "onupdate": "onPerspectivesViewUpdated",
+                        "oncanvasrendered": "onPerspectivesViewCanvasRendered"
                         }
                 },
                 {
-                    "command":"NewView",
+                    "command": "NewView",
                     "data": {
                         "project": id,
                         "module": "SysML",
                         "modelID":"model-" + id,
                         "viewID": "" + scope.inspectorId,
-                        "viewName": inspectorName,
+                        "viewName": params.inspectorName,
                         "viewClass": 'tsInspectorView',
-                        "onload":"onPerspectivesViewLoaded",
-                        "onupdate":"onPerspectivesViewUpdated",
-                        "oncanvasrendered":"onPerspectivesViewCanvasRendered"
+                        "onload": "onPerspectivesViewLoaded",
+                        "onupdate": "onPerspectivesViewUpdated",
+                        "oncanvasrendered": "onPerspectivesViewCanvasRendered"
                         }
                 },
                 {
-                    "command":"NewView",
+                    "command": "NewView",
                     "data": {
                         "project": id,
                         "module": "SysML",
                         "modelID":"model-" + id,
-                        "viewID":"" + scope.controlsId,
-                        "viewName": controlsTreeName,
+                        "viewID": "" + scope.controlsId,
+                        "viewName": params.controlsName,
                         "viewClass": 'tsTreeView',
-                        "onload":"onPerspectivesViewLoaded",
-                        "onupdate":"onPerspectivesViewUpdated",
-                        "oncanvasrendered":"onPerspectivesViewCanvasRendered"
+                        "onload": "onPerspectivesViewLoaded",
+                        "onupdate": "onPerspectivesViewUpdated",
+                        "oncanvasrendered": "onPerspectivesViewCanvasRendered"
                         }
                 },
                 {
-                    "command":"NewTabPanel",
+                    "command": "NewTabPanel",
                     "data": {
                         "project": id,
                         "module": "SysML",
-                        "modelID":"model-" + id,
-                        "id":"tabContainer-" + id,
+                        "modelID": "model-" + id,
+                        "id": "tabContainer-" + id,
                         "widgetIDs": [scope.viewId, scope.tableId, scope.edgeTableId,
                          scope.inspectorId, scope.controlsId]
                     }
@@ -245,6 +270,10 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
                 
             ]
         };
+        return webProjectCommand;
+    }
+
+    function _createUpdateCommand(scope, viewName, id) {
         var updateCommand = {
             "command": "Group",
             "data": [
@@ -271,7 +300,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
                         "viewID": "view-" + id,
                         "viewName": viewName
                     },
-                    "onfailure":"onPerspectivesCommandFailure",
+                    "onfailure": "onPerspectivesCommandFailure",
                 },
                 {
                     "command": "SetModelAttribute",
@@ -284,7 +313,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
                         "viewID": "view-" + id,
                         "viewName": viewName
                     },
-                    "onfailure":"onPerspectivesCommandFailure",
+                    "onfailure": "onPerspectivesCommandFailure",
                 },
                 {
                     "command": "SetModelAttribute",
@@ -297,7 +326,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
                         "viewID": "view-" + id,
                         "viewName": viewName
                     },
-                    "onfailure":"onPerspectivesCommandFailure",
+                    "onfailure": "onPerspectivesCommandFailure",
                 }
             ]
         };
@@ -308,7 +337,7 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
                     "command": "SetModelAttribute",
                     "data": {
                         "attributeName": "AddElements",
-                        "attributeValue": getElementsArrayString(scope.initElements),
+                        "attributeValue": _getElementsArrayString(scope.initElements),
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,
@@ -321,9 +350,9 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
             }
             initialIntegratorIds.push('int-fcd-' + id);
             updateCommand.data.push({
-                "command":"Update",
-                "onsuccess":"onPerspectivesCommandSuccess",
-                "onfailure":"onPerspectivesCommandFailure",
+                "command": "Update",
+                "onsuccess": "onPerspectivesCommandSuccess",
+                "onfailure": "onPerspectivesCommandFailure",
                 "data": {
                     "project": id,
                     "module": "SysML",
@@ -333,29 +362,21 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
             if (scope.context) {
                 updateCommand.data.push({
                     "command": "Custom",
-                            "data":{
-                                "project":id,
-                                "module":"SysML",
-                                "modelID":'model-' + id,
-                                "serverClassName":"gov.nasa.jpl.mbee.ems.command.NewContextCommand",
-                                "viewID":"view-" + id,
-                                "viewName":viewName,
-                                "args":[""+scope.context]
+                            "data": {
+                                "project": id,
+                                "module": "SysML",
+                                "modelID": 'model-' + id,
+                                "serverClassName": "gov.nasa.jpl.mbee.ems.command.NewContextCommand",
+                                "viewID": "view-" + id,
+                                "viewName": viewName,
+                                "args": ["" + scope.context]
                             },
-                    "onfailure":"onPerspectivesCommandFailure",
+                    "onfailure": "onPerspectivesCommandFailure",
                 });
             }
         }
-        mapping[id] = updateCommand;
-        projectId2PeId[id] = scope.mmsPeId;
-        function tryInvokeCommand() {
-            if (!$window.invokePerspectivesCommand) {
-                $timeout(tryInvokeCommand, 1000, false);
-            }
-            invokePerspectivesCommand(webProjectCommand);
-        }
-        tryInvokeCommand();
-    };
+        return updateCommand;
+    }
 
     return {
         restrict: 'E',
@@ -366,6 +387,6 @@ function mmsPerspectives(ElementService, $templateCache, $window, $timeout, grow
             mmsTspSpec: '<',
             mmsPeId: '@'
         },
-        link: mmsPerspectivesLink
+        link: mmsTsDiagramLink
     };
 }

@@ -375,7 +375,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         printContents = printElementCopy[0].outerHTML;
         var header = '';
         var footer = '';
-        var displayTime = '';   
+        var displayTime = '';
         var dnum = '';
         var version = '';
         var tagname = '';
