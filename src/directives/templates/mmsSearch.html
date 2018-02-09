@@ -42,7 +42,7 @@
                 <a ng-click="advanceSearch = !advanceSearch"><i class="fa fa-arrow-left"></i>Basic</a>
             </div>
             <!-- submit change -->
-            <form class="form-inline" ng-submit="newSearch(mainSearch)" style="margin-bottom: 23px;">
+            <form class="form-inline" ng-submit="newSearch(mainSearch)" style="margin-bottom: 23px;position:relative;">
                 <!-- advanced search query input disabled -->
                 <h3 class="fixed-content-m">Advanced Search</h3>
                 <div class="form-group">
@@ -140,7 +140,7 @@
         </div>
 
 
-        <div ng-show="advancedSearchResults" class="mms-search-input">
+        <div ng-show="advancedSearchResults" class="mms-search-input" style="position:relative;">
             <!-- advanced search query input disabled -->
             <div class="form-group">
                 <div class="misc-form-field search-nav-back">
@@ -156,12 +156,15 @@
             </div>
         </div>
     </div>
-    <div class="misc-form-field ve-secondary-text" ng-show="searchResults" style="margin-top:20px;max-width: 1000px;padding: 0 60px;">
+    <div class="misc-form-field ve-secondary-text" ng-show="searchResults" style="margin-top:20px;max-width: 1000px;padding: 0 30px;">
         <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
     </div>
     <div class="search-results" ng-show="searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
-            <hr>
+            <div class="elem-type-wrapper">
+                <span class="elem-type">{{elem.type}}</span><span ng-if="elem._appliedStereotypeIds.length"></span><span ng-repeat="type in elem._appliedStereotypeIds" class="elem-type"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>
+                </span>
+            </div>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
                 <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
@@ -180,13 +183,13 @@
                       </a></span>
                 </div>
             </div>
-            <div class="elem-type-wrapper">
+            <!--<div class="elem-type-wrapper">
                 <label>Metatypes:</label>
                 <span class="elem-type">{{elem.type}}</span><span ng-if="elem._appliedStereotypeIds.length">,</span>
                 <span ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
                     <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name><span ng-if="!$last">,</span>
                 </span>
-            </div>
+            </div>-->
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
                 <label>Value</label>
                 <div class="elem-properties">
@@ -252,7 +255,6 @@
                 <div>Last updated {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
             </div>
         </div>
-        <hr>
     </div>
     <div class="container-fluid">
         <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>

@@ -1,12 +1,15 @@
 .mms-search {
 
+  background: #fbfbfb;
+
   .search-header{
      border-bottom: 1px solid #d3d3d3;
-     box-shadow: 10px 0 10px 0 rgba(0,0,0,.1);
+     box-shadow: 0px 5px 7px -4px rgba(0,0,0,.1);
+     background:white;
   }
 
   .search-results{
-    padding:0 60px;
+    padding:20px 0;
   }
 
   .form-inline {
@@ -21,6 +24,7 @@
     .form-group,
     .btn{
       margin: 7px 3px;
+      line-height: 16px;
     }
     .form-group{
       width: 100%;
@@ -31,7 +35,7 @@
       flex:none;
     }
     .fixed-content-s{
-      width:100px;
+      width:70px;
       flex:none;
     }
 
@@ -43,11 +47,11 @@
       display:inline-block;
       font-weight: 500;
       font-size: 18px;
-      margin:0;
+      margin: 0 3px 0 0;
     }
 
     input{
-      min-height: 28px;
+      min-height: 30px;
       border-radius: 2px;
       border: 1px solid #d3d3d3;
       padding: 3px 5px;
@@ -60,8 +64,8 @@
   }
 
   .mms-search-input{
-    max-width: 1000px;
-    padding: 40px 60px;
+    max-width: 1200px;
+    padding: 36px;
 
     .search-nav-back{
       position:absolute;
@@ -83,10 +87,12 @@
   }
 
   .elem-wrapper {
-    margin: 38px 0;
+    padding: 30px;
+    background: white;
+    border-top: 1px solid #d3d3d3;
 
     .elem-name {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
     }
 
@@ -104,8 +110,9 @@
     }
 
     label {
-      font-size: 16px;
-      margin: 10px 0 0 0;
+      font-size: 14px;
+      margin: 20px 0 0 0;
+      display:block;
     }
 
     .elem-properties-wrapper {
@@ -125,8 +132,12 @@
 
     .elem-updated-wrapper {
       color: $medium_grey;
-      margin-top: 10px;
+      margin-top: 18px;
       font-size:14px;
+    }
+
+    .elem-type-wrapper{
+      margin-left:-3px;
     }
 
   }
@@ -153,5 +164,21 @@
     background-color: #f4f4f4;
     min-height: 30px;
     width: 100%;
+  }
+
+  .elem-type{
+    letter-spacing: .14em;
+    margin-right: 6px;
+    padding: 2px 6px;
+    wrap-text: none;
+    white-space: pre;
+    margin: 3px;
+    display:inline-block;
+    //text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    background: #f4f4f4;
+    border-radius: 3px;
+    color: #6e6e6e;
   }
 }

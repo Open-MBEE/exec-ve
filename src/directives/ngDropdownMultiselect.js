@@ -22,13 +22,13 @@ function ($filter, $document, $compile, $parse, _) {
             var groups = attrs.groupBy ? true : false;
 
             var template = '<div class="multiselect-parent btn-group dropdown-multiselect ve-light-dropdown" ng-value="getButtonText()">';
-            template += '<button type="button" class="dropdown-toggle" ng-class="settings.buttonClasses" ng-click="toggleDropdown()">{{getButtonText()}}&nbsp;<span class="caret"></span></button>';
-            template += '<ul class="dropdown-menu dropdown-menu-form" ng-style="{display: open ? \'block\' : \'none\', height : settings.scrollable ? settings.scrollableHeight : \'auto\' }" style="overflow-y: scroll" >';
+            template += '<button type="button" class="dropdown-toggle" ng-class="settings.buttonClasses" ng-click="toggleDropdown()">{{getButtonText()}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i></button>';
+            template += '<ul class="dropdown-menu dropdown-menu-form menu-with-input" ng-style="{display: open ? \'block\' : \'none\', height : settings.scrollable ? settings.scrollableHeight : \'auto\' }" style="overflow-y: scroll" >';
             template += '<li ng-hide="!settings.showCheckAll || settings.selectionLimit > 0"><a data-ng-click="selectAll()"><span class="fa fa-check"></span>  {{texts.checkAll}}</a>';
             template += '<li ng-show="settings.showUncheckAll"><a data-ng-click="deselectAll();"><span class="fa fa-remove"></span>   {{texts.uncheckAll}}</a></li>';
-            template += '<li ng-hide="(!settings.showCheckAll || settings.selectionLimit > 0) && !settings.showUncheckAll" class="divider"></li>';
-            template += '<li ng-show="settings.enableSearch"><div class="dropdown-header"><input type="text" class="form-control" style="width: 100%;" ng-model="searchFilter" placeholder="{{texts.searchPlaceholder}}" /></li>';
-            template += '<li ng-show="settings.enableSearch" class="divider"></li>';
+            //template += '<li ng-hide="(!settings.showCheckAll || settings.selectionLimit > 0) && !settings.showUncheckAll" class="divider"></li>';
+            template += '<li class="dropdown-input" ng-show="settings.enableSearch"><input type="text" class="ve-plain-input" ng-model="searchFilter" placeholder="{{texts.searchPlaceholder}}" /></li>';
+            //template += '<li ng-show="settings.enableSearch" class="divider"></li>';
 
             if (groups) {
                 template += '<li ng-repeat-start="option in orderedItems | filter: searchFilter" ng-show="getPropertyForObject(option, settings.groupBy) !== getPropertyForObject(orderedItems[$index - 1], settings.groupBy)" role="presentation" class="dropdown-header">{{ getGroupTitle(getPropertyForObject(option, settings.groupBy)) }}</li>';
@@ -42,7 +42,7 @@ function ($filter, $document, $compile, $parse, _) {
             if (checkboxes) {
                 template += '<div class="checkbox"><label><input class="checkboxInput" type="checkbox" ng-click="checkboxClick($event, getPropertyForObject(option,settings.idProp))" ng-checked="isChecked(getPropertyForObject(option,settings.idProp))" /> {{getPropertyForObject(option, settings.displayProp)}}</label></div></a>';
             } else {
-                template += '<span data-ng-class="{\'fa fa-check\': isChecked(getPropertyForObject(option,settings.idProp))}"></span> {{getPropertyForObject(option, settings.displayProp)}}</a>';
+                template += '<span data-ng-class="{\'checked-list-item\': isChecked(getPropertyForObject(option,settings.idProp))}"></span> {{getPropertyForObject(option, settings.displayProp)}}</a>';
             }
 
             template += '</li>';
