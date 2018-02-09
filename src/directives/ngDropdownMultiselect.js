@@ -25,7 +25,7 @@ function ($filter, $document, $compile, $parse, _) {
             template += '<button type="button" class="dropdown-toggle" ng-class="settings.buttonClasses" ng-click="toggleDropdown()">{{getButtonText()}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i></button>';
             template += '<ul class="dropdown-menu dropdown-menu-form menu-with-input" ng-style="{display: open ? \'block\' : \'none\', height : settings.scrollable ? settings.scrollableHeight : \'auto\' }" style="overflow-y: scroll" >';
             template += '<li ng-hide="!settings.showCheckAll || settings.selectionLimit > 0"><a data-ng-click="selectAll()"><span class="fa fa-check"></span>  {{texts.checkAll}}</a>';
-            template += '<li ng-show="settings.showUncheckAll"><a data-ng-click="deselectAll();"><span class="fa fa-remove"></span>   {{texts.uncheckAll}}</a></li>';
+            template += '<li ng-show="settings.showUncheckAll"><a data-ng-click="deselectAll();"><span class="remove-list-item"></span>   {{texts.uncheckAll}}</a></li>';
             //template += '<li ng-hide="(!settings.showCheckAll || settings.selectionLimit > 0) && !settings.showUncheckAll" class="divider"></li>';
             template += '<li class="dropdown-input" ng-show="settings.enableSearch"><input type="text" class="ve-plain-input" ng-model="searchFilter" placeholder="{{texts.searchPlaceholder}}" /></li>';
             //template += '<li ng-show="settings.enableSearch" class="divider"></li>';

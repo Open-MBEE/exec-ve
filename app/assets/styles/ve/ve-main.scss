@@ -472,6 +472,17 @@ div.tooltip-inner {
     color:$ve-green-lighter-1;
   }
 
+  .remove-list-item::before{
+    content: "\f00d";
+    font-family: FontAwesome;
+    height: 16px;
+    position: absolute;
+    left: 10px;
+    top: 3px;
+    width: 16px;
+    color:$ve-slate-lighter-2; 
+  }
+
   ul{
     min-width:100%;
   }
