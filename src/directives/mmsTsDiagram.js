@@ -44,9 +44,9 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         STM: 'Controls',
         ACT: 'Activity Controls',
         SD: 'Controls',
-        PKG: 'Controls',
-        PAR: 'Controls',
-        REQ: 'Controls',
+        PKG: 'Package Diagram Controls',
+        PAR: 'Parametric Diagram Controls',
+        REQ: 'REQ Controls',
         UC: 'Controls'
     };
     $('body').append(
