@@ -32,7 +32,7 @@
     }
 
     .elem-documentation {
-      color: $base_blue !important;
+      color: $brand_base !important;
     }
 
     label {
@@ -50,7 +50,7 @@
     }
 
     .ellipses {
-      color: $base_blue;
+      color: $brand_base;
     }
   }
 
@@ -143,7 +143,7 @@
       padding-right: 12px;
 
       &.btn-primary {
-        border: 2px solid $base_blue;
+        border: 2px solid $brand_base;
         margin-left: 6px;
         border-radius: 3px !important;
         color: $white;

@@ -30,7 +30,7 @@
   z-index: 200;
   // position: relative;
   width: 100%;
-  height: 36px;
+  height: $navHeight;
   min-height: 30px;
   border: 0;
   background-color: $ve-slate-base;
@@ -63,7 +63,7 @@ a.switch-org:hover {
 
 .logotype {
   font-weight: 300;
-  line-height: 36px;
+  line-height: $navHeight;
   padding: 0 5px 0 13px;
 }
 
@@ -218,7 +218,7 @@ ul.global-menu {
 
 nav.project-level-header {
   background-color: $ve-slate-darker-2;
-  top: 36px;
+  top: $navHeight;
   z-index: 150;
 
   .navbar-nav {
@@ -252,7 +252,7 @@ nav.project-level-header {
 
 .breadcrumbs li {
   display: inline;
-  line-height: 36px;
+  line-height: $navHeight;
 }
 
 .breadcrumbs .fa-folder,

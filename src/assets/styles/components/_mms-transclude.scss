@@ -1,6 +1,4 @@
 /* Stylesheet for transclusion-related elements */
-
-
 mms-transclude-doc,
 mms-transclude-val > span,
 mms-transclude-name > span,
@@ -26,7 +24,7 @@ mms-view {
       display: inline;
     }
   }
-  .add-buttons-container {
+  .add-pe-button-container {
     display: none;
   }
 }
@@ -68,7 +66,7 @@ mms-view.editing {
 }
 
 mms-view.editing {
-  .add-buttons-container {
+  .add-pe-button-container {
     display: block;
   }
 }
