@@ -5,15 +5,23 @@
   the Bootstrap assets directory.
 *************************/
 
-$brand-primary: $base_blue;
+//== Colors
+
+$brand-primary: $brand_base;
 $brand-success: $green;
 $brand-danger: $red;
 
-$btn-font-weight: $default_font_weight;
-$btn-default-color: $white;
-$btn-default-border: $white;
 
-$btn-primary-border: $base_blue;
+//== Buttons
+
+$btn-font-weight: $default_font_weight;
+
+$btn-default-color:              $ve-light-text;
+$btn-default-bg:                 $ve-silver-base !default;
+// $btn-default-border:             #ccc !default;
+
+
+$btn-primary-border: $brand_base;
 $btn-success-border: $green;
 $btn-danger-border: $red;
 

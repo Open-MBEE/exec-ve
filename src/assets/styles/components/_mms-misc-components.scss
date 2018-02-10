@@ -4,7 +4,7 @@
 *************************/
 
 a {
-  color: $base_blue;
+  color: $brand_base;
   text-decoration: none;
 
   &:hover {
@@ -17,7 +17,7 @@ img {
 }
 
 .form-control:focus {
-  border-color: $base_blue;
+  border-color: $brand_base;
 }
 
 .modal-dialog {
