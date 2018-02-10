@@ -10,8 +10,7 @@
 @import "base/mms-typography";
 
 /* A minimal Bootstrap file */
-@import "../../lib/bootstrap-sass-3.3.7/assets/stylesheets/bootstrap";
-@import "base/mms-bootstrap-variable-overrides";
+@import "vendors/bootstrap/styles";
 
 /* App level customizations */
 @import "base/mms-globals";
