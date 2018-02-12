@@ -1,12 +1,12 @@
 
 <div class="mms-search">
-    <div class="search-header">
+    <div class="search-header" ng-class="{searchresults : searchResults}"">
         <div class="mms-search-input" ng-hide="advanceSearch || advancedSearchResults">
             <form class="form-inline basic-search-form" ng-submit="newSearch(mainSearch)">
                 <!-- search type menu -->
                 <div class="form-group fixed-content-m">
                     <label class="sr-only" for="searchTypeSelect">Search type menu</label>
-                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchType.isopen" style="flex:1;">
+                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchType.isopen">
                         <button id="searchTypeSelect" class="dropdown-toggle" type="button" uib-dropdown-toggle>
                             {{mainSearch.searchType.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
                         </button>
@@ -42,7 +42,7 @@
                 <a ng-click="advanceSearch = !advanceSearch"><i class="fa fa-arrow-left"></i>Basic</a>
             </div>
             <!-- submit change -->
-            <form class="form-inline" ng-submit="newSearch(mainSearch)" style="margin-bottom: 23px;position:relative;">
+            <form class="form-inline advanced-query" ng-submit="newSearch(mainSearch)">
                 <!-- advanced search query input disabled -->
                 <h3 class="fixed-content-m">Advanced Search</h3>
                 <div class="form-group">
@@ -140,13 +140,13 @@
         </div>
 
 
-        <div ng-show="advancedSearchResults" class="mms-search-input" style="position:relative;">
+        <div ng-show="advancedSearchResults" class="mms-search-input">
             <!-- advanced search query input disabled -->
             <div class="form-group">
                 <div class="misc-form-field search-nav-back">
                     <a ng-click="advancedSearchResults = !advancedSearchResults"><i class="fa fa-arrow-left"></i>Basic</a>
                 </div>
-                <form class="form-inline" ng-submit="newSearch(mainSearch)">
+                <form class="form-inline advanced-query" ng-submit="newSearch(mainSearch)">
                     <!-- advanced search query input disabled -->
                     <h3 class="fixed-content-m">Advanced Search</h3>
                     <label class="sr-only" for="searchText">Advanced search query (disabled)</label>
@@ -156,7 +156,7 @@
             </div>
         </div>
     </div>
-    <div class="misc-form-field ve-secondary-text" ng-show="searchResults" style="margin-top:20px;max-width: 1000px;padding: 0 30px;">
+    <div class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
         <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
     </div>
     <div class="search-results" ng-show="searchResults.length > 0">
@@ -256,7 +256,7 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid search-nav" ng-show="searchResults.length > 0">
         <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
         <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
     </div>
@@ -264,7 +264,7 @@
     <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
         <h3>No Results Found.</h3>
     </div>
-    <div class="container-fluid" ng-show="searchResults.length === 0">
+    <div class="container-fluid search-nav" ng-show="searchResults.length === 0">
         <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
         <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
     </div>

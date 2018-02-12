@@ -29,6 +29,13 @@ tr {
   .pane-center {
     margin-right: 0;
     padding-bottom: 30px;
+
+    >div{
+      height:100%;
+      >div{
+        height:100%;
+      }
+    }
   }
 
   .pane-center-spinner {
