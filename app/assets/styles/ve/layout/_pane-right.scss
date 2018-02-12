@@ -4,7 +4,7 @@
 
 .pane-right {
   > .pane-right {
-    border-left:1px solid #d3d3d3;
+    @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
   }
 
   &.fa-pane-orientation-horizontal {

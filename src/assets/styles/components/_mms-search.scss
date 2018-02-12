@@ -42,7 +42,7 @@
 
   .mms-search-input{
     max-width: 1200px;
-    padding: 36px;
+    padding: 30px 36px;
     position: relative;
 
     /*Navigatiom back to basic search input, with a left back arrow*/
@@ -52,7 +52,7 @@
 
       a{
         display: inline-block;
-        margin: 20px 0;
+        margin: 15px 0;
 
         .fa-arrow-left{
           padding-right:4px;
