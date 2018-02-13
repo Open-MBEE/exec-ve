@@ -3,88 +3,33 @@
 //   conform to the MMS app design guide
 // *************************/
 
-.btn-primary {
-  @include button-variant($white, $brand_base, $btn-primary-border);
-  padding: 7px;
+.btn {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: .14em;
+  font-size: 12px;
 
-  i .fa {
+  .fa {
     padding-right: 4px;
     font-size: 14px;
   }
 }
 
 .btn-secondary {
-  @include button-variant($brand_base, $white, $btn-primary-border);
-  padding: 7px;
-
-  i .fa {
-    padding-right: 4px;
-    font-size: 14px;
-  }
+  @include button-variant($brand_base, $white, transparent);
 }
 
-// // TODO buttonbar styles... needs to be part of new design-- ellen has design with txt
-/* Style link part of view tools */
-// .view-tools,
-// .view-tools > a > i {
-//   color: $black;
-  // font-size: 16px;
-//   position: relative;
-//   float: left;
-//   min-width: 33px;
-//   @include transition($background_hover_transition);
-
-//   &:hover {
-//     text-decoration:none;
-//   }
-// }
-
-
-// /* Add borders to right of every other button in button bar */
-.view-tools{
-  // border-right: 2px solid $tertiary_grey;
+// Toolbar button style
+.btn-toolbar {
+  @include button-variant($base_grey, $white, transparent);
   line-height: 20px;
-
-  // &:hover {
-  //   background-color: $tertiary_grey;
-  //   cursor: pointer;
-  //   color: $black;
-  //   z-index: 100;
-  // }
-
-  // &.center {
-  //   text-align: center;
-  // }
-
-  .dropdown-toggle{
-    /* font awesome caret to dropdown menus in view tools*/
-    &:after{
-      font-family:FontAwesome;
-      content: "\f0d7";
-      padding-left: 3px;
-      font-size:12px;
-      opacity:0.5;
-    }
-    /*VE button styling for export dropdown*/
-    &.export{
-      letter-spacing: .14em;
-      font-size: 12px;
-      border: none;
-      text-transform: uppercase;
-      padding: 0 4px 0 6px;
-      font-weight: 600;
-      text-decoration: none;
-
-      .fa{
-        padding-right:4px;
-      }
-    }
-  }
+  padding: 2px 1px 3px 6px;
+  margin: 0 4px;
 }
 
 /*Pull center button dropdowns to the right*/
-.pane-center .view-tools.center.btn-group{
-  .dropdown-menu{
+.pane-center .mms-button-bar {
+  .dropdown-menu {
     right: 0;
     left: auto;
   }
