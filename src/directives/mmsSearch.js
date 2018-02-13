@@ -357,6 +357,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
          * specified project.
          *
          */
+        // TODO cache results
         var getAllMountsAsArray = function(project, projectsList) {
             projectsList.push({
                     bool: {
