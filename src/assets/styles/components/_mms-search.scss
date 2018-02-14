@@ -14,7 +14,7 @@
 -------------------------------------------------------------------*/
 
   /*Grey background from top to bottom */
-  background: $quaternary_grey-darker;
+  background: #fcfcfc;
   height:100%;
 
 
@@ -23,7 +23,7 @@
 
     /*Border with shadow added when search results >= 0*/
     &.searchresults{
-      border-bottom: 1px solid $tertiary_grey;
+      border-bottom: 1px solid #e9e9e9;
       box-shadow: 0px 5px 4px -5px rgba(0,0,0,.1);
     }
   }
@@ -36,7 +36,7 @@
   /*Spaceing for next and previous at bottom of results*/
   .search-nav{
     padding:36px 36px 60px;
-    background: $quaternary_grey-darker;
+    background: #fcfcfc;
   }
 
 
@@ -141,8 +141,8 @@
 -------------------------------------------------------------------*/
 
   .elem-wrapper {
-    padding: 30px;
-    background: white;
+    padding: 30px 0;
+    margin:0 30px;
     border-top: 1px solid $tertiary_grey;
 
     &:last-child{
@@ -208,17 +208,17 @@
 
     /*Light grey boxes for metatype styling*/
     .elem-type{
-      letter-spacing: .14em;
+      letter-spacing: .1em;
       margin-right: 6px;
-      padding: 1px 4px;
+      padding: 2px 5px;
       wrap-text: none;
       white-space: pre;
       margin: 3px;
       display:inline-block;
       //text-transform: uppercase;
       font-size: 12px;
-      font-weight: 600;
-      background: #f4f4f4;
+      font-weight: 500;
+      background: #f1f1f1;
       border-radius: 3px;
       color: #6e6e6e;
     }
