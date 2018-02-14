@@ -38,13 +38,13 @@ mms-view.editing {
   mms-transclude-val > span,
   mms-transclude-val > p {
     @include transition(border, .5s);
+    @include border-radius(5px);
     border: 2px solid $tertiary_grey;
-    border-radius: 5px;
     cursor: pointer;
     margin-bottom: 5px;
 
     .panel {
-      box-shadow: 0 10px 12px rgba(0,0,0,0.05);
+      @include box-shadow(0 10px 12px rgba(0,0,0,0.05));
     }
   }
 
@@ -74,11 +74,15 @@ mms-view.editing {
 /* comments */
 mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
+  @include border-radius(5px);
   background-color: $yellow;
   display: block;
-  border-radius: 5px;
   padding: 2px;
   margin-bottom: 5px;
+
+  .panel {
+    margin-bottom: 0;
+  }
 }
 
 mms-view:not(.editing) .placeholder {
