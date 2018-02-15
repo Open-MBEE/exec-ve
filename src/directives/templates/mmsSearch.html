@@ -258,15 +258,11 @@
         </div>
     </div>
     <div class="container-fluid search-nav" ng-show="searchResults.length > 0">
-        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
-        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+        <a ng-show="currentPage > 0" ng-click="prevPage()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="nextPage()">Next ></a>
     </div>
 
     <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
         <h3>No Results Found.</h3>
-    </div>
-    <div class="container-fluid search-nav" ng-show="searchResults.length === 0">
-        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
-        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
     </div>
 </div>
