@@ -162,7 +162,11 @@
     <div class="search-results" ng-show="searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
             <div class="elem-type-wrapper">
-                <span class="elem-type">{{elem.type}}</span><span ng-if="elem._appliedStereotypeIds.length"></span><span ng-repeat="type in elem._appliedStereotypeIds" class="elem-type"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>
+                <span class="elem-type">{{elem.type}}</span>
+                <span ng-if="elem._appliedStereotypeIds.length">
+                    <span ng-repeat="type in elem._appliedStereotypeIds">
+                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
+                    </span>
                 </span>
             </div>
             <div class="elem-name-wrapper">
@@ -183,13 +187,6 @@
                       </a></span>
                 </div>
             </div>
-            <!--<div class="elem-type-wrapper">
-                <label>Metatypes:</label>
-                <span class="elem-type">{{elem.type}}</span><span ng-if="elem._appliedStereotypeIds.length">,</span>
-                <span ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
-                    <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name><span ng-if="!$last">,</span>
-                </span>
-            </div>-->
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
                 <label>Value</label>
                 <div class="elem-properties">
@@ -222,7 +219,11 @@
                 </a>
             </div>
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
-                <label>Properties</label>
+                <span ng-hide="showSearchResultProps">
+                    <a ng-click="showSearchResultProps = !showSearchResultProps">More</a>
+                </span>
+                <span ng-show="showSearchResultProps">
+                <label>Properties</label><a ng-click="showSearchResultProps = !showSearchResultProps">Hide</a>
                 <table>
                     <tbody>
                         <tr ng-repeat="row in elem._properties2">
@@ -242,6 +243,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </span>
             </div>
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">
                 <label>Related Documents</label>
