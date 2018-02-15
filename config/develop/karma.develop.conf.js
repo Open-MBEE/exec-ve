@@ -15,37 +15,21 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         // Take note of the order of how each JS file is placed.
         files: [
-            "build/bower_components/jquery/dist/jquery.js",
-            "build/bower_components/angular/angular.js",
-            'build/bower_components/angular-mocks/angular-mocks.js',
-            "build/bower_components/angular-animate/angular-animate.js",
-            "build/bower_components/angular-borderlayout/src/borderLayout.js",
-            "build/bower_components/angular-ui-router/release/angular-ui-router.js",
-            "build/bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js",
-            "build/bower_components/angular-ui-tree/dist/angular-ui-tree.js",
-            "build/bower_components/angular-growl-v2/build/angular-growl.js",
-            "build/bower_components/angular-hotkeys/build/hotkeys.min.js",
-            "build/bower_components/lodash/lodash.js",
-            "build/bower_components/stompjs/lib/stomp.min.js",
-            "build/bower_components/d3/d3.js",
-            "build/bower_components/c3/c3.js",
-            //"build/bower_components/timely/timely.js",
-            // "build/bower_components/tinymce/tinymce.js",
+             // external libs
+            'dist/js/vendor.min.js',
 
-            "build/lib/jquery.isonscreen.js",
-            "build/lib/table2CSV.js",
-            "build/lib/ckeditor/ckeditor.js",
-            "build/lib/ckeditor/plugins/autosave/plugin.js",
-            //"build/lib/ckeditor/plugins/mathjax/dialogs/mathjax.js",
+            // external dev dependency libs
+            'dist/bower_components/angular-mocks/angular-mocks.js',
+
+             // internally maintained libs
+            'dist/js/vendor-internal.min.js',
+            "dist/lib/ckeditor/plugins/autosave/plugin.js",
             "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML",
 
-            'build/mms.js',
-            'build/mms.directives.tpls.js',
-            'build/mms.directives.js',
+             // our codes
+            'dist/js/ve-mms.min.js',
 
-            'build/js/mms/app.tpls.js',
-            'build/js/mms/app.js',
-            'build/js/mms/controllers.js',
+             // test codes
             'test/develop/unit/**/*.js',
             'test/mock-data/**/*.js',
             // Fixtures -- This is how you can load JSON Data as mock data

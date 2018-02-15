@@ -379,8 +379,8 @@ describe('UtilsService', function() {
         };
     });
 
+    beforeEach(module('mms'));
     beforeEach(function() {
-        module('mms');
         inject(function($injector) {
             this.UtilsService = $injector.get('UtilsService');
         });

@@ -13,8 +13,8 @@
 
 angular.module('mmsApp')
 .controller('RedirectCtrl', ['$scope', '$rootScope', '$state', '$location', '$timeout',
-    'projectObs', 'ProjectService', 'ElementService', 'growl', 
-    function($scope, $rootScope, $state, $location, $timeout, projectObs, ProjectService, ElementService, growl) {
+        'ProjectService', 'ElementService', 'growl', 
+    function($scope, $rootScope, $state, $location, $timeout, ProjectService, ElementService, growl) {
         $rootScope.ve_title = 'View Editor'; //what to name this?
         $scope.redirect_noResults = false;
         $scope.redirect_element = null;
@@ -35,9 +35,13 @@ angular.module('mmsApp')
             return queryOb;
         };
 
+        var errorHandler = function(reason) {
+            $state.go('login.select');
+        };
+
         var oldUrlTest = function(location) {
             var segments = location.split('/');
-            var searchTermList = [], successRedirectFnc;
+            var searchTermList = [], successRedirectFnc = errorHandler;
             var noResultFnc = function() {
                 // TODO - Search for document was unsucessful. Please select from the following or contact admin to verify that document exists.
                 $scope.redirect_noResults = true;
@@ -183,14 +187,14 @@ angular.module('mmsApp')
             // console.log(segments);
             var queryOb = buildQuery(searchTermList, projectList);
             ElementService.search(reqOb, queryOb)
-            .then(successRedirectFnc, function(reason) {
-                growl.error("Search Error: " + reason.message);
-                $state.go('login.select');
-            });
+            .then(successRedirectFnc, errorHandler);
         };
 
-        var projectList = projectObs.map(function(a) {return a.id;});
-        var reqOb = {projectId: projectList[0], refId: 'master'};
-        oldUrlTest($scope.crush_url);
-
+        var projectList = [];
+        var reqOb = {};
+        ProjectService.getProjects().then(function(projectObs) {
+            projectList = projectObs.map(function(a) {return a.id;});
+            reqOb = {projectId: projectList[0], refId: 'master'};
+            oldUrlTest($scope.crush_url);
+        });
 }]);

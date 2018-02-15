@@ -19,8 +19,9 @@ angular.module('mms.directives')
  */
 function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _) {
 
-    var mmsGroupDocsLink = function(scope, element, attrs, mmsViewCtrl) {
-
+    var mmsGroupDocsLink = function(scope, element, attrs, controllers) {
+        var mmsCfCtrl = controllers[0];
+        var mmsViewCtrl = controllers[1];
         var update = function(documents) {
             var docs = [];
             for (var i = 0; i < documents.length; i++) {
@@ -33,7 +34,15 @@ function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _)
 
         var projectId = scope.mmsProjectId;
         var refId = scope.mmsRefId;
-            
+        if (mmsCfCtrl) {
+            var cfVersion = mmsCfCtrl.getElementOrigin();
+            if (!projectId) {
+                projectId = cfVersion.projectId;
+            }
+            if (!refId) {
+                refId = cfVersion.refId;
+            }
+        }
         if (mmsViewCtrl) {
             var viewVersion = mmsViewCtrl.getElementOrigin();
             if (!projectId) {
@@ -42,6 +51,9 @@ function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _)
             if (!refId) {
                 refId = viewVersion.refId;
             }
+        }
+        if (!projectId) {
+            return;
         }
         scope.projectId = projectId;
         scope.refId = refId ? refId : 'master';
@@ -66,7 +78,7 @@ function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _)
             mmsProjectId: '@',
             mmsGroupId: '@'
         },
-        require: '?^^mmsView',
+        require: ['?^^mmsCf', '?^^mmsView'],
         link: mmsGroupDocsLink
     };
 }
