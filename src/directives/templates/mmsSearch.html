@@ -222,15 +222,11 @@
                 </a>
             </div>
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
-                <span ng-hide="showSearchResultProps">
-                    <a ng-click="showSearchResultProps = !showSearchResultProps">More</a>
-                </span>
-                <span ng-show="showSearchResultProps">
-                <label>Properties</label><a ng-click="showSearchResultProps = !showSearchResultProps">Hide</a>
+                <label>Properties</label><a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Hide' : switchText='Show'">{{switchText}}</a>
                 <table>
                     <tbody>
-                        <tr ng-repeat="row in elem._properties2">
-                            <td ng-repeat="property in row">
+                        <tr ng-repeat="row in elem._properties2" ng-if="($first && !showSearchResultProps) || showSearchResultProps">
+                            <td ng-repeat="property in row" class="elem-properties-rows">
                                 {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
                                 <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}
                                     <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value|limitTo:4">
@@ -246,7 +242,6 @@
                         </tr>
                     </tbody>
                 </table>
-                </span>
             </div>
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">
                 <label>Related Documents</label>

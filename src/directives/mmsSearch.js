@@ -29,6 +29,8 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
         scope.filterQuery = {query: ""};
         scope.currentPage = 0;
         scope.itemsPerPage = 50;
+        scope.showSearchResultProps = false;
+        scope.switchText = 'Expand';
         scope.advanceSearch = false;
         scope.advanceSearchRows = [];
         scope.docsviews = {
