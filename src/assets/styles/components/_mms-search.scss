@@ -41,7 +41,7 @@
 
   .mms-search-input {
     max-width: 1200px;
-    padding: 30px 36px;
+    padding: 30px 36px 30px 30px;
     position: relative;
 
     /*Navigatiom back to basic search input, with a left back arrow*/
@@ -61,7 +61,11 @@
 
     /*Navigatiom to advanced search input*/
     .advanced-query {
-      margin-bottom: 25px;
+      margin-bottom: 18px;
+    }
+
+    .advanced-views-docs{
+      padding-top:22px;
     }
   }
 
