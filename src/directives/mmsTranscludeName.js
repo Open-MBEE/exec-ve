@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', 'ViewService', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
@@ -28,7 +28,7 @@ angular.module('mms.directives')
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils) {
+function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils, ViewService) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
@@ -130,12 +130,12 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     });
                 }
             }, function(reason) {
-                var recentElement = reason.data.recentVersionOfElement;
-                if (recentElement) {
-                    domElement.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
-                } else {
-                    domElement.html('<span class="mms-error">no value available</span>');
-                }
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeName
+                }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
             });

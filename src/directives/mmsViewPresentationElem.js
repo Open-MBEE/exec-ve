@@ -90,12 +90,12 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $t
                 if (reason.status === 500) {
                     element.html('<span class="mms-error">View element reference error: ' + scope.mmsInstanceVal.instanceId + ' invalid specification</span>');
                 } else {
-                    var recentElement = reason.data.recentVersionOfElement;
-                    if (recentElement) {
-                        element.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
-                    } else {
-                        element.html('<span class="mms-error">no value available</span>');
-                    }
+                    element.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                    $compile(element.contents())(Object.assign(scope.$new(), {
+                        reqOb: reqOb,
+                        recentElement: reason.data.recentVersionOfElement,
+                        type: ViewService.AnnotationType.mmsPresentationElement
+                    }));
                 }
             }).finally(function() {
                 element.removeClass("isLoading");

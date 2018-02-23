@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService', '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
+    '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -32,7 +33,8 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http, _, $compile, $templateCache, growl, MathJax) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http,
+                          _, $compile, $templateCache, growl, MathJax, ViewService) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -180,12 +182,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     });
                 }
             }, function(reason) {
-                var recentElement = reason.data.recentVersionOfElement;
-                if (recentElement) {
-                    domElement.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
-                } else {
-                    domElement.html('<span class="mms-error">no value available</span>');
-                }
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeVal
+                }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
             });

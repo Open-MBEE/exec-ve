@@ -37,6 +37,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
     };
 
+    var AnnotationType = {
+        mmsTranscludeName: 1,
+        mmsTranscludeDoc: 2,
+        mmsTranscludeCom: 3,
+        mmsTranscludeVal: 4,
+        mmsViewLink: 5,
+        mmsPresentationElement: 6
+    };
+
     function getClassifierIds() {
         var re = [];
         Object.keys(TYPE_TO_CLASSIFIER_ID).forEach(function(key) {
@@ -1171,6 +1180,20 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var reset = function() {
         inProgress = {};
     };
+
+    var getTypeFromClassifierId = function(classifierIds) {
+        var type = '';
+        if (classifierIds.length > 0) {
+            Object.keys(TYPE_TO_CLASSIFIER_ID).some(function(key) {
+                if(TYPE_TO_CLASSIFIER_ID[key] === classifierIds[0]) {
+                    type = key + ' ';
+                    return true;
+                }
+                return false;
+            });
+        }
+        return type;
+    };
     
     return {
         getViewElements: getViewElements,
@@ -1193,9 +1216,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeViewFromParentView: removeViewFromParentView,
         createInstanceSpecification: createInstanceSpecification,
         TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
+        getTypeFromClassifierId: getTypeFromClassifierId,
         getElementReferenceTree : getElementReferenceTree,
         getDocMetadata: getDocMetadata,
-        reset: reset
+        reset: reset,
+        AnnotationType: AnnotationType
     };
 
 }

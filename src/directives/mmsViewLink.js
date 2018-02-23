@@ -89,12 +89,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 }
                 scope.loading = false;
             }, function(reason) {
-                var recentElement = reason.data.recentVersionOfElement;
-                if (recentElement) {
-                    element.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
-                } else {
-                    element.html('<span class="mms-error">no value available</span>');
-                }
+                element.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                $compile(element.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsViewLink
+                }));
                 scope.loading = false;
             });
         });

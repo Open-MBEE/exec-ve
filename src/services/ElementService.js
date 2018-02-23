@@ -75,7 +75,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var getElement = function(reqOb, weight, update) {
         UtilsService.normalize(reqOb);
         var requestCacheKey = getElementKey(reqOb);
-        var key = URLService.getElementURL(reqOb);
+        var url = URLService.getElementURL(reqOb);
+        var key = url;
+        if (reqOb.includeRecentVersionElement) {
+            key = key + 'addRecentVersion';
+        }
         // if it's in the inProgress queue get it immediately
         if (inProgress.hasOwnProperty(key)) {  //change to change proirity if it's already in the queue
             HttpService.ping(key, weight);
@@ -90,8 +94,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 return deferred.promise;
             //}
         }
-        inProgress[key] = deferred.promise;
-        HttpService.get(key,
+         inProgress[key] = deferred.promise;
+
+         HttpService.get(url,
             function(data, status, headers, config) {
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(cacheElement(reqOb, data.elements[0]));

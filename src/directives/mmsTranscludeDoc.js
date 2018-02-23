@@ -161,12 +161,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     });
                 }
             }, function(reason) {
-                var recentElement = reason.data.recentVersionOfElement;
-                if (recentElement) {
-                    domElement.html('<span class="mms-error">' + recentElement.name + ' documentation not found ' + '</span>');
-                } else {
-                    domElement.html('<span class="mms-error">no value available</span>');
-                }
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeDoc
+                }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
             });
