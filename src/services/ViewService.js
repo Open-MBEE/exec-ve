@@ -1183,7 +1183,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     var getTypeFromClassifierId = function(classifierIds) {
         var type = '';
-        if (classifierIds.length > 0) {
+        if ( classifierIds && classifierIds.length > 0) {
             Object.keys(TYPE_TO_CLASSIFIER_ID).some(function(key) {
                 if(TYPE_TO_CLASSIFIER_ID[key] === classifierIds[0]) {
                     type = key + ' ';
