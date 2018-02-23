@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$timeout', '$location', '$anchorScroll', mmsViewPresentationElem]);
+.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$timeout', '$location',
+    '$anchorScroll', '$compile', mmsViewPresentationElem]);
 
 /**
  * @ngdoc directive
@@ -26,7 +27,7 @@ angular.module('mms.directives')
  * @param {Object} mmsInstanceVal A InstanceValue json object 
  * @param {Object} mmsParentSection the parent section if available
  */
-function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $timeout, $location, $anchorScroll) {
+function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $timeout, $location, $anchorScroll, $compile) {
     var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');
 
     var mmsViewPresentationElemCtrl = function($scope) {

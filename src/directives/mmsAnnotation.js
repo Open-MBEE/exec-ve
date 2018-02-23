@@ -21,7 +21,6 @@ function mmsAnnotation($templateCache, ViewService) {
     function mmsAnnotationLink(scope, element, attrs) {}
 
     function mmsAnnotationCtrl($scope) {
-        console.log($scope);
         var displayContent;
         if ($scope.mmsRecentElement) {
             displayContent = _getContentIfElementFound($scope.mmsType, $scope.mmsRecentElement);
@@ -115,6 +114,6 @@ function mmsAnnotation($templateCache, ViewService) {
         if (element.type === 'Constraint' && element.specification) {
             value = element.specification;
         }
-        return value
+        return value;
     }
 }
