@@ -169,25 +169,9 @@
       }
     }
 
-    label {
-      font-size: 13px;
-      margin: 12px 5px 0 0;
-      // display: block;
-      /*text-transform: uppercase;
-      font-size: 12px;
-      letter-spacing: .14em;
-      color: #636363;*/
-    }
-
     .elem-properties-wrapper {
-      table > tbody > tr > td {
-        padding: 0;
-        border: 0;
-        min-width: 150px;
-        width: 30%;
-        overflow: hidden;
-        border-right: 25px solid white;
-        text-overflow: ellipsis;
+      ul{
+        margin-bottom: 0;
       }
     }
 
@@ -197,8 +181,8 @@
 
     .elem-updated-wrapper {
       color: $medium_grey;
-      margin-top: 18px;
       font-size: 14px;
+      margin-top:20px;
     }
 
     /*File icon for documents and views*/
@@ -207,28 +191,6 @@
       font-family: FontAwesome;
       padding: 0 4px 0 0;
       font-size:12px;
-    }
-
-    /*Light grey boxes for metatype styling*/
-    .elem-type{
-      letter-spacing: .1em;
-      margin-right: 6px;
-      padding: 2px 5px;
-      wrap-text: none;
-      white-space: pre;
-      margin: 3px;
-      display:inline-block;
-      //text-transform: uppercase;
-      font-size: 12px;
-      font-weight: 500;
-      background: #f1f1f1;
-      border-radius: 3px;
-      color: #6e6e6e;
-    }
-
-    /*pull in metatype wrapper to compensate for padding*/
-    .elem-type-wrapper {
-      margin-left: -3px;
     }
   }
 
@@ -245,5 +207,71 @@
       margin: 40px auto;
       width: 290px;
     }
+  }
+}
+
+/*------------------------------------------------------------------
+5. Styles that apply to both the spec
+-------------------------------------------------------------------*/
+
+.mms-search,
+.pane-right,
+.revert-spec{
+  .elem-wrapper label {
+    font-size: 12px;
+    font-weight: 700;
+    margin: 12px 5px 0 0;
+    // display: block;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    //color: #636363;
+    }
+
+  .visibility-toggle{
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-decoration: none;
+  }
+
+  .visibility-toggle::after{
+    content:"\f0d8";
+    font-family: fontAwesome;
+    font-size: 14px;
+    padding: 4px;
+    color: #b2b2b2;
+  }
+
+  .visibility-toggle.active::after{
+    content:"\f0d7";
+    font-family: fontAwesome;
+  }
+
+  /*Light grey boxes for metatype styling*/
+  .elem-type{
+    letter-spacing: .1em;
+    margin-right: 6px;
+    padding: 2px 5px;
+    wrap-text: none;
+    white-space: pre;
+    margin: 3px;
+    display:inline-block;
+    //text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 500;
+    background: #f1f1f1;
+    border-radius: 3px;
+    color: #6e6e6e;
+  }
+
+  /*pull in metatype wrapper to compensate for padding*/
+  .elem-type-wrapper {
+    margin-left: -3px;
+  }
+
+  .elem-updated-wrapper {
+    color: $medium_grey;
+    font-size: 14px;
+    display: block;
   }
 }
