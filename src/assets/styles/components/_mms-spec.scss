@@ -16,24 +16,15 @@
 
   span.prop {
     font-size: 16px;
-    margin: 4px 0 24px;
+    margin: 4px 0 30px;
     min-width: 280px;
     word-wrap: break-word;
+    display: block;
   }
 
   h1.element-title {
     min-width: 280px;
     word-wrap: break-word;
-  }
-
-  .prop-title {
-    font-family: $font-family-sans-serif;
-    font-weight: 700;
-    margin:28px 0 2px;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    white-space: nowrap;
   }
 
   .doc-text {
