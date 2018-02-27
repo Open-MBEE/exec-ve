@@ -50,10 +50,10 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         UC: 'Controls'
     };
     $('body').append(
-    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/tsperspectives.nocache.js"></script>\n' +
-    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
-    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/TSHovering.js"></script>\n' +
-    '<script type="text/javascript" language="javascript" src="/Basic/tsperspectives/TSButtonTooltip.js"></script>');
+    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/tsperspectives.nocache.js"></script>\n' +
+    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
+    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSHovering.js"></script>\n' +
+    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSButtonTooltip.js"></script>');
 
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " + successfulCommand.command + " completed successfully");
