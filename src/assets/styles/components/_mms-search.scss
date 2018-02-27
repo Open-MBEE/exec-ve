@@ -222,22 +222,17 @@
 .pane-right,
 .revert-spec{
   .elem-wrapper label,
-  .prop-title  {
-    font-size: 12px;
+  .prop-title,
+  .visibility-toggle  {
+    font-size: 13px;
     font-weight: 700;
     margin: 12px 5px 0 0;
     // display: block;
     //text-transform: uppercase;
-    letter-spacing: .06em;
-    //color: #636363;
-    }
-
-  .visibility-toggle{
-    font-weight: 700;
-    font-size: 12px;
     letter-spacing: .04em;
     text-decoration: none;
-  }
+    //color: #636363;
+    }
 
   .visibility-toggle::after{
     content:"\f0d8";
