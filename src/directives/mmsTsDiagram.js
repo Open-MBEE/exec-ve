@@ -281,7 +281,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
                     "command": "Custom",
                     "data": {
                         "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-add-" + id, 'https://opencae-uat.jpl.nasa.gov/alfresco/service'],//ApplicationService.getAppBaseUrl() + URLService.getRoot()],
+                        "args": ["int-add-" + id, URLService.getMmsServer() + URLService.getRoot()],
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,

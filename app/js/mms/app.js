@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies'])
-.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'URLServiceProvider', function($stateProvider, $urlRouterProvider, $httpProvider, URLServiceProvider) {
 
     $urlRouterProvider.rule(function ($injector, $location) {
         var locationPath = $location.url();
@@ -13,7 +13,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             locationPath = locationPath.substring(0, locationPath.length-1);
         if (locationPath !== $location.url())
             $location.url(locationPath);
-     });
+    });
+
+    var mmsHost = window.location.protocol + '//' + window.location.host;
+    URLServiceProvider.setMmsUrl(mmsHost);
+    //URLServiceProvider.setMmsUrl('https://opencae-uat.jpl.nasa.gov');
 
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped

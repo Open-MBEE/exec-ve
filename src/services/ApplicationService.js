@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ApplicationService', ['$q', '$http', '$location', 'URLService', ApplicationService]);
+.factory('ApplicationService', ['$q', '$http', 'URLService', ApplicationService]);
 
 /**
  * @ngdoc service
@@ -14,7 +14,7 @@ angular.module('mms')
  * Provide general applications functions such as getting MMS Version, getting username,
  * creating unique IDs, etc...
  */
-function ApplicationService($q, $http, $location, URLService) {
+function ApplicationService($q, $http, URLService) {
     var source = createUniqueId();
     var username;
 
@@ -60,18 +60,12 @@ function ApplicationService($q, $http, $location, URLService) {
         return username;
     };
 
-    var getAppBaseUrl = function() {
-        var port = $location.port();
-        return $location.protocol() + '://' + $location.host() + (port !== 80 && port !== 443) ? ':' + port : ''; 
-    };
-
     return {
         getSource: getSource,
         createUniqueId: createUniqueId,
         getMmsVersion: getMmsVersion,
         setUserName: setUserName,
         getUserName: getUserName,
-        getAppBaseUrl: getAppBaseUrl
     };
 
 }
