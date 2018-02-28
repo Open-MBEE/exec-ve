@@ -56,6 +56,9 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 if (!commitId)
                     commitId = viewVersion.commitId;
             }
+            if (!projectId) {
+                return;
+            }
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';

@@ -40,9 +40,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
+            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document")); //-or-group
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
-            $scope.bbApi.setPermission( "tree-add-document-or-group", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
+            $scope.bbApi.setPermission( "tree-add-document", documentOb._editable && (refOb.type === 'Tag' ? false : true) ); //-or-group
             $scope.bbApi.setPermission( "tree-delete-document", documentOb._editable &&  (refOb.type === 'Tag' ? false : true) );
         } else if ($state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
@@ -89,7 +89,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-delete-view', function() {
-        $scope.deleteItem();
+        $scope.deleteItem(function(deleteBranch) {
+            $rootScope.$broadcast('mms-full-doc-view-deleted', deleteBranch);
+        });
     });
 
     $scope.$on('tree-reorder-view', function() {
@@ -402,8 +404,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var sectionId = branch.type === 'section' ? branch.data.id : null;
             var hash = branch.data.id;
             if ($rootScope.ve_fullDocMode) {
-                $location.hash(hash);
-                $anchorScroll();
+                $rootScope.$broadcast('mms-tree-click', branch);
             } else if (branch.type === 'view' || branch.type === 'section') {
                 $state.go('project.ref.document.view', {viewId: branch.data.id, search: undefined});
             } else {
@@ -571,7 +572,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     var num = 1;
                     for (var i = 0; i < node.children.length; i++) {
                         var cNode = node.children[i];
-                        $rootScope.$broadcast('newViewAdded', cNode.data.id, curSection + '.' + num, lastChild);
+                        $rootScope.$broadcast('mms-new-view-added', cNode.data.id, curSection + '.' + num, lastChild);
                         lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.id);
                         num = num + 1;
                     }
@@ -600,9 +601,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     $state.go('project.ref.document.view', {viewId: data.id, search: undefined});
                 } else {
                     if (prevBranch) {
-                        $rootScope.$broadcast('newViewAdded', data.id, curNum, prevBranch.data.id);
+                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, prevBranch.data.id);
                     } else {
-                        $rootScope.$broadcast('newViewAdded', data.id, curNum, branch.data.id);
+                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, branch.data.id);
                     }
                 }
             }
@@ -736,7 +737,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
     };
 
-    $scope.deleteItem = function() {
+    $scope.deleteItem = function(cb) {
         var branch = $scope.treeApi.get_selected_branch();
         if (!branch) {
             growl.warning("Delete Error: Select item to delete.");
@@ -770,8 +771,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
             if ($rootScope.ve_fullDocMode) {
-                $state.go('project.ref.document.full', {search: undefined});
-                $state.reload();
+                cb(branch);
             } else {
                 $state.go('^', {search: undefined});
             }

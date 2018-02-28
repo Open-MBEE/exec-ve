@@ -64,7 +64,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 var toParams = $rootScope.ve_redirect.toParams;
                                 $state.go(toState, toParams);
                             } else {
-                                $state.go('login.select');
+                                $state.go('login.select', {fromLogin: true});
                             }
                         }, function (reason) {
                             $scope.spin = false;
@@ -78,7 +78,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('login.redirect', {
         url: '/redirect',
         resolve: {
-            ticket: function($window, URLService, AuthService, $q, $cookies, ApplicationService) {
+            ticket: ['$window', 'URLService', 'AuthService', '$q', '$cookies', 'ApplicationService', function($window, URLService, AuthService, $q, $cookies, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
@@ -89,10 +89,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     deferred.reject(rejection);
                 });
                 return deferred.promise;
-            },
-            projectObs: function(ProjectService) {
-                return ProjectService.getProjects();
-            }
+            }]
         },
         views: {
             'login@': {
@@ -102,7 +99,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('login.select', {
-        url: '/select',
+        url: '/select?fromLogin',
         resolve: {
             ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
@@ -122,8 +119,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: ['$scope', '$rootScope', '$state', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
+                controller: ['$scope', '$rootScope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, $stateParams, orgObs, ProjectService, AuthService, growl, $localStorage) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
+                    $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
                     $scope.spin = false;
                     $scope.orgs = orgObs;
@@ -656,4 +654,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         };
     }]);
+
+    $httpProvider.useApplyAsync(true);
 }]);

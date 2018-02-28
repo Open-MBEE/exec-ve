@@ -141,9 +141,9 @@ function urlService(baseUrl, mmsUrl) {
 
     var getRefHistoryURL = function(projectId, refId, timestamp) {
         if (timestamp !== '' && isTimestamp(timestamp)) {
-            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history') + '&maxTimestamp=' + timestamp;
+            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/commits') + '&maxTimestamp=' + timestamp + '&limit=1';
         }
-        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history');
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/commits');
     };
 
     var getGroupsURL = function(projectId, refId) {
@@ -264,7 +264,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history');
+        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits');
     };
 
     /**
@@ -362,25 +362,6 @@ function urlService(baseUrl, mmsUrl) {
     var getElementSearchURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?checkType=true';
         return addExtended(addTicket(r), true);
-    };
-
-    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
-        var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
-        if(recalc === true) diffUrl += '&recalculate=true';
-        
-        return addTicket(diffUrl);
-        /*if (ws1time && ws1time !== 'latest')
-            r += '&timestamp1=' + ws1time;
-        if (ws2time && ws2time !== 'latest')
-            r += '&timestamp2=' + ws2time;
-        return r;*/
-    };
-
-    var getPostWsDiffURL = function(sourcetime) {
-        var r = root + '/diff';
-        if (sourcetime && isTimestamp(sourcetime))
-            r += '?timestamp2=' + sourcetime;
-        return addTicket(r);
     };
     
     var setJobsUrl = function(jobUrl) {
@@ -520,8 +501,6 @@ function urlService(baseUrl, mmsUrl) {
         handleHttpStatus: handleHttpStatus,
         getImageURL: getImageURL,
         getHtmlToPdfURL: getHtmlToPdfURL,
-        getWsDiffURL: getWsDiffURL,
-        getPostWsDiffURL: getPostWsDiffURL,
         setJobsUrl: setJobsUrl,
         getJobsURL: getJobsURL,
         getJobURL: getJobURL,
