@@ -24,6 +24,11 @@ angular.module('mms.directives')
 function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, ElementService) {
     var template = $templateCache.get('mms/templates/mmsDiffAttr.html');
 
+    var baseNotFound = false;
+    var compNotFound = false;
+    var baseDeleted = false;
+    var compDeleted = false;
+
     return {
         restrict: 'E',
         scope: {
@@ -36,91 +41,94 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             mmsElementId: '@'
         },
         template: template,
-        link: mmsDiffAttrLink
+        link: mmsDiffAttrLink,
+        controller: ['$scope', mmsDiffAttrCtrl]
     };
 
-    function mmsDiffAttrLink(scope, element, attrs) {
-        var baseNotFound = false;
-        var compNotFound = false;
-        var baseDeleted = false;
-        var compDeleted = false;
-        var alreadyRunOnLoad = false;
+    function mmsDiffAttrLink(scope, element, attrs) {}
 
-        scope.diffFinish = function() {
-            scope.diffLoading = false;
-            console.log('diffFinish');
+    function mmsDiffAttrCtrl($scope) {
+        $scope.diffFinish = function() {
+            $scope.diffLoading = false;
         };
 
-        scope.$watch('mmsBaseCommitId', changeElement);
-        scope.$watch('mmsCompareCommitId', changeElement);
+        $scope.$watch('mmsBaseCommitId', function(newVal, oldVal) {
+            commitIdChangeHandler(newVal, oldVal, $scope);
+        });
 
-        function changeElement(newVal, oldVal) {
-            // to make sure that we only run this logic once on initialize
-            if(alreadyRunOnLoad && newVal === oldVal) {
-                return;
-            }
-            alreadyRunOnLoad = true;
+        $scope.$watch('mmsCompareCommitId', function(newVal, oldVal) {
+            commitIdChangeHandler(newVal, oldVal, $scope);
+        });
 
-            scope.diffLoading = true;
-            baseNotFound = false;
-            compNotFound = false;
-            baseDeleted = false;
-            compDeleted = false;
+        setupDiff($scope);
+    }
 
-            var projectId = scope.mmsProjectId;
-            var elementId = scope.mmsElementId;
-
-            var baseRefId = scope.mmsBaseRefId || 'master';
-            var baseCommitId = scope.mmsBaseCommitId || 'latest';
-
-            var compareRefId = scope.mmsCompareRefId || baseRefId;
-            var compareCommitId = scope.mmsCompareCommitId || 'latest';
-
-            if (baseCommitId === compareCommitId) {
-                scope.message = ' Comparing same commit.';
-                scope.diffLoading = false;
-                return;
-            }
-
-            var baseElementPromise = getElementData(projectId, baseRefId, baseCommitId, elementId);
-            var comparedElementPromise = getElementData(projectId, compareRefId, compareCommitId, elementId);
-
-            $q.allSettled([baseElementPromise, comparedElementPromise]).then(function(responses) {
-                var message;
-
-                var respForBaseElement = responses[0];
-                if (respForBaseElement.state === 'fulfilled') {
-                    fullyRender(respForBaseElement.value, scope, function(baseElementHtml) {
-                        scope.baseElementHtml = baseElementHtml;
-                    });
-                } else {
-                    message = respForBaseElement.reason.data.message;
-                    if (message && message.toLowerCase().includes("deleted")) {
-                        baseDeleted = true;
-                    } else {
-                        baseNotFound = true;
-                        scope.baseElementHtml = '';
-                    }
-                }
-
-                var respForComparedElement = responses[1];
-                if(respForComparedElement.state === 'fulfilled') {
-                    fullyRender(respForComparedElement.value, scope, function(comparedElementHtml) {
-                        scope.comparedElementHtml = comparedElementHtml;
-                    });
-                } else {
-                    message = respForComparedElement.reason.data.message;
-                    if (message && message.toLowerCase().includes("deleted")) {
-                        compDeleted = true;
-                    } else {
-                        compNotFound = true;
-                        scope.comparedElementHtml = '';
-                    }
-                }
-
-                scope.message = checkElement(baseNotFound, compNotFound, baseDeleted, compDeleted);
-            });
+    function commitIdChangeHandler(newVal, oldVal, scope) {
+        if (newVal !== oldVal) {
+            setupDiff(scope);
         }
+    }
+
+    function setupDiff(scope) {
+        scope.diffLoading = true;
+        baseNotFound = false;
+        compNotFound = false;
+        baseDeleted = false;
+        compDeleted = false;
+
+        var projectId = scope.mmsProjectId;
+        var elementId = scope.mmsElementId;
+
+        var baseRefId = scope.mmsBaseRefId || 'master';
+        var baseCommitId = scope.mmsBaseCommitId || 'latest';
+
+        var compareRefId = scope.mmsCompareRefId || baseRefId;
+        var compareCommitId = scope.mmsCompareCommitId || 'latest';
+
+        if (baseCommitId === compareCommitId) {
+            scope.message = ' Comparing same commit.';
+            scope.diffLoading = false;
+            return;
+        }
+
+        var baseElementPromise = getElementData(projectId, baseRefId, baseCommitId, elementId);
+        var comparedElementPromise = getElementData(projectId, compareRefId, compareCommitId, elementId);
+
+        $q.allSettled([baseElementPromise, comparedElementPromise]).then(function(responses) {
+            var message;
+
+            var respForBaseElement = responses[0];
+            if (respForBaseElement.state === 'fulfilled') {
+                fullyRender(respForBaseElement.value, scope, function(baseElementHtml) {
+                    scope.baseElementHtml = baseElementHtml;
+                });
+            } else {
+                message = respForBaseElement.reason.data.message;
+                if (message && message.toLowerCase().includes("deleted")) {
+                    baseDeleted = true;
+                } else {
+                    baseNotFound = true;
+                    scope.baseElementHtml = '';
+                }
+            }
+
+            var respForComparedElement = responses[1];
+            if(respForComparedElement.state === 'fulfilled') {
+                fullyRender(respForComparedElement.value, scope, function(comparedElementHtml) {
+                    scope.comparedElementHtml = comparedElementHtml;
+                });
+            } else {
+                message = respForComparedElement.reason.data.message;
+                if (message && message.toLowerCase().includes("deleted")) {
+                    compDeleted = true;
+                } else {
+                    compNotFound = true;
+                    scope.comparedElementHtml = '';
+                }
+            }
+
+            scope.message = checkElement(baseNotFound, compNotFound, baseDeleted, compDeleted);
+        });
     }
 
 
