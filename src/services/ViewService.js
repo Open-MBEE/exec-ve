@@ -1100,7 +1100,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return instanceSpec.classifierIds && 
                instanceSpec.classifierIds.length > 0 &&
                (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.ImageT ||
-                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image);
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image || 
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.FigureT);
     };
 
     var isEquation = function(instanceSpec) {
