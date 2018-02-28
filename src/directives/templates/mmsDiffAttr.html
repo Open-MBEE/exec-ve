@@ -1,12 +1,7 @@
-<style>
-del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}
-ins, .ins{color: black;background: #dafde0;}
-.match,.textdiff span {color: gray;}
-</style>
-
-<span ng-show="diffLoading"><i class="fa fa-spin fa-spinner"></i></span>
+<span ng-show="diffLoading">
+    <i class="fa fa-spin fa-spinner"></i>
+</span>
 <span ng-hide="diffLoading">
-<span class="text-info" ng-if="message !== ''"><i class="fa fa-info-circle"></i>{{message}}</span>
-<div ng-if="element.type !== 'Property' && element.type !== 'Port' && element.type !== 'Slot'" class="textdiff" processing-diff options="options" left-obj="origElem" right-obj="compElem"></div>
-<div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'" class="textdiff" line-diff options="options" left-obj="origElem" right-obj="compElem"></div>
+    <span class="text-info" ng-if="message"><i class="fa fa-info-circle"></i>{{message}}</span>
+    <mms-html-diff ng-if="baseElementHtml && comparedElementHtml" mms-base-html="baseElementHtml" mms-compared-html="comparedElementHtml" mms-diff-finish="diffFinish"></mms-html-diff>
 </span>

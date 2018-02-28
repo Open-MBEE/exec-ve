@@ -71,25 +71,35 @@
     <div class="ve-notify-banner fade-in-out" ng-show="disableRevert">
         <span>Element does not exist on <strong>{{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}</strong></span>
     </div>
-    <h1 class="prop element-title">
-        <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="name" mms-base-project-id="{{mmsProjectId}}"
-        mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
-        mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
-    </h1>
+    <!--<h1 class="prop element-title">-->
+        <!--<mms-diff-attr mms-element-id="{{mmsElementId}}" mms-attr="name" mms-project-id="{{mmsProjectId}}"-->
+                       <!--mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"-->
+                       <!--mms-base-commit-id="{{baseCommit.commitSelected.id}}"-->
+                       <!--mms-compare-commit-id="{{compareCommit.commitSelected.id}}">-->
+        <!--</mms-diff-attr>-->
+    <!--</h1>-->
 
     <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="doc" mms-base-project-id="{{mmsProjectId}}"
-    mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
-    mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
+    <mms-diff-attr mms-attr="doc"
+                   mms-project-id="{{mmsProjectId}}"
+                   mms-element-id="{{mmsElementId}}"
+                   mms-base-ref-id="{{baseCommit.refSelected.id}}"
+                   mms-base-commit-id="{{baseCommit.commitSelected.id}}"
+                   mms-compare-ref-id="{{mmsRefId}}"
+                   mms-compare-commit-id="{{compareCommit.commitSelected.id}}">
+    </mms-diff-attr>
 
-    <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
-    <h2 class="prop-title">val</h2>
-    <span class="prop">
-        <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="val" mms-base-project-id="{{mmsProjectId}}"
-        mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
-        mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
-    </span>
-    </div>
+    <!--<div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">-->
+        <!--<h2 class="prop-title">val</h2>-->
+        <!--<span class="prop">-->
+            <!--<mms-diff-attr mms-attr="val" mms-project-id="{{mmsProjectId}}"-->
+                           <!--mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"-->
+                           <!--mms-base-commit-id="{{baseCommit.commitSelected.id}}"-->
+                           <!--mms-compare-commit-id="{{compareCommit.commitSelected.id}}"-->
+                           <!--mms-element-id="{{mmsElementId}}">-->
+            <!--</mms-diff-attr>-->
+        <!--</span>-->
+    <!--</div>-->
     <h2 class="prop-title">Commit</h2>
     <span class="prop">{{baseCommit.commitSelected.id}}<br>
     <img src="assets/images/arrow-change.svg" class="change-connection"><br>
