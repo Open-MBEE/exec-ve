@@ -19,13 +19,13 @@ angular.module('mms')
  * 
  * @description
  * This utility service gives back url paths for use in other services in communicating
- * with the server, arguments like workspace, version are expected to be strings and
+ * with the server, arguments like projectId, refId, commitId are expected to be strings and
  * not null or undefined. This service is usually called by higher level services and
  * should rarely be used directly by applications.
  *
- * To configure the base url of the ems server, you can use the URLServiceProvider
- * in your application module's config. By default, the baseUrl is '/alfresco/service' 
- * which assumes your application is hosted on the same machine as the ems. 
+ * To configure the base url of the mms server, you can use the URLServiceProvider
+ * in your application module's config. By default, the baseUrl is '/alfresco/service'
+ * which assumes your application is hosted on the same machine as the mms and ve.
  *  <pre>
         angular.module('myApp', ['mms'])
         .config(function(URLServiceProvider) {
@@ -138,9 +138,9 @@ function urlService(baseUrl) {
 
     var getRefHistoryURL = function(projectId, refId, timestamp) {
         if (timestamp !== '' && isTimestamp(timestamp)) {
-            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history') + '&maxTimestamp=' + timestamp;
+            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/commits') + '&maxTimestamp=' + timestamp + '&limit=1';
         }
-        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history');
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/commits');
     };
 
     var getGroupsURL = function(projectId, refId) {
@@ -261,7 +261,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history');
+        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits');
     };
 
     /**
@@ -360,25 +360,6 @@ function urlService(baseUrl) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?checkType=true';
         return addExtended(addTicket(r), true);
     };
-
-    var getWsDiffURL = function(ws1, ws2, ws1time, ws2time, recalc) {
-        var diffUrl =  root + '/diff/' + ws1 + '/' + ws2 + '/' + ws1time + '/' + ws2time  + '?background=true';
-        if(recalc === true) diffUrl += '&recalculate=true';
-        
-        return addTicket(diffUrl);
-        /*if (ws1time && ws1time !== 'latest')
-            r += '&timestamp1=' + ws1time;
-        if (ws2time && ws2time !== 'latest')
-            r += '&timestamp2=' + ws2time;
-        return r;*/
-    };
-
-    var getPostWsDiffURL = function(sourcetime) {
-        var r = root + '/diff';
-        if (sourcetime && isTimestamp(sourcetime))
-            r += '?timestamp2=' + sourcetime;
-        return addTicket(r);
-    };
     
     var setJobsUrl = function(jobUrl) {
         jobsRoot = jobUrl + ':8443/';
@@ -432,6 +413,17 @@ function urlService(baseUrl) {
         return url;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addTicket
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds alf_ticket parameter to URL string
+     *
+     * @param {String} url The url string for which to add als_ticket parameter argument.
+     * @returns {string} The url with alf_ticket parameter added.
+     */
     var addTicket = function(url) {
         var r = url;
         if (!ticket)
@@ -502,8 +494,6 @@ function urlService(baseUrl) {
         handleHttpStatus: handleHttpStatus,
         getImageURL: getImageURL,
         getHtmlToPdfURL: getHtmlToPdfURL,
-        getWsDiffURL: getWsDiffURL,
-        getPostWsDiffURL: getPostWsDiffURL,
         setJobsUrl: setJobsUrl,
         getJobsURL: getJobsURL,
         getJobURL: getJobURL,

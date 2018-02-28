@@ -124,10 +124,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     domElement[0].innerHTML = toCompile;
                 }
                 $(domElement[0]).find('img').each(function(index) {
-                    var src = $(this).attr('src');
-                    if (src && src.startsWith('/alfresco')) {
-                        $(this).attr('src', src + '?alf_ticket=' + AuthService.getTicket());
-                    }
+                    Utils.fixImgSrc($(this));
                 });
                 if (MathJax) {
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
@@ -147,8 +144,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'val')) {
                 domElement.html('<span class="mms-error">Circular Reference!</span>');
@@ -166,6 +164,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 scope.element = data;
                 Utils.setupValCf(scope);
                 recompile();
+                Utils.reopenUnsavedElts(scope, 'value');
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&

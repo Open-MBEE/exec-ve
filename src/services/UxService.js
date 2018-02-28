@@ -97,15 +97,25 @@ function UxService($rootScope) {
       case "tree-filter":
         return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter', 
                 spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-add-document":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-document-or-group":
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Group or Document',
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete Document', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-view":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-group":
+        return {id: button, icon: 'fa-folder', selected: true, active: true, permission: true, tooltip: 'Add Group',
+              spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-document":
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Document',
+            spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+
+
+
       case "tree-add-tag":
         return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Tag', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
@@ -212,7 +222,7 @@ function UxService($rootScope) {
     var treeTypes = {};
 
     MetaTypes.forEach(function (type) {
-      treeTypes[type] = "fa " + getTypeIcon(type) + " fa-fw";
+      treeTypes[type] = getTypeIcon(type) + " fa-fw";
     });
 
     return treeTypes;
@@ -225,45 +235,45 @@ function UxService($rootScope) {
     t = t.toLowerCase();
     switch (t) {
       case "tag":
-        return "fa-tag";
+        return "fa fa-tag";
       case "connector":
-        return "fa-expand";
+        return "fa fa-expand";
       case "dependency":
-        return "fa-long-arrow-right";
+        return "fa fa-long-arrow-right";
       case "directedrelationship":
-        return "fa-long-arrow-right";
+        return "fa fa-long-arrow-right";
       case "element":
-        return "fa-square";
+        return "fa fa-square";
       case "property":
-        return "fa-circle";
+        return "fa fa-circle";
       case "generalization":
-        return "fa-chevron-right";
+        return "fa fa-chevron-right";
       case "package":
-        return "fa-folder";
+        return "fa fa-folder";
       case "section":
-        return "fa-square-o";//"fa-file-o";
+        return "section-icon";//"fa-file-o";
       case "group":
-        return "fa-folder";
+        return "fa fa-folder";
       case "snapshot":
-        return "fa-camera";
+        return "fa fa-camera";
       case "view":
-        return "fa-file";
+        return "fa fa-file";
       case "view-composite":
-        return "fa-file";
+        return "fa fa-file";
       case "view-shared":
-        return "fa-file-o";
+        return "fa fa-file-o";
       case "view-none":
-        return "fa-file-o";
+        return "fa fa-file-o";
       case "branch":
-        return "fa-tasks";
+        return "fa fa-tasks";
       case "table":
-        return "fa-table";
+        return "fa fa-table";
       case "figure":
-        return "fa-image";
+        return "fa fa-image";
       case "equation":
-        return "fa-superscript";
+        return "fa fa-superscript";
       default:
-        return "fa-square";
+        return "fa fa-square";
         }
   };
 

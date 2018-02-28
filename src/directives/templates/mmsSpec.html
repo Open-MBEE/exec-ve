@@ -61,9 +61,8 @@
     <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" autosave-key="{{element._projectId + element._refId + element.id}}"></textarea>
 
     <div>
-        <h2 class="prop-title">Type</h2>
-        <span class="prop">{{element.type}}</span>
         <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
+        <span class="prop">{{element.type}}</span>
         <div ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
         <h2 class="prop-title">Location</h2>
         <span class="prop">{{element._qualifiedName}}</span>
@@ -155,9 +154,8 @@
     </p>
     <div ng-show="showDocHTML">{{element.documentation}}</div>
 
-    <h2 class="prop-title">Type</h2>
-    <span class="prop">{{element.type}}</span>
     <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
+    <span class="prop">{{element.type}}</span>
     <div ng-repeat="type in element._appliedStereotypeIds" class="prop"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
     <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
     <span class="prop">{{element._qualifiedName}}</span>

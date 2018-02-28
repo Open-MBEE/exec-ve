@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4>Create new document</h4>
+    <h4>Create new {{itemType}}</h4>
 </div>
 
 <div class="modal-body comment-modal">
@@ -7,8 +7,10 @@
     <div class="comment-modal-input">
         <div class="form-group">
             <label>Name:</label>
-            <input class="form-control" ng-model="newDoc.name" type="text"
+            <input ng-if="itemType === 'Document'" class="form-control" ng-model="newDoc.name" type="text"
                    placeholder="Type a name for your document here" autofocus>
+            <input ng-if="itemType === 'Group'"class="form-control" ng-model="newGroup.name" type="text"
+                   placeholder="Type a name for your group here" autofocus>
         </div>
     </div>
 

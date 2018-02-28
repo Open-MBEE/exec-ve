@@ -108,10 +108,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 domElement[0].innerHTML = doc;
             }
             $(domElement[0]).find('img').each(function(index) {
-                var src = $(this).attr('src');
-                if (src && src.startsWith('/alfresco')) {
-                    $(this).attr('src', src + '?alf_ticket=' + AuthService.getTicket());
-                }
+                Utils.fixImgSrc($(this));
             });
             if (MathJax) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
@@ -123,9 +120,10 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
         };
 
-        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+        var idwatch = scope.$watch('mmsElementId', function(newVal) {
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             if (!scope.mmsWatchId) {
                 idwatch();
             }
@@ -147,6 +145,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = "Text";
                 }
                 recompile();
+                Utils.reopenUnsavedElts(scope, "documentation");
+
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&

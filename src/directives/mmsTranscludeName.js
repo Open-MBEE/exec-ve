@@ -95,8 +95,9 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             if (!scope.mmsWatchId) {
                 idwatch();
             }
@@ -111,6 +112,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             .then(function(data) {
                 scope.element = data;
                 recompile();
+                Utils.reopenUnsavedElts(scope, "name");
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }

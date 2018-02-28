@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('HttpService', ['$http', '$q', HttpService]);
+.factory('HttpService', ['$http', HttpService]);
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ angular.module('mms')
  * @description
  * Provides prioritization and caching for $http service calls
  */
-function HttpService($http, $q, _) {
+function HttpService($http) {
     
     var queue = {};
     queue[0]= [];//high proirity

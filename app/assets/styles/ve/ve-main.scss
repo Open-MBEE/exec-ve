@@ -81,6 +81,8 @@ div.tooltip-inner {
     2.6.1 Light input
     2.6.2 Minor dark input
   2.7 Animation
+  2.8 Special Icons
+    2.8.1 Section
 3. Table filtering
 4. Search
 5. Modal fixes
@@ -780,6 +782,26 @@ span.fixed-content-dropdown{
 // .ng-hide {
 //   opacity:0;
 // }
+
+/*------------------------------------------------------------------
+  2.8 Special Icons
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+    2.8.1 Section icon
+-------------------------------------------------------------------*/
+
+/*set pseudoclass and reset italic from <i>*/
+.section-icon::before{
+  content:"\00a7";
+  font-style: normal;
+  font-weight: bold;
+}
+
+/*display inline block to be same width in tree*/
+.section-icon{
+  display:inline-block;
+}
 
 /*------------------------------------------------------------------
 3. Table Filtering & Sorting

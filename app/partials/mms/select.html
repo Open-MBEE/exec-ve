@@ -1,6 +1,6 @@
 <div id="ve-origin-select" class="row">
     <div class="account-wall-lg" ng-if="redirect_from_old_site">
-        <h2>This link is no longer valid</h2>
+        <h2>This is not a valid link</h2>
         <div class="flex">
             <div class="two-thirds-flex">
                 <h4>Please navigate to your document by selecting the corresponding organization and project to continue.</h4>
@@ -38,13 +38,13 @@
         </div>
     </div>
     <div class="account-wall" ng-if="!redirect_from_old_site">
-        <div>
-            <a ng-click="logout()"><i class="fa fa-arrow-left fade-in back-to-account" aria-hidden="true"></i></a>
+        <div ng-class="{'fade-in': fromLogin}">
+            <a ng-click="logout()"><i class="fa fa-arrow-left back-to-account" aria-hidden="true"></i></a>
             <h2>{{ ve_title }}</h2>
         </div>
-        <div>
+        <div ng-class="{'animated-fade-in-slide': fromLogin}">
             <form name="loginForm" ng-submit="continue()">
-                <div class="btn-group ve-dark-dropdown-wide animated-fade-in-slide" uib-dropdown>
+                <div class="btn-group ve-dark-dropdown-wide" uib-dropdown>
                     <span class="label-dropdown">Org:</span>
                     <button type="button" class="dropdown-toggle" uib-dropdown-toggle>
                         <span>{{ selectedOrg }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
@@ -54,7 +54,7 @@
                         ng-class="{'checked-list-item': org.name === selectedOrg}">{{ org.name }}</li>
                     </ul>
                 </div>
-                <div class="btn-group ve-dark-dropdown-wide animated-fade-in-slide" uib-dropdown>
+                <div class="btn-group ve-dark-dropdown-wide" uib-dropdown>
                     <span class="label-dropdown">Project:</span>
                     <button type="button" class="dropdown-toggle" uib-dropdown-toggle ng-disabled="!selectedOrg || !projects.length">
                         <span ng-hide="projects.length || !selectedOrg">No Projects for selected Org</span>
@@ -67,7 +67,7 @@
                         </li>
                     </ul>
                 </div>
-                <button class="btn btn-block btn-primary animated-fade-in-slide" type="submit"  ng-disabled="!selectedProject || !selectedOrg">Continue
+                <button class="btn btn-block btn-primary" type="submit" ng-disabled="!selectedProject || !selectedOrg">Continue
                     <span ng-if="spin"><i class="fa fa-spin fa-spinner"></i></span>
                 </button>
             </form>

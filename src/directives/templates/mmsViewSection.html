@@ -1,7 +1,7 @@
 <div ng-if="section.specification">
     <div ng-show="! isEditing">
-        <h4 ng-hide="inPreviewMode">{{section.name}}</h4>
-        <div ng-show="inPreviewMode" class="panel panel-info"><h4>{{edit.name}}</h4></div>
+        <h1 class="section-title" ng-hide="inPreviewMode">{{section._veNumber}} {{section.name}}</h1>
+        <div ng-show="inPreviewMode"><h1 class="section-title">{{section._veNumber}} {{edit.name}}</h1></div>
     </div>
     <div ng-class="{'panel panel-default' : isEditing}">
         <div ng-class="{'no-display' : ! isEditing}" class="panel-heading clearfix no-print">

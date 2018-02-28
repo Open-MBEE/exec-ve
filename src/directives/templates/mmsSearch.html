@@ -4,7 +4,7 @@
         <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
             <div class="form-search input-group ve-search">
                 <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" autofocus/>
-                <span class="input-group-btn">                
+                <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
                     <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
                 </span>
@@ -58,7 +58,7 @@
                 <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
             </div>
             <div class="elem-type-wrapper">
-                <label>LAST MODIFIED</label>
+                <label>Last Modified</label>
                 <div>{{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
             </div>
             <div class="elem-qualified-name-wrapper">
@@ -67,7 +67,7 @@
                 </div>
             </div>
             <div class="elem-documentation-wrapper">
-                <label>DOCUMENTATION</label>
+                <label>Documentation</label>
                 <div class="elem-documentation">
                     <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
                     <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem, 'doc')">
@@ -76,17 +76,14 @@
                 </div>
             </div>
             <div class="elem-type-wrapper">
-                <label>TYPE</label>
+                <label>Metatypes</label>
                 <div class="elem-type">{{elem.type}}</div>
-            </div>
-            <div class="elem-type-wrapper">
-                <label>STEREOTYPES</label>
                 <div ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
                     <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
                 </div>
             </div>
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
-                <label>VALUE</label>
+                <label>Value</label>
                 <div class="elem-properties">
                     <a ng-click="userResultClick(elem, 'val')">
                             {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
@@ -94,7 +91,7 @@
                 </div>
             </div>
             <div ng-if="elem.type === 'Slot' && elem.value">
-                <label>VALUE</label>
+                <label>Value</label>
                 <div class="elem-properties">
                     <a ng-click="userResultClick(elem, 'val')">
                         <span ng-repeat="val in elem.value">
@@ -104,7 +101,7 @@
                 </div>
             </div>
             <div ng-if="elem.type === 'Constraint'">
-                <label>SPECIFICATION</label>
+                <label>Specification</label>
                 <div class="elem-specification">
                     <a ng-click="userResultClick(elem, 'val')">
                         {{elem.specification.value + '' || 'Constraint Specification'}}
@@ -117,7 +114,7 @@
                 </a>
             </div>
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
-                <label>PROPERTIES</label>
+                <label>Properties</label>
                 <table>
                     <tbody>
                         <tr ng-repeat="row in elem._properties2">
@@ -130,7 +127,7 @@
                 </table>
             </div>
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-documentation-wrapper">
-                <label>RELATED DOCUMENTS</label>
+                <label>Related Documents</label>
                 <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
                     <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="project.ref.document.view({documentId: relatedDocument.id, viewId: relatedView.id, projectId: relatedDocument._projectId, refId: relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
                         <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}"></mms-view-link> > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}"></mms-view-link><br/>
@@ -140,11 +137,11 @@
         </div>
         <hr/>
     </div>
-    
+
     <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
-        <h3>NO RESULTS FOUND.</h3>
+        <h3>No Results Found.</h3>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid" ng-show="searchResults.length === 0">
         <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
         <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
     </div>
