@@ -1187,23 +1187,6 @@ span.inline-btn-label{
 }
 
 
-.mms-error{
-  background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff3ee 10px,#fff3ee 20px);
-  color:#333;
-  border: none;
-  padding-left: 11px;
-}
-
-.mms-error::before{
-  content: "\f071";
-  font-family: fontAwesome;
-  margin-left: -14px;
-  color: #e36630;
-  font-size: 12px;
-  position: absolute;
-}
-
-
 
 
 
