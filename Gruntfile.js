@@ -60,10 +60,8 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/mms-ts',
-            host: servers[key],//'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
-            port: serverPort,
-            https: serverHttps,
-            changeOrigin: true
+            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
+            port: 8080
           },
           {
             context: '/alfresco',  // '/api'
