@@ -204,6 +204,18 @@ div.tooltip-inner {
   color:$ve-light-text-darker-1;
 }
 
+.btn-copy {
+  background-color: transparent;
+  color: $ve-light-text-darker-1;
+  margin: 0 5px 5px 10px;
+  float: right;
+}
+
+.btn-copy:hover {
+  color: $ve-silver-base;
+  background-color: $ve-teal-base;
+}
+
 /*------------------------------------------------------------------
   2.2 Modals
 -------------------------------------------------------------------*/

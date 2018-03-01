@@ -2,9 +2,9 @@
 
 /** Used for annotating an element that doesn't have any commit history at all or for an element that is deleted but has commit history **/
 angular.module('mms.directives')
-    .directive('mmsAnnotation', ['$templateCache', 'ViewService', mmsAnnotation]);
+    .directive('mmsAnnotation', ['$templateCache', '$rootScope', 'ViewService', mmsAnnotation]);
 
-function mmsAnnotation($templateCache, ViewService) {
+function mmsAnnotation($templateCache, $rootScope, ViewService) {
     var template = $templateCache.get('mms/templates/mmsAnnotation.html');
     return {
         restrict: 'A',
@@ -18,15 +18,32 @@ function mmsAnnotation($templateCache, ViewService) {
         link: mmsAnnotationLink
     };
 
-    function mmsAnnotationLink(scope, element, attrs) {}
+    function mmsAnnotationLink(scope, element, attrs) {
+        element.on('click', function() {
+            if(scope.mmsRecentElement) {
+                $rootScope.$broadcast('elementSelected', scope.mmsRecentElement, scope.mmsRecentElement._commitId);
+            }
+        });
+
+        scope.copyToClipboard = function($event) {
+            $event.stopPropagation();
+            var target = element.find('#toolTipContent');
+            var range = window.document.createRange();
+            range.selectNode(target[0]);
+            window.getSelection().addRange(range);
+            try {
+                window.document.execCommand('copy');
+            } catch(err) {}
+            window.getSelection().removeAllRanges();
+        };
+    }
 
     function mmsAnnotationCtrl($scope) {
         var displayContent;
         if ($scope.mmsRecentElement) {
             displayContent = _getContentIfElementFound($scope.mmsType, $scope.mmsRecentElement);
         } else {
-            displayContent = _getCOntentIfElementNotFound($scope.mmsType, $scope.mmsReqOb);
-
+            displayContent = _getContentIfElementNotFound($scope.mmsType, $scope.mmsReqOb);
         }
         $scope.displayContent = displayContent;
     }
@@ -40,11 +57,11 @@ function mmsAnnotation($templateCache, ViewService) {
         switch (type) {
             case AT.mmsTranscludeName:
                 inlineContent = element.name;
-                toolTipContent = classifierType + element.name + ' name not found';
+                toolTipContent = element.name + ' name not found';
                 break;
             case AT.mmsTranscludeDoc:
                 inlineContent = element.documentation;
-                toolTipContent = classifierType + element.name + ' documentation not found';
+                toolTipContent = element.name + ' documentation not found';
                 break;
             case AT.mmsTranscludeCom:
                 inlineContent = element.documentation;
@@ -59,8 +76,8 @@ function mmsAnnotation($templateCache, ViewService) {
                 toolTipContent = element.name + ' value not found';
                 break;
             case AT.mmsPresentationElement:
-                inlineContent = element.documentation;
-                toolTipContent = element.name + ' presentation element not found';
+                inlineContent = element.documentation || '<span>--no content--</span>';
+                toolTipContent = classifierType + element.name + ' presentation element not found';
                 break;
         }
 
@@ -70,7 +87,7 @@ function mmsAnnotation($templateCache, ViewService) {
         };
     }
 
-    function _getCOntentIfElementNotFound(type, reqOb) {
+    function _getContentIfElementNotFound(type, reqOb) {
         var AT = ViewService.AnnotationType;
         var inlineContent = '';
         var tooltipContent = reqOb.id;
@@ -105,14 +122,14 @@ function mmsAnnotation($templateCache, ViewService) {
         var value = '';
         if (element.type === 'Property' || element.type === 'Port' ||element.type === 'Slot') {
             if (element.defaultValue) {
-                value = element.defaultValue;
-            } else if(element.valueOf) {
-                value = element.value;
+                value = element.defaultValue.value;
+            } else if(element.value) {
+                value = element.value[0].value;
             }
 
         }
         if (element.type === 'Constraint' && element.specification) {
-            value = element.specification;
+            value = element.specification.value;
         }
         return value;
     }
