@@ -878,6 +878,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     }
                     CacheService.put(['group', groupObj.projectId, groupObj.refId, groupObj.id], groupObj, true);
                     deferred.resolve(groupObj);
+                } else {
+                    deferred.reject({status: 500, message: "Failed to create group"});
                 }
             }, function(reason) {
                 console.log('POST failed:', reason);
