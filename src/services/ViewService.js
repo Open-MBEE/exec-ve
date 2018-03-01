@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', ViewService]);
+.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms')
  * CRUD for views and products/documents/group
  *
  */
-function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService ) {
+function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var inProgress = {}; //only used for view elements over limit
 
     // The type of opaque element to the sysmlId of the classifierIds:
@@ -835,85 +835,32 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} parent currently selected project and Org.
      * @returns {Promise} The promise will be resolved with the new view.
      */
-    var createGroup = function(siteName, ownerOb) {
+    var createGroup = function(name, ownerOb, orgId) {
         var deferred = $q.defer();
 
-        var PACKAGE_ID =  UtilsService.createMmsId(), OWNER_ID = ownerOb.id, DEPENDENCY_ID = UtilsService.createMmsId(),
-            GENERALIZATION_ID = UtilsService.createMmsId(), SITE_CHAR_BLOCK_ID = UtilsService.createMmsId(),
-            DEPENDENCY_ASI_ID = DEPENDENCY_ID + "_asi", SITE_CHAR_BLOCK_ASI_ID = SITE_CHAR_BLOCK_ID + "_asi";
+        var PACKAGE_ID =  UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
 
         // Our Group package element
         var group = UtilsService.createPackageElement(
             {
                 "id" : PACKAGE_ID,
-                "name" : (siteName) ? siteName : "Untitled",
-                "ownerId" : OWNER_ID,
-                "supplierDependencyIds" : [ DEPENDENCY_ID ],
-                "_isSite": true
+                "name" : (name) ? name : "Untitled",
+                "ownerId" : ownerOb.id,
+                "_isSite": true,
+                "_appliedStereotypeIds": ["TBD"],
+                "appliedStereotypeInstanceId": PACKAGE_ASI_ID
             }
         );
-
-        // Our Site Characterization Block for this group
-        var siteCharBlk = UtilsService.createClassElement(
+        var groupAsi = UtilsService.createInstanceElement(
             {
-                "appliedStereotypeInstanceId" : SITE_CHAR_BLOCK_ASI_ID,
-                "clientDependencyIds" : [ DEPENDENCY_ID ],
-                "generalizationIds" : [ GENERALIZATION_ID ],
-                "id" : SITE_CHAR_BLOCK_ID,
-                "name" : siteName + " Site Characterization",
+                "classifierIds" : [ "TBD" ],
+                "id" : PACKAGE_ASI_ID,
                 "ownerId" : PACKAGE_ID,
-                "_appliedStereotypeIds" : [ "_11_5EAPbeta_be00301_1147424179914_458922_958" ],
-            }
-        );
-        // Our Site Characterization Block's Applied Stereotype Instance
-        var SiteCharBlkStereotypeApplied = UtilsService.createInstanceElement(
-            {
-                "classifierIds" : [ "_11_5EAPbeta_be00301_1147424179914_458922_958" ],
-                "id" : SITE_CHAR_BLOCK_ASI_ID,
-                "ownerId" : SITE_CHAR_BLOCK_ID,
                 "visibility" : null,
-                "stereotypedElementId" : SITE_CHAR_BLOCK_ID
+                "stereotypedElementId" : PACKAGE_ID
             }
         );
-        // Generalization from our Site Characterization Block to the General Site Characterization Block
-        var generalizationFromSiteCharBlkToGeneralSiteChar = UtilsService.createGeneralizationElement(
-            {
-                "generalId" : "_17_0_5_1_8660276_1415063844134_132446_18688",
-                "id" : GENERALIZATION_ID,
-                "ownerId" : SITE_CHAR_BLOCK_ID,
-                "specificId" : SITE_CHAR_BLOCK_ID,
-                "_sourceIds" : [ SITE_CHAR_BLOCK_ID ],
-                "_targetIds" : [ "_17_0_5_1_8660276_1415063844134_132446_18688" ],
-            }
-        );
-        // Dependency from Package to our Site Characterization Block
-        var dependencyFromPkgToSiteChar = UtilsService.createDependencyElement(
-            {
-                "_appliedStereotypeIds" : [ "_17_0_5_1_8660276_1407362513794_939259_26181" ],
-                "id" : DEPENDENCY_ID,
-                "mdExtensionsIds" : [ ],
-                "ownerId" : PACKAGE_ID,
-                "appliedStereotypeInstanceId" : DEPENDENCY_ASI_ID,
-                "_sourceIds" : [ SITE_CHAR_BLOCK_ID ],
-                "_targetIds" : [ PACKAGE_ID ],
-                "clientIds" : [ SITE_CHAR_BLOCK_ID ],
-                "supplierIds" : [ PACKAGE_ID ]
-            }
-        );
-        // Dependency's Applied Stereotype Instance
-        var dependencyFromPkgToSiteCharStereoType = UtilsService.createInstanceElement(
-            {
-                "id" : DEPENDENCY_ASI_ID,
-                "ownerId" : DEPENDENCY_ID,
-                "visibility" : null,
-                "classifierIds" : [ "_17_0_5_1_8660276_1407362513794_939259_26181" ],
-                "stereotypedElementId" : DEPENDENCY_ID
-            }
-        );
-
-        var toCreate = [group, siteCharBlk, SiteCharBlkStereotypeApplied,
-            generalizationFromSiteCharBlkToGeneralSiteChar, dependencyFromPkgToSiteChar,
-            dependencyFromPkgToSiteCharStereoType];
+        var toCreate = [group, groupAsi];
         var reqOb = {
             projectId: ownerOb._projectId,
             refId: ownerOb._refId,
@@ -921,12 +868,17 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         ElementService.createElements(reqOb)
             .then(function(data) {
-                var cacheKey = ['groups', ownerOb._projectId, ownerOb._refId],
-                    groupObj = { _id: group.id, _name: group.name, _parentId: (group.ownerId.includes("holding_bin_")) ?  null : group.ownerId };
-                if (CacheService.exists(cacheKey)) {
-                    CacheService.get(cacheKey).push(groupObj);
+                var cacheKey = ['groups', ownerOb._projectId, ownerOb._refId];
+                var groupObj = _.find(data, {id: PACKAGE_ID});
+                if (groupObj) {
+                    groupObj._parentId = ownerOb.id.indexOf('holding') != -1 ? null : ownerOb.id;
+                    groupObj._link = '/share/page/repository#filter=path|/Sites/' + orgId + '/documentLibrary/' + groupObj._projectId + '/' + groupObj.id;
+                    if (CacheService.exists(cacheKey)) {
+                        CacheService.get(cacheKey).push(groupObj);
+                    }
+                    CacheService.put(['group', groupObj.projectId, groupObj.refId, groupObj.id], groupObj, true);
+                    deferred.resolve(groupObj);
                 }
-                deferred.resolve(groupObj);
             }, function(reason) {
                 console.log('POST failed:', reason);
                 deferred.reject(reason);
