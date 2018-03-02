@@ -222,11 +222,9 @@
                 </a>
             </div>
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
-                <label>Properties</label><a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Hide' : switchText='Show'">{{switchText}}</a>
-                <table>
-                    <tbody>
-                        <tr ng-repeat="row in elem._properties2" ng-if="($first && !showSearchResultProps) || showSearchResultProps">
-                            <td ng-repeat="property in row" class="elem-properties-rows">
+                <label>Properties</label><a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Collapse' : switchText='Expand'" class="visibility-toggle" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
+                        <ul ng-repeat="row in elem._properties2" ng-if="($first && !showSearchResultProps) || showSearchResultProps">
+                            <li ng-repeat="property in row" class="elem-properties-rows">
                                 {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
                                 <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}
                                     <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value|limitTo:4">
@@ -238,10 +236,8 @@
                                     <!-- set variable for limit -->
                                     <span class="ellipses" ng-if="property.value.length > 4">...</span>
                                 </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                            </li>
+                </ul>
             </div>
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">
                 <label>Related Documents</label>

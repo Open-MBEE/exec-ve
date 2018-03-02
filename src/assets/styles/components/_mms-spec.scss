@@ -3,7 +3,7 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 32px;
-    margin:32px 0;
+    margin: 20px 0 4px;;
     height: inherit;
     width: 100%;
   }
@@ -15,23 +15,16 @@
   }
 
   span.prop {
-    font-size: 15px;
-    margin:4px 0 24px;
+    font-size: 16px;
+    margin: 4px 0 30px;
     min-width: 280px;
     word-wrap: break-word;
+    display: block;
   }
 
   h1.element-title {
     min-width: 280px;
     word-wrap: break-word;
-  }
-
-  .prop-title {
-    font-family: $font-family-sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    margin:28px 0 2px;
-    white-space: nowrap;
   }
 
   .doc-text {
@@ -66,5 +59,4 @@
       margin-bottom: 5px;
     }
   }
-
 }
