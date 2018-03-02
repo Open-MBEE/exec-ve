@@ -31,10 +31,12 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: "_17_0_5_1_407019f_1430628211976_255218_12002",
         ListT: "_17_0_5_1_407019f_1431903739087_549326_12013",
         TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
-        Figure: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
+        ImageT: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
-        SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
+        SectionT: "_18_0_2_407019f_1435683487667_494971_14412",
+        Figure: "_18_5_2_8bf0285_1506035630979_342273_15944",
+        FigureT: "_18_5_2_8bf0285_1506035630029_725905_15942"
     };
 
     function getClassifierIds() {
@@ -51,13 +53,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: 'SectionT',
         Comment: 'ParagraphT',
         List: 'ListT',
-        Image: 'Figure',
+        Image: 'ImageT',
         Equation: 'Equation'
     };
 
     var classifierIdsIds = getClassifierIds();
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
-        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table];
+        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table, TYPE_TO_CLASSIFIER_ID.Figure];
     
     var processString = function(values) {
         if (!values || values.length === 0 || values[0].type !== 'LiteralString')
@@ -1097,8 +1099,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var isFigure = function(instanceSpec) {
         return instanceSpec.classifierIds && 
                instanceSpec.classifierIds.length > 0 &&
-               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
-                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image);
+               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.ImageT ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image || 
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.FigureT);
     };
 
     var isEquation = function(instanceSpec) {
