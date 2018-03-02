@@ -1,3 +1,5 @@
+//not usable using stereotype <<Plot>> in mdk so commented out for now.
+/*
 (function() {
   'use strict';
   angular.module('mms.directives')
@@ -63,7 +65,8 @@
    * @TODO: Add data types support (spline, area-spline, area-line, etc.)
    * @TODO: Find way to avoid using onrendered callback for log scale
    */
-  function mmsLineGraph(TableService, $window, $q, $log) {
+   /*
+  function mmsLineGraph(TableService, $window, $q, $log, mmsViewCtrl) {
 
     var graphCount = 0;
     var DEFAULT = {
@@ -112,9 +115,7 @@
       }
       var res = label.match(/\((.+)\)/);
       if (res) {
-        /**
-         * @TODO: Add superscript support for SVG text (axes labels)
-         */
+        //@TODO: Add superscript support for SVG text (axes labels)
         var unit = res[1].replace(/\d/g, sup2('$&'));
         $log.log(label + " : " + unit);
         return ' ' + unit;
@@ -128,14 +129,12 @@
       xData, yData,                     // column data
       xColHeads, yColHeads;             // column headers
 
-    /**
-     * Generate C3 configurations for the table
-     */
-    function generateGraphSettings(scope) {
+  
+    //Generate C3 configurations for the table
+    function generateGraphSettings(scope, projectId, refId, commitId) {
       var deferred = $q.defer();
 
-      var ws = scope.mmsWs;
-      var version = scope.mmsVersion;
+    
       var promises = [];
       var eids = scope.eid.split(',').map(function (val) {
         return val.trim();
@@ -149,9 +148,10 @@
 
       // Initiate REST calls
       eids.forEach(function(eid) {
-        promises.push(TableService.readTableCols(eid, ws, version));
+        var reqOb = {elementId: eid, projectId: projectId, refId: refId, commitId: commitId};
+        promises.push(TableService.readTableCols(reqOb));
       });
-
+  
       // Collect column settings
       if (scope.xCols) {
         xCols = scope.xCols;
@@ -565,7 +565,7 @@
          * Generate a config object for a log gridline
          * @param {number} @pos Position/value of gridline
          */
-        function logGridLine(pos, className, text) {
+        /*function logGridLine(pos, className, text) {
           var posLog = logFn(pos);
           return {
             value: posLog,
@@ -583,7 +583,21 @@
       var d3 = $window.d3;
       var c3 = $window.c3;
 
-      generateGraphSettings(scope).then(function(_chart) {
+      var projectId;
+      var refId;
+      var commitId;
+          
+      if (mmsViewCtrl) {
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (!projectId)
+            projectId = viewVersion.projectId;
+        if (!refId)
+            refId = viewVersion.refId;
+        if (!commitId)
+            commitId = viewVersion.commitId;
+      }
+
+      generateGraphSettings(scope, projectId, refId, commitId).then(function(_chart) {
         // Handle logarithmic scales
         if (scope.logScale) {
           // Both axes use same log base
@@ -654,3 +668,4 @@
     };
   }
 })();
+*/
