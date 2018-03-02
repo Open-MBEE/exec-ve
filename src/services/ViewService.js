@@ -35,6 +35,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
         SectionT: "_18_0_2_407019f_1435683487667_494971_14412",
+        TSDiagram: "_18_5_2_8bf0285_1506035630029_725905_15942",
         Figure: "_18_5_2_8bf0285_1506035630979_342273_15944",
         FigureT: "_18_5_2_8bf0285_1506035630029_725905_15942"
     };
@@ -54,7 +55,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Comment: 'ParagraphT',
         List: 'ListT',
         Image: 'ImageT',
-        Equation: 'Equation'
+        Equation: 'Equation',
+        TSDiagram: 'TSDiagram'
     };
 
     var classifierIdsIds = getClassifierIds();
