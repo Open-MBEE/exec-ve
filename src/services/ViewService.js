@@ -831,9 +831,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * id cannot be specified (automatically generated)
      * if name isn't specified, "Untitled" will be used.
      *
-     * @param {object} siteName the value the user input on the form, new-doc-or-group.html
-     * @param {object} parent currently selected project and Org.
-     * @returns {Promise} The promise will be resolved with the new view.
+     * @param {object} name group name new-doc-or-group.html
+     * @param {object} ownerOb parent id, projectId and refId
+     * @param {string} orgId parent orgId
+     * @returns {Promise} The promise will be resolved with the new group object.
      */
     var createGroup = function(name, ownerOb, orgId) {
         var deferred = $q.defer();
