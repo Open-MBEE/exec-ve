@@ -111,7 +111,7 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-folder', selected: true, active: true, permission: true, tooltip: 'Add Group',
               spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-document":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Document',
+        return {id: button, icon: 'fa-file', selected: true, active: true, permission: true, tooltip: 'Add Document',
             spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 
 
