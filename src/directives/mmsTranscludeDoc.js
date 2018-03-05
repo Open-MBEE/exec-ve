@@ -161,11 +161,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     });
                 }
             }, function(reason) {
-                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
                 $compile(domElement.contents())(Object.assign(scope.$new(), {
                     reqOb: reqOb,
                     recentElement: reason.data.recentVersionOfElement,
-                    type: ViewService.AnnotationType.mmsTranscludeDoc
+                    type: ViewService.AnnotationType.mmsTranscludeDoc,
+                    cfLabel: scope.mmsCfLabel
                 }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
@@ -241,7 +242,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsWatchId: '@',
-            nonEditable: '<'
+            nonEditable: '<',
+            mmsCfLabel: '@'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeDocCtrl],

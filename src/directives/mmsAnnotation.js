@@ -12,7 +12,8 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
         scope: {
             mmsReqOb: '<',
             mmsRecentElement: '<',
-            mmsType: '<'
+            mmsType: '<',
+            mmsCfLabel: '<'
         },
         controller: ['$scope', mmsAnnotationCtrl],
         link: mmsAnnotationLink
@@ -43,7 +44,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
         if ($scope.mmsRecentElement) {
             displayContent = _getContentIfElementFound($scope.mmsType, $scope.mmsRecentElement);
         } else {
-            displayContent = _getContentIfElementNotFound($scope.mmsType, $scope.mmsReqOb);
+            displayContent = _getContentIfElementNotFound($scope.mmsType, $scope.mmsReqOb, $scope.mmsCfLabel);
         }
         $scope.displayContent = displayContent;
     }
@@ -87,22 +88,23 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
         };
     }
 
-    function _getContentIfElementNotFound(type, reqOb) {
+    function _getContentIfElementNotFound(type, reqOb, cfLabel) {
         var AT = ViewService.AnnotationType;
         var inlineContent = '';
         var tooltipContent = reqOb.id;
+        var label = cfLabel ? cfLabel : '';
         switch (type) {
             case AT.mmsTranscludeName:
-                inlineContent = 'cf name does not exist';
+                inlineContent = 'cf name (' + label + ') does not exist';
                 break;
             case AT.mmsTranscludeDoc:
-                inlineContent = 'cf documentation does not exist';
+                inlineContent = 'cf documentation (' + label + ') does not exist';
                 break;
             case AT.mmsTranscludeCom:
-                inlineContent = 'cf com does not exist';
+                inlineContent = 'cf com (' + label + ') does not exist';
                 break;
             case AT.mmsTranscludeVal:
-                inlineContent = 'cf value does not exist';
+                inlineContent = 'cf value (' + label + ') does not exist';
                 break;
             case AT.mmsViewLink:
                 inlineContent = 'view link does not exist';

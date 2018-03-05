@@ -121,11 +121,12 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                     });
                 }
             }, function(reason) {
-                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
                 $compile(domElement.contents())(Object.assign(scope.$new(), {
                     reqOb: reqOb,
                     recentElement: reason.data.recentVersionOfElement,
-                    type: ViewService.AnnotationType.mmsTranscludeCom
+                    type: ViewService.AnnotationType.mmsTranscludeCom,
+                    cfLabel: scope.mmsCfLabel
                 }));
             });
         });
@@ -187,7 +188,8 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            nonEditable: '<'
+            nonEditable: '<',
+            mmsCfLabel: '@'
         },
         require: ['?^mmsView', '?^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeComCtrl],
