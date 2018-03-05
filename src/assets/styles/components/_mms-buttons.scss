@@ -16,15 +16,15 @@
 }
 
 .btn-secondary {
-  @include button-variant($brand_base, $white, transparent);
+  @include button-variant($brand_base, $white, $white);
 }
 
 // Toolbar button style
-.btn-toolbar {
-  @include button-variant($base_grey, $white, transparent);
-  line-height: 20px;
-  padding: 2px 1px 3px 6px;
-  margin: 0 4px;
+.btn-tools {
+  @include button-variant($base_grey, $white, $white);
+  &:not(.dropdown-toggle) .fa {
+    padding-right: 0;
+  }
 }
 
 /*Pull center button dropdowns to the right*/

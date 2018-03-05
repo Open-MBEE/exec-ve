@@ -728,7 +728,7 @@ span.fixed-content-dropdown{
   background-color: white;
   padding: 2px 6px;
   border: 1px solid $ve-silver-darker-1;
-  border-radius: 3px;
+  @include border-radius(3px);
   margin: 2px 10px;
   width: calc(100% - 20px);
   font-weight: normal;
@@ -741,7 +741,7 @@ span.fixed-content-dropdown{
 .ve-dark-minor-search input{
   width: 100%;
   border: 1px solid $ve-slate-darker-2;
-  border-radius: 3px;
+  @include border-radius(3px);
   background-color: $ve-slate-darker-2;
   padding: 3px 5px;
   letter-spacing: .05em;
