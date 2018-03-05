@@ -223,20 +223,21 @@
             </div>
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
                 <label>Properties</label><a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Collapse' : switchText='Expand'" class="visibility-toggle" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
-                        <ul ng-repeat="row in elem._properties2" ng-if="($first && !showSearchResultProps) || showSearchResultProps">
-                            <li ng-repeat="property in row" class="elem-properties-rows">
-                                {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
-                                <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}
-                                    <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value|limitTo:4">
-                                        <span ng-bind-html="val.value | limitTo:300"></span>
-                                        <span ng-bind-html="val.body[0] | limitTo:300"></span>
-                                        <span ng-if="!val.value && !val.body[0]">Default Value</span>
-                                        <!-- {{$last ? '' : ', '}} -->
-                                    </span>
-                                    <!-- set variable for limit -->
-                                    <span class="ellipses" ng-if="property.value.length > 4">...</span>
-                                </a>
-                            </li>
+                <!-- <ul ng-repeat="row in elem._properties2" ng-if="($first && !showSearchResultProps) || showSearchResultProps"> -->
+                <ul>
+                <!-- <li ng-repeat="property in row" class="elem-properties-rows"> -->
+                    <li ng-repeat="property in elem._properties" ng-if="($first && !showSearchResultProps) || showSearchResultProps">
+                    {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
+                        <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}
+                            <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value|limitTo:4">
+                                <span ng-bind-html="val.value | limitTo:300"></span>
+                                <span ng-bind-html="val.body[0] | limitTo:300"></span>
+                                <span ng-if="!val.value && !val.body[0]">Default Value</span>
+                            </span>
+                            <!-- set variable for limit -->
+                            <span class="ellipses" ng-if="property.value.length > 4">...</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">

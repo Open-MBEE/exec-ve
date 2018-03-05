@@ -119,10 +119,6 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 if (elem._properties) {
                     return;
                 }
-                // Create a flag for getting properties - only want them when global and general cf
-                
-                //Design - have ellen come up with design for list of properties in columns
-
                 // mms does not return properties will need to make a call for the results whose type is Class
                 // Call ElementService.getOwnedElements with depth of 2
                 // filter out results that have type = to Property and Slot
@@ -142,16 +138,16 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                             });
                             elem._properties = properties;
                             // OLD CODE - splits into 3cols
-                            if (elem._properties && elem._properties[0]) {
-                                var properties2 = [];
-                                for (var i = 0; i < elem._properties.length; i++) {
-                                    if (i % 3 === 0) {
-                                        properties2.push([]);
-                                    }
-                                    properties2[properties2.length - 1].push(elem._properties[i]);
-                                }
-                                elem._properties2 = properties2;
-                            }
+                            // if (elem._properties && elem._properties[0]) {
+                            //     var properties2 = [];
+                            //     for (var i = 0; i < elem._properties.length; i++) {
+                            //         if (i % 3 === 0) {
+                            //             properties2.push([]);
+                            //         }
+                            //         properties2[properties2.length - 1].push(elem._properties[i]);
+                            //     }
+                            //     elem._properties2 = properties2;
+                            // }
                         });
                 }
             });
@@ -202,7 +198,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSearch#addAdvanceSearchRow
+         * @name mms.directives.directive:mmsSearch#removeRowAdvanceSearch
          * @methodOf mms.directives.directive:mmsSearch
          *
          * @description
@@ -265,7 +261,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
          * @methodOf mms.directives.directive:mmsSearch
          *
          * @description
-         * Call ElementService to make search post and get search results. Check for filerCallback
+         * Call ElementService to make search post and get search results. Check for filterCallback
          * to further filter search results. Reassign pagination variables.
          *
          * @param {object} query search type and keyword from user input
@@ -472,6 +468,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
             // Set project and mounted projects filter
             var projectTermsOb = getProjectMountsQuery();
             var filterList = [projectTermsOb];
+
             // Set custom filter options for query
             if (scope.mmsOptions.filterQueryList) {
                 angular.forEach(scope.mmsOptions.filterQueryList, function(filterOb){
@@ -515,18 +512,6 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                     }
                 }
                 mainBoolQuery = clause1;
-                // jsonQueryOb = {
-                //     "sort" : [
-                //         "_score",
-                //         { "_modified" : {"order" : "desc"}}
-                //     ],
-                //     "query": {
-                //         "bool": {
-                //             "must": mainBoolQuery,
-                //             "filter": filterList
-                //         }
-                //     }
-                // };
             }
 
             jsonQueryOb = {
