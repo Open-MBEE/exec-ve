@@ -31,7 +31,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: "_17_0_5_1_407019f_1430628211976_255218_12002",
         ListT: "_17_0_5_1_407019f_1431903739087_549326_12013",
         TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
-        ImageT: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
+        ImageT: "_17_0_5_1_407019f_1431903748021_2367_12034", //manual images + timely, etc
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
         SectionT: "_18_0_2_407019f_1435683487667_494971_14412",
@@ -62,7 +62,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var classifierIdsIds = getClassifierIds();
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
         TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table, TYPE_TO_CLASSIFIER_ID.Figure];
-    
+
     var processString = function(values) {
         if (!values || values.length === 0 || values[0].type !== 'LiteralString')
             return '';
@@ -357,7 +357,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: reqOb.projectId,
             refId: reqOb.refId,
             elementId: reqOb.parentViewId
-        }, 2).then(function(data) {  
+        }, 2).then(function(data) {
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
@@ -401,7 +401,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: reqOb.projectId,
             refId: reqOb.refId,
             elementId: reqOb.parentViewId
-        }, 2).then(function(data) {  
+        }, 2).then(function(data) {
             if (data._childViews) {
                 var clone = {
                     _projectId: data._projectId,
@@ -455,7 +455,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             refId: reqOb._refId,
             elementId: reqOb.id
         }, 2)
-        .then(function(data) {  
+        .then(function(data) {
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
@@ -520,7 +520,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (instanceVal) {
             ElementService.getElement(reqOb, 2)
-            .then(function(data) {  
+            .then(function(data) {
                 var clone = {
                     _projectId: data._projectId,
                     _refId: data._refId,
@@ -551,7 +551,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     for (var i = 0; i < operands.length; i++) {
                         if (instanceVal.instanceId === operands[i].instanceId) {
                             clone[key].operand.splice(i,1);
-                            break; 
+                            break;
                         }
                     }
                 }
@@ -607,9 +607,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         });
         */
         var instanceSpecSpec = {
-            'type': jsonType, 
-            'sourceType': 'reference', 
-            'source': newInstanceId, 
+            'type': jsonType,
+            'sourceType': 'reference',
+            'source': newInstanceId,
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
@@ -796,11 +796,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @description
      * Create a new document,
      * if name isn't specified, "Untitled" will be used, a default contents with 
-     * paragraph of the view documentation will be used. 
+     * paragraph of the view documentation will be used.
      * 
      * @param {object} ownerOb see createView
      * @param {object} docOb see createView
-     * @returns {Promise} The promise will be resolved with the new view. 
+     * @returns {Promise} The promise will be resolved with the new view.
      */
     var createDocument = function(ownerOb, docOb) {
         var deferred = $q.defer();
@@ -962,7 +962,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             deferred.resolve(CacheService.get(cacheKey));
         } else {
             ElementService.getGenericElements(url, reqOb, 'documents', weight, update).
-            then(function(data) {              
+            then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
                 deferred.reject(reason);
@@ -1085,7 +1085,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {boolean} whether it's a section
      */
     var isSection = function(instanceSpec) {
-        return instanceSpec.classifierIds && 
+        return instanceSpec.classifierIds &&
                instanceSpec.classifierIds.length > 0 &&
                (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Section ||
                 instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
