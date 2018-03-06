@@ -25,9 +25,6 @@ angular.module('mms.directives')
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  */
 function mmsCf($compile) {
-
-    var templateElementHtml;
-
     var mmsCfCtrl = function($scope) {
         //INFO this was this.getWsAndVersion
         this.getElementOrigin = function() {
@@ -75,7 +72,7 @@ function mmsCf($compile) {
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
-            scope.templateElementHtml = templateElementHtml;
+            scope.templateElementHtml = domElement[0].innerHTML;
             if (scope.mmsCfType) {
                 domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable" mms-cf-label="{{templateElementHtml}}"></mms-transclude-'+scope.mmsCfType+'>';
                 $compile(domElement.contents())(scope);
@@ -95,15 +92,10 @@ function mmsCf($compile) {
             mmsCommitId: '@',
             mmsCfType: '@',
             mmsWatchId: '@',
-            nonEditable: '<',
+            nonEditable: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
         controller: ['$scope', mmsCfCtrl],
-        compile: function(tElem, tAttrs){
-            templateElementHtml = tElem[0].innerHTML;
-            return {
-                post: mmsCfLink
-            };
-        }
+        link: mmsCfLink
     };
 }
