@@ -83,7 +83,7 @@ mms-view.editing mms-transclude-com {
   margin-bottom: 5px;
 }
 
-mms-view:not(.editing) .placeholder {
+mms-view:not(.editing):not(.outline) .placeholder {
   display: none;
 }
 
