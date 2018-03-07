@@ -151,22 +151,25 @@
         </p>
         <div ng-show="showDocHTML">{{element.documentation}}</div>
 
-        <h2 class="prop-title">Metatypes</h2>
-        <span class="elem-type-wrapper prop">
-            <span class="elem-type">{{element.type}}</span>
-            <div ng-repeat="type in element._appliedStereotypeIds" class="elem-type"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
-        </span>
-        <h2 class="prop-title">Location <i class="fa fa-folder"></i></h2>
-        <span class="prop">{{element._qualifiedName}}</span>
-        <h2 class="prop-title">ID</h2>
-        <span class="prop id">{{element.id}}</span>
-        <h2 class="prop-title">Branch/Tag</h2>
-        <span class="prop">{{element._refId}}</span>
-        <h2 class="prop-title">Project</h2>
-        <span class="prop">{{element._projectId}}</span>
-        <h2 class="prop-title">Formatted Modified Time</h2>
-        <span class="prop">{{element._modified}}</span>
-        <h2 class="prop-title">Commit</h2>
-        <span class="prop">{{element._commitId}}</span>
+        <!-- <a ng-click="toggleAdvancedProperties = !toggleAdvancedProperties" class="visibility-toggle" ng-class="{active: toggleAdvancedProperties}" ng-init="toggleAdvancedProperties=false">Advanced</a>
+        <div ng-show="toggleAdvancedProperties"> -->
+            <h2 class="prop-title">Metatypes</h2>
+            <span class="elem-type-wrapper prop">
+                <span class="elem-type">{{element.type}}</span>
+                <div ng-repeat="type in element._appliedStereotypeIds" class="elem-type"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
+            </span>
+            <h2 class="prop-title">Location</h2>
+            <span class="prop">{{element._qualifiedName}}</span>
+            <h2 class="prop-title">ID</h2>
+            <span class="prop id">{{element.id}}</span>
+            <h2 class="prop-title">Branch/Tag</h2>
+            <span class="prop">{{element._refId}}</span>
+            <h2 class="prop-title">Project</h2>
+            <span class="prop">{{element._projectId}}</span>
+            <h2 class="prop-title">Formatted Modified Time</h2>
+            <span class="prop">{{element._modified}}</span>
+            <h2 class="prop-title">Commit</h2>
+            <span class="prop">{{element._commitId}}</span>
+        <!-- </div> -->
     </div>
 </div>

@@ -56,7 +56,7 @@
     ]);
     </pre>
  */
-angular.module('mms', ['angularjs-dropdown-multiselect'])
+angular.module('mms', [])
 .config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
 }])
