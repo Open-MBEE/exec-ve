@@ -62,8 +62,8 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         }, function(fail){
             deferred.reject(fail);
             removeTicket();
-        });  
-        return deferred.promise;  
+        });
+        return deferred.promise;
     };
 
     var logout = function() {
@@ -71,11 +71,7 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         checkLogin().then(function() {
             var logouturl = URLService.getLogoutURL();
             removeTicket();
-            $http.delete(logouturl).then(function(success) {
-                deferred.resolve(true);
-            }, function(failure) {
-                URLService.handleHttpStatus(failure.data, failure.status, failure.headers, failure.config, deferred);
-            });
+            //$cookies.remove('com.tomsawyer.web.license.user');
         }, function() {
             removeTicket();
             deferred.resolve(true);
@@ -84,11 +80,11 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
     };
 
     return {
-        getAuthorized: getAuthorized,    
+        getAuthorized: getAuthorized,
         getTicket: getTicket,
         removeTicket: removeTicket,
         checkLogin: checkLogin,
-        logout: logout 
+        logout: logout
     };
 
 }
