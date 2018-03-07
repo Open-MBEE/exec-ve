@@ -72,9 +72,9 @@ describe('Directive: mmsViewTable', function() {
     var $timeout;
     var self;
 
+    beforeEach(module('mms'));
+    beforeEach(module('mms.directives'));
     beforeEach(function() {
-        module('mms.directives');
-        module('mms');
         inject(function ($injector) {
             $rootScope = $injector.get('$rootScope');
             $compile = $injector.get('$compile');

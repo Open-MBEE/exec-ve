@@ -1,8 +1,7 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate'])
-.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider) {
-
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies'])
+.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'URLServiceProvider', function($stateProvider, $urlRouterProvider, $httpProvider, URLServiceProvider) {
 
     $urlRouterProvider.rule(function ($injector, $location) {
         var locationPath = $location.url();
@@ -14,8 +13,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             locationPath = locationPath.substring(0, locationPath.length-1);
         if (locationPath !== $location.url())
             $location.url(locationPath);
-     });
+    });
 
+    var mmsHost = window.location.protocol + '//' + window.location.host;
+    URLServiceProvider.setMmsUrl(mmsHost);
+    //URLServiceProvider.setMmsUrl('https://opencae-uat.jpl.nasa.gov');
+
+    $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
     $urlRouterProvider.otherwise(function($injector, $location) {
         var $rootScope = $injector.get('$rootScope');
@@ -60,7 +64,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 var toParams = $rootScope.ve_redirect.toParams;
                                 $state.go(toState, toParams);
                             } else {
-                                $state.go('login.select');
+                                $state.go('login.select', {fromLogin: true});
                             }
                         }, function (reason) {
                             $scope.spin = false;
@@ -74,20 +78,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('login.redirect', {
         url: '/redirect',
         resolve: {
-            ticket: function($window, URLService, AuthService, $q, ApplicationService) {
+            ticket: ['$window', 'URLService', 'AuthService', '$q', '$cookies', 'ApplicationService', function($window, URLService, AuthService, $q, $cookies, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
+                    $cookies.put('com.tomsawyer.web.license.user', data, {path: '/'});
                 }, function(rejection) {
                     deferred.reject(rejection);
                 });
                 return deferred.promise;
-            },
-            projectObs: function(ProjectService) {
-                return ProjectService.getProjects();
-            }
+            }]
         },
         views: {
             'login@': {
@@ -97,7 +99,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('login.select', {
-        url: '/select',
+        url: '/select?fromLogin',
         resolve: {
             ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
@@ -117,8 +119,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: ['$scope', '$rootScope', '$state', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
+                controller: ['$scope', '$rootScope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, $stateParams, orgObs, ProjectService, AuthService, growl, $localStorage) {
                     $rootScope.ve_title = 'View Editor'; //what to name this?
+                    $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
                     $scope.spin = false;
                     $scope.orgs = orgObs;
@@ -186,12 +189,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project', { //TODO this will be the ui to diff and merge and manage refs
         url: '/projects/:projectId',
         resolve: {
-            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
+            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', '$cookies', function($window, URLService, AuthService, $q, ApplicationService, $cookies) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
+                    $cookies.put('com.tomsawyer.web.license.user', data, {path: '/'});
                 }, function(rejection) {
                     deferred.reject(rejection);
                 });
@@ -650,4 +654,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         };
     }]);
+
+    $httpProvider.useApplyAsync(true);
 }]);

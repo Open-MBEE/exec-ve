@@ -13,8 +13,8 @@ describe('Service: ElementService', function() {
 	var result = {};
 	var elementHistory;
 
-	beforeEach(module('mms'));
 	beforeEach(function() {
+		module('mmsApp');
 		inject(function($injector) {
 			$httpBackend 			= $injector.get('$httpBackend');
 			mockURLService			= $injector.get('URLService');
@@ -24,6 +24,13 @@ describe('Service: ElementService', function() {
 			mockApplicationService	= $injector.get('ApplicationService');
 			ElementServiceObj		= $injector.get('ElementService');
 		});
+
+        $httpBackend.whenGET(function(url) {
+        	return url.indexOf('/alfresco/service/mms/login/ticket/') !== -1;
+		} ).respond(200, {username: 'fakeUser'});
+        $httpBackend.whenGET(function(url) {
+            return url.indexOf('/alfresco/service/orgs?alf_ticket') !== -1;
+        } ).respond(200, {orgs: ['org1']});
 
 		projects = {
 			projects: [
@@ -62,7 +69,7 @@ describe('Service: ElementService', function() {
 					uri 		: "file:/Users/admin/Downloads/thelonelymountain.mdzip"
 				}
 			]
-		}
+		};
 
 		$httpBackend.when('GET', '/alfresco/service/projects').respond(200, projects);
 
@@ -70,7 +77,7 @@ describe('Service: ElementService', function() {
 			_elasticId: "refelastic3",
 			id: "thirdref",
 			name: "thirdref"
-		}]
+		}];
 
 		refs = {
 			refs: [
@@ -85,7 +92,7 @@ describe('Service: ElementService', function() {
 					name: "secondref"
 				}
 			]
-		}
+		};
 
 		$httpBackend.when('GET', '/alfresco/service/projects/projectId/refs').respond(200, refs);
 
@@ -169,7 +176,7 @@ describe('Service: ElementService', function() {
 					_projectId: "heyaproject"
 				}
 			]
-		}
+		};
 
 		$httpBackend.when('GET', '/alfresco/service/projects/projectId/refs/master/elements').respond(200, elements);
 
@@ -248,7 +255,7 @@ describe('Service: ElementService', function() {
 			collaborationUseIds 		: [],
 			isFinalSpecialization 		: false,
 			_projectId 					: "heyaproject"
-		}
+		};
 
 		// //GETELEMENTHISTORY:
 		// elementHistory = {
@@ -274,6 +281,166 @@ describe('Service: ElementService', function() {
 		// $httpBackend.when('GET', 'alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, elementHistory);
 	});
 
+	describe('updateElements', function() {
+        it('should respond with the appropriately formatted response when updating elements that do not have the' +
+			' required fields (id, _refId, _projectId)', function() {
+            var elementObs = [
+                {
+                    _projectId: "heyaproject",
+                    _refId: 'master'
+                },
+                {
+                    id: 2,
+                    _projectId: "heyaproject"
+                }
+            ];
+            ElementServiceObj.updateElements(elementObs).then(function() {
+                fail("Promise should not be resolved because elementObs do not have id, _projectId, _refId");
+            }, function(response) {
+                // Assert to make sure that the response is formatted correctly, because users of this method expect this
+                var failedRequests = response.failedRequests[0];
+                expect(response.successfulRequests.length).toEqual(0);
+                expect(response.failedRequests.length).toEqual(1);
+                expect(failedRequests.message).toEqual('Some of the elements do not have id, _projectId, _refId');
+                expect(failedRequests.status).toEqual(400);
+                expect(failedRequests.data).toEqual(elementObs);
+            });
+            $httpBackend.flush();
+        });
+
+        it('should respond with the appropriately formatted response when updating elements that have all the' +
+			' required fields', function() {
+            var elementObs = [
+                {
+                    id: 1,
+                    _projectId: "heyaproject",
+                    _refId: 'master',
+                    _commitId: 'latest',
+                    name: '1'
+                },
+                {
+                    id: 2,
+                    _projectId: "heyaproject",
+                    _refId: 'master',
+                    _commitId: 'latest',
+                    name: '2'
+                }
+            ];
+
+            var mockedData = {
+                elements: elementObs
+            };
+
+            // Ensure that the success handler is triggered correctly
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(200, mockedData);
+            ElementServiceObj.updateElements(elementObs).then(function(responses) {
+                expect(responses.length).toEqual(2);
+            }, function() {
+                fail("Promise should be resolved successfully");
+            });
+
+            // Ensure that the error handler is triggered correctly
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(500, mockedData);
+            ElementServiceObj.updateElements(elementObs).then(function() {
+                fail("Promise should not be resolved successfully");
+            }, function(response) {
+                expect(response.failedRequests[0].status).toEqual(500);
+                expect(response.failedRequests[0].data).toEqual(elementObs);
+            });
+            $httpBackend.flush();
+        });
+
+        it('should respond with the appropriately formatted response when updating elements where some of them share' +
+			' the same _refId and _projectId and some do not', function() {
+            var element1 = {
+                id: 1,
+                _projectId: "heyaproject",
+                _refId: 'ref1',
+                _commitId: 'latest',
+                name: '1'
+            };
+            var element2 = {
+                id: 2,
+                _projectId: "heyaproject",
+                _refId: 'ref2',
+                _commitId: 'latest',
+                name: '2'
+            };
+            var element3 = {
+                id: 3,
+                _projectId: "heyaproject",
+                _refId: 'ref2',
+                _commitId: 'latest',
+                name: '3'
+            };
+            var elementObs = [ element1, element2, element3 ];
+
+            var mockedData1 = {
+                elements: [element1]
+            };
+
+            var mockedData2 = {
+                elements: [element2, element3]
+            };
+
+            // There should be two different post requests because element2 and element3 have same _refId and _projectId
+            // while element1 has different _refId from the other two
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref1/elements').respond(200, mockedData1);
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref2/elements').respond(200, mockedData2);
+
+            // updateElements however will wait for both requests and consolidate the result
+            ElementServiceObj.updateElements(elementObs).then(function(responses) {
+                expect(responses.length).toEqual(3);
+                expect(responses).toEqual(elementObs);
+            }, function() {
+                fail("Promise should be resolved successfully");
+            });
+            $httpBackend.flush();
+        });
+
+        it('should respond with the appropriately formatted response when updating elements where some of them share' +
+			' the same _refId and _projectId and some do not and when one of the requests fails', function() {
+            var element1 = {
+                id: 1,
+                _projectId: "heyaproject",
+                _refId: 'ref1',
+                _commitId: 'latest',
+                name: '1'
+            };
+            var element2 = {
+                id: 2,
+                _projectId: "heyaproject",
+                _refId: 'ref2',
+                _commitId: 'latest',
+                name: '2'
+            };
+            var element3 = {
+                id: 3,
+                _projectId: "heyaproject",
+                _refId: 'ref2',
+                _commitId: 'latest',
+                name: '3'
+            };
+
+            // There should be two different post requests because element2 and element3 have the same _refId and _projectId
+            // while element1 has different _refId from the other two. Fail one of the requests
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref1/elements').respond(500, { elements: [element1]});
+            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/ref2/elements').respond(200, { elements: [element2, element3]});
+
+            // updateElements however will wait for both requests and consolidate the result
+            ElementServiceObj.updateElements([ element1, element2, element3 ]).then(function(responses) {
+                fail("Promise should be resolved successfully because 1 of the requests failed with status code 500");
+            }, function(response) {
+                // one failed request
+                expect(response.failedRequests.length).toEqual(1);
+                expect(response.failedRequests[0].data).toEqual([element1]);
+                // one successful requests with two element in it
+                expect(response.successfulRequests.length).toEqual(2);
+                expect(response.successfulRequests).toEqual([element2, element3]);
+            });
+            $httpBackend.flush();
+        });
+    });
 
 	afterEach(function () {
 		$httpBackend.verifyNoOutstandingExpectation();
@@ -504,12 +671,6 @@ describe('Service: ElementService', function() {
 		});
 	});
 
-	xdescribe('updateElements', function() {
-		it('should get an element', function() {
-
-		});
-	});
-
 	describe('createElement', function() {
 		it('should get new element and add to cache', function() {
 			var elemOb = {};
@@ -670,4 +831,4 @@ describe('Service: ElementService', function() {
 
 	describe('reset: do not need to test', function() {
 	});
-})
+});

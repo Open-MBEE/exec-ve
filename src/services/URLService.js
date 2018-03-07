@@ -3,13 +3,15 @@
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
     var baseUrl = '/alfresco/service';
-
+    var mmsUrl = '';
     this.setBaseUrl = function(base) {
         baseUrl = base;
     };
-
+    this.setMmsUrl = function(mms) {
+        mmsUrl = mms;
+    };
     this.$get = [function URLServiceFactory() {
-        return urlService(baseUrl);
+        return urlService(baseUrl, mmsUrl);
     }];
 });
 
@@ -35,8 +37,9 @@ angular.module('mms')
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
-function urlService(baseUrl) {
+function urlService(baseUrl, mmsUrl) {
     var root = baseUrl;
+    var mmsServer = mmsUrl;
     var jobsRoot = 'https://cae-pma-int:8443/';
     var ticket;
     /**
@@ -134,9 +137,9 @@ function urlService(baseUrl) {
 
     var getRefHistoryURL = function(projectId, refId, timestamp) {
         if (timestamp !== '' && isTimestamp(timestamp)) {
-            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history') + '&maxTimestamp=' + timestamp;
+            return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/commits') + '&maxTimestamp=' + timestamp + '&limit=1';
         }
-        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/history');
+        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/commits');
     };
 
     var getGroupsURL = function(projectId, refId) {
@@ -258,7 +261,7 @@ function urlService(baseUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history');
+        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits');
     };
 
     /**
@@ -517,6 +520,10 @@ function urlService(baseUrl) {
         return root + '/connection/jms';
     };
 
+    var getMmsServer = function() {
+        return mmsServer;
+    };
+
     return {
         getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
@@ -553,7 +560,8 @@ function urlService(baseUrl) {
         isTimestamp: isTimestamp,
         getRoot: getRoot,
         setTicket: setTicket,
-        getJMSHostname: getJMSHostname
+        getJMSHostname: getJMSHostname,
+        getMmsServer: getMmsServer
     };
 
 }

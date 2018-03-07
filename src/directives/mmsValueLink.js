@@ -23,10 +23,21 @@ angular.module('mms.directives')
  */
 function mmsValueLink(ElementService, $compile, growl) {
 
-    var mmsValueLinkLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsValueLinkLink = function(scope, element, attrs, controllers) {
+        var mmsCfCtrl = controllers[0];
+        var mmsViewCtrl = controllers[1];
         var projectId = scope.mmsProjectId;
         var refId = scope.mmsRefId;
         var commitId = scope.mmsCommitId;
+        if (mmsCfCtrl) {
+            var cfVersion = mmsCfCtrl.getElementOrigin();
+            if (!projectId)
+                projectId = cfVersion.projectId;
+            if (!refId)
+                refId = cfVersion.refId;
+            if (!commitId)
+                commitId = cfVersion.commitId;
+        }
         if (mmsViewCtrl) {
             var viewVersion = mmsViewCtrl.getElementOrigin();
             if (!projectId)
@@ -35,6 +46,9 @@ function mmsValueLink(ElementService, $compile, growl) {
                 refId = viewVersion.refId;
             if (!commitId)
                 commitId = viewVersion.commitId;
+        }
+        if (!projectId) {
+            return;
         }
         scope.projectId = projectId;
         scope.refId = refId ? refId : 'master';
@@ -77,7 +91,7 @@ function mmsValueLink(ElementService, $compile, growl) {
             mmsErrorText: '@',
             mmsLinkText: '@',
         },
-        require: '?^mmsView',
+        require: ['?^^mmsCf', '?^^mmsView'],
         template: '<a ng-href="{{url}}">{{mmsLinkText}}</a>',
         link: mmsValueLinkLink
     };

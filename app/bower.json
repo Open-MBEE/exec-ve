@@ -26,6 +26,7 @@
   "dependencies": {
     "jquery": "~2.1.4",
     "angular": "~1.5.5",
+    "angular-cookies": "~1.5.0",
     "angular-animate": "~1.5.5",
     "angular-borderlayout": "https://github.com/dlamoris/angular-borderlayout.git#master",
     "angular-ui-router": "~0.3.1",
@@ -41,7 +42,8 @@
     "angulartics": "~1.1.0",
     "angulartics-piwik": "~1.0.4",
     "angular-diff-match-patch": "~0.4.0",
-    "ngStorage": "https://github.com/gsklee/ngStorage.git#master"
+    "ngStorage": "https://github.com/gsklee/ngStorage.git#master",
+    "angular-promise-extras": "^0.1.8"
   },
   "resolutions": {
     "lodash": "3.9.3",

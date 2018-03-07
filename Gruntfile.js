@@ -4,7 +4,8 @@ module.exports = function(grunt) {
   require('jit-grunt')(grunt, {
     // static mapping for tasks that don't match their modules' name
     useminPrepare: 'grunt-usemin',
-    setupProxies: 'grunt-middleware-proxy'
+    setupProxies: 'grunt-middleware-proxy',
+    artifactory: 'grunt-artifactory-artifact'
   });
 
   var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
@@ -57,6 +58,11 @@ module.exports = function(grunt) {
           }
         },
         proxies: [
+          {
+            context: '/mms-ts',
+            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
+            port: 8080
+          },
           {
             context: '/alfresco',  // '/api'
             host: servers[key],
@@ -272,7 +278,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       options: {
         reporterOutput: '',
-        // evil: true, //allow eval for timely integration
+        evil: true, //allow eval for plot integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -285,7 +291,7 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false,
+          eval: true,
           Set: true
         }
       }
@@ -433,7 +439,7 @@ module.exports = function(grunt) {
       grunt.task.run('setupProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('setupProxies:emsstg', 'connect:emsstg');
+      grunt.task.run('setupProxies:opencaeuat', 'connect:opencaeuat');
     }
     grunt.task.run('watch:' + build);
   });

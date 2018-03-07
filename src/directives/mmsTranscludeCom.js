@@ -96,8 +96,9 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'doc')) {
                 domElement.html('<span class="mms-error">Circular Reference!</span>');
