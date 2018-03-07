@@ -1,6 +1,6 @@
 <div ng-if="!noEdit && editing" class="editing">
 
-    <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></h1>
+    <h1 class="prop" ng-if="edit.name"><input class="form-control" type="text" ng-model="edit.name"></h1>
 
     <h2 class="prop-title">Last Modification</h2>
     <span class="prop">{{element._modified | date:'M/d/yy h:mm a'}} by {{element._modifier}}</span>
