@@ -112,12 +112,18 @@ div.tooltip-inner {
   a:hover,
   a:visited {
     text-decoration: none;
-    color:white;
+    color: white;
   }
 }
 
 .ve-secondary-text{
-  color:$ve-light-text;
+  color: $ve-light-text;
+}
+
+.placeholder{
+  color: $ve-light-text;
+  font-style: italic; 
+  text-transform: lowercase; 
 }
 
 /*------------------------------------------------------------------
@@ -138,8 +144,8 @@ div.tooltip-inner {
   transition: background-color .1s ease-out;
   border: none;
   text-transform: uppercase;
-  border-radius:3px;
-  box-shadow:none;
+  border-radius: 3px;
+  box-shadow: none;
   padding: 7px 12px;
 }
 
@@ -170,7 +176,7 @@ div.tooltip-inner {
 
 .btn-sm{
   padding: 5px 10px;
-  font-size:11px;
+  font-size: 11px;
 }
 
 /*------------------------------------------------------------------
@@ -228,7 +234,7 @@ div.tooltip-inner {
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-weight: 400;
-    color:$ve-white-text-lighter-2;
+    color: $ve-white-text-lighter-2;
   }
 
   /*Clearing bootstrap*/
@@ -249,7 +255,7 @@ div.tooltip-inner {
   font-size: 13px;
   text-transform: uppercase;
   display:inline-block;
-  color:$ve-light-text-darker-1;
+  color: $ve-light-text-darker-1;
 }
 
 /*------------------------------------------------------------------
