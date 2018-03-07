@@ -87,20 +87,27 @@
 
   .visibility-toggle{
     color: $base_blue;
+    list-style: none;
+    margin: 3px 0 0 -14px;
 
-  //Show more content caret
-    &:after{
-      content:"\f0d7";
-      font-family: $icon-font-name;
-      font-size: 14px;
-      padding: 4px;
-      color: $tertiary_grey;
-    }
+    //Show more content caret
 
-    //Show less content caret
-    &.active::after{
-      content:"\f0d8";
-      font-family: $icon-font-name;
+    a{
+      text-decoration: none;
+
+      &:after{
+        content:"\f0d7";
+        font-family: $icon-font-name;
+        font-size: 14px;
+        padding: 4px;
+        color: $tertiary_grey;
+      }
+
+      //Show less content caret
+      &.active::after{
+        content:"\f0d8";
+        font-family: $icon-font-name;
+      }
     }
   }
 

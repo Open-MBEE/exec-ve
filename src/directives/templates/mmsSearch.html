@@ -222,7 +222,7 @@
                 </a>
             </div>
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
-                <label>Properties</label><a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Show Less' : switchText='Show More'" class="visibility-toggle" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
+                <label>Properties</label>
                 <!-- <ul ng-repeat="row in elem._properties2" ng-if="($first && !showSearchResultProps) || showSearchResultProps"> -->
                 <ul>
                 <!-- <li ng-repeat="property in row" class="elem-properties-rows"> -->
@@ -237,6 +237,9 @@
                             <!-- set variable for limit -->
                             <span class="ellipses" ng-if="property.value.length > 4">...</span>
                         </a>
+                    </li>
+                    <li class="visibility-toggle">    
+                        <a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Show Less' : switchText='Show More'" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
                     </li>
                 </ul>
             </div>
