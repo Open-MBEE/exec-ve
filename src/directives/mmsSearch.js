@@ -382,17 +382,17 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
         var buildSearchClause = function(query) {
             var clause = {};
             var q = {};
-            var valueSearchFields = ["defaultValue.value", "value.value", "specification.value"];
+            var valueSearchFields = ["defaultValue.value^3", "value.value^3", "specification.value^3"];
             if (query.searchType.id === 'all') {
                 // Set query term for ID
                 var idQuery = {};
-                idQuery.term = {"id": query.searchText};
+                idQuery.term = {"id": {"value": query.searchText, "boost": 10.0}};
 
                 // Set query for value,doc,name fields
                 var allQuery = {};
                 q.query = query.searchText;
                 q.fields = valueSearchFields.slice();
-                q.fields.push('name', 'documentation');
+                q.fields.push('name^5', 'documentation');
                 allQuery.multi_match = q;
                 clause = {
                     "bool": {

@@ -228,17 +228,17 @@
                 <!-- <li ng-repeat="property in row" class="elem-properties-rows"> -->
                     <li ng-repeat="property in elem._properties" ng-if="($first && !showSearchResultProps) || showSearchResultProps">
                     {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
-                        <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}
-                            <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value|limitTo:4">
+                        <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value | limitTo:300}}
+                            <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value | limitTo:4">
                                 <span ng-bind-html="val.value | limitTo:300"></span>
                                 <span ng-bind-html="val.body[0] | limitTo:300"></span>
                                 <span ng-if="!val.value && !val.body[0]">Default Value</span>
                             </span>
                             <!-- set variable for limit -->
-                            <span class="ellipses" ng-if="property.value.length > 4">...</span>
+                            <span ng-if="property.value.length > 4 || property.defaultValue.value.length > 300">...</span>
                         </a>
                     </li>
-                    <li class="visibility-toggle">    
+                    <li class="visibility-toggle">
                         <a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Show Less' : switchText='Show More'" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
                     </li>
                 </ul>
