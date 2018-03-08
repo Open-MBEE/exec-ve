@@ -88,36 +88,33 @@
   .visibility-toggle{
     color: $base_blue;
     list-style: none;
-    margin: 18px 0 0 -14px;
+    margin: 12px 0 0 -14px;
     position: relative;
 
     //Show more content caret
 
     a{
-      text-decoration: none;
-
       //show more content caret
       &:after{
-        content:"\f0d7";
+        content:"\f078";
         font-family: $icon-font-name;
-        font-size: 14px;
-        padding: 4px;
-        color: $tertiary_grey;
+        font-size: 10px;
+        padding: 0 2px;
       }
 
       //Show less content caret
       &.active::after{
-        content:"\f0d8";
+        content:"\f077";
         font-family: $icon-font-name;
       }
 
       //Add ellipses to list before "show more"
       &:not(.active):before{
         content: "...";
-        font-size: 20px;
+        font-size: 16px;
         color: $tertiary_grey;
         position: absolute;
-        top: -28px;
+        top: -22px;
       }
     }
   }
