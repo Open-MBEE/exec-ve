@@ -57,6 +57,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
 
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " + successfulCommand.command + " completed successfully");
+        $window.hidePerspectivesProgressIndicator();
     };
     $window.onPerspectivesCommandFailure = function(failedCommand, message, callstack) {
         console.log("Perspectives command " + failedCommand.commmand + " failed. Reason is: " + message);
@@ -68,6 +69,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
     $window.onPerspectivesProjectReady = function(projectID) {
         console.log("All project RPC calls are complete and you can now access all project resources via the DOM. " + projectID);
         if (!projectIdLoaded[projectID]) {
+            $window.showPerspectivesProgressIndicator();
             $window.invokePerspectivesCommand(mapping[projectID]);
             projectIdLoaded[projectID] = true;
         }
