@@ -216,7 +216,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         var cachedKey = UtilsService.makeElementKey(editOb);
         var elementOb = CacheService.get(cachedKey);
 
-        editOb.name = elementOb.name;
+        if (elementOb.name) {
+            editOb.name = elementOb.name;
+        }
         editOb.documentation = elementOb.documentation;
         if (editOb.type === 'Property' || editOb.type === 'Port') {
             editOb.defaultValue = JSON.parse(JSON.stringify(elementOb.defaultValue));
@@ -873,7 +875,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                     var reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.baseCommit.refSelected.id, commitId: $scope.baseCommit.commitSelected.id};
                     ElementService.getElement(reqOb, 2, false)
                     .then(function(data) {
-                        revertEltInfo.name = data.name;
+                        if (data.name) {
+                            revertEltInfo.name = data.name;
+                        }
                         revertEltInfo.documentation = data.documentation;
                         if (data.defaultValue) {
                             revertEltInfo.defaultValue = data.defaultValue;

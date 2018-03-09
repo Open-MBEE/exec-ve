@@ -328,10 +328,13 @@ function ProjectService($q, $http,ApplicationService,CacheService,ElementService
                     return;
                 }
                 var groups = [];
+                var reqOb = {projectId: projectId, refId: refId, commitId: 'latest'};
                 for (var i = 0; i < response.data.groups.length; i++) {
                     var group = response.data.groups[i];
-                    CacheService.put(['group', projectId, refId, group._id], group, true);
-                    groups.push(CacheService.get(['group', projectId, refId, group._id]));
+                    reqOb.elementId = group.id;
+                    group = ElementService.cacheElement(reqOb, group, false);
+                    CacheService.put(['group', projectId, refId, group.id], group, true);
+                    groups.push(CacheService.get(['group', projectId, refId, group.id]));
                 }
                 CacheService.put(cacheKey, groups, false);
                 deferred.resolve(CacheService.get(cacheKey));
