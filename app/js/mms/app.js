@@ -465,9 +465,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }],
             groupOb: ['groupObs', 'documentOb', 'ProjectService', 'ticket', function(groupObs, documentOb, ProjectService, ticket) {
                 var group = null;
-                if(documentOb) {
-                    for(var i = 0; i < groupObs.length; i++) {
-                        if(groupObs[i]._id == documentOb._groupId) {
+                if (documentOb) {
+                    for (var i = 0; i < groupObs.length; i++) {
+                        if (groupObs[i].id == documentOb._groupId) {
                             group = groupObs[i];
                             break;
                         }
@@ -520,16 +520,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return documentOb;
             }],
             groupOb: ['groupObs', 'documentOb', function(groupObs, documentOb) {
-            var group = null;
-            if(documentOb) {
-                for(var i = 0; i < groupObs.length; i++) {
-                    if(groupObs[i]._id == documentOb._groupId) {
-                        group = groupObs[i];
-                        break;
+                var group = null;
+                if (documentOb) {
+                    for (var i = 0; i < groupObs.length; i++) {
+                        if (groupObs[i].id == documentOb._groupId) {
+                            group = groupObs[i];
+                            break;
+                        }
                     }
                 }
-            }
-            return group;
+                return group;
             }]
         },
         views: {
@@ -581,9 +581,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }],
             groupOb: ['groupObs', 'documentOb', function(groupObs, documentOb) {
                 var group = null;
-                if(documentOb) {
-                    for(var i = 0; i < groupObs.length; i++) {
-                        if(groupObs[i]._id == documentOb._groupId) {
+                if (documentOb) {
+                    for (var i = 0; i < groupObs.length; i++) {
+                        if (groupObs[i].id == documentOb._groupId) {
                             group = groupObs[i];
                             break;
                         }

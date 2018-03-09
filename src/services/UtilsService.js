@@ -264,7 +264,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         for (i = 0; i < array.length; i++) {
             data = array[i];
             data2Node[data[id]] = { 
-                label : data.name || data._name, 
+                label : data.name, 
                 type : type,
                 data : data, 
                 children : [] 
