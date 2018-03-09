@@ -2,7 +2,7 @@
 
     <h1 class="prop"><input class="form-control" type="text" ng-model="edit.name"></h1>
     
-    <span class="elem-updated-wrapper">Last updated {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
+    <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
         <h2 class="prop-title spec-view-value-heading">Property Value</h2>
@@ -85,7 +85,7 @@
     <div ng-hide="gettingSpec">
         <h1 class="prop element-title">{{element.name}}</h1>
 
-        <span class="elem-updated-wrapper">Last updated {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
+        <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
 
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
             <h2 class="prop-title spec-view-value-heading">Property Value</h2>
