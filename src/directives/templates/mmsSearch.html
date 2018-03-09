@@ -239,7 +239,7 @@
                         </a>
                     </li>
                     <li class="visibility-toggle">
-                        <a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Show Less' : switchText='Show More'" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
+                        <a ng-click="showSearchResultProps = !showSearchResultProps;showSearchResultProps ? switchText='Less' : switchText='More'" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
                     </li>
                 </ul>
             </div>
@@ -253,7 +253,7 @@
                 </div>
             </div>
             <div class="elem-updated-wrapper">
-                <div>Last updated {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
+                <div>Last modified {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
             </div>
         </div>
     </div>

@@ -17,6 +17,14 @@
   h2.prop-title{
     //border-top: 1px solid $tertiary_grey;
     padding-top: 20px;
+    border-top: 1px solid $ve-silver-base;
+  }
+
+  /*First values in the list and should not have a border on top*/
+  .elem-updated-wrapper + h2.prop-title,
+  .element-title + h2.prop-title
+  h2.prop-title:first-child{
+    border-top: none;
   }
 
   span.prop {
@@ -68,7 +76,7 @@
 }
 
 /*------------------------------------------------------------------
-5. Styles that apply to both the spec
+Styles that apply to both the spec
 -------------------------------------------------------------------*/
 
 .mms-search,
