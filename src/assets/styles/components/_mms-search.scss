@@ -95,7 +95,7 @@
 
     /*fixed width of medium content so that vertical rhythym is consistent*/
     .fixed-content-m {
-      width: 160px;
+      width: 150px;
       flex: none;
     }
     /*fixed width of small content*/
@@ -214,3 +214,20 @@
   }
 }
 
+/*------------------------------------------------------------------
+5. Small modals
+-------------------------------------------------------------------*/
+
+.modal-body{
+  .mms-search{
+    .mms-search-input{
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+    .results-count,
+    .elem-wrapper{
+      margin-left: 6px;
+      margin-right: 6px;
+    }
+  }
+}
