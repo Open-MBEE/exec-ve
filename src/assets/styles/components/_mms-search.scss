@@ -165,7 +165,7 @@
     }
 
     .elem-documentation {
-      color: $base_blue !important;
+      color: $brand_base !important;
       table {
         @extend .content-table;
       }
@@ -179,7 +179,7 @@
     }
 
     .ellipses {
-      color: $base_blue;
+      color: $brand_base;
     }
 
     .elem-updated-wrapper {
