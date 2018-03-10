@@ -1,0 +1,216 @@
+.mms-search {
+
+/*------------------------------------------------------------------
+
+1. Layout
+2. Forms (can move most of this to main)
+3. Results styles
+4. Empty state
+
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+1. Layout
+-------------------------------------------------------------------*/
+
+  /*Grey background from top to bottom */
+  background: $ve-silver-lighter-2;
+  height: 100%;
+
+
+  .search-header {
+     background: $white;
+     padding-bottom: 250px;
+
+    /*Border with shadow added when search results >= 0*/
+    &.searchresults{
+      border-bottom: 1px solid #e9e9e9;
+      box-shadow: 0px 5px 4px -5px rgba(0,0,0,.1);
+      padding-bottom: 0;
+    }
+  }
+
+  /*Spacing for count of results at top of results*/
+  .results-count {
+     margin: 20px 30px;
+  }
+
+  /*Spaceing for next and previous at bottom of results*/
+  .search-nav{
+    padding:36px 36px 60px;
+  }
+
+
+  .mms-search-input {
+    max-width: 1200px;
+    padding: 30px 36px 30px 30px;
+    position: relative;
+
+    /*Navigatiom back to basic search input, with a left back arrow*/
+    .search-nav-back {
+      position: absolute;
+      top: 0;
+
+      a {
+        display: inline-block;
+        margin: 15px 0;
+
+        .fa-arrow-left {
+          padding-right: 4px;
+        }
+      }
+    }
+
+    /*Navigatiom to advanced search input*/
+    .advanced-query {
+      margin-bottom: 18px;
+    }
+
+    .advanced-views-docs{
+      padding-top:22px;
+    }
+  }
+
+/*------------------------------------------------------------------
+2. Forms
+-------------------------------------------------------------------*/
+
+  .form-inline {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center; /* Safari 7.0+ */
+    align-items: center;
+
+    .form-group,
+    .btn {
+      margin: 7px 3px;
+      line-height: 16px;
+    }
+    .form-group {
+      width: 100%;
+    }
+
+    /*fixed width of medium content so that vertical rhythym is consistent*/
+    .fixed-content-m {
+      width: 160px;
+      flex: none;
+    }
+    /*fixed width of small content*/
+    .fixed-content-s {
+      width: 90px;
+      flex: none;
+    }
+
+    .ve-light-dropdown {
+      margin: 0;
+    }
+
+    h3 {
+      display: inline-block;
+      font-weight: 500;
+      font-size: 18px;
+      margin: 0 3px 0 0;
+    }
+
+    input {
+      min-height: 30px;
+      border-radius: 2px;
+      border: 1px solid $tertiary_grey;
+      padding: 3px 5px;
+    }
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+/*feedback for advanced search where user cannot edit*/
+  .search-input.disabled-input {
+    font-size: 14px;
+    padding: 4px 8px;
+    line-height: 13px;
+    display: inline;
+    border: none;
+    border-radius: 2px !important;
+    letter-spacing: .05em;
+    background-color: #f4f4f4;
+    min-height: 30px;
+    width: 100%;
+  }
+
+/*------------------------------------------------------------------
+3. Results styles
+-------------------------------------------------------------------*/
+
+  .elem-wrapper {
+    padding: 36px 0;
+    margin:0 30px;
+    border-top: 1px solid $tertiary_grey;
+
+    &:last-child {
+      border-bottom: 1px solid $tertiary_grey;
+    }
+
+    .elem-name {
+      font-size: 22px;
+    }
+
+    .elem-qualified-name {
+      font-size: 14px;
+      font-style: italic;
+      color: $medium_grey;
+    }
+
+    .elem-documentation {
+      color: $base_blue !important;
+      table {
+        @extend .content-table;
+      }
+    }
+
+    .elem-properties-wrapper {
+      ul{
+        margin-bottom: 0;
+        color: #6d6d6d;
+      }
+    }
+
+    .ellipses {
+      color: $base_blue;
+    }
+
+    .elem-updated-wrapper {
+      color: $medium_grey;
+      font-size: 14px;
+      margin-top:10px;
+    }
+
+    /*File icon for documents and views*/
+    .elem-related-docs-wrapper mms-view-link::before {
+      content: "\f15b";
+      font-family: $icon-font-name;
+      padding: 0 4px 0 0;
+      font-size:12px;
+    }
+  }
+
+/*------------------------------------------------------------------
+4. Empty state
+-------------------------------------------------------------------*/
+
+  // No results styles
+  .container-no-results {
+    color: $medium_grey;
+    min-height: 250px;
+
+    h3 {
+      font-weight: 500;
+      margin: 60px auto;
+      width: 290px;
+    }
+  }
+}
+

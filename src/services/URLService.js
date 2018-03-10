@@ -18,7 +18,7 @@ angular.module('mms')
 /**
  * @ngdoc service
  * @name mms.URLService
- * 
+ *
  * @description
  * This utility service gives back url paths for use in other services in communicating
  * with the server, arguments like projectId, refId, commitId are expected to be strings and
@@ -59,10 +59,6 @@ function urlService(baseUrl, mmsUrl) {
         if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim()))
             return true;
         return false;
-        
-        // if (String(version).indexOf('-') >= 0)
-        //     return true;
-        // return false;
     };
 
     /**
@@ -85,18 +81,18 @@ function urlService(baseUrl, mmsUrl) {
      * @methodOf mms.URLService
      *
      * @description
-     * Gets url that to convert HTML to PDF
+     * Gets url to convert HTML to PDF
      *
      * @param {string} docId Id of the document
-     * @param {string} site Site name
-     * @param {string} workspace Workspace name
+     * @param {string} projectId Project Id
+     * @param {string} refId Ref Id
      * @returns {string} The url
      */
     var getHtmlToPdfURL = function(docId, projectId, refId) {
         return addTicket(root + "/projects/" + projectId +
                       "/refs/" + refId +
                       "/documents/" + docId +
-                      "/htmlToPdf/123456789");  
+                      "/htmlToPdf/123456789"); //TODO cleanup
     };
 
     /**
@@ -156,7 +152,7 @@ function urlService(baseUrl, mmsUrl) {
      * @methodOf mms.URLService
      *
      * @description
-     * Gets url that gets products in a site
+     * Gets the url for all documents in a ref
      *
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url
@@ -211,7 +207,7 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
-    var getElementURL = function(reqOb) {        
+    var getElementURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addExtended(addTicket(addVersion(r, reqOb.commitId)), reqOb.extended);
     };
@@ -227,11 +223,12 @@ function urlService(baseUrl, mmsUrl) {
             recurseString = 'depth=' + reqOb.depth;
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         r = addVersion(r, reqOb.commitId);
-        if (r.indexOf('?') > 0)
+        if (r.indexOf('?') > 0) {
             r += '&' + recurseString;
-        else
+        } else {
             r += '?' + recurseString;
-        return addTicket(addExtended(r, reqOb.extended));        
+        }
+        return addTicket(addExtended(r, reqOb.extended));
     };
 
     /**
@@ -363,7 +360,32 @@ function urlService(baseUrl, mmsUrl) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?checkType=true';
         return addExtended(addTicket(r), true);
     };
-    
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getSearchURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url for default search. Can optionally provide query parameters
+     * i.e. `checkType=true&literal=true`
+     *
+     * @param {string} projectId Project Id
+     * @param {string} refId Ref Id
+     * @param {string} urlParams provide optional query parameters
+     * @returns {string} The url with ticket
+     */
+    var getSearchURL = function(projectId, refId, urlParams) {
+        var r;
+        if (urlParams !== null || urlParams !== ''){
+            // ie '/search?checkType=true&literal=true';
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
+        } else {
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search';
+        }
+        return addTicket(r);
+    };
+
     var setJobsUrl = function(jobUrl) {
         jobsRoot = jobUrl + ':8443/';
     };
@@ -396,6 +418,18 @@ function urlService(baseUrl, mmsUrl) {
         return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addServer
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds mmsServer parameter to URL string, mainly used for PMA jobs
+     *
+     * @param {String} url The url string for which to add mmsServer parameter argument.
+     * @param {String} server The mms server url for where elements are stored
+     * @returns {string} The url with server parameter added.
+     */
     var addServer = function(url, server) {
         var r = url;
         if (url.indexOf('?') > 0)
@@ -403,7 +437,19 @@ function urlService(baseUrl, mmsUrl) {
         else
             return url + '?mmsServer=' + server;
     };
-    
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addVersion
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds commitId parameter to URL string
+     *
+     * @param {String} url The url string for which to add version parameter argument.
+     * @param {String} version The commit id
+     * @returns {string} The url with commitId parameter added.
+     */
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -424,7 +470,7 @@ function urlService(baseUrl, mmsUrl) {
      * @description
      * Adds alf_ticket parameter to URL string
      *
-     * @param {String} url The url string for which to add als_ticket parameter argument.
+     * @param {String} url The url string for which to add alf_ticket parameter argument.
      * @returns {string} The url with alf_ticket parameter added.
      */
     var addTicket = function(url) {
@@ -496,6 +542,7 @@ function urlService(baseUrl, mmsUrl) {
         getOwnedElementURL: getOwnedElementURL,
         getElementHistoryURL: getElementHistoryURL,
         getElementSearchURL: getElementSearchURL,
+        getSearchURL: getSearchURL,
         getProjectDocumentsURL: getProjectDocumentsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         handleHttpStatus: handleHttpStatus,
