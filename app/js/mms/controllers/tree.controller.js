@@ -12,12 +12,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $rootScope.mms_refOb = refOb;
     $rootScope.ve_bbApi = $scope.bbApi = {};
+    $scope.tbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
     $rootScope.ve_tree_pane = $scope.$pane;
     if (!$rootScope.veTreeShowPe) {
         $rootScope.veTreeShowPe = false;
     }
     $scope.buttons = [];
+    $scope.treeButtons = [];
     $scope.projectOb = projectOb;
     $scope.refOb = refOb;
     $scope.treeExpandLevel = 1;
@@ -36,16 +38,22 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.treeFilter = {search: ''};
     var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
 
+    $scope.tbApi.init = function() {
+        $scope.tbApi.addButton(UxService.getButtonBarButton("tree-expand"));
+        $scope.tbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
+        if ($state.includes('project.ref.document')) {
+            $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
+        }
+    };
+    
     $scope.bbApi.init = function() {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
             $scope.bbApi.setPermission( "tree-add-document-or-group", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
             $scope.bbApi.setPermission( "tree-delete-document", documentOb._editable &&  (refOb.type === 'Tag' ? false : true) );
         } else if ($state.includes('project.ref.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
+            // $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
             $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
