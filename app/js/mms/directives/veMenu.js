@@ -88,7 +88,7 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
         var groupsMap = {};
         if (scope.group !== undefined) {
             for (var i = 0; i < groups.length; i++) {
-                groupsMap[groups[i]._id] = {id: groups[i]._id, name: groups[i]._name, parentId: groups[i]._parentId};
+                groupsMap[groups[i].id] = {id: groups[i].id, name: groups[i].name, parentId: groups[i]._parentId};
             }
             child = scope.group;
         }
@@ -96,8 +96,8 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
             child = scope.document;
         }
         if (child) {
-            if (child.hasOwnProperty('_id')) {
-                bcrumbs.push({name: child._name, id: child._id, type: "group", alfLink: child._link, link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
+            if (child.type === 'Package') {//child.hasOwnProperty('_id')) {
+                bcrumbs.push({name: child.name, id: child.id, type: "group", alfLink: child._link, link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
                 if(child._parentId) {
                     parentId = child._parentId;
                 }

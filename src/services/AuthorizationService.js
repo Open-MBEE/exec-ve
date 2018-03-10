@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', '$window', AuthService]);
+.factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', '$window', '$cookies', AuthService]);
 
 /**
  * @ngdoc service
@@ -17,7 +17,7 @@ angular.module('mms')
  * @description
  * Provide general authorization functions. I.e. login, logout, etc...
  */
-function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window) {
+function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window, $cookies) {
     
     var ticket = $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
@@ -62,8 +62,8 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         }, function(fail){
             deferred.reject(fail);
             removeTicket();
-        });  
-        return deferred.promise;  
+        });
+        return deferred.promise;
     };
 
     var logout = function() {
@@ -71,11 +71,7 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         checkLogin().then(function() {
             var logouturl = URLService.getLogoutURL();
             removeTicket();
-            $http.delete(logouturl).then(function(success) {
-                deferred.resolve(true);
-            }, function(failure) {
-                URLService.handleHttpStatus(failure.data, failure.status, failure.headers, failure.config, deferred);
-            });
+            //$cookies.remove('com.tomsawyer.web.license.user');
         }, function() {
             removeTicket();
             deferred.resolve(true);
@@ -84,11 +80,11 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
     };
 
     return {
-        getAuthorized: getAuthorized,    
+        getAuthorized: getAuthorized,
         getTicket: getTicket,
         removeTicket: removeTicket,
         checkLogin: checkLogin,
-        logout: logout 
+        logout: logout
     };
 
 }
