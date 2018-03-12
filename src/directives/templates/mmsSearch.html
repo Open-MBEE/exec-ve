@@ -165,10 +165,10 @@
     <div class="search-results" ng-show="searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
             <div class="elem-type-wrapper">
-                <span class="elem-type" title="Metatype">{{elem.type}}</span>
+                <span class="elem-type" uib-tooltip="Metatype" tooltip-popup-delay="500">{{elem.type}}</span>
                 <span ng-if="elem._appliedStereotypeIds.length">
                     <span ng-repeat="type in elem._appliedStereotypeIds">
-                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true" title="Metatype"></mms-transclude-name>
+                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true" uib-tooltip="Metatype" tooltip-popup-delay="500"></mms-transclude-name>
                     </span>
                 </span>
             </div>
