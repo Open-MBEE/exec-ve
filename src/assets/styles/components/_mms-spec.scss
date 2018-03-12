@@ -3,7 +3,7 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 32px;
-    margin:32px 0;
+    margin: 20px 0 4px;;
     height: inherit;
     width: 100%;
   }
@@ -14,24 +14,31 @@
     word-wrap: break-word;
   }
 
+  h2.prop-title{
+    //border-top: 1px solid $tertiary_grey;
+    padding-top: 20px;
+    border-top: 1px solid $ve-silver-base;
+  }
+
+  /*First values in the list and should not have a border on top*/
+  .elem-updated-wrapper + h2.prop-title,
+  .element-title + h2.prop-title
+  h2.prop-title:first-child{
+    border-top: none;
+  }
+
   span.prop {
-    font-size: 15px;
-    margin:4px 0 24px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    margin-top: 2px;
     min-width: 280px;
     word-wrap: break-word;
+    display: block;
   }
 
   h1.element-title {
     min-width: 280px;
     word-wrap: break-word;
-  }
-
-  .prop-title {
-    font-family: $font-family-sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    margin:28px 0 2px;
-    white-space: nowrap;
   }
 
   .doc-text {
@@ -41,7 +48,7 @@
   }
 
   h2.spec-view-doc-heading, h2.spec-view-value-heading, h2.spec-view-type-heading {
-    margin-top: 32px;
+    margin-top: 16px;
   }
 
   table {
@@ -66,5 +73,84 @@
       margin-bottom: 5px;
     }
   }
+}
 
+/*------------------------------------------------------------------
+Styles that apply to both the spec
+-------------------------------------------------------------------*/
+
+.mms-search,
+.pane-right,
+.revert-spec{
+  .elem-wrapper label,
+  .prop-title,
+  .visibility-toggle{
+    font-size: 13px;
+    font-weight: $bold_font_weight;
+    margin: 10px 5px 0 0;
+    letter-spacing: .05em;
+    text-decoration: none;
+    color: $ve-light-text-darker-1;
+  }
+
+  .visibility-toggle{
+    color: $brand_base;
+    list-style: none;
+    margin: 12px 0 0 -14px;
+    position: relative;
+
+    //Show more content caret
+
+    a{
+      //show more content caret
+      &:after{
+        content:"\f078";
+        font-family: $icon-font-name;
+        font-size: 10px;
+        padding: 0 2px;
+      }
+
+      //Show less content caret
+      &.active::after{
+        content:"\f077";
+        font-family: $icon-font-name;
+      }
+
+      //Add ellipses to list before "show more"
+      &:not(.active):before{
+        content: "...";
+        font-size: 16px;
+        color: $tertiary_grey;
+        position: absolute;
+        top: -22px;
+      }
+    }
+  }
+
+  /*Light grey boxes for metatype styling*/
+  .elem-type{
+    letter-spacing: .1em;
+    margin-right: 6px;
+    padding: 2px 5px;
+    wrap-text: none;
+    white-space: pre;
+    margin: 3px;
+    display:inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    background: $highlight_grey;
+    border-radius: 3px;
+    color: $ve-light-text-darker-1;
+  }
+
+  /*pull in metatype wrapper to compensate for padding*/
+  .elem-type-wrapper {
+    margin-left: -3px;
+  }
+
+  .elem-updated-wrapper {
+    color: $medium_grey;
+    font-size: 14px;
+    display: block;
+  }
 }

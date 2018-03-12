@@ -15,6 +15,10 @@
 /* App level customizations */
 @import "base/mms-globals";
 
+/* Tom Sawyer Perspectives View customizations */
+@import "components/mms-tsp-view";
+
+
 /* Other customizations */
 @import "components/mms-add-pe-button";
 @import "components/mms-buttons";
@@ -23,6 +27,8 @@
 @import "components/mms-toolbar";
 @import "components/mms-spec";
 @import "components/mms-view";
+@import "components/mms-cf-modal";
+@import "components/mms-search";
 @import "components/mms-editor";
 @import "components/mms-misc-components";
 @import "components/mms-autocomplete-modal";

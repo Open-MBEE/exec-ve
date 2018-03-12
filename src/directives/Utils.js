@@ -216,7 +216,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         var cachedKey = UtilsService.makeElementKey(editOb);
         var elementOb = CacheService.get(cachedKey);
 
-        editOb.name = elementOb.name;
+        if (elementOb.name) {
+            editOb.name = elementOb.name;
+        }
         editOb.documentation = elementOb.documentation;
         if (editOb.type === 'Property' || editOb.type === 'Port') {
             editOb.defaultValue = JSON.parse(JSON.stringify(elementOb.defaultValue));
@@ -715,7 +717,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             } else if ($scope.presentationElemType === 'List') {
                 classIdOb.classifierIds  = ViewService.TYPE_TO_CLASSIFIER_ID.ListT;
             } else if ($scope.presentationElemType === 'Image') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.Figure;
+                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ImageT;
             } else if ($scope.presentationElemType === 'Paragraph') {
                 classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT;
             } else if ($scope.presentationElemType === 'Section') {
@@ -873,7 +875,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                     var reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.baseCommit.refSelected.id, commitId: $scope.baseCommit.commitSelected.id};
                     ElementService.getElement(reqOb, 2, false)
                     .then(function(data) {
-                        revertEltInfo.name = data.name;
+                        if (data.name) {
+                            revertEltInfo.name = data.name;
+                        }
                         revertEltInfo.documentation = data.documentation;
                         if (data.defaultValue) {
                             revertEltInfo.defaultValue = data.defaultValue;

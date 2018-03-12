@@ -59,6 +59,11 @@ module.exports = function(grunt) {
         },
         proxies: [
           {
+            context: '/mms-ts',
+            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
+            port: 8080
+          },
+          {
             context: '/alfresco',  // '/api'
             host: servers[key],
             changeOrigin: true,
@@ -273,7 +278,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       options: {
         reporterOutput: '',
-        // evil: true, //allow eval for timely integration
+        evil: true, //allow eval for plot integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -286,7 +291,7 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false,
+          eval: true,
           Set: true
         }
       }
