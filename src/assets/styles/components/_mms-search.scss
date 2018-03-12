@@ -37,7 +37,7 @@
 
   /*Spaceing for next and previous at bottom of results*/
   .search-nav{
-    padding:36px 36px 60px;
+    padding:38px 38px 60px;
   }
 
 
@@ -95,7 +95,7 @@
 
     /*fixed width of medium content so that vertical rhythym is consistent*/
     .fixed-content-m {
-      width: 160px;
+      width: 150px;
       flex: none;
     }
     /*fixed width of small content*/
@@ -125,20 +125,22 @@
 
   .search-input {
     width: 100%;
-  }
 
-/*feedback for advanced search where user cannot edit*/
-  .search-input.disabled-input {
-    font-size: 14px;
-    padding: 4px 8px;
-    line-height: 13px;
-    display: inline;
-    border: none;
-    border-radius: 2px !important;
-    letter-spacing: .05em;
-    background-color: #f4f4f4;
-    min-height: 30px;
-    width: 100%;
+  /*feedback for advanced search where user cannot edit*/
+    &.disabled-input {
+      font-size: 14px;
+      padding: 4px 8px;
+      line-height: 13px;
+      border: none;
+      border-radius: 2px !important;
+      letter-spacing: .05em;
+      background-color: #f4f4f4;
+      min-height: 30px;
+    }
+
+    &.disabled-input-container {
+      margin-right: 8px;
+    }
   }
 
 /*------------------------------------------------------------------
@@ -156,6 +158,7 @@
 
     .elem-name {
       font-size: 22px;
+      font-weight: 500;
     }
 
     .elem-qualified-name {
@@ -214,3 +217,20 @@
   }
 }
 
+/*------------------------------------------------------------------
+5. Small modals
+-------------------------------------------------------------------*/
+
+.modal-body{
+  .mms-search{
+    .mms-search-input{
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+    .results-count,
+    .elem-wrapper{
+      margin-left: 6px;
+      margin-right: 6px;
+    }
+  }
+}
