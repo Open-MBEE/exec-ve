@@ -25,6 +25,25 @@
       }
     }
   }
+
+  h2.right-pane-title{
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    color: $ve-light-text;
+    margin: 20px 0;
+  }
+
+  .container-fluid{
+    padding:0 18px 34px;
+  }
+
+  hr.spec-title-divider{
+    margin-left:-18px;
+    margin-right:-18px;
+    border-color: $ve-silver-darker-2;
+  }
 }
 
 .diff-pane-right {

@@ -22,6 +22,11 @@ tr {
   background-color: $light_blue;
 }
 
+/*Overriding default from fa-pane-scroller that results in double scroll bar*/
+.center-view .center-view{
+  overflow: hidden;
+}
+
 .pane-center {
   margin-right: -11px;
   font-size: 16px;
@@ -39,37 +44,12 @@ tr {
 
   .pane-center-btn-group {
     float: right;
-    padding: 10px 12px;
+    padding: 5px 10px;
     min-width: $pane_center_btn_group_width;
 
     .bordered-button-bar {
       float: right;
     }
-  }
-
-  .center-view {
-    right: 41px !important;
-
-    .nav-tabs {
-      min-width: 200px;
-      background-color: $tertiary_grey;
-    }
-
-    .nav-tabs li a {
-      cursor: pointer;
-      color: $black;
-      @include border-radius(0);
-      height: 35px;
-    }
-
-    .nav-tabs li.active a {
-      border-bottom-color: transparent;
-    }
-  }
-
-  .pane-center-inner {
-    padding-top: 14px;
-    padding-bottom:40px;
   }
 }
 
@@ -151,7 +131,7 @@ tr {
 
 .doclib-link {
   margin: 0 4px;
-  padding-top: 10px;
+  padding-top: 5px;
   float: left;
 
   img{

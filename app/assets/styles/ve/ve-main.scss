@@ -85,11 +85,9 @@ div.tooltip-inner {
   2.8 Special Icons
     2.8.1 Section
 3. Table filtering
-4. Search
-5. Modal fixes
-6. Create ref
-7. 404 bookmark
-8. Open document button
+4. Modal fixes
+5. 404 bookmark
+6. Open document button
 
 -------------------------------------------------------------------*/
 
@@ -278,7 +276,7 @@ div.tooltip-inner {
   ul.dropdown-menu {
     min-height: 0;
     overflow-y: auto;
-    max-height: 300px;
+    max-height: 360px;
     overflow-x:hidden;
   }
 
@@ -830,6 +828,32 @@ span.fixed-content-dropdown{
 }
 
 /*------------------------------------------------------------------
+    2.8.2 Ref icons
+-------------------------------------------------------------------*/
+
+/*add to branch labels*/
+.Branch-icon::before,
+.branch-icon::before{
+  content: "\f126";
+  font-family: FontAwesome;
+  color: $ve-silver-darker-3;
+  padding-right: 6px;
+  top: 1px;
+  position: relative;
+}
+
+/*add to tag labels*/
+.Tag-icon::before,
+.tag-icon::before{
+  content: "\f02b";
+  font-family: FontAwesome;
+  color: $ve-silver-darker-3;
+  padding-right: 6px;
+  top: 1px;
+  position: relative;
+}
+
+/*------------------------------------------------------------------
 3. Table Filtering & Sorting
 -------------------------------------------------------------------*/
 
@@ -901,31 +925,6 @@ table caption {
 
 .ve-filter-table-form .btn-sm {
   margin: 0 4px;
-}
-
-/*------------------------------------------------------------------
-4. Search
--------------------------------------------------------------------*/
-
-.ve-search{
-  table{
-    width:100%;
-    table-layout:fixed;
-  }
-
-  td{
-    padding-bottom:10px !important;
-  }
-
-  mms-transclude-name{
-    color:$ve-light-text;
-  }
-
-  .btn-primary{
-    border:none !important;
-    padding:7px 12px 7px !important;
-    font-weight:700 !important;
-  }
 }
 
 /*------------------------------------------------------------------
@@ -1028,7 +1027,7 @@ table caption {
 }
 
 /*------------------------------------------------------------------
-6. New Ref
+4. New Ref
 -------------------------------------------------------------------*/
 
 .ve-new-ref{
@@ -1077,7 +1076,7 @@ table caption {
 }
 
 /*------------------------------------------------------------------
-7. 404 Bookmark
+5. 404 Bookmark
 -------------------------------------------------------------------*/
 .account-wall-lg{
   max-width:820px;
@@ -1117,7 +1116,7 @@ table caption {
 }
 
 /*------------------------------------------------------------------
-8. Open document button styling
+6. Open document button styling
 -------------------------------------------------------------------*/
 
 .btn.open-document{
@@ -1142,46 +1141,3 @@ table caption {
   text-decoration-color: rgb(72, 133, 189);
 }
 
-/*------------------------------------------------------------------
-9. Right pane
--------------------------------------------------------------------*/
-
-h2.right-pane-title{
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  color: #6a6a6a;
-  margin: 20px 0;
-}
-
-.pane-right .container-fluid{
-  padding:0 18px 34px;
-}
-
-hr.spec-title-divider{
-  margin-left:-18px;
-  margin-right:-18px;
-  border-color:#ddd;
-}
-
-/*------------------------------------------------------------------
-  9.4 Modal for revert history
--------------------------------------------------------------------*/
-
-/* Special styling to preview element*/
-.element-preview-box{
-  padding: 0 20px;
-  background-color: $ve-silver-lighter-1;
-  border-radius: 3px;
-  border: 1px solid $ve-silver-darker-1;
-}
-
-/*Custom styling to keep labels inline with dropdowns*/
-span.inline-btn-label{
-  min-height: 28px;
-  margin: 6px 0;
-  padding: 7px 4px;
-  line-height: 13px;
-  color:$ve-light-text;
-}

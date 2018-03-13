@@ -1,39 +1,40 @@
 <div class="mms-add-pe-button">
   <span class="center btn-group dropdown" uib-dropdown="">
-    <a type="button" class="dropdown-toggle btn btn-secondary" ng-click="$event.stopPropagation()" uib-dropdown-toggle="" aria-expanded="true">
+    <a type="button" class="dropdown-toggle btn btn-secondary" ng-click="$event.stopPropagation()" uib-dropdown-toggle="" aria-expanded="true" title="Add text, image, table, equation, comment, and section elements">
         <i class="fa fa-plus"></i>Add
     </a>
     <ul class="dropdown-menu" role="menu">
-      <li><a type="button" class="add-element-button btn center view-add-paragraph"
+      <li><a type="button" class="add-element-button center view-add-paragraph"
           ng-click="addEltAction($index, 'Paragraph', $event)">
           <i class="fa fa-paragraph"></i>
-          <small><strong><span class="icon-title">TEXT</span></strong></small>
+          <small><span class="icon-title">Text</span></small>
         </a></li>
-      <li><a type="button" class="add-element-button btn center view-add-table"
+      <li><a type="button" class="add-element-button center view-add-table"
           ng-click="addEltAction($index, 'Table', $event)">
           <i class="fa fa-table"></i>
-          <small><strong><span class="icon-title">TABLE</span></strong></small>
+          <small><span class="icon-title">Table</span></small>
         </a></li>
-      <li><a type="button" class="add-element-button btn center view-add-image"
+      <li><a type="button" class="add-element-button center view-add-image"
           ng-click="addEltAction($index, 'Image', $event)">
           <i class="fa fa-image"></i>
-          <small><strong><span class="icon-title">IMAGE</span></strong></small>
+          <small><span class="icon-title">Image</span></small>
         </a></li>
-      <li><a type="button" class="add-element-button btn center view-add-equation"
+      <li><a type="button" class="add-element-button center view-add-equation"
           ng-click="addEltAction($index, 'Equation', $event)">
           <i class="fa fa-superscript"></i>
-          <small><strong><span class="icon-title">EQUATION</span></strong></small>
+          <small><span class="icon-title">Equation</span></small>
         </a></li>
-      <li><a type="button" class="add-element-button btn center view-add-comment"
+      <li><a type="button" class="add-element-button center view-add-comment"
           ng-click="addEltAction($index, 'Comment', $event)">
           <i class="fa fa-comment-o"></i>
-          <small><strong><span class="icon-title">COMMENT</span></strong></small>
+          <small><span class="icon-title">Comment</span></small>
         </a></li>
-      <li><a type="button" class="add-element-button btn center view-add-section"
+      <li><a type="button" class="add-element-button center view-add-section"
           ng-click="addEltAction($index, 'Section', $event)">
           <i class="section-icon"></i>
-          <small><strong><span class="icon-title">&nbsp;SECTION</span></strong></small>
-        </a></li>
+          <small><span class="icon-title">&nbsp;Section</span></small>
+        </a>
+      </li>
     </ul>
   </span>
 </div>

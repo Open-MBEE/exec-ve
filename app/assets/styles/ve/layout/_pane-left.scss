@@ -2,7 +2,7 @@
   Styles for the View Editor left pane
 *************************/
 
-$pane_left_btn_group_width: 300px;
+$pane_left_btn_group_width: 250px;
 
 #main-pane {
   > .west-tabs {
@@ -24,15 +24,36 @@ $pane_left_btn_group_width: 300px;
 
   .pane-left {
     width: 100%;
+    min-width: $pane_left_btn_group_width;
 
     .pane-left-toolbar {
-      margin-left: 15px;
-      min-width: $pane_left_btn_group_width;
-      padding-top: 5px;
+      padding: 5px 4px;
     }
 
-    .btn-tools {
-      padding: 5px 7px;
+    .tree-options {
+      display: -webkit-box; 
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: -webkit-flex; 
+      display: flex;
+      padding: 4px 5px;
+      background: $ve-silver-lighter-1;
+      border-top: 1px solid $ve-silver-darker-1;
+      border-bottom: 1px solid $ve-silver-darker-1;
+
+      .ve-plain-input{
+        margin: 0;
+      }
+
+      .btn-tools{
+        padding: 4px 6px;
+        background: transparent;
+      }
+
+      .dropdown-menu {
+        right: 0;
+        left: auto;
+      }
     }
   }
 }

@@ -39,14 +39,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
 
     $scope.tbApi.init = function() {
-        $scope.tbApi.addButton(UxService.getButtonBarButton("tree-expand"));
-        $scope.tbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref.document')) {
             $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
         }
     };
     
     $scope.bbApi.init = function() {
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
+        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
