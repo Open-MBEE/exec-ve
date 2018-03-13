@@ -45,7 +45,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             }
         );
         </pre>
-     * ## Example with timestamp
+     * ## Example with commitId
      *  <pre>
         ElementService.getElement({
             projectId: 'projectId', 
