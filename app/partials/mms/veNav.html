@@ -50,7 +50,7 @@
                             {{ username | limitTo:1 | uppercase }}
                         </a>
                         <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
-                            <li ng-if="username">
+                            <li ng-if="username" class="ve-secondary">
                                 Logged in as <b>{{ username }}</b>
                             </li>
                             <li class="divider"></li>

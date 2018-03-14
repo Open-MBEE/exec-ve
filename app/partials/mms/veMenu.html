@@ -61,7 +61,7 @@
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
                                 tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">{{ tag.name }}
                             </li>
-                            <li ng-if="!tags.length">No Tags</li>
+                            <li ng-if="!tags.length" class="ve-secondary">No Tags</li>
                         </uib-tab>
                     </uib-tabset>
                 </ul>

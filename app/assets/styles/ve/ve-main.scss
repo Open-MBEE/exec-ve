@@ -407,6 +407,14 @@ div.tooltip-inner {
     top: 3px;
     color:$ve-silver-base;
   }
+
+  li.ve-secondary{
+    color:$ve-white-text-lighter-2;
+    
+    &:hover {
+      background-color:$ve-slate-lighter-1;
+    }
+  }
 }
 
 @media (max-width: 767px) {
