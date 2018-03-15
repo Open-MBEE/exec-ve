@@ -35,14 +35,13 @@ describe("URLService", function () {
 		}))
 	});
 
-	describe('Method getHtmlToPdfURL', function () {
-		var tmpId        = 1234;
+	fdescribe('Method getExportHtmlUrl', function () {
 		var project = "this_isnt_your_project";
 		var ref      = "dont_go_to_this_site";
 		var htmlToPdfURL;
-		it('should generate a Html to PDF url', inject(function () {
-			htmlToPdfURL = root + "/projects/" + project + "/refs/" + ref + "/documents/" + tmpId + "/htmlToPdf/123456789";
-			expect(htmlToPdfURL).toBe(URLServiceObj.getHtmlToPdfURL(tmpId, project, ref));
+		it('should generate the correct url', inject(function () {
+			htmlToPdfURL = root + "/projects/" + project + "/refs/" + ref + '/convert';
+			expect(htmlToPdfURL).toBe(URLServiceObj.getExportHtmlUrl(project, ref));
 		}));
 	});
 

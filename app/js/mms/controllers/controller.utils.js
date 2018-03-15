@@ -110,7 +110,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
      * @param {Object} refOb current branch/tag object
      * @param {Boolean} isDoc viewOrDocOb is view or doc
      * @param {Number} mode 1 = print, 2 = word, 3 = pdf
-     * @returns {Promise} The promise returned from UtilsService.convertHtmlToPdf - server response
+     * @returns {Promise} The promise returned from UtilsService.exportHtmlAs - server response
      *
      */
     var printModal = function(viewOrDocOb, refOb, isDoc, mode) {
@@ -119,8 +119,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             templateUrl: 'partials/mms/printConfirm.html',
             controller: ["$scope", "$uibModalInstance", function($scope, $uibModalInstance) {
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
-                $scope.action = 'print';
-                $scope.genpdf = false;
+                $scope.action = mode === 1 ? 'print' : mode === 3 ? 'generate pdf' : 'generate word';
+                $scope.label = mode === 3 ? 'pdf' : mode === 2 ? 'word' : '';
+                $scope.mode = mode;
                 $scope.meta = {
                     'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
                     'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
@@ -152,14 +153,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     });
                 }
                 $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
-                if (mode === 2) {
-                    $scope.action = 'save';
-                }
-                if (mode === 3) {
-                    $scope.action = 'generate pdf';
-                    $scope.genpdf = true;
-                }
-                $scope.docOption = (!isDoc && mode === 3);
+                $scope.docOption = (!isDoc && (mode === 3 || mode === 2));
                 $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
                 $scope.print = function() {
                     $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]);
@@ -189,59 +183,22 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 printOrGenerate(viewOrDocOb, refOb, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
                     var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3], choice[4], choice[5]);
-                    var cover = result.cover;
-                    var toc = result.toc;
-                    var tof = result.tof;
-                    var tot = result.tot;
-                    var toe = result.toe;
-                    if (choice[3]) {
-                        toe = '';
-                        result.toe = '';
-                    }
-                    var contents = result.contents;
-                    if (mode === 1 || mode === 2) {
-                        var inst = '';
-                        if (mode === 2) {
-                            inst = "<div>(Copy and paste into Word)</div>";
-                        }
+                    result.toe = choice[3] ? '' : result.toe;
+                    if (mode === 1) {
                         var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
                         popupWin.document.open();
-                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + tot + tof + toe + contents + '</body></html>');
+                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
                         popupWin.document.close();
-                        if (mode === 1) {
-                            $timeout(function() {
-                                popupWin.print();
-                            }, 1000, false);
-                        }
-                    } else { //TODO server changes for doc object
-                        var doc = {
-                            docId: viewOrDocOb.id,
-                            header: result.header,
-                            footer: result.footer,
-                            html: result.contents,
-                            cover: result.cover,
-                            time: result.displayTime,
-                            displayTime: result.displayTime,
-                            toc: result.toc,
-                            tof: result.tof + result.toe,
-                            tot: result.tot,
-                            dnum: result.dnum,
-                            workspace: refOb.id,
-                            customCss: css,
-                            version: result.version,
-                            name: viewOrDocOb.id + '_' + refOb.id + '_' + new Date().getTime(),
-                            disabledCoverPage: isDoc ? false : true
-                        };
-                        if (!choice[2]) {
-                            doc.tof = '<div style="display:none;"></div>';
-                            doc.tot = '<div style="display:none;"></div>';
-                        }
-                        //TODO this might need to be updated
-                        if (refOb.type != 'Tag')
-                            doc.tagId = 'Latest';
-                        else
-                            doc.tagId = refOb.name;
-                        UtilsService.convertHtmlToPdf(doc, viewOrDocOb._projectId, viewOrDocOb._refId)
+                        $timeout(function() {
+                            popupWin.print();
+                        }, 1000, false);
+
+                    } else {
+                      result.tof = choice[2] ? result.tof + result.toe : '<div style="display:none;"></div>';
+                      result.tot = choice[2] ? result.tot : '<div style="display:none;"></div>';
+                      var name = viewOrDocOb.name + new Date().getTime();
+                      var htmlString = ['<html><head><title>', name, '</title><style>', css, '</style></head><body style="overflow: auto">', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
+                      UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId})
                         .then(function(reuslt) {
                             deferred.resolve(result);
                         }, function(reason){
@@ -341,11 +298,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
-        if (mode === 2) {
-            printElementCopy.find('.mms-svg').remove();
-        } else {
-            printElementCopy.find('.mms-png').remove();
-        }
+        printElementCopy.find('.mms-png').remove();
         printElementCopy.find('p:empty').remove();
         printElementCopy.find('p').each(function() {
             var $this = $(this);

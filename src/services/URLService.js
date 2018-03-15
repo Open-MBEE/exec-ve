@@ -81,23 +81,19 @@ function urlService(baseUrl, mmsUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getHtmlToPdfURL
+     * @name mms.URLService#getExportHtmlUrl
      * @methodOf mms.URLService
      *
      * @description
-     * Gets url that to convert HTML to PDF
-     *
-     * @param {string} docId Id of the document
-     * @param {string} site Site name
-     * @param {string} workspace Workspace name
+     * Gets url that to convert HTML to PDF or Word
+     * @param {string} projectId id of the project
+     * @param {string} refId id of the ref
      * @returns {string} The url
      */
-    var getHtmlToPdfURL = function(docId, projectId, refId) {
+    var getExportHtmlUrl = function(projectId, refId) {
         return addTicket(root + "/projects/" + projectId +
-                      "/refs/" + refId +
-                      "/documents/" + docId +
-                      "/htmlToPdf/123456789");  
-    };
+          "/refs/" + refId + '/convert');
+      };
 
     /**
      * @ngdoc method
@@ -500,7 +496,7 @@ function urlService(baseUrl, mmsUrl) {
         getDocumentViewsURL: getDocumentViewsURL,
         handleHttpStatus: handleHttpStatus,
         getImageURL: getImageURL,
-        getHtmlToPdfURL: getHtmlToPdfURL,
+        getExportHtmlUrl: getExportHtmlUrl,
         setJobsUrl: setJobsUrl,
         getJobsURL: getJobsURL,
         getJobURL: getJobURL,
