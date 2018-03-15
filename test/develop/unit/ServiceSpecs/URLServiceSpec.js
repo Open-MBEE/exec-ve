@@ -35,7 +35,7 @@ describe("URLService", function () {
 		}))
 	});
 
-	fdescribe('Method getExportHtmlUrl', function () {
+	describe('Method getExportHtmlUrl', function () {
 		var project = "this_isnt_your_project";
 		var ref      = "dont_go_to_this_site";
 		var htmlToPdfURL;
