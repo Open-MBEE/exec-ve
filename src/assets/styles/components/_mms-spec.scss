@@ -3,7 +3,7 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 32px;
-    margin: 20px 0 4px;;
+    margin: 24px 0 4px;;
     height: inherit;
     width: 100%;
   }
@@ -15,20 +15,11 @@
   }
 
   h2.prop-title{
-    //border-top: 1px solid $tertiary_grey;
-    padding-top: 20px;
-    border-top: 1px solid $ve-silver-base;
-  }
-
-  /*First values in the list and should not have a border on top*/
-  .elem-updated-wrapper + h2.prop-title,
-  .element-title + h2.prop-title
-  h2.prop-title:first-child{
-    border-top: none;
+    padding-top: 24px;
   }
 
   span.prop {
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 20px;
     margin-top: 2px;
     min-width: 280px;
@@ -85,12 +76,12 @@ Styles that apply to both the spec
   .elem-wrapper label,
   .prop-title,
   .visibility-toggle{
-    font-size: 13px;
-    font-weight: $bold_font_weight;
+    font-size: 12px;
+    font-weight: 500;
     margin: 10px 5px 0 0;
     letter-spacing: .05em;
     text-decoration: none;
-    color: $ve-light-text-darker-1;
+    color: $ve-light-text;
   }
 
   .visibility-toggle{
