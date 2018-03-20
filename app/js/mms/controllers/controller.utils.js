@@ -299,7 +299,11 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
         // word doesn't support svg only png.
-        mode === 2 ? printElementCopy.find('.mms-svg').remove() : printElementCopy.find('.mms-png').remove();
+        if (mode === 2) {
+            printElementCopy.find('.mms-svg').remove();
+        } else {
+            printElementCopy.find('.mms-png').remove();
+        }
         printElementCopy.find('p:empty').remove();
         printElementCopy.find('p').each(function() {
             var $this = $(this);
