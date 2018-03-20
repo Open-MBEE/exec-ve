@@ -22,9 +22,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
-    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
-        '_allowedElementIds', '_contents', '_relatedDocuments', '_childViews', 'ownedAttributeIds',
-        '_qualifiedName', '_qualifiedId', '_commitId', '_creator', '_created', '_modifier', '_modified'];
     var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
@@ -192,13 +189,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Cleans 
      *
      * @param {Object} elem the element object to be cleaned 
-     * @param {boolean} [forEdit=false] (optional) forEdit.  If true deletes nonEditKeys from elem.
+     * @param {boolean} [forEdit=false] (optional) forEdit.
      * @returns {Object} clean elem
      */
     var cleanElement = function(elem, forEdit) {
-        if (!elem.name) {
-            elem.name = '';
-        }
         var i = 0;
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
@@ -242,13 +236,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 }
                 delete elem[keys[i]];
             }
-            /*
-            for (i = 0; i < nonEditKeys.length; i++) {
-                if (elem.hasOwnProperty(nonEditKeys[i])) {
-                    delete elem[nonEditKeys[i]];
-                }
-            }
-            */
         }
         return elem;
     };
@@ -277,7 +264,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         for (i = 0; i < array.length; i++) {
             data = array[i];
             data2Node[data[id]] = { 
-                label : data.name || data._name, 
+                label : data.name, 
                 type : type,
                 data : data, 
                 children : [] 

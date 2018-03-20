@@ -6,7 +6,7 @@
                 <a class="tree-item">
                     <i ng-class="{'active-text': row.branch.selected}" ng-click="expandCallback(row, $event)" class="indented tree-icon {{row.expand_icon}}" ></i>
                     <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
-                    <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name || row.branch.data._name}}</span>
+                    <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
                 </a>
                 <span class="pull-right {{row.branch.detail.style}}" ng-if="row.branch.detail">
                 <i class="fa fa-{{row.branch.detail.icon}} icon-{{row.branch.detail.iconType}} indented"></i>
