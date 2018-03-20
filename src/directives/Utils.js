@@ -925,10 +925,14 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     var fixImgSrc = function(imgDom) {
         var src = imgDom.attr('src');
-        if (src && src.startsWith('../')) {
-            src = src.replace('../', '/alfresco/');
+        if (src) {
+            if (src.startsWith('../')) {
+                src.replace('../', '/alfresco/');
+            }
+            if (src.startsWith('/alfresco/')) {
+                imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
+            }
         }
-        imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
     };
 
     return {
