@@ -111,11 +111,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             domElement.empty();
             scope.recompileScope = scope.$new();
             if (values.length === 0 || Object.keys(values[0]).length < 2) {
-                domElement[0].innerHTML = '<span class="no-print">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
+                domElement[0].innerHTML = '<span class="no-print placeholder">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
             } else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '' || emptyRegex.test(toCompile)) {
-                    domElement[0].innerHTML = '<span class="no-print">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
+                    domElement[0].innerHTML = '<span class="no-print placeholder">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
                     return;
                 }
                 if (preview) {
