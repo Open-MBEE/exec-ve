@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['VizService','ElementService','URLService','growl', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['ArtifactService','VizService','ElementService','URLService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
@@ -20,7 +20,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
+function mmsTranscludeImg(ArtifactService, VizService, ElementService, URLService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
@@ -38,42 +38,73 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
                 return;
             }
             processed = true;
-
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/svg'};
 
             element.addClass('isLoading');
-            //TODO change when VizService is updated to use correct params
-            VizService.getImageURL(reqOb)
+            ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
-                scope.svgImgUrl = data;
-            //scope.svgImgUrl = URLService.getImageURL(reqOb);
-            //reqOb.accept = 'image/png';
-            //scope.pngImgUrl = URLService.getImageURL(reqOb);
+                scope.element = data;
+                var artifactOb = {
+                    projectId: data._projectId,
+                    refId: data._refId,
+                    artifactIds : data._artifactIds
+                };
+
+                ArtifactService.getArtifacts(artifactOb)
+                .then(function(artifacts) {
+                    scope.artifacts = artifacts;
+                    for(var i = 0; i < artifacts.length; i++) {
+                        var artifact = artifacts[i];
+                        if (artifact.contentType == "image/svg+xml") {
+                            scope.svgImgUrl = artifact.location;
+                        } else if (artifact.contentType == "image/png") {
+                            scope.pngImgUrl = artifact.location;
+                        }
+                    }
+                }, function(reason) {
+                    // todo update
+                    growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+                });
             }, function(reason) {
                 growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
                 element.removeClass('isLoading');
             });
-            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/png'};
-            VizService.getImageURL(reqOb2)
-            .then(function(data) {
-                scope.pngImgUrl = data;
-            }, function(reason) {
-                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
-            });
-            ElementService.getElement(reqOb, 1, false)
-            .then(function(data) {
-                scope.element = data;
-            });
+
+
+
+            //TODO change when VizService is updated to use correct params
+            // VizService.getImageURL(reqOb)
+            // .then(function(data) {
+            //     scope.svgImgUrl = data;
+            // //scope.svgImgUrl = URLService.getImageURL(reqOb);
+            // //reqOb.accept = 'image/png';
+            // //scope.pngImgUrl = URLService.getImageURL(reqOb);
+            // }, function(reason) {
+            //     growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+            // }).finally(function() {
+            //     element.removeClass('isLoading');
+            // });
+            // var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/png'};
+            // VizService.getImageURL(reqOb2)
+            // .then(function(data) {
+            //     scope.pngImgUrl = data;
+            // }, function(reason) {
+            //     //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
+            // });
+            // ElementService.getElement(reqOb, 1, false)
+            // .then(function(data) {
+            //     scope.element = data;
+            // });
         });
     };
 
     return {
         restrict: 'E',
-        template: '<img class="mms-svg" ng-src="{{svgImgUrl}}"></img><img class="mms-png" ng-src="{{pngImgUrl}}"></img>',
+        template: '<img class="mms-svg" ng-src="{{ \'/alfresco\' + svgImgUrl}}"></img><img class="mms-png" ng-src="{{ \'/alfresco\' + pngImgUrl}}"></img>',
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

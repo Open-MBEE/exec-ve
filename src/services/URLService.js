@@ -388,8 +388,8 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys
      * @returns {string} url
      */
-    var getArtifactURL = function(id, reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + id;
+    var getArtifactURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
         return addTicket(addVersion(r, reqOb.commitId));
     };
 
@@ -404,8 +404,9 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys
      * @returns {string} url
      */
-    var getPutArtifactsURL = function(id, reqOb) {
+    var getPutArtifactsURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
+        return addTicket(r);
     };
 
     /**
@@ -419,8 +420,8 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys
      * @returns {string} url
      */
-    var getArtifactHistoryURL = function(id, reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + id + '/commits';
+    var getArtifactHistoryURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
         return addTicket(r);
     };
 

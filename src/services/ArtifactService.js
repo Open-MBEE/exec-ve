@@ -36,7 +36,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
      * @returns {object} cached object
      */
     var cacheArtifact = function(reqOb, artifactOb, edit) {
-        var requestCacheKey = getArtifactCacheKey(reqOb);
+        var requestCacheKey = getArtifactCacheKey(reqOb, artifactOb.id);
         var origResultCommit = artifactOb._commitId;
         if (reqOb.commmitId === 'latest') {
             var resultCommitCopy = JSON.parse(JSON.stringify(artifactOb));
@@ -379,7 +379,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
         var refId = !reqOb.refId ? 'master' : reqOb.refId;
         var commitId = !reqOb.commitId ? 'latest' : reqOb.commitId;
         var artifactId = id ? id : reqOb.artifactId;
-        var key = ['artifact', reqOb.projectId, refId, artifactId, commitId, reqOb.accept];
+        var key = ['artifact', reqOb.projectId, refId, artifactId, commitId];
         if (edit) {
             key.push('edit');
         }
