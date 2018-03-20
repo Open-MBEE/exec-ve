@@ -16,8 +16,8 @@
         <div class="transclude-modal-instructions">
             {{description}}
         </div>
-        <label ng-show="showEditableOp">
-            <input type="checkbox" ng-model="nonEditableCheckbox">&nbsp;Restrict editing
+        <label ng-show="showEditableOp" for="nonEditableCheckbox">
+            <input id="nonEditableCheckbox" type="checkbox" ng-model="nonEditableCheckbox">&nbsp;Restrict editing
         </label>
 
         <mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
