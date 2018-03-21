@@ -292,6 +292,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return old;
         });
 
+        handleTomSawyerDiagram(printElementCopy);
+
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
@@ -430,6 +432,19 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     var refreshNumbering = function(tree, centerElement) {
         UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true, false);
     };
+
+    /** Replace mms-ts-diagram with its canvas (but as an img element) **/
+    function handleTomSawyerDiagram(element) {
+        element.find($('mms-ts-diagram')).each(function(){
+            var tsDom = $(this);
+            var canvas = tsDom.find('canvas')[0];
+            if(canvas) {
+                var imgElement = $('<img>');
+                imgElement.attr('src', canvas.toDataURL());
+                tsDom.replaceWith(imgElement);
+            }
+        });
+    }
 
     return {
         printModal: printModal,
