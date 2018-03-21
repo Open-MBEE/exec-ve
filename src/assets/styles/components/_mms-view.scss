@@ -11,7 +11,7 @@ mms-view {
     mms-view-section {
       display: block;
       border: 2px solid $tertiary_grey;
-      border-radius: 5px;
+      @include border-radius(5px);
     }
   }
 

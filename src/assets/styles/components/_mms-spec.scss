@@ -59,7 +59,7 @@
       background-color: $yellow;
       cursor: auto;
       display: block;
-      border-radius: 5px;
+      @include border-radius(5px);
       padding: 2px;
       margin-bottom: 5px;
     }
@@ -123,14 +123,13 @@ Styles that apply to both the spec
     letter-spacing: .1em;
     margin-right: 6px;
     padding: 2px 5px;
-    wrap-text: none;
-    white-space: pre;
+    white-space: nowrap;
     margin: 3px;
     display:inline-block;
     font-size: 12px;
     font-weight: 500;
     background: $highlight_grey;
-    border-radius: 3px;
+    @include border-radius(3px);
     color: $ve-light-text-darker-1;
   }
 

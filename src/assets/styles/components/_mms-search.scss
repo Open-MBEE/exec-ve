@@ -117,7 +117,7 @@
 
     input {
       min-height: 30px;
-      border-radius: 2px;
+      @include border-radius(2px);
       border: 1px solid $tertiary_grey;
       padding: 3px 5px;
     }

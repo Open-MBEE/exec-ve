@@ -46,7 +46,7 @@ mms-history {
     width: 8px;
     top: 20px;
     border-right: none;
-    border-radius: 8px 0 0 8px;
+    @include border-radius(8px 0 0 8px);
   }
 
   /*Flex styling to keep buttons and labels vertically aligned*/
@@ -129,7 +129,7 @@ mms-history {
   .element-preview-box{
     padding: 0 20px;
     background-color: $ve-silver-lighter-1;
-    border-radius: 3px;
+    @include border-radius(3px);
     border: 1px solid $ve-silver-darker-1;
   }
 }
