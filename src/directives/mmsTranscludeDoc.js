@@ -91,7 +91,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             var doc = preview ? scope.edit.documentation : scope.element.documentation;
             if (!doc || emptyRegex.test(doc)) {
                 if (preview) {
-                    doc = '<p class="no-print placeholder" ng-class="{placeholder: commitId!=\'latest\'}">(no ' + scope.panelType + ')</p>';
+                    doc = '<p class="no-print placeholder">(no ' + scope.panelType + ')</p>';
                 }
                 var p = '<span class="no-print placeholder">(no ' + scope.panelType + ')</span>';
                 if (scope.commitId !== 'latest')
