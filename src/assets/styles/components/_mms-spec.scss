@@ -19,7 +19,7 @@
   }
 
   span.prop {
-    font-size: 18px;
+    font-size: 1.15em;
     margin-bottom: 20px;
     margin-top: 2px;
     min-width: 280px;
@@ -77,7 +77,7 @@ Styles that apply to both the spec
   .prop-title,
   .visibility-toggle{
     font-size: 12px;
-    font-weight: 500;
+    font-weight: bold;
     margin: 10px 5px 0 0;
     letter-spacing: .05em;
     text-decoration: none;
@@ -128,7 +128,6 @@ Styles that apply to both the spec
     margin: 3px;
     display:inline-block;
     font-size: 12px;
-    font-weight: 500;
     background: $highlight_grey;
     border-radius: 3px;
     color: $ve-light-text-darker-1;
