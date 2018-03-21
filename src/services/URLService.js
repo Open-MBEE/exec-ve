@@ -413,7 +413,7 @@ function urlService(baseUrl, mmsUrl) {
     var getLogoutURL = function() {
         return addTicket(root + '/api/login/ticket/' + ticket);
     };
-    
+
     var getCheckTicketURL = function(t) {
         return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
     };
@@ -515,7 +515,7 @@ function urlService(baseUrl, mmsUrl) {
     var setTicket = function(t) {
         ticket = t;
     };
-    
+
     var getJMSHostname = function(){
         return root + '/connection/jms';
     };
