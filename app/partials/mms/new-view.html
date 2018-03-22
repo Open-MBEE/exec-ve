@@ -17,7 +17,7 @@
         <div class="comment-modal-input">
             <div class="form-group">
                 <label>Name:</label>
-                <input class="form-control" ng-model="newView.name" type="text" placeholder="Type a name for your view here" autofocus>
+                <input class="form-control" ng-model="newView.name" ng-keyup="$event.keyCode == 13 ? ok() : null" type="text" placeholder="Type a name for your view here" autofocus>
             </div>
         </div>
     </div>
