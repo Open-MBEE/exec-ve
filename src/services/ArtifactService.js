@@ -40,7 +40,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
         var origResultCommit = artifactOb._commitId;
         if (reqOb.commmitId === 'latest') {
             var resultCommitCopy = JSON.parse(JSON.stringify(artifactOb));
-            resultCommitCopy._commitId = 'latest'; //so realCacheKey is right later
+            resultCommitCopy._commitId = artifactOb._commitId;
             var commitCacheKey = UtilsService.makeArtifactKey(resultCommitCopy); //save historic artifact
             if (!edit) {
                 CacheService.put(commitCacheKey, resultCommitCopy, true);
@@ -248,88 +248,10 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
      * @returns {Promise} The promise will be resolved with the updated cache element reference if 
      *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
-    var updateArtifact = function(artifactOb, returnChildViews) { //artifactOb should have the keys needed to make url
-        var deferred = $q.defer();
-
-        var handleSuccess = function(data) {
-            var e = null;
-            if (data.artifacts.length > 1 && artifactOb.id) {
-                for (var i = 0; i < data.artifacts.length; i++) {
-                    if (data.artifacts[i].id === artifactOb.id) {
-                        e = data.artifacts[i];
-                        break;
-                    }
-                }
-                if (!e) {//TODO shouldn't happen
-                    e = data.artifacts[0];
-                }
-            } else {
-                e = data.artifacts[0];
-            }
-            var metaOb = {
-                projectId: e._projectId,
-                refId: e._refId,
-                commitId: 'latest',
-                artifactId: e.id
-            };
-            var resp = cacheArtifact(metaOb, e);
-            var editCopy = JSON.parse(JSON.stringify(e));
-            cacheArtifact(metaOb, editCopy, true);
-            var history = CacheService.get(['artifactHistory', metaOb.projectId, metaOb.refId, metaOb.artifactId]);
-            if (history) {
-                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
-            }
-            deferred.resolve(resp);
-        };
-
-        if (!artifactOb.hasOwnProperty('id')) {
-            deferred.reject({status: 400, data: '', message: 'Artifact id not found, create artifact first!'});
-            return deferred.promise;
-        }
-
-        // Post artifact to update
-        $http.post(URLService.getPutArtifactsURL({
-                projectId: artifactOb._projectId,
-                refId: artifactOb._refId,
-            }), {
-                artifacts: [artifactOb],
-                source: ApplicationService.getSource()
-            }, {timeout: 60000})
-        .then(function(response) {
-            if (!angular.isArray(response.data.artifacts) || response.data.artifacts.length === 0) {
-                deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
-                return;
-            }
-            handleSuccess(response.data);
-        }, function(response) {
-            if (response.status === 409) {
-                var serverOb = response.data.artifacts[0];
-                var origCommit = artifactOb._commitId;
-                artifactOb._commitId = 'latest';
-                var origOb = CacheService.get(UtilsService.makeElementKey(artifactOb));
-                artifactOb._commitId = origCommit;
-                if (!origOb) {
-                    URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-                    return;
-                } 
-                if (!UtilsService.hasConflict(artifactOb, origOb, serverOb)) {
-                    artifactOb._read = serverOb._read;
-                    artifactOb._modified = serverOb._modified;
-                    updateArtifact(artifactOb, returnChildViews)
-                    .then(function(good) {
-                        deferred.resolve(good);
-                    }, function(reason) {
-                        deferred.reject(reason);
-                    });
-                } else {
-                    URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-                }
-            } else {
-                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-            }
-        });
-        return deferred.promise;
-    };
+    // var updateArtifact = function(artifactOb, returnChildViews) { //artifactOb should have the keys needed to make url
+    //     var deferred = $q.defer();
+    //     return deferred.promise;
+    // };
 
     /**
      * @ngdoc method
@@ -344,36 +266,9 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
      * @returns {Promise} The promise will be resolved with the created artifact
      *                    references if create is successful.
      */
-    var createArtifact = function(reqOb) {
-        UtilsService.normalize(reqOb);
-        var deferred = $q.defer();
-        var url = URLService.getPostArtifactsURL(reqOb);
-
-        $http.post(url, {'artifacts': [reqOb.artifact], 'source': ApplicationService.getSource()})
-        .then(function(response) {
-            if (!angular.isArray(response.data.artifacts) || response.data.artifacts.length === 0) {
-                deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
-                return;
-            }
-            var resp = null;
-            if (response.data.artifacts.length > 1 && reqOb.artifact.id) {
-                for (var i = 0; i < response.data.artifacts.length; i++) {
-                    if (response.data.artifacts[i].id === reqOb.artifact.id) {
-                        resp = response.data.artifacts[i];
-                    }
-                }
-                if (!resp) {//shouldn't happen!
-                    resp = response.data.artifacts[0];
-                }
-            } else {
-                resp = response.data.artifacts[0];
-            }
-            deferred.resolve(cacheArtifact(reqOb, resp));
-        }, function(response) {
-            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-        });
-        return deferred.promise;
-    };
+    // var createArtifact = function(reqOb) {
+    //     return deferred.promise;
+    // };
 
     var getArtifactCacheKey = function(reqOb, id, edit) {
         var refId = !reqOb.refId ? 'master' : reqOb.refId;
@@ -396,8 +291,8 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
         getArtifact: getArtifact,
         getArtifacts: getArtifacts,
         getArtifactHistory: getArtifactHistory,
-        createArtifact: createArtifact,
-        updateArtifact: updateArtifact,
+        // createArtifact: createArtifact,
+        // updateArtifact: updateArtifact,
         reset: reset
     };
 }
