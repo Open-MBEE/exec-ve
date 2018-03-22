@@ -402,14 +402,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             documentOb: ['$stateParams', '$q', 'ElementService', 'ViewService', 'refOb', 'ticket', function($stateParams, $q, ElementService, ViewService, refOb, ticket) {
                 var deferred = $q.defer();
                 var eid = $stateParams.documentId;
-                var projectId = $stateParams.projectId;
-                var refId = $stateParams.refId;
                 var coverIndex = eid.indexOf('_cover');
                 if (coverIndex > 0) {
                     var groupId = eid.substring(5, coverIndex);
                     ElementService.getElement({
-                        projectId: projectId,
-                        refId: refId,
+                        projectId: $stateParams.projectId,
+                        refId: $stateParams.refId,
                         extended: true,
                         elementId: eid
                     }, 2).then(function(data) {
@@ -419,7 +417,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             if (refOb.type === 'Tag') {
                                 deferred.resolve(null);
                             } else {
-                                var viewDoc = '<mms-group-docs mms-project-id="' + projectId + '" mms-ref-id="' + refId + '" mms-group-id="' + groupId + '">[cf:group docs]</mms-group-docs>';
+                                var viewDoc = '<mms-group-docs mms-group-id="' + groupId + '">[cf:group docs]</mms-group-docs>';
                                 ElementService.getElement({projectId: $stateParams.projectId, refId: $stateParams.refId, elementId: groupId})
                                 .then(function(groupElement) {
                                     ViewService.createView({
