@@ -24,8 +24,8 @@
 
     /*Border with shadow added when search results >= 0*/
     &.searchresults{
-      border-bottom: 1px solid #e9e9e9;
-      box-shadow: 0px 5px 4px -5px rgba(0,0,0,.1);
+      border-bottom: 1px solid $ve-silver-darker-1;
+      box-shadow: 0 4px 4px -4px rgba(0,0,0,.1);
       padding-bottom: 0;
     }
   }
@@ -39,7 +39,6 @@
   .search-nav{
     padding:36px 36px 60px;
   }
-
 
   .mms-search-input {
     max-width: 1200px;
@@ -145,14 +144,15 @@
 3. Results styles
 -------------------------------------------------------------------*/
 
+  .search-results{
+    background: $white;
+    border-top: 1px solid $ve-silver-darker-1;
+  }
+
   .elem-wrapper {
     padding: 36px 0;
     margin:0 30px;
-    border-top: 1px solid $tertiary_grey;
-
-    &:last-child {
-      border-bottom: 1px solid $tertiary_grey;
-    }
+    border-bottom: 1px solid $ve-silver-darker-1;
 
     .elem-name {
       font-size: 22px;
