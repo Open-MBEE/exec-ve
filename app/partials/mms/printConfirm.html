@@ -28,7 +28,7 @@
     <div ng-if="type == 'DOCUMENT' && mode !== 1">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
     <div ng-if="model.genTotf">Use HTML for List of Tables and Figures (will not include equations and may differ from web numbering): <input type="checkbox" ng-model="model.htmlTotf"></div>
     <div ng-if="mode !== 1">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
-    <form ng-if="type == 'DOCUMENT' && (mode !== 1)" role="form">
+    <form ng-if="type == 'DOCUMENT' && (mode === 3)" role="form">
         <h6>Header and Footer</h6>
         <div>Use 'counter(page)' for page number.</div>
         <div class="form-group">

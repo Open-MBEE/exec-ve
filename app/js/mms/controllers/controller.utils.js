@@ -196,9 +196,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     } else {
                       result.tof = choice[2] ? result.tof + result.toe : '<div style="display:none;"></div>';
                       result.tot = choice[2] ? result.tot : '<div style="display:none;"></div>';
-                      var name = viewOrDocOb.name + new Date().getTime();
-                      var htmlString = ['<html><head><title>', name, '</title><style>', css, '</style></head><body style="overflow: auto">', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
-                      UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId})
+                      var htmlString = ['<html><head><title>', viewOrDocOb.name, '</title><style>', css, '</style></head><body style="overflow: auto">', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
+                      UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId})
                         .then(function(reuslt) {
                             deferred.resolve(result);
                         }, function(reason){
