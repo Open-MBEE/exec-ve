@@ -40,7 +40,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
         var origResultCommit = artifactOb._commitId;
         if (reqOb.commmitId === 'latest') {
             var resultCommitCopy = JSON.parse(JSON.stringify(artifactOb));
-            resultCommitCopy._commitId = artifactOb._commitId;
+            artifactOb._commitId = 'latest'; //so realCacheKey is right later
             var commitCacheKey = UtilsService.makeArtifactKey(resultCommitCopy); //save historic artifact
             if (!edit) {
                 CacheService.put(commitCacheKey, resultCommitCopy, true);

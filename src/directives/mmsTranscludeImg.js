@@ -1,14 +1,17 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['ArtifactService','VizService','ElementService','URLService','growl', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['ArtifactService','AuthService','ElementService','URLService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeImg
  *
- * @requires mms.VizService
+ * @requires mms.ArtifactService
+ * @requires mms.AuthService
  * @requires mms.ElementService
+ * @requires mms.URLService
+ * @requires growl
  *
  * @restrict E
  *
@@ -20,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeImg(ArtifactService, VizService, ElementService, URLService, growl) {
+function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
@@ -43,6 +46,8 @@ function mmsTranscludeImg(ArtifactService, VizService, ElementService, URLServic
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
+            var server = URLService.getMmsServer();
+            var ticket = '?alf_ticket=' + AuthService.getTicket();
             element.addClass('isLoading');
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
@@ -60,9 +65,9 @@ function mmsTranscludeImg(ArtifactService, VizService, ElementService, URLServic
                     for(var i = 0; i < artifacts.length; i++) {
                         var artifact = artifacts[i];
                         if (artifact.contentType == "image/svg+xml") {
-                            scope.svgImgUrl = artifact.location;
+                            scope.svgImgUrl = server + '/alfresco' + artifact.location + ticket;
                         } else if (artifact.contentType == "image/png") {
-                            scope.pngImgUrl = artifact.location;
+                            scope.pngImgUrl = server + '/alfresco' + artifact.location + ticket;
                         }
                     }
                 }, function(reason) {
@@ -79,7 +84,7 @@ function mmsTranscludeImg(ArtifactService, VizService, ElementService, URLServic
 
     return {
         restrict: 'E',
-        template: '<img class="mms-svg" ng-src="{{ \'/alfresco\' + svgImgUrl}}"></img><img class="mms-png" ng-src="{{ \'/alfresco\' + pngImgUrl}}"></img>',
+        template: '<img class="mms-svg" ng-src="{{svgImgUrl}}"></img><img class="mms-png" ng-src="{{pngImgUrl}}"></img>',
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',
