@@ -259,7 +259,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             return '';
         });
-        // Conversion of canvas to its dataUrl must be done because "clone", because "clone" doesn't preserve
+        // Conversion of canvas to its dataUrl must be done before "clone", because "clone" doesn't preserve
         // canvas' content
         var mapping = storeTomsawyerDiagramAsImg(printElementCopy);
         printElementCopy = printElementCopy.clone();
@@ -438,7 +438,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true, false);
     };
 
-    /** Store canvas as an img element to be used later **/
+    /** Store all tomsawyer diagram(canvas) as an img element **/
     function storeTomsawyerDiagramAsImg(originalDom) {
         var mapping = {};
         originalDom.find('mms-ts-diagram').each(function(index){
