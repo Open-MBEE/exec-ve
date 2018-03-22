@@ -24,8 +24,11 @@ function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _)
         var mmsViewCtrl = controllers[1];
         var update = function(documents) {
             var docs = [];
+            var groupId = scope.mmsGroupId === '' ? undefined : scope.groupId;
             for (var i = 0; i < documents.length; i++) {
-                if (documents[i]._groupId == scope.mmsGroupId) {
+                if (groupId === undefined || groupId === projectId) {
+                    docs.push(documents[i]);
+                } else if (documents[i]._groupId == scope.mmsGroupId) {
                     docs.push(documents[i]);
                 }
             }
