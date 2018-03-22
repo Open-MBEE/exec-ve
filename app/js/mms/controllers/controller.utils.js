@@ -445,7 +445,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             var canvas = tsDom.find('canvas')[0];
             if(canvas) {
                 var imgElement = $('<img>');
-                imgElement.attr('src', canvas.toDataURL());
+                imgElement.attr({'src': canvas.toDataURL(), 'width': '100%' });
                 mapping[index] = imgElement;
             }
         });
