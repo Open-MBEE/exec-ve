@@ -717,6 +717,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
         var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
 
+        var untitledName = viewOb.isDoc ? 'Untitled Document' : 'Untitled View';
         var view = UtilsService.createClassElement({
             id: newViewId,
             type: 'Class',
@@ -730,7 +731,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 id: newViewId + "_vc_expression",
                 ownerId: newViewId + "_vc"
             }),
-            name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
+            name: viewOb.viewName ? viewOb.viewName : untitledName,
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
                 (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
@@ -860,7 +861,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createGroup = function(siteName, ownerOb) {
         var deferred = $q.defer();
 
-        var PACKAGE_ID =  UtilsService.createMmsId(), OWNER_ID = ownerOb.id, DEPENDENCY_ID = UtilsService.createMmsId(),
+        var PACKAGE_ID = UtilsService.createMmsId(), OWNER_ID = ownerOb.id, DEPENDENCY_ID = UtilsService.createMmsId(),
             GENERALIZATION_ID = UtilsService.createMmsId(), SITE_CHAR_BLOCK_ID = UtilsService.createMmsId(),
             DEPENDENCY_ASI_ID = DEPENDENCY_ID + "_asi", SITE_CHAR_BLOCK_ASI_ID = SITE_CHAR_BLOCK_ID + "_asi";
 
@@ -958,7 +959,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#getSiteDocuments
+     * @name mms.ViewService#getProjectDocuments
      * @methodOf mms.ViewService
      * 
      * @description
@@ -1010,7 +1011,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (type === 'LiteralString') { // If it is a Opaque List, Paragraph, Table, Image, List:
             var jsonString = instanceSpecSpec.value;
-            return JSON.parse(jsonString); 
+            return JSON.parse(jsonString);
         } else if (type === 'Expression') { // If it is a Opaque Section, or a Expression:
             // If it is a Opaque Section then we want the instanceSpec:
             if (isSection(instanceSpec)) {
@@ -1056,7 +1057,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var elementObject = {};
-
         elementObject.instanceId = instanceVal.instanceId;
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
@@ -1193,8 +1193,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var reset = function() {
         inProgress = {};
     };
-    
+
     return {
+        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
@@ -1214,7 +1215,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeElementFromViewOrSection: removeElementFromViewOrSection,
         removeViewFromParentView: removeViewFromParentView,
         createInstanceSpecification: createInstanceSpecification,
-        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getElementReferenceTree : getElementReferenceTree,
         getDocMetadata: getDocMetadata,
         reset: reset
