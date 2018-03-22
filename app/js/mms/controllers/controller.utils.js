@@ -259,7 +259,12 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             return '';
         });
+        // Conversion of canvas to its dataUrl must be done because "clone", because "clone" doesn't preserve
+        // canvas' content
+        var mapping = storeTomsawyerDiagramAsImg(printElementCopy);
         printElementCopy = printElementCopy.clone();
+        replaceMmsTsDiagramWithImg(printElementCopy, mapping);
+
         var hostname = $location.host();
         var port = $location.port();
         var protocol = $location.protocol();
@@ -292,7 +297,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return old;
         });
 
-        handleTomSawyerDiagram(printElementCopy);
+
 
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
@@ -433,16 +438,26 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true, false);
     };
 
-    /** Replace mms-ts-diagram with its canvas (but as an img element) **/
-    function handleTomSawyerDiagram(element) {
-        element.find($('mms-ts-diagram')).each(function(){
+    /** Store canvas as an img element to be used later **/
+    function storeTomsawyerDiagramAsImg(originalDom) {
+        var mapping = {};
+        originalDom.find('mms-ts-diagram').each(function(index){
             var tsDom = $(this);
             var canvas = tsDom.find('canvas')[0];
             if(canvas) {
                 var imgElement = $('<img>');
                 imgElement.attr('src', canvas.toDataURL());
-                tsDom.replaceWith(imgElement);
+                mapping[index] = imgElement;
             }
+        });
+        return mapping;
+    }
+
+    /** Replace all mms-ts-diagram elements with their corresponding img elements **/
+    function replaceMmsTsDiagramWithImg(element, mapping) {
+        element.find('mms-ts-diagram').each(function(index) {
+           var imgDom = mapping[index];
+           $(this).replaceWith(imgDom);
         });
     }
 
