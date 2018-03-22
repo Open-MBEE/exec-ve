@@ -708,9 +708,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} ownerOb should contain _project and _ref, can be a parent view with _childViews
      * @param {object} viewOb can specify optional viewId, viewName, viewDoc to be used when
      *                          creating the new view, boolean isDoc indicate whether it's a document
-     * @returns {Promise} The promise will be resolved with the new view. 
+     * @param {string} peDoc optional documentation to set for pe creation
+     * @returns {Promise} The promise will be resolved with the new view.
      */
-    var createView = function(ownerOb, viewOb) {
+    var createView = function(ownerOb, viewOb, peDoc) {
         var deferred = $q.defer();
 
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
@@ -724,7 +725,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: UtilsService.createValueSpecElement({
-                operand: [],
+                operand: [UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: newInstanceId})],
                 type: 'Expression',
                 id: newViewId + "_vc_expression",
                 ownerId: newViewId + "_vc"
@@ -750,6 +751,27 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
+        var peSpec = {
+            'type': 'Paragraph',
+            'sourceType': 'reference',
+            'source': newInstanceId,
+            'sourceProperty': 'documentation'
+        };
+        var pe = UtilsService.createInstanceElement({
+            id: newInstanceId,
+            ownerId: 'view_instances_bin_' + ownerOb._projectId,
+            name: "View Paragraph",
+            documentation: peDoc ? peDoc : '',
+            type: "InstanceSpecification",
+            classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
+            specification: UtilsService.createValueSpecElement({
+                value: JSON.stringify(peSpec),
+                type: "LiteralString",
+                id: UtilsService.createMmsId(),
+                ownerId: newInstanceId
+            }),
+            _appliedStereotypeIds: [],
+        });
         var asi = UtilsService.createInstanceElement({ //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
@@ -760,7 +782,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         });
-        var toCreate = [view, asi];
+        var toCreate = [pe, view, asi];
         if (parentView) {
             parentView = ElementService.fillInElement(parentView);
             toCreate.push(parentView);
