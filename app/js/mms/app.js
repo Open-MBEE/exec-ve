@@ -49,6 +49,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                       password: ''
                     };
                     $rootScope.ve_title = 'Login';
+                    $scope.pageTitle = 'View Editor';
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                         $scope.spin = true;
@@ -115,7 +116,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'login@': {
                 templateUrl: 'partials/mms/select.html',
                 controller: ['$scope', '$rootScope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, $stateParams, orgObs, ProjectService, AuthService, growl, $localStorage) {
-                    $rootScope.ve_title = 'View Editor';
+                    $rootScope.ve_title = 'Projects';
+                    $scope.pageTitle = 'View Editor';
                     $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
                     $scope.spin = false;
