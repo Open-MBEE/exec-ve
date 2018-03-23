@@ -354,6 +354,27 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
     /**
      * @ngdoc method
+     * @name mms.UtilsService#makeArtifactKey
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Make key for element for use in CacheService
+     *
+     * @param {string} elementOb element object
+     * @param {boolean} [edited=false] element is to be edited
+     * @returns {Array} key to be used in CacheService
+     */
+    var makeArtifactKey = function(elementOb, edit) {
+        var refId = !elementOb._refId ? 'master' : elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+        var key = ['artifact', elementOb._projectId, refId, elementOb.id, commitId];
+        if (edit)
+            key.push('edit');
+        return key;
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.UtilsService#mergeElement
      * @methodOf mms.UtilsService
      * 
@@ -1208,6 +1229,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         cleanElement: cleanElement,
         normalize: normalize,
         makeElementKey: makeElementKey,
+        makeArtifactKey: makeArtifactKey,
         buildTreeHierarchy: buildTreeHierarchy,
         filterProperties: filterProperties,
         mergeElement: mergeElement,
