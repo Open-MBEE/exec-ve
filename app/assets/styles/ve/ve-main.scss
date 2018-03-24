@@ -383,7 +383,7 @@ div.tooltip-inner {
     left: 10px;
     top: 6px;
     width: 16px;
-    color:$ve-green-lighter-1;
+    color: $ve-green-lighter-1;
   }
 
   /*Styling for Branch that is being created. */
@@ -450,6 +450,17 @@ div.tooltip-inner {
 
   li.checked-list-item{
     position:relative
+  }
+
+  .dotted-list-item::before {
+    content: "\f00c";
+    font-family: FontAwesome; 
+    height: 16px;
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 16px;
+    color: $ve-silver-darker-1;
   }
 
   .checked-list-item::before {

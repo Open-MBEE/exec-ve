@@ -125,7 +125,7 @@ tr {
   }
 
   .angular-ui-tree-handle:hover{
-    background-color:$ve-silver-darker-1;
+    background-color:$ve-silver-lighter-0;
   }
 
   .angular-ui-tree-placeholder{
@@ -146,6 +146,13 @@ tr {
     background-repeat: no-repeat;
     position: absolute;
     left: 4px;
+  }
+
+  .angular-ui-tree-placeholder+.angular-ui-tree-node,
+  .angular-ui-tree-node+.angular-ui-tree-placeholder{
+    .angular-ui-tree-handl:hover{
+      background-color: transparent;
+    }
   }
 }
 
