@@ -168,6 +168,8 @@
     <h2 class="prop-title">Formatted Modified Time</h2>
     <span class="prop">{{element._modified}}</span>
     <h2 class="prop-title">Commit</h2>
-    <span class="prop">{{element._commitId}}</span>
+    <span class="prop">
+        <a target="_blank" ng-href="/alfresco/service/projects/{{element._projectId}}/refs/{{element._refId}}/elements/{{element.id}}?commitId={{element._commitId}}">{{element._commitId}}</a>
+    </span>
     </div>
 </div>
