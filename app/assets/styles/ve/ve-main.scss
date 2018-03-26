@@ -262,25 +262,29 @@ div.tooltip-inner {
   2.3 Dropdown
 -------------------------------------------------------------------*/
 
+@mixin fa-menu-content($content, $color) {
+  content: "\f00c";
+  font-family: FontAwesome;
+  position: absolute;
+  top: 3px;
+  color: $color;
+}
+
 // selected item styling
 .dropdown-menu {
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color: $ve-green-lighter-1;
-  }
-
-  li.checked-list-item {
-    position: relative
-  }
-
   .secondary-checked-list-item::before {
-    color: $ve-silver-darker-1;
+    @include fa-menu-content("\f00c", $ve-silver-darker-1);
+    left: 10px;
+  }
+
+  .checked-list-item::before {
+    @include fa-menu-content("\f00c", $ve-green-lighter-1);
+    left: 10px;
+  }
+
+  li.checked-list-item,
+  li.secondary-checked-list-item {
+    position: relative;
   }
 }
 
@@ -292,7 +296,7 @@ div.tooltip-inner {
     min-height: 0;
     overflow-y: auto;
     max-height: 300px;
-    overflow-x:hidden;
+    overflow-x: hidden;
   }
 
   button.dropdown-toggle {
