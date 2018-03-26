@@ -24,11 +24,11 @@
                 </li>
             </ul>
         </div>
-        <div class="btn-group ve-light-dropdown" style="flex:2" ng-show="disableRevert">
-            <button class="dropdown-toggle">Element does not exist</button>
-        </div>
 
-        <span class="inline-btn-label">on</span>
+        <span class="inline-btn-label" style="flex:2;text-align:right;" ng-show="disableRevert">Element does not exist</span>
+
+        <span class="inline-btn-label"> on</span>
+
         <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.refisopen" auto-close="outsideClick" style="flex:1">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 {{baseCommit.refSelected.type}}: <b>{{baseCommit.refSelected.name}}</b>
