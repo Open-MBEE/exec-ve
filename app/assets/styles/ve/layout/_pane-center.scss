@@ -147,13 +147,6 @@ tr {
     position: absolute;
     left: 4px;
   }
-
-  .angular-ui-tree-placeholder+.angular-ui-tree-node,
-  .angular-ui-tree-node+.angular-ui-tree-placeholder{
-    .angular-ui-tree-handl:hover{
-      background-color: transparent;
-    }
-  }
 }
 
 .diff-pane-center {
