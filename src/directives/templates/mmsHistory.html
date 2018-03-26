@@ -9,21 +9,25 @@
 <div style="position:relative;">
     <div ng-if="ModelData.ShowDiffPrototype" class="inline-diff-buttons fade-in-out">
         <span class="inline-btn-label">Base:</span>
-        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="flex:2">
+        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="flex:2" ng-hide="disableRevert">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}: <b>{{baseCommit.commitSelected._creator}}</b>
+                {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{baseCommit.commitSelected._creator}}</b>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
                 <li class="dropdown-input">
-                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Filter history">
+                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Filter history on  {{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}">
                 </li>
                 <li ng-click="baseCommitClicked(version)" ng-repeat="version in baseCommit.baseHistory | filter:compareHistoryFilter"
                     ng-class="{'checked-list-item': version === baseCommit.commitSelected,'dotted-list-item': version === compareCommit.commitSelected}" ng-disabled="$index === 0" >
-                    <a>{{version._created | date:'M/d/yy h:mm a'}}: <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
+                    <a>{{version._created | date:'M/d/yy h:mm a'}} by <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
                 </li>
             </ul>
         </div>
+        <div class="btn-group ve-light-dropdown" style="flex:2" ng-show="disableRevert">
+            <button class="dropdown-toggle">Element does not exist</button>
+        </div>
+
         <span class="inline-btn-label">on</span>
         <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.refisopen" auto-close="outsideClick" style="flex:1">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
@@ -47,16 +51,16 @@
         <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype">Compare:</span>
         <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink':ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="compareCommit.isopen" auto-close="outsideClick" style="flex:2">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                <span>{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}: <b>{{compareCommit.commitSelected._creator}}</b></span>
+                <span>{{compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{compareCommit.commitSelected._creator}}</b></span>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
             <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
                 <li class="dropdown-input">
-                    <input class="ve-plain-input" type="text" placeholder="Filter history" ng-model="historyFilter">
+                    <input class="ve-plain-input" type="text" placeholder="Filter history on {{compareCommit.ref.type}}: {{compareCommit.ref.name}}" ng-model="historyFilter">
                 </li>
                 <li ng-click="commitClicked(version)" ng-repeat="version in compareCommit.compareHistory | filter:historyFilter"
                     ng-class="{'checked-list-item': version === compareCommit.commitSelected,'dotted-list-item': version === baseCommit.commitSelected && ModelData.ShowDiffPrototype}">
-                    <a>{{version._created | date:'M/d/yy h:mm a'}}: <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
+                    <a>{{version._created | date:'M/d/yy h:mm a'}} by <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
                 </li>
             </ul>
         </div>
@@ -71,29 +75,31 @@
     <div class="ve-notify-banner fade-in-out" ng-show="disableRevert">
         <span>Element does not exist on <strong>{{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}</strong></span>
     </div>
-    <h1 class="prop element-title">
-        <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="name" mms-base-project-id="{{mmsProjectId}}"
+    <div ng-hide="disableRevert">
+        <h1 class="prop element-title">
+            <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="name" mms-base-project-id="{{mmsProjectId}}"
+            mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
+            mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
+        </h1>
+
+        <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
+        <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="doc" mms-base-project-id="{{mmsProjectId}}"
         mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
         mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
-    </h1>
 
-    <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="doc" mms-base-project-id="{{mmsProjectId}}"
-    mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
-    mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
-
-    <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
-    <h2 class="prop-title">val</h2>
-    <span class="prop">
-        <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="val" mms-base-project-id="{{mmsProjectId}}"
-        mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
-        mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
-    </span>
+        <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
+        <h2 class="prop-title">val</h2>
+        <span class="prop">
+            <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="val" mms-base-project-id="{{mmsProjectId}}"
+            mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
+            mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
+        </span>
+        </div>
+        <h2 class="prop-title">Commit</h2>
+        <span class="prop">{{baseCommit.commitSelected.id}}<br>
+        <img src="assets/images/arrow-change.svg" class="change-connection"><br>
+        {{compareCommit.commitSelected.id}}</span>
     </div>
-    <h2 class="prop-title">Commit</h2>
-    <span class="prop">{{baseCommit.commitSelected.id}}<br>
-    <img src="assets/images/arrow-change.svg" class="change-connection"><br>
-    {{compareCommit.commitSelected.id}}</span>
 </div>
 
 <!-- Spec window -->
