@@ -262,6 +262,28 @@ div.tooltip-inner {
   2.3 Dropdown
 -------------------------------------------------------------------*/
 
+// selected item styling
+.dropdown-menu {
+  .checked-list-item::before {
+    content: "\f00c";
+    font-family: FontAwesome;
+    height: 16px;
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    width: 16px;
+    color: $ve-green-lighter-1;
+  }
+
+  li.checked-list-item {
+    position: relative
+  }
+
+  .secondary-checked-list-item::before {
+    color: $ve-silver-darker-1;
+  }
+}
+
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav {
 
@@ -331,8 +353,8 @@ div.tooltip-inner {
   /*Clearing bootstrap styling*/
   .dropdown-menu > li > a {
     padding: 1px 10px;
-    font-weight:300;
-    color:white;
+    font-weight: 300;
+    color: white;
   }
 
   button.dropdown-toggle:hover {
@@ -375,30 +397,19 @@ div.tooltip-inner {
     padding: 0px;
   }
 
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color: $ve-green-lighter-1;
-  }
-
   /*Styling for Branch that is being created. */
 
-  .branch-disabled{
+  .branch-disabled {
     color:$ve-white-text-darker-1;
   }
 
-  .branch-disabled::before{
+  .branch-disabled::before {
     font-family:FontAwesome;
     content: "\2026";
     position: absolute;
     left: 10px;
     top: 3px;
-    color:$ve-silver-base;
+    color: $ve-silver-base;
   }
 }
 
@@ -446,32 +457,6 @@ div.tooltip-inner {
 
   li a{
     padding-left: 32px;
-  }
-
-  li.checked-list-item{
-    position:relative
-  }
-
-  .dotted-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome; 
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color: $ve-silver-darker-1;
-  }
-
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color:$ve-green-lighter-1;
   }
 
   ul{

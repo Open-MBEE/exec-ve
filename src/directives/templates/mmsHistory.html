@@ -16,10 +16,10 @@
             </button>
             <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
                 <li class="dropdown-input">
-                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Filter history on  {{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}">
+                    <input class="ve-plain-input" ng-model="compareHistoryFilter" type="text" placeholder="Filter history on {{baseCommit.refSelected.type}}: {{baseCommit.refSelected.name}}">
                 </li>
                 <li ng-click="baseCommitClicked(version)" ng-repeat="version in baseCommit.baseHistory | filter:compareHistoryFilter"
-                    ng-class="{'checked-list-item': version === baseCommit.commitSelected,'dotted-list-item': version === compareCommit.commitSelected}" ng-disabled="$index === 0" >
+                    ng-class="{'checked-list-item': version === baseCommit.commitSelected,'checked-list-item secondary-checked-list-item': version === compareCommit.commitSelected}" ng-disabled="$index === 0" >
                     <a>{{version._created | date:'M/d/yy h:mm a'}} by <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
                 </li>
             </ul>
@@ -59,7 +59,7 @@
                     <input class="ve-plain-input" type="text" placeholder="Filter history on {{compareCommit.ref.type}}: {{compareCommit.ref.name}}" ng-model="historyFilter">
                 </li>
                 <li ng-click="commitClicked(version)" ng-repeat="version in compareCommit.compareHistory | filter:historyFilter"
-                    ng-class="{'checked-list-item': version === compareCommit.commitSelected,'dotted-list-item': version === baseCommit.commitSelected && ModelData.ShowDiffPrototype}">
+                    ng-class="{'checked-list-item': version === compareCommit.commitSelected,'checked-list-item secondary-checked-list-item': version === baseCommit.commitSelected && ModelData.ShowDiffPrototype}">
                     <a>{{version._created | date:'M/d/yy h:mm a'}} by <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
                 </li>
             </ul>
