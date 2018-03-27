@@ -91,7 +91,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
     function _getContentIfElementNotFound(type, reqOb, cfLabel) {
         var AT = ViewService.AnnotationType;
         var inlineContent = '';
-        var tooltipContent = reqOb.id;
+        var tooltipContent = reqOb.elementId;
         var label = cfLabel ? cfLabel : '';
         switch (type) {
             case AT.mmsTranscludeName:
