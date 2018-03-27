@@ -125,7 +125,7 @@ tr {
   }
 
   .angular-ui-tree-handle:hover{
-    background-color:$ve-silver-darker-1;
+    background-color:$ve-silver-lighter-0;
   }
 
   .angular-ui-tree-placeholder{
@@ -243,46 +243,5 @@ tr {
         }
       }
     }
-  }
-}
-
-@media screen and (min-width: 1500px) {
-  .diff-pane-center {
-    /*.pane-center-header {
-      font-size: 56px;
-    }
-
-    .pane-center-heading {
-      font-size: 41px;
-    }
-
-    table {
-      th {
-        font-size: 20px;
-      }
-      
-      thead {
-        tr {
-          height: 50px;
-        }
-      }
-
-      tbody {
-        td {
-          font-size: 20px;
-        }
-
-        tr {
-          td:nth-child(1) {
-            padding: 20px 0 20px 50px;
-          }
-
-          td:nth-child(2),
-          td:nth-child(3) {
-            padding: 20px 20px 20px 0;
-          }
-        }
-      }
-    } */
   }
 }

@@ -59,6 +59,11 @@ module.exports = function(grunt) {
         },
         proxies: [
           {
+            context: '/mms-ts',
+            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
+            port: 8080
+          },
+          {
             context: '/alfresco',  // '/api'
             host: servers[key],
             changeOrigin: true,
@@ -119,7 +124,7 @@ module.exports = function(grunt) {
 
           // Internal deps
           {expand: true, cwd: 'app/lib', src: '**', dest: 'dist/lib'},
-          {expand: true, cwd: 'src/lib/', src: '**', dest: 'dist/lib'},
+          {expand: true, cwd: 'src/lib/', src: ['**', '!bootstrap-sass-3.3.7/**'], dest: 'dist/lib'},
 
           // Assets
           {expand: true, cwd: 'app/bower_components/font-awesome-bower/fonts', src: '**', dest: 'dist/fonts'},
@@ -273,7 +278,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       options: {
         reporterOutput: '',
-        // evil: true, //allow eval for timely integration
+        evil: true, //allow eval for plot integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -286,7 +291,7 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false,
+          eval: true,
           Set: true
         }
       }
@@ -339,7 +344,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: 'gov.nasa.jpl:evm:zip',
-            version: '3.3.0-SNAPSHOT',
+            version: '3.2.5-SNAPSHOT',
             path: 'deploy/'
           }]
         }

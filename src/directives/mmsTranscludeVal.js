@@ -55,7 +55,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
-            }     
+            }
         };
     };
 
@@ -109,15 +109,15 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 } else {
                     break;
                 }
-            } 
+            }
             domElement.empty();
             scope.recompileScope = scope.$new();
             if (values.length === 0 || Object.keys(values[0]).length < 2) {
-                domElement[0].innerHTML = '<span class="no-print">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
+                domElement[0].innerHTML = '<span class="no-print placeholder">(no value)</span>';
             } else if (areStrings) {
                 var toCompile = toCompileList.join(' ');
                 if (toCompile === '' || emptyRegex.test(toCompile)) {
-                    domElement[0].innerHTML = '<span class="no-print">' + ((scope.commitId === 'latest') ? '(no value)' : '') + '</span>';
+                    domElement[0].innerHTML = '<span class="no-print placeholder">(no value)</span>';
                     return;
                 }
                 if (preview) {
@@ -146,8 +146,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'val')) {
                 domElement.html('<span class="mms-error">Circular Reference!</span>');

@@ -31,8 +31,8 @@ angular.module('mms.directives')
 function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils, ViewService) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
-    var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
-    var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
+    var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print placeholder">(no name)</span>';
+    var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print placeholder">(no name)</span>';
 
     var mmsTranscludeNameCtrl = function ($scope) {
 
@@ -95,8 +95,9 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             if (!scope.mmsWatchId) {
                 idwatch();
             }

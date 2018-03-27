@@ -90,15 +90,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             domElement.empty();
             var doc = preview ? scope.edit.documentation : scope.element.documentation;
             if (!doc || emptyRegex.test(doc)) {
-                if (preview) {
-                    doc = '<p class="no-print" ng-class="{placeholder: commitId!=\'latest\'}">(No ' + scope.panelType + ')</p>';
-                }
-                var p = '<span class="no-print">(No ' + scope.panelType + ')</span>';
-                if (scope.commitId !== 'latest')
-                    p = '';
-                doc = '<p>' + p + '</p>';
+                doc = '<p class="no-print placeholder">(no ' + scope.panelType + ')</p>';
             }
-            var fixSpan = /<span style="/;
             doc = doc.replace(fixPreSpanRegex, "<mms-cf");
             doc = doc.replace(fixPostSpanRegex, "</mms-cf>");
             if (preview) {
@@ -121,8 +114,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             if (!scope.mmsWatchId) {
                 idwatch();
             }
@@ -174,7 +168,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         });
 
         if (mmsViewCtrl) {
-
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
@@ -204,7 +197,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         } 
 
         if (mmsViewPresentationElemCtrl) {
-
             scope.delete = function() {
                 Utils.deleteAction(scope, scope.bbApi, mmsViewPresentationElemCtrl.getParentSection());
             };
@@ -225,7 +217,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = scope.panelType.substring(0, scope.panelType.length-1);
                 if (scope.panelType === 'Paragraph')
                     scope.panelType = 'Text';
-                if (scope.panelType === 'Figure')
+                if (scope.panelType === 'Figure' || scope.panelType === 'ImageT')
                     scope.panelType = 'Image';
             }
             if (scope.presentationElem) {

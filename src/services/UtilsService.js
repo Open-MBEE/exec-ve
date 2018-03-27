@@ -22,9 +22,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
-    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
-        '_allowedElementIds', '_contents', '_relatedDocuments', '_childViews', 'ownedAttributeIds',
-        '_qualifiedName', '_qualifiedId', '_commitId', '_creator', '_created', '_modifier', '_modified'];
     var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
@@ -192,13 +189,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Cleans 
      *
      * @param {Object} elem the element object to be cleaned 
-     * @param {boolean} [forEdit=false] (optional) forEdit.  If true deletes nonEditKeys from elem.
+     * @param {boolean} [forEdit=false] (optional) forEdit.
      * @returns {Object} clean elem
      */
     var cleanElement = function(elem, forEdit) {
-        if (!elem.name) {
-            elem.name = '';
-        }
         var i = 0;
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
@@ -242,13 +236,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 }
                 delete elem[keys[i]];
             }
-            /*
-            for (i = 0; i < nonEditKeys.length; i++) {
-                if (elem.hasOwnProperty(nonEditKeys[i])) {
-                    delete elem[nonEditKeys[i]];
-                }
-            }
-            */
         }
         return elem;
     };
@@ -277,7 +264,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         for (i = 0; i < array.length; i++) {
             data = array[i];
             data2Node[data[id]] = { 
-                label : data.name || data._name, 
+                label : data.name, 
                 type : type,
                 data : data, 
                 children : [] 
@@ -360,6 +347,27 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
         var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
+        if (edit)
+            key.push('edit');
+        return key;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeArtifactKey
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Make key for element for use in CacheService
+     *
+     * @param {string} elementOb element object
+     * @param {boolean} [edited=false] element is to be edited
+     * @returns {Array} key to be used in CacheService
+     */
+    var makeArtifactKey = function(elementOb, edit) {
+        var refId = !elementOb._refId ? 'master' : elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+        var key = ['artifact', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -1000,6 +1008,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
+            elementId = elementId.replace(/[^\w\-]/gi, '');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
@@ -1221,6 +1230,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         cleanElement: cleanElement,
         normalize: normalize,
         makeElementKey: makeElementKey,
+        makeArtifactKey: makeArtifactKey,
         buildTreeHierarchy: buildTreeHierarchy,
         filterProperties: filterProperties,
         mergeElement: mergeElement,

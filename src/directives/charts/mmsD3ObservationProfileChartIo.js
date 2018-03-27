@@ -1,4 +1,5 @@
-'use strict';
+//not usable using stereotype <<Plot>> in mdk so commented out for now.
+/*'use strict';
  angular.module('mms.directives')
     .directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
 function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableService, $compile, growl, $window) {
@@ -21,14 +22,18 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
       .attr("class", "obpchart");
         
     var processed = false;
-    var ws = scope.mmsWs;
-    var version = scope.mmsVersion;
+    var projectId;
+    var refId;
+    var commitId;
+          
     if (mmsViewCtrl) {
-        var viewVersion = mmsViewCtrl.getWsAndVersion();
-        if (!ws)
-            ws = viewVersion.workspace;
-        if (!version)
-            version = viewVersion.version;
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (!projectId)
+            projectId = viewVersion.projectId;
+        if (!refId)
+            refId = viewVersion.refId;
+        if (!commitId)
+            commitId = viewVersion.commitId;
     }
     function transpose(a) {
       return Object.keys(a[0]).map(
@@ -257,7 +262,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
 
       //label for solid, opacity, white
       svg.selectAll(".bottomShadingLabelText")
-      .data(["On", "Standby", "Off"])
+      .data(["On(3)", "Standby(2)", "Off(1)"])
       .enter().append("g")
       .attr("transform", function(d,i){ 
         if ( i === 2)
@@ -491,7 +496,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
             ]
         }
         ]
-      };*/
+      };*//*
       obpchartPlot(modelData);
     };//end of render
  
@@ -503,7 +508,8 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
     var scopetableColumnHeadersLabel= [];
     var dataIdFilters = [];
 
-    TableService.readTables (scope.mmsEid,ws, version)
+    var reqOb = {elementId: scope.mmsEid, projectId: projectId, refId: refId, commitId: commitId};
+    TableService.readTables (reqOb)
       .then(function(value) {
         scopeTableTitles = value.tableTitles;
         scopeTableIds = value.tableIds;
@@ -525,6 +531,6 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableServi
       link: mmsChartLink
     }; //return
 }
-
+*/
 
 

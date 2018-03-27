@@ -12,7 +12,6 @@ angular.module('mms')
  * Provides cache of key value pairs. Key can be a string or an array of strings.
  */
 function CacheService(_) {
-    
     var cache = {};
 
     /**
@@ -55,7 +54,6 @@ function CacheService(_) {
      */
     var getLatestElements = function(projectId, refId) {
         var latestElements = [];
-
         for (var key in cache) {
             if (!cache.hasOwnProperty(key)) {
                 continue;
@@ -180,9 +178,9 @@ function CacheService(_) {
     var makeKey = function(keys) {
         return keys.join('|');
     };
-    
+
     var getCache = function() {
-        return cache;    
+        return cache;
     };
 
     var reset = function() {

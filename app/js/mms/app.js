@@ -1,8 +1,7 @@
 'use strict';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate', 'ngPromiseExtras'])
-.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider) {
-
+angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies'])
+.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'URLServiceProvider', function($stateProvider, $urlRouterProvider, $httpProvider, URLServiceProvider) {
 
     $urlRouterProvider.rule(function ($injector, $location) {
         var locationPath = $location.url();
@@ -14,8 +13,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             locationPath = locationPath.substring(0, locationPath.length-1);
         if (locationPath !== $location.url())
             $location.url(locationPath);
-     });
+    });
 
+    var mmsHost = window.location.protocol + '//' + window.location.host;
+    URLServiceProvider.setMmsUrl(mmsHost);
+    //URLServiceProvider.setMmsUrl('https://opencae-uat.jpl.nasa.gov');
+
+    $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
     $urlRouterProvider.otherwise(function($injector, $location) {
         var $rootScope = $injector.get('$rootScope');
@@ -48,7 +52,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                       username: '',
                       password: ''
                     };
-                    $rootScope.ve_title = 'View Editor';
+                    $rootScope.ve_title = 'Login';
+                    $scope.pageTitle = 'View Editor';
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                         $scope.spin = true;
@@ -60,7 +65,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 var toParams = $rootScope.ve_redirect.toParams;
                                 $state.go(toState, toParams);
                             } else {
-                                $state.go('login.select');
+                                $state.go('login.select', {fromLogin: true});
                             }
                         }, function (reason) {
                             $scope.spin = false;
@@ -74,12 +79,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('login.redirect', {
         url: '/redirect',
         resolve: {
-            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
+            ticket: ['$window', 'URLService', 'AuthService', '$q', '$cookies', 'ApplicationService', function($window, URLService, AuthService, $q, $cookies, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
+                    $cookies.put('com.tomsawyer.web.license.user', data, {path: '/'});
                 }, function(rejection) {
                     deferred.reject(rejection);
                 });
@@ -94,7 +100,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         }
     })
     .state('login.select', {
-        url: '/select',
+        url: '/select?fromLogin',
         resolve: {
             ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
@@ -114,8 +120,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: ['$scope', '$rootScope', '$state', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, orgObs, ProjectService, AuthService, growl, $localStorage) {
-                    $rootScope.ve_title = 'View Editor'; //what to name this?
+                controller: ['$scope', '$rootScope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, $stateParams, orgObs, ProjectService, AuthService, growl, $localStorage) {
+                    $rootScope.ve_title = 'Projects';
+                    $scope.pageTitle = 'View Editor';
+                    $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
                     $scope.spin = false;
                     $scope.orgs = orgObs;
@@ -183,12 +191,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project', { //TODO this will be the ui to diff and merge and manage refs
         url: '/projects/:projectId',
         resolve: {
-            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
+            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', '$cookies', function($window, URLService, AuthService, $q, ApplicationService, $cookies) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
                     URLService.setTicket($window.localStorage.getItem('ticket'));
                     deferred.resolve($window.localStorage.getItem('ticket'));
+                    $cookies.put('com.tomsawyer.web.license.user', data, {path: '/'});
                 }, function(rejection) {
                     deferred.reject(rejection);
                 });
@@ -252,7 +261,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'menu@': {
                 template: '<ve-menu mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
                 controller:['$scope', '$rootScope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
-                    $rootScope.ve_title = orgOb.name;
+                    $rootScope.ve_title = projectOb.name;
                     $scope.org = orgOb;
                     $scope.project = projectOb;
                     $scope.projects = projectObs;
@@ -270,7 +279,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         }
     })
-    .state('project.ref', { //equivalent to old sites and documents page
+    .state('project.ref', { // equivalent to old sites and documents page
         url: '/:refId?search',
         resolve: {
             projectOb: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
@@ -361,7 +370,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'menu@': {
                 template: '<ve-menu mms-title="ve_title" mms-org="org" mms-ref="ref" mms-refs="refs" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
                 controller: ['$scope', '$rootScope', 'orgOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', function ($scope, $rootScope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
-                    $rootScope.ve_title = orgOb.name;
+                    $rootScope.ve_title = projectOb.name;
                     $scope.org = orgOb;
                     $scope.groups = groupObs;
                     $scope.project = projectOb;
@@ -416,6 +425,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             if (refOb.type === 'Tag') {
                                 deferred.resolve(null);
                             } else {
+                                var viewDoc = '<mms-group-docs mms-group-id="' + groupId + '">[cf:group docs]</mms-group-docs>';
                                 ElementService.getElement({projectId: $stateParams.projectId, refId: $stateParams.refId, elementId: groupId})
                                 .then(function(groupElement) {
                                     ViewService.createView({
@@ -425,7 +435,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                     },{
                                         viewName: groupElement.name + ' Cover Page',
                                         viewId: eid
-                                    }, 2)
+                                    }, viewDoc)
                                     .then(function(data) {
                                         deferred.resolve(data);
                                     }, function(reason3) {
@@ -458,9 +468,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }],
             groupOb: ['groupObs', 'documentOb', 'ProjectService', 'ticket', function(groupObs, documentOb, ProjectService, ticket) {
                 var group = null;
-                if(documentOb) {
-                    for(var i = 0; i < groupObs.length; i++) {
-                        if(groupObs[i]._id == documentOb._groupId) {
+                if (documentOb) {
+                    for (var i = 0; i < groupObs.length; i++) {
+                        if (groupObs[i].id == documentOb._groupId) {
                             group = groupObs[i];
                             break;
                         }
@@ -472,8 +482,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 template: '<ve-menu mms-title="ve_title" mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
-                    $rootScope.ve_title = orgOb.name;
+                controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
+                    $rootScope.ve_title = documentOb.name;
                     $scope.org = orgOb;
                     $scope.ref = refOb;
                     $scope.group = groupOb;
@@ -513,23 +523,23 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return documentOb;
             }],
             groupOb: ['groupObs', 'documentOb', function(groupObs, documentOb) {
-            var group = null;
-            if(documentOb) {
-                for(var i = 0; i < groupObs.length; i++) {
-                    if(groupObs[i]._id == documentOb._groupId) {
-                        group = groupObs[i];
-                        break;
+                var group = null;
+                if (documentOb) {
+                    for (var i = 0; i < groupObs.length; i++) {
+                        if (groupObs[i].id == documentOb._groupId) {
+                            group = groupObs[i];
+                            break;
+                        }
                     }
                 }
-            }
-            return group;
+                return group;
             }]
         },
         views: {
             'menu@': {
                 template: '<ve-menu mms-title="ve_title" mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
                 controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
-                    $rootScope.ve_title = orgOb.name;
+                    $rootScope.ve_title = documentOb.name;
                     $scope.org = orgOb;
                     $scope.group = groupOb;
                     $scope.groups = groupObs;
@@ -574,9 +584,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }],
             groupOb: ['groupObs', 'documentOb', function(groupObs, documentOb) {
                 var group = null;
-                if(documentOb) {
-                    for(var i = 0; i < groupObs.length; i++) {
-                        if(groupObs[i]._id == documentOb._groupId) {
+                if (documentOb) {
+                    for (var i = 0; i < groupObs.length; i++) {
+                        if (groupObs[i].id == documentOb._groupId) {
                             group = groupObs[i];
                             break;
                         }
@@ -589,7 +599,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'menu@': {
                 template: '<ve-menu mms-title="ve_title" mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
                 controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
-                    $rootScope.ve_title = orgOb.name;
+                    $rootScope.ve_title = documentOb.name;
                     $scope.org = orgOb;
                     $scope.group = groupOb;
                     $scope.groups = groupObs;

@@ -45,7 +45,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             }
         );
         </pre>
-     * ## Example with timestamp
+     * ## Example with commitId
      *  <pre>
         ElementService.getElement({
             projectId: 'projectId', 
@@ -81,7 +81,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             key = key + 'addRecentVersion';
         }
         // if it's in the inProgress queue get it immediately
-        if (inProgress.hasOwnProperty(key)) {  //change to change proirity if it's already in the queue
+        if (inProgress.hasOwnProperty(key)) { //change to change proirity if it's already in the queue
             HttpService.ping(key, weight);
             return inProgress[key];
         }
@@ -191,7 +191,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var result = UtilsService.cleanElement(elementOb, edit);
         var requestCacheKey = getElementKey(reqOb, result.id, edit);
         var origResultCommit = result._commitId;
-        if (reqOb.commitId === 'latest') { 
+        if (reqOb.commitId === 'latest') {
             var resultCommitCopy = JSON.parse(JSON.stringify(result));
             result._commitId = 'latest'; //so realCacheKey is right later
             var commitCacheKey = UtilsService.makeElementKey(resultCommitCopy); //save historic element
@@ -321,7 +321,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         inProgress[url] = deferred.promise;
         
-        HttpService.get(url, 
+        HttpService.get(url,
             function(data, status, headers, config) {
                 var results = [];
                 var elements = data[jsonKey];
@@ -333,7 +333,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     results.push(cacheElement(reqOb, element));
                 }
                 delete inProgress[url];
-                deferred.resolve(results); 
+                deferred.resolve(results);
             },
             function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -350,8 +350,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         /*
         var deferred = $q.defer();
         getElement({
-            projectId: elementOb._projectId, 
-            elementId: elementOb.id, 
+            projectId: elementOb._projectId,
+            elementId: elementOb.id,
             commitId: 'latest',
             refId: elementOb._refId
         }, 2)
@@ -422,9 +422,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 e = data.elements[0];
             }
             var metaOb = {
-                projectId: e._projectId, 
-                refId: e._refId, 
-                commitId: 'latest', 
+                projectId: e._projectId,
+                refId: e._refId,
+                commitId: 'latest',
                 elementId: e.id
             };
             var resp = cacheElement(metaOb, e);
@@ -444,7 +444,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var postElem = fillInElement(elementOb);
         //.then(function(postElem) {
             $http.post(URLService.getPostElementsURL({
-                    projectId: postElem._projectId, 
+                    projectId: postElem._projectId,
                     refId: postElem._refId,
                     returnChildViews: returnChildViews
                 }), {
@@ -510,7 +510,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             });
 
             var groupOfElements = _groupElementsByProjectIdAndRefId(postElements);
-
             var promises = [];
 
             Object.keys(groupOfElements).forEach(function (key) {
@@ -695,13 +694,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * 
      * @param {object} reqOb see description of getElement
      * @param {object} query JSON object with Elastic query format
-     * @param {integer} [page=null] page
-     * @param {integer} [items=null] items per page
      * @param {integer} [weight=1] priority
      * @returns {Promise} The promise will be resolved with an array of element objects.
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(reqOb, query, page, items, weight) {
+    var search = function(reqOb, query, weight) {
         UtilsService.normalize(reqOb);
         var url = URLService.getElementSearchURL(reqOb);
         var deferred = $q.defer();
@@ -763,9 +760,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
     var getElementKey = function(reqOb, id, edit) {
         var cacheKey = UtilsService.makeElementKey({
-            _projectId: reqOb.projectId, 
-            id: id ? id : reqOb.elementId, 
-            _commitId: reqOb.commitId, 
+            _projectId: reqOb.projectId,
+            id: id ? id : reqOb.elementId,
+            _commitId: reqOb.commitId,
             _refId: reqOb.refId
         }, edit);
         return cacheKey;

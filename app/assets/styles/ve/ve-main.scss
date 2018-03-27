@@ -67,7 +67,8 @@ div.tooltip-inner {
     2.1.1 Primary Button
     2.1.2 Small Button
     2.1.3 Warning Button
-    2.1.4 Tertiary Button
+    2.1.4 Secondary Button
+    2.1.5 Tertiary Button
   2.2 Dark Modal
   2.3 Dropdown
     2.3.1 Wide Dropdown
@@ -112,12 +113,18 @@ div.tooltip-inner {
   a:hover,
   a:visited {
     text-decoration: none;
-    color:white;
+    color: white;
   }
 }
 
 .ve-secondary-text{
-  color:$ve-light-text;
+  color: $ve-light-text;
+}
+
+.placeholder{
+  color: $ve-light-text;
+  font-style: italic; 
+  text-transform: lowercase; 
 }
 
 /*------------------------------------------------------------------
@@ -138,8 +145,8 @@ div.tooltip-inner {
   transition: background-color .1s ease-out;
   border: none;
   text-transform: uppercase;
-  border-radius:3px;
-  box-shadow:none;
+  border-radius: 3px;
+  box-shadow: none;
   padding: 7px 12px;
 }
 
@@ -170,7 +177,7 @@ div.tooltip-inner {
 
 .btn-sm{
   padding: 5px 10px;
-  font-size:11px;
+  font-size: 11px;
 }
 
 /*------------------------------------------------------------------
@@ -189,7 +196,21 @@ div.tooltip-inner {
 }
 
 /*------------------------------------------------------------------
-    2.1.4 Tertiary Button
+    2.1.4 Secondary Button
+-------------------------------------------------------------------*/
+
+.btn-secondary{
+  color: $ve-teal-base;
+  background-color:white;
+}
+
+.btn-secondary:hover{
+  background-color:$ve-silver-darker-2;
+  color:$ve-teal-darker-1;
+}
+
+/*------------------------------------------------------------------
+    2.1.5 Tertiary Button
 -------------------------------------------------------------------*/
 
   /*Discreet light grey button. Now just being used for filter table*/
@@ -240,7 +261,7 @@ div.tooltip-inner {
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-weight: 400;
-    color:$ve-white-text-lighter-2;
+    color: $ve-white-text-lighter-2;
   }
 
   /*Clearing bootstrap*/
@@ -261,12 +282,38 @@ div.tooltip-inner {
   font-size: 13px;
   text-transform: uppercase;
   display:inline-block;
-  color:$ve-light-text-darker-1;
+  color: $ve-light-text-darker-1;
 }
 
 /*------------------------------------------------------------------
   2.3 Dropdown
 -------------------------------------------------------------------*/
+
+@mixin fa-menu-content($content, $color) {
+  content: $content;
+  font-family: FontAwesome;
+  position: absolute;
+  top: 3px;
+  color: $color;
+}
+
+// selected item styling
+.dropdown-menu {
+  .secondary-checked-list-item::before {
+    @include fa-menu-content("\f00c", $ve-silver-darker-1);
+    left: 10px;
+  }
+
+  .checked-list-item::before {
+    @include fa-menu-content("\f00c", $ve-green-lighter-1);
+    left: 10px;
+  }
+
+  li.checked-list-item,
+  li.secondary-checked-list-item {
+    position: relative;
+  }
+}
 
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav {
@@ -276,7 +323,7 @@ div.tooltip-inner {
     min-height: 0;
     overflow-y: auto;
     max-height: 300px;
-    overflow-x:hidden;
+    overflow-x: hidden;
   }
 
   button.dropdown-toggle {
@@ -337,8 +384,8 @@ div.tooltip-inner {
   /*Clearing bootstrap styling*/
   .dropdown-menu > li > a {
     padding: 1px 10px;
-    font-weight:300;
-    color:white;
+    font-weight: 300;
+    color: white;
   }
 
   button.dropdown-toggle:hover {
@@ -381,30 +428,19 @@ div.tooltip-inner {
     padding: 0px;
   }
 
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color:$ve-green-lighter-1;
-  }
-
   /*Styling for Branch that is being created. */
 
-  .branch-disabled{
+  .branch-disabled {
     color:$ve-white-text-darker-1;
   }
 
-  .branch-disabled::before{
+  .branch-disabled::before {
     font-family:FontAwesome;
     content: "\2026";
     position: absolute;
     left: 10px;
     top: 3px;
-    color:$ve-silver-base;
+    color: $ve-silver-base;
   }
 }
 
@@ -424,7 +460,7 @@ div.tooltip-inner {
   .dropdown-toggle{
     text-align: left;
     font-size: 14px;
-    padding: 7px 8px;
+    padding: 8px 8px;
     line-height: 13px;
     display: inline;
     border: none;
@@ -435,7 +471,7 @@ div.tooltip-inner {
     transition: background-color .1s ease-out !important;
     letter-spacing: .05em;
     background-color:$ve-silver-lighter-0;
-    min-height: 28px;
+    min-height: 30px;
     width:100%;
   }
 
@@ -452,21 +488,6 @@ div.tooltip-inner {
 
   li a{
     padding-left: 32px;
-  }
-
-  li.checked-list-item{
-    position:relative
-  }
-
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color:$ve-green-lighter-1;
   }
 
   ul{
@@ -707,6 +728,11 @@ span.fixed-content-dropdown{
   .nav > li > a:hover {
     background-color: $ve-silver-lighter-0;
     border-bottom: 3px solid $ve-teal-lighter-1;
+  }
+
+  .fa{
+    opacity: .4;
+    padding-right: 6px;
   }
 }
 
@@ -1172,7 +1198,6 @@ span.inline-btn-label{
   color:$ve-light-text;
 }
 
-
 /*------------------------------------------------------------------
 Element not found styling
 -------------------------------------------------------------------*/
@@ -1193,8 +1218,3 @@ Element not found styling
   font-size: 12px;
   position: absolute;
 }
-
-
-
-
-
