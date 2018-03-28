@@ -738,7 +738,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             name: viewOb.viewName ? viewOb.viewName : untitledName,
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
-                (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
+                (viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
         });
@@ -783,7 +783,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             documentation: '',
             name: '',
             type: 'InstanceSpecification',
-            classifierIds: [(viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
+            classifierIds: [(viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)],
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         });
@@ -866,7 +866,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createGroup = function(name, ownerOb, orgId) {
         var deferred = $q.defer();
 
-        var PACKAGE_ID =  UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
+        var PACKAGE_ID = UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
 
         // Our Group package element
         var group = UtilsService.createPackageElement(
