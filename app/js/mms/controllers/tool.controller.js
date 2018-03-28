@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, tagObs, documentOb, viewOb, Utils) {
+    ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -21,6 +21,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
     $scope.noTags = false;
+    $scope.branchObs = branchObs;
+    $scope.noBranches = false;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
