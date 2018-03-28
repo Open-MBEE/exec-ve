@@ -188,15 +188,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @methodOf mms.ViewService
      * 
      * @description
-     * Demote document to a view
+     * Demote document to a view and update the applied stereotype instance
      * 
      * @param {Object} elementOb A document object
      * @returns {Promise} The promise will be resolved with the downgraded view
      */
-    var downgradeDocument = function(elementOb) { //TODO fix this to update the applied stereotype instance
+    var downgradeDocument = function(elementOb) {
         var clone = JSON.parse(JSON.stringify(elementOb));
-        clone._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
-        return ElementService.updateElement(clone)
+        clone._appliedStereotypeIds = [UtilsService.VIEW_SID];
+        var asi = {
+            id: elementOb.id + "_asi",
+            ownerId: elementOb.id,
+            classifierIds: [UtilsService.VIEW_SID],
+            type: "InstanceSpecification",
+            _projectId: elementOb._projectId,
+            _refId: elementOb._refId,
+            stereotypedElementId: elementOb.id
+        };
+        return ElementService.updateElements([clone, asi])
             .then(function(data) {
                 var cacheKey = ['documents', elementOb._projectId, elementOb._refId];
                 var index = -1;
