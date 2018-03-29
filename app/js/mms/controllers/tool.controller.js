@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'JobService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils) {
+    ElementService, JobService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -20,9 +20,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
-    $scope.noTags = false;
     $scope.branchObs = branchObs;
-    $scope.noBranches = false;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -30,10 +28,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     } else if (documentOb) {
         $scope.specInfo.id = documentOb.id;
         $scope.viewId = documentOb.id;
-    }
-
-    if (angular.isArray(tagObs) && tagObs.length === 0) {
-        $scope.noTags = true;
     }
 
     $scope.specApi = {};
@@ -99,6 +93,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
 
     $scope.$on('tags', function() {
         showPane('tags');
+        // JobService.createJob({jobName:'Testing_docmerge',jobType:'docmerge',id:'MMS_1521684158616_8cbfdb9b-3f02-47b2-935e-231a311b3764'},projectOb.id,refOb.id);
     });
 
     var cleanUpEdit = function(editOb, cleanAll) {

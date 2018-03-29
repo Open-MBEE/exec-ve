@@ -31,34 +31,8 @@
     <div class="container-fluid container-tags" ng-show="show.tags">
         <h2 class="right-pane-title">Branches/Tags</h2>
         <hr class="spec-title-divider">
-        <input class="form-control" ng-model="refFilter" type="text" placeholder="Filter branches/tags">
-        <div ng-hide="tagObs.length">No tags in current project.</div>
-        <div ng-show="tagObs.length">
-            <table ng-show="filteredTags.length" class="tags-table table table-condensed">
-                <tr><th>Name</th><th>Time</th></tr>
-                <tr ng-repeat="tag in filteredTags = (tagObs | orderBy:'-_created' | filter: {name : refFilter})">
-                    <td>
-                        <a ui-sref="project.ref({refId: tag.id, search: undefined})">{{tag.name}}</a>
-                        <div>{{tag.description}}</div>
-                    </td>
-                    <td>{{tag._created | date:'M/d/yy h:mm a'}}</td>
-                </tr>
-            </table>
-            <div ng-hide="filteredTags.length">No tags found with that name.</div>
-        </div>
-        <div>
-            <table class="tags-table table table-condensed">
-                <tr><th>Name</th><th>Time</th></tr>
-                <tr ng-repeat="branch in filteredBranches = (branchObs | orderBy:'-_created' | filter: {name : refFilter})">
-                    <td style="display:block">
-                        <a ui-sref="project.ref({refId: branch.id, search: undefined})"><b>{{branch.name}}</b></a>
-                        <div>{{branch.description}}</div>
-                    </td>
-                    <td>{{branch._created | date:'M/d/yy h:mm a'}}</td>
-                </tr>
-            </table>
-            <div ng-hide="filteredBranchs.length">No branches found with that name.</div>
-        </div>
+        <mms-ref-list mms-doc-id="{{documentOb.id}}" mms-project-id="{{projectOb.id}}"
+        mms-ref-id="{{refOb.id}}" mms-branches="branchObs" mms-tags="tagObs"></mms-ref-list>
     </div>
 
     <div class="container-fluid" ng-show="show.reorder">

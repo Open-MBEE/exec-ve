@@ -47,8 +47,8 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
             serverSentPMA = host;
         } else {
             //use default pma //TODO need to define env var when running dev
-            URLService.setJobsUrl('https://cae-pma-uat.jpl.nasa.gov');
-            serverSentPMA = 'opencae-uat.jpl.nasa.gov';
+            URLService.setJobsUrl('https://cae-pma-test.jpl.nasa.gov');
+            serverSentPMA = 'opencae-test.jpl.nasa.gov';
         }
 
         scope.jobs = [];
@@ -202,7 +202,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _ , $q,
                 // "arguments" : ["arg1","arg2"],
                 "schedule" : thisSchedule,
                 "associatedElementID" : id,
-                "mmsServer" : serverSentPMA, 
+                "mmsServer" : serverSentPMA,
                 "alfrescoToken" : AuthService.getTicket()
             };
 
