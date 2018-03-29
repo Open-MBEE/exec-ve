@@ -92,19 +92,19 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
         var AT = ViewService.AnnotationType;
         var inlineContent = '';
         var tooltipContent = reqOb.elementId;
-        var label = cfLabel ? cfLabel : '';
+        var label = cfLabel ? '(' + cfLabel + ')' : '';
         switch (type) {
             case AT.mmsTranscludeName:
-                inlineContent = 'cf name (' + label + ') does not exist';
+                inlineContent = 'cf name' + label + ' does not exist';
                 break;
             case AT.mmsTranscludeDoc:
-                inlineContent = 'cf documentation (' + label + ') does not exist';
+                inlineContent = 'cf documentation' + label + ' does not exist';
                 break;
             case AT.mmsTranscludeCom:
-                inlineContent = 'cf com (' + label + ') does not exist';
+                inlineContent = 'cf com' + label + ' does not exist';
                 break;
             case AT.mmsTranscludeVal:
-                inlineContent = 'cf value (' + label + ') does not exist';
+                inlineContent = 'cf value' + label + ' does not exist';
                 break;
             case AT.mmsViewLink:
                 inlineContent = 'view link does not exist';
