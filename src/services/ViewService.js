@@ -876,7 +876,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var PACKAGE_ID = UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
-
+        var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
         // Our Group package element
         var group = UtilsService.createPackageElement(
             {
@@ -884,13 +884,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 "name" : (name) ? name : "Untitled",
                 "ownerId" : ownerOb.id,
                 "_isSite": true,
-                "_appliedStereotypeIds": ["TBD"],
+                "_appliedStereotypeIds": [GROUP_ST_ID],
                 "appliedStereotypeInstanceId": PACKAGE_ASI_ID
             }
         );
         var groupAsi = UtilsService.createInstanceElement(
             {
-                "classifierIds" : [ "TBD" ],
+                "classifierIds" : [GROUP_ST_ID],
                 "id" : PACKAGE_ASI_ID,
                 "ownerId" : PACKAGE_ID,
                 "visibility" : null,
