@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -929,11 +929,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     var fixImgSrc = function(imgDom) {
         var src = imgDom.attr('src');
-        if (src && src.startsWith('/alfresco')) {
-            imgDom.attr('src', src + '?alf_ticket=' + AuthService.getTicket());
-        }
-        if (src && src.startsWith('../')) {
-            imgDom.attr('src', src.replace('../', '/alfresco/') + '?alf_ticket=' + AuthService.getTicket());
+        if (src) {
+            if (src.startsWith('../')) {
+                src.replace('../', '/alfresco/');
+            }
+            if (src.startsWith('/alfresco/')) {
+                imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
+            }
         }
     };
 
