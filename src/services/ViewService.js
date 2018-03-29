@@ -188,15 +188,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @methodOf mms.ViewService
      * 
      * @description
-     * Demote document to a view
+     * Demote document to a view and update the applied stereotype instance
      * 
      * @param {Object} elementOb A document object
      * @returns {Promise} The promise will be resolved with the downgraded view
      */
-    var downgradeDocument = function(elementOb) { //TODO fix this to update the applied stereotype instance
+    var downgradeDocument = function(elementOb) {
         var clone = JSON.parse(JSON.stringify(elementOb));
-        clone._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
-        return ElementService.updateElement(clone)
+        clone._appliedStereotypeIds = [UtilsService.VIEW_SID];
+        var asi = {
+            id: elementOb.id + "_asi",
+            ownerId: elementOb.id,
+            classifierIds: [UtilsService.VIEW_SID],
+            type: "InstanceSpecification",
+            _projectId: elementOb._projectId,
+            _refId: elementOb._refId,
+            stereotypedElementId: elementOb.id
+        };
+        return ElementService.updateElements([clone, asi])
             .then(function(data) {
                 var cacheKey = ['documents', elementOb._projectId, elementOb._refId];
                 var index = -1;
@@ -712,14 +721,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} ownerOb should contain _project and _ref, can be a parent view with _childViews
      * @param {object} viewOb can specify optional viewId, viewName, viewDoc to be used when
      *                          creating the new view, boolean isDoc indicate whether it's a document
-     * @returns {Promise} The promise will be resolved with the new view. 
+     * @param {string} peDoc optional documentation to set for pe creation
+     * @returns {Promise} The promise will be resolved with the new view.
      */
-    var createView = function(ownerOb, viewOb) {
+    var createView = function(ownerOb, viewOb, peDoc) {
         var deferred = $q.defer();
 
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
         var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
 
+        var untitledName = viewOb.isDoc ? 'Untitled Document' : 'Untitled View';
         var view = UtilsService.createClassElement({
             id: newViewId,
             type: 'Class',
@@ -728,15 +739,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: UtilsService.createValueSpecElement({
-                operand: [],
+                operand: [UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: newInstanceId})],
                 type: 'Expression',
                 id: newViewId + "_vc_expression",
                 ownerId: newViewId + "_vc"
             }),
-            name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
+            name: viewOb.viewName ? viewOb.viewName : untitledName,
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
-                (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
+                (viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
         });
@@ -754,17 +765,38 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
+        var peSpec = {
+            'type': 'Paragraph',
+            'sourceType': 'reference',
+            'source': newInstanceId,
+            'sourceProperty': 'documentation'
+        };
+        var pe = UtilsService.createInstanceElement({
+            id: newInstanceId,
+            ownerId: 'view_instances_bin_' + ownerOb._projectId,
+            name: "View Paragraph",
+            documentation: peDoc ? peDoc : '',
+            type: "InstanceSpecification",
+            classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
+            specification: UtilsService.createValueSpecElement({
+                value: JSON.stringify(peSpec),
+                type: "LiteralString",
+                id: UtilsService.createMmsId(),
+                ownerId: newInstanceId
+            }),
+            _appliedStereotypeIds: [],
+        });
         var asi = UtilsService.createInstanceElement({ //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
             documentation: '',
             name: '',
             type: 'InstanceSpecification',
-            classifierIds: [(viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
+            classifierIds: [(viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)],
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         });
-        var toCreate = [view, asi];
+        var toCreate = [pe, view, asi];
         if (parentView) {
             parentView = ElementService.fillInElement(parentView);
             toCreate.push(parentView);
@@ -843,8 +875,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var createGroup = function(name, ownerOb, orgId) {
         var deferred = $q.defer();
 
-        var PACKAGE_ID =  UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
-
+        var PACKAGE_ID = UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
+        var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
         // Our Group package element
         var group = UtilsService.createPackageElement(
             {
@@ -852,13 +884,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 "name" : (name) ? name : "Untitled",
                 "ownerId" : ownerOb.id,
                 "_isSite": true,
-                "_appliedStereotypeIds": ["TBD"],
+                "_appliedStereotypeIds": [GROUP_ST_ID],
                 "appliedStereotypeInstanceId": PACKAGE_ASI_ID
             }
         );
         var groupAsi = UtilsService.createInstanceElement(
             {
-                "classifierIds" : [ "TBD" ],
+                "classifierIds" : [GROUP_ST_ID],
                 "id" : PACKAGE_ASI_ID,
                 "ownerId" : PACKAGE_ID,
                 "visibility" : null,
@@ -895,7 +927,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#getSiteDocuments
+     * @name mms.ViewService#getProjectDocuments
      * @methodOf mms.ViewService
      * 
      * @description
@@ -947,7 +979,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (type === 'LiteralString') { // If it is a Opaque List, Paragraph, Table, Image, List:
             var jsonString = instanceSpecSpec.value;
-            return JSON.parse(jsonString); 
+            return JSON.parse(jsonString);
         } else if (type === 'Expression') { // If it is a Opaque Section, or a Expression:
             // If it is a Opaque Section then we want the instanceSpec:
             if (isSection(instanceSpec)) {
@@ -993,7 +1025,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var elementObject = {};
-
         elementObject.instanceId = instanceVal.instanceId;
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
@@ -1132,8 +1163,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var reset = function() {
         inProgress = {};
     };
-    
+
     return {
+        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
@@ -1153,7 +1185,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeElementFromViewOrSection: removeElementFromViewOrSection,
         removeViewFromParentView: removeViewFromParentView,
         createInstanceSpecification: createInstanceSpecification,
-        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getElementReferenceTree : getElementReferenceTree,
         getDocMetadata: getDocMetadata,
         reset: reset

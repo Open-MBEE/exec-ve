@@ -17,9 +17,9 @@ angular.module('mms')
  * Utilities
  */
 function UtilsService($q, $http, CacheService, URLService, ApplicationService, _) {
-    var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
+    var VIEW_SID = '_11_5EAPbeta_be00301_1147420760998_43940_227';
     var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
-        '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
+        '_17_0_1_232f03dc_1325612611695_581988_21583', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
     var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
@@ -347,6 +347,27 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
         var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
+        if (edit)
+            key.push('edit');
+        return key;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeArtifactKey
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Make key for element for use in CacheService
+     *
+     * @param {string} elementOb element object
+     * @param {boolean} [edited=false] element is to be edited
+     * @returns {Array} key to be used in CacheService
+     */
+    var makeArtifactKey = function(elementOb, edit) {
+        var refId = !elementOb._refId ? 'master' : elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+        var key = ['artifact', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -987,6 +1008,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
+            elementId = elementId.replace(/[^\w\-]/gi, '');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
@@ -1223,6 +1245,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         cleanElement: cleanElement,
         normalize: normalize,
         makeElementKey: makeElementKey,
+        makeArtifactKey: makeArtifactKey,
         buildTreeHierarchy: buildTreeHierarchy,
         filterProperties: filterProperties,
         mergeElement: mergeElement,

@@ -8,9 +8,9 @@
         <div class="form-group">
             <label>Name:</label>
             <input ng-if="itemType === 'Document'" class="form-control" ng-model="newDoc.name" type="text"
-                   placeholder="Type a name for your document here" autofocus>
+                ng-keyup="$event.keyCode == 13 ? ok() : null" placeholder="Type a name for your document here" autofocus>
             <input ng-if="itemType === 'Group'"class="form-control" ng-model="newGroup.name" type="text"
-                   placeholder="Type a name for your group here" autofocus>
+                ng-keyup="$event.keyCode == 13 ? ok() : null" placeholder="Type a name for your group here" autofocus>
         </div>
     </div>
 
