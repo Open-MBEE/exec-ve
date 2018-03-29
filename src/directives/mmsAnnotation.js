@@ -28,7 +28,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
 
         scope.copyToClipboard = function($event) {
             $event.stopPropagation();
-            var target = element.find('#toolTipContent');
+            var target = element.find('#tooltipElementId');
             var range = window.document.createRange();
             range.selectNode(target[0]);
             window.getSelection().addRange(range);
@@ -58,39 +58,34 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
         switch (type) {
             case AT.mmsTranscludeName:
                 inlineContent = element.name;
-                //toolTipContent = element.name + ' name not found';
                 toolTipContent = 'Element not found. Displaying last found name as placeholder.';
                 break;
             case AT.mmsTranscludeDoc:
                 inlineContent = element.documentation;
-                //toolTipContent = element.name + ' documentation not found';
                 toolTipContent = 'Element not found. Displaying last found documentation as placeholder.';
                 break;
             case AT.mmsTranscludeCom:
                 inlineContent = element.documentation;
-                //toolTipContent = element.name + ' comment not found';
                 toolTipContent = 'Comment not found. Displaying last found content as a placeholder.';
                 break;
             case AT.mmsViewLink:
                 inlineContent = element.name;
-                //toolTipContent = element.name + ' view not found';
                 toolTipContent = 'Element not found. Displaying last found view name as placeholder.';
                 break;
             case AT.mmsTranscludeVal:
                 inlineContent = _getValueForTranscludeVal(element);
-                //toolTipContent = element.name + ' value not found';
                 toolTipContent = 'Element not found. Displaying last found value as placeholder.';
                 break;
             case AT.mmsPresentationElement:
                 inlineContent = element.documentation || '<span>(no text)</span>';
-                //toolTipContent = classifierType + element.name + ' presentation element not found';
                 toolTipContent = classifierType + ' not found. Displaying last found content as placeholder.';
                 break;
         }
 
         return {
             inlineContent: inlineContent,
-            toolTipContent: toolTipContent
+            toolTipContent: toolTipContent,
+            id: element.id
         };
     }
 
@@ -122,7 +117,8 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
 
         return {
             inlineContent: inlineContent,
-            toolTipContent: tooltipContent
+            toolTipContent: tooltipContent,
+            id: reqOb.elementId
         };
     }
 
