@@ -1203,9 +1203,9 @@ Element not found styling
 -------------------------------------------------------------------*/
 
 .mms-error{
-  background:#fff2e4;
-  background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);
-  color:#333;
+  background:$ve-warning-orange-light;
+  background: repeating-linear-gradient(45deg, $white, $white 10px,$ve-warning-orange-light 10px,$ve-warning-orange-light 20px);
+  color: $black;
   border: none;
   padding-left: 11px;
 }
@@ -1214,7 +1214,7 @@ Element not found styling
   content: "\f071";
   font-family: fontAwesome;
   margin-left: -14px;
-  color: #ffb462;
+  color: $ve-warning-orange;
   font-size: 12px;
   position: absolute;
 }

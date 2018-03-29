@@ -1,7 +1,7 @@
-<span class="mms-error" uib-popover-template="'annotationTemplate.html'" popover-popup-close-delay="500" popover-trigger="mouseenter" ng-bind-html="displayContent.inlineContent"></span>
+<span class="mms-error" uib-popover-template="'annotationTemplate.html'" popover-popup-close-delay="500" popover-trigger="mouseenter" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="Content Not Found"></span>
 <script type="text/ng-template" id="annotationTemplate.html">
     <div id="toolTipContent">
         {{displayContent.toolTipContent}}
     </div>
-    <button ng-click="copyToClipboard($event)" class="btn btn-copy"><i class="fa fa-copy"></i></button>
+    <button ng-click="copyToClipboard($event)" class="btn btn-sm btn-tertiary"><i class="fa fa-copy"></i>Copy Element ID</button>
 </script>
