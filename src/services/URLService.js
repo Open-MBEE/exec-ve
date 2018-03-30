@@ -376,7 +376,7 @@ function urlService(baseUrl, mmsUrl) {
     /**
      * @ngdocs method
      * @name mms.URLService#getArtifactURL
-     * @memberOf mms.URLService
+     * @methodOf mms.URLService
      * 
      * @description
      * Gets the url for an artifact
@@ -392,7 +392,7 @@ function urlService(baseUrl, mmsUrl) {
     /**
      * @ngdocs method
      * @name mms.URLService#getPutArtifactsURL
-     * @memberOf mms.URLService
+     * @methodOf mms.URLService
      * 
      * @description
      * Gets the url for an artifact
@@ -408,7 +408,7 @@ function urlService(baseUrl, mmsUrl) {
     /**
      * @ngdocs method
      * @name mms.URLService#getArtifactHistoryURL
-     * @memberOf mms.URLService
+     * @methodOf mms.URLService
      * 
      * @description
      * Gets the url for an artifact commit history
