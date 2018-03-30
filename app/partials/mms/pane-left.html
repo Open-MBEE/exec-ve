@@ -4,10 +4,10 @@
             <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
         </div>
         <div class="tree-options">
+            <mms-button-bar buttons="treeButtons" mms-bb-api="tbApi"></mms-button-bar>
             <input class="ve-plain-input" ng-model-optoins="{debounce: 1000}"
                 ng-model="treeFilter.search" type="text" placeholder="Filter tree"
                 ng-change="treeApi.expand_all()" style="flex:2">
-            <mms-button-bar buttons="treeButtons" mms-bb-api="tbApi"></mms-button-bar>
         </div>
     </div>
 </div>

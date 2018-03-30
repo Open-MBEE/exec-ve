@@ -5,7 +5,8 @@ ul.abn-tree {
   li.abn-tree-row {  
     width: 100%;
     padding: 0px;
-    line-height: 1.5em;
+    line-height: 1.6em;
+    margin-top: 0;
 
     a.tree-item {
       @include border-radius(0);
