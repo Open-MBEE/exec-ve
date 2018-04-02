@@ -122,11 +122,12 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.action = mode === 1 ? 'print' : mode === 3 ? 'generate pdf' : 'generate word';
                 $scope.label = mode === 3 ? 'pdf' : mode === 2 ? 'word' : '';
                 $scope.mode = mode;
-                $scope.meta = {
-                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
-                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
-                };
+                $scope.meta = {};
                 if (isDoc) {
+                    $scope.meta = {
+                        'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
+                        'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
+                    };
                     ViewService.getDocMetadata({
                         elementId: viewOrDocOb.id,
                         projectId: viewOrDocOb._projectId,
