@@ -193,17 +193,16 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         $timeout(function() {
                             popupWin.print();
                         }, 1000, false);
-
                     } else {
-                      result.tof = choice[2] ? result.tof + result.toe : '<div style="display:none;"></div>';
-                      result.tot = choice[2] ? result.tot : '<div style="display:none;"></div>';
-                      var htmlString = ['<html><head><title>', viewOrDocOb.name, '</title><style>', css, '</style></head><body style="overflow: auto">', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
-                      UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId})
-                        .then(function(reuslt) {
-                            deferred.resolve(result);
-                        }, function(reason){
-                            deferred.reject(reason);
-                        });
+                        result.tof = choice[2] ? result.tof + result.toe : '';
+                        result.tot = choice[2] ? result.tot : '';
+                        var htmlString = ['<html><head><style>', css, '</style></head><body style="overflow: auto">', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
+                        UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId})
+                            .then(function(reuslt) {
+                                deferred.resolve(result);
+                            }, function(reason){
+                                deferred.reject(reason);
+                            });
                     }
                 });
             } else {
@@ -297,20 +296,21 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return old;
         });
 
-
-
+        // Remove comments, table features, and all elements with classes: mms-error, no-print, ng-hide
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
+
         // word doesn't support svg only png.
         if (mode === 2) {
             printElementCopy.find('.mms-svg').remove();
         } else {
             printElementCopy.find('.mms-png').remove();
         }
+        // Remove all empty paragraphs
         printElementCopy.find('p:empty').remove();
         printElementCopy.find('p').each(function() {
             var $this = $(this);
