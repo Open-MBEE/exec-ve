@@ -280,6 +280,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         vm._displaySortedRows = _displaySortedRows;
         vm._comparatorForSortReset = _comparatorForSortReset;
         vm._rowSortOrderAttrName = 'data-original-row-num';
+        vm.__areAllCellValidNumber = _areAllCellValidNumber;
 
         /** Add sorting ability **/
         function addSorting(trs, tbody) {
