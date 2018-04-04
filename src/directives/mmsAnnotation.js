@@ -52,38 +52,46 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
     function _getContentIfElementFound(type, element) {
         var AT = ViewService.AnnotationType;
         var inlineContent = '';
+        var toolTipTitle;
         var toolTipContent;
         var classifierType = ViewService.getTypeFromClassifierId(element.classifierIds);
 
         switch (type) {
             case AT.mmsTranscludeName:
                 inlineContent = element.name;
-                toolTipContent = 'Element not found. Displaying last found name as placeholder.';
+                toolTipTitle = 'Referenced element not found';
+                toolTipContent = 'Displaying last found name as placeholder.';
                 break;
             case AT.mmsTranscludeDoc:
                 inlineContent = element.documentation;
-                toolTipContent = 'Element not found. Displaying last found documentation as placeholder.';
+                toolTipTitle = 'Referenced element not found';
+                toolTipContent = 'Displaying last found documentation as placeholder.';
                 break;
             case AT.mmsTranscludeCom:
                 inlineContent = element.documentation;
-                toolTipContent = 'Comment not found. Displaying last found content as a placeholder.';
+                toolTipTitle = 'Referenced comment not found.';
+                toolTipContent = 'Displaying last found comment content as a placeholder.';
                 break;
             case AT.mmsViewLink:
                 inlineContent = element.name;
-                toolTipContent = 'Element not found. Displaying last found view name as placeholder.';
+                toolTipTitle = 'Referenced view link not found';
+                toolTipContent = 'Displaying last found view link as placeholder.';
                 break;
             case AT.mmsTranscludeVal:
                 inlineContent = _getValueForTranscludeVal(element);
-                toolTipContent = 'Element not found. Displaying last found value as placeholder.';
+                toolTipTitle = 'Referenced element not found';
+                toolTipContent = 'Displaying last found value as placeholder.';
                 break;
             case AT.mmsPresentationElement:
                 inlineContent = element.documentation || '<span>(no text)</span>';
-                toolTipContent = classifierType + ' not found. Displaying last found content as placeholder.';
+                toolTipTitle = classifierType + 'not found.';
+                toolTipContent =  'Displaying last found content as placeholder.';
                 break;
         }
 
         return {
             inlineContent: inlineContent,
+            toolTipTitle: toolTipTitle,
             toolTipContent: toolTipContent,
             id: element.id
         };
@@ -117,7 +125,8 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
 
         return {
             inlineContent: inlineContent,
-            toolTipContent: tooltipContent,
+            toolTipTitle: 'Element not found',
+            toolTipContent: '',
             id: reqOb.elementId
         };
     }
