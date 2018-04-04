@@ -188,7 +188,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     if (mode === 1) {
                         var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
                         popupWin.document.open();
-                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
+                        popupWin.document.write('<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
                         popupWin.document.close();
                         $timeout(function() {
                             popupWin.print();
@@ -196,7 +196,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     } else {
                         result.tof = choice[2] ? result.tof + result.toe : '';
                         result.tot = choice[2] ? result.tot : '';
-                        var htmlString = ['<html><head><style>', css, '</style></head><body style="overflow: auto">', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
+                        var htmlString = ['<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">', css, '</style></head><body>', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
                         UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId})
                             .then(function(reuslt) {
                                 deferred.resolve(result);

@@ -883,7 +883,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 "id" : PACKAGE_ID,
                 "name" : (name) ? name : "Untitled",
                 "ownerId" : ownerOb.id,
-                "_isSite": true,
+                "_isGroup": true,
                 "_appliedStereotypeIds": [GROUP_ST_ID],
                 "appliedStereotypeInstanceId": PACKAGE_ASI_ID
             }
