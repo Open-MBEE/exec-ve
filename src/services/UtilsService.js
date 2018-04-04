@@ -1063,6 +1063,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
+                ".toc {page-break-before: always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
