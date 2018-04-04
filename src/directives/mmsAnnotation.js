@@ -85,7 +85,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
             case AT.mmsPresentationElement:
                 inlineContent = element.documentation || '<span>(no text)</span>';
                 toolTipTitle = classifierType + 'not found.';
-                toolTipContent =  'Displaying last found content as placeholder.';
+                toolTipContent = 'Displaying last found content as placeholder.';
                 break;
         }
 
@@ -100,7 +100,6 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
     function _getContentIfElementNotFound(type, reqOb, cfLabel) {
         var AT = ViewService.AnnotationType;
         var inlineContent = '';
-        var tooltipContent = reqOb.elementId;
         var label = cfLabel ? '(' + cfLabel + ')' : '';
         switch (type) {
             case AT.mmsTranscludeName:
@@ -139,7 +138,6 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
             } else if(element.value) {
                 value = element.value[0].value;
             }
-
         }
         if (element.type === 'Constraint' && element.specification) {
             value = element.specification.value;
