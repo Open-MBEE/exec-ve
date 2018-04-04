@@ -15,19 +15,14 @@ angular.module('mms.directives')
  * @restrict E
  *
  * @description
- * Shows you jobs that you have running, going to run and history of jobs.
- * As well as let you edit and add jobs
+ * Displays a list of branches/tags with details. Provides options for taking action on ref.
+ * For the time being it only allows for running a doc merge job on current document.
  *
- * ### template (html)
- * ## Example for showing an element jobs
- *  <pre>
- *   <mms-jobs></mms-jobs>
- * </pre>
- *
- * @param {string=master} mmsBranch Branch to use, defaults to master
- * @param {string=null} mmsDocId the id of the current document under which the job is being run
+ * @param {string=master} mmsProjectId Current project
+ * @param {string=master} mmsRefId Current branch
+ * @param {string=null} mmsDocId the id of the current document
  */
-function mmsRefList($templateCache, $http, growl, _ , $q, 
+function mmsRefList($templateCache, $http, growl, _ , $q,
     UtilsService, JobService, ElementService) {
 
     var template = $templateCache.get('mms/templates/mmsRefList.html');
@@ -40,19 +35,19 @@ function mmsRefList($templateCache, $http, growl, _ , $q,
 
 
         // logic for adding a new job
-        scope.createJob = function() {
+        var createJob = function() {
             var deferred = $q.defer();
             var defaultName = "DocMerge_on_" + scope.docName;
-            var post = {
+            var jobOb = {
                 "id": scope.mmsDocId,
                 "jobName" : defaultName,
                 "jobType" : "docmerge"
             };
 
-            JobService.createJob(post, scope.mmsProjectId, scope.mmsRefId)
+            JobService.createJob(jobOb, scope.mmsProjectId, scope.mmsRefId)
             .then(function(job) {
-                // growl.success('Your job has posted');
                 deferred.resolve(job);
+                growl.success('Creating your job');
             }, function(error) {
                 growl.error('Your job failed to post: ' + error.data.message);
             });
@@ -71,40 +66,42 @@ function mmsRefList($templateCache, $http, growl, _ , $q,
             JobService.runJob(jobRunOb, scope.mmsProjectId, scope.mmsRefId)
             .then(function(data) {
                 growl.success('Your job is running!');
-                // var jobInst = data.data.jobInstances;
             }, function(error) {
                 growl.error('Your job failed to run: ' + error.data.message);
             }).finally(function() {
-                scope.runCleared = true;
+                scope.runCleared = true;//TODO clear when stomp gets completed message -use jobservice to handle?
             });
         };
 
         // TODO disable docmerge when one is already running!!!
-        // Check if the doc already has a job created
         scope.createJobandRun = function (refId) {
             // If yes, assign id to run
             scope.jobs = [];
-            scope.loading = true;
+            // Check if the doc already has a job created
             JobService.getJobs(scope.mmsDocId, scope.mmsProjectId, scope.mmsRefId).then(function (jobs) {
-                scope.jobs = [];
+                var jobExists = false;
                 if (jobs.length) {
                     for (var i = 0; i < jobs.length; i++) {
                         if (jobs[i].associatedElementID === scope.mmsDocId && jobs[i].command === 'docmerge') {
                             // If yes, assign id to run
                             var docmergeJobId = jobs[i].id;
                             runJob(docmergeJobId,refId);
+                            jobExists = true;
                             break;
                         }
                     }
+                    if (!jobExists) {
+                        createJob().then(function(job) {
+                            runJob(job.id,refId);
+                        });
+                    }
                 } else { // If not, create
-                    scope.createJob().then(function(job) {
+                    createJob().then(function(job) {
                         runJob(job.id,refId);
                     });
                 }
             }, function (error) {
                 growl.error('There was a error in retrieving your job: ' + error.status);
-            }).finally(function () {
-                scope.loading = false;
             });
         };
 
@@ -140,9 +137,10 @@ function mmsRefList($templateCache, $http, growl, _ , $q,
             scope.jobInstances[jobId] = [updateJob];
         });
 
-        scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
-            // getRefsInProgress();
-        });
+        // Stomp message when merge complete?
+        // scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
+        //     // getRefsInProgress();
+        // });
     };
     return {
         restrict: 'E',

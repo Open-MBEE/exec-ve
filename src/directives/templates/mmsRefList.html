@@ -26,7 +26,7 @@
     <table class="tags-table table table-condensed">
         <tr><th>Name</th><th>Time</th></tr>
         <tr ng-repeat="branch in filteredBranches = (mmsBranches | orderBy:'-_created' | filter: {name : refFilter})">
-            <td style="display:block">
+            <td>
                 <a ui-sref="project.ref({refId: branch.id, search: undefined})"><b>{{branch.name}}</b></a>
                 <div>{{branch.description}}</div>
             </td>
