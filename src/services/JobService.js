@@ -29,7 +29,7 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         }
         serverSentPMA = host;
     } else {
-        //use default pma //TODO need to define env var when running dev
+        //use default pma //TODO need to define env var when running dev// TODO create porxy in gruntfile for PMA
         URLService.setJobsUrl('https://cae-pma-test.jpl.nasa.gov');
         serverSentPMA = 'opencae-test.jpl.nasa.gov';
     }
@@ -42,6 +42,9 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
      * @description
      * Run job
      * 
+     * @param {object} jobRunOb {id: jobId, post: {all params needed for running job}}
+     * @param {string} projectId Project Id
+     * @param {string} refId Ref Id
      * @returns {Promise} The promise will be resolved with the job instance
      */
     var runJob = function (jobRunOb, projectId, refId) {
@@ -64,6 +67,19 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
     };
 
 
+    /**
+     * @ngdoc method
+     * @name mms.JobService#runJob
+     * @methodOf mms.JobService
+     * 
+     * @description
+     * Run job
+     * 
+     * @param {string} docId Document Id
+     * @param {string} projectId Project Id
+     * @param {string} refId Ref Id
+     * @returns {Promise} The promise will be resolved with the job instance
+     */
     // get all the jobs for current document
     var getJobs = function (docId, projectId, refId) {
         var deferred = $q.defer();
@@ -80,6 +96,30 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         }, function(error) {
             deferred.reject(error);
             // growl.error('There was a error in retrieving your job: ' + error.status);
+        });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.JobService#getJobInstances
+     * @methodOf mms.JobService
+     * 
+     * @description
+     * Get all instances of job. 
+     * 
+     * @param {string} jobId Job Id
+     * @param {string} projectId Project Id
+     * @param {string} refId Ref Id
+     * @returns {Promise} The promise will be resolved with all job instances for jobId
+     */
+    var getJobInstances = function (jobId, projectId, refId) {
+        var deferred = $q.defer();
+        var link = URLService.getJobInstancesURL(projectId, refId, jobId, serverSentPMA);
+        $http.get(link).then(function(data) {
+            deferred.resolve(data.data.jobInstances);
+        }, function(error) {
+            deferred.reject(error);
         });
         return deferred.promise;
     };
@@ -108,6 +148,9 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         );
         </pre>
      * 
+     * @param {object} jobOb {id: docId, jobName: 'jobName', jobType: 'docmerge/docgen'}
+     * @param {string} projectId Project Id
+     * @param {string} refId Ref Id
      * @returns {Promise} The promise will be resolved with new job
      */
     var createJob = function(jobOb, projectId, refId) {
@@ -124,11 +167,6 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
             jobSchedule = jobOb.jobSchedule;
         }
 
-        // {"jobName":"JobTest",
-        // "command":"docmerge",
-        // "associatedElementID":"_18_5_1_83a025f_1496779295221_543977_3603",
-        // "mmsServer":"opencae-int.jpl.nasa.gov",
-        // "alfrescoToken":"TICKET_3d1e48c2dd70c18e4d1f5fd01a7ce210264fbd56"}
         var post = {
             "jobName" : jobName,
             "command" : jobType,
@@ -145,20 +183,19 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
             deferred.resolve(data.data.jobs);
         }, function(error) {
             deferred.reject(error);
-            // growl.error('Your job failed to post: ' + fail.data.message);
         });
         return deferred.promise;
     };
 
-    var createImageCacheKey = function(reqOb) {
+    var createJobCacheKey = function(reqOb) {
         var refId = !reqOb.refId ? 'master' : reqOb.refId;
-        var commitId = !reqOb.commitId ? 'latest' : reqOb.commitId;
-        return ['image', reqOb.projectId, refId, reqOb.elementId, commitId, reqOb.accept];
+        return ['job', reqOb.projectId, refId, reqOb.elementId];
     };
 
     return {
         createJob: createJob,
         getJobs: getJobs,
+        getJobInstances: getJobInstances,
         runJob: runJob
     };
 
