@@ -1169,7 +1169,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if ( classifierIds && classifierIds.length > 0) {
             Object.keys(TYPE_TO_CLASSIFIER_ID).some(function(key) {
                 if(TYPE_TO_CLASSIFIER_ID[key] === classifierIds[0]) {
-                    type = key + ' ';
+                    type = key;
                     return true;
                 }
                 return false;

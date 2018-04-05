@@ -56,6 +56,17 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
         var toolTipContent;
         var classifierType = ViewService.getTypeFromClassifierId(element.classifierIds);
 
+        switch (classifierType) {
+            case 'ListT':
+            case 'TableT':
+            case 'ImageT':
+            case 'ParagraphT':
+            case 'SectionT':
+            case 'FigureT':
+                classifierType = classifierType.substring(0, classifierType.length - 1);
+                break;
+        }
+
         switch (type) {
             case AT.mmsTranscludeName:
                 inlineContent = element.name;
