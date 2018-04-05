@@ -1,0 +1,25 @@
+<div class="modal-header">
+        <h4>TWG Notes: Apply changed Presentation elements <span class="text-warning">(beta)</span></h4>
+    </div>
+    
+    <div class="modal-body revert-dialogue">
+        <div class="element-preview-box">
+            <p>Notice: Your document may not look complete unless your model merge was
+                completed as well.
+            </p>
+            <p>Before merging to your target branch, please create a test branch from
+                your target branch and preview changes.</p>
+        </div>
+        <p><b>Apply changed presentation elements from {{srcRefOb.name}} to {{destRefOb.name}}</b></p>
+    
+        <label>Commit message</label>
+        <div class="commit-message-box">
+            <textarea style="width:100%" rows="3">{{commitMessage}}</textarea>
+        </div>
+    </div>
+    
+    <div class="modal-footer">
+        <button class="btn btn-warning" ng-click="ok()">Apply</button>
+        <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+    </div>
+    
