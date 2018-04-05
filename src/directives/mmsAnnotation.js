@@ -84,7 +84,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
                 break;
             case AT.mmsPresentationElement:
                 inlineContent = element.documentation || '<span>(no text)</span>';
-                toolTipTitle = classifierType + 'not found.';
+                toolTipTitle = 'Referenced ' + classifierType + ' not found.';
                 toolTipContent = 'Displaying last found content as placeholder.';
                 break;
         }
