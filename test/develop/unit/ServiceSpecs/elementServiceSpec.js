@@ -544,6 +544,41 @@ describe('Service: ElementService', function() {
 			$httpBackend.flush();
 			expect(elemOb).toEqual(result);
 		});
+
+		it('should include a recent version of the element when its latest version is not deleted given that the reqOb enables includeRecentVersionElement', function() {
+            var mockedData = {};
+
+            var reqOb = {
+                projectId: "heyaproject",
+                elementId: "heyanelement",
+                refId: 'master',
+                commitId: 'latest',
+                includeRecentVersionElement: true
+            };
+
+            var mockedCommits = {
+				commits: [{id: 1}, {id: 2}]
+			};
+
+            var mockedElementWithCommitId2 = {
+                elements: [{name: 'docName', _commitId: 2}]
+			};
+
+            $httpBackend.expectGET('/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement').respond(410, mockedData);
+            $httpBackend.expectGET('/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement/history').respond(200, mockedCommits);
+            $httpBackend.whenGET('/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement?commitId=2').respond(200, mockedElementWithCommitId2);
+
+            ElementServiceObj.getElement(reqOb).then(function() {
+            	fail('Since this is element is deleted, this method should reject with a latest version' +
+					' of the element in the history instead.');
+            }, function(response) {
+            	expect(response.data.recentVersionOfElement).toEqual(mockedElementWithCommitId2.elements[0]);
+            });
+
+            $httpBackend.flush();
+            $httpBackend.flush();
+            $httpBackend.flush();
+		});
 	});
 
 	describe('getElements', function() {
