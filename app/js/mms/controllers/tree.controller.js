@@ -475,6 +475,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     }
     // TODO: this is a hack, need to resolve in alternate way    
     $timeout(function() {
+        $rootScope.veTreeShowPe = true;
+        setPeVisibility(viewId2node[documentOb.id]);
         $scope.treeApi.refresh();
     }, 5000);
 
