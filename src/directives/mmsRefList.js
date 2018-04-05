@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsRefList', ['$templateCache', '$http', 'growl', '_', '$q',
+.directive('mmsRefList', ['$templateCache', '$http', 'growl', '_', '$q', '$uibModal',
         'UtilsService', 'JobService', 'ElementService', mmsRefList]);
 /**
  * @ngdoc directive
@@ -22,17 +22,19 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Current branch
  * @param {string=null} mmsDocId the id of the current document
  */
-function mmsRefList($templateCache, $http, growl, _ , $q,
+function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
     UtilsService, JobService, ElementService) {
 
     var template = $templateCache.get('mms/templates/mmsRefList.html');
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsRefListLink = function (scope, element, attrs) {
         var ran;
-        scope.responseCleared = true; //TODO do we need?
         scope.runCleared = true;
         scope.docEditable = false;
-
+        scope.currentRefOb = _.find(scope.mmsBranches, { 'id': scope.mmsRefId });
+        if (scope.currentRefOb == undefined){
+            scope.currentRefOb = _.find(scope.mmsTags, { 'id': scope.mmsRefId });
+        }
 
         // logic for adding a new job
         var createJob = function() {
@@ -75,10 +77,10 @@ function mmsRefList($templateCache, $http, growl, _ , $q,
 
         // TODO disable docmerge when one is already running!!!
         scope.createJobandRun = function (refId) {
-            // If yes, assign id to run
-            scope.jobs = [];
+            var deferred = $q.defer();
             // Check if the doc already has a job created
-            JobService.getJobs(scope.mmsDocId, scope.mmsProjectId, scope.mmsRefId).then(function (jobs) {
+            JobService.getJobs(scope.mmsDocId, scope.mmsProjectId, scope.mmsRefId)
+            .then(function (jobs) {
                 var jobExists = false;
                 if (jobs.length) {
                     for (var i = 0; i < jobs.length; i++) {
@@ -100,9 +102,11 @@ function mmsRefList($templateCache, $http, growl, _ , $q,
                         runJob(job.id,refId);
                     });
                 }
+                deferred.resolve('ok');
             }, function (error) {
                 growl.error('There was a error in retrieving your job: ' + error.status);
             });
+            return deferred.promise;
         };
 
         //Callback function for document change
@@ -130,6 +134,51 @@ function mmsRefList($templateCache, $http, growl, _ , $q,
         scope.$watch('mmsDocId', changeDocument);
 
 
+
+        scope.docMergeAction = function (srcRef) {
+            var templateUrlStr = 'mms/templates/mergeConfirm.html';
+            // var refs = 
+            // scope.currentRefOb = _.find(users, { 'id': mmsRefId });
+            scope.srcRefOb = srcRef;
+            scope.destRefOb = scope.currentRefOb;
+            scope.createJobandRun = scope.createJobandRun;
+
+            var instance = $uibModal.open({
+                templateUrl: templateUrlStr,
+                scope: scope,
+                controller: ['$scope', '$uibModalInstance', '$filter', mergeDocCtrl]
+            });
+            instance.result.then(function(data) {
+                // TODO: do anything here?
+            });
+        };
+
+        var mergeDocCtrl = function($scope, $uibModalInstance, $filter) {
+            $scope.oking = false;
+            $scope.commitMessage = '';
+            $scope.createForm = true;
+
+            $scope.ok = function() {
+                if ($scope.oking) {
+                    growl.info("Please wait...");
+                    return;
+                }
+                $scope.oking = true;
+                $scope.createJobandRun($scope.srcRefOb.id)
+                .then(function(data) {
+                    growl.success("Creating job to merge documents... please see the jobs pane for status updates");
+                    $uibModalInstance.close(data);
+                }, function(reason) {
+                    growl.error("Could not merge document: " + reason.message);
+                }).finally(function() {
+                    $scope.oking = false;
+                });
+            };
+    
+            $scope.cancel = function() {
+                $uibModalInstance.dismiss();
+            };
+        };
 
         // actions for stomp
         scope.$on("stomp.updateJob", function(event, updateJob) {
