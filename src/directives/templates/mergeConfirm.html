@@ -1,20 +1,20 @@
 <div class="modal-header">
-        <h4>TWG Notes: Apply changed Presentation elements <span class="text-warning">(beta)</span></h4>
+        <h4><span class="text-warning">(beta)</span> <b>(document name):</b> Apply changed Presentation Elements from <b><span class="{{srcRefOb.type}}-icon">{{srcRefOb.name}}</span></b> to <b><span class="{{srcRefOb.type}}-icon">{{destRefOb.name}}</span></b></h4>
     </div>
     
     <div class="modal-body revert-dialogue">
+
+        <p style="padding-bottom:20px;"> This will commit contents of <span class="{{srcRefOb.type}}-icon"><b>{{srcRefOb.name}}</b></span> PEs to <span class="{{destRefOb.type}}-icon"><b>{{destRefOb.name}}</b></span> PEs if they have changed, and add new PEs from <span class="{{srcRefOb.type}}-icon"><b>{{srcRefOb.name}}</b></span> to <span class="{{destRefOb.type}}-icon"><b>{{destRefOb.name}}</b></span> if they do not yet exist.<a> More...</a></p>
+
         <div class="element-preview-box">
-            <p>Notice: Your document may not look complete unless your model merge was
-                completed as well.
+            <p><i class="fa fa-exclamation-triangle"></i><b>Notice:</b> Your document may not look complete unless your model merge was completed as well.
             </p>
-            <p>Before merging to your target branch, please create a test branch from
-                your target branch and preview changes.</p>
+            <p><i class="fa fa-exclamation-triangle"></i><b>Before applying to your production branch</b> please <a>create a test branch</a> from our target branch, apply changes, and preview.</p>
         </div>
-        <p><b>Apply changed presentation elements from {{srcRefOb.name}} to {{destRefOb.name}}</b></p>
-    
-        <label>Commit message</label>
+
+        <label>Optional change log message</label>
         <div class="commit-message-box">
-            <textarea style="width:100%" rows="3">{{commitMessage}}</textarea>
+            <textarea style="width:100%" rows="3" placeholder="Describe your changes">{{commitMessage}}</textarea>
         </div>
     </div>
     

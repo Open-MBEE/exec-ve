@@ -30,7 +30,7 @@
                     </div>
                     <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
                         <div class="panels-detail-title clearfix">
-                            <h3 class="{{refSelected.type}} ref-type">{{refSelected.name}}</h3>
+                            <h3 class="{{refSelected.type}}-icon">{{refSelected.name}}</h3>
                             <div class="ref-button-options" style="float:right">
                             <button class="btn btn-tertiary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="deleteRef()" ng-if="refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
                             <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addTag()"><i class="fa fa-plus"></i> Tag</button>

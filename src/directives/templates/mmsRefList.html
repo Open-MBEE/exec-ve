@@ -1,39 +1,59 @@
 
 <input class="form-control" ng-model="refFilter" type="text" placeholder="Filter branches/tags">
-<div ng-hide="mmsTags.length">No tags in current project.</div>
-<div ng-show="mmsTags.length">
-    <table ng-show="filteredTags.length" class="tags-table table table-condensed">
-        <tr><th>Name</th><th>Time</th><th ng-if="isDoc && docEditable"></th></tr>
+
+<table class="tags-table table table-condensed">
+    <thead><tr><td colspan="3"><h3 class="Tag-icon">Tags</h3></td></tr></thead>
+    <tbody ng-show="filteredTags.length">
         <tr ng-repeat="tag in filteredTags = (mmsTags | orderBy:'-_created' | filter: {name : refFilter})">
             <td>
-                <a ui-sref="project.ref({refId: tag.id, search: undefined})">{{tag.name}}</a>
+                <a ui-sref="project.ref({refId: tag.id, search: undefined})"><b>{{tag.name}}</b></a>
                 <div>{{tag.description}}</div>
             </td>
-            <td>{{tag._created | date:'M/d/yy h:mm a'}}</td>
+            <td class="ve-secondary-text">{{tag._created | date:'M/d/yy h:mm a'}}</td>
             <td ng-if="isDoc && docEditable">
-                <button class="btn btn-primary btn-sm" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="docMergeAction(tag)">
-                    Merge to Doc <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
-                </button>
+                <div class="btn-group" uib-dropdown is-open="status.isopen">
+                    <button type="button" class="btn btn-tertiary" uib-dropdown-toggle ng-disabled="disabled">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                        <li role="menuitem" style="padding:10px;">                
+                            <button class="btn btn-tertiary btn-sm" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="docMergeAction(tag)">
+                                Apply<i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
+                            </button> to this doc on current branch
+                        </li>
+                    </ul>
+                </div>
             </td>
         </tr>
-    </table>
-    <div ng-hide="filteredTags.length">No tags found with that name.</div>
-</div>
-<div>
-    <table ng-show="filteredBranches.length" class="tags-table table table-condensed">
-        <tr><th>Name</th><th>Time</th><th ng-if="isDoc && docEditable"></th></tr>
+    </tbody>
+
+    <tbody ng-show="mmsTags.length && !filteredTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags found</td></tr></tbody>
+
+    <tbody ng-hide="mmsTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags in current project.</td></tr></div>
+
+    <thead><tr><td colspan="3"><h3 class="Branch-icon">Branches</h3></td></tr></thead>
+    <tbody ng-show="filteredBranches.length">
         <tr ng-repeat="branch in filteredBranches = (mmsBranches | orderBy:'-_created' | filter: {name : refFilter})">
             <td>
                 <a ui-sref="project.ref({refId: branch.id, search: undefined})"><b>{{branch.name}}</b></a>
                 <div>{{branch.description}}</div>
             </td>
-            <td>{{branch._created | date:'M/d/yy h:mm a'}}</td>
+            <td class="ve-secondary-text">{{branch._created | date:'M/d/yy h:mm a'}}</td>
             <td ng-if="isDoc && docEditable">
-                <button class="btn btn-primary btn-sm" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="docMergeAction(branch)">
-                    Merge to Doc <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
-                </button>
+                <div class="btn-group" uib-dropdown is-open="status.isopen">
+                    <button type="button" class="btn btn-tertiary" uib-dropdown-toggle ng-disabled="disabled">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                        <li role="menuitem" style="padding:10px;">                
+                            <button class="btn btn-tertiary btn-sm" ng-class="{'disabled': !docEditable || !runCleared}" ng-click="docMergeAction(branch)">
+                                Apply<i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
+                            </button> to this doc on current branch
+                        </li>
+                    </ul>
+                </div>
             </td>
         </tr>
-    </table>
-    <div ng-hide="filteredBranches.length">No branches found with that name.</div>
-</div>
+    </tbody>
+    <tbody><tr ng-hide="filteredBranches.length"><td colspan="3" class="ve-secondary-text">No branches found</td></tr></tbody>
+</table>
