@@ -223,23 +223,30 @@
             </div>
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
                 <label>Properties</label>
-                <ul>
-                    <li ng-repeat="property in elem._properties | limitTo : limitForProps">
-                        {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
-                        <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value | limitTo:300}}
-                            <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value | limitTo:4">
-                                <span ng-bind-html="val.value | limitTo:300"></span>
-                                <span ng-bind-html="val.body[0] | limitTo:300"></span>
-                                <span ng-if="!val.value && !val.body[0]">Default Value</span>
-                            </span>
-                            <!-- set variable for limit -->
-                            <span ng-if="property.value.length > 4 || property.defaultValue.value.length > 300">...</span>
-                        </a>
-                    </li>
-                    <li class="visibility-toggle" ng-show="elem._properties.length > 3">
-                        <a ng-click="showSearchResultProps = !showSearchResultProps; showSearchResultProps ? switchText='Less' : switchText='More'; showSearchResultProps ? limitForProps=50 : limitForProps=3" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
-                    </li>
-                </ul>
+                <table>
+                    <tr ng-repeat="property in elem._properties | limitTo : limitForProps">
+                        <td>
+                            {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
+                        </td>
+                        <td>
+                            <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value | limitTo:300}}
+                                <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value | limitTo:4">
+                                    <span ng-bind-html="val.value | limitTo:300"></span>
+                                    <span ng-bind-html="val.body[0] | limitTo:300"></span>
+                                    <span ng-if="!val.value && !val.body[0]">Default Value</span>
+                                </span>
+                                <!-- set variable for limit -->
+                                <span ng-if="property.value.length > 4 || property.defaultValue.value.length > 300">...</span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr class="visibility-toggle" ng-show="elem._properties.length > 3">
+                        <td></td>
+                        <td>
+                            <a ng-click="showSearchResultProps = !showSearchResultProps; showSearchResultProps ? switchText='Less' : switchText='More'; showSearchResultProps ? limitForProps=50 : limitForProps=3" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
+                        </td>
+                    </tr>
+                </table>
             </div>
             <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">
                 <label>Related Documents</label>

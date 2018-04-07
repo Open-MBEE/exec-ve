@@ -75,21 +75,24 @@ Styles that apply to both the spec
   .visibility-toggle{
     font-size: 12px;
     font-weight: bold;
-    margin: 10px 5px 0 0;
+    margin: 12px 5px 0 0;
     letter-spacing: .05em;
     text-decoration: none;
     color: $ve-light-text;
   }
 
   .visibility-toggle{
-    color: $brand_base;
     list-style: none;
     margin: 12px 0 0 -14px;
     position: relative;
 
-    //Show more content caret
+    td{
+      line-height: 2.6em
+    }
 
+    //Show more content caret
     a{
+
       //show more content caret
       &:after{
         content:"\f078";
@@ -110,7 +113,7 @@ Styles that apply to both the spec
         font-size: 16px;
         color: $tertiary_grey;
         position: absolute;
-        top: -22px;
+        top: -1em;
       }
     }
   }
@@ -123,7 +126,7 @@ Styles that apply to both the spec
     white-space: nowrap;
     margin: 3px;
     display:inline-block;
-    font-size: 12px;
+    font-size: .75em;
     background: $highlight_grey;
     @include border-radius(3px);
     color: $ve-light-text-darker-1;

@@ -145,7 +145,6 @@
 -------------------------------------------------------------------*/
 
   .search-results{
-    background: $white;
     border-top: 1px solid $ve-silver-darker-1;
   }
 
@@ -166,16 +165,27 @@
     }
 
     .elem-documentation {
-      color: $brand_base !important;
+      color: $ve-link !important;
       table {
         @extend .content-table;
       }
     }
 
     .elem-properties-wrapper {
-      ul{
+      table{
         margin-bottom: 0;
-        color: #6d6d6d;
+        color: $ve-light-text;
+      }
+      table > tbody > tr > td{
+
+        border-top: none;
+        padding: 2px;
+
+        /*Float property name right for better readability*/
+        &:first-child{
+          float: right;
+          text-align: right;
+        }
       }
     }
 
@@ -194,7 +204,7 @@
       content: "\f15b";
       font-family: $icon-font-name;
       padding: 0 4px 0 0;
-      font-size:12px;
+      font-size: .75em;
     }
   }
 
