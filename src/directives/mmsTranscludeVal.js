@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService', '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeVal]);
+.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
+    '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -32,7 +33,8 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http, _, $compile, $templateCache, growl, MathJax) {
+function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http,
+                          _, $compile, $templateCache, growl, MathJax, ViewService) {
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -158,7 +160,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
@@ -181,10 +183,13 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                     });
                 }
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                domElement.html('<span class="mms-error">value cf ' + newVal + status + '</span>');
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeVal,
+                    cfLabel: scope.mmsCfLabel
+                }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
             });
@@ -258,7 +263,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            nonEditable: '<'
+            nonEditable: '<',
+            mmsCfLabel: '@'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeCtrl],

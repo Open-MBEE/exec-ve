@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', mmsViewLink]);
 
 /**
  * @ngdoc directive
@@ -22,7 +22,7 @@ angular.module('mms.directives')
  * @param {string} mmsDocId Document context of view
  * @param {string} mmsPeId Document context of view
  */
-function mmsViewLink(ElementService, UtilsService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService) {
 
     var mmsViewLinkLink = function(scope, element, attrs, controllers) {
         var mmsCfCtrl = controllers[0];
@@ -65,7 +65,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             var id = scope.mmsElementId;
             id = id.replace(/[^\w\-]/gi, '');
 
-            var reqOb = {elementId: id, projectId: projectId, refId: refId, commitId: commitId};
+            var reqOb = {elementId: id, projectId: projectId, refId: refId, commitId: commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
@@ -94,7 +94,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 }
                 scope.loading = false;
             }, function(reason) {
-                element.html('<span class="mms-error">view link not found</span>');
+                element.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                $compile(element.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsViewLink
+                }));
                 scope.loading = false;
             });
         });

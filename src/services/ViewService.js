@@ -40,6 +40,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         FigureT: "_18_5_2_8bf0285_1506035630029_725905_15942"
     };
 
+    var AnnotationType = {
+        mmsTranscludeName: 1,
+        mmsTranscludeDoc: 2,
+        mmsTranscludeCom: 3,
+        mmsTranscludeVal: 4,
+        mmsViewLink: 5,
+        mmsPresentationElement: 6
+    };
+
     function getClassifierIds() {
         var re = [];
         Object.keys(TYPE_TO_CLASSIFIER_ID).forEach(function(key) {
@@ -876,21 +885,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var PACKAGE_ID = UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
-
+        var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
         // Our Group package element
         var group = UtilsService.createPackageElement(
             {
                 "id" : PACKAGE_ID,
                 "name" : (name) ? name : "Untitled",
                 "ownerId" : ownerOb.id,
-                "_isSite": true,
-                "_appliedStereotypeIds": ["TBD"],
+                "_isGroup": true,
+                "_appliedStereotypeIds": [GROUP_ST_ID],
                 "appliedStereotypeInstanceId": PACKAGE_ASI_ID
             }
         );
         var groupAsi = UtilsService.createInstanceElement(
             {
-                "classifierIds" : [ "TBD" ],
+                "classifierIds" : [GROUP_ST_ID],
                 "id" : PACKAGE_ASI_ID,
                 "ownerId" : PACKAGE_ID,
                 "visibility" : null,
@@ -1164,6 +1173,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         inProgress = {};
     };
 
+    var getTypeFromClassifierId = function(classifierIds) {
+        var type = '';
+        if ( classifierIds && classifierIds.length > 0) {
+            Object.keys(TYPE_TO_CLASSIFIER_ID).some(function(key) {
+                if(TYPE_TO_CLASSIFIER_ID[key] === classifierIds[0]) {
+                    type = key;
+                    return true;
+                }
+                return false;
+            });
+        }
+        return type;
+    };
+
+
     return {
         TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getViewElements: getViewElements,
@@ -1185,9 +1209,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeElementFromViewOrSection: removeElementFromViewOrSection,
         removeViewFromParentView: removeViewFromParentView,
         createInstanceSpecification: createInstanceSpecification,
+        getTypeFromClassifierId: getTypeFromClassifierId,
         getElementReferenceTree : getElementReferenceTree,
         getDocMetadata: getDocMetadata,
-        reset: reset
+        reset: reset,
+        AnnotationType: AnnotationType
     };
 
 }

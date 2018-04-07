@@ -189,10 +189,10 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "convert-pdf":
-        return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Html to PDF',
+        return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Export to PDF',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "word":
-        return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Save to Word',
+        return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Export to Word',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tabletocsv":
         return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV',

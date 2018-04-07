@@ -394,6 +394,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 q.query = query.searchText;
                 q.fields = valueSearchFields.slice();
                 q.fields.push('name^5', 'documentation');
+                q.fuzziness = 'AUTO';
                 allQuery.multi_match = q;
                 clause = {
                     "bool": {
@@ -408,6 +409,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 // "{"query":{"bool":{"must":[{"match":{"documentation":"val"}}]}}}"
                 var type = query.searchType.id;
                 q[type] = query.searchText;
+                q.fuzziness = 'AUTO';
                 clause.match = q;
             } else if (query.searchType.id === 'id') {
                 // "{"query":{"bool":{"must":[{"term":{"id":"val"}}]}}}"
@@ -416,6 +418,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 // "{"query":{"bool":{"must":[{"multi_match":{"query":"val","fields":["defaultValue.value","value.value","specification.value"]}}]}}}"
                 q.query = query.searchText;
                 q.fields = valueSearchFields;
+                q.fuzziness = 'AUTO';
                 clause.multi_match = q;
             } else if (query.searchType.id === 'metatype') {
                 var metatypeFilterList = _.pluck(query.selectedSearchMetatypes, 'id');

@@ -133,23 +133,19 @@ function urlService(baseUrl, mmsUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getHtmlToPdfURL
+     * @name mms.URLService#getExportHtmlUrl
      * @methodOf mms.URLService
      *
      * @description
-     * Gets url to convert HTML to PDF
-     *
-     * @param {string} docId Id of the document
-     * @param {string} projectId Project Id
-     * @param {string} refId Ref Id
+     * Gets url that to convert HTML to PDF or Word
+     * @param {string} projectId id of the project
+     * @param {string} refId id of the ref
      * @returns {string} The url
      */
-    var getHtmlToPdfURL = function(docId, projectId, refId) {
+    var getExportHtmlUrl = function(projectId, refId) {
         return addTicket(root + "/projects/" + projectId +
-                      "/refs/" + refId +
-                      "/documents/" + docId +
-                      "/htmlToPdf/123456789"); //TODO cleanup
-    };
+          "/refs/" + refId + '/convert');
+      };
 
     /**
      * @ngdoc method
@@ -380,7 +376,7 @@ function urlService(baseUrl, mmsUrl) {
     /**
      * @ngdocs method
      * @name mms.URLService#getArtifactURL
-     * @memberOf mms.URLService
+     * @methodOf mms.URLService
      * 
      * @description
      * Gets the url for an artifact
@@ -396,7 +392,7 @@ function urlService(baseUrl, mmsUrl) {
     /**
      * @ngdocs method
      * @name mms.URLService#getPutArtifactsURL
-     * @memberOf mms.URLService
+     * @methodOf mms.URLService
      * 
      * @description
      * Gets the url for an artifact
@@ -412,7 +408,7 @@ function urlService(baseUrl, mmsUrl) {
     /**
      * @ngdocs method
      * @name mms.URLService#getArtifactHistoryURL
-     * @memberOf mms.URLService
+     * @methodOf mms.URLService
      * 
      * @description
      * Gets the url for an artifact commit history
@@ -582,7 +578,6 @@ function urlService(baseUrl, mmsUrl) {
         isTimestamp: isTimestamp,
         getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
-        getHtmlToPdfURL: getHtmlToPdfURL,
         getOrgsURL: getOrgsURL,
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
@@ -602,6 +597,7 @@ function urlService(baseUrl, mmsUrl) {
         getProjectDocumentsURL: getProjectDocumentsURL,
         getDocumentViewsURL: getDocumentViewsURL,
         getImageURL: getImageURL,
+        getExportHtmlUrl: getExportHtmlUrl,
         getArtifactURL: getArtifactURL,
         getPutArtifactsURL: getPutArtifactsURL,
         getArtifactHistoryURL: getArtifactHistoryURL,

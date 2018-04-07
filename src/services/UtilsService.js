@@ -1063,6 +1063,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
+                ".toc {page-break-before: always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
@@ -1146,20 +1147,35 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
     /**
      * @ngdoc method
-     * @name mms.UtilsService#convertHtmlToPdf
+     * @name mms.UtilsService#exportHtmlAs
      * @methodOf mms.UtilsService
      *
      * @description
      * Converts HTML to PDF
      *
-     * @param {Object} doc The document object with Id and HTML payload that will be converted to PDF
-     * @param {string} site The site name
-     * @param {string} refId [workspace=master] Workspace name
+     * @param {string} exportType The export type (3 for pdf | 2 for word)
+     * @param {Object} data contains htmlString, name, projectId, refId
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var convertHtmlToPdf = function(doc, projectId, refId){ //TODO fix
+    var exportHtmlAs = function(exportType, data){
+        var accept;
+        switch (exportType) {
+          case 2:
+              accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+              break;
+          case 3:
+              accept = 'application/pdf';
+              break;
+          default:
+              accept = 'application/pdf';
+        }
         var deferred = $q.defer();
-        $http.post(URLService.getHtmlToPdfURL(doc.docId, projectId, refId), {'documents': [doc]})
+        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId), {
+            'Content-Type' : 'text/html',
+            'Accepts' : accept,
+            'body': data.htmlString,
+            'name': data.name
+        })
         .success(function(data, status, headers, config){
             deferred.resolve('ok');
         }).error(function(data, status, headers, config){
@@ -1246,7 +1262,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,
-        convertHtmlToPdf: convertHtmlToPdf,
+        exportHtmlAs: exportHtmlAs,
         generateTOCHtmlOption: generateTOCHtmlOption,
         generateAnchorId: generateAnchorId,
         tableConfig: tableConfig,

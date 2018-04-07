@@ -95,14 +95,8 @@ angular.module('mmsApp')
             $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
             $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            // if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
-            //     $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-                // if ($state.includes('project.ref.document'))
-                    // $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
-                // $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-                // $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
-            // }
 
+            // Set hotkeys for toolbar
             hotkeys.bindTo($scope)
             .add({
                 combo: 'alt+c',
@@ -124,6 +118,7 @@ angular.module('mmsApp')
                     $scope.bbApi.addButton(exportButtons);
                     $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
                     $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
+                    // Set hotkeys for toolbar
                     hotkeys.bindTo($scope)
                     .add({
                         combo: 'alt+.',
@@ -223,7 +218,12 @@ angular.module('mmsApp')
     $scope.$on('convert-pdf', function() {
         if (isPageLoading())
             return;
-        MmsAppUtils.printModal(viewOb, refOb, false, 3);
+        MmsAppUtils.printModal(viewOb, refOb, false, 3)
+        .then(function(ob) {
+            growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
+        }, function(reason){
+            growl.error("Exporting as PDF file Failed: " + reason.message);
+        });
     });
 
     $scope.$on('print', function() {
@@ -235,7 +235,12 @@ angular.module('mmsApp')
     $scope.$on('word', function() {
         if (isPageLoading())
             return;
-        MmsAppUtils.printModal(viewOb, refOb, false, 2);
+        MmsAppUtils.printModal(viewOb, refOb, false, 2)
+        .then(function(ob) {
+            growl.info('Exporting as Word file. Please wait for a completion email.',{ttl: -1});
+        }, function(reason){
+            growl.error("Exporting as Word file Failed: " + reason.message);
+        });
     });
 
     $scope.$on('tabletocsv', function() {
