@@ -67,11 +67,11 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
             };
             JobService.runJob(jobRunOb, scope.mmsProjectId, scope.mmsRefId)
             .then(function(data) {
-                growl.success('Your job is running!');
+                // growl.success('Your job is running!');
             }, function(error) {
                 growl.error('Your job failed to run: ' + error.data.message);
-            }).finally(function() {
-                scope.runCleared = true;//TODO clear when stomp gets completed message -use jobservice to handle?
+            // }).finally(function() {
+            //     scope.runCleared = true;//TODO clear when stomp gets completed message -use jobservice to handle?
             });
         };
 
@@ -137,11 +137,10 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
 
         scope.docMergeAction = function (srcRef) {
             var templateUrlStr = 'mms/templates/mergeConfirm.html';
-            // var refs = 
-            // scope.currentRefOb = _.find(users, { 'id': mmsRefId });
             scope.srcRefOb = srcRef;
             scope.destRefOb = scope.currentRefOb;
             scope.createJobandRun = scope.createJobandRun;
+            scope.docName = scope.docName;
 
             var instance = $uibModal.open({
                 templateUrl: templateUrlStr,
@@ -183,13 +182,14 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
         // actions for stomp
         scope.$on("stomp.updateJob", function(event, updateJob) {
             var jobId = updateJob.jobId;
-            scope.jobInstances[jobId] = [updateJob];
+            if (updateJob.type === 'docmerge' && updateJob.associatedElementId === scope.mmsDocId && 
+                updateJob.refId === scope.mmsRefId && updateJob.jobStatus === 'completed') {
+                    growl.success(scope.docName + ' has been merged');
+                    scope.runCleared = true; // disable apply until stomp gets completed message
+                }
         });
 
-        // Stomp message when merge complete?
-        // scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
-        //     // getRefsInProgress();
-        // });
+
     };
     return {
         restrict: 'E',

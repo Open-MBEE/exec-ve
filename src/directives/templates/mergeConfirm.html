@@ -1,25 +1,26 @@
 <div class="modal-header">
-        <h4><span class="text-warning">beta</span> <b>(document name):</b> Apply changed Presentation Elements from <span class="{{srcRefOb.type}}-icon"><b>{{srcRefOb.name}}</b></span> to <span class="{{destRefOb.type}}-icon"><b>{{destRefOb.name}}</b></span></h4>
-    </div>
-    
-    <div class="modal-body revert-dialogue">
+    <h4><span class="text-warning">beta</span> <b>({{docName}}):</b> Apply changed Presentation Elements from <span class="{{srcRefOb.type}}-icon"><b>{{srcRefOb.name}}</b></span> to <span class="{{destRefOb.type}}-icon"><b>{{destRefOb.name}}</b></span></h4>
+</div>
 
-        <p style="padding-bottom:20px;"> This will commit contents of source Presentation Elements (PEs)<a><i class="fa fa-question-circle"></i></a> to target PEs if source PEs have changed, and add new PEs from source to target if they do not exist on target.<a> More...</a></p>
+<div class="modal-body revert-dialogue">
 
-        <div class="element-preview-box">
-            <p><i class="fa fa-exclamation-triangle"></i><b>Notice:</b> Your document may not look complete unless your model merge was completed as well.
-            </p>
-            <p><i class="fa fa-exclamation-triangle"></i><b>Before applying to your production branch</b> please <a>create a test branch</a> from your target branch, apply changes, and preview.</p>
-        </div>
+    <p style="padding-bottom:20px;"> This will commit contents of source Presentation Elements (PEs)<a><i class="fa fa-question-circle"></i></a> to target PEs if source PEs have changed, and add new PEs from source to target if they do not exist on target.<a> More...</a></p>
 
-        <label>Optional change log message</label>
-        <div class="commit-message-box">
-            <textarea style="width:100%" rows="3" placeholder="Describe your changes">{{commitMessage}}</textarea>
-        </div>
+    <div class="element-preview-box">
+        <p><i class="fa fa-exclamation-triangle"></i><b>Notice:</b> Your document may not
+            look complete unless your model merge was completed as well.
+        </p>
+        <p><i class="fa fa-exclamation-triangle"></i><b>Before applying to your production
+            branch</b> please <a>create a test branch</a> from your target branch, apply changes, and preview.</p>
     </div>
-    
-    <div class="modal-footer">
-        <button class="btn btn-warning" ng-click="ok()">Apply</button>
-        <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+
+    <label>Optional change log message</label>
+    <div class="commit-message-box">
+        <textarea style="width:100%" rows="3" placeholder="Describe your changes">{{commitMessage}}</textarea>
     </div>
-    
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-warning" ng-click="ok()">Apply</button>
+    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+</div>
