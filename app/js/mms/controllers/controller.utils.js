@@ -119,7 +119,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             templateUrl: 'partials/mms/printConfirm.html',
             controller: ["$scope", "$uibModalInstance", function($scope, $uibModalInstance) {
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
-                $scope.action = 'print';
+                $scope.action = 'Print';
                 $scope.genpdf = false;
                 $scope.meta = {
                     'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
@@ -153,10 +153,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 }
                 $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
                 if (mode === 2) {
-                    $scope.action = 'save';
+                    $scope.action = 'Save';
                 }
                 if (mode === 3) {
-                    $scope.action = 'generate pdf';
+                    $scope.action = 'Generate PDF';
                     $scope.genpdf = true;
                 }
                 $scope.docOption = (!isDoc && mode === 3);

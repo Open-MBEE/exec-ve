@@ -21,6 +21,7 @@ $pane_left_btn_group_width: 226px;
 .container-pane-left {
   height: 100%;
   width: 100%;
+  background: $ve-silver-lighter-2;
 
   .pane-left {
     width: 100%;
@@ -28,6 +29,7 @@ $pane_left_btn_group_width: 226px;
 
     .pane-left-toolbar {
       padding: 5px 4px;
+      background: $white;
     }
 
     .tree-options {
