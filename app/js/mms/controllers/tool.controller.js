@@ -93,7 +93,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
 
     $scope.$on('tags', function() {
         showPane('tags');
-        // JobService.createJob({jobName:'Testing_docmerge',jobType:'docmerge',id:'MMS_1521684158616_8cbfdb9b-3f02-47b2-935e-231a311b3764'},projectOb.id,refOb.id);
     });
 
     var cleanUpEdit = function(editOb, cleanAll) {

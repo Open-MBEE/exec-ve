@@ -51,13 +51,14 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
             ProjectService.getRefs(scope.mmsProjectId)
             .then(function(data) {
                 scope.refList = data.filter(function(ref) {
-                    if (ref.status === 'creating')
+                    if (ref.status === 'creating') {
                         return true;
+                    }
                 });
             });
         };
 
-        var getJobInstances = function (jobId) {// TODO create porxy in gruntfile for PMA
+        var getJobInstances = function (jobId) {
             scope.loading = true;
             JobService.getJobInstances(jobId, scope.mmsProjectId, scope.mmsRefId)
             .then(function (instances) {
