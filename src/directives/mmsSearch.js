@@ -408,8 +408,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 // "{"query":{"bool":{"must":[{"match":{"name":"val"}}]}}}"
                 // "{"query":{"bool":{"must":[{"match":{"documentation":"val"}}]}}}"
                 var type = query.searchType.id;
-                q[type] = query.searchText;
-                q.fuzziness = 'AUTO';
+                q[type] = { query: query.searchText, fuzziness: 'AUTO'};
                 clause.match = q;
             } else if (query.searchType.id === 'id') {
                 // "{"query":{"bool":{"must":[{"term":{"id":"val"}}]}}}"
