@@ -199,7 +199,9 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
         // actions for stomp
         scope.$on("stomp.updateJob", function(event, updateJob) {
             var jobId = updateJob.jobId;
-            scope.jobInstances[jobId] = [updateJob];
+            if (scope.jobInstances[jobId]){
+                scope.jobInstances[jobId] = [updateJob];
+            }
         });
 
         scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {

@@ -176,7 +176,7 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
 
         var link = URLService.getCreateJobURL(projectId, refId);
         $http.post(link, post).then(function(data) {
-            deferred.resolve(data.data.jobs);
+            deferred.resolve(data.data.jobs[0]);
         }, function(error) {
             deferred.reject(error);
         });

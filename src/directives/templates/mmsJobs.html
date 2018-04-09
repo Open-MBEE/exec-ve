@@ -80,7 +80,7 @@
                                 <i class="fa fa-ellipsis-h in-progress-marker" aria-hidden="true"></i>in progress
                             </span>
                             <span ng-switch-when="failed">
-                                Created {{jobInstances[job.id][0].created | date:'M/d/yy h:mm a'}}<br>
+                                Completed {{jobInstances[job.id][0].completed | date:'M/d/yy h:mm a'}}<br>
                                 <i class="fa fa-circle failed-marker" aria-hidden="true"></i>failed
                             </span>
                             <span ng-switch-when="completed">
@@ -88,7 +88,7 @@
                                 <i class="fa fa-circle completed-marker" aria-hidden="true"></i>success
                             </span>
                             <span class="animate-switch" ng-switch-default>{{jobInstances[job.id][0].jobStatus}}</span>
-                            <a ng-attr-href="{{jobInstances[job.id][0].jenkinsLog}}" target="_blank" ng-show="jobInstances[job.id][0].jenkinsLog">log</a>
+                            <a ng-attr-href="{{jobInstances[job.id][0].logUrl}}" target="_blank" ng-show="jobInstances[job.id][0].logUrl">log</a>
                         </div>
                     </div>
                     <div ng-if="(!jobInstances[job.id] || !jobInstances[job.id].length) && !loading">
