@@ -61,6 +61,11 @@
       margin-bottom: 5px;
     }
   }
+
+  /*pull in metatype wrapper to compensate for padding*/
+  .elem-type-wrapper {
+    margin-left: -3px;
+  }
 }
 
 /*------------------------------------------------------------------
@@ -132,10 +137,6 @@ Styles that apply to both the spec
     color: $ve-light-text-darker-1;
   }
 
-  /*pull in metatype wrapper to compensate for padding*/
-  .elem-type-wrapper {
-    margin-left: -3px;
-  }
 
   .elem-updated-wrapper {
     color: $medium_grey;

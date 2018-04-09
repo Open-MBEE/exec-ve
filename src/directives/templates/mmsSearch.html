@@ -164,14 +164,6 @@
     </div>
     <div class="search-results" ng-show="searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
-            <div class="elem-type-wrapper">
-                <span class="elem-type">{{elem.type}}</span>
-                <span ng-if="elem._appliedStereotypeIds.length">
-                    <span ng-repeat="type in elem._appliedStereotypeIds">
-                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
-                    </span>
-                </span>
-            </div>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
                 <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
@@ -256,6 +248,15 @@
                         > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)"></mms-view-link><br/>
                     </span>
                 </div>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>Metatypes:</label>
+                <span class="elem-type">{{elem.type}}</span>
+                <span ng-if="elem._appliedStereotypeIds.length">
+                    <span ng-repeat="type in elem._appliedStereotypeIds">
+                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
+                    </span>
+                </span>
             </div>
             <div class="elem-updated-wrapper">
                 <div>Last modified {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
