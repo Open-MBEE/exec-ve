@@ -25,7 +25,7 @@
 .navbar {
   color: white;
   margin: 0;
-  letter-spacing: .06em;
+  letter-spacing: .05em;
   font-size: 14px;
   z-index: 200;
   // position: relative;
@@ -39,7 +39,7 @@
   a:hover,
   a:visited {
     text-decoration: none;
-    color:white;
+    color: white;
   }
 }
 
@@ -234,41 +234,51 @@ nav.project-level-header {
   3.2 Breadcrumbs
 -------------------------------------------------------------------*/
 
-.breadcrumbs {
-  display: inline-block;
-
-  ul {
-    list-style: none;
+.navbar{
+  .breadcrumbs {
     display: inline-block;
-    margin: 0;
-    padding-left: 10px;
-    position: relative;
-  }
 
-  li {
-    display: inline;
-    line-height: $navHeight;
-  }
+    ul {
+      list-style: none;
+      display: inline-block;
+      margin: 0;
+      padding-left: 10px;
+      position: relative;
+    }
 
-  .fa-folder,
-  .fa-file {
-    font-size: 12px;
-    padding: 6px 4px 6px 6px;
-  }
+    li {
+      display: inline;
+      line-height: $navHeight;
 
-  .fa-file {
-    font-size: 11px;
-    top: -.1em;
-    position: relative;
-  }
+      /* add navigation to all list items except for the last*/
+      &:not(:first-child):before{
+        content: "\203A";
+      }
 
-  .back-to-proj{
-    font-size: 1.1em;
-    top: .05em;
-    position: relative;    
+      a{
+        padding: 0 6px 0 4px;
+
+      /*Hover state over links to show it's clickable*/
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+
+    /*adjust folder and file icons for nav */
+    .fa-folder,
+    .fa-file {
+      font-size: 12px;
+      padding: 6px 4px 6px 6px;
+    }
+
+    .back-to-proj{
+      font-size: 1.1em;
+      top: .05em;
+      position: relative;    
+    }
   }
 }
-
 
 
 /*Hide breadcrumbs for mobile*/
@@ -278,11 +288,14 @@ nav.project-level-header {
       a, span{
         display: none;
       }
+      &:before{
+        display: none;
+      }
     }
 
     /* Keep home visible*/
     li:first-child{
-      a, span{
+      a{
         display: inline-block;
       }
     }
@@ -295,24 +308,29 @@ nav.project-level-header {
   }
 }
 
+/*Hide all but the first 2 breadcrumbs and add ellipses*/
 @media (max-width: 1000px) and (min-width: 700px){
   .breadcrumbs{
     li:nth-child(3):after{
-      content: "...";
+      content: "\203A  ...";
     }
 
     li:nth-child(2){
-      a, span{
+      a{
+        display: inline-block;
+      }
+      &:before{
         display: inline-block;
       }
     }
   }
 }
 
+/*Add an ellipsis after the home to show there's more */
 @media (max-width: 700px){
   .breadcrumbs{
     li:nth-child(2):after{
-      content: "...";
+      content: "\203A  ...";
     }
   }
 }

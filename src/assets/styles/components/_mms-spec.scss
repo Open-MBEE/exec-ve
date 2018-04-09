@@ -32,7 +32,7 @@
   .doc-text {
     font-family: $font-family-sans-serif;
     max-width: $default-line-length;
-    min-width: 15em;
+    //min-width: 15em;
   }
 
   h2.spec-view-doc-heading, h2.spec-view-value-heading, h2.spec-view-type-heading {
@@ -122,7 +122,7 @@ Styles that apply to both the spec
   .elem-type{
     letter-spacing: .1em;
     margin-right: 6px;
-    padding: 2px 5px;
+    padding: 1px 5px;
     white-space: nowrap;
     margin: 3px;
     display:inline-block;
