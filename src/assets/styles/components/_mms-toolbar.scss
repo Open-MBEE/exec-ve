@@ -115,33 +115,4 @@ mms-toolbar {
 	.pulldown {
 		margin-top: 50px;
 	}
-
-	/*Combine tags and branches icon for right toolbar*/
-	.tools.tags{ 
-		.fa{
-			position: relative;
-
-			/*add branch icon as a pseudoclass and position*/
-			&::after{
-				position: absolute;
-				content: "\f126";
-				top: -.3em;
-				right: -.3em;
-				font-size: 1.1em;
-			}
-			/*add text shadow to the tag icon and position in front of branch*/
-			&::before{
-				position: relative;
-				z-index: 10;
-				text-shadow: 3px 0px $tertiary_grey;
-				font-size: .8em;
-			}
-		}
-		/*When selected, make the shadow white*/
-		&.selected{
-			.fa::before{
-				text-shadow: 3px 0px $white;
-			}
-		}
-	}
 }
