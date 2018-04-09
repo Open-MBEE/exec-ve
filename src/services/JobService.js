@@ -58,7 +58,6 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
             _.merge(post, jobRunOb.post);
         }
         $http.post(link, post).then(function(data) {
-            // growl.success('Your job is running!');
             deferred.resolve(data.data.jobInstances);
         }, function(error) {
             deferred.reject(error);
@@ -69,24 +68,23 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
 
     /**
      * @ngdoc method
-     * @name mms.JobService#runJob
+     * @name mms.JobService#getJobs
      * @methodOf mms.JobService
      * 
      * @description
-     * Run job
+     * Get all the jobs for current document
      * 
      * @param {string} docId Document Id
      * @param {string} projectId Project Id
      * @param {string} refId Ref Id
-     * @returns {Promise} The promise will be resolved with the job instance
+     * @returns {Promise} The promise will be resolved with list of jobs
      */
-    // get all the jobs for current document
     var getJobs = function (docId, projectId, refId) {
         var deferred = $q.defer();
         var link = URLService.getJobsURL(projectId, refId, serverSentPMA);
         var docJobs = [];
         $http.get(link).then(function(data) {
-            var jobs = data.data.jobs; // get jobs json
+            var jobs = data.data.jobs;
             for (var i = 0; i < jobs.length; i++) {
                 if (jobs[i].associatedElementID === docId) {
                     docJobs.push(jobs[i]);
@@ -95,7 +93,6 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
             deferred.resolve(docJobs);
         }, function(error) {
             deferred.reject(error);
-            // growl.error('There was a error in retrieving your job: ' + error.status);
         });
         return deferred.promise;
     };
@@ -106,12 +103,12 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
      * @methodOf mms.JobService
      * 
      * @description
-     * Get all instances of job. 
+     * Get latest instances of job. Need to use history to get past instances/builds.
      * 
      * @param {string} jobId Job Id
      * @param {string} projectId Project Id
      * @param {string} refId Ref Id
-     * @returns {Promise} The promise will be resolved with all job instances for jobId
+     * @returns {Promise} The promise will be resolved with a job instance
      */
     var getJobInstances = function (jobId, projectId, refId) {
         var deferred = $q.defer();
@@ -179,7 +176,6 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
 
         var link = URLService.getCreateJobURL(projectId, refId);
         $http.post(link, post).then(function(data) {
-            // growl.success('Your job has posted');
             deferred.resolve(data.data.jobs);
         }, function(error) {
             deferred.reject(error);
