@@ -250,11 +250,6 @@ nav.project-level-header {
       display: inline;
       line-height: $navHeight;
 
-      /* add navigation to all list items except for the last*/
-      &:not(:first-child):before{
-        content: "\203A";
-      }
-
       a{
         padding: 0 6px 0 4px;
 
@@ -288,9 +283,6 @@ nav.project-level-header {
       a, span{
         display: none;
       }
-      &:before{
-        display: none;
-      }
     }
 
     /* Keep home visible*/
@@ -308,18 +300,15 @@ nav.project-level-header {
   }
 }
 
-/*Hide all but the first 2 breadcrumbs and add ellipses*/
+/*Hide all but the first 2 breadcrumbs and add */
 @media (max-width: 1000px) and (min-width: 700px){
   .breadcrumbs{
     li:nth-child(3):after{
-      content: "\203A  ...";
+      content: "\203A ...";
     }
 
     li:nth-child(2){
-      a{
-        display: inline-block;
-      }
-      &:before{
+      a, span{
         display: inline-block;
       }
     }
@@ -330,7 +319,7 @@ nav.project-level-header {
 @media (max-width: 700px){
   .breadcrumbs{
     li:nth-child(2):after{
-      content: "\203A  ...";
+      content: "\203A ...";
     }
   }
 }
