@@ -144,6 +144,7 @@ mms-transclude-img img {
 }
 .item-type-Group::before{
   content: "\f07b";
+  color: lighten($ve-accent, 20%);
 }
 .pe-type-Text::before{
   content: "\f1dd";

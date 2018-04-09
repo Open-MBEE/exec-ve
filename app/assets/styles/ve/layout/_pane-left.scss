@@ -49,11 +49,14 @@ $pane_left_btn_group_width: 226px;
         padding: 4px 6px;
         background: transparent;
       }
-
-      .dropdown-menu {
-        right: 0;
-        left: auto;
-      }
+    }
+    .fa-folder{
+      color: lighten($ve-accent, 20%);
+    }
+    .fa-file,
+    .fa-caret-down,
+    .fa-caret-right{
+      color: $ve-light-text;
     }
   }
 }
