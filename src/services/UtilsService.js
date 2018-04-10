@@ -1174,7 +1174,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             'Content-Type' : 'text/html',
             'Accepts' : accept,
             'body': data.htmlString,
-            'name': data.name
+            'name': data.name,
+            'css': data.css
         })
         .success(function(data, status, headers, config){
             deferred.resolve('ok');

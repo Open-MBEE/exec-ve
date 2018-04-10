@@ -197,7 +197,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         result.tof = choice[2] ? result.tof + result.toe : '';
                         result.tot = choice[2] ? result.tot : '';
                         var htmlString = ['<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">', css, '</style></head><body>', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
-                        UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId})
+                        UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId, css: css})
                             .then(function(reuslt) {
                                 deferred.resolve(result);
                             }, function(reason){
