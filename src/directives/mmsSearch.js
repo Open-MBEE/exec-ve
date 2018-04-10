@@ -486,6 +486,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 };
                 filterList.push(viewsAndDocs);
             }
+            filterList.push({"type": {"value": "element"}});
 
             // Set main query
             var mainBoolQuery = {};
