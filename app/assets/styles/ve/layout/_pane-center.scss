@@ -2,7 +2,8 @@
   Styles for the View Editor center pane
 *************************/
 
-$pane_center_btn_group_width: 440px;
+$pane_center_btn_group_width: 340px;
+$pane_center_toolbar: $pane_center_btn_group_width + 150px;
 
 /* start of fullDoc page styles */
 body.fullDoc {
@@ -42,9 +43,14 @@ tr {
     left: 50%;
   }
 
+
+  .pane-center-toolbar {
+    padding: 5px 10px;
+    min-width: $pane_center_toolbar;
+  }
   .pane-center-btn-group {
     float: right;
-    padding: 5px 10px;
+    // padding: 5px 10px;
     min-width: $pane_center_btn_group_width;
 
     .bordered-button-bar {
@@ -131,7 +137,6 @@ tr {
 
 .doclib-link {
   margin: 0 4px;
-  padding-top: 5px;
   float: left;
   .btn-tools{
     color: $ve-light-text;
