@@ -2,7 +2,7 @@ ul.abn-tree {
   font-size: 14px;
   cursor: pointer;
 
-  li.abn-tree-row {  
+  li.abn-tree-row {
     width: 100%;
     padding: 0px;
     line-height: 1.6em;
@@ -23,7 +23,7 @@ ul.abn-tree {
     padding: 2px;
   }
 
-  @for $i from 1 through 25 { 
+  @for $i from 1 through 25 {
     .level-#{$i} .tree-item {
       position: relative;
       padding-left: 20px * ($i - 1);
