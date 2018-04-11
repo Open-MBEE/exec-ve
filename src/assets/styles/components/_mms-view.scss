@@ -10,7 +10,8 @@ mms-view {
   &.editing {
     mms-view-section {
       display: block;
-      border: 2px solid $tertiary_grey;
+      border: 2px solid $ve-silver-darker-1;
+      @include transition(border, .5s);
       @include border-radius(5px);
     }
   }
@@ -22,7 +23,7 @@ mms-view {
 
 mms-view-section {
   .panel-heading {
-    padding: 0;
+    padding: 2px 8px;
   }
 }
 

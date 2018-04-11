@@ -6,7 +6,7 @@ mms-transclude-val > p,
 mms-transclude-com,
 mms-transclude-img {
   cursor: pointer;
-  border: 2px solid transparent;
+  border: transparent;
 }
 
 mms-view {
@@ -41,30 +41,22 @@ mms-view.editing {
     @include border-radius(5px);
     border: 2px solid $ve-silver-darker-1;
     cursor: pointer;
-    margin-bottom: 5px;
 
-    .panel {
-      @include box-shadow(0 10px 12px rgba(0,0,0,0.05));
-    }
-
+    // do we want this animation ?
     &:hover{
       border-color: $tertiary_grey;
     }
   }
 
-  mms-transclude-doc {
+  mms-transclude-doc, mms-transclude-com {
     display: block;
 
     > div > div.panel-heading {
-      padding: 2px 15px;
+      padding: 2px 8px;
     }
 
     .panel {
       margin: 0px;
-    }
-
-    .transclude-doc-bb {
-      margin: 8px 0;
     }
   }
 }
@@ -80,13 +72,7 @@ mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
   @include border-radius(5px);
   background-color: $yellow;
-  display: block;
   padding: 2px;
-  margin-bottom: 5px;
-
-  .panel {
-    margin-bottom: 0;
-  }
 }
 
 mms-view:not(.editing) .placeholder {
@@ -124,6 +110,7 @@ mms-transclude-img img {
 .item-type-Document,
 .item-type-Group,
 .pe-type-Paragraph,
+.pe-type-Text,
 .pe-type-Table,
 .pe-type-Image,
 .pe-type-Equation,
@@ -146,7 +133,8 @@ mms-transclude-img img {
   content: "\f07b";
   color: lighten($ve-accent, 20%);
 }
-.pe-type-Paragraph::before{
+.pe-type-Paragraph::before,
+.pe-type-Text::before{
   content: "\f1dd";
 }
 .pe-type-Table::before{
@@ -171,4 +159,15 @@ mms-transclude-img img {
   color: $ve-light-text;
 }
 
-
+// Transclude edit panel buttons
+.transclude-panel-toolbar {
+  .btn-tools {
+    @include button-variant($base_grey, $quaternary_grey, $quaternary_grey);
+    &:not(.dropdown-toggle) .fa {
+      padding-right: 0;
+    }
+    .caret{
+      opacity: .4;
+    }
+  }
+}
