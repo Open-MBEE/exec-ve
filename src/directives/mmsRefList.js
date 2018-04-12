@@ -26,7 +26,7 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
     UtilsService, JobService, ElementService) {
 
     var template = $templateCache.get('mms/templates/mmsRefList.html');
-    //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
+
     var mmsRefListLink = function (scope, element, attrs) {
         var ran;
         scope.runCleared = true;
@@ -56,10 +56,11 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
             return deferred.promise;
         };
 
-        var runJob = function (id, fromRef) {
+        var runJob = function (id, fromRef, comment) {
             scope.runCleared = false;
             var postOb = {
-                "fromRefId" : fromRef
+                "fromRefId": fromRef,
+                "comment": comment
             };
             var jobRunOb = {
                 "id": id,
@@ -75,31 +76,26 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
             });
         };
 
-        // TODO disable docmerge when one is already running!!!
-        scope.createJobandRun = function (refId) {
+        scope.createJobandRun = function (refId, comment) {
             var deferred = $q.defer();
             // Check if the doc already has a job created
             JobService.getJobs(scope.mmsDocId, scope.mmsProjectId, scope.mmsRefId)
             .then(function (jobs) {
                 var jobExists = false;
-                if (jobs.length) {
-                    for (var i = 0; i < jobs.length; i++) {
-                        if (jobs[i].associatedElementID === scope.mmsDocId && jobs[i].command === 'docmerge') {
-                            // If yes, assign id to run
-                            var docmergeJobId = jobs[i].id;
-                            runJob(docmergeJobId,refId);
-                            jobExists = true;
-                            break;
-                        }
+                var docmergeJobId;
+                for (var i = 0; i < jobs.length; i++) {
+                    if (jobs[i].associatedElementID === scope.mmsDocId && jobs[i].command === 'docmerge') {
+                        // If yes, assign id to run
+                        docmergeJobId = jobs[i].id;
+                        jobExists = true;
+                        break;
                     }
-                    if (!jobExists) {
-                        createJob().then(function(job) {
-                            runJob(job.id,refId);
-                        });
-                    }
+                }
+                if (jobExists) {
+                    runJob(docmergeJobId, refId, comment);
                 } else { // If not, create
                     createJob().then(function(job) {
-                        runJob(job.id,refId);
+                        runJob(job.id, refId, comment);
                     });
                 }
                 deferred.resolve('ok');
@@ -134,13 +130,9 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
         scope.$watch('mmsDocId', changeDocument);
 
 
-
         scope.docMergeAction = function (srcRef) {
             var templateUrlStr = 'mms/templates/mergeConfirm.html';
             scope.srcRefOb = srcRef;
-            scope.destRefOb = scope.currentRefOb;
-            scope.createJobandRun = scope.createJobandRun;
-            scope.docName = scope.docName;
 
             var instance = $uibModal.open({
                 templateUrl: templateUrlStr,
@@ -163,7 +155,7 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
                     return;
                 }
                 $scope.oking = true;
-                $scope.createJobandRun($scope.srcRefOb.id)
+                $scope.createJobandRun($scope.srcRefOb.id, $scope.commitMessage)
                 .then(function(data) {
                     growl.success("Creating job to merge documents... please see the jobs pane for status updates");
                     $uibModalInstance.close(data);
@@ -197,6 +189,7 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
         scope: {
             mmsProjectId: '@',
             mmsRefId: '@',
+            mmsRefType: '@',
             mmsDocId:'@',
             mmsBranches: '<',
             mmsTags: '<'
