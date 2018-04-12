@@ -45,7 +45,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             }
         );
         </pre>
-     * ## Example with timestamp
+     * ## Example with commitId
      *  <pre>
         ElementService.getElement({
             projectId: 'projectId', 
@@ -75,7 +75,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var getElement = function(reqOb, weight, update) {
         UtilsService.normalize(reqOb);
         var requestCacheKey = getElementKey(reqOb);
-        var key = URLService.getElementURL(reqOb);
+        var url = URLService.getElementURL(reqOb);
+        var key = url;
+        if (reqOb.includeRecentVersionElement) {
+            key = key + 'addRecentVersion';
+        }
         // if it's in the inProgress queue get it immediately
         if (inProgress.hasOwnProperty(key)) { //change to change proirity if it's already in the queue
             HttpService.ping(key, weight);
@@ -90,8 +94,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 return deferred.promise;
             //}
         }
-        inProgress[key] = deferred.promise;
-        HttpService.get(key,
+         inProgress[key] = deferred.promise;
+
+         HttpService.get(url,
             function(data, status, headers, config) {
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(cacheElement(reqOb, data.elements[0]));
@@ -101,7 +106,17 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete inProgress[key];
             },
             function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                if (reqOb.includeRecentVersionElement) {
+                    _getLatestVersionOfElement(_.clone(reqOb)).then(function(element){
+                        data.recentVersionOfElement = element;
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    }, function() {
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    });
+                } else {
+                    URLService.handleHttpStatus(data, status, headers, config, deferred);
+                }
+
                 delete inProgress[key];
             },
             weight
@@ -819,6 +834,26 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         // for now the server doesn't return anything for the data properties, so override with the input
         response.data = elementObs;
         URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+    }
+
+    function _getLatestVersionOfElement(reqOb) {
+        var deferred = $q.defer();
+        getElementHistory(reqOb).then(function(elementHistory) {
+            if (elementHistory.length > 1) {
+                // Index 0 is the deletion commit, 0 index is the the commit before deletion
+                var commitBeforeDelete = elementHistory[1];
+                reqOb.commitId = commitBeforeDelete.id;
+                reqOb.includeRecentVersionElement = false;
+                getElement(reqOb).then(function(element) {
+                    deferred.resolve(element);
+                }, deferred.reject);
+            } else {
+                // this case is not possible coz this method should only be called if the element is already deleted
+                // ( and with that there will be at least two commits, one for the add at the very beginning and one for the deletion )
+                deferred.reject();
+            }
+        }, deferred.reject);
+        return deferred.promise;
     }
 
     return {

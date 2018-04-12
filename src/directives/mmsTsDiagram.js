@@ -113,12 +113,12 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         scope.initElements = [];
 
         var params = {
-            viewName: viewNameMapping[scope.mmsTspSpec.tstype],
+            viewName: viewNameMapping[scope.mmsTspSpec.diagramType],
             viewType: 'tsDrawingView',
             tableName: 'Classifiers',
             edgeTableName: 'Associations',
             inspectorName: 'Details',
-            controlsName: controlMapping[scope.mmsTspSpec.tstype]
+            controlsName: controlMapping[scope.mmsTspSpec.diagramType]
         };
 
         if (scope.mmsTspSpec && scope.mmsTspSpec.elements)

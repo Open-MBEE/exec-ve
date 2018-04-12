@@ -15,8 +15,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.tbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
     $rootScope.ve_tree_pane = $scope.$pane;
-    if (!$rootScope.veTreeShowPe) {
-        $rootScope.veTreeShowPe = false;
+    if ($rootScope.veTreeShowPe !== false) {
+        $rootScope.veTreeShowPe = true;
     }
     $scope.buttons = [];
     $scope.treeButtons = [];
@@ -481,10 +481,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     if (!$state.includes('project.ref.document')) {
         $scope.treeOptions.sort = treeSortFunction;
     }
-    // TODO: this is a hack, need to resolve in alternate way    
-    $timeout(function() {
-        $scope.treeApi.refresh();
-    }, 5000);
 
     $scope.fullDocMode = function() {
         if ($rootScope.ve_fullDocMode) {

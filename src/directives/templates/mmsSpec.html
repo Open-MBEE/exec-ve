@@ -1,7 +1,6 @@
 <div ng-if="!noEdit && editing" class="editing">
 
     <h1 class="prop" ng-if="edit.name"><input class="form-control" type="text" ng-model="edit.name"></h1>
-    
     <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
@@ -150,7 +149,6 @@
             <mms-cf mms-cf-type="doc" mms-element-id="{{element.id}}" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-commit-id="{{element._commitId}}" mms-watch-id="true"></mms-cf>
         </p>
         <div ng-show="showDocHTML">{{element.documentation}}</div>
-
         <!-- <a ng-click="toggleAdvancedProperties = !toggleAdvancedProperties" class="visibility-toggle" ng-class="{active: toggleAdvancedProperties}" ng-init="toggleAdvancedProperties=false">Advanced</a>
         <div ng-show="toggleAdvancedProperties"> -->
             <h2 class="prop-title">Metatypes</h2>

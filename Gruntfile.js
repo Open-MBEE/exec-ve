@@ -124,7 +124,7 @@ module.exports = function(grunt) {
 
           // Internal deps
           {expand: true, cwd: 'app/lib', src: '**', dest: 'dist/lib'},
-          {expand: true, cwd: 'src/lib/', src: '**', dest: 'dist/lib'},
+          {expand: true, cwd: 'src/lib/', src: ['**', '!bootstrap-sass-3.3.7/**'], dest: 'dist/lib'},
 
           // Assets
           {expand: true, cwd: 'app/bower_components/font-awesome-bower/fonts', src: '**', dest: 'dist/fonts'},

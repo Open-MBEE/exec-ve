@@ -9,17 +9,17 @@
     <div class="ve-light-tabs">
       <ul class="nav nav-tabs" ng-show="presentationElemType != 'Comment' && createForm">
         <li class="uib-tab nav-item active tab-item">
-          <a class="nav-link">Create new</a>
+          <a class="nav-link"><i class="fa fa-plus"></i>Create New</a>
         </li>
         <li class="uib-tab nav-item tab-item">
-          <a ng-click="createForm = false" class="create-element-link" class="nav-link">Search for existing</a>
+          <a ng-click="createForm = false" class="create-element-link" class="nav-link"><i class="fa fa-search"></i>Search for existing</a>
         </li>
       </ul>
     </div>
     <div class="comment-modal-input">
       <div class="form-group">
         <label>Name:</label>
-        <input class="form-control" ng-model="newPe.name" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus>
+        <input class="form-control" ng-model="newPe.name" ng-keyup="$event.keyCode == 13 ? ok() : null" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus>
       </div>
     </div>
   </div>
@@ -28,10 +28,10 @@
     <div class="ve-light-tabs">
       <ul class="nav nav-tabs" ng-show="!createForm">
         <li class="uib-tab nav-item tab-item">
-          <a class="nav-link" ng-click="createForm = true">Create new</a>
+          <a class="nav-link" ng-click="createForm = true"><i class="fa fa-plus"></i>Create New</a>
         </li>
         <li class="uib-tab nav-item tab-item active">
-          <a class="nav-link">Search for existing {{presentationElemType}}</a>
+          <a class="nav-link"><i class="fa fa-search"></i>Search for existing</a>
         </li>
       </ul>
     </div>

@@ -108,13 +108,18 @@ div.tooltip-inner {
   a:hover,
   a:visited {
     text-decoration: none;
-    color:white;
+    color: white;
   }
 }
 
 .ve-secondary-text{
-  color:$ve-light-text;
-  font-size: .9em;
+  color: $ve-light-text;
+}
+
+.placeholder{
+  color: $ve-light-text;
+  font-style: italic; 
+  text-transform: lowercase; 
 }
 
 /*------------------------------------------------------------------
@@ -132,9 +137,21 @@ div.tooltip-inner {
 
 .btn-sm{
   padding: 5px 10px;
-  font-size:11px;
+  font-size: 11px;
 }
 
+
+.btn-copy {
+  background-color: transparent;
+  color: $ve-light-text-darker-1;
+  margin: 0 5px 5px 10px;
+  float: right;
+}
+
+.btn-copy:hover {
+  color: $ve-silver-base;
+  background-color: $ve-teal-base;
+}
 
 /*------------------------------------------------------------------
   2.2 Modals
@@ -182,6 +199,37 @@ div.tooltip-inner {
 /*------------------------------------------------------------------
   2.3 Dropdown
 -------------------------------------------------------------------*/
+
+@mixin fa-menu-content($content, $color) {
+  content: $content;
+  font-family: FontAwesome;
+  position: absolute;
+  top: 3px;
+  color: $color;
+}
+
+// selected item styling
+.dropdown-menu {
+  .secondary-checked-list-item::before {
+    @include fa-menu-content("\f00c", $ve-silver-darker-1);
+    left: 10px;
+  }
+
+  .checked-list-item::before {
+    @include fa-menu-content("\f00c", $ve-green-lighter-1);
+    left: 10px;
+  }
+
+  a.checked-list-item::before {
+    left: 5px;
+  }
+
+  a.checked-list-item,
+  li.checked-list-item,
+  li.secondary-checked-list-item {
+    position: relative;
+  }
+}
 
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav {
@@ -252,8 +300,8 @@ div.tooltip-inner {
   /*Clearing bootstrap styling*/
   .dropdown-menu > li > a {
     padding: 1px 10px;
-    font-weight:300;
-    color:white;
+    font-weight: 300;
+    color: white;
   }
 
   button.dropdown-toggle:hover {
@@ -296,30 +344,19 @@ div.tooltip-inner {
     padding: 0px;
   }
 
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color:$ve-green-lighter-1;
-  }
-
   /*Styling for Branch that is being created. */
 
-  .branch-disabled{
+  .branch-disabled {
     color:$ve-white-text-darker-1;
   }
 
-  .branch-disabled::before{
+  .branch-disabled::before {
     font-family:FontAwesome;
     content: "\2026";
     position: absolute;
     left: 10px;
     top: 3px;
-    color:$ve-silver-base;
+    color: $ve-silver-base;
   }
 
   li.ve-secondary{
@@ -375,32 +412,6 @@ div.tooltip-inner {
 
   li a{
     padding-left: 32px;
-  }
-
-  li{
-    position:relative
-  }
-
-  .checked-list-item::before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 6px;
-    width: 16px;
-    color:$ve-green-lighter-1;
-  }
-
-  .remove-list-item::before{
-    content: "\f00d";
-    font-family: FontAwesome;
-    height: 16px;
-    position: absolute;
-    left: 10px;
-    top: 3px;
-    width: 16px;
-    color:$ve-slate-lighter-2; 
   }
 
   ul{
@@ -641,6 +652,11 @@ span.fixed-content-dropdown{
   .nav > li > a:hover {
     background-color: $ve-silver-lighter-0;
     border-bottom: 3px solid $ve-teal-lighter-1;
+  }
+
+  .fa{
+    opacity: .4;
+    padding-right: 6px;
   }
 }
 
@@ -1063,3 +1079,67 @@ table caption {
   text-decoration-color: rgb(72, 133, 189);
 }
 
+/*------------------------------------------------------------------
+9. Right pane
+-------------------------------------------------------------------*/
+
+h2.right-pane-title{
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: #6a6a6a;
+  margin: 20px 0;
+}
+
+.pane-right .container-fluid{
+  padding:0 18px 34px;
+}
+
+hr.spec-title-divider{
+  margin-left:-18px;
+  margin-right:-18px;
+  border-color:#ddd;
+}
+
+/*------------------------------------------------------------------
+  9.4 Modal for revert history
+-------------------------------------------------------------------*/
+
+/* Special styling to preview element*/
+.element-preview-box{
+  padding: 0 20px;
+  background-color: $ve-silver-lighter-1;
+  border-radius: 3px;
+  border: 1px solid $ve-silver-darker-1;
+}
+
+/*Custom styling to keep labels inline with dropdowns*/
+span.inline-btn-label{
+  min-height: 28px;
+  margin: 6px 0;
+  padding: 7px 4px;
+  line-height: 13px;
+  color:$ve-light-text;
+}
+
+/*------------------------------------------------------------------
+Element not found styling
+-------------------------------------------------------------------*/
+
+.mms-error{
+  background:$ve-warning-orange-light;
+  background: repeating-linear-gradient(45deg, $white, $white 10px,$ve-warning-orange-light 10px,$ve-warning-orange-light 20px);
+  color: $black;
+  border: none;
+  padding-left: 11px;
+}
+
+.mms-error::before{
+  content: "\f071";
+  font-family: fontAwesome;
+  margin-left: -14px;
+  color: $ve-warning-orange;
+  font-size: 12px;
+  position: absolute;
+}

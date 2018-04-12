@@ -40,7 +40,7 @@
     <div class="account-wall" ng-if="!redirect_from_old_site">
         <div ng-class="{'fade-in': fromLogin}">
             <a ng-click="logout()"><i class="fa fa-arrow-left back-to-account" aria-hidden="true"></i></a>
-            <h2>{{ ve_title }}</h2>
+            <h2>{{ pageTitle }}</h2>
         </div>
         <div ng-class="{'animated-fade-in-slide': fromLogin}">
             <form name="loginForm" ng-submit="continue()">

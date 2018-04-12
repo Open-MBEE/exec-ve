@@ -153,7 +153,9 @@
                     <!-- advanced search query input disabled -->
                     <h3 class="fixed-content-m">Advanced Search</h3>
                     <label class="sr-only" for="searchText">Advanced search query (disabled)</label>
-                    <input ng-click="modifyAdvanceSearch()" class="search-input disabled-input form-group" type="text" id="searchText" ng-model="stringQuery" disabled />
+                    <span ng-click="modifyAdvanceSearch()" class="search-input disabled-input-container">
+                        <input class="search-input disabled-input form-group" type="text" id="searchText" ng-model="stringQuery" disabled />
+                    </span>
                     <a ng-click="modifyAdvanceSearch()">Modify</a>
                 </form>
             </div>

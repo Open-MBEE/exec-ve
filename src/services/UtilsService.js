@@ -17,9 +17,9 @@ angular.module('mms')
  * Utilities
  */
 function UtilsService($q, $http, CacheService, URLService, ApplicationService, _) {
-    var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
+    var VIEW_SID = '_11_5EAPbeta_be00301_1147420760998_43940_227';
     var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
-        '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
+        '_17_0_1_232f03dc_1325612611695_581988_21583', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
     var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
@@ -347,6 +347,27 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
         var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
+        if (edit)
+            key.push('edit');
+        return key;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeArtifactKey
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Make key for element for use in CacheService
+     *
+     * @param {string} elementOb element object
+     * @param {boolean} [edited=false] element is to be edited
+     * @returns {Array} key to be used in CacheService
+     */
+    var makeArtifactKey = function(elementOb, edit) {
+        var refId = !elementOb._refId ? 'master' : elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+        var key = ['artifact', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -987,6 +1008,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
+            elementId = elementId.replace(/[^\w\-]/gi, '');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
@@ -1041,6 +1063,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
+                ".toc {page-break-before: always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
@@ -1124,20 +1147,36 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
     /**
      * @ngdoc method
-     * @name mms.UtilsService#convertHtmlToPdf
+     * @name mms.UtilsService#exportHtmlAs
      * @methodOf mms.UtilsService
      *
      * @description
      * Converts HTML to PDF
      *
-     * @param {Object} doc The document object with Id and HTML payload that will be converted to PDF
-     * @param {string} site The site name
-     * @param {string} refId [workspace=master] Workspace name
+     * @param {string} exportType The export type (3 for pdf | 2 for word)
+     * @param {Object} data contains htmlString, name, projectId, refId
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var convertHtmlToPdf = function(doc, projectId, refId){ //TODO fix
+    var exportHtmlAs = function(exportType, data){
+        var accept;
+        switch (exportType) {
+          case 2:
+              accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+              break;
+          case 3:
+              accept = 'application/pdf';
+              break;
+          default:
+              accept = 'application/pdf';
+        }
         var deferred = $q.defer();
-        $http.post(URLService.getHtmlToPdfURL(doc.docId, projectId, refId), {'documents': [doc]})
+        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId), {
+            'Content-Type' : 'text/html',
+            'Accepts' : accept,
+            'body': data.htmlString,
+            'name': data.name,
+            'css': data.css
+        })
         .success(function(data, status, headers, config){
             deferred.resolve('ok');
         }).error(function(data, status, headers, config){
@@ -1208,6 +1247,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         cleanElement: cleanElement,
         normalize: normalize,
         makeElementKey: makeElementKey,
+        makeArtifactKey: makeArtifactKey,
         buildTreeHierarchy: buildTreeHierarchy,
         filterProperties: filterProperties,
         mergeElement: mergeElement,
@@ -1223,7 +1263,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,
-        convertHtmlToPdf: convertHtmlToPdf,
+        exportHtmlAs: exportHtmlAs,
         generateTOCHtmlOption: generateTOCHtmlOption,
         generateAnchorId: generateAnchorId,
         tableConfig: tableConfig,

@@ -137,23 +137,23 @@ function UxService($rootScope) {
       case "view-mode-dropdown":
         return {id: button, icon: 'fa-gear', selected: true, active: true, permission: true, tooltip: 'Filter by type',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
-                dropdown_buttons: [ getButtonBarButton("tree-show-views"), getButtonBarButton("tree-show-pe"),
+                dropdown_buttons: [ getButtonBarButton("tree-show-pe"), getButtonBarButton("tree-show-views"),
                     getButtonBarButton("tree-show-tables"), getButtonBarButton("tree-show-figures"),
                     getButtonBarButton("tree-show-equations")]};
       case "tree-show-views":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Views',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Views',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-pe":
         return {id: button, selected: true, active: true, permission: true, tooltip: 'Show All',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-tables":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Tables',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Tables',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-figures":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Figures',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Figures',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-equations":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Equations',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Equations',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 
 
@@ -189,10 +189,10 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "convert-pdf":
-        return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Html to PDF',
+        return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Export to PDF',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "word":
-        return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Save to Word',
+        return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Export to Word',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tabletocsv":
         return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV',

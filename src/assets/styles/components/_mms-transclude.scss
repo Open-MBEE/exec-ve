@@ -6,7 +6,7 @@ mms-transclude-val > p,
 mms-transclude-com,
 mms-transclude-img {
   cursor: pointer;
-  border: transparent;
+  border-color: transparent;
 }
 
 mms-view {
@@ -75,7 +75,7 @@ mms-view.editing mms-transclude-com {
   padding: 2px;
 }
 
-mms-view:not(.editing) .placeholder {
+mms-view:not(.editing):not(.outline) .placeholder {
   display: none;
 }
 
