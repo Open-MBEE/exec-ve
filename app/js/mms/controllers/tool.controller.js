@@ -126,6 +126,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.projectId = elementOb._projectId;
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
+        $scope.specInfo.mmsDisplayOldContent = elementOb.mmsDisplayOldContent;
         $rootScope.ve_tbApi.select('element-viewer');
 
         showPane('element');

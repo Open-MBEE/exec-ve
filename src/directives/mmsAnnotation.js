@@ -22,6 +22,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
     function mmsAnnotationLink(scope, element, attrs) {
         element.on('click', function() {
             if(scope.mmsRecentElement) {
+                scope.mmsRecentElement.mmsDisplayOldContent = true;
                 $rootScope.$broadcast('elementSelected', scope.mmsRecentElement, scope.mmsRecentElement._commitId);
             }
         });
