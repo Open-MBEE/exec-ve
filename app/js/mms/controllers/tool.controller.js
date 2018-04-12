@@ -95,6 +95,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         showPane('tags');
     });
 
+    $scope.$on('gotoTagsBranches', function(){
+        $rootScope.ve_tbApi.select('tags');
+        showPane('tags');
+    });
+
     var cleanUpEdit = function(editOb, cleanAll) {
         if (!Utils.hasEdits(editOb) || cleanAll) {//TODO Utils.hasEdits
             var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache', '$http', '$location', '$window', 'growl', '_', '$q',
+.directive('mmsJobs', ['$templateCache', '$http', '$location', '$window', 'growl', '_', '$q', '$rootScope',
         'AuthService', 'ElementService', 'ProjectService', 'UtilsService', 'JobService', mmsJobs]);
 /**
  * @ngdoc directive
@@ -27,7 +27,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsBranch Branch to use, defaults to master
  * @param {string=null} mmsDocId the id of the current document under which the job is being run
  */
-function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
+function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootScope,
         AuthService, ElementService, ProjectService, UtilsService, JobService) {
 
     var template = $templateCache.get('mms/templates/mmsJobs.html');
@@ -193,6 +193,10 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
         //     }).finally(function(){
         //         scope.deleteCleared = true;
         //     });
+        };
+
+        scope.changePane = function(pane) {
+            $rootScope.$broadcast(pane);
         };
 
         // actions for stomp
