@@ -309,6 +309,11 @@ div.tooltip-inner {
     left: 10px;
   }
 
+  a.checked-list-item::before {
+    left: 5px;
+  }
+
+  a.checked-list-item,
   li.checked-list-item,
   li.secondary-checked-list-item {
     position: relative;
