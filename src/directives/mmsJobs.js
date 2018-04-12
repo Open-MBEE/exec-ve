@@ -37,11 +37,10 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
         scope.jobs = [];
         scope.jobInstances = {};
         // scope.editorEnabled = false; // Edit name of job
-        scope.loading = true;
-        scope.loadingJobs = true;
-        scope.responseCleared = true; //TODO do we need?
+        scope.loadingJobs = false;
+        scope.createJobCleared = true; // TODO do we need?
         scope.runCleared = true;
-        scope.deleteCleared = true;
+        // scope.deleteCleared = true;
         scope.jobInput = {jobName: ''};
         scope.hasRefArr = false;
         scope.docEditable = false;
@@ -64,7 +63,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
             .then(function (instances) {
                 scope.jobInstances[jobId] = instances;
             }, function(error) {
-                growl.error('Failed to get job instances: ' + error.data.message);
+                scope.jobInstances[jobId] = {jobStatus: 'error getting job'};
             }).finally(function () {
                 scope.loading = false;
             });
@@ -153,7 +152,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
         var createJob = function() {
             var deferred = $q.defer();
             var defaultName = scope.jobInput.jobName;
-            scope.responseCleared = false;
+            scope.createJobCleared = false;
             if (!scope.jobInput.jobName) {
                 defaultName = scope.docName + "_job";
             }
@@ -176,7 +175,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q,
             }, function(error) {
                 growl.error('Your job failed to post: ' + error.data.message);
             }).finally(function() {
-                scope.responseCleared = true;
+                scope.createJobCleared = true;
             });
             return deferred.promise;
         };
