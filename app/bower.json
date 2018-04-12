@@ -43,7 +43,8 @@
     "angulartics-piwik": "~1.0.4",
     "angular-diff-match-patch": "~0.4.0",
     "ngStorage": "https://github.com/gsklee/ngStorage.git#master",
-    "angular-promise-extras": "^0.1.8"
+    "angular-promise-extras": "^0.1.8",
+    "moment": "^2.22.0"
   },
   "resolutions": {
     "lodash": "3.9.3",
