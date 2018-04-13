@@ -257,10 +257,7 @@ div.tooltip-inner {
 
   .modal-title {
     margin: 0;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-weight: 400;
+    letter-spacing: 0.04em;
     color: $ve-white-text-lighter-2;
   }
 
@@ -277,12 +274,10 @@ div.tooltip-inner {
 
 .modal-header>h4{
   margin:0;
-  font-weight: 500;
-  letter-spacing: .14em;
-  font-size: 13px;
-  text-transform: uppercase;
+  letter-spacing: .04em;
   display:inline-block;
   color: $ve-light-text-darker-1;
+  font-weight: 400; /* change to default*/
 }
 
 /*------------------------------------------------------------------
@@ -847,6 +842,33 @@ span.fixed-content-dropdown{
 }
 
 /*------------------------------------------------------------------
+    2.8.2 Ref icons
+-------------------------------------------------------------------*/
+
+/*add to branch labels*/
+.Branch-icon::before,
+.branch-icon::before{
+  content: "\f126";
+  font-family: FontAwesome;
+  color: $ve-silver-darker-3;
+  padding-right: 6px;
+  top: 1px;
+  position: relative;
+}
+
+/*add to tag labels*/
+.Tag-icon::before,
+.tag-icon::before{
+  content: "\f02b";
+  font-family: FontAwesome;
+  color: $ve-silver-darker-3;
+  padding-right: 6px;
+  top: 1px;
+  position: relative;
+}
+
+
+/*------------------------------------------------------------------
 3. Table Filtering & Sorting
 -------------------------------------------------------------------*/
 
@@ -1188,7 +1210,8 @@ hr.spec-title-divider{
 
 /* Special styling to preview element*/
 .element-preview-box{
-  padding: 0 20px;
+  padding: 10px 20px;
+  margin-bottom: 20px;
   background-color: $ve-silver-lighter-1;
   border-radius: 3px;
   border: 1px solid $ve-silver-darker-1;
@@ -1204,11 +1227,18 @@ span.inline-btn-label{
 }
 
 /*------------------------------------------------------------------
+  Warning - move to main after css cleanup and change brand-warnng
+-------------------------------------------------------------------*/
+.fa-exclamation-triangle{
+  color: $ve-yellow-base;
+}
+
+/*------------------------------------------------------------------
 Element not found styling
 -------------------------------------------------------------------*/
 
 .mms-error{
-  background:$ve-warning-orange-light;
+  background: $ve-warning-orange-light;
   background: repeating-linear-gradient(45deg, $white, $white 10px,$ve-warning-orange-light 10px,$ve-warning-orange-light 20px);
   color: $black;
   border: none;
