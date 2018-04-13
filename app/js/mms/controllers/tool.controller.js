@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'JobService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, tagObs, documentOb, viewOb, Utils) {
+    ElementService, JobService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -20,7 +20,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
-    $scope.noTags = false;
+    $scope.branchObs = branchObs;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -28,10 +28,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     } else if (documentOb) {
         $scope.specInfo.id = documentOb.id;
         $scope.viewId = documentOb.id;
-    }
-
-    if (angular.isArray(tagObs) && tagObs.length === 0) {
-        $scope.noTags = true;
     }
 
     $scope.specApi = {};
@@ -96,6 +92,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     $scope.$on('tags', function() {
+        showPane('tags');
+    });
+
+    $scope.$on('gotoTagsBranches', function(){
+        $rootScope.ve_tbApi.select('tags');
         showPane('tags');
     });
 

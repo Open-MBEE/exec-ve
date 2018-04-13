@@ -48,7 +48,7 @@ function UxService($rootScope) {
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("document-snapshot-create")]};
       case "tags":
-        return {id: button, icon: 'fa-tag', selected: false, active: true, permission: true, tooltip: 'Tags',
+        return {id: button, icon: 'fa-code-fork', selected: false, active: true, permission: true, tooltip: 'Branches and Tags',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "jobs":
         return {id: button, icon: 'fa-sort-amount-desc', selected: true, active: true, permission:true, tooltip: 'Jobs',

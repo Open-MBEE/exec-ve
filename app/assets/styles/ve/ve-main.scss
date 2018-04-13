@@ -173,7 +173,8 @@ div.tooltip-inner {
 
   .modal-title {
     margin: 0;
-    color:$ve-white-text-lighter-2;
+    letter-spacing: 0.04em;
+    color: $ve-white-text-lighter-2;
   }
 
   /*Clearing bootstrap*/
@@ -1108,7 +1109,8 @@ hr.spec-title-divider{
 
 /* Special styling to preview element*/
 .element-preview-box{
-  padding: 0 20px;
+  padding: 10px 20px;
+  margin-bottom: 20px;
   background-color: $ve-silver-lighter-1;
   border-radius: 3px;
   border: 1px solid $ve-silver-darker-1;
@@ -1124,11 +1126,18 @@ span.inline-btn-label{
 }
 
 /*------------------------------------------------------------------
+  Warning - move to main after css cleanup and change brand-warnng
+-------------------------------------------------------------------*/
+.fa-exclamation-triangle{
+  color: $ve-yellow-base;
+}
+
+/*------------------------------------------------------------------
 Element not found styling
 -------------------------------------------------------------------*/
 
 .mms-error{
-  background:$ve-warning-orange-light;
+  background: $ve-warning-orange-light;
   background: repeating-linear-gradient(45deg, $white, $white 10px,$ve-warning-orange-light 10px,$ve-warning-orange-light 20px);
   color: $black;
   border: none;

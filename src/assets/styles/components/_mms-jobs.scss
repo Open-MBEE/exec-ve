@@ -1,4 +1,5 @@
-#ve-jobs-table{
+#ve-jobs-table,
+#ve-branches-tags{
 
 /*------------------------------------------------------------------
 VE Jobs Table Table of contents
@@ -75,6 +76,11 @@ VE Jobs Table Table of contents
 
   .build-details{
     padding-left: 12px;
+  }
+
+  /*clear default margin when header is in table*/
+  td h3{
+    margin: 0;
   }
 
 /*------------------------------------------------------------------
