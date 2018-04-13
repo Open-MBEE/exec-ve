@@ -6,7 +6,7 @@
     <tbody ng-show="filteredTags.length">
         <tr ng-repeat="tag in filteredTags = (mmsTags | orderBy:'-_created' | filter: {name : refFilter})">
             <td>
-                <a ui-sref="project.ref.document({refId: tag.id, documentId: mmsDocId, search: undefined})"><b>{{tag.name}}</b></a>
+                <a ui-sref="{refId: tag.id}"><b>{{tag.name}}</b></a>
                 <div>{{tag.description}}</div>
             </td>
             <td class="ve-secondary-text">{{tag._created | date:'M/d/yy h:mm a'}}</td>
@@ -35,7 +35,7 @@
     <tbody ng-show="filteredBranches.length">
         <tr ng-repeat="branch in filteredBranches = (mmsBranches | orderBy:'-_created' | filter: {name : refFilter})">
             <td>
-                <a ui-sref="project.ref.document({refId: branch.id, documentId: mmsDocId, search: undefined})"><b>{{branch.name}}</b></a>
+                <a ui-sref="{refId: branch.id}"><b>{{branch.name}}</b></a>
                 <div>{{branch.description}}</div>
             </td>
             <td class="ve-secondary-text">{{branch._created | date:'M/d/yy h:mm a'}}</td>

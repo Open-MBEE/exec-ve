@@ -97,7 +97,7 @@
                 </td>
                 <td>
                     <div ng-if="jobInstances[job.id][0].type === 'docmerge'">
-                        <a ng-click="changePane('gotoTagsBranches')">Got to branches/tags pane</a>
+                        <a ng-click="changePane('gotoTagsBranches')">Go to branches/tags pane</a>
                     </div>
                     <div ng-switch="jobInstances[job.id][0].jobStatus" ng-if="jobInstances[job.id][0].type != 'docmerge'">
                         <span ng-switch-when="pending|loading|running|started" ng-switch-when-separator="|">
