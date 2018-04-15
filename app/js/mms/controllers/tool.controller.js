@@ -121,12 +121,12 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         cleanUpEdit(editOb);
     });
 
-    var elementSelected = function(event, elementOb, commitId) {
+    var elementSelected = function(event, elementOb, commitId, displayOldContent) {
         $scope.specInfo.id = elementOb.id;
         $scope.specInfo.projectId = elementOb._projectId;
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
-        $scope.specInfo.mmsDisplayOldContent = elementOb.mmsDisplayOldContent;
+        $scope.specInfo.mmsDisplayOldContent = displayOldContent;
         $rootScope.ve_tbApi.select('element-viewer');
 
         showPane('element');
