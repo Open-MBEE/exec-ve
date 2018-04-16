@@ -31,7 +31,7 @@
 }
 
 // Pull center button dropdowns to the right
-.pane-center .mms-button-bar {
+.pane-center mms-button-bar {
   .dropdown-menu {
     right: 0;
     left: auto;

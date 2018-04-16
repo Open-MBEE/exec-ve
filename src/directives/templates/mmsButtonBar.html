@@ -1,4 +1,4 @@
-<span class="mms-button-bar" ng-repeat="button in buttons | filter: {permission: true}">
+<span ng-repeat="button in buttons | filter: {permission: true}">
 
   <!-- Normal button -->
   <a type="button" ng-if="!button.dropdown_buttons" class="btn btn-tools btn-sm {{button.id}}"
