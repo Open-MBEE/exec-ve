@@ -300,7 +300,7 @@ CKEDITOR.MmsAutosavePlugin =
             '        </div>\n' +
             '        <div class="modal-footer">\n' +
             '                <button id="autosave-confirm" class="btn btn-primary">Review</button>\n' +
-            '                <button id="autosave-cancel" class="btn btn-tertiary">Discard</button>\n' +
+            '                <button id="autosave-cancel" class="btn btn-default">Discard</button>\n' +
             '        </div>\n' +
             '    </div>\n' +
             '</div>';

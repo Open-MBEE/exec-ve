@@ -3,6 +3,7 @@
 *************************/
 
 $pane_center_btn_group_width: 340px;
+$pane_center_toolbar: $pane_center_btn_group_width + 150px;
 
 /* start of fullDoc page styles */
 body.fullDoc {
@@ -22,6 +23,11 @@ tr {
   background-color: $light_blue;
 }
 
+/*Overriding default from fa-pane-scroller that results in double scroll bar*/
+.center-view .center-view{
+  overflow: hidden;
+}
+
 .pane-center {
   margin-right: -11px;
   font-size: 16px;
@@ -37,45 +43,22 @@ tr {
     left: 50%;
   }
 
+
+  .pane-center-toolbar {
+    padding: 5px 10px;
+    min-width: $pane_center_toolbar;
+  }
   .pane-center-btn-group {
     float: right;
-    padding-top: 9px;
-    padding-right: 12px;
+    // padding: 5px 10px;
     min-width: $pane_center_btn_group_width;
 
     .bordered-button-bar {
       float: right;
     }
   }
-
-  .center-view {
-    right: 41px !important;
-
-    .nav-tabs {
-      min-width: 200px;
-      background-color: $tertiary_grey;
-    }
-
-    .nav-tabs li a {
-      cursor: pointer;
-      color: $black;
-      @include border-radius(0);
-      height: 35px;
-    }
-
-    .nav-tabs li.active a {
-      border-bottom-color: transparent;
-    }
-  }
-
-  .pane-center-inner {
-    padding-top: 14px;
-    padding-bottom:40px;
-  }
 }
-@media (max-width: 720px) {
 
-}
 
 .container-tree-reorder {
   margin-bottom: 24px;
@@ -149,99 +132,19 @@ tr {
   }
 }
 
-.diff-pane-center {
-  /*margin-right: -14px;*/
-
-  > .pane-center {
-    @include box-shadow(-4px 0px 2px -2px rgba(0, 0, 0, .24));
-    margin-right: 0;
-  }
-
-  .pane-center-header,
-  .pane-center-heading-element {
-    margin-top: 40px;
-  }
-
-  table {
-    th {
-      background-color: $tertiary_grey;
-      border-bottom: 0 !important;
-      padding: 0;
-      vertical-align: middle !important;
-      /*font-size: 16px;*/
-    }
-
-    tbody {
-      td {
-        border-bottom: 1px solid #f3f3f3;
-        padding: 0;
-        /*font-size: 14px;*/
-      }
-
-      tr {
-        background-color: inherit;
-
-        td:nth-child(1) {
-          font-weight: $bold_font_weight;
-        }
-      }
-    }
-  }
-}
 
 /* styling for doclib link to the right of the button bar*/
 
 .doclib-link {
   margin: 0 4px;
-  line-height: 1.1;
-  padding-top: 9px;
   float: left;
+  .btn-tools{
+    color: $ve-light-text;
+  }
 
   img{
     padding-right:5px;
     top: -1px;
     position: relative;
-  }
-}
-
-
-@media screen and (min-width: 768px) {
-  .diff-pane-center {
-    .pane-center-header {
-      font-size: 40px;
-    }
-
-    .pane-center-heading {
-      font-size: 28px;
-    }
-
-    table {
-      th {
-        font-size: 14px;
-      }
-
-      thead {
-        tr {
-          height: 30px;
-        }
-      }
-
-      tbody {
-        td {
-          font-size: 14px;
-        }
-
-        tr {
-          td:nth-child(1) {
-            padding: 10px;
-          }
-
-          td:nth-child(2),
-          td:nth-child(3) {
-            padding: 10px;
-          }
-        }
-      }
-    }
   }
 }

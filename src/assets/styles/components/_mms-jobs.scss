@@ -89,7 +89,7 @@ VE Jobs Table Table of contents
   .empty-state{
     background-color: $quaternary_grey-darker;
     border: 1px solid $tertiary_grey;
-    border-radius: 3px;
+    @include border-radius(3px);
     padding: 20px 10px 30px;
     margin: 10px 0;
   }

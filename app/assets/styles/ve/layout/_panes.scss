@@ -94,32 +94,6 @@
   top: 72px;
 }
 
-.diff-pane-left,
-.diff-pane-center,
-.diff-pane-right {
-  h1,
-  h3 {
-    white-space: nowrap;
-  }
-
-  h3 {
-    font-size: 20px;
-    padding-left: 20px;
-  }
-}
-
 .content-container {
   top: $navHeight;
-}
-
-.diff-pane-left {
-  h3 {
-    padding-left: 0px;
-  }
-}
-
-.diff-pane-center {
-  h3 {
-    padding-left: 0px;
-  }
 }

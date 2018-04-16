@@ -3,21 +3,12 @@
   MMS app design guide
 *************************/
 
-a {
-  color: $base_blue;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 img {
   max-width: 100%;
 }
 
 .form-control:focus {
-  border-color: $base_blue;
+  border-color: $brand_base;
 }
 
 .modal-dialog {

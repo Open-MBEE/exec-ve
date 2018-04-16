@@ -1,11 +1,15 @@
 <div class="panel panel-default">
     <div class="panel-heading clearfix">
-        <h3 class="panel-title pull-left">{{panelType}} :
+        <h3 class="panel-title pull-left">
+                <form class="form-inline">
+                        <div class="form-group">
+            <span class="pe-type-{{panelType}}">{{panelType}} :</span>
             <span ng-if="!isDirectChildOfPresentationElement">{{panelTitle}}</span>
-            <span ng-if="isDirectChildOfPresentationElement"><input type="text" ng-model="edit.name"/></span>
+            <span ng-if="isDirectChildOfPresentationElement"><input type="text" class="form-control" ng-model="edit.name"/></span>
+                        </div></form>
         </h3>
         <div class="btn-group pull-right">
-            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+            <mms-button-bar class="transclude-panel-toolbar" buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
         </div>
     </div>
     <div class="panel-body no-padding-panel">

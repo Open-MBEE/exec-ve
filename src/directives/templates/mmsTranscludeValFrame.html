@@ -3,7 +3,7 @@
     <div class="panel-heading clearfix">
         <h3 class="panel-title pull-left">Value : {{element.name}}</h3>
         <div class="btn-group pull-right">
-            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
+            <mms-button-bar class="transclude-panel-toolbar" buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
         </div>
     </div>
     <div class="panel-body">
@@ -28,7 +28,7 @@
                 <div ng-switch-default>Editing not supported for now</div>
             </span>
             <div ng-if="editValues.length != 0 && isSlot">
-                <button class="btn btn-sm btn-tertiary" ng-click="addValue(editValues[0].type)">Add</button>
+                <button class="btn btn-sm btn-default" ng-click="addValue(editValues[0].type)">Add</button>
             </div>
         </div>
         <!-- if enum and isslot repeat values in element -->
@@ -37,7 +37,7 @@
             <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
         </div>
         <div ng-if="(isSlot || editValues.length == 0) && isEnumeration">
-            <button class="btn btn-sm btn-tertiary" ng-click="addEnumerationValue()">Add</button>
+            <button class="btn btn-sm btn-default" ng-click="addEnumerationValue()">Add</button>
         </div>
     </div>
 </div>

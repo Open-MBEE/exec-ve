@@ -4,7 +4,7 @@
     }
 </style>
 <div class="modal-header">
-    <h4>{{action | uppercase}} {{type}}</h4>
+    <h4>{{action}} {{type | lowercase}}</h4>
 </div>
 
 <div class="modal-body">
@@ -25,9 +25,11 @@
       WARNING: You currently have unsaved changes in the session that may not be reflected.
     </p>
     <br/>
-    <div ng-if="type == 'DOCUMENT' && mode !== 1">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
-    <div ng-if="model.genTotf">Use HTML for List of Tables and Figures (will not include equations and may differ from web numbering): <input type="checkbox" ng-model="model.htmlTotf"></div>
-    <div ng-if="mode !== 1">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
+    <h6>Options</h6>
+    <div ng-if="type == 'DOCUMENT' && mode !== 1"><input type="checkbox" ng-model="model.genTotf"> List of Tables and Figures</div>
+    <div ng-if="model.genTotf" class="indent"><input type="checkbox" ng-model="model.htmlTotf"> Use HTML for List (will not include equations and may differ from web numbering)</div>
+    <div ng-if="mode !== 1"><input type="checkbox" ng-model="model.landscape"> Landscape</div>
+    <br>
     <form ng-if="type == 'DOCUMENT' && (mode === 3)" role="form">
         <h6>Header and Footer</h6>
         <div>Use 'counter(page)' for page number.</div>
@@ -49,5 +51,5 @@
 <div class="modal-footer">
     <button ng-if="type == 'VIEW' && docOption" class="btn btn-primary" ng-click="fulldoc()">Go to full document</button>
     <button class="btn btn-primary" ng-click="print()">{{action | uppercase}}</button>
-    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
 </div>

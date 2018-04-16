@@ -3,48 +3,36 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 32px;
-    margin: 20px 0 4px;;
+    margin: 24px 0 4px;;
     height: inherit;
     width: 100%;
   }
 
   h1.prop {
     width: 100%;
-    min-width: 280px;
     word-wrap: break-word;
   }
 
   h2.prop-title{
-    //border-top: 1px solid $tertiary_grey;
-    padding-top: 20px;
-    border-top: 1px solid $ve-silver-base;
-  }
-
-  /*First values in the list and should not have a border on top*/
-  .elem-updated-wrapper + h2.prop-title,
-  .element-title + h2.prop-title
-  h2.prop-title:first-child{
-    border-top: none;
+    padding-top: 24px;
   }
 
   span.prop {
-    font-size: 16px;
+    font-size: 1.15em;
     margin-bottom: 20px;
     margin-top: 2px;
-    min-width: 280px;
     word-wrap: break-word;
     display: block;
   }
 
   h1.element-title {
-    min-width: 280px;
     word-wrap: break-word;
   }
 
   .doc-text {
     font-family: $font-family-sans-serif;
     max-width: $default-line-length;
-    min-width: 15em;
+    //min-width: 15em;
   }
 
   h2.spec-view-doc-heading, h2.spec-view-value-heading, h2.spec-view-type-heading {
@@ -68,10 +56,15 @@
       background-color: $yellow;
       cursor: auto;
       display: block;
-      border-radius: 5px;
+      @include border-radius(5px);
       padding: 2px;
       margin-bottom: 5px;
     }
+  }
+
+  /*pull in metatype wrapper to compensate for padding*/
+  .elem-type-wrapper {
+    margin-left: -3px;
   }
 }
 
@@ -85,23 +78,26 @@ Styles that apply to both the spec
   .elem-wrapper label,
   .prop-title,
   .visibility-toggle{
-    font-size: 13px;
-    font-weight: $bold_font_weight;
-    margin: 10px 5px 0 0;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 16px 0px 0 0;
     letter-spacing: .05em;
     text-decoration: none;
-    color: $ve-light-text-darker-1;
+    color: $ve-light-text;
   }
 
   .visibility-toggle{
-    color: $base_blue;
     list-style: none;
     margin: 12px 0 0 -14px;
     position: relative;
 
-    //Show more content caret
+    td{
+      line-height: 2.6em
+    }
 
+    //Show more content caret
     a{
+
       //show more content caret
       &:after{
         content:"\f078";
@@ -122,7 +118,7 @@ Styles that apply to both the spec
         font-size: 16px;
         color: $tertiary_grey;
         position: absolute;
-        top: -22px;
+        top: -1em;
       }
     }
   }
@@ -131,21 +127,18 @@ Styles that apply to both the spec
   .elem-type{
     letter-spacing: .1em;
     margin-right: 6px;
-    padding: 2px 5px;
-    wrap-text: none;
+    padding: 1px 5px;
+    white-space: nowrap;
     margin: 3px;
     display:inline-block;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: .75em;
     background: $highlight_grey;
-    border-radius: 3px;
+    @include border-radius(3px);
     color: $ve-light-text-darker-1;
+    font-weight: 500;
+    border: 1px solid $ve-silver-darker-1;
   }
 
-  /*pull in metatype wrapper to compensate for padding*/
-  .elem-type-wrapper {
-    margin-left: -3px;
-  }
 
   .elem-updated-wrapper {
     color: $medium_grey;

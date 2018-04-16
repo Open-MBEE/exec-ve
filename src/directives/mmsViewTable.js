@@ -30,9 +30,9 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
 
         var html = UtilsService.makeHtmlTable(scope.table, true, true );
         html = '<div class="tableSearch ve-table-filter">' +
-                '<button class="btn btn-sm export-csv-button btn-tertiary" ng-click="doClick()">Export CSV</button> ' +
-                '<button class="btn btn-sm filter-table-button btn-tertiary" ng-click="showFilter = !showFilter">Filter table</button> ' +
-                '<button class="btn btn-sm reset-sort-button btn-tertiary reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
+                '<button class="btn btn-sm export-csv-button btn-default" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
+                '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
                 '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + html;
