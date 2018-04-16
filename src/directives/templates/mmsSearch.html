@@ -175,6 +175,15 @@
                     {{elem._qualifiedName}}
                 </div>
             </div>
+            <div class="elem-type-wrapper">
+                <label>Metatypes:</label>
+                <span class="elem-type">{{elem.type}}</span>
+                <span ng-if="elem._appliedStereotypeIds.length">
+                    <span ng-repeat="type in elem._appliedStereotypeIds">
+                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
+                    </span>
+                </span>
+            </div>
             <div class="elem-documentation-wrapper">
                 <label>Documentation</label>
                 <div class="elem-documentation">
@@ -250,15 +259,6 @@
                         > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)"></mms-view-link><br/>
                     </span>
                 </div>
-            </div>
-            <div class="elem-type-wrapper">
-                <label>Metatypes:</label>
-                <span class="elem-type">{{elem.type}}</span>
-                <span ng-if="elem._appliedStereotypeIds.length">
-                    <span ng-repeat="type in elem._appliedStereotypeIds">
-                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
-                    </span>
-                </span>
             </div>
             <div class="elem-updated-wrapper">
                 <div>Last modified {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
