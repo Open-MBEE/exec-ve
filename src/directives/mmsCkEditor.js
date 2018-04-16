@@ -65,7 +65,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 });
             }
 
-            $scope.title = 'INSERT A CROSS REFERENCE';
+            $scope.title = 'Insert a cross reference';
             $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
             $scope.requestName = false;
@@ -201,7 +201,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         // If user selects name or doc, link will be to first related doc
         // Also defines options for search interfaces -- see mmsSearch.js for more info
         var transcludeViewLinkCtrl = function($scope, $uibModalInstance) {
-            $scope.title = 'INSERT VIEW LINK';
+            $scope.title = 'Insert view link';
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
 
             // Function to construct view link

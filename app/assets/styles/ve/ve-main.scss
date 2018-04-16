@@ -38,6 +38,10 @@ div.tooltip-inner {
   white-space: normal;
 }
 
+.indent{
+  margin-left:24px;
+}
+
 @media print {
   a[href]:after {
     content: none !important;
@@ -972,10 +976,6 @@ table caption {
 .ve-new-ref{
   input[type="radio"]{
     margin:0 4px;
-  }
-
-  .indent{
-    margin-left:24px;
   }
 
   label{

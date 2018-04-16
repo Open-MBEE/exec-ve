@@ -119,8 +119,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             templateUrl: 'partials/mms/printConfirm.html',
             controller: ["$scope", "$uibModalInstance", function($scope, $uibModalInstance) {
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
-                $scope.action = mode === 1 ? 'print' : mode === 3 ? 'generate pdf' : 'generate word';
-                $scope.label = mode === 3 ? 'pdf' : mode === 2 ? 'word' : '';
+                $scope.action = mode === 1 ? 'print' : mode === 3 ? 'Generate PDF' : 'Generate word';
+                $scope.label = mode === 3 ? 'PDF' : mode === 2 ? 'Word' : '';
                 $scope.mode = mode;
                 $scope.meta = {};
                 if (isDoc) {
