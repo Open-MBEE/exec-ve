@@ -10,7 +10,6 @@
   font-size: 12px;
 
   .fa {
-    padding-right: 4px;
     font-size: 14px;
   }
 }
@@ -22,9 +21,16 @@
 // Toolbar button style
 .btn-tools {
   @include button-variant($base_grey, $white, $white);
+
+  .fa {
+    padding-right: 4px;
+    font-size: 14px;
+  }
+
   &:not(.dropdown-toggle) .fa {
     padding-right: 0;
   }
+
   .caret{
     opacity: .4;
   }

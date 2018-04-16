@@ -215,13 +215,14 @@ div.tooltip-inner {
 
 // selected item styling
 .dropdown-menu {
-  .secondary-checked-list-item::before {
-    @include fa-menu-content("\f00c", $ve-silver-darker-1);
-    left: 10px;
-  }
 
   .checked-list-item::before {
     @include fa-menu-content("\f00c", $ve-green-lighter-1);
+    left: 10px;
+  }
+
+  .secondary-checked-list-item::before {
+    @include fa-menu-content("\f00c", $ve-silver-darker-1);
     left: 10px;
   }
 
@@ -233,6 +234,15 @@ div.tooltip-inner {
   li.checked-list-item,
   li.secondary-checked-list-item {
     position: relative;
+  }
+}
+
+// Fix checkbox in multiselect
+.dropdown-multiselect {
+  .dropdown-menu {
+    li {
+      position: relative;
+    }
   }
 }
 
