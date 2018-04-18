@@ -333,7 +333,8 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             mmsCommitId: '@',
             mmsElement: '<?',
             mmsSpecApi: '<?',
-            noEdit: '@'
+            noEdit: '@',
+            mmsDisplayOldContent: '<?'
         },
         link: mmsSpecLink
     };

@@ -82,8 +82,11 @@
     <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
 
     <div ng-hide="gettingSpec">
-        <h1 class="prop element-title">{{element.name}}</h1>
-
+        <div class="text-warning" ng-if="mmsDisplayOldContent">
+            <b> Element not found:</b> displaying last found content
+        </div>
+        <h1 class="prop element-title {{mmsDisplayOldContent ? 'mms-error': ''}}">{{element.name}}</h1>
+        
         <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
 
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">

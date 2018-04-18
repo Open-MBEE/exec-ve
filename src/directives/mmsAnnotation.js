@@ -22,7 +22,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
     function mmsAnnotationLink(scope, element, attrs) {
         element.on('click', function() {
             if(scope.mmsRecentElement) {
-                $rootScope.$broadcast('elementSelected', scope.mmsRecentElement, scope.mmsRecentElement._commitId);
+                $rootScope.$broadcast('elementSelected', scope.mmsRecentElement, scope.mmsRecentElement._commitId, true);
             }
         });
 
