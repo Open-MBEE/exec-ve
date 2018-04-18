@@ -7,7 +7,23 @@ mms-view {
     margin-bottom: 15px;
   }
 
+  &.editing {
+    mms-view-section {
+      display: block;
+      border: 2px solid $ve-silver-darker-1;
+      @include transition(border, .5s);
+      @include border-radius(5px);
+    }
+  }
+
   table {
     @extend .content-table;
   }
 }
+
+mms-view-section {
+  .panel-heading {
+    padding: 2px 8px;
+  }
+}
+

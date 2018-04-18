@@ -3,9 +3,7 @@
 {
 	background-color : #FFFFFF;
 	border: 1px solid #b0b09e;
-	border-radius: 15px;
-	-moz-border-radius: 15px;
-	-webkit-border-radius: 15px;
+	@include border-radius(15px);
 	padding: 2px;
 	width: 180px!important; //Note: This should be set as !important when we define the element. Size should be set from Designer.
 }

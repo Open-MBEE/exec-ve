@@ -1,4 +1,5 @@
-#ve-jobs-table{
+#ve-jobs-table,
+#ve-branches-tags{
 
 /*------------------------------------------------------------------
 VE Jobs Table Table of contents
@@ -77,13 +78,18 @@ VE Jobs Table Table of contents
     padding-left: 12px;
   }
 
+  /*clear default margin when header is in table*/
+  td h3{
+    margin: 0;
+  }
+
 /*------------------------------------------------------------------
   Empy State Layout
 -------------------------------------------------------------------*/
   .empty-state{
     background-color: $quaternary_grey-darker;
     border: 1px solid $tertiary_grey;
-    border-radius: 3px;
+    @include border-radius(3px);
     padding: 20px 10px 30px;
     margin: 10px 0;
   }

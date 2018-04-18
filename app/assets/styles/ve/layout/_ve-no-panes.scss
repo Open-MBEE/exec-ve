@@ -26,7 +26,6 @@
 .ve-no-panes {
 
   margin-top: 90px;
-  letter-spacing: .05em;
   overflow: auto;
   height: 90vh;
 
@@ -249,24 +248,6 @@ ul.ve-light-list {
 
     h3 {
       display: inline-block;
-    }
-
-    h3.ref-type.Branch::before{
-      content: "\f126";
-      font-family: FontAwesome;
-      color: $ve-silver-darker-3;
-      padding-right: 6px;
-      top: 1px;
-      position: relative;
-    }
-
-    h3.ref-type.Tag::before{
-      content: "\f02b";
-      font-family: FontAwesome;
-      color: $ve-silver-darker-3;
-      padding-right: 6px;
-      top: 1px;
-      position: relative;
     }
 
     mms-button-bar {

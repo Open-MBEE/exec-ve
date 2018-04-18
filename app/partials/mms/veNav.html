@@ -13,7 +13,7 @@
         <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed" id="global-navigation">
             <form id="global-search" ng-submit="search(searchText)" class="navbar-form navbar-left" role="search">
                 <div class="form-group">
-                    <input placeholder="Search selected project" ng-model="searchText"/>
+                    <input placeholder="Search project and related projects" ng-model="searchText"/>
                     <button ng-click="search(searchText)">
                         <i class="fa fa-search" aria-hidden="true"></i>
                     </button>
@@ -50,7 +50,7 @@
                             {{ username | limitTo:1 | uppercase }}
                         </a>
                         <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
-                            <li ng-if="username">
+                            <li ng-if="username" class="ve-secondary">
                                 Logged in as <b>{{ username }}</b>
                             </li>
                             <li class="divider"></li>

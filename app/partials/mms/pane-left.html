@@ -1,14 +1,13 @@
-<div fa-pane pane-anchor="north" pane-size="76px" pane-no-toggle="true" pane-no-scroll="true">
+<div fa-pane pane-anchor="north" pane-size="77px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-left">
-        <div class="pane-left-toolbar-wrap">
-            <div class="toolbar pane-left-btn-group">
-                <mms-button-bar buttons="buttons" mms-bb-api="bbApi" class="bordered-button-bar"></mms-button-bar>
-            </div>
+        <div class="pane-left-toolbar" role="toolbar">
+            <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
         </div>
-        <div>
-            <input class="input-filter-tree form-control" ng-model-optoins="{debounce: 1000}"
-                ng-model="treeFilter.search" type="text" placeholder="Filter items in the tree"
-                ng-change="treeApi.expand_all()">
+        <div class="tree-options">
+            <mms-button-bar buttons="treeButtons" mms-bb-api="tbApi"></mms-button-bar>
+            <input class="ve-plain-input" ng-model-optoins="{debounce: 1000}"
+                ng-model="treeFilter.search" type="text" placeholder="Filter tree"
+                ng-change="treeApi.expand_all()" style="flex:2">
         </div>
     </div>
 </div>

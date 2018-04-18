@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h4>Export table(s) to CSV in {{type}}</h4>
+    <h4>Export table(s) to CSV in {{type | lowercase}}</h4>
 </div>
 
 <div class="modal-body">
@@ -20,5 +20,5 @@
 <div class="modal-footer">
     <button class="btn btn-primary" ng-click="export()">Export to CSV</button>
     <!--<button ng-if="type == 'VIEW'" class="btn btn-sm btn-primary" ng-click="fulldoc()">GO TO FULL DOCUMENT</button>-->
-    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
 </div>

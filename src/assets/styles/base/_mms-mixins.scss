@@ -6,7 +6,7 @@
   -webkit-border-radius: $radius;
   -moz-border-radius: $radius;
   -ms-border-radius: $radius;
-  border-radius: $radius; 
+  border-radius: $radius;
 }
 
 @mixin transform($args...) {
@@ -14,7 +14,7 @@
   -moz-transform: $args;
   -ms-transform: $args;
   -o-transform: $args;
-  transform: $args; 
+  transform: $args;
 }
 
 @mixin transition($args...) {
@@ -41,9 +41,9 @@
   box-shadow: $args;
 }
 
-@mixin calc($property, $expression) { 
-  #{$property}: -webkit-calc(#{$expression}); 
-  #{$property}: calc(#{$expression}); 
+@mixin calc($property, $expression) {
+  #{$property}: -webkit-calc(#{$expression});
+  #{$property}: calc(#{$expression});
 }
 
 @mixin selection {
