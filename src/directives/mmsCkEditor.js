@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsCkeditor', ['CacheService', 'ElementService', 'UtilsService', 'ViewService', '$uibModal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR', '_', mmsCkeditor]);
+.directive('mmsCkeditor', ['CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', '$uibModal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR', '_', mmsCkeditor]);
 
 /**
  * @ngdoc directive
@@ -33,7 +33,7 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
+function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, URLService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl) {
@@ -489,6 +489,36 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                     update();
                 };
             }
+            instance.on('fileUploadRequest', function(evt) {
+                var fileLoader = evt.data.fileLoader,
+                    formData = new FormData(),
+                    xhr = fileLoader.xhr;
+
+                xhr.open( 'POST', URLService.getPutArtifactsURL({projectId: scope.mmsProjectId, refId: scope.mmsRefId}), true );
+                formData.append('file', fileLoader.file, fileLoader.fileName );
+                formData.append('id', 'generatedId');
+                fileLoader.xhr.send( formData );
+
+                // Prevented the default behavior.
+                evt.stop();
+            });
+            instance.on( 'fileUploadResponse', function( evt ) {
+                // Prevent the default response handler.
+                evt.stop();
+            
+                // Get XHR and response.
+                var data = evt.data,
+                    xhr = data.fileLoader.xhr,
+                    response = xhr.responseText.split( '|' );
+            
+                if ( response[ 1 ] ) {
+                    // An error occurred during upload.
+                    data.message = response[ 1 ];
+                    evt.cancel();
+                } else {
+                    data.url = response[ 0 ];
+                }
+            } );
         }, 0, false);
         
         ngModelCtrl.$render = function() {
