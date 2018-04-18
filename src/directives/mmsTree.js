@@ -240,6 +240,9 @@ function mmsTree($timeout, $log, $templateCache) {
                         }
                     }, 500, false);
                 }
+            // fix for when user presses browser back button
+            } else {
+                expand_all_parents(branch);
             }
         };
 
