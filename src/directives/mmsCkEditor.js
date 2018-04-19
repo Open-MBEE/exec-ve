@@ -403,7 +403,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
         // var customToolbar =   { name: 'custom',   items: [ 'Mmscf','mmsreset','Mmscomment','Mmsvlink','Mmssignature' ] };
-        var customToolbar =   { name: 'custom',   items: [ 'Mmssignature','MMSInsertMenu' ] };
+        var customToolbar =   { name: 'custom',   items: [ 'MMSInsertMenu', 'Mmssignature'] };
         var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
 
         //Set toolbar based on editor type
@@ -441,30 +441,23 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 mmscomment: {callbackModalFnc: commentCallback},
                 mmsvlink: {callbackModalFnc: viewLinkCallback},
                 mmsreset: {callback: mmsResetCallback},
-                autoGrow_minHeight: 200,
-                autoGrow_maxHeight: $window.innerHeight*0.55,
-                autoGrow_bottomSpace: 50,
                 contentsCss: CKEDITOR.basePath+'contents.css',
-                toolbar: thisToolbar
+                toolbar: thisToolbar,
+                height: $window.innerHeight*0.55,
             });
 
             // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
             if ( attrs.autosaveKey ) {
                 // Configuration for autosave plugin
                 instance.config.autosave = {
-                SaveKey: attrs.autosaveKey,
-                delay: 5,
-                NotOlderThen: 10080, // 7 days in minutes
-                enableAutosave: true
+                    SaveKey: attrs.autosaveKey,
+                    delay: 5,
+                    NotOlderThen: 10080, // 7 days in minutes
+                    enableAutosave: true
                 };
             } else {
                 instance.config.autosave = {enableAutosave: false};
             }
-
-            // CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
-            // CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
-            // CKEDITOR.plugins.addExternal('autogrow','/lib/ckeditor/plugins/autogrow/');
-            // CKEDITOR.plugins.addExternal('mathjax','/lib/ckeditor/plugins/mathjax/');
 
             instance.on( 'init', function(args) {
                 ngModelCtrl.$setPristine();
@@ -480,23 +473,34 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.focusManager.blur();
             });
             instance.on( 'key', function(e) {
-                if (e.data.domEvent.getKeystroke() == (CKEDITOR.CTRL + 192)) { //little tilde
+                if (e.data.keyCode == (CKEDITOR.CTRL + 192)) { //little tilde
                     autocompleteCallback(instance);
-                } else { deb(e); }
-            });
+                } else { 
+                    if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
+                        //trying to prevent tab and shift tab jumping focus out of editor, prevent shift tab doesn't seem to work
+                        e.data.domEvent.stopPropagation();
+                        e.data.domEvent.preventDefault();
+                        e.stop();
+                    }
+                    deb(e); 
+                }
+            }, null, null, 31); //priority is after indent list plugin's event handler
             if (scope.mmsEditorApi) {
                 scope.mmsEditorApi.save = function() {
                     update();
                 };
             }
             instance.on('fileUploadRequest', function(evt) {
-                var fileLoader = evt.data.fileLoader,
-                    formData = new FormData(),
-                    xhr = fileLoader.xhr;
+                var fileLoader = evt.data.fileLoader;
+                var formData = new FormData();
+                var xhr = fileLoader.xhr;
 
                 xhr.open( 'POST', URLService.getPutArtifactsURL({projectId: scope.mmsProjectId, refId: scope.mmsRefId}), true );
+                formData.append('id', UtilsService.createMmsId().replace('MMS', 'VE'));
                 formData.append('file', fileLoader.file, fileLoader.fileName );
-                formData.append('id', 'generatedId');
+                if (fileLoader.fileName) {
+                    formData.append('name', fileLoader.fileName);
+                }
                 fileLoader.xhr.send( formData );
 
                 // Prevented the default behavior.
@@ -507,28 +511,29 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 evt.stop();
             
                 // Get XHR and response.
-                var data = evt.data,
-                    xhr = data.fileLoader.xhr,
-                    response = xhr.responseText.split( '|' );
+                var data = evt.data;
+                var xhr = data.fileLoader.xhr;
+                var response = JSON.parse(xhr.response);
             
-                if ( response[ 1 ] ) {
+                if ( !response.artifacts || response.artifacts.length == 0) {
                     // An error occurred during upload.
-                    data.message = response[ 1 ];
+                    //data.message = response[ 1 ];
                     evt.cancel();
                 } else {
-                    data.url = response[ 0 ];
+                    data.url = '/alfresco' + response.artifacts[0].location;
                 }
             } );
         }, 0, false);
         
-        ngModelCtrl.$render = function() {
-            if (!instance) {
-                instance = CKEDITOR.instances[attrs.id];
-            } else {
-                var ranges = instance.getSelection().getRanges();
-                instance.setData(ngModelCtrl.$viewValue || '');
-                instance.getSelection().selectRanges( ranges );
-            }
+        ngModelCtrl.$render = function() { //commenting out to see if it helps with cursors jumping problem without adverse effects
+        //side effect is will not sync if editing in both right pane and center pane at the same time
+            // if (!instance) {
+            //     instance = CKEDITOR.instances[attrs.id];
+            // } else {
+            //     var ranges = instance.getSelection().getRanges();
+            //     instance.setData(ngModelCtrl.$viewValue || '');
+            //     instance.getSelection().selectRanges( ranges );
+            // }
         };
         
         scope.$on('$destroy', function() {
