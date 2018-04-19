@@ -7,7 +7,7 @@ body
 {
 	/* Font */
 	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
-	font-size: 12px;
+	font-size: 14px;
 
 	/* Text color */
 	color: #333;
@@ -20,7 +20,7 @@ body
 
 .cke_editable
 {
-	font-size: 13px;
+	font-size: 16px;
 	line-height: 1.6;
 
 	/* Fix for missing scrollbars with RTL texts. (#10488) */
@@ -37,12 +37,14 @@ blockquote
 	border-width: 0;
 }
 
+/*
 .cke_contents_ltr blockquote
 {
 	padding-left: 20px;
 	padding-right: 8px;
 	border-left-width: 5px;
 }
+*/
 
 .cke_contents_rtl blockquote
 {
@@ -66,8 +68,8 @@ ol,ul,dl
 
 h1,h2,h3,h4,h5,h6
 {
-	font-weight: normal;
-	line-height: 1.2;
+	font-weight: 200;
+	line-height: 1.22;
 }
 
 hr
@@ -205,3 +207,25 @@ a > img {
 	max-height: 1080px;
 	margin:0 auto;
 }
+
+/*
+ * VE Custom added
+ */
+ mms-cf, mms-group-docs, mms-view-link {
+	background-color: lightblue;
+	margin-top: 0;
+	margin-bottom: 0 !important;
+	padding: 1px !important;
+	border: 1px solid gray !important;
+	z-index: 0;
+	cursor: not-allowed;
+ }
+
+ mms-cf[mms-cf-type="com"] {
+	 background-color: yellow;
+ }
+
+ .signature-box {
+	 padding: 8px;
+	 border: 1px solid #ddd;
+ }
