@@ -42,12 +42,34 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         IBD: 'IBD Controls',
         BDD: 'BDD Controls',
         STM: 'Controls',
-        ACT: 'Activity Controls',
+        ACT: 'ACT Controls',
         SD: 'Controls',
-        PKG: 'Package Diagram Controls',
-        PAR: 'Parametric Diagram Controls',
+        PKG: 'PKG Controls',
+        PAR: 'PAR Controls',
         REQ: 'REQ Controls',
-        UC: 'Controls'
+        UC: 'UC Controls'
+    };
+    var elementTableMapping = {
+        IBD: 'IBD Elements',
+        BDD: 'BDD Elements',
+        STM: 'STM Elements',
+        ACT: 'ACT Elements',
+        SD: 'Elements',
+        PKG: 'PKG Elements',
+        PAR: 'PAR Elements',
+        REQ: 'REQ Elements',
+        UC: 'UC Elements'
+    };
+    var relTableMapping = {
+        IBD: 'IBD Relationships',
+        BDD: 'BDD Relationships',
+        STM: 'STM Relationships',
+        ACT: 'ACT Relationships',
+        SD: 'Associations',
+        PKG: 'PKG Relationships',
+        PAR: 'PAR Relationships',
+        REQ: 'REQ Relationships',
+        UC: 'UC Relationships'
     };
     $('body').append(
     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/tsperspectives.nocache.js"></script>\n' +
@@ -115,8 +137,8 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         var params = {
             viewName: viewNameMapping[scope.mmsTspSpec.diagramType],
             viewType: 'tsDrawingView',
-            tableName: 'Classifiers',
-            edgeTableName: 'Associations',
+            tableName: elementTableMapping[scope.mmsTspSpec.diagramType],
+            edgeTableName: relTableMapping[scope.mmsTspSpec.diagramType],
             inspectorName: 'Details',
             controlsName: controlMapping[scope.mmsTspSpec.diagramType]
         };
