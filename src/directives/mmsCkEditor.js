@@ -74,7 +74,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             $scope.nonEditableCheckbox = false;
             $scope.showEditableOp = true;
             $scope.choose = function(elem, property) {
-                var tag = '<mms-cf mms-cf-type="' + property + '" mms-element-id="' + elem.id + '" non-editable="' + $scope.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</mms-cf> ';
+                var tag = '<mms-cf mms-cf-type="' + property + '" mms-element-id="' + elem.id + '" non-editable="' + $scope.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</mms-cf>';
                 $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -147,7 +147,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             };
             $scope.autocomplete = function(success) {
                 if (success) {
-                    var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf> ';
+                    var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf>';
                     $uibModalInstance.close(tag);
                 } else {
                     $uibModalInstance.close(false);
@@ -320,7 +320,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 var reqOb = {element: $scope.comment, projectId: scope.mmsProjectId, refId: scope.mmsRefId};
                 ElementService.createElement(reqOb)
                 .then(function(data) {
-                    var tag = '<mms-cf mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</mms-cf> ';
+                    var tag = '<mms-cf mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</mms-cf>';
                     $uibModalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
@@ -480,11 +480,20 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                         //trying to prevent tab and shift tab jumping focus out of editor, prevent shift tab doesn't seem to work
                         e.data.domEvent.stopPropagation();
                         e.data.domEvent.preventDefault();
+                        e.cancel();
                         e.stop();
                     }
                     deb(e); 
                 }
             }, null, null, 31); //priority is after indent list plugin's event handler
+            instance.on('contentDom', function(e) {
+                instance.document.on('key', function(e) {
+                    e.stop();
+                    e.cancel();
+                    e.data.domEvent.stopPropagation();
+                    e.data.domEvent.preventDefault();
+                });
+            });
             if (scope.mmsEditorApi) {
                 scope.mmsEditorApi.save = function() {
                     update();
