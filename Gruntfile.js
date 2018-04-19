@@ -292,7 +292,8 @@ module.exports = function(grunt) {
           Blob: true,
           navigator: true,
           eval: true,
-          Set: true
+          Set: true,
+          FormData: true
         }
       }
     },

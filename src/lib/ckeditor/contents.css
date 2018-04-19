@@ -1,12 +1,12 @@
 /*
-Copyright (c) 2003-2016, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.md or http://ckeditor.com/license
+Copyright (c) 2003-2018, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
 */
 
 body
 {
 	/* Font */
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-family: sans-serif, Arial, Verdana, "Trebuchet MS";
 	font-size: 14px;
 
 	/* Text color */
@@ -21,7 +21,7 @@ body
 .cke_editable
 {
 	font-size: 16px;
-	line-height: 1.8;
+	line-height: 1.6;
 
 	/* Fix for missing scrollbars with RTL texts. (#10488) */
 	word-wrap: break-word;
@@ -29,27 +29,29 @@ body
 
 blockquote
 {
-	font-weight: 200;
 	font-style: italic;
-	padding: 2px 22px;
-	margin: 0 0 22px;
-	font-size: 16px;
-	border-left: 5px solid #eee;
+	font-family: Georgia, Times, "Times New Roman", serif;
+	padding: 2px 0;
+	border-style: solid;
+	border-color: #ccc;
+	border-width: 0;
 }
 
-/*.cke_contents_ltr blockquote
+/*
+.cke_contents_ltr blockquote
 {
 	padding-left: 20px;
 	padding-right: 8px;
 	border-left-width: 5px;
 }
+*/
 
 .cke_contents_rtl blockquote
 {
 	padding-left: 8px;
 	padding-right: 20px;
 	border-right-width: 5px;
-}*/
+}
 
 a
 {
@@ -66,11 +68,8 @@ ol,ul,dl
 
 h1,h2,h3,h4,h5,h6
 {
-	font-family: HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-weight: 200;
 	line-height: 1.22;
-	margin-top: 22px;
-	margin-bottom: 11px;
 }
 
 hr
@@ -116,8 +115,7 @@ span[lang]
 figure
 {
 	text-align: center;
-	border: solid 1px #ccc;
-	border-radius: 2px;
+	outline: solid 1px #ccc;
 	background: rgba(0,0,0,0.05);
 	padding: 10px;
 	margin: 10px 20px;
@@ -137,49 +135,97 @@ a > img {
 	outline: 1px solid #0782C1;
 }
 
+/* Widget Styles */
+.code-featured
+{
+	border: 5px solid red;
+}
+
+.math-featured
+{
+	padding: 20px;
+	box-shadow: 0 0 2px rgba(200, 0, 0, 1);
+	background-color: rgba(255, 0, 0, 0.05);
+	margin: 10px;
+}
+
+.image-clean
+{
+	border: 0;
+	background: none;
+	padding: 0;
+}
+
+.image-clean > figcaption
+{
+	font-size: .9em;
+	text-align: right;
+}
+
+.image-grayscale
+{
+	background-color: white;
+	color: #666;
+}
+
+.image-grayscale img, img.image-grayscale
+{
+	filter: grayscale(100%);
+}
+
+.embed-240p
+{
+	max-width: 426px;
+	max-height: 240px;
+	margin:0 auto;
+}
+
+.embed-360p
+{
+	max-width: 640px;
+	max-height: 360px;
+	margin:0 auto;
+}
+
+.embed-480p
+{
+	max-width: 854px;
+	max-height: 480px;
+	margin:0 auto;
+}
+
+.embed-720p
+{
+	max-width: 1280px;
+	max-height: 720px;
+	margin:0 auto;
+}
+
+.embed-1080p
+{
+	max-width: 1920px;
+	max-height: 1080px;
+	margin:0 auto;
+}
+
 /*
- * Transclude custom css
-*/
-mms-transclude-name,
-mms-transclude-doc,
-mms-transclude-val,
-mms-view-link,
-tms-timely,
-mms-d3-observation-profile-chart-io,
-mms-d3-parallel-axis-chart-io,
-mms-d3-radar-chart-io,
-mms-d3-grouped-horizontal-bar-chart-io,
-mms-site-docs,
-mms-workspace-docs,
-mms-cf {
+ * VE Custom added
+ */
+ mms-cf, mms-group-docs, mms-view-link {
 	background-color: lightblue;
 	margin-top: 0;
 	margin-bottom: 0 !important;
-	padding: 3px !important;
-	border: 1px solid black !important;
+	padding: 0px !important;
+	border: 0px solid gray !important;
 	z-index: 0;
 	cursor: not-allowed;
-}
+ }
 
-mms-transclude-com,
-mms-cf[mms-cf-type="com"] {
-	background-color: yellow;
-	margin-top: 0;
-	margin-bottom: 0 !important;
-	padding: 3px !important;
-	border: 1px solid black !important;
-	z-index: 0;
-	cursor: not-allowed;
-}
+ mms-cf[mms-cf-type="com"] {
+	 background-color: yellow;
+ }
 
-/*
- * mmssignature
- */
-.signature-box {
-	padding: 8px;
-	border: 1px solid #ddd;
-}
-
-.signature-box td div.cell-styling {
-	padding: 0 8px;
-}
+ .signature-box {
+	 padding: 8px;
+	 border: 1px solid #ddd;
+ }
