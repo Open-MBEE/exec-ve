@@ -12,7 +12,7 @@ CKEDITOR.editorConfig = function( config ) {
 	config.fullPage = false;
 	//config.enableContextMenu = false;
 	//config.tabSpaces = 4;
-	config.height = 350;
+	//config.height = 350;
 	// config.extraPlugins = 'autosave,iframe,mediaembed,embed,
 	config.extraPlugins = 'autosave,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature';
 	config.mathJaxLib = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';

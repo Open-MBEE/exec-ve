@@ -486,14 +486,14 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     deb(e); 
                 }
             }, null, null, 31); //priority is after indent list plugin's event handler
-            instance.on('contentDom', function(e) {
+            /*instance.on('contentDom', function(e) {
                 instance.document.on('key', function(e) {
                     e.stop();
                     e.cancel();
                     e.data.domEvent.stopPropagation();
                     e.data.domEvent.preventDefault();
                 });
-            });
+            });*/
             if (scope.mmsEditorApi) {
                 scope.mmsEditorApi.save = function() {
                     update();
