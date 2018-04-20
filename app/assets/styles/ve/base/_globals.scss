@@ -1,0 +1,64 @@
+/*************************
+  View Editor variables & mixins
+*************************/
+
+/* MMS base styles */
+@import "../../../../../src/assets/styles/base/_mms-mixins.scss";
+@import "../../../../../src/assets/styles/base/_mms-typography.scss";
+@import "../../../../../src/assets/styles/base/_mms-colors.scss";
+
+$background_hover_transition: background-color .2s linear;
+
+$navHeight: 40px;
+$treeMarginTop: 15px;
+$mainViewShadowColor: rgba(0,0,0,.26);
+.login-icons{
+    font-family: "FontAwesome";
+}
+.clean {
+  background-color: $white !important;
+}
+
+.addition {
+  background-color: lighten($green, 20%) !important;
+}
+
+.removal {
+  background-color: lighten($red, 33%) !important;
+}
+
+.conflict {
+  background-color: $yellow !important;
+}
+
+.update {
+  background-color: $light_blue !important;
+}
+
+.moved {
+  background-color: $light_purple !important;
+}
+
+.undo {
+  background-color: $white !important;
+}
+
+.icon-added {
+  color: $green;
+}
+
+.icon-removed {
+  color: $red;
+}
+
+.icon-updated {
+  color: $base_blue;
+}
+
+.icon-moved {
+  color: $purple;
+}
+
+.icon-conflict {
+  color: darken($yellow, 33%);
+}

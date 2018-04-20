@@ -1,4 +1,4 @@
-<nav class="project-level-header navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+<nav class="project-level-header navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="block">
         <div class="btn-group ve-dark-dropdown-nav select-project-dropdown" uib-dropdown keyboard-nav>
             <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" ng-click="updateProjectChecked()" uib-dropdown-toggle>
@@ -7,24 +7,30 @@
             </button>
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
                 <li ng-repeat="project in projects | orderBy: 'name'" ng-click="updateProject(project)"
-                       ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
+                    ng-class="{'checked-list-item': project.name === currentProject}">{{ project.name }}</li>
             </ul>
         </div>
         <div class="breadcrumbs">
             <ul>
+                <li ng-style="truncateStyle">
+                    <a class="back-to-proj" ui-sref="project.ref({refId: branch.id? branch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}">
+                        <i class="fa fa-home" aria-hidden="true"></i>
+                    </a>
+                    <span ng-show="breadcrumbs.length"> &#8250;</span>
+                </li>
                 <li ng-style="truncateStyle" ng-show="!isRefsView()" ng-repeat="breadcrumb in breadcrumbs track by $index">
                     <a ui-sref="{{ breadcrumb.link }}">
-                        <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
+                        <i ng-class="{'fa fa-folder': breadcrumb.type === 'group', 'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true" 
+                        uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="600" tooltip-placement="bottom"></i>{{ breadcrumb.name }}
                     </a>
-                    <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span>
+                    <!-- <span ng-if="breadcrumb.alfLink && breadcrumb.showAlf">(<a id="alfUploadLink" target="_blank" ng-href="{{breadcrumb.alfLink}}">Upload</a>)</span> -->
                     <span ng-show="!$last"> &#8250;</span>
                 </li>
             </ul>
         </div>
 
-        <ul ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 25px">
-            <li>
-            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="disabled">
+        <div ng-show="!isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 25px">
+            <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
                 <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
                     <span class="label-dropdown">{{ currentRef.type }}:</span>
                     <span class = "selected-dropdown">{{ currentRef.name }}</span>
@@ -36,21 +42,30 @@
                         <button class="btn btn-large btn-block btn-primary" ng-click="refsView()">Manage Branches/Tags
                         </button>
                     </li>
+                    <li class="button-item">
+                        <form class="ve-dark-minor-search">
+                            <input placeholder="Filter branches/tags" ng-model="refFilter">
+                        </form>
+                    </li>
                     <uib-tabset active="active" type="tabs" justified="false">
                         <uib-tab index="0" classes="tab-item" heading="Branches">
-                            <li ng-repeat="branch in branches | orderBy:'name'" ng-click="updateBranch(branch)"
-                                ng-class="{'checked-list-item': branch.name === currentBranch}" is-open="false" tooltip-placement="left" 
-                                uib-tooltip-html="htmlTooltip" tooltip-append-to-body="branch.status == 'loading'" tooltip-enable="branch.status == 'loading'">{{ branch.name }}
+                            <li ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter} " ng-click="updateBranch(branch)"
+                                ng-class="{'checked-list-item': branch.name === currentBranch, 'branch-disabled': branch.status == 'creating'}"
+                                is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
+                                tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">{{ branch.name }}
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
-                            <li ng-repeat="tag in tags | orderBy:'name'" ng-click="updateTag(tag)"
-                           ng-class="{'checked-list-item': tag.name === currentTag}" is-open="false">{{ tag.name }}</li>
+                            <li ng-if="tags.length" ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
+                                ng-class="{'checked-list-item': tag.name === currentTag, 'branch-disabled': tag.status == 'creating'}"
+                                is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
+                                tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">{{ tag.name }}
+                            </li>
+                            <li ng-if="!tags.length">No Tags</li>
                         </uib-tab>
                     </uib-tabset>
                 </ul>
             </div>
-            </li>
-        </ul>
+        </div>
     </div>
 </nav>

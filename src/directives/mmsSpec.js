@@ -83,8 +83,9 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         scope.gettingSpec = false;
         scope.isEnumeration = false;
         //TODO pass proper args
-        scope.propertyTypeClicked = function() {
-            scope.$emit('elementSelected', scope.element.typeId, 'element');
+        scope.propertyTypeClicked = function(id) {
+            var elmentOb = {id: id, _projectId: scope.mmsProjectId, _refId: scope.mmsRefId};
+            scope.$emit('elementSelected', elmentOb);
         };
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
@@ -107,7 +108,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
          * @param {string} newVal new element id
          */
         var changeElement = function(newVal, oldVal) {
-            if (!newVal || newVal === oldVal && ran) {
+            if (!newVal || (newVal === oldVal && ran) || !scope.mmsProjectId) {
                 return;
             }
             ran = true;
@@ -118,7 +119,11 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             scope.isEnumeration = false;
             scope.isSlot = false;
             scope.gettingSpec = true;
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: true};
+            var extended = true;
+            if (scope.mmsCommitId && scope.mmsCommitId !== 'latest') {
+                extended = false;
+            }
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId, extended: extended};
             ElementService.getElement(reqOb, 2, false)
             .then(function(data) {
                 if (newVal !== lastid) {

@@ -1,6 +1,6 @@
 <style>
     button:disabled {
-        background-color:background: #dddddd;
+        background-color: #dddddd;
     }
 </style>
 <div class="modal-header">
@@ -8,32 +8,27 @@
 </div>
 
 <div class="modal-body">
-    <p ng-if="type == 'DOCUMENT' && !genpdf">
-      This will bring up a popup where you can {{action}} the contents of this document, please disable any popup blockers if you don't 
+    <p ng-if="mode === 1">
+      This will bring up a popup where you can {{action}} the contents of this {{type === 'DOCUMENT' ? 'document' : 'view'}} , please disable any popup blockers if you don't
       see the popup. 
       <br/><br/>If you don't see certain content appearing in the popup, please wait until the full document appears in this pane before clicking {{action}}.
     </p>
-    <p ng-if="type == 'VIEW' && !genpdf">
-        This will bring up a popup where you can {{action}} the contents of this view, please disable any popup blockers if you don't 
-      see the popup. 
-      <br/><br/>
-      If you don't see certain content appearing in the popup, please wait until the full document appears in this pane before clicking {{action}}.
-      <br/><br/><span ng-show="docOption">If you want to {{action}} the entire document instead, please click on 'GO TO FULL DOCUMENT' and click {{action}} again when it finishes loading.</span>
-    </p>
-    <p ng-if="type == 'VIEW' && genpdf">
-      Click on GENERATE PDF to generate a pdf of this view (it will not include table of contents or cover pages). You will receive an email with subject line "HTML to PDF generation completed" with a link to the generated PDF. If you want the full document instead, please click on GO TO FULL DOCUMENT.
-    </p>
-    <p ng-if="type == 'DOCUMENT' && genpdf">
-      Please note that you should wait until the full document appears in this pane before continuing. You will receive an email with subject line "HTML to PDF generation completed" with a link to the generated PDF.
+    <p ng-if="mode !== 1">
+     <span ng-if="type === 'VIEW'">
+      Click on {{action | uppercase}} to generate a {{label}} of this view (it will not include table of contents or cover pages). You will receive an email with subject line "HTML to {{label}} generation completed" with a link to the generated {{label | uppercase}}. If you want the full document instead, please click on GO TO FULL DOCUMENT.
+     </span>
+     <span ng-if="type === 'DOCUMENT'">
+      Please note that you should wait until the full document appears in this pane before continuing. You will receive an email with subject line "HTML to {{label}} generation completed" with a link to the generated {{label}}.
+     </span>
     </p>
     <p ng-if="unsaved" class="error">
       WARNING: You currently have unsaved changes in the session that may not be reflected.
     </p>
-    <br/> <!--<div ng-if="type == 'DOCUMENT'">Generate Standard Cover Page: <input type="checkbox" ng-model="model.genCover"></div> -->
-    <div ng-if="type == 'DOCUMENT' && genpdf">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
+    <br/>
+    <div ng-if="type == 'DOCUMENT' && mode !== 1">Generate List of Tables and Figures: <input type="checkbox" ng-model="model.genTotf"></div>
     <div ng-if="model.genTotf">Use HTML for List of Tables and Figures (will not include equations and may differ from web numbering): <input type="checkbox" ng-model="model.htmlTotf"></div>
-    <div ng-if="genpdf">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
-    <form ng-if="type == 'DOCUMENT' && genpdf" role="form">
+    <div ng-if="mode !== 1">Landscape: <input type="checkbox" ng-model="model.landscape"></div>
+    <form ng-if="type == 'DOCUMENT' && (mode === 3)" role="form">
         <h6>Header and Footer</h6>
         <div>Use 'counter(page)' for page number.</div>
         <div class="form-group">

@@ -14,8 +14,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $rootScope.ve_bbApi = $scope.bbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
     $rootScope.ve_tree_pane = $scope.$pane;
-    if (!$rootScope.veTreeShowPe) {
-        $rootScope.veTreeShowPe = false;
+    if ($rootScope.veTreeShowPe !== false) {
+        $rootScope.veTreeShowPe = true;
     }
     $scope.buttons = [];
     $scope.projectOb = projectOb;
@@ -40,9 +40,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document"));
+            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
-            $scope.bbApi.setPermission( "tree-add-document", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
+            $scope.bbApi.setPermission( "tree-add-document-or-group", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
             $scope.bbApi.setPermission( "tree-delete-document", documentOb._editable &&  (refOb.type === 'Tag' ? false : true) );
         } else if ($state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
@@ -89,13 +89,19 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     $scope.$on('tree-delete-view', function() {
-        $scope.deleteItem();
+        $scope.deleteItem(function(deleteBranch) {
+            $rootScope.$broadcast('mms-full-doc-view-deleted', deleteBranch);
+        });
     });
 
     $scope.$on('tree-reorder-view', function() {
         $rootScope.ve_fullDocMode = false;
         $scope.bbApi.setToggleState("tree-full-document", false);
         $state.go('project.ref.document.order', {search: undefined});
+    });
+
+    $scope.$on('tree-add-group', function() {
+        addItem('Group');
     });
 
     $scope.$on('tree-show-pe', function() {
@@ -192,7 +198,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var docOb, i;
             for (i = 0; i < documentObs.length; i++) {
                 docOb = documentObs[i];
-                if (docOb._groupId === groupOb._id) {
+                if (docOb._groupId === groupOb.id) {
                     docs.push(docOb);
                 }
             }
@@ -207,8 +213,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 });
             }
             groupNode.loading = false;
-            if ($scope.treeApi.refresh) {
-                $scope.treeApi.refresh();
+            if ($scope.treeApi.initialSelect) {
+                $scope.treeApi.initialSelect();
             }
         });
     };
@@ -261,13 +267,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     };
     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-        $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "_id", "group", "_parentId", groupLevel2Func);
+        $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "id", "group", "_parentId", groupLevel2Func);
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
                     refId: refOb.id
         }, 2).then(function(documentObs) {
             for (var i = 0; i < documentObs.length; i++) {
-                if (!documentObs[i]._groupId) {
+                if (!documentObs[i]._groupId || documentObs[i]._groupId == projectOb.id) {
                     $scope.treeData.push({
                         label: documentObs[i].name,
                         type: 'view',
@@ -276,8 +282,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     });
                 }
             }
-            if ($scope.treeApi.refresh) {
-                $scope.treeApi.refresh();
+            if ($scope.treeApi.initialSelect) {
+                $scope.treeApi.initialSelect();
             }
         });
     } else {
@@ -302,7 +308,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 refId: refOb.id
             }, 0).finally(function() {
                 for (var i in viewId2node) {
-                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i]);
+                    addSectionElements(viewId2node[i].data, viewId2node[i], viewId2node[i], true);
                 }
                 $scope.treeApi.refresh();
             });
@@ -312,7 +318,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeData = [viewId2node[documentOb.id]];
     }
 
-    function addSectionElements(element, viewNode, parentNode) {
+    function addSectionElements(element, viewNode, parentNode, initial) {
         var contents = null;
 
         var addContentsSectionTreeNode = function(operand) {
@@ -349,7 +355,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                             };
                             viewId2node[instance.id] = sectionTreeNode;
                             parentNode.children.unshift(sectionTreeNode);
-                            addSectionElements(instance, viewNode, sectionTreeNode);
+                            addSectionElements(instance, viewNode, sectionTreeNode, initial);
                         } else if (ViewService.getTreeType(instance)) {
                             var otherTreeNode = {
                                 label : instance.name,
@@ -363,6 +369,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         }
                     }
                     $scope.treeApi.refresh();
+                    if (initial) {
+                        $scope.treeApi.initialSelect();
+                    }
                     resetPeTreeList('all');
                 }, function(reason) {
                     //view is bad
@@ -386,7 +395,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.treeClickHandler = function(branch) {
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type === 'group') {
-                $state.go('project.ref.preview', {documentId: 'site_' + branch.data._id + '_cover', search: undefined});
+                $state.go('project.ref.preview', {documentId: 'site_' + branch.data.id + '_cover', search: undefined});
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
                 $state.go('project.ref.preview', {documentId: branch.data.id, search: undefined});
             }
@@ -395,8 +404,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var sectionId = branch.type === 'section' ? branch.data.id : null;
             var hash = branch.data.id;
             if ($rootScope.ve_fullDocMode) {
-                $location.hash(hash);
-                $anchorScroll();
+                $rootScope.$broadcast('mms-tree-click', branch);
             } else if (branch.type === 'view' || branch.type === 'section') {
                 $state.go('project.ref.document.view', {viewId: branch.data.id, search: undefined});
             } else {
@@ -465,10 +473,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     if (!$state.includes('project.ref.document')) {
         $scope.treeOptions.sort = treeSortFunction;
     }
-    // TODO: this is a hack, need to resolve in alternate way    
-    $timeout(function() {
-        $scope.treeApi.refresh();
-    }, 5000);
 
     $scope.fullDocMode = function() {
         if ($rootScope.ve_fullDocMode) {
@@ -478,7 +482,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if (curBranch) {
                 var viewId;
                 if (curBranch.type !== 'view') {
-                    if (curBranch.type == 'section' && curBranch.data.type === 'InstanceSpecification') {
+                    if (curBranch.type === 'section' && curBranch.data.type === 'InstanceSpecification') {
                         viewId = curBranch.data.id;
                     } else {
                         viewId = curBranch.viewId;
@@ -504,15 +508,26 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         
         if (itemType === 'Document') {
             if (!branch) {
-                $scope.parentBranchData = {_id: "holding_bin_" + projectOb.id};
+                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
             } else if (branch.type !== 'group') {
                 growl.warning("Select a group to add document under");
                 return;
             } else {
                 $scope.parentBranchData = branch.data;
             }
-            templateUrlStr = 'partials/mms/new-doc.html';
+            templateUrlStr = 'partials/mms/new-doc-or-group.html';
             newBranchType = 'view';
+        } else if (itemType === 'Group') {
+            if (!branch) {
+                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
+            } else if (branch.type !== 'group') {
+                growl.warning("Select a group to add group under");
+                return;
+            } else {
+                $scope.parentBranchData = branch.data;
+            }
+            templateUrlStr = 'partials/mms/new-doc-or-group.html';
+            newBranchType = 'group';
         } else if (itemType === 'View') {
             if (!branch) {
                 growl.warning("Add View Error: Select parent view first");
@@ -544,7 +559,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 data: data,
                 children: []
             };
-            $scope.treeApi.add_branch(branch, newbranch, false);
+            var top = itemType === 'Group' ? true : false;
+            $scope.treeApi.add_branch(branch, newbranch, top);
 
             var addToFullDocView = function(node, curSection, prevSysml) {
                 var lastChild = prevSysml;
@@ -552,7 +568,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     var num = 1;
                     for (var i = 0; i < node.children.length; i++) {
                         var cNode = node.children[i];
-                        $rootScope.$broadcast('newViewAdded', cNode.data.id, curSection + '.' + num, lastChild);
+                        $rootScope.$broadcast('mms-new-view-added', cNode.data.id, curSection + '.' + num, lastChild);
                         lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.id);
                         num = num + 1;
                     }
@@ -566,7 +582,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 newbranch.aggr = $scope.newViewAggr.type;
                 var curNum = branch.children[branch.children.length-1].section;
                 var prevBranch = $scope.treeApi.get_prev_branch(newbranch);
-                while (prevBranch.type != 'view') {
+                while (prevBranch.type !== 'view') {
                     prevBranch = $scope.treeApi.get_prev_branch(prevBranch);
                 }
                 MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, projectOb.id, refOb.id, handleSingleView, handleChildren)
@@ -581,16 +597,16 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     $state.go('project.ref.document.view', {viewId: data.id, search: undefined});
                 } else {
                     if (prevBranch) {
-                        $rootScope.$broadcast('newViewAdded', data.id, curNum, prevBranch.data.id);
+                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, prevBranch.data.id);
                     } else {
-                        $rootScope.$broadcast('newViewAdded', data.id, curNum, branch.data.id);
+                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, branch.data.id);
                     }
                 }
             }
         });
     };
 
-    var addItemCtrl = function($scope, $uibModalInstance, $filter) {
+    var addItemCtrl = function($scope, $uibModalInstance) {
         $scope.createForm = true;
         $scope.oking = false;
         $scope.projectOb = projectOb;
@@ -598,11 +614,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         var displayName = "";
 
         if ($scope.itemType === 'Document') {
-            $scope.newDoc = {name: ""};
+            $scope.newDoc = {name: ''};
             displayName = "Document";
         } else if ($scope.itemType === 'View') {
             $scope.newView = {name: ''};
             displayName = "View";
+        } else if ($scope.itemType === 'Group') {
+            $scope.newGroup = {name: ''};
+            displayName = "Group";
         } else {
             growl.error("Add Item of Type " + $scope.itemType + " is not supported");
             return;
@@ -626,8 +645,18 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 refId: $scope.parentBranchData._refId,
                 aggr: $scope.newViewAggr.type
             }).then(function(data) {
-                growl.success("View Added");
-                $uibModalInstance.close(view);
+                ElementService.getElement({
+                    elementId: viewId,
+                    projectId: view._projectId,
+                    refId: view._refId
+                }, 2, false)
+                .then(function(realView) {
+                    $uibModalInstance.close(realView);
+                }, function() {
+                    $uibModalInstance.close(view);
+                }).finally(function() {
+                    growl.success("View Added");
+                });
             }, function(reason) {
                 growl.error("View Add Error: " + reason.message);
             }).finally(function() {
@@ -662,7 +691,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 promise = ViewService.createDocument({
                     _projectId: projectOb.id,
                     _refId: refOb.id,
-                    id: $scope.parentBranchData._id
+                    id: $scope.parentBranchData.id
                 },{
                     viewName: $scope.newDoc.name,
                     isDoc: true
@@ -672,6 +701,14 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 promise = ViewService.createView($scope.parentBranchData, {
                     viewName: $scope.newView.name
                 });
+            } else if ($scope.itemType === 'Group') {
+                promise = ViewService.createGroup($scope.newGroup.name,
+                    {
+                        _projectId: projectOb.id,
+                        _refId: refOb.id,
+                        id: $scope.parentBranchData.id
+                    }, orgOb.id
+                );
             } else {
                 growl.error("Add Item of Type " + $scope.itemType + " is not supported");
                 $scope.oking = false;
@@ -696,7 +733,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         };
     };
 
-    $scope.deleteItem = function() {
+    $scope.deleteItem = function(cb) {
         var branch = $scope.treeApi.get_selected_branch();
         if (!branch) {
             growl.warning("Delete Error: Select item to delete.");
@@ -730,8 +767,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
             if ($rootScope.ve_fullDocMode) {
-                $state.go('project.ref.document.full', {search: undefined});
-                $state.reload();
+                cb(branch);
             } else {
                 $state.go('^', {search: undefined});
             }
@@ -835,11 +871,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 break;
             }
         }
-        if (lastSection == -1 && !childViewFound) {//case when first child is view
+        if (lastSection === -1 && !childViewFound) {//case when first child is view
             lastSection = branch.children.length-1;
         }
         branch.children.splice(lastSection+1, 0, newbranch);
-        if (elemType == 'section') {
+        if (elemType === 'section') {
             addSectionElements(instanceSpec, viewNode, newbranch);
         }
         $scope.treeApi.refresh();

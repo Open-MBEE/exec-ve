@@ -1,27 +1,45 @@
 <!-- TODO: This is almost the same as new-view.html.  Should be combined if possible -->
 
 <div class="modal-header">
-  <h4>Add New {{presentationElemType | uppercase}}</h4>
+  <h4>Add {{presentationElemType | uppercase}}</h4>
 </div>
 
-<div class="modal-body comment-modal" ng-show="createForm">
-  <div class="comment-modal-input">
-    <div class="form-group">
-      <label>Name:</label>
-      <input class="form-control" ng-model="newPe.name" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus></input>
+<div class="modal-body">
+  <div ng-show="createForm">
+    <div class="ve-light-tabs">
+      <ul class="nav nav-tabs" ng-show="presentationElemType != 'Comment' && createForm">
+        <li class="uib-tab nav-item active tab-item">
+          <a class="nav-link"><i class="fa fa-plus"></i>Create New</a>
+        </li>
+        <li class="uib-tab nav-item tab-item">
+          <a ng-click="createForm = false" class="create-element-link" class="nav-link"><i class="fa fa-search"></i>Search for existing</a>
+        </li>
+      </ul>
     </div>
+    <div class="comment-modal-input">
+      <div class="form-group">
+        <label>Name:</label>
+        <input class="form-control" ng-model="newPe.name" ng-keyup="$event.keyCode == 13 ? ok() : null" type="text" placeholder="Type a name for your {{presentationElemType}} here" autofocus>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="!createForm">
+    <div class="ve-light-tabs">
+      <ul class="nav nav-tabs" ng-show="!createForm">
+        <li class="uib-tab nav-item tab-item">
+          <a class="nav-link" ng-click="createForm = true"><i class="fa fa-plus"></i>Create New</a>
+        </li>
+        <li class="uib-tab nav-item tab-item active">
+          <a class="nav-link"><i class="fa fa-search"></i>Search for existing</a>
+        </li>
+      </ul>
+    </div>
+    <mms-search mms-options="searchOptions" mms-project-id="{{viewOrSectionOb._projectId}}" mms-ref-id="{{viewOrSectionOb._refId}}"></mms-search>
   </div>
 </div>
 
-<div ng-show="!createForm">
-    <mms-search mms-options="searchOptions" mms-project-id="{{viewOrSectionOb._projectId}}" mms-ref-id="{{viewOrSectionOb._refId}}"></mms-search>
-</div>
-
 <div class="modal-footer">
-    <div class="pull-left" ng-show="presentationElemType != 'Comment' && createForm">
-      <a ng-click="createForm = false" class="create-element-link">Search for existing item</a>
-    </div>
-    <div class="pull-left" ng-show="!createForm"><a ng-click="createForm = true">Return to Create {{presentationElemType}}</a></div>
     <button class="btn btn-primary" ng-show="createForm" ng-click="ok()">Create <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
     <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
 </div>

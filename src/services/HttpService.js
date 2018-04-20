@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('HttpService', ['$http', '$q', HttpService]);
+.factory('HttpService', ['$http', HttpService]);
 
 /**
  * @ngdoc service
@@ -10,14 +10,14 @@ angular.module('mms')
  * @description
  * Provides prioritization and caching for $http service calls
  */
-function HttpService($http, $q, _) {
+function HttpService($http) {
     
     var queue = {};
     queue[0]= [];//high proirity
     queue[1]=[];//low prority
     var cache = {}; // cache url -> this is a easy key look up
     var inProgress = 0;
-    var GET_OUTBOUND_LIMIT = 200; //max number of requests sent to the rest server at one time
+    var GET_OUTBOUND_LIMIT = 20; //max number of get requests active
     
     var setOutboundLimit = function(limit){
         GET_OUTBOUND_LIMIT = limit;

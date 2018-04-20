@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', ElementService]);
+.factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', '_', ElementService]);
 
 /**
  * @ngdoc service
@@ -15,11 +15,9 @@ angular.module('mms')
  * 
  * @description
  * An element CRUD service with additional convenience methods for managing edits.
- *
- * For element json example, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService) {
-    
+function ElementService($q, $http, URLService, UtilsService, CacheService, HttpService, ApplicationService, _) {
+
     var inProgress = {};// leave for now
     /**
      * @ngdoc method
@@ -47,7 +45,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             }
         );
         </pre>
-     * ## Example with timestamp
+     * ## Example with commitId
      *  <pre>
         ElementService.getElement({
             projectId: 'projectId', 
@@ -77,9 +75,13 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var getElement = function(reqOb, weight, update) {
         UtilsService.normalize(reqOb);
         var requestCacheKey = getElementKey(reqOb);
-        var key = URLService.getElementURL(reqOb);
+        var url = URLService.getElementURL(reqOb);
+        var key = url;
+        if (reqOb.includeRecentVersionElement) {
+            key = key + 'addRecentVersion';
+        }
         // if it's in the inProgress queue get it immediately
-        if (inProgress.hasOwnProperty(key)) {  //change to change proirity if it's already in the queue
+        if (inProgress.hasOwnProperty(key)) { //change to change proirity if it's already in the queue
             HttpService.ping(key, weight);
             return inProgress[key];
         }
@@ -92,8 +94,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 return deferred.promise;
             //}
         }
-        inProgress[key] = deferred.promise;
-        HttpService.get(key,
+         inProgress[key] = deferred.promise;
+
+         HttpService.get(url,
             function(data, status, headers, config) {
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(cacheElement(reqOb, data.elements[0]));
@@ -103,7 +106,17 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete inProgress[key];
             },
             function(data, status, headers, config) {
-                URLService.handleHttpStatus(data, status, headers, config, deferred);
+                if (reqOb.includeRecentVersionElement) {
+                    _getLatestVersionOfElement(_.clone(reqOb)).then(function(element){
+                        data.recentVersionOfElement = element;
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    }, function() {
+                        URLService.handleHttpStatus(data, status, headers, config, deferred);
+                    });
+                } else {
+                    URLService.handleHttpStatus(data, status, headers, config, deferred);
+                }
+
                 delete inProgress[key];
             },
             weight
@@ -178,7 +191,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var result = UtilsService.cleanElement(elementOb, edit);
         var requestCacheKey = getElementKey(reqOb, result.id, edit);
         var origResultCommit = result._commitId;
-        if (reqOb.commitId === 'latest') { 
+        if (reqOb.commitId === 'latest') {
             var resultCommitCopy = JSON.parse(JSON.stringify(result));
             result._commitId = 'latest'; //so realCacheKey is right later
             var commitCacheKey = UtilsService.makeElementKey(resultCommitCopy); //save historic element
@@ -308,7 +321,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         inProgress[url] = deferred.promise;
         
-        HttpService.get(url, 
+        HttpService.get(url,
             function(data, status, headers, config) {
                 var results = [];
                 var elements = data[jsonKey];
@@ -320,7 +333,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     results.push(cacheElement(reqOb, element));
                 }
                 delete inProgress[url];
-                deferred.resolve(results); 
+                deferred.resolve(results);
             },
             function(data, status, headers, config) {
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
@@ -337,8 +350,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         /*
         var deferred = $q.defer();
         getElement({
-            projectId: elementOb._projectId, 
-            elementId: elementOb.id, 
+            projectId: elementOb._projectId,
+            elementId: elementOb.id,
             commitId: 'latest',
             refId: elementOb._refId
         }, 2)
@@ -409,9 +422,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 e = data.elements[0];
             }
             var metaOb = {
-                projectId: e._projectId, 
-                refId: e._refId, 
-                commitId: 'latest', 
+                projectId: e._projectId,
+                refId: e._refId,
+                commitId: 'latest',
                 elementId: e.id
             };
             var resp = cacheElement(metaOb, e);
@@ -431,7 +444,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var postElem = fillInElement(elementOb);
         //.then(function(postElem) {
             $http.post(URLService.getPostElementsURL({
-                    projectId: postElem._projectId, 
+                    projectId: postElem._projectId,
                     refId: postElem._refId,
                     returnChildViews: returnChildViews
                 }), {
@@ -479,20 +492,71 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @ngdoc method
      * @name mms.ElementService#updateElements
      * @methodOf mms.ElementService
-     * 
+     *
      * @description
      * Save elements to alfresco and update the cache if successful.
-     * 
-     * @param {Array.<Object>} elems Array of element objects that contains element id and any property changes to be saved.
-     * @returns {Promise} The promise will be resolved with an array of updated element references if 
-     *      update is successful.
+     *
+     * @param {Array.<Object>} elementObs, array of element objects that contains element id and any property changes to be saved.
+     * @param {boolean} returnChildViews, whether to include childViews
+     * @returns {Promise} The promise will be resolved with an array of updated element references if
+     *      update is successful and will be rejected with an object with the following format:
+     *      {failedRequests: list of rejection reasons, successfulRequests: array of updated elements }
      */
-    var updateElements = function(elementObs, returnChildViews) { //do individual updates for now since post need to be given canonical project and ref
-        var promises = [];
-        for (var i = 0; i < elementObs.length; i++) {
-            promises.push(updateElement(elementObs[i], returnChildViews));
+    var updateElements = function(elementObs, returnChildViews) {
+        var deferred = $q.defer();
+        if ( _validate(elementObs) ) {
+            var postElements = elementObs.map(function(elementOb) {
+                return fillInElement(elementOb);
+            });
+
+            var groupOfElements = _groupElementsByProjectIdAndRefId(postElements);
+            var promises = [];
+
+            Object.keys(groupOfElements).forEach(function (key) {
+                promises.push(_bulkUpdate(groupOfElements[key], returnChildViews));
+            });
+
+             // responses is an array of response corresponding to both successful and failed requests with the following format
+             // [ { state: 'fulfilled', value: the value returned by the server },
+             //   { state: 'rejected', reason: {status, data, message} -- Specified by handleHttpStatus method }
+             // ]
+            $q.allSettled(promises).then(function(responses) {
+                // get all the successful requests
+                var successfulRequests = responses.filter(function(response) {
+                    return response.state === 'fulfilled';
+                });
+
+                var successValues = _.flatten( successfulRequests.map(function(response){
+                    return response.value;
+                }));
+
+                if ( successfulRequests.length === promises.length ) {
+                    // All requests succeeded
+                    deferred.resolve(successValues);
+                } else {
+                    // some requests failed
+                    var rejectionReasons = responses.filter(function(response) {
+                        return response.state === 'rejected';
+                    }).map(function(response) {
+                        return response.reason;
+                    });
+
+                    // since we could have multiple failed requests when having some successful requests,
+                    // reject with the following format so that the client can deal with them at a granular level if
+                    // desired
+                    deferred.reject({
+                        failedRequests: rejectionReasons,
+                        successfulRequests: successValues
+                    });
+                }
+            });
+        } else {
+            deferred.reject( {
+                failedRequests: [ { status: 400, data: elementObs, message: 'Some of the elements do not have id, _projectId, _refId' } ],
+                successfulRequests: []
+            });
         }
-        return $q.all(promises);
+        return deferred.promise;
     };
 
     /**
@@ -630,13 +694,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * 
      * @param {object} reqOb see description of getElement
      * @param {object} query JSON object with Elastic query format
-     * @param {integer} [page=null] page
-     * @param {integer} [items=null] items per page
      * @param {integer} [weight=1] priority
      * @returns {Promise} The promise will be resolved with an array of element objects.
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    var search = function(reqOb, query, page, items, weight) {
+    var search = function(reqOb, query, weight) {
         UtilsService.normalize(reqOb);
         var url = URLService.getElementSearchURL(reqOb);
         var deferred = $q.defer();
@@ -698,9 +760,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
     var getElementKey = function(reqOb, id, edit) {
         var cacheKey = UtilsService.makeElementKey({
-            _projectId: reqOb.projectId, 
-            id: id ? id : reqOb.elementId, 
-            _commitId: reqOb.commitId, 
+            _projectId: reqOb.projectId,
+            id: id ? id : reqOb.elementId,
+            _commitId: reqOb.commitId,
             _refId: reqOb.refId
         }, edit);
         return cacheKey;
@@ -709,6 +771,90 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     var reset = function() {
         inProgress = {};
     };
+
+    function _groupElementsByProjectIdAndRefId(elementObs) {
+        return _.groupBy(elementObs, function(element) {
+            return element._projectId + '|' + element._refId;
+        });
+    }
+
+    function _createMetaOb(element) {
+        return {
+            projectId: element._projectId,
+            refId: element._refId,
+            commitId: 'latest',
+            elementId: element.id
+        };
+    }
+
+    function _validate(elementObs) {
+        return _.every( elementObs, function( elementOb ) {
+            return elementOb.hasOwnProperty('id') && elementOb.hasOwnProperty('_projectId') && elementOb.hasOwnProperty('_refId');
+        });
+    }
+
+    function _bulkUpdate(elements, returnChildViews) {
+        var deferred = $q.defer();
+        $http.post(URLService.getPostElementsURL({
+            projectId: elements[0]._projectId,
+            refId: elements[0]._refId,
+            returnChildViews: returnChildViews
+        }), {
+            elements: elements,
+            source: ApplicationService.getSource()
+        }, {timeout: 60000})
+            .then(function (response) {
+                _bulkUpdateSuccessHandler(response, deferred);
+            }, function (response) {
+                _bulkUpdateFailHandler(response, deferred, elements);
+            });
+        return deferred.promise;
+    }
+
+    function _bulkUpdateSuccessHandler(serverResponse, deferred) {
+        var results = [];
+        var elements = serverResponse.data.elements;
+        elements.forEach(function (e) {
+            var metaOb = _createMetaOb(e);
+            var editCopy = JSON.parse(JSON.stringify(e));
+            results.push(cacheElement(metaOb, e));
+
+            cacheElement(metaOb, editCopy, true);
+
+            var history = CacheService.get(['history', metaOb.projectId, metaOb.refId, metaOb.elementId]);
+            if (history) {
+                history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
+            }
+        });
+        deferred.resolve(results);
+    }
+
+    /** For now, not doing anything special when there is a "conflict" error **/
+    function _bulkUpdateFailHandler(response, deferred, elementObs) {
+        // for now the server doesn't return anything for the data properties, so override with the input
+        response.data = elementObs;
+        URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+    }
+
+    function _getLatestVersionOfElement(reqOb) {
+        var deferred = $q.defer();
+        getElementHistory(reqOb).then(function(elementHistory) {
+            if (elementHistory.length > 1) {
+                // Index 0 is the deletion commit, 0 index is the the commit before deletion
+                var commitBeforeDelete = elementHistory[1];
+                reqOb.commitId = commitBeforeDelete.id;
+                reqOb.includeRecentVersionElement = false;
+                getElement(reqOb).then(function(element) {
+                    deferred.resolve(element);
+                }, deferred.reject);
+            } else {
+                // this case is not possible coz this method should only be called if the element is already deleted
+                // ( and with that there will be at least two commits, one for the add at the very beginning and one for the deletion )
+                deferred.reject();
+            }
+        }, deferred.reject);
+        return deferred.promise;
+    }
 
     return {
         getElement: getElement,

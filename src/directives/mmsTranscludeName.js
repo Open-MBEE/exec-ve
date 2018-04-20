@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', mmsTranscludeName]);
+.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', 'ViewService', mmsTranscludeName]);
 
 /**
  * @ngdoc directive
@@ -25,12 +25,14 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
+ * @param {bool} mmsWatchId set to true to not destroy element ID watcher
+ * @param {boolean=false} nonEditable can edit inline or not
  */
-function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils) {
+function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils, ViewService) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
-    var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
-    var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print" ng-class="{placeholder: version!=\'latest\'}">(no name)</span>';
+    var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print placeholder">(no name)</span>';
+    var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print placeholder">(no name)</span>';
 
     var mmsTranscludeNameCtrl = function ($scope) {
 
@@ -93,21 +95,24 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
-            if (!scope.mmsWatchId)
+            }
+            if (!scope.mmsWatchId) {
                 idwatch();
+            }
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
                 recompile();
+                Utils.reopenUnsavedElts(scope, "name");
                 if (mmsViewCtrl) {
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
@@ -126,10 +131,13 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     });
                 }
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                domElement.html('<span class="mms-error">name cf ' + newVal + status + '</span>');
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeName,
+                    cfLabel: scope.mmsCfLabel
+                }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
             });
@@ -176,7 +184,8 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             mmsWatchId: '@',
             noClick: '@',
             nonEditable: '<',
-            clickHandler: '&?'
+            clickHandler: '&?',
+            mmsCfLabel: '@'
         },
         require: ['?^^mmsView'],
         controller: ['$scope', mmsTranscludeNameCtrl],

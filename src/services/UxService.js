@@ -48,7 +48,7 @@ function UxService($rootScope) {
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("document-snapshot-create")]};
       case "tags":
-        return {id: button, icon: 'fa-tag', selected: false, active: true, permission: true, tooltip: 'Tags',
+        return {id: button, icon: 'fa-code-fork', selected: false, active: true, permission: true, tooltip: 'Branches and Tags',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "jobs":
         return {id: button, icon: 'fa-sort-amount-desc', selected: true, active: true, permission:true, tooltip: 'Jobs',
@@ -97,15 +97,25 @@ function UxService($rootScope) {
       case "tree-filter":
         return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter', 
                 spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-add-document":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Document', 
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-document-or-group":
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Group or Document',
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete Document', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-view":
-        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View', 
+        return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-group":
+        return {id: button, icon: 'fa-folder', selected: true, active: true, permission: true, tooltip: 'Add Group',
+              spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tree-add-document":
+        return {id: button, icon: 'fa-file', selected: true, active: true, permission: true, tooltip: 'Add Document',
+            spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+
+
+
       case "tree-add-tag":
         return {id: button, icon: 'fa-tag', selected: true, active: true, permission: true, tooltip: 'Add Tag', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
@@ -118,9 +128,6 @@ function UxService($rootScope) {
       case "tree-delete-view":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete View', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tree-merge":
-        return {id: button, icon: 'fa-share-alt fa-flip-horizontal', selected: true, active: true, permission: true, tooltip: 'Compare', 
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-reorder-view":
         return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
@@ -130,57 +137,67 @@ function UxService($rootScope) {
       case "view-mode-dropdown":
         return {id: button, icon: 'fa-gear', selected: true, active: true, permission: true, tooltip: 'View Mode',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
-                dropdown_buttons: [ getButtonBarButton("tree-show-views"), getButtonBarButton("tree-show-pe"),
+                dropdown_buttons: [ getButtonBarButton("tree-show-pe"), getButtonBarButton("tree-show-views"),
                     getButtonBarButton("tree-show-tables"), getButtonBarButton("tree-show-figures"),
                     getButtonBarButton("tree-show-equations")]};
       case "tree-show-views":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Views',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Views',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-pe":
         return {id: button, selected: true, active: true, permission: true, tooltip: 'Show All',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-tables":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Tables',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Tables',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-figures":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Figures',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Figures',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-equations":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Equations',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Equations',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "show-comments":
-        return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Show Comments',
-                spinner: false, togglable: true, toggle_icon: 'fa-comment', toggle_tooltip: 'Hide Comments',
+
+
+      case "show-edits":
+        return {id: button, icon: 'fa-pencil-square-o', selected: true, active: true, permission: true, tooltip: 'Enable Edits',
+                spinner: false, togglable: true, toggle_icon: 'fa-pencil-square', toggle_tooltip: 'Disable Edits',
                 action: function() {$rootScope.$broadcast(button);}};
       case "show-elements":
         return {id: button, icon: 'fa-codepen', selected: true, active: true, permission: true, tooltip: 'Show Elements',
                 spinner: false, togglable: true, toggle_icon: 'fa-cube', toggle_tooltip: 'Hide Elements',
                 action: function() {$rootScope.$broadcast(button);}};
-      case "show-edits":
-        return {id: button, icon: 'fa-pencil-square-o', selected: true, active: true, permission: true, tooltip: 'Enable Edits',
-                spinner: false, togglable: true, toggle_icon: 'fa-pencil-square', toggle_tooltip: 'Disable Edits',
+      case "show-comments":
+        return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Show Comments',
+                spinner: false, togglable: true, toggle_icon: 'fa-comment', toggle_tooltip: 'Hide Comments',
                 action: function() {$rootScope.$broadcast(button);}};
+      case "refresh-numbering":
+        return {id: button, icon: 'fa-sort-numeric-asc', selected: true, active: true, permission: true, tooltip: 'Refresh Figure Numbering',
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "share-url":
+        return {id: button, icon: 'fa-share-alt', selected: true, active: true, permission: true, tooltip: 'Share Short URL',
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "center-previous":
         return {id: button, icon: 'fa-chevron-left', selected: true, active: true, permission: true, tooltip: 'Previous',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "center-next":
         return {id: button, icon: 'fa-chevron-right', selected: true, active: true, permission: true, tooltip: 'Next',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      // case "download-pdf":
-      //   return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Download PDF',
-      //           spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      // case "download-zip":
-      //   return {id: button, icon: 'fa-file-zip-o', selected: true, active: true, permission: true, tooltip: 'Download ZIP',
-      //           spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      // case "generate-pdf":
-      //   return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Generate PDF',
-      //           spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "export":
+        return {id: button, icon: 'fa-download', selected: true, active: true, permission: true, tooltip: 'Export', button_content: 'Export',
+              spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+              dropdown_buttons: [ getButtonBarButton("word"), getButtonBarButton("tabletocsv")]};
+      case "print":
+        return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print',
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "convert-pdf":
-        return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Html to PDF',
+        return {id: button, icon: 'fa-file-pdf-o', selected: true, active: true, permission: true, tooltip: 'Export to PDF',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "generate-zip":
-        return {id: button, icon: 'fa-file-zip-o', selected: true, active: true, permission: true, tooltip: 'Generate ZIP',
+      case "word":
+        return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Export to Word',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+      case "tabletocsv":
+        return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV',
+                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+
       case "presentation-element-delete":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete',
                 spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.delete();}};
@@ -196,18 +213,6 @@ function UxService($rootScope) {
       case "presentation-element-preview":
         return {id: button, icon: 'fa-file-powerpoint-o', selected: true, active: true, permission: true, tooltip: 'Preview Changes',
                 spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.preview();}};
-      case "print":
-        return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "word":
-        return {id: button, icon: 'fa-file-word-o', selected: true, active: true, permission: true, tooltip: 'Save to Word',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "tabletocsv":
-        return {id: button, icon: 'fa-table', selected: true, active: true, permission: true, tooltip: 'Table to CSV',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
-      case "refresh-numbering":
-        return {id: button, icon: 'fa-sort-numeric-asc', selected: true, active: true, permission: true, tooltip: 'Refresh Figure Numbering',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
     }
   };
 
@@ -217,7 +222,7 @@ function UxService($rootScope) {
     var treeTypes = {};
 
     MetaTypes.forEach(function (type) {
-      treeTypes[type] = "fa " + getTypeIcon(type) + " fa-fw";
+      treeTypes[type] = getTypeIcon(type) + " fa-fw";
     });
 
     return treeTypes;
@@ -230,45 +235,45 @@ function UxService($rootScope) {
     t = t.toLowerCase();
     switch (t) {
       case "tag":
-        return "fa-tag";
+        return "fa fa-tag";
       case "connector":
-        return "fa-expand";
+        return "fa fa-expand";
       case "dependency":
-        return "fa-long-arrow-right";
+        return "fa fa-long-arrow-right";
       case "directedrelationship":
-        return "fa-long-arrow-right";
+        return "fa fa-long-arrow-right";
       case "element":
-        return "fa-square";
+        return "fa fa-square";
       case "property":
-        return "fa-circle";
+        return "fa fa-circle";
       case "generalization":
-        return "fa-chevron-right";
+        return "fa fa-chevron-right";
       case "package":
-        return "fa-folder";
+        return "fa fa-folder";
       case "section":
-        return "fa-square-o";//"fa-file-o";
+        return "section-icon";//"fa-file-o";
       case "group":
-        return "fa-folder";
+        return "fa fa-folder";
       case "snapshot":
-        return "fa-camera";
+        return "fa fa-camera";
       case "view":
-        return "fa-file";
+        return "fa fa-file";
       case "view-composite":
-        return "fa-file";
+        return "fa fa-file";
       case "view-shared":
-        return "fa-file-o";
+        return "fa fa-file-o";
       case "view-none":
-        return "fa-file-o";
+        return "fa fa-file-o";
       case "branch":
-        return "fa-tasks";
+        return "fa fa-tasks";
       case "table":
-        return "fa-table";
+        return "fa fa-table";
       case "figure":
-        return "fa-image";
+        return "fa fa-image";
       case "equation":
-        return "fa-superscript";
+        return "fa fa-superscript";
       default:
-        return "fa-square";
+        return "fa fa-square";
         }
   };
 

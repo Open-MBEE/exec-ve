@@ -2,18 +2,57 @@
     <h4>{{title}}</h4>
 </div>
 <div class="modal-body">
-    <div class="transclude-modal-instructions">
-        {{description}}
-    </div>
-    <div class="cant-find-element transclude-modal-input" ng-show="showProposeLink">
-        Can't find your element? <a ng-click="openProposeModal()" class="create-element-link">Create a new one</a>
-    </div>
-    <label ng-show="showEditableOp">Restrict editing
-        <input type="checkbox" ng-model="nonEditableCheckbox">
-    </label>
+    <div ng-show="!createForm">
+        <div class="ve-light-tabs" ng-show="showProposeLink">
+            <ul class="nav nav-tabs" ng-show="!createForm">
+                <li class="uib-tab nav-item tab-item">
+                    <a class="nav-link" ng-click="createForm = true"><i class="fa fa-plus"></i>Create New</a>
+                </li>
+                <li class="uib-tab nav-item tab-item active">
+                    <a class="nav-link"><i class="fa fa-search"></i>Search for existing</a>
+                </li>
+            </ul>
+        </div>
+        <div class="transclude-modal-instructions">
+            {{description}}
+        </div>
+        <label ng-show="showEditableOp" for="nonEditableCheckbox">
+            <input id="nonEditableCheckbox" type="checkbox" ng-model="nonEditableCheckbox">&nbsp;Restrict editing
+        </label>
 
-    <mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
+        <mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
+    </div>
+    <div ng-show="createForm">
+        <div class="ve-light-tabs">
+            <ul class="nav nav-tabs">
+                <li class="uib-tab nav-item active tab-item">
+                    <a class="nav-link"><i class="fa fa-plus"></i>Create New</a>
+                </li>
+                <li class="uib-tab nav-item tab-item">
+                    <a ng-click="createForm = false" class="create-element-link nav-link" ng-show="createForm"><i class="fa fa-search"></i>Search for existing</a>
+                </li>
+            </ul>
+        </div>
+        <form>
+            <div class="form-group">
+                <label>Name </label><span class="star-mandatory">*</span>
+                <input class="form-control" type="text" ng-model="newE.name" placeholder="Name your new element" autofocus/>
+            </div>
+            <div class="form-group">
+                <label class="label-documentation">Documentation</label>
+                <textarea mms-ckeditor ng-model="newE.documentation" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" class="textarea-transclude-modal"></textarea>
+            </div>
+        </form>
+
+        <label>Property to cross-reference </label><span class="star-mandatory">*</span>
+        <div class="radio">
+            <label class="radio"><input type="radio" name="optradio" value="true" ng-click="toggleRadio('name')">Name</label>
+            <label class="radio"><input type="radio" name="optradio" value="true" ng-click="toggleRadio('documentation')">Documentation</label>
+        </div>
+        <p class="expl-mandatory pull-left"><i>Fields marked with <span class="star-mandatory">*</span> are required</i></p>
+    </div>
 </div>
 <div class="modal-footer">
+    <button class="btn btn-primary" ng-show="createForm" type="button" ng-click="makeNewAndChoose()">Create & Cross Reference<i class="{{proposeClass}}"></i></button>
     <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
 </div>

@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'JobService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, tagObs, documentOb, viewOb, Utils) {
+    ElementService, JobService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -20,7 +20,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
-    $scope.noTags = false;
+    $scope.branchObs = branchObs;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -28,10 +28,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     } else if (documentOb) {
         $scope.specInfo.id = documentOb.id;
         $scope.viewId = documentOb.id;
-    }
-
-    if (angular.isArray(tagObs) && tagObs.length === 0) {
-        $scope.noTags = true;
     }
 
     $scope.specApi = {};
@@ -48,9 +44,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.tracker = {};
     if (!$rootScope.ve_edits)
         $rootScope.ve_edits = {};
-    $scope.presentElemEditCnts = {};
 
-    // Set edit count for tracker view 
+    // Set edit count for tracker view
     $scope.veEditsLength = function() {
         return Object.keys($rootScope.ve_edits).length;
     };
@@ -100,30 +95,22 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         showPane('tags');
     });
 
-    var cleanUpEdit = function(editOb, cleanAll) {
-        var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-        var currentCnt = 0;
+    $scope.$on('gotoTagsBranches', function(){
+        $rootScope.ve_tbApi.select('tags');
+        showPane('tags');
+    });
 
-        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
-            currentCnt = $scope.presentElemEditCnts[key];
-        }
-        if ((currentCnt <= 1 && !Utils.hasEdits(editOb)) || cleanAll) {//TODO Utils.hasEdits
+    var cleanUpEdit = function(editOb, cleanAll) {
+        if (!Utils.hasEdits(editOb) || cleanAll) {//TODO Utils.hasEdits
+            var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
             delete $rootScope.ve_edits[key];
-            delete $scope.presentElemEditCnts[key];
             cleanUpSaveAll();
-        } else {
-            $scope.presentElemEditCnts[key] = currentCnt - 1;
         }
     };
 
     $scope.$on('presentationElem.edit', function(event, editOb) {
         var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-        var currentCnt = 1;
         $rootScope.ve_edits[key] = editOb;
-        if ($scope.presentElemEditCnts.hasOwnProperty(key)) {
-            currentCnt = $scope.presentElemEditCnts[key] + 1;
-        }
-        $scope.presentElemEditCnts[key] = currentCnt;
         cleanUpSaveAll();
     });
 
@@ -132,7 +119,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     $scope.$on('presentationElem.cancel', function(event, editOb) {
-        cleanUpEdit(editOb);           
+        cleanUpEdit(editOb);
     });
 
     var elementSelected = function(event, elementOb, commitId) {
@@ -141,7 +128,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
         $rootScope.ve_tbApi.select('element-viewer');
-        
+
         showPane('element');
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
@@ -188,7 +175,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.viewContentsOrderApi.setEditing(true);
         showPane('reorder');
     });
-    
+
     var elementSaving = false;
     $scope.$on('element-editor-save', function() {
         save(false);
@@ -201,6 +188,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.info('Please Wait...');
             return;
         }
+        var edit = $scope.specApi.getEdits();
+        Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
         elementSaving = true;
         if (!continueEdit)
             $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save');
@@ -210,7 +199,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
             growl.success('Save Successful');
-            if (continueEdit) 
+            if (continueEdit)
                 return;
             var edit = $scope.specApi.getEdits();
             var key = edit.id + '|' + edit._projectId + '|' + edit._refId;
@@ -259,59 +248,49 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             growl.info('Please wait...');
             return;
         }
-        if (Object.keys($rootScope.ve_edits).length === 0) {
+        var ve_edits = $rootScope.ve_edits;
+        if (Object.keys(ve_edits).length === 0) {
             growl.info('Nothing to save');
             return;
         }
+
+        Object.values(ve_edits).forEach(function(ve_edit) {
+           Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
+        });
+
         if ($scope.specApi && $scope.specApi.editorSave)
             $scope.specApi.editorSave();
         savingAll = true;
         $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
-        var promises = [];
-        angular.forEach($rootScope.ve_edits, function(value, key) {
-            var defer = $q.defer();
-            promises.push(defer.promise);
-            ElementService.updateElement(value)
-            .then(function(e) {
-                defer.resolve({status: 200, ob: value});
-            }, function(reason) {
-                defer.resolve({status: reason.status, ob: value});
-            });
-        });
-        $q.all(promises).then(function(results) {
-            var somefail = false;
-            var failed = null;
-            for (var i = 0; i < results.length; i++) {
-                var ob = results[i];
-                if (ob.status === 200) {
-                    delete $rootScope.ve_edits[ob.ob.id + '|' + ob.ob._projectId + '|' + ob.ob._refId];
-                    $rootScope.$broadcast('element.updated', ob.ob, 'all');
-                } else {
-                    somefail = true;
-                    failed = ob.ob;
-                }
-            }
-            if (!somefail) {
+        ElementService.updateElements(Object.values($rootScope.ve_edits))
+            .then(function(responses) {
+                responses.forEach(function(elementOb) {
+                    delete $rootScope.ve_edits[elementOb.id + '|' + elementOb._projectId + '|' + elementOb._refId];
+                    $rootScope.$broadcast('element.updated', elementOb, false);
+                    $rootScope.ve_tbApi.select('element-viewer');
+                    $scope.specApi.setEditing(false);
+                });
                 growl.success("Save All Successful");
-                $rootScope.ve_tbApi.select('element-viewer');
-                $scope.specApi.setEditing(false);
-            } else {
-                $scope.tracker.etrackerSelected = failed.id + '|' + failed._projectId + '|' + failed._refId;
+
+            }, function(responses) {
+                // reset the last edit elementOb to one of the existing element
+                var elementToSelect = Object.values($rootScope.ve_edits)[0];
+                $scope.tracker.etrackerSelected = elementToSelect.id + '|' + elementToSelect._projectId + '|' + elementToSelect._refId;
                 $scope.specApi.keepMode();
-                $scope.specInfo.id = failed.id;
-                $scope.specInfo.projectId = failed._projectId;
-                $scope.specInfo.refId = failed._refId;
+                $scope.specInfo.id = elementToSelect.id;
+                $scope.specInfo.projectId = elementToSelect._projectId;
+                $scope.specInfo.refId = elementToSelect._refId;
                 $scope.specInfo.commitId = 'latest';
                 growl.error("Some elements failed to save, resolve individually in edit pane");
-            }
-            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
-            savingAll = false;
-            cleanUpSaveAll();
 
-            if (Object.keys($rootScope.ve_edits).length === 0) {
-                $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
-            }
-        });
+            }).finally(function() {
+                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
+                savingAll = false;
+                cleanUpSaveAll();
+                if (Object.keys($rootScope.ve_edits).length === 0) {
+                    $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+                }
+            });
     });
     $scope.$on('element-editor-cancel', function() {
         var go = function() {
@@ -340,6 +319,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 scope: $scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {
+                        var edit = $scope.specApi.getEdits();
+                        Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
+
                         $uibModalInstance.close('ok');
                     };
                     $scope.cancel = function() {
@@ -366,16 +348,12 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             $scope.viewContentsOrderApi.refresh();
             growl.success('Save Succesful');
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
-            $rootScope.$broadcast('view.reorder.saved', $scope.viewId);
-        }, function(reason) {
+            $rootScope.$broadcast('view.reorder.saved', $scope.viewOb.id);
+        }, function(response) {
             $scope.viewContentsOrderApi.refresh();
             viewSaving = false;
-            if (reason.type === 'info')
-                growl.info(reason.message);
-            else if (reason.type === 'warning')
-                growl.warning(reason.message);
-            else if (reason.type === 'error')
-                growl.error(reason.message);
+            var reason = response.failedRequests[0];
+            growl.error(reason.message);
             $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
         });
         $rootScope.ve_tbApi.select('view-reorder');

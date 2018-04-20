@@ -85,7 +85,9 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             } else {
                 domElement[0].innerHTML = doc;
             }
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+            if (MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+            }
             scope.recompileScope = scope.$new();
             $compile(domElement.contents())(scope.recompileScope); 
             if (mmsViewCtrl) {
@@ -94,8 +96,9 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         };
 
         var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+            if (!newVal || !scope.mmsProjectId) {
                 return;
+            }
             idwatch();
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'doc')) {
                 domElement.html('<span class="mms-error">Circular Reference!</span>');
@@ -104,7 +107,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
@@ -119,10 +122,13 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                     });
                 }
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                domElement.html('<span class="mms-error">comment ' + newVal + status + '</span>');
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeCom,
+                    cfLabel: scope.mmsCfLabel
+                }));
             });
         });
 
@@ -183,7 +189,8 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            nonEditable: '<'
+            nonEditable: '<',
+            mmsCfLabel: '@'
         },
         require: ['?^mmsView', '?^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeComCtrl],

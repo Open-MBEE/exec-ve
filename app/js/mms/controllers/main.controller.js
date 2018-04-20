@@ -83,26 +83,34 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                     $scope.login = function (credentials) {
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                            AuthService.getAuthorized(credentialsJSON).then(function (user) {
-                                growl.success("Logged in");
-                                $uibModalInstance.dismiss();
-                            }, function (reason) {
-                                $scope.spin = false;
-                                $scope.credentials.password = '';
-                                growl.error(reason.message);
+                        AuthService.getAuthorized(credentialsJSON).then(function (user) {
+                            growl.success("Logged in");
+                            $uibModalInstance.dismiss();
+                            // Check if user had changes queued before refreshing page data
+                            // add edits to cache
+                            var edits = $rootScope.ve_edits;
+                            _.map(edits, function(element, key) {
+                                var cacheKey = UtilsService.makeElementKey(element, true);
+                                CacheService.put(cacheKey, element);
                             });
-                        };
-                    }],
+                            $state.go($state.current, {}, {reload: true});
+                        }, function (reason) {
+                            $scope.spin = false;
+                            $scope.credentials.password = '';
+                            growl.error(reason.message);
+                        });
+                    };
+                }],
                 size: 'md'
             }).result.finally(function(){
                 modalOpen = false;
             });
         });
     });
-    // broadcast mms.unauthorized every minute with interval service
+    // broadcast mms.unauthorized every 10 minutes with interval service
     $interval(function() {
         $rootScope.$broadcast("mms.unauthorized");
-    }, 60000, 0, false);
+    }, 600000, 0, false);
 
     $rootScope.$on('$stateChangeSuccess', 
         function(event, toState, toParams, fromState, fromParams) {
@@ -110,7 +118,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             $rootScope.hidePanes = false;
             $rootScope.showManageRefs = false;
             $rootScope.showLogin = false;
-            if ($state.current.name === 'login' || $state.current.name === 'login.select') {
+            if ($state.current.name === 'login' || $state.current.name === 'login.select' || $state.current.name === 'login.redirect') {
                 $rootScope.hidePanes = true;
                 $rootScope.showLogin = true;
             } else if ( $state.includes('project') && !($state.includes('project.ref')) ) {
@@ -133,11 +141,11 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                     $rootScope.ve_treeInitial = toParams.documentId;
             }
             $rootScope.ve_viewContentLoading = false;
-            if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project')) {
+            if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project' || fromState.name === 'login.redirect')) {
                 $timeout(function() {
                     $rootScope.ve_tree_pane.toggle();
                     $rootScope.ve_tree_pane.toggle();
-                }, 0, false);
+                }, 1, false);
             }
         }
     );
@@ -168,7 +176,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         var editKey = UtilsService.makeElementKey(element, true);
         var veEditsKey = element.id + '|' + element._projectId + '|' + element._refId;
         if ($rootScope.ve_edits && !$rootScope.ve_edits[veEditsKey] && CacheService.exists(editKey)) {
-            ElementService.cacheElement(JSON.parse(JSON.stringify(element)), true);
+            ElementService.cacheElement({projectId: element._projectId, refId: element._refId, elementId: element.id, commitId: 'latest'}, JSON.parse(JSON.stringify(element)), true);
         }
     });
 }]);

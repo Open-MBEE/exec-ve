@@ -3,20 +3,12 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$window', '$element', 'hotkeys', 'growl',
-    'MmsAppUtils', 'UxService', 'search', '_', 'documentOb', 'projectOb', 'refOb',
-function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, growl,
-    MmsAppUtils, UxService, search, _, documentOb, projectOb, refOb) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', '$timeout', 'FullDocumentService',
+    'hotkeys', 'growl', '_', 'MmsAppUtils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
+function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDocumentService, hotkeys, growl, _,
+    MmsAppUtils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
-
-    function isPageLoading() {
-        if ($element.find('.isLoading').length > 0) {
-            growl.warning("Still loading!");
-            return true;
-        }
-        return false;
-    }
     if (!$rootScope.veCommentsOn)
         $rootScope.veCommentsOn = false;
     if (!$rootScope.veElementsOn)
@@ -29,107 +21,7 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
     $scope.refOb = refOb;
     $scope.projectOb = projectOb;
     $scope.latestElement = '';
-    //build array of views in doc
-    var elementTranscluded = function(elementOb, type) {
-        if (elementOb && type !== 'Comment') {
-            if (elementOb._modified > $scope.latestElement)
-                $scope.latestElement = elementOb._modified;
-        }
-    };
-    var elementClicked = function(elementOb) {
-        $rootScope.$broadcast('elementSelected', elementOb, 'latest');
-    };
-
-    var views = [];
-    views.push({id: documentOb.id, api: {
-        init: function(dis) {
-            if ($rootScope.veCommentsOn) {
-                dis.toggleShowComments();
-            }
-            if ($rootScope.veElementsOn) {
-                dis.toggleShowElements();
-            }
-            if ($rootScope.ve_editmode) {
-                dis.toggleShowEdits();
-            }
-        },
-        elementTranscluded: elementTranscluded,
-        elementClicked: elementClicked
-    }});
-    var view2children = {};
-    var buildViewElt = function(vId, curSec) {
-      return {id: vId, api: {
-            init: function(dis) {
-                if ($rootScope.veCommentsOn) {
-                    dis.toggleShowComments();
-                }
-                if ($rootScope.veElementsOn) {
-                    dis.toggleShowElements();
-                }
-                if ($rootScope.ve_editmode) {
-                    dis.toggleShowEdits();
-                }
-            },
-            elementTranscluded: elementTranscluded,
-            elementClicked: elementClicked
-        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
-    };
-
-    var addToArray = function(viewId, curSection) {
-        views.push(buildViewElt(viewId, curSection));
-
-        if (view2children[viewId]) {
-            var num = 1;
-            for (var i = 0; i < view2children[viewId].length; i++) {
-                addToArray(view2children[viewId][i], curSection + '.' + num);
-                num = num + 1;
-            }
-        }
-    };
-    var num = 1;
-
-    var seenViewIds = {};
-    function handleSingleView(v, aggr) {
-        var childIds = view2children[v.id];
-        if (!childIds) {
-            childIds = [];
-        }
-        view2children[v.id] = childIds;
-        if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
-            return childIds;
-        }
-        for (var i = 0; i < v._childViews.length; i++) {
-            if (seenViewIds[v._childViews[i].id]) {
-                continue;
-            }
-            seenViewIds[v._childViews[i].id] = true;
-            childIds.push(v._childViews[i].id);
-        }
-        return childIds;
-    }
-
-    function handleChildren(childIds, childNodes) {
-        return childIds;
-    }
-
-    view2children[documentOb.id] = [];
-    if (!documentOb._childViews) {
-        documentOb._childViews = [];
-    }
-    MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
-    .then(function(childIds) {
-        for (var i = 0; i < childIds.length; i++) {
-            addToArray(childIds[i], num);
-            num = num + 1;
-        }
-    });
-    $scope.views = views;
-
-    $scope.$on('newViewAdded', function(event, vId, curSec, prevSibId) {
-        var sibIndex = _.findIndex(views, {id: prevSibId});
-        views.splice(sibIndex+1, 0, buildViewElt(vId, curSec) );
-    });
-
+    $scope.docLibLink = '';
     $scope.bbApi = {
         init: function() {
             if (documentOb && documentOb._editable && refOb.type === 'Branch') {
@@ -143,14 +35,15 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
                 });
             }
 
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('convert-pdf'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('word'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('tabletocsv'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
             $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
+            // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            var exportButtons = UxService.getButtonBarButton('export');
+            exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
+            $scope.bbApi.addButton(exportButtons);
+            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
             $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
             hotkeys.bindTo($scope)
             .add({
@@ -164,6 +57,64 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
             });
         }
     };
+    $scope.searchOptions = {
+        emptyDocTxt: 'This field is empty.',
+        searchInput: search,
+        getProperties: true,
+        callback: function(elementOb) {
+            $rootScope.$broadcast('elementSelected', elementOb, 'latest');
+            if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
+                $rootScope.ve_togglePane.toggle();
+        },
+        relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
+            $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
+        }
+    };
+    $scope.views = [];
+    // api to communicate with borderlayout library
+    $scope.scrollApi = {
+        notifyOnScroll: notifyOnScroll,
+        isScrollVisible: function(){}, // pane's directive (in borderlayout) resets this to the right function
+        throttleRate: 500, // how often should the wheel event triggered
+        threshold : 3000, // how far from the bottom of the page before adding more views
+        frequency: 100 // how fast to add more views
+    };
+
+
+    var views = [];
+    var view2children = {};
+    var num = 1;
+    var seenViewIds = {};
+    view2children[documentOb.id] = [];
+    var fullDocumentService;
+    _createViews().then(function() {
+        // The Controller codes get executed before all the directives'
+        // code in its template ( full-doc.html ). As a result, use $timeout here
+        // to let them finish first because in this case
+        // we rely on fa-pane directive to setup isScrollVisible
+        $timeout(function() {
+            fullDocumentService = new FullDocumentService(views);
+            fullDocumentService.addInitialViews($scope.scrollApi.isScrollVisible);
+            $scope.views = fullDocumentService.viewsBuffer;
+        });
+    });
+
+    _initializeDocLibLink();
+
+    $scope.$on('mms-tree-click', function(e, branch) {
+        fullDocumentService.handleClickOnBranch(branch, function() {
+            $location.hash(branch.data.id);
+            $anchorScroll();
+        });
+    });
+
+    $scope.$on('mms-full-doc-view-deleted', function(event, deletedBranch) {
+       fullDocumentService.handleViewDelete(deletedBranch);
+    });
+
+    $scope.$on('mms-new-view-added', function(event, vId, curSec, prevSibId) {
+        fullDocumentService.handleViewAdd(_buildViewElement(vId, curSec), prevSibId);
+    });
 
     $scope.$on('show-comments', function() {
         for (var i = 0; i < $scope.views.length; i++) {
@@ -197,64 +148,152 @@ function($scope, $rootScope, $state, $stateParams, $window, $element, hotkeys, g
         }
     });
 
-    $scope.searchOptions = {
-        emptyDocTxt: 'This field is empty.',
-        searchInput: search,
-        getProperties: true,
-        callback: function(elementOb) {
-            $rootScope.$broadcast('elementSelected', elementOb, 'latest');
-            if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
-                $rootScope.ve_togglePane.toggle();
-        },
-        relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
-            $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
-        }
-    };
-
-    var converting = false;
     $scope.$on('convert-pdf', function() {
-        if (isPageLoading())
-            return;
-        if (converting) {
-            growl.info("Please wait...");
-            return;
-        }
-        converting = true;
-        $scope.bbApi.toggleButtonSpinner('convert-pdf');
-        MmsAppUtils.printModal(documentOb, refOb, true, 3)
-        .then(function(ob) {
-            growl.info('Converting HTML to PDF...Please wait for a completion email.',{ttl: -1});
-        }, function(reason){
-            growl.error("Failed to convert HTML to PDF: " + reason.message);
-        }).finally(function() {
-            converting = false;
-            $scope.bbApi.toggleButtonSpinner('convert-pdf');
+        fullDocumentService.loadRemainingViews(function() {
+            MmsAppUtils.printModal(documentOb, refOb, true, 3)
+            .then(function(ob) {
+                growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
+            }, function(reason){
+                growl.error("Exporting as PDF file Failed: " + reason.message);
+            });
         });
     });
 
     $scope.$on('print', function() {
-        if (isPageLoading())
-            return;
-        MmsAppUtils.printModal(documentOb, refOb, true, 1);
+        fullDocumentService.loadRemainingViews(function() {
+            MmsAppUtils.printModal(documentOb, refOb, true, 1);
+        });
     });
 
     $scope.$on('word', function() {
-        if (isPageLoading())
-            return;
-        MmsAppUtils.printModal(documentOb, refOb, true, 2);
+        fullDocumentService.loadRemainingViews(function() {
+            MmsAppUtils.printModal(documentOb, refOb, true, 2)
+            .then(function(ob) {
+                growl.info('Exporting as Word file. Please wait for a completion email.',{ttl: -1});
+            }, function(reason){
+                growl.error("Exporting as Word file Failed: " + reason.message);
+            });
+        });
     });
 
     $scope.$on('tabletocsv', function() {
-        if (isPageLoading())
-            return;
-        MmsAppUtils.tableToCsv(true);
+        fullDocumentService.loadRemainingViews(function() {
+            MmsAppUtils.tableToCsv(true);
+        });
     });
 
     $scope.$on('refresh-numbering', function() {
-        if (isPageLoading())
-            return;
-        var printElementCopy = angular.element("#print-div");
-        MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
+        fullDocumentService.loadRemainingViews(function() {
+            MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), angular.element("#print-div"));
+        });
     });
-}]);
 
+    function _createViews() {
+        var loadingViewsFromServer = growl.info('Loading data from server!', {ttl: -1});
+        views.push({id: documentOb.id, api: {
+            init: function(dis) {
+                if ($rootScope.veCommentsOn) {
+                    dis.toggleShowComments();
+                }
+                if ($rootScope.veElementsOn) {
+                    dis.toggleShowElements();
+                }
+                if ($rootScope.ve_editmode) {
+                    dis.toggleShowEdits();
+                }
+            },
+            elementTranscluded: _elementTranscluded,
+            elementClicked: _elementClicked
+        }});
+        if (!documentOb._childViews) {
+            documentOb._childViews = [];
+        }
+        return MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, _handleSingleView, _handleChildren)
+            .then(function(childIds) {
+                for (var i = 0; i < childIds.length; i++) {
+                    _constructViews(childIds[i], num);
+                    num = num + 1;
+                }
+            }).finally(loadingViewsFromServer.destroy);
+    }
+
+    function _initializeDocLibLink() {
+        if (groupOb !== null) {
+            $scope.docLibLink = groupOb._link;
+        } else if (documentOb !== null && documentOb._groupId !== undefined && documentOb._groupId !== null) {
+            $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
+                projectOb.id + '/' + documentOb._groupId;
+        } else {
+            $scope.docLibLink = '/share/page/repository#filter=path|/Sites/' + orgOb.id + '/documentLibrary/' +
+                projectOb.id;
+        }
+    }
+
+    function _elementTranscluded(elementOb, type) {
+        if (elementOb && type !== 'Comment') {
+            if (elementOb._modified > $scope.latestElement)
+                $scope.latestElement = elementOb._modified;
+        }
+    }
+
+    function _elementClicked(elementOb) {
+        $rootScope.$broadcast('elementSelected', elementOb, 'latest');
+    }
+
+    function _buildViewElement(vId, curSec) {
+        return {id: vId, api: {
+            init: function(dis) {
+                if ($rootScope.veCommentsOn) {
+                    dis.toggleShowComments();
+                }
+                if ($rootScope.veElementsOn) {
+                    dis.toggleShowElements();
+                }
+                if ($rootScope.ve_editmode) {
+                    dis.toggleShowEdits();
+                }
+            },
+            elementTranscluded: _elementTranscluded,
+            elementClicked: _elementClicked
+        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
+    }
+
+    function _constructViews(viewId, curSection) {
+        views.push(_buildViewElement(viewId, curSection));
+
+        if (view2children[viewId]) {
+            var num = 1;
+            for (var i = 0; i < view2children[viewId].length; i++) {
+                _constructViews(view2children[viewId][i], curSection + '.' + num);
+                num = num + 1;
+            }
+        }
+    }
+
+    function _handleSingleView(v, aggr) {
+        var childIds = view2children[v.id];
+        if (!childIds) {
+            childIds = [];
+        }
+        view2children[v.id] = childIds;
+        if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
+            return childIds;
+        }
+        for (var i = 0; i < v._childViews.length; i++) {
+            if (seenViewIds[v._childViews[i].id]) {
+                continue;
+            }
+            seenViewIds[v._childViews[i].id] = true;
+            childIds.push(v._childViews[i].id);
+        }
+        return childIds;
+    }
+
+    function _handleChildren(childIds, childNodes) {
+        return childIds;
+    }
+
+    function notifyOnScroll() {
+        return fullDocumentService.handleDocumentScrolling();
+    }
+}]);

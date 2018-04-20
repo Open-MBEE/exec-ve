@@ -12,32 +12,22 @@ angular.module('mmsApp')
  * @restrict E
  *
  * @description
- * A prebuilt nav bar that's customizable with current page title,
- * and the "type" of page/app. Include navigation to other sites' dashboard
- * and docweb pages.
- * ## Example
- *  <pre>
-    <mms-nav mms-title="Model Manager"></mms-nav>
-    </pre>
- * ## Support for responsive sliding pane on small browser
- *  <pre>
-    <div id="outer-wrap">
-        <div id="inner-wrap">
-            <mms-nav mms-title="Model Manager"></mms-nav>
-            <!-- everything visible on the page should go in here -->
-        </div>
-    </div>
-    </pre>
- * @param {string} mmsTitle Title to display
+ * A navbar that include navigation to other Organizations/Project along with helpful
+ * links for the application. i.e. version, shortcut keys, about...
+ * 
+ * The navbar is mobile friendly.
+ * 
  */
 function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
     var template = $templateCache.get('partials/mms/veNav.html');
 
     var veNavLink = function(scope, element, attrs) {
 
+        scope.isNavCollapsed = true;
         scope.updateOrg = function() {
             var instance = $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
+                windowClass: 've-dropdown-short-modal',
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
 
@@ -88,7 +78,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.0.0';
+            scope.veV = '3.3.0';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
@@ -118,9 +108,9 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             if ($state.includes('project.ref.document.order')) {
                 growl.warning("Please finish reorder action first.");
                 return;
-            } else if ($state.includes('project.diff')) {
-                growl.warning("Please finish diff action first.");
-                return;
+            // } else if ($state.includes('project.diff')) {
+            //     growl.warning("Please finish diff action first.");
+            //     return;
             } else {
                 if ($state.params.search === searchText)
                     return;
@@ -130,7 +120,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         };
         scope.stagingView = function(){ //changing to something "opencae"?
             var hostName = $location.host();
-            var address = "https://cae-ems-uat.jpl.nasa.gov";
+            var address = "https://uatlinkhere";
             if (hostName !== 'localhost' && hostName.split('.')[0].substr(-3) !== 'uat')
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
             window.open(address ,'_blank');

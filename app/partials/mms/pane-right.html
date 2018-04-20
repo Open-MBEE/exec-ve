@@ -1,59 +1,48 @@
 <div class="pane-right">
     <div ng-if="documentOb">
         <div class="container-fluid" ng-show="show.element">
-            <br>
+            <h2 ng-if="specApi.getEditing()" class="right-pane-title">Edit Element</h2>
+            <h2 ng-if="!specApi.getEditing()" class="right-pane-title">Preview Element</h2>
             <form class="form-horizontal">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
                     <div class="col-sm-9">
                         <select class="form-control"
-                                ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in ve_edits"
-                                ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
+                            ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in ve_edits"
+                            ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
                         </select>
                     </div>
                 </div>
             </form>
+            <hr class="spec-title-divider">
             <mms-spec mms-element-id="{{specInfo.id}}" mms-commit-id="{{specInfo.commitId}}"
-                      mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}"
-                      mms-spec-api="specApi"></mms-spec>
+                mms-ref-id="{{specInfo.refId}}" mms-project-id="{{specInfo.projectId}}"
+                mms-spec-api="specApi"></mms-spec>
         </div>
     </div>
 
     <div ng-if="documentOb">
         <div class="container-fluid" ng-if="show.history">
             <mms-history mms-element-id="{{specInfo.id}}" mms-ref-id="{{specInfo.refId}}"
-                         mms-project-id="{{specInfo.projectId}}"></mms-history>
+                mms-project-id="{{specInfo.projectId}}"></mms-history>
         </div>
     </div>
 
-    <div class="container-fluid container-tags" ng-show="show.tags">
-        <h2>Tags</h2>
-        <div ng-show="noTags">No tags in current project.</div>
-        <div ng-hide="noTags">
-            <input class="form-control" ng-model="tagFilter" type="text" placeholder="Type here to filter tags">
-            <br />
-            <table ng-show="filteredTags.length" class="tags-table table table-condensed">
-                <tr><th>Name</th><th>Time</th></tr>
-                <tr ng-repeat="tag in filteredTags = (tagObs | orderBy:'-_created' | filter: {name : tagFilter})">
-                    <td>
-                        <a ui-sref="project.ref({refId: tag.id, search: undefined})">{{tag.name}}</a>
-                    </td>
-                    <td>{{tag._created | date:'M/d/yy h:mm a'}}
-                    </td>
-                </tr>
-            </table>
-            <div ng-hide="filteredTags.length">No tags found with that name.</div>
-        </div>
+    <div class="container-fluid container-tags" id="ve-branches-tags" ng-show="show.tags">
+        <h2 class="right-pane-title">Branches/Tags</h2>
+        <hr class="spec-title-divider">
+        <mms-ref-list mms-doc-id="{{documentOb.id}}" mms-project-id="{{projectOb.id}}"
+        mms-ref-id="{{refOb.id}}" mms-ref-type="{{refOb.type}}" mms-branches="branchObs" mms-tags="tagObs"></mms-ref-list>
     </div>
 
     <div class="container-fluid" ng-show="show.reorder">
         <mms-view-reorder mms-element-id="{{viewOb.id}}" mms-project-id="{{viewOb._projectId}}"
-                          mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}"
-                          mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
+            mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}"
+            mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
     </div>
 
     <div class="container-fluid" ng-if="show.jobs">
         <mms-jobs mms-doc-id="{{documentOb.id}}" mms-project-id="{{projectOb.id}}"
-                  mms-ref-id="{{refOb.id}}"></mms-jobs>
+            mms-ref-id="{{refOb.id}}"></mms-jobs>
     </div>
 </div>

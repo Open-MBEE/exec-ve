@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -34,8 +34,10 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
+ * @param {bool} mmsWatchId set to true to not destroy element ID watcher
+ * @param {boolean=false} nonEditable can edit inline or not
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, $compile, $templateCache, growl, _, MathJax) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, $compile, $templateCache, growl, _, MathJax) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -88,15 +90,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             domElement.empty();
             var doc = preview ? scope.edit.documentation : scope.element.documentation;
             if (!doc || emptyRegex.test(doc)) {
-                if (preview) {
-                    doc = '<p class="no-print" ng-class="{placeholder: commitId!=\'latest\'}">(No ' + scope.panelType + ')</p>';
-                }
-                var p = '<span class="no-print">(No ' + scope.panelType + ')</span>';
-                if (scope.commitId !== 'latest')
-                    p = '';
-                doc = '<p>' + p + '</p>';
+                doc = '<p class="no-print placeholder">(no ' + scope.panelType + ')</p>';
             }
-            var fixSpan = /<span style="/;
             doc = doc.replace(fixPreSpanRegex, "<mms-cf");
             doc = doc.replace(fixPostSpanRegex, "</mms-cf>");
             if (preview) {
@@ -105,7 +100,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.isEditing = false;
                 domElement[0].innerHTML = doc;
             }
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+            $(domElement[0]).find('img').each(function(index) {
+                Utils.fixImgSrc($(this));
+            });
+            if (MathJax) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+            }
             scope.recompileScope = scope.$new();
             $compile(domElement.contents())(scope.recompileScope);
             if (mmsViewCtrl) {
@@ -113,10 +113,13 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
         };
 
-        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
-            if (!newVal)
+        var idwatch = scope.$watch('mmsElementId', function(newVal) {
+            if (!newVal || !scope.mmsProjectId) {
                 return;
-            idwatch();
+            }
+            if (!scope.mmsWatchId) {
+                idwatch();
+            }
             if (UtilsService.hasCircularReference(scope, scope.mmsElementId, 'doc')) {
                 domElement.html('<span class="mms-error">Circular Reference!</span>');
                 return;
@@ -126,7 +129,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
@@ -135,6 +138,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = "Text";
                 }
                 recompile();
+                Utils.reopenUnsavedElts(scope, "documentation");
+
                 if (scope.commitId === 'latest') {
                     scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
@@ -150,17 +155,19 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     });
                 }
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                domElement.html('<span class="mms-error">doc cf ' + newVal + status + '</span>');
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeDoc,
+                    cfLabel: scope.mmsCfLabel
+                }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
             });
         });
 
         if (mmsViewCtrl) {
-
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
@@ -190,7 +197,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         } 
 
         if (mmsViewPresentationElemCtrl) {
-
             scope.delete = function() {
                 Utils.deleteAction(scope, scope.bbApi, mmsViewPresentationElemCtrl.getParentSection());
             };
@@ -211,7 +217,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     scope.panelType = scope.panelType.substring(0, scope.panelType.length-1);
                 if (scope.panelType === 'Paragraph')
                     scope.panelType = 'Text';
-                if (scope.panelType === 'Figure')
+                if (scope.panelType === 'Figure' || scope.panelType === 'ImageT')
                     scope.panelType = 'Image';
             }
             if (scope.presentationElem) {
@@ -227,7 +233,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            nonEditable: '<'
+            mmsWatchId: '@',
+            nonEditable: '<',
+            mmsCfLabel: '@'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeDocCtrl],

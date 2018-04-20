@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', mmsViewLink]);
 
 /**
  * @ngdoc directive
@@ -22,10 +22,13 @@ angular.module('mms.directives')
  * @param {string} mmsDocId Document context of view
  * @param {string} mmsPeId Document context of view
  */
-function mmsViewLink(ElementService, UtilsService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService) {
 
-    var mmsViewLinkLink = function(scope, element, attrs, mmsViewCtrl) {
+    var mmsViewLinkLink = function(scope, element, attrs, controllers) {
+        var mmsCfCtrl = controllers[0];
+        var mmsViewCtrl = controllers[1];
         var processed = false;
+        scope.loading = true;
         scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
@@ -35,6 +38,15 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             var refId = scope.mmsRefId;
             var commitId = scope.mmsCommitId;
             var docid = scope.mmsDocId;
+            if (mmsCfCtrl) {
+                var cfVersion = mmsCfCtrl.getElementOrigin();
+                if (!projectId)
+                    projectId = cfVersion.projectId;
+                if (!refId)
+                    refId = cfVersion.refId;
+                if (!commitId)
+                    commitId = cfVersion.commitId;
+            }
             if (mmsViewCtrl) {
                 var viewVersion = mmsViewCtrl.getElementOrigin();
                 if (!projectId)
@@ -44,11 +56,16 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 if (!commitId)
                     commitId = viewVersion.commitId;
             }
+            if (!projectId) {
+                return;
+            }
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
+            var id = scope.mmsElementId;
+            id = id.replace(/[^\w\-]/gi, '');
 
-            var reqOb = {elementId: scope.mmsElementId, projectId: projectId, refId: refId, commitId: commitId};
+            var reqOb = {elementId: id, projectId: projectId, refId: refId, commitId: commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
@@ -75,8 +92,15 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                 } else {
                     element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                 }
+                scope.loading = false;
             }, function(reason) {
-                element.html('<span class="mms-error">view link not found</span>');
+                element.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                $compile(element.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsViewLink
+                }));
+                scope.loading = false;
             });
         });
     };
@@ -90,12 +114,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             mmsCommitId: '@',
             mmsDocId: '@',
             mmsPeId: '@',
-            linkText: '@?'
+            linkText: '@?',
+            linkClass: '@?',
+            linkIconClass: '@?'
         },
-        require: '?^^mmsView',
-        template: ['<span ng-if="linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{linkText}}</a></span>',
-            '<span ng-if="!linkText"><a href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}">{{name || "Unnamed View"}}</a></span>'
-        ].join(''),
+        require: ['?^^mmsCf', '?^^mmsView'],
+        template: '<a ng-if="!loading" ng-class="linkClass" href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText">{{name || "Unnamed View"}}</span></a>',
         link: mmsViewLinkLink
     };
 }

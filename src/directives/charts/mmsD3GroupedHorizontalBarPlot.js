@@ -10,11 +10,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       var d3 = $window.d3;  
       var divchart = d3.select(element[0]).append('div');
 
-      var chartdata = [];
-      var dataIdFilters;
-      var scopeTableIds;
-      var scopetableColumnHeadersLabel= [];
-      
+      var achartdata;
       element.click(function(e) {
         //stop Propogating event to parent(mms-transclude-doc) element.
         e.stopPropagation();
@@ -24,7 +20,6 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       function getColor(data, i){
         return data.colors !== undefined ? d3colorR[data.colors[i]] : d3colorR[i];
       }
-      var processed = false;
       var projectId;
       var refId;
       var commitId;
@@ -39,9 +34,16 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
               commitId = viewVersion.commitId;
       }
 
+      if ( scope.plot.config.length !== 0){ 
+        scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); //{"colors: [5,6,7,8,9]"}
+      } 
+
+
+
       var opacitydefault = 1,//0.7,
           opacityselected = 1.0,
           opacitynotselected = 0.3;
+
       function mouseout(){
         d3.selectAll(".ghbbar")
           .transition(200)
@@ -107,7 +109,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
                       d3.select(this).append("input")
                         .attr("type", "checkbox")
                         .attr("checked",function(d,i){
-                          if (dataIdFilters[0][TableService.toValidId(d)] === true)
+                          if (data.legendsFilter[TableService.toValidId(d)] === true)
                             return true;
                           else 
                             return null;
@@ -115,8 +117,9 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
                         .attr("style", function(d,i){var color = getColor(data,i); return "color: " +color + ";background-color:" + color + ";";})
                         .on("click", function (d) {
                             // filter by legends
-                            dataIdFilters[0][TableService.toValidId(d)] = this.checked;
-                            createGroupedHorizontalBarChart(chartdata[data.id], null); //2nd argument is not used
+                            data.legendsFilter[TableService.toValidId(d)] = this.checked;
+                            //createGroupedHorizontalBarChart(chartdata[data.id], null); //2nd argument is not used
+                            createGroupedHorizontalBarChart(achartdata, null); //2nd argument is not used
                             //handle by visibility
                             //d3.selectAll(".ghbbar."+ data.id + "." + TableService.toValidId(d) ).style("visibility", this.checked ? "visible": "hidden");
                          });
@@ -146,17 +149,15 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
                     d3.select(this).append("input")
                       .attr("type", "checkbox")
                       .attr("checked", function(d,i){
-                          if (dataIdFilters[1][TableService.toValidId(d)] === true)
+                          if (data.labelsFilter[TableService.toValidId(d)] === true)
                             return true;
                           else 
                             return null;
                       })
                       .on("click", function (d) {
                           //filter by columns(labels)
-                          dataIdFilters[1][TableService.toValidId(d)] = this.checked;     
-                          createGroupedHorizontalBarChart(chartdata[data.id], null); //2nd argument is not used
-                          //visibility 
-                          //d3.selectAll("." + data.id + "."+ TableService.toValidId(d) ).style("visibility", this.checked ? "visible": "hidden");
+                          data.labelsFilter[TableService.toValidId(d)] = this.checked;     
+                          createGroupedHorizontalBarChart(achartdata, null); //2nd argument is not used
                        });
                     d3.select(this).append("span")
                         .text(function (d) {
@@ -176,9 +177,11 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
         var filteredDataColors=[];
         var filteredDataLegends=[];//table row headers
         var filteredDataLabels=[];//table column headers
-        var datalegendsfilter = dataIdFilters[0];  
-        var datalabelsfilter = dataIdFilters[1];              
+        var datalegendsfilter = data.legendsFilter;
+        var datalabelsfilter = data.labelsFilter;            
         var counter = -1;
+
+       
         for (var i=0; i<data.labels.length; i++) {
           if ( datalabelsfilter[TableService.toValidId(data.labels[i])]){
             filteredDataLabels.push(data.labels[i]);
@@ -186,7 +189,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
               counter++;
               if (datalegendsfilter[TableService.toValidId(data.legends[j])]){
                 filteredDataValues.push(Number(data.values[j][i]));
-                filteredDataSysmlids.push(data.valuesysmlIds[j][i]);
+                filteredDataSysmlids.push(data.valueIds[j][i]);
                 filteredDataColors.push(getColor(data ,counter % data.legends.length));
                 filteredDataLegends.push(TableService.toValidId(data.legends[j]));
               }
@@ -317,129 +320,85 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       }
           
       scope.render = function() {
-          if (scopetableColumnHeadersLabel.length === 0) return;
-          
-          var udcolors;
-          if (scope.plot.config.colors !== undefined){
-            udcolors = scope.plot.config.colors;
-          }
-         var dataValuesPerTable;
-          dataValuesPerTable = scope.datavalues;//[k];
-          var legends = [];
 
-          for ( i = 0; i < scope.tableRowHeaders.length; i++){
-            if ( scope.tableRowHeaders[i].type === "InstanceSpecification")
-              legends.push(scope.tableRowHeaders[i].name);
-            else //property
-              legends.push(scope.tableRowHeaders[i].defaultValue.value);
-          }
-          var rowvalues=[];
-          var rowsysmlIds=[];
-          for ( var i = 0; i < dataValuesPerTable.length; i++){
-              var tvalues = [];
-              var sysmlIds = [];
+        TableService.readvalues(scope.plot, projectId, refId, commitId)
+       .then( function(value){
+        
+        var tablebody = value.tablebody;
+        var tableheader = value.tableheader;
+        //scope.isHeader = value.isHeader;
+        scope.valuesO = value.tablebody.valuesO; //value objects used in watch
+        if (tablebody.c3_data.length === 0) { //no data
+          return;
+        }
+        
+        var udcolors;
+        if (scope.plot.config.colors !== undefined){
+          udcolors = scope.plot.config.colors;
+        }
 
-              for ( var j = 0; j < dataValuesPerTable[i].length; j++){
-                sysmlIds[j] =  dataValuesPerTable[i][j].id;
-                var datavalue = null;
-                if ( isNaN(dataValuesPerTable[i][j])){
-                  if (dataValuesPerTable[i][j].type === "Property" || dataValuesPerTable[i][j].type === "Port")
-                    tvalues[j] = dataValuesPerTable[i][j].defaultValue.value;
-                  else if (dataValuesPerTable[i][j].type === 'Slot')
-                    tvalues[j] = dataValuesPerTable[i][j].value[0].value;
-                  else if ( dataValuesPerTable[i][j].type === "Class"){
-                    if ( scope.indexDocumentation.includes(i+","+j)){
-                      if ( !isNaN(dataValuesPerTable[i][j].documentation))
-                        tvalues[j] = Number(dataValuesPerTable[i][j].documentation);
-                    }
-                    else if (scope.indexName.includes(i+","+j)){
-                      if ( !isNaN(dataValuesPerTable[i][j].name))
-                        tvalues[j] =  Number(dataValuesPerTable[i][j].name);
-                    }
-                  }
-                }
-                else 
-                  tvalues[j] = dataValuesPerTable[i][j];
-              }
-              rowvalues[i] = tvalues;
-              rowsysmlIds[i] =sysmlIds;
+        var rowvalues = [];
+        var cellIds = []; //0, 1, 2, 3
+        var legends = [];
+        var legendsFilter = [];
+        var rowvalue;
+        var cellId;
+        var cid = 0;
+        tablebody.c3_data.forEach( function (row){
+           legends.push(row[0]);
+           legendsFilter[row[0]] = true;
+           rowvalue = []; //reset
+           cellId = []; //reset
+           for ( var i = 1; i < row.length; i++){
+            rowvalue.push(row[i]);
+            cellId.push(cid++);
            }
-          var achartdata = {
-            id: scopeTableIds,
-            labels: scopetableColumnHeadersLabel,
-            legends: legends,
+           cellIds.push(cellId);
+           rowvalues.push(rowvalue);
+        });
+        // legendsFilter = temp;
+
+        var labelsFilter = []; 
+        tableheader.forEach( function (item){
+          labelsFilter[item] = true;
+        });
+        
+        //var dataV
+        achartdata = {
+            id: '_'+scope.$id,
+            labels: tableheader,
+            legends: legends, //row headers
             colors: udcolors,
-            values:rowvalues,
-            valuesysmlIds: rowsysmlIds
+            values: rowvalues,//table body without row headers
+            valueIds: cellIds,
+            legendsFilter: legendsFilter,
+            labelsFilter: labelsFilter
            };
-           chartdata[achartdata.id] = achartdata;
-           
+           //chartdata[achartdata.id] = achartdata;
           d3.select("."+ achartdata.id + scope.$id).remove();
           var dataIdDiv = divchart.append('div')
                               .attr("class", achartdata.id + scope.$id)
                               .attr("style", 'border:1px solid #ddd');
           createGroupedHorizontalBarChart(achartdata, dataIdDiv);
           createFilters(achartdata);
+          });
       }; //end of render
-      scope.$watch('datavalues', function(newValue, oldValue) {
+      scope.$watch('valuesO', function(newValue, oldValue) {
         return scope.render();
       },true); 
 
-      
-      scope.$watch('tableRowHeaders', function(newRowHeaders, oldRowHeaders) {
-        //When a rowHeader is changed, it rquires to change dataIdFilters, too.
-        if ( oldRowHeaders !== undefined){
-          for ( var i = 0; i < newRowHeaders.length; i++ ){
-            for ( var j = 0; j < newRowHeaders[i].length; j++){
-              if ( oldRowHeaders[i].type === "InstanceSpecification"){
-                if ( newRowHeaders[i][j].name !== oldRowHeaders[i][j].name){
-                   //add new one.
-                   dataIdFilters[0][newRowHeaders[i][j].name] = dataIdFilters[0][oldRowHeaders[i][j].name];
-                   //delete old one
-                   delete dataIdFilters[0][oldRowHeaders[i][j].name];
-                }
-              } else { //oldRowHeaders[i].type === Property
-                if ( newRowHeaders[i][j].defaultValue.value !== oldRowHeaders[i][j].defaultValue.value){
-                   //add new one.
-                   dataIdFilters[0][newRowHeaders[i][j].defaultValue.value] = dataIdFilters[0][oldRowHeaders[i][j].defaultValue.value];
-                   //delete old one
-                   delete dataIdFilters[0][oldRowHeaders[i][j].defaultValue.value];
-                }
-              }
-            }
-          }
-        }
-        return scope.render();
-      },true); 
-     
       //rect bar is clicked or table cell (Except rowHeaders) is clicked
       scope.$on('elementSelected', function(event, eid, type) {
           d3.selectAll("rect").transition(200).style("fill-opacity", opacitynotselected);
       });
      
-      scope.plot = JSON.parse(scope.splot); 
-      var reqOb = {tableData: scope.plot.table, projectId: projectId, refId: refId, commitId: commitId};   
-      TableService.readTable (reqOb)
-        .then(function(value) {
-          scopeTableIds = '_'+scope.$id;
-          scopetableColumnHeadersLabel = value.tableColumnHeadersLabels;
-          scope.tableRowHeaders = value.tableRowHeaders;
-          scope.datavalues = value.datavalues; //[][] - array
-          dataIdFilters = value.dataIdFilters;
-          scope.indexName = value.indexName;
-          scope.indexDocumentation = value.indexDocumentation;
-        });    
-    
-      if ( scope.plot.config.length !== 0){ 
-        scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); //{"colors: [5,6,7,8,9]"}
-      } 
     }; //end of link
 
     return {
       restrict: 'EA',
       require: '?^mmsView',
        scope: {
-          splot: '@' 
+          plot: '<' 
       },
       link: mmsChartLink
     }; //return

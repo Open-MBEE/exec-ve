@@ -1,0 +1,55 @@
+/*************************
+  Styles for the View Editor right pane
+*************************/
+
+.pane-right {
+  > .pane-right {
+    @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+  }
+
+  &.fa-pane-orientation-horizontal {
+    .fa-pane-handle > .fa-pane-toggle {
+      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
+      margin-left: 1px;
+    }
+  }
+
+  .container-tags {
+    .tags-table {
+      font-size: 14px;
+      margin-top: 24px;
+      width: 100%;
+
+      a:hover {
+        color: $base_blue;
+      }
+    }
+  }
+}
+
+.diff-pane-right {
+  > .pane-right {
+    @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+    z-index: 1;
+  }
+
+  &.fa-pane-orientation-horizontal {
+    .fa-pane-handle > .fa-pane-toggle {
+      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
+      margin-left: 1px;
+    }
+  }
+
+  ul.abn-tree {
+    cursor: default;
+
+    .shaft,
+    .shaft-hidden:hover {
+      background: inherit;
+
+      i {
+        cursor: pointer;
+      }
+    }
+  }
+}

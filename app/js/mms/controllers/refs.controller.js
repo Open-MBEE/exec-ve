@@ -4,10 +4,10 @@
 
 angular.module('mmsApp')
 .controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$timeout', '$window', 'growl', '_',
-                         'UxService', 'ElementService', 'UtilsService', 'ProjectService', 'MmsAppUtils', 'ApplicationService',
+                         'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
 function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, $window, growl, _,
-    UxService, ElementService, UtilsService, ProjectService, MmsAppUtils, ApplicationService,
+    ElementService, ProjectService, MmsAppUtils, ApplicationService,
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
     $rootScope.mms_refOb = refOb;
@@ -38,51 +38,27 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         $scope.fromParams = refOb;
         $scope.refSelected = refOb;
     }
+
     $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.');
     // $scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.<br>Branch author will be notified by email upon completion.');
     // var refPerm = projectOb && projectOb._editable;
 
-    $scope.bbApi.init = function() {
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-branch"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-tag"));
-        $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete"));
-        // $scope.bbApi.addButton(UxService.getButtonBarButton("tree-merge"));
-        // $scope.bbApi.setPermission("tree-add-branch", $scope.refPerm);
-        // $scope.bbApi.setPermission("tree-add-tag", $scope.refPerm);
-        // $scope.bbApi.setPermission("tree-delete", $scope.refPerm);
-        // $scope.bbApi.setPermission("tree-merge", $scope.refPerm);
-    };
-    $scope.$on('tree-add-branch', function(e) {
+    $scope.addBranch = function(e) {
         addItem('Branch');
-    });
-    $scope.$on('tree-add-tag', function(e) {
+    };
+    $scope.addTag = function(e) {
         addItem('Tag');
-    });
-    $scope.$on('tree-delete', function(e) {
+    };
+    $scope.deleteRef = function(e) {
         deleteItem();
-    });
+    };
     $scope.$on('fromParamChange', function(event, fromParams) {
         var index = _.findIndex(refObs, {name: fromParams.refId});
         if ( index > -1 ) {
             $scope.fromParams = refObs[index];
         }
     });
-    $scope.$on("stomp.branchCreated", function(event, refList, updateRef) {
-        // var index = -1;
-        // if (updateRef.type === 'Branch') {
-        //     index = _.findIndex($scope.branches, {id: updateRef.id});
-        //     if ( index > -1 ) {
-        //         // $scope.branches[index].loading = false;
-        //         $scope.branches[index] = updateRef;
-        //     }
-        // } else if (updateRef.type === 'Tag') {
-        //     index = _.findIndex($scope.tags, {id: updateRef.id});
-        //     if ( index > -1 ) {
-        //         // $scope.tags[index].loading = false;
-        //         $scope.tags[index] = updateRef;
-        //     }
-        // }
-
+    $scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
         growl.success(updateRef.name + " " + updateRef.type + " Created");
     });
 
@@ -90,25 +66,13 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         ProjectService.getRef(ref.id, projectOb.id).then(
             function(data) {
                 $scope.refSelected = data;
-            }, 
+            },
             function(error){
                 growl.error("Ref click handler error: " + error );
                 return;
             }
         );
     };
-
-    // $scope.treeDblclickHandler = function(branch) {
-    //     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-    //         if (branch.type === 'group')
-    //             $rootScope.ve_treeApi.expand_branch(branch);
-    //         else if (branch.type === 'view' || branch.type === 'snapshot') {
-    //             $state.go('project.ref.document', {documentId: branch.data.id, search: undefined});
-    //         }
-    //     } else if ($state.includes('project.ref.document')) {
-    //         $rootScope.ve_treeApi.expand_branch(branch);
-    //     }
-    // };
 
     var addItem = function(itemType) {
         $scope.itemType = itemType;
@@ -186,13 +150,38 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             $scope.branch.name = "";
             $scope.branch.description = "";
             $scope.branch.permission = "read";
+            $scope.branch.lastCommit = true;
+            $scope.branch.timestamp = new Date();
             displayName = "Branch";
+            $scope.updateTimeOpt = function () {
+                $scope.branch.lastCommit = false;
+            };
         } else if ($scope.itemType === 'Tag') {
-            $scope.configuration = {};
-            $scope.configuration.name = "";
-            $scope.configuration.description = "";
+            $scope.tag = {};
+            $scope.tag.name = "";
+            $scope.tag.description = "";
+            $scope.tag.lastCommit = true;
+            $scope.tag.timestamp = new Date();
             displayName = "Tag";
+            $scope.updateTimeOpt = function () {
+                $scope.tag.lastCommit = false;
+            };
         }
+
+        var handlePromise = function(promise) {
+            promise.then(function(data) {
+                growl.success(displayName + " is being created.");
+                // growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
+                // refArr.push(refJson);
+                // var storeArr = refArr.toString();
+                // $window.localStorage.setItem('refArr', storeArr); 
+                $uibModalInstance.close(data); //need to figure out a way to cache this stuff
+            }, function(reason) {
+                growl.error("Create " + displayName + " : " + reason.message);
+            }).finally(function() {
+                $scope.oking = false;
+            });
+        };
 
         $scope.ok = function() {
             if ($scope.oking) {
@@ -200,53 +189,49 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 return;
             }
             $scope.oking = true;
-            var promise;
-            var date = new Date();
+            var promise, ts;
             // Item specific promise:
-            if ($scope.itemType === 'Branch') {
-                var branchObj = {"name": $scope.branch.name, "type": "Branch", 
+            if ($scope.itemType === 'Branch' && $scope.branch.name !== '') {
+                var branchObj = {"name": $scope.branch.name, "type": "Branch",
                                 "description": $scope.branch.description};
                 branchObj.parentRefId = $scope.createParentRefId;
                 branchObj.permission = $scope.branch.permission;
                 branchObj.id = ApplicationService.createUniqueId();
-                promise = ProjectService.createRef( branchObj, projectOb.id );
-                refJson = {
-                    name: $scope.branch.name,
-                    id: $scope.branch.id,
-                    type: $scope.itemType,
-                    status: 'in progress', //will get status from JMS?
-                    start_time: (date.getMonth() + 1) + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
-                };
-            } else if ($scope.itemType === 'Tag') {
-                var tagObj = {"name": $scope.configuration.name, "type": "Tag",
-                                "description": $scope.configuration.description};
+                if (!$scope.branch.lastCommit) {
+                    // Make call to history?maxTimestamp to get closest commit id to branch off
+                    ts = $filter('date')($scope.branch.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
+                    ProjectService.getRefHistory(branchObj.parentRefId, projectOb.id, ts)
+                    .then(function(commits) {
+                        branchObj.parentCommitId = commits[0].id;
+                        promise = ProjectService.createRef( branchObj, projectOb.id );
+                        handlePromise(promise);
+                    });
+                } else {
+                    promise = ProjectService.createRef( branchObj, projectOb.id );
+                    handlePromise(promise);
+                }
+            } else if ($scope.itemType === 'Tag' && $scope.tag.name !== '') {
+                var tagObj = {"name": $scope.tag.name, "type": "Tag",
+                                "description": $scope.tag.description};
                 tagObj.parentRefId =  $scope.createParentRefId;
                 tagObj.id = ApplicationService.createUniqueId();
-                promise = ProjectService.createRef( tagObj, projectOb.id );
-                refJson = {
-                    name: tagObj.name,
-                    id: tagObj.id,
-                    type: $scope.itemType, 
-                    status: 'in progress', //will get status from JMS?
-                    start_time: (date.getMonth() + 1) + "/" + date.getDate() + "/" +  date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
-                };
+                if (!$scope.tag.lastCommit) {
+                    ts = $filter('date')($scope.tag.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
+                    ProjectService.getRefHistory(tagObj.parentRefId, projectOb.id, ts)
+                    .then(function(commits) {
+                        tagObj.parentCommitId = commits[0].id;
+                        promise = ProjectService.createRef( tagObj, projectOb.id );
+                        handlePromise(promise);
+                    });
+                } else {
+                    promise = ProjectService.createRef( tagObj, projectOb.id );
+                    handlePromise(promise);
+                }
             } else {
                 growl.error("Add Item of Type " + $scope.itemType + " is not supported");
                 $scope.oking = false;
                 return;
             }
-            promise.then(function(data) {
-                growl.success(displayName+" is being created.");
-                // growl.info('Please wait for a completion email prior to viewing of the '+$scope.itemType+'.', {ttl: -1});
-                refArr.push(refJson);
-                // var storeArr = refArr.toString();
-                // $window.localStorage.setItem('refArr', storeArr); 
-                $uibModalInstance.close(data); //need to figure out a way to cache this stuff
-            }, function(reason) {
-                growl.error("Create "+displayName+" Error: " + reason.message);
-            }).finally(function() {
-                $scope.oking = false;
-            });
         };
 
         $scope.cancel = function() {

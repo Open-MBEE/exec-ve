@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', '$rootScope','URLService', 'ElementService', 'UtilsService', 'CacheService', ViewService]);
+.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -16,11 +16,10 @@ angular.module('mms')
  * 
  * @description
  * Similar to the ElementService and proxies a lot of functions to it, this provides
- * CRUD for views and products/documents
+ * CRUD for views and products/documents/group
  *
- * For View and Product json object schemas, see [here](https://ems.jpl.nasa.gov/alfresco/mms/raml/index.html)
  */
-function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService) {
+function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var inProgress = {}; //only used for view elements over limit
 
     // The type of opaque element to the sysmlId of the classifierIds:
@@ -32,10 +31,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: "_17_0_5_1_407019f_1430628211976_255218_12002",
         ListT: "_17_0_5_1_407019f_1431903739087_549326_12013",
         TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
-        Figure: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
+        ImageT: "_17_0_5_1_407019f_1431903748021_2367_12034", //manual images + timely, etc
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
-        SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
+        SectionT: "_18_0_2_407019f_1435683487667_494971_14412",
+        TomSawyerDiagram: "_18_5_2_8bf0285_1506035630029_725905_15942",
+        Figure: "_18_5_2_8bf0285_1506035630979_342273_15944",
+        FigureT: "_18_5_2_8bf0285_1506035630029_725905_15942"
+    };
+
+    var AnnotationType = {
+        mmsTranscludeName: 1,
+        mmsTranscludeDoc: 2,
+        mmsTranscludeCom: 3,
+        mmsTranscludeVal: 4,
+        mmsViewLink: 5,
+        mmsPresentationElement: 6
     };
 
     function getClassifierIds() {
@@ -52,14 +63,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: 'SectionT',
         Comment: 'ParagraphT',
         List: 'ListT',
-        Image: 'Figure',
-        Equation: 'Equation'
+        Image: 'ImageT',
+        Equation: 'Equation',
+        TomSawyerDiagram: 'TomSawyerDiagram'
     };
 
     var classifierIdsIds = getClassifierIds();
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
-        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table];
-    
+        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table, TYPE_TO_CLASSIFIER_ID.Figure];
+
     var processString = function(values) {
         if (!values || values.length === 0 || values[0].type !== 'LiteralString')
             return '';
@@ -185,15 +197,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @methodOf mms.ViewService
      * 
      * @description
-     * Demote document to a view
+     * Demote document to a view and update the applied stereotype instance
      * 
      * @param {Object} elementOb A document object
      * @returns {Promise} The promise will be resolved with the downgraded view
      */
-    var downgradeDocument = function(elementOb) { //TODO fix this to update the aplied stereotype instance
+    var downgradeDocument = function(elementOb) {
         var clone = JSON.parse(JSON.stringify(elementOb));
-        clone._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
-        return ElementService.updateElement(clone)
+        clone._appliedStereotypeIds = [UtilsService.VIEW_SID];
+        var asi = {
+            id: elementOb.id + "_asi",
+            ownerId: elementOb.id,
+            classifierIds: [UtilsService.VIEW_SID],
+            type: "InstanceSpecification",
+            _projectId: elementOb._projectId,
+            _refId: elementOb._refId,
+            stereotypedElementId: elementOb.id
+        };
+        return ElementService.updateElements([clone, asi])
             .then(function(data) {
                 var cacheKey = ['documents', elementOb._projectId, elementOb._refId];
                 var index = -1;
@@ -250,6 +271,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(view) {
             var toGet = [];
             var results = [];
+            var toGetSet;
             if (view._displayedElementIds) {
                 var displayed = view._displayedElementIds;
                 if (!angular.isArray(displayed)) {
@@ -259,15 +281,39 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     toGet = displayed;
                 }
             }
-            reqOb.elementIds = toGet;
-            ElementService.getElements(reqOb, weight, update)
-            .then(function(data) {
-                results = data;
-            }, function(reason) {
+            if (view._contents && view._contents.operand) {
+                var contents = view._contents.operand;
+                for (var i = 0; i < contents.length; i++) {
+                    if (contents[i] && contents[i].instanceId) {
+                        toGet.push(contents[i].instanceId);
+                    }
+                }
+            }
+            if (view.specification) {
+                var specContents = view.specification.operand;
+                for (var j = 0; j < specContents.length; j++) {
+                    if (specContents[j] && specContents[j].instanceId) {
+                        toGet.push(specContents[j].instanceId);
+                    }
+                }
+            }
+            toGetSet = new Set(toGet);
+            $http.get(URLService.getViewElementIdsURL(reqOb))
+            .then(function(response) {
+                var data = response.data.elementIds;
+                for (var i = 0; i < data.length; i++) {
+                    toGetSet.add(data[i]);
+                }
             }).finally(function() {
-                CacheService.put(requestCacheKey, results);
-                deferred.resolve(results);
-                delete inProgress[key];
+                reqOb.elementIds = Array.from(toGetSet);
+                ElementService.getElements(reqOb, weight, update)
+                .then(function(data) {
+                    results = data;
+                }).finally(function() {
+                    CacheService.put(requestCacheKey, results);
+                    deferred.resolve(results);
+                    delete inProgress[key];
+                });
             });
         }, function(reason) {
             deferred.reject(reason);
@@ -329,7 +375,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: reqOb.projectId,
             refId: reqOb.refId,
             elementId: reqOb.parentViewId
-        }, 2).then(function(data) {  
+        }, 2).then(function(data) {
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
@@ -373,7 +419,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: reqOb.projectId,
             refId: reqOb.refId,
             elementId: reqOb.parentViewId
-        }, 2).then(function(data) {  
+        }, 2).then(function(data) {
             if (data._childViews) {
                 var clone = {
                     _projectId: data._projectId,
@@ -427,7 +473,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             refId: reqOb._refId,
             elementId: reqOb.id
         }, 2)
-        .then(function(data) {  
+        .then(function(data) {
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
@@ -492,7 +538,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (instanceVal) {
             ElementService.getElement(reqOb, 2)
-            .then(function(data) {  
+            .then(function(data) {
                 var clone = {
                     _projectId: data._projectId,
                     _refId: data._refId,
@@ -523,7 +569,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     for (var i = 0; i < operands.length; i++) {
                         if (instanceVal.instanceId === operands[i].instanceId) {
                             clone[key].operand.splice(i,1);
-                            break; 
+                            break;
                         }
                     }
                 }
@@ -579,9 +625,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         });
         */
         var instanceSpecSpec = {
-            'type': jsonType, 
-            'sourceType': 'reference', 
-            'source': newInstanceId, 
+            'type': jsonType,
+            'sourceType': 'reference',
+            'source': newInstanceId,
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
@@ -684,14 +730,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} ownerOb should contain _project and _ref, can be a parent view with _childViews
      * @param {object} viewOb can specify optional viewId, viewName, viewDoc to be used when
      *                          creating the new view, boolean isDoc indicate whether it's a document
-     * @returns {Promise} The promise will be resolved with the new view. 
+     * @param {string} peDoc optional documentation to set for pe creation
+     * @returns {Promise} The promise will be resolved with the new view.
      */
-    var createView = function(ownerOb, viewOb) {
+    var createView = function(ownerOb, viewOb, peDoc) {
         var deferred = $q.defer();
 
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
         var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
 
+        var untitledName = viewOb.isDoc ? 'Untitled Document' : 'Untitled View';
         var view = UtilsService.createClassElement({
             id: newViewId,
             type: 'Class',
@@ -700,15 +748,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: UtilsService.createValueSpecElement({
-                operand: [],
+                operand: [UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: newInstanceId})],
                 type: 'Expression',
                 id: newViewId + "_vc_expression",
                 ownerId: newViewId + "_vc"
             }),
-            name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
+            name: viewOb.viewName ? viewOb.viewName : untitledName,
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
-                (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
+                (viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
         });
@@ -726,17 +774,38 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
+        var peSpec = {
+            'type': 'Paragraph',
+            'sourceType': 'reference',
+            'source': newInstanceId,
+            'sourceProperty': 'documentation'
+        };
+        var pe = UtilsService.createInstanceElement({
+            id: newInstanceId,
+            ownerId: 'view_instances_bin_' + ownerOb._projectId,
+            name: "View Paragraph",
+            documentation: peDoc ? peDoc : '',
+            type: "InstanceSpecification",
+            classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
+            specification: UtilsService.createValueSpecElement({
+                value: JSON.stringify(peSpec),
+                type: "LiteralString",
+                id: UtilsService.createMmsId(),
+                ownerId: newInstanceId
+            }),
+            _appliedStereotypeIds: [],
+        });
         var asi = UtilsService.createInstanceElement({ //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
             documentation: '',
             name: '',
             type: 'InstanceSpecification',
-            classifierIds: [(viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
+            classifierIds: [(viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)],
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         });
-        var toCreate = [view, asi];
+        var toCreate = [pe, view, asi];
         if (parentView) {
             parentView = ElementService.fillInElement(parentView);
             toCreate.push(parentView);
@@ -768,11 +837,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @description
      * Create a new document,
      * if name isn't specified, "Untitled" will be used, a default contents with 
-     * paragraph of the view documentation will be used. 
+     * paragraph of the view documentation will be used.
      * 
      * @param {object} ownerOb see createView
      * @param {object} docOb see createView
-     * @returns {Promise} The promise will be resolved with the new view. 
+     * @returns {Promise} The promise will be resolved with the new view.
      */
     var createDocument = function(ownerOb, docOb) {
         var deferred = $q.defer();
@@ -795,7 +864,79 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#getSiteDocuments
+     * @name mms.ViewService#createGroup
+     * @methodOf mms.ViewService
+     *
+     * @description
+     * create a group depending on what the user has selected:
+     *   - if the user has not selected anything, create a group at the root level of the project
+     *   - if the user has selected a group, create a child group
+     *   - if the user has selected anything else, let the user know that they must select a group
+     * owner must be specified (parent view/document)
+     * id cannot be specified (automatically generated)
+     * if name isn't specified, "Untitled" will be used.
+     *
+     * @param {object} name group name new-doc-or-group.html
+     * @param {object} ownerOb parent id, projectId and refId
+     * @param {string} orgId parent orgId
+     * @returns {Promise} The promise will be resolved with the new group object.
+     */
+    var createGroup = function(name, ownerOb, orgId) {
+        var deferred = $q.defer();
+
+        var PACKAGE_ID = UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
+        var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
+        // Our Group package element
+        var group = UtilsService.createPackageElement(
+            {
+                "id" : PACKAGE_ID,
+                "name" : (name) ? name : "Untitled",
+                "ownerId" : ownerOb.id,
+                "_isGroup": true,
+                "_appliedStereotypeIds": [GROUP_ST_ID],
+                "appliedStereotypeInstanceId": PACKAGE_ASI_ID
+            }
+        );
+        var groupAsi = UtilsService.createInstanceElement(
+            {
+                "classifierIds" : [GROUP_ST_ID],
+                "id" : PACKAGE_ASI_ID,
+                "ownerId" : PACKAGE_ID,
+                "visibility" : null,
+                "stereotypedElementId" : PACKAGE_ID
+            }
+        );
+        var toCreate = [group, groupAsi];
+        var reqOb = {
+            projectId: ownerOb._projectId,
+            refId: ownerOb._refId,
+            elements: toCreate
+        };
+        ElementService.createElements(reqOb)
+            .then(function(data) {
+                var cacheKey = ['groups', ownerOb._projectId, ownerOb._refId];
+                var groupObj = _.find(data, {id: PACKAGE_ID});
+                if (groupObj) {
+                    groupObj._parentId = ownerOb.id.indexOf('holding') != -1 ? null : ownerOb.id;
+                    groupObj._link = '/share/page/repository#filter=path|/Sites/' + orgId + '/documentLibrary/' + groupObj._projectId + '/' + groupObj.id;
+                    if (CacheService.exists(cacheKey)) {
+                        CacheService.get(cacheKey).push(groupObj);
+                    }
+                    CacheService.put(['group', groupObj.projectId, groupObj.refId, groupObj.id], groupObj, true);
+                    deferred.resolve(groupObj);
+                } else {
+                    deferred.reject({status: 500, message: "Failed to create group"});
+                }
+            }, function(reason) {
+                console.log('POST failed:', reason);
+                deferred.reject(reason);
+            });
+        return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getProjectDocuments
      * @methodOf mms.ViewService
      * 
      * @description
@@ -817,7 +958,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             deferred.resolve(CacheService.get(cacheKey));
         } else {
             ElementService.getGenericElements(url, reqOb, 'documents', weight, update).
-            then(function(data) {              
+            then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
                 deferred.reject(reason);
@@ -847,7 +988,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (type === 'LiteralString') { // If it is a Opaque List, Paragraph, Table, Image, List:
             var jsonString = instanceSpecSpec.value;
-            return JSON.parse(jsonString); 
+            return JSON.parse(jsonString);
         } else if (type === 'Expression') { // If it is a Opaque Section, or a Expression:
             // If it is a Opaque Section then we want the instanceSpec:
             if (isSection(instanceSpec)) {
@@ -893,7 +1034,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var elementObject = {};
-
         elementObject.instanceId = instanceVal.instanceId;
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
@@ -940,7 +1080,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {boolean} whether it's a section
      */
     var isSection = function(instanceSpec) {
-        return instanceSpec.classifierIds && 
+        return instanceSpec.classifierIds &&
                instanceSpec.classifierIds.length > 0 &&
                (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Section ||
                 instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
@@ -956,8 +1096,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var isFigure = function(instanceSpec) {
         return instanceSpec.classifierIds && 
                instanceSpec.classifierIds.length > 0 &&
-               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
-                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image);
+               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.ImageT ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image || 
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.FigureT);
     };
 
     var isEquation = function(instanceSpec) {
@@ -1030,11 +1172,28 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var reset = function() {
         inProgress = {};
     };
-    
+
+    var getTypeFromClassifierId = function(classifierIds) {
+        var type = '';
+        if ( classifierIds && classifierIds.length > 0) {
+            Object.keys(TYPE_TO_CLASSIFIER_ID).some(function(key) {
+                if(TYPE_TO_CLASSIFIER_ID[key] === classifierIds[0]) {
+                    type = key;
+                    return true;
+                }
+                return false;
+            });
+        }
+        return type;
+    };
+
+
     return {
+        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
+        createGroup: createGroup,
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
         getDocumentViews: getDocumentViews,
@@ -1050,10 +1209,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeElementFromViewOrSection: removeElementFromViewOrSection,
         removeViewFromParentView: removeViewFromParentView,
         createInstanceSpecification: createInstanceSpecification,
-        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
+        getTypeFromClassifierId: getTypeFromClassifierId,
         getElementReferenceTree : getElementReferenceTree,
         getDocMetadata: getDocMetadata,
-        reset: reset
+        reset: reset,
+        AnnotationType: AnnotationType
     };
 
 }

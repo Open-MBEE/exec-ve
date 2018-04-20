@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', 'growl', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils) {
+function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils, growl) {
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
@@ -20,6 +20,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
                 $scope.buttonsInit = true;
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
                 $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
@@ -51,6 +52,12 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             // do nothing
         };
 
+        if (scope.section.specification && scope.section.specification.operand) {
+            var dups = Utils.checkForDuplicateInstances(scope.section.specification.operand);
+            if (dups.length > 0) {
+                growl.warning("There are duplicates in this section, dupilcates ignored!");
+            }
+        }
         domElement.append(defaultTemplate);
         $compile(domElement.contents())(scope);
 
@@ -97,6 +104,10 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
 
             scope.save = function() {
                 Utils.saveAction(scope, domElement, false);
+            };
+
+            scope.saveC = function() {
+                Utils.saveAction(scope, domElement, true);
             };
 
             scope.cancel = function() {

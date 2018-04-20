@@ -1,0 +1,88 @@
+
+/*------------------------------------------------------------------
+[VE Table Filter Table of Contents]
+
+1. Top Level Buttons
+2. Filter 
+  2.1 Layout
+  2.2 Buttons
+  2.3 Input
+  2.4 Status text
+
+-------------------------------------------------------------------*/
+
+.ve-table-filter{
+
+/*------------------------------------------------------------------
+1. Top Level Buttons
+-------------------------------------------------------------------*/
+  .export-csv-button.btn,
+  .filter-table-button.btn,
+  .reset-sort-button.btn {
+    margin: 30px 0 6px;
+    font-weight:500;
+  }
+
+/*------------------------------------------------------------------
+2. Filter
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+  2.1 Layout
+-------------------------------------------------------------------*/
+  .ve-show-filter{
+    margin: 12px 0 4px;
+    min-width:730px;
+  }
+
+/*------------------------------------------------------------------
+  2.2 Buttons
+-------------------------------------------------------------------*/
+  .ve-apply-filter{
+    display: inline;
+    height: 36px;
+    padding: 0px 6px;
+    margin: 0 6px;
+    box-sizing: border-box;
+    vertical-align: bottom;
+  }
+
+  .ve-reset-search{
+    background-color: $ve-clear;
+    color: $ve-silver-darker-1;
+    font-size: 1.2em;
+    margin-left: -1.2em;
+    padding: 0;
+    position: absolute;
+    border: 0;
+    margin-top: .18em;
+  }
+
+  .ve-reset-search:hover{
+    color:$ve-silver-darker-2;
+  }
+
+/*------------------------------------------------------------------
+  2.3 Input
+-------------------------------------------------------------------*/
+  .ve-filter-table-form{
+    input{
+    border-radius:3px;
+    border:1px solid $ve-silver-darker-2;
+    height: 36px;
+    padding: 0px 6px;
+    display: inline;
+    box-sizing: border-box;
+    }
+  }
+
+/*------------------------------------------------------------------
+  2.4 Status text
+-------------------------------------------------------------------*/
+  .ve-filter-status{
+    display:block;
+    margin: 10px 0;
+    color:$ve-light-text;
+  }
+}
+

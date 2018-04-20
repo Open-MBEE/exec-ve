@@ -17,7 +17,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/tableExport.html',
-            controller: function($scope, $uibModalInstance, type) {
+            controller: ["$scope", "$uibModalInstance", "type", function($scope, $uibModalInstance, type) {
                 $scope.type = type;
                 $scope.export = function() {
                     $uibModalInstance.close('export');
@@ -25,7 +25,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.cancel = function() {
                     $uibModalInstance.dismiss();
                 };
-            },
+            }],
             resolve: {
                 type: function() { return isDoc ? 'DOCUMENT' : 'VIEW';}
             },
@@ -97,26 +97,37 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         });
     };
 
-    /*
-        ob = document or view object
-        refOb = reference object
-        refOb = reference object
-        isDoc = if ob is view or doc
-        mode: 1 = browser print, 2 = word, 3 = pdf
-    */
+    /**
+     * @ngdoc method
+     * @name mmsApp.MmsAppUtils#printModal
+     * @methodOf mmsApp.MmsAppUtils
+     *
+     * @description
+     * Click handler for print and export buttons. Opens modal or print 
+     * confirmation and options to select from
+     *
+     * @param {Object} viewOrDocOb current document or view object
+     * @param {Object} refOb current branch/tag object
+     * @param {Boolean} isDoc viewOrDocOb is view or doc
+     * @param {Number} mode 1 = print, 2 = word, 3 = pdf
+     * @returns {Promise} The promise returned from UtilsService.exportHtmlAs - server response
+     *
+     */
     var printModal = function(viewOrDocOb, refOb, isDoc, mode) {
         var deferred = $q.defer();
         var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/printConfirm.html',
-            controller: function($scope, $uibModalInstance) {
+            controller: ["$scope", "$uibModalInstance", function($scope, $uibModalInstance) {
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
-                $scope.action = 'print';
-                $scope.genpdf = false;
-                $scope.meta = {
-                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
-                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
-                };
+                $scope.action = mode === 1 ? 'print' : mode === 3 ? 'generate pdf' : 'generate word';
+                $scope.label = mode === 3 ? 'pdf' : mode === 2 ? 'word' : '';
+                $scope.mode = mode;
+                $scope.meta = {};
                 if (isDoc) {
+                    $scope.meta = {
+                        'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
+                        'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
+                    };
                     ViewService.getDocMetadata({
                         elementId: viewOrDocOb.id,
                         projectId: viewOrDocOb._projectId,
@@ -143,14 +154,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                     });
                 }
                 $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
-                if (mode === 2) {
-                    $scope.action = 'save';
-                }
-                if (mode === 3) {
-                    $scope.action = 'generate pdf';
-                    $scope.genpdf = true;
-                }
-                $scope.docOption = (!isDoc && mode === 3);
+                $scope.docOption = (!isDoc && (mode === 3 || mode === 2));
                 $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
                 $scope.print = function() {
                     $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]);
@@ -161,72 +165,44 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.cancel = function() {
                     $uibModalInstance.dismiss();
                 };
-            },
+            }],
             backdrop: 'static',
             keyboard: false
         });
+        /* choice:
+        ['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]
+        [0] 'ok' - modal button to confirm print/export
+        [1] Generate cover page option
+        [2] Generate List of Tables and Figures option
+        [3] HTML option checked - used to generate ToC from html
+        [4] Landscape option
+        [5] metadata:
+            bottom, bottom-left, bottom-right, top, top-left, top-right
+        */
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
                 printOrGenerate(viewOrDocOb, refOb, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[4], choice[5]);
-                    var cover = result.cover;
-                    var toc = result.toc;
-                    var tof = result.tof;
-                    var tot = result.tot;
-                    var toe = result.toe;
-                    var contents = result.contents;
-                    if (mode === 1 || mode === 2) {
-                        var inst = '';
-                        if (mode === 2) {
-                            inst = "<div>(Copy and paste into Word)</div>";
-                        }
+                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3], choice[4], choice[5]);
+                    result.toe = choice[3] ? '' : result.toe;
+                    if (mode === 1) {
                         var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
                         popupWin.document.open();
-                        popupWin.document.write('<html><head><style>' + css + '</style></head><body style="overflow: auto">' + inst + cover + toc + tot + tof + toe + contents + '</body></html>');
+                        popupWin.document.write('<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
                         popupWin.document.close();
-                        if (mode === 1) {
-                            $timeout(function() {
-                                popupWin.print();
-                            }, 1000, false);
-                        }
-                    } else { //TODO server changes for doc object
-                        var doc = {
-                            docId: viewOrDocOb.id,
-                            header: result.header,
-                            footer: result.footer,
-                            html: result.contents,
-                            cover: result.cover,
-                            time: result.displayTime,
-                            displayTime: result.displayTime,
-                            toc: result.toc,
-                            tof: result.tof + result.toe,
-                            tot: result.tot,
-                            dnum: result.dnum,
-                            workspace: refOb.id,
-                            customCss: css,
-                            version: result.version,
-                            name: viewOrDocOb.id + '_' + refOb.id + '_' + new Date().getTime(),
-                            disabledCoverPage: isDoc ? false : true
-                        };
-                        if (!choice[2]) {
-                            doc.tof = '<div style="display:none;"></div>';
-                            doc.tot = '<div style="display:none;"></div>';
-                        } else if (choice[3]) { //let server scrape html for now
-                            doc.tof = '';
-                            doc.tot = '';
-                        }
-                        //TODO this might need to be updated
-                        if (refOb.type != 'Tag')
-                            doc.tagId = 'Latest';
-                        else
-                            doc.tagId = refOb.name;
-                        UtilsService.convertHtmlToPdf(doc, viewOrDocOb._projectId, viewOrDocOb._refId)
-                        .then(function(reuslt) {
-                            deferred.resolve(result);
-                        }, function(reason){
-                            deferred.reject(reason);
-                        });
+                        $timeout(function() {
+                            popupWin.print();
+                        }, 1000, false);
+                    } else {
+                        result.tof = choice[2] ? result.tof + result.toe : '';
+                        result.tot = choice[2] ? result.tot : '';
+                        var htmlString = ['<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">', css, '</style></head><body>', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
+                        UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId, css: css})
+                            .then(function(reuslt) {
+                                deferred.resolve(result);
+                            }, function(reason){
+                                deferred.reject(reason);
+                            });
                     }
                 });
             } else {
@@ -234,34 +210,44 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $rootScope.ve_bbApi.setToggleState('tree-full-document', true);
                 $state.go('project.ref.document.full', {search: undefined});
             }
-        }, function() {
-            deferred.reject();
         });
         return deferred.promise;
     };
 
-    /*
-        ob = document or view object
-        ws = workspace id
-        time = timestamp or latest
-        tag = tag object
-        isDoc = ob is view or doc
-        genCover = generate default cover page
-        genTotf = whether to gen table of figures and tables
-        mode: 1 = print, 2 = word, 3 = pdf
-        returns promise that resolves with
-        {
-            cover: cover page html
-            contents: main content html
-            header: header string or ''
-            footer: footer string or ''
-            displayTime: human readable time
-            dnum: document d number
-            version: version string from doc tag
-            toc: toc html
-            tag: tagname or ''
-        }
-    */
+
+    /**
+     * @ngdoc method
+     * @name mmsApp.MmsAppUtils#printOrGenerate
+     * @methodOf mmsApp.MmsAppUtils
+     *
+     * @description
+     * Called by printModal to handle cleanup and building content needed for 
+     * print, PDF or word export.
+     * Cleansup html i.e. removes mms errors, no-print, ng-hide
+     *
+     * @param {Object} viewOrDocOb current document or view object
+     * @param {Object} refOb current branch/tag object
+     * @param {Boolean} isDoc viewOrDocOb is view or doc
+     * @param {Boolean} genCover generate default cover page (option from the modal form)
+     * @param {Boolean} genTotf whether to gen table of figures and tables (option from the modal form)
+     * @param {Boolean} htmlTotf include DocGen generated tables and rapid tables (option from the modal form)
+     * @param {Number} mode 1 = print, 2 = word, 3 = pdf
+     * @param {Boolean} landscape PDF in lanscape vie (option from the modal form)
+     * @returns {Promise} The promise returns object with content needed for print/word export/PDf generation
+     * <pre>
+     * {
+     *      cover: cover page html
+     *      contents: main content html
+     *      header: header string or ''
+     *      footer: footer string or ''
+     *      displayTime: human readable time
+     *      dnum: document d number
+     *      version: version string from doc tag
+     *      toc: toc html
+     *      tag: tagname or ''
+     * }
+     * </pre>
+     */
     var printOrGenerate = function(viewOrDocOb, refOb, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
         var deferred = $q.defer();
         var printContents = '';
@@ -272,7 +258,12 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             }
             return '';
         });
+        // Conversion of canvas to its dataUrl must be done before "clone", because "clone" doesn't preserve
+        // canvas' content
+        var mapping = storeTomsawyerDiagramAsImg(printElementCopy);
         printElementCopy = printElementCopy.clone();
+        replaceMmsTsDiagramWithImg(printElementCopy, mapping);
+
         var hostname = $location.host();
         var port = $location.port();
         var protocol = $location.protocol();
@@ -281,6 +272,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
         var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        UtilsService.convertViewLinks(printElementCopy);
         if (genTotf) {
             tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         }
@@ -304,18 +296,21 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             return old;
         });
 
-        UtilsService.convertViewLinks(printElementCopy);
+        // Remove comments, table features, and all elements with classes: mms-error, no-print, ng-hide
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
         printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
+
+        // word doesn't support svg only png.
         if (mode === 2) {
             printElementCopy.find('.mms-svg').remove();
         } else {
             printElementCopy.find('.mms-png').remove();
         }
+        // Remove all empty paragraphs
         printElementCopy.find('p:empty').remove();
         printElementCopy.find('p').each(function() {
             var $this = $(this);
@@ -442,6 +437,29 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     var refreshNumbering = function(tree, centerElement) {
         UtilsService.makeTablesAndFiguresTOC(tree, centerElement, true, false);
     };
+
+    /** Store all tomsawyer diagram(canvas) as an img element **/
+    function storeTomsawyerDiagramAsImg(originalDom) {
+        var mapping = {};
+        originalDom.find('mms-ts-diagram').each(function(index){
+            var tsDom = $(this);
+            var canvas = tsDom.find('canvas')[0];
+            if(canvas) {
+                var imgElement = $('<img>');
+                imgElement.attr({'src': canvas.toDataURL(), 'width': '100%' });
+                mapping[index] = imgElement;
+            }
+        });
+        return mapping;
+    }
+
+    /** Replace all mms-ts-diagram elements with their corresponding img elements **/
+    function replaceMmsTsDiagramWithImg(element, mapping) {
+        element.find('mms-ts-diagram').each(function(index) {
+           var imgDom = mapping[index];
+           $(this).replaceWith(imgDom);
+        });
+    }
 
     return {
         printModal: printModal,

@@ -22,9 +22,9 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  * @param {boolean=false} nonEditable can edit inline or not
+ * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  */
 function mmsCf($compile) {
-
     var mmsCfCtrl = function($scope) {
         //INFO this was this.getWsAndVersion
         this.getElementOrigin = function() {
@@ -40,11 +40,14 @@ function mmsCf($compile) {
         var mmsCfCtrl = controllers[0];
         var mmsViewCtrl = controllers[1];
 
-        var idwatch = scope.$watch('mmsElementId', function(newVal, oldVal) {
+        var changeElement = function(newVal, oldVal) {
             if (!newVal) {
                 return;
             }
-            idwatch();
+            if (!scope.mmsWatchId) {
+                idwatch();
+                commitwatch();
+            }
             var projectId = scope.mmsProjectId;
             var refId = scope.mmsRefId;
             var commitId = scope.mmsCommitId;
@@ -66,14 +69,21 @@ function mmsCf($compile) {
                 if (!commitId)
                     commitId = viewVersion.commitId;
             }
+            if (!projectId) {
+                return;
+            }
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
+            scope.templateElementHtml = domElement[0].innerHTML;
             if (scope.mmsCfType) {
-                domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable"></<mms-transclude-'+scope.mmsCfType+'>';
+                domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable" mms-cf-label="{{templateElementHtml}}"></mms-transclude-'+scope.mmsCfType+'>';
                 $compile(domElement.contents())(scope);
             }
-        });
+        };
+
+        var idwatch = scope.$watch('mmsElementId', changeElement);
+        var commitwatch = scope.$watch('mmsCommitId', changeElement);
     };
 
     return {
@@ -84,7 +94,8 @@ function mmsCf($compile) {
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsCfType: '@',
-            nonEditable: '<',
+            mmsWatchId: '@',
+            nonEditable: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
         controller: ['$scope', mmsCfCtrl],

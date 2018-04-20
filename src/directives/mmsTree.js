@@ -246,7 +246,7 @@ function mmsTree($timeout, $log, $templateCache) {
         var on_initialSelection_change = function() {
             if (scope.initialSelection) {
                 for_each_branch(function(b) {
-                    if (b.data.id === scope.initialSelection || b.data._id === scope.initialSelection) {
+                    if (b.data.id === scope.initialSelection) {
                         select_branch(b, true);
                     }
                 });
@@ -313,6 +313,9 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
                 
                 branch.section = section;
+                if (branch.data && branch.data.id) {
+                    branch.data._veNumber = section;
+                }
                 if (branch.hide)
                     visible = false;
                 scope.tree_rows.push({
@@ -336,9 +339,9 @@ function mmsTree($timeout, $log, $templateCache) {
                         var sectionValue = '';
                         if (section === '')
                             sectionChar = '';
-                        if (branch.children[i].type === 'section')
-                            add_branch_to_list(level + 1, '§ ', branch.children[i], child_visible);
-                        else if (branch.children[i].type === 'figure' || branch.children[i].type === 'table' || branch.children[i].type === 'equation') {
+                        //if (branch.children[i].type === 'section')
+                        //    add_branch_to_list(level + 1, '§ ', branch.children[i], child_visible);
+                        if (branch.children[i].type === 'figure' || branch.children[i].type === 'table' || branch.children[i].type === 'equation') {
                             add_branch_to_list(level + 1, '', branch.children[i], child_visible);
                         } else {
                             j++;
@@ -380,7 +383,7 @@ function mmsTree($timeout, $log, $templateCache) {
 
         if (attrs.initialSelection) {
             for_each_branch(function(b) {
-                if (b.data.id === attrs.initialSelection || b.data._id === attrs.initialSelection) {
+                if (b.data.id === attrs.initialSelection) {
                     $timeout(function() {
                         select_branch(b);
                     });
@@ -696,6 +699,10 @@ function mmsTree($timeout, $log, $templateCache) {
              */
             tree.refresh = function() {
                 on_treeData_change();
+            };
+
+            tree.initialSelect = function() {
+                on_initialSelection_change();
             };
 
             tree.sort_branch = function(b, sortFunction) {

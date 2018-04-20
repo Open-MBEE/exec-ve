@@ -12,7 +12,7 @@ function mmsViewPlot($compile) {
         },
         link: function(scope, domElement, element, attrs) {
             if ( scope.plot.type === "Plot") {
-                domElement[0].innerHTML = '<figure><mms-' + scope.plot.ptype + '-plot splot="{{plot}}"></mms-' + scope.plot.ptype + '-plot><figcaption>{{plot.title}}</figcaption></figure>';
+                domElement[0].innerHTML = '<figure><mms-' + scope.plot.ptype + '-plot plot="plot"></mms-' + scope.plot.ptype + '-plot><figcaption>{{plot.title}}</figcaption></figure>';
                 $compile(domElement.contents())(scope);
             }
 
