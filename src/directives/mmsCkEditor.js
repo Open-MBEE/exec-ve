@@ -476,24 +476,9 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 if (e.data.keyCode == (CKEDITOR.CTRL + 192)) { //little tilde
                     autocompleteCallback(instance);
                 } else { 
-                    if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
-                        //trying to prevent tab and shift tab jumping focus out of editor, prevent shift tab doesn't seem to work
-                        e.data.domEvent.stopPropagation();
-                        e.data.domEvent.preventDefault();
-                        e.cancel();
-                        e.stop();
-                    }
                     deb(e); 
                 }
             }, null, null, 31); //priority is after indent list plugin's event handler
-            /*instance.on('contentDom', function(e) {
-                instance.document.on('key', function(e) {
-                    e.stop();
-                    e.cancel();
-                    e.data.domEvent.stopPropagation();
-                    e.data.domEvent.preventDefault();
-                });
-            });*/
             if (scope.mmsEditorApi) {
                 scope.mmsEditorApi.save = function() {
                     update();
