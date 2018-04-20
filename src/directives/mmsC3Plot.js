@@ -101,8 +101,6 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
     }//end of vf_pplot()
   
     scope.render = function() {
-      console.log("C3plot>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-      console.log(scope.plot);
       TableService.readvalues(scope.plot, projectId, refId, commitId)
        .then( function(value){
           scope.valuesO = value.tablebody.valuesO; //value objects used in watch
