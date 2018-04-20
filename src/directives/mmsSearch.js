@@ -31,7 +31,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
         scope.itemsPerPage = 50;
         scope.showSearchResultProps = false;
         scope.switchText = 'More';
-        scope.limitForProps = 3;
+        scope.limitForProps = 6;
         scope.advanceSearch = false;
         scope.advanceSearchRows = [];
         scope.docsviews = {
