@@ -319,7 +319,7 @@ CKEDITOR.MmsAutosavePlugin =
         var compressedJSON = LZString.compressToUTF16(JSON.stringify({ data: editorInstance.getData(), saveTime: new Date(), isAutosaveContent: true }));
 
         var quotaExceeded = _trySavingContentToLocalStorage(localStorage, moment, LZString, config.NotOlderThen, autoSaveKey, compressedJSON);
-
+        /*
         if (quotaExceeded) {
             console.log(editorInstance.lang.autosave.localStorageFull);
             var notificationError = new CKEDITOR.plugins.notification(editorInstance, { message: editorInstance.lang.autosave.localStorageFull, type: 'warning',  duration:5000 });
@@ -348,6 +348,7 @@ CKEDITOR.MmsAutosavePlugin =
                 _changeAutosavePopupStyle(editorInstance, notification);
             }
         }
+        */
     }   
 
     function _changeAutosavePopupStyle(editorInstance, notification) {
