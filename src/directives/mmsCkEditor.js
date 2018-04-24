@@ -403,7 +403,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
         // var customToolbar =   { name: 'custom',   items: [ 'Mmscf','mmsreset','Mmscomment','Mmsvlink','Mmssignature' ] };
-        var customToolbar =   { name: 'custom',   items: [ 'MMSInsertMenu', 'Mmssignature'] };
+        var customToolbar =   { name: 'custom',   items: [ 'MMSInsertMenu'] };
         var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
 
         //Set toolbar based on editor type
