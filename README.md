@@ -36,6 +36,7 @@ https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUser
   * _grunt release:a_ : same thing as above but with a different server's url that you want. Make sure that "a" exists in the angular-mms-grunt-servers.json.
   * _grunt deploy_ : to build and bundle the app in production modes, generate documentation and publish the final artifact to Artifactory.
   * _grunt test_ : to run unit tests
+7. To deploy, zip up the dist folder, it can be served as static files from a web server. For convenience, can unzip it to where mms is hosted (ex. {tomcatDir}/webapps/ve, {mmshost}/ve/mms.html to access)
 
 For more information, please consult the Gruntfile.js and the links at the bottom.
 
