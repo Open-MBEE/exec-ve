@@ -357,8 +357,6 @@ module.exports = function(grunt) {
         },
         continuous:{
           configFile:'config/develop/karma.develop.conf.js',
-          singleRun: true,
-          browsers: ['Chrome'],
           logLevel: 'ERROR'
         }
     },
