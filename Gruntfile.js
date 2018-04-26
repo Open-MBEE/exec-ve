@@ -218,37 +218,6 @@ module.exports = function(grunt) {
         dest: 'dist/jsTemp/app.tpls.js'
       }
     },
-
-      concat: {
-          combineCustomJS: {
-              options: {
-                  banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
-                  wrap: 'mms',
-                  mangle: true,
-                  sourceMap: {
-                      includeSources: true
-                  }
-              },
-              files: {
-                  'dist/js/ve-mms.min.js': [
-
-                      // mms module
-                      'src/mms.js',
-                      'src/services/*.js',
-
-                      // mms.directives module (need mms, mms.directives.tpls.js module )
-                      'dist/jsTemp/mms.directives.tpls.js',
-                      'src/mms.directives.js',
-                      'src/directives/**/*.js',
-
-                      // app module ( need app.tpls.js, mms, mms.directives module )
-                      'dist/jsTemp/app.tpls.js',
-                      'app/js/mms/app.js',
-                      'app/js/mms/controllers/*.js',
-                      'app/js/mms/directives/*.js'
-                  ]
-              }
-          }},
     /** Concat + Minify JS files **/
     uglify: {
       combineCustomJS: {
@@ -389,7 +358,7 @@ module.exports = function(grunt) {
         continuous:{
           configFile:'config/develop/karma.develop.conf.js',
           singleRun: true,
-          browsers: ['PhantomJS'],
+          browsers: ['Chrome'],
           logLevel: 'ERROR'
         }
     },
@@ -417,7 +386,7 @@ module.exports = function(grunt) {
   grunt.registerTask('install', 'bower-install-simple');
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('processAppStyleSheets', ['sass', 'cssmin']);
-  grunt.registerTask('processAppJS', ['html2js', 'concat:combineCustomJS']);
+  grunt.registerTask('processAppJS', ['html2js', 'uglify:combineCustomJS']);
   grunt.registerTask('processExternalDeps', ['wiredep', 'useminPrepare', 'concat:generated', 'cssmin:generated', 'uglify:generated', 'usemin']);
 
   // for dev mode, we don't need to minify vendor files because it slows down the build process
