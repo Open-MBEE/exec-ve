@@ -3,6 +3,7 @@
   "description": "mms ve module",
   "repository": "https://github.com/Open-MBEE/EMS-Webapp.git",
   "devDependencies": {
+    "babel-polyfill": "^6.26.0",
     "compression": "^1.7.1",
     "connect-livereload": "^0.6.0",
     "grunt": "^1.0.1",
