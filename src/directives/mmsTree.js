@@ -271,7 +271,7 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
             });
             scope.tree_rows = [];
-            var add_branch_to_list = function(level, section, branch, visible) {
+            var add_branch_to_list = function(level, section, branch, visible, peNums) {
                 var expand_icon = "";
                 var type_icon = "";
                 var aggr = branch.aggr;
@@ -314,16 +314,26 @@ function mmsTree($timeout, $log, $templateCache) {
                 if (scope.options && scope.options.statuses && scope.options.statuses[branch.status]) {
                     status_properties = scope.options.statuses[branch.status];
                 }
-                
-                branch.section = section;
-                if (branch.data && branch.data.id) {
-                    branch.data._veNumber = section;
+                var number = section.join('.');
+                if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
+                    peNums[branch.type]++;
+                    peNums[branch.type + 'All']++;
+                    if (section.length > 1) {
+                        number = section[0] + '.' + section[1] + '-' + peNums[branch.type];
+                    } else {
+                        number = section[0] + '.0-' + peNums[branch.type]; 
+                    }
+                } else if (branch.type !== 'view' && branch.type !== 'section') {
+                    number = '';
+                }
+                if (branch.data && branch.data.id && scope.sectionNumbering) {
+                    branch.data._veNumber = number;
                 }
                 if (branch.hide)
                     visible = false;
                 scope.tree_rows.push({
                     level: level,
-                    section: section,
+                    section: number,
                     branch: branch,
                     label: branch.label,
                     expand_icon: expand_icon,
@@ -338,21 +348,21 @@ function mmsTree($timeout, $log, $templateCache) {
                     }
                     for (i = 0, j = 0; i < branch.children.length; i++) {
                         var child_visible = visible && branch.expanded;
-                        var sectionChar = '.';
-                        var sectionValue = '';
-                        if (section === '')
-                            sectionChar = '';
                         //if (branch.children[i].type === 'section')
                         //    add_branch_to_list(level + 1, '§ ', branch.children[i], child_visible);
                         if (branch.children[i].type === 'figure' || branch.children[i].type === 'table' || branch.children[i].type === 'equation') {
-                            add_branch_to_list(level + 1, '', branch.children[i], child_visible);
+                            add_branch_to_list(level + 1, section, branch.children[i], child_visible, peNums);
                         } else {
                             j++;
                             if (scope.sectionNumbering) {
-                                sectionValue = section + sectionChar + j;
-                                add_branch_to_list(level + 1, sectionValue, branch.children[i], child_visible);
+                                var nextSection = [].concat(section); 
+                                nextSection.push(j);
+                                if (nextSection.length < 3) {
+                                    peNums.table = 0; peNums.figure = 0; peNums.equaton = 0;
+                                }
+                                add_branch_to_list(level + 1, nextSection, branch.children[i], child_visible, peNums);
                             } else
-                                add_branch_to_list(level + 1, '', branch.children[i], child_visible);
+                                add_branch_to_list(level + 1, [], branch.children[i], child_visible, peNums);
                         }
                     }
                 }
@@ -363,7 +373,7 @@ function mmsTree($timeout, $log, $templateCache) {
             }
 
             for (var i = 0; i < scope.treeData.length; i++) {
-                add_branch_to_list(1, '', scope.treeData[i], true);
+                add_branch_to_list(1, [], scope.treeData[i], true, {figure: 0, table: 0, equation: 0, figureAll: 0, tableAll: 0, equationAll: 0});
             }
 
         };

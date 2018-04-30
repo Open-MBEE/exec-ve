@@ -28,7 +28,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
             }
         };
 
-        var html = UtilsService.makeHtmlTable(scope.table, true, true );
+        var html = UtilsService.makeHtmlTable(scope.table, true, true, scope.mmsPe);
         html = '<div class="tableSearch ve-table-filter">' +
                 '<button class="btn btn-sm export-csv-button btn-default" ng-click="doClick()">Export CSV</button> ' +
                 '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
@@ -68,6 +68,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         $compile(thead)(scope);
         var searchbar = element.children('div');
         $compile(searchbar)(scope);
+        $compile(element.find('caption'))(scope);
         //Add the search input here (before the TRS, aka the columns/rows)
         var tbody = element.children('table').children('tbody');
         var trs = tbody.children('tr');
@@ -418,7 +419,8 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
     return {
         restrict: 'E',
         scope: {
-            table: '<mmsTable'
+            table: '<mmsTable',
+            mmsPe: '<'
         },
         controller: mmsViewTableController,
         link: mmsViewTableLink
