@@ -201,17 +201,27 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             });
         };
 
-        var transcludeViewLinkCtrl = function($scope, $uibModalInstance) {
+        var transcludeViewLinkCtrl = function($scope, $uibModalInstance, ApplicationService) {
             $scope.title = 'INSERT VIEW LINK';
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
             $scope.choose = function(elem) {
                 var did = null;
                 var vid = null;
                 var peid = null;
+                var currentDoc = ApplicationService.getState().currentDoc;
                 if (elem._relatedDocuments && elem._relatedDocuments.length > 0) {
-                    did = elem._relatedDocuments[0].id;
-                    if (elem._relatedDocuments[0]._parentViews.length > 0)
-                        vid = elem._relatedDocuments[0]._parentViews[0].id;
+                    var cur = _.find(elem._relatedDocuments, {id: currentDoc});
+                    if (cur) {
+                        did = currentDoc;
+                        if (cur._parentViews.length > 0) {
+                            vid = cur._parentViews[0].id;
+                        }
+                    } else {
+                        did = elem._relatedDocuments[0].id;
+                        if (elem._relatedDocuments[0]._parentViews.length > 0) {
+                            vid = elem._relatedDocuments[0]._parentViews[0].id;
+                        }
+                    }
                 }
                 if (elem.type === 'InstanceSpecification') {
                     if (ViewService.isSection(elem))
@@ -287,7 +297,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$uibModalInstance', transcludeViewLinkCtrl],
+                controller: ['$scope', '$uibModalInstance', 'ApplicationService', transcludeViewLinkCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {

@@ -460,9 +460,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} isSortable table content
      * @returns {string} generated html string
      */
-    var makeHtmlTable = function(table, isFilterable, isSortable) {
+    var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
         var result = ['<table class="table table-bordered table-condensed">'];
-        if (table.title) {
+        if (ApplicationService.getState().inDoc) {
+            result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
+        } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
         }
         if (table.colwidths && table.colwidths.length > 0) {
@@ -766,20 +768,23 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      */
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
         var sysmlId = child.data.id;
+        var veNumber = child.data._veNumber;
+        var prefix = '';
         var el = printElement.find('#' + sysmlId);
         var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
         var name = '';
         if (child.type === 'table') {
-            ob.tableCount++;
+            //ob.tableCount++;
+            prefix = 'Table ' + veNumber + '. ';
             var capTbl = el.find('table > caption');
             name = capTbl.text();
             if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf('. ') + 2);
+                name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
                 name = child.data.name;
             }
-            cap = ob.tableCount + '. ' + name;
+            cap = veNumber + '. ' + name;
             ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capTbl.html('Table ' + cap);
             // If caption does not exist, add to html
@@ -787,10 +792,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 el.find('table').prepend('<caption>Table ' + cap + '</caption>');
             }
             // Change cap value based on showRefName true/false
-            if (showRefName) {
-                cap = ob.tableCount + '. ' + child.data.name;
-            } else {
-                cap = ob.tableCount;
+            if (!showRefName) {
+                cap = veNumber;
             }
             if (live) {
                 refs.find('a').html('Table ' + cap);
@@ -799,15 +802,16 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
         if (child.type === 'figure') {
-            ob.figureCount++;
+            //ob.figureCount++;
+            prefix = 'Figure ' + veNumber + '. ';
             var capFig = el.find('figure > figcaption');
             name = capFig.text();
             if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf('. ') + 2);
+                name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
                 name = child.data.name;
             }
-            cap = ob.figureCount + '. ' + name;
+            cap = veNumber + '. ' + name;
             ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capFig.html('Figure ' + cap);
             // If caption does not exist, add to html
@@ -815,10 +819,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
             }
             // Change cap value based on showRefName true/false
-            if (showRefName) {
-                cap = ob.figureCount + '. ' + child.data.name;
-            } else {
-                cap = ob.figureCount;
+            if (!showRefName) {
+                cap = veNumber;
             }
             if (live) {
                 refs.find('a').html('Fig. ' + cap);
@@ -827,21 +829,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
         if (child.type === 'equation') {
-            ob.equationCount++;
-            cap = ob.equationCount + '. ' + child.data.name;
+            //ob.equationCount++;
+            cap = veNumber + '. ' + child.data.name;
             ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
-            var equationCap = '(' + ob.equationCount + ')';
+            var equationCap = '(' + veNumber + ')';
             var capEq = el.find('.mms-equation-caption');
             capEq.html(equationCap);
             // If caption does not exist, add to html
             if (capEq.length === 0) {
                 el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
-            }
-            // Change cap value based on showRefName true/false
-            if (showRefName) {
-                cap = ob.equationCount + '. ' + child.data.name;
-            } else {
-                cap = ob.equationCount;
             }
             if (live) {
                 refs.find('a').html('Eq. ' + equationCap);

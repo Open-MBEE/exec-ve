@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', 'ViewService', 'ApplicationService', '$compile', 'growl', mmsViewLink]);
 
 /**
  * @ngdoc directive
@@ -22,7 +22,7 @@ angular.module('mms.directives')
  * @param {string} mmsDocId Document context of view
  * @param {string} mmsPeId Document context of view
  */
-function mmsViewLink(ElementService, UtilsService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, ViewService, ApplicationService, $compile, growl) {
 
     var mmsViewLinkLink = function(scope, element, attrs, controllers) {
         var mmsCfCtrl = controllers[0];
@@ -70,13 +70,29 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             .then(function(data) {
                 scope.element = data;
                 scope.name = data.name;
-
+                scope.type = 'Section ';
+                scope.suffix = '';
+                scope.hash = '#' + data.id;
                 if (scope.mmsPeId && scope.mmsPeId !== '') {
-                    scope.hash = '#' + scope.mmsPeId;
                     var reqPEOb = {elementId: scope.mmsPeId, projectId: projectId, refId: refId, commitId: commitId};
                     ElementService.getElement(reqPEOb)
                     .then(function(pe) {
+                        scope.hash = '#' + pe.id;
+                        scope.element = pe;
                         scope.name = pe.name;
+                        if (ViewService.isTable(pe)) {
+                            scope.type = 'Table ';
+                        } else if (ViewService.isFigure(pe)) {
+                            scope.type = "Fig. ";
+                        } else if (ViewService.isEquation(pe)) {
+                            scope.type = "Eq. (";
+                            scope.suffix = ')';
+                        }
+                        if (ApplicationService.getState().fullDoc) {
+                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + "/full" + scope.hash;
+                        } else {
+                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
+                        }
                     });
                 }
                 if (UtilsService.isDocument(data)) {
@@ -93,6 +109,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                     element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                 }
                 scope.loading = false;
+                if (ApplicationService.getState().fullDoc) {
+                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
+                } else {
+                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
+                }
+                scope.change = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc == scope.docid);
             }, function(reason) {
                 element.html('<span class="mms-error">view link not found</span>');
                 scope.loading = false;
@@ -114,7 +136,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             linkIconClass: '@?'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
-        template: '<a ng-if="!loading" ng-class="linkClass" href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText">{{name || "Unnamed View"}}</span></a>',
+        template: '<a ng-if="!loading" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>',
         link: mmsViewLinkLink
     };
 }

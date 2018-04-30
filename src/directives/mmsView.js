@@ -308,7 +308,6 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            mmsNumber: '@',
             mmsLink: '<',
             mmsViewApi: '<'
         },
