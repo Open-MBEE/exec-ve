@@ -103,6 +103,14 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             $(domElement[0]).find('img').each(function(index) {
                 Utils.fixImgSrc($(this));
             });
+            if (mmsViewPresentationElemCtrl) {
+                var peSpec = mmsViewPresentationElemCtrl.getPresentationElement();
+                var pe = mmsViewPresentationElemCtrl.getInstanceSpec();
+                if (pe && pe._veNumber && peSpec && (peSpec.type === 'TableT' || peSpec.type === 'Figure' || peSpec.type === 'Equation')) {
+                    var type = (peSpec.type === 'TableT') ? 'table' : peSpec.type.toLowerCase();
+                    UtilsService.addLiveNumbering(pe, $('#' + pe.id), type);
+                }
+            }
             if (MathJax) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             }

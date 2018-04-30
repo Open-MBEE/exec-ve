@@ -767,8 +767,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {void} nothing
      */
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
-        var sysmlId = child.data.id;
-        var veNumber = child.data._veNumber;
+        var pe = child.data;
+        var sysmlId = pe.id;
+        var veNumber = pe._veNumber;
         var prefix = '';
         var el = printElement.find('#' + sysmlId);
         var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
@@ -782,7 +783,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
-                name = child.data.name;
+                name = pe.name;
             }
             cap = veNumber + '. ' + name;
             ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
@@ -809,7 +810,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
-                name = child.data.name;
+                name = pe.name;
             }
             cap = veNumber + '. ' + name;
             ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
@@ -830,7 +831,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         if (child.type === 'equation') {
             //ob.equationCount++;
-            cap = veNumber + '. ' + child.data.name;
+            cap = veNumber + '. ' + pe.name;
             ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var equationCap = '(' + veNumber + ')';
             var capEq = el.find('.mms-equation-caption');
@@ -847,6 +848,56 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         for (var i = 0; i < child.children.length; i++) {
             makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
+        }
+    };
+
+    var addLiveNumbering = function(pe, el, type) {
+        var sysmlId = pe.id;
+        var veNumber = pe._veNumber;
+        var prefix = '';
+        var name = '';
+        var cap = '';
+        if (type === 'table') {
+            prefix = 'Table ' + veNumber + '. ';
+            var capTbl = el.find('table > caption');
+            name = capTbl.text();
+            if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf(prefix) + prefix.length);
+            } else if (name === "") {
+                name = pe.name;
+            }
+            cap = veNumber + '. ' + name;
+            capTbl.html('Table ' + cap);
+            // If caption does not exist, add to html
+            if (capTbl.length === 0) {
+                el.find('table').prepend('<caption>Table ' + cap + '</caption>');
+            }
+        }
+        if (type === 'figure') {
+            prefix = 'Figure ' + veNumber + '. ';
+            var capFig = el.find('figure > figcaption');
+            name = capFig.text();
+            if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf(prefix) + prefix.length);
+            } else if (name === "") {
+                name = pe.name;
+            }
+            cap = veNumber + '. ' + name;
+            capFig.html('Figure ' + cap);
+            // If caption does not exist, add to html
+            if (capFig.length === 0) {
+                el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
+            }
+        }
+        if (type === 'equation') {
+            cap = veNumber + '. ' + pe.name;
+            var equationCap = '(' + veNumber + ')';
+            var capEq = el.find('.mms-equation-caption');
+            capEq.html(equationCap);
+            // If caption does not exist, add to html
+            if (capEq.length === 0) {
+                el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
+            }
         }
     };
 
@@ -1215,6 +1266,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
         makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
+        addLiveNumbering: addLiveNumbering,
         convertViewLinks: convertViewLinks,
         createMmsId: createMmsId,
         getPrintCss: getPrintCss,
