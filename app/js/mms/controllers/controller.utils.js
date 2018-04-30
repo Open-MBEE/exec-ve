@@ -121,11 +121,12 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.type = isDoc ? 'DOCUMENT' : 'VIEW';
                 $scope.action = 'print';
                 $scope.genpdf = false;
-                $scope.meta = {
-                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
-                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
-                };
+                $scope.meta = {};
                 if (isDoc) {
+                    $scope.meta = {
+                        'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
+                        'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
+                    };
                     ViewService.getDocMetadata({
                         elementId: viewOrDocOb.id,
                         projectId: viewOrDocOb._projectId,
