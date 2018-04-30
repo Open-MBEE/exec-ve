@@ -114,7 +114,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                 } else {
                     scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
                 }
-                scope.change = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc == scope.docid);
+                scope.change = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc == scope.docid) && !scope.suppressNumbering;
             }, function(reason) {
                 element.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
                 $compile(element.contents())(Object.assign(scope.$new(), {
@@ -138,7 +138,8 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
             mmsPeId: '@',
             linkText: '@?',
             linkClass: '@?',
-            linkIconClass: '@?'
+            linkIconClass: '@?',
+            suppressNumbering: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
         template: '<a ng-if="!loading" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>',
