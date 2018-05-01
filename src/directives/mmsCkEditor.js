@@ -386,9 +386,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         };
         
         // Formatting editor toolbar
-        // var customToolbar =   { name: 'custom',   items: [ 'Mmscf','mmsreset','Mmscomment','Mmsvlink','Mmssignature' ] };
         var stylesToolbar = { name: 'styles', items : [ 'Format','FontSize','TextColor','BGColor' ] };
-        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-'] };
+        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'ExtraFormatting','-'] };
         var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
         var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
         var editingToolbar = { name: 'editing', items : [ 'Find','Replace' ] };
@@ -397,7 +396,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
         var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var dropdownToolbar = { name: 'custom', items: [ 'MMSInsertMenu'] };
+        var dropdownToolbar = { name: 'custom', items: [ 'MoreFeatures'] };
         var sourceToolbar = { name: 'source', items: [ 'Maximize','Source' ] };
         var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
         var tableImageEquationToolbar = { name: 'combined', items: ['Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', '-' ]};
