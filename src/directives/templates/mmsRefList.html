@@ -2,7 +2,7 @@
 <input class="form-control" ng-model="refFilter" type="text" placeholder="Filter branches/tags">
 
 <table class="tags-table table table-condensed">
-    <thead><tr><td colspan="3"><h3 class="Tag-icon">Tags</h3></td></tr></thead>
+    <thead><tr><td><h3 class="Tag-icon">Tags</h3></td><td>Created</td></tr></thead>
     <tbody ng-show="filteredTags.length">
         <tr ng-repeat="tag in filteredTags = (mmsTags | orderBy:'-_created' | filter: {name : refFilter})">
             <td>
@@ -31,7 +31,7 @@
 
     <tbody ng-hide="mmsTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags in current project.</td></tr></tbody>
 
-    <thead><tr><td colspan="3"><h3 class="Branch-icon">Branches</h3></td></tr></thead>
+    <thead><tr><td><h3 class="Branch-icon">Branches</h3></td><td>Created</td></tr></thead>
     <tbody ng-show="filteredBranches.length">
         <tr ng-repeat="branch in filteredBranches = (mmsBranches | orderBy:'-_created' | filter: {name : refFilter})">
             <td>
