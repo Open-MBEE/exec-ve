@@ -16,7 +16,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// config.extraPlugins = 'autosave,iframe,mediaembed,embed,
 	config.extraPlugins = 'liststyle,autosave,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature';
 	config.mathJaxLib = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-	config.extraAllowedContent = 'div(*)[*]{*}; p[class]{*}; a[class,href,alt]{*}; i[class,aria-hidden]{*}; span[class]{*}; audio[*]; video[*]; source[*]; mms-group-docs[*]; mms-cf[*]; mms-view-link[*]; mms-value-link[*]; mms-line-graph[*]; mms-diff-attr[*]; mms-maturity-bar[*]; math[*]; maction[*]; maligngroup[*]; malignmark[*]; menclose[*]; merror[*]; mfenced[*]; mfrac[*]; mglyph[*]; mi[*]; mlabeledtr[*]; mlongdiv[*]; mmultiscripts[*]; mn[*]; mo[*]; mover[*]; mpadded[*]; mphantom[*]; mroot[*]; mrow[*]; ms[*]; mscarries[*]; mscarry[*]; msgroup[*]; mstack[*]; msline[*]; mspace[*]; msqrt[*]; msrow[*]; mstyle[*]; msub[*]; msup[*]; msubsup[*]; mtable[*]; mtd[*]; mtext[*]; mtr[*]; munder[*]; munderover[*];';
+	config.extraAllowedContent = 'hr(*)[*]{*};blockquote(*)[*]{*}; div(*)[*]{*}; p[class]{*}; a[class,href,alt]{*}; i[class,aria-hidden]{*}; span[class]{*}; audio[*]; video[*]; source[*]; mms-group-docs[*]; mms-cf[*]; mms-view-link[*]; mms-value-link[*]; mms-line-graph[*]; mms-diff-attr[*]; mms-maturity-bar[*]; math[*]; maction[*]; maligngroup[*]; malignmark[*]; menclose[*]; merror[*]; mfenced[*]; mfrac[*]; mglyph[*]; mi[*]; mlabeledtr[*]; mlongdiv[*]; mmultiscripts[*]; mn[*]; mo[*]; mover[*]; mpadded[*]; mphantom[*]; mroot[*]; mrow[*]; ms[*]; mscarries[*]; mscarry[*]; msgroup[*]; mstack[*]; msline[*]; mspace[*]; msqrt[*]; msrow[*]; mstyle[*]; msub[*]; msup[*]; msubsup[*]; mtable[*]; mtd[*]; mtext[*]; mtr[*]; munder[*]; munderover[*];';
 	config.disallowedContent = 'script';
 	config.specialChars = ['&euro;', '&lsquo;', '&rsquo;', '&ldquo;', '&rdquo;', '&ndash;', '&mdash;', '&iexcl;', '&cent;', '&pound;', '&curren;', '&yen;', '&brvbar;', '&sect;', '&uml;', '&copy;', '&ordf;', '&laquo;', '&not;', '&reg;', '&macr;', '&deg;', '&sup2;', '&sup3;', '&acute;', '&micro;', '&para;', '&middot;', '&cedil;', '&sup1;', '&ordm;', '&raquo;', '&frac14;', '&frac12;', '&frac34;', '&iquest;', '&Agrave;', '&Aacute;', '&Acirc;', '&Atilde;', '&Auml;', '&Aring;', '&AElig;', '&Ccedil;', '&Egrave;', '&Eacute;', '&Ecirc;', '&Euml;', '&Igrave;', '&Iacute;', '&Icirc;', '&Iuml;', '&ETH;', '&Ntilde;', '&Ograve;', '&Oacute;', '&Ocirc;', '&Otilde;', '&Ouml;', '&times;', '&Oslash;', '&Ugrave;', '&Uacute;', '&Ucirc;', '&Uuml;', '&Yacute;', '&THORN;', '&szlig;', '&agrave;', '&aacute;', '&acirc;', '&atilde;', '&auml;', '&aring;', '&aelig;', '&ccedil;', '&egrave;', '&eacute;', '&ecirc;', '&euml;', '&igrave;', '&iacute;', '&icirc;', '&iuml;', '&eth;', '&ntilde;', '&ograve;', '&oacute;', '&ocirc;', '&otilde;', '&ouml;', '&divide;', '&oslash;', '&ugrave;', '&uacute;', '&ucirc;', '&uuml;', '&yacute;', '&thorn;', '&yuml;', '&OElig;', '&oelig;', '&#372;', '&#374', '&#373', '&#375;', '&sbquo;', '&#8219;', '&bdquo;', '&hellip;', '&trade;', '&#9658;', '&bull;', '&rarr;', '&rArr;', '&hArr;', '&diams;', '&asymp;','&alpha;','&beta;','&gamma;','&delta;','&epsilon;','&zeta;','&eta;','&theta;','&iota;','&kappa;','&lambda;','&mu;','&nu;','&xi;','&omicron;','&pi;','&rho;','&sigma;','&tau;','&upsilon;','&phi;','&chi;','&psi;','&omega;','&Alpha;','&Beta;','&Gamma;','&Delta;','&Epsilon;','&Zeta;','&Eta;','&Theta;','&Iota;','&Kappa;','&Lambda;','&Mu;','&Nu;','&Xi;','&Omicron;','&Pi;','&Rho;','&Sigma;','&Tau;','&Upsilon;','&Phi;','&Chi;','&Psi;','&Omega;'];
 	//config.protectedSource.push( /<i[^>]*><\/i>/g );
@@ -33,15 +33,64 @@ CKEDITOR.editorConfig = function( config ) {
 				name: 'Mmscf',
 				label: 'Cross Reference',
 				command: 'mmscf'
-			}, {
+			},
+			{
+				name: 'Mmsvlink',
+				label: 'View/Section Link',
+				command: 'mmsvlink'
+			},
+			{
+				name: 'Link',
+				command: 'link'
+			},
+			{
+				name: 'Table',
+				command: 'table'
+			},
+			{
+				name: 'Image',
+				command: 'image'
+			},
+			{
+				name: 'Iframe',
+				command: 'iframe'
+			},
+			{
+				name: 'Mathjax',
+				label: 'Equation',
+				command: 'mathjax'
+			},
+			{
+				name: 'SpecialChar',
+				label: 'Math',
+				command: 'specialchar'
+			},
+			{
 				name: 'Mmscomment',
 				label: 'Comment',
 				command: 'mmscomment'
-			}, {
-				name: 'Mmsvlink',
-				label: 'View/Element Link',
-				command: 'mmsvlink'
-			}, {
+			},
+			{
+				name: 'CodeSnippet',
+				label: 'Code Snippet',
+				command: 'codeSnippet'
+			},	
+			{
+				name: 'Blockquote',
+				label: 'Quote',
+				command: 'blockquote'
+			},
+			{
+				name: 'PageBreak',
+				label: 'Page break for printing',
+				command: 'pagebreak'
+			},
+			{
+				name: 'HorizontalRule',
+				label: 'Horizontal Rule',
+				command: 'horizontalrule'
+			},
+			{
 				name: 'Mmsreset',
 				label: 'Update Cross Ref',
 				command: 'mmsreset'

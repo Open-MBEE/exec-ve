@@ -19,10 +19,11 @@
 /* Third party customizations */
 @import "thirdparty/_autosave-plugin.scss";
 
-.cke_button__mmscf_label, .cke_button__mmscomment_label,
-.cke_button__mmsvlink_label, .cke_button__mmsreset_label, .cke_button__mmssignature_label {
-  display: inline !important;
-}
+// uncomment this if want to display these plugin's button label
+// .cke_button__mmscf_label, .cke_button__mmscomment_label,
+// .cke_button__mmsvlink_label, .cke_button__mmsreset_label, .cke_button__mmssignature_label {
+//   display: inline !important;
+// }
 
 .ng-hide {
   display: none !important;
