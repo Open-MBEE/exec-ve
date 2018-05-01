@@ -115,7 +115,11 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
             console.log("JavaScript Callback = Mouse double clicked on object with ID = " + data.objectID);
         }
     };
-
+    $window.PerspectivesErrorDialogHandler = function(message, callStackString) {
+        //prevent ts error dialog from appearing for any js exception
+        console.log(message);
+        console.log(callStackString);
+    };
     //store global mapping of project name to hash, on*** functions can lookup the hash 
     var mmsTsDiagramLink = function(scope, element, attrs) {
         var id = ApplicationService.createUniqueId();
