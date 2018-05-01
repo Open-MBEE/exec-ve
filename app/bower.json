@@ -37,8 +37,8 @@
     "font-awesome-bower": "~4.6.3",
     "lodash": "~3.9.3",
     "stompjs": "https://github.com/jmesnil/stomp-websocket.git#2.3.4",
-    "d3": "~3.5.6",
-    "c3": "~0.4.10",
+    "d3": "~5.1.0",
+    "c3": "~0.5.4",
     "angulartics": "~1.1.0",
     "angulartics-piwik": "~1.0.4",
     "angular-diff-match-patch": "~0.4.0",
@@ -48,7 +48,7 @@
   },
   "resolutions": {
     "lodash": "3.9.3",
-    "d3": "~3.5.6",
+	"d3": "~5.1.0",
     "angular": "~1.5.5"
   },
   "devDependencies": {

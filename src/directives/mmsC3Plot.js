@@ -8,7 +8,7 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
   
     var c3 = $window.c3;
     var d3 = $window.d3;  
-    var svg = d3.select(element[0]).append('div');
+    var divchart = d3.select(element[0]).append('div');
    
     var projectId;
     var refId;
@@ -23,9 +23,9 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-    if ( scope.plot.config.length !== 0){
-      scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
-    } 
+    //if ( scope.plot.config.length !== 0){
+      //scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
+    //} 
     /*
     Convert a json definining functions in an array of keys (axis, x, tick, format, function(...))
     The last entry is a function value.
@@ -126,8 +126,8 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
           if ( scope.plot.config.functions !== undefined && scope.plot.config.functions.length !== 0){
             c3jfunc = scope.plot.config.functions;//JSON.parse(scope.plot.config.functions.replace(/'/g, '"'));
           }
-          svg.selectAll('*').remove();
-          svg.append('div').attr("id", 'c3chart' + scope.$id);
+          divchart.selectAll('*').remove();
+          divchart.attr("id", 'c3chart' + scope.$id);
           c3options.bindto = '#c3chart' + scope.$id;
         
         vf_pplot(c3options, c3jfunc); 

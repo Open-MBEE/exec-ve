@@ -22,14 +22,15 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-    if ( scope.plot.config.length !== 0){
+    /*if ( scope.plot.config.length !== 0){
       //{{name: "A", color: "Green"}, {name: "B", color:"Red"}}
       scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); 
-    }
+    }*/
 
     
     
     function vf_pplot(_out) {
+
       var outputs = _out;
       var width =900;
       var m = [0, 0, 25, 60]; //top, right, bottom, left
@@ -43,11 +44,8 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
       for (var i = 0; i < outputs.variables.length; i++)
       {
         size = outputs.variables[i].length; //length of the string
-        
         if (maxSize < size)
-        {
           maxSize = size;
-        }
       }
       
       m[0] = maxSize * 4.5 * 0.707 + 50; //to make label
@@ -56,14 +54,12 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
       //define width and height
       var w = width - m[1] - m[3],
         h = (width * 0.37) - m[0] - m[2];
-      
-      var x = d3.scale.ordinal().domain(outputs.variables).rangePoints([0, w]),
+
+      var colorscale = d3.scaleOrdinal(d3.schemeCategory10);
+      var x = d3.scalePoint(d3.schemeCategory10).domain(outputs.variables).range([0, w]),
       y = {};
-      
-      var line = d3.svg.line(),
-      axis = d3.svg.axis().ticks(5).orient("left"),foreground;
-      var colorscale = d3.scale.category10();
-    
+      var line = d3.line(),foreground;
+
       divchart.selectAll('*').remove();
       var svg = divchart
         .append("svg:svg")
@@ -89,15 +85,11 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         {
           //test to see if minTest is still the minimum
           if (minTest > outputs.table[j].values[d])
-          {
             minTest = outputs.table[j].values[d];
-          }
           
           //tests to see if maxTest is still the maximum
           if (maxTest < outputs.table[j].values[d])
-          {
             maxTest = outputs.table[j].values[d];
-          }
         }
         minMax[d].min = minTest;
         minMax[d].max = maxTest;
@@ -134,7 +126,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
 
       //Create a scale and brush for each variables.
       outputs.variables.forEach(function (d) {
-        y[d] = d3.scale.linear()
+        y[d] = d3.scaleLinear()
           .domain([minimum[d], maximum[d]])
           .range([h, 0]);
         
@@ -201,11 +193,13 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         .attr("transform", function(d,i) { 
             return "translate(" + x(d) + ")"; 
           });
+
       // Add an axis and title.
       g.append("svg:g")
         .attr("class", "axis")
         .each(function(d) { 
-          d3.select(this).call(axis.scale(y[d])); 
+          //d3.select(this).call(axis.scale(y[d])); 
+          d3.select(this).call(d3.axisLeft(y[d]).ticks(5));
         })
       .append("svg:text")
         .data(outputs.variables)
@@ -213,6 +207,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         .attr("transform", "rotate(-45 0 0)") //deg y x
         .attr("x", 0)
         .attr("class", "axislabel")
+        .attr("fill", "black")
         .text(function(d){
           return d;
         });
@@ -267,6 +262,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
     }
 
     scope.render = function() {
+
       TableService.readvalues(scope.plot, projectId, refId, commitId)
        .then( function(value){
         scope.tablebody = value.tablebody;
@@ -278,7 +274,6 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         }
         var  dataseries= [];
         var tickColor;
-      
         scope.tablebody.c3_data.forEach( function (row){
             var values = [];
             for (var i = 1; i < row.length; i++) {

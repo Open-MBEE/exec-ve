@@ -21,7 +21,7 @@
     "grunt-html2js": "^0.5.1",
     "grunt-karma": "^2.0.0",
     "grunt-middleware-proxy": "^1.0.7",
-    "grunt-ngdocs": "~0.2.5",
+    "grunt-ngdocs": "^0.2.11",
     "grunt-protractor-runner": "^5.0.0",
     "grunt-sass": "^2.0.0",
     "grunt-usemin": "^3.0.0",
@@ -29,11 +29,11 @@
     "jasmine-core": "~2.8.0",
     "jasmine-jquery": "^2.1.1",
     "jit-grunt": "~0.10.0",
-    "karma": "^1.7.0",
+    "karma": "^1.7.1",
     "karma-chrome-launcher": "^2.1.1",
     "karma-fixture": "^0.2.6",
     "karma-html2js-preprocessor": "^1.0.0",
-    "karma-jasmine": "^1.1.0",
+    "karma-jasmine": "^1.1.1",
     "karma-jasmine-jquery": "^0.1.1",
     "karma-json-fixtures-preprocessor": "0.0.6",
     "karma-junit-reporter": "^1.2.0",
@@ -42,5 +42,9 @@
     "phantomjs": "^2.1.7",
     "protractor": "~5.2.0",
     "time-grunt": "^1.4.0"
+  },
+  "dependencies": {
+    "c3": "^0.5.4",
+    "d3": "^5.1.0"
   }
 }
