@@ -29,6 +29,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
         var mmsViewCtrl = controllers[1];
         var processed = false;
         scope.loading = true;
+        scope.target = scope.linkTarget ? scope.linkTarget : '_self';
         scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
@@ -139,10 +140,11 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
             linkText: '@?',
             linkClass: '@?',
             linkIconClass: '@?',
+            linkTarget: '@?',
             suppressNumbering: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
-        template: '<a ng-if="!loading" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>',
+        template: '<a ng-if="!loading" target="{{target}}" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>',
         link: mmsViewLinkLink
     };
 }
