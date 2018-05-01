@@ -18,6 +18,10 @@
   @include button-variant($brand_base, $white, $white);
 }
 
+.btn-placeholder {
+  @include button-variant(darken($tertiary-grey, 12%), $white, $white);
+}
+
 // Toolbar button style
 .btn-tools {
   @include button-variant($base_grey, $white, $white);
