@@ -24,9 +24,6 @@ mms-view {
       display: inline;
     }
   }
-  .add-pe-button-container {
-    display: none;
-  }
 }
 
 mms-view.outline,
@@ -58,12 +55,6 @@ mms-view.editing {
     .panel {
       margin: 0px;
     }
-  }
-}
-
-mms-view.editing {
-  .add-pe-button-container {
-    display: block;
   }
 }
 

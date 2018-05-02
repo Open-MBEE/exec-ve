@@ -128,6 +128,9 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         }
 
         scope.addEltAction = function(index, type, e) {
+            if (!mmsViewCtrl || !mmsViewCtrl.isEditable()) {
+                return;
+            }
             e.stopPropagation();
             scope.addPeIndex = index;
             Utils.addPresentationElement(scope, type, scope.section);
