@@ -3,6 +3,12 @@
 //   inline box for dropdowns
 // *************************/
 .mms-add-pe-button {
+
+  position: absolute;
+  left: -7px;
+  margin-top: -17px;
+
+
   /*Border radius and color to match dropdown*/
   a.dropdown-toggle{
     @include border-radius(4px 0 0 4px);
@@ -13,7 +19,7 @@
 
   /*Dropdown menu is always open but has 0 opacity for transition*/
   .dropdown-menu {
-    display: block;
+    display: none;
     opacity: 0;
     position: relative;
     padding: 0;
@@ -22,6 +28,16 @@
     border: 2px solid darken($white, 12%);
     @include box-shadow( 6px 6px 12px rgba(0,0,0,.175))
     @include transition(all .5s);
+
+    &::after{
+      background-image: url(../assets/location-feedback.svg);
+      content: ' ';
+      background-size: 70px 30px;
+      height: 30px;
+      width: 70px;
+      background-repeat: no-repeat;
+      position: absolute;
+    }
 
     /*Special padding to align with add button*/
     li > a{
@@ -36,7 +52,9 @@
 
   /*When hovering over the whole menu, set opacity to 1*/
   .open > .dropdown-menu,
-   span:hover .dropdown-menu{
+   .dropdown-toggle:hover + .dropdown-menu,
+   .dropdown-menu:hover{
+    display: block;
     opacity: 1;
   }
 
@@ -48,4 +66,12 @@
       border-color: darken($white, 12%);
       color: darken($tertiary-grey, 42%);
   }
+
+
+}
+
+mms-view-section .mms-add-pe-button {
+  position: relative;
+  left: 0;
+  margin-top: 0;
 }
