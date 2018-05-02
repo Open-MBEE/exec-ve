@@ -147,6 +147,10 @@
             <span class="prop" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>
         </div>
 
+        <div ng-if="element.type === 'Diagram' && element._artifactIds">
+            <mms-transclude-img mms-element-id="{{element.id}}" mms-ref-id="{{element._refId}}" mms-project-id="{{element._projectId}}" mms-commit-id="{{element._commitId}}"></mms-transclude-img>
+        </div>
+
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="showDocHTML = !showDocHTML"><i class="fa fa-code"></i></a></h2>
         <p ng-show="!showDocHTML" class="doc-text">
             <mms-cf mms-cf-type="doc" mms-element-id="{{element.id}}" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-commit-id="{{element._commitId}}" mms-watch-id="true"></mms-cf>

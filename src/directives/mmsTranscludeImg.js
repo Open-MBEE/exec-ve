@@ -55,7 +55,8 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
                 var artifactOb = {
                     projectId: data._projectId,
                     refId: data._refId,
-                    artifactIds : data._artifactIds
+                    artifactIds : data._artifactIds,
+                    commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
                 };
 
                 // Get the artifacts of the element
@@ -71,10 +72,10 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
                         }
                     }
                 }, function(reason) {
-                    growl.error('Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
+                    console.log('Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
                 });
             }, function(reason) {
-                growl.error('Cf Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
+                console.log('Cf Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
                 element.removeClass('isLoading');
             });
@@ -89,7 +90,8 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             mmsElementId: '@',
             mmsProjectId: '@',
             mmsRefId: '@',
-            mmsCommitId: '@'
+            mmsCommitId: '@',
+            mmsCfLabel: '@'
         },
         require: ['?^^mmsView'],
         link: mmsTranscludeImgLink
