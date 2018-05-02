@@ -8,7 +8,11 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
     scope.rowHeaders=[]; //not null when render is called 1st time.      
     var d3 = $window.d3;  
     var divchart = d3.select(element[0]).append('div');  
-        
+    
+    var defaultPlotConfig = {width : 900, 
+        marginTop:0, marginRight:0, marginBottom:25, marginLeft:60};
+      
+
     var projectId;
     var refId;
     var commitId;
@@ -22,18 +26,15 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-    /*if ( scope.plot.config.length !== 0){
-      //{{name: "A", color: "Green"}, {name: "B", color:"Red"}}
-      scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); 
-    }*/
-
-    
     
     function vf_pplot(_out) {
 
+      var plotConfig = TableService.plotConfig(scope.plot.config.options, defaultPlotConfig);
+
       var outputs = _out;
-      var width =900;
-      var m = [0, 0, 25, 60]; //top, right, bottom, left
+      var width =plotConfig.width;
+      var height = plotConfig.width*0.37;
+      var m = [plotConfig.marginTop, plotConfig.marginRight, plotConfig.marginBottom, plotConfig.marginLeft]; //top, right, bottom, left
       
       var maxSize = 0;
       var size = 0;
@@ -53,7 +54,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
       
       //define width and height
       var w = width - m[1] - m[3],
-        h = (width * 0.37) - m[0] - m[2];
+        h = height - m[0] - m[2];
 
       var colorscale = d3.scaleOrdinal(d3.schemeCategory10);
       var x = d3.scalePoint(d3.schemeCategory10).domain(outputs.variables).range([0, w]),

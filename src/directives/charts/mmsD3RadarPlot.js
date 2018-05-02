@@ -6,11 +6,13 @@
     var mmsRadarChartLink = function(scope, element, attrs, mmsViewCtrl) {
       var d3 = $window.d3;  
       var colorscale = d3.scaleOrdinal(d3.schemeCategory10);
-      var w = 500, h = 500;
 
       var scopetableColumnHeadersLabel= [];
       var divchart = d3.select(element[0]).append('div');
-
+      
+      var defaultPlotConfig = {width : 700 /*parseInt(divchart.style("width"))*0.95*/, height: 700, 
+        marginTop:0, marginRight:0, marginBottom:0, marginLeft:0};
+      
       var projectId;
       var refId;
       var commitId;
@@ -65,15 +67,16 @@
         return scope.render();
     }, true);
    
-
+    var plotConfig = TableService.plotConfig(scope.plot.config.options, defaultPlotConfig);
+    
     var cfg;
     var RadarChart = {
       draw: function(id, d){
         cfg = {
          radius: 5,
-         w: 500,
-         h: 500,
          factor: 1,
+         w: plotConfig.width-200,
+         h: plotConfig.height-200,
          factorLegend: 0.85,
          levels: 3,
          maxValue: 0,
@@ -86,7 +89,7 @@
          ExtraWidthY:  0, /*100 original */
          color: colorscale
         };
-     
+
      
       cfg.maxValue = Math.max(cfg.maxValue, 
       d3.max(d, function(i){
@@ -94,20 +97,14 @@
           function(o){return Number(o.value);}));
         })
       );
-   
       var allAxis = (d[0].map(function(i, j){return i.axis;}));
       var total = allAxis.length;
       var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
    
-      //d3.select(".rdchart." + id).selectAll('*').remove();
-      //var svg = d3.select(".rdchart." + id);
-      
-      //if ( svg === undefined || svg[0] === undefined || svg[0][0] === undefined) //first time
-        
       var svg = divchart.append("svg:svg")
-        /*svg = dataIdDiv.append("svg")*/.attr("class", "rdchart " + scope.$id)
-                                     .attr("height", h+200)
-                                     .attr("width", w + 200);
+       .attr("class", "rdchart " + scope.$id);
+      svg.attr("width", plotConfig.width); 
+      svg.attr("height", plotConfig.height);
 
       var g = svg
         .append("g")
@@ -283,8 +280,8 @@
       var svg = d3.select("." + id) //div
         .selectAll('svg')
         .append('svg')
-        .attr("width", w+300)
-        .attr("height", h);
+        .attr("width", cfg.w+300)
+        .attr("height", cfg.h);
         //Initiate Legend 
       var legend = svg.append("g")
         .attr("class", "legend")
@@ -297,7 +294,7 @@
         .data(LegendOptions)
         .enter()
         .append("rect")
-        .attr("x", w - 65)
+        .attr("x", cfg.w - 65)
         .attr("y", function(d, i){ return i * 20;})
         .attr("width", 10)
         .attr("height", 10)
@@ -322,7 +319,7 @@
         .data(LegendOptions)
         .enter()
         .append("text")
-        .attr("x", w - 52)
+        .attr("x", cfg.w - 52)
         .attr("y", function(d, i){ return i * 20 + 9;})
         .attr("font-size", "11px")
         .attr("fill", "#737373")

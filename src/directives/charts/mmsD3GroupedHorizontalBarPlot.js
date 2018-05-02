@@ -9,7 +9,9 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       
       var d3 = $window.d3;  
       var divchart = d3.select(element[0]).append('div');
-
+      var defaultPlotConfig = {width : 960,
+        marginTop:20, marginRight:40, marginBottom:30, marginLeft:40};
+     var plotConfig = TableService.plotConfig(scope.plot.config.options, defaultPlotConfig); 
       var achartdata;
       element.click(function(e) {
         //stop Propogating event to parent(mms-transclude-doc) element.
@@ -52,7 +54,6 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       }//end of function mouseout
    
       function mouseover(mouseoverClassId){
-        console.log("mouseover: " + mouseoverClassId);
             d3.selectAll(".ghbbar")
             .transition(200)
             .style("fill-opacity", opacitynotselected); 
@@ -72,21 +73,17 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
             d3.selectAll(mouseoverClassId)
             .transition(200)
             .style("opacity", opacityselected);
-
-            console.log(d3.selectAll(mouseoverClassId));
-            console.log("opacityselected: " + opacityselected);
-
       } //end of function mouseover
 
       function createFilters(data){
             //create only one filter display
             var graphFilter = divchart.append('div')
               .attr("class", 'graphFilter '+ data.id)
-              .style('margin-left', '10px');
+              .style('margin-left', plotConfig.marginLeft + 'px');
             var filterLegendsDiv = graphFilter.append('div')
               .append('label').style('border', '1px solid #ddd')
               .text ("Filter by Legends");
-              filterLegendsDiv//.append('div')
+              filterLegendsDiv
                 .selectAll("div")
                 .data(data.legends)
                 .enter()  
@@ -114,11 +111,8 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
                         .on("click", function (d) {
                             // filter by legends
                             data.legendsFilter[TableService.toValidId(d)] = this.checked;
-                            //createGroupedHorizontalBarChart(chartdata[data.id], null); //2nd argument is not used
-                            createGroupedHorizontalBarChart(achartdata); //2nd argument is not used
+                            createGroupedHorizontalBarChart(achartdata); 
                             createFilters(achartdata);
-                            //handle by visibility
-                            //d3.selectAll(".ghbbar."+ data.id + "." + TableService.toValidId(d) ).style("visibility", this.checked ? "visible": "hidden");
                          });
                       d3.select(this).append("span")
                           .text(function (d) {
@@ -135,8 +129,6 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
                 .append("div")
                 .attr("class", function(d,i){return "columnfilter "+ data.id + " " + TableService.toValidId(d);} )
                 .on('mouseover', function (d, i){
-                      console.log(d);
-                      console.log(i);
                       mouseover('.'+data.id+'.' + TableService.toValidId(d));
                 })
                 .on('mouseout', function (d, i){
@@ -166,12 +158,8 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
               });
       } //end of function createFilter
 
-      function createGroupedHorizontalBarChart(data){
-        //d3.select(".ghbchart." + data.id + scope.$id).selectAll('*').remove();
-        //var svg = d3.select(".ghbchart." + data.id + scope.$id);
-        //if ( svg[0][0] === null) //first time
-          //svg = dataIdDiv.append("svg").attr("class", "ghbchart " + data.id + scope.$id);
-       
+      function createGroupedHorizontalBarChart(data)
+      {
         divchart.selectAll('*').remove();
         divchart.attr("class", achartdata.id )
           .attr("style", 'border:1px solid #ddd');
@@ -188,7 +176,6 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
         var datalabelsfilter = data.labelsFilter;            
         var counter = -1;
 
-       
         for (var i=0; i<data.labels.length; i++) {
           if ( datalabelsfilter[TableService.toValidId(data.labels[i])]){
             filteredDataLabels.push(data.labels[i]);
@@ -204,12 +191,12 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
           }
         }
         var filteredLegendsLength = filteredDataLegends.length/filteredDataLabels.length;
-         
-        var chartWidth       = 700,
+        
+        var chartWidth       = plotConfig.width-260,
             barHeight        = 20,
             groupHeight      = barHeight * filteredLegendsLength,
             gapBetweenGroups = 10,
-            spaceForLabels   = 150,
+            spaceForLabels   = plotConfig.marginLeft,
             spaceForLegend   = 200,
             marginbottom = 50;
         var chartHeight = barHeight * filteredDataValues.length + gapBetweenGroups * filteredDataLabels.length;
@@ -227,7 +214,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
                         
         // Specify the chart area and dimensions
         var chart = svg
-            .attr("width", "100%")
+            .attr("width", plotConfig.width)
             .attr("height", chartHeight + marginbottom);
         
         // Create bars
@@ -238,8 +225,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
               return "translate(" + spaceForLabels + "," + (i * barHeight + gapBetweenGroups * (0.5 + Math.floor(i/filteredLegendsLength))) + ")";
             });
         var numRows = filteredDataLegends.length/filteredDataLabels.length;
-        console.log("numRows: " + numRows);
-          // Create rectangles of the correct width
+        // Create rectangles of the correct width
         bar.append("rect")
             .attr('id', function(d,i){ return filteredDataSysmlids[i];})
             .attr("fill", function(d,i) { return filteredDataColors[i]; })
@@ -367,7 +353,6 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
             legendsFilter: legendsFilter,
             labelsFilter: labelsFilter
            };
-          //d3.select("."+ achartdata.id + scope.$id).remove();
           createGroupedHorizontalBarChart(achartdata);
           createFilters(achartdata);
           });
