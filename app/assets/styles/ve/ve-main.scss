@@ -19,12 +19,6 @@
 /* Third party customizations */
 @import "thirdparty/_autosave-plugin.scss";
 
-// uncomment this if want to display these plugin's button label
-// .cke_button__mmscf_label, .cke_button__mmscomment_label,
-// .cke_button__mmsvlink_label, .cke_button__mmsreset_label, .cke_button__mmssignature_label {
-//   display: inline !important;
-// }
-
 .ng-hide {
   display: none !important;
 }
@@ -1167,3 +1161,20 @@ Element not found styling
 .pane-right .prop.mms-error {
   margin-top: 10px;
 }
+
+/** Additional style for ckeditor custom dropdown **/
+.mmsExtraFormat .cke_combo_button, .mmsExtraFeature .cke_combo_button {
+  width: 30px;
+}
+
+.mmsExtraFormat .cke_combo_open, .mmsExtraFeature .cke_combo_open {
+  margin-left: 3px !important;
+}
+
+.mmsExtraFormat a.cke_combo_button .cke_combo_inlinelabel,
+.mmsExtraFeature a.cke_combo_button .cke_combo_inlinelabel {
+  width: 17%;
+  height: 25px;
+  display: inline-block;  
+  background: url('/lib/ckeditor/skins/moono-lisa/images/lock.png') no-repeat center !important;
+ }

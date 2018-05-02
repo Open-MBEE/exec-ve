@@ -14,7 +14,7 @@ CKEDITOR.editorConfig = function( config ) {
 	//config.tabSpaces = 4;
 	//config.height = 350;
 	// config.extraPlugins = 'autosave,iframe,mediaembed,embed,
-	config.extraPlugins = 'liststyle,autosave,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature';
+	config.extraPlugins = 'liststyle,autosave,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,mmsdropdown';
 	config.mathJaxLib = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
 	config.extraAllowedContent = 'span(*)[*]{*};sub(*)[*]{*};sup(*)[*]{*};s(*)[*]{*};hr(*)[*]{*};blockquote(*)[*]{*}; div(*)[*]{*}; p[class]{*}; a[class,href,alt]{*}; i[class,aria-hidden]{*}; span[class]{*}; audio[*]; video[*]; source[*]; mms-group-docs[*]; mms-cf[*]; mms-view-link[*]; mms-value-link[*]; mms-line-graph[*]; mms-diff-attr[*]; mms-maturity-bar[*]; math[*]; maction[*]; maligngroup[*]; malignmark[*]; menclose[*]; merror[*]; mfenced[*]; mfrac[*]; mglyph[*]; mi[*]; mlabeledtr[*]; mlongdiv[*]; mmultiscripts[*]; mn[*]; mo[*]; mover[*]; mpadded[*]; mphantom[*]; mroot[*]; mrow[*]; ms[*]; mscarries[*]; mscarry[*]; msgroup[*]; mstack[*]; msline[*]; mspace[*]; msqrt[*]; msrow[*]; mstyle[*]; msub[*]; msup[*]; msubsup[*]; mtable[*]; mtd[*]; mtext[*]; mtr[*]; munder[*]; munderover[*];';
 	config.disallowedContent = 'script';
@@ -23,121 +23,121 @@ CKEDITOR.editorConfig = function( config ) {
 	//config.filebrowserUploadUrl = "/alfresco.php";
 	//config.filebrowserBrowseUrl = "/alfresco.php";
 	config.uploadUrl = "/alfresco.php";
-	config.dropdownmenumanager = {
-		'MoreFeatures': {
-			items:[{	
-				name: 'Mmscf',
-				label: 'Cross Reference',
-				command: 'mmscf'
-			},
-			{
-				name: 'Mmsvlink',
-				label: 'View/Section Link',
-				command: 'mmsvlink'
-			},
-			{
-				name: 'Link',
-				command: 'link'
-			},
-			{
-				name: 'Table',
-				command: 'table'
-			},
-			{
-				name: 'Image',
-				command: 'image'
-			},
-			{
-				name: 'Iframe',
-				command: 'iframe'
-			},
-			{
-				name: 'Mathjax',
-				label: 'Equation',
-				command: 'mathjax'
-			},
-			{
-				name: 'SpecialChar',
-				label: 'Math',
-				command: 'specialchar'
-			},
-			{
-				name: 'Mmscomment',
-				label: 'Comment',
-				command: 'mmscomment'
-			},
-			{
-				name: 'CodeSnippet',
-				label: 'Code Snippet',
-				command: 'codeSnippet'
-			},	
-			{
-				name: 'Blockquote',
-				label: 'Quote',
-				command: 'blockquote'
-			},
-			{
-				name: 'PageBreak',
-				label: 'Page break for printing',
-				command: 'pagebreak'
-			},
-			{
-				name: 'HorizontalRule',
-				label: 'Horizontal Rule',
-				command: 'horizontalrule'
-			},
-			{
-				name: 'Mmsreset',
-				label: 'Update Cross Ref',
-				command: 'mmsreset'
-			},
-			{
-				name: 'Mmssignature',
-				label: 'Signature Template',
-				command: 'mmssignature'
-			}],
-			label: {
-				text: 'More features',
-				width: 45,
-				visible: true //default value
-			},
-			iconPath: 'dropdown', //You can use global icons or absolute path to the icon
-			toolbar: 'custom', // to specify toolbar group for button
-		},
-		'ExtraFormatting': {
-			items:
-				[
-					{	
-						name: 'Strike',
-						label: 'Strikethrough',
-						command: 'strike'
-					},
-					{	
-						name: 'Superscript',
-						label: 'Superscript',
-						command: 'superscript'
-					},
-					{	
-						name: 'Subscript',
-						label: 'Subscript',
-						command: 'subscript'
-					},
+	// config.dropdownmenumanager = {
+	// 	'MoreFeatures': {
+	// 		items:[{	
+	// 			name: 'Mmscf',
+	// 			label: 'Cross Reference',
+	// 			command: 'mmscf'
+	// 		},
+	// 		{
+	// 			name: 'Mmsvlink',
+	// 			label: 'View/Section Link',
+	// 			command: 'mmsvlink'
+	// 		},
+	// 		{
+	// 			name: 'Link',
+	// 			command: 'link'
+	// 		},
+	// 		{
+	// 			name: 'Table',
+	// 			command: 'table'
+	// 		},
+	// 		{
+	// 			name: 'Image',
+	// 			command: 'image'
+	// 		},
+	// 		{
+	// 			name: 'Iframe',
+	// 			command: 'iframe'
+	// 		},
+	// 		{
+	// 			name: 'Mathjax',
+	// 			label: 'Equation',
+	// 			command: 'mathjax'
+	// 		},
+	// 		{
+	// 			name: 'SpecialChar',
+	// 			label: 'Math',
+	// 			command: 'specialchar'
+	// 		},
+	// 		{
+	// 			name: 'Mmscomment',
+	// 			label: 'Comment',
+	// 			command: 'mmscomment'
+	// 		},
+	// 		{
+	// 			name: 'CodeSnippet',
+	// 			label: 'Code Snippet',
+	// 			command: 'codeSnippet'
+	// 		},	
+	// 		{
+	// 			name: 'Blockquote',
+	// 			label: 'Quote',
+	// 			command: 'blockquote'
+	// 		},
+	// 		{
+	// 			name: 'PageBreak',
+	// 			label: 'Page break for printing',
+	// 			command: 'pagebreak'
+	// 		},
+	// 		{
+	// 			name: 'HorizontalRule',
+	// 			label: 'Horizontal Rule',
+	// 			command: 'horizontalrule'
+	// 		},
+	// 		{
+	// 			name: 'Mmsreset',
+	// 			label: 'Update Cross Ref',
+	// 			command: 'mmsreset'
+	// 		},
+	// 		{
+	// 			name: 'Mmssignature',
+	// 			label: 'Signature Template',
+	// 			command: 'mmssignature'
+	// 		}],
+	// 		label: {
+	// 			text: 'More features',
+	// 			width: 45,
+	// 			visible: true //default value
+	// 		},
+	// 		iconPath: '/lib/ckeditor/skins/moono-lisa/images/lock-open.png', //You can use global icons or absolute path to the icon
+	// 		toolbar: 'custom', // to specify toolbar group for button
+	// 	},
+	// 	'ExtraFormatting': {
+	// 		items:
+	// 			[
+	// 				{	
+	// 					name: 'Strike',
+	// 					label: 'Strikethrough',
+	// 					command: 'strike'
+	// 				},
+	// 				{	
+	// 					name: 'Superscript',
+	// 					label: 'Superscript',
+	// 					command: 'superscript'
+	// 				},
+	// 				{	
+	// 					name: 'Subscript',
+	// 					label: 'Subscript',
+	// 					command: 'subscript'
+	// 				},
 					
-					{	
-						name: 'RemoveFormat',
-						label: 'Clear Formatting',
-						command: 'removeFormat'
-					}
-				],
-			label: {
-				text: 'Extra formatting',
-				width: 45,
-				visible: true //default value
-			},
-			iconPath: 'dropdown', //You can use global icons or absolute path to the icon
-			toolbar: 'custom', // to specify toolbar group for button
-		}
-	};
+	// 				{	
+	// 					name: 'RemoveFormat',
+	// 					label: 'Clear Formatting',
+	// 					command: 'removeFormat'
+	// 				}
+	// 			],
+	// 		label: {
+	// 			text: 'Extra formatting',
+	// 			width: 45,
+	// 			visible: true //default value
+	// 		},
+	// 		iconPath: '/lib/ckeditor/skins/moono-lisa/images/lock.png', //You can use global icons or absolute path to the icon
+	// 		toolbar: 'custom', // to specify toolbar group for button
+	// 	}
+	// };
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Subscript,Superscript,Blockquote';
