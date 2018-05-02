@@ -1175,6 +1175,12 @@ Element not found styling
 .mmsExtraFeature a.cke_combo_button .cke_combo_inlinelabel {
   width: 17%;
   height: 25px;
-  display: inline-block;  
-  background: url('/lib/ckeditor/skins/moono-lisa/images/lock.png') no-repeat center !important;
+  display: inline-block;
  }
+.mmsExtraFormat a.cke_combo_button .cke_combo_inlinelabel {
+  background: url('/assets/format-dropdown.png') no-repeat center !important;
+  background-size: 16px !important; 
+}
+.mmsExtraFeature a.cke_combo_button .cke_combo_inlinelabel {
+  background: url('/lib/ckeditor/skins/moono-lisa/images/lock.png') no-repeat center !important;
+}
