@@ -190,7 +190,7 @@ describe("URLService", function () {
 			accept: true
 		};
 		it('should create the url to query for element history', function () {
-			var elementHistoryUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
+			var elementHistoryUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
 			expect(elementHistoryUrl).toBe(URLServiceObj.getElementHistoryURL(reqOb));
 		});
 	});
@@ -219,7 +219,7 @@ describe("URLService", function () {
 			accept: true
 		};
 		it('should create the url to query for element keyword search', function () {
-			var elementSearchUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?extended=true';
+			var elementSearchUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?checkType=true&extended=true';
 			expect(elementSearchUrl).toBe(URLServiceObj.getElementSearchURL(reqOb));
 		});
 	});

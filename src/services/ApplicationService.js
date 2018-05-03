@@ -17,6 +17,7 @@ angular.module('mms')
 function ApplicationService($q, $http, URLService) {
     var source = createUniqueId();
     var username;
+    var state = {};
 
     function createUniqueId() {
         function s4() {
@@ -60,12 +61,17 @@ function ApplicationService($q, $http, URLService) {
         return username;
     };
 
+    var getState = function() {
+        return state;
+    };
+
     return {
         getSource: getSource,
         createUniqueId: createUniqueId,
         getMmsVersion: getMmsVersion,
         setUserName: setUserName,
-        getUserName: getUserName
+        getUserName: getUserName,
+        getState: getState
     };
 
 }

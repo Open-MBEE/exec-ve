@@ -15,8 +15,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.tbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
     $rootScope.ve_tree_pane = $scope.$pane;
-    if ($rootScope.veTreeShowPe !== false) {
-        $rootScope.veTreeShowPe = true;
+    if (!$rootScope.veTreeShowPe) {
+        $rootScope.veTreeShowPe = false;
     }
     $scope.buttons = [];
     $scope.treeButtons = [];
@@ -40,7 +40,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $scope.tbApi.init = function() {
         if ($state.includes('project.ref.document')) {
-            $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
+            var viewModeButton = UxService.getButtonBarButton("view-mode-dropdown");
+            $scope.tbApi.addButton(viewModeButton);
+            $scope.tbApi.select(viewModeButton, $rootScope.veTreeShowPe ? UxService.getButtonBarButton('tree-show-pe') : UxService.getButtonBarButton('tree-show-views'));
         }
     };
     
@@ -54,7 +56,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.bbApi.setPermission( "tree-delete-document", documentOb._editable &&  (refOb.type === 'Tag' ? false : true) );
         } else if ($state.includes('project.ref.document')) {
             // $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
-            $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
+            //$scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-view"));

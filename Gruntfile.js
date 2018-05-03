@@ -4,7 +4,7 @@ module.exports = function(grunt) {
   require('jit-grunt')(grunt, {
     // static mapping for tasks that don't match their modules' name
     useminPrepare: 'grunt-usemin',
-    setupProxies: 'grunt-middleware-proxy',
+    configureProxies: 'grunt-connect-proxy-updated',
     artifactory: 'grunt-artifactory-artifact'
   });
 
@@ -49,7 +49,7 @@ module.exports = function(grunt) {
           },
           middleware: function (connect, options, middlewares) {
             middlewares.unshift(
-              require('grunt-middleware-proxy/lib/Utils').getProxyMiddleware(),
+              require('grunt-connect-proxy-updated/lib/utils').proxyRequest,
               // add gzip compression to local server to reduce static resources' size and improve load speed
               require('compression')(),
               // need to add livereload as a middleware at this specific order to avoid issues with other middlewares
@@ -218,7 +218,6 @@ module.exports = function(grunt) {
         dest: 'dist/jsTemp/app.tpls.js'
       }
     },
-
     /** Concat + Minify JS files **/
     uglify: {
       combineCustomJS: {
@@ -358,8 +357,6 @@ module.exports = function(grunt) {
         },
         continuous:{
           configFile:'config/develop/karma.develop.conf.js',
-          singleRun: true,
-          browsers: ['PhantomJS'],
           logLevel: 'ERROR'
         }
     },
@@ -437,10 +434,10 @@ module.exports = function(grunt) {
     if (arg1) {
       grunt.log.writeln("Launching server with proxy");
 
-      grunt.task.run('setupProxies:' + arg1, 'connect:' + arg1);
+      grunt.task.run('configureProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('setupProxies:opencaeuat', 'connect:opencaeuat');
+      grunt.task.run('configureProxies:opencaeuat', 'connect:opencaeuat');
     }
     grunt.task.run('watch:' + build);
   });

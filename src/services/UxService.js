@@ -141,10 +141,10 @@ function UxService($rootScope) {
                     getButtonBarButton("tree-show-tables"), getButtonBarButton("tree-show-figures"),
                     getButtonBarButton("tree-show-equations")]};
       case "tree-show-views":
-        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Views',
+        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Views',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-pe":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show All',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show All',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-tables":
         return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Tables',

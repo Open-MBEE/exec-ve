@@ -123,6 +123,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.label = mode === 3 ? 'PDF' : mode === 2 ? 'Word' : '';
                 $scope.mode = mode;
                 $scope.meta = {};
+                var print = angular.element("#print-div");
+                if (print.find('.mms-error').length > 0) {
+                    $scope.hasError = true;
+                }
                 if (isDoc) {
                     $scope.meta = {
                         'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
@@ -273,14 +277,17 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
         var tableAndFigTOC = {figures: '', tables: '', equations: ''};
         UtilsService.convertViewLinks(printElementCopy);
-        if (genTotf) {
+        //if (genTotf) {
             tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
-        }
+        //}
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
         if (!isDoc) {
             toc = tof = tot = toe = '';
+        }
+        if (!genTotf) {
+            tof = tot = toe = '';
         }
         angular.element(printElementCopy).find("a").attr('href', function(index, old) {
             if (!old)
@@ -300,7 +307,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var comments = printElementCopy.find('mms-transclude-com');
         comments.remove();
         printElementCopy.find('div.tableSearch').remove();
-        printElementCopy.find('.mms-error').html('error');
+        //printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
 

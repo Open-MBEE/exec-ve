@@ -3,6 +3,7 @@
   "description": "mms ve module",
   "repository": "https://github.com/Open-MBEE/EMS-Webapp.git",
   "devDependencies": {
+    "babel-polyfill": "^6.26.0",
     "compression": "^1.7.1",
     "connect-livereload": "^0.6.0",
     "grunt": "^1.0.1",
@@ -10,6 +11,7 @@
     "grunt-bower-install-simple": "1.2.4",
     "grunt-cache-bust": "^1.6.0",
     "grunt-concurrent": "^2.3.1",
+    "grunt-connect-proxy-updated": "^0.2.1",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-connect": "~1.0.2",

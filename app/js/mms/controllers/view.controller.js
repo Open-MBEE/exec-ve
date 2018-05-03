@@ -132,14 +132,6 @@ angular.module('mmsApp')
                 } else {
                     $scope.bbApi.addButton(UxService.getButtonBarButton('export'));
                 }
-                if ($rootScope.ve_treeApi && $rootScope.ve_treeApi.get_selected_branch) {
-                    var selected_branch = $rootScope.ve_treeApi.get_selected_branch();
-                    while (selected_branch && selected_branch.type !== 'view' && viewOb.type !== 'InstanceSpecification') {
-                        selected_branch = $rootScope.ve_treeApi.get_parent_branch(selected_branch);
-                    }
-                    if (selected_branch)
-                        $scope.sectionNumber = selected_branch.section;
-                }
             }
         }
     };
