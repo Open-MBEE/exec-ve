@@ -14,8 +14,8 @@ CKEDITOR.plugins.add('mmsdropdown',
                 panel: {css: [CKEDITOR.skin.getPath('editor')].concat(config.contentsCss)},
 
                 init: function () {
-                    this.add('mmscf', createItem({ isMmsCustomPlugin: true, imgSrc: '/lib/ckeditor/plugins/mmscf/icons/mmscf.png', label: 'Cross Reference' }), 'Add a cross reference');
-                    this.add('mmsvlink', createItem({ isMmsCustomPlugin: true, imgSrc: '/lib/ckeditor/plugins/mmsvlink/icons/mmsvlink.png', label: 'View/Section Link' }), 'Add a view/section link');
+                    this.add('mmscf', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscf/icons/mmscf.png', label: 'Cross Reference' }), 'Add a cross reference');
+                    this.add('mmsvlink', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmsvlink/icons/mmsvlink.png', label: 'Cross reference as link' }), 'Add a view/section link');
                     this.add('', '<hr>');
 
                     this.add('link', createItem({ isMmsCustomPlugin: false, iconClass: 'link', label: 'Link' }), 'Add a link');
@@ -26,7 +26,7 @@ CKEDITOR.plugins.add('mmsdropdown',
                     this.add('specialchar', createItem({ isMmsCustomPlugin: false, iconClass: 'specialchar', label: 'Math' }), 'Add a symbol');
                     this.add('', '<hr>');
 
-                    this.add('mmscomment', createItem({ isMmsCustomPlugin: true, imgSrc: '/lib/ckeditor/plugins/mmscomment/icons/mmscomment.png', label: 'Comment' }), 'Add a comment');
+                    this.add('mmscomment', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscomment/icons/mmscomment.png', label: 'Comment' }), 'Add a comment');
                     this.add('', '<hr>');
 
                     this.add('codeSnippet', createItem({ isMmsCustomPlugin: false, iconClass: 'codesnippet', label: 'Code Snippet' }), 'Add a code snippet');
@@ -37,7 +37,7 @@ CKEDITOR.plugins.add('mmsdropdown',
                     this.add('horizontalrule', createItem({ isMmsCustomPlugin: false, iconClass: 'horizontalrule', label: 'Horizontal Rule' }), 'Add a horizontal');
                     this.add('', '<hr>');
 
-                    this.add('mmssignature', createItem({ isMmsCustomPlugin: true, imgSrc: '/lib/ckeditor/plugins/mmssignature/icons/mmssignature.png', label: 'Signature template' }), 'Add a signature template');
+                    this.add('mmssignature', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmssignature/icons/mmssignature.png', label: 'Signature template' }), 'Add a signature template');
                 },
 
                 onClick: function (command) {
