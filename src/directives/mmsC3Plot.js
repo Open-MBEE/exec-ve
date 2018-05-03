@@ -23,9 +23,6 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         if (!commitId)
             commitId = viewVersion.commitId;
     }
-    //if ( scope.plot.config.length !== 0){
-      //scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"'));
-    //} 
     /*
     Convert a json definining functions in an array of keys (axis, x, tick, format, function(...))
     The last entry is a function value.
@@ -96,8 +93,8 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
         }
       }
       
-      console.log(JSON.stringify(c3json));
-      var chart = c3.generate(c3json);
+      //console.log(JSON.stringify(c3json));
+      c3.generate(c3json);
     }//end of vf_pplot()
   
     scope.render = function() {
