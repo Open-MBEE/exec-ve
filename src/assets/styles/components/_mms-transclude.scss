@@ -67,7 +67,7 @@ mms-view.editing mms-transclude-com {
 }
 
 mms-view:not(.editing):not(.outline) .placeholder {
-  display: none;
+  visibility: hidden;
 }
 
 mms-view:not(.reviewing) mms-transclude-com {

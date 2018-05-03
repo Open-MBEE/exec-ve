@@ -6,7 +6,7 @@
         <tr>
             <td><h3 class="Tag-icon">Tag</h3></td>
             <td><h3>Created</h3></td>
-            <td></td>
+            <td ng-if="isDoc && docEditable"></td>
         </tr>
     </thead>
     <tbody ng-show="filteredTags.length">
@@ -41,7 +41,7 @@
         <tr>
             <td><h3 class="Branch-icon">Branch</h3></td>
             <td><h3>Created</h3></td>
-            <td></td>
+            <td ng-if="isDoc && docEditable"></td>
         </tr>
     </thead>
     <tbody ng-show="filteredBranches.length">
