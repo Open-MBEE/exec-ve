@@ -34,7 +34,7 @@ mms-view.editing {
   mms-transclude-name > span,
   mms-transclude-val > span,
   mms-transclude-val > p {
-    @include transition(border, .5s);
+    @include transition(border, .3s);
     @include border-radius(5px);
     border: 2px solid $ve-silver-darker-1;
     cursor: pointer;

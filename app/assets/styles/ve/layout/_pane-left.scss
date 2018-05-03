@@ -21,7 +21,7 @@ $pane_left_btn_group_width: 226px;
 .container-pane-left {
   height: 100%;
   width: 100%;
-  background: $ve-silver-lighter-2;
+  background: $ve-silver-lighter-1;
 
   .pane-left {
     width: 100%;
@@ -39,7 +39,7 @@ $pane_left_btn_group_width: 226px;
       display: -webkit-flex; 
       display: flex;
       padding: 4px 5px;
-      background: $ve-silver-lighter-1;
+      background: $white;
       border-top: 1px solid $ve-silver-darker-1;
       border-bottom: 1px solid $ve-silver-darker-1;
 
