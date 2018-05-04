@@ -468,23 +468,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         return 0;
     };
 
-    ElementService.getElement({
-        projectId: documentOb._projectId,
-        refId: documentOb._refId,
-        elementId: documentOb.id + "_asi-slot-_18_5_3_8bf0285_1525395209859_614940_15902"
-    }).then(function(slot) {
-        if (slot.value && slot.value.length > 0) {
-            if (Number.isInteger(slot.value[0].value)) {
-                $scope.treeOptions.numberingDepth = slot.value[0].value;
-            } else if ((typeof slot.value[0].value) === 'string') {
-                var val = parseInt(slot.value[0].value);
-                if (!isNaN(val)) {
-                    $scope.treeOptions.numberingDepth = val;
-                }
-            }
-        }
-    });
-
     $scope.treeOptions = {
         types: UxService.getTreeTypes(),
         sectionNumbering: $state.includes('project.ref.document') ? true : false,
@@ -496,6 +479,24 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         onDblclick: treeDblclickHandler,
         sort: $state.includes('project.ref.document') ? null : treeSortFunction
     };
+    if (documentOb) {
+        ElementService.getElement({
+            projectId: documentOb._projectId,
+            refId: documentOb._refId,
+            elementId: documentOb.id + "_asi-slot-_18_5_3_8bf0285_1525395209859_614940_15902"
+        }).then(function(slot) {
+            if (slot.value && slot.value.length > 0) {
+                if (Number.isInteger(slot.value[0].value)) {
+                    $scope.treeOptions.numberingDepth = slot.value[0].value;
+                } else if ((typeof slot.value[0].value) === 'string') {
+                    var val = parseInt(slot.value[0].value);
+                    if (!isNaN(val)) {
+                        $scope.treeOptions.numberingDepth = val;
+                    }
+                }
+            }
+        });
+    }
 
     $scope.fullDocMode = function() {
         if ($rootScope.ve_fullDocMode) {
