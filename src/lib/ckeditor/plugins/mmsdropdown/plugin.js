@@ -22,8 +22,8 @@ CKEDITOR.plugins.add('mmsdropdown',
                     this.add('table', createItem({ isMmsCustomPlugin: false, iconClass: 'table', label: 'Table' }), 'Add a table');
                     this.add('image', createItem({ isMmsCustomPlugin: false, iconClass: 'image', label: 'Image' }), 'Add an image');
                     this.add('iframe', createItem({ isMmsCustomPlugin: false, iconClass: 'iframe', label: 'Iframe' }), 'Add an iframe');
-                    this.add('mathjax', createItem({ isMmsCustomPlugin: false, iconClass: 'mathjax', label: 'Equation' }), 'Add an equation');
-                    this.add('specialchar', createItem({ isMmsCustomPlugin: false, iconClass: 'specialchar', label: 'Math' }), 'Add a symbol');
+                    this.add('mathjax', createItem({ isMmsCustomPlugin: false, iconClass: 'mathjax', label: 'Math' }), 'Add an equation');
+                    this.add('specialchar', createItem({ isMmsCustomPlugin: false, iconClass: 'specialchar', label: 'Special Character' }), 'Add a symbol');
                     this.add('', '<hr>');
 
                     this.add('mmscomment', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscomment/icons/mmscomment.png', label: 'Comment' }), 'Add a comment');

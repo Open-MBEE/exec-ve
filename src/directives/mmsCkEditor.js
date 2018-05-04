@@ -201,7 +201,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         // If user selects name or doc, link will be to first related doc
         // Also defines options for search interfaces -- see mmsSearch.js for more info
         var transcludeViewLinkCtrl = function($scope, $uibModalInstance, ApplicationService) {
-            $scope.title = 'Insert view link';
+            $scope.title = 'Insert cross reference as link';
 
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
 
@@ -416,7 +416,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         var thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, extraToolbar, linksToolbar, tableImageEquationToolbar, commentToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
         switch(scope.mmsEditorType) {
             case 'TableT':
-                thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+                //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
                 break;
             case 'ListT':
                 thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
