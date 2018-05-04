@@ -6,7 +6,7 @@
 
 /*take PE button out of document flow and put to left of content*/
   position: absolute;
-  margin-top: -1em;
+  margin-top: -16px;
   left: 0;
 
   /*** Add PE dropdown ***/
@@ -15,11 +15,20 @@
   a.dropdown-toggle{
     @include border-radius(4px 0 0 4px);
     border: 1px solid $white;
-    /*Special line-height so it aligns with the dropdown menu*/
-    line-height: 1.8em;
-    padding-left: 8px;
-    padding-right: 8px;
   }
+
+  //Padding, font size, and line height match for the toggle and dropdown
+  a.dropdown-toggle,
+  .dropdown-menu a{
+    padding: 4px 8px 2px;
+    font-size: 14px;
+  }
+
+  /*Special line-height so icons align*/
+  .dropdown-menu a::before,
+  a.dropdown-toggle .fa{
+      line-height: 1.5;
+    }
 
   /*Special horizontal dropdown menu */
   .dropdown-menu {
@@ -34,24 +43,22 @@
     &::after{
       background-image: url(../assets/location-feedback-inline.svg);
       content: ' ';
-      background-size: 70px 30px;
-      height: 30px;
+      background-size: 70px 4px;
+      height: 4px;
       width: 70px;
       background-repeat: no-repeat;
       position: absolute;
       right: -70px;
-      top: 0;
+      top: 13px;
     }
 
-    /*Special padding to align with add button*/
-    li > a{
-      padding: .1em 1.2em;
-      line-height: 1.6em;
-      font-size: 16px;
-    }
     /*Horizontal menu that should be more consistent across browsers*/
     li{
       display: inline-block;
+      a{
+        padding-left: 18px;
+        padding-right: 18px;
+      }
     }
   }
 
