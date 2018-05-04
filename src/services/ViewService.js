@@ -72,12 +72,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
         TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table, TYPE_TO_CLASSIFIER_ID.Figure];
 
-    var processString = function(values) {
-        if (!values || values.length === 0 || values[0].type !== 'LiteralString')
-            return '';
-        return values[0].value;
-    };
-    var processStrings = function(values) {
+    var processSlotStrings = function(values) {
         var res = [];
         if (!values || values.length === 0)
             return res;
@@ -87,108 +82,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             res.push(value.value);
         });
         return res;
-    };
-    var processPeople = function(values) {
-        if (!values || values.length === 0)
-            return [];
-        var people = [];
-        values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.value)
-                return;
-            var p = value.value.split(',');
-            if (p.length !== 5)
-                return;
-            people.push({
-                firstname: p[0],
-                lastname: p[1],
-                title: p[2],
-                orgname: p[3],
-                orgnum: p[4]
-            });
-        });
-        return people;
-    };
-    var processRevisions = function(values) {
-        if (!values || values.length === 0)
-            return [];
-        var rev = [];
-        values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.value)
-                return;
-            var p = value.value.split('|');
-            if (p.length !== 5)
-                return;
-            rev.push({
-                revnum: p[0],
-                date: p[1],
-                firstname: p[2],
-                lastname: p[3],
-                remark: p[4]
-            });
-        });
-        return rev;
-    };
-    var docMetadataTypes = {
-        '_17_0_1_407019f_1326234342817_186479_2256': {
-            name: 'header',
-            process: processString
-        },
-        '_17_0_1_407019f_1326234349580_411867_2258': {
-            name: 'footer',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903710_685116_36989': {
-            name: 'dnumber',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903991_141146_36990': {
-            name: 'version',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903994_494629_36996': {
-            name: 'titlelegal',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903994_370992_36997': {
-            name: 'footerlegal',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903995_652492_37000': {
-            name: 'authors',
-            process: processPeople
-        },
-        '_17_0_2_3_f4a035d_1366647903996_970714_37001': {
-            name: 'approvers',
-            process: processPeople
-        },
-        '_17_0_2_3_f4a035d_1366647903996_463299_37002': {
-            name: 'concurrences',
-            process: processPeople
-        },
-        '_17_0_2_3_f4a035d_1366698987711_498852_36951': {
-            name: 'revisions',
-            process: processRevisions
-        },
-        '_17_0_2_3_f4a035d_1366696484320_980107_36953': {
-            name: 'project',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903995_864529_36998': {
-            name: 'emails',
-            process: processStrings
-        },
-        '_17_0_2_3_e9f034d_1375464775176_680884_29346': {
-            name: 'instlogo',
-            process: processString
-        },
-        '_17_0_2_3_e9f034d_1375464942934_241960_29357': {
-            name: 'inst1',
-            process: processString
-        },
-        '_17_0_2_3_e9f034d_1375464993159_319060_29362': {
-            name: 'inst2',
-            process: processString
-        }
     };
 
     /**
@@ -1138,7 +1031,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var metadata = {};
         reqOb.depth = 2;
         //ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
-        ElementService.getOwnedElements(reqOb, weight)
+        reqOb.elementIds = [reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234342817_186479_2256', reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234349580_411867_2258'];
+        ElementService.getElements(reqOb, weight)
         .then(function(data) {
             if (data.length === 0) {
                 return;
@@ -1147,10 +1041,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var prop = data[i];
                 var feature = prop.definingFeatureId ? prop.definingFeatureId : null;
                 var value = prop.value ? prop.value : null;
-                if (!feature || !docMetadataTypes[feature] || !value || value.length === 0) {
+                if (!feature || !value || value.length === 0) {
                     continue;
                 }
-                metadata[docMetadataTypes[feature].name] = docMetadataTypes[feature].process(value);
+                var result = processSlotStrings(value);
+                if (feature === '_17_0_1_407019f_1326234342817_186479_2256') { //header
+                    metadata.top = result.length > 0 ? result[0] : '';
+                    metadata.topl = result.length > 1 ? result[1] : '';
+                    metadata.topr = result.length > 2 ? result[2] : '';
+                } else if (feature == '_17_0_1_407019f_1326234349580_411867_2258') {//footer
+                    metadata.bottom = result.length > 0 ? result[0] : '';
+                    metadata.bottoml = result.length > 1 ? result[1] : '';
+                    metadata.bottomr = result.length > 2 ? result[2] : '';
+                }
             }
         }, function(reason) {
         }).finally(function() {
