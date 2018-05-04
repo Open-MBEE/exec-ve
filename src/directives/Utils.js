@@ -460,7 +460,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         scope.elementSaving = true;
 
         var work = function() {
-            save(scope.edit, null, scope, continueEdit).then(function(data) {
+            save(scope.edit, scope.editorApi, scope, continueEdit).then(function(data) {
                 scope.elementSaving = false;
                 if (!continueEdit) {
                     scope.isEditing = false;

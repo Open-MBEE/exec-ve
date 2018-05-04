@@ -70,7 +70,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
-
+        scope.editorApi = {};
         domElement.click(function(e) {
             if (scope.startEdit && !scope.nonEditable)
                 scope.startEdit();

@@ -1055,6 +1055,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
+            if (!elementId) {
+                return;
+            }
             elementId = elementId.replace(/[^\w\-]/gi, '');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
