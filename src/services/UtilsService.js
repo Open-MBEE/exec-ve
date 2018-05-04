@@ -702,7 +702,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             return '';
         var result = '<ul>';
         var anchor = '<a href=#' + child.data.id + '>';
-        result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
+        result += '  <li>' + anchor + child.data._veNumber + ' ' + child.data.name + '</a></li>';
         var i = 0;
         for (i = 0; i < child.children.length; i++) {
             result += makeHtmlTOCChild(child.children[i]);
