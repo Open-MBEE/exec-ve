@@ -137,10 +137,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         projectId: viewOrDocOb._projectId,
                         refId: viewOrDocOb._refId
                     }, 2).then(function(metadata) {
-                        $scope.meta.top = metadata.header ? metadata.header : '';
-                        $scope.meta.bottom = metadata.footer ? metadata.footer : '';
-                        $scope.meta['top-left'] = metadata.dnumber ? metadata.dnumber : '';
-                        $scope.meta['top-right'] = metadata.version ? metadata.version : '';
+                        $scope.meta.top = metadata.top ? metadata.top : '';
+                        $scope.meta.bottom = metadata.bottom ? metadata.bottom : '';
+                        $scope.meta['top-left'] = metadata.topl ? metadata.topl : '';
+                        $scope.meta['top-right'] = metadata.topr ? metadata.topr : '';
                         if (refOb && refOb.type === 'Tag') {
                             $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + refOb.name;
                         }
@@ -150,8 +150,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                             displayTime = $filter('date')(displayTime, 'M/d/yy h:mm a');
                         }
                         $scope.meta['top-right'] = $scope.meta['top-right'] + ' ' + displayTime;
-                        $scope.meta['bottom-left'] = '';
-                        $scope.meta['bottom-right'] = 'counter(page)';
+                        $scope.meta['bottom-left'] = metadata.bottoml ? metadata.bottoml : '';
+                        $scope.meta['bottom-right'] = metadata.bottomr ? metadata.bottomr : 'counter(page)';
                     }, function(reason) {
                         $scope.meta['top-left'] = $scope.meta.top = $scope.meta['top-right'] = $scope.meta['bottom-left'] = $scope.meta.bottom = '';
                         $scope.meta['bottom-right'] = 'counter(page)';
