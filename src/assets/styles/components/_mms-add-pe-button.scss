@@ -91,7 +91,6 @@ mms-view-section .mms-add-pe-button {
   border-top: 3px dashed rgb(0, 153, 255);
   height: 0px;
   margin: 0px;
-  width: 90%;
 }
 .add-pe-button-container:hover hr {
   visibility: visible; //maybe toggle visibility with js for hover and click?
@@ -101,4 +100,5 @@ mms-view-section .add-pe-button-container hr {
   left: 25px;
   bottom: 15px;
   position: relative;
+  width: calc(100% - 25px);
 }
