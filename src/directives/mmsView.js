@@ -200,8 +200,11 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
          * Add specified element at the defined 'index'
          */
         scope.addEltAction = function (index, type) {
-             scope.addPeIndex = index;
-             Utils.addPresentationElement(scope, type, scope.view);
+            if (!scope.showEdits) {
+                return;
+            }
+            scope.addPeIndex = index;
+            Utils.addPresentationElement(scope, type, scope.view);
         };
 
         /**

@@ -24,9 +24,6 @@ mms-view {
       display: inline;
     }
   }
-  .add-pe-button-container {
-    display: none;
-  }
 }
 
 mms-view.outline,
@@ -37,7 +34,7 @@ mms-view.editing {
   mms-transclude-name > span,
   mms-transclude-val > span,
   mms-transclude-val > p {
-    @include transition(border, .5s);
+    @include transition(border, .3s);
     @include border-radius(5px);
     border: 2px solid $ve-silver-darker-1;
     cursor: pointer;
@@ -61,12 +58,6 @@ mms-view.editing {
   }
 }
 
-mms-view.editing {
-  .add-pe-button-container {
-    display: block;
-  }
-}
-
 /* comments */
 mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
@@ -76,7 +67,7 @@ mms-view.editing mms-transclude-com {
 }
 
 mms-view:not(.editing):not(.outline) .placeholder {
-  display: none;
+  visibility: hidden;
 }
 
 mms-view:not(.reviewing) mms-transclude-com {

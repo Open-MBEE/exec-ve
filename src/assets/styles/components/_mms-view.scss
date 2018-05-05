@@ -19,6 +19,27 @@ mms-view {
   table {
     @extend .content-table;
   }
+
+  .add-pe-button-container, .last-modified {
+    //opacity: 0;
+    display: block;
+    visibility: hidden;
+  }
+}
+
+mms-view.editing,
+mms-view.outline {
+  .last-modified {
+    //opacity: 1;
+    visibility: visible;
+  }
+}
+
+mms-view.editing {
+  .add-pe-button-container {
+    //opacity: 1;
+    visibility: visible;
+  }
 }
 
 mms-view-section {
