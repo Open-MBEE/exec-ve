@@ -64,7 +64,11 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
             var id = scope.mmsElementId;
-            id = id.replace(/[^\w\-]/gi, '');
+            if (id) {
+                id = id.replace(/[^\w\-]/gi, '');
+            } else if (scope.mmsPeId && !scope.mmsDocId) {
+                id = ApplicationService.getState().currentDoc;
+            }
 
             var reqOb = {elementId: id, projectId: projectId, refId: refId, commitId: commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)

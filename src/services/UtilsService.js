@@ -723,7 +723,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             return '';
         var result = '<ul>';
         var anchor = '<a href=#' + child.data.id + '>';
-        result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
+        result += '  <li>' + anchor + child.data._veNumber + ' ' + child.data.name + '</a></li>';
         var i = 0;
         for (i = 0; i < child.children.length; i++) {
             result += makeHtmlTOCChild(child.children[i]);
@@ -1055,6 +1055,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
+            if (!elementId) {
+                return;
+            }
             elementId = elementId.replace(/[^\w\-]/gi, '');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {

@@ -6,27 +6,24 @@
         <div class="tree-options">
             <mms-button-bar buttons="treeButtons" mms-bb-api="tbApi"></mms-button-bar>
             <input class="ve-plain-input" ng-model-optoins="{debounce: 1000}"
-                ng-model="treeFilter.search" type="text" placeholder="Filter tree"
+                ng-model="treeOptions.search" type="text" placeholder="Filter tree"
                 ng-change="treeApi.expand_all()" style="flex:2">
         </div>
     </div>
 </div>
 <div fa-pane pane-anchor="center" pane-no-toggle="true">
     <div class="pane-left" style="display:table;">
-        <mms-tree ng-show="'showTree'==(activeMenu)" search="treeFilter.search" tree-data="treeData"
-                section-numbering="treeSectionNumbering" tree-control="treeApi" on-select="treeClickHandler(branch)"
-                on-dblclick="treeDblclickHandler(branch)" expand-level="{{treeExpandLevel}}"
-                initial-selection="{{ve_treeInitial}}" options="treeOptions"></mms-tree>
+        <mms-tree ng-show="'showTree'==(activeMenu)" tree-data="treeData"
+                tree-control="treeApi" initial-selection="{{ve_treeInitial}}" options="treeOptions"></mms-tree>
 
         <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
             <h5 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h5>
             <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-                <li ng-repeat=" row in view.branchList | filter:treeFilter.search track by $index  "
+                <li ng-repeat=" row in view.branchList | filter:treeOptions.search track by $index  "
                     class="abn-tree-row">
                     <div class="arrow" ng-click="user_clicks_branch(row)"
                         ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.id}}">
-                        <a class="tree-item" style="padding-left: 20px; position:relative;"
-                        ng-click="my_tree_handler(row)">
+                        <a class="tree-item" style="padding-left: 20px; position:relative;">
                             <i ng-class="{'active-text': row.branch.selected}"
                             class="indented tree-icon fa {{view.icon}}"></i>
                             <!-- TODO active branch -->
