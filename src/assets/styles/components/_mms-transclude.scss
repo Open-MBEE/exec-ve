@@ -85,6 +85,7 @@ mms-view:not(.reviewing) mms-transclude-com {
 figcaption, .mms-equation-caption, caption {
   text-align: center;
   font-weight: bold;
+  cursor: pointer;
 }
 
 mms-transclude-img img {
