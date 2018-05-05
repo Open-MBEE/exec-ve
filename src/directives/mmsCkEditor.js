@@ -201,7 +201,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         // If user selects name or doc, link will be to first related doc
         // Also defines options for search interfaces -- see mmsSearch.js for more info
         var transcludeViewLinkCtrl = function($scope, $uibModalInstance, ApplicationService) {
-            $scope.title = 'Insert view link';
+            $scope.title = 'Insert cross reference as link';
 
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
 
@@ -397,50 +397,37 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         };
         
         // Formatting editor toolbar
-        var defaultToolbar = [
-            { name: 'clipboard',   items : [ 'Undo','Redo' ] },
-            { name: 'editing',     items : [ 'Find','Replace' ] },
-            { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','Subscript','Superscript','Blockquote','-','RemoveFormat' ] },
-            { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
-            { name: 'links',       items : [ 'Link','Unlink','-','CodeSnippet' ] },
-            { name: 'insert',      items : [ 'PageBreak','HorizontalRule' ] },
-            { name: 'document',    items : [ 'Maximize', 'Source' ] },
-            '/',
-            { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
-        ];
-        var justifyToolbar =  { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] };
-        var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
-        var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
-        var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
+        var stylesToolbar = { name: 'styles', items : ['Format','FontSize','TextColor','BGColor' ] };
+        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat', '-'] };
+        var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
+        var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
+        var editingToolbar = { name: 'editing', items : [ 'Find','Replace' ] };
+        var linksToolbar = { name: 'links', items : [ 'Link','Unlink','-' ] };
+        var extraToolbar = {name: 'extra', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'}, {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, '-']};
+        var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
+        var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        // var customToolbar =   { name: 'custom',   items: [ 'Mmscf','mmsreset','Mmscomment','Mmsvlink','Mmssignature' ] };
-        var customToolbar =   { name: 'custom',   items: [ 'MMSInsertMenu', 'Mmssignature'] };
-        var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
-
-        //Set toolbar based on editor type
-        var thisToolbar = defaultToolbar.slice();
-        thisToolbar.push(listToolbar);
-        thisToolbar.push(tableToolbar);
-        thisToolbar.push(imageToolbar);
-        thisToolbar.push(equationToolbar);
-        thisToolbar.push(customToolbar);
-        if (scope.mmsEditorType === 'TableT') {
-          thisToolbar = defaultToolbar.slice();
-          thisToolbar.push(tableToolbar);
-          thisToolbar.push(equationToolbar);
-          thisToolbar.push(customToolbar);
-        }
-        if (scope.mmsEditorType === 'ListT') {
-          thisToolbar = defaultToolbar.slice();
-          thisToolbar.push(listToolbar);
-          thisToolbar.push(equationToolbar);
-          thisToolbar.push(customToolbar);
-        }
-        if (scope.mmsEditorType === 'Figure' || scope.mmsEditorType === 'ImageT') {
-          thisToolbar = [sourceToolbar, justifyToolbar, imageToolbar];
-        }
-        if (scope.mmsEditorType === 'Equation') {
-            thisToolbar = [sourceToolbar, justifyToolbar, equationToolbar];
+        var dropdownToolbar = { name: 'custom', items: [ 'mmsExtraFeature'] };
+        var sourceToolbar = { name: 'source', items: [ 'Maximize','Source' ] };
+        var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
+        var tableImageEquationToolbar = { name: 'combined', items: ['Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', '-' ]};
+        var commentToolbar = {name: 'comment', items: [{name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}]};
+        
+        var thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, extraToolbar, linksToolbar, tableImageEquationToolbar, commentToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+        switch(scope.mmsEditorType) {
+            case 'TableT':
+                //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+                break;
+            case 'ListT':
+                thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+                break;
+            case 'Equation':
+                thisToolbar = [justifyToolbar, equationToolbar, sourceToolbar];
+                break;
+            case 'Figure':
+            case 'ImageT':
+                thisToolbar = [justifyToolbar, imageToolbar, sourceToolbar];
+                break;
         }
 
         $timeout(function() {
