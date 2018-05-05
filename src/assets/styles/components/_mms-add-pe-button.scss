@@ -39,7 +39,7 @@
     border-color: darken($white, 12%);
     @include box-shadow( 6px 6px 12px rgba(0,0,0,.175))
 
-    /*line to indicate where the presentation element will be added*/
+    /*line to indicate where the presentation element will be added
     &::after{
       background-image: url(../assets/location-feedback-inline.svg);
       content: ' ';
@@ -50,7 +50,7 @@
       position: absolute;
       right: -70px;
       top: 13px;
-    }
+    }*/
 
     /*Horizontal menu that should be more consistent across browsers*/
     li{
@@ -83,4 +83,22 @@
 mms-view-section .mms-add-pe-button {
   position: relative;
   margin-top: 0;
+}
+
+.add-pe-button-container hr {
+  visibility: hidden;
+  border: none;
+  border-top: 3px dashed rgb(0, 153, 255);
+  height: 0px;
+  margin: 0px;
+  width: 90%;
+}
+.add-pe-button-container:hover hr {
+  visibility: visible; //maybe toggle visibility with js for hover and click?
+}
+
+mms-view-section .add-pe-button-container hr {
+  left: 25px;
+  bottom: 15px;
+  position: relative;
 }
