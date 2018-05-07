@@ -367,7 +367,7 @@ div.tooltip-inner {
     color:$ve-white-text-darker-1;
   }
 
-  .branch-disabled::before {
+  li.branch-disabled::before {
     font-family:FontAwesome;
     content: "\2026";
     position: absolute;
