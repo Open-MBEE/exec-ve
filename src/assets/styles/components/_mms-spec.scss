@@ -89,10 +89,10 @@ Styles that apply to both the spec
   .visibility-toggle{
     list-style: none;
     margin: 12px 0 0 -14px;
-    position: relative;
 
     td{
-      line-height: 2.6em
+      line-height: 2.6em;
+      position: relative;
     }
 
     //Show more content caret
