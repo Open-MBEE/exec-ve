@@ -17,13 +17,23 @@ mms-view {
   }
 
   table {
-    @extend .content-table;
+    @extend .table-condensed;
+    @extend .table-bordered;
+    p {
+      margin: 0px 0px 5px;
+    }
   }
 
   .add-pe-button-container, .last-modified {
     //opacity: 0;
     display: block;
     visibility: hidden;
+  }
+
+  .read-width {
+    p, ol, ul { //figure, img, table, div
+      max-width: 630px;
+    }
   }
 }
 
