@@ -8,36 +8,36 @@ CKEDITOR.plugins.add('mmsdropdown',
                     : '<span> <span class="cke_button_icon cke_button__' + options.iconClass + '_icon"> </span> <span style="margin-left:3px">' + options.label + '</span> </span>';
             }
             editor.ui.addRichCombo('mmsExtraFeature', {
-                title: "More feature",
+                title: "Insert more content",
                 className: 'mmsExtraFeature',
                 multiSelect: false,
                 panel: {css: [CKEDITOR.skin.getPath('editor')].concat(config.contentsCss)},
 
                 init: function () {
-                    this.add('mmscf', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscf/icons/mmscf.png', label: 'Cross Reference' }), 'Add a cross reference');
-                    this.add('mmsvlink', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmsvlink/icons/mmsvlink.png', label: 'Cross reference as link' }), 'Add a view/section link');
+                    this.add('mmscf', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscf/icons/mmscf.png', label: 'Cross Reference' }), 'Insert Cross Reference');
+                    this.add('mmsvlink', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmsvlink/icons/mmsvlink.png', label: 'Cross Reference as link' }), 'Insert Cross Reference as link (View Link)');
                     this.add('', '<hr>');
 
-                    this.add('link', createItem({ isMmsCustomPlugin: false, iconClass: 'link', label: 'Link' }), 'Add a link');
-                    this.add('table', createItem({ isMmsCustomPlugin: false, iconClass: 'table', label: 'Table' }), 'Add a table');
-                    this.add('image', createItem({ isMmsCustomPlugin: false, iconClass: 'image', label: 'Image' }), 'Add an image');
-                    this.add('iframe', createItem({ isMmsCustomPlugin: false, iconClass: 'iframe', label: 'Iframe' }), 'Add an iframe');
-                    this.add('mathjax', createItem({ isMmsCustomPlugin: false, iconClass: 'mathjax', label: 'Math' }), 'Add an equation');
-                    this.add('specialchar', createItem({ isMmsCustomPlugin: false, iconClass: 'specialchar', label: 'Special Character' }), 'Add a symbol');
+                    this.add('link', createItem({ isMmsCustomPlugin: false, iconClass: 'link', label: 'Link' }), 'Insert link');
+                    this.add('table', createItem({ isMmsCustomPlugin: false, iconClass: 'table', label: 'Table' }), 'Insert table');
+                    this.add('image', createItem({ isMmsCustomPlugin: false, iconClass: 'image', label: 'Image' }), 'Insert image');
+                    this.add('iframe', createItem({ isMmsCustomPlugin: false, iconClass: 'iframe', label: 'Iframe' }), 'Insert iframe');
+                    this.add('mathjax', createItem({ isMmsCustomPlugin: false, iconClass: 'mathjax', label: 'Math' }), 'Insert math');
+                    this.add('specialchar', createItem({ isMmsCustomPlugin: false, iconClass: 'specialchar', label: 'Special Character' }), 'Insert symbol');
                     this.add('', '<hr>');
 
-                    this.add('mmscomment', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscomment/icons/mmscomment.png', label: 'Comment' }), 'Add a comment');
+                    this.add('mmscomment', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscomment/icons/mmscomment.png', label: 'Comment' }), 'Insert comment');
                     this.add('', '<hr>');
 
-                    this.add('codeSnippet', createItem({ isMmsCustomPlugin: false, iconClass: 'codesnippet', label: 'Code Snippet' }), 'Add a code snippet');
-                    this.add('blockquote', createItem({ isMmsCustomPlugin: false, iconClass: 'blockquote', label: 'Quote' }), 'Add a quote');
+                    this.add('codeSnippet', createItem({ isMmsCustomPlugin: false, iconClass: 'codesnippet', label: 'Code Snippet' }), 'Insert code snippet');
+                    this.add('blockquote', createItem({ isMmsCustomPlugin: false, iconClass: 'blockquote', label: 'Quote' }), 'Insert quote');
                     this.add('', '<hr>');
 
-                    this.add('pagebreak', createItem({ isMmsCustomPlugin: false, iconClass: 'pagebreak', label: 'Page break for printing' }), 'Add a page break');
-                    this.add('horizontalrule', createItem({ isMmsCustomPlugin: false, iconClass: 'horizontalrule', label: 'Horizontal Rule' }), 'Add a horizontal');
+                    this.add('pagebreak', createItem({ isMmsCustomPlugin: false, iconClass: 'pagebreak', label: 'Page break for printing' }), 'Insert page break');
+                    this.add('horizontalrule', createItem({ isMmsCustomPlugin: false, iconClass: 'horizontalrule', label: 'Horizontal Rule' }), 'Insert horizontal rule');
                     this.add('', '<hr>');
 
-                    this.add('mmssignature', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmssignature/icons/mmssignature.png', label: 'Signature template' }), 'Add a signature template');
+                    this.add('mmssignature', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmssignature/icons/mmssignature.png', label: 'Signature template' }), 'Insert signature template');
                 },
 
                 onClick: function (command) {
@@ -57,7 +57,7 @@ CKEDITOR.plugins.add('mmsdropdown',
                     this.add('subscript', createItem({ isMmsCustomPlugin: false, iconClass: 'subscript', label: 'Subscript' }), 'Subscript');
                     this.add('', '<hr>');
 
-                    this.add('removeFormat', createItem({ isMmsCustomPlugin: false, iconClass: 'removeformat', label: 'Clear Formatting' }), 'Add an equation');
+                    this.add('removeFormat', createItem({ isMmsCustomPlugin: false, iconClass: 'removeformat', label: 'Clear Formatting' }), 'Clear Formatting');
                 },
 
                 onClick: function (command) {

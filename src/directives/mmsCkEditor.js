@@ -65,7 +65,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 });
             }
 
-            $scope.title = 'Insert a cross reference';
+            $scope.title = 'Insert cross reference';
             $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
             $scope.requestName = false;

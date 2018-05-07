@@ -12,7 +12,7 @@ CKEDITOR.plugins.add('mmsvlink', {
     // Register mmsvlink widget to opens view link search window 
     // and insert mmsvlink tag as widget.
     editor.widgets.add('mmsvlink', {
-      button: 'Cross Reference as Link',
+      button: 'Insert Cross Reference as link',
       allowedContent: 'mms-view-link[*];',
       inline: true,
       insert: function () {
