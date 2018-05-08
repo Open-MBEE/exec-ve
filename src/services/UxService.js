@@ -135,25 +135,25 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
                 spinner: false, togglable: true, toggle_icon: 'fa-file-text', toggle_tooltip: 'View Mode', action: function() {$rootScope.$broadcast(button);}};
       case "view-mode-dropdown":
-        return {id: button, icon: 'fa-gear', selected: true, active: true, permission: true, tooltip: 'Filter by type',
+        return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter by type',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-show-pe"), getButtonBarButton("tree-show-views"),
                     getButtonBarButton("tree-show-tables"), getButtonBarButton("tree-show-figures"),
                     getButtonBarButton("tree-show-equations")]};
       case "tree-show-views":
-        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Views',
+        return {id: button, selected: true, active: true, permission: true, tooltip: 'Show Only Views',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-pe":
         return {id: button, selected: false, active: true, permission: true, tooltip: 'Show All',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-tables":
-        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Tables',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Only Tables',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-figures":
-        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Figures',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Only Figures',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-show-equations":
-        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Equations',
+        return {id: button, selected: false, active: true, permission: true, tooltip: 'Show Only Equations',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 
 
