@@ -28,8 +28,8 @@
   /*Special line-height so icons align*/
   .dropdown-menu a::before,
   a.dropdown-toggle .fa{
-      line-height: 1.5;
-    }
+    line-height: 1.5;
+  }
 
   /*Special horizontal dropdown menu */
   .dropdown-menu {
@@ -72,8 +72,8 @@
 
   /*When hovering over button or opening toggle, darken text and background to show activated*/
   span:hover a.dropdown-toggle,
-  .open > a.btn-placeholder.dropdown-toggle,
-  .open > a.btn-placeholder.dropdown-toggle:hover{
+  .open > a.dropdown-toggle,
+  .open > a.dropdown-toggle:hover{
     background-color: darken($white, 10%);
     border-color: darken($white, 12%);
     color: darken($tertiary-grey, 42%);
