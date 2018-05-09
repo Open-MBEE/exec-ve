@@ -713,20 +713,20 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         var peFilterQuery = function () {
             var classIdOb = {};
             if ($scope.presentationElemType === 'Table') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.TableT;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.TableT, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
             } else if ($scope.presentationElemType === 'List') {
-                classIdOb.classifierIds  = ViewService.TYPE_TO_CLASSIFIER_ID.ListT;
+                classIdOb.classifierIds  = [ViewService.TYPE_TO_CLASSIFIER_ID.ListT, ViewService.TYPE_TO_CLASSIFIER_ID.List];
             } else if ($scope.presentationElemType === 'Image') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ImageT;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.ImageT, ViewService.TYPE_TO_CLASSIFIER_ID.Image];
             } else if ($scope.presentationElemType === 'Paragraph') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph];
             } else if ($scope.presentationElemType === 'Section') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.SectionT;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.SectionT, ViewService.TYPE_TO_CLASSIFIER_ID.Section];
             } else {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType];
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]];
             }
             var obj = {};
-            obj.term = classIdOb;
+            obj.terms = classIdOb;
             return obj;
         };
 
