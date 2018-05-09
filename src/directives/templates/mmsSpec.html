@@ -176,8 +176,14 @@
             </span>
             <h2 class="prop-title">Location</h2>
             <span class="prop">{{element._qualifiedName}}</span>
-            <h2 class="prop-title">ID</h2>
-            <span class="prop id">{{element.id}}</span>
+            <h2 class="prop-title">ID&nbsp;
+                <button ng-click="copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default">
+                    <i class="fa fa-copy"></i>&nbsp;Copy
+                </button>
+            </h2>
+            <span class="prop id" title="Copy ID">
+                <span id="spec-element-id" ng-click="copyToClipboard($event, '#spec-element-id')">{{element.id}}</span>
+            </span>
             <h2 class="prop-title">Branch/Tag</h2>
             <span class="prop">{{element._refId}}</span>
             <h2 class="prop-title">Project</h2>
@@ -185,8 +191,10 @@
             <h2 class="prop-title">Formatted Modified Time</h2>
             <span class="prop">{{element._modified}}</span>
             <h2 class="prop-title">Commit</h2>
-            <span class="prop">
-                <a target="_blank" ng-href="/alfresco/service/projects/{{element._projectId}}/refs/{{element._refId}}/elements/{{element.id}}?commitId={{element._commitId}}">{{element._commitId}}</a>
+            <span class="prop" title="View raw element data">
+                <a target="_blank" ng-href="{{elementDataLink}}">
+                    {{element._commitId}}&nbsp;<i class="fa fa-external-link" aria-hidden="true"></i>
+                </a>
             </span>
         <!-- </div> -->
     </div>

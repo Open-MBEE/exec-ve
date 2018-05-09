@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils','ElementService', 'UtilsService', '$compile', '$templateCache', '$uibModal', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils', 'AuthService', 'ElementService', 'UtilsService', '$compile', '$templateCache', '$uibModal', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -71,7 +71,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, $uibModal, growl, _) {
+function mmsSpec(Utils, AuthService, ElementService, UtilsService, $compile, $templateCache, $uibModal, growl, _) {
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, domElement, attrs) {
@@ -182,6 +182,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                         }
                     });
                 }
+                scope.elementDataLink = '/alfresco/service/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&alf_ticket='+AuthService.getTicket();
                 scope.gettingSpec = false;
             }, function(reason) {
                 scope.gettingSpec = false;
@@ -193,7 +194,20 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         scope.$watch('mmsProjectId', changeElement);
         scope.$watch('mmsCommitId', changeElement);
         scope.$watch('mmsRefId', changeElement);
-        
+
+        scope.copyToClipboard = function($event, selector) {
+            $event.stopPropagation();
+            var target = domElement.find(selector);
+            var range = window.document.createRange();
+            range.selectNode(target[0]);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            try {
+                window.document.execCommand('copy');
+            } catch(err) {}
+            window.getSelection().removeAllRanges();
+        };
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#revertEdits
