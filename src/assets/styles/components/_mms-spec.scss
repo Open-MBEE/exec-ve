@@ -46,10 +46,9 @@
   mms-spec div {
     mms-transclude-doc {
       cursor: auto;
-    }
-
-    mms-view-link {
-      background-color: $light_blue;
+      mms-view-link {
+        background-color: $light_blue;
+      }
     }
 
     mms-transclude-com {
