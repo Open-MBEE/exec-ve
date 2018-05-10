@@ -512,7 +512,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     //data.message = response[ 1 ];
                     evt.cancel();
                 } else {
-                    data.url = '/alfresco' + response.artifacts[0].location;
+                    data.url = '/alfresco' + response.artifacts[0].artifactLocation;
                 }
             } );
         }, 0, false);
