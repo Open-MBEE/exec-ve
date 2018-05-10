@@ -282,18 +282,19 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
         var buildQuery = function (searchTxt) {
             var mainQuery = {};
             var q = {};
-            var valueSearchFields = ["defaultValue.value", "value.value", "specification.value"];
+            var valueSearchFields = ["defaultValue.value^3", "value.value^3", "specification.value^2"];
             if (scope.searchType === 'all') {
-                q = {};
-                var idQuery = {};
-                q.id = searchTxt;
-                idQuery.term = q;
+                //q = {};
+                var idQuery = {term: {id: {value: searchTxt, boost: 10}}};
+                //q.id = searchTxt;
+                //idQuery.term = q;
 
                 var q2 = {};
                 var allQuery = {};
                 q2.query = searchTxt;
                 q2.fields = valueSearchFields.slice();
-                q2.fields.push('name', 'documentation');
+                q2.fields.push('name^5', 'documentation');
+                q2.fuzziness = 'AUTO';
                 allQuery.multi_match = q2;
                 mainQuery = {
                     "bool": {
@@ -310,7 +311,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, g
                 // "{"query":{"bool":{"must":[{"match":{"documentation":"val"}}]}}}"
                 var type = scope.searchType;
                 q = {};
-                q[type] = searchTxt;
+                q[type] = {fuzziness: 'AUTO', query: searchTxt};
                 mainQuery.match = q;
             }
             if (scope.searchType === 'id') {
