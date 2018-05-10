@@ -33,7 +33,16 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
 
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
-
+        scope.setPeLineVisibility = function($event) {
+            window.setTimeout(function() {
+                var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
+                if (peContainer.find('.dropdown-menu').css('display') == 'none') {
+                    peContainer.find('hr').css('visibility', 'hidden');
+                } else {
+                    peContainer.find('hr').css('visibility', 'visible');
+                }
+            });
+        };
         domElement.click(function(e) {
             //should not do anything if section is not an instancespec
             if (scope.startEdit)
