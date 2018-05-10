@@ -441,7 +441,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 mmsreset: {callback: mmsResetCallback},
                 contentsCss: CKEDITOR.basePath+'contents.css',
                 toolbar: thisToolbar,
-                height: $window.innerHeight*0.55,
+                height: $window.innerHeight*0.4,
             });
 
             // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
@@ -450,7 +450,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.config.autosave = {
                     SaveKey: attrs.autosaveKey,
                     delay: 5,
-                    NotOlderThen: 10080, // 7 days in minutes
+                    NotOlderThen: 7200, // 5 days in minutes
                     enableAutosave: true
                 };
             } else {
