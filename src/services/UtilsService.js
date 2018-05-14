@@ -1124,7 +1124,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
-                "p {widow: 3; orphan: 3;}\n" +
+                "p {widows: 2; orphans: 2;}\n" +
                 "table, figure {margin-bottom: 10px;}\n" +
                 "@page {margin: 0.5in;}\n" + 
                 "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
