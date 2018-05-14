@@ -10,6 +10,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 	config.disableNativeSpellChecker = false;
 	config.fullPage = false;
+	config.dialog_noConfirmCancel = true;
 	//config.enableContextMenu = false;
 	//config.tabSpaces = 4;
 	//config.height = 350;

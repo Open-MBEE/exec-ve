@@ -274,7 +274,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
             var queryOb = buildQuery(query);
             queryOb.from = page*numItems + page;
             queryOb.size = numItems;
-            var reqOb = {projectId: scope.mmsProjectId, refId: scope.refId};
+            var reqOb = {projectId: scope.mmsProjectId, refId: scope.refId, checkType: true};
             ElementService.search(reqOb, queryOb, 2)
             .then(function(data) {
                 if (scope.mmsOptions.filterCallback) {

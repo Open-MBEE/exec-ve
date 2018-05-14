@@ -127,7 +127,7 @@ mms-history {
 
   /* Special styling to preview element*/
   .element-preview-box{
-    padding: 0 20px;
+    padding: 10px 20px;
     background-color: $ve-silver-lighter-1;
     @include border-radius(3px);
     border: 1px solid $ve-silver-darker-1;

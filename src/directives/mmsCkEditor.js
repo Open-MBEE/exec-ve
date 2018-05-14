@@ -65,7 +65,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 });
             }
 
-            $scope.title = 'Insert a cross reference';
+            $scope.title = 'Insert cross reference';
             $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
             $scope.requestName = false;
@@ -441,7 +441,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 mmsreset: {callback: mmsResetCallback},
                 contentsCss: CKEDITOR.basePath+'contents.css',
                 toolbar: thisToolbar,
-                height: $window.innerHeight*0.55,
+                height: $window.innerHeight*0.4,
             });
 
             // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
@@ -450,7 +450,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.config.autosave = {
                     SaveKey: attrs.autosaveKey,
                     delay: 5,
-                    NotOlderThen: 10080, // 7 days in minutes
+                    NotOlderThen: 7200, // 5 days in minutes
                     enableAutosave: true
                 };
             } else {
@@ -474,6 +474,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 if (e.data.keyCode == (CKEDITOR.CTRL + 192)) { //little tilde
                     autocompleteCallback(instance);
                 } else { 
+                    if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
+                        //trying to prevent tab and shift tab jumping focus out of editor
+                        e.cancel();
+                        e.stop();
+                    }
                     deb(e); 
                 }
             }, null, null, 31); //priority is after indent list plugin's event handler
@@ -512,7 +517,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     //data.message = response[ 1 ];
                     evt.cancel();
                 } else {
-                    data.url = '/alfresco' + response.artifacts[0].location;
+                    data.url = '/alfresco' + response.artifacts[0].artifactLocation;
                 }
             } );
         }, 0, false);

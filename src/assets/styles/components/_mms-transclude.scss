@@ -50,6 +50,9 @@ mms-view.editing {
 
     > div > div.panel-heading {
       padding: 2px 8px;
+      h3{
+        font-weight: $default_font_weight;
+      }
     }
 
     .panel {
@@ -107,13 +110,9 @@ mms-transclude-img img {
 .pe-type-Image,
 .pe-type-Equation,
 .pe-type-Comment{
-  font-weight: $default_font_weight;
-
   &::before{
-    color: $ve-light-text;
     font-family: $icon-font-name;
     padding-right: 4px;
-    font-weight: $light_font_weight;
   }
 }
 
@@ -148,7 +147,6 @@ mms-transclude-img img {
   font-style: normal;
   font-weight: bold;
   padding-right: 4px;
-  color: $ve-light-text;
 }
 
 // Transclude edit panel buttons

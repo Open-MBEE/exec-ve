@@ -66,9 +66,9 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
                     for(var i = 0; i < artifacts.length; i++) {
                         var artifact = artifacts[i];
                         if (artifact.contentType == "image/svg+xml") {
-                            scope.svgImgUrl = server + '/alfresco' + artifact.location + ticket;
+                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
                         } else if (artifact.contentType == "image/png") {
-                            scope.pngImgUrl = server + '/alfresco' + artifact.location + ticket;
+                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
                         }
                     }
                 }, function(reason) {

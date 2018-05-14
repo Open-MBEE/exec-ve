@@ -6,6 +6,7 @@
     margin: 24px 0 4px;;
     height: inherit;
     width: 100%;
+    font-weight: $default_font_weight;
   }
 
   h1.prop {
@@ -18,7 +19,7 @@
   }
 
   span.prop {
-    font-size: 1.15em;
+    font-size: 16px;
     margin-bottom: 20px;
     margin-top: 2px;
     word-wrap: break-word;
@@ -31,7 +32,7 @@
 
   .doc-text {
     font-family: $font-family-sans-serif;
-    max-width: $default-line-length;
+    //max-width: $default-line-length;
     //min-width: 15em;
   }
 
@@ -46,10 +47,9 @@
   mms-spec div {
     mms-transclude-doc {
       cursor: auto;
-    }
-
-    mms-view-link {
-      background-color: $light_blue;
+      mms-view-link {
+        background-color: $light_blue;
+      }
     }
 
     mms-transclude-com {
@@ -89,10 +89,10 @@ Styles that apply to both the spec
   .visibility-toggle{
     list-style: none;
     margin: 12px 0 0 -14px;
-    position: relative;
 
     td{
-      line-height: 2.6em
+      line-height: 2.6em;
+      position: relative;
     }
 
     //Show more content caret

@@ -1124,6 +1124,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
+                "p {widows: 2; orphans: 2;}\n" +
+                "table, figure {margin-bottom: 10px;}\n" +
                 "@page {margin: 0.5in;}\n" + 
                 "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;

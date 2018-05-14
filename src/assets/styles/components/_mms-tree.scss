@@ -5,7 +5,7 @@ ul.abn-tree {
   li.abn-tree-row {
     width: 100%;
     padding: 0px;
-    line-height: 1.6em;
+    line-height: 1.7em;
     margin-top: 0;
 
     a.tree-item {
@@ -39,14 +39,14 @@ ul.abn-tree {
 
 .shaft {
   width: 100%;
-  background: $ve-silver-darker-1;
+  background: $tertiary_grey;
 }
 
 .shaft-hidden {
   background: transparent;
-  @include transition($background_hover_transition);
+  //@include transition($background_hover_transition);
 
   &:hover {
-    background: $highlight_grey;
+    background: $ve-silver-darker-1;
   }
 }

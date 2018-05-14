@@ -2,7 +2,7 @@
     <div fa-pane pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true">
         <div class="pane-center-toolbar">
             <div class="doclib-link">
-                <a type="button" class="btn btn-tools btn-sm" target="_blank" ng-href="{{docLibLink}}">
+                <a type="button" class="btn btn-tools btn-sm" target="_blank" ng-href="{{docLibLink}}" uib-tooltip="Manage files" tooltip-placement="bottom" tooltip-popup-delay="400">
                     <img src="assets/alfresco-icon-sm.png">DocLib
                 </a>
             </div>
@@ -20,7 +20,7 @@
                 </div>
                 <div class="ve-secondary-text">{{comments.count}} Comment<span ng-if="comments.count !== 1">s</span>
                     <span ng-if="comments.count > 0">
-                        , Last Commented {{comments.lastCommented | date:'M/d/yy h:mm a'}} by {{comments.lastCommentedBy}}</span>
+                        , Last Commented {{comments.lastCommented | date:'M/d/yy h:mm a'}} by <b>{{comments.lastCommentedBy}}</b></span>
                 </div>
                 <div id="print-div" ng-if="viewOb">
                     <mms-view mms-element-id="{{viewOb.id}}" mms-commit-id="latest"

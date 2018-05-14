@@ -2,7 +2,7 @@
   Styles for the View Editor left pane
 *************************/
 
-$pane_left_btn_group_width: 226px;
+$pane_left_btn_group_width: 234px;
 
 #main-pane {
   > .west-tabs {
@@ -52,12 +52,8 @@ $pane_left_btn_group_width: 226px;
         background: transparent;
       }
     }
-    .fa-file,
-    .tree-icon{
-      color: $ve-light-text;
-    }
     .fa-folder{
-      color: lighten($ve-accent, 20%);
+      color: lighten($ve-accent, 12%);
     }
   }
 }

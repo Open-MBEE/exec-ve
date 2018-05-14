@@ -13,11 +13,6 @@
 1. Layout
 -------------------------------------------------------------------*/
 
-  /*Grey background from top to bottom */
-  background: $ve-silver-lighter-2;
-  height: 100%;
-
-
   .search-header {
      background: $white;
      padding-bottom: 250px;
@@ -33,7 +28,9 @@
 
   /*Spacing for count of results at top of results*/
   .results-count {
-     margin: 20px 30px;
+    padding: 20px 30px;
+    background: $ve-silver-lighter-2;
+    font-size: 14px;
   }
 
   /*Spaceing for next and previous at bottom of results*/
@@ -234,11 +231,11 @@
 
 .modal-body{
   .mms-search{
-    .mms-search-input{
+    .mms-search-input,
+    .results-count{
       padding-left: 6px;
       padding-right: 6px;
     }
-    .results-count,
     .elem-wrapper{
       margin-left: 6px;
       margin-right: 6px;

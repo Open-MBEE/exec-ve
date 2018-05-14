@@ -367,7 +367,7 @@ div.tooltip-inner {
     color:$ve-white-text-darker-1;
   }
 
-  .branch-disabled::before {
+  li.branch-disabled::before {
     font-family:FontAwesome;
     content: "\2026";
     position: absolute;
@@ -780,6 +780,10 @@ span.fixed-content-dropdown{
 /*display inline block to be same width in tree*/
 .section-icon{
   display:inline-block;
+}
+
+i.section-icon{
+  line-height: 14px;
 }
 
 /*------------------------------------------------------------------
