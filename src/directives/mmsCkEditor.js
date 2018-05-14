@@ -476,8 +476,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 } else { 
                     if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
                         //trying to prevent tab and shift tab jumping focus out of editor
-                        e.data.domEvent.stopPropagation();
-                        e.data.domEvent.preventDefault();
                         e.cancel();
                         e.stop();
                     }

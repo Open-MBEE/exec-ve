@@ -6,6 +6,7 @@
     margin: 24px 0 4px;;
     height: inherit;
     width: 100%;
+    font-weight: $default_font_weight;
   }
 
   h1.prop {
@@ -18,7 +19,7 @@
   }
 
   span.prop {
-    font-size: 1.15em;
+    font-size: 16px;
     margin-bottom: 20px;
     margin-top: 2px;
     word-wrap: break-word;
@@ -31,7 +32,7 @@
 
   .doc-text {
     font-family: $font-family-sans-serif;
-    max-width: $default-line-length;
+    //max-width: $default-line-length;
     //min-width: 15em;
   }
 
