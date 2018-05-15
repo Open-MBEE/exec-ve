@@ -1197,3 +1197,7 @@ Element not found styling
   background: url('../assets/mmsplus.png') no-repeat center !important;
   background-size: 14px !important;
 }
+
+.cke_button.cke_button__mmscomment:after {
+  border-right: 0px !important;
+}

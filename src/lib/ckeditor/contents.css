@@ -229,3 +229,8 @@ a > img {
 	 padding: 8px;
 	 border: 1px solid #ddd;
  }
+
+a[title='mms-br']:hover {
+	background-color: transparent;
+	cursor: default;
+}

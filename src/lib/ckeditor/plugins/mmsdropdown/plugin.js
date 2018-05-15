@@ -16,7 +16,7 @@ CKEDITOR.plugins.add('mmsdropdown',
                 init: function () {
                     this.add('mmscf', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscf/icons/mmscf.png', label: 'Cross Reference' }), 'Insert Cross Reference');
                     this.add('mmsvlink', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmsvlink/icons/mmsvlink.png', label: 'Cross Reference as link' }), 'Insert Cross Reference as link (View Link)');
-                    this.add('', '<hr>');
+                    this.add('', '<hr>', 'mms-br');
 
                     this.add('link', createItem({ isMmsCustomPlugin: false, iconClass: 'link', label: 'Link' }), 'Insert link');
                     this.add('table', createItem({ isMmsCustomPlugin: false, iconClass: 'table', label: 'Table' }), 'Insert table');
@@ -24,18 +24,18 @@ CKEDITOR.plugins.add('mmsdropdown',
                     this.add('iframe', createItem({ isMmsCustomPlugin: false, iconClass: 'iframe', label: 'Iframe' }), 'Insert iframe');
                     this.add('mathjax', createItem({ isMmsCustomPlugin: false, iconClass: 'mathjax', label: 'Math' }), 'Insert math');
                     this.add('specialchar', createItem({ isMmsCustomPlugin: false, iconClass: 'specialchar', label: 'Special Character' }), 'Insert symbol');
-                    this.add('', '<hr>');
+                    this.add('', '<hr>', 'mms-br');
 
                     this.add('mmscomment', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmscomment/icons/mmscomment.png', label: 'Comment' }), 'Insert comment');
-                    this.add('', '<hr>');
+                    this.add('', '<hr>', 'mms-br');
 
                     this.add('codeSnippet', createItem({ isMmsCustomPlugin: false, iconClass: 'codesnippet', label: 'Code Snippet' }), 'Insert code snippet');
                     this.add('blockquote', createItem({ isMmsCustomPlugin: false, iconClass: 'blockquote', label: 'Quote' }), 'Insert quote');
-                    this.add('', '<hr>');
+                    this.add('', '<hr>', 'mms-br');
 
                     this.add('pagebreak', createItem({ isMmsCustomPlugin: false, iconClass: 'pagebreak', label: 'Page break for printing' }), 'Insert page break');
                     this.add('horizontalrule', createItem({ isMmsCustomPlugin: false, iconClass: 'horizontalrule', label: 'Horizontal Rule' }), 'Insert horizontal rule');
-                    this.add('', '<hr>');
+                    this.add('', '<hr>', 'mms-br');
 
                     this.add('mmssignature', createItem({ isMmsCustomPlugin: true, imgSrc: 'lib/ckeditor/plugins/mmssignature/icons/mmssignature.png', label: 'Signature template' }), 'Insert signature template');
                 },
