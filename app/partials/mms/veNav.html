@@ -6,8 +6,8 @@
                 <i class="fa fa-bars" aria-hidden="true"></i>
             </button>
         <a class="logotype" ui-sref="login.select">VE</a>
-        <a ng-if="!org.homeLink" class="org-title" ui-sref="project.ref({projectId: project.id, refId: ref.id})">{{ title }}</a>
-        <a ng-if="org.homeLink" class="org-title" ng-href="{{org.homeLink}}">{{ title }}</a>
+        <a ng-if="!org.homeLink" class="org-title" ui-sref="project.ref({projectId: project.id, refId: ref.id})">{{ org.name }}</a>
+        <a ng-if="org.homeLink" class="org-title" ng-href="{{org.homeLink}}">{{ org.name }}</a>
         <a class="switch-org" ng-click="updateOrg()">Switch Org</a>
         </div>
         <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed" id="global-navigation">
@@ -50,7 +50,7 @@
                             {{ username | limitTo:1 | uppercase }}
                         </a>
                         <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
-                            <li ng-if="username">
+                            <li ng-if="username" class="ve-secondary">
                                 Logged in as <b>{{ username }}</b>
                             </li>
                             <li class="divider"></li>

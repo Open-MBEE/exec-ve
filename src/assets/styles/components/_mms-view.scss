@@ -7,7 +7,45 @@ mms-view {
     margin-bottom: 15px;
   }
 
+  &.editing {
+    mms-view-section {
+      display: block;
+      border: 2px solid $ve-silver-darker-1;
+      @include transition(border, .5s);
+      @include border-radius(5px);
+    }
+  }
+
   table {
     @extend .content-table;
   }
+
+  .add-pe-button-container, .last-modified {
+    //opacity: 0;
+    display: block;
+    visibility: hidden;
+  }
 }
+
+mms-view.editing,
+mms-view.outline {
+  .last-modified {
+    //opacity: 1;
+    visibility: visible;
+  }
+}
+
+mms-view.editing {
+  .add-pe-button-container {
+    //opacity: 1;
+    visibility: visible;
+  }
+}
+
+mms-view-section {
+  .panel-heading {
+    font-weight: $default_font_weight;
+    padding: 2px 8px;
+  }
+}
+

@@ -91,30 +91,30 @@ angular.module('mms.directives')
     </pre>
  *
  * @param {Array} treeData Array of root nodes
- * @param {Array} treeData Array of root nodes
  * @param {Object=} treeControl Empty object to populate with api
  * @param {Object=} options Options object to customize icons for types and statuses
- * @param {expression=} onSelect Handler for branch selected
  * @param {string='fa fa-caret-right'} iconExpand icon to use when branch is collapsed
  * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
  * @param {string='fa fa-file'} iconDefault default icon to use for nodes
- * @param {boolean=false} sectionNumbering Add section numbers
- * @param {string} search filter on labels
  */
 function mmsTree($timeout, $log, $templateCache) {
 
     var mmsTreeLink = function(scope, element, attrs) {
-        scope.search = "";
-        
+        if (!scope.options) {
+            scope.options = {
+                expandLevel: 1,
+                search: ''
+            };
+        }
         if (!attrs.iconExpand)
             attrs.iconExpand = 'fa fa-caret-right fa-lg fa-fw';
         if (!attrs.iconCollapse)
             attrs.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
         if (!attrs.iconDefault)
             attrs.iconDefault = 'fa fa-file fa-fw';
-        if (!attrs.expandLevel)
-            attrs.expandLevel = '1';
-        var expand_level = parseInt(attrs.expandLevel, 10);
+        if (!scope.options.expandLevel && scope.options.expandLevel !== 0)
+            scope.options.expandLevel = 1;
+        var expand_level = scope.options.expandLevel;
         if (!angular.isArray(scope.treeData)) {
             $log.warn('treeData is not an array!');
             return;
@@ -226,9 +226,9 @@ function mmsTree($timeout, $log, $templateCache) {
                         $timeout(function() {
                             branch.onSelect(branch);
                         });
-                    } else if (scope.onSelect) {
+                    } else if (scope.options.onSelect) {
                         $timeout(function() {
-                            scope.onSelect({branch: branch});
+                            scope.options.onSelect(branch);
                         });
                     }
                 }
@@ -240,13 +240,16 @@ function mmsTree($timeout, $log, $templateCache) {
                         }
                     }, 500, false);
                 }
+            // fix for when user presses browser back button
+            } else {
+                expand_all_parents(branch);
             }
         };
 
         var on_initialSelection_change = function() {
             if (scope.initialSelection) {
                 for_each_branch(function(b) {
-                    if (b.data.id === scope.initialSelection || b.data._id === scope.initialSelection) {
+                    if (b.data.id === scope.initialSelection) {
                         select_branch(b, true);
                     }
                 });
@@ -268,7 +271,7 @@ function mmsTree($timeout, $log, $templateCache) {
                 }
             });
             scope.tree_rows = [];
-            var add_branch_to_list = function(level, section, branch, visible) {
+            var add_branch_to_list = function(level, section, branch, visible, peNums) {
                 var expand_icon = "";
                 var type_icon = "";
                 var aggr = branch.aggr;
@@ -276,7 +279,6 @@ function mmsTree($timeout, $log, $templateCache) {
                     aggr = "";
                 else
                     aggr = '-' + aggr.toLowerCase();
-                var status_properties = { style: "" };
                 var i, j = 0;
                 if (!branch.expanded)
                     branch.expanded = false;
@@ -308,25 +310,35 @@ function mmsTree($timeout, $log, $templateCache) {
                 else
                     type_icon = attrs.iconDefault;
 
-                if (scope.options && scope.options.statuses && scope.options.statuses[branch.status]) {
-                    status_properties = scope.options.statuses[branch.status];
+                var number = section.join('.');
+                if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
+                    peNums[branch.type]++;
+                    if (scope.options.numberingDepth == 0) {
+                        number = peNums[branch.type];
+                    } else if (section.length >= scope.options.numberingDepth) {
+                        number = section.slice(0, scope.options.numberingDepth).join('.') + scope.options.numberingSeparator + peNums[branch.type];
+                    } else {
+                        var sectionCopy = section.slice();
+                        while (sectionCopy.length < scope.options.numberingDepth) {
+                            sectionCopy.push(0);
+                        }
+                        number = sectionCopy.join('.') + scope.options.numberingSeparator + peNums[branch.type]; 
+                    }
+                } else if (branch.type !== 'view' && branch.type !== 'section') {
+                    number = '';
                 }
-                
-                branch.section = section;
-                if (branch.data && branch.data.id) {
-                    branch.data._veNumber = section;
+                if (branch.data && branch.data.id && scope.options.sectionNumbering) {
+                    branch.data._veNumber = number;
                 }
                 if (branch.hide)
                     visible = false;
                 scope.tree_rows.push({
                     level: level,
-                    section: section,
+                    section: number,
                     branch: branch,
                     label: branch.label,
                     expand_icon: expand_icon,
                     visible: visible,
-                    status: branch.status,
-                    status_properties: status_properties,
                     type_icon: type_icon
                 });
                 if (branch.children) {
@@ -335,21 +347,21 @@ function mmsTree($timeout, $log, $templateCache) {
                     }
                     for (i = 0, j = 0; i < branch.children.length; i++) {
                         var child_visible = visible && branch.expanded;
-                        var sectionChar = '.';
-                        var sectionValue = '';
-                        if (section === '')
-                            sectionChar = '';
                         //if (branch.children[i].type === 'section')
                         //    add_branch_to_list(level + 1, '§ ', branch.children[i], child_visible);
                         if (branch.children[i].type === 'figure' || branch.children[i].type === 'table' || branch.children[i].type === 'equation') {
-                            add_branch_to_list(level + 1, '', branch.children[i], child_visible);
+                            add_branch_to_list(level + 1, section, branch.children[i], child_visible, peNums);
                         } else {
                             j++;
-                            if (scope.sectionNumbering) {
-                                sectionValue = section + sectionChar + j;
-                                add_branch_to_list(level + 1, sectionValue, branch.children[i], child_visible);
+                            if (scope.options.sectionNumbering) {
+                                var nextSection = section.slice(); 
+                                nextSection.push(j);
+                                if (nextSection.length <= scope.options.numberingDepth) {
+                                    peNums.table = 0; peNums.figure = 0; peNums.equaton = 0;
+                                }
+                                add_branch_to_list(level + 1, nextSection, branch.children[i], child_visible, peNums);
                             } else
-                                add_branch_to_list(level + 1, '', branch.children[i], child_visible);
+                                add_branch_to_list(level + 1, [], branch.children[i], child_visible, peNums);
                         }
                     }
                 }
@@ -360,7 +372,7 @@ function mmsTree($timeout, $log, $templateCache) {
             }
 
             for (var i = 0; i < scope.treeData.length; i++) {
-                add_branch_to_list(1, '', scope.treeData[i], true);
+                add_branch_to_list(1, [], scope.treeData[i], true, {figure: 0, table: 0, equation: 0});
             }
 
         };
@@ -383,7 +395,7 @@ function mmsTree($timeout, $log, $templateCache) {
 
         if (attrs.initialSelection) {
             for_each_branch(function(b) {
-                if (b.data.id === attrs.initialSelection || b.data._id === attrs.initialSelection) {
+                if (b.data.id === attrs.initialSelection) {
                     $timeout(function() {
                         select_branch(b);
                     });
@@ -409,9 +421,9 @@ function mmsTree($timeout, $log, $templateCache) {
                 $timeout(function() {
                     branch.onDblclick(branch);
                 });
-            } else if (scope.onDblclick) {
+            } else if (scope.options.onDblclick) {
                 $timeout(function() {
-                    scope.onDblclick({branch: branch});
+                    scope.options.onDblclick(branch);
                 });
             }
         };
@@ -747,12 +759,8 @@ function mmsTree($timeout, $log, $templateCache) {
         // replace: true,
         scope: {
             treeData: '<',
-            sectionNumbering: '<',
-            onSelect: '&?',
-            onDblclick: '&?',
             initialSelection: '@',
             treeControl: '<',
-            search: '<',
             options: '<'
         },
         link: mmsTreeLink

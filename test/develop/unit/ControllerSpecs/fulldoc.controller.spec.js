@@ -41,11 +41,6 @@ describe('Controller: fullDocController', function() {
         } ).respond(200, {orgs: ['org1']});
     }));
 
-    afterEach(function () {
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
-    });
-
     describe('when Lazy loading Views', function() {
         it('should setup scrollApi on the scope to communicate with borderLayout library', function() {
             expect(scope.scrollApi).toBeDefined();

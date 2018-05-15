@@ -31,6 +31,8 @@ describe('Service: FullDocumentService', function() {
         // Mock loading some views till scrollbar shows up
         spyOn(this, 'isScrollbarVisible').and.returnValues(false, true);
         service.addInitialViews(this.isScrollbarVisible);
+        $httpBackend.flush();
+        $httpBackend.flush();
         $timeout.flush();
 
         // There should be two views added because scrollbar was invisible the first time, but visible the second time
@@ -52,41 +54,29 @@ describe('Service: FullDocumentService', function() {
     });
 
     it('should add all the remaining views incrementally when users want to do content export or other actions that require all the views to be loaded', function() {
-        this.success = function() {}; // method to be called after all the views are loaded successfully
-        spyOn(this, 'success');
-        service.loadRemainingViews(this.success);
+        service.loadRemainingViews(function() {});
         $interval.flush(1000);
         $timeout.flush();
 
         expect(service.viewsBuffer.length).toEqual(mockedViews.length);
-        expect(this.success).toHaveBeenCalled();
-
     });
 
     it ('should load more views up until the view the user clicks on if that view is not yet loaded', function() {
         var branch = {type: 'view', data: {id: 2}};
-        this.success = function() {};
-        spyOn(this, 'success');
-        service.handleClickOnBranch(branch, this.success);
+        service.handleClickOnBranch(branch, function() {});
         $timeout.flush();
 
         // expect to load view with id = 1 and id = 2 because the user click on view with id = 2
         expect(service.viewsBuffer.length).toEqual(2);
-        expect(this.success).toHaveBeenCalled();
-
     });
 
     it ('should load more views up until the view of the element the user clicks on if the view of that element is not yet loaded', function() {
         var branch = {type: 'figure', viewId: 3};
-        this.success = function() {};
-        spyOn(this, 'success');
-        service.handleClickOnBranch(branch, this.success);
+        service.handleClickOnBranch(branch, function() {});
         $timeout.flush();
 
         // expect to load view with id = 1, id = 2 and id = 3 because the user click on an element in a view with id = 3
         expect(service.viewsBuffer.length).toEqual(3);
-        expect(this.success).toHaveBeenCalled();
-
     });
 
     it('should not load more views when users click on a view that is already loaded', function() {

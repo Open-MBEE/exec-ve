@@ -30,7 +30,7 @@
   z-index: 200;
   // position: relative;
   width: 100%;
-  height: 36px;
+  height: $navHeight;
   min-height: 30px;
   border: 0;
   background-color: $ve-slate-base;
@@ -39,7 +39,7 @@
   a:hover,
   a:visited {
     text-decoration: none;
-    color:white;
+    color: white;
   }
 }
 
@@ -63,7 +63,7 @@ a.switch-org:hover {
 
 .logotype {
   font-weight: 300;
-  line-height: 36px;
+  line-height: $navHeight;
   padding: 0 5px 0 13px;
 }
 
@@ -108,12 +108,16 @@ ul.global-menu {
   height: 24px;
   line-height: 24px;
 
+  /* Lighten top level nav to recede it*/
   span a,
   span a:visited,
-  span > a,
-  .dropdown-menu > li > a {
+  span > a{
     color: $ve-white-text-lighter-2;
     background-color: transparent;
+  }
+
+  .dropdown-menu > li > a{
+    color: $white;
   }
 
   span a:hover,
@@ -140,7 +144,7 @@ ul.global-menu {
     background-color: $ve-slate-darker-2;
     border: 1px solid $ve-slate-darker-2;
     border-radius: 3px 0 0 3px;
-    width: 330px;
+    width: 300px;
     padding: 0 8px;
     height: 26px;
     margin: 5px 0;
@@ -194,23 +198,15 @@ ul.global-menu {
   border-radius: 50%;
   width: 24px;
   height: 24px;
-  background:$ve-accent-green;
+  background:$ve-accent;
   text-align: center;
   color:white;
 }
 
 #login-dropdown:hover {
-  background-color:$ve-accent-green-darker;
+  background-color:$ve-accent-darker;
 }
 
-.user-profile > ul > li:first-child {
-  padding: 0 18px;
-  color:$ve-white-text-lighter-2;
-}
-
-.user-profile > ul > li:first-child:hover {
-  background-color:$ve-slate-lighter-1;
-}
 
 /*------------------------------------------------------------------
 3. Project Level Header
@@ -218,7 +214,7 @@ ul.global-menu {
 
 nav.project-level-header {
   background-color: $ve-slate-darker-2;
-  top: 36px;
+  top: $navHeight;
   z-index: 150;
 
   .navbar-nav {
@@ -238,47 +234,101 @@ nav.project-level-header {
   3.2 Breadcrumbs
 -------------------------------------------------------------------*/
 
-.breadcrumbs {
-  display: inline;
-}
-
-.breadcrumbs ul {
-  list-style: none;
-  display: inline;
-  margin: 0;
-  padding-left: 10px;
-  position: relative;
-}
-
-.breadcrumbs li {
-  display: inline;
-  line-height: 36px;
-}
-
-.breadcrumbs .fa-folder,
-.breadcrumbs .fa-file {
-  font-size: 12px;
-  padding: 6px 4px 6px 6px;
-}
-
-.breadcrumbs .fa-file {
-  font-size: 11px;
-  top: -.1em;
-  position: relative;
-}
-
-
-@media (max-width: 1024px) {
+.navbar{
   .breadcrumbs {
-     display: none;
+    display: inline-block;
+
+    ul {
+      list-style: none;
+      display: inline-block;
+      margin: 0;
+      padding-left: 10px;
+      position: relative;
+    }
+
+    li {
+      display: inline;
+      line-height: $navHeight;
+
+      a{
+        padding: 0 6px 0 4px;
+
+      /*Hover state over links to show it's clickable*/
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
+
+    /*adjust folder and file icons for nav */
+    .fa-folder,
+    .fa-file {
+      font-size: 12px;
+      padding: 6px 4px 6px 6px;
+    }
+
+    .back-to-proj{
+      font-size: 1.2em;
+      top: .05em;
+      position: relative;    
+    }
   }
 }
+
+
+/*Hide breadcrumbs for mobile*/
+@media (max-width: 1000px){
+  .breadcrumbs {
+    li {
+      a, span{
+        display: none;
+      }
+    }
+
+    /* Keep home visible*/
+    li:first-child{
+      a{
+        display: inline-block;
+      }
+    }
+  }
+
+  .project-level-header{
+    .navbar-right{
+      float: right;
+    }
+  }
+}
+
+/*Hide all but the first 2 breadcrumbs and add */
+@media (max-width: 1000px) and (min-width: 700px){
+  .breadcrumbs{
+    li:nth-child(3):after{
+      content: "\203A ...";
+    }
+
+    li:nth-child(2){
+      a, span{
+        display: inline-block;
+      }
+    }
+  }
+}
+
+/*Add an ellipsis after the home to show there's more */
+@media (max-width: 700px){
+  .breadcrumbs{
+    li:nth-child(2):after{
+      content: "\203A ...";
+    }
+  }
+}
+
 
 /*------------------------------------------------------------------
   3.3 Dropdowns
 -------------------------------------------------------------------*/
 
 .project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
-  background-color: #404040;
   max-width: 300px;
 }

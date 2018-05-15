@@ -1,70 +1,191 @@
 
-<div class="transclude-modal">
-    <div class="transclude-modal-input">
-        <form ng-submit="newSearch(searchText, 0, itemsPerPage)">
-            <div class="form-search input-group ve-search">
-                <input class="form-control" type="text" ng-model="searchText" placeholder="Search for an element" autofocus/>
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" ng-click="newSearch(searchText, 0, itemsPerPage)">
-                    <span class="btn-text">SEARCH</span> <i class="{{searchClass}}"></i></button>
-                </span>
-            </div>
-            <div class="container-search-type">
-                <div class="btn-group btn-group-xs">
-                    <button ng-click="setSearchType('all')" type="button" class="btn-search-all btn-search-type btn btn-default active">ALL</button>
-                    <button ng-click="setSearchType('name')" type="button" class="btn-search-name btn-search-type btn btn-default">NAME</button>
-                    <button ng-click="setSearchType('documentation')" type="button" class="btn-search-documentation btn btn-search-type btn-default">DOCUMENTATION</button>
-                    <button ng-click="setSearchType('value')" type="button" class="btn-search-value btn-search-type btn btn-default">VALUE</button>
-                    <button ng-click="setSearchType('id')" type="button" class="btn-search-id btn-search-type btn btn-default">ID</button>
+<div class="mms-search">
+    <div class="search-header" ng-class="{searchresults : searchResults}">
+        <div class="mms-search-input" ng-hide="advanceSearch || advancedSearchResults">
+            <form class="form-inline basic-search-form" ng-submit="newSearch(mainSearch)">
+                <!-- search type menu -->
+                <div class="form-group fixed-content-m">
+                    <label class="sr-only" for="searchTypeSelect">Search type menu</label>
+                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchType.isopen">
+                        <button id="searchTypeSelect" class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                            {{mainSearch.searchType.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
+                        </button>
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchTypeSelect">
+                            <li ng-click="mainSearch.searchType = type;" ng-repeat="type in fieldTypeList"
+                                ng-class="{'checked-list-item': type.id === mainSearch.searchType.id}">
+                                <a>{{ type.label }}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="search-filter-views-docs">
-                    <input type="checkbox" ng-model="docsviews.selected"> Search for Views and Documents<br>
+                <!-- search keyword input -->
+                <div class="form-group" ng-show="mainSearch.searchType.id != 'metatype'">
+                    <label class="sr-only" for="searchInput">Search keyword</label>
+                    <input class="search-input" type="text" id="searchInput" ng-model="mainSearch.searchText" autofocus/>
+                </div>
+                <div class="form-group" ng-if="mainSearch.searchType.id === 'metatype'">
+                    <label class="sr-only" for="searchMetatypeSelect">Search metatype menu</label>
+                    <div id="searchMetatypeSelect" ng-dropdown-multiselect="" options="metatypeList" selected-model="mainSearch.selectedSearchMetatypes" extra-settings="metatypeSettings"></div>
+                </div>
+                <button class="btn btn-primary" type="button" ng-click="newSearch(mainSearch)">
+                    <span class="btn-text">Search</span> <i class="{{searchClass}}"></i>
+                </button>
+            </form>
+            <div>
+                <input type="checkbox" ng-model="docsviews.selected"> Search for Views and Documents
+                <a class="pull-right" ng-click="advanceSearch = !advanceSearch">Advanced Search</a>
+            </div>
+        </div>
+
+        <div class="mms-search-input" ng-show="advanceSearch">
+            <div class="misc-form-field search-nav-back">
+                <a ng-click="advanceSearch = !advanceSearch"><i class="fa fa-arrow-left"></i>Basic Search</a>
+            </div>
+            <!-- submit change -->
+            <form class="form-inline advanced-query" ng-submit="newSearch(mainSearch)">
+                <!-- advanced search query input disabled -->
+                <h3 class="fixed-content-m">Advanced Search</h3>
+                <div class="form-group">
+                    <label class="sr-only" for="searchText">Advanced search query (disabled)</label>
+                    <input class="search-input disabled-input" type="text" id="searchText" ng-model="stringQuery" disabled />
+                </div>
+                <button class="btn btn-primary" type="button" ng-click="newSearch(mainSearch)">
+                    <span class="btn-text">Search</span> <i class="{{searchClass}}"></i>
+                </button>
+            </form>
+
+            <div class="form-inline" style="justify-content: flex-end">
+                <div class="form-group fixed-content-s">
+                </div>
+                <!-- search type menu -->
+                <div class="form-group fixed-content-m">
+                    <label class="sr-only" for="searchTypeSelect2">Search type menu</label>
+                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchType.isopen2">
+                        <button id="searchTypeSelect2" class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                            {{mainSearch.searchType.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
+                        </button>
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchTypeSelect2">
+                            <li ng-click="mainSearch.searchType = type; stringQueryUpdate()" ng-repeat="type in fieldTypeList"
+                                ng-class="{'checked-list-item': type.id === mainSearch.searchType.id}">
+                                <a>{{ type.label }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- search keyword input -->
+                <div class="form-group" ng-show="mainSearch.searchType.id != 'metatype'">
+                    <label class="sr-only" for="searchText">Advanced search query</label>
+                    <input class="search-input" type="text" id="searchText" ng-model="mainSearch.searchText" ng-change="stringQueryUpdate()" autofocus/>
+                </div>
+                <!-- metatype multiselect -->
+                <div class="form-group" ng-if="mainSearch.searchType.id === 'metatype'">
+                    <label class="sr-only" for="searchMetatypeSelect">Search metatype menu</label>
+                    <div id="searchMetatypeSelect" ng-dropdown-multiselect="" options="metatypeList" selected-model="mainSearch.selectedSearchMetatypes" extra-settings="metatypeSettings" events="multiselectEvent"></div>
                 </div>
             </div>
-        </form>
-        <div class="misc-form-field" ng-show="searchResults">
-            <div class="form-filter">
-                <input class="form-control" type="text" ng-model="filterQuery.query" ng-model-options="{debounce: 1000}" placeholder="Filter results" />
-            </div>
-            <div class="container-search-type">
-                <div class="btn-group btn-group-xs search-filter-type">
-                    <button ng-click="setFilterFacet('all')" type="button"
-                            class="btn-filter-facet-all btn-search-type btn btn-default active">ALL
-                    </button>
-                    <button ng-click="setFilterFacet('name')" type="button"
-                            class="btn-filter-facet-name btn-search-type btn btn-default">NAME
-                    </button>
-                    <button ng-click="setFilterFacet('documentation')" type="button"
-                            class="btn-filter-facet-documentation btn btn-search-type btn-default">DOCUMENTATION
-                    </button>
-                    <!-- <button ng-click="setFilterFacet('properties')" type="button" class="btn-filter-facet-value btn-search-type btn btn-default">VALUE</button> -->
-                    <button ng-click="setFilterFacet('id')" type="button"
-                            class="btn-filter-facet-id btn-search-type btn btn-default">ID
-                    </button>
+
+            <!-- Advanced search rows -->
+            <div ng-repeat="row in advanceSearchRows">
+                <div class="form-inline">
+                    <!-- operator -->
+                    <div class="form-group fixed-content-s">
+                        <label class="sr-only" for="operator-{{$index}}">Search row operator</label>
+                        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="row.operatorisopen">
+                            <button id="operator-{{$index}}" class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                                {{row.operator}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
+                            </button>
+                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="operator-{{$index}}">
+                                <li ng-click="row.operator = value; stringQueryUpdate()" ng-repeat="(key, value) in operatorList"
+                                    ng-class="{'checked-list-item': value === row.operator}">
+                                    <a>{{ value }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- row search type menu -->
+                    <div class="form-group fixed-content-m">
+                        <label class="sr-only" for="searchTypeSelect-{{$index}}">Search type menu</label>
+                        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="row.isopen">
+                            <button id="searchTypeSelect-{{$index}}" class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                                {{row.searchType.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
+                            </button>
+                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchTypeSelect-{{$index}}">
+                                <li ng-click="row.searchType = type; stringQueryUpdate()" ng-repeat="type in fieldTypeList"
+                                    ng-class="{'checked-list-item': type.id === row.searchType.id}">
+                                    <a>{{ type.label }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- row search keyword input -->
+                    <div class="form-group" ng-show="row.searchType.id != 'metatype'">
+                        <label class="sr-only" for="searchText-{{$index}}">Advanced search query</label>
+                        <input class="search-input" type="text" id="searchText-{{$index}}" ng-model="row.searchText" ng-change="stringQueryUpdate()" autofocus/>
+                    </div>
+                    <!-- row metatype multiselect -->
+                    <div class="form-group" ng-if="row.searchType.id === 'metatype'">
+                        <label class="sr-only" for="searchMetatypeSelect-{{$index}}">Search metatype menu</label>
+                        <div id="searchMetatypeSelect-{{$index}}" ng-dropdown-multiselect="" options="metatypeList" selected-model="row.selectedSearchMetatypes" extra-settings="metatypeSettings" events="multiselectEvent"></div>
+                    </div>
+                    <!-- remove row button -->
+                    <a type="button" ng-click="removeRowAdvanceSearch(row)" class="btn btn-secondary">
+                        <i class="fa fa-times"></i>
+                    </a>
                 </div>
             </div>
-            <div>Showing {{filteredElms.length}} <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
+            <!-- add row button -->
+            <a type="button" ng-click="addAdvanceSearchRow()" class="btn btn-secondary">
+                <i class="fa fa-plus"></i>&nbsp;Add Row
+            </a>
+            <div class="advanced-views-docs">
+                <input type="checkbox" ng-model="docsviews.selected"> Search for Views and Documents
+            </div>
+        </div>
+
+
+        <div ng-show="advancedSearchResults" class="mms-search-input">
+            <!-- advanced search query input disabled -->
+            <div class="form-group">
+                <div class="misc-form-field search-nav-back">
+                    <a ng-click="advancedSearchResults = !advancedSearchResults"><i class="fa fa-arrow-left"></i>Basic</a>
+                </div>
+                <form class="form-inline" ng-submit="newSearch(mainSearch)">
+                    <!-- advanced search query input disabled -->
+                    <h3 class="fixed-content-m">Advanced Search</h3>
+                    <label class="sr-only" for="searchText">Advanced search query (disabled)</label>
+                    <span ng-click="modifyAdvanceSearch()" class="search-input disabled-input-container">
+                        <input class="search-input disabled-input form-group" type="text" id="searchText" ng-model="stringQuery" disabled />
+                    </span>
+                    <a ng-click="modifyAdvanceSearch()">Modify</a>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="container-fluid">
-        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
-        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
+    <div class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
+        <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
     </div>
-    <div class="container-fluid" ng-show="searchResults.length > 0">
+    <div class="search-results" ng-show="searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
-            <hr>
             <div class="elem-name-wrapper">
                 <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
                 <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
             </div>
-            <div class="elem-type-wrapper">
-                <label>Last Modified</label>
-                <div>{{elem._modified | date:'M/d/yy h:mm a'}} by {{elem._modifier}}</div>
-            </div>
             <div class="elem-qualified-name-wrapper">
                 <div class="elem-qualified-name">
-                        {{elem._qualifiedName}}
+                    {{elem._qualifiedName}}
                 </div>
+            </div>
+            <div class="elem-type-wrapper">
+                <label>Metatypes:</label>
+                <span class="elem-type">{{elem.type}}</span>
+                <span ng-if="elem._appliedStereotypeIds.length">
+                    <span ng-repeat="type in elem._appliedStereotypeIds">
+                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
+                    </span>
+                </span>
+            </div>
+            <div ng-if="elem.type === 'Diagram' && elem._artifactIds">
+                <mms-transclude-img ng-click="userResultClick(elem, 'img')" mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></mms-transclude-img>
             </div>
             <div class="elem-documentation-wrapper">
                 <label>Documentation</label>
@@ -75,18 +196,11 @@
                       </a></span>
                 </div>
             </div>
-            <div class="elem-type-wrapper">
-                <label>Metatypes</label>
-                <div class="elem-type">{{elem.type}}</div>
-                <div ng-repeat="type in elem._appliedStereotypeIds" class="elem-type">
-                    <mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
-                </div>
-            </div>
             <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
                 <label>Value</label>
                 <div class="elem-properties">
                     <a ng-click="userResultClick(elem, 'val')">
-                            {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
+                        {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
                     </a>
                 </div>
             </div>
@@ -116,33 +230,50 @@
             <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
                 <label>Properties</label>
                 <table>
-                    <tbody>
-                        <tr ng-repeat="row in elem._properties2">
-                            <td ng-repeat="property in row">
-                                {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
-                                <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value}}<span ng-if="property.type === 'Slot'" ng-repeat="val in property.value">{{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}</span></a>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tr ng-repeat="property in elem._properties | limitTo : limitForProps">
+                        <td>
+                            {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
+                        </td>
+                        <td>
+                            <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value | limitTo:300}}
+                                <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value | limitTo:4">
+                                    <span ng-bind-html="val.value | limitTo:300"></span>
+                                    <span ng-bind-html="val.body[0] | limitTo:300"></span>
+                                    <span ng-if="!val.value && !val.body[0]">Default Value</span>
+                                </span>
+                                <!-- set variable for limit -->
+                                <span ng-if="property.value.length > 4 || property.defaultValue.value.length > 300">...</span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr class="visibility-toggle" ng-show="elem._properties.length > 6">
+                        <td></td>
+                        <td>
+                            <a ng-click="showSearchResultProps = !showSearchResultProps; showSearchResultProps ? switchText='Less' : switchText='More'; showSearchResultProps ? limitForProps=50 : limitForProps=6" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
+                        </td>
+                    </tr>
                 </table>
             </div>
-            <div ng-if="elem._relatedDocuments.length > 0" class="elem-documentation-wrapper">
+            <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">
                 <label>Related Documents</label>
                 <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
-                    <a ng-repeat="relatedView in relatedDocument._parentViews" ui-sref="project.ref.document.view({documentId: relatedDocument.id, viewId: relatedView.id, projectId: relatedDocument._projectId, refId: relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)">
-                        <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}"></mms-view-link> > <mms-view-link mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}"></mms-view-link><br/>
-                    </a>
+                    <span ng-repeat="relatedView in relatedDocument._parentViews">
+                        <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedDocument, elem)"></mms-view-link>
+                        > <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)"></mms-view-link><br/>
+                    </span>
                 </div>
             </div>
+            <div class="elem-updated-wrapper">
+                <div>Last modified {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
+            </div>
         </div>
-        <hr/>
+    </div>
+    <div class="container-fluid search-nav" ng-show="searchResults.length > 0">
+        <a ng-show="currentPage > 0" ng-click="prevPage()">&lt; Prev</a>
+        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="nextPage()">Next ></a>
     </div>
 
     <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
         <h3>No Results Found.</h3>
-    </div>
-    <div class="container-fluid" ng-show="searchResults.length === 0">
-        <a ng-show="currentPage > 0" ng-click="prev()">&lt; Prev</a>
-        <a ng-show="searchResults.length > 0" class="pull-right" ng-click="next()">Next ></a>
     </div>
 </div>

@@ -3,15 +3,14 @@
  */
 
 // Register the plugin within the editor.
-CKEDITOR.plugins.add( 'mmsreset', {
-	// Register the icons.
-	icons: 'mmsreset',
-
-	init: function( editor ) {
-		editor.addCommand( 'resetCF', {
-      exec: function( editor ) {
+CKEDITOR.plugins.add('mmsreset', {
+  // Register the icons.
+  icons: 'mmsreset',
+  init: function (editor) {
+    editor.addCommand('mmsreset', {
+      exec: function (editor) {
         var defaultConfig = {
-          callbackModalFnc : function () {
+          callbackModalFnc: function () {
             console.log("There is no callback function defined");
           }
         }
@@ -19,10 +18,10 @@ CKEDITOR.plugins.add( 'mmsreset', {
         config.callback(editor);
       }
     });
-      
-    editor.ui.addButton( 'mmsreset', {
-        label: 'Update Cross Ref',
-        command: 'resetCF',
+
+    editor.ui.addButton('mmsreset', {
+      label: 'Update Cross Ref',
+      command: 'mmsreset',
     });
-	}
+  }
 });

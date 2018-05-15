@@ -1,14 +1,17 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['VizService','ElementService','URLService','growl', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['ArtifactService','AuthService','ElementService','URLService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeImg
  *
- * @requires mms.VizService
+ * @requires mms.ArtifactService
+ * @requires mms.AuthService
  * @requires mms.ElementService
+ * @requires mms.URLService
+ * @requires growl
  *
  * @restrict E
  *
@@ -20,7 +23,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
+function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
@@ -38,36 +41,45 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
                 return;
             }
             processed = true;
-
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/svg'};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
+            var server = URLService.getMmsServer();
+            var ticket = '?alf_ticket=' + AuthService.getTicket();
             element.addClass('isLoading');
-            //TODO change when VizService is updated to use correct params
-            VizService.getImageURL(reqOb)
-            .then(function(data) {
-                scope.svgImgUrl = data;
-            //scope.svgImgUrl = URLService.getImageURL(reqOb);
-            //reqOb.accept = 'image/png';
-            //scope.pngImgUrl = URLService.getImageURL(reqOb);
-            }, function(reason) {
-                growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
-            }).finally(function() {
-                element.removeClass('isLoading');
-            });
-            var reqOb2 = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, accept: 'image/png'};
-            VizService.getImageURL(reqOb2)
-            .then(function(data) {
-                scope.pngImgUrl = data;
-            }, function(reason) {
-                //growl.error('Cf Image Error: ' + reason.message + ': ' + scope.mmsElementId);
-            });
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
+                var artifactOb = {
+                    projectId: data._projectId,
+                    refId: data._refId,
+                    artifactIds : data._artifactIds,
+                    commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
+                };
+
+                // Get the artifacts of the element
+                ArtifactService.getArtifacts(artifactOb)
+                .then(function(artifacts) {
+                    scope.artifacts = artifacts;
+                    for(var i = 0; i < artifacts.length; i++) {
+                        var artifact = artifacts[i];
+                        if (artifact.contentType == "image/svg+xml") {
+                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
+                        } else if (artifact.contentType == "image/png") {
+                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
+                        }
+                    }
+                }, function(reason) {
+                    console.log('Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
+                });
+            }, function(reason) {
+                console.log('Cf Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
+            }).finally(function() {
+                element.removeClass('isLoading');
             });
+
         });
     };
 
@@ -78,7 +90,8 @@ function mmsTranscludeImg(VizService, ElementService, URLService, growl) {
             mmsElementId: '@',
             mmsProjectId: '@',
             mmsRefId: '@',
-            mmsCommitId: '@'
+            mmsCommitId: '@',
+            mmsCfLabel: '@'
         },
         require: ['?^^mmsView'],
         link: mmsTranscludeImgLink

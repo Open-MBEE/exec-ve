@@ -58,6 +58,9 @@ jQuery.fn.table2CSV = function(options) {
         // var output = output.replace(regexp, "");
         output = $.trim(output);
         if (output == "") return '';
+        if (output[0] == '+' || output[0] == '=' || output[0] == '-') {
+            output = ' ' + output;
+        }
         return '"' + output + '"';
     }
     function popup(data) {

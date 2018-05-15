@@ -1,6 +1,4 @@
 /* Stylesheet for transclusion-related elements */
-
-
 mms-transclude-doc,
 mms-transclude-val > span,
 mms-transclude-name > span,
@@ -8,7 +6,7 @@ mms-transclude-val > p,
 mms-transclude-com,
 mms-transclude-img {
   cursor: pointer;
-  border: 2px solid transparent;
+  border-color: transparent;
 }
 
 mms-view {
@@ -26,9 +24,6 @@ mms-view {
       display: inline;
     }
   }
-  .add-buttons-container {
-    display: none;
-  }
 }
 
 mms-view.outline,
@@ -39,52 +34,43 @@ mms-view.editing {
   mms-transclude-name > span,
   mms-transclude-val > span,
   mms-transclude-val > p {
-    @include transition(border, .5s);
-    border: 2px solid $tertiary_grey;
-    border-radius: 5px;
+    @include transition(border, .3s);
+    @include border-radius(5px);
+    border: 2px solid $ve-silver-darker-1;
     cursor: pointer;
-    margin-bottom: 5px;
 
-    .panel {
-      box-shadow: 0 10px 12px rgba(0,0,0,0.05);
+    // do we want this animation ?
+    &:hover{
+      border-color: $tertiary_grey;
     }
   }
 
-  mms-transclude-doc {
+  mms-transclude-doc, mms-transclude-com {
     display: block;
 
     > div > div.panel-heading {
-      padding: 2px 15px;
+      padding: 2px 8px;
+      h3{
+        font-weight: $default_font_weight;
+      }
     }
 
     .panel {
       margin: 0px;
     }
-
-    .transclude-doc-bb {
-      margin: 8px 0;
-    }
-  }
-}
-
-mms-view.editing {
-  .add-buttons-container {
-    display: block;
   }
 }
 
 /* comments */
 mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
+  @include border-radius(5px);
   background-color: $yellow;
-  display: block;
-  border-radius: 5px;
   padding: 2px;
-  margin-bottom: 5px;
 }
 
-mms-view:not(.editing) .placeholder {
-  display: none;
+mms-view:not(.editing):not(.outline) .placeholder {
+  visibility: hidden;
 }
 
 mms-view:not(.reviewing) mms-transclude-com {
@@ -102,6 +88,7 @@ mms-view:not(.reviewing) mms-transclude-com {
 figcaption, .mms-equation-caption, caption {
   text-align: center;
   font-weight: bold;
+  cursor: pointer;
 }
 
 mms-transclude-img img {
@@ -112,4 +99,65 @@ mms-transclude-img img {
 
 .no-padding-panel {
   padding: 0px;
+}
+
+.item-type-View,
+.item-type-Document,
+.item-type-Group,
+.pe-type-Paragraph,
+.pe-type-Text,
+.pe-type-Table,
+.pe-type-Image,
+.pe-type-Equation,
+.pe-type-Comment{
+  &::before{
+    font-family: $icon-font-name;
+    padding-right: 4px;
+  }
+}
+
+.item-type-Document::before,
+.item-type-View::before{
+  content: "\f15b";
+}
+.item-type-Group::before{
+  content: "\f07b";
+  color: lighten($ve-accent, 20%);
+}
+.pe-type-Paragraph::before,
+.pe-type-Text::before{
+  content: "\f1dd";
+}
+.pe-type-Table::before{
+  content: "\f0ce";
+}
+.pe-type-Image::before{
+  content: "\f03e";
+}
+.pe-type-Equation::before{
+  content: "\f12b";
+}
+.pe-type-Comment::before{
+  content: "\f0e5";
+}
+
+/*set pseudoclass and reset italic from <i>*/
+.pe-type-Section::before{
+  content:"\00a7";
+  font-style: normal;
+  font-weight: bold;
+  padding-right: 4px;
+}
+
+// Transclude edit panel buttons
+.transclude-panel-toolbar {
+  .btn-tools {
+    @include button-variant($base_grey, $quaternary_grey, $quaternary_grey);
+    &:not(.dropdown-toggle) .fa {
+      padding-right: 0;
+    }
+    .caret{
+      opacity: .4;
+    }
+  }
 }

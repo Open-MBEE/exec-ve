@@ -3,27 +3,22 @@
   MMS app design guide
 *************************/
 
-a {
-  color: $base_blue;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 img {
   max-width: 100%;
 }
 
 .form-control:focus {
-  border-color: $base_blue;
+  border-color: $brand_base;
 }
 
 .modal-dialog {
   .modal-footer {
     margin-top: 0;
   }
+}
+
+.transclude-modal-instructions {
+  margin-top: -6px;
 }
 
 .nav-pills {
@@ -41,10 +36,10 @@ img {
   }
 }
 
-table {
-  @extend .table;
-  width: auto!important;
-}
+// table {
+//   @extend .table;
+//   width: auto!important;
+// }
 
 thead td, table caption {
   font-weight: bold;

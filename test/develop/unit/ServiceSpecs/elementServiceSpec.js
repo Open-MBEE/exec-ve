@@ -4,7 +4,7 @@ describe('Service: ElementService', function() {
 	
 	var root = '/alfresco/service';
 	var $httpBackend;
-	var mockURLService, mockUtilsService, mockCacheService, mockHttpService, mockApplicationService;
+	var mockURLService, mockUtilsService, mockCacheService, mockHttpService, mockApplicationService, urlService;
 	var ElementServiceObj;
 	var projects = {};
 	var ref = {};
@@ -13,8 +13,9 @@ describe('Service: ElementService', function() {
 	var result = {};
 	var elementHistory;
 
+    // need to put this into different beforeEach block. If not jasmine will intermittently fail.
+	beforeEach(module('mmsApp'));
 	beforeEach(function() {
-		module('mmsApp');
 		inject(function($injector) {
 			$httpBackend 			= $injector.get('$httpBackend');
 			mockURLService			= $injector.get('URLService');
@@ -23,6 +24,8 @@ describe('Service: ElementService', function() {
 			mockHttpService			= $injector.get('HttpService');
 			mockApplicationService	= $injector.get('ApplicationService');
 			ElementServiceObj		= $injector.get('ElementService');
+            urlService = $injector.get('URLService');
+            urlService.setTicket(null);
 		});
 
         $httpBackend.whenGET(function(url) {
@@ -99,7 +102,7 @@ describe('Service: ElementService', function() {
 		elements = {
 			elements: [
 				{
-					_allowedElements			: [],
+					// _allowedElements			: [],
 					_modifier					: "admin",
 					powertypeExtentIds			: [],
 					representationId			: null,
@@ -306,10 +309,11 @@ describe('Service: ElementService', function() {
                 expect(failedRequests.data).toEqual(elementObs);
             });
             $httpBackend.flush();
+            $httpBackend.flush();
         });
 
         it('should respond with the appropriately formatted response when updating elements that have all the' +
-			' required fields', function() {
+			' required fields and the request is successful', function() {
             var elementObs = [
                 {
                     id: 1,
@@ -332,15 +336,40 @@ describe('Service: ElementService', function() {
             };
 
             // Ensure that the success handler is triggered correctly
-            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(200, mockedData);
+            $httpBackend.when('POST','/alfresco/service/projects/heyaproject/refs/master/elements').respond(200, mockedData);
             ElementServiceObj.updateElements(elementObs).then(function(responses) {
                 expect(responses.length).toEqual(2);
             }, function() {
                 fail("Promise should be resolved successfully");
             });
+            $httpBackend.flush();
+            $httpBackend.flush();
+        });
 
+        it('should respond with the appropriately formatted response when updating elements that have all the required fields' +
+			' and the request fails', function() {
+            var elementObs = [
+                {
+                    id: 1,
+                    _projectId: "heyaproject",
+                    _refId: 'master',
+                    _commitId: 'latest',
+                    name: '1'
+                },
+                {
+                    id: 2,
+                    _projectId: "heyaproject",
+                    _refId: 'master',
+                    _commitId: 'latest',
+                    name: '2'
+                }
+            ];
+
+            var mockedData = {
+                elements: elementObs
+            };
             // Ensure that the error handler is triggered correctly
-            $httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements').respond(500, mockedData);
+            $httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements').respond(500, mockedData);
             ElementServiceObj.updateElements(elementObs).then(function() {
                 fail("Promise should not be resolved successfully");
             }, function(response) {
@@ -348,7 +377,8 @@ describe('Service: ElementService', function() {
                 expect(response.failedRequests[0].data).toEqual(elementObs);
             });
             $httpBackend.flush();
-        });
+            $httpBackend.flush();
+		});
 
         it('should respond with the appropriately formatted response when updating elements where some of them share' +
 			' the same _refId and _projectId and some do not', function() {
@@ -396,6 +426,7 @@ describe('Service: ElementService', function() {
                 fail("Promise should be resolved successfully");
             });
             $httpBackend.flush();
+            $httpBackend.flush();
         });
 
         it('should respond with the appropriately formatted response when updating elements where some of them share' +
@@ -438,6 +469,7 @@ describe('Service: ElementService', function() {
                 expect(response.successfulRequests.length).toEqual(2);
                 expect(response.successfulRequests).toEqual([element2, element3]);
             });
+            $httpBackend.flush();
             $httpBackend.flush();
         });
     });
@@ -542,7 +574,48 @@ describe('Service: ElementService', function() {
 				elemOb = reason.message;
 			});
 			$httpBackend.flush();
+            $httpBackend.flush();
 			expect(elemOb).toEqual(result);
+		});
+
+		it('should include a recent version of the element when its latest version is not deleted given that the reqOb enables includeRecentVersionElement', function() {
+            var mockedData = {};
+
+            var reqOb = {
+                projectId: "heyaproject",
+                elementId: "heyanelement",
+                refId: 'master',
+                commitId: 'latest',
+                includeRecentVersionElement: true
+            };
+
+            var mockedCommits = {
+				commits: [{id: 1}, {id: 2}]
+			};
+
+            var mockedElementWithCommitId2 = {
+                elements: [{name: 'docName', _commitId: 2}]
+			};
+
+            urlService.setTicket(null);
+
+            $httpBackend.whenGET('/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement').respond(410, mockedData);
+            $httpBackend.whenGET(function(url) {
+                return url.indexOf('/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement/commits') !== -1;
+            } ).respond(200, mockedCommits);
+            $httpBackend.whenGET(function(url) {
+                return url.indexOf('/alfresco/service/projects/heyaproject/refs/master/elements/heyanelement?commitId=2') !== -1;
+            } ).respond(200, mockedElementWithCommitId2);
+            ElementServiceObj.getElement(reqOb).then(function() {
+            	fail('Since this is element is deleted, this method should reject with a latest version' +
+					' of the element in the history instead.');
+            }, function(response) {
+            	expect(response.data.recentVersionOfElement).toEqual(mockedElementWithCommitId2.elements[0]);
+            });
+
+            $httpBackend.flush();
+            $httpBackend.flush();
+            $httpBackend.flush();
 		});
 	});
 
@@ -565,6 +638,7 @@ describe('Service: ElementService', function() {
 				elemsOb = reason.message;
 			});
 			$httpBackend.flush();
+            $httpBackend.flush();
 			expect(elemsOb).toEqual(result);
 		});
 	});
@@ -600,11 +674,11 @@ describe('Service: ElementService', function() {
 			// var elemReturned = {};
 			// elemReturned.elements = [reqOb];
 			// $httpBackend.when('GET', root + '/projects/heyaproject/refs/master/elements/heyanelement').respond(200, elements);
-			
+
 			var key = mockUtilsService.makeElementKey({
-				_projectId: reqOb.projectId, 
-				id: reqOb.elementId, 
-				_commitId: reqOb.commitId, 
+				_projectId: reqOb.projectId,
+				id: reqOb.elementId,
+				_commitId: reqOb.commitId,
 				_refId: reqOb.refId
 			}, true);
 			var val = mockCacheService.put(key, reqOb);
@@ -613,6 +687,8 @@ describe('Service: ElementService', function() {
 				elemOb = data;
 				expect(elemOb).toEqual(val);
 			});
+			$httpBackend.flush();
+            $httpBackend.flush();
 		});
 	});
 
@@ -642,9 +718,6 @@ describe('Service: ElementService', function() {
 		// });
 	});
 
-	describe('fillInElement: do not need to test', function() {
-	});
-
 	describe('updateElement', function() {
 		it('it should save an element to MMS and update the cache if successful', function() {
 			var elemObReturned;
@@ -661,11 +734,12 @@ describe('Service: ElementService', function() {
 
 			var key = mockUtilsService.makeElementKey(testElem);
 			mockCacheService.put(key, testElem);
-			$httpBackend.expectPOST('/alfresco/service/projects/heyaproject/refs/master/elements', elemOb).respond(201, elemOb);
+			$httpBackend.when('POST', '/alfresco/service/projects/heyaproject/refs/master/elements').respond(201, elemOb);
 			ElementServiceObj.updateElement(testElem).then(function(data) {
 				elemObReturned = data;
 			});
 			$httpBackend.flush();
+            $httpBackend.flush();
 			expect(elemObReturned).toEqual(testElem);
 			expect(mockCacheService.get(key)).toEqual(testElem);
 		});
@@ -711,17 +785,10 @@ describe('Service: ElementService', function() {
 				elemOb = reason.message;
 			});
 			$httpBackend.flush();
+            $httpBackend.flush();
 			expect(elemOb).toEqual(toCreate);
 			expect(mockCacheService.get(key)).toEqual(toCreate);
 		});
-	});
-
-	xdescribe('createElements', function() {
-		it('should get an element', function() {
-		});
-	});
-
-	describe('isCacheOutdated: do not need to test', function() {
 	});
 
 	describe('search', function() {
@@ -779,7 +846,7 @@ describe('Service: ElementService', function() {
 				_refId: 'master',
 				_commitId: 'latest'
 			};
-			$httpBackend.expectPUT('/alfresco/service/projects/heyaproject/refs/master/search?extended=true', queryOb).respond(201, {elements: resultElem});
+			$httpBackend.expectPUT('/alfresco/service/projects/heyaproject/refs/master/search?checkType=true&extended=true', queryOb).respond(201, {elements: resultElem});
 			var reqOb = {
 				projectId: "heyaproject",
 				elementId: "heyanelement",
@@ -791,6 +858,7 @@ describe('Service: ElementService', function() {
 				elemOb = data;
 			});
 			$httpBackend.flush();
+            $httpBackend.flush();
 			expect(elemOb).toEqual(resultElem);
 		});
 	});
@@ -816,7 +884,7 @@ describe('Service: ElementService', function() {
 					}
 				]
 			};
-			$httpBackend.when('GET', '/alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/history').respond(200, commitHistory);
+			$httpBackend.when('GET', '/alfresco/service/projects/someprojectid/refs/master/elements/getelementhistory/commits').respond(200, commitHistory);
 			var elemOb = {
 				projectId: "someprojectid",
 				elementId: "getelementhistory",
@@ -826,9 +894,7 @@ describe('Service: ElementService', function() {
 
 			var elemHistory = ElementServiceObj.getElementHistory(elemOb);
 			$httpBackend.flush();
+            $httpBackend.flush();
 		});
-	});
-
-	describe('reset: do not need to test', function() {
 	});
 });

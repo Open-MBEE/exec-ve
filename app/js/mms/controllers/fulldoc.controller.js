@@ -150,14 +150,11 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
 
     $scope.$on('convert-pdf', function() {
         fullDocumentService.loadRemainingViews(function() {
-            $scope.bbApi.toggleButtonSpinner('convert-pdf');
             MmsAppUtils.printModal(documentOb, refOb, true, 3)
-                .then(function(ob) {
-                    growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
-                }, function(reason){
-                    growl.error("Exporting as PDF file Failed: " + reason.message);
-                }).finally(function() {
-                $scope.bbApi.toggleButtonSpinner('convert-pdf');
+            .then(function(ob) {
+                growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
+            }, function(reason){
+                growl.error("Exporting as PDF file Failed: " + reason.message);
             });
         });
     });
@@ -170,7 +167,12 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
 
     $scope.$on('word', function() {
         fullDocumentService.loadRemainingViews(function() {
-            MmsAppUtils.printModal(documentOb, refOb, true, 2);
+            MmsAppUtils.printModal(documentOb, refOb, true, 2)
+            .then(function(ob) {
+                growl.info('Exporting as Word file. Please wait for a completion email.',{ttl: -1});
+            }, function(reason){
+                growl.error("Exporting as Word file Failed: " + reason.message);
+            });
         });
     });
 

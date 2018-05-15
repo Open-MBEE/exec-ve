@@ -70,7 +70,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         scope.recompileScope = null;
         var processed = false;
         scope.cfType = 'doc';
-
+        scope.editorApi = {};
         domElement.click(function(e) {
             if (scope.startEdit && !scope.nonEditable)
                 scope.startEdit();
@@ -90,15 +90,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             domElement.empty();
             var doc = preview ? scope.edit.documentation : scope.element.documentation;
             if (!doc || emptyRegex.test(doc)) {
-                if (preview) {
-                    doc = '<p class="no-print" ng-class="{placeholder: commitId!=\'latest\'}">(No ' + scope.panelType + ')</p>';
-                }
-                var p = '<span class="no-print">(No ' + scope.panelType + ')</span>';
-                if (scope.commitId !== 'latest')
-                    p = '';
-                doc = '<p>' + p + '</p>';
+                doc = '<p class="no-print placeholder">(no ' + scope.panelType + ')</p>';
             }
-            var fixSpan = /<span style="/;
             doc = doc.replace(fixPreSpanRegex, "<mms-cf");
             doc = doc.replace(fixPostSpanRegex, "</mms-cf>");
             if (preview) {
@@ -110,6 +103,17 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             $(domElement[0]).find('img').each(function(index) {
                 Utils.fixImgSrc($(this));
             });
+            if (mmsViewPresentationElemCtrl) {
+                var peSpec = mmsViewPresentationElemCtrl.getPresentationElement();
+                var pe = mmsViewPresentationElemCtrl.getInstanceSpec();
+                if (pe && pe._veNumber && peSpec && (peSpec.type === 'TableT' || peSpec.type === 'Figure' || peSpec.type === 'Equation' || peSpec.type === 'ImageT')) {
+                    var type = (peSpec.type === 'TableT') ? 'table' : peSpec.type.toLowerCase();
+                    if (type === 'imaget') {
+                        type = 'figure';
+                    }
+                    UtilsService.addLiveNumbering(pe, $('#' + pe.id), type);
+                }
+            }
             if (MathJax) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             }
@@ -136,7 +140,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
@@ -162,17 +166,19 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     });
                 }
             }, function(reason) {
-                var status = ' not found';
-                if (reason.status === 410)
-                    status = ' deleted';
-                domElement.html('<span class="mms-error">doc cf ' + newVal + status + '</span>');
+                domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
+                $compile(domElement.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsTranscludeDoc,
+                    cfLabel: scope.mmsCfLabel
+                }));
             }).finally(function() {
                 domElement.removeClass("isLoading");
             });
         });
 
         if (mmsViewCtrl) {
-
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
@@ -202,7 +208,6 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         } 
 
         if (mmsViewPresentationElemCtrl) {
-
             scope.delete = function() {
                 Utils.deleteAction(scope, scope.bbApi, mmsViewPresentationElemCtrl.getParentSection());
             };
@@ -240,7 +245,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsRefId: '@',
             mmsCommitId: '@',
             mmsWatchId: '@',
-            nonEditable: '<'
+            nonEditable: '<',
+            mmsCfLabel: '@'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeDocCtrl],

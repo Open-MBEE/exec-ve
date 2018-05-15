@@ -3,20 +3,22 @@
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
     var baseUrl = '/alfresco/service';
-
+    var mmsUrl = '';
     this.setBaseUrl = function(base) {
         baseUrl = base;
     };
-    
+    this.setMmsUrl = function(mms) {
+        mmsUrl = mms;
+    };
     this.$get = [function URLServiceFactory() {
-        return urlService(baseUrl);
+        return urlService(baseUrl, mmsUrl);
     }];
 });
 
 /**
  * @ngdoc service
  * @name mms.URLService
- * 
+ *
  * @description
  * This utility service gives back url paths for use in other services in communicating
  * with the server, arguments like projectId, refId, commitId are expected to be strings and
@@ -35,10 +37,52 @@ angular.module('mms')
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
-function urlService(baseUrl) {
+function urlService(baseUrl, mmsUrl) {
     var root = baseUrl;
+    var mmsServer = mmsUrl;
     var jobsRoot = 'https://cae-pma-int:8443/';
     var ticket;
+
+    var getRoot = function() {
+        return root;
+    };
+
+    var setTicket = function(t) {
+        ticket = t;
+    };
+    
+    var getJMSHostname = function(){
+        return root + '/connection/jms';
+    };
+
+    var getMmsServer = function() {
+        return mmsServer;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addTicket
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds alf_ticket parameter to URL string
+     *
+     * @param {String} url The url string for which to add alf_ticket parameter argument.
+     * @returns {string} The url with alf_ticket parameter added.
+     */
+    var addTicket = function(url) {
+        var r = url;
+        if (!ticket)
+            return r;
+        // if (r.indexOf('commitId') > 0) //TODO check mms cache rules
+        //     return r;
+        if (r.indexOf('?') > 0)
+            r += '&alf_ticket=' + ticket;
+        else
+            r += '?alf_ticket=' + ticket;
+        return r;
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#isTimestamp
@@ -56,10 +100,6 @@ function urlService(baseUrl) {
         if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim()))
             return true;
         return false;
-        
-        // if (String(version).indexOf('-') >= 0)
-        //     return true;
-        // return false;
     };
 
     /**
@@ -78,23 +118,34 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getHtmlToPdfURL
+     * @name mms.URLService#getSiteDashboardURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the path for a site dashboard.
+     * 
+     * @param {string} site Site name (not title!).
+     * @returns {string} The path for site dashboard.
+     */
+    var getSiteDashboardURL = function(site) {
+        return addTicket("/share/page/site/" + site + "/dashboard");
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getExportHtmlUrl
      * @methodOf mms.URLService
      *
      * @description
-     * Gets url that to convert HTML to PDF
-     *
-     * @param {string} docId Id of the document
-     * @param {string} site Site name
-     * @param {string} workspace Workspace name
+     * Gets url that to convert HTML to PDF or Word
+     * @param {string} projectId id of the project
+     * @param {string} refId id of the ref
      * @returns {string} The url
      */
-    var getHtmlToPdfURL = function(docId, projectId, refId) {
+    var getExportHtmlUrl = function(projectId, refId) {
         return addTicket(root + "/projects/" + projectId +
-                      "/refs/" + refId +
-                      "/documents/" + docId +
-                      "/htmlToPdf/123456789");  
-    };
+          "/refs/" + refId + '/convert');
+      };
 
     /**
      * @ngdoc method
@@ -153,7 +204,7 @@ function urlService(baseUrl) {
      * @methodOf mms.URLService
      *
      * @description
-     * Gets url that gets products in a site
+     * Gets the url for all documents in a ref
      *
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url
@@ -184,21 +235,6 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getSiteDashboardURL
-     * @methodOf mms.URLService
-     * 
-     * @description
-     * Gets the path for a site dashboard.
-     * 
-     * @param {string} site Site name (not title!).
-     * @returns {string} The path for site dashboard.
-     */
-    var getSiteDashboardURL = function(site) {
-        return addTicket("/share/page/site/" + site + "/dashboard");
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.URLService#getElementURL
      * @methodOf mms.URLService
      * 
@@ -208,7 +244,7 @@ function urlService(baseUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
-    var getElementURL = function(reqOb) {        
+    var getElementURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addExtended(addTicket(addVersion(r, reqOb.commitId)), reqOb.extended);
     };
@@ -224,11 +260,12 @@ function urlService(baseUrl) {
             recurseString = 'depth=' + reqOb.depth;
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         r = addVersion(r, reqOb.commitId);
-        if (r.indexOf('?') > 0)
+        if (r.indexOf('?') > 0) {
             r += '&' + recurseString;
-        else
+        } else {
             r += '?' + recurseString;
-        return addTicket(addExtended(r, reqOb.extended));        
+        }
+        return addTicket(addExtended(r, reqOb.extended));
     };
 
     /**
@@ -297,6 +334,127 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
+     * @name mms.URLService#getElementSearchURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url for element keyword search.
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
+     * @returns {string} The post elements url.
+     */
+    var getElementSearchURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
+        return addExtended(addTicket(r), true);
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#getSearchURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url for default search. Can optionally provide query parameters
+     * i.e. `checkType=true&literal=true`
+     *
+     * @param {string} projectId Project Id
+     * @param {string} refId Ref Id
+     * @param {string} urlParams provide optional query parameters
+     * @returns {string} The url with ticket
+     */
+    var getSearchURL = function(projectId, refId, urlParams) {
+        var r;
+        if (urlParams !== null || urlParams !== ''){
+            // ie '/search?checkType=true&literal=true';
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
+        } else {
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search';
+        }
+        return addTicket(r);
+    };
+
+    /**
+     * @ngdocs method
+     * @name mms.URLService#getArtifactURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url for an artifact
+     * 
+     * @param {object} reqOb object with keys
+     * @returns {string} url
+     */
+    var getArtifactURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
+        return addTicket(addVersion(r, reqOb.commitId));
+    };
+
+    /**
+     * @ngdocs method
+     * @name mms.URLService#getPutArtifactsURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url for an artifact
+     * 
+     * @param {object} reqOb object with keys
+     * @returns {string} url
+     */
+    var getPutArtifactsURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
+        return addTicket(r);
+    };
+
+    /**
+     * @ngdocs method
+     * @name mms.URLService#getArtifactHistoryURL
+     * @methodOf mms.URLService
+     * 
+     * @description
+     * Gets the url for an artifact commit history
+     * 
+     * @param {object} reqOb object with keys
+     * @returns {string} url
+     */
+    var getArtifactHistoryURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
+        return addTicket(r);
+    };
+
+    var setJobsUrl = function(jobUrl) {
+        jobsRoot = jobUrl + ':8443/';
+    };
+
+    var getJobsURL = function(projectId, refId, machine) {
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs', machine) );
+    };
+
+    var getJobURL = function(projectId, refId, jobId, machine){
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId , machine) );
+    };
+
+    var getRunJobURL = function(projectId, refId, jobId) {
+        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances';
+    };
+    
+    var getCreateJobURL = function(projectId, refId) {
+        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs';
+    };
+
+    var getJobInstancesURL = function(projectId, refId, jobId, machine) {
+        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine) );
+    };
+
+    var getLogoutURL = function() {
+        return addTicket(root + '/api/login/ticket/' + ticket);
+    };
+
+    var getCheckTicketURL = function(t) {
+        return root + '/mms/login/ticket/' + t; //TODO remove when server returns 404
+    };
+
+        /**
+     * @ngdoc method
      * @name mms.URLService#handleHttpStatus
      * @methodOf mms.URLService
      * 
@@ -347,52 +505,16 @@ function urlService(baseUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getElementSearchURL
+     * @name mms.URLService#addServer
      * @methodOf mms.URLService
-     * 
-     * @description
-     * Gets the url for element keyword search.
      *
-     * @param {object} reqOb object with keys as described in ElementService.
-     * @returns {string} The post elements url.
+     * @description
+     * Adds mmsServer parameter to URL string, mainly used for PMA jobs
+     *
+     * @param {String} url The url string for which to add mmsServer parameter argument.
+     * @param {String} server The mms server url for where elements are stored
+     * @returns {string} The url with server parameter added.
      */
-    var getElementSearchURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?checkType=true';
-        return addExtended(addTicket(r), true);
-    };
-    
-    var setJobsUrl = function(jobUrl) {
-        jobsRoot = jobUrl + ':8443/';
-    };
-
-    var getJobsURL = function(projectId, refId, machine) {
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs', machine) );
-    };
-
-    var getJobURL = function(projectId, refId, jobId, machine){
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId , machine) );
-    };
-
-    var getRunJobURL = function(projectId, refId, jobId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances';
-    };
-    
-    var getCreateJobURL = function(projectId, refId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs';
-    };
-
-    var getJobInstancesURL = function(projectId, refId, jobId, machine) {
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine) );
-    };
-
-    var getLogoutURL = function() {
-        return addTicket(root + '/api/login/ticket/' + ticket);
-    };
-    
-    var getCheckTicketURL = function(t) {
-        return root + '/mms/login/ticket/' + t;//+ '?alf_ticket=' + t; //TODO remove when server returns 404
-    };
-
     var addServer = function(url, server) {
         var r = url;
         if (url.indexOf('?') > 0)
@@ -400,7 +522,19 @@ function urlService(baseUrl) {
         else
             return url + '?mmsServer=' + server;
     };
-    
+
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addVersion
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds commitId parameter to URL string
+     *
+     * @param {String} url The url string for which to add version parameter argument.
+     * @param {String} version The commit id
+     * @returns {string} The url with commitId parameter added.
+     */
     var addVersion = function(url, version) {
         if (version === 'latest')
             return url;
@@ -411,30 +545,6 @@ function urlService(baseUrl) {
                 return url + '?commitId=' + version;
         } 
         return url;
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.URLService#addTicket
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Adds alf_ticket parameter to URL string
-     *
-     * @param {String} url The url string for which to add als_ticket parameter argument.
-     * @returns {string} The url with alf_ticket parameter added.
-     */
-    var addTicket = function(url) {
-        var r = url;
-        if (!ticket)
-            return r;
-        // if (r.indexOf('commitId') > 0) //TODO check mms cache rules
-        //     return r;
-        if (r.indexOf('?') > 0)
-            r += '&alf_ticket=' + ticket;
-        else
-            r += '?alf_ticket=' + ticket;
-        return r;
     };
 
     var addExtended = function(url, extended) {
@@ -459,19 +569,13 @@ function urlService(baseUrl) {
         return r;
     };
 
-    var getRoot = function() {
-        return root;
-    };
-
-    var setTicket = function(t) {
-        ticket = t;
-    };
-    
-    var getJMSHostname = function(){
-        return root + '/connection/jms';
-    };
 
     return {
+        getRoot: getRoot,
+        setTicket: setTicket,
+        getJMSHostname: getJMSHostname,
+        getMmsServer: getMmsServer,
+        isTimestamp: isTimestamp,
         getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
         getOrgsURL: getOrgsURL,
@@ -489,11 +593,14 @@ function urlService(baseUrl) {
         getOwnedElementURL: getOwnedElementURL,
         getElementHistoryURL: getElementHistoryURL,
         getElementSearchURL: getElementSearchURL,
+        getSearchURL: getSearchURL,
         getProjectDocumentsURL: getProjectDocumentsURL,
         getDocumentViewsURL: getDocumentViewsURL,
-        handleHttpStatus: handleHttpStatus,
         getImageURL: getImageURL,
-        getHtmlToPdfURL: getHtmlToPdfURL,
+        getExportHtmlUrl: getExportHtmlUrl,
+        getArtifactURL: getArtifactURL,
+        getPutArtifactsURL: getPutArtifactsURL,
+        getArtifactHistoryURL: getArtifactHistoryURL,
         setJobsUrl: setJobsUrl,
         getJobsURL: getJobsURL,
         getJobURL: getJobURL,
@@ -503,10 +610,7 @@ function urlService(baseUrl) {
         getCheckLoginURL: getCheckLoginURL,
         getCheckTicketURL: getCheckTicketURL,
         getLogoutURL: getLogoutURL,
-        isTimestamp: isTimestamp,
-        getRoot: getRoot,
-        setTicket: setTicket,
-        getJMSHostname: getJMSHostname
+        handleHttpStatus: handleHttpStatus,
     };
 
 }

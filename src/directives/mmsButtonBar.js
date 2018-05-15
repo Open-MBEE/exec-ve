@@ -6,46 +6,20 @@ angular.module('mms.directives')
 function mmsButtonBar($templateCache) {
     var template = $templateCache.get('mms/templates/mmsButtonBar.html');
 
-    // TODO: this link is currently not used
     var mmsButtonBarLink = function(scope, element, attrs){
-        scope.clicked = function(button) {
-            if (! button.active)
-                return;
 
-            if (button.onClick)
-                button.onClick();
-            else if (scope.onClick)
-                scope.onClick({button: button});
-
-            scope.buttons.forEach(function(b) {
-                if (b === button) {
-                    b.selected = true;
-                    if (b.togglable) {
-                        if (! b.toggle_state)
-                            b.toggle_state = true;
-                        else 
-                            b.toggle_state = ! b.toggle_state;
-                    }
-                } else
-                    b.selected = false;
-            });
-        };
     };
 
     var mmsButtonBarCtrl = function($scope) {
         if ($scope.mmsBbApi) {
             var api = $scope.mmsBbApi;
 
-            // TODO: select is currently not being used, so clicked is not being used
-            api.select = function(id) {
-                $scope.buttons.forEach(function(button) {
-                    if (button.id === id && button.active) {
-                        button.selected = true;
-                        $scope.clicked(button);
-                    }
-                    else
-                        button.selected = false;
-                });
+            api.select = function(parentButton, childButton) {
+                if(parentButton && childButton) {
+                    parentButton.dropdown_buttons.forEach(function(dropdownButton) {
+                        dropdownButton.selected = dropdownButton.id === childButton.id;
+                    });
+                }
             };
 
             api.setPermission = function (id, permission) {

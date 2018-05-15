@@ -6,18 +6,18 @@
         <div class="ve-light-tabs" ng-show="showProposeLink">
             <ul class="nav nav-tabs" ng-show="!createForm">
                 <li class="uib-tab nav-item tab-item">
-                    <a class="nav-link" ng-click="createForm = true">Create New</a>
+                    <a class="nav-link" ng-click="createForm = true"><i class="fa fa-plus"></i>Create New</a>
                 </li>
                 <li class="uib-tab nav-item tab-item active">
-                    <a class="nav-link">Search for existing</a>
+                    <a class="nav-link"><i class="fa fa-search"></i>Search for existing</a>
                 </li>
             </ul>
         </div>
         <div class="transclude-modal-instructions">
             {{description}}
         </div>
-        <label ng-show="showEditableOp">
-            <input type="checkbox" ng-model="nonEditableCheckbox">&nbsp;Restrict editing
+        <label ng-show="showEditableOp" for="nonEditableCheckbox">
+            <input id="nonEditableCheckbox" type="checkbox" ng-model="nonEditableCheckbox">&nbsp;Restrict editing
         </label>
 
         <mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
@@ -26,10 +26,10 @@
         <div class="ve-light-tabs">
             <ul class="nav nav-tabs">
                 <li class="uib-tab nav-item active tab-item">
-                    <a class="nav-link">Create New</a>
+                    <a class="nav-link"><i class="fa fa-plus"></i>Create New</a>
                 </li>
                 <li class="uib-tab nav-item tab-item">
-                    <a ng-click="createForm = false" class="create-element-link nav-link" ng-show="createForm">Search for existing</a>
+                    <a ng-click="createForm = false" class="create-element-link nav-link" ng-show="createForm"><i class="fa fa-search"></i>Search for existing</a>
                 </li>
             </ul>
         </div>
@@ -54,5 +54,5 @@
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" ng-show="createForm" type="button" ng-click="makeNewAndChoose()">Create & Cross Reference<i class="{{proposeClass}}"></i></button>
-    <button class="btn btn-tertiary" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
 </div>

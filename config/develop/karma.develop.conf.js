@@ -1,6 +1,5 @@
 // Karma configuration
 // Generated on Wed Jan 13 2016 14:34:59 GMT-0800 (PST)
-
 module.exports = function (config) {
     config.set({
 
@@ -15,6 +14,7 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         // Take note of the order of how each JS file is placed.
         files: [
+            'node_modules/babel-polyfill/dist/polyfill.js',
              // external libs
             'dist/js/vendor.min.js',
 
@@ -90,7 +90,7 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
+        browsers: ['PhantomJS'],
         plugins : [
             'karma-chrome-launcher',
             'karma-jasmine',
@@ -111,7 +111,7 @@ module.exports = function (config) {
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
-        singleRun: false,
+        singleRun: true,
 
         // Concurrency level
         // how many browser should be started simultaneous

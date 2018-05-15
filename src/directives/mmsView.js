@@ -138,7 +138,16 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
         // Build request object
         var reqOb = {elementId: scope.mmsElementId, projectId: scope.mmsProjectId, refId: scope.mmsRefId, commitId: scope.mmsCommitId};
         var processed = false;
-
+        scope.setPeLineVisibility = function($event) {
+            window.setTimeout(function() {
+                var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
+                if (peContainer.find('.dropdown-menu').css('display') == 'none') {
+                    peContainer.find('hr').css('visibility', 'hidden');
+                } else {
+                    peContainer.find('hr').css('visibility', 'visible');
+                }
+            });
+        };
         scope.isSection = false;
         var changeView = function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
@@ -200,8 +209,11 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
          * Add specified element at the defined 'index'
          */
         scope.addEltAction = function (index, type) {
-             scope.addPeIndex = index;
-             Utils.addPresentationElement(scope, type, scope.view);
+            if (!scope.showEdits) {
+                return;
+            }
+            scope.addPeIndex = index;
+            Utils.addPresentationElement(scope, type, scope.view);
         };
 
         /**
@@ -308,7 +320,6 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            mmsNumber: '@',
             mmsLink: '<',
             mmsViewApi: '<'
         },

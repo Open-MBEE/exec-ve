@@ -12,41 +12,42 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $rootScope.mms_refOb = refOb;
     $rootScope.ve_bbApi = $scope.bbApi = {};
+    $scope.tbApi = {};
     $rootScope.ve_treeApi = $scope.treeApi = {};
     $rootScope.ve_tree_pane = $scope.$pane;
     if (!$rootScope.veTreeShowPe) {
         $rootScope.veTreeShowPe = false;
     }
     $scope.buttons = [];
+    $scope.treeButtons = [];
     $scope.projectOb = projectOb;
     $scope.refOb = refOb;
-    $scope.treeExpandLevel = 1;
-    if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-        $scope.treeExpandLevel = 0;
-    }
-    $scope.treeSectionNumbering = false;
-    if ($state.includes('project.ref.document')) {
-        $scope.treeSectionNumbering = true;
-        $scope.treeExpandLevel = 3;
-    }
+
     $rootScope.ve_fullDocMode = false;
     if ($state.includes('project.ref.document.full')) {
         $rootScope.ve_fullDocMode = true;
     }
-    $scope.treeFilter = {search: ''};
     var docEditable = documentOb && documentOb._editable && refOb && refOb.type === 'Branch' && UtilsService.isView(documentOb);
 
+    $scope.tbApi.init = function() {
+        if ($state.includes('project.ref.document')) {
+            var viewModeButton = UxService.getButtonBarButton("view-mode-dropdown");
+            $scope.tbApi.addButton(viewModeButton);
+            $scope.tbApi.select(viewModeButton, $rootScope.veTreeShowPe ? UxService.getButtonBarButton('tree-show-pe') : UxService.getButtonBarButton('tree-show-views'));
+        }
+    };
+    
     $scope.bbApi.init = function() {
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document")); //-or-group
+            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
-            $scope.bbApi.setPermission( "tree-add-document", documentOb._editable && (refOb.type === 'Tag' ? false : true) ); //-or-group
+            $scope.bbApi.setPermission( "tree-add-document-or-group", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
             $scope.bbApi.setPermission( "tree-delete-document", documentOb._editable &&  (refOb.type === 'Tag' ? false : true) );
         } else if ($state.includes('project.ref.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
-            $scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
+            // $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
+            //$scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-view"));
@@ -198,7 +199,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             var docOb, i;
             for (i = 0; i < documentObs.length; i++) {
                 docOb = documentObs[i];
-                if (docOb._groupId === groupOb._id) {
+                if (docOb._groupId === groupOb.id) {
                     docs.push(docOb);
                 }
             }
@@ -267,7 +268,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     };
     if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-        $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "_id", "group", "_parentId", groupLevel2Func);
+        $scope.treeData = UtilsService.buildTreeHierarchy(groupObs, "id", "group", "_parentId", groupLevel2Func);
         ViewService.getProjectDocuments({
                     projectId: projectOb.id,
                     refId: refOb.id
@@ -392,10 +393,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     }
 
-    $scope.treeClickHandler = function(branch) {
+    var treeClickHandler = function(branch) {
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type === 'group') {
-                $state.go('project.ref.preview', {documentId: 'site_' + branch.data._id + '_cover', search: undefined});
+                $state.go('project.ref.preview', {documentId: 'site_' + branch.data.id + '_cover', search: undefined});
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
                 $state.go('project.ref.preview', {documentId: branch.data.id, search: undefined});
             }
@@ -418,7 +419,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $rootScope.ve_tbApi.select('element-viewer');
     };
 
-    $scope.treeDblclickHandler = function(branch) {
+    var treeDblclickHandler = function(branch) {
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type === 'group')
                 $rootScope.ve_treeApi.expand_branch(branch);
@@ -468,15 +469,34 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     };
 
     $scope.treeOptions = {
-        types: UxService.getTreeTypes()
+        types: UxService.getTreeTypes(),
+        sectionNumbering: $state.includes('project.ref.document') ? true : false,
+        numberingDepth: 0,
+        numberingSeparator: '.',
+        expandLevel: $state.includes('project.ref.document') ? 3 : ($state.includes('project.ref') ? 0 : 1),
+        search: '',
+        onSelect: treeClickHandler,
+        onDblclick: treeDblclickHandler,
+        sort: $state.includes('project.ref.document') ? null : treeSortFunction
     };
-    if (!$state.includes('project.ref.document')) {
-        $scope.treeOptions.sort = treeSortFunction;
+    if (documentOb) {
+        ElementService.getElement({
+            projectId: documentOb._projectId,
+            refId: documentOb._refId,
+            elementId: documentOb.id + "_asi-slot-_18_5_3_8bf0285_1525395209859_614940_15902"
+        }).then(function(slot) {
+            if (slot.value && slot.value.length > 0) {
+                if (Number.isInteger(slot.value[0].value)) {
+                    $scope.treeOptions.numberingDepth = slot.value[0].value;
+                } else if ((typeof slot.value[0].value) === 'string') {
+                    var val = parseInt(slot.value[0].value);
+                    if (!isNaN(val)) {
+                        $scope.treeOptions.numberingDepth = val;
+                    }
+                }
+            }
+        });
     }
-    // TODO: this is a hack, need to resolve in alternate way    
-    $timeout(function() {
-        $scope.treeApi.refresh();
-    }, 5000);
 
     $scope.fullDocMode = function() {
         if ($rootScope.ve_fullDocMode) {
@@ -512,7 +532,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         
         if (itemType === 'Document') {
             if (!branch) {
-                $scope.parentBranchData = {_id: "holding_bin_" + projectOb.id};
+                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
             } else if (branch.type !== 'group') {
                 growl.warning("Select a group to add document under");
                 return;
@@ -523,7 +543,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             newBranchType = 'view';
         } else if (itemType === 'Group') {
             if (!branch) {
-                $scope.parentBranchData = {_id: "holding_bin_" + projectOb.id};
+                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
             } else if (branch.type !== 'group') {
                 growl.warning("Select a group to add group under");
                 return;
@@ -558,7 +578,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         });
         instance.result.then(function(data) {
             var newbranch = {
-                label: data.name || data._name,
+                label: data.name,
                 type: newBranchType,
                 data: data,
                 children: []
@@ -695,7 +715,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 promise = ViewService.createDocument({
                     _projectId: projectOb.id,
                     _refId: refOb.id,
-                    id: $scope.parentBranchData._id
+                    id: $scope.parentBranchData.id
                 },{
                     viewName: $scope.newDoc.name,
                     isDoc: true
@@ -710,8 +730,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     {
                         _projectId: projectOb.id,
                         _refId: refOb.id,
-                        id: $scope.parentBranchData._id
-                    }
+                        id: $scope.parentBranchData.id
+                    }, orgOb.id
                 );
             } else {
                 growl.error("Add Item of Type " + $scope.itemType + " is not supported");

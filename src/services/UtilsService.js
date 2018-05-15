@@ -17,14 +17,11 @@ angular.module('mms')
  * Utilities
  */
 function UtilsService($q, $http, CacheService, URLService, ApplicationService, _) {
-    var VIEW_SID = '_17_0_1_232f03dc_1325612611695_581988_21583';
+    var VIEW_SID = '_11_5EAPbeta_be00301_1147420760998_43940_227';
     var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
-        '_11_5EAPbeta_be00301_1147420760998_43940_227', '_18_0beta_9150291_1392290067481_33752_4359'];
+        '_17_0_1_232f03dc_1325612611695_581988_21583', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
-    var nonEditKeys = ['contains', 'view2view', 'childrenViews', '_displayedElementIds',
-        '_allowedElementIds', '_contents', '_relatedDocuments', '_childViews', 'ownedAttributeIds',
-        '_qualifiedName', '_qualifiedId', '_commitId', '_creator', '_created', '_modifier', '_modified'];
     var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
@@ -192,13 +189,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Cleans 
      *
      * @param {Object} elem the element object to be cleaned 
-     * @param {boolean} [forEdit=false] (optional) forEdit.  If true deletes nonEditKeys from elem.
+     * @param {boolean} [forEdit=false] (optional) forEdit.
      * @returns {Object} clean elem
      */
     var cleanElement = function(elem, forEdit) {
-        if (!elem.name) {
-            elem.name = '';
-        }
         var i = 0;
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
@@ -242,13 +236,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 }
                 delete elem[keys[i]];
             }
-            /*
-            for (i = 0; i < nonEditKeys.length; i++) {
-                if (elem.hasOwnProperty(nonEditKeys[i])) {
-                    delete elem[nonEditKeys[i]];
-                }
-            }
-            */
         }
         return elem;
     };
@@ -277,7 +264,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         for (i = 0; i < array.length; i++) {
             data = array[i];
             data2Node[data[id]] = { 
-                label : data.name || data._name, 
+                label : data.name, 
                 type : type,
                 data : data, 
                 children : [] 
@@ -360,6 +347,27 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var refId = !elementOb._refId ? 'master' : elementOb._refId;
         var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
         var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
+        if (edit)
+            key.push('edit');
+        return key;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.UtilsService#makeArtifactKey
+     * @methodOf mms.UtilsService
+     * 
+     * @description
+     * Make key for element for use in CacheService
+     *
+     * @param {string} elementOb element object
+     * @param {boolean} [edited=false] element is to be edited
+     * @returns {Array} key to be used in CacheService
+     */
+    var makeArtifactKey = function(elementOb, edit) {
+        var refId = !elementOb._refId ? 'master' : elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+        var key = ['artifact', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
         return key;
@@ -473,9 +481,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} isSortable table content
      * @returns {string} generated html string
      */
-    var makeHtmlTable = function(table, isFilterable, isSortable) {
+    var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
         var result = ['<table class="table table-bordered table-condensed">'];
-        if (table.title) {
+        if (ApplicationService.getState().inDoc) {
+            result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
+        } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
         }
         if (table.colwidths && table.colwidths.length > 0) {
@@ -713,7 +723,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             return '';
         var result = '<ul>';
         var anchor = '<a href=#' + child.data.id + '>';
-        result += '  <li>' + anchor + child.section + ' ' + child.label + '</a></li>';
+        result += '  <li>' + anchor + child.data._veNumber + ' ' + child.data.name + '</a></li>';
         var i = 0;
         for (i = 0; i < child.children.length; i++) {
             result += makeHtmlTOCChild(child.children[i]);
@@ -778,21 +788,25 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {void} nothing
      */
     var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
-        var sysmlId = child.data.id;
+        var pe = child.data;
+        var sysmlId = pe.id;
+        var veNumber = pe._veNumber;
+        var prefix = '';
         var el = printElement.find('#' + sysmlId);
         var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
         var name = '';
         if (child.type === 'table') {
-            ob.tableCount++;
+            //ob.tableCount++;
+            prefix = 'Table ' + veNumber + '. ';
             var capTbl = el.find('table > caption');
             name = capTbl.text();
             if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf('. ') + 2);
+                name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
-                name = child.data.name;
+                name = pe.name;
             }
-            cap = ob.tableCount + '. ' + name;
+            cap = veNumber + '. ' + name;
             ob.tables += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capTbl.html('Table ' + cap);
             // If caption does not exist, add to html
@@ -800,10 +814,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 el.find('table').prepend('<caption>Table ' + cap + '</caption>');
             }
             // Change cap value based on showRefName true/false
-            if (showRefName) {
-                cap = ob.tableCount + '. ' + child.data.name;
-            } else {
-                cap = ob.tableCount;
+            if (!showRefName) {
+                cap = veNumber;
             }
             if (live) {
                 refs.find('a').html('Table ' + cap);
@@ -812,15 +824,16 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
         if (child.type === 'figure') {
-            ob.figureCount++;
+            //ob.figureCount++;
+            prefix = 'Figure ' + veNumber + '. ';
             var capFig = el.find('figure > figcaption');
             name = capFig.text();
             if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
-                name = name.substring(name.indexOf('. ') + 2);
+                name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
-                name = child.data.name;
+                name = pe.name;
             }
-            cap = ob.figureCount + '. ' + name;
+            cap = veNumber + '. ' + name;
             ob.figures += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             capFig.html('Figure ' + cap);
             // If caption does not exist, add to html
@@ -828,10 +841,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
             }
             // Change cap value based on showRefName true/false
-            if (showRefName) {
-                cap = ob.figureCount + '. ' + child.data.name;
-            } else {
-                cap = ob.figureCount;
+            if (!showRefName) {
+                cap = veNumber;
             }
             if (live) {
                 refs.find('a').html('Fig. ' + cap);
@@ -840,21 +851,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
         if (child.type === 'equation') {
-            ob.equationCount++;
-            cap = ob.equationCount + '. ' + child.data.name;
+            //ob.equationCount++;
+            cap = veNumber + '. ' + pe.name;
             ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
-            var equationCap = '(' + ob.equationCount + ')';
+            var equationCap = '(' + veNumber + ')';
             var capEq = el.find('.mms-equation-caption');
             capEq.html(equationCap);
             // If caption does not exist, add to html
             if (capEq.length === 0) {
                 el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
-            }
-            // Change cap value based on showRefName true/false
-            if (showRefName) {
-                cap = ob.equationCount + '. ' + child.data.name;
-            } else {
-                cap = ob.equationCount;
             }
             if (live) {
                 refs.find('a').html('Eq. ' + equationCap);
@@ -864,6 +869,56 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         for (var i = 0; i < child.children.length; i++) {
             makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
+        }
+    };
+
+    var addLiveNumbering = function(pe, el, type) {
+        var sysmlId = pe.id;
+        var veNumber = pe._veNumber;
+        var prefix = '';
+        var name = '';
+        var cap = '';
+        if (type === 'table') {
+            prefix = 'Table ' + veNumber + '. ';
+            var capTbl = el.find('table > caption');
+            name = capTbl.text();
+            if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf(prefix) + prefix.length);
+            } else if (name === "") {
+                name = pe.name;
+            }
+            cap = veNumber + '. ' + name;
+            capTbl.html('Table ' + cap);
+            // If caption does not exist, add to html
+            if (capTbl.length === 0) {
+                el.find('table').prepend('<caption>Table ' + cap + '</caption>');
+            }
+        }
+        if (type === 'figure') {
+            prefix = 'Figure ' + veNumber + '. ';
+            var capFig = el.find('figure > figcaption');
+            name = capFig.text();
+            if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
+                name = name.substring(name.indexOf(prefix) + prefix.length);
+            } else if (name === "") {
+                name = pe.name;
+            }
+            cap = veNumber + '. ' + name;
+            capFig.html('Figure ' + cap);
+            // If caption does not exist, add to html
+            if (capFig.length === 0) {
+                el.find('img').wrap('<figure></figure>').after('<figcaption>Figure ' + cap + '</figcaption>');
+            }
+        }
+        if (type === 'equation') {
+            cap = veNumber + '. ' + pe.name;
+            var equationCap = '(' + veNumber + ')';
+            var capEq = el.find('.mms-equation-caption');
+            capEq.html(equationCap);
+            // If caption does not exist, add to html
+            if (capEq.length === 0) {
+                el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
+            }
         }
     };
 
@@ -1000,6 +1055,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         printElement.find('mms-view-link').each(function(index) {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
+            if (!elementId) {
+                return;
+            }
+            elementId = elementId.replace(/[^\w\-]/gi, '');
             var isElementInDoc = printElement.find("#" + elementId);
             if (isElementInDoc.length) {
                 $this.find('a').attr('href','#' + elementId);
@@ -1054,6 +1113,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
+                ".toc {page-break-before: always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
@@ -1063,6 +1123,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
+                ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
+                "p {widows: 2; orphans: 2;}\n" +
+                "table, figure {margin-bottom: 10px;}\n" +
                 "@page {margin: 0.5in;}\n" + 
                 "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
@@ -1137,20 +1200,36 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
     /**
      * @ngdoc method
-     * @name mms.UtilsService#convertHtmlToPdf
+     * @name mms.UtilsService#exportHtmlAs
      * @methodOf mms.UtilsService
      *
      * @description
      * Converts HTML to PDF
      *
-     * @param {Object} doc The document object with Id and HTML payload that will be converted to PDF
-     * @param {string} site The site name
-     * @param {string} refId [workspace=master] Workspace name
+     * @param {string} exportType The export type (3 for pdf | 2 for word)
+     * @param {Object} data contains htmlString, name, projectId, refId
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var convertHtmlToPdf = function(doc, projectId, refId){ //TODO fix
+    var exportHtmlAs = function(exportType, data){
+        var accept;
+        switch (exportType) {
+          case 2:
+              accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+              break;
+          case 3:
+              accept = 'application/pdf';
+              break;
+          default:
+              accept = 'application/pdf';
+        }
         var deferred = $q.defer();
-        $http.post(URLService.getHtmlToPdfURL(doc.docId, projectId, refId), {'documents': [doc]})
+        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId), {
+            'Content-Type' : 'text/html',
+            'Accepts' : accept,
+            'body': data.htmlString,
+            'name': data.name,
+            'css': data.css
+        })
         .success(function(data, status, headers, config){
             deferred.resolve('ok');
         }).error(function(data, status, headers, config){
@@ -1221,6 +1300,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         cleanElement: cleanElement,
         normalize: normalize,
         makeElementKey: makeElementKey,
+        makeArtifactKey: makeArtifactKey,
         buildTreeHierarchy: buildTreeHierarchy,
         filterProperties: filterProperties,
         mergeElement: mergeElement,
@@ -1231,12 +1311,13 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         makeHtmlList: makeHtmlList,
         makeHtmlTOC: makeHtmlTOC,
         makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
+        addLiveNumbering: addLiveNumbering,
         convertViewLinks: convertViewLinks,
         createMmsId: createMmsId,
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,
-        convertHtmlToPdf: convertHtmlToPdf,
+        exportHtmlAs: exportHtmlAs,
         generateTOCHtmlOption: generateTOCHtmlOption,
         generateAnchorId: generateAnchorId,
         tableConfig: tableConfig,

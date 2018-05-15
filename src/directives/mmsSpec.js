@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils','ElementService', 'UtilsService', '$compile', '$templateCache', '$uibModal', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils', 'AuthService', 'ElementService', 'UtilsService', '$compile', '$templateCache', '$uibModal', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -71,7 +71,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, $uibModal, growl, _) {
+function mmsSpec(Utils, AuthService, ElementService, UtilsService, $compile, $templateCache, $uibModal, growl, _) {
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, domElement, attrs) {
@@ -111,6 +111,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             if (!newVal || (newVal === oldVal && ran) || !scope.mmsProjectId) {
                 return;
             }
+            scope.relatedDocuments = null;
             ran = true;
             lastid = newVal;
             if (scope.edit && scope.editorApi.save) {
@@ -131,6 +132,20 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                 }
                 scope.element = data;
                 Utils.setupValCf(scope);
+                if (!scope.mmsCommitId || scope.mmsCommitId === 'latest') {
+                    ElementService.search(reqOb, {
+                        size: 1,
+                        sort : [{ _modified : {order : "desc"}}],
+                        query: {bool: {filter: [{term: {id: data.id}}, {term: {'_projectId': data._projectId}}]}}
+                    }, 2).then(function(searchResult) {
+                        if (newVal !== lastid) {
+                            return;
+                        }
+                        if (searchResult && searchResult.length == 1 && searchResult[0].id === data.id && searchResult[0]._relatedDocuments.length > 0) {
+                            scope.relatedDocuments = searchResult[0]._relatedDocuments;
+                        }
+                    });
+                }
                 if (!scope.element._editable ||
                         (scope.mmsCommitId !== 'latest' && scope.mmsCommitId)) {
                     scope.editable = false;
@@ -167,6 +182,7 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
                         }
                     });
                 }
+                scope.elementDataLink = '/alfresco/service/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&alf_ticket='+AuthService.getTicket();
                 scope.gettingSpec = false;
             }, function(reason) {
                 scope.gettingSpec = false;
@@ -178,7 +194,20 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
         scope.$watch('mmsProjectId', changeElement);
         scope.$watch('mmsCommitId', changeElement);
         scope.$watch('mmsRefId', changeElement);
-        
+
+        scope.copyToClipboard = function($event, selector) {
+            $event.stopPropagation();
+            var target = domElement.find(selector);
+            var range = window.document.createRange();
+            range.selectNode(target[0]);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            try {
+                window.document.execCommand('copy');
+            } catch(err) {}
+            window.getSelection().removeAllRanges();
+        };
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#revertEdits
@@ -333,7 +362,8 @@ function mmsSpec(Utils, ElementService, UtilsService, $compile, $templateCache, 
             mmsCommitId: '@',
             mmsElement: '<?',
             mmsSpecApi: '<?',
-            noEdit: '@'
+            noEdit: '@',
+            mmsDisplayOldContent: '<?'
         },
         link: mmsSpecLink
     };

@@ -36,7 +36,6 @@ describe('Directive: mmsViewTable', function() {
      *
      */
 
-
     function applyFilter(filterInputDom, filterTerm) {
         scope.$apply(function() {
             filterInputDom.val(filterTerm).change();
@@ -63,7 +62,6 @@ describe('Directive: mmsViewTable', function() {
         $(trs[1]).children('td:nth-child(1)').find('mms-cf').replaceWith('<mms-cf mms-cf-type="name"><span>aaa</span></mms-cf>');
         $(trs[1]).children('td:nth-child(2)').find('mms-cf').replaceWith('<mms-cf mms-cf-type="doc"><span>adfew dfvdfdsf</span></mms-cf>');
     }
-
 
     var scope,
         element;
@@ -418,7 +416,6 @@ describe('Directive: mmsViewTable', function() {
         });
     });
 
-
     it('can do Full Table Filter ', function() {
         /** Filter by 'g' **/
         var fullTableFilterInput = element.find('form').children('input').first();
@@ -501,5 +498,175 @@ describe('Directive: mmsViewTable', function() {
         /** Do a Column-wise filter and make sure that the Full Table Filter input box is cleared **/
         applyFilter(column0FilterInput, 'g');
         expect(fullTableFilterInput.val()).toEqual('');
+    });
+
+    it('use the numerical sort when all cells value is a valid number', function() {
+        var tableData = {
+            header: [
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "Column1",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ]
+            ],
+            body: [
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "20",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "3",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "-1",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ]
+
+            ]
+        };
+        var element = angular.element('<mms-view-table data-mms-table="tableData"></mms-view-table>');
+        var scope = $rootScope.$new();
+        scope.tableData = tableData;
+        $compile(element)(scope);
+        scope.$digest();
+
+        var table = element.children('table');
+        var tbody = table.children('tbody');
+        var trs = tbody.children('tr');
+
+        // all cells' value is a valid number
+        expect(self.mmsViewTableController.__areAllCellValidNumber(trs.toArray(), 0)).toBeTruthy();
+
+        expect($(trs[0]).children('td').first().text()).toEqual('20');
+        expect($(trs[1]).children('td').first().text()).toEqual('3');
+        expect($(trs[2]).children('td').first().text()).toEqual('-1');
+
+        table.find('span[ng-click]').click();
+        trs = tbody.children('tr');
+
+        expect($(trs[0]).children('td').first().text()).toEqual('-1');
+        expect($(trs[1]).children('td').first().text()).toEqual('3');
+        expect($(trs[2]).children('td').first().text()).toEqual('20');
+    });
+
+    it('do not use the numerical sort when one or more cells value is not a valid number', function() {
+        var tableData = {
+            header: [
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "Column1",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ]
+            ],
+            body: [
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "3",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "20",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "colspan": "1",
+                        "rowspan": "1",
+                        "content": [
+                            {
+                                "sourceType": "text",
+                                "text": "a",
+                                "type": "Paragraph"
+                            }
+                        ]
+                    }
+                ]
+
+            ]
+        };
+        var element = angular.element('<mms-view-table data-mms-table="tableData"></mms-view-table>');
+        var scope = $rootScope.$new();
+        scope.tableData = tableData;
+        $compile(element)(scope);
+        scope.$digest();
+
+        var table = element.children('table');
+        var tbody = table.children('tbody');
+        var trs = tbody.children('tr');
+
+        // the last cell's value("a") is not a valid number, so use alphabetical sorting
+        expect(self.mmsViewTableController.__areAllCellValidNumber(trs.toArray(), 0)).toBeFalsy();
+
+        expect($(trs[0]).children('td').first().text()).toEqual('3');
+        expect($(trs[1]).children('td').first().text()).toEqual('20');
+        expect($(trs[2]).children('td').first().text()).toEqual('a');
+
+        table.find('span[ng-click]').click();
+        trs = tbody.children('tr');
+
+        expect($(trs[0]).children('td').first().text()).toEqual('20');
+        expect($(trs[1]).children('td').first().text()).toEqual('3');
+        expect($(trs[2]).children('td').first().text()).toEqual('a');
     });
 });

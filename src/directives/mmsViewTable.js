@@ -28,11 +28,11 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
             }
         };
 
-        var html = UtilsService.makeHtmlTable(scope.table, true, true );
+        var html = UtilsService.makeHtmlTable(scope.table, true, true, scope.mmsPe);
         html = '<div class="tableSearch ve-table-filter">' +
-                '<button class="btn btn-sm export-csv-button btn-tertiary" ng-click="doClick()">Export CSV</button> ' +
-                '<button class="btn btn-sm filter-table-button btn-tertiary" ng-click="showFilter = !showFilter">Filter table</button> ' +
-                '<button class="btn btn-sm reset-sort-button btn-tertiary reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
+                '<button class="btn btn-sm export-csv-button btn-default" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
+                '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
                 '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + html;
@@ -68,6 +68,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         $compile(thead)(scope);
         var searchbar = element.children('div');
         $compile(searchbar)(scope);
+        $compile(element.find('caption'))(scope);
         //Add the search input here (before the TRS, aka the columns/rows)
         var tbody = element.children('table').children('tbody');
         var trs = tbody.children('tr');
@@ -275,11 +276,12 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         vm._addDefaultSortOrder = _addDefaultSortOrder;
         vm._addSortingBinding = _addSortingBinding;
         vm._addSortResetBinding = _addSortResetBinding;
-        vm._comparator = _comparator;
+        vm._comparator = _generalComparator;
         vm._getCellValueForSorting = _getCellValueForSorting;
         vm._displaySortedRows = _displaySortedRows;
         vm._comparatorForSortReset = _comparatorForSortReset;
         vm._rowSortOrderAttrName = 'data-original-row-num';
+        vm.__areAllCellValidNumber = _areAllCellValidNumber;
 
         /** Add sorting ability **/
         function addSorting(trs, tbody) {
@@ -303,7 +305,9 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
 
             $scope[tableConfig.sortByColumnFn] = function (sortColumnNum) {
                 $scope[tableConfig.showBindingForSortIcon] = sortColumnNum;
-                var sortedRows = trs.toArray().sort(_comparator(sortColumnNum));
+                var rows = trs.toArray();
+                var sortedRows = _areAllCellValidNumber(rows, sortColumnNum) ?
+                    rows.sort(_numericalComparator(sortColumnNum)) : rows.sort(_generalComparator(sortColumnNum));
 
                 $scope.isAscending = !$scope.isAscending;
 
@@ -330,8 +334,8 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         /** A comparator for sorting table's rows. When one of them is null ( null is reserved for non-sortable content
          *  such as  image, list, table ), that content is pushed to the end of the final sorted list regardless of
          *  whether sorting asc or dsc **/
-        function _comparator(columnIndex) {
-            return function (rowA, rowB) {
+        function _generalComparator(columnIndex) {
+            return function(rowA, rowB) {
                 var cellValueA = _getCellValueForSorting(rowA, columnIndex);
                 var cellValueB = _getCellValueForSorting(rowB, columnIndex);
 
@@ -355,6 +359,25 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
             };
         }
 
+        /** Return true if and only if all cells' value can be converted to a valid number **/
+        function _areAllCellValidNumber(rows, columnIndex) {
+            return rows.every(function(row) {
+                return _isValidNumber(_getCellValueForSorting(row, columnIndex));
+            });
+        }
+
+        function _numericalComparator(columnIndex) {
+            return function(rowA, rowB) {
+                var cellValueA = Number(_getCellValueForSorting(rowA, columnIndex));
+                var cellValueB = Number(_getCellValueForSorting(rowB, columnIndex));
+                return cellValueA - cellValueB;
+            };
+        }
+
+        function _isValidNumber(val) {
+            return val !== null && !isNaN(Number(val));
+        }
+
         /** Get content of a cell given its row and its columnIndex. Return null for a cell that contains non-sortable
          *  content such as image, table, list **/
         function _getCellValueForSorting(row, columnIndex) {
@@ -363,6 +386,8 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
             // if there is no content, think of it as empty string
             if (containerDivContent.length === 0) {
                 return '';
+            } else if(!containerDivContent.prop('tagName')) {
+                return cell.text().trim();
             } else {
                 var cf = 'mms-cf';
                 var contentTag = containerDivContent.prop('tagName').toLowerCase();
@@ -394,7 +419,8 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
     return {
         restrict: 'E',
         scope: {
-            table: '<mmsTable'
+            table: '<mmsTable',
+            mmsPe: '<'
         },
         controller: mmsViewTableController,
         link: mmsViewTableLink

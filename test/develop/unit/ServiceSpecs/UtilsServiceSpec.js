@@ -8,7 +8,6 @@ describe('UtilsService', function() {
         expect(row[columnIndex].startRow).toEqual(expectedStartRow);
         expect(row[columnIndex].endRow).toEqual(expectedEndRow);
     }
-
     function getSortClickBinding(cellDom) {
         return cellDom.children('span').attr('ng-click');
     }
@@ -49,7 +48,6 @@ describe('UtilsService', function() {
     function getNestedTables(tableDom) {
         return tableDom.children('table').map(function() { return $(this); });
     }
-
 
     beforeAll(function() {
         jasmine.addMatchers(
@@ -383,6 +381,7 @@ describe('UtilsService', function() {
     beforeEach(function() {
         inject(function($injector) {
             this.UtilsService = $injector.get('UtilsService');
+            this.$httpBackend = $injector.get('$httpBackend');
         });
 
         this.tableDom = $(this.UtilsService.makeHtmlTable(this.tableData, true, true));
@@ -508,6 +507,46 @@ describe('UtilsService', function() {
                 }
             });
         })
+    });
+
+    it('exportHtmlAs can create a post request for word generation with the correct url and data', function() {
+        var mockData = {
+            projectId: 'project1',
+            refId: 'master',
+            name: '',
+            htmlString: ''
+        };
+        var exportType = 2;
+        var expectedUrl = '/alfresco/service/projects/' + mockData.projectId + '/refs/' + mockData.refId + '/convert';
+        var expectedData = {
+            "Content-Type": "text/html",
+            "Accepts": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "body": "",
+            "name": ""
+        };
+        this.UtilsService.exportHtmlAs(exportType, mockData);
+        this.$httpBackend.expectPOST(expectedUrl, expectedData).respond(200, {});
+        this.$httpBackend.flush();
+    });
+
+    it('exportHtmlAs can create a post request for pdf generation with the correct url and data', function() {
+        var mockData = {
+            projectId: 'project1',
+            refId: 'master',
+            name: '',
+            htmlString: ''
+        };
+        var exportType = 3;
+        var expectedUrl = '/alfresco/service/projects/' + mockData.projectId + '/refs/' + mockData.refId + '/convert';
+        var expectedData = {
+            "Content-Type": "text/html",
+            "Accepts": "application/pdf",
+            "body": "",
+            "name": ""
+        };
+        this.UtilsService.exportHtmlAs(exportType, mockData);
+        this.$httpBackend.expectPOST(expectedUrl, expectedData).respond(200, {});
+        this.$httpBackend.flush();
     });
 
 });

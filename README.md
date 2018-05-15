@@ -33,6 +33,7 @@ https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUser
   "ems": "hostnameurl"
 }
 ```
+
 6. In the angular-mms directory, run. . .
 * . . .to build and bundle the app in development mode. The final artifact will be available in the dist folder:
   
@@ -66,6 +67,7 @@ https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUser
 
       grunt test
       
+7. To deploy, zip up the dist folder, it can be served as static files from a web server. For convenience, can unzip it to where mms is hosted (ex. {tomcatDir}/webapps/ve, {mmshost}/ve/mms.html to access)
 
 For more information, please consult the Gruntfile.js and the links at the bottom.
 
