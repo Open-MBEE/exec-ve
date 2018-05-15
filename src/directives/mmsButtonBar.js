@@ -75,7 +75,8 @@ function mmsButtonBar($templateCache) {
                 if ($scope.buttons.count === 0) {
                     button.placement = "bottom-left";
                 }
-                else {
+                else if (!button.placement) {
+                // else {
                     button.placement = "bottom";
                 }
 
