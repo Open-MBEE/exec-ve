@@ -1193,11 +1193,19 @@ Element not found styling
   background: url('../assets/format-dropdown.png') no-repeat center !important;
   background-size: 16px !important;
 }
+
 .mmsExtraFeature a.cke_combo_button .cke_combo_inlinelabel {
   background: url('../assets/mmsplus.png') no-repeat center !important;
   background-size: 14px !important;
 }
 
 .cke_button.cke_button__mmscomment:after {
-  border-right: 0px !important;
+  border-right: 0 !important;
+}
+
+.cke_combopanel {
+  -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  border-radius: 4px;
 }

@@ -4,7 +4,7 @@ CKEDITOR.plugins.add('mmsdropdown',
         init: function (editor) {
             var config = editor.config, lang = editor.lang.format;
             function createItem(options) {
-                return options.isMmsCustomPlugin ? '<span> <img style="width:auto; height:auto; max-width:20px; max-height:20px;" src="' + options.imgSrc + '"> <span style="margin-left:3px">' + options.label + '</span> </span>'
+                return options.isMmsCustomPlugin ? '<span> <img style="vertical-align:middle; width:auto; height:auto; max-width:17px; max-height:17px;" src="' + options.imgSrc + '"> <span style="margin-left:3px">' + options.label + '</span> </span>'
                     : '<span> <span class="cke_button_icon cke_button__' + options.iconClass + '_icon"> </span> <span style="margin-left:3px">' + options.label + '</span> </span>';
             }
             editor.ui.addRichCombo('mmsExtraFeature', {
