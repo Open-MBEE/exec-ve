@@ -15,7 +15,11 @@ CKEDITOR.editorConfig = function( config ) {
 	//config.tabSpaces = 4;
 	//config.height = 350;
 	// config.extraPlugins = 'autosave,iframe,mediaembed,embed,
-	config.extraPlugins = 'liststyle,autosave,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,mmsdropdown';
+	config.extraPlugins = 'liststyle,autosave,autogrow,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,mmsdropdown';
+    config.autoGrow_minHeight = 200;
+    config.autoGrow_maxHeight = 600;
+    config.autoGrow_bottomSpace = 50;
+    config.autoGrow_onStartup = true;
 	config.mathJaxLib = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
 	//config.extraAllowedContent = 'div(*)[*]{*}; p[class]{*}; a[class,href,alt]{*}; i[class,aria-hidden]{*}; span[class]{*}; audio[*]; video[*]; source[*]; mms-group-docs[*]; mms-cf[*]; mms-view-link[*]; mms-value-link[*]; mms-line-graph[*]; mms-diff-attr[*]; mms-maturity-bar[*]; math[*]; maction[*]; maligngroup[*]; malignmark[*]; menclose[*]; merror[*]; mfenced[*]; mfrac[*]; mglyph[*]; mi[*]; mlabeledtr[*]; mlongdiv[*]; mmultiscripts[*]; mn[*]; mo[*]; mover[*]; mpadded[*]; mphantom[*]; mroot[*]; mrow[*]; ms[*]; mscarries[*]; mscarry[*]; msgroup[*]; mstack[*]; msline[*]; mspace[*]; msqrt[*]; msrow[*]; mstyle[*]; msub[*]; msup[*]; msubsup[*]; mtable[*]; mtd[*]; mtext[*]; mtr[*]; munder[*]; munderover[*];';
 	config.allowedContent = true;

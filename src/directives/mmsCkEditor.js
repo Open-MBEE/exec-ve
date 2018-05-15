@@ -438,8 +438,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 mmsvlink: {callbackModalFnc: viewLinkCallback},
                 mmsreset: {callback: mmsResetCallback},
                 contentsCss: CKEDITOR.basePath+'contents.css',
-                toolbar: thisToolbar,
-                height: $window.innerHeight*0.4,
+                toolbar: thisToolbar
+                // height: $window.innerHeight*0.4,
             });
 
             // Enable Autosave plugin only when provided with unique identifier (autosaveKey)

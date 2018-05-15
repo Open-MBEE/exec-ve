@@ -55,7 +55,7 @@ CKEDITOR.plugins.add('mmsdropdown',
                     this.add('strike', createItem({ isMmsCustomPlugin: false, iconClass: 'strike', label: 'Strikethrough' }), 'Strikethrough');
                     this.add('superscript', createItem({ isMmsCustomPlugin: false, iconClass: 'superscript', label: 'Superscript' }), 'Superscript');
                     this.add('subscript', createItem({ isMmsCustomPlugin: false, iconClass: 'subscript', label: 'Subscript' }), 'Subscript');
-                    this.add('', '<hr>');
+                    this.add('', '<hr>', 'mms-br');
 
                     this.add('removeFormat', createItem({ isMmsCustomPlugin: false, iconClass: 'removeformat', label: 'Clear Formatting' }), 'Clear Formatting');
                 },
