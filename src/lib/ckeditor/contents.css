@@ -247,6 +247,6 @@ a[title='mms-br'] > hr {
 	outline: 0;
 }
 
-.cke_panel_listItem > a {
-	padding-left: 20px;
+.cke_panel_listItem  a {
+	padding-left: 20px !important;
 }
