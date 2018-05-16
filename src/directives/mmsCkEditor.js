@@ -398,28 +398,26 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         
         // Formatting editor toolbar
         var stylesToolbar = { name: 'styles', items : ['Format','FontSize','TextColor','BGColor' ] };
-        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat', '-'] };
+        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
         var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
         var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
         var editingToolbar = { name: 'editing', items : [ 'Find','Replace' ] };
         var linksToolbar = { name: 'links', items : [ 'Link','Unlink','-' ] };
-        var extraToolbar = {name: 'extra', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'}, {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, '-']};
         var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
         var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var dropdownToolbar = { name: 'custom', items: [ 'mmsExtraFeature'] };
         var sourceToolbar = { name: 'source', items: [ 'Maximize','Source' ] };
-        var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
-        var tableImageEquationToolbar = { name: 'combined', items: ['Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', '-' ]};
-        var commentToolbar = {name: 'comment', items: [{name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}]};
-        
-        var thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, extraToolbar, linksToolbar, tableImageEquationToolbar, commentToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+        var combinedToolbar = { name: 'combined', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'},
+            {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, 'Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', {name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}, 'mmsExtraFeature' ]};
+        // var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
+
+        var thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, combinedToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
         switch(scope.mmsEditorType) {
             case 'TableT':
                 //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
                 break;
             case 'ListT':
-                thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+                thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, 'mmsExtraFeature', clipboardToolbar, editingToolbar, sourceToolbar];
                 break;
             case 'Equation':
                 thisToolbar = [justifyToolbar, equationToolbar, sourceToolbar];
@@ -440,8 +438,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 mmsvlink: {callbackModalFnc: viewLinkCallback},
                 mmsreset: {callback: mmsResetCallback},
                 contentsCss: CKEDITOR.basePath+'contents.css',
-                toolbar: thisToolbar,
-                height: $window.innerHeight*0.4,
+                toolbar: thisToolbar
+                // height: $window.innerHeight*0.4,
             });
 
             // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
