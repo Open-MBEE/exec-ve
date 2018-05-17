@@ -769,9 +769,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
         }
+
+        // when in project.ref state, allow deletion for view/document/group
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            if (branch.type !== 'view' || (!UtilsService.isDocument(branch.data))) {
-                growl.warning("Delete Error: Selected item is not a document.");
+            if (!(branch.type === 'view' || branch.type === 'group' || UtilsService.isDocument(branch.data))) {
+                growl.warning("Delete Error: Selected item is not a document/group.");
                 return;
             }
         }
@@ -800,12 +802,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     // TODO: Make this a generic delete controller
     var deleteCtrl = function($scope, $uibModalInstance) {
-        $scope.oking = false;
         var branch = $scope.deleteBranch;
-        if (branch.type === 'view') {
-            $scope.type = 'View';
-            if (UtilsService.isDocument(branch.data))
-                $scope.type = 'Document';
+        $scope.oking = false;
+        $scope.type = branch.type;
+        if (UtilsService.isDocument(branch.data)) {
+            $scope.type = 'Document';
         }
         $scope.name = branch.data.name;
         $scope.ok = function() {
@@ -827,6 +828,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         viewId: branch.data.id
                     });
                 }
+            }
+
+            if(branch.type === 'group' && branch.children.length === 0) {
+                promise = ViewService.removeGroup(branch.data);
             }
             promise.then(function(data) {
                 growl.success($scope.type + " Deleted");

@@ -111,7 +111,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data) {
                 var cacheKey = ['documents', elementOb._projectId, elementOb._refId];
                 var index = -1;
-                var found = false;
                 var projectDocs = CacheService.get(cacheKey);
                 if (projectDocs) {
                     for (var i = 0; i < projectDocs.length; i++) {
@@ -829,6 +828,34 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
+     * @name mms.ViewService#deleteGroup
+     * @methodOf mms.ViewService
+     *
+     * @description remove a group
+     *
+     * @param elementOb group to remove
+     * @returns {Promise} The promise will be resolved with the updated group object.
+     */
+    var removeGroup = function(elementOb) {
+        elementOb._isGroup = false;
+        elementOb._appliedStereotypeIds = [];
+        elementOb.appliedStereotypeInstanceId = null;
+        return ElementService.updateElements([elementOb], false)
+            .then(function(data) {
+                // remove this group for cache
+                var cacheKey = ['groups', elementOb._projectId, elementOb._refId];
+                var groups = CacheService.get(cacheKey) || [];
+                _.remove(groups, function(group) {
+                    return group.id === elementOb.id;
+                });
+                return data;
+            }, function(reason) {
+                return reason;
+            });
+    };
+
+    /**
+     * @ngdoc method
      * @name mms.ViewService#getProjectDocuments
      * @methodOf mms.ViewService
      * 
@@ -1097,6 +1124,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         createView: createView,
         createDocument: createDocument,
         createGroup: createGroup,
+        removeGroup: removeGroup,
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
         getDocumentViews: getDocumentViews,
