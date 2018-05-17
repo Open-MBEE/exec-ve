@@ -128,7 +128,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
         ElementService.updateElements(toSave, true)
         .then(function() {
             growl.success('Reorder Successful');
-            $state.go('project.ref.document', {}, {reload:true});
+            navigate(true);
         }, function(response) {
             var reason = response.failedRequests[0];
             var errorMessage = reason.message;
@@ -144,6 +144,10 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
     };
     
     $scope.cancel = function() {
+        navigate(false);
+    };
+
+    function navigate(reload) {
         var curBranch = $rootScope.ve_treeApi.get_selected_branch();
         if (!curBranch) {
             $state.go('project.ref.document', {}, {reload:true});
@@ -152,7 +156,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
             if (curBranch.type === 'section') {
                 goToId = curBranch.viewId;
             }
-            $state.go('project.ref.document.view', {viewId: goToId});
+            $state.go('project.ref.document.view', {viewId: goToId}, {reload: reload});
         }
-    };
+    }
 }]);
