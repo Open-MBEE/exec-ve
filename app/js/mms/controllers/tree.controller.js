@@ -789,9 +789,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if ($state.includes('project.ref.document') && branch.type === 'view') {
                 processDeletedViewBranch(branch);
             }
-            if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-                return;
-            }
             if ($rootScope.ve_fullDocMode) {
                 cb(branch);
             } else {
