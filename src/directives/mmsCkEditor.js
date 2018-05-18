@@ -473,10 +473,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     autocompleteCallback(instance);
                     // to prevent ckeditor from adding the @ symbol when user actually want to do cross referencing
                     return false;
-                }
-                if (e.data.keyCode == (CKEDITOR.CTRL + 192)) { //little tilde
-                    autocompleteCallback(instance);
-                } else { 
+                } else {
                     if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
                         //trying to prevent tab and shift tab jumping focus out of editor
                         e.cancel();
