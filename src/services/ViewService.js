@@ -1048,8 +1048,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getDocMetadata = function(reqOb, weight) {
         var deferred = $q.defer();
         var metadata = {numberingDepth: 0, numberingSeparator: '.'};
-        reqOb.depth = 2;
-        //ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
         reqOb.elementIds = [
             reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234342817_186479_2256', //header
             reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234349580_411867_2258', //footer
@@ -1068,7 +1066,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 if (!feature || !value || value.length === 0) {
                     continue;
                 }
-                var result = processSlotStrings(value);
+                var result = [];
                 if (feature === '_17_0_1_407019f_1326234342817_186479_2256') { //header
                     result = processSlotStrings(value);
                     metadata.top = result.length > 0 ? result[0] : '';
