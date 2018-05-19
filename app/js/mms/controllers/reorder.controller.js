@@ -153,7 +153,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
             $state.go('project.ref.document', {}, {reload:true});
         } else {
             var goToId = curBranch.data.id;
-            if (curBranch.type === 'section') {
+            if (curBranch.type !== 'section' && curBranch.type !== 'view') {
                 goToId = curBranch.viewId;
             }
             $state.go('project.ref.document.view', {viewId: goToId}, {reload: reload});
