@@ -738,12 +738,14 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @methodOf mms.UtilsService
      *
      * @description
-     * Generates a list of tables, figures, and equations. It also appends the captions to the figures and tables.
+     * Generates a list of tables, figures, and equations. Default uses presentation elements.
+     * `html` param provides option to use html content to generate list. It also appends the
+     * captions to the figures and tables.
      *
      * @param {string} tree the document/view to be printed (what is on the left pane)
      * @param {string} printElement contents to be printed (what is displayed in the center pane)
      * @param {boolean} live true only if a specific sorting is required
-     * @param {boolean} user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not
+     * @param {boolean} html whether to generated list of tables and figures using html content, outside of the corresponding PE or not
      * @returns {object} results
      */
     var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
