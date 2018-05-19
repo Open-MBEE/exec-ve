@@ -1016,7 +1016,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     var processSlotIntegers = function(values) {
         var res = [];
-        if (!values || values.length > 0) {
+        if (!values || values.length === 0) {
             return res;
         }
         values.forEach(function(value) {
