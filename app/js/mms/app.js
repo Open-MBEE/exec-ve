@@ -348,6 +348,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return null;
                 }
                 return $stateParams.search;
+            }],
+            docMeta: [function(){
+                return {};
             }]
         },
         views: {
@@ -533,6 +536,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     }
                 }
                 return group;
+            }],
+            docMeta: ['ViewService', 'documentOb', function(ViewService, documentOb) {
+                return ViewService.getDocMetadata({
+                    projectId: documentOb._projectId,
+                    refId: documentOb._refId,
+                    elementId: documentOb.id
+                });
             }]
         },
         views: {
