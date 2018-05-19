@@ -208,6 +208,10 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, $compile, $te
             window.getSelection().removeAllRanges();
         };
 
+        scope.cleanupVal = function(obj) {
+            obj.value = parseInt(obj.value);
+        };
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#revertEdits
