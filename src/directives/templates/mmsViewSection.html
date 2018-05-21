@@ -3,7 +3,7 @@
         <h1 class="section-title" ng-hide="inPreviewMode">{{section._veNumber}} {{section.name}}</h1>
         <div ng-show="inPreviewMode"><h1 class="section-title">{{section._veNumber}} {{edit.name}}</h1></div>
     </div>
-    <div ng-class="{'panel panel-default no-print' : isEditing}">
+    <div ng-class="{'panel panel-default' : isEditing}">
         <div ng-class="{'no-display' : ! isEditing}" class="panel-heading clearfix no-print">
             <h3 class="panel-title pull-left">
                 <div ng-class="{prop: isEditing}"><input class="form-control" type="text" ng-model="edit.name"/></div>
