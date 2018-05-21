@@ -92,7 +92,7 @@
         mms-base-commit-id="{{baseCommit.commitSelected.id}}" mms-compare-commit-id="{{compareCommit.commitSelected.id}}"></mms-diff-attr>
 
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
-        <h2 class="prop-title">val</h2>
+        <h2 class="prop-title">Property Value</h2>
         <span class="prop">
             <mms-diff-attr mms-base-element-id="{{mmsElementId}}" mms-attr="val" mms-base-project-id="{{mmsProjectId}}"
             mms-base-ref-id="{{baseCommit.refSelected.id}}" mms-compare-ref-id="{{mmsRefId}}"
