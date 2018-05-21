@@ -172,8 +172,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     ed.insertHtml( tag );
                 }
             }, function() {
-                var focusManager = new CKEDITOR.focusManager( ed );
-                focusManager.focus();
+                ed.insertText('@');
+                ed.focus();
             });
         };
 
@@ -469,9 +469,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.focusManager.blur();
             });
             instance.on( 'key', function(e) {
-                if (e.data.keyCode == (CKEDITOR.CTRL + 192)) { //little tilde
+                if(e.data.domEvent.$.shiftKey && e.data.domEvent.$.key === '@') {
                     autocompleteCallback(instance);
-                } else { 
+                    // to prevent ckeditor from adding the @ symbol when user actually want to do cross referencing
+                    return false;
+                } else {
                     if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
                         //trying to prevent tab and shift tab jumping focus out of editor
                         e.cancel();
