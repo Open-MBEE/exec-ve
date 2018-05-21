@@ -1169,6 +1169,22 @@ Element not found styling
   position: absolute;
 }
 
+.mms-error-icon{
+  color: $black;
+  border: none;
+  padding-left: 11px;
+}
+
+.mms-error-icon::before{
+  content: "\f071";
+  font-family: fontAwesome;
+  margin-left: -14px;
+  color: $ve-warning-orange;
+  font-size: 12px;
+  position: absolute;
+}
+
+
 .pane-right .prop.mms-error {
   margin-top: 10px;
 }

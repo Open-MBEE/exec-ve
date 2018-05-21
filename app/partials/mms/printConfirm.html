@@ -8,11 +8,11 @@
 </div>
 
 <div class="modal-body">
-    <p ng-if="hasError" class="mms-error">
+    <p ng-if="hasError" class="mms-error-icon">
         WARNING: There are cross reference errors in this document that will be reflected in the export.
     </p>
-    <p ng-if="unsaved" class="mms-error">
-        WARNING: You currently have unsaved changes in the session that may not be reflected.
+    <p ng-if="unsaved" class="mms-error-icon">
+        WARNING: Unsaved changes may not be reflected (alt + a to save all)
     </p>
     <p ng-if="mode === 1">
       This will bring up a popup where you can {{action}} the contents of this {{type === 'DOCUMENT' ? 'document' : 'view'}} , please disable any popup blockers if you don't

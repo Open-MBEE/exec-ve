@@ -69,10 +69,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeApi.collapse_all();
     });
 
-    $scope.$on('tree-filter', function() {
-        $scope.toggleFilter();
-    });
-
     $scope.$on('tree-add-document', function() {
         addItem('Document');
     });
@@ -184,10 +180,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.$on('tree-full-document', function() {
         $scope.fullDocMode();
     });
-
-    $scope.toggleFilter = function() {
-        $scope.bbApi.toggleButtonState('tree-filter');
-    };
 
     var groupLevel2Func = function(groupOb, groupNode) {
         groupNode.loading = true;
