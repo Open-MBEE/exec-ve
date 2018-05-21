@@ -12,12 +12,12 @@
             </div>
             <div ng-repeat="value in editValues" ng-switch on="value.type" ng-form="valForm">
                 <div ng-switch-when="LiteralInteger" ng-class="{'has-error': valForm.$error.pattern}">
-                    <input class="form-control" type="number" ng-model="value.value" ng-pattern="/^-?[0-9][^\.]*$/" ng-blur="cleanupVal(value)">&nbsp;
+                    <input class="form-control" type="number" ng-model="value.value" ng-pattern="/^-?\d+$/" ng-blur="cleanupVal(value)">&nbsp;
                     <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
                     <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid integer</label>
                 </div>
                 <div ng-switch-when="LiteralUnlimitedNatural" ng-class="{'has-error': valForm.$error.pattern}">&nbsp;
-                    <input class="form-control" type="number" name="natVal" ng-model="value.value" ng-pattern="/^[0-9][^\.]*$/" ng-blur="cleanupVal(value)">&nbsp;
+                    <input class="form-control" type="number" name="natVal" ng-model="value.value" ng-pattern="/^\d+$/" ng-blur="cleanupVal(value)">&nbsp;
                     <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
                     <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid natural number</label>
                 </div>
