@@ -5,10 +5,10 @@
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
-                          'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs',
+                          'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'docMeta',
 function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
-    orgOb, projectOb, refOb, refObs, groupObs) {
+    orgOb, projectOb, refOb, refObs, groupObs, docMeta) {
 
     $rootScope.mms_refOb = refOb;
     $rootScope.ve_bbApi = $scope.bbApi = {};
@@ -479,23 +479,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         onDblclick: treeDblclickHandler,
         sort: $state.includes('project.ref.document') ? null : treeSortFunction
     };
-    if (documentOb) {
-        ElementService.getElement({
-            projectId: documentOb._projectId,
-            refId: documentOb._refId,
-            elementId: documentOb.id + "_asi-slot-_18_5_3_8bf0285_1525395209859_614940_15902"
-        }).then(function(slot) {
-            if (slot.value && slot.value.length > 0) {
-                if (Number.isInteger(slot.value[0].value)) {
-                    $scope.treeOptions.numberingDepth = slot.value[0].value;
-                } else if ((typeof slot.value[0].value) === 'string') {
-                    var val = parseInt(slot.value[0].value);
-                    if (!isNaN(val)) {
-                        $scope.treeOptions.numberingDepth = val;
-                    }
-                }
-            }
-        });
+    if (documentOb && docMeta) {
+        $scope.treeOptions.numberingDepth = docMeta.numberingDepth;
+        $scope.treeOptions.numberingSeparator = docMeta.numberingSeparator;
     }
 
     $scope.fullDocMode = function() {
