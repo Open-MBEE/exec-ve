@@ -47,7 +47,7 @@ function mmsTranscludeArt(ArtifactService, AuthService, URLService) {
             ArtifactService.getArtifact(reqOb)
             .then(function(artifact) {
                 scope.artifact = artifact;
-                scope.url = server + '/alfresco' + artifact.location + ticket;
+                scope.url = server + '/alfresco' + artifact.artifactLocation + ticket;
                 if (artifact.contentType.indexOf('image') > -1) {
                     scope.image = true;
                 }

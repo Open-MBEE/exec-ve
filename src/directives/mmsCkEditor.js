@@ -172,8 +172,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     ed.insertHtml( tag );
                 }
             }, function() {
-                var focusManager = new CKEDITOR.focusManager( ed );
-                focusManager.focus();
+                ed.insertText('@');
+                ed.focus();
             });
         };
 
@@ -398,28 +398,26 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         
         // Formatting editor toolbar
         var stylesToolbar = { name: 'styles', items : ['Format','FontSize','TextColor','BGColor' ] };
-        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat', '-'] };
+        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
         var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
         var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
         var editingToolbar = { name: 'editing', items : [ 'Find','Replace' ] };
         var linksToolbar = { name: 'links', items : [ 'Link','Unlink','-' ] };
-        var extraToolbar = {name: 'extra', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'}, {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, '-']};
         var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
         var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var dropdownToolbar = { name: 'custom', items: [ 'mmsExtraFeature'] };
         var sourceToolbar = { name: 'source', items: [ 'Maximize','Source' ] };
-        var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
-        var tableImageEquationToolbar = { name: 'combined', items: ['Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', '-' ]};
-        var commentToolbar = {name: 'comment', items: [{name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}]};
-        
-        var thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, extraToolbar, linksToolbar, tableImageEquationToolbar, commentToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+        var combinedToolbar = { name: 'combined', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'},
+            {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, 'Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', {name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}, 'mmsExtraFeature' ]};
+        // var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
+
+        var thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, combinedToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
         switch(scope.mmsEditorType) {
             case 'TableT':
                 //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
                 break;
             case 'ListT':
-                thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+                thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, 'mmsExtraFeature', clipboardToolbar, editingToolbar, sourceToolbar];
                 break;
             case 'Equation':
                 thisToolbar = [justifyToolbar, equationToolbar, sourceToolbar];
@@ -440,8 +438,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 mmsvlink: {callbackModalFnc: viewLinkCallback},
                 mmsreset: {callback: mmsResetCallback},
                 contentsCss: CKEDITOR.basePath+'contents.css',
-                toolbar: thisToolbar,
-                height: $window.innerHeight*0.55,
+                toolbar: thisToolbar
+                // height: $window.innerHeight*0.4,
             });
 
             // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
@@ -450,7 +448,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.config.autosave = {
                     SaveKey: attrs.autosaveKey,
                     delay: 5,
-                    NotOlderThen: 10080, // 7 days in minutes
+                    NotOlderThen: 7200, // 5 days in minutes
                     enableAutosave: true
                 };
             } else {
@@ -471,9 +469,19 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.focusManager.blur();
             });
             instance.on( 'key', function(e) {
-                if (e.data.keyCode == (CKEDITOR.CTRL + 192)) { //little tilde
+                if(e.data.domEvent.$.shiftKey && e.data.domEvent.$.key === '@') {
                     autocompleteCallback(instance);
-                } else { 
+                    // to prevent ckeditor from adding the @ symbol when user actually want to do cross referencing
+                    return false;
+                } else {
+                    if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
+                        //trying to prevent tab and shift tab jumping focus out of editor
+                        if (e.data.keyCode == 9) {
+                            instance.insertHtml('&nbsp;&nbsp;&nbsp;&nbsp;');
+                        }
+                        e.cancel();
+                        e.stop();
+                    }
                     deb(e); 
                 }
             }, null, null, 31); //priority is after indent list plugin's event handler
@@ -512,7 +520,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     //data.message = response[ 1 ];
                     evt.cancel();
                 } else {
-                    data.url = '/alfresco' + response.artifacts[0].location;
+                    data.url = '/alfresco' + response.artifacts[0].artifactLocation;
                 }
             } );
         }, 0, false);

@@ -229,3 +229,24 @@ a > img {
 	 padding: 8px;
 	 border: 1px solid #ddd;
  }
+
+a[title='mms-br']:hover {
+	background-color: transparent;
+	cursor: default;
+}
+a[title='mms-br'] {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+a[title='mms-br'] > hr {
+	margin: 0;
+}
+
+.cke_panel_listItem.cke_selected a, .cke_panel_listItem a:hover, .cke_panel_listItem a:focus, .cke_panel_listItem a:active {
+	background-color: #f5f5f5 !important;
+	outline: 0;
+}
+
+.cke_panel_listItem  a {
+	padding-left: 20px !important;
+}

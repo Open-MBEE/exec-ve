@@ -185,7 +185,7 @@ ul.global-menu {
 }
 @media (max-width: 720px) {
   #global-search input {
-    width: 92%;
+    width: calc(100% - 30px);
   }
 }
 

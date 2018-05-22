@@ -93,13 +93,13 @@ mms-view-section .mms-add-pe-button {
   height: 0px;
   margin: 0px;
 }
-.add-pe-button-container:hover hr {
-  visibility: visible; //maybe toggle visibility with js for hover and click?
-}
+//.add-pe-button-container:hover hr {
+//  visibility: visible; //maybe toggle visibility with js for hover and click?
+//}
 
 mms-view-section .add-pe-button-container hr {
-  left: 25px;
-  bottom: 15px;
+  left: 31px;
+  bottom: 18px;
   position: relative;
-  width: calc(100% - 25px);
+  width: calc(100% - 31px);
 }

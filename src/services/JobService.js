@@ -84,10 +84,13 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         var link = URLService.getJobsURL(projectId, refId, serverSentPMA);
         var docJobs = [];
         $http.get(link).then(function(data) {
-            var jobs = data.data.jobs;
-            for (var i = 0; i < jobs.length; i++) {
-                if (jobs[i].associatedElementID === docId) {
-                    docJobs.push(jobs[i]);
+            var jobs;
+            if (data.data.jobs) {
+                jobs = data.data.jobs;
+                for (var i = 0; i < jobs.length; i++) {
+                    if (jobs[i].associatedElementID === docId) {
+                        docJobs.push(jobs[i]);
+                    }
                 }
             }
             deferred.resolve(docJobs);

@@ -304,8 +304,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         });
 
         // Remove comments, table features, and all elements with classes: mms-error, no-print, ng-hide
-        var comments = printElementCopy.find('mms-transclude-com');
-        comments.remove();
+        printElementCopy.find('mms-transclude-com').remove();
+        printElementCopy.find('style').remove(); //prevent user inserted styles from interfering
         printElementCopy.find('div.tableSearch').remove();
         //printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
@@ -330,6 +330,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             this.style.removeProperty('font-size');
             this.style.removeProperty('width');
             this.style.removeProperty('min-width');
+            this.style.removeProperty('height');
         });
         printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
         printElementCopy.find('script').remove();

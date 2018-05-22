@@ -106,7 +106,7 @@
                         </button>
                         </span>
                         <span ng-switch-default>
-                            <button class="btn btn-primary btn-sm" ng-class="{'disabled': !docEditable || !runCleared || loading}" ng-click="createJobandRun(job.id)">
+                            <button class="btn btn-primary btn-sm" ng-class="{'disabled': !docEditable || !runCleared || loading}" ng-click="!runCleared || createJobandRun(job.id)">
                                 Run Now <i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
                             </button>
                         </span>
@@ -121,8 +121,8 @@
         <a target="_blank" href="https://opencae.jpl.nasa.gov/alfresco/mmsapp/mms.html#/projects/PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85/master/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
         <p ng-if="mmsRefType == 'Tag'">PMA is not available on tags.</p>
         <p ng-if="!isDoc">Please select a document.</p>
-        <button class="btn btn-primary" ng-if="mmsRefType != 'Tag' && isDoc" ng-click="createJobandRun()" ng-class="{'disabled': !docEditable || !runCleared}">
-            Run DocGen <i ng-hide="runCleared" class="fa fa-spin fa-spinner"></i>
+        <button class="btn btn-primary" ng-if="mmsRefType != 'Tag' && isDoc" ng-click="!createJobCleared || createJobandRun()" ng-class="{'disabled': !docEditable || !runCleared || !createJobCleared}">
+            Run DocGen <i ng-hide="createJobCleared" class="fa fa-spin fa-spinner"></i>
         </button>
     </div>
     <!--<div class="pull-right" ng-if="docEditable">

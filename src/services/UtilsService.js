@@ -738,12 +738,14 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @methodOf mms.UtilsService
      *
      * @description
-     * Generates a list of tables, figures, and equations. It also appends the captions to the figures and tables.
+     * Generates a list of tables, figures, and equations. Default uses presentation elements.
+     * `html` param provides option to use html content to generate list. It also appends the
+     * captions to the figures and tables.
      *
      * @param {string} tree the document/view to be printed (what is on the left pane)
      * @param {string} printElement contents to be printed (what is displayed in the center pane)
      * @param {boolean} live true only if a specific sorting is required
-     * @param {boolean} user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not
+     * @param {boolean} html whether to generated list of tables and figures using html content, outside of the corresponding PE or not
      * @returns {object} results
      */
     var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
@@ -1124,6 +1126,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
+                "p {widows: 2; orphans: 2;}\n" +
+                "table, figure {margin-bottom: 10px;}\n" +
                 "@page {margin: 0.5in;}\n" + 
                 "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
