@@ -215,15 +215,15 @@ div.tooltip-inner {
   // Standardize font size across VE
   font-size: 14px;
 
-  // Indicate selected list item - primary
-  .checked-list-item::before {
-    @include fa-menu-content("\f00c", $ve-green-lighter-1);
-    left: 10px;
-  }
-
   // Indicate selected list item - secondary
   .secondary-checked-list-item::before {
     @include fa-menu-content("\f00c", $ve-silver-darker-1);
+    left: 10px;
+  }
+
+  // Indicate selected list item - primary
+  .checked-list-item::before {
+    @include fa-menu-content("\f00c", $ve-green-lighter-1);
     left: 10px;
   }
 
