@@ -170,6 +170,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     transcludeCallback(ed, true);
                 } else {
                     ed.insertHtml( tag );
+                    focusOnEditorAfterAddingWidget(ed);
                 }
             }, function() {
                 ed.insertText('@');
@@ -544,6 +545,15 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance = null;
             }
         });
+
+        function focusOnEditorAfterAddingWidget(editor) {
+            var element = editor.widgets.focused.element.getParent();
+            var range = editor.createRange();
+            if(range) {
+                range.moveToClosestEditablePosition(element, true);
+                range.select();
+            }
+        }
     };
 
     return {
