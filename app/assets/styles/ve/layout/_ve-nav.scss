@@ -264,7 +264,9 @@ nav.project-level-header {
     .fa-folder,
     .fa-file {
       font-size: 12px;
-      padding: 6px 4px 6px 6px;
+      padding: 6px 4px 6px 0;
+      top: -.1em;
+      position: relative;
     }
 
     .back-to-proj{
