@@ -152,5 +152,7 @@ Styles that apply to both the spec
     font-family: $icon-font-name;
     padding: 0 4px 0 0;
     font-size: .75em;
+    position: relative;
+    top: -.1em;
   }
 }
