@@ -825,19 +825,26 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         viewId: branch.data.id
                     });
                 }
+            } else if (branch.type === 'group') {
+                if (branch.children.length === 0) {
+                    promise = ViewService.removeGroup(branch.data);
+                } else {
+                    growl.error("Cannot delete groups that aren't empty");
+                }
             }
-
-            if(branch.type === 'group' && branch.children.length === 0) {
-                promise = ViewService.removeGroup(branch.data);
-            }
-            promise.then(function(data) {
-                growl.success($scope.type + " Deleted");
-                $uibModalInstance.close('ok');
-            }, function(reason) {
-                growl.error($scope.type + ' Delete Error: ' + reason.message);
-            }).finally(function() {
+            if (promise) {
+                promise.then(function (data) {
+                    growl.success($scope.type + " Deleted");
+                    $uibModalInstance.close('ok');
+                }, function (reason) {
+                    growl.error($scope.type + ' Delete Error: ' + reason.message);
+                }).finally(function () {
+                    $scope.oking = false;
+                });
+            } else {
                 $scope.oking = false;
-            });
+                $uibModalInstance.dismiss();
+            }
         };
         $scope.cancel = function() {
             $uibModalInstance.dismiss();

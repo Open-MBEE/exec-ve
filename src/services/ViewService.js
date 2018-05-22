@@ -848,7 +848,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _projectId: elementOb._projectId,
             _refId: elementOb._refId,
             _appliedStereotypeIds: elementOb._appliedStereotypeIds,
-            appliedStereotypeInstanceId: elementOb.appliedStereotypeInstanceId
+            appliedStereotypeInstanceId: elementOb.appliedStereotypeInstanceId,
+            _isGroup: elementOb._isGroup
         };
 
         return ElementService.updateElements([updatedElement], false)
