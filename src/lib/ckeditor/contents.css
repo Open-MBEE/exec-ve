@@ -212,8 +212,7 @@ a > img {
  * VE Custom CSS
  */
 mms-cf, mms-group-docs, mms-view-link {
-	background-color: #dfeaf3;
-	color: #366590;
+	background-color: lightblue;
 	margin-top: 0;
 	margin-bottom: 0 !important;
 	padding: 0px !important;
