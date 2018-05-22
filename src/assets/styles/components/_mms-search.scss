@@ -198,14 +198,6 @@
       font-size: 14px;
       margin-top:10px;
     }
-
-    /*File icon for documents and views*/
-    .elem-related-docs-wrapper mms-view-link::before {
-      content: "\f15b";
-      font-family: $icon-font-name;
-      padding: 0 4px 0 0;
-      font-size: .75em;
-    }
   }
 
 /*------------------------------------------------------------------
@@ -235,12 +227,12 @@
     
     .mms-search-input,
     .results-count{
-      padding-left: 6px;
-      padding-right: 6px;
+      padding-left: 10px;
+      padding-right: 10px;
     }
     .elem-wrapper{
-      margin-left: 6px;
-      margin-right: 6px;
+      margin-left: 10px;
+      margin-right: 10px;
     }
   }
 }

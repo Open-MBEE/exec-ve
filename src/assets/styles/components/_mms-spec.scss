@@ -125,13 +125,13 @@ Styles that apply to both the spec
 
   /*Light grey boxes for metatype styling*/
   .elem-type{
-    letter-spacing: .1em;
+    letter-spacing: .08em;
     margin-right: 6px;
     padding: 1px 5px;
     white-space: nowrap;
     margin: 3px;
     display:inline-block;
-    font-size: .75em;
+    font-size: 12px;
     background: $highlight_grey;
     @include border-radius(3px);
     color: $ve-light-text-darker-1;
@@ -139,10 +139,18 @@ Styles that apply to both the spec
     //border: 1px solid $ve-silver-darker-1;
   }
 
-
+  /*Specific styling for last updated*/
   .elem-updated-wrapper {
     color: $medium_grey;
     font-size: 14px;
     display: block;
+  }
+
+  /*File icon for documents and views*/
+  .elem-related-docs-wrapper mms-view-link a::before {
+    content: "\f15b";
+    font-family: $icon-font-name;
+    padding: 0 4px 0 0;
+    font-size: .75em;
   }
 }

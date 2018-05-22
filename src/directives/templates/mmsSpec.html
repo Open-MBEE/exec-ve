@@ -175,12 +175,14 @@
 
         <div ng-if="relatedDocuments.length > 0">
             <h2 class="prop-title">Used by Documents/Views</h2>
-            <div ng-repeat="relatedDocument in relatedDocuments">
-                <span ng-repeat="relatedView in relatedDocument._parentViews">
-                    <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" link-target="_blank"></mms-view-link>
-                    > <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" link-target="_blank"></mms-view-link><br/>
-                </span>
-            </div>
+            <span class="elem-related-docs-wrapper prop">
+                <div ng-repeat="relatedDocument in relatedDocuments">
+                    <span ng-repeat="relatedView in relatedDocument._parentViews">
+                        <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" link-target="_blank"></mms-view-link>
+                        > <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" link-target="_blank"></mms-view-link><br/>
+                    </span>
+                </div>
+            </span>
         </div>
 
         <!-- <a ng-click="toggleAdvancedProperties = !toggleAdvancedProperties" class="visibility-toggle" ng-class="{active: toggleAdvancedProperties}" ng-init="toggleAdvancedProperties=false">Advanced</a>
