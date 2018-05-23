@@ -209,8 +209,9 @@ a > img {
 }
 
 /*
- * VE Custom added
+ * VE Custom CSS
  */
+ 
  mms-cf, mms-group-docs, mms-view-link {
 	background-color: #e7f2ff;
 	margin-top: 0;
@@ -220,11 +221,11 @@ a > img {
 	border-radius: 2px;
 	z-index: 0;
 	cursor: not-allowed;
- }
+}
 
- mms-cf[mms-cf-type="com"] {
-	 background-color: yellow;
- }
+mms-cf[mms-cf-type="com"] {
+	background-color: #faf5ac;
+}
 
  .signature-box {
 	 padding: 8px;

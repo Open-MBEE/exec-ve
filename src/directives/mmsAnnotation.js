@@ -31,6 +31,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
             var target = element.find('#tooltipElementId');
             var range = window.document.createRange();
             range.selectNode(target[0]);
+            window.getSelection().removeAllRanges();
             window.getSelection().addRange(range);
             try {
                 window.document.execCommand('copy');

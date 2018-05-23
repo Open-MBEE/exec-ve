@@ -28,7 +28,9 @@
      </span>
     </p>
     <br/>
+    <div ng-if="type == 'DOCUMENT' && mode !== 1">
     <h6>Options</h6>
+    </div>
     <div ng-if="type == 'DOCUMENT' && mode !== 1"><input type="checkbox" ng-model="model.genTotf"> List of Tables and Figures</div>
     <div ng-if="model.genTotf" class="indent"><input type="checkbox" ng-model="model.htmlTotf"> Use HTML for List (will not include equations and may differ from web numbering)</div>
     <div ng-if="mode !== 1"><input type="checkbox" ng-model="model.landscape"> Landscape</div>

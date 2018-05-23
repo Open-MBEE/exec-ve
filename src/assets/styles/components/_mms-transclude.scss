@@ -77,8 +77,34 @@ mms-view:not(.reviewing) mms-transclude-com {
   display: none;
 }
 
-.mms-error {
-  color: $red;
+
+/*------------------------------------------------------------------
+Element not found styling
+-------------------------------------------------------------------*/
+
+.mms-error{
+  background: $ve-warning-orange-light;
+  background: repeating-linear-gradient(45deg, $white, $white 10px,$ve-warning-orange-light 10px,$ve-warning-orange-light 20px);
+  color: $black;
+  border: none;
+  padding-left: 11px;
+}
+
+.mms-error::before{
+  content: "\f071";
+  font-family: fontAwesome;
+  margin-left: -14px;
+  color: $ve-warning-orange;
+  font-size: 12px;
+  position: absolute;
+}
+
+.mms-error:hover{
+  background: repeating-linear-gradient(45deg, $white, $white 10px,darken($ve-warning-orange-light, 10%) 10px,darken($ve-warning-orange-light, 10%) 20px);
+}
+
+.pane-right .prop.mms-error {
+  margin-top: 10px;
 }
 
 .mms-png {
