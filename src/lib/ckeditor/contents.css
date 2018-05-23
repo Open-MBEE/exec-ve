@@ -212,11 +212,12 @@ a > img {
  * VE Custom added
  */
  mms-cf, mms-group-docs, mms-view-link {
-	background-color: lightblue;
+	background-color: #e7f2ff;
 	margin-top: 0;
 	margin-bottom: 0 !important;
-	padding: 0px !important;
-	border: 0px solid gray !important;
+	padding: 2px 2px 1px !important;
+	border: 2px solid #8cbaf1 !important;
+	border-radius: 2px;
 	z-index: 0;
 	cursor: not-allowed;
  }
