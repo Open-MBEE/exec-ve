@@ -761,7 +761,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
         // If both "Generate List of Tables and Figures" && "Use HTML for List of Tables and Figures " options are checked...
         if (html) {
-            var obHTML = generateTOCHtmlOption(ob,tree, printElement, live, html);
+            var obHTML = generateTOCHtmlOption(ob, tree, printElement);
             return obHTML;
         }
 
@@ -913,7 +913,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
         if (type === 'equation') {
-            cap = veNumber + '. ' + pe.name;
             var equationCap = '(' + veNumber + ')';
             var capEq = el.find('.mms-equation-caption');
             capEq.html(equationCap);
@@ -1141,8 +1140,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "caption::before {content: \"Table \" counter(table-counter) \". \"; }\n";
         }
         Object.keys(meta).forEach(function(key) {
-            var content = '""';
             if (meta[key]) {
+                var content = '""';
                 if (meta[key] === 'counter(page)') {
                     content = meta[key];
                 } else {

@@ -14,11 +14,11 @@
     <h3>Preview Element</h3>
     <div class="element-preview-box">
         <h1 class="prop element-title">
-            <mms-cf mms-cf-type="name" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.i}}" mms-commit-id="{{baseCommit.commitSelected.id}}"></mms-cf>
+            <mms-cf mms-cf-type="name" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}"></mms-cf>
         </h1>
         <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
         <p ng-show="!showDocHTML" class="doc-text">
-            <mms-cf mms-cf-type="doc" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.i}}" mms-commit-id="{{baseCommit.commitSelected.id}}"></mms-cf>
+            <mms-cf mms-cf-type="doc" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{baseCommit.refSelected.id}}" mms-commit-id="{{baseCommit.commitSelected.id}}"></mms-cf>
         </p>
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
         <h2 class="prop-title">Property Value</h2>
