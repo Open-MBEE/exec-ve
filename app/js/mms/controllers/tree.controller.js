@@ -772,8 +772,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
         // when in project.ref state, allow deletion for view/document/group
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            if (!(branch.type === 'view' || branch.type === 'group' || UtilsService.isDocument(branch.data))) {
-                growl.warning("Delete Error: Selected item is not a document/group.");
+            if (!(branch.type === 'view' || (branch.type === 'group' && branch.children.length > 0) || UtilsService.isDocument(branch.data))) {
+                growl.warning("Delete Error: Selected item is not a document/empty group.");
                 return;
             }
         }
@@ -826,12 +826,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     });
                 }
             } else if (branch.type === 'group') {
-                if (branch.children.length === 0) {
-                    promise = ViewService.removeGroup(branch.data);
-                } else {
-                    growl.error("Cannot delete groups that aren't empty");
-                }
+                promise = ViewService.removeGroup(branch.data);
             }
+
             if (promise) {
                 promise.then(function (data) {
                     growl.success($scope.type + " Deleted");
