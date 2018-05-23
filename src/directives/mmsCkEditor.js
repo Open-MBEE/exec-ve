@@ -169,7 +169,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 if (!tag) {
                     transcludeCallback(ed, true);
                 } else {
-                    ed.insertHtml( tag );
+                    addWidgetTag(ed, tag);
                 }
             }, function() {
                 ed.insertText('@');
@@ -186,10 +186,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                if (fromAutocomplete) {
-                    ed.execCommand('undo');
-                }
-                ed.insertHtml( tag );
+                addWidgetTag(ed, tag);
             }, function() {
                 var focusManager = new CKEDITOR.focusManager( ed );
                 focusManager.focus();
@@ -217,7 +214,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 if (peid) {
                     tag += ' mms-pe-id="' + peid + '"';
                 }
-                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>';
                 return tag;
             };
 
@@ -307,7 +304,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                ed.insertHtml( tag );
+                addWidgetTag(ed, tag);
             });
         };
 
@@ -351,7 +348,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 controller: ['$scope', '$uibModalInstance', commentCtrl]
             });
             instance.result.then(function(tag) {
-                ed.insertHtml( tag );
+                addWidgetTag(ed, tag);
             });
         };
 
@@ -544,6 +541,20 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance = null;
             }
         });
+
+        function addWidgetTag(editor, tag) {
+            editor.insertHtml( tag );
+            focusOnEditorAfterAddingWidgetTag(editor);
+        }
+
+        function focusOnEditorAfterAddingWidgetTag(editor) {
+            var element = editor.widgets.focused.element.getParent();
+            var range = editor.createRange();
+            if(range) {
+                range.moveToClosestEditablePosition(element, true);
+                range.select();
+            }
+        }
     };
 
     return {
