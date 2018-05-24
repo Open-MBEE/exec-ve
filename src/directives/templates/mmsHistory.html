@@ -8,7 +8,7 @@
 
 <div style="position:relative;">
     <div ng-if="ModelData.ShowDiffPrototype" class="inline-diff-buttons fade-in-out">
-        <span class="inline-btn-label">Base:</span>
+        <span class="inline-btn-label">Baseline:</span>
         <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="baseCommit.isopen" auto-close="outsideClick" style="flex:2" ng-hide="disableRevert">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 {{baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{baseCommit.commitSelected._creator}}</b>
@@ -62,7 +62,7 @@
                 </li>
                 <li ng-click="commitClicked(version)" ng-repeat="version in compareCommit.compareHistory | filter:historyFilter"
                     ng-class="{'checked-list-item': version === compareCommit.commitSelected,'secondary-checked-list-item': version === baseCommit.commitSelected && ModelData.ShowDiffPrototype}"
-                    tooltip-placement="left" uib-tooltip="Selected base version"
+                    tooltip-placement="left" uib-tooltip="Selected baseline version"
                     tooltip-append-to-body="version === baseCommit.commitSelected" tooltip-enable="ModelData.ShowDiffPrototype && version === baseCommit.commitSelected">
                     <a>{{version._created | date:'M/d/yy h:mm a'}} by <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
                 </li>
@@ -118,7 +118,7 @@
 </div>
 <div ng-show="ModelData.ShowDiffPrototype && !disableRevert && compareCommit.ref.type !== 'Tag'" class="revert-section fade-in-out">
     <div>
-        <span>To revert <b>documentation</b>, <b>name</b>, and <b>value</b> to base content:</span>
+        <span>To revert <b>documentation</b>, <b>name</b>, and <b>value</b> to baseline content:</span>
         <button class="btn btn-warning btn-sm pull-right" ng-click="revert()">Revert</button>
     </div>
 </div>

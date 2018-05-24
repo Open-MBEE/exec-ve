@@ -188,12 +188,12 @@ div.tooltip-inner {
   }
 }
 
-.modal-header>h4{
+.modal-header>h4,
+h2.right-pane-title{
   margin:0;
-  font-size: 1.2em;
-  letter-spacing: 0.04em;
-  font-weight: 400;
-  color:$ve-light-text-darker-1;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  font-weight: 600;
   display: inline-block;
 }
 
@@ -1099,15 +1099,6 @@ table caption {
 /*------------------------------------------------------------------
 9. Right pane
 -------------------------------------------------------------------*/
-
-h2.right-pane-title{
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-  color: #6a6a6a;
-  margin: 20px 0;
-}
 
 .pane-right .container-fluid{
   padding:0 18px 34px;
