@@ -224,7 +224,8 @@ a > img {
 }
 
 mms-cf[mms-cf-type="com"] {
-	background-color: #faf5ac;
+	background-color: #fdfbdc; /*lighten($yellow, 10%);*/
+	border-color: #f8f086 !important; /*darken($yellow, 8%);*/
 }
 
  .signature-box {
