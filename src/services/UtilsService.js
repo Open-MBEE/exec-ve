@@ -1106,7 +1106,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".signature-box td.signature-space-styling {width: 1%;}\n" + 
                 ".signature-box td.signature-date-styling {width: 39%;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
-                "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0;}\n" +
+                "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
                 "h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
                 ".ng-hide {display: none;}\n" +
                 "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
@@ -1125,13 +1125,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
-                "p {widows: 2; orphans: 2;}\n" +
+                "p, div {widows: 2; orphans: 2;}\n" +
                 "table, figure {margin-bottom: 10px;}\n" +
                 "@page {margin: 0.5in;}\n" + 
                 "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
                 //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
                 //".big-table {page: big_table; max-width: 1100px; }\n";
-
+        for (var i = 1; i < 10; i++) {
+            ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
+        }
         if(htmlFlag) {
             ret += ".toc { counter-reset: table-counter figure-counter;}\n" +
                 "figure { counter-increment: figure-counter; }\n" +
