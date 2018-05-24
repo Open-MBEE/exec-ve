@@ -67,6 +67,9 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
                 growl.warning("There are duplicates in this section, dupilcates ignored!");
             }
         }
+        if (scope.section._veNumber) {
+            scope.level = scope.section._veNumber.split('.').length;
+        }
         domElement.append(defaultTemplate);
         $compile(domElement.contents())(scope);
 
