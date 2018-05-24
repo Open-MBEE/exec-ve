@@ -102,7 +102,7 @@ function UxService($rootScope) {
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
-        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete Document', 
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-view":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View',

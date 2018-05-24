@@ -747,9 +747,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
         }
+
+        // when in project.ref state, allow deletion for view/document/group
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            if (branch.type !== 'view' || (!UtilsService.isDocument(branch.data))) {
-                growl.warning("Delete Error: Selected item is not a document.");
+            if (branch.type !== 'view' && !UtilsService.isDocument(branch.data) && (branch.type !== 'group' || branch.children.length > 0) ) {
+                growl.warning("Delete Error: Selected item is not a document/empty group.");
                 return;
             }
         }
@@ -765,9 +767,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if ($state.includes('project.ref.document') && branch.type === 'view') {
                 processDeletedViewBranch(branch);
             }
-            if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-                return;
-            }
             if ($rootScope.ve_fullDocMode) {
                 cb(branch);
             } else {
@@ -778,12 +777,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     // TODO: Make this a generic delete controller
     var deleteCtrl = function($scope, $uibModalInstance) {
-        $scope.oking = false;
         var branch = $scope.deleteBranch;
-        if (branch.type === 'view') {
-            $scope.type = 'View';
-            if (UtilsService.isDocument(branch.data))
-                $scope.type = 'Document';
+        $scope.oking = false;
+        $scope.type = branch.type;
+        if (UtilsService.isDocument(branch.data)) {
+            $scope.type = 'Document';
         }
         $scope.name = branch.data.name;
         $scope.ok = function() {
@@ -805,15 +803,23 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         viewId: branch.data.id
                     });
                 }
+            } else if (branch.type === 'group') {
+                promise = ViewService.removeGroup(branch.data);
             }
-            promise.then(function(data) {
-                growl.success($scope.type + " Deleted");
-                $uibModalInstance.close('ok');
-            }, function(reason) {
-                growl.error($scope.type + ' Delete Error: ' + reason.message);
-            }).finally(function() {
+
+            if (promise) {
+                promise.then(function (data) {
+                    growl.success($scope.type + " Deleted");
+                    $uibModalInstance.close('ok');
+                }, function (reason) {
+                    growl.error($scope.type + ' Delete Error: ' + reason.message);
+                }).finally(function () {
+                    $scope.oking = false;
+                });
+            } else {
                 $scope.oking = false;
-            });
+                $uibModalInstance.dismiss();
+            }
         };
         $scope.cancel = function() {
             $uibModalInstance.dismiss();

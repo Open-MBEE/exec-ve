@@ -49,6 +49,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         mmsPresentationElement: 6
     };
 
+    var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
+
     function getClassifierIds() {
         var re = [];
         Object.keys(TYPE_TO_CLASSIFIER_ID).forEach(function(key) {
@@ -99,7 +101,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             .then(function(data) {
                 var cacheKey = ['documents', elementOb._projectId, elementOb._refId];
                 var index = -1;
-                var found = false;
                 var projectDocs = CacheService.get(cacheKey);
                 if (projectDocs) {
                     for (var i = 0; i < projectDocs.length; i++) {
@@ -766,7 +767,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var PACKAGE_ID = UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
-        var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
         // Our Group package element
         var group = UtilsService.createPackageElement(
             {
@@ -813,6 +813,45 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 deferred.reject(reason);
             });
         return deferred.promise;
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#deleteGroup
+     * @methodOf mms.ViewService
+     *
+     * @description remove a group
+     *
+     * @param elementOb group to remove
+     * @returns {Promise} The promise will be resolved with the updated group object.
+     */
+    var removeGroup = function(elementOb) {
+        elementOb._isGroup = false;
+        _.remove(elementOb._appliedStereotypeIds, function(id) {
+            return id === GROUP_ST_ID;
+        });
+        elementOb.appliedStereotypeInstanceId = elementOb._appliedStereotypeIds.length > 0 ? elementOb.appliedStereotypeInstanceId : null;
+        var updatedElement = {
+            id: elementOb.id,
+            _projectId: elementOb._projectId,
+            _refId: elementOb._refId,
+            _appliedStereotypeIds: elementOb._appliedStereotypeIds,
+            appliedStereotypeInstanceId: elementOb.appliedStereotypeInstanceId,
+            _isGroup: elementOb._isGroup
+        };
+
+        return ElementService.updateElements([updatedElement], false)
+            .then(function(data) {
+                // remove this group for cache
+                var cacheKey = ['groups', elementOb._projectId, elementOb._refId];
+                var groups = CacheService.get(cacheKey) || [];
+                _.remove(groups, function(group) {
+                    return group.id === elementOb.id;
+                });
+                return data;
+            }, function(reason) {
+                return reason;
+            });
     };
 
     /**
@@ -1127,6 +1166,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         createView: createView,
         createDocument: createDocument,
         createGroup: createGroup,
+        removeGroup: removeGroup,
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
         getDocumentViews: getDocumentViews,
