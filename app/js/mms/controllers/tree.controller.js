@@ -772,7 +772,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
         // when in project.ref state, allow deletion for view/document/group
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            if (branch.type !== 'view' && !UtilsService.isDocument((branch.data)) && (branch.type !== 'group' || branch.children.length > 0) ) {
+            if (branch.type !== 'view' && !UtilsService.isDocument(branch.data) && (branch.type !== 'group' || branch.children.length > 0) ) {
                 growl.warning("Delete Error: Selected item is not a document/empty group.");
                 return;
             }
