@@ -44,7 +44,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval, $templateC
             viewOrigin = mmsViewCtrl.getElementOrigin();
         }
         scope.options = {
-            editCost: 4
+            editCost: 8
         };
 
         /**

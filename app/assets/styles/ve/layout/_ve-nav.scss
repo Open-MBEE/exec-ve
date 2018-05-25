@@ -251,7 +251,7 @@ nav.project-level-header {
       line-height: $navHeight;
 
       a{
-        padding: 0 6px 0 4px;
+        padding: 0 7px 0 5px;
 
       /*Hover state over links to show it's clickable*/
         &:hover{
@@ -264,7 +264,9 @@ nav.project-level-header {
     .fa-folder,
     .fa-file {
       font-size: 12px;
-      padding: 6px 4px 6px 6px;
+      padding: 6px 4px 6px 0;
+      top: -.1em;
+      position: relative;
     }
 
     .back-to-proj{

@@ -50,9 +50,6 @@ mms-view.editing {
 
     > div > div.panel-heading {
       padding: 2px 8px;
-      h3{
-        font-weight: $default_font_weight;
-      }
     }
 
     .panel {
@@ -61,12 +58,21 @@ mms-view.editing {
   }
 }
 
+
+
+//Keep title the same size as reading 
+.view-title .panel-body .form-control{
+  height: inherit;
+  font-size: inherit;
+}
+
 /* comments */
 mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
   @include border-radius(5px);
-  background-color: $yellow;
-  padding: 2px;
+  background-color: lighten($yellow, 10%);
+  padding: 2px; 
+  //border: 2px solid darken($yellow, 8%);
 }
 
 mms-view:not(.editing):not(.outline) .placeholder {
@@ -173,6 +179,14 @@ mms-transclude-img img {
   font-style: normal;
   font-weight: bold;
   padding-right: 4px;
+}
+
+//Make font weight of panel headings more readable
+.panel-heading{
+  h3{
+    font-weight: $default_font_weight;
+    color: $ve-light-text-darker-1;
+  }
 }
 
 // Transclude edit panel buttons

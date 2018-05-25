@@ -34,6 +34,11 @@
   .caret{
     opacity: .4;
   }
+
+  &.print,
+  &.refresh-numbering{
+    margin-left: 12px;
+  }
 }
 
 // Pull center button dropdowns to the right

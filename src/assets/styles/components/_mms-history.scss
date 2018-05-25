@@ -18,13 +18,14 @@ mms-history {
 
   /*Delete styling*/
   del {
-    background-color: #ffe3e3;
+    background-color: #ffe3e3 !important;
+    text-decoration: line-through !important;
   }
 
   /*Insert styling*/
   ins {
-    background-color: #dafde0;
-    text-decoration: none;
+    background-color: #dafde0 !important;
+    text-decoration: none !important;
   }
 
   /*SVG arrow for pointing from history to present in spec*/
