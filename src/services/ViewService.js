@@ -822,7 +822,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *
      * @description remove a group
      *
-     * @param elementOb group to remove
+     * @param {object} elementOb group to remove
      * @returns {Promise} The promise will be resolved with the updated group object.
      */
     var removeGroup = function(elementOb) {
