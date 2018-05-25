@@ -482,7 +482,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {string} generated html string
      */
     var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
-        var result = ['<table class="table table-bordered table-condensed">'];
+        var result = ['<table class="table-bordered table-condensed">'];
         if (ApplicationService.getState().inDoc) {
             result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
         } else if (table.title) {
