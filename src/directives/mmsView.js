@@ -171,6 +171,9 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
                 if (dups.length > 0) {
                     growl.warning("There are duplicates in this view, dupilcates ignored!");
                 }
+                if (data._veNumber) {
+                    scope.level = data._veNumber.split('.').length;
+                }
                 if (//data._numElements && data._numElements > 5000 &&
                         scope.mmsCommitId && scope.mmsCommitId !== 'latest') {
                     //threshold where getting view elements in bulk takes too long and it's not latest

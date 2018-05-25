@@ -111,7 +111,10 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
                     }
                     scope.doc = document;
                     scope.docName = document.name;
+                    // Set job run permissions
                     scope.docEditable = document._editable && scope.mmsRefType != 'Tag';
+                    scope.createJobCleared = scope.docEditable;
+                    scope.runCleared = scope.docEditable;
                     getJobs();
                 });
             });

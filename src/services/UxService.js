@@ -90,7 +90,7 @@ function UxService($rootScope) {
     switch (button) {
       case "tree-expand":
         return {id: button, icon: 'fa-caret-square-o-down', selected: true, active: true, permission: true, tooltip: 'Expand All', 
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+                spinner: false, togglable: false, placement: 'right', action: function() {$rootScope.$broadcast(button);}};
       case "tree-collapse":
         return {id: button, icon: 'fa-caret-square-o-up', selected: true, active: true, permission: true, tooltip: 'Collapse All', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
@@ -102,7 +102,7 @@ function UxService($rootScope) {
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
-        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete Document', 
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-view":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View',
@@ -136,7 +136,7 @@ function UxService($rootScope) {
                 spinner: false, togglable: true, toggle_icon: 'fa-file-text', toggle_tooltip: 'View Mode', action: function() {$rootScope.$broadcast(button);}};
       case "view-mode-dropdown":
         return {id: button, icon: 'fa-filter', selected: true, active: true, permission: true, tooltip: 'Filter by type',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                spinner: false, togglable: false, placement: 'right', action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-show-pe"), getButtonBarButton("tree-show-views"),
                     getButtonBarButton("tree-show-tables"), getButtonBarButton("tree-show-figures"),
                     getButtonBarButton("tree-show-equations")]};

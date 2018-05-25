@@ -5,10 +5,10 @@
 angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
-                          'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs',
+                          'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'docMeta',
 function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
-    orgOb, projectOb, refOb, refObs, groupObs) {
+    orgOb, projectOb, refOb, refObs, groupObs, docMeta) {
 
     $rootScope.mms_refOb = refOb;
     $rootScope.ve_bbApi = $scope.bbApi = {};
@@ -67,10 +67,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $scope.$on('tree-collapse', function() {
         $scope.treeApi.collapse_all();
-    });
-
-    $scope.$on('tree-filter', function() {
-        $scope.toggleFilter();
     });
 
     $scope.$on('tree-add-document', function() {
@@ -184,10 +180,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.$on('tree-full-document', function() {
         $scope.fullDocMode();
     });
-
-    $scope.toggleFilter = function() {
-        $scope.bbApi.toggleButtonState('tree-filter');
-    };
 
     var groupLevel2Func = function(groupOb, groupNode) {
         groupNode.loading = true;
@@ -479,23 +471,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         onDblclick: treeDblclickHandler,
         sort: $state.includes('project.ref.document') ? null : treeSortFunction
     };
-    if (documentOb) {
-        ElementService.getElement({
-            projectId: documentOb._projectId,
-            refId: documentOb._refId,
-            elementId: documentOb.id + "_asi-slot-_18_5_3_8bf0285_1525395209859_614940_15902"
-        }).then(function(slot) {
-            if (slot.value && slot.value.length > 0) {
-                if (Number.isInteger(slot.value[0].value)) {
-                    $scope.treeOptions.numberingDepth = slot.value[0].value;
-                } else if ((typeof slot.value[0].value) === 'string') {
-                    var val = parseInt(slot.value[0].value);
-                    if (!isNaN(val)) {
-                        $scope.treeOptions.numberingDepth = val;
-                    }
-                }
-            }
-        });
+    if (documentOb && docMeta) {
+        $scope.treeOptions.numberingDepth = docMeta.numberingDepth;
+        $scope.treeOptions.numberingSeparator = docMeta.numberingSeparator;
     }
 
     $scope.fullDocMode = function() {
@@ -769,9 +747,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
         }
+
+        // when in project.ref state, allow deletion for view/document/group
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            if (branch.type !== 'view' || (!UtilsService.isDocument(branch.data))) {
-                growl.warning("Delete Error: Selected item is not a document.");
+            if (branch.type !== 'view' && !UtilsService.isDocument(branch.data) && (branch.type !== 'group' || branch.children.length > 0) ) {
+                growl.warning("Delete Error: Selected item is not a document/empty group.");
                 return;
             }
         }
@@ -787,9 +767,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if ($state.includes('project.ref.document') && branch.type === 'view') {
                 processDeletedViewBranch(branch);
             }
-            if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-                return;
-            }
             if ($rootScope.ve_fullDocMode) {
                 cb(branch);
             } else {
@@ -800,12 +777,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     // TODO: Make this a generic delete controller
     var deleteCtrl = function($scope, $uibModalInstance) {
-        $scope.oking = false;
         var branch = $scope.deleteBranch;
-        if (branch.type === 'view') {
-            $scope.type = 'View';
-            if (UtilsService.isDocument(branch.data))
-                $scope.type = 'Document';
+        $scope.oking = false;
+        $scope.type = branch.type;
+        if (UtilsService.isDocument(branch.data)) {
+            $scope.type = 'Document';
         }
         $scope.name = branch.data.name;
         $scope.ok = function() {
@@ -827,15 +803,23 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                         viewId: branch.data.id
                     });
                 }
+            } else if (branch.type === 'group') {
+                promise = ViewService.removeGroup(branch.data);
             }
-            promise.then(function(data) {
-                growl.success($scope.type + " Deleted");
-                $uibModalInstance.close('ok');
-            }, function(reason) {
-                growl.error($scope.type + ' Delete Error: ' + reason.message);
-            }).finally(function() {
+
+            if (promise) {
+                promise.then(function (data) {
+                    growl.success($scope.type + " Deleted");
+                    $uibModalInstance.close('ok');
+                }, function (reason) {
+                    growl.error($scope.type + ' Delete Error: ' + reason.message);
+                }).finally(function () {
+                    $scope.oking = false;
+                });
+            } else {
                 $scope.oking = false;
-            });
+                $uibModalInstance.dismiss();
+            }
         };
         $scope.cancel = function() {
             $uibModalInstance.dismiss();

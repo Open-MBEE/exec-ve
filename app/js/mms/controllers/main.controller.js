@@ -32,7 +32,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             description: 'close all messages',
             callback: function() {growlMessages.destroyAllMessages();}
         }).add({
-            combo: 'ctrl+`',
+            combo: '@',
             description: 'fast cf in editor',
             callback: function() {}
         });
