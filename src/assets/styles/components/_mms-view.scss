@@ -31,8 +31,8 @@ mms-view {
   }
 
   .read-width {
-    p, ol, ul { //figure, img, table, div
-      max-width: 8.5in;
+    p, h1, h2, h3, h4, h5, h6, ol, ul { //figure, img, table, div
+      max-width: 7.5in;
     }
   }
 }
