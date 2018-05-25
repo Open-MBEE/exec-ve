@@ -211,8 +211,8 @@ a > img {
 /*
  * VE Custom CSS
  */
- 
- mms-cf, mms-group-docs, mms-view-link {
+
+mms-cf, mms-group-docs, mms-view-link {
 	background-color: #e7f2ff;
 	margin-top: 0;
 	margin-bottom: 0 !important;
@@ -228,10 +228,11 @@ mms-cf[mms-cf-type="com"] {
 	border-color: #f8f086 !important; /*darken($yellow, 8%);*/
 }
 
- .signature-box {
+
+.signature-box {
 	 padding: 8px;
 	 border: 1px solid #ddd;
- }
+}
 
 a[title='mms-br']:hover {
 	background-color: transparent;

@@ -56,13 +56,6 @@ mms-view.editing {
       margin: 0px;
     }
   }
-  //Make font weight of panel headings more readable
-  .panel-heading{
-    h3{
-      font-weight: $default_font_weight;
-      color: $ve-light-text-darker-1;
-    }
-  }
 }
 
 
@@ -186,6 +179,14 @@ mms-transclude-img img {
   font-style: normal;
   font-weight: bold;
   padding-right: 4px;
+}
+
+//Make font weight of panel headings more readable
+.panel-heading{
+  h3{
+    font-weight: $default_font_weight;
+    color: $ve-light-text-darker-1;
+  }
 }
 
 // Transclude edit panel buttons
