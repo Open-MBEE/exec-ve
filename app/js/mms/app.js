@@ -401,6 +401,23 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }
         }
     })
+    .state('project.ref.groupReorder', {
+        url: '/group-reorder',
+        resolve: {
+            documentObs: ['ViewService', '$stateParams', function(ViewService, $stateParams) {
+                return ViewService.getProjectDocuments({
+                    projectId: $stateParams.projectId,
+                    refId: $stateParams.refId
+                });
+            }]
+        },
+        views: {
+            'pane-center@': {
+                templateUrl: 'partials/mms/reorder-groups.html',
+                controller: 'ReorderGroupCtrl'
+            }
+        }
+    })
     .state('project.ref.manage', { //not needed right now, for managing mounts
         url: '/manage'
     })
