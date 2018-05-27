@@ -132,8 +132,8 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-reorder-group":
-        return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Groups',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
+        return {id: button, icon: 'fa-object-group', selected: true, active: true, permission: false, tooltip: 'Move to/from Group',
+              spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-full-document":
         return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
                 spinner: false, togglable: true, toggle_icon: 'fa-file-text', toggle_tooltip: 'View Mode', action: function() {$rootScope.$broadcast(button);}};
