@@ -839,8 +839,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             appliedStereotypeInstanceId: elementOb.appliedStereotypeInstanceId,
             _isGroup: elementOb._isGroup
         };
-
-        return ElementService.updateElements([updatedElement], false)
+        var toUpdate = [updatedElement];
+        if (updatedElement.appliedStereotypeInstanceId !== null) {
+            toUpdate.push({
+                id: elementOb.id + '_asi', 
+                _refId: elementOb._refId, 
+                _projectId: elementOb._projectId,
+                classifierIds: updatedElement._appliedStereotypeIds
+            });
+        } else {
+            $http.delete(URLService.getElementURL({
+                elementId: elementOb.id + '_asi', 
+                refId: elementOb._refId, 
+                projectId: elementOb._projectId
+            }));
+        }
+        return ElementService.updateElements(toUpdate, false)
             .then(function(data) {
                 // remove this group for cache
                 var cacheKey = ['groups', elementOb._projectId, elementOb._refId];
