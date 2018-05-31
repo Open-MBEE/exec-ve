@@ -6,13 +6,9 @@ angular.module('mmsApp')
 function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, CacheService, projectOb, refOb, groupObs, documentObs) {
     $scope.isSaving = false;
     $scope.treeOptions = {
-        dropped: function (change) {
-        },
+        dropped: function (change) {},
         accept: function (sourceNodeScope, destNodeScope, destIndex) {
-            if(destNodeScope.node && destNodeScope.node.type === 'view') {
-                return false;
-            }
-            return true;
+            return destNodeScope.node && destNodeScope.node.type === 'group';
         }
     };
     $scope.saveReorder = saveReorder;
@@ -53,6 +49,8 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
             }
             return groupNode;
         });
+
+        // only groups that don't have parents show up at root level
         tree = tree.filter(function (groupNode) {
             return !groupNode.isChild;
         });
@@ -86,7 +84,6 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
                    ownerId: result.newOwnerId,
                    _projectId: projectOb.id,
                    _refId: refOb.id
-
                };
             });
             ElementService
@@ -117,27 +114,26 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
                 helper(childNode, result, false);
             });
         }
-
     }
 
     function cleanupCache(results) {
-        // update cache for documents list and group list
+        // update cache for documents list and groups list
         var listOfDocInCache = CacheService.get(['documents', projectOb.id, refOb.id]);
         var listOfGroupInCache = CacheService.get(['groups', projectOb.id, refOb.id]);
         results.forEach(function(result) {
-            if(result.node.type === 'group') {
+            if (result.node.type === 'group') {
                 var cacheGroupOb =_.find(listOfGroupInCache, function(groupOb) {
                     return groupOb.id === result.node.data.id;
                 });
                 if(cacheGroupOb) {
                     cacheGroupOb._parentId = result.newOwnerId;
                 }
-            } else if(result.node.type === 'view') {
+            } else if (result.node.type === 'view') {
                 var cacheDocument =_.find(listOfDocInCache, function(documentOb) {
                     return documentOb.id === result.node.data.id;
                 });
                 if(cacheDocument) {
-                    // if the new owner is the project, set _groupId to undefined
+                    // if the new owner is the projectId, set _groupId to undefined
                     cacheDocument._groupId = result.newOwnerId.indexOf(projectOb.id) !== -1 ? undefined : result.newOwnerId;
                 }
             }

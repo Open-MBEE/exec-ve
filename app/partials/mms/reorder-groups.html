@@ -12,7 +12,7 @@
 <div class="container-tree-reorder container-fluid">
     <button class="btn-tree-reorder-save btn btn-primary" ng-click="saveReorder()">Save <i ng-If="isSaving" class='fa fa-spin fa-spinner'></i></button>
     <button class="btn-tree-reorder-save btn btn-default" ng-click="cancelReorder()">Cancel</button>
-    <div>Move group/document in or out of a group. Only Grouping is preserved. Ordering is not</div>
+    <div>Move group/document to/from a group. Only Grouping is preserved. Ordering is not.</div>
     <div class="tree-reorder" ui-tree="treeOptions">
         <ol ui-tree-nodes="" class="root" ng-model="tree">
             <li ng-repeat="node in tree" ui-tree-node ng-include="'nodes_renderer.html'"></li>
