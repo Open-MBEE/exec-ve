@@ -48,10 +48,6 @@ mms-view.editing {
   mms-transclude-doc, mms-transclude-com {
     display: block;
 
-    > div > div.panel-heading {
-      padding: 2px 8px;
-    }
-
     .panel {
       margin: 0px;
     }
@@ -183,9 +179,12 @@ mms-transclude-img img {
 
 //Make font weight of panel headings more readable
 .panel-heading{
+  line-height: 22px;
+  padding: 4px 8px;
   h3{
     font-weight: $default_font_weight;
     color: $ve-light-text-darker-1;
+    line-height: 28px;
   }
 }
 
