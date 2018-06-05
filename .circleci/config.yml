@@ -27,11 +27,9 @@ jobs:
 
       - run: npm install
 
-      - run: npm install -g grunt-cli
-
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: grunt
+      - run: ./node_modules/grunt/bin/grunt
