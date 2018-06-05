@@ -21,15 +21,15 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}
+          - openmbee-ve-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - openmbee-ve-
 
       - run: npm install
 
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: openmbee-ve-{{ checksum "package.json" }}
 
-      - run: ./node_modules/grunt/bin/grunt --ARTIFACTORY_URL=$ARTIFACTORY_URL --ARTIFACTORY_USER=$ARTIFACTORY_USER --ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD deploy --verbose
+      - run: ./node_modules/grunt/bin/grunt --ARTIFACTORY_URL=$ARTIFACTORY_URL --ARTIFACTORY_USER=$ARTIFACTORY_USER --ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD deploy
