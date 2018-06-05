@@ -13,6 +13,10 @@ module.exports = function(grunt) {
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
   var artifactoryUser = grunt.option('ARTIFACTORY_USER');
   var artifactoryPassword = grunt.option('ARTIFACTORY_PASSWORD');
+  var snapshotRepo = grunt.option('SNAPSHOT_REPO');
+  var releaseRepo = grunt.option('RELEASE_REPO');
+  var groupId = grunt.option('GROUP_ID');
+
   var connectObject = {
     docs: {
       options: {
@@ -333,7 +337,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactoryUrl,
-        repository: 'libs-snapshot-local',
+        repository: snapshotRepo, //releaseRepo
         username: artifactoryUser,
         password: artifactoryPassword
       },
@@ -343,7 +347,7 @@ module.exports = function(grunt) {
         }],
         options: {
           publish: [{
-            id: 'gov.nasa.jpl:ve:zip',
+            id: groupId + ':ve:zip',
             version: '3.3.0-SNAPSHOT',
             path: 'deploy/'
           }]

@@ -32,4 +32,4 @@ jobs:
             - node_modules
           key: openmbee-ve-{{ checksum "package.json" }}
 
-      - run: ./node_modules/grunt/bin/grunt --ARTIFACTORY_URL=$ARTIFACTORY_URL --ARTIFACTORY_USER=$ARTIFACTORY_USER --ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD deploy
+      - run: ./node_modules/grunt/bin/grunt --ARTIFACTORY_URL=https://oss.jfrog.org --ARTIFACTORY_USER=$ARTIFACTORY_USER --ARTIFACTORY_PASSWORD=$ARTIFACTORY_PASSWORD --SNAPSHOT_REPO=oss.snapshot.local --RELEASE_REPO=oss.release.local --GROUP_ID=org.openmbee deploy
