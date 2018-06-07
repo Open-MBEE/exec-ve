@@ -8,7 +8,8 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
     $scope.treeOptions = {
         dropped: function (change) {},
         accept: function (sourceNodeScope, destNodeScope, destIndex) {
-            return destNodeScope.node && destNodeScope.node.type === 'group';
+            // allow moving to root or to group
+            return !destNodeScope.node || destNodeScope.node.type === 'group';
         }
     };
     $scope.saveReorder = saveReorder;
