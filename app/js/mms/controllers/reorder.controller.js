@@ -109,7 +109,8 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
             for (var i = 0; i < node.children.length; i++) {
                 childViews.push({
                     id: node.children[i].id, 
-                    aggregation: node.children[i].aggr
+                    aggregation: node.children[i].aggr,
+                    propertyId: node.children[i].propertyId
                 });
             }
             var orig = origViews[id];
