@@ -15,3 +15,44 @@ $background_hover_transition: background-color .2s linear;
 a:hover {
   cursor: pointer;
 }
+
+figure {
+  text-align: center;
+  display: inline-block;
+}
+
+figure > figcaption {
+  text-align: center;
+  display: block;
+}
+
+// Align image left
+.image-left {
+  margin-left: 0;
+}
+
+// Align image and figure right
+.image-right {
+  display: inline-block;
+  > img {
+    text-align: right;
+  }
+}
+
+p > img.image-right {
+  display: block;
+  margin-left: auto;
+}
+
+figure.image-right {
+  display: block;
+  max-width: 7.5in;
+  text-align: right;
+}
+
+// Center image and figure
+.image-center,
+figure.image-center {
+  text-align: center;
+  max-width: 7.5in;
+}

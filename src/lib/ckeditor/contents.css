@@ -78,20 +78,19 @@ hr
 	border-top: 1px solid #ccc;
 }
 
-img.right
-{
-	border: 1px solid #ccc;
-	float: right;
-	margin-left: 15px;
-	padding: 5px;
+/* Align image right */
+span.cke_image_nocaption.image-right,
+div.cke_widget_block.cke_widget_image.image-right{
+	display: block;
+	text-align: right;
 }
 
-img.left
-{
-	border: 1px solid #ccc;
-	float: left;
-	margin-right: 15px;
-	padding: 5px;
+/* Align image center */
+span.cke_image_nocaption.image-center,
+div.cke_widget_block.cke_widget_image.image-center,
+p.image-center {
+	display: block;
+	text-align: center;
 }
 
 pre
@@ -118,7 +117,7 @@ figure
 	outline: solid 1px #ccc;
 	background: rgba(0,0,0,0.05);
 	padding: 10px;
-	margin: 10px 20px;
+	margin: 0;
 	display: inline-block;
 }
 
@@ -251,6 +250,6 @@ a[title='mms-br'] > hr {
 	outline: 0;
 }
 
-.cke_panel_listItem  a {
+.cke_panel_listItem a {
 	padding-left: 20px !important;
 }
