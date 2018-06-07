@@ -24,7 +24,7 @@
 
   .fa {
     padding-right: 4px;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   &:not(.dropdown-toggle) .fa {
@@ -33,6 +33,11 @@
 
   .caret{
     opacity: .4;
+  }
+
+  &.print,
+  &.refresh-numbering{
+    margin-left: 12px;
   }
 }
 

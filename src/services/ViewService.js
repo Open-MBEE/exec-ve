@@ -74,18 +74,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
         TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table, TYPE_TO_CLASSIFIER_ID.Figure];
 
-    var processSlotStrings = function(values) {
-        var res = [];
-        if (!values || values.length === 0)
-            return res;
-        values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.value)
-                return;
-            res.push(value.value);
-        });
-        return res;
-    };
-
     /**
      * @ngdoc method
      * @name mms.ViewService#downgradeDocument
@@ -834,7 +822,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      *
      * @description remove a group
      *
-     * @param elementOb group to remove
+     * @param {object} elementOb group to remove
      * @returns {Promise} The promise will be resolved with the updated group object.
      */
     var removeGroup = function(elementOb) {
@@ -851,8 +839,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             appliedStereotypeInstanceId: elementOb.appliedStereotypeInstanceId,
             _isGroup: elementOb._isGroup
         };
-
-        return ElementService.updateElements([updatedElement], false)
+        var toUpdate = [updatedElement];
+        if (updatedElement.appliedStereotypeInstanceId !== null) {
+            toUpdate.push({
+                id: elementOb.id + '_asi', 
+                _refId: elementOb._refId, 
+                _projectId: elementOb._projectId,
+                classifierIds: updatedElement._appliedStereotypeIds
+            });
+        } else {
+            $http.delete(URLService.getElementURL({
+                elementId: elementOb.id + '_asi', 
+                refId: elementOb._refId, 
+                projectId: elementOb._projectId
+            }));
+        }
+        return ElementService.updateElements(toUpdate, false)
             .then(function(data) {
                 // remove this group for cache
                 var cacheKey = ['groups', elementOb._projectId, elementOb._refId];
@@ -1052,6 +1054,37 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return null;
     };
 
+    var processSlotStrings = function(values) {
+        var res = [];
+        if (!values || values.length === 0) {
+            return res;
+        }
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.value)
+                return;
+            res.push(value.value);
+        });
+        return res;
+    };
+
+    var processSlotIntegers = function(values) {
+        var res = [];
+        if (!values || values.length === 0) {
+            return res;
+        }
+        values.forEach(function(value) {
+            if (Number.isInteger(value.value)) {
+                res.push(value.value);
+            } else if ((typeof value.value) === 'string') {
+                var val = parseInt(value.value);
+                if (!isNaN(val)) {
+                    res.push(val);
+                }
+            }
+        });
+        return res;
+    };
+    
     /**
      * @ngdoc method
      * @name mms.ViewService#getDocMetadata
@@ -1067,10 +1100,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var getDocMetadata = function(reqOb, weight) {
         var deferred = $q.defer();
-        var metadata = {};
-        reqOb.depth = 2;
-        //ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
-        reqOb.elementIds = [reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234342817_186479_2256', reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234349580_411867_2258'];
+        var metadata = {numberingDepth: 0, numberingSeparator: '.'};
+        reqOb.elementIds = [
+            reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234342817_186479_2256', //header
+            reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234349580_411867_2258', //footer
+            reqOb.elementId + '_asi-slot-_18_5_3_8bf0285_1526605771405_96327_15754', //numbering depth
+            reqOb.elementId + '_asi-slot-_18_5_3_8bf0285_1526605817077_688557_15755' //numbering separator
+        ];
         ElementService.getElements(reqOb, weight)
         .then(function(data) {
             if (data.length === 0) {
@@ -1083,15 +1119,23 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 if (!feature || !value || value.length === 0) {
                     continue;
                 }
-                var result = processSlotStrings(value);
+                var result = [];
                 if (feature === '_17_0_1_407019f_1326234342817_186479_2256') { //header
+                    result = processSlotStrings(value);
                     metadata.top = result.length > 0 ? result[0] : '';
                     metadata.topl = result.length > 1 ? result[1] : '';
                     metadata.topr = result.length > 2 ? result[2] : '';
                 } else if (feature == '_17_0_1_407019f_1326234349580_411867_2258') {//footer
+                    result = processSlotStrings(value);
                     metadata.bottom = result.length > 0 ? result[0] : '';
                     metadata.bottoml = result.length > 1 ? result[1] : '';
                     metadata.bottomr = result.length > 2 ? result[2] : '';
+                } else if (feature == '_18_5_3_8bf0285_1526605771405_96327_15754') { //depth
+                    result = processSlotIntegers(value);
+                    metadata.numberingDepth = result.length > 0 ? result[0] : 0;
+                } else if (feature == '_18_5_3_8bf0285_1526605817077_688557_15755') { //separator
+                    result = processSlotStrings(value);
+                    metadata.numberingSeparator = result.length > 0 ? result[0] : '.';
                 }
             }
         }, function(reason) {

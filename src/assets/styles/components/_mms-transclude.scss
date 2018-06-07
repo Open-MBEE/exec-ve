@@ -48,25 +48,27 @@ mms-view.editing {
   mms-transclude-doc, mms-transclude-com {
     display: block;
 
-    > div > div.panel-heading {
-      padding: 2px 8px;
-      h3{
-        font-weight: $default_font_weight;
-      }
-    }
-
     .panel {
       margin: 0px;
     }
   }
 }
 
+
+
+//Keep title the same size as reading 
+.view-title .panel-body .form-control{
+  height: inherit;
+  font-size: inherit;
+}
+
 /* comments */
 mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
   @include border-radius(5px);
-  background-color: $yellow;
-  padding: 2px;
+  background-color: lighten($yellow, 10%);
+  padding: 2px; 
+  //border: 2px solid darken($yellow, 8%);
 }
 
 mms-view:not(.editing):not(.outline) .placeholder {
@@ -77,8 +79,34 @@ mms-view:not(.reviewing) mms-transclude-com {
   display: none;
 }
 
-.mms-error {
-  color: $red;
+
+/*------------------------------------------------------------------
+Element not found styling
+-------------------------------------------------------------------*/
+
+.mms-error{
+  background: $ve-warning-orange-light;
+  background: repeating-linear-gradient(45deg, $white, $white 10px,$ve-warning-orange-light 10px,$ve-warning-orange-light 20px);
+  color: $black;
+  border: none;
+  padding-left: 11px;
+}
+
+.mms-error::before{
+  content: "\f071";
+  font-family: fontAwesome;
+  margin-left: -14px;
+  color: $ve-warning-orange;
+  font-size: 12px;
+  position: absolute;
+}
+
+.mms-error:hover{
+  background: repeating-linear-gradient(45deg, $white, $white 10px,darken($ve-warning-orange-light, 10%) 10px,darken($ve-warning-orange-light, 10%) 20px);
+}
+
+.pane-right .prop.mms-error {
+  margin-top: 10px;
 }
 
 .mms-png {
@@ -147,6 +175,17 @@ mms-transclude-img img {
   font-style: normal;
   font-weight: bold;
   padding-right: 4px;
+}
+
+//Make font weight of panel headings more readable
+.panel-heading{
+  line-height: 22px;
+  padding: 4px 8px;
+  h3{
+    font-weight: $default_font_weight;
+    color: $ve-light-text-darker-1;
+    line-height: 28px;
+  }
 }
 
 // Transclude edit panel buttons

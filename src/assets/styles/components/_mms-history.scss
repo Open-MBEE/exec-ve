@@ -1,3 +1,28 @@
+/*------------------------------------------------------------------
+  1 Diff styling 
+-------------------------------------------------------------------*/
+
+/*Delete styling*/
+del {
+  background-color: #ffe3e3 !important;
+  text-decoration: line-through !important;
+}
+
+/*Insert styling*/
+ins {
+  background-color: #dafde0 !important;
+  text-decoration: none !important;
+}
+
+/*No change styling */
+.match,.textdiff span {
+  color: gray;
+}
+
+/*------------------------------------------------------------------
+  1.1 History component styling 
+-------------------------------------------------------------------*/
+
 mms-history {
   .history-top {
     position: absolute;
@@ -10,21 +35,6 @@ mms-history {
   .history-bottom {
     position: absolute;
     top: 430px;
-  }
-
-  /*------------------------------------------------------------------
-    1 Diff styling 
-  -------------------------------------------------------------------*/
-
-  /*Delete styling*/
-  del {
-    background-color: #ffe3e3;
-  }
-
-  /*Insert styling*/
-  ins {
-    background-color: #dafde0;
-    text-decoration: none;
   }
 
   /*SVG arrow for pointing from history to present in spec*/

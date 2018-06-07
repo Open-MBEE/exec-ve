@@ -38,7 +38,7 @@
     margin: 0;
     @include border-radius(0 4px 4px 0);
     border-color: darken($white, 12%);
-    @include box-shadow( 6px 6px 12px rgba(0,0,0,.175))
+    @include box-shadow( 6px 6px 12px rgba(0,0,0,.175));
 
     /*line to indicate where the presentation element will be added
     &::after{

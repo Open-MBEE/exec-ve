@@ -82,6 +82,10 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             value.value = "<p>" + value.value + "</p>";
         };
 
+        scope.cleanupVal = function(obj) {
+            obj.value = parseInt(obj.value);
+        };
+
         var recompile = function(preview) {
             if (scope.recompileScope) {
                 scope.recompileScope.$destroy();

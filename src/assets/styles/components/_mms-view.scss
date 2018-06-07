@@ -17,13 +17,23 @@ mms-view {
   }
 
   table {
-    @extend .content-table;
+    @extend .table-condensed;
+    @extend .table-bordered;
+    p {
+      margin: 0px 0px 5px;
+    }
   }
 
   .add-pe-button-container, .last-modified {
     //opacity: 0;
     display: block;
     visibility: hidden;
+  }
+
+  .read-width {
+    p, h1, h2, h3, h4, h5, h6, ol, ul { //figure, img, table, div
+      max-width: 7.5in;
+    }
   }
 }
 
@@ -39,13 +49,6 @@ mms-view.editing {
   .add-pe-button-container {
     //opacity: 1;
     visibility: visible;
-  }
-}
-
-mms-view-section {
-  .panel-heading {
-    font-weight: $default_font_weight;
-    padding: 2px 8px;
   }
 }
 

@@ -109,7 +109,8 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
             for (var i = 0; i < node.children.length; i++) {
                 childViews.push({
                     id: node.children[i].id, 
-                    aggregation: node.children[i].aggr
+                    aggregation: node.children[i].aggr,
+                    propertyId: node.children[i].propertyId
                 });
             }
             var orig = origViews[id];
@@ -128,7 +129,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
         ElementService.updateElements(toSave, true)
         .then(function() {
             growl.success('Reorder Successful');
-            $state.go('project.ref.document', {}, {reload:true});
+            navigate(true);
         }, function(response) {
             var reason = response.failedRequests[0];
             var errorMessage = reason.message;
@@ -144,15 +145,19 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
     };
     
     $scope.cancel = function() {
+        navigate(false);
+    };
+
+    function navigate(reload) {
         var curBranch = $rootScope.ve_treeApi.get_selected_branch();
         if (!curBranch) {
             $state.go('project.ref.document', {}, {reload:true});
         } else {
             var goToId = curBranch.data.id;
-            if (curBranch.type === 'section') {
+            if (curBranch.type !== 'section' && curBranch.type !== 'view') {
                 goToId = curBranch.viewId;
             }
-            $state.go('project.ref.document.view', {viewId: goToId});
+            $state.go('project.ref.document.view', {viewId: goToId}, {reload: reload});
         }
-    };
+    }
 }]);
