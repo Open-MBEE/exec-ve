@@ -88,7 +88,7 @@
                                 <i class="fa fa-circle completed-marker" aria-hidden="true"></i>success
                             </span>
                             <span class="animate-switch" ng-switch-default>{{jobInstances[job.id][0].jobStatus}}</span>
-                            <a ng-attr-href="{{jobInstances[job.id][0].logUrl}}" target="_blank" ng-show="jobInstances[job.id][0].logUrl">log</a>
+                            <a ng-attr-href="{{jobInstances[job.id][0].logUrl}}" target="_blank" rel="noopener noreferrer" ng-show="jobInstances[job.id][0].logUrl">log</a>
                         </div>
                     </div>
                     <div ng-if="(!jobInstances[job.id] || !jobInstances[job.id].length) && !loading">
@@ -125,8 +125,5 @@
             Run DocGen <i ng-hide="createJobCleared" class="fa fa-spin fa-spinner"></i>
         </button>
     </div>
-    <!--<div class="pull-right" ng-if="docEditable">
-        <a href="/share/page/document-details?nodeRef={{doc.nodeRefId}}" target="_blank">Edit Permissions</a>
-    </div>-->
 </div>
 
