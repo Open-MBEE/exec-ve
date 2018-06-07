@@ -56,3 +56,20 @@ figure.image-center {
   text-align: center;
   max-width: 7.5in;
 }
+
+table[align="right"] {
+  display: block;
+  float: none;
+  margin-left: auto;
+}
+
+table[align="left"] {
+  display: block;
+  float: none;
+}
+
+table[align="center"] {
+  display: block;
+  float: none;
+  margin: auto;
+}
