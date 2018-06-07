@@ -337,7 +337,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactoryUrl,
-        repository: snapshotRepo, //releaseRepo
+        repository: releaseRepo,
         username: artifactoryUser,
         password: artifactoryPassword
       },
@@ -348,7 +348,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: groupId + ':ve:zip',
-            version: '3.3.0-SNAPSHOT',
+            version: '3.3.0-rc1',
             path: 'deploy/'
           }]
         }
