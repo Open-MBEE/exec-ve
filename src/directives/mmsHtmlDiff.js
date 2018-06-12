@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-    .directive('mmsHtmlDiff', ['$templateCache', 'htmldiff', mmsHtmlDiff]);
+    .directive('mmsHtmlDiff', ['$templateCache', 'HtmlRenderedDiff', mmsHtmlDiff]);
 
-function mmsHtmlDiff($templateCache, htmldiff) {
+function mmsHtmlDiff($templateCache, HtmlRenderedDiff) {
     var template = $templateCache.get('mms/templates/mmsHtmlDiff.html');
     return {
         restrict: 'E',
@@ -36,7 +36,11 @@ function mmsHtmlDiff($templateCache, htmldiff) {
     }
 
     function performDiff(scope, baseHtml, comparedHtml) {
-        var diffResult = htmldiff(baseHtml, comparedHtml);
+        var diffResult = HtmlRenderedDiff.generateDiff(baseHtml, comparedHtml);
+        // still need to run math stuff to render it properly
+        // if (MathJax) {
+        //     MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
+        // }
         scope.diffResult = diffResult;
         scope.mmsDiffFinish();
     }
