@@ -43,7 +43,7 @@
     "angulartics-piwik": "~1.0.4",
     "ngStorage": "https://github.com/gsklee/ngStorage.git#master",
     "angular-promise-extras": "^0.1.8",
-    "HtmlRenderedDiff": "https://github.com/chhaymenghong/HtmlRenderedDiff.git#master",
+    "HtmlRenderedDiff": "https://github.com/chhaymenghong/HtmlRenderedDiff.git#release",
     "moment": "^2.22.0"
   },
   "resolutions": {
