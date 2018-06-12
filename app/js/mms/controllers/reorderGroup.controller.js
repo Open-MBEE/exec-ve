@@ -108,8 +108,8 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
         });
 
         function helper(node, result) {
-            node.children.forEach(function(childNode) {
-                if (childNode.data.ownerId !== node.data.id) {
+            node.children.forEach(function (childNode) {
+                if ((childNode.type === 'group' && childNode.data._parentId !== node.data.id) || (childNode.type === 'view' && childNode.data._groupId !== node.data.id)) {
                     result.push({node: childNode, newOwnerId: node.data.id});
                 }
                 helper(childNode, result);
