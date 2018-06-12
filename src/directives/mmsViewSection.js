@@ -33,7 +33,16 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
 
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
-
+        scope.setPeLineVisibility = function($event) {
+            window.setTimeout(function() {
+                var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
+                if (peContainer.find('.dropdown-menu').css('display') == 'none') {
+                    peContainer.find('hr').css('visibility', 'hidden');
+                } else {
+                    peContainer.find('hr').css('visibility', 'visible');
+                }
+            });
+        };
         domElement.click(function(e) {
             //should not do anything if section is not an instancespec
             if (scope.startEdit)
@@ -57,6 +66,9 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             if (dups.length > 0) {
                 growl.warning("There are duplicates in this section, dupilcates ignored!");
             }
+        }
+        if (scope.section._veNumber) {
+            scope.level = scope.section._veNumber.split('.').length;
         }
         domElement.append(defaultTemplate);
         $compile(domElement.contents())(scope);
@@ -128,6 +140,9 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         }
 
         scope.addEltAction = function(index, type, e) {
+            if (!mmsViewCtrl || !mmsViewCtrl.isEditable()) {
+                return;
+            }
             e.stopPropagation();
             scope.addPeIndex = index;
             Utils.addPresentationElement(scope, type, scope.section);

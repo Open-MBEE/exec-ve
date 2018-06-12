@@ -10,11 +10,14 @@
 @import "base/mms-typography";
 
 /* A minimal Bootstrap file */
-@import "../../lib/bootstrap-sass-3.3.7/assets/stylesheets/bootstrap";
-@import "base/mms-bootstrap-variable-overrides";
+@import "vendors/bootstrap/styles";
 
 /* App level customizations */
 @import "base/mms-globals";
+
+/* Tom Sawyer Perspectives View customizations */
+@import "components/mms-tsp-view";
+
 
 /* Other customizations */
 @import "components/mms-add-pe-button";
@@ -24,11 +27,11 @@
 @import "components/mms-toolbar";
 @import "components/mms-spec";
 @import "components/mms-view";
-@import "components/mms-view-section";
 @import "components/mms-cf-modal";
+@import "components/mms-search";
 @import "components/mms-editor";
 @import "components/mms-misc-components";
 @import "components/mms-autocomplete-modal";
 @import "components/mms-history";
-@import "components/mms-ve-jobs-table";
+@import "components/mms-jobs";
 @import "../../directives/charts/mms-d3-chart";

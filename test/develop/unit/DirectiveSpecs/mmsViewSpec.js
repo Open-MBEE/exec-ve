@@ -6,10 +6,10 @@ describe('Directive: mmsView', function () {
     var $httpBackend;
     var $rootScope,
         $compile;
-
+    // need to put these into different beforeEach block. If not jasmine will intermittently fail...
+    beforeEach(module('mms.directives'));
+    beforeEach(module('mms'));
     beforeEach(function() {
-        module('mms.directives');
-        module('mms');
         inject(function ($injector) {
             $rootScope = $injector.get('$rootScope');
             $compile = $injector.get('$compile');

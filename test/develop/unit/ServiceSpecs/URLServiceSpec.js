@@ -35,14 +35,13 @@ describe("URLService", function () {
 		}))
 	});
 
-	describe('Method getHtmlToPdfURL', function () {
-		var tmpId        = 1234;
+	describe('Method getExportHtmlUrl', function () {
 		var project = "this_isnt_your_project";
 		var ref      = "dont_go_to_this_site";
 		var htmlToPdfURL;
-		it('should generate a Html to PDF url', inject(function () {
-			htmlToPdfURL = root + "/projects/" + project + "/refs/" + ref + "/documents/" + tmpId + "/htmlToPdf/123456789";
-			expect(htmlToPdfURL).toBe(URLServiceObj.getHtmlToPdfURL(tmpId, project, ref));
+		it('should generate the correct url', inject(function () {
+			htmlToPdfURL = root + "/projects/" + project + "/refs/" + ref + '/convert';
+			expect(htmlToPdfURL).toBe(URLServiceObj.getExportHtmlUrl(project, ref));
 		}));
 	});
 
@@ -191,7 +190,7 @@ describe("URLService", function () {
 			accept: true
 		};
 		it('should create the url to query for element history', function () {
-			var elementHistoryUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/history';
+			var elementHistoryUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
 			expect(elementHistoryUrl).toBe(URLServiceObj.getElementHistoryURL(reqOb));
 		});
 	});
@@ -220,7 +219,7 @@ describe("URLService", function () {
 			accept: true
 		};
 		it('should create the url to query for element keyword search', function () {
-			var elementSearchUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?extended=true';
+			var elementSearchUrl = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search?checkType=true&extended=true';
 			expect(elementSearchUrl).toBe(URLServiceObj.getElementSearchURL(reqOb));
 		});
 	});

@@ -61,11 +61,18 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                     $scope.spin = false;
                     $scope.continue = function() {
                         if(orgId && projectId) {
-                            $scope.spin = true;
-                            $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master', search: undefined}).then(function(data) {
-                            }, function(reject) {
-                                $scope.spin = false;
-                            });
+                            // was the same project selected? cancel...
+                            if ($scope.$parent.project.orgId === orgId &&
+                                $scope.$parent.project.id === projectId) {
+                                $scope.cancel();
+                            }
+                            else {
+                                $scope.spin = true;
+                                $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master', search: undefined}).then(function(data) {
+                                }, function(reject) {
+                                    $scope.spin = false;
+                                });
+                            }
                         }
                     };
                     $scope.cancel = function() {

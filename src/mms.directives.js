@@ -71,7 +71,7 @@
     angular.module('exampleApp', ['mms', 'mms.directives']);
     </pre>
  */
-angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 'angular-growl'])
+angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect'])
 .config(['$sceProvider', 'growlProvider', function($sceProvider, growlProvider) {
     $sceProvider.enabled(false);
     growlProvider.onlyUniqueMessages(false);

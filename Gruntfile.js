@@ -4,7 +4,7 @@ module.exports = function(grunt) {
   require('jit-grunt')(grunt, {
     // static mapping for tasks that don't match their modules' name
     useminPrepare: 'grunt-usemin',
-    setupProxies: 'grunt-middleware-proxy',
+    configureProxies: 'grunt-connect-proxy-updated',
     artifactory: 'grunt-artifactory-artifact'
   });
 
@@ -13,6 +13,10 @@ module.exports = function(grunt) {
   var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
   var artifactoryUser = grunt.option('ARTIFACTORY_USER');
   var artifactoryPassword = grunt.option('ARTIFACTORY_PASSWORD');
+  var snapshotRepo = grunt.option('SNAPSHOT_REPO');
+  var releaseRepo = grunt.option('RELEASE_REPO');
+  var groupId = grunt.option('GROUP_ID');
+
   var connectObject = {
     docs: {
       options: {
@@ -49,7 +53,7 @@ module.exports = function(grunt) {
           },
           middleware: function (connect, options, middlewares) {
             middlewares.unshift(
-              require('grunt-middleware-proxy/lib/Utils').getProxyMiddleware(),
+              require('grunt-connect-proxy-updated/lib/utils').proxyRequest,
               // add gzip compression to local server to reduce static resources' size and improve load speed
               require('compression')(),
               // need to add livereload as a middleware at this specific order to avoid issues with other middlewares
@@ -58,6 +62,11 @@ module.exports = function(grunt) {
           }
         },
         proxies: [
+          {
+            context: '/mms-ts',
+            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
+            port: 8080
+          },
           {
             context: '/alfresco',  // '/api'
             host: servers[key],
@@ -119,7 +128,7 @@ module.exports = function(grunt) {
 
           // Internal deps
           {expand: true, cwd: 'app/lib', src: '**', dest: 'dist/lib'},
-          {expand: true, cwd: 'src/lib/', src: '**', dest: 'dist/lib'},
+          {expand: true, cwd: 'src/lib/', src: ['**', '!bootstrap-sass-3.3.7/**'], dest: 'dist/lib'},
 
           // Assets
           {expand: true, cwd: 'app/bower_components/font-awesome-bower/fonts', src: '**', dest: 'dist/fonts'},
@@ -213,7 +222,6 @@ module.exports = function(grunt) {
         dest: 'dist/jsTemp/app.tpls.js'
       }
     },
-
     /** Concat + Minify JS files **/
     uglify: {
       combineCustomJS: {
@@ -273,7 +281,7 @@ module.exports = function(grunt) {
       beforeconcat: jsFiles,
       options: {
         reporterOutput: '',
-        // evil: true, //allow eval for timely integration
+        evil: true, //allow eval for plot integration
         globalstrict: true,
         globals: {
           angular: true,
@@ -286,8 +294,9 @@ module.exports = function(grunt) {
           //__timely: true,
           Blob: true,
           navigator: true,
-          eval: false,
-          Set: true
+          eval: true,
+          Set: true,
+          FormData: true
         }
       }
     },
@@ -328,7 +337,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactoryUrl,
-        repository: 'libs-snapshot-local',
+        repository: releaseRepo,
         username: artifactoryUser,
         password: artifactoryPassword
       },
@@ -338,8 +347,8 @@ module.exports = function(grunt) {
         }],
         options: {
           publish: [{
-            id: 'gov.nasa.jpl:evm:zip',
-            version: '3.3.0-SNAPSHOT',
+            id: groupId + ':ve:zip',
+            version: '3.3.0-rc1',
             path: 'deploy/'
           }]
         }
@@ -352,8 +361,6 @@ module.exports = function(grunt) {
         },
         continuous:{
           configFile:'config/develop/karma.develop.conf.js',
-          singleRun: true,
-          browsers: ['PhantomJS'],
           logLevel: 'ERROR'
         }
     },
@@ -431,10 +438,10 @@ module.exports = function(grunt) {
     if (arg1) {
       grunt.log.writeln("Launching server with proxy");
 
-      grunt.task.run('setupProxies:' + arg1, 'connect:' + arg1);
+      grunt.task.run('configureProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
-      grunt.task.run('setupProxies:opencaeuat', 'connect:opencaeuat');
+      grunt.task.run('configureProxies:opencaeuat', 'connect:opencaeuat');
     }
     grunt.task.run('watch:' + build);
   });

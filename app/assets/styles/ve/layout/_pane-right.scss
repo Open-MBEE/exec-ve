@@ -19,11 +19,22 @@
       font-size: 14px;
       margin-top: 24px;
       width: 100%;
-
-      a:hover {
-        color: $base_blue;
-      }
     }
+  }
+
+  h2.right-pane-title{
+    display: block;
+    margin: 20px 0;
+  }
+
+  .container-fluid{
+    padding:0 18px 34px;
+  }
+
+  hr.spec-title-divider{
+    margin-left:-18px;
+    margin-right:-18px;
+    border-color: $ve-silver-darker-2;
   }
 }
 

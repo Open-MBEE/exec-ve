@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -216,7 +216,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         var cachedKey = UtilsService.makeElementKey(editOb);
         var elementOb = CacheService.get(cachedKey);
 
-        editOb.name = elementOb.name;
+        if (elementOb.name) {
+            editOb.name = elementOb.name;
+        }
         editOb.documentation = elementOb.documentation;
         if (editOb.type === 'Property' || editOb.type === 'Port') {
             editOb.defaultValue = JSON.parse(JSON.stringify(elementOb.defaultValue));
@@ -458,7 +460,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         scope.elementSaving = true;
 
         var work = function() {
-            save(scope.edit, null, scope, continueEdit).then(function(data) {
+            save(scope.edit, scope.editorApi, scope, continueEdit).then(function(data) {
                 scope.elementSaving = false;
                 if (!continueEdit) {
                     scope.isEditing = false;
@@ -711,20 +713,20 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         var peFilterQuery = function () {
             var classIdOb = {};
             if ($scope.presentationElemType === 'Table') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.TableT;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.TableT, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
             } else if ($scope.presentationElemType === 'List') {
-                classIdOb.classifierIds  = ViewService.TYPE_TO_CLASSIFIER_ID.ListT;
+                classIdOb.classifierIds  = [ViewService.TYPE_TO_CLASSIFIER_ID.ListT, ViewService.TYPE_TO_CLASSIFIER_ID.List];
             } else if ($scope.presentationElemType === 'Image') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.Figure;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.ImageT, ViewService.TYPE_TO_CLASSIFIER_ID.Image];
             } else if ($scope.presentationElemType === 'Paragraph') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph];
             } else if ($scope.presentationElemType === 'Section') {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID.SectionT;
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.SectionT, ViewService.TYPE_TO_CLASSIFIER_ID.Section];
             } else {
-                classIdOb.classifierIds = ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType];
+                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]];
             }
             var obj = {};
-            obj.term = classIdOb;
+            obj.terms = classIdOb;
             return obj;
         };
 
@@ -873,7 +875,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                     var reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.baseCommit.refSelected.id, commitId: $scope.baseCommit.commitSelected.id};
                     ElementService.getElement(reqOb, 2, false)
                     .then(function(data) {
-                        revertEltInfo.name = data.name;
+                        if (data.name) {
+                            revertEltInfo.name = data.name;
+                        }
                         revertEltInfo.documentation = data.documentation;
                         if (data.defaultValue) {
                             revertEltInfo.defaultValue = data.defaultValue;
@@ -925,11 +929,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     var fixImgSrc = function(imgDom) {
         var src = imgDom.attr('src');
-        if (src && src.startsWith('/alfresco')) {
-            imgDom.attr('src', src + '?alf_ticket=' + AuthService.getTicket());
-        }
-        if (src && src.startsWith('../')) {
-            imgDom.attr('src', src.replace('../', '/alfresco/') + '?alf_ticket=' + AuthService.getTicket());
+        if (src) {
+            if (src.startsWith('../')) {
+                src.replace('../', '/alfresco/');
+            }
+            if (src.startsWith('/alfresco/')) {
+                imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
+            }
         }
     };
 

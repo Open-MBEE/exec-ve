@@ -102,12 +102,12 @@ describe('ProjectService', function () {
 				{
 					_name: "group1",
 					_parentId: "groupparent1",
-					_id: "groups1id"
+					id: "groups1id"
 				},
 				{
 					_name: "groups2",
 					_parentId: "groupsparent2",
-					_id: "group2id"
+					id: "group2id"
 				}
 			]
 		}
@@ -314,12 +314,12 @@ describe('ProjectService', function () {
 				{
 					_name: "group1",
 					_parentId: "groupparent1",
-					_id: "groups1id"
+					id: "groups1id"
 				},
 				{
 					_name: "groups2",
 					_parentId: "groupsparent2",
-					_id: "group2id"
+					id: "group2id"
 				}
 			];
 			$httpBackend.when('GET', root + '/projects/hereisanid/refs/master/groups').respond(

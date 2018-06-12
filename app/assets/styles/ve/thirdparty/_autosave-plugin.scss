@@ -9,6 +9,7 @@
   1.1 Compare versions prompt modal
   1.2 Diff modal
 2. Save success message
+3. Firefox table overflow fix
 
 -------------------------------------------------------------------*/
 
@@ -179,3 +180,34 @@
 .cke_notification.cke_notification_success{
   display:none !important;
 }
+
+/*------------------------------------------------------------------
+3. Firefox table overflow fix
+-------------------------------------------------------------------*/
+
+table.diff{
+  /* Set table layout to fixed so it doesn't adjust to long strings.*/
+  table-layout: fixed !important;
+  width: 100% !important;
+  word-wrap: break-word;
+
+  /* Fix the width of the first numbering column*/
+  tr > th:first-child{
+    width: 20px;
+  }
+
+  /* Fix the width of the second numbering column in the case of the inline diff view*/
+  &.inlinediff{
+    tr > th:nth-child(2){
+      width: 20px;
+    }  
+  }
+
+  /*fix the width of the third numbering column in the case of the side by side diff view*/
+  &:not(.inlinediff){
+    tr > th:nth-child(3){
+      width: 20px;
+    }
+  }
+}
+

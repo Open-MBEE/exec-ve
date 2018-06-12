@@ -1,9 +1,7 @@
-.autocomplete-modal-help {
-  font-size: 12px;
-  margin-top: 5px;
-  margin-left: 5px;
 
-  > a:hover {
-    cursor: pointer;
+.mms-autocomplete-modal {
+  .autocomplete-modal-help {
+    font-size: 12px;
+    margin: 5px;
   }
 }

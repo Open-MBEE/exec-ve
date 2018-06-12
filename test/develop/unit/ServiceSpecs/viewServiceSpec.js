@@ -123,7 +123,7 @@ xdescribe('Service: ViewService', function() {
 		it('it should demote an object to a view', function() {
 			var result;
 			var newElemOb = elemOb;
-			newElemOb._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
+			newElemOb._appliedStereotypeIds = ['_11_5EAPbeta_be00301_1147420760998_43940_227'];
 			$httpBackend.when('POST', root + '/elements/heyanelement', newElemOb).respond(
 				function(method, url, data) {
 					return [201, ''];

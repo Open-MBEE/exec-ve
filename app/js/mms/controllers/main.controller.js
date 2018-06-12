@@ -3,8 +3,8 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', '$interval',
-function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, ElementService, CacheService, $interval) {
+.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', '$interval',
+function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, $interval) {
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
@@ -32,7 +32,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             description: 'close all messages',
             callback: function() {growlMessages.destroyAllMessages();}
         }).add({
-            combo: 'ctrl+`',
+            combo: '@',
             description: 'fast cf in editor',
             callback: function() {}
         });
@@ -83,16 +83,24 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                     $scope.login = function (credentials) {
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                            AuthService.getAuthorized(credentialsJSON).then(function (user) {
-                                growl.success("Logged in");
-                                $uibModalInstance.dismiss();
-                            }, function (reason) {
-                                $scope.spin = false;
-                                $scope.credentials.password = '';
-                                growl.error(reason.message);
+                        AuthService.getAuthorized(credentialsJSON).then(function (user) {
+                            growl.success("Logged in");
+                            $uibModalInstance.dismiss();
+                            // Check if user had changes queued before refreshing page data
+                            // add edits to cache
+                            var edits = $rootScope.ve_edits;
+                            _.map(edits, function(element, key) {
+                                var cacheKey = UtilsService.makeElementKey(element, true);
+                                CacheService.put(cacheKey, element);
                             });
-                        };
-                    }],
+                            $state.go($state.current, {}, {reload: true});
+                        }, function (reason) {
+                            $scope.spin = false;
+                            $scope.credentials.password = '';
+                            growl.error(reason.message);
+                        });
+                    };
+                }],
                 size: 'md'
             }).result.finally(function(){
                 modalOpen = false;
@@ -131,6 +139,18 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                     $rootScope.ve_treeInitial = toParams.viewId;
                 else
                     $rootScope.ve_treeInitial = toParams.documentId;
+            }
+            if ($state.includes('project.ref.document')) {
+                ApplicationService.getState().inDoc = true;
+                ApplicationService.getState().currentDoc = toParams.documentId;
+                if ($state.includes('project.ref.document.full')) {
+                    ApplicationService.getState().fullDoc = true;
+                } else {
+                    ApplicationService.getState().fullDoc = false;
+                }
+            } else {
+                ApplicationService.getState().inDoc = false;
+                ApplicationService.getState().fullDoc = false;
             }
             $rootScope.ve_viewContentLoading = false;
             if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project' || fromState.name === 'login.redirect')) {

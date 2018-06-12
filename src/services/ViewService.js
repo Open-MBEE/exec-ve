@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', ViewService]);
+.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms')
  * CRUD for views and products/documents/group
  *
  */
-function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService ) {
+function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
     var inProgress = {}; //only used for view elements over limit
 
     // The type of opaque element to the sysmlId of the classifierIds:
@@ -31,11 +31,25 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: "_17_0_5_1_407019f_1430628211976_255218_12002",
         ListT: "_17_0_5_1_407019f_1431903739087_549326_12013",
         TableT: "_17_0_5_1_407019f_1431903724067_825986_11992",
-        Figure: "_17_0_5_1_407019f_1431903748021_2367_12034",  //manual images + timely, etc
+        ImageT: "_17_0_5_1_407019f_1431903748021_2367_12034", //manual images + timely, etc
         Equation: "_17_0_5_1_407019f_1431905053808_352752_11992",
         ParagraphT: "_17_0_5_1_407019f_1431903758416_800749_12055",
-        SectionT: "_18_0_2_407019f_1435683487667_494971_14412"
+        SectionT: "_18_0_2_407019f_1435683487667_494971_14412",
+        TomSawyerDiagram: "_18_5_2_8bf0285_1506035630029_725905_15942",
+        Figure: "_18_5_2_8bf0285_1506035630979_342273_15944",
+        FigureT: "_18_5_2_8bf0285_1506035630029_725905_15942"
     };
+
+    var AnnotationType = {
+        mmsTranscludeName: 1,
+        mmsTranscludeDoc: 2,
+        mmsTranscludeCom: 3,
+        mmsTranscludeVal: 4,
+        mmsViewLink: 5,
+        mmsPresentationElement: 6
+    };
+
+    var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
 
     function getClassifierIds() {
         var re = [];
@@ -51,132 +65,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         Section: 'SectionT',
         Comment: 'ParagraphT',
         List: 'ListT',
-        Image: 'Figure',
-        Equation: 'Equation'
+        Image: 'ImageT',
+        Equation: 'Equation',
+        TomSawyerDiagram: 'TomSawyerDiagram'
     };
 
     var classifierIdsIds = getClassifierIds();
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
-        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table];
-    
-    var processString = function(values) {
-        if (!values || values.length === 0 || values[0].type !== 'LiteralString')
-            return '';
-        return values[0].value;
-    };
-    var processStrings = function(values) {
-        var res = [];
-        if (!values || values.length === 0)
-            return res;
-        values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.value)
-                return;
-            res.push(value.value);
-        });
-        return res;
-    };
-    var processPeople = function(values) {
-        if (!values || values.length === 0)
-            return [];
-        var people = [];
-        values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.value)
-                return;
-            var p = value.value.split(',');
-            if (p.length !== 5)
-                return;
-            people.push({
-                firstname: p[0],
-                lastname: p[1],
-                title: p[2],
-                orgname: p[3],
-                orgnum: p[4]
-            });
-        });
-        return people;
-    };
-    var processRevisions = function(values) {
-        if (!values || values.length === 0)
-            return [];
-        var rev = [];
-        values.forEach(function(value) {
-            if (value.type !== 'LiteralString' || !value.value)
-                return;
-            var p = value.value.split('|');
-            if (p.length !== 5)
-                return;
-            rev.push({
-                revnum: p[0],
-                date: p[1],
-                firstname: p[2],
-                lastname: p[3],
-                remark: p[4]
-            });
-        });
-        return rev;
-    };
-    var docMetadataTypes = {
-        '_17_0_1_407019f_1326234342817_186479_2256': {
-            name: 'header',
-            process: processString
-        },
-        '_17_0_1_407019f_1326234349580_411867_2258': {
-            name: 'footer',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903710_685116_36989': {
-            name: 'dnumber',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903991_141146_36990': {
-            name: 'version',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903994_494629_36996': {
-            name: 'titlelegal',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903994_370992_36997': {
-            name: 'footerlegal',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903995_652492_37000': {
-            name: 'authors',
-            process: processPeople
-        },
-        '_17_0_2_3_f4a035d_1366647903996_970714_37001': {
-            name: 'approvers',
-            process: processPeople
-        },
-        '_17_0_2_3_f4a035d_1366647903996_463299_37002': {
-            name: 'concurrences',
-            process: processPeople
-        },
-        '_17_0_2_3_f4a035d_1366698987711_498852_36951': {
-            name: 'revisions',
-            process: processRevisions
-        },
-        '_17_0_2_3_f4a035d_1366696484320_980107_36953': {
-            name: 'project',
-            process: processString
-        },
-        '_17_0_2_3_f4a035d_1366647903995_864529_36998': {
-            name: 'emails',
-            process: processStrings
-        },
-        '_17_0_2_3_e9f034d_1375464775176_680884_29346': {
-            name: 'instlogo',
-            process: processString
-        },
-        '_17_0_2_3_e9f034d_1375464942934_241960_29357': {
-            name: 'inst1',
-            process: processString
-        },
-        '_17_0_2_3_e9f034d_1375464993159_319060_29362': {
-            name: 'inst2',
-            process: processString
-        }
-    };
+        TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table, TYPE_TO_CLASSIFIER_ID.Figure];
 
     /**
      * @ngdoc method
@@ -184,19 +80,27 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @methodOf mms.ViewService
      * 
      * @description
-     * Demote document to a view
+     * Demote document to a view and update the applied stereotype instance
      * 
      * @param {Object} elementOb A document object
      * @returns {Promise} The promise will be resolved with the downgraded view
      */
-    var downgradeDocument = function(elementOb) { //TODO fix this to update the applied stereotype instance
+    var downgradeDocument = function(elementOb) {
         var clone = JSON.parse(JSON.stringify(elementOb));
-        clone._appliedStereotypeIds = ['_17_0_1_232f03dc_1325612611695_581988_21583'];
-        return ElementService.updateElement(clone)
+        clone._appliedStereotypeIds = [UtilsService.VIEW_SID];
+        var asi = {
+            id: elementOb.id + "_asi",
+            ownerId: elementOb.id,
+            classifierIds: [UtilsService.VIEW_SID],
+            type: "InstanceSpecification",
+            _projectId: elementOb._projectId,
+            _refId: elementOb._refId,
+            stereotypedElementId: elementOb.id
+        };
+        return ElementService.updateElements([clone, asi])
             .then(function(data) {
                 var cacheKey = ['documents', elementOb._projectId, elementOb._refId];
                 var index = -1;
-                var found = false;
                 var projectDocs = CacheService.get(cacheKey);
                 if (projectDocs) {
                     for (var i = 0; i < projectDocs.length; i++) {
@@ -353,7 +257,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: reqOb.projectId,
             refId: reqOb.refId,
             elementId: reqOb.parentViewId
-        }, 2).then(function(data) {  
+        }, 2).then(function(data) {
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
@@ -397,7 +301,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             projectId: reqOb.projectId,
             refId: reqOb.refId,
             elementId: reqOb.parentViewId
-        }, 2).then(function(data) {  
+        }, 2).then(function(data) {
             if (data._childViews) {
                 var clone = {
                     _projectId: data._projectId,
@@ -451,7 +355,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             refId: reqOb._refId,
             elementId: reqOb.id
         }, 2)
-        .then(function(data) {  
+        .then(function(data) {
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
@@ -516,7 +420,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (instanceVal) {
             ElementService.getElement(reqOb, 2)
-            .then(function(data) {  
+            .then(function(data) {
                 var clone = {
                     _projectId: data._projectId,
                     _refId: data._refId,
@@ -547,7 +451,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     for (var i = 0; i < operands.length; i++) {
                         if (instanceVal.instanceId === operands[i].instanceId) {
                             clone[key].operand.splice(i,1);
-                            break; 
+                            break;
                         }
                     }
                 }
@@ -603,9 +507,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         });
         */
         var instanceSpecSpec = {
-            'type': jsonType, 
-            'sourceType': 'reference', 
-            'source': newInstanceId, 
+            'type': jsonType,
+            'sourceType': 'reference',
+            'source': newInstanceId,
             'sourceProperty': 'documentation'
         };
         var instanceSpec = {
@@ -708,14 +612,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {object} ownerOb should contain _project and _ref, can be a parent view with _childViews
      * @param {object} viewOb can specify optional viewId, viewName, viewDoc to be used when
      *                          creating the new view, boolean isDoc indicate whether it's a document
-     * @returns {Promise} The promise will be resolved with the new view. 
+     * @param {string} peDoc optional documentation to set for pe creation
+     * @returns {Promise} The promise will be resolved with the new view.
      */
-    var createView = function(ownerOb, viewOb) {
+    var createView = function(ownerOb, viewOb, peDoc) {
         var deferred = $q.defer();
 
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
         var newInstanceId = '_hidden_' + UtilsService.createMmsId() + '_pei';
 
+        var untitledName = viewOb.isDoc ? 'Untitled Document' : 'Untitled View';
         var view = UtilsService.createClassElement({
             id: newViewId,
             type: 'Class',
@@ -724,15 +630,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _displayedElementIds: [newViewId],
             _childViews: [],
             _contents: UtilsService.createValueSpecElement({
-                operand: [],
+                operand: [UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: newInstanceId})],
                 type: 'Expression',
                 id: newViewId + "_vc_expression",
                 ownerId: newViewId + "_vc"
             }),
-            name: viewOb.viewName ? viewOb.viewName : 'Untitled View',
+            name: viewOb.viewName ? viewOb.viewName : untitledName,
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
-                (viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")
+                (viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)
             ],
             appliedStereotypeInstanceId: newViewId + '_asi'
         });
@@ -750,17 +656,38 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
             parentView._childViews.push({id: newViewId, aggregation: "composite"});
         }
+        var peSpec = {
+            'type': 'Paragraph',
+            'sourceType': 'reference',
+            'source': newInstanceId,
+            'sourceProperty': 'documentation'
+        };
+        var pe = UtilsService.createInstanceElement({
+            id: newInstanceId,
+            ownerId: 'view_instances_bin_' + ownerOb._projectId,
+            name: "View Paragraph",
+            documentation: peDoc ? peDoc : '',
+            type: "InstanceSpecification",
+            classifierIds:[TYPE_TO_CLASSIFIER_ID.ParagraphT],
+            specification: UtilsService.createValueSpecElement({
+                value: JSON.stringify(peSpec),
+                type: "LiteralString",
+                id: UtilsService.createMmsId(),
+                ownerId: newInstanceId
+            }),
+            _appliedStereotypeIds: [],
+        });
         var asi = UtilsService.createInstanceElement({ //create applied stereotype instance
             id: newViewId + '_asi',
             ownerId: newViewId,
             documentation: '',
             name: '',
             type: 'InstanceSpecification',
-            classifierIds: [(viewOb.isDoc ? "_17_0_2_3_87b0275_1371477871400_792964_43374" : "_17_0_1_232f03dc_1325612611695_581988_21583")],
+            classifierIds: [(viewOb.isDoc ? UtilsService.DOCUMENT_SID : UtilsService.VIEW_SID)],
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId
         });
-        var toCreate = [view, asi];
+        var toCreate = [pe, view, asi];
         if (parentView) {
             parentView = ElementService.fillInElement(parentView);
             toCreate.push(parentView);
@@ -792,11 +719,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @description
      * Create a new document,
      * if name isn't specified, "Untitled" will be used, a default contents with 
-     * paragraph of the view documentation will be used. 
+     * paragraph of the view documentation will be used.
      * 
      * @param {object} ownerOb see createView
      * @param {object} docOb see createView
-     * @returns {Promise} The promise will be resolved with the new view. 
+     * @returns {Promise} The promise will be resolved with the new view.
      */
     var createDocument = function(ownerOb, docOb) {
         var deferred = $q.defer();
@@ -831,89 +758,36 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * id cannot be specified (automatically generated)
      * if name isn't specified, "Untitled" will be used.
      *
-     * @param {object} siteName the value the user input on the form, new-doc-or-group.html
-     * @param {object} parent currently selected project and Org.
-     * @returns {Promise} The promise will be resolved with the new view.
+     * @param {object} name group name new-doc-or-group.html
+     * @param {object} ownerOb parent id, projectId and refId
+     * @param {string} orgId parent orgId
+     * @returns {Promise} The promise will be resolved with the new group object.
      */
-    var createGroup = function(siteName, ownerOb) {
+    var createGroup = function(name, ownerOb, orgId) {
         var deferred = $q.defer();
 
-        var PACKAGE_ID =  UtilsService.createMmsId(), OWNER_ID = ownerOb.id, DEPENDENCY_ID = UtilsService.createMmsId(),
-            GENERALIZATION_ID = UtilsService.createMmsId(), SITE_CHAR_BLOCK_ID = UtilsService.createMmsId(),
-            DEPENDENCY_ASI_ID = DEPENDENCY_ID + "_asi", SITE_CHAR_BLOCK_ASI_ID = SITE_CHAR_BLOCK_ID + "_asi";
-
+        var PACKAGE_ID = UtilsService.createMmsId(), PACKAGE_ASI_ID = PACKAGE_ID + "_asi";
         // Our Group package element
         var group = UtilsService.createPackageElement(
             {
                 "id" : PACKAGE_ID,
-                "name" : (siteName) ? siteName : "Untitled",
-                "ownerId" : OWNER_ID,
-                "supplierDependencyIds" : [ DEPENDENCY_ID ],
-                "_isSite": true
+                "name" : (name) ? name : "Untitled",
+                "ownerId" : ownerOb.id,
+                "_isGroup": true,
+                "_appliedStereotypeIds": [GROUP_ST_ID],
+                "appliedStereotypeInstanceId": PACKAGE_ASI_ID
             }
         );
-
-        // Our Site Characterization Block for this group
-        var siteCharBlk = UtilsService.createClassElement(
+        var groupAsi = UtilsService.createInstanceElement(
             {
-                "appliedStereotypeInstanceId" : SITE_CHAR_BLOCK_ASI_ID,
-                "clientDependencyIds" : [ DEPENDENCY_ID ],
-                "generalizationIds" : [ GENERALIZATION_ID ],
-                "id" : SITE_CHAR_BLOCK_ID,
-                "name" : siteName + " Site Characterization",
+                "classifierIds" : [GROUP_ST_ID],
+                "id" : PACKAGE_ASI_ID,
                 "ownerId" : PACKAGE_ID,
-                "_appliedStereotypeIds" : [ "_11_5EAPbeta_be00301_1147424179914_458922_958" ],
-            }
-        );
-        // Our Site Characterization Block's Applied Stereotype Instance
-        var SiteCharBlkStereotypeApplied = UtilsService.createInstanceElement(
-            {
-                "classifierIds" : [ "_11_5EAPbeta_be00301_1147424179914_458922_958" ],
-                "id" : SITE_CHAR_BLOCK_ASI_ID,
-                "ownerId" : SITE_CHAR_BLOCK_ID,
                 "visibility" : null,
-                "stereotypedElementId" : SITE_CHAR_BLOCK_ID
+                "stereotypedElementId" : PACKAGE_ID
             }
         );
-        // Generalization from our Site Characterization Block to the General Site Characterization Block
-        var generalizationFromSiteCharBlkToGeneralSiteChar = UtilsService.createGeneralizationElement(
-            {
-                "generalId" : "_17_0_5_1_8660276_1415063844134_132446_18688",
-                "id" : GENERALIZATION_ID,
-                "ownerId" : SITE_CHAR_BLOCK_ID,
-                "specificId" : SITE_CHAR_BLOCK_ID,
-                "_sourceIds" : [ SITE_CHAR_BLOCK_ID ],
-                "_targetIds" : [ "_17_0_5_1_8660276_1415063844134_132446_18688" ],
-            }
-        );
-        // Dependency from Package to our Site Characterization Block
-        var dependencyFromPkgToSiteChar = UtilsService.createDependencyElement(
-            {
-                "_appliedStereotypeIds" : [ "_17_0_5_1_8660276_1407362513794_939259_26181" ],
-                "id" : DEPENDENCY_ID,
-                "mdExtensionsIds" : [ ],
-                "ownerId" : PACKAGE_ID,
-                "appliedStereotypeInstanceId" : DEPENDENCY_ASI_ID,
-                "_sourceIds" : [ SITE_CHAR_BLOCK_ID ],
-                "_targetIds" : [ PACKAGE_ID ],
-                "clientIds" : [ SITE_CHAR_BLOCK_ID ],
-                "supplierIds" : [ PACKAGE_ID ]
-            }
-        );
-        // Dependency's Applied Stereotype Instance
-        var dependencyFromPkgToSiteCharStereoType = UtilsService.createInstanceElement(
-            {
-                "id" : DEPENDENCY_ASI_ID,
-                "ownerId" : DEPENDENCY_ID,
-                "visibility" : null,
-                "classifierIds" : [ "_17_0_5_1_8660276_1407362513794_939259_26181" ],
-                "stereotypedElementId" : DEPENDENCY_ID
-            }
-        );
-
-        var toCreate = [group, siteCharBlk, SiteCharBlkStereotypeApplied,
-            generalizationFromSiteCharBlkToGeneralSiteChar, dependencyFromPkgToSiteChar,
-            dependencyFromPkgToSiteCharStereoType];
+        var toCreate = [group, groupAsi];
         var reqOb = {
             projectId: ownerOb._projectId,
             refId: ownerOb._refId,
@@ -921,12 +795,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         ElementService.createElements(reqOb)
             .then(function(data) {
-                var cacheKey = ['groups', ownerOb._projectId, ownerOb._refId],
-                    groupObj = { _id: group.id, _name: group.name, _parentId: (group.ownerId.includes("holding_bin_")) ?  null : group.ownerId };
-                if (CacheService.exists(cacheKey)) {
-                    CacheService.get(cacheKey).push(groupObj);
+                var cacheKey = ['groups', ownerOb._projectId, ownerOb._refId];
+                var groupObj = _.find(data, {id: PACKAGE_ID});
+                if (groupObj) {
+                    groupObj._parentId = ownerOb.id.indexOf('holding') != -1 ? null : ownerOb.id;
+                    groupObj._link = '/share/page/repository#filter=path|/Sites/' + orgId + '/documentLibrary/' + groupObj._projectId + '/' + groupObj.id;
+                    if (CacheService.exists(cacheKey)) {
+                        CacheService.get(cacheKey).push(groupObj);
+                    }
+                    CacheService.put(['group', groupObj.projectId, groupObj.refId, groupObj.id], groupObj, true);
+                    deferred.resolve(groupObj);
+                } else {
+                    deferred.reject({status: 500, message: "Failed to create group"});
                 }
-                deferred.resolve(groupObj);
             }, function(reason) {
                 console.log('POST failed:', reason);
                 deferred.reject(reason);
@@ -936,7 +817,60 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     /**
      * @ngdoc method
-     * @name mms.ViewService#getSiteDocuments
+     * @name mms.ViewService#deleteGroup
+     * @methodOf mms.ViewService
+     *
+     * @description remove a group
+     *
+     * @param {object} elementOb group to remove
+     * @returns {Promise} The promise will be resolved with the updated group object.
+     */
+    var removeGroup = function(elementOb) {
+        elementOb._isGroup = false;
+        _.remove(elementOb._appliedStereotypeIds, function(id) {
+            return id === GROUP_ST_ID;
+        });
+        elementOb.appliedStereotypeInstanceId = elementOb._appliedStereotypeIds.length > 0 ? elementOb.appliedStereotypeInstanceId : null;
+        var updatedElement = {
+            id: elementOb.id,
+            _projectId: elementOb._projectId,
+            _refId: elementOb._refId,
+            _appliedStereotypeIds: elementOb._appliedStereotypeIds,
+            appliedStereotypeInstanceId: elementOb.appliedStereotypeInstanceId,
+            _isGroup: elementOb._isGroup
+        };
+        var toUpdate = [updatedElement];
+        if (updatedElement.appliedStereotypeInstanceId !== null) {
+            toUpdate.push({
+                id: elementOb.id + '_asi', 
+                _refId: elementOb._refId, 
+                _projectId: elementOb._projectId,
+                classifierIds: updatedElement._appliedStereotypeIds
+            });
+        } else {
+            $http.delete(URLService.getElementURL({
+                elementId: elementOb.id + '_asi', 
+                refId: elementOb._refId, 
+                projectId: elementOb._projectId
+            }));
+        }
+        return ElementService.updateElements(toUpdate, false)
+            .then(function(data) {
+                // remove this group for cache
+                var cacheKey = ['groups', elementOb._projectId, elementOb._refId];
+                var groups = CacheService.get(cacheKey) || [];
+                _.remove(groups, function(group) {
+                    return group.id === elementOb.id;
+                });
+                return data;
+            }, function(reason) {
+                return reason;
+            });
+    };
+
+    /**
+     * @ngdoc method
+     * @name mms.ViewService#getProjectDocuments
      * @methodOf mms.ViewService
      * 
      * @description
@@ -958,7 +892,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             deferred.resolve(CacheService.get(cacheKey));
         } else {
             ElementService.getGenericElements(url, reqOb, 'documents', weight, update).
-            then(function(data) {              
+            then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));
             }, function(reason) {
                 deferred.reject(reason);
@@ -988,7 +922,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
         if (type === 'LiteralString') { // If it is a Opaque List, Paragraph, Table, Image, List:
             var jsonString = instanceSpecSpec.value;
-            return JSON.parse(jsonString); 
+            return JSON.parse(jsonString);
         } else if (type === 'Expression') { // If it is a Opaque Section, or a Expression:
             // If it is a Opaque Section then we want the instanceSpec:
             if (isSection(instanceSpec)) {
@@ -1034,7 +968,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         var deferred = $q.defer();
 
         var elementObject = {};
-
         elementObject.instanceId = instanceVal.instanceId;
         elementObject.instanceVal = instanceVal;
         elementObject.sectionElements = [];
@@ -1081,7 +1014,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @returns {boolean} whether it's a section
      */
     var isSection = function(instanceSpec) {
-        return instanceSpec.classifierIds && 
+        return instanceSpec.classifierIds &&
                instanceSpec.classifierIds.length > 0 &&
                (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Section ||
                 instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.SectionT);
@@ -1097,8 +1030,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var isFigure = function(instanceSpec) {
         return instanceSpec.classifierIds && 
                instanceSpec.classifierIds.length > 0 &&
-               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
-                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image);
+               (instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.ImageT ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Image || 
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.Figure ||
+                instanceSpec.classifierIds[0] === TYPE_TO_CLASSIFIER_ID.FigureT);
     };
 
     var isEquation = function(instanceSpec) {
@@ -1119,6 +1054,37 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return null;
     };
 
+    var processSlotStrings = function(values) {
+        var res = [];
+        if (!values || values.length === 0) {
+            return res;
+        }
+        values.forEach(function(value) {
+            if (value.type !== 'LiteralString' || !value.value)
+                return;
+            res.push(value.value);
+        });
+        return res;
+    };
+
+    var processSlotIntegers = function(values) {
+        var res = [];
+        if (!values || values.length === 0) {
+            return res;
+        }
+        values.forEach(function(value) {
+            if (Number.isInteger(value.value)) {
+                res.push(value.value);
+            } else if ((typeof value.value) === 'string') {
+                var val = parseInt(value.value);
+                if (!isNaN(val)) {
+                    res.push(val);
+                }
+            }
+        });
+        return res;
+    };
+    
     /**
      * @ngdoc method
      * @name mms.ViewService#getDocMetadata
@@ -1134,10 +1100,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var getDocMetadata = function(reqOb, weight) {
         var deferred = $q.defer();
-        var metadata = {};
-        reqOb.depth = 2;
-        //ElementService.search(docid, ['id'], null, null, null, null, ws, weight)
-        ElementService.getOwnedElements(reqOb, weight)
+        var metadata = {numberingDepth: 0, numberingSeparator: '.'};
+        reqOb.elementIds = [
+            reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234342817_186479_2256', //header
+            reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234349580_411867_2258', //footer
+            reqOb.elementId + '_asi-slot-_18_5_3_8bf0285_1526605771405_96327_15754', //numbering depth
+            reqOb.elementId + '_asi-slot-_18_5_3_8bf0285_1526605817077_688557_15755' //numbering separator
+        ];
+        ElementService.getElements(reqOb, weight)
         .then(function(data) {
             if (data.length === 0) {
                 return;
@@ -1146,10 +1116,27 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var prop = data[i];
                 var feature = prop.definingFeatureId ? prop.definingFeatureId : null;
                 var value = prop.value ? prop.value : null;
-                if (!feature || !docMetadataTypes[feature] || !value || value.length === 0) {
+                if (!feature || !value || value.length === 0) {
                     continue;
                 }
-                metadata[docMetadataTypes[feature].name] = docMetadataTypes[feature].process(value);
+                var result = [];
+                if (feature === '_17_0_1_407019f_1326234342817_186479_2256') { //header
+                    result = processSlotStrings(value);
+                    metadata.top = result.length > 0 ? result[0] : '';
+                    metadata.topl = result.length > 1 ? result[1] : '';
+                    metadata.topr = result.length > 2 ? result[2] : '';
+                } else if (feature == '_17_0_1_407019f_1326234349580_411867_2258') {//footer
+                    result = processSlotStrings(value);
+                    metadata.bottom = result.length > 0 ? result[0] : '';
+                    metadata.bottoml = result.length > 1 ? result[1] : '';
+                    metadata.bottomr = result.length > 2 ? result[2] : '';
+                } else if (feature == '_18_5_3_8bf0285_1526605771405_96327_15754') { //depth
+                    result = processSlotIntegers(value);
+                    metadata.numberingDepth = result.length > 0 ? result[0] : 0;
+                } else if (feature == '_18_5_3_8bf0285_1526605817077_688557_15755') { //separator
+                    result = processSlotStrings(value);
+                    metadata.numberingSeparator = result.length > 0 ? result[0] : '.';
+                }
             }
         }, function(reason) {
         }).finally(function() {
@@ -1171,12 +1158,29 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var reset = function() {
         inProgress = {};
     };
-    
+
+    var getTypeFromClassifierId = function(classifierIds) {
+        var type = '';
+        if ( classifierIds && classifierIds.length > 0) {
+            Object.keys(TYPE_TO_CLASSIFIER_ID).some(function(key) {
+                if(TYPE_TO_CLASSIFIER_ID[key] === classifierIds[0]) {
+                    type = key;
+                    return true;
+                }
+                return false;
+            });
+        }
+        return type;
+    };
+
+
     return {
+        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
         getViewElements: getViewElements,
         createView: createView,
         createDocument: createDocument,
         createGroup: createGroup,
+        removeGroup: removeGroup,
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
         getDocumentViews: getDocumentViews,
@@ -1192,10 +1196,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeElementFromViewOrSection: removeElementFromViewOrSection,
         removeViewFromParentView: removeViewFromParentView,
         createInstanceSpecification: createInstanceSpecification,
-        TYPE_TO_CLASSIFIER_ID: TYPE_TO_CLASSIFIER_ID,
+        getTypeFromClassifierId: getTypeFromClassifierId,
         getElementReferenceTree : getElementReferenceTree,
         getDocMetadata: getDocMetadata,
-        reset: reset
+        reset: reset,
+        AnnotationType: AnnotationType
     };
 
 }

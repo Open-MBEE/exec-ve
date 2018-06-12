@@ -1,3 +1,28 @@
+/*------------------------------------------------------------------
+  1 Diff styling 
+-------------------------------------------------------------------*/
+
+/*Delete styling*/
+del {
+  background-color: #ffe3e3 !important;
+  text-decoration: line-through !important;
+}
+
+/*Insert styling*/
+ins {
+  background-color: #dafde0 !important;
+  text-decoration: none !important;
+}
+
+/*No change styling */
+.match,.textdiff span {
+  color: gray;
+}
+
+/*------------------------------------------------------------------
+  1.1 History component styling 
+-------------------------------------------------------------------*/
+
 mms-history {
   .history-top {
     position: absolute;
@@ -12,23 +37,8 @@ mms-history {
     top: 430px;
   }
 
-  /*------------------------------------------------------------------
-    1 Diff styling 
-  -------------------------------------------------------------------*/
-
-  /*Delete styling*/
-  del{
-    background-color: #ffe3e3;
-  }
-
-  /*Insert styling*/
-  ins{
-    background-color: #dafde0;
-    text-decoration:none;
-  }
-
   /*SVG arrow for pointing from history to present in spec*/
-  .change-connection{
+  .change-connection {
     height: 18px;
     margin: 2px 0 3px;
   }
@@ -38,7 +48,7 @@ mms-history {
   -------------------------------------------------------------------*/
 
   /*Arrow connecting former commit to current*/
-  .diff-dotted-connection{
+  .diff-dotted-connection {
     position: absolute;
     height: calc(100% - 40px);
     border: 2px solid #cacaca;
@@ -46,21 +56,30 @@ mms-history {
     width: 8px;
     top: 20px;
     border-right: none;
-    border-radius: 8px 0 0 8px;
+    @include border-radius(8px 0 0 8px);
   }
 
   /*Flex styling to keep buttons and labels vertically aligned*/
-  .inline-diff-buttons{
-    display:flex;
+  .inline-diff-buttons {
+    display: flex;
     align-items: center;
   }
 
-  .inline-diff-buttons span:first-child{
+  .inline-diff-buttons span:first-child {
     padding-left:0;
   }
 
+  /*Custom styling to keep labels inline with dropdowns*/
+  span.inline-btn-label{
+    min-height: 28px;
+    margin: 6px 0;
+    padding: 7px 4px;
+    line-height: 13px;
+    color:$ve-light-text;
+  }
+
   /*SVG arrow for pointing from history to present*/
-  .diff-dotted-connection:after{
+  .diff-dotted-connection:after {
     background-image: url(../assets/images/arrowhead.svg);
     position: absolute;
     right: -8px;
@@ -77,7 +96,7 @@ mms-history {
   -------------------------------------------------------------------*/
 
   /* Stick revert section to bottom of right pane*/
-  .revert-section{
+  .revert-section {
     float: right;
     width: 100%;
     background-color: #fff;
@@ -85,7 +104,7 @@ mms-history {
     margin: 30px 0 0;
   }
 
-  .revert-section>div{
+  .revert-section > div {
     float:right;
     display:flex;
     padding:16px 0;
@@ -93,19 +112,36 @@ mms-history {
     align-items: center;
   }
 
-  .revert-section .btn{
+  .revert-section .btn {
     margin:0 8px;
   }
 
 }
 
-.revert-dialogue.modal-body{
-  p{
+.revert-dialogue.modal-body {
+
+  p {
     font-size: 16px;
     margin-bottom: 10px;
   }
-  h3{
+
+  h3 {
     font-size: 20px;
     font-weight: 600;
   }
+
+
+  /*------------------------------------------------------------------
+  2. History modal
+  -------------------------------------------------------------------*/
+
+  /* Special styling to preview element*/
+  .element-preview-box{
+    padding: 10px 20px;
+    background-color: $ve-silver-lighter-1;
+    @include border-radius(3px);
+    border: 1px solid $ve-silver-darker-1;
+  }
 }
+
+

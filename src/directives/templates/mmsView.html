@@ -6,29 +6,29 @@
         link-text="Open Document" link-class="btn btn-primary" link-icon-class="fa fa-share"></mms-view-link>
     </h1>
 
-    <h1 ng-if="!mmsLink" class="view-title">
+    <h1 ng-if="!mmsLink" class="view-title h{{level}}">
       {{view._veNumber}} <mms-transclude-name mms-element-id="{{view.id}}" mms-project-id="{{view._projectId}}" mms-ref-id="{{view._refId}}"></mms-transclude-name>
     </h1>
 
-    <div ng-show="showElements" class="ve-secondary-text">
-      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by {{modifier}}
+    <div class="ve-secondary-text last-modified no-print">
+      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by <b>{{modifier}}</b>
     </div>
 
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
-    <div class="add-buttons-container no-print" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
+    <div class="add-pe-button-container no-print" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
     <div ng-if="view._contents">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
         <div ng-repeat="instanceVal in view._contents.operand track by instanceVal.instanceId"> 
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
-            <div class="add-buttons-container no-print" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
+            <div class="add-pe-button-container no-print" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         </div>
     </div>
     <div ng-if="view.specification">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
         <div ng-repeat="instanceVal in view.specification.operand track by instanceVal.instanceId"> 
             <mms-view-presentation-elem data-mms-instance-val="::instanceVal"></mms-view-presentation-elem>
-            <div class="add-buttons-container no-print" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
+            <div class="add-pe-button-container no-print" ng-include="'mms/templates/mmsAddPeButton.html'"></div>
         </div>
     </div>
 </div>

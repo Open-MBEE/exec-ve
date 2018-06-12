@@ -1,0 +1,10 @@
+<span class="mms-error" uib-popover-template="'annotationTemplate.html'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{displayContent.toolTipTitle}}"></span>
+<script type="text/ng-template" id="annotationTemplate.html">
+    <p>
+        {{displayContent.toolTipContent}}
+    </p>
+    <p id="tooltipElementId" style="position: absolute; left: -1000px; top: -1000px; ">
+        {{displayContent.id}}
+    </p>
+    <button ng-click="copyToClipboard($event)" class="btn btn-sm btn-default"><i class="fa fa-copy"></i>Copy Element ID</button>
+</script>

@@ -3,45 +3,41 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 32px;
-    margin:32px 0;
+    margin: 24px 0 4px;;
     height: inherit;
     width: 100%;
+    font-weight: $default_font_weight;
   }
 
   h1.prop {
     width: 100%;
-    min-width: 280px;
     word-wrap: break-word;
+  }
+
+  h2.prop-title{
+    padding-top: 24px;
   }
 
   span.prop {
-    font-size: 15px;
-    margin:4px 0 24px;
-    min-width: 280px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    margin-top: 2px;
     word-wrap: break-word;
+    display: block;
   }
 
   h1.element-title {
-    min-width: 280px;
     word-wrap: break-word;
-  }
-
-  .prop-title {
-    font-family: $font-family-sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    margin:28px 0 2px;
-    white-space: nowrap;
   }
 
   .doc-text {
     font-family: $font-family-sans-serif;
-    max-width: $default-line-length;
-    min-width: 15em;
+    //max-width: $default-line-length;
+    //min-width: 15em;
   }
 
   h2.spec-view-doc-heading, h2.spec-view-value-heading, h2.spec-view-type-heading {
-    margin-top: 32px;
+    margin-top: 16px;
   }
 
   table {
@@ -53,18 +49,107 @@
       cursor: auto;
     }
 
-    mms-view-link {
-      background-color: $light_blue;
-    }
-
     mms-transclude-com {
       background-color: $yellow;
       cursor: auto;
       display: block;
-      border-radius: 5px;
+      @include border-radius(5px);
       padding: 2px;
       margin-bottom: 5px;
     }
   }
 
+  /*pull in metatype wrapper to compensate for padding*/
+  .elem-type-wrapper {
+    margin-left: -3px;
+  }
+}
+
+/*------------------------------------------------------------------
+Styles that apply to both the spec
+-------------------------------------------------------------------*/
+
+.mms-search,
+.pane-right,
+.revert-spec{
+  .elem-wrapper label,
+  .prop-title,
+  .visibility-toggle{
+    font-size: 12px;
+    font-weight: bold;
+    margin: 16px 0px 0 0;
+    letter-spacing: .05em;
+    text-decoration: none;
+    color: $ve-light-text;
+  }
+
+  .visibility-toggle{
+    list-style: none;
+    margin: 12px 0 0 -14px;
+
+    td{
+      line-height: 2.6em;
+      position: relative;
+    }
+
+    //Show more content caret
+    a{
+
+      //show more content caret
+      &:after{
+        content:"\f078";
+        font-family: $icon-font-name;
+        font-size: 10px;
+        padding: 0 2px;
+      }
+
+      //Show less content caret
+      &.active::after{
+        content:"\f077";
+        font-family: $icon-font-name;
+      }
+
+      //Add ellipses to list before "show more"
+      &:not(.active):before{
+        content: "...";
+        font-size: 16px;
+        color: $tertiary_grey;
+        position: absolute;
+        top: -1em;
+      }
+    }
+  }
+
+  /*Light grey boxes for metatype styling*/
+  .elem-type{
+    letter-spacing: .08em;
+    margin-right: 6px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    margin: 3px;
+    display:inline-block;
+    font-size: 12px;
+    background: $highlight_grey;
+    @include border-radius(3px);
+    color: $ve-light-text-darker-1;
+    font-weight: 500;
+    //border: 1px solid $ve-silver-darker-1;
+  }
+
+  /*Specific styling for last updated*/
+  .elem-updated-wrapper {
+    color: $medium_grey;
+    font-size: 14px;
+    display: block;
+  }
+
+  /*File icon for documents and views*/
+  .elem-related-docs-wrapper mms-view-link a::before {
+    content: "\f15b";
+    font-family: $icon-font-name;
+    padding: 0 4px 0 0;
+    font-size: .75em;
+    position: relative;
+    top: -.1em;
+  }
 }

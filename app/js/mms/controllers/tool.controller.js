@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'JobService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, tagObs, documentOb, viewOb, Utils) {
+    ElementService, JobService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -20,7 +20,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.documentOb = documentOb;
     $scope.refOb = refOb;
     $scope.tagObs = tagObs;
-    $scope.noTags = false;
+    $scope.branchObs = branchObs;
 
     if (viewOb) {
         $scope.specInfo.id = viewOb.id;
@@ -28,10 +28,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     } else if (documentOb) {
         $scope.specInfo.id = documentOb.id;
         $scope.viewId = documentOb.id;
-    }
-
-    if (angular.isArray(tagObs) && tagObs.length === 0) {
-        $scope.noTags = true;
     }
 
     $scope.specApi = {};
@@ -99,6 +95,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         showPane('tags');
     });
 
+    $scope.$on('gotoTagsBranches', function(){
+        $rootScope.ve_tbApi.select('tags');
+        showPane('tags');
+    });
+
     var cleanUpEdit = function(editOb, cleanAll) {
         if (!Utils.hasEdits(editOb) || cleanAll) {//TODO Utils.hasEdits
             var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
@@ -121,11 +122,12 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         cleanUpEdit(editOb);
     });
 
-    var elementSelected = function(event, elementOb, commitId) {
+    var elementSelected = function(event, elementOb, commitId, displayOldContent) {
         $scope.specInfo.id = elementOb.id;
         $scope.specInfo.projectId = elementOb._projectId;
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
+        $scope.specInfo.mmsDisplayOldContent = displayOldContent;
         $rootScope.ve_tbApi.select('element-viewer');
 
         showPane('element');

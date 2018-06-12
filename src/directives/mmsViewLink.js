@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', mmsViewLink]);
+.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', 'ApplicationService', mmsViewLink]);
 
 /**
  * @ngdoc directive
@@ -22,13 +22,14 @@ angular.module('mms.directives')
  * @param {string} mmsDocId Document context of view
  * @param {string} mmsPeId Document context of view
  */
-function mmsViewLink(ElementService, UtilsService, $compile, growl) {
+function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService, ApplicationService) {
 
     var mmsViewLinkLink = function(scope, element, attrs, controllers) {
         var mmsCfCtrl = controllers[0];
         var mmsViewCtrl = controllers[1];
         var processed = false;
         scope.loading = true;
+        scope.target = scope.linkTarget ? scope.linkTarget : '_self';
         scope.$watch('mmsElementId', function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
@@ -62,19 +63,41 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             scope.projectId = projectId;
             scope.refId = refId ? refId : 'master';
             scope.commitId = commitId ? commitId : 'latest';
+            var id = scope.mmsElementId;
+            if (id) {
+                id = id.replace(/[^\w\-]/gi, '');
+            } else if (scope.mmsPeId && !scope.mmsDocId) {
+                id = ApplicationService.getState().currentDoc;
+            }
 
-            var reqOb = {elementId: scope.mmsElementId, projectId: projectId, refId: refId, commitId: commitId};
+            var reqOb = {elementId: id, projectId: projectId, refId: refId, commitId: commitId, includeRecentVersionElement: true};
             ElementService.getElement(reqOb, 1)
             .then(function(data) {
                 scope.element = data;
                 scope.name = data.name;
-
+                scope.type = 'Section ';
+                scope.suffix = '';
+                scope.hash = '#' + data.id;
                 if (scope.mmsPeId && scope.mmsPeId !== '') {
-                    scope.hash = '#' + scope.mmsPeId;
                     var reqPEOb = {elementId: scope.mmsPeId, projectId: projectId, refId: refId, commitId: commitId};
                     ElementService.getElement(reqPEOb)
                     .then(function(pe) {
+                        scope.hash = '#' + pe.id;
+                        scope.element = pe;
                         scope.name = pe.name;
+                        if (ViewService.isTable(pe)) {
+                            scope.type = 'Table ';
+                        } else if (ViewService.isFigure(pe)) {
+                            scope.type = "Fig. ";
+                        } else if (ViewService.isEquation(pe)) {
+                            scope.type = "Eq. (";
+                            scope.suffix = ')';
+                        }
+                        if (ApplicationService.getState().fullDoc) {
+                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + "/full" + scope.hash;
+                        } else {
+                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
+                        }
                     });
                 }
                 if (UtilsService.isDocument(data)) {
@@ -91,8 +114,19 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
                     element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                 }
                 scope.loading = false;
+                if (ApplicationService.getState().fullDoc) {
+                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
+                } else {
+                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
+                }
+                scope.change = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc == scope.docid) && !scope.suppressNumbering;
             }, function(reason) {
-                element.html('<span class="mms-error">view link not found</span>');
+                element.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
+                $compile(element.contents())(Object.assign(scope.$new(), {
+                    reqOb: reqOb,
+                    recentElement: reason.data.recentVersionOfElement,
+                    type: ViewService.AnnotationType.mmsViewLink
+                }));
                 scope.loading = false;
             });
         });
@@ -109,10 +143,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl) {
             mmsPeId: '@',
             linkText: '@?',
             linkClass: '@?',
-            linkIconClass: '@?'
+            linkIconClass: '@?',
+            linkTarget: '@?',
+            suppressNumbering: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
-        template: '<a ng-if="!loading" ng-class="linkClass" href="mms.html#/projects/{{projectId}}/{{refId}}/documents/{{docid}}/views/{{vid}}{{hash}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText">{{name || "Unnamed View"}}</span></a>',
+        template: '<a ng-if="!loading" target="{{target}}" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>',
         link: mmsViewLinkLink
     };
 }

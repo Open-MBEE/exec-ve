@@ -26,6 +26,7 @@
   "dependencies": {
     "jquery": "~2.1.4",
     "angular": "~1.5.5",
+    "angular-cookies": "~1.5.0",
     "angular-animate": "~1.5.5",
     "angular-borderlayout": "https://github.com/dlamoris/angular-borderlayout.git#master",
     "angular-ui-router": "~0.3.1",
@@ -36,18 +37,18 @@
     "font-awesome-bower": "~4.6.3",
     "lodash": "~3.9.3",
     "stompjs": "https://github.com/jmesnil/stomp-websocket.git#2.3.4",
-    "d3": "~3.5.6",
-    "c3": "~0.4.10",
+    "d3": "~5.1.0",
+    "c3": "~0.5.4",
     "angulartics": "~1.1.0",
     "angulartics-piwik": "~1.0.4",
     "ngStorage": "https://github.com/gsklee/ngStorage.git#master",
     "angular-promise-extras": "^0.1.8",
-    "HtmlRenderedDiff": "https://github.com/chhaymenghong/HtmlRenderedDiff.git#master"
-
+    "HtmlRenderedDiff": "https://github.com/chhaymenghong/HtmlRenderedDiff.git#master",
+    "moment": "^2.22.0"
   },
   "resolutions": {
     "lodash": "3.9.3",
-    "d3": "~3.5.6",
+	"d3": "~5.1.0",
     "angular": "~1.5.5"
   },
   "devDependencies": {

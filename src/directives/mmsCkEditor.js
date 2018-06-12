@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsCkeditor', ['CacheService', 'ElementService', 'UtilsService', 'ViewService', '$uibModal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR', '_', mmsCkeditor]);
+.directive('mmsCkeditor', ['CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', '$uibModal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR', '_', mmsCkeditor]);
 
 /**
  * @ngdoc directive
@@ -33,25 +33,22 @@ angular.module('mms.directives')
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
+function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, URLService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl) {
-        if (!attrs.id)
+        if (!attrs.id) {
             attrs.$set('id', 'mmsCkEditor' + generatedIds++);
-        
-        var instance = null;
+        }
 
+        var instance = null;
         var autocompleteModalTemplate = $templateCache.get('mms/templates/mmsAutocompleteModal.html');
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
-        //TODO check how we call the link modal
-        // var chooseImageModalTemplate = $templateCache.get('mms/templates/mmsChooseImageModal.html');
-        // var viewLinkModalTemplate = $templateCache.get('mms/templates/mmsViewLinkModal.html');
-        var proposeModalTemplate = $templateCache.get('mms/templates/mmsProposeModal.html');
-
-
+        // Controller for inserting cross reference
+        // Defines scope variables for html template and how to handle user click
+        // Also defines options for search interfaces -- see mmsSearch.js for more info
         var transcludeCtrl = function($scope, $uibModalInstance, autocomplete) {
             var autocompleteName;
             var autocompleteProperty;
@@ -68,7 +65,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 });
             }
 
-            $scope.title = 'INSERT A CROSS REFERENCE';
+            $scope.title = 'Insert cross reference';
             $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
             $scope.requestName = false;
@@ -77,7 +74,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             $scope.nonEditableCheckbox = false;
             $scope.showEditableOp = true;
             $scope.choose = function(elem, property) {
-                var tag = '<mms-cf mms-cf-type="' + property + '" mms-element-id="' + elem.id + '" non-editable="' + $scope.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</mms-cf> ';
+                var tag = '<mms-cf mms-cf-type="' + property + '" mms-element-id="' + elem.id + '" non-editable="' + $scope.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</mms-cf>';
                 $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
@@ -135,13 +132,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             };
             $scope.autocompleteOnSelect = function($item, $model, $label) {
                 autocompleteElementId = $item.id;
-
                 var lastIndexOfName = $item.name.lastIndexOf(" ");
                 autocompleteName = $item.name.substring(0, lastIndexOfName);
 
                 var property = $label.split(' ');
                 property = property[property.length - 1];
-
                 if (property === 'name') {
                     autocompleteProperty = 'name';
                 } else if (property === 'documentation') {
@@ -152,10 +147,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             };
             $scope.autocomplete = function(success) {
                 if (success) {
-                    var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf> ';
-                    $uibModalInstance.close(tag);
+                    var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf>';
+                    $uibModalInstance.close(tag);
                 } else {
-                    $uibModalInstance.close(false);
+                    $uibModalInstance.close(false);
                 }
             };
         };
@@ -174,11 +169,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 if (!tag) {
                     transcludeCallback(ed, true);
                 } else {
-                    ed.insertHtml( tag );
+                    addWidgetTag(ed, tag);
                 }
             }, function() {
-                var focusManager = new CKEDITOR.focusManager( ed );
-                focusManager.focus();
+                ed.insertText('@');
+                ed.focus();
             });
         };
 
@@ -191,62 +186,80 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                if (fromAutocomplete) {
-                    ed.execCommand('undo');
-                }
-                ed.insertHtml( tag );
+                addWidgetTag(ed, tag);
             }, function() {
                 var focusManager = new CKEDITOR.focusManager( ed );
                 focusManager.focus();
             });
         };
 
-        var transcludeViewLinkCtrl = function($scope, $uibModalInstance) {
-            $scope.title = 'INSERT VIEW LINK';
+        // Controller for inserting view link
+        // Defines scope variables for html template and how to handle user click
+        // If user selects name or doc, link will be to first related doc
+        // Also defines options for search interfaces -- see mmsSearch.js for more info
+        var transcludeViewLinkCtrl = function($scope, $uibModalInstance, ApplicationService) {
+            $scope.title = 'Insert cross reference as link';
+
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
+
+            // Function to construct view link
+            var createViewLink = function (elem, did, vid, peid) {
+                var tag = '<mms-view-link';
+                if (did) {
+                    tag += ' mms-doc-id="' + did + '"';
+                }
+                if (vid) {
+                    tag += ' mms-element-id="' + vid + '"';
+                }
+                if (peid) {
+                    tag += ' mms-pe-id="' + peid + '"';
+                }
+                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>';
+                return tag;
+            };
+
             $scope.choose = function(elem) {
                 var did = null;
                 var vid = null;
                 var peid = null;
+                var currentDoc = ApplicationService.getState().currentDoc;
                 if (elem._relatedDocuments && elem._relatedDocuments.length > 0) {
-                    did = elem._relatedDocuments[0].id;
-                    if (elem._relatedDocuments[0]._parentViews.length > 0)
-                        vid = elem._relatedDocuments[0]._parentViews[0].id;
+                    var cur = _.find(elem._relatedDocuments, {id: currentDoc});
+                    if (cur) {
+                        did = currentDoc;
+                        if (cur._parentViews.length > 0) {
+                            vid = cur._parentViews[0].id;
+                        }
+                    } else {
+                        did = elem._relatedDocuments[0].id;
+                        if (elem._relatedDocuments[0]._parentViews.length > 0) {
+                            vid = elem._relatedDocuments[0]._parentViews[0].id;
+                        }
+                    }
                 }
                 if (elem.type === 'InstanceSpecification') {
-                    if (ViewService.isSection(elem))
+                    if (ViewService.isSection(elem)) {
                         vid = elem.id;
-                    else
+                    } else {
                         peid = elem.id;
-                } else 
+                    }
+                } else {
                     vid = elem.id;
-                var tag = '<mms-view-link';
-                if (did) 
-                    tag += ' mms-doc-id="' + did + '"';
-                if (vid) 
-                    tag += ' mms-element-id="' + vid + '"';
-                if (peid) 
-                    tag += ' mms-pe-id="' + peid + '"';
-                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
-                $uibModalInstance.close(tag);
+                }
+                var tag = createViewLink(elem, did, vid, peid);
+                $uibModalInstance.close(tag);
             };
             $scope.chooseDoc = function(doc, view, elem) {
                 var did = doc.id;
                 var vid = view.id;
                 var peid = null;
-                if (ViewService.isSection(elem))
+                if (ViewService.isSection(elem)) {
                     vid = elem.id;
-                else if (ViewService.isPresentationElement(elem))
+                } else if (ViewService.isPresentationElement(elem)) {
                     peid = elem.id;
-                var tag = '<mms-view-link';
-                if (did) 
-                    tag += ' mms-doc-id="' + did + '"';
-                if (vid) 
-                    tag += ' mms-element-id="' + vid + '"';
-                if (peid) 
-                    tag += ' mms-pe-id="' + peid + '"';
-                tag += '>[cf:' + elem.name + '.vlink]</mms-view-link> ';
-                $uibModalInstance.close(tag);
+                }
+                var tag = createViewLink(elem, did, vid, peid);
+                $uibModalInstance.close(tag);
             };
             $scope.cancel = function() {
                 $uibModalInstance.dismiss();
@@ -287,11 +300,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                controller: ['$scope', '$uibModalInstance', transcludeViewLinkCtrl],
+                controller: ['$scope', '$uibModalInstance', 'ApplicationService', transcludeViewLinkCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                ed.insertHtml( tag );
+                addWidgetTag(ed, tag);
             });
         };
 
@@ -299,8 +312,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
             var id = UtilsService.createMmsId();
             $scope.comment = UtilsService.createClassElement({
                 id: id,
-                name: 'Comment ' + new Date().toISOString(), 
-                documentation: '', 
+                name: 'Comment ' + new Date().toISOString(),
+                documentation: '',
                 type: 'Class',
                 ownerId: "holding_bin_" + scope.mmsProjectId,
                 _appliedStereotypeIds: []
@@ -315,7 +328,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 var reqOb = {element: $scope.comment, projectId: scope.mmsProjectId, refId: scope.mmsRefId};
                 ElementService.createElement(reqOb)
                 .then(function(data) {
-                    var tag = '<mms-cf mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</mms-cf> ';
+                    var tag = '<mms-cf mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</mms-cf>';
                     $uibModalInstance.close(tag);
                 }, function(reason) {
                     growl.error("Comment Error: " + reason.message);
@@ -335,7 +348,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 controller: ['$scope', '$uibModalInstance', commentCtrl]
             });
             instance.result.then(function(tag) {
-                ed.insertHtml( tag );
+                addWidgetTag(ed, tag);
             });
         };
 
@@ -345,7 +358,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
                 var transclusionId = transclusionObject.attr('mms-element-id');
                 var transclusionKey = UtilsService.makeElementKey({id: transclusionId, _projectId: scope.mmsProjectId, _refId: scope.mmsRefId});
                 var inCache = CacheService.get(transclusionKey);
-                if(inCache){
+                if (inCache) {
                     transclusionObject.html('[cf:' + inCache.name + typeString);
                 } else {
                     //TODO create Utils function to handle request objects
@@ -381,128 +394,167 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, $u
         };
         
         // Formatting editor toolbar
-        var defaultToolbar = [
-            { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','Subscript','Superscript','Blockquote','-','RemoveFormat' ] },
-            { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] },
-            { name: 'clipboard',   items : [ 'Undo','Redo' ] },
-            { name: 'links',       items : [ 'Link','Unlink','-','CodeSnippet' ] },
-            { name: 'editing',     items : [ 'Find','Replace' ] },
-            { name: 'document',    items : [ 'Maximize', 'Source' ] },
-            '/',
-            { name: 'styles',      items : [ 'Format','FontSize','TextColor','BGColor' ] },
-            { name: 'insert',      items : [ 'PageBreak','HorizontalRule' ] },
-        ];
-        var justifyToolbar =  { name: 'paragraph',   items : [ 'JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock' ] };
-        var listToolbar =     { name: 'list',     items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
-        var tableToolbar =    { name: 'table',    items: [ 'Table' ] };
-        var imageToolbar =    { name: 'image',    items: [ 'Image','Iframe' ] };
+        var stylesToolbar = { name: 'styles', items : ['Format','FontSize','TextColor','BGColor' ] };
+        var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
+        var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
+        var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
+        var editingToolbar = { name: 'editing', items : [ 'Find','Replace' ] };
+        var linksToolbar = { name: 'links', items : [ 'Link','Unlink','-' ] };
+        var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
+        var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var customToolbar =   { name: 'custom',   items: [ 'Mmscf','Mmsreset','Mmscomment','Mmsvlink','Mmssignature' ] };
-        var sourceToolbar =   { name: 'source',   items: [ 'Maximize','Source' ] };
+        var sourceToolbar = { name: 'source', items: [ 'Maximize','Source' ] };
+        var combinedToolbar = { name: 'combined', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'},
+            {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, 'Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', {name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}, 'mmsExtraFeature' ]};
+        // var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
 
-        //Set toolbar based on editor type
-        var thisToolbar = defaultToolbar.slice();
-        thisToolbar.push(listToolbar);
-        thisToolbar.push(tableToolbar);
-        thisToolbar.push(imageToolbar);
-        thisToolbar.push(equationToolbar);
-        thisToolbar.push(customToolbar);
-        if (scope.mmsEditorType === 'TableT') {
-          thisToolbar = defaultToolbar.slice();
-          thisToolbar.push(tableToolbar);
-          thisToolbar.push(equationToolbar);
-          thisToolbar.push(customToolbar);
-        }
-        if (scope.mmsEditorType === 'ListT') {
-          thisToolbar = defaultToolbar.slice();
-          thisToolbar.push(listToolbar);
-          thisToolbar.push(equationToolbar);
-          thisToolbar.push(customToolbar);
-        }
-        if (scope.mmsEditorType === 'Figure') {
-          thisToolbar = [sourceToolbar, justifyToolbar, imageToolbar];
-        }
-        if (scope.mmsEditorType === 'Equation') {
-            thisToolbar = [sourceToolbar, justifyToolbar, equationToolbar];
+        var thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, combinedToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+        switch(scope.mmsEditorType) {
+            case 'TableT':
+                //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+                break;
+            case 'ListT':
+                thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, 'mmsExtraFeature', clipboardToolbar, editingToolbar, sourceToolbar];
+                break;
+            case 'Equation':
+                thisToolbar = [justifyToolbar, equationToolbar, sourceToolbar];
+                break;
+            case 'Figure':
+            case 'ImageT':
+                thisToolbar = [justifyToolbar, imageToolbar, sourceToolbar];
+                break;
         }
 
         $timeout(function() {
-          // Initialize ckeditor and set event handlers
-          $(element).val(ngModelCtrl.$modelValue);
-          instance = CKEDITOR.replace(attrs.id, {
-            // customConfig: '/lib/ckeditor/config.js',
-            mmscf: {callbackModalFnc: transcludeCallback},
-            mmscomment: {callbackModalFnc: commentCallback},
-            mmsvlink: {callbackModalFnc: viewLinkCallback},
-            mmsreset: {callback: mmsResetCallback},
-            autoGrow_minHeight: 200,
-            autoGrow_maxHeight: $window.innerHeight*0.65,
-            autoGrow_bottomSpace: 50, 
-            contentsCss: CKEDITOR.basePath+'contents.css',
-            toolbar: thisToolbar
-          });
+            // Initialize ckeditor and set event handlers
+            $(element).val(ngModelCtrl.$modelValue);
+            instance = CKEDITOR.replace(attrs.id, {
+                // customConfig: '/lib/ckeditor/config.js',
+                mmscf: {callbackModalFnc: transcludeCallback},
+                mmscomment: {callbackModalFnc: commentCallback},
+                mmsvlink: {callbackModalFnc: viewLinkCallback},
+                mmsreset: {callback: mmsResetCallback},
+                contentsCss: CKEDITOR.basePath+'contents.css',
+                toolbar: thisToolbar
+                // height: $window.innerHeight*0.4,
+            });
 
-          // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
-          if ( attrs.autosaveKey ) {
-            // Configuration for autosave plugin
-            instance.config.autosave = {
-              SaveKey: attrs.autosaveKey,
-              delay: 5,
-              NotOlderThen: 10080, // 7 days in minutes
-              enableAutosave: true
-            };
-          } else {
-              instance.config.autosave = {enableAutosave: false};
-          }
+            // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
+            if ( attrs.autosaveKey ) {
+                // Configuration for autosave plugin
+                instance.config.autosave = {
+                    SaveKey: attrs.autosaveKey,
+                    delay: 5,
+                    NotOlderThen: 7200, // 5 days in minutes
+                    enableAutosave: true
+                };
+            } else {
+                instance.config.autosave = {enableAutosave: false};
+            }
 
-          // CKEDITOR.plugins.addExternal('mmscf','/lib/ckeditor/plugins/mmscf/');
-          // CKEDITOR.plugins.addExternal('mmscomment','/lib/ckeditor/plugins/mmscomment/');
-          // CKEDITOR.plugins.addExternal('autogrow','/lib/ckeditor/plugins/autogrow/');
-          // CKEDITOR.plugins.addExternal('mathjax','/lib/ckeditor/plugins/mathjax/');
+            instance.on( 'init', function(args) {
+                ngModelCtrl.$setPristine();
+            });
+            var deb = _.debounce(function(e) {
+                update();
+            }, 1000);
+            instance.on( 'change', deb);
+            instance.on( 'afterCommandExec', deb);
+            instance.on( 'resize', deb);
+            instance.on( 'destroy', deb);
+            instance.on( 'blur', function(e) {
+                instance.focusManager.blur();
+            });
+            instance.on( 'key', function(e) {
+                if(e.data.domEvent.$.shiftKey && e.data.domEvent.$.key === '@') {
+                    autocompleteCallback(instance);
+                    // to prevent ckeditor from adding the @ symbol when user actually want to do cross referencing
+                    return false;
+                } else {
+                    if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
+                        //trying to prevent tab and shift tab jumping focus out of editor
+                        if (e.data.keyCode == 9) {
+                            instance.insertHtml('&nbsp;&nbsp;&nbsp;&nbsp;');
+                        }
+                        e.cancel();
+                        e.stop();
+                    }
+                    deb(e); 
+                }
+            }, null, null, 31); //priority is after indent list plugin's event handler
+            if (scope.mmsEditorApi) {
+                scope.mmsEditorApi.save = function() {
+                    update();
+                };
+            }
+            instance.on('fileUploadRequest', function(evt) {
+                var fileLoader = evt.data.fileLoader;
+                var formData = new FormData();
+                var xhr = fileLoader.xhr;
 
-          instance.on( 'init', function(args) {
-              ngModelCtrl.$setPristine();
-          });
-          var deb = _.debounce(function(e) {
-              update();
-          }, 1000);
-          instance.on( 'change', deb);
-          instance.on( 'afterCommandExec', deb);
-          instance.on( 'resize', deb);
-          instance.on( 'destroy', deb);
-          instance.on( 'blur', function(e) {
-            instance.focusManager.blur();
-          });
-          instance.on( 'key', function(e) {
-            if (e.data.domEvent.getKeystroke() == (CKEDITOR.CTRL + 192)) { //little tilde
-                autocompleteCallback(instance);
-            } else { deb(e); }
-          });
-          if (scope.mmsEditorApi) {
-              scope.mmsEditorApi.save = function() {
-                  update();
-              };
-          }
+                xhr.open( 'POST', URLService.getPutArtifactsURL({projectId: scope.mmsProjectId, refId: scope.mmsRefId}), true );
+                formData.append('id', UtilsService.createMmsId().replace('MMS', 'VE'));
+                formData.append('file', fileLoader.file, fileLoader.fileName );
+                if (fileLoader.fileName) {
+                    formData.append('name', fileLoader.fileName);
+                }
+                fileLoader.xhr.send( formData );
+
+                // Prevented the default behavior.
+                evt.stop();
+            });
+            instance.on( 'fileUploadResponse', function( evt ) {
+                // Prevent the default response handler.
+                evt.stop();
+            
+                // Get XHR and response.
+                var data = evt.data;
+                var xhr = data.fileLoader.xhr;
+                var response = JSON.parse(xhr.response);
+            
+                if ( !response.artifacts || response.artifacts.length == 0) {
+                    // An error occurred during upload.
+                    //data.message = response[ 1 ];
+                    evt.cancel();
+                } else {
+                    data.url = '/alfresco' + response.artifacts[0].artifactLocation;
+                }
+            } );
         }, 0, false);
         
-        ngModelCtrl.$render = function() {
-            if (!instance)
-                instance = CKEDITOR.instances[attrs.id];
-            if (instance) {
-                var ranges = instance.getSelection().getRanges();
-                instance.setData(ngModelCtrl.$viewValue || '');
-                instance.getSelection().selectRanges( ranges );
-            }
+        ngModelCtrl.$render = function() { //commenting out to see if it helps with cursors jumping problem without adverse effects
+        //side effect is will not sync if editing in both right pane and center pane at the same time
+            // if (!instance) {
+            //     instance = CKEDITOR.instances[attrs.id];
+            // } else {
+            //     var ranges = instance.getSelection().getRanges();
+            //     instance.setData(ngModelCtrl.$viewValue || '');
+            //     instance.getSelection().selectRanges( ranges );
+            // }
         };
         
         scope.$on('$destroy', function() {
-            if (!instance)
+            if (!instance) {
                 instance = CKEDITOR.instances[attrs.id];
-            if (instance) {
+            } else {
                 instance.destroy();
                 instance = null;
             }
         });
+
+        function addWidgetTag(editor, tag) {
+            editor.insertHtml( tag );
+            focusOnEditorAfterAddingWidgetTag(editor);
+        }
+
+        function focusOnEditorAfterAddingWidgetTag(editor) {
+            var element = editor.widgets.focused.element.getParent();
+            var range = editor.createRange();
+            if(range) {
+                range.moveToClosestEditablePosition(element, true);
+                range.select();
+            }
+        }
     };
 
     return {
