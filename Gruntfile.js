@@ -337,7 +337,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactoryUrl,
-        repository: snapshotRepo, // releaseRepo
+        repository: snapshotRepo, //releaseRepo
         username: artifactoryUser,
         password: artifactoryPassword
       },
