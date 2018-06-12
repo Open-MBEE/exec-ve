@@ -36,6 +36,8 @@ function mmsHtmlDiff($templateCache, HtmlRenderedDiff) {
     }
 
     function performDiff(scope, baseHtml, comparedHtml) {
+        baseHtml = baseHtml.replace(/\r?\n|\r/g, '');
+        comparedHtml = comparedHtml.replace(/\r?\n|\r/g, '');
         var diffResult = HtmlRenderedDiff.generateDiff(baseHtml, comparedHtml);
         // still need to run math stuff to render it properly
         // if (MathJax) {
