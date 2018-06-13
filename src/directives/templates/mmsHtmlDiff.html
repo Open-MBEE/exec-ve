@@ -1,14 +1,18 @@
 <style>
     /*todo need to add better styling for img diff, coz background-color only work if img is png ( maybe use + minus sign or sth*/
     .patcher-replaceIn,
-    .patcher-replaceOut,
-    .patcher-delete,
-    .patcher-attribute-replace-in,
-    .patcher-attribute-replace-out
+    .patcher-attribute-replace-in
     {
         display: inline-block;
         border: 2px solid #CCFDC4;
     }
+    .patcher-replaceOut,
+    .patcher-delete,
+    .patcher-attribute-replace-out {
+        display: inline-block;
+        border: 2px solid #F6C1C0;
+    }
+
     .patcher-replaceIn {
         background-color: #CCFDC4;
     }
@@ -23,27 +27,12 @@
         background-color: #F6C1C0;
     }
 
-    .patcher-text-diff {
-
-    }
-
+    .patcher-text-diff {}
     .patcher-text-deletion {
         background-color: #F6C1C0;
     }
     .patcher-text-insertion {
         background-color: #CCFDC4;
-    }
-
-
-
-    .patcher-attribute-replace-in {
-        border: 10px solid #CCFDC4;
-    }
-    .patcher-attribute-replace-out {
-        border: 10px solid #F6C1C0;
-    }
-    .basic, .basic th, .basic td {
-        border: solid 1px #DDEEEE;
     }
 </style>
 <div class="htmlDiff" ng-bind-html="diffResult"></div>
