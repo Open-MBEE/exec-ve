@@ -33,16 +33,29 @@ function ProjectService($q, $http,ApplicationService,CacheService,ElementService
      */
     var getOrg = function(orgId) {
         var deferred = $q.defer();
-        getOrgs().then(function(data) {
-            var result = CacheService.get(['org', orgId]);
-            if (result) {
-                deferred.resolve(result);
-            } else {
-                deferred.reject({status: 404, data: '', message: "Org not found"});
-            }
-        }, function(reason) {
-            deferred.reject(reason);
-        });
+        var key = ['org', orgId];
+        var urlkey = URLService.getOrgURL(orgId);
+        if (inProgress.hasOwnProperty(urlkey)) {
+            return inProgress[urlkey];
+        }
+        if (CacheService.exists(key)) {
+            deferred.resolve(CacheService.get(key));
+        } else {
+            inProgress[urlkey] = deferred.promise;
+            $http.get(urlkey)
+            .then(function(response) {
+                if (!response.data.orgs || response.data.orgs.length < 1) {
+                    deferred.reject({status: 404, data: '', message: 'Org not found'});
+                } else {
+                    CacheService.put(key, response.data.orgs[0], true);
+                    deferred.resolve(CacheService.get(key));
+                }
+            }, function(response) {
+                URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+            }).finally(function() {
+                delete inProgress[urlkey];
+            });
+        }
         return deferred.promise;
     };
 
@@ -68,11 +81,13 @@ function ProjectService($q, $http,ApplicationService,CacheService,ElementService
             inProgress[key] = deferred.promise;
             $http.get(URLService.getOrgsURL())
             .then(function(response) {
-                CacheService.put(key, response.data.orgs, false);
+                var orgs = [];
                 for (var i = 0; i < response.data.orgs.length; i++) {
                     var org = response.data.orgs[i];
-                    CacheService.put(['org', org.id], org);
+                    CacheService.put(['org', org.id], org, true);
+                    orgs.push(CacheService.get(['org', org.id]));
                 }
+                CacheService.put(key, orgs, false);
                 deferred.resolve(CacheService.get(key));
             }, function(response) {
                 URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
