@@ -89,8 +89,9 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
             });
             ElementService
                 .updateElements(elementsToUpdate, false)
-                .then(function() { cleanupCache(results); })
-                .finally(function() { navigateAway(true); $scope.isSaving = false; });
+                .then(function() { cleanupCache(results); navigateAway(true); })
+                .catch(function() { growl.error('Failed to save the grouping!'); })
+                .finally(function() { $scope.isSaving = false; });
         } else {
             growl.info("please wait");
         }
