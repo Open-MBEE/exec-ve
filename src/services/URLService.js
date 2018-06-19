@@ -161,6 +161,10 @@ function urlService(baseUrl, mmsUrl) {
         return root + "/checklogin";
     };
 
+    var getOrgURL = function(orgId) {
+        return addTicket(root + '/orgs/' + orgId);
+    };
+    
     var getOrgsURL = function() {
         return addTicket(root + "/orgs");
     };
@@ -578,6 +582,7 @@ function urlService(baseUrl, mmsUrl) {
         isTimestamp: isTimestamp,
         getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
+        getOrgURL: getOrgURL,
         getOrgsURL: getOrgsURL,
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,
