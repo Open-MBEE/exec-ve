@@ -2,7 +2,7 @@
   Styles for the View Editor left pane
 *************************/
 
-$pane_left_btn_group_width: 234px;
+$pane_left_btn_group_width: 244px;
 
 #main-pane {
   > .west-tabs {
@@ -33,10 +33,10 @@ $pane_left_btn_group_width: 234px;
     }
 
     .tree-options {
-      display: -webkit-box; 
+      display: -webkit-box;
       display: -moz-box;
       display: -ms-flexbox;
-      display: -webkit-flex; 
+      display: -webkit-flex;
       display: flex;
       padding: 4px 5px;
       background: $white;
