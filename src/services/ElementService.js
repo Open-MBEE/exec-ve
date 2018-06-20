@@ -452,6 +452,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                     source: ApplicationService.getSource()
                 }, {timeout: 60000})
             .then(function(response) {
+                var rejected = response.data.rejected;
+                if (rejected && rejected.length > 0 && rejected[0].code === 304 && rejected[0].element) { //elem will be rejected if server detects no changes
+                    deferred.resolve(rejected[0].element);
+                    return;
+                }
                 if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
@@ -826,6 +831,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 history.unshift({_creator: e._modifier, _created: e._modified, id: e._commitId});
             }
         });
+        var rejected = serverResponse.data.rejected;
+        if (rejected && rejected.length > 0) {
+            rejected.forEach(function(e) {
+                if (e.code === 304 && e.element) {
+                    results.push(e.element); //add any server rejected elements because they haven't changed
+                }
+            });
+        }
         deferred.resolve(results);
     }
 
