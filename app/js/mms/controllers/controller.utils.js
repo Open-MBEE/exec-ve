@@ -325,7 +325,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $this.remove();
             }
         });
-        printElementCopy.find('[width]').not('img').removeAttr('width');
+        printElementCopy.find('[width]').not('img').not('.ve-fixed-width').removeAttr('width');
         printElementCopy.find('[style]').each(function() {
             this.style.removeProperty('font-size');
             this.style.removeProperty('width');

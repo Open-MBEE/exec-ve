@@ -60,7 +60,7 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-send-o', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save and Continue',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "element-editor-saveall":
-        return {id: button, icon: 'fa-save-all', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Save All',
+        return {id: button, icon: 'fa-save-all', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Save All (alt + a)',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "element-editor-cancel":
         return {id: button, icon: 'fa-times', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Cancel',
@@ -99,7 +99,7 @@ function UxService($rootScope) {
                 spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-document-or-group":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Group or Document',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                spinner: false, togglable: false, placement: 'bottom-right', action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete', 
@@ -132,7 +132,7 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-reorder-group":
-        return {id: button, icon: 'fa-object-group', selected: true, active: true, permission: false, tooltip: 'Move to/from Group',
+        return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Organize Groups/Docs',
               spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-full-document":
         return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
@@ -161,16 +161,16 @@ function UxService($rootScope) {
 
 
       case "show-edits":
-        return {id: button, icon: 'fa-pencil-square-o', selected: true, active: true, permission: true, tooltip: 'Enable Edits',
-                spinner: false, togglable: true, toggle_icon: 'fa-pencil-square', toggle_tooltip: 'Disable Edits',
+        return {id: button, icon: 'fa-pencil-square-o', selected: true, active: true, permission: true, tooltip: 'Enable Edits (alt + d)',
+                spinner: false, togglable: true, toggle_icon: 'fa-pencil-square', toggle_tooltip: 'Disable Edits (alt + d)',
                 action: function() {$rootScope.$broadcast(button);}};
       case "show-elements":
-        return {id: button, icon: 'fa-codepen', selected: true, active: true, permission: true, tooltip: 'Show Elements',
-                spinner: false, togglable: true, toggle_icon: 'fa-cube', toggle_tooltip: 'Hide Elements',
+        return {id: button, icon: 'fa-codepen', selected: true, active: true, permission: true, tooltip: 'Show Elements (alt + e)',
+                spinner: false, togglable: true, toggle_icon: 'fa-cube', toggle_tooltip: 'Hide Elements (alt + e)',
                 action: function() {$rootScope.$broadcast(button);}};
       case "show-comments":
-        return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Show Comments',
-                spinner: false, togglable: true, toggle_icon: 'fa-comment', toggle_tooltip: 'Hide Comments',
+        return {id: button, icon: 'fa-comment-o', selected: true, active: true, permission: true, tooltip: 'Show Comments (alt + c)',
+                spinner: false, togglable: true, toggle_icon: 'fa-comment', toggle_tooltip: 'Hide Comments (alt + c)',
                 action: function() {$rootScope.$broadcast(button);}};
       case "refresh-numbering":
         return {id: button, icon: 'fa-sort-numeric-asc', selected: true, active: true, permission: true, tooltip: 'Refresh Figure Numbering',
@@ -179,10 +179,10 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-share-alt', selected: true, active: true, permission: true, tooltip: 'Share Short URL',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "center-previous":
-        return {id: button, icon: 'fa-chevron-left', selected: true, active: true, permission: true, tooltip: 'Previous',
+        return {id: button, icon: 'fa-chevron-left', selected: true, active: true, permission: true, tooltip: 'Previous (alt + ,)',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "center-next":
-        return {id: button, icon: 'fa-chevron-right', selected: true, active: true, permission: true, tooltip: 'Next',
+        return {id: button, icon: 'fa-chevron-right', selected: true, active: true, permission: true, tooltip: 'Next (alt + .)',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "export":
         return {id: button, icon: 'fa-download', selected: true, active: true, permission: true, tooltip: 'Export', button_content: 'Export',

@@ -379,6 +379,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             if (ob._childViews && !elementOb._childViews) {
                 delete ob._childViews;
             }
+            delete ob._commitId;
             return ob;
         /*
             deferred.resolve(ob);

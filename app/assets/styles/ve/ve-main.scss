@@ -84,6 +84,8 @@ div.tooltip-inner {
 4. Modal fixes
 5. 404 bookmark
 6. Open document button
+7. Right pane
+8. Growl notification
 
 -------------------------------------------------------------------*/
 
@@ -1097,7 +1099,7 @@ table caption {
 }
 
 /*------------------------------------------------------------------
-9. Right pane
+7. Right pane
 -------------------------------------------------------------------*/
 
 .pane-right .container-fluid{
@@ -1111,7 +1113,7 @@ hr.spec-title-divider{
 }
 
 /*------------------------------------------------------------------
-  9.4 Modal for revert history
+7.1 Modal for revert history
 -------------------------------------------------------------------*/
 
 /* Special styling to preview element*/
@@ -1137,4 +1139,16 @@ span.inline-btn-label{
 -------------------------------------------------------------------*/
 .fa-exclamation-triangle{
   color: $ve-yellow-base;
+}
+
+
+/*------------------------------------------------------------------
+8. Growl notification
+-------------------------------------------------------------------*/
+.growl-container > .growl-item.ng-enter,
+.growl-container > .growl-item.ng-leave {
+  -webkit-transition:0.1s linear all;
+  -moz-transition:0.1s linear all;
+  -o-transition:0.1s linear all;
+  transition:0.1s linear all;
 }
