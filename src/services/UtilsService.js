@@ -435,7 +435,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     var hasConflict = function(edit, orig, server) {
         for (var i in edit) {
             if (i === '_read' || i === '_modified' || i === '_modifier' || 
-                    i === '_creator' || i === '_created' || '_commitId') {
+                    i === '_creator' || i === '_created' || i === '_commitId') {
                 continue;
             }
             if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
@@ -1146,7 +1146,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         Object.keys(meta).forEach(function(key) {
             if (meta[key]) {
-                var content = '""';
+                var content;
                 if (meta[key] === 'counter(page)') {
                     content = meta[key];
                 } else {

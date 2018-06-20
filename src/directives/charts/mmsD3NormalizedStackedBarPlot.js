@@ -9,8 +9,8 @@
       
     var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {
       
-      var d3 = $window.d3;  
-      
+      var d3 = $window.d3;
+
       var divchart = d3.select(element[0]).append('div');
       //default 
       var defaultPlotConfig = {width : 960 /*parseInt(divchart.style("width"))*0.95*/, height: 500, 
@@ -19,13 +19,10 @@
 
       var projectId, refId, commitId;
       if (mmsViewCtrl) {
-          var viewVersion = mmsViewCtrl.getElementOrigin();
-          if (!projectId)
-              projectId = viewVersion.projectId;
-          if (!refId)
-              refId = viewVersion.refId;
-          if (!commitId)
-              commitId = viewVersion.commitId;
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        projectId = viewVersion.projectId;
+        refId = viewVersion.refId;
+        commitId = viewVersion.commitId;
       }
 
   function vf_pplot() {

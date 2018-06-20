@@ -7,26 +7,23 @@ function mmsC3Plot($q, ElementService, UtilsService, TableService, $compile, gro
 
   
     var c3 = $window.c3;
-    var d3 = $window.d3;  
+    var d3 = $window.d3;
     var divchart = d3.select(element[0]).append('div');
-   
+
     var projectId;
     var refId;
     var commitId;
-          
+
     if (mmsViewCtrl) {
-        var viewVersion = mmsViewCtrl.getElementOrigin();
-        if (!projectId)
-            projectId = viewVersion.projectId;
-        if (!refId)
-            refId = viewVersion.refId;
-        if (!commitId)
-            commitId = viewVersion.commitId;
+      var viewVersion = mmsViewCtrl.getElementOrigin();
+      projectId = viewVersion.projectId;
+      refId = viewVersion.refId;
+      commitId = viewVersion.commitId;
     }
     /*
     Convert a json definining functions in an array of keys (axis, x, tick, format, function(...))
     The last entry is a function value.
-    */  
+    */
     function simplifyFunctions(values, allkeys){
       values = eval(values);
       var results = [];
