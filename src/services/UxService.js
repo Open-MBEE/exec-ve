@@ -99,7 +99,7 @@ function UxService($rootScope) {
                 spinner: false, togglable: true, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-document-or-group":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Group or Document',
-                spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);},
+                spinner: false, togglable: false, placement: 'bottom-right', action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete', 
@@ -132,7 +132,7 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-reorder-group":
-        return {id: button, icon: 'fa-object-group', selected: true, active: true, permission: false, tooltip: 'Move to/from Group',
+        return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Organize Groups/Docs',
               spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-full-document":
         return {id: button, icon: 'fa-file-text-o', selected: true, active: true, permission: true, tooltip: 'Full Document', 
