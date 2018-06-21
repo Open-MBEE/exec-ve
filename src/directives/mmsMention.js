@@ -1,35 +1,38 @@
 'use strict';
 
 angular.module('mms.directives')
-    .directive('mmsMention', ['$templateCache', mmsMention]);
+    .directive('mmsMention', ['$templateCache', 'MentionService', 'Utils', mmsMention]);
 
-function mmsMention($templateCache) {
+function mmsMention($templateCache, MentionService, Utils) {
     return {
         template: $templateCache.get('mms/templates/mmsMention.html'),
         scope: {
-            mmsMentionItems: '<',
-            editor: '<',
-            inputValue: '<',
-            done: '<'
+            mmsEditor: '<',
+            mmsMentionValue: '<',
+            mmsMentionId: '<',
+            mmsDone: '<'
         },
         controller: ['$scope', mmsMentionCtrl],
         link: mmsMentionLink
     };
+    function mmsMentionLink(scope, element, attrs, ctrls) {}
 
     function mmsMentionCtrl($scope) {
+        $scope.fastCfListing = MentionService.getFastCfListing();
+        $scope.autocompleteOnSelect = autocompleteOnSelect;
 
-    }
+        function autocompleteOnSelect($item, $model, $label) {
+            _createCf($item, $label);
+            MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId); // maybe handleCleanup first?
+            $scope.done();
+        }
 
-    function mmsMentionLink(scope, element, attrs, ctrls) {
-        scope.id = 'hong';
-        scope.autocompleteOnSelect = function($item, $model, $label) {
+        function _createCf($item, $label) {
             var autocompleteElementId = $item.id;
             var lastIndexOfName = $item.name.lastIndexOf(" ");
             var autocompleteName = $item.name.substring(0, lastIndexOfName);
-
             var property = $label.split(' ');
             property = property[property.length - 1];
-
             var autocompleteProperty;
             if (property === 'name') {
                 autocompleteProperty = 'name';
@@ -39,35 +42,20 @@ function mmsMention($templateCache) {
                 autocompleteProperty = 'val';
             }
             var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf>';
-            scope.editor.insertHtml(tag);
-
-            // remove the input or maybe figure out a way to destroy this whole tthing
-            $('#' + scope.id).remove();
-            var iframe = $($('iframe')[0]);
-            iframe.contents().find('#hong007').remove();
-            scope.done();
-
-            focusOnEditorAfterAddingWidgetTag(scope.editor);
-        };
-    }
-
-    function focusOnEditorAfterAddingWidgetTag(editor) {
-        var element = editor.widgets.focused.element.getParent();
-        var range = editor.createRange();
-        if(range) {
-            range.moveToClosestEditablePosition(element, true);
-            range.select();
+            $scope.mmsEditor.insertHtml(tag);
+            Utils.focusOnEditorAfterAddingWidgetTag($scope.mmsEditor);
         }
     }
+
 }
 
 angular.module('mms.directives')
-    .directive('mmsTesting', ['$templateCache',  mmsTesting]);
+    .directive('mmsMentionIntercept', ['$templateCache',  mmsTesting]);
 
 function mmsTesting() {
     return {
         scope: {
-            testValue: '<'
+            mmsMentionInterceptValue: '<'
         },
         controller: ['$scope', mmsTestingController],
         require: ['ngModel'],

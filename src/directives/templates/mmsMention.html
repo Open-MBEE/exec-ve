@@ -1,4 +1,4 @@
-<div id="{{id}}">
-    <input style="display: none;" mms-testing test-value="inputValue" uib-typeahead="autocompleteItem as (autocompleteItem.name + ' ' + autocompleteItem.type) for autocompleteItem in mmsMentionItems | filter:{name: $viewValue} | limitTo:10"
+<div id="{{mmsMentionId}}">
+    <input  mms-mention-intercept mms-mention-intercept-value="mmsMentionValue" uib-typeahead="autocompleteItem as (autocompleteItem.name + ' ' + autocompleteItem.type) for autocompleteItem in fastCfListing | filter:{name: $viewValue} | limitTo:10"
            typeahead-on-select='autocompleteOnSelect($item, $model, $label)' ng-model="selected" class="autocomplete-modal-typeahead form-control" placeholder="Type an element name to Cf" autofocus/>
 </div>
