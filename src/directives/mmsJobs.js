@@ -161,7 +161,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
             var defaultName = scope.jobInput.jobName;
             scope.createJobCleared = false;
             if (!scope.jobInput.jobName) {
-                defaultName = scope.docName + "_job";
+                defaultName = scope.docName + "_DocGen_job";
             }
             var thisSchedule = '';
             // Do we allow users to input schedule??
@@ -178,6 +178,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
             JobService.createJob(jobOb, scope.mmsProjectId, scope.mmsRefId)
             .then(function(job) {
                 growl.success('Your job has posted');
+                scope.docgenExists = true;
                 deferred.resolve(job);
             }, function(error) {
                 growl.error('Your job failed to post: ' + error.data.message);
