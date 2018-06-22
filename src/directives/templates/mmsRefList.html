@@ -6,7 +6,7 @@
         <tr>
             <td><h3 class="Tag-icon">Tag</h3></td>
             <td><h3>Created</h3></td>
-            <td ng-if="isDoc && docEditable"></td>
+            <td ng-if="isDoc && docEditable && showMerge"></td>
         </tr>
     </thead>
     <tbody ng-show="filteredTags.length">
@@ -16,7 +16,7 @@
                 <div>{{tag.description}}</div>
             </td>
             <td class="ve-secondary-text">{{tag._created | date:'M/d/yy h:mm a'}}</td>
-            <td ng-if="isDoc && docEditable">
+            <td ng-if="isDoc && docEditable && showMerge">
                 <div class="btn-group" uib-dropdown is-open="status.isopen">
                     <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Tag actions">
                         <i class="fa fa-ellipsis-v"></i>
@@ -41,7 +41,7 @@
         <tr>
             <td><h3 class="Branch-icon">Branch</h3></td>
             <td><h3>Created</h3></td>
-            <td ng-if="isDoc && docEditable"></td>
+            <td ng-if="isDoc && docEditable && showMerge"></td>
         </tr>
     </thead>
     <tbody ng-show="filteredBranches.length">
@@ -51,7 +51,7 @@
                 <div>{{branch.description}}</div>
             </td>
             <td class="ve-secondary-text">{{branch._created | date:'M/d/yy h:mm a'}}</td>
-            <td ng-if="isDoc && docEditable">
+            <td ng-if="isDoc && docEditable && showMerge">
                 <div class="btn-group" uib-dropdown is-open="status.isopen">
                     <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Branch actions">
                         <i class="fa fa-ellipsis-v"></i>

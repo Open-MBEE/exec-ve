@@ -2,7 +2,7 @@
 
 angular.module('mms.directives')
 .directive('mmsRefList', ['$templateCache', '$http', 'growl', '_', '$q', '$uibModal',
-        'UtilsService', 'JobService', 'ElementService', mmsRefList]);
+        'UtilsService', 'JobService', 'ElementService', 'URLService', mmsRefList]);
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsRefList
@@ -23,12 +23,13 @@ angular.module('mms.directives')
  * @param {string=null} mmsDocId the id of the current document
  */
 function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
-    UtilsService, JobService, ElementService) {
+    UtilsService, JobService, ElementService, URLService) {
 
     var template = $templateCache.get('mms/templates/mmsRefList.html');
 
     var mmsRefListLink = function (scope, element, attrs) {
         var ran;
+        scope.showMerge = URLService.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1;
         scope.runCleared = true;
         scope.docEditable = false;
         scope.currentRefOb = _.find(scope.mmsBranches, { 'id': scope.mmsRefId });
