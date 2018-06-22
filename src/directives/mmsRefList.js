@@ -84,7 +84,7 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
                 var jobExists = false;
                 var docmergeJobId;
                 for (var i = 0; i < jobs.length; i++) {
-                    if (jobs[i].associatedElementID === scope.mmsDocId && jobs[i].command === 'docmerge') {
+                    if (jobs[i].associatedElementID === scope.mmsDocId && jobs[i].type === 'docmerge') {
                         // If yes, assign id to run
                         docmergeJobId = jobs[i].id;
                         jobExists = true;
