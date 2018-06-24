@@ -39,21 +39,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         }
 
         var instance = null;
-        var autocompleteModalTemplate = $templateCache.get('mms/templates/mmsAutocompleteModal.html');
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
         // Controller for inserting cross reference
         // Defines scope variables for html template and how to handle user click
         // Also defines options for search interfaces -- see mmsSearch.js for more info
-        var transcludeCtrl = function($scope, $uibModalInstance, autocomplete) {
-            var autocompleteName;
-            var autocompleteProperty;
-            var autocompleteElementId;
-            if (autocomplete) {
-                $scope.autocompleteItems = MentionService.getFastCfListing(scope.mmsProjectId, scope.refId);
-            }
-
+        var transcludeCtrl = function($scope, $uibModalInstance) {
             $scope.title = 'Insert cross reference';
             $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.newE = {name: '', documentation: ''};
@@ -119,37 +111,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     $scope.requestDocumentation = true;
                 }
             };
-            $scope.autocompleteOnSelect = function($item, $model, $label) {
-                autocompleteElementId = $item.id;
-                var lastIndexOfName = $item.name.lastIndexOf(" ");
-                autocompleteName = $item.name.substring(0, lastIndexOfName);
-
-                var property = $label.split(' ');
-                property = property[property.length - 1];
-                if (property === 'name') {
-                    autocompleteProperty = 'name';
-                } else if (property === 'documentation') {
-                    autocompleteProperty = 'doc';
-                } else if (property === 'value') {
-                    autocompleteProperty = 'val';
-                }
-            };
-            $scope.autocomplete = function(success) {
-                if (success) {
-                    var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf>';
-                    $uibModalInstance.close(tag);
-                } else {
-                    $uibModalInstance.close(false);
-                }
-            };
         };
 
-        var transcludeCallback = function(ed, fromAutocomplete) {
+        var transcludeCallback = function(ed) {
             var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                resolve: {autocomplete: false},
-                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
