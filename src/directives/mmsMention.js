@@ -10,6 +10,8 @@ function mmsMention($templateCache, MentionService, Utils) {
             mmsEditor: '<',
             mmsMentionValue: '<',
             mmsMentionId: '<',
+            mmsProjectId: '<',
+            mmsRefId: '<',
             mmsDone: '<'
         },
         controller: ['$scope', mmsMentionCtrl],
@@ -18,13 +20,13 @@ function mmsMention($templateCache, MentionService, Utils) {
     function mmsMentionLink(scope, element, attrs, ctrls) {}
 
     function mmsMentionCtrl($scope) {
-        $scope.fastCfListing = MentionService.getFastCfListing();
+        $scope.fastCfListing = MentionService.getFastCfListing($scope.mmsProjectId, $scope.mmsRefId);
         $scope.autocompleteOnSelect = autocompleteOnSelect;
 
         function autocompleteOnSelect($item, $model, $label) {
             _createCf($item, $label);
-            MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId); // maybe handleCleanup first?
-            $scope.done();
+            MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId);
+            $scope.mmsDone();
         }
 
         function _createCf($item, $label) {
@@ -60,10 +62,7 @@ function mmsTesting() {
         controller: ['$scope', mmsTestingController],
         require: ['ngModel'],
         link: function(scope, el, attrs, ctls) {
-            console.log(ctls);
-            scope.$watch('testValue', function(newV, oldV) {
-                console.log(oldV);
-                console.log(newV);
+            scope.$watch('mmsMentionInterceptValue', function(newV, oldV) {
                 if(newV) {
                     ctls[0].$setViewValue(newV);
                     ctls[0].$render();
@@ -75,6 +74,3 @@ function mmsTesting() {
 
     }
 }
-
-// childScope.$destroy();
-// $('.my-directive-placeholder').empty();

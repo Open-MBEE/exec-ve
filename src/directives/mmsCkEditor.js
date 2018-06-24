@@ -51,7 +51,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             var autocompleteProperty;
             var autocompleteElementId;
             if (autocomplete) {
-                $scope.autocompleteItems = MentionService.getFastCfListing();
+                $scope.autocompleteItems = MentionService.getFastCfListing(scope.mmsProjectId, scope.refId);
             }
 
             $scope.title = 'Insert cross reference';
@@ -455,13 +455,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             });
             instance.on( 'key', function(e) {
                 if(e.data.domEvent.$.shiftKey && e.data.domEvent.$.key === '@') {
-                    MentionService.createMention(instance);
+                    MentionService.createMention(instance, scope.mmsProjectId, scope.mmsRefId);
                     return false;
                 } else {
-                    // add check for input inside @ here
-                    // var newInput = ''; var mentionId;
-                    // MentionService.handleInput(instance, mentionId, newInput);
-
+                    $timeout(MentionService.handleInput(e));
                     if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
                         //trying to prevent tab and shift tab jumping focus out of editor
                         if (e.data.keyCode == 9) {
@@ -470,7 +467,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                         e.cancel();
                         e.stop();
                     }
-                    deb(e); 
+                    deb(e);
                 }
             }, null, null, 31); //priority is after indent list plugin's event handler
 

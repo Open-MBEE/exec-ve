@@ -7,12 +7,13 @@ function MentionService($rootScope, $compile, CacheService) {
     /** Used to maintain all mention in all ckeditors **/
     var mentions = {};
     var mentionId = 1;
+    var mentionPlacerHolderPrefix = 'mentionPlaceHolder';
 
     return {
         getFastCfListing: getFastCfListing,
         createMention: createMention,
-        handleMentionSelection: handleMentionSelection,
-        handleInput: handleInput
+        handleInput: handleInput,
+        handleMentionSelection: handleMentionSelection
     };
 
     function getFastCfListing(projectId, refId) {
@@ -28,62 +29,84 @@ function MentionService($rootScope, $compile, CacheService) {
         return cfListing;
     }
 
-    function handleMentionSelection(editor, mentionId) {
-        // remove the mentionPlaceHolder
-        // remove the mention state
-        // remove the mention directive/dom
-
-        // $('#' + $scope.id).remove();
-        // var iframe = $($('iframe')[0]);
-        // iframe.contents().find('#hong007').remove();
-    }
-
-    function handleInput(editor, mentionId, newValue) {
-        var mentionState = _retrieveMentionState(editor.id, mentionId);
-        var mentionScope = mentionState.scope;
-        mentionScope.$apply(function() {
-            mentionScope.mmsMentionValue = newValue;
-        });
-    }
-
-    function _getNewMentionId() {
-        return ++mentionId;
-    }
-
-
-    /** Create the mention directive and it state **/
-    function createMention(editor) {
+    function createMention(editor, projectId, refId) {
         var mentionId = _getNewMentionId();
         var mentionPlaceHolderId = _createMentionPlaceHolder(editor, mentionId);
-        var mention = _createMentionDirective(editor, mentionId);
-        _createNewMentionState(editor, mention.scope, mentionPlaceHolderId, mentionId);
+        var mention = _createMentionDirective(editor, mentionId, projectId, refId);
+        _createNewMentionState(editor, mention, mentionPlaceHolderId, mentionId);
         _positionMentionElement(editor, mention.element, mentionPlaceHolderId);
-        _bumpMentionId();
     }
 
-    function _createMentionDirective(editor, mentionId) {
-        var newScope = Object.assign($rootScope.$new(), { mmsEditor: editor, mmsMentionValue: '', mmsMentionId: mentionId, mmsDone: function() { newScope.$destroy(); } });
-        var element = $compile('<span mms-mention mms-editor="mmsEditor" mms-mention-value="mmsMentionValue" mms-mention-id="mmsMentionId" mms-done="mmsDone"></span>')(newScope);
+    function handleInput(event) {
+        // console.log(String.fromCharCode(event.data.domEvent.$.which));
+        var editor = event.editor;
+        var currentEditingElement = editor._.elementsPath.list[0].$;
+        var currentEditingElementId = currentEditingElement.getAttribute('id');
+        var mentionId = _getMentionPlaceHolderData(currentEditingElementId);
+        if (mentionId) {
+            var mentionState = _retrieveMentionState(editor.id, mentionId);
+            var mentionScope = mentionState.mentionScope;
+            mentionScope.$apply(function() {
+                var text = currentEditingElement.innerText;
+                text = text.substring(1); // ignore @
+                mentionScope.mmsMentionValue = text;
+            });
+        }
+    }
+
+    function handleMentionSelection(editor, mentionId) {
+        var mentionState = _retrieveMentionState(editor.id, mentionId);
+        var mentionPlaceHolderId = mentionState.mentionPlaceHolderId;
+        var ckeditorDocument = _getCkeditorFrame(editor).contentDocument;
+        // remove the mentionPlaceHolder
+        ckeditorDocument.getElementById(mentionPlaceHolderId).remove();
+        // remove the mention directive
+        var mentionScope = mentionState.mentionScope;
+        mentionScope.$destroy();
+        // remove the mention dom
+        var mentionElement = mentionState.mentionElement;
+        mentionElement.remove();
+        // remove the mention state
+        delete mentions[_getMentionStateId(editor.id, mentionId)];
+        console.log('mentions:', mentions);
+    }
+
+
+    function _createMentionDirective(editor, mentionId, projectId, refId) {
+        var newScope = Object.assign($rootScope.$new(),
+            {
+                mmsEditor: editor,
+                mmsMentionValue: '',
+                mmsMentionId: mentionId,
+                mmsProjectId: projectId,
+                mmsRefId: refId,
+                mmsDone: function() { newScope.$destroy(); }
+            });
+        var element = $compile('<span mms-mention mms-editor="mmsEditor" mms-mention-value="mmsMentionValue" mms-mention-id="mmsMentionId" mms-project-id="mmsProjectId" mms-ref-id="mmsRefId" mms-done="mmsDone"></span>')(newScope);
         return {
             scope: newScope,
             element: element
         };
     }
+
+    function _getCkeditorFrame(editor) {
+        return editor.container.$.getElementsByTagName('iframe')[0];
+    }
     
     function _positionMentionElement(editor, mentionElement, mentionPlaceHolderId) {
-        var ckeditorBodyDom = editor.container.$.getElementsByTagName('iframe')[0];
-        var box = ckeditorBodyDom.getBoundingClientRect();
-        var mentionPlaceHolder = $(ckeditorBodyDom).contents().find('#' + mentionPlaceHolderId);
-        var offset = mentionPlaceHolder.offset();
+        var ckeditorFrame = _getCkeditorFrame(editor);
+        var box = ckeditorFrame.getBoundingClientRect();
+        var mentionPlaceHolder = ckeditorFrame.contentDocument.getElementById(mentionPlaceHolderId);
+        var offset = $(mentionPlaceHolder).offset();
         mentionElement.css({position: 'absolute', top: box.top + offset.top + 30, left: box.left + offset.left});
         $('body').append(mentionElement);
     }
 
-    /** Add a new state to track new @ **/
-    function _createNewMentionState(editor, mentionScope, mentionPlaceHolderId, mentionId) {
+    function _createNewMentionState(editor, mention, mentionPlaceHolderId, mentionId) {
         var key = _getMentionStateId(editor.id, mentionId);
         var value = {
-            mentionScope: mentionScope,
+            mentionScope: mention.scope,
+            mentionElement: mention.element,
             mentionId: mentionId,
             mentionPlaceHolderId: mentionPlaceHolderId
         };
@@ -100,13 +123,22 @@ function MentionService($rootScope, $compile, CacheService) {
     }
 
     function _createMentionPlaceHolder(editor, mentionId) {
-        var id = 'mentionPlaceHolder-' + editor.id + '-' + mentionId;
+        var id = mentionPlacerHolderPrefix + '-' + editor.id + '-' + mentionId;
         var mentionPlaceHolder = '<span id="' + id + '">@</span>';
         editor.insertHtml(mentionPlaceHolder);
         return id;
     }
 
-    function _bumpMentionId() {
-        mentionId++;
+    function _getNewMentionId() {
+        return mentionId++;
+    }
+
+    function _getMentionPlaceHolderData(id) {
+        if (id && id.indexOf('mentionPlacerHolderPrefix')) {
+            var splits = id.split('-');
+            var mentionId = splits[2];
+            return mentionId;
+        }
+        return null;
     }
 }
