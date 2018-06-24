@@ -37,9 +37,7 @@ function MentionService($rootScope, $compile, CacheService) {
         _positionMentionElement(editor, mention.element, mentionPlaceHolderId);
     }
 
-    function handleInput(event) {
-        // console.log(String.fromCharCode(event.data.domEvent.$.which));
-        var editor = event.editor;
+    function handleInput(event, editor) {
         var currentEditingElement = editor._.elementsPath.list[0].$;
         var currentEditingElementId = currentEditingElement.getAttribute('id');
         var mentionId = _getMentionPlaceHolderData(currentEditingElementId);
@@ -68,9 +66,7 @@ function MentionService($rootScope, $compile, CacheService) {
         mentionElement.remove();
         // remove the mention state
         delete mentions[_getMentionStateId(editor.id, mentionId)];
-        console.log('mentions:', mentions);
     }
-
 
     function _createMentionDirective(editor, mentionId, projectId, refId) {
         var newScope = Object.assign($rootScope.$new(),
@@ -79,10 +75,9 @@ function MentionService($rootScope, $compile, CacheService) {
                 mmsMentionValue: '',
                 mmsMentionId: mentionId,
                 mmsProjectId: projectId,
-                mmsRefId: refId,
-                mmsDone: function() { newScope.$destroy(); }
+                mmsRefId: refId
             });
-        var element = $compile('<span mms-mention mms-editor="mmsEditor" mms-mention-value="mmsMentionValue" mms-mention-id="mmsMentionId" mms-project-id="mmsProjectId" mms-ref-id="mmsRefId" mms-done="mmsDone"></span>')(newScope);
+        var element = $compile('<span mms-mention mms-editor="mmsEditor" mms-mention-value="mmsMentionValue" mms-mention-id="mmsMentionId" mms-project-id="mmsProjectId" mms-ref-id="mmsRefId"></span>')(newScope);
         return {
             scope: newScope,
             element: element

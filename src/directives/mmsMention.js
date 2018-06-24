@@ -11,8 +11,7 @@ function mmsMention($templateCache, MentionService, Utils) {
             mmsMentionValue: '<',
             mmsMentionId: '<',
             mmsProjectId: '<',
-            mmsRefId: '<',
-            mmsDone: '<'
+            mmsRefId: '<'
         },
         controller: ['$scope', mmsMentionCtrl],
         link: mmsMentionLink
@@ -26,7 +25,6 @@ function mmsMention($templateCache, MentionService, Utils) {
         function autocompleteOnSelect($item, $model, $label) {
             _createCf($item, $label);
             MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId);
-            $scope.mmsDone();
         }
 
         function _createCf($item, $label) {
@@ -52,9 +50,9 @@ function mmsMention($templateCache, MentionService, Utils) {
 }
 
 angular.module('mms.directives')
-    .directive('mmsMentionIntercept', ['$templateCache',  mmsTesting]);
+    .directive('mmsMentionIntercept', ['$templateCache',  mmsMentionIntercept]);
 
-function mmsTesting() {
+function mmsMentionIntercept() {
     return {
         scope: {
             mmsMentionInterceptValue: '<'
@@ -70,7 +68,5 @@ function mmsTesting() {
             });
         }
     };
-    function mmsTestingController($scope) {
-
-    }
+    function mmsTestingController($scope) {}
 }

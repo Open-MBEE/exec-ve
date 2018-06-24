@@ -144,28 +144,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             };
         };
 
-        var autocompleteCallback = function(ed) {
-            var instance = $uibModal.open({
-                template: autocompleteModalTemplate,
-                windowClass: 've-dropdown-short-modal',
-                scope: scope,
-                resolve: {autocomplete: true},
-                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
-                size: 'sm'
-            });
-
-            instance.result.then(function(tag) {
-                if (!tag) {
-                    transcludeCallback(ed, true);
-                } else {
-                    addWidgetTag(ed, tag);
-                }
-            }, function() {
-                ed.insertText('@');
-                ed.focus();
-            });
-        };
-
         var transcludeCallback = function(ed, fromAutocomplete) {
             var instance = $uibModal.open({
                 template: transcludeModalTemplate,
@@ -175,7 +153,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                addWidgetTag(ed, tag);
+                _addWidgetTag(ed, tag);
             }, function() {
                 var focusManager = new CKEDITOR.focusManager( ed );
                 focusManager.focus();
@@ -293,7 +271,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                addWidgetTag(ed, tag);
+                _addWidgetTag(ed, tag);
             });
         };
 
@@ -337,7 +315,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 controller: ['$scope', '$uibModalInstance', commentCtrl]
             });
             instance.result.then(function(tag) {
-                addWidgetTag(ed, tag);
+                _addWidgetTag(ed, tag);
             });
         };
 
@@ -455,10 +433,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             });
             instance.on( 'key', function(e) {
                 if(e.data.domEvent.$.shiftKey && e.data.domEvent.$.key === '@') {
-                    MentionService.createMention(instance, scope.mmsProjectId, scope.mmsRefId);
-                    return false;
+                    return false; // to prevent "@" from getting written to the editor
                 } else {
-                    $timeout(MentionService.handleInput(e));
                     if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
                         //trying to prevent tab and shift tab jumping focus out of editor
                         if (e.data.keyCode == 9) {
@@ -470,6 +446,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     deb(e);
                 }
             }, null, null, 31); //priority is after indent list plugin's event handler
+
+            _addInlineMention();
 
             if (scope.mmsEditorApi) {
                 scope.mmsEditorApi.save = function() {
@@ -531,9 +509,28 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             }
         });
 
-        function addWidgetTag(editor, tag) {
+        function _addWidgetTag(editor, tag) {
             editor.insertHtml( tag );
             Utils.focusOnEditorAfterAddingWidgetTag(editor);
+        }
+
+        function _addInlineMention() {
+            var keyupHandler;
+            CKEDITOR.instances[attrs.id].on('contentDom', function() {
+                keyupHandler = CKEDITOR.instances[instance.name].document.on('keyup', function(e) {
+                    if(e.data.$.shiftKey && e.data.$.key === '@') {
+                        MentionService.createMention(instance, scope.mmsProjectId, scope.mmsRefId);
+                        return false;
+                    } else {
+                        MentionService.handleInput(e, instance);
+                    }
+                });
+            });
+            CKEDITOR.instances[attrs.id].on('contentDomUnload', function() {
+                if (keyupHandler) {
+                    keyupHandler.removeListener();
+                }
+            });
         }
     };
 
