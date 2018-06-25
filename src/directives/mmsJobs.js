@@ -44,6 +44,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
         scope.jobInput = {jobName: ''};
         scope.hasRefArr = false;
         scope.docEditable = false;
+        scope.docgenExists = false;
 
         // Get ref list for project and details on
         var getRefsInProgress = function() {
@@ -78,6 +79,9 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
                 for (var i = 0; i < jobs.length; i++) {
                     scope.jobs.push(jobs[i]);
                     getJobInstances(jobs[i].id);
+                    if (jobs[i].type === 'docgen') {
+                        scope.docgenExists = true;
+                    }
                 }
             }, function (error) {
                 growl.error('There was a error in retrieving your job: ' + error.status);
@@ -157,7 +161,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
             var defaultName = scope.jobInput.jobName;
             scope.createJobCleared = false;
             if (!scope.jobInput.jobName) {
-                defaultName = scope.docName + "_job";
+                defaultName = scope.docName + "_DocGen_job";
             }
             var thisSchedule = '';
             // Do we allow users to input schedule??
@@ -174,6 +178,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
             JobService.createJob(jobOb, scope.mmsProjectId, scope.mmsRefId)
             .then(function(job) {
                 growl.success('Your job has posted');
+                scope.docgenExists = true;
                 deferred.resolve(job);
             }, function(error) {
                 growl.error('Your job failed to post: ' + error.data.message);
