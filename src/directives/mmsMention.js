@@ -61,7 +61,7 @@ function mmsMentionIntercept() {
         require: ['ngModel'],
         link: function(scope, el, attrs, ctls) {
             scope.$watch('mmsMentionInterceptValue', function(newV, oldV) {
-                if(newV) {
+                if(newV !== oldV) {
                     ctls[0].$setViewValue(newV);
                     ctls[0].$render();
                 }
