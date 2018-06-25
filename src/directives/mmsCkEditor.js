@@ -472,6 +472,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             if (!instance) {
                 instance = CKEDITOR.instances[attrs.id];
             } else {
+                MentionService.removeAllMentionForEditor(instance);
                 instance.destroy();
                 instance = null;
             }
@@ -490,7 +491,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                         MentionService.createMention(instance, scope.mmsProjectId, scope.mmsRefId);
                         return false;
                     } else {
-                        MentionService.handleInput(e, instance);
+                        MentionService.handleInput(e, instance, scope.mmsProjectId, scope.mmsRefId);
                     }
                 });
             });

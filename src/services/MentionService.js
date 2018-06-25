@@ -6,14 +6,14 @@ angular.module('mms')
 function MentionService($rootScope, $compile, CacheService) {
     /** Used to maintain all mention in all ckeditors **/
     var mentions = {};
-    var mentionId = 1;
     var mentionPlacerHolderPrefix = 'mentionPlaceHolder';
 
     return {
         getFastCfListing: getFastCfListing,
         createMention: createMention,
         handleInput: handleInput,
-        handleMentionSelection: handleMentionSelection
+        handleMentionSelection: handleMentionSelection,
+        removeAllMentionForEditor: removeAllMentionForEditor
     };
 
     function getFastCfListing(projectId, refId) {
@@ -29,20 +29,27 @@ function MentionService($rootScope, $compile, CacheService) {
         return cfListing;
     }
 
-    function createMention(editor, projectId, refId) {
-        var mentionId = _getNewMentionId();
-        var mentionPlaceHolderId = _createMentionPlaceHolder(editor, mentionId);
+
+    function createMention(editor, projectId, refId, existingMentionPlaceHolder) {
+        var mentionId = existingMentionPlaceHolder ? existingMentionPlaceHolder.mentionId : _getNewMentionId();
+        var mentionPlaceHolderId = existingMentionPlaceHolder ? existingMentionPlaceHolder.mentionPlaceHolderId : _createMentionPlaceHolder(editor, mentionId);
         var mention = _createMentionDirective(editor, mentionId, projectId, refId);
         _createNewMentionState(editor, mention, mentionPlaceHolderId, mentionId);
         _positionMentionElement(editor, mention.element, mentionPlaceHolderId);
     }
 
-    function handleInput(event, editor) {
+    function handleInput(event, editor, projectId, refId) {
         var currentEditingElement = editor._.elementsPath.list[0].$;
         var currentEditingElementId = currentEditingElement.getAttribute('id');
         var mentionId = _getMentionPlaceHolderData(currentEditingElementId);
         if (mentionId) {
             var mentionState = _retrieveMentionState(editor.id, mentionId);
+            // logic to reactivate existing "@" when reloading ckeditor
+            if (!mentionState) {
+                createMention(editor, projectId, refId, { mentionId: mentionId, mentionPlaceHolderId: currentEditingElementId} );
+                mentionState = _retrieveMentionState(editor.id, mentionId);
+            }
+
             var mentionScope = mentionState.mentionScope;
             mentionScope.$apply(function() {
                 var text = currentEditingElement.innerText;
@@ -53,19 +60,7 @@ function MentionService($rootScope, $compile, CacheService) {
     }
 
     function handleMentionSelection(editor, mentionId) {
-        var mentionState = _retrieveMentionState(editor.id, mentionId);
-        var mentionPlaceHolderId = mentionState.mentionPlaceHolderId;
-        var ckeditorDocument = _getCkeditorFrame(editor).contentDocument;
-        // remove the mentionPlaceHolder
-        ckeditorDocument.getElementById(mentionPlaceHolderId).remove();
-        // remove the mention directive
-        var mentionScope = mentionState.mentionScope;
-        mentionScope.$destroy();
-        // remove the mention dom
-        var mentionElement = mentionState.mentionElement;
-        mentionElement.remove();
-        // remove the mention state
-        delete mentions[_getMentionStateId(editor.id, mentionId)];
+        _cleanup(editor, mentionId);
     }
 
     function _createMentionDirective(editor, mentionId, projectId, refId) {
@@ -124,16 +119,45 @@ function MentionService($rootScope, $compile, CacheService) {
         return id;
     }
 
+    // Generate unique id
     function _getNewMentionId() {
-        return mentionId++;
+        function chr4(){
+            return Math.random().toString(16).slice(-4);
+        }
+        return chr4() + chr4() + chr4() + chr4() + chr4() + chr4() + chr4() + chr4();
     }
 
     function _getMentionPlaceHolderData(id) {
-        if (id && id.indexOf('mentionPlacerHolderPrefix')) {
+        if (id && id.indexOf(mentionPlacerHolderPrefix) > -1) {
             var splits = id.split('-');
             var mentionId = splits[2];
             return mentionId;
         }
         return null;
+    }
+
+    function _cleanup(editor, mentionId) {
+        var mentionState = _retrieveMentionState(editor.id, mentionId);
+        var mentionPlaceHolderId = mentionState.mentionPlaceHolderId;
+        var ckeditorDocument = _getCkeditorFrame(editor).contentDocument;
+        // remove the mentionPlaceHolder
+        ckeditorDocument.getElementById(mentionPlaceHolderId).remove();
+        // cleanup the mention directive
+        var mentionScope = mentionState.mentionScope;
+        mentionScope.$destroy();
+        // remove the mention dom
+        var mentionElement = mentionState.mentionElement;
+        mentionElement.remove();
+        // remove the mention state
+        delete mentions[_getMentionStateId(editor.id, mentionId)];
+    }
+
+    function removeAllMentionForEditor(editor) {
+        Object.keys(mentions).filter(function(key) {
+            var splits = key.split('-');
+            return splits[0] === editor.id;
+        }).forEach(function(key) {
+            _cleanup(editor, key.split('-')[1]);
+        });
     }
 }
