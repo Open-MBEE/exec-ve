@@ -1,7 +1,27 @@
 'use strict';
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'diff-match-patch', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies'])
-.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', 'URLServiceProvider', function($stateProvider, $urlRouterProvider, $httpProvider, URLServiceProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider) {
+    // override uibTypeaheadPopup functionality
+    $provide.decorator('uibTypeaheadPopupDirective', ['$delegate', function($delegate) {
+        var originalLinkFn = $delegate[0].link;
+        $delegate[0].compile = function(tElem, tAttr) {
+            return function newLinkFn(scope, elem, attr) {
+                // fire the originalLinkFn
+                originalLinkFn.apply($delegate[0], arguments);
+                scope.selectActive = function(matchIdx) {
+                    // added behavior
+                    elem.children().removeClass('active');
+
+                    // default behavior
+                    scope.active = matchIdx;
+                };
+            };
+        };
+        // get rid of the old link function since we return a link function in compile
+        delete $delegate[0].link;
+        return $delegate;
+    }]);
 
     $urlRouterProvider.rule(function ($injector, $location) {
         var locationPath = $location.url();
