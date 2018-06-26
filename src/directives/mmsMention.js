@@ -20,28 +20,17 @@ function mmsMention($templateCache, MentionService, Utils) {
 
     function mmsMentionCtrl($scope) {
         $scope.fastCfListing = MentionService.getFastCfListing($scope.mmsProjectId, $scope.mmsRefId);
+        // expose this api so on the controller itself so that it can be access by codes that use $compile service.
+        this.autocompleteOnSelect = autocompleteOnSelect;
         $scope.autocompleteOnSelect = autocompleteOnSelect;
 
-        function autocompleteOnSelect($item, $model, $label) {
-            _createCf($item, $label);
+        function autocompleteOnSelect($item, $model) {
+            _createCf($item);
             MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId);
         }
 
-        function _createCf($item, $label) {
-            var autocompleteElementId = $item.id;
-            var lastIndexOfName = $item.name.lastIndexOf(" ");
-            var autocompleteName = $item.name.substring(0, lastIndexOfName);
-            var property = $label.split(' ');
-            property = property[property.length - 1];
-            var autocompleteProperty;
-            if (property === 'name') {
-                autocompleteProperty = 'name';
-            } else if (property === 'documentation') {
-                autocompleteProperty = 'doc';
-            } else if (property === 'value') {
-                autocompleteProperty = 'val';
-            }
-            var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf>';
+        function _createCf($item) {
+            var tag = '<mms-cf mms-cf-type="' + $item.type + '" mms-element-id="' + $item.id + '">[cf:' + $item.name + '.' + $item.type + ']</mms-cf>';
             $scope.mmsEditor.insertHtml(tag);
             Utils.focusOnEditorAfterAddingWidgetTag($scope.mmsEditor);
         }

@@ -13,22 +13,20 @@ function MentionService($rootScope, $compile, CacheService) {
         createMention: createMention,
         handleInput: handleInput,
         handleMentionSelection: handleMentionSelection,
-        removeAllMentionForEditor: removeAllMentionForEditor
+        removeAllMentionForEditor: removeAllMentionForEditor,
+        hasMentionResults: hasMentionResults
     };
 
     function getFastCfListing(projectId, refId) {
-        var cfListing = [];
-        var cacheElements = CacheService.getLatestElements(projectId, refId);
-        cacheElements.forEach(function(cacheElement) {
-            cfListing.push({ 'id' : cacheElement.id, 'name' : cacheElement.name , 'type': ' - name' });
-            cfListing.push({ 'id' : cacheElement.id, 'name' : cacheElement.name , 'type': ' - documentation' });
+        return CacheService.getLatestElements(projectId, refId).reduce(function(result, cacheElement) {
+            result.push({ id : cacheElement.id, name : cacheElement.name , type: 'name', label: cacheElement.name + ' - name' });
+            result.push({ id : cacheElement.id, name : cacheElement.name , type: 'doc', label: cacheElement.name + ' - documentation' });
             if (cacheElement.type === 'Property') {
-                cfListing.push({ 'id' : cacheElement.id, 'name' : cacheElement.name , 'type': ' - value' });
+                result.push({ id : cacheElement.id, name : cacheElement.name , type: 'val', label: cacheElement.name + ' - value' });
             }
-        });
-        return cfListing;
+            return result;
+        }, []);
     }
-
 
     function createMention(editor, projectId, refId, existingMentionPlaceHolder) {
         var mentionId = existingMentionPlaceHolder ? existingMentionPlaceHolder.mentionId : _getNewMentionId();
@@ -41,7 +39,7 @@ function MentionService($rootScope, $compile, CacheService) {
     function handleInput(event, editor, projectId, refId) {
         var currentEditingElement = editor._.elementsPath.list[0].$;
         var currentEditingElementId = currentEditingElement.getAttribute('id');
-        var mentionId = _getMentionPlaceHolderData(currentEditingElementId);
+        var mentionId = _getMentionPlaceHolderMentionId(currentEditingElementId);
         if (mentionId) {
             var mentionState = _retrieveMentionState(editor.id, mentionId);
             // logic to reactivate existing "@" when reloading ckeditor
@@ -56,11 +54,36 @@ function MentionService($rootScope, $compile, CacheService) {
                 text = text.substring(1); // ignore @
                 mentionScope.mmsMentionValue = text;
             });
+
+            _handleSpecialKeys(event, mentionId, editor, projectId, refId);
         }
     }
 
     function handleMentionSelection(editor, mentionId) {
         _cleanup(editor, mentionId);
+    }
+
+    function removeAllMentionForEditor(editor) {
+        Object.keys(mentions).filter(function(key) {
+            var splits = key.split('-');
+            return splits[0] === editor.id;
+        }).forEach(function(key) {
+            _cleanup(editor, key.split('-')[1]);
+        });
+    }
+
+    function hasMentionResults(editor) {
+        var currentEditingElement = editor._.elementsPath.list[0].$;
+        var currentEditingElementId = currentEditingElement.getAttribute('id');
+        var mentionId = _getMentionPlaceHolderMentionId(currentEditingElementId);
+        if (mentionId) {
+            return _hasMentionResults(mentionId);
+        }
+        return false;
+    }
+
+    function _hasMentionResults(mentionId) {
+        return $('#' + mentionId).find('ul').children().length > 0;
     }
 
     function _createMentionDirective(editor, mentionId, projectId, refId) {
@@ -75,6 +98,7 @@ function MentionService($rootScope, $compile, CacheService) {
         var element = $compile('<span mms-mention mms-editor="mmsEditor" mms-mention-value="mmsMentionValue" mms-mention-id="mmsMentionId" mms-project-id="mmsProjectId" mms-ref-id="mmsRefId"></span>')(newScope);
         return {
             scope: newScope,
+            controller: element.controller('mms-mention'),
             element: element
         };
     }
@@ -96,6 +120,7 @@ function MentionService($rootScope, $compile, CacheService) {
         var key = _getMentionStateId(editor.id, mentionId);
         var value = {
             mentionScope: mention.scope,
+            mentionController: mention.controller,
             mentionElement: mention.element,
             mentionId: mentionId,
             mentionPlaceHolderId: mentionPlaceHolderId
@@ -127,9 +152,9 @@ function MentionService($rootScope, $compile, CacheService) {
         return chr4() + chr4() + chr4() + chr4() + chr4() + chr4() + chr4() + chr4();
     }
 
-    function _getMentionPlaceHolderData(id) {
-        if (id && id.indexOf(mentionPlacerHolderPrefix) > -1) {
-            var splits = id.split('-');
+    function _getMentionPlaceHolderMentionId(currentEditingElementId) {
+        if (currentEditingElementId && currentEditingElementId.indexOf(mentionPlacerHolderPrefix) > -1) {
+            var splits = currentEditingElementId.split('-');
             var mentionId = splits[2];
             return mentionId;
         }
@@ -152,12 +177,66 @@ function MentionService($rootScope, $compile, CacheService) {
         delete mentions[_getMentionStateId(editor.id, mentionId)];
     }
 
-    function removeAllMentionForEditor(editor) {
-        Object.keys(mentions).filter(function(key) {
-            var splits = key.split('-');
-            return splits[0] === editor.id;
-        }).forEach(function(key) {
-            _cleanup(editor, key.split('-')[1]);
+    function _handleSpecialKeys(evt, mentionId, editor, projectId, refId) {
+        switch (evt.data.$.which) {
+            case 38: // up arrow
+                _handleArrowKey(mentionId, false);
+                break;
+            case 40: // down arrow
+                _handleArrowKey(mentionId, true);
+                break;
+            case 13: // enter
+                _handleEnterKey(editor.id, mentionId, projectId, refId);
+                break;
+        }
+    }
+
+    function _getMentionItem(key, projectId, refId) {
+        var cfListing = getFastCfListing(projectId, refId);
+        return cfListing.find(function(cf) {
+            return cf.label === key;
         });
+    }
+
+    function _handleEnterKey(editorId, mentionId, projectId, refId) {
+        var currentMentionMatchDom = $('#' + mentionId).find('ul').children().filter(function() {
+            return $(this).hasClass('active');
+        });
+
+        if (currentMentionMatchDom.length > 0) {
+            var key = currentMentionMatchDom.text().trim();
+            var mentionItem = _getMentionItem(key, projectId, refId);
+            var mentionState = _retrieveMentionState(editorId, mentionId);
+            mentionState.mentionController.autocompleteOnSelect(mentionItem);
+        }
+    }
+
+    function _handleArrowKey(mentionId, isDownArrow) {
+        var popUpEl = $('#' + mentionId);
+        var allOptions = popUpEl.find('li');
+        var len = allOptions.length;
+        var activeIndex = -1;
+        allOptions.each(function(index) {
+            if ($(this).hasClass('active')) {
+                activeIndex = index;
+            }
+        });
+        if (activeIndex !== -1) {
+            var nextIndex;
+            if (isDownArrow) {
+                nextIndex = (activeIndex + 1) % len;
+            } else {
+                if (activeIndex === 0 ) {
+                    nextIndex = len - 1;
+                } else {
+                    nextIndex = (activeIndex - 1) % len;
+                }
+            }
+            var target = $(allOptions[nextIndex]);
+            target.addClass('active');
+            $(allOptions[activeIndex]).removeClass('active');
+            // scroll if necessary
+            target[0].parentNode.scrollTop = target[0].offsetTop;
+        }
     }
 }

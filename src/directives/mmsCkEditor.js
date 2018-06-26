@@ -389,31 +389,15 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             instance.on( 'init', function(args) {
                 ngModelCtrl.$setPristine();
             });
-            var deb = _.debounce(function(e) {
-                update();
-            }, 1000);
-            instance.on( 'change', deb);
-            instance.on( 'afterCommandExec', deb);
-            instance.on( 'resize', deb);
-            instance.on( 'destroy', deb);
+
+            instance.on( 'change', _deb());
+            instance.on( 'afterCommandExec', _deb());
+            instance.on( 'resize', _deb());
+            instance.on( 'destroy', _deb());
             instance.on( 'blur', function(e) {
                 instance.focusManager.blur();
             });
-            instance.on( 'key', function(e) {
-                if(e.data.domEvent.$.shiftKey && e.data.domEvent.$.key === '@') {
-                    return false; // to prevent "@" from getting written to the editor
-                } else {
-                    if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
-                        //trying to prevent tab and shift tab jumping focus out of editor
-                        if (e.data.keyCode == 9) {
-                            instance.insertHtml('&nbsp;&nbsp;&nbsp;&nbsp;');
-                        }
-                        e.cancel();
-                        e.stop();
-                    }
-                    deb(e);
-                }
-            }, null, null, 31); //priority is after indent list plugin's event handler
+            instance.on( 'key', _keyHandler , null, null, 31); //priority is after indent list plugin's event handler
 
             _addInlineMention();
 
@@ -495,11 +479,56 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     }
                 });
             });
+
             CKEDITOR.instances[attrs.id].on('contentDomUnload', function() {
                 if (keyupHandler) {
                     keyupHandler.removeListener();
                 }
             });
+        }
+
+        function _deb() {
+            return _.debounce(function(e) {
+                update();
+            }, 1000);
+        }
+
+        function _keyHandler(e) {
+            if (_isMentionKey(e)) {
+                return false; // to prevent "@" from getting written to the editor
+            }
+
+            // when tab is pressed or any of these special keys is pressed while the mention results show up, ignore default ckeditor's behaviour
+            var ignoreDefaultBehaviour = _isTabKey(e) || (_isSpecialKey(e) && MentionService.hasMentionResults(instance) );
+            if ( ignoreDefaultBehaviour ) {
+                e.cancel(); e.stop();
+            }
+
+            if (_isTabKey(e) && !_isShiftKeyOn(e)) {
+                instance.insertHtml('&nbsp;&nbsp;&nbsp;&nbsp;');
+            }
+
+            if (!ignoreDefaultBehaviour) {
+                _deb()(e);
+            }
+        }
+
+        // 13 = enter, 38 = up arrow, 13 = down arrow
+        function _isSpecialKey(event) {
+            var key = event.data.domEvent.$.which;
+            return key === 13 || key === 38 || key === 13;
+        }
+
+        function _isTabKey(event) {
+            return event.data.domEvent.$.which === 9;
+        }
+
+        function _isMentionKey(event) {
+            return event.data.domEvent.$.shiftKey && event.data.domEvent.$.key === '@';
+        }
+
+        function _isShiftKeyOn(event) {
+            return event.data.domEvent.$.shiftKey;
         }
     };
 
