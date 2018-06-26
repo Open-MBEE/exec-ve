@@ -513,10 +513,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             }
         }
 
-        // 13 = enter, 38 = up arrow, 13 = down arrow
+        // 13 = enter, 38 = up arrow, 40 = down arrow
         function _isSpecialKey(event) {
             var key = event.data.domEvent.$.which;
-            return key === 13 || key === 38 || key === 13;
+            return key === 13 || key === 38 || key === 40;
         }
 
         function _isTabKey(event) {
