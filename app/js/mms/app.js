@@ -407,7 +407,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.groupReorder', {
         url: '/group-reorder',
         resolve: {
-            documentObs: ['ViewService', '$stateParams', function(ViewService, $stateParams) {
+            documentObs: ['ViewService', '$stateParams', 'ticket', function(ViewService, $stateParams, ticket) {
                 return ViewService.getProjectDocuments({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId
