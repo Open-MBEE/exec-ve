@@ -387,15 +387,16 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         return deferred.promise;
     };
 
-    var handleChildViews = function(v, aggr, projectId, refId, curItemFunc, childrenFunc, seen) {
+    var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen) {
         var seenViews = seen;
         if (!seenViews)
             seenViews = {};
         var deferred = $q.defer();
-        var curItem = curItemFunc(v, aggr);
+        var curItem = curItemFunc(v, aggr, propId);
         seenViews[v.id] = v;
         var childIds = [];
         var childAggrs = [];
+        var childPropIds = [];
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             if (angular.isObject(curItem) && curItem.loading) {
                 curItem.loading = false;
@@ -408,6 +409,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 continue;
             childIds.push(v._childViews[i].id);
             childAggrs.push(v._childViews[i].aggregation);
+            childPropIds.push(v._childViews[i].propertyId);
         }
         ElementService.getElements({
             elementIds: childIds,
@@ -424,9 +426,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             for (i = 0; i < childIds.length; i++) {
                 var child = mapping[childIds[i]];
                 if (child && UtilsService.isView(child)) { //what if not found??
-                    childPromises.push(handleChildViews(child, childAggrs[i], projectId, refId, curItemFunc, childrenFunc, seenViews));
-                    childNodes.push(curItemFunc(child, childAggrs[i]));
-                    processedChildViews.push({id: child.id, aggregation: childAggrs[i]});
+                    childPromises.push(handleChildViews(child, childAggrs[i], childPropIds[i], projectId, refId, curItemFunc, childrenFunc, seenViews));
+                    childNodes.push(curItemFunc(child, childAggrs[i], childPropIds[i]));
+                    processedChildViews.push({id: child.id, aggregation: childAggrs[i], propertyId: childPropIds[i]});
                 }
             }
             v._childViews = processedChildViews;
