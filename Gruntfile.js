@@ -79,6 +79,36 @@ module.exports = function(grunt) {
     }
   }
 
+  var combineCustomJS = {
+        options: {
+            banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
+                wrap: 'mms',
+                mangle: true,
+                sourceMap: {
+                includeSources: true
+            }
+        },
+        files: {
+            'dist/js/ve-mms.min.js': [
+
+                // mms module
+                'src/mms.js',
+                'src/services/*.js',
+
+                // mms.directives module (need mms, mms.directives.tpls.js module )
+                'dist/jsTemp/mms.directives.tpls.js',
+                'src/mms.directives.js',
+                'src/directives/**/*.js',
+
+                // app module ( need app.tpls.js, mms, mms.directives module )
+                'dist/jsTemp/app.tpls.js',
+                'app/js/mms/app.js',
+                'app/js/mms/controllers/*.js',
+                'app/js/mms/directives/*.js'
+            ]
+        }
+    };
+
   // Project configuration.
   grunt.initConfig({
 
@@ -86,12 +116,12 @@ module.exports = function(grunt) {
 
     concurrent: {
       devStep1: ['install', 'lint', 'clean:before'],
-      devStep2: [['copy:all', 'processExternalDepsDevMode'], 'processAppStyleSheets', 'processAppJS' ],
+      devStep2: [['copy:all', 'processExternalDepsDevMode'], 'processAppStyleSheets', 'processAppJSInDev' ],
       devStep3: ['copy:dev'],
       devStep4: ['clean:devAfter', 'cacheBust'],
 
       releaseStep1: ['install', 'lint', 'clean:before'],
-      releaseStep2: [['copy:all', 'processExternalDeps'], 'processAppStyleSheets', 'processAppJS' ],
+      releaseStep2: [['copy:all', 'processExternalDeps'], 'processAppStyleSheets', 'processAppJSInProd' ],
       releaseStep3: ['clean:releaseAfter', 'cacheBust']
     },
 
@@ -222,37 +252,15 @@ module.exports = function(grunt) {
         dest: 'dist/jsTemp/app.tpls.js'
       }
     },
+
+    // concat only (no minification )
+    concat: {
+        combineCustomJS: combineCustomJS
+    },
+
     /** Concat + Minify JS files **/
     uglify: {
-      combineCustomJS: {
-        options: {
-          banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
-          wrap: 'mms',
-          mangle: true,
-          sourceMap: {
-            includeSources: true
-          }
-        },
-        files: {
-          'dist/js/ve-mms.min.js': [
-
-            // mms module
-            'src/mms.js',
-            'src/services/*.js',
-
-            // mms.directives module (need mms, mms.directives.tpls.js module )
-            'dist/jsTemp/mms.directives.tpls.js',
-            'src/mms.directives.js',
-            'src/directives/**/*.js',
-
-            // app module ( need app.tpls.js, mms, mms.directives module )
-            'dist/jsTemp/app.tpls.js',
-            'app/js/mms/app.js',
-            'app/js/mms/controllers/*.js',
-            'app/js/mms/directives/*.js'
-          ]
-        }
-      },
+      combineCustomJS: combineCustomJS,
       // this target is for files handled by usemin task.
       generated: {
         options: {
@@ -283,6 +291,7 @@ module.exports = function(grunt) {
         reporterOutput: '',
         evil: true, //allow eval for plot integration
         globalstrict: true,
+        validthis: true,
         globals: {
           angular: true,
           window: true,
@@ -388,7 +397,8 @@ module.exports = function(grunt) {
   grunt.registerTask('install', 'bower-install-simple');
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('processAppStyleSheets', ['sass', 'cssmin']);
-  grunt.registerTask('processAppJS', ['html2js', 'uglify:combineCustomJS']);
+  grunt.registerTask('processAppJSInDev', ['html2js', 'concat:combineCustomJS']);
+  grunt.registerTask('processAppJSInProd', ['html2js', 'uglify:combineCustomJS']);
   grunt.registerTask('processExternalDeps', ['wiredep', 'useminPrepare', 'concat:generated', 'cssmin:generated', 'uglify:generated', 'usemin']);
 
   // for dev mode, we don't need to minify vendor files because it slows down the build process
