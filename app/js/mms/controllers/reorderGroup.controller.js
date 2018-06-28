@@ -6,7 +6,9 @@ angular.module('mmsApp')
 function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, CacheService, projectOb, refOb, groupObs, documentObs) {
     $scope.isSaving = false;
     $scope.treeOptions = {
-        dropped: function (change) {},
+        dropped: function (change) {
+            sortRecursively(tree);
+        },
         accept: function (sourceNodeScope, destNodeScope, destIndex) {
             // allow moving to root or to group
             return !destNodeScope.node || destNodeScope.node.type === 'group';
