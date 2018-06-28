@@ -12,7 +12,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 scope.selectActive = function(matchIdx) {
                     // added behavior
                     elem.children().removeClass('active');
-
                     // default behavior
                     scope.active = matchIdx;
                 };
