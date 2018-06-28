@@ -406,7 +406,7 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getPutArtifactsURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
-        return addTicket(r);
+        return addTicket(addVersion(r, reqOb.commitId));
     };
 
     /**
