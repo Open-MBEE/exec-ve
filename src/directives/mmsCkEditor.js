@@ -471,7 +471,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             var keyupHandler;
             CKEDITOR.instances[attrs.id].on('contentDom', function() {
                 keyupHandler = CKEDITOR.instances[instance.name].document.on('keyup', function(e) {
-                    if(e.data.$.shiftKey && e.data.$.key === '@') {
+                    if(_isMentionKey(e.data.$)) {
                         MentionService.createMention(instance, scope.mmsProjectId, scope.mmsRefId);
                         return false;
                     } else {
@@ -494,7 +494,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         }
 
         function _keyHandler(e) {
-            if (_isMentionKey(e)) {
+            if (_isMentionKey(e.data.domEvent.$)) {
                 return false; // to prevent "@" from getting written to the editor
             }
 
@@ -523,8 +523,8 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             return event.data.domEvent.$.which === 9;
         }
 
-        function _isMentionKey(event) {
-            return event.data.domEvent.$.shiftKey && event.data.domEvent.$.key === '@';
+        function _isMentionKey(keyboardEvent) {
+            return keyboardEvent.shiftKey && keyboardEvent.key === '@';
         }
 
         function _isShiftKeyOn(event) {
