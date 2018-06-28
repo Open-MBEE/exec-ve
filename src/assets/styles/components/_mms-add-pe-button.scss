@@ -6,7 +6,7 @@
 
 /*take PE button out of document flow and put to left of content*/
   position: absolute;
-  margin-top: -16px;
+  margin-top: -17px;
   left: 0;
 
   /*** Add PE dropdown ***/
@@ -21,7 +21,7 @@
   //Padding, font size, and line height match for the toggle and dropdown
   a.dropdown-toggle,
   .dropdown-menu a{
-    padding: 5px 8px;
+    padding: 7px 8px;
     font-size: 14px;
   }
 
