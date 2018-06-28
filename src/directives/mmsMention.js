@@ -20,11 +20,11 @@ function mmsMention($templateCache, MentionService, Utils) {
 
     function mmsMentionCtrl($scope) {
         $scope.fastCfListing = MentionService.getFastCfListing($scope.mmsProjectId, $scope.mmsRefId);
-        // expose this api so on the controller itself so that it can be access by codes that use $compile service.
+        // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
         this.autocompleteOnSelect = autocompleteOnSelect;
         $scope.autocompleteOnSelect = autocompleteOnSelect;
 
-        function autocompleteOnSelect($item, $model) {
+        function autocompleteOnSelect($item) {
             _createCf($item);
             MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId);
         }
@@ -35,9 +35,9 @@ function mmsMention($templateCache, MentionService, Utils) {
             Utils.focusOnEditorAfterAddingWidgetTag($scope.mmsEditor);
         }
     }
-
 }
 
+// Used to sync value between input from the ckeditor and the uib-typeahead directive
 angular.module('mms.directives')
     .directive('mmsMentionIntercept', ['$templateCache',  mmsMentionIntercept]);
 

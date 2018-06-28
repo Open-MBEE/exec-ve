@@ -39,7 +39,7 @@ function MentionService($rootScope, $compile, CacheService) {
     function handleInput(event, editor, projectId, refId) {
         var currentEditingElement = editor._.elementsPath.list[0].$;
         var currentEditingElementId = currentEditingElement.getAttribute('id');
-        var mentionId = _getMentionPlaceHolderMentionId(currentEditingElementId);
+        var mentionId = _getMentionIdFromMentionPlaceHolder(currentEditingElementId);
         if (mentionId) {
             var mentionState = _retrieveMentionState(editor.id, mentionId);
             // logic to reactivate existing "@" when reloading ckeditor
@@ -75,7 +75,7 @@ function MentionService($rootScope, $compile, CacheService) {
     function hasMentionResults(editor) {
         var currentEditingElement = editor._.elementsPath.list[0].$;
         var currentEditingElementId = currentEditingElement.getAttribute('id');
-        var mentionId = _getMentionPlaceHolderMentionId(currentEditingElementId);
+        var mentionId = _getMentionIdFromMentionPlaceHolder(currentEditingElementId);
         if (mentionId) {
             return _hasMentionResults(mentionId);
         }
@@ -152,7 +152,7 @@ function MentionService($rootScope, $compile, CacheService) {
         return chr4() + chr4() + chr4() + chr4() + chr4() + chr4() + chr4() + chr4();
     }
 
-    function _getMentionPlaceHolderMentionId(currentEditingElementId) {
+    function _getMentionIdFromMentionPlaceHolder(currentEditingElementId) {
         if (currentEditingElementId && currentEditingElementId.indexOf(mentionPlacerHolderPrefix) > -1) {
             var splits = currentEditingElementId.split('-');
             var mentionId = splits[2];

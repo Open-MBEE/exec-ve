@@ -473,7 +473,6 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 keyupHandler = CKEDITOR.instances[instance.name].document.on('keyup', function(e) {
                     if(_isMentionKey(e.data.$)) {
                         MentionService.createMention(instance, scope.mmsProjectId, scope.mmsRefId);
-                        return false;
                     } else {
                         MentionService.handleInput(e, instance, scope.mmsProjectId, scope.mmsRefId);
                     }
@@ -504,7 +503,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 e.cancel(); e.stop();
             }
 
-            if (_isTabKey(e) && !_isShiftKeyOn(e)) {
+            if (_isTabKey(e) && !_isShiftKeyOn(e.data.domEvent.$)) {
                 instance.insertHtml('&nbsp;&nbsp;&nbsp;&nbsp;');
             }
 
@@ -524,11 +523,11 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         }
 
         function _isMentionKey(keyboardEvent) {
-            return keyboardEvent.shiftKey && keyboardEvent.key === '@';
+            return _isShiftKeyOn(keyboardEvent) && keyboardEvent.key === '@';
         }
 
-        function _isShiftKeyOn(event) {
-            return event.data.domEvent.$.shiftKey;
+        function _isShiftKeyOn(keyboardEvent) {
+            return keyboardEvent.shiftKey;
         }
     };
 
