@@ -50,10 +50,9 @@ function mmsMentionIntercept() {
         require: ['ngModel'],
         link: function(scope, el, attrs, ctls) {
             scope.$watch('mmsMentionInterceptValue', function(newV, oldV) {
-                if(newV !== oldV) {
-                    ctls[0].$setViewValue(newV);
-                    ctls[0].$render();
-                }
+                var ngModelCtrl = ctls[0];
+                ngModelCtrl.$setViewValue(newV);
+                ngModelCtrl.$render();
             });
         }
     };
