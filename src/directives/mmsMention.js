@@ -21,10 +21,10 @@ function mmsMention($templateCache, MentionService, Utils) {
     function mmsMentionCtrl($scope) {
         $scope.fastCfListing = MentionService.getFastCfListing($scope.mmsProjectId, $scope.mmsRefId);
         // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
-        this.autocompleteOnSelect = autocompleteOnSelect;
-        $scope.autocompleteOnSelect = autocompleteOnSelect;
+        this.selectMentionItem = selectMentionItem;
+        $scope.selectMentionItem = selectMentionItem;
 
-        function autocompleteOnSelect($item) {
+        function selectMentionItem($item) {
             _createCf($item);
             MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId);
         }

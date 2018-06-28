@@ -1,4 +1,4 @@
 <div id={{mmsMentionId}}>
-    <input style="display:none;" mms-mention-intercept mms-mention-intercept-value="mmsMentionValue" uib-typeahead="autocompleteItem as autocompleteItem.label for autocompleteItem in fastCfListing | filter:{name: $viewValue} | limitTo:10"
-           typeahead-on-select='autocompleteOnSelect($item, $model)' ng-model="selected" class="autocomplete-modal-typeahead form-control" placeholder="Type an element name to Cf" autofocus/>
+    <input style="display:none;" mms-mention-intercept mms-mention-intercept-value="mmsMentionValue" uib-typeahead="mentionItem as mentionItem.label for mentionItem in fastCfListing | filter:{name: $viewValue} | limitTo:10"
+           typeahead-on-select='selectMentionItem($item, $model)' ng-model="selected" class="autocomplete-modal-typeahead form-control" placeholder="Type an element name to Cf" autofocus/>
 </div>

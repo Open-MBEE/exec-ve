@@ -207,7 +207,7 @@ function MentionService($rootScope, $compile, CacheService) {
             var key = currentMentionMatchDom.text().trim();
             var mentionItem = _getMentionItem(key, projectId, refId);
             var mentionState = _retrieveMentionState(editorId, mentionId);
-            mentionState.mentionController.autocompleteOnSelect(mentionItem);
+            mentionState.mentionController.selectMentionItem(mentionItem);
         }
     }
 
