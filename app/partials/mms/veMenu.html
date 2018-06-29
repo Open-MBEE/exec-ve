@@ -8,7 +8,7 @@
             <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
                 <li ng-repeat="project in projects | orderBy: 'name'" ng-click="updateProject(project)"
                     ng-class="{'checked-list-item': project.name === currentProject}">
-                    <a href="{{getHref(project);}}"> {{ project.name }} </a>
+                    <a ng-href="{{getHrefForProject(project);}}"> {{ project.name }} </a>
                 </li>
             </ul>
         </div>
@@ -54,14 +54,16 @@
                             <li ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter} " ng-click="updateBranch(branch)"
                                 ng-class="{'checked-list-item': branch.name === currentBranch, 'branch-disabled': branch.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
-                                tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">{{ branch.name }}
+                                tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">
+                                <a ng-href="{{getHrefForBranch(branch);}}" ng-style="{display: 'block'}"> {{ branch.name }} </a>
                             </li>
                         </uib-tab>
                         <uib-tab index="1" classes="tab-item" heading="Tags">
                             <li ng-if="tags.length" ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="updateTag(tag)"
                                 ng-class="{'checked-list-item': tag.name === currentTag, 'branch-disabled': tag.status == 'creating'}"
                                 is-open="false" tooltip-placement="left" uib-tooltip-html="htmlTooltip"
-                                tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">{{ tag.name }}
+                                tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">
+                                <a ng-href="{{getHrefForTag(tag);}}" ng-style="{display: 'block'}"> {{ tag.name }} </a>
                             </li>
                             <li ng-if="!tags.length" class="ve-secondary">No Tags</li>
                         </uib-tab>
