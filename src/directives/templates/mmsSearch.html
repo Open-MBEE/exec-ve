@@ -175,15 +175,6 @@
                     {{elem._qualifiedName}}
                 </div>
             </div>
-            <label>Metatypes</label>
-            <div class="elem-type-wrapper">
-                <span class="elem-type">{{elem.type}}</span>
-                <span ng-if="elem._appliedStereotypeIds.length">
-                    <span ng-repeat="type in elem._appliedStereotypeIds">
-                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
-                    </span>
-                </span>
-            </div>
             <div ng-if="elem.type === 'Diagram' && elem._artifactIds">
                 <mms-transclude-img ng-click="userResultClick(elem, 'img')" mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></mms-transclude-img>
             </div>
@@ -262,6 +253,15 @@
                         > <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)"></mms-view-link><br/>
                     </span>
                 </div>
+            </div>
+            <label>Metatypes</label>
+            <div class="elem-type-wrapper">
+                <span class="elem-type">{{elem.type}}</span>
+                <span ng-if="elem._appliedStereotypeIds.length">
+                    <span ng-repeat="type in elem._appliedStereotypeIds">
+                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
+                    </span>
+                </span>
             </div>
             <div class="elem-updated-wrapper">
                 <div>Last modified {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
