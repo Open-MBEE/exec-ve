@@ -2,7 +2,7 @@
 .revert-spec {
   h1.prop,
   h1.prop > .form-control {
-    font-size: 32px;
+    font-size: 26px;
     margin: 24px 0 4px;;
     height: inherit;
     width: 100%;
@@ -76,7 +76,7 @@ Styles that apply to both the spec
   .visibility-toggle{
     font-size: 12px;
     font-weight: bold;
-    margin: 16px 0px 0 0;
+    margin: 15px 0px 0 0;
     letter-spacing: .05em;
     text-decoration: none;
     color: $ve-light-text;
