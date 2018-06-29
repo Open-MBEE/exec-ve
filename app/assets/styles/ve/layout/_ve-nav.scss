@@ -61,15 +61,29 @@ a.switch-org:hover {
   text-decoration: underline !important;
 }
 
-.logotype {
-  font-weight: 300;
-  line-height: $navHeight;
-  padding: 0 5px 0 13px;
+/* View Editor logo placement*/
+.navbar-brand{
+  float: left;
+  padding: 5px 7px;
+  font-size: 20px;
+  line-height: 22px;
+  height: $navHeight;
+
+  img{
+    height: 26px;
+    border-radius: 50%;
+    transition: $background_hover_transition;
+
+    &:hover{
+      background-color: #0096FF;
+    }
+  }
 }
 
 .org-title {
   font-weight: 600;
   padding-right: 4px;
+  line-height: $navHeight;
 }
 
 /*------------------------------------------------------------------

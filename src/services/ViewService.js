@@ -261,8 +261,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
-                _modified: data._modified,
-                // _read: data._read,
+                //_modified: data._modified,
                 id: data.id
             };
             if (data._childViews) {
@@ -306,8 +305,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var clone = {
                     _projectId: data._projectId,
                     _refId: data._refId,
-                    _modified: data._modified,
-                    _read: data._read,
+                    //_modified: data._modified,
+                    //_read: data._read,
                     id: data.id,
                     _childViews: JSON.parse(JSON.stringify(data._childViews))
                 };
@@ -359,8 +358,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             var clone = {
                 _projectId: data._projectId,
                 _refId: data._refId,
-                _modified: data._modified,
-                _read: data._read,
+                //_modified: data._modified,
                 id: data.id,
             };
             var key = '_contents';
@@ -424,8 +422,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var clone = {
                     _projectId: data._projectId,
                     _refId: data._refId,
-                    _modified: data._modified,
-                    _read: data._read,
+                    //_modified: data._modified,
                     id: data.id,
                 };
                 var key = '_contents';

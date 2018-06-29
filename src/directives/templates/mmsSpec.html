@@ -178,8 +178,8 @@
             <span class="elem-related-docs-wrapper prop">
                 <div ng-repeat="relatedDocument in relatedDocuments">
                     <span ng-repeat="relatedView in relatedDocument._parentViews">
-                        <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" link-target="_blank"></mms-view-link>
-                        > <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" link-target="_blank"></mms-view-link><br/>
+                        <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" link-target="_blank" rel="noopener"></mms-view-link>
+                        > <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" link-target="_blank" rel="noopener"></mms-view-link><br/>
                     </span>
                 </div>
             </span>
@@ -210,7 +210,7 @@
             <span class="prop">{{element._modified}}</span>
             <h2 class="prop-title">Commit</h2>
             <span class="prop" title="View raw element data">
-                <a target="_blank" ng-href="{{elementDataLink}}">
+                <a target="_blank" rel="noopener noreferrer" ng-href="{{elementDataLink}}">
                     {{element._commitId}}&nbsp;<i class="fa fa-external-link" aria-hidden="true"></i>
                 </a>
             </span>

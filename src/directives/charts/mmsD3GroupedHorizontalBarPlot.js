@@ -4,9 +4,9 @@
  angular.module('mms.directives')
     .directive('mmsD3GroupedHorizontalBarPlot', ['TableService','$window', mmsD3GroupedHorizontalBarPlot]);
 function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
-      
+
     var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {
-      
+
       var d3 = $window.d3;  
       var divchart = d3.select(element[0]).append('div');
       var defaultPlotConfig = {width : 960,
@@ -25,15 +25,12 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       var projectId;
       var refId;
       var commitId;
-            
+
       if (mmsViewCtrl) {
-          var viewVersion = mmsViewCtrl.getElementOrigin();
-          if (!projectId)
-              projectId = viewVersion.projectId;
-          if (!refId)
-              refId = viewVersion.refId;
-          if (!commitId)
-              commitId = viewVersion.commitId;
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        projectId = viewVersion.projectId;
+        refId = viewVersion.refId;
+        commitId = viewVersion.commitId;
       }
       var opacitydefault = 1,//0.7,
           opacityselected = 1.0,
@@ -52,7 +49,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
           .transition(200)
           .style("opacity", opacitydefault);
       }//end of function mouseout
-   
+
       function mouseover(mouseoverClassId){
             d3.selectAll(".ghbbar")
             .transition(200)

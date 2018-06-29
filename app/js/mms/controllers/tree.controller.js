@@ -41,6 +41,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
+            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-group"));
+            $scope.bbApi.setPermission("tree-reorder-group", projectOb && projectOb._editable);
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
             $scope.bbApi.setPermission( "tree-add-document-or-group", documentOb._editable && (refOb.type === 'Tag' ? false : true) );
@@ -95,6 +97,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $rootScope.ve_fullDocMode = false;
         $scope.bbApi.setToggleState("tree-full-document", false);
         $state.go('project.ref.document.order', {search: undefined});
+    });
+
+    $scope.$on('tree-reorder-group', function() {
+        $state.go('project.ref.groupReorder');
     });
 
     $scope.$on('tree-add-group', function() {
@@ -284,7 +290,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if (!documentOb._childViews) {
             documentOb._childViews = [];
         }
-        MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
+        MmsAppUtils.handleChildViews(documentOb, 'composite', undefined, projectOb.id, refOb.id, handleSingleView, handleChildren)
         .then(function(node) {
             var bulkGet = [];
             for (var i in viewId2node) {
@@ -587,7 +593,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 while (prevBranch.type !== 'view') {
                     prevBranch = $scope.treeApi.get_prev_branch(prevBranch);
                 }
-                MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, projectOb.id, refOb.id, handleSingleView, handleChildren)
+                MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, undefined, projectOb.id, refOb.id, handleSingleView, handleChildren)
                   .then(function(node) {
                       // handle full doc mode
                       if ($rootScope.ve_fullDocMode) {

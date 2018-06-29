@@ -32,7 +32,7 @@ mms-view {
 
   .read-width {
     p, h1, h2, h3, h4, h5, h6, ol, ul { //figure, img, table, div
-      max-width: 7.5in;
+      max-width: $pane_center_text_width;
     }
   }
 }

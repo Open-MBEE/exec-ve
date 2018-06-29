@@ -435,7 +435,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     var hasConflict = function(edit, orig, server) {
         for (var i in edit) {
             if (i === '_read' || i === '_modified' || i === '_modifier' || 
-                    i === '_creator' || i === '_created' || '_commitId') {
+                    i === '_creator' || i === '_created' || i === '_commitId') {
                 continue;
             }
             if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
@@ -1131,9 +1131,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
                 ".match,.textdiff span {color: gray;}\n" +
                 "@page {margin: 0.5in;}\n" + 
-                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
-                //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
-                //".big-table {page: big_table; max-width: 1100px; }\n";
+                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
+                "@page landscape {size: 11in 8.5in;}\n" +
+                ".landscape {page: landscape;}\n";
         for (var i = 1; i < 10; i++) {
             ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
         }
@@ -1146,7 +1146,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         Object.keys(meta).forEach(function(key) {
             if (meta[key]) {
-                var content = '""';
+                var content;
                 if (meta[key] === 'counter(page)') {
                     content = meta[key];
                 } else {

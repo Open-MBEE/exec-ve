@@ -31,8 +31,8 @@ CKEDITOR.editorConfig = function( config ) {
 	// Enhanced Image config
 	config.image2_alignClasses = [ 'image-left', 'image-center', 'image-right' ];
 	config.filebrowserUploadUrl = "/alfresco.php";
-	//config.filebrowserBrowseUrl = "/alfresco.php";
 	config.uploadUrl = "/alfresco.php";
+
 	// Remove some buttons provided by the standard plugins, which are
 	// not needed in the Standard(s) toolbar.
 	config.removeButtons = 'Subscript,Superscript,Blockquote';

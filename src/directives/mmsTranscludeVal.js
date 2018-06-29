@@ -92,7 +92,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             }
             var toCompileList = [];
             var areStrings = false;
-            var isExpression = false;
             var values = scope.values;
             if (preview) {
                 values = scope.editValues;
@@ -107,9 +106,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                         s = s.replace('<', '&lt;');
                     }
                     toCompileList.push(s);
-                } else if (values[i].type === 'Expression') {
-                    isExpression = true;
-                    break;
                 } else {
                     break;
                 }

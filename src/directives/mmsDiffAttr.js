@@ -104,7 +104,7 @@ function mmsDiffAttr(ElementService, $compile, $rootScope, $interval, $templateC
                 compareCommitId = 'latest';
             }
             if (baseCommitId === compareCommitId) {
-                scope.message = ' Comparing same commit.';
+                scope.message = ' Comparing same version.';
                 scope.diffLoading = false;
                 return;
             }
