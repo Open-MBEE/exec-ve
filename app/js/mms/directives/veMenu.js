@@ -26,6 +26,7 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
+        scope.getHref = getHref;
 
         scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.');
         scope.currentProject = scope.project.name;
@@ -122,6 +123,11 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
             var crumbcount = scope.breadcrumbs.length;
             var liWidth = (eltWidth * 0.65)/crumbcount;
             scope.truncateStyle={'max-width': liWidth, 'white-space': 'nowrap', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'display': 'inline-block'};
+        }
+
+        function getHref(project) {
+            var refId = project._refId || 'master';
+            return 'mms.html#/projects/' + project.id + '/' + refId;
         }
     };
 
