@@ -32,6 +32,8 @@
 
   .doc-text {
     font-family: $font-family-sans-serif;
+    
+    /* Add border to left to delineate*/
     padding-left: 4px;
     border-left: 3px solid $ve-silver-base;
     max-width: $default-line-length;
