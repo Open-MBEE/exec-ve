@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="169px" height="165px" viewBox="0 0 169 165" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>logo2 copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
+        <g id="logo2-copy" transform="translate(5.000000, 5.000000)" stroke="#FFFFFF" stroke-width="9">
+            <g id="Group-2">
+                <path d="M60.9410783,0.0520049832 C25.9696088,8.51967318 0,39.986751 0,77.5104378 C0,114.897022 25.780182,146.271175 60.5581075,154.875134" id="Oval-2-Copy"></path>
+                <path d="M158.586404,0.315941154 C124.150542,9.15673741 98.7035319,40.3662231 98.7035319,77.5104378 C98.7035319,114.803206 124.354493,146.11368 159,154.809933" id="Oval-2-Copy-2" transform="translate(128.851766, 77.562937) scale(-1, 1) translate(-128.851766, -77.562937) "></path>
+            </g>
+            <polyline id="Triangle" stroke-linejoin="round" transform="translate(52.500000, 79.500000) scale(1, -1) translate(-52.500000, -79.500000) " points="38 99 52.5 60 67 99"></polyline>
+            <polyline id="Rectangle-4" stroke-linejoin="round" transform="translate(108.000000, 79.500000) scale(-1, 1) translate(-108.000000, -79.500000) " points="95 60 121 60 121 80.7509766 121 99 95 99"></polyline>
+            <path d="M96.4285714,79.5 L119.587296,79.5" id="Line-6"></path>
+        </g>
+    </g>
+</svg>
