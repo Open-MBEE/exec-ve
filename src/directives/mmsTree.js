@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTree', ["$timeout", "$log", '$templateCache', mmsTree]);
+.directive('mmsTree', ["$timeout", "$log", '$templateCache', 'UtilsService', mmsTree]);
 
 /**
  * @ngdoc directive
@@ -97,9 +97,10 @@ angular.module('mms.directives')
  * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
  * @param {string='fa fa-file'} iconDefault default icon to use for nodes
  */
-function mmsTree($timeout, $log, $templateCache) {
+function mmsTree($timeout, $log, $templateCache, UtilsService) {
 
     var mmsTreeLink = function(scope, element, attrs) {
+        scope.getHref = getHref;
         if (!scope.options) {
             scope.options = {
                 expandLevel: 1,
@@ -750,6 +751,14 @@ function mmsTree($timeout, $log, $templateCache) {
                 return scope.user_clicks_branch(branch);
             };
 
+        }
+        
+        function getHref(row) {
+            var data = row.branch.data;
+            if (row.branch.type !== 'group' && UtilsService.isDocument(data)) {
+                var ref = data._refId ? data._refId : 'master';
+                return "mms.html#/projects/" + data._projectId + '/' + ref+ '/documents/' + data.id + '/views/' + data.id;
+            }
         }
     };
 
