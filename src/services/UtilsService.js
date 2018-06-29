@@ -1131,9 +1131,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
                 ".match,.textdiff span {color: gray;}\n" +
                 "@page {margin: 0.5in;}\n" + 
-                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n";
-                //"@page big_table {  size: 8.5in 11in; margin: 0.75in; prince-shrink-to-fit:auto;}\n" +  //size: 11in 8.5in;
-                //".big-table {page: big_table; max-width: 1100px; }\n";
+                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
+                "@page landscape {size: 11in 8.5in;}\n" +
+                ".landscape {page: landscape;}\n";
         for (var i = 1; i < 10; i++) {
             ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
         }

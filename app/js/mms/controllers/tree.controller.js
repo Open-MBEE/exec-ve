@@ -290,7 +290,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         if (!documentOb._childViews) {
             documentOb._childViews = [];
         }
-        MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, handleSingleView, handleChildren)
+        MmsAppUtils.handleChildViews(documentOb, 'composite', undefined, projectOb.id, refOb.id, handleSingleView, handleChildren)
         .then(function(node) {
             var bulkGet = [];
             for (var i in viewId2node) {
@@ -593,7 +593,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 while (prevBranch.type !== 'view') {
                     prevBranch = $scope.treeApi.get_prev_branch(prevBranch);
                 }
-                MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, projectOb.id, refOb.id, handleSingleView, handleChildren)
+                MmsAppUtils.handleChildViews(data, $scope.newViewAggr.type, undefined, projectOb.id, refOb.id, handleSingleView, handleChildren)
                   .then(function(node) {
                       // handle full doc mode
                       if ($rootScope.ve_fullDocMode) {
