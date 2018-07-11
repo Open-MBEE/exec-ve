@@ -148,8 +148,9 @@
     border-top: 1px solid $ve-silver-darker-1;
   }
 
+  /*Search result wrapper*/
   .elem-wrapper {
-    padding: 36px 0;
+    padding: 44px 0;
     margin:0 30px;
     border-bottom: 1px solid $ve-silver-darker-1;
 
@@ -170,16 +171,17 @@
         @extend .content-table;
       }
     }
-
     .elem-properties-wrapper {
+
+      /*Table styling so values are aligned right and properties are aligned left*/
       table{
         margin-bottom: 0;
         color: $ve-light-text;
       }
+      
       table > tbody > tr > td{
-
         border-top: none;
-        padding: 2px;
+        padding: 1px;
 
         /*Float property name right for better readability*/
         &:first-child{
@@ -187,6 +189,14 @@
           text-align: right;
         }
       }
+    }
+
+    /*Indent content so it pops out*/
+    .elem-properties,
+    .elem-specification,
+    .elem-documentation,
+    .elem-properties-wrapper > table > tbody > tr > td:first-child{
+      padding-left: 10px;
     }
 
     .ellipses {
