@@ -10,12 +10,14 @@ ul.abn-tree {
 
     a.tree-item {
       @include border-radius(0);
-      margin-top: 3px;
-      margin-bottom: 3px;
+      margin-top: 1px;
+      margin-bottom: 1px;
       margin-left: 10px;  
       color: $black;
       text-decoration: none;
       white-space: nowrap;
+      width: 100%;
+      display: inline-block;
     }
   }
 

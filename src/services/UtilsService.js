@@ -17,6 +17,7 @@ angular.module('mms')
  * Utilities
  */
 function UtilsService($q, $http, CacheService, URLService, ApplicationService, _) {
+    var PROJECT_URL_PREFIX = 'mms.html#/projects/';
     var VIEW_SID = '_11_5EAPbeta_be00301_1147420760998_43940_227';
     var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
         '_17_0_1_232f03dc_1325612611695_581988_21583', '_18_0beta_9150291_1392290067481_33752_4359'];
@@ -1328,5 +1329,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         generateAnchorId: generateAnchorId,
         tableConfig: tableConfig,
         _generateRowColNumber: _generateRowColNumber,
+        PROJECT_URL_PREFIX: PROJECT_URL_PREFIX
     };
 }

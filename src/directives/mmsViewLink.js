@@ -94,9 +94,9 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                             scope.suffix = ')';
                         }
                         if (ApplicationService.getState().fullDoc) {
-                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + "/full" + scope.hash;
+                            scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + "/full" + scope.hash;
                         } else {
-                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
+                            scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
                         }
                     });
                 }
@@ -115,9 +115,9 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                 }
                 scope.loading = false;
                 if (ApplicationService.getState().fullDoc) {
-                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
+                    scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
                 } else {
-                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
+                    scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
                 }
                 scope.change = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc == scope.docid) && !scope.suppressNumbering;
             }, function(reason) {
