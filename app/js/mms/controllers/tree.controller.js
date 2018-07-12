@@ -526,13 +526,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             templateUrlStr = 'partials/mms/new-doc-or-group.html';
             newBranchType = 'view';
         } else if (itemType === 'Group') {
-            if (!branch) {
-                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
-            } else if (branch.type !== 'group') {
-                growl.warning("Select a group to add group under");
-                return;
-            } else {
+            if (branch && branch.type === 'group') {
                 $scope.parentBranchData = branch.data;
+            } else {
+                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
+                // Always create group at root level if the selected branch is not a group branch
+                branch = null;
             }
             templateUrlStr = 'partials/mms/new-doc-or-group.html';
             newBranchType = 'group';
