@@ -162,11 +162,11 @@ tr {
   color: lighten($ve-accent, 12%);
 }
 
-#group-reorder-container .highlighted {
+.group-reorder-container .highlighted {
   background-color: $ve-teal-darker-1;
   color: white;
 }
 
-#group-reorder-container .angular-ui-tree-placeholder:before {
+.group-reorder-container .angular-ui-tree-placeholder:before {
   background-image: none;
 }
