@@ -2,19 +2,29 @@
     <h4>{{title}}</h4>
 </div>
 <div class="modal-body">
-    <div ng-show="!createForm">
-        <div class="ve-light-tabs" ng-show="showProposeLink">
-            <ul class="nav nav-tabs" ng-show="!createForm">
-                <li class="uib-tab nav-item tab-item">
-                    <a class="nav-link" ng-click="createForm = true"><i class="fa fa-plus"></i>Create New</a>
-                </li>
-                <li class="uib-tab nav-item tab-item active">
-                    <a class="nav-link"><i class="fa fa-search"></i>Search for existing</a>
-                </li>
-            </ul>
-        </div>
+    <div class="ve-light-tabs" ng-show="showProposeLink">
+        <ul class="nav nav-tabs">
+            <li class="uib-tab nav-item tab-item" ng-class="{'active': !searchExisting}">
+                <a class="nav-link" ng-click="searchExisting = !searchExisting"><i class="fa fa-plus"></i>Create New</a>
+            </li>
+            <li class="uib-tab nav-item tab-item" ng-class="{'active': searchExisting}">
+                <a class="nav-link" ng-click="searchExisting = !searchExisting"><i class="fa fa-search"></i>Search for existing</a>
+            </li>
+        </ul>
+    </div>
+
+    <div ng-show="searchExisting">
         <div class="transclude-modal-instructions">
             {{description}}
+        </div>
+        <label>Display Option</label><span class="star-mandatory">*</span>
+        <div ng-show="!showProposeLink">
+            <div class="radio">
+                <label><input type="radio" ng-model="suppressNumbering" ng-value="false">Use auto-numbering as title</label>
+            </div>
+            <div class="radio">
+                <label><input type="radio" ng-model="suppressNumbering" ng-value="true">Use Name as title</label>
+            </div>
         </div>
         <label ng-show="showEditableOp" for="nonEditableCheckbox">
             <input id="nonEditableCheckbox" type="checkbox" ng-model="nonEditableCheckbox">&nbsp;Restrict editing
@@ -22,17 +32,7 @@
 
         <mms-search mms-options="searchOptions" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-search>
     </div>
-    <div ng-show="createForm">
-        <div class="ve-light-tabs">
-            <ul class="nav nav-tabs">
-                <li class="uib-tab nav-item active tab-item">
-                    <a class="nav-link"><i class="fa fa-plus"></i>Create New</a>
-                </li>
-                <li class="uib-tab nav-item tab-item">
-                    <a ng-click="createForm = false" class="create-element-link nav-link" ng-show="createForm"><i class="fa fa-search"></i>Search for existing</a>
-                </li>
-            </ul>
-        </div>
+    <div ng-show="!searchExisting">
         <form>
             <div class="form-group">
                 <label>Name </label><span class="star-mandatory">*</span>
