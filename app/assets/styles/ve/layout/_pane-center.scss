@@ -163,8 +163,13 @@ tr {
 }
 
 .group-reorder-container .highlighted {
-  background-color: $ve-teal-darker-1;
+  background-color: darken($ve-active, 4%);
   color: white;
+
+  /*lighten folder against dark blue background*/
+  .fa-folder{
+    color: lighten($ve-accent, 24%);
+  }
 }
 
 .group-reorder-container .angular-ui-tree-placeholder:before {
