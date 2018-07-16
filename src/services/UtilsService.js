@@ -876,7 +876,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     };
 
     var addLiveNumbering = function(pe, el, type) {
-        var sysmlId = pe.id;
         var veNumber = pe._veNumber;
         var prefix = '';
         var name = '';
@@ -957,7 +956,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var tables = printElement.find('table'),
             figures = printElement.find('figure');
             // equations = printElement.find('.math-tex');
-        var anchorId = '', thisCap='', tblCap, tbl, fig, eq, j;
+        var anchorId = '', thisCap='', tblCap, tbl, fig, j;
 
         ob.tableCount = tables.length;
         ob.figureCount = figures.length;

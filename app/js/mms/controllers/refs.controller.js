@@ -142,8 +142,6 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         $scope.createForm = true;
         $scope.oking = false;
         var displayName = "";
-        var refArr = [];
-        var refJson = {};
         // Item specific setup:
         if ($scope.itemType === 'Branch') {
             $scope.branch = {};

@@ -57,7 +57,6 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
-        var processed = false;
         scope.cfType = 'doc';
 
         domElement.click(function(e) {
@@ -138,7 +137,6 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(domElement, mmsViewCtrl);
-            var type = "documentation";
 
             scope.save = function() {
                 Utils.saveAction(scope, domElement, false);
