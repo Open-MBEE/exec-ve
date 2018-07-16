@@ -164,12 +164,11 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
          * Updates advanced search main query input
          */
         scope.stringQueryUpdate = function() {
-            var metatypeFilterString;
             var rowLength = scope.advanceSearchRows.length;
             scope.stringQuery = Array(rowLength+1).join('(');
             scope.stringQuery += scope.mainSearch.searchType.label + ':';
             if (scope.mainSearch.searchType.id === 'metatype') {
-                scope.stringQuery += getMetatypeSelection('#searchMetatypeSelect');
+                scope.stringQuery += getMetatypeSelection('#searchMetatypeSelectAdvance');
             } else {
                 scope.stringQuery += scope.mainSearch.searchText;
             }
@@ -498,9 +497,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                         "must": mainBoolQuery,
                     } };
             } else {
-                var boolQuery, clause2;
-                var clause1 = buildSearchClause(scope.mainSearch);
-
+                var clause2, clause1 = buildSearchClause(scope.mainSearch);
                 for (var i = 0; i < rowLength; i++) {
                     // if must, must_not or should
                     var row = scope.advanceSearchRows[i];
