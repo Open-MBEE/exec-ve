@@ -285,7 +285,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 scope.currentPage = page;
                 scope.paginationCache.push(scope.searchResults);
                 if (scope.advanceSearch) {
-                    scope.advanceSearch = !scope.advanceSearch;
+                    // scope.advanceSearch = !scope.advanceSearch;
                     scope.advancedSearchResults = true;
                 }
             }, function(reason) {

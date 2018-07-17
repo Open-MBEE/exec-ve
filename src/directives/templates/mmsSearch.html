@@ -142,16 +142,15 @@
             </div>
         </div>
 
-
-        <div ng-show="advancedSearchResults" class="mms-search-input">
+        <!-- <div ng-show="advancedSearchResults" class="mms-search-input"> -->
             <!-- advanced search query input disabled -->
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <div class="misc-form-field search-nav-back">
                     <a ng-click="advancedSearchResults = !advancedSearchResults"><i class="fa fa-arrow-left"></i>Basic Search</a>
                 </div>
-                <form class="form-inline" ng-submit="newSearch(mainSearch)">
+                <form class="form-inline" ng-submit="newSearch(mainSearch)"> -->
                     <!-- advanced search query input disabled -->
-                    <h3 class="fixed-content-m">Advanced Search</h3>
+                    <!-- <h3 class="fixed-content-m">Advanced Search</h3>
                     <label class="sr-only" for="searchText">Advanced search query (disabled)</label>
                     <span ng-click="modifyAdvanceSearch()" class="search-input disabled-input-container">
                         <input class="search-input disabled-input form-group" type="text" id="searchText" ng-model="stringQuery" disabled />
@@ -159,115 +158,9 @@
                     <a ng-click="modifyAdvanceSearch()">Modify</a>
                 </form>
             </div>
-        </div>
+        </div> -->
     </div>
-    <div class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
-        <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
-    </div>
-    <div class="search-results" ng-show="searchResults.length > 0">
-        <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
-            <div class="elem-name-wrapper">
-                <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
-                <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')"><mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></a>
-            </div>
-            <div class="elem-qualified-name-wrapper">
-                <div class="elem-qualified-name">
-                    {{elem._qualifiedName}}
-                </div>
-            </div>
-            <div ng-if="elem.type === 'Diagram' && elem._artifactIds">
-                <mms-transclude-img ng-click="userResultClick(elem, 'img')" mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></mms-transclude-img>
-            </div>
-            <div class="elem-documentation-wrapper">
-                <label>Documentation</label>
-                <div class="elem-documentation">
-                    <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
-                    <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem, 'doc')">
-                      {{emptyDocTxt}}
-                      </a></span>
-                </div>
-            </div>
-            <div ng-if="(elem.type === 'Property' || elem.type === 'Port') && elem.defaultValue">
-                <label>Value</label>
-                <div class="elem-properties">
-                    <a ng-click="userResultClick(elem, 'val')">
-                        {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
-                    </a>
-                </div>
-            </div>
-            <div ng-if="elem.type === 'Slot' && elem.value">
-                <label>Value</label>
-                <div class="elem-properties">
-                    <a ng-click="userResultClick(elem, 'val')">
-                        <span ng-repeat="val in elem.value">
-                            {{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
-                        </span>
-                    </a>
-                </div>
-            </div>
-            <div ng-if="elem.type === 'Constraint'">
-                <label>Specification</label>
-                <div class="elem-specification">
-                    <a ng-click="userResultClick(elem, 'val')">
-                        {{elem.specification.value + '' || 'Constraint Specification'}}
-                    </a>
-                </div>
-                <a ng-click="userResultClick(elem, 'val')">
-                    <div ng-repeat="str in elem.specification.body">
-                        <div class="elem-specification">{{str}}</div>
-                    </div>
-                </a>
-            </div>
-            <div ng-if="elem._properties[0]" class="elem-properties-wrapper ve-search">
-                <label>Properties</label>
-                <table>
-                    <tr ng-repeat="property in elem._properties | limitTo : limitForProps">
-                        <td>
-                            {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
-                        </td>
-                        <td>
-                            <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value | limitTo:300}}
-                                <span ng-if="property.type === 'Slot'" ng-repeat="val in property.value | limitTo:4">
-                                    <span ng-bind-html="val.value | limitTo:300"></span>
-                                    <span ng-bind-html="val.body[0] | limitTo:300"></span>
-                                    <span ng-if="!val.value && !val.body[0]">Default Value</span>
-                                </span>
-                                <!-- set variable for limit -->
-                                <span ng-if="property.value.length > 4 || property.defaultValue.value.length > 300">...</span>
-                            </a>
-                        </td>
-                    </tr>
-                    <tr class="visibility-toggle" ng-show="elem._properties.length > 6">
-                        <td></td>
-                        <td>
-                            <a ng-click="showSearchResultProps = !showSearchResultProps; showSearchResultProps ? switchText='Less' : switchText='More'; showSearchResultProps ? limitForProps=50 : limitForProps=6" ng-class="{active: showSearchResultProps}">{{switchText}}</a>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">
-                <label>Related Documents</label>
-                <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
-                    <span ng-repeat="relatedView in relatedDocument._parentViews">
-                        <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedDocument, elem)"></mms-view-link>
-                        > <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)"></mms-view-link><br/>
-                    </span>
-                </div>
-            </div>
-            <label>Metatypes</label>
-            <div class="elem-type-wrapper">
-                <span class="elem-type">{{elem.type}}</span>
-                <span ng-if="elem._appliedStereotypeIds.length">
-                    <span ng-repeat="type in elem._appliedStereotypeIds">
-                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
-                    </span>
-                </span>
-            </div>
-            <div class="elem-updated-wrapper">
-                <div>Last modified {{elem._modified | date:'M/d/yy h:mm a'}} by <b>{{elem._modifier}}</b></div>
-            </div>
-        </div>
-    </div>
+    <div class="slide-animate" ng-include="'mms/templates/mmsSearchResults.html'"></div>
     <div class="container-fluid search-nav">
         <a ng-show="currentPage > 0" ng-click="prevPage()">&lt; Prev</a>
         <a ng-show="searchResults.length > 0" class="pull-right" ng-click="nextPage()">Next ></a>
