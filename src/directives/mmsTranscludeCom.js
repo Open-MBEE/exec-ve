@@ -176,7 +176,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 scope.isDirectChildOfPresentationElement = false;
             if (scope.isDirectChildOfPresentationElement)
                 scope.panelTitle = scope.instanceSpec.name;
-            scope.panelType = 'Comment'; 
+            scope.panelType = 'Comment';
         }
     };
 

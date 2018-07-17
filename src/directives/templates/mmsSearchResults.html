@@ -18,7 +18,7 @@
         <div class="elem-documentation-wrapper">
             <label>Documentation</label>
             <div class="elem-documentation">
-                <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:300" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 300 ? ' ...' : ''}}</span>
+                <a ng-show="elem.documentation" ng-bind-html="elem.documentation | limitTo:270" ng-click="userResultClick(elem, 'doc')"></a><span class="ellipses">{{elem.documentation.length > 270 ? ' ...' : ''}}</span>
                 <span><a ng-show="!elem.documentation" ng-click="userResultClick(elem, 'doc')">
                   {{emptyDocTxt}}
                   </a></span>
@@ -28,7 +28,7 @@
             <label>Value</label>
             <div class="elem-properties">
                 <a ng-click="userResultClick(elem, 'val')">
-                    {{elem.defaultValue.value + '' || elem.defaultValue.body[0] || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1) ? ' ...' : '' }}</span>
+                    {{elem.defaultValue.value + '' | limitTo:250 || elem.defaultValue.body[0] | limitTo:250 || 'Default Value'}}<span class="ellipses">{{(elem.defaultValue.body[0] && elem.defaultValue.body.length > 1 || val.value.length > 250) ? ' ...' : '' }}</span>
                 </a>
             </div>
         </div>
@@ -37,7 +37,7 @@
             <div class="elem-properties">
                 <a ng-click="userResultClick(elem, 'val')">
                     <span ng-repeat="val in elem.value">
-                        {{val.value + '' || val.body[0] || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
+                        {{val.value + '' | limitTo:250 || val.body[0] | limitTo:250 || 'Default Value'}}<span class="ellipses">{{(val.body[0] && val.body.length > 1 || val.value.length > 250) ? ' ...' : '' }}</span>{{$last ? '' : ', '}}
                     </span>
                 </a>
             </div>
