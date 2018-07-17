@@ -50,6 +50,8 @@ function MentionService($rootScope, $compile, CacheService) {
 
             var mentionScope = mentionState.mentionScope;
             mentionScope.$apply(function() {
+                // make sure that mention directive is visible, in case esc key was pressed before
+                mentionState.mentionController.toggleMentionDisplay(true);
                 var text = currentEditingElement.innerText;
                 text = text.substring(1); // ignore @
                 mentionScope.mmsMentionValue = text;
@@ -188,6 +190,8 @@ function MentionService($rootScope, $compile, CacheService) {
             case 13: // enter
                 _handleEnterKey(editor.id, mentionId, projectId, refId);
                 break;
+            case 27: // esc
+                _handleEscKey(editor.id, mentionId);
         }
     }
 
@@ -209,6 +213,14 @@ function MentionService($rootScope, $compile, CacheService) {
             var mentionState = _retrieveMentionState(editorId, mentionId);
             mentionState.mentionController.selectMentionItem(mentionItem);
         }
+    }
+    
+    function _handleEscKey(editorId, mentionId) {
+        var mentionState = _retrieveMentionState(editorId, mentionId);
+        var mentionScope = mentionState.mentionScope;
+        mentionScope.$apply(function() {
+            mentionState.mentionController.toggleMentionDisplay(false);
+        });
     }
 
     function _handleArrowKey(mentionId, isDownArrow) {

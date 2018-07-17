@@ -19,14 +19,22 @@ function mmsMention($templateCache, MentionService, Utils) {
     function mmsMentionLink(scope, element, attrs, ctrls) {}
 
     function mmsMentionCtrl($scope) {
+        $scope.show = true;
         $scope.fastCfListing = MentionService.getFastCfListing($scope.mmsProjectId, $scope.mmsRefId);
         // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
         this.selectMentionItem = selectMentionItem;
+        this.toggleMentionDisplay = toggleMentionDisplay;
         $scope.selectMentionItem = selectMentionItem;
 
         function selectMentionItem($item) {
             _createCf($item);
             MentionService.handleMentionSelection($scope.mmsEditor, $scope.mmsMentionId);
+        }
+
+        function toggleMentionDisplay(show) {
+            if ($scope.show !== show) {
+                $scope.show = show;
+            }
         }
 
         function _createCf($item) {

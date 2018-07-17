@@ -1,4 +1,4 @@
-<div id={{mmsMentionId}}>
+<div ng-show="show" id={{mmsMentionId}}>
     <input style="display:none;" mms-mention-intercept mms-mention-intercept-value="mmsMentionValue" uib-typeahead="mentionItem as mentionItem.label for mentionItem in fastCfListing | filter:{name: $viewValue} | limitTo:10"
            typeahead-on-select='selectMentionItem($item, $model)' ng-model="selected" class="autocomplete-modal-typeahead form-control" placeholder="Type an element name to Cf" autofocus/>
 </div>
