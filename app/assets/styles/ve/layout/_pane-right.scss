@@ -80,30 +80,42 @@
   }
 
   [class*="patcher-"]:before {
-    font-family: "FontAwesome";
     position: absolute;
     z-index: 1;
-    top: -.8em;
-    right: -.4em;
+    top: -8px;
+    right: -8px;
+    content: ' ';
+    background-size: 16px;
+    height: 16px;
+    width: 16px;
+    background-repeat: no-repeat;
   }
 
+  /*Green background to additions*/
   .patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {
-    background-color: #CCFDC4;
-    border: 3px dashed #83b769;
+    background-color: #dafde0;
   }
 
-  .patcher-replaceIn:before, .patcher-attribute-replace-in:before, .patcher-insert:before, .patcher-text-insertion:before {
-    content: "\f067";
-    color: #2d8253;
+  /*Plus sign and green border to non textual changes*/
+  .patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {
+    &::before{
+      background-image: url(../assets/insert.svg);
+    }
+    border: 2px dashed #abffb9;
   }
 
+  /*Strikethrough and red background to deletions*/
   .patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {
-    background-color: #F6C1C0;
-    border: 3px dashed #d17a68;
+    background-color: #ffe3e3;
+    text-decoration: rgba(255, 0, 0, 0.4) line-through; /* Ignored in CSS1/CSS2 UAs */
+    -webkit-text-decoration: rgba(255, 0, 0, 0.4) line-through; /* Ignored in CSS1/CSS2 UAs */
   }
 
-  .patcher-replaceOut:before, .patcher-delete:before, .patcher-attribute-replace-out:before, .patcher-text-deletion:before {
-    content: "\f00d";
-    color: #fe0752;
+  /*Delete icon and dotted red border to non textual deletions*/
+  .patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {
+    &::before{
+      background-image: url(../assets/delete.svg);
+    }
+    border: 2px dashed #ffb6b6;
   }
 }
