@@ -64,3 +64,46 @@
     }
   }
 }
+
+.htmlDiff {
+
+  [class*="patcher-"] {
+    position: relative;
+  }
+
+  [class*="patcher-"]:not(td):not(tr) {
+    display: inline-block;
+  }
+
+  .patcher-text-insertion, .patcher-text-deletion {
+    display: inline !important;
+  }
+
+  [class*="patcher-"]:before {
+    font-family: "FontAwesome";
+    position: absolute;
+    z-index: 1;
+    top: -.8em;
+    right: -.4em;
+  }
+
+  .patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {
+    background-color: #CCFDC4;
+    border: 3px dashed #83b769;
+  }
+
+  .patcher-replaceIn:before, .patcher-attribute-replace-in:before, .patcher-insert:before, .patcher-text-insertion:before {
+    content: "\f067";
+    color: #2d8253;
+  }
+
+  .patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {
+    background-color: #F6C1C0;
+    border: 3px dashed #d17a68;
+  }
+
+  .patcher-replaceOut:before, .patcher-delete:before, .patcher-attribute-replace-out:before, .patcher-text-deletion:before {
+    content: "\f00d";
+    color: #fe0752;
+  }
+}
