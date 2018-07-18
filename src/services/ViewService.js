@@ -1152,6 +1152,26 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return false;
     };
 
+    var getPresentationElementType = function (elementOb) {
+        if (elementOb.type === 'InstanceSpecification') {
+            return _.findKey(TYPE_TO_CLASSIFIER_ID, function(o) { return o === elementOb.classifierIds[0]; });
+        }
+        return false;
+    };
+
+    var getElementType = function(element) {
+        // Get Type
+        var elementType = '';
+        if (UtilsService.isDocument(element)) {
+            elementType = 'Document';
+        } else if (UtilsService.isView(element)) {
+            elementType = 'View';
+        } else {
+            elementType = getPresentationElementType(element);
+        }
+        return elementType;
+    };
+
     var reset = function() {
         inProgress = {};
     };
@@ -1189,6 +1209,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         isEquation: isEquation,
         getTreeType: getTreeType,
         isPresentationElement: isPresentationElement,
+        getPresentationElementType: getPresentationElementType,
+        getElementType: getElementType,
         addElementToViewOrSection: addElementToViewOrSection,
         removeElementFromViewOrSection: removeElementFromViewOrSection,
         removeViewFromParentView: removeViewFromParentView,

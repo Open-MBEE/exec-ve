@@ -1,3 +1,4 @@
+<!-- HTML for edit mode -->
 <div ng-if="!noEdit && editing" class="editing">
 
     <h1 class="prop" ng-if="edit.name"><input class="form-control ve-plain-input" type="text" ng-model="edit.name"></h1>
@@ -92,17 +93,15 @@
     <h2 class="prop-title">Commit</h2>
     <span class="prop">{{element._commitId}}</span>
 </div>
-
+<!-- HTML for view mode -->
 <div ng-hide="editing" class="reading">
-
     <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
 
     <div ng-hide="gettingSpec">
         <div class="text-warning" ng-if="mmsDisplayOldContent">
             <b> Element not found:</b> displaying last found content
         </div>
-        <h1 class="prop element-title {{mmsDisplayOldContent ? 'mms-error': ''}}">{{element.name}}</h1>
-        
+        <h1 class="prop element-title" ng-class="{'mms-error': mmsDisplayOldContent}"><span class="{{ elementTypeClass }}"></span>{{element.name}}</h1>
         <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
 
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">

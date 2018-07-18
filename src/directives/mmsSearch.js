@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
+.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -15,7 +15,7 @@ angular.module('mms.directives')
  * @scope
  *
  */
-function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _, growl, $templateCache, $timeout) {
+function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -61,6 +61,18 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
             });
         };
         getMetaTypes();
+
+        scope.getTypeClass = function(element) {
+            // Get Type
+            scope.elementType = ViewService.getElementType(element);
+            scope.elementTypeClass = '';
+            if (element.type === 'InstanceSpecification') {
+                scope.elementTypeClass = 'pe-type-' + scope.elementType;
+            } else {
+                scope.elementTypeClass = 'item-type-' + scope.elementType;
+            }
+            return scope.elementTypeClass;
+        };
 
         // Set search options
         scope.fieldTypeList = [
