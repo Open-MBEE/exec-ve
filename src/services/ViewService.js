@@ -1142,16 +1142,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
-    var isPresentationElement = function(e) {
-        if (e.type === 'InstanceSpecification') {
-            var classifierIdss = e.classifierIds;
-            if (classifierIdss.length > 0 && classifierIdsIds.indexOf(classifierIdss[0]) >= 0) {
-                return true;
-            }
-        }
-        return false;
-    };
-
     var getPresentationElementType = function (elementOb) {
         if (elementOb.type === 'InstanceSpecification') {
             return _.findKey(TYPE_TO_CLASSIFIER_ID, function(o) { return o === elementOb.classifierIds[0]; });
@@ -1208,7 +1198,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         isTable: isTable,
         isEquation: isEquation,
         getTreeType: getTreeType,
-        isPresentationElement: isPresentationElement,
         getPresentationElementType: getPresentationElementType,
         getElementType: getElementType,
         addElementToViewOrSection: addElementToViewOrSection,
