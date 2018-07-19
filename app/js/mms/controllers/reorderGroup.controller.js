@@ -6,10 +6,6 @@ angular.module('mmsApp')
 function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, CacheService, projectOb, refOb, groupObs, documentObs) {
     $scope.isSaving = false;
     $scope.targetId = '';
-    var placeHolder = {
-        element: null,
-        originalHeight: null
-    };
     $scope.treeOptions = {
         dropped: function (change) {
             sortRecursively(children);
@@ -26,19 +22,7 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
             return accept;
         },
         dragStart: function(data) {
-            placeHolder.element = data.elements.placeholder;
-            placeHolder.originalHeight = placeHolder.element.height();
             $scope.targetId = data.dest.nodesScope.$nodeScope.$modelValue.id;
-            if ( data.dest.nodesScope.$modelValue.length !== 0 ) {
-                data.elements.placeholder.height('0');
-            }
-        },
-        dragMove: function(data) {
-            if ( data.dest.nodesScope.$modelValue.length !== 0 ) {
-                placeHolder.element.height('0');
-            } else {
-                placeHolder.element.height(placeHolder.originalHeight + 'px');
-            }
         }
     };
     $scope.saveReorder = saveReorder;
