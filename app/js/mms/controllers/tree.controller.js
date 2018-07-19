@@ -743,12 +743,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.deleteItem = function(cb) {
         var branch = $scope.treeApi.get_selected_branch();
         if (!branch) {
-            growl.warning("Delete Error: Select item to delete.");
+            growl.warning("Select item to remove.");
             return;
         }
         if ($state.includes('project.ref.document')) { 
             if (branch.type !== 'view' || (!UtilsService.isView(branch.data))) {
-                growl.warning("Delete Error: Selected item is not a view.");
+                growl.warning("Cannot remove non-view item. To remove non-view item, open it in the center pane.");
                 return;
             }
         }
@@ -756,7 +756,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         // when in project.ref state, allow deletion for view/document/group
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type !== 'view' && !UtilsService.isDocument(branch.data) && (branch.type !== 'group' || branch.children.length > 0) ) {
-                growl.warning("Delete Error: Selected item is not a document/empty group.");
+                growl.warning("Cannot remove group with contents. Empty contents and try again.");
                 return;
             }
         }
@@ -814,10 +814,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
             if (promise) {
                 promise.then(function (data) {
-                    growl.success($scope.type + " Deleted");
+                    growl.success($scope.type + " Removec");
                     $uibModalInstance.close('ok');
                 }, function (reason) {
-                    growl.error($scope.type + ' Delete Error: ' + reason.message);
+                    growl.error($scope.type + ' Removal Error: ' + reason.message);
                 }).finally(function () {
                     $scope.oking = false;
                 });

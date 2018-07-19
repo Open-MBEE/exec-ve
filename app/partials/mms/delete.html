@@ -1,12 +1,13 @@
 <div class="modal-header">
-    <h4>Confirm Delete</h4>
+    <h4>Confirm Remove</h4>
 </div>
 
 <div class="modal-body comment-modal">
-    <div>Are you sure you want to delete {{type}} "{{name}}"?</div>
+    <p>Are you sure you want to remove {{type}} <b>"{{name}}"</b>?</p>
+    <p>This will remove <b>{{name}}</b> from the hierarchy, but can still access it in search unless you delete from MMS.</p>
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-warning" ng-click="ok()">Delete <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-warning" ng-click="ok()">Remove <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
 </div>
