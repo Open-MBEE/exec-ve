@@ -771,6 +771,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         ob.tables += '</ul></div>';
         ob.figures += '</ul></div>';
         ob.equations += '</ul></div>';
+        ob.tables = ob.tableCount == 0 ? '' : ob.tables;
+        ob.figures = ob.figureCount == 0 ? '' : ob.figures;
+        ob.equations = ob.equationCount == 0 ? '' : ob.equations;
         return ob;
     };
 
@@ -799,7 +802,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var cap = '';
         var name = '';
         if (child.type === 'table') {
-            //ob.tableCount++;
+            ob.tableCount++;
             prefix = 'Table ' + veNumber + '. ';
             var capTbl = el.find('table > caption');
             name = capTbl.text();
@@ -826,7 +829,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
         if (child.type === 'figure') {
-            //ob.figureCount++;
+            ob.figureCount++;
             prefix = 'Figure ' + veNumber + '. ';
             var capFig = el.find('figure > figcaption');
             name = capFig.text();
@@ -853,7 +856,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
         if (child.type === 'equation') {
-            //ob.equationCount++;
+            ob.equationCount++;
             cap = veNumber + '. ' + pe.name;
             ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var equationCap = '(' + veNumber + ')';
@@ -1091,10 +1094,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
                 "figure img {display: block;}\n" +
-                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
+                " tr, td, th, li, figure { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
-                ".chapter {page-break-before: always}\n" + 
-                ".chapter h1.view-title {font-size: 20pt; }\n" + 
+                ".chapter {page-break-before: right;}\n" + 
+                "ul:last-child, ol:last-child {page-break-before: avoid;} ul:first-child, ol:first-child {page-break-after: avoid;}\n" +
+                //".chapter h1.view-title {font-size: 20pt; }\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
                 "table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}\n" +
                 "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
@@ -1107,13 +1111,14 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".signature-box td.signature-date-styling {width: 39%;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
                 "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
-                "h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
+                //"h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
+                ".h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}\n" +
                 ".ng-hide {display: none;}\n" +
                 "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
                 "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
-                ".toc, .tof, .tot {page-break-after:always;}\n" +
+                ".toc, .tof, .tot {page-break-after:always; page: toc;}\n" +
                 ".toc {page-break-before: always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
@@ -1131,7 +1136,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
                 ".match,.textdiff span {color: gray;}\n" +
                 "@page {margin: 0.5in;}\n" + 
-                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
+                "@page toc {@top {content: '';} @bottom {content: '';} @top-left {content: '';} @top-right {content: '';} @bottom-left {content: '';} @bottom-right {content: '';}}\n" +
                 "@page landscape {size: 11in 8.5in;}\n" +
                 ".landscape {page: landscape;}\n";
         for (var i = 1; i < 10; i++) {
@@ -1144,7 +1149,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "table { counter-increment: table-counter; }\n" +
                 "caption::before {content: \"Table \" counter(table-counter) \". \"; }\n";
         }
-        Object.keys(meta).forEach(function(key) {
+        ret += "@page:right { @bottom-left {font-size: 9px; content: 'OMG Systems Modeling Language, v1.5.1';} @bottom-right {font-size: 9px; content: counter(page);}}" + 
+               "@page:left { @bottom-right {font-size: 9px; content: 'OMG Systems Modeling Language, v1.5.1';} @bottom-left {font-size: 9px; content: counter(page);}}" +
+               ".first-chapter {counter-reset: page 3;} body > mms-view {page: toc;}";
+        /*Object.keys(meta).forEach(function(key) {
             if (meta[key]) {
                 var content;
                 if (meta[key] === 'counter(page)') {
@@ -1152,9 +1160,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 } else {
                     content = '"' + meta[key] + '"';
                 }
-                ret += '@page {@' + key + ' {font-size: 10px; content: ' + content + ';}}\n';
+                ret += '@page {@' + key + ' {font-size: 9px; content: ' + content + ';}}\n';
             }
-        });
+        });*/
         if (landscape) {
             ret += "@page {size: 11in 8.5in;}";
         }
