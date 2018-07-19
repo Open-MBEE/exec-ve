@@ -305,7 +305,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
 
         // Remove comments, table features, and all elements with classes: mms-error, no-print, ng-hide
         printElementCopy.find('mms-transclude-com').remove();
-        printElementCopy.find('style').remove(); //prevent user inserted styles from interfering
+        //printElementCopy.find('style').remove(); //prevent user inserted styles from interfering
         printElementCopy.find('div.tableSearch').remove();
         //printElementCopy.find('.mms-error').html('error');
         printElementCopy.find('.no-print').remove();
@@ -343,6 +343,18 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             cover.remove();
             cover = cover[0].outerHTML;
         }
+        printElementCopy.find('caption').each(function() {
+            var $this = $(this);
+            if ($this.text().indexOf('<>') > 0) {
+                $this.remove();
+            }
+        });
+        printElementCopy.find('figcaption').each(function() {
+            var $this = $(this);
+            if ($this.text().indexOf('<>') > 0) {
+                $this.remove();
+            }
+        });
         var newScope = $rootScope.$new();
         //var useCover = false;
         printContents = printElementCopy[0].outerHTML;
