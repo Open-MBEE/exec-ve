@@ -748,7 +748,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
         if ($state.includes('project.ref.document')) { 
             if (branch.type !== 'view' || (!UtilsService.isView(branch.data))) {
-                growl.warning("Cannot remove non-view item. To remove non-view item, open it in the center pane.");
+                growl.warning("Cannot remove non-view item. To remove this item, open it in the center pane.");
                 return;
             }
         }
