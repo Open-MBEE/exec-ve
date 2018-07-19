@@ -136,11 +136,11 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
         function _fullyRender(data, finishRenderCb) {
             var dataAsHtmlDom = _createTransclude(data.id, $scope.mmsAttr, data._projectId, data._refId, data._commitId);
             $compile(dataAsHtmlDom)($rootScope.$new());
-            var baseHtml = angular.element(dataAsHtmlDom).html();
             var handler = $interval(function() {
+                var baseHtml = angular.element(dataAsHtmlDom).html();
                 if (!baseHtml.includes("(loading...)")) {
                     $interval.cancel(handler);
-                    finishRenderCb(angular.element(dataAsHtmlDom).html());
+                    finishRenderCb(baseHtml);
                 }
             }, 10);
         }
