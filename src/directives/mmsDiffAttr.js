@@ -134,10 +134,9 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
         }
 
         function _fullyRender(data, finishRenderCb) {
-            var dataAsHtmlDom = _createTransclude(data.id, $scope.mmsAttr, data._projectId, data._refId, data._commitId);
-            $compile(dataAsHtmlDom)($rootScope.$new());
+            var element = _createElement($scope.mmsAttr, data.id, data._projectId, data._refId, data._commitId);
             var handler = $interval(function() {
-                var baseHtml = angular.element(dataAsHtmlDom).html();
+                var baseHtml = element.html();
                 if (!baseHtml.includes("(loading...)")) {
                     $interval.cancel(handler);
                     finishRenderCb(baseHtml);
@@ -145,14 +144,23 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             }, 10);
         }
 
-        function _createTransclude(elementId, type, projectId, refId, commitId) {
-            var transcludeElm = angular.element('<mms-cf>');
-            transcludeElm.attr("mms-cf-type", type);
-            transcludeElm.attr("mms-element-id", elementId);
-            transcludeElm.attr("mms-project-id", projectId);
-            transcludeElm.attr("mms-ref-id", refId);
-            transcludeElm.attr("mms-commit-id", commitId);
-            return transcludeElm;
+        function _createElement(type, mmsElementId, mmsProjectId, mmsRefId, mmsCommitId) {
+            var html;
+            if (type === 'doc' || type === 'val' || type === 'com') {
+                html = '<mms-cf mms-generate-for-diff="mmsGenerateForDiff" mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>';
+            } else {
+                html = '<mms-cf mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>';
+            }
+            var newScope = $rootScope.$new();
+            newScope = Object.assign(newScope, {
+                type: type,
+                mmsElementId: mmsElementId,
+                mmsProjectId: mmsProjectId,
+                mmsRefId: mmsRefId,
+                mmsCommitId: mmsCommitId,
+                mmsGenerateForDiff: true
+            });
+            return $compile(html)(newScope);
         }
 
         function _checkElement() {

@@ -132,7 +132,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 $(domElement[0]).find('img').each(function(index) {
                     Utils.fixImgSrc($(this));
                 });
-                if (MathJax) {
+                if (MathJax && !scope.mmsGenerateForDiff ) {
                     MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
                 }
                 $compile(domElement.contents())(scope.recompileScope);
@@ -268,7 +268,8 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             mmsRefId: '@',
             mmsCommitId: '@',
             nonEditable: '<',
-            mmsCfLabel: '@'
+            mmsCfLabel: '@',
+            mmsGenerateForDiff: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeCtrl],

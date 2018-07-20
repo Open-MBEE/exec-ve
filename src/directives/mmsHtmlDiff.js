@@ -45,7 +45,6 @@ function mmsHtmlDiff($templateCache, $timeout, MathJax, HtmlRenderedDiff) {
             var diffContainer = $('#' + scope.htmlDiffId);
             formatImgDiff(diffContainer);
             formatRowDiff(diffContainer);
-            // formatEquationDiff(diffContainer);
             scope.mmsDiffFinish();
         });
     }
@@ -75,11 +74,5 @@ function mmsHtmlDiff($templateCache, $timeout, MathJax, HtmlRenderedDiff) {
                    });
                 }
             });
-    }
-
-    function formatEquationDiff(diffContainer) {
-        if (MathJax) {
-            MathJax.Hub.Queue(["Typeset", MathJax.Hub, diffContainer[0]]);
-        }
     }
 }
