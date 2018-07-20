@@ -6,6 +6,7 @@
 2. Forms (can move most of this to main)
 3. Results styles
 4. Empty state
+5. Small Modals
 
 -------------------------------------------------------------------*/
 
@@ -181,7 +182,7 @@
       
       table > tbody > tr > td{
         border-top: none;
-        padding: 1px;
+        padding: 2px 1px;
 
         /*Float property name right for better readability*/
         &:first-child{
@@ -196,7 +197,7 @@
     .elem-specification,
     .elem-documentation,
     .elem-properties-wrapper > table > tbody > tr > td:first-child{
-      padding-left: 10px;
+      padding-left: 12px;
     }
 
     .ellipses {
@@ -237,12 +238,15 @@
     
     .mms-search-input,
     .results-count{
-      padding-left: 10px;
-      padding-right: 10px;
+      padding-left: 14px;
+      padding-right: 14px;
     }
     .elem-wrapper{
-      margin-left: 10px;
-      margin-right: 10px;
+      margin-left: 14px;
+      margin-right: 14px;
     }
   }
 }
+
+
+
