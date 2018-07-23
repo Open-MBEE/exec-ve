@@ -4,7 +4,8 @@
 
 <div class="modal-body comment-modal">
     <p>Are you sure you want to remove {{type}} <b>&ldquo;{{name}}&rdquo;</b>?</p>
-    <p>This will remove <b>&ldquo;{{name}}&rdquo;</b> from the hierarchy, but you can still access it in search unless you delete it from MMS.</p>
+    <p ng-if="type != 'Document' && type != 'group'">This will remove <b>&ldquo;{{name}}&rdquo;</b> from the hierarchy, but you can still access it in search.</p>
+    <p ng-if="type === 'Document' || type === 'group'">This will remove <b>&ldquo;{{name}}&rdquo;</b> from the project navigation, but you can still access it in search.</p>
 </div>
 
 <div class="modal-footer">

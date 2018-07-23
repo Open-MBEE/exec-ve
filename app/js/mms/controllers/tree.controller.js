@@ -760,10 +760,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 return;
             }
         }
-        // TODO: do not pass selected branch in scope, move page to generic location
         $scope.deleteBranch = branch;
         var instance = $uibModal.open({
-            templateUrl: 'partials/mms/delete.html',
+            templateUrl: 'partials/mms/confirmRemove.html',
             scope: $scope,
             controller: ['$scope', '$uibModalInstance', deleteCtrl]
         });
@@ -814,7 +813,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
             if (promise) {
                 promise.then(function (data) {
-                    growl.success($scope.type + " Removec");
+                    growl.success($scope.type + " Removed");
                     $uibModalInstance.close('ok');
                 }, function (reason) {
                     growl.error($scope.type + ' Removal Error: ' + reason.message);
