@@ -242,12 +242,12 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
     var deleteItem = function() {
         var branch = $scope.refSelected;
         if (!branch) {
-            growl.warning("Delete Error: Select item to delete.");
+            growl.warning("Select item to delete.");
             return;
         }
         $scope.deleteBranch = branch;
         var instance = $uibModal.open({
-            templateUrl: 'partials/mms/delete.html',
+            templateUrl: 'partials/mms/confirmDelete.html',
             scope: $scope,
             controller: ['$scope', '$uibModalInstance', deleteCtrl]
         });
@@ -260,7 +260,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 selectMasterDefault();
             } else if ($scope.refSelected.type === 'Tag') {
                 index = $scope.tags.indexOf($scope.refSelected);
-                $scope.tags.splice(index, 1);  
+                $scope.tags.splice(index, 1);
             }
             $scope.refSelected = null;
         });

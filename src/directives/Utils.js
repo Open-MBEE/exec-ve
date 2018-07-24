@@ -567,7 +567,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             scope.name = scope.edit.name;
 
             var instance = $uibModal.open({
-                templateUrl: 'partials/mms/delete.html',
+                templateUrl: 'partials/mms/confirmRemove.html',
                 scope: scope,
                 controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                     $scope.ok = function() {

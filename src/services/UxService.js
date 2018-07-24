@@ -102,7 +102,7 @@ function UxService($rootScope) {
                 spinner: false, togglable: false, placement: 'bottom-right', action: function() {$rootScope.$broadcast(button);},
                 dropdown_buttons: [ getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
-        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete', 
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Remove', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-add-view":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add View',
@@ -123,10 +123,10 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: true, tooltip: 'Add Branch',
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-delete":
-        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete', 
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Remove', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-delete-view":
-        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Delete View', 
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Remove View', 
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
       case "tree-reorder-view":
         return {id: button, icon: 'fa-arrows-v', selected: true, active: true, permission: false, tooltip: 'Reorder Views', 
@@ -202,7 +202,7 @@ function UxService($rootScope) {
                 spinner: false, togglable: false, action: function() {$rootScope.$broadcast(button);}};
 
       case "presentation-element-delete":
-        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Delete',
+        return {id: button, icon: 'fa-trash', selected: true, active: true, permission: true, tooltip: 'Remove',
                 spinner: false, togglable: false, action: function(e) {e.stopPropagation(); scope.delete();}};
       case "presentation-element-save":
         return {id: button, icon: 'fa-save', selected: true, active: true, permission: true, tooltip: 'Save',
