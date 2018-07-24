@@ -286,7 +286,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         });
     } else {
-        var seenChild = {};        
         if (!documentOb._childViews) {
             documentOb._childViews = [];
         }
@@ -400,7 +399,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         } else if ($state.includes('project.ref.document')) {
             var viewId = (branch.type !== 'view') ? branch.viewId : branch.data.id;
-            var sectionId = branch.type === 'section' ? branch.data.id : null;
+            // var sectionId = branch.type === 'section' ? branch.data.id : null;
             var hash = branch.data.id;
             if ($rootScope.ve_fullDocMode) {
                 $rootScope.$broadcast('mms-tree-click', branch);

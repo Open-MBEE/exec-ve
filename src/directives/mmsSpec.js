@@ -1,18 +1,18 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils', 'AuthService', 'ElementService', 'UtilsService', '$compile', '$templateCache', '$uibModal', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils', 'AuthService', 'ElementService', 'ViewService', '$templateCache', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsSpec
  *
- * @requires mms.ElementService
- * @requires mms.UtilsService
  * @requires mms.Utils
+ * @requires mms.AuthService
+ * @requires mms.ElementService
+ * @requires mms.ViewService
  * @requires $compile
  * @requires $templateCache
- * @requires $uibModal
  * @requires growl
  * @requires _
  *
@@ -71,7 +71,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, AuthService, ElementService, UtilsService, $compile, $templateCache, $uibModal, growl, _) {
+function mmsSpec(Utils, AuthService, ElementService, ViewService, $templateCache, growl, _) {
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, domElement, attrs) {
@@ -97,6 +97,19 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, $compile, $te
             value.value = "<p>" + value.value + "</p>";
         };
         scope.editorApi = {};
+
+        var getTypeClass = function(element) {
+            // Get Type
+            scope.elementType = ViewService.getElementType(element);
+            scope.elementTypeClass = '';
+            if (element.type === 'InstanceSpecification') {
+                scope.elementTypeClass = 'pe-type-' + scope.elementType;
+            } else {
+                scope.elementTypeClass = 'item-type-' + scope.elementType;
+            }
+            return scope.elementTypeClass;
+        };
+
         /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSpec#changeElement
@@ -182,6 +195,7 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, $compile, $te
                         }
                     });
                 }
+                getTypeClass(scope.element);
                 scope.elementDataLink = '/alfresco/service/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&alf_ticket='+AuthService.getTicket();
                 scope.gettingSpec = false;
             }, function(reason) {

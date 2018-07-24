@@ -69,7 +69,6 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
     var logout = function() {
         var deferred = $q.defer();
         checkLogin().then(function() {
-            var logouturl = URLService.getLogoutURL();
             removeTicket();
             //$cookies.remove('com.tomsawyer.web.license.user');
         }, function() {

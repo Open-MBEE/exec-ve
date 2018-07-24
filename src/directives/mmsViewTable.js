@@ -39,7 +39,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
 
         scope.doClick = function() {
             var csvString = element.children('table').table2CSV({delivery:'value'});
-            var bom = "\xEF\xBB\xBF"; //just for excel
+            // var bom = "\xEF\xBB\xBF"; //just for excel
             var bom2 = "\uFEFF";      //just for excel
             var blob = new Blob([bom2 + csvString], {
                     type: "text/csv;charset=utf-8;"

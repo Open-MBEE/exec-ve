@@ -34,8 +34,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         }
     }
 
-    var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
-    var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
+    // var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
+    // var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
 
     var conflictCtrl = function($scope, $uibModalInstance) {
         $scope.ok = function() {
