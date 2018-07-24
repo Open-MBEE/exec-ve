@@ -796,7 +796,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var veNumber = pe._veNumber;
         var prefix = '';
         var el = printElement.find('#' + sysmlId);
-        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
+        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"][suppress-numbering!="true"], mms-view-link[data-mms-pe-id="' + sysmlId + '"][suppress-numbering!="true"]');
         var cap = '';
         var name = '';
         if (child.type === 'table') {

@@ -17,14 +17,14 @@
   .search-header {
      background: $white;
      padding-bottom: 250px;
+     font-size: 14px;
 
     /*Border with shadow added when search results >= 0*/
-    &.searchresults{
+    &.searchresults {
       border-bottom: 1px solid $ve-silver-darker-1;
       box-shadow: 0 4px 4px -4px rgba(0,0,0,.1);
       padding-bottom: 0;
     }
-    font-size: 14px; 
   }
 
   /*Spacing for count of results at top of results*/
@@ -35,8 +35,8 @@
   }
 
   /*Spaceing for next and previous at bottom of results*/
-  .search-nav{
-    padding:38px 38px 60px;
+  .search-nav {
+    padding: 38px 38px 60px;
   }
 
   .mms-search-input {
@@ -63,9 +63,8 @@
     .advanced-query {
       margin-bottom: 18px;
     }
-
-    .advanced-views-docs{
-      padding-top:22px;
+    .advanced-views-docs {
+      padding-top: 22px;
     }
   }
 
@@ -90,7 +89,6 @@
     .form-group {
       width: 100%;
     }
-
     /*fixed width of medium content so that vertical rhythym is consistent*/
     .fixed-content-m {
       width: 150px;
@@ -101,18 +99,15 @@
       width: 90px;
       flex: none;
     }
-
     .ve-light-dropdown {
       margin: 0;
     }
-
     h3 {
       display: inline-block;
       font-weight: 500;
       font-size: 18px;
       margin: 0 3px 0 0;
     }
-
     input {
       min-height: 30px;
       @include border-radius(2px);
@@ -124,7 +119,7 @@
   .search-input {
     width: 100%;
 
-  /*feedback for advanced search where user cannot edit*/
+    /*feedback for advanced search where user cannot edit*/
     &.disabled-input {
       font-size: 14px;
       padding: 4px 8px;
@@ -135,7 +130,6 @@
       background-color: #f4f4f4;
       min-height: 30px;
     }
-
     &.disabled-input-container {
       margin-right: 8px;
     }
@@ -145,27 +139,25 @@
 3. Results styles
 -------------------------------------------------------------------*/
 
-  .search-results{
+  .search-results {
     border-top: 1px solid $ve-silver-darker-1;
   }
 
   /*Search result wrapper*/
   .elem-wrapper {
     padding: 44px 0;
-    margin:0 30px;
+    margin: 0 30px;
     border-bottom: 1px solid $ve-silver-darker-1;
 
     .elem-name {
       font-size: 20px;
       font-weight: 500;
     }
-
     .elem-qualified-name {
       font-size: 14px;
       font-style: italic;
       color: $medium_grey;
     }
-
     .elem-documentation {
       color: $ve-link !important;
       table {
@@ -173,37 +165,32 @@
       }
     }
     .elem-properties-wrapper {
-
       /*Table styling so values are aligned right and properties are aligned left*/
-      table{
+      table {
         margin-bottom: 0;
         color: $ve-light-text;
       }
-      
-      table > tbody > tr > td{
+      table > tbody > tr > td {
         border-top: none;
         padding: 2px 1px;
 
         /*Float property name right for better readability*/
-        &:first-child{
+        &:first-child {
           float: right;
           text-align: right;
         }
       }
     }
-
     /*Indent content so it pops out*/
     .elem-properties,
     .elem-specification,
     .elem-documentation,
-    .elem-properties-wrapper > table > tbody > tr > td:first-child{
+    .elem-properties-wrapper > table > tbody > tr > td:first-child {
       padding-left: 12px;
     }
-
     .ellipses {
       color: $brand_base;
     }
-
     .elem-updated-wrapper {
       color: $medium_grey;
       font-size: 14px;
@@ -232,16 +219,16 @@
 5. Small modals
 -------------------------------------------------------------------*/
 
-.modal-body{
-  .mms-search{
+.modal-body {
+  .mms-search {
     font-size: 16px;
-    
+
     .mms-search-input,
-    .results-count{
+    .results-count {
       padding-left: 14px;
       padding-right: 14px;
     }
-    .elem-wrapper{
+    .elem-wrapper {
       margin-left: 14px;
       margin-right: 14px;
     }
