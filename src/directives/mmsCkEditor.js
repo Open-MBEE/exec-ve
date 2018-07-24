@@ -201,6 +201,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         var transcludeViewLinkCtrl = function($scope, $uibModalInstance, ApplicationService) {
             $scope.title = 'Insert cross reference as link';
             $scope.description = 'Search for a view or content element, click on its name to insert link.';
+            $scope.showProposeLink = false;
             $scope.searchExisting = true;
             $scope.suppressNumbering = false;
 
