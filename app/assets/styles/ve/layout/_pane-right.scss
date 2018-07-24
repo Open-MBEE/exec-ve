@@ -79,7 +79,7 @@
     display: inline !important;
   }
 
-  [class*="patcher-"]:not(.patcher-text-diff):before {
+  [class*="patcher-"]:not(.patcher-text-diff)::before {
     position: absolute;
     z-index: 1;
     top: -8px;
