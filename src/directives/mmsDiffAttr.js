@@ -146,11 +146,8 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
 
         function _createElement(type, mmsElementId, mmsProjectId, mmsRefId, mmsCommitId) {
             var html;
-            if (type === 'doc' || type === 'val' || type === 'com') {
-                html = '<mms-cf mms-generate-for-diff="mmsGenerateForDiff" mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>';
-            } else {
-                html = '<mms-cf mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>';
-            }
+            var ignoreMathjaxAutoFormatting = type === 'doc' || type === 'val' || type === 'com';
+            html = '<mms-cf' + (ignoreMathjaxAutoFormatting ? 'mms-generate-for-diff="mmsGenerateForDiff"' : '') +  'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>';
             var newScope = $rootScope.$new();
             newScope = Object.assign(newScope, {
                 type: type,
