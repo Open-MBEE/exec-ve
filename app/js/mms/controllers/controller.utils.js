@@ -275,14 +275,14 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
-        var tableAndFigTOC = {figures: '', tables: '', equations: ''};
+        // Conver to proper links for word/pdf
         UtilsService.convertViewLinks(printElementCopy);
-        //if (genTotf) {
-            tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
-        //}
+        // Get correct table/image numbering based on doc hierarchy
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
+        // Customize TOC based on user choice
         if (!isDoc) {
             toc = tof = tot = toe = '';
         }
@@ -325,7 +325,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $this.remove();
             }
         });
-        printElementCopy.find('[width]').not('img').removeAttr('width');
+        printElementCopy.find('[width]').not('img').not('.ve-fixed-width').removeAttr('width');
         printElementCopy.find('[style]').each(function() {
             this.style.removeProperty('font-size');
             this.style.removeProperty('width');
@@ -387,15 +387,16 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         return deferred.promise;
     };
 
-    var handleChildViews = function(v, aggr, projectId, refId, curItemFunc, childrenFunc, seen) {
+    var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen) {
         var seenViews = seen;
         if (!seenViews)
             seenViews = {};
         var deferred = $q.defer();
-        var curItem = curItemFunc(v, aggr);
+        var curItem = curItemFunc(v, aggr, propId);
         seenViews[v.id] = v;
         var childIds = [];
         var childAggrs = [];
+        var childPropIds = [];
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             if (angular.isObject(curItem) && curItem.loading) {
                 curItem.loading = false;
@@ -408,6 +409,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 continue;
             childIds.push(v._childViews[i].id);
             childAggrs.push(v._childViews[i].aggregation);
+            childPropIds.push(v._childViews[i].propertyId);
         }
         ElementService.getElements({
             elementIds: childIds,
@@ -424,9 +426,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             for (i = 0; i < childIds.length; i++) {
                 var child = mapping[childIds[i]];
                 if (child && UtilsService.isView(child)) { //what if not found??
-                    childPromises.push(handleChildViews(child, childAggrs[i], projectId, refId, curItemFunc, childrenFunc, seenViews));
-                    childNodes.push(curItemFunc(child, childAggrs[i]));
-                    processedChildViews.push({id: child.id, aggregation: childAggrs[i]});
+                    childPromises.push(handleChildViews(child, childAggrs[i], childPropIds[i], projectId, refId, curItemFunc, childrenFunc, seenViews));
+                    childNodes.push(curItemFunc(child, childAggrs[i], childPropIds[i]));
+                    processedChildViews.push({id: child.id, aggregation: childAggrs[i], propertyId: childPropIds[i]});
                 }
             }
             v._childViews = processedChildViews;

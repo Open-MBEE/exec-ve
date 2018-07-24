@@ -1,4 +1,4 @@
-<div id="{{mmsElementId}}">
+<div id="{{mmsElementId}}" ng-class="{landscape: view._printLandscape}">
 
     <h1 ng-if="mmsLink" class="view-title">
       {{view._veNumber}} <mms-view-link ng-class="{'docTitle-underlined': isHover}" mms-element-id="{{view.id}}" mms-doc-id="{{view.id}}"></mms-view-link>

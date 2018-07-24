@@ -169,7 +169,7 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
 
         var post = {
             "jobName" : jobName,
-            "command" : jobType,
+            "type" : jobType,
             // "arguments" : ["arg1","arg2"],
             "schedule" : jobSchedule,
             "associatedElementID" : id,

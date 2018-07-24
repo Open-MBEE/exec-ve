@@ -2,6 +2,7 @@
   Declarations
 *************************/
 
+$pane_center_text_width: 10in;
 @viewport {
   width: device-width;
 }
@@ -46,7 +47,7 @@ p > img.image-right {
 
 figure.image-right {
   display: block;
-  max-width: 7.5in;
+  max-width: $pane_center_text_width;
   text-align: right;
 }
 
@@ -54,7 +55,7 @@ figure.image-right {
 .image-center,
 figure.image-center {
   text-align: center;
-  max-width: 7.5in;
+  max-width: $pane_center_text_width;
 }
 
 table[align="right"] {

@@ -47,18 +47,19 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
     };
 
     var seenViewIds = {};
-    function handleSingleView(v, aggr) {
+    function handleSingleView(v, aggr, propId) {
         var curNode = viewIds2node[v.id];
         if (!curNode) {
             curNode = {
                 name: v.name,
                 id: v.id,
                 aggr: aggr,
+                propertyId: propId,
                 children: []
             };
             viewIds2node[v.id] = curNode;
         }
-        origViews[v.id] = JSON.parse(JSON.stringify(v));
+        origViews[v.id] = v;
         return curNode;
     }
 
@@ -75,7 +76,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
         curNode.children.push.apply(curNode.children, newChildNodes);
     }
 
-    MmsAppUtils.handleChildViews(documentOb, 'composite', documentOb._projectId, 
+    MmsAppUtils.handleChildViews(documentOb, 'composite', undefined, documentOb._projectId, 
         documentOb._refId, handleSingleView, handleChildren)
     .then(function(docNode) {
         var num = 1;
@@ -126,6 +127,12 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
                 });
             }
         });
+        if (toSave.length === 0) {
+            growl.info("No changes to save!");
+            saving = false;
+            $scope.saveClass = "";
+            return;
+        }
         ElementService.updateElements(toSave, true)
         .then(function() {
             growl.success('Reorder Successful');

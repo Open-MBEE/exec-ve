@@ -27,7 +27,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         });
         scope.isNavCollapsed = true;
         scope.updateOrg = function() {
-            var instance = $uibModal.open({
+            $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
                 windowClass: 've-dropdown-short-modal',
                 scope: scope,

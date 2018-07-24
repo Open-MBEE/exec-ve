@@ -406,7 +406,7 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getPutArtifactsURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
-        return addTicket(r);
+        return addTicket(addVersion(r, reqOb.commitId));
     };
 
     /**
@@ -520,7 +520,6 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url with server parameter added.
      */
     var addServer = function(url, server) {
-        var r = url;
         if (url.indexOf('?') > 0)
             return url + '&mmsServer=' + server;
         else

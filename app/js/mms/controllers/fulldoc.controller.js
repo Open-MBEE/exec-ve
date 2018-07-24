@@ -208,7 +208,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
         if (!documentOb._childViews) {
             documentOb._childViews = [];
         }
-        return MmsAppUtils.handleChildViews(documentOb, 'composite', projectOb.id, refOb.id, _handleSingleView, _handleChildren)
+        return MmsAppUtils.handleChildViews(documentOb, 'composite', undefined, projectOb.id, refOb.id, _handleSingleView, _handleChildren)
             .then(function(childIds) {
                 for (var i = 0; i < childIds.length; i++) {
                     _constructViews(childIds[i], num);

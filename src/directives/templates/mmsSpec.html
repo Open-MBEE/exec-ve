@@ -1,3 +1,4 @@
+<!-- HTML for edit mode -->
 <div ng-if="!noEdit && editing" class="editing">
 
     <h1 class="prop" ng-if="edit.name"><input class="form-control ve-plain-input" type="text" ng-model="edit.name"></h1>
@@ -92,17 +93,15 @@
     <h2 class="prop-title">Commit</h2>
     <span class="prop">{{element._commitId}}</span>
 </div>
-
+<!-- HTML for view mode -->
 <div ng-hide="editing" class="reading">
-
     <p class="text-center" ng-show="gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
 
     <div ng-hide="gettingSpec">
         <div class="text-warning" ng-if="mmsDisplayOldContent">
             <b> Element not found:</b> displaying last found content
         </div>
-        <h1 class="prop element-title {{mmsDisplayOldContent ? 'mms-error': ''}}">{{element.name}}</h1>
-        
+        <h1 class="prop element-title" ng-class="{'mms-error': mmsDisplayOldContent}"><span class="{{ elementTypeClass }}"></span>{{element.name}}</h1>
         <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
 
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
@@ -158,11 +157,6 @@
             </div>
         </div>
 
-        <div ng-if="element.type === 'InstanceSpecification'">
-            <h2 class="prop-title">Classifiers</h2>
-            <span class="prop" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>
-        </div>
-
         <div ng-if="element.type === 'Diagram' && element._artifactIds">
             <mms-transclude-img mms-element-id="{{element.id}}" mms-ref-id="{{element._refId}}" mms-project-id="{{element._projectId}}" mms-commit-id="{{element._commitId}}"></mms-transclude-img>
         </div>
@@ -178,8 +172,8 @@
             <span class="elem-related-docs-wrapper prop">
                 <div ng-repeat="relatedDocument in relatedDocuments">
                     <span ng-repeat="relatedView in relatedDocument._parentViews">
-                        <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" link-target="_blank"></mms-view-link>
-                        > <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" link-target="_blank"></mms-view-link><br/>
+                        <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" link-target="_blank" rel="noopener"></mms-view-link>
+                        > <mms-view-link suppress-numbering="true" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" link-target="_blank" rel="noopener"></mms-view-link><br/>
                     </span>
                 </div>
             </span>
@@ -192,6 +186,12 @@
                 <span class="elem-type">{{element.type}}</span>
                 <div ng-repeat="type in element._appliedStereotypeIds" class="elem-type"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
             </span>
+
+            <div ng-if="element.type === 'InstanceSpecification'">
+                <h2 class="prop-title">Classifiers</h2>
+                <span class="prop" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>
+            </div>
+
             <h2 class="prop-title">Location</h2>
             <span class="prop">{{element._qualifiedName}}</span>
             <h2 class="prop-title">ID&nbsp;
@@ -210,7 +210,7 @@
             <span class="prop">{{element._modified}}</span>
             <h2 class="prop-title">Commit</h2>
             <span class="prop" title="View raw element data">
-                <a target="_blank" ng-href="{{elementDataLink}}">
+                <a target="_blank" rel="noopener noreferrer" ng-href="{{elementDataLink}}">
                     {{element._commitId}}&nbsp;<i class="fa fa-external-link" aria-hidden="true"></i>
                 </a>
             </span>
