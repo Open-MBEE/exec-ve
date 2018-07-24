@@ -260,7 +260,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 var peid = null;
                 if (ViewService.isSection(elem)) {
                     vid = elem.id;
-                } else if (ViewService.isPresentationElement(elem)) {
+                } else if (ViewService.getPresentationElementType(elem)) {
                     peid = elem.id;
                 }
                 var tag = createViewLink(elem, did, vid, peid);

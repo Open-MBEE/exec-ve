@@ -20,12 +20,6 @@ function ApplicationService($q, $http, URLService) {
     var state = {};
 
     function createUniqueId() {
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-
         var s = [];
         var hexDigits = "0123456789abcdef";
         for (var i = 0; i < 36; i++) {

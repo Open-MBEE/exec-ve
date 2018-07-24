@@ -762,12 +762,12 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
         // If both "Generate List of Tables and Figures" && "Use HTML for List of Tables and Figures " options are checked...
         if (html) {
-            var obHTML = generateTOCHtmlOption(ob, tree, printElement);
-            return obHTML;
-        }
-
-        for (var i = 0; i < root_branch.children.length; i++) {
-            makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
+            ob = generateTOCHtmlOption(ob, tree, printElement);
+            // return obHTML;
+        } else {
+            for (var i = 0; i < root_branch.children.length; i++) {
+                makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
+            }
         }
         ob.tables += '</ul></div>';
         ob.figures += '</ul></div>';
@@ -876,7 +876,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     };
 
     var addLiveNumbering = function(pe, el, type) {
-        var sysmlId = pe.id;
         var veNumber = pe._veNumber;
         var prefix = '';
         var name = '';
@@ -957,7 +956,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var tables = printElement.find('table'),
             figures = printElement.find('figure');
             // equations = printElement.find('.math-tex');
-        var anchorId = '', thisCap='', tblCap, tbl, fig, eq, j;
+        var anchorId = '', thisCap='', tblCap, tbl, fig, j;
 
         ob.tableCount = tables.length;
         ob.figureCount = figures.length;
@@ -1015,10 +1014,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         //         eq.append('<caption>&nbsp;</caption>');
         //     }
         // }
-
-        ob.tables += '</ul></div>';
-        ob.figures += '</ul></div>';
-        ob.equations += '</ul></div>';
         return ob;
     };
 

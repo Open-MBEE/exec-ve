@@ -51,13 +51,13 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
 
     var GROUP_ST_ID = '_18_5_3_8bf0285_1520469040211_2821_15754';
 
-    function getClassifierIds() {
-        var re = [];
-        Object.keys(TYPE_TO_CLASSIFIER_ID).forEach(function(key) {
-            re.push(TYPE_TO_CLASSIFIER_ID[key]);
-        });
-        return re;
-    }
+    // function getClassifierIds() {
+    //     var re = [];
+    //     Object.keys(TYPE_TO_CLASSIFIER_ID).forEach(function(key) {
+    //         re.push(TYPE_TO_CLASSIFIER_ID[key]);
+    //     });
+    //     return re;
+    // }
 
     var TYPE_TO_CLASSIFIER_TYPE = {
         Table: 'TableT',
@@ -70,7 +70,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         TomSawyerDiagram: 'TomSawyerDiagram'
     };
 
-    var classifierIdsIds = getClassifierIds();
+    // var classifierIdsIds = getClassifierIds();
     var opaqueClassifiers = [TYPE_TO_CLASSIFIER_ID.Image, TYPE_TO_CLASSIFIER_ID.List, 
         TYPE_TO_CLASSIFIER_ID.Paragraph, TYPE_TO_CLASSIFIER_ID.Section, TYPE_TO_CLASSIFIER_ID.Table, TYPE_TO_CLASSIFIER_ID.Figure];
 
@@ -1142,14 +1142,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
-    var isPresentationElement = function(e) {
-        if (e.type === 'InstanceSpecification') {
-            var classifierIdss = e.classifierIds;
-            if (classifierIdss.length > 0 && classifierIdsIds.indexOf(classifierIdss[0]) >= 0) {
-                return true;
-            }
+    var getPresentationElementType = function (elementOb) {
+        if (elementOb.type === 'InstanceSpecification') {
+            return _.findKey(TYPE_TO_CLASSIFIER_ID, function(o) { return o === elementOb.classifierIds[0]; });
         }
         return false;
+    };
+
+    var getElementType = function(element) {
+        // Get Type
+        var elementType = '';
+        if (UtilsService.isDocument(element)) {
+            elementType = 'Document';
+        } else if (UtilsService.isView(element)) {
+            elementType = 'View';
+        } else {
+            elementType = getPresentationElementType(element);
+        }
+        return elementType;
     };
 
     var reset = function() {
@@ -1188,7 +1198,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         isTable: isTable,
         isEquation: isEquation,
         getTreeType: getTreeType,
-        isPresentationElement: isPresentationElement,
+        getPresentationElementType: getPresentationElementType,
+        getElementType: getElementType,
         addElementToViewOrSection: addElementToViewOrSection,
         removeElementFromViewOrSection: removeElementFromViewOrSection,
         removeViewFromParentView: removeViewFromParentView,

@@ -3,7 +3,7 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 26px;
-    margin: 24px 0 4px;;
+    margin: 26px 0 0;
     height: inherit;
     width: 100%;
     font-weight: $default_font_weight;
@@ -12,6 +12,18 @@
   h1.prop {
     width: 100%;
     word-wrap: break-word;
+
+    /*Make presentation element icons smaller and to the top of the name*/
+
+    .pe-type-Image, .pe-type-ImageT, .pe-type-TableT, .item-type-View, .item-type-Document, .pe-type-ParagraphT, .pe-type-SectionT, .pe-type-Equation {
+
+      &::before{
+        left: 0;
+        bottom: 0;
+        font-size: .5em;
+        top: -1em;
+      }
+    }
   }
 
   h2.prop-title{
@@ -78,8 +90,8 @@ Styles that apply to both the spec
   .visibility-toggle{
     font-size: 12px;
     font-weight: bold;
-    margin: 10px 0px 0 0;
-    letter-spacing: .05em;
+    margin: 8px 0px 0 0;
+    letter-spacing: .04em;
     text-decoration: none;
     color: $ve-light-text;
   }
@@ -157,5 +169,22 @@ Styles that apply to both the spec
     font-size: .75em;
     position: relative;
     top: -.1em;
+  }
+
+  /*Add light colored presentation element icons to the left of the title*/
+
+  .pe-type-Image, .pe-type-ImageT, .pe-type-TableT, .item-type-View, .item-type-Document, .pe-type-ParagraphT, .pe-type-SectionT, .pe-type-Equation {
+
+    position:relative;
+
+    &::before{
+      color: $ve-silver-darker-2;
+      right: 0;
+      padding: 0;
+      font-size: .8em;
+      position:absolute;
+      right: 4px;
+      top: 0px;
+    }
   }
 }
