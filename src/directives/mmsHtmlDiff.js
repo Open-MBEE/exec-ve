@@ -19,37 +19,39 @@ function mmsHtmlDiff($templateCache, $timeout, MathJax, HtmlRenderedDiff) {
     };
 
     function mmsHtmlDiffCtrl($scope) {
-        performDiff($scope, $scope.mmsBaseHtml, $scope.mmsComparedHtml);
+        _performDiff($scope, $scope.mmsBaseHtml, $scope.mmsComparedHtml);
     }
 
     function mmsHtmlDiffLink(scope, element, attrs) {
         scope.htmlDiffId = htmlDiffIdPrefix + scope.$id;
         scope.$watch('mmsBaseHtml', function(newBaseHtml, oldBaseHtml) {
             if (newBaseHtml !== oldBaseHtml) {
-                performDiff(scope, scope.mmsBaseHtml, scope.mmsComparedHtml);
+                _performDiff(scope, scope.mmsBaseHtml, scope.mmsComparedHtml);
             }
         });
 
         scope.$watch('mmsComparedHtml', function(newComparedHtml, oldComparedHtml) {
             if(newComparedHtml !== oldComparedHtml) {
-                performDiff(scope, scope.mmsBaseHtml, scope.mmsComparedHtml);
+                _performDiff(scope, scope.mmsBaseHtml, scope.mmsComparedHtml);
             }
         });
     }
 
-    function performDiff(scope, baseHtml, comparedHtml) {
-        baseHtml = baseHtml.replace(/\r?\n|\r/g, '');
-        comparedHtml = comparedHtml.replace(/\r?\n|\r/g, '');
-        scope.diffResult = HtmlRenderedDiff.generateDiff(baseHtml, comparedHtml);
+    function _performDiff(scope, baseHtml, comparedHtml) {
+        scope.diffResult = HtmlRenderedDiff.generateDiff(_preformatHtml(baseHtml), _preformatHtml(comparedHtml));
         $timeout(function() {
             var diffContainer = $('#' + scope.htmlDiffId);
-            formatImgDiff(diffContainer);
-            formatRowDiff(diffContainer);
+            _formatImgDiff(diffContainer);
+            _formatRowDiff(diffContainer);
             scope.mmsDiffFinish();
         });
     }
 
-    function formatImgDiff(diffContainer) {
+    function _preformatHtml(html) {
+        return html.replace(/\r?\n|\r|\t/g, '').replace('<p class="ng-scope">&nbsp;</p>', '');
+    }
+
+    function _formatImgDiff(diffContainer) {
         diffContainer
             .find('img')
             .each(function () {
@@ -61,7 +63,7 @@ function mmsHtmlDiff($templateCache, $timeout, MathJax, HtmlRenderedDiff) {
             });
     }
 
-    function formatRowDiff(diffContainer) {
+    function _formatRowDiff(diffContainer) {
         diffContainer
             .find('tr')
             .each(function () {
