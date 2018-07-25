@@ -73,8 +73,8 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             var compareCommitId = $scope.mmsCompareCommitId || 'latest';
 
             if (baseCommitId === compareCommitId) {
-                scope.message = ' Comparing same version.';
-                scope.diffLoading = false;
+                $scope.message = ' Comparing same version.';
+                $scope.diffLoading = false;
                 return;
             }
 
