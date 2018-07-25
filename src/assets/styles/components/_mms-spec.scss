@@ -3,7 +3,7 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 26px;
-    margin: 26px 0 0;
+    margin: 30px 0 0;
     height: inherit;
     width: 100%;
     font-weight: $default_font_weight;
@@ -15,13 +15,25 @@
 
     /*Make presentation element icons smaller and to the top of the name*/
 
-    .pe-type-Image, .pe-type-ImageT, .pe-type-TableT, .item-type-View, .item-type-Document, .pe-type-ParagraphT, .pe-type-SectionT, .pe-type-Equation {
+    .item-type-View,
+    .item-type-Document,
+    .item-type-Group,
+    .pe-type-Paragraph,
+    .pe-type-ParagraphT,
+    .pe-type-Text,
+    .pe-type-TextT,
+    .pe-type-Table,
+    .pe-type-TableT,
+    .pe-type-Image,
+    .pe-type-ImageT,
+    .pe-type-Equation,
+    .pe-type-Comment{
 
       &::before{
         left: 0;
         bottom: 0;
         font-size: .5em;
-        top: -1em;
+        top: -1.2em;
       }
     }
   }
@@ -173,12 +185,24 @@ Styles that apply to both the spec
 
   /*Add light colored presentation element icons to the left of the title*/
 
-  .pe-type-Image, .pe-type-ImageT, .pe-type-TableT, .item-type-View, .item-type-Document, .pe-type-ParagraphT, .pe-type-SectionT, .pe-type-Equation {
+  .item-type-View,
+  .item-type-Document,
+  .item-type-Group,
+  .pe-type-Paragraph,
+  .pe-type-ParagraphT,
+  .pe-type-Text,
+  .pe-type-TextT,
+  .pe-type-Table,
+  .pe-type-TableT,
+  .pe-type-Image,
+  .pe-type-ImageT,
+  .pe-type-Equation,
+  .pe-type-Comment{
 
     position:relative;
 
     &::before{
-      color: $ve-silver-darker-2;
+      color: $tertiary_grey;
       right: 0;
       padding: 0;
       font-size: .8em;
