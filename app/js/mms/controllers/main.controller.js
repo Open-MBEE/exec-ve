@@ -66,7 +66,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             if ($state.$current.name === 'login' || modalOpen)
                 return;
             modalOpen = true;
-            var instance = $uibModal.open({
+            $uibModal.open({
                 template: '<div class="modal-header"><h4>You have been logged out, please login again.</h4></div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
                                 '<input type="text" class="form-control" ng-model="credentials.username" placeholder="Username" style="margin-bottom: 1.5em;" autofocus>' + 
                                 '<input type="password" class="form-control" ng-model="credentials.password" placeholder="Password" style="margin-bottom: 1.5em;">' + 
@@ -170,7 +170,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         }
         $scope.mmsWorkingTime = response.data;
         workingModalOpen = true;
-        var instance = $uibModal.open({
+        $uibModal.open({
             template: "<div class=\"modal-header\">Please come back later</div><div class=\"modal-body\">The document you're requesting has been requested already at {{mmsWorkingTime.startTime | date:'M/d/yy h:mm a'}} and is currently being cached, please try again later.</div>",
             scope: $scope,
             backdrop: true,

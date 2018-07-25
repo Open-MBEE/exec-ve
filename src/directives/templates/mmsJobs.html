@@ -1,4 +1,4 @@
-<h2 class="right-pane-title">Jobs</h2>
+<h4 class="right-pane-title">Jobs</h4>
 <span ng-if="loadingJobs"><i class="fa fa-spin fa-spinner"></i></span>
 <hr class="spec-title-divider">
 
@@ -88,7 +88,7 @@
                                 <i class="fa fa-circle completed-marker" aria-hidden="true"></i>success
                             </span>
                             <span class="animate-switch" ng-switch-default>{{jobInstances[job.id][0].jobStatus}}</span>
-                            <a ng-attr-href="{{jobInstances[job.id][0].logUrl}}" target="_blank" ng-show="jobInstances[job.id][0].logUrl">log</a>
+                            <a ng-attr-href="{{jobInstances[job.id][0].logUrl}}" target="_blank" rel="noopener noreferrer" ng-show="jobInstances[job.id][0].logUrl">log</a>
                         </div>
                     </div>
                     <div ng-if="(!jobInstances[job.id] || !jobInstances[job.id].length) && !loading">
@@ -115,7 +115,7 @@
             </tr>
         </tbody>
     </table>
-    <div ng-if="!jobs.length && !loadingJobs" class="text-center empty-state">
+    <div ng-if="!docgenExists && !loadingJobs" class="text-center empty-state">
         <h4 ng-if="!jobs.length && !loadingJobs">No Current PMA Jobs</h4>
         <p><i>What's PMA?</i> PMA regenerates views for the current document. 
         <a target="_blank" href="https://opencae.jpl.nasa.gov/alfresco/mmsapp/mms.html#/projects/PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85/master/documents/_18_0_2_8630260_1446850132083_177552_51111/views/MMS_1474586905881_1cf20cf0-711f-4cca-8a61-de8a354e3d43">More</a></p>
@@ -125,8 +125,5 @@
             Run DocGen <i ng-hide="createJobCleared" class="fa fa-spin fa-spinner"></i>
         </button>
     </div>
-    <!--<div class="pull-right" ng-if="docEditable">
-        <a href="/share/page/document-details?nodeRef={{doc.nodeRefId}}" target="_blank">Edit Permissions</a>
-    </div>-->
 </div>
 

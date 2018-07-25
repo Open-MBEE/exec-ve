@@ -133,9 +133,13 @@ mms-transclude-img img {
 .item-type-Document,
 .item-type-Group,
 .pe-type-Paragraph,
+.pe-type-ParagraphT,
 .pe-type-Text,
+.pe-type-TextT,
 .pe-type-Table,
+.pe-type-TableT,
 .pe-type-Image,
+.pe-type-ImageT,
 .pe-type-Equation,
 .pe-type-Comment{
   &::before{
@@ -153,13 +157,17 @@ mms-transclude-img img {
   color: lighten($ve-accent, 20%);
 }
 .pe-type-Paragraph::before,
-.pe-type-Text::before{
+.pe-type-ParagraphT::before,
+.pe-type-Text::before,
+.pe-type-TextT::before{
   content: "\f1dd";
 }
-.pe-type-Table::before{
+.pe-type-Table::before,
+.pe-type-TableT::before{
   content: "\f0ce";
 }
-.pe-type-Image::before{
+.pe-type-Image::before,
+.pe-type-ImageT::before{
   content: "\f03e";
 }
 .pe-type-Equation::before{
@@ -170,7 +178,7 @@ mms-transclude-img img {
 }
 
 /*set pseudoclass and reset italic from <i>*/
-.pe-type-Section::before{
+.pe-type-Section::before, .pe-type-SectionT::before{
   content:"\00a7";
   font-style: normal;
   font-weight: bold;

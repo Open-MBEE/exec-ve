@@ -18,13 +18,10 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
     var commitId;
           
     if (mmsViewCtrl) {
-        var viewVersion = mmsViewCtrl.getElementOrigin();
-        if (!projectId)
-            projectId = viewVersion.projectId;
-        if (!refId)
-            refId = viewVersion.refId;
-        if (!commitId)
-            commitId = viewVersion.commitId;
+      var viewVersion = mmsViewCtrl.getElementOrigin();
+      projectId = viewVersion.projectId;
+      refId = viewVersion.refId;
+      commitId = viewVersion.commitId;
     }
     
     function vf_pplot(_out) {

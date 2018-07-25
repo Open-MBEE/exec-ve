@@ -1,11 +1,11 @@
 {
-  "name": "mms",
-  "version": "3.2.0",
+  "name": "ve",
+  "version": "3.3.0",
   "authors": [
     "Shakeh E Brys <skhudiky@jpl.nasa.gov",
     "Raffi P Tikidjian <raffi@jpl.nasa.gov>"
   ],
-  "description": "Model Management System",
+  "description": "View Editor bower dependencies",
   "main": "bower.json",
   "moduleType": [
     "globals"
@@ -48,7 +48,7 @@
   },
   "resolutions": {
     "lodash": "3.9.3",
-	"d3": "~5.1.0",
+    "d3": "~5.1.0",
     "angular": "~1.5.5"
   },
   "devDependencies": {

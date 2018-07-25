@@ -18,13 +18,10 @@
       var commitId;
         
       if (mmsViewCtrl) {
-          var viewVersion = mmsViewCtrl.getElementOrigin();
-          if (!projectId)
-              projectId = viewVersion.projectId;
-          if (!refId)
-              refId = viewVersion.refId;
-          if (!commitId)
-              commitId = viewVersion.commitId;
+        var viewVersion = mmsViewCtrl.getElementOrigin();
+        projectId = viewVersion.projectId;
+        refId = viewVersion.refId;
+        commitId = viewVersion.commitId;
       }
       //if ( scope.plot.config.length !== 0){ 
         //scope.plot.config = JSON.parse(scope.plot.config.replace(/'/g, '"')); //{"colors: [5,6,7,8,9]"}

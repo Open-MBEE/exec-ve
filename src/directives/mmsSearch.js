@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
+.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -15,7 +15,7 @@ angular.module('mms.directives')
  * @scope
  *
  */
-function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _, growl, $templateCache, $timeout) {
+function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -61,6 +61,18 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
             });
         };
         getMetaTypes();
+
+        scope.getTypeClass = function(element) {
+            // Get Type
+            scope.elementType = ViewService.getElementType(element);
+            scope.elementTypeClass = '';
+            if (element.type === 'InstanceSpecification') {
+                scope.elementTypeClass = 'pe-type-' + scope.elementType;
+            } else {
+                scope.elementTypeClass = 'item-type-' + scope.elementType;
+            }
+            return scope.elementTypeClass;
+        };
 
         // Set search options
         scope.fieldTypeList = [
@@ -164,12 +176,11 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
          * Updates advanced search main query input
          */
         scope.stringQueryUpdate = function() {
-            var metatypeFilterString;
             var rowLength = scope.advanceSearchRows.length;
             scope.stringQuery = Array(rowLength+1).join('(');
             scope.stringQuery += scope.mainSearch.searchType.label + ':';
             if (scope.mainSearch.searchType.id === 'metatype') {
-                scope.stringQuery += getMetatypeSelection('#searchMetatypeSelect');
+                scope.stringQuery += getMetatypeSelection('#searchMetatypeSelectAdvance');
             } else {
                 scope.stringQuery += scope.mainSearch.searchText;
             }
@@ -286,7 +297,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                 scope.currentPage = page;
                 scope.paginationCache.push(scope.searchResults);
                 if (scope.advanceSearch) {
-                    scope.advanceSearch = !scope.advanceSearch;
+                    // scope.advanceSearch = !scope.advanceSearch;
                     scope.advancedSearchResults = true;
                 }
             }, function(reason) {
@@ -498,9 +509,7 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, _
                         "must": mainBoolQuery,
                     } };
             } else {
-                var boolQuery, clause2;
-                var clause1 = buildSearchClause(scope.mainSearch);
-
+                var clause2, clause1 = buildSearchClause(scope.mainSearch);
                 for (var i = 0; i < rowLength; i++) {
                     // if must, must_not or should
                     var row = scope.advanceSearchRows[i];

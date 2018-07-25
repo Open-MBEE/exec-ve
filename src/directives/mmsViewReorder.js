@@ -106,8 +106,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             var updateSectionElementOrder = function(elementReference) {
                 var sectionEdit = {
                     id: elementReference.instanceId,
-                    _read: elementReference.instanceSpecification._read,
-                    _modified: elementReference.instanceSpecification._modified,
+                    //_modified: elementReference.instanceSpecification._modified,
                     _projectId: elementReference.instanceSpecification._projectId,
                     _refId: elementReference.instanceSpecification._refId,
                     type: elementReference.instanceSpecification.type,
@@ -139,8 +138,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
             }
             var viewEdit = {
                 id: scope.view.id,
-                _read: scope.view._read,
-                _modified: scope.view._modified,
+                //_modified: scope.view._modified,
                 _projectId: scope.view._projectId,
                 _refId: scope.view._refId,
                 type: scope.view.type

@@ -36,7 +36,7 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             return false;
         });
 
-        scope.$watch('mmsElementId', function(newVal, oldVal) {
+        var changeElement = function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed) || !scope.mmsProjectId) {
                 return;
             }
@@ -79,8 +79,11 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             }).finally(function() {
                 element.removeClass('isLoading');
             });
+        };
 
-        });
+        scope.$watch('mmsElementId', changeElement);
+        scope.$watch('mmsRefId', changeElement);
+        scope.$watch('mmsCommitId', changeElement);
     };
 
     return {
