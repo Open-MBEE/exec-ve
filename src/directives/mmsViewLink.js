@@ -149,7 +149,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
         },
         require: ['?^^mmsCf', '?^^mmsView'],
         template: '<span ng-if="!loading"><a target="{{target}}" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>' +
-        '<a class="external-link" target=_blank ng-href="{{href}}" ng-if="linkText"><i class="fa fa-external-link" aria-hidden="true"></i></a></span>',
+        '<a class="external-link" target=_blank ng-href="{{href}}" ng-if="linkText"><i class="fa fa-external-link" aria-hidden="true" title="Open document in new tab"></i></a></span>',
         link: mmsViewLinkLink
     };
 }
