@@ -796,7 +796,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var veNumber = pe._veNumber;
         var prefix = '';
         var el = printElement.find('#' + sysmlId);
-        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"][suppress-numbering!="true"], mms-view-link[data-mms-pe-id="' + sysmlId + '"][suppress-numbering!="true"]');
+        var refs = printElement.find('mms-view-link[mms-pe-id="' + sysmlId + '"], mms-view-link[data-mms-pe-id="' + sysmlId + '"]');
         var cap = '';
         var name = '';
         if (child.type === 'table') {
@@ -820,11 +820,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             if (!showRefName) {
                 cap = veNumber;
             }
-            if (live) {
-                refs.find('a').html('Table ' + cap);
-            } else {
-                refs.html('<a href="#' + sysmlId + '">Table ' + cap + '</a>');
+            if (!live) {
+                refs.find('a').attr('href', '#' + sysmlId);
             }
+            refs.filter('[suppress-numbering!="true"]').filter(':not([link-text])').find('a').html('Table ' + cap);
         }
         if (child.type === 'figure') {
             //ob.figureCount++;
@@ -847,11 +846,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             if (!showRefName) {
                 cap = veNumber;
             }
-            if (live) {
-                refs.find('a').html('Fig. ' + cap);
-            } else {
-                refs.html('<a href="#' + sysmlId + '">Fig. ' + cap + '</a>');
+            if (!live) {
+                refs.find('a').attr('href', '#' + sysmlId);
             }
+            refs.filter('[suppress-numbering!="true"]').filter(':not([link-text])').find('a').html('Fig. ' + cap);
         }
         if (child.type === 'equation') {
             //ob.equationCount++;
@@ -864,11 +862,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             if (capEq.length === 0) {
                 el.find('mms-view-equation > mms-cf > mms-transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
             }
-            if (live) {
-                refs.find('a').html('Eq. ' + equationCap);
-            } else {
-                refs.html('<a href="#' + sysmlId + '">Eq. ' + equationCap + '</a>');
+            if (!live) {
+                refs.find('a').attr('href', '#' + sysmlId);
             }
+            refs.filter('[suppress-numbering!="true"]').filter(':not([link-text])').find('a').html('Eq. ' + equationCap);
         }
         for (var i = 0; i < child.children.length; i++) {
             makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
