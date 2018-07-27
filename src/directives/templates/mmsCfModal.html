@@ -21,8 +21,10 @@
         <div class="form-group" ng-show="!showProposeLink"><br>
             <label>For links within this document</label>
             <div class="radio radio-with-label">
-                <label><input type="radio" ng-model="suppressNumbering" ng-value="false">&nbsp;Use auto-numbering as title</label><br>
-                <label><input type="radio" ng-model="suppressNumbering" ng-value="true">&nbsp;Use Name as title</label>
+                <label><input type="radio" ng-model="linkType" ng-value="1">&nbsp;Use auto-numbering as title</label><br>
+                <label><input type="radio" ng-model="linkType" ng-value="2">&nbsp;Use Name as title</label><br>
+                <label><input type="radio" ng-model="linkType" ng-value="3">&nbsp;Use custom title:&nbsp;
+                    <input type="text" ng-model="linkText" placeholder="custom title"/></label>
             </div>
         </div>
         <label ng-show="showEditableOp" for="nonEditableCheckbox">
