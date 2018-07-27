@@ -71,8 +71,24 @@ mms-view.editing mms-transclude-com {
   //border: 2px solid darken($yellow, 8%);
 }
 
-mms-view:not(.editing):not(.outline) .placeholder {
-  visibility: hidden;
+mms-view:not(.editing):not(.outline) {
+  .placeholder {
+    visibility: hidden;
+  }
+  
+  mms-view-para > mms-cf > mms-transclude-doc,
+  mms-view-list-t > mms-cf > mms-transclude-doc,
+  mms-view-table-t > mms-cf > mms-transclude-doc,
+  mms-view-figure > mms-cf > mms-transclude-doc,
+  mms-view-equation > mms-cf > mms-transclude-doc,
+  mms-view-section {
+    border: 2px solid white;
+    display: block;
+  }
+
+  .view-title mms-transclude-name > span {
+    border: 2px solid white;
+  }
 }
 
 mms-view:not(.reviewing) mms-transclude-com {
