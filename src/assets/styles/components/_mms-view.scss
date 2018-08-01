@@ -15,6 +15,12 @@ mms-view {
       @include border-radius(5px);
     }
   }
+  &.outline:not(.editing) {
+    mms-view-section {
+      display: block;
+      border: 2px solid white;
+    }
+  }
 
   table {
     @extend .table-condensed;
