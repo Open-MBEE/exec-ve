@@ -200,10 +200,12 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         // Also defines options for search interfaces -- see mmsSearch.js for more info
         var transcludeViewLinkCtrl = function($scope, $uibModalInstance, ApplicationService) {
             $scope.title = 'Insert cross reference as link';
-            $scope.description = 'Search for a view or content element, click on its name to insert link.';
+            $scope.description = 'Search for a view or content element, click on its name or its document/section to insert link.';
             $scope.showProposeLink = false;
             $scope.searchExisting = true;
             $scope.suppressNumbering = false;
+            $scope.linkType = 1;
+            $scope.linkText = '';
 
             // Function to construct view link
             var createViewLink = function (elem, did, vid, peid) {
@@ -217,8 +219,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 if (peid) {
                     tag += ' mms-pe-id="' + peid + '"';
                 }
-                if ($scope.suppressNumbering) {
+                if ($scope.linkType == 2) {
                     tag += ' suppress-numbering="true"';
+                }
+                if ($scope.linkType == 3 && $scope.linkText) {
+                    tag += ' link-text="' + $scope.linkText + '"';
                 }
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>';
                 return tag;
