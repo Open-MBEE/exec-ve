@@ -5,19 +5,33 @@ angular.module('mmsApp')
 
 function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, CacheService, projectOb, refOb, groupObs, documentObs) {
     $scope.isSaving = false;
+    $scope.targetId = '';
     $scope.treeOptions = {
-        dropped: function (change) {},
+        dropped: function (change) {
+            sortRecursively(children);
+            $scope.targetId = '';
+        },
         accept: function (sourceNodeScope, destNodeScope, destIndex) {
-            // allow moving to root or to group
-            return !destNodeScope.node || destNodeScope.node.type === 'group';
+            // allow moving to the root or to a group
+            var accept = destNodeScope.node && ( destNodeScope.node.type === 'group' || destNodeScope.node.type === 'root' );
+            if (accept) {
+                if(destNodeScope.$nodeScope && destNodeScope.$nodeScope.$modelValue && destNodeScope.$nodeScope.$modelValue.id) {
+                    $scope.targetId = destNodeScope.$nodeScope.$modelValue.id;
+                }
+            }
+            return accept;
+        },
+        dragStart: function(data) {
+            $scope.targetId = data.dest.nodesScope.$nodeScope.$modelValue.id;
         }
     };
     $scope.saveReorder = saveReorder;
     $scope.cancelReorder = cancelReorder;
 
-    var tree = generateTree();
-    sortRecursively(tree);
-    $scope.tree = tree;
+    var children = generateTree();
+    sortRecursively(children);
+    var root = createNode('Top Level', 'root', children, {id: 'root'});
+    $scope.tree = [root];
 
     function generateTree() {
         // create a node for each groupOb
@@ -67,8 +81,8 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
         return tree;
     }
 
-    function createNode(name, type, chilldren, data) {
-        return {name: name, type: type, children: chilldren, data: data};
+    function createNode(name, type, children, data) {
+        return {name: name, type: type, children: children, data: data, id: data.id};
     }
 
     function cancelReorder() {
@@ -98,7 +112,9 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
     }
 
     function findNodesToUpdate(result) {
-        $scope.tree.forEach(function(node) {
+        // ignore root
+        var root = $scope.tree[0];
+        root.children.forEach(function(node) {
             // handle node change at the root level
             if ( (node.type === 'group' && node.data._parentId) || (node.type === 'view' && node.data._groupId) ) {
                 result.push({node: node, newOwnerId: 'holding_bin_' + projectOb.id });

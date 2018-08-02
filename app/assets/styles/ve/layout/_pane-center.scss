@@ -161,3 +161,13 @@ tr {
 .fa-folder {
   color: lighten($ve-accent, 12%);
 }
+
+.group-reorder-container .highlighted {
+  background-color: darken($ve-active, 4%);
+  color: white;
+
+  /*lighten folder against dark blue background*/
+  .fa-folder{
+    color: lighten($ve-accent, 24%);
+  }
+}

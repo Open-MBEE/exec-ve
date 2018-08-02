@@ -111,7 +111,6 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
             if (!newVal || (newVal == oldVal && ran))
                 return;
             ran = true;
-            var lastid = newVal;
             var reqOb = {elementId: scope.mmsDocId, projectId: scope.mmsProjectId, refId: scope.mmsRefId};
             ElementService.getElement(reqOb, 2, false)
             .then(function (document) {
@@ -174,7 +173,6 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
 
         // actions for stomp
         scope.$on("stomp.updateJob", function(event, updateJob) {
-            var jobId = updateJob.jobId;
             if (updateJob.type === 'docmerge' && updateJob.associatedElementId === scope.mmsDocId && 
                 updateJob.refId === scope.mmsRefId && updateJob.jobStatus === 'completed') {
                     growl.success(scope.docName + ' has been merged');

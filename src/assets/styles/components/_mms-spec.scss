@@ -3,7 +3,7 @@
   h1.prop,
   h1.prop > .form-control {
     font-size: 26px;
-    margin: 24px 0 4px;;
+    margin: 30px 0 0;
     height: inherit;
     width: 100%;
     font-weight: $default_font_weight;
@@ -12,6 +12,30 @@
   h1.prop {
     width: 100%;
     word-wrap: break-word;
+
+    /*Make presentation element icons smaller and to the top of the name*/
+
+    .item-type-View,
+    .item-type-Document,
+    .item-type-Group,
+    .pe-type-Paragraph,
+    .pe-type-ParagraphT,
+    .pe-type-Text,
+    .pe-type-TextT,
+    .pe-type-Table,
+    .pe-type-TableT,
+    .pe-type-Image,
+    .pe-type-ImageT,
+    .pe-type-Equation,
+    .pe-type-Comment{
+
+      &::before{
+        left: 0;
+        bottom: 0;
+        font-size: .5em;
+        top: -1.2em;
+      }
+    }
   }
 
   h2.prop-title{
@@ -78,8 +102,8 @@ Styles that apply to both the spec
   .visibility-toggle{
     font-size: 12px;
     font-weight: bold;
-    margin: 15px 0px 0 0;
-    letter-spacing: .05em;
+    margin: 8px 0px 0 0;
+    letter-spacing: .04em;
     text-decoration: none;
     color: $ve-light-text;
   }
@@ -157,5 +181,34 @@ Styles that apply to both the spec
     font-size: .75em;
     position: relative;
     top: -.1em;
+  }
+
+  /*Add light colored presentation element icons to the left of the title*/
+
+  .item-type-View,
+  .item-type-Document,
+  .item-type-Group,
+  .pe-type-Paragraph,
+  .pe-type-ParagraphT,
+  .pe-type-Text,
+  .pe-type-TextT,
+  .pe-type-Table,
+  .pe-type-TableT,
+  .pe-type-Image,
+  .pe-type-ImageT,
+  .pe-type-Equation,
+  .pe-type-Comment{
+
+    position:relative;
+
+    &::before{
+      color: $tertiary_grey;
+      right: 0;
+      padding: 0;
+      font-size: .8em;
+      position:absolute;
+      right: 4px;
+      top: 0px;
+    }
   }
 }
