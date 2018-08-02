@@ -1083,6 +1083,12 @@ table caption {
   text-decoration-color: rgb(72, 133, 189);
 }
 
+// Customize exertnal link for view open-document link
+h1 .open-document a.external-link {
+  padding-left: 0.3em;
+  font-size: 0.5em;
+}
+
 /*------------------------------------------------------------------
 7. Right pane
 -------------------------------------------------------------------*/
