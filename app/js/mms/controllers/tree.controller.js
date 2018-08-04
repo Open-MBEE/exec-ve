@@ -286,7 +286,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         });
     } else {
-        var seenChild = {};        
         if (!documentOb._childViews) {
             documentOb._childViews = [];
         }
@@ -400,7 +399,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             }
         } else if ($state.includes('project.ref.document')) {
             var viewId = (branch.type !== 'view') ? branch.viewId : branch.data.id;
-            var sectionId = branch.type === 'section' ? branch.data.id : null;
+            // var sectionId = branch.type === 'section' ? branch.data.id : null;
             var hash = branch.data.id;
             if ($rootScope.ve_fullDocMode) {
                 $rootScope.$broadcast('mms-tree-click', branch);
@@ -526,13 +525,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             templateUrlStr = 'partials/mms/new-doc-or-group.html';
             newBranchType = 'view';
         } else if (itemType === 'Group') {
-            if (!branch) {
-                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
-            } else if (branch.type !== 'group') {
-                growl.warning("Select a group to add group under");
-                return;
-            } else {
+            if (branch && branch.type === 'group') {
                 $scope.parentBranchData = branch.data;
+            } else {
+                $scope.parentBranchData = {id: "holding_bin_" + projectOb.id};
+                // Always create group at root level if the selected branch is not a group branch
+                branch = null;
             }
             templateUrlStr = 'partials/mms/new-doc-or-group.html';
             newBranchType = 'group';
@@ -744,12 +742,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.deleteItem = function(cb) {
         var branch = $scope.treeApi.get_selected_branch();
         if (!branch) {
-            growl.warning("Delete Error: Select item to delete.");
+            growl.warning("Select item to remove.");
             return;
         }
         if ($state.includes('project.ref.document')) { 
             if (branch.type !== 'view' || (!UtilsService.isView(branch.data))) {
-                growl.warning("Delete Error: Selected item is not a view.");
+                growl.warning("Cannot remove non-view item. To remove this item, open it in the center pane.");
                 return;
             }
         }
@@ -757,14 +755,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         // when in project.ref state, allow deletion for view/document/group
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             if (branch.type !== 'view' && !UtilsService.isDocument(branch.data) && (branch.type !== 'group' || branch.children.length > 0) ) {
-                growl.warning("Delete Error: Selected item is not a document/empty group.");
+                growl.warning("Cannot remove group with contents. Empty contents and try again.");
                 return;
             }
         }
-        // TODO: do not pass selected branch in scope, move page to generic location
         $scope.deleteBranch = branch;
         var instance = $uibModal.open({
-            templateUrl: 'partials/mms/delete.html',
+            templateUrl: 'partials/mms/confirmRemove.html',
             scope: $scope,
             controller: ['$scope', '$uibModalInstance', deleteCtrl]
         });
@@ -815,10 +812,10 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
             if (promise) {
                 promise.then(function (data) {
-                    growl.success($scope.type + " Deleted");
+                    growl.success($scope.type + " Removed");
                     $uibModalInstance.close('ok');
                 }, function (reason) {
-                    growl.error($scope.type + ' Delete Error: ' + reason.message);
+                    growl.error($scope.type + ' Removal Error: ' + reason.message);
                 }).finally(function () {
                     $scope.oking = false;
                 });

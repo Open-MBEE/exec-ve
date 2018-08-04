@@ -26,7 +26,7 @@ angular.module('mms.directives')
 function mmsTranscludeArt(ArtifactService, AuthService, URLService) {
 
     var mmsTranscludeArtLink = function(scope, element, attrs, controllers) {
-        var mmsViewCtrl = controllers[0];
+        // var mmsViewCtrl = controllers[0];
         var processed = false;
 
         scope.$watch('mmsElementId', function(newVal, oldVal) {

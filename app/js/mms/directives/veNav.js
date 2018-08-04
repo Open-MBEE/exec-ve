@@ -27,7 +27,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         });
         scope.isNavCollapsed = true;
         scope.updateOrg = function() {
-            var instance = $uibModal.open({
+            $uibModal.open({
                 templateUrl: 'partials/mms/selectModal.html',
                 windowClass: 've-dropdown-short-modal',
                 scope: scope,
@@ -87,7 +87,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.3.0';
+            scope.veV = '3.3.1';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
