@@ -30,6 +30,7 @@ angular.module('mmsApp')
         $rootScope.ve_editmode = false;
 
     $scope.search = search;
+    toggleLeftPane(search);
     $scope.viewOb = viewOb;
     $scope.projectOb = projectOb;
     $scope.refOb = refOb;
@@ -248,4 +249,13 @@ angular.module('mmsApp')
         MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
     });
 
+    function toggleLeftPane(searchTerm) {
+        if ( searchTerm && !$rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
+
+        if ( !searchTerm && $rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
+    }
 }]);
