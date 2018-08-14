@@ -937,6 +937,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
             }
         }
+        var parent = imgDom.parent('p');
+        if (parent.length > 0) {
+            if (parent.css('text-align') == 'center' || parent.hasClass('image-center')) {
+                imgDom.addClass('image-center');
+            }
+            imgDom.unwrap(); //note this removes parent p and puts img and any of its siblings in its place
+        }
     };
 
     return {

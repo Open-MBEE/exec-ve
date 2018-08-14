@@ -40,9 +40,15 @@ figure > figcaption {
   }
 }
 
-p > img.image-right {
+img.image-right {
   display: block;
   margin-left: auto;
+}
+
+img.image-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 figure.image-right {
