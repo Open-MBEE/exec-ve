@@ -939,6 +939,16 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         }
     };
 
+    var toggleLeftPane = function (searchTerm) {
+        if ( searchTerm && !$rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
+
+        if ( !searchTerm && $rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -959,7 +969,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         clearAutosaveContent: clearAutosaveContent,
         reopenUnsavedElts: reopenUnsavedElts,
         checkForDuplicateInstances: checkForDuplicateInstances,
-        fixImgSrc: fixImgSrc
+        fixImgSrc: fixImgSrc,
+        toggleLeftPane: toggleLeftPane
     };
 
 }
