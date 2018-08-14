@@ -464,6 +464,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             }
 
             instance.on( 'instanceReady', function() {
+                addCkeditorHtmlFilerRule(instance);
+            } );
+
+            function addCkeditorHtmlFilerRule(instance) {
                 instance.dataProcessor.htmlFilter.addRules({
                     elements: {
                         $: function (element) {
@@ -476,7 +480,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                         }
                     }
                 });
-            } );
+            }
 
             instance.on( 'init', function(args) {
                 ngModelCtrl.$setPristine();
