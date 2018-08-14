@@ -463,6 +463,21 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.config.autosave = {enableAutosave: false};
             }
 
+            instance.on( 'instanceReady', function() {
+                instance.dataProcessor.htmlFilter.addRules({
+                    elements: {
+                        $: function (element) {
+                            var attributesToDelete = Object.keys(element.attributes).filter(function(attrKey) {
+                                return attrKey.startsWith('ng-');
+                            });
+                            attributesToDelete.forEach(function(attrToDelete) {
+                                delete element.attributes[attrToDelete];
+                            });
+                        }
+                    }
+                });
+            } );
+
             instance.on( 'init', function(args) {
                 ngModelCtrl.$setPristine();
             });
