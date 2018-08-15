@@ -111,10 +111,14 @@ function MentionService($rootScope, $compile, CacheService) {
     
     function _positionMentionElement(editor, mentionElement, mentionPlaceHolderId) {
         var ckeditorFrame = _getCkeditorFrame(editor);
-        var box = ckeditorFrame.getBoundingClientRect();
+        var ckeditorBox = ckeditorFrame.getBoundingClientRect();
         var mentionPlaceHolder = ckeditorFrame.contentDocument.getElementById(mentionPlaceHolderId);
-        var offset = $(mentionPlaceHolder).offset();
-        mentionElement.css({position: 'absolute', top: box.top + offset.top + 30, left: box.left + offset.left});
+        var mentionPlaceHolderBox = $(mentionPlaceHolder)[0].getBoundingClientRect();
+        mentionElement.css({
+            position: 'absolute',
+            top: ckeditorBox.top + mentionPlaceHolderBox.top + 30,
+            left: ckeditorBox.left + mentionPlaceHolderBox.left
+        });
         $('body').append(mentionElement);
     }
 
