@@ -23,7 +23,7 @@ angular.module('mms.directives')
 function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, ApplicationService, AuthService, URLService) {
     var template = $templateCache.get('mms/templates/mmsTsDiagram.html');
     var mapping = {};
-    var deferreds = {};
+    // var deferreds = {};
     var projectId2PeId = {};
     var peId2projectId = {};
     var projectIdLoaded = {};

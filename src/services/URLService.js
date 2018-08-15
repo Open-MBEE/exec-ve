@@ -161,6 +161,10 @@ function urlService(baseUrl, mmsUrl) {
         return root + "/checklogin";
     };
 
+    var getOrgURL = function(orgId) {
+        return addTicket(root + '/orgs/' + orgId);
+    };
+    
     var getOrgsURL = function() {
         return addTicket(root + "/orgs");
     };
@@ -402,7 +406,7 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getPutArtifactsURL = function(reqOb) {
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
-        return addTicket(r);
+        return addTicket(addVersion(r, reqOb.commitId));
     };
 
     /**
@@ -516,7 +520,6 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url with server parameter added.
      */
     var addServer = function(url, server) {
-        var r = url;
         if (url.indexOf('?') > 0)
             return url + '&mmsServer=' + server;
         else
@@ -578,6 +581,7 @@ function urlService(baseUrl, mmsUrl) {
         isTimestamp: isTimestamp,
         getMmsVersionURL: getMmsVersionURL,
         getSiteDashboardURL: getSiteDashboardURL,
+        getOrgURL: getOrgURL,
         getOrgsURL: getOrgsURL,
         getProjectsURL: getProjectsURL,
         getProjectURL: getProjectURL,

@@ -48,6 +48,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         var transcludeCtrl = function($scope, $uibModalInstance) {
             $scope.title = 'Insert cross reference';
             $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
+            $scope.searchExisting = true;
             $scope.newE = {name: '', documentation: ''};
             $scope.requestName = false;
             $scope.requestDocumentation = false;
@@ -134,8 +135,12 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         // Also defines options for search interfaces -- see mmsSearch.js for more info
         var transcludeViewLinkCtrl = function($scope, $uibModalInstance, ApplicationService) {
             $scope.title = 'Insert cross reference as link';
-
-            $scope.description = 'Search for a view or content element, click on its name to insert link.';
+            $scope.description = 'Search for a view or content element, click on its name or its document/section to insert link.';
+            $scope.showProposeLink = false;
+            $scope.searchExisting = true;
+            $scope.suppressNumbering = false;
+            $scope.linkType = 1;
+            $scope.linkText = '';
 
             // Function to construct view link
             var createViewLink = function (elem, did, vid, peid) {
@@ -148,6 +153,12 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 }
                 if (peid) {
                     tag += ' mms-pe-id="' + peid + '"';
+                }
+                if ($scope.linkType == 2) {
+                    tag += ' suppress-numbering="true"';
+                }
+                if ($scope.linkType == 3 && $scope.linkText) {
+                    tag += ' link-text="' + $scope.linkText + '"';
                 }
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>';
                 return tag;
@@ -190,7 +201,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 var peid = null;
                 if (ViewService.isSection(elem)) {
                     vid = elem.id;
-                } else if (ViewService.isPresentationElement(elem)) {
+                } else if (ViewService.getPresentationElementType(elem)) {
                     peid = elem.id;
                 }
                 var tag = createViewLink(elem, did, vid, peid);

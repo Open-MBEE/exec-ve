@@ -78,7 +78,6 @@ module.exports = function(grunt) {
       };
     }
   }
-
   var combineCustomJS = {
         options: {
             banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
@@ -107,8 +106,7 @@ module.exports = function(grunt) {
                 'app/js/mms/directives/*.js'
             ]
         }
-    };
-
+  };
   // Project configuration.
   grunt.initConfig({
 
@@ -116,7 +114,7 @@ module.exports = function(grunt) {
 
     concurrent: {
       devStep1: ['install', 'lint', 'clean:before'],
-      devStep2: [['copy:all', 'processExternalDepsDevMode'], 'processAppStyleSheets', 'processAppJSInDev' ],
+      devStep2: [['copy:all', 'processExternalDepsDevMode'], 'processAppStyleSheets', 'processAppJSInDev'],
       devStep3: ['copy:dev'],
       devStep4: ['clean:devAfter', 'cacheBust'],
 
@@ -261,6 +259,7 @@ module.exports = function(grunt) {
     /** Concat + Minify JS files **/
     uglify: {
       combineCustomJS: combineCustomJS,
+
       // this target is for files handled by usemin task.
       generated: {
         options: {
@@ -363,7 +362,7 @@ module.exports = function(grunt) {
         }
       }
     },
-    
+
     karma: {
         unit:{
             configFile:'config/develop/karma.develop.conf.js'

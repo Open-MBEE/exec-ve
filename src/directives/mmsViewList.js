@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewList', ['$compile', 'UtilsService', mmsViewList]);
+.directive('mmsViewList', ['$compile', 'UtilsService', 'Utils', mmsViewList]);
 
-function mmsViewList($compile, UtilsService) {
+function mmsViewList($compile, UtilsService, Utils) {
 
     return {
         restrict: 'E',
@@ -13,6 +13,9 @@ function mmsViewList($compile, UtilsService) {
         link: function(scope, element, attrs) {
             var html = UtilsService.makeHtmlList(scope.list);
             element[0].innerHTML = html;
+            $(element[0]).find('img').each(function(index) {
+                Utils.fixImgSrc($(this));
+            });
             $compile(element.contents())(scope);
             return;
         }

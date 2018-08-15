@@ -94,9 +94,9 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                             scope.suffix = ')';
                         }
                         if (ApplicationService.getState().fullDoc) {
-                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + "/full" + scope.hash;
+                            scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + "/full" + scope.hash;
                         } else {
-                            scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
+                            scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
                         }
                     });
                 }
@@ -115,9 +115,9 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                 }
                 scope.loading = false;
                 if (ApplicationService.getState().fullDoc) {
-                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
+                    scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
                 } else {
-                    scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
+                    scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
                 }
                 scope.change = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc == scope.docid) && !scope.suppressNumbering;
             }, function(reason) {
@@ -145,10 +145,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
             linkClass: '@?',
             linkIconClass: '@?',
             linkTarget: '@?',
+            mmsExternalLink: '<?',
             suppressNumbering: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
-        template: '<a ng-if="!loading" target="{{target}}" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>',
+        template: '<span ng-if="!loading"><a target="{{target}}" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>' +
+        '<a class="external-link no-print" target="_blank" ng-href="{{href}}" ng-if="mmsExternalLink"><i class="fa fa-external-link" aria-hidden="true" title="Open document in new tab"></i></a></span>',
         link: mmsViewLinkLink
     };
 }
