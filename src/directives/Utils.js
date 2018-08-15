@@ -594,7 +594,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                      // Broadcast message for the ToolCtrl:
                     $rootScope.$broadcast('presentationElem.cancel',scope.edit);
 
-                    growl.success('Delete Successful');
+                    growl.success('Remove Successful');
                 }, handleError);
 
             }).finally(function() {
