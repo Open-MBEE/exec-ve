@@ -360,6 +360,10 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 break;
         }
 
+        var deb = _.debounce(function(e) {
+            update();
+        }, 1000);
+
         $timeout(function() {
             // Initialize ckeditor and set event handlers
             $(element).val(ngModelCtrl.$modelValue);
@@ -390,10 +394,10 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 ngModelCtrl.$setPristine();
             });
 
-            instance.on( 'change', _deb());
-            instance.on( 'afterCommandExec', _deb());
-            instance.on( 'resize', _deb());
-            instance.on( 'destroy', _deb());
+            instance.on( 'change', deb);
+            instance.on( 'afterCommandExec', deb);
+            instance.on( 'resize', deb);
+            instance.on( 'destroy', deb);
             instance.on( 'blur', function(e) {
                 instance.focusManager.blur();
             });
@@ -486,12 +490,6 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             });
         }
 
-        function _deb() {
-            return _.debounce(function(e) {
-                update();
-            }, 1000);
-        }
-
         function _keyHandler(e) {
             if (_isMentionKey(e.data.domEvent.$)) {
                 return false; // to prevent "@" from getting written to the editor
@@ -508,7 +506,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             }
 
             if (!ignoreDefaultBehaviour) {
-                _deb()(e);
+                deb(e);
             }
         }
 
