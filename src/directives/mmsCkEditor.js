@@ -471,6 +471,11 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.dataProcessor.htmlFilter.addRules({
                     elements: {
                         $: function (element) {
+                            if (element.name === 'script') {
+                                element.remove();
+                                return;
+                            }
+                            
                             if (element.name.startsWith('mms-')) {
                                 if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
                                     element.replaceWithChildren();
