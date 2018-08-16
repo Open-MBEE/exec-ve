@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', '$templateCache',
-    '$rootScope','$compile', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', '_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', '$templateCache', 'growl',
+    '$rootScope','$compile', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'Utils', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -11,8 +11,8 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache,
-    $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, _) {
+function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache, growl,
+    $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, Utils, _) {
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
@@ -123,11 +123,25 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.label = mode === 3 ? 'PDF' : mode === 2 ? 'Word' : '';
                 $scope.mode = mode;
                 $scope.meta = {};
+                $scope.customizeDoc = {};
+                $scope.customizeDoc.useCustomStyle = false;
                 var print = angular.element("#print-div");
                 if (print.find('.mms-error').length > 0) {
                     $scope.hasError = true;
                 }
+
                 if (isDoc) {
+                    // TODO If _printCss, use to set doc css for export/print
+                    $scope.customizeDoc.useCustomStyle = false;
+                    if ( viewOrDocOb._printCss != undefined ) {
+                        // Make tab for custom css default
+                        $scope.customizeDoc.useCustomStyle = true;
+                        $scope.customizeDoc.customCSS = viewOrDocOb._printCss;
+                    } else {
+                        $scope.customizeDoc.customCSS = UtilsService.getPrintCss(false, false, {});
+                    }
+
+                    // Get/Set document header/footer for PDF generation
                     $scope.meta = {
                         'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
                         'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
@@ -160,8 +174,23 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
                 $scope.docOption = (!isDoc && (mode === 3 || mode === 2));
                 $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
+                
+                $scope.saveStyleUpdate = function() {
+                    // add _printCss to viewOrDoc ob and update element
+                    $scope.elementSaving = true;
+                    viewOrDocOb._printCss = $scope.customizeDoc.customCSS;
+                    $window.alert($scope.customizeDoc.customCSS);
+                    Utils.save(viewOrDocOb, false, $scope, false).then(function(data) {
+                        $scope.elementSaving = false;
+                        growl.success('Save Successful');
+                    }, function(reason) {
+                        $scope.elementSaving = false;
+                        growl.warning('Save was not complete. Please try again.');
+                    });
+                };
                 $scope.print = function() {
-                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]);
+                    $scope.customization = $scope.customizeDoc.useCustomStyle ? $scope.customizeDoc.customCSS : false;
+                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta, $scope.customization]);
                 };
                 $scope.fulldoc = function() {
                     $uibModalInstance.close(['fulldoc']);
@@ -182,12 +211,19 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         [4] Landscape option
         [5] metadata:
             bottom, bottom-left, bottom-right, top, top-left, top-right
+        [6] customization: CSS String || false
         */
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
-                printOrGenerate(viewOrDocOb, refOb, isDoc, choice[1], choice[2], choice[3], mode, choice[4])
+                printOrGenerate(viewOrDocOb, refOb, mode, isDoc, choice[1], choice[2], choice[3])
                 .then(function(result) {
-                    var css = UtilsService.getPrintCss(result.header, result.footer, result.dnum, result.tag, result.displayTime, choice[3], choice[4], choice[5]);
+                    var css;
+                    var customization = choice[6];
+                    if (customization) {
+                        css = customization;
+                    } else {
+                        css = UtilsService.getPrintCss(choice[3], choice[4], choice[5]);
+                    }
                     result.toe = choice[3] ? '' : result.toe;
                     if (mode === 1) {
                         var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
@@ -231,11 +267,11 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
      *
      * @param {Object} viewOrDocOb current document or view object
      * @param {Object} refOb current branch/tag object
+     * @param {Number} mode 1 = print, 2 = word, 3 = pdf
      * @param {Boolean} isDoc viewOrDocOb is view or doc
      * @param {Boolean} genCover generate default cover page (option from the modal form)
      * @param {Boolean} genTotf whether to gen table of figures and tables (option from the modal form)
      * @param {Boolean} htmlTotf include DocGen generated tables and rapid tables (option from the modal form)
-     * @param {Number} mode 1 = print, 2 = word, 3 = pdf
      * @param {Boolean} landscape PDF in lanscape vie (option from the modal form)
      * @returns {Promise} The promise returns object with content needed for print/word export/PDf generation
      * <pre>
@@ -252,7 +288,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
      * }
      * </pre>
      */
-    var printOrGenerate = function(viewOrDocOb, refOb, isDoc, genCover, genTotf, htmlTotf, mode, landscape) {
+    var printOrGenerate = function(viewOrDocOb, refOb, mode, isDoc, genCover, genTotf, htmlTotf) {
         var deferred = $q.defer();
         var printContents = '';
         var printElementCopy = angular.element("#print-div");

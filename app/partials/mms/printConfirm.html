@@ -1,8 +1,3 @@
-<style>
-    button:disabled {
-        background-color: #dddddd;
-    }
-</style>
 <div class="modal-header">
     <h4>{{action}} {{type | lowercase}}</h4>
 </div>
@@ -29,28 +24,65 @@
     </p>
     <br/>
     <div ng-if="type == 'DOCUMENT' && mode !== 1">
-    <h6>Options</h6>
+    <label>Options</label>
     </div>
     <div ng-if="type == 'DOCUMENT' && mode !== 1"><input type="checkbox" ng-model="model.genTotf"> List of Tables and Figures</div>
     <div ng-if="model.genTotf" class="indent"><input type="checkbox" ng-model="model.htmlTotf"> Use HTML for List (will not include equations and may differ from web numbering)</div>
-    <div ng-if="mode !== 1"><input type="checkbox" ng-model="model.landscape"> Landscape</div>
     <br>
-    <form ng-if="type == 'DOCUMENT' && (mode === 3)" role="form">
-        <h6>Header and Footer</h6>
-        <div>Use 'counter(page)' for page number.</div>
-        <div class="form-group">
-            <div style="text-align:center;">Header:</div>
-            <input type="text" ng-model="meta['top-left']" size="11" placeholder="Left">
-            <input type="text" ng-model="meta.top" size="50" placeholder="Center">
-            <input type="text" ng-model="meta['top-right']" size="11" placeholder="Right">
+
+    <div ng-if="type == 'DOCUMENT' && mode === 3">
+        <br>
+        <div class="ve-nav-tabs">
+            <ul class="nav nav-tabs">
+                <li class="uib-tab nav-item tab-item" ng-class="{'active': !customizeDoc.useCustomStyle}">
+                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = false">Export Options (Default CSS)</a>
+                </li>
+                <li class="uib-tab nav-item tab-item" ng-class="{'active': customizeDoc.useCustomStyle}">
+                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = true">Custom Styling</a>
+                </li>
+            </ul>
         </div>
-        <div class="form-group">
-            <div for="footer" style="text-align:center;" >Footer:</div>
-            <input type="text" ng-model="meta['bottom-left']" size="11" placeholder="Left">
-            <input type="text" ng-model="meta.bottom" size="50" placeholder="Center">
-            <input type="text" ng-model="meta['bottom-right']" size="11" placeholder="Right">
+        <!-- <div class="btn-group" role="group" aria-label="...">
+            <button type="button" class="btn btn-default" ng-class="{'active': !customizeDoc.useCustomStyle}" ng-click="customizeDoc.useCustomStyle = false">Export Options (Default CSS)</button>
+            <button type="button" class="btn btn-default" ng-class="{'active': customizeDoc.useCustomStyle}" ng-click="customizeDoc.useCustomStyle = true">Custom Styling</button>
+        </div> -->
+        <div class="well" ng-show="!customizeDoc.useCustomStyle">
+        <form role="form">
+
+            <div ng-if="mode !== 1"><input type="checkbox" ng-model="model.landscape"> Landscape</div>
+
+            <div class="form-group">
+                <label>Header</label>
+                <br>
+                <input type="text" ng-model="meta['top-left']" size="12" placeholder="Left">
+                <input type="text" ng-model="meta.top" size="48" placeholder="Center">
+                <input type="text" ng-model="meta['top-right']" size="12" placeholder="Right">
+            </div>
+            <div class="form-group">
+                <label for="footer">Footer</label>
+                <br>
+                <input type="text" ng-model="meta['bottom-left']" size="12" placeholder="Left">
+                <input type="text" ng-model="meta.bottom" size="48" placeholder="Center">
+                <input type="text" ng-model="meta['bottom-right']" size="12" placeholder="Right">
+            </div>
+            <p class="help-block"><i>Use 'counter(page)' for page number</i></p>
+
+        </form>
         </div>
-    </form>
+
+        <div class="well" ng-show="customizeDoc.useCustomStyle">
+        <form ng-submit="saveStyleUpdate()" role="form">
+
+            <div class="form-group">
+                <label>Custom Style (Defualt CSS is provided below)</label>
+                <textarea class="form-control" rows="6" ng-model="customizeDoc.customCSS"></textarea>
+            </div>
+            <button class="btn btn-default" type="submit">Save Style<span ng-if="elementSaving"><i class="fa fa-spinner fa-spin"></i></span></button>
+
+        </form>
+        </div>
+    </div>
+
 </div>
 
 <div class="modal-footer">

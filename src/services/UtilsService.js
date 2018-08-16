@@ -1068,20 +1068,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @description
      * Typeset HTML to PDF (resource: https://www.princexml.com/)
      *
-     * @param {string} header header slot on doc
-     * @param {string} footer footer slot on doc
-     * @param {string} dnum dnumber slot on doc
-     * @param {string} tag ve tag name if available
-     * @param {string} site the site name
      * @param {string} htmlFlag user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not(<-- this comment needs to be approved by Shakeh)
      * @param {string} landscape user input taken from the printConfirm modal
-     * @param {string} meta $scope.meta (in controller.utils.js) = {
+     * @param {string} meta metadata about document/view {
                     'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
                     'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
                 };
      * @returns {string} document/view content string to be passed to the server for conversion
      */
-    var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
+    var getPrintCss = function(htmlFlag, landscape, meta) {
         var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
                 "figure img {display: block;}\n" +
                 " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
@@ -1130,7 +1125,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         for (var i = 1; i < 10; i++) {
             ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
         }
-        if(htmlFlag) {
+        if (htmlFlag) {
             ret += ".toc { counter-reset: table-counter figure-counter;}\n" +
                 "figure { counter-increment: figure-counter; }\n" +
                 "figcaption::before {content: \"Figure \" counter(figure-counter) \". \"; }\n" +
