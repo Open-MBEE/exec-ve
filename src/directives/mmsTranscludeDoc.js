@@ -44,6 +44,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     var fixPreSpanRegex = /<\/span>\s*<mms-cf/g;
     var fixPostSpanRegex = /<\/mms-cf>\s*<span[^>]*>/g;
     var emptyRegex = /^\s*$/;
+    var spacePeriod = />\s\./g;
+    var spaceSpace = />\s\s/g;
+    var spaceComma = />\s,/g;
 
     var mmsTranscludeDocCtrl = function($scope) {
 
@@ -94,6 +97,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             }
             doc = doc.replace(fixPreSpanRegex, "<mms-cf");
             doc = doc.replace(fixPostSpanRegex, "</mms-cf>");
+            doc = doc.replace(spacePeriod, '>.');
+            doc = doc.replace(spaceSpace, '> ');
+            doc = doc.replace(spaceComma, '>,');
             if (preview) {
                 domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             } else {

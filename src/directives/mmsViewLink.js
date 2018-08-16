@@ -75,7 +75,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
             .then(function(data) {
                 scope.element = data;
                 scope.name = data.name;
-                scope.type = 'Section ';
+                scope.type = 'Clause ';
                 scope.suffix = '';
                 scope.hash = '#' + data.id;
                 if (scope.mmsPeId && scope.mmsPeId !== '') {
@@ -99,6 +99,13 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                             scope.href = "mms.html#/projects/" + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
                         }
                     });
+                } else {
+                    if (data._veNumber) {
+                        var numbers = data._veNumber.split('.');
+                        if (numbers.length > 1 && numbers[1] != '0') {
+                            scope.type = '';
+                        }
+                    }
                 }
                 if (UtilsService.isDocument(data)) {
                     docid = data.id;
