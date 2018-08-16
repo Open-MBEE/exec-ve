@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$document', 'UtilsService', mmsViewTable]);
+.directive('mmsViewTable', ['$compile', '$timeout', '$document', 'UtilsService', 'Utils', mmsViewTable]);
 
-function mmsViewTable($compile, $timeout, $document, UtilsService) {
+function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
 
     var mmsViewTableLink = function(scope, element, attrs, ctrl) {
         if (!scope.table.showIfEmpty && scope.table.body.length === 0)
@@ -39,7 +39,7 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
 
         scope.doClick = function() {
             var csvString = element.children('table').table2CSV({delivery:'value'});
-            var bom = "\xEF\xBB\xBF"; //just for excel
+            // var bom = "\xEF\xBB\xBF"; //just for excel
             var bom2 = "\uFEFF";      //just for excel
             var blob = new Blob([bom2 + csvString], {
                     type: "text/csv;charset=utf-8;"
@@ -63,6 +63,9 @@ function mmsViewTable($compile, $timeout, $document, UtilsService) {
         };
 
         element[0].innerHTML = html;
+        $(element[0]).find('img').each(function(index) {
+            Utils.fixImgSrc($(this));
+        });
         var nextIndex = 0;
         var thead = element.find('thead');
         $compile(thead)(scope);

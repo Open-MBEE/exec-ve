@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['CacheService','$state','$templateCache','$sce',veMenu]);
+.directive('veMenu', ['CacheService','$state','$templateCache','$sce', 'UtilsService',veMenu]);
 
 /**
  * @ngdoc directive
@@ -22,10 +22,14 @@ angular.module('mmsApp')
  * and tags for selected view.
  *
  */
-function veMenu(CacheService, $state, $templateCache, $sce) {
+function veMenu(CacheService, $state, $templateCache, $sce, UtilsService) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
+        scope.getHrefForProject = getHrefForProject;
+        scope.getHrefForBranch = getHrefForBranch;
+        scope.getHrefForTag = getHrefForTag;
+
 
         scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.');
         scope.currentProject = scope.project.name;
@@ -122,6 +126,19 @@ function veMenu(CacheService, $state, $templateCache, $sce) {
             var crumbcount = scope.breadcrumbs.length;
             var liWidth = (eltWidth * 0.65)/crumbcount;
             scope.truncateStyle={'max-width': liWidth, 'white-space': 'nowrap', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'display': 'inline-block'};
+        }
+
+        function getHrefForProject(project) {
+            var refId = project._refId || 'master';
+            return UtilsService.PROJECT_URL_PREFIX + project.id + '/' + refId;
+        }
+
+        function getHrefForBranch(branch) {
+            return UtilsService.PROJECT_URL_PREFIX + scope.project.id + '/' + branch.id;
+        }
+
+        function getHrefForTag(tag) {
+            return UtilsService.PROJECT_URL_PREFIX + scope.project.id + '/' + tag.id;
         }
     };
 

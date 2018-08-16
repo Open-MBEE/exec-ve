@@ -66,7 +66,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
-        var processed = false;
         scope.cfType = 'val';
         domElement.click(function(e) {
             if (scope.startEdit && !scope.nonEditable) {
@@ -212,7 +211,6 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             scope.elementSaving = false;
             scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(domElement, mmsViewCtrl);
             scope.view = mmsViewCtrl.getView();
-            var type = "value";
 
             scope.save = function() {
                 Utils.saveAction(scope, domElement, false);

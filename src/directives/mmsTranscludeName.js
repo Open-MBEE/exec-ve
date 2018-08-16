@@ -53,7 +53,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
 
     var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
-        var processed = false;
         scope.recompileScope = null;
         domElement.click(function(e) {
             if (scope.noClick)
@@ -150,7 +149,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.isEditing = false;
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
-            var type = "name";
 
             scope.save = function() {
                 Utils.saveAction(scope, domElement, false);
