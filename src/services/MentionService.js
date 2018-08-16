@@ -50,8 +50,6 @@ function MentionService($rootScope, $compile, CacheService) {
 
             var mentionScope = mentionState.mentionScope;
             mentionScope.$apply(function() {
-                // make sure that mention directive is visible, in case esc key was pressed before
-                mentionState.mentionController.toggleMentionDisplay(true);
                 var text = currentEditingElement.innerText;
                 text = text.substring(1); // ignore @
                 mentionScope.mmsMentionValue = text;
@@ -167,12 +165,17 @@ function MentionService($rootScope, $compile, CacheService) {
         return null;
     }
 
-    function _cleanup(editor, mentionId) {
+    function _cleanup(editor, mentionId, unwrapOnly) {
         var mentionState = _retrieveMentionState(editor.id, mentionId);
         var mentionPlaceHolderId = mentionState.mentionPlaceHolderId;
         var ckeditorDocument = _getCkeditorFrame(editor).contentDocument;
-        // remove the mentionPlaceHolder
-        ckeditorDocument.getElementById(mentionPlaceHolderId).remove();
+        var mentionPlacerHolderDom = ckeditorDocument.getElementById(mentionPlaceHolderId);
+        if (unwrapOnly) {
+            $(mentionPlacerHolderDom).contents().unwrap();
+        } else {
+            // remove the mentionPlaceHolder
+            mentionPlacerHolderDom.remove();
+        }
         // cleanup the mention directive
         var mentionScope = mentionState.mentionScope;
         mentionScope.$destroy();
@@ -195,7 +198,7 @@ function MentionService($rootScope, $compile, CacheService) {
                 _handleEnterKey(editor.id, mentionId, projectId, refId);
                 break;
             case 27: // esc
-                _handleEscKey(editor.id, mentionId);
+                _handleEscKey(editor, mentionId);
         }
     }
 
@@ -219,12 +222,8 @@ function MentionService($rootScope, $compile, CacheService) {
         }
     }
     
-    function _handleEscKey(editorId, mentionId) {
-        var mentionState = _retrieveMentionState(editorId, mentionId);
-        var mentionScope = mentionState.mentionScope;
-        mentionScope.$apply(function() {
-            mentionState.mentionController.toggleMentionDisplay(false);
-        });
+    function _handleEscKey(editor, mentionId) {
+        _cleanup(editor, mentionId, true);
     }
 
     function _handleArrowKey(mentionId, isDownArrow) {
