@@ -471,6 +471,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.dataProcessor.htmlFilter.addRules({
                     elements: {
                         $: function (element) {
+                            if (element.name.startsWith('mms-')) {
+                                if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    element.remove();
+                                    return;
+                                }
+                            }
+
                             var attributesToDelete = Object.keys(element.attributes).filter(function(attrKey) {
                                 return attrKey.startsWith('ng-');
                             });
