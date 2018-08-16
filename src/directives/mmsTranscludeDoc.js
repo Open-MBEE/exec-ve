@@ -44,9 +44,9 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
     var fixPreSpanRegex = /<\/span>\s*<mms-cf/g;
     var fixPostSpanRegex = /<\/mms-cf>\s*<span[^>]*>/g;
     var emptyRegex = /^\s*$/;
-    var spacePeriod = />\s\./g;
-    var spaceSpace = />\s\s/g;
-    var spaceComma = />\s,/g;
+    var spacePeriod = />(?:\s|&nbsp;)\./g;
+    var spaceSpace = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g;
+    var spaceComma = />(?:\s|&nbsp;),/g;
 
     var mmsTranscludeDocCtrl = function($scope) {
 

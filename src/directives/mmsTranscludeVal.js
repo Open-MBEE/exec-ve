@@ -39,9 +39,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
     var emptyRegex = /^\s*$/;
-    var spacePeriod = />\s\./g;
-    var spaceSpace = />\s\s/g;
-    var spaceComma = />\s,/g;
+    var spacePeriod = />(?:\s|&nbsp;)\./g;
+    var spaceSpace = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g;
+    var spaceComma = />(?:\s|&nbsp;),/g;
 
     var mmsTranscludeCtrl = function ($scope, $rootScope) {
 
