@@ -475,6 +475,8 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                                 if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
                                     element.remove();
                                     return;
+                                } else {
+                                    element.innerHTML = 'hello';
                                 }
                             }
 
