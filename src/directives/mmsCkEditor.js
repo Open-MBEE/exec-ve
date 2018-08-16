@@ -464,10 +464,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             }
 
             instance.on( 'instanceReady', function() {
-                addCkeditorHtmlFilerRule(instance);
+                addCkeditorHtmlFilterRule(instance);
             } );
 
-            function addCkeditorHtmlFilerRule(instance) {
+            function addCkeditorHtmlFilterRule(instance) {
                 instance.dataProcessor.htmlFilter.addRules({
                     elements: {
                         $: function (element) {
