@@ -773,6 +773,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if ($rootScope.ve_fullDocMode) {
                 cb(branch);
             } else {
+                $scope.treeApi.clear_selected_branch();
                 $state.go('^', {search: undefined});
             }
         });
