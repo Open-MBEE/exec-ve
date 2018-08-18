@@ -698,12 +698,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {string} toc string
      */
     var makeHtmlTOC = function (tree) {
-        var result = '<div class="toc"><div class="header">Table of Contents</div>';
+        var result = '<div class="toc"><h1 class="header">Table of Contents</h1>';
         var root_branch = tree[0].branch;
-        var i = 0;
-        for (i = 0; i < root_branch.children.length; i++) {
-            result += makeHtmlTOCChild(root_branch.children[i]);
-        }
+        result += makeHtmlTOCChild(root_branch, true);
         result += '</div>'; 
         return result;
     };
@@ -717,19 +714,34 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * Generates table of contents for the document/views.
      *
      * @param {string} child the view to be referenced in the table of content
+     * @param {boolean} skip skip adding li for this branch
      * @returns {string} toc string
      */
-    var makeHtmlTOCChild = function(child) {
-        if (child.type !== 'view' && child.type !== 'section')
-            return '';
-        var result = '<ul>';
-        var anchor = '<a href=#' + child.data.id + '>';
-        result += '  <li>' + anchor + child.data._veNumber + ' ' + child.data.name + '</a></li>';
-        var i = 0;
-        for (i = 0; i < child.children.length; i++) {
-            result += makeHtmlTOCChild(child.children[i]);
+    var makeHtmlTOCChild = function(branch, skip) {
+        var result = '';
+        var child;
+        if (!skip) {
+            var anchor = '<a href=#' + branch.data.id + '>';
+            result += '  <li>' + anchor + branch.data._veNumber + ' ' + branch.data.name + '</a>';
         }
-        result += '</ul>';
+        var ulAdded = false;
+        for (var i = 0; i < branch.children.length; i++) {
+            child = branch.children[i];
+            if (child.type !== 'view' && child.type !== 'section') {
+                continue;
+            }
+            if (!ulAdded) {
+                result += '<ul>';
+                ulAdded = true;
+            }
+            result += makeHtmlTOCChild(child);
+        }
+        if (ulAdded) {
+            result += '</ul>';
+        }
+        if (!skip) {
+            result += '</li>';
+        }
         return result;
     };
 
@@ -751,9 +763,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      */
     var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
         var ob = {
-            tables: '<div class="tot"><div class="header">List of Tables</div><ul>',
-            figures: '<div class="tof"><div class="header">List of Figures</div><ul>',
-            equations: '<div class="tof"><div class="header">List of Equations</div><ul>',
+            tables: '<div class="tot"><h1 class="header">List of Tables</h1><ul>',
+            figures: '<div class="tof"><h1 class="header">List of Figures</h1><ul>',
+            equations: '<div class="tof"><h1 class="header">List of Equations</h1><ul>',
             tableCount: 0,
             figureCount: 0,
             equationCount: 0
