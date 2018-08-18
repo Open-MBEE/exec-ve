@@ -168,13 +168,17 @@ function MentionService($rootScope, $compile, CacheService) {
     function _cleanup(editor, mentionId, unwrapOnly) {
         var mentionState = _retrieveMentionState(editor.id, mentionId);
         var mentionPlaceHolderId = mentionState.mentionPlaceHolderId;
-        var ckeditorDocument = _getCkeditorFrame(editor).contentDocument;
-        var mentionPlacerHolderDom = ckeditorDocument.getElementById(mentionPlaceHolderId);
+        var mentionPlaceHolderDom = editor.document.getById(mentionPlaceHolderId); 
         if (unwrapOnly) {
-            $(mentionPlacerHolderDom).contents().unwrap();
+            var range = editor.createRange();
+            if (range && mentionPlaceHolderDom) {
+                range.moveToClosestEditablePosition(mentionPlaceHolderDom, true);
+                $(mentionPlaceHolderDom.$).contents().unwrap();
+                range.select();
+            }
         } else {
             // remove the mentionPlaceHolder
-            mentionPlacerHolderDom.remove();
+            mentionPlaceHolderDom.remove();
         }
         // cleanup the mention directive
         var mentionScope = mentionState.mentionScope;
