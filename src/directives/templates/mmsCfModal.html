@@ -5,10 +5,10 @@
     <div class="ve-light-tabs" ng-show="showProposeLink">
         <ul class="nav nav-tabs">
             <li class="uib-tab nav-item tab-item" ng-class="{'active': !searchExisting}">
-                <a class="nav-link" ng-click="searchExisting = !searchExisting"><i class="fa fa-plus"></i>Create New</a>
+                <a class="nav-link" ng-click="searchExisting = false"><i class="fa fa-plus"></i>Create New</a>
             </li>
             <li class="uib-tab nav-item tab-item" ng-class="{'active': searchExisting}">
-                <a class="nav-link" ng-click="searchExisting = !searchExisting"><i class="fa fa-search"></i>Search for existing</a>
+                <a class="nav-link" ng-click="searchExisting = true"><i class="fa fa-search"></i>Search for existing</a>
             </li>
         </ul>
     </div>
