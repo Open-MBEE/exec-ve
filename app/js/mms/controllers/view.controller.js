@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
     .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout',
-    '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'growl',
+    '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'Utils', 'growl',
     'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
-    function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, growl,
+    function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, Utils, growl,
              search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb) {
 
     function isPageLoading() {
@@ -30,6 +30,7 @@ angular.module('mmsApp')
         $rootScope.ve_editmode = false;
 
     $scope.search = search;
+    Utils.toggleLeftPane(search);
     $scope.viewOb = viewOb;
     $scope.projectOb = projectOb;
     $scope.refOb = refOb;
@@ -247,5 +248,4 @@ angular.module('mmsApp')
         var printElementCopy = angular.element("#print-div");
         MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
     });
-
 }]);
