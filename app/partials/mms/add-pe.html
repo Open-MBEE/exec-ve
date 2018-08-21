@@ -6,7 +6,7 @@
 
 <div class="modal-body">
   <div ng-show="createForm">
-    <div class="ve-light-tabs">
+    <div class="ve-light-tabs modal-top-tabs">
       <ul class="nav nav-tabs" ng-show="presentationElemType != 'Comment' && createForm">
         <li class="uib-tab nav-item active tab-item">
           <a class="nav-link"><i class="fa fa-plus"></i>Create New</a>
@@ -25,7 +25,7 @@
   </div>
 
   <div ng-show="!createForm">
-    <div class="ve-light-tabs">
+    <div class="ve-light-tabs modal-top-tabs">
       <ul class="nav nav-tabs" ng-show="!createForm">
         <li class="uib-tab nav-item tab-item">
           <a class="nav-link" ng-click="createForm = true"><i class="fa fa-plus"></i>Create New</a>
