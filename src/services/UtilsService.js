@@ -1077,34 +1077,77 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {string} document/view content string to be passed to the server for conversion
      */
     var getPrintCss = function(htmlFlag, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
+        var ret = "/*------------------------------------------------------------------\n" +
+                "Custom CSS Table of Contents\n" +
+                "1. Images\n" +
+                "2. Tables\n" +
+                "3. Typography\n" +
+                "   3.1 Diff\n" +
+                "   3.2 Errors\n" +
+                "4. Figure Captions\n" +
+                "5. Table of Contents\n" +
+                "6. Page Layout\n" +
+                "7. Headers and Footers\n" +
+                "8. Signature Box\n" +
+                "9. Bookmark Level\n" +
+                "------------------------------------------------------------------*/\n" +
+                "\n" +                
+                "/*------------------------------------------------------------------\n" +
+                "1. Images\n" +
+                "------------------------------------------------------------------*/\n" +
+                "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
                 "figure img {display: block;}\n" +
-                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
-                ".chapter {page-break-before: always}\n" + 
-                ".chapter h1.view-title {font-size: 20pt; }\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "2. Tables\n" +
+                "------------------------------------------------------------------*/\n" +
+                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
                 "table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}\n" +
                 "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
                 "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
-                //"table p {word-break: break-all;}\n" + 
-                ".signature-box td.signature-name-styling {width: 60%;}\n" + 
-                ".signature-box td.signature-space-styling {width: 1%;}\n" + 
-                ".signature-box td.signature-date-styling {width: 39%;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
+                //"table p {word-break: break-all;}\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "3. Typography\n" +
+                "------------------------------------------------------------------*/\n" +
                 "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
                 "h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
                 ".ng-hide {display: none;}\n" +
+                ".chapter h1.view-title {font-size: 20pt; }\n" + 
                 "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "   3.1 Diff\n" +
+                "------------------------------------------------------------------*/\n" +
+                "ins, .ins {color: black; background: #dafde0;}\n" +
+                "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
+                ".match,.textdiff span {color: gray;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "   3.2 Errors\n" +
+                "------------------------------------------------------------------*/\n" +
+                ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "4. Figure Captions\n" +
+                "------------------------------------------------------------------*/\n" +
                 "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
+                "table, figure {margin-bottom: 10px;}\n" +
                 ".mms-equation-caption {float: right;}\n" +
-                "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
+                "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "5. Table of Contents\n" +
+                "------------------------------------------------------------------*/\n" +
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc {page-break-before: always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
-                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
+                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" +
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
                 ".tof ul, .tot ul {padding-left:0;}\n" +
                 ".toc ul {padding-left:4em;}\n" +
@@ -1112,16 +1155,31 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
-                ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
-                "p, div {widows: 2; orphans: 2;}\n" +
-                "table, figure {margin-bottom: 10px;}\n" +
-                "ins, .ins {color: black; background: #dafde0;}\n" +
-                "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
-                ".match,.textdiff span {color: gray;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "6. Page Layout\n" +
+                "------------------------------------------------------------------*/\n" +
                 "@page {margin: 0.5in;}\n" + 
-                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
                 "@page landscape {size: 11in 8.5in;}\n" +
-                ".landscape {page: landscape;}\n";
+                ".landscape {page: landscape;}\n" +
+                ".chapter {page-break-before: always}\n" + 
+                "p, div {widows: 2; orphans: 2;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "7. Headers and Footers\n" +
+                "------------------------------------------------------------------*/\n" +
+                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "8. Signature Box\n" +
+                "------------------------------------------------------------------*/\n" +
+                ".signature-box td.signature-name-styling {width: 60%;}\n" + 
+                ".signature-box td.signature-space-styling {width: 1%;}\n" + 
+                ".signature-box td.signature-date-styling {width: 39%;}\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "9. Bookmark Level\n" +
+                "------------------------------------------------------------------*/\n" ;
         for (var i = 1; i < 10; i++) {
             ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
         }
