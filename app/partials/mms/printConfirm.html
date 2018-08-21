@@ -34,10 +34,10 @@
         <div class="ve-nav-tabs ve-light-tabs">
             <ul class="nav nav-tabs">
                 <li class="uib-tab nav-item tab-item" ng-class="{'active': !customizeDoc.useCustomStyle}">
-                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = false">Basic Styling</a>
+                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = false">Basic Options</a>
                 </li>
                 <li class="uib-tab nav-item tab-item" ng-class="{'active': customizeDoc.useCustomStyle}">
-                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = true">Advanced Styling</a>
+                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = true">Advanced Options</a>
                 </li>
             </ul>
         </div>
@@ -49,6 +49,7 @@
         <form role="form">
 
             <div ng-if="mode !== 1">
+                <label>Orientation</label><br>
                 <form>
                     <input type="radio" name="export-orientation" checked="checked" > Portrait<br>
                     <input type="radio" name="export-orientation" ng-model="model.landscape"> Landscape
