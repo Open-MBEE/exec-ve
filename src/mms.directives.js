@@ -78,5 +78,13 @@ angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 
     growlProvider.globalTimeToLive({success: 5000, error: -1, warning: 5000, info: 5000});
     growlProvider.globalPosition('bottom-right');
 }])
+.filter('veRealNum', function() {
+    return function(n) {
+        if (Number.isInteger(n)) {
+            return n + '.0';
+        }
+        return n;
+    };
+})
 .constant('CKEDITOR', window.CKEDITOR)
 .constant('MathJax', window.MathJax);
