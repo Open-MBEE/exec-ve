@@ -77,9 +77,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var requestCacheKey = getElementKey(reqOb);
         var url = URLService.getElementURL(reqOb);
         var key = url;
-        if (reqOb.includeRecentVersionElement) {
-            key = key + 'addRecentVersion';
-        }
+        //if (reqOb.includeRecentVersionElement) {
+        //    key = key + 'addRecentVersion';
+        //}
         // if it's in the inProgress queue get it immediately
         if (inProgress.hasOwnProperty(key)) { //change to change proirity if it's already in the queue
             HttpService.ping(key, weight);
@@ -106,16 +106,16 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete inProgress[key];
             },
             function(data, status, headers, config) {
-                if (reqOb.includeRecentVersionElement) {
+                /*if (reqOb.includeRecentVersionElement) {
                     _getLatestVersionOfElement(_.clone(reqOb)).then(function(element){
                         data.recentVersionOfElement = element;
                         URLService.handleHttpStatus(data, status, headers, config, deferred);
                     }, function() {
                         URLService.handleHttpStatus(data, status, headers, config, deferred);
                     });
-                } else {
+                } else {*/
                     URLService.handleHttpStatus(data, status, headers, config, deferred);
-                }
+                //}
 
                 delete inProgress[key];
             },
