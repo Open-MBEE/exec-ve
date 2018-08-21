@@ -109,7 +109,7 @@
             <div ng-repeat="value in values" ng-switch on="value.type">
                 <span class="prop" ng-switch-when="LiteralInteger">{{value.value}}</span>
                 <span class="prop" ng-switch-when="LiteralBoolean">{{value.value}}</span>
-                <span class="prop" ng-switch-when="LiteralReal">{{value.value}}</span>
+                <span class="prop" ng-switch-when="LiteralReal">{{value.value | veRealNum}}</span>
                 <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.value}}</span>
                 <span class="prop" ng-switch-when="LiteralString" ng-bind-html="value.value"></span>
                 <span class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>
@@ -148,7 +148,7 @@
             <div ng-switch on="values[0].type">
                 <span class="prop" ng-switch-when="LiteralInteger">{{values[0].value}}</span>
                 <span class="prop" ng-switch-when="LiteralBoolean">{{values[0].value}}</span>
-                <span class="prop" ng-switch-when="LiteralReal">{{values[0].value}}</span>
+                <span class="prop" ng-switch-when="LiteralReal">{{values[0].value | veRealNum}}</span>
                 <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{values[0].value}}</span>
                 <span class="prop" ng-switch-when="LiteralString" ng-bind-html="values[0].value"></span>
                 <span class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>
