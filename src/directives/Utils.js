@@ -785,7 +785,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
         });
         instance.result.then(function(data) {
-              // TODO: do anything here?
+            $timeout(function() { //auto open editor for added pe
+                $('#' + data.id).find('mms-transclude-doc').click();
+            }, 0, false);
         });
     };
 
