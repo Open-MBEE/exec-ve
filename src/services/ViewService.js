@@ -163,23 +163,32 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     toGet = displayed;
                 }
             }
+            toGetSet = new Set(toGet);
             if (view._contents && view._contents.operand) {
                 var contents = view._contents.operand;
                 for (var i = 0; i < contents.length; i++) {
                     if (contents[i] && contents[i].instanceId) {
-                        toGet.push(contents[i].instanceId);
+                        toGetSet.add(contents[i].instanceId);
                     }
                 }
             }
-            if (view.specification) {
+            if (view.specification && view.specification.operand) {
                 var specContents = view.specification.operand;
                 for (var j = 0; j < specContents.length; j++) {
                     if (specContents[j] && specContents[j].instanceId) {
-                        toGet.push(specContents[j].instanceId);
+                        toGetSet.add(specContents[j].instanceId);
                     }
                 }
             }
-            toGetSet = new Set(toGet);
+            if (isTable(view) && view.specification && view.specification.value) {
+                try {
+                    var tableJson = JSON.parse(view.specification.value);
+                    if (tableJson.body) {
+                        collectTableSources(toGetSet, tableJson.body);
+                    }
+                } catch (e) {
+                }
+            }
             $http.get(URLService.getViewElementIdsURL(reqOb))
             .then(function(response) {
                 var data = response.data.elementIds;
@@ -202,6 +211,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             delete inProgress[key];
         });
         return deferred.promise;
+    };
+
+    var collectTableSources = function(sourceSet, body) {
+        var i, j, k;
+        for (i = 0; i < body.length; i++) {
+            var row = body[i];
+            for (j = 0; j < row.length; j++) {
+                var cell = row[j];
+                for (k = 0; k < cell.content.length; k++) {
+                    var thing = cell.content[k];
+                    if (thing.type === 'Table' && thing.body) {
+                        collectTableSources(thing.body);
+                    } else if (thing.type === 'Paragraph' && thing.source) {
+                        sourceSet.add(thing.source);
+                    }
+                }
+            }
+        }
     };
 
     /**
