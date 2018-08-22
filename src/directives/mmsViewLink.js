@@ -105,6 +105,8 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                             var numbers = data._veNumber.split('.');
                             if (numbers.length > 1) {
                                 scope.type = '';
+                            } else if (isNaN(parseInt(numbers[0]))) {
+                                scope.type = 'Annex ';
                             }
                         }
                     });
@@ -113,6 +115,8 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                         var numbers = data._veNumber.split('.');
                         if (numbers.length > 1) {
                             scope.type = '';
+                        } else if (isNaN(parseInt(numbers[0]))) {
+                            scope.type = 'Annex ';
                         }
                     }
                 }

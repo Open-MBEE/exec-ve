@@ -343,6 +343,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                     type_icon: type_icon
                 });
                 if (branch.children) {
+                    var alpha = false;
                     if (scope.options.sort) {
                         branch.children.sort(scope.options.sort);
                     }
@@ -355,8 +356,12 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                         } else {
                             j++;
                             if (scope.options.sectionNumbering) {
+                                if (branch.children[i].data._isAppendix) {
+                                    alpha = true;
+                                    j = 0;
+                                }
                                 var nextSection = section.slice(); 
-                                nextSection.push(j);
+                                nextSection.push(alpha ? String.fromCharCode(j + 65) : j);
                                 if (nextSection.length <= scope.options.numberingDepth) {
                                     peNums.table = 0; peNums.figure = 0; peNums.equaton = 0;
                                 }

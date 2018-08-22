@@ -1112,7 +1112,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always; page: toc;}\n" +
-                ".toc {page-break-before: always;}\n" +
+                ".toc {page-break-before: right; counter-reset: page 5;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
                 ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
@@ -1129,22 +1129,18 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
                 ".match,.textdiff span {color: gray;}\n" +
                 "@page {margin: 0.5in;}\n" + 
-                "@page toc {@top {content: '';} @bottom {content: '';} @top-left {content: '';} @top-right {content: '';} @bottom-left {content: '';} @bottom-right {content: '';}}\n" +
+                "@page nof {@top {content: '';} @bottom {content: '';} @top-left {content: '';} @top-right {content: '';} @bottom-left {content: '';} @bottom-right {content: '';}}\n" +
                 "@page landscape {size: 11in 8.5in;}\n" +
                 ".landscape {page: landscape;}\n";
         for (var i = 1; i < 10; i++) {
             ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
         }
-        if(htmlFlag) {
-            ret += ".toc { counter-reset: table-counter figure-counter;}\n" +
-                "figure { counter-increment: figure-counter; }\n" +
-                "figcaption::before {content: \"Figure \" counter(figure-counter) \". \"; }\n" +
-                "table { counter-increment: table-counter; }\n" +
-                "caption::before {content: \"Table \" counter(table-counter) \". \"; }\n";
-        }
         ret += "@page:right { @bottom-left {font-size: 9px; content: 'OMG Systems Modeling Language, v1.5.1';} @bottom-right {font-size: 9px; content: counter(page);}}" + 
                "@page:left { @bottom-right {font-size: 9px; content: 'OMG Systems Modeling Language, v1.5.1';} @bottom-left {font-size: 9px; content: counter(page);}}" +
-               ".first-chapter {counter-reset: page 3;} body > mms-view {page: toc;}";
+               ".first-chapter {counter-reset: page 3;} body > mms-view {page: nof;}";
+        ret += "@page toc:right { @bottom-left {font-size: 9px; content: 'OMG Systems Modeling Language, v1.5.1';} @bottom-right {font-size: 9px; content: counter(page, lower-roman);}}" + 
+               "@page toc:left { @bottom-right {font-size: 9px; content: 'OMG Systems Modeling Language, v1.5.1';} @bottom-left {font-size: 9px; content: counter(page, lower-roman);}}" +
+               ".first-chapter {counter-reset: page 3;} body > mms-view {page: nof;}";
         /*Object.keys(meta).forEach(function(key) {
             if (meta[key]) {
                 var content;

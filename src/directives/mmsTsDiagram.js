@@ -71,12 +71,12 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         REQ: 'REQ Relationships',
         UC: 'UC Relationships'
     };
-    $('body').append(
+   /* $('body').append(
     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/tsperspectives.nocache.js"></script>\n' +
     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSHovering.js"></script>\n' +
     '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSButtonTooltip.js"></script>');
-
+*/
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " + successfulCommand.command + " completed successfully");
         $window.hidePerspectivesProgressIndicator();
