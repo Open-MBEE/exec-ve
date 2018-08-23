@@ -4,9 +4,9 @@
 
 angular.module('mmsApp')
 .controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', '$timeout', 'FullDocumentService',
-    'hotkeys', 'growl', '_', 'MmsAppUtils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
+    'hotkeys', 'growl', '_', 'MmsAppUtils', 'Utils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
 function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDocumentService, hotkeys, growl, _,
-    MmsAppUtils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
+    MmsAppUtils, Utils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
     if (!$rootScope.veCommentsOn)
@@ -17,6 +17,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
         $rootScope.ve_editmode = false;
 
     $scope.search = search;
+    Utils.toggleLeftPane(search);
     $scope.buttons = [];
     $scope.refOb = refOb;
     $scope.projectOb = projectOb;

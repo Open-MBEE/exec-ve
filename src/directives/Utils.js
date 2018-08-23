@@ -594,7 +594,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                      // Broadcast message for the ToolCtrl:
                     $rootScope.$broadcast('presentationElem.cancel',scope.edit);
 
-                    growl.success('Delete Successful');
+                    growl.success('Remove Successful');
                 }, handleError);
 
             }).finally(function() {
@@ -937,6 +937,26 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
             }
         }
+        if (imgDom.width() < 860) { //keep image relative centered with text if less than 9 in
+            return;
+        }
+        var parent = imgDom.parent('p');
+        if (parent.length > 0) {
+            if (parent.css('text-align') == 'center' || parent.hasClass('image-center')) {
+                imgDom.addClass('image-center');
+            }
+            imgDom.unwrap(); //note this removes parent p and puts img and any of its siblings in its place
+        }
+    };
+
+    var toggleLeftPane = function (searchTerm) {
+        if ( searchTerm && !$rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
+
+        if ( !searchTerm && $rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
     };
 
     return {
@@ -959,7 +979,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         clearAutosaveContent: clearAutosaveContent,
         reopenUnsavedElts: reopenUnsavedElts,
         checkForDuplicateInstances: checkForDuplicateInstances,
-        fixImgSrc: fixImgSrc
+        fixImgSrc: fixImgSrc,
+        toggleLeftPane: toggleLeftPane
     };
 
 }
