@@ -77,9 +77,6 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var requestCacheKey = getElementKey(reqOb);
         var url = URLService.getElementURL(reqOb);
         var key = url;
-        //if (reqOb.includeRecentVersionElement) {
-        //    key = key + 'addRecentVersion';
-        //}
         // if it's in the inProgress queue get it immediately
         if (inProgress.hasOwnProperty(key)) { //change to change proirity if it's already in the queue
             HttpService.ping(key, weight);
@@ -88,15 +85,19 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
         var cached = CacheService.get(requestCacheKey);
         if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
-            //if (UtilsService.isView(cached) && !cached.hasOwnProperty('_contents')) {
-            //} else {
-                deferred.resolve(cached);
-                return deferred.promise;
-            //}
+            deferred.resolve(cached);
+            return deferred.promise;
         }
-         inProgress[key] = deferred.promise;
+        var deletedRequestCacheKey = getElementKey(reqOb);
+        deletedRequestCacheKey.push('deleted');
+        var deleted = CacheService.get(deletedRequestCacheKey);
+        if (deleted) {
+            deferred.reject({status: 410, data: {recentVersionOfElement: deleted}, message: 'Deleted'});
+            return deferred.promise;
+        }
+        inProgress[key] = deferred.promise;
 
-         HttpService.get(url,
+        HttpService.get(url,
             function(data, status, headers, config) {
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(cacheElement(reqOb, data.elements[0]));
@@ -106,17 +107,10 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 delete inProgress[key];
             },
             function(data, status, headers, config) {
-                /*if (reqOb.includeRecentVersionElement) {
-                    _getLatestVersionOfElement(_.clone(reqOb)).then(function(element){
-                        data.recentVersionOfElement = element;
-                        URLService.handleHttpStatus(data, status, headers, config, deferred);
-                    }, function() {
-                        URLService.handleHttpStatus(data, status, headers, config, deferred);
-                    });
-                } else {*/
-                    URLService.handleHttpStatus(data, status, headers, config, deferred);
-                //}
-
+                if (data.deleted && data.deleted.length > 0 && data.deleted[0].id === reqOb.elementId) {
+                    data.recentVersionOfElement = data.deleted[0];
+                }
+                URLService.handleHttpStatus(data, status, headers, config, deferred);
                 delete inProgress[key];
             },
             weight
@@ -165,6 +159,12 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             for (var i = 0; i < data.length; i++) {
                 existing.push(cacheElement(reqOb, data[i]));
             }
+            var deleted = response.data.deleted;
+            if (deleted && deleted.length > 0) {
+                for (i = 0; i < deleted.length; i++) {
+                    cacheDeletedElement(reqOb, deleted[i]);
+                }
+            }
             deferred.resolve(existing);
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
@@ -208,6 +208,14 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             result = CacheService.put(realCacheKey, result, true);
         }
         return result;
+    };
+
+    var cacheDeletedElement = function(reqOb, deletedOb) {
+        var requestCacheKey = getElementKey(reqOb, deletedOb.id);
+        requestCacheKey.push('deleted');
+        var commitCacheKey = UtilsService.makeElementKey(deletedOb);
+        CacheService.put(requestCacheKey, commitCacheKey.join('|'));
+        CacheService.put(commitCacheKey, deletedOb, true);
     };
 
     /**
