@@ -131,10 +131,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 }
 
                 if (isDoc) {
-                    // TODO If _printCss, use to set doc css for export/print
+                    // If _printCss, use to set doc css for export/print
                     $scope.customizeDoc.useCustomStyle = false;
                     if ( viewOrDocOb._printCss != undefined ) {
-                        // Make tab for custom css default
+                        // If _printCss, show tab for custom css
                         $scope.customizeDoc.useCustomStyle = true;
                         $scope.customizeDoc.customCSS = viewOrDocOb._printCss;
                     } else {
@@ -173,24 +173,24 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 }
                 $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
                 $scope.docOption = (!isDoc && (mode === 3 || mode === 2));
-                $scope.model = {genCover: false, genTotf: false, landscape: false, htmlTotf: false};
+                $scope.model = { genTotf: false, landscape: false, htmlTotf: false };
                 
                 $scope.saveStyleUpdate = function() {
-                    // add _printCss to viewOrDoc ob and update element
+                    // To only update _printCss, create new ob with doc info
                     $scope.elementSaving = true;
-                    viewOrDocOb._printCss = $scope.customizeDoc.customCSS;
-                    $window.alert($scope.customizeDoc.customCSS);
-                    Utils.save(viewOrDocOb, false, $scope, false).then(function(data) {
+                    var docOb = {id: viewOrDocOb.id, _projectId: viewOrDocOb._projectId, _refId: viewOrDocOb._refId};
+                    docOb._printCss = $scope.customizeDoc.customCSS;
+                    ElementService.updateElement(docOb).then(function() {
                         $scope.elementSaving = false;
                         growl.success('Save Successful');
-                    }, function(reason) {
+                    }, function() {
                         $scope.elementSaving = false;
                         growl.warning('Save was not complete. Please try again.');
                     });
                 };
                 $scope.print = function() {
                     $scope.customization = $scope.customizeDoc.useCustomStyle ? $scope.customizeDoc.customCSS : false;
-                    $uibModalInstance.close(['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta, $scope.customization]);
+                    $uibModalInstance.close(['ok', $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta, $scope.customization]);
                 };
                 $scope.fulldoc = function() {
                     $uibModalInstance.close(['fulldoc']);
@@ -203,48 +203,45 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
             keyboard: false
         });
         /* choice:
-        ['ok', $scope.model.genCover, $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]
+        ['ok', $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]
         [0] 'ok' - modal button to confirm print/export
-        [1] Generate cover page option
-        [2] Generate List of Tables and Figures option
-        [3] HTML option checked - used to generate ToC from html
-        [4] Landscape option
-        [5] metadata:
+        [1] Generate List of Tables and Figures option
+        [2] HTML option checked - used to generate ToC from html
+        [3] Landscape option
+        [4] metadata:
             bottom, bottom-left, bottom-right, top, top-left, top-right
-        [6] customization: CSS String || false
+        [5] customization: CSS String || false
         */
         modalInstance.result.then(function(choice) {
             if (choice[0] === 'ok') {
-                printOrGenerate(viewOrDocOb, refOb, mode, isDoc, choice[1], choice[2], choice[3])
-                .then(function(result) {
-                    var css;
-                    var customization = choice[6];
-                    if (customization) {
-                        css = customization;
-                    } else {
-                        css = UtilsService.getPrintCss(choice[3], choice[4], choice[5]);
-                    }
-                    result.toe = choice[3] ? '' : result.toe;
-                    if (mode === 1) {
-                        var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
-                        popupWin.document.open();
-                        popupWin.document.write('<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
-                        popupWin.document.close();
-                        $timeout(function() {
-                            popupWin.print();
-                        }, 1000, false);
-                    } else {
-                        result.tof = choice[2] ? result.tof + result.toe : '';
-                        result.tot = choice[2] ? result.tot : '';
-                        var htmlString = ['<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">', css, '</style></head><body>', result.cover, result.toc, result.tot, result.tof, result.contents, '</body></html>' ].join('');
-                        UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId, css: css})
-                            .then(function(reuslt) {
-                                deferred.resolve(result);
-                            }, function(reason){
-                                deferred.reject(reason);
-                            });
-                    }
-                });
+                var result = printOrGenerate(viewOrDocOb, mode, isDoc, choice[1], choice[2]);
+                var customization = choice[5];
+                var css = customization ? customization : UtilsService.getPrintCss(choice[2], choice[3], choice[4]);
+                result.toe = choice[2] ? '' : result.toe;
+                if (mode === 1) {
+                    var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
+                    popupWin.document.open();
+                    popupWin.document.write('<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
+                    popupWin.document.close();
+                    $timeout(function() {
+                        popupWin.print();
+                    }, 1000, false);
+                } else {
+                    result.tof = choice[1] ? result.tof + result.toe : '';
+                    result.tot = choice[1] ? result.tot : '';
+                    var htmlArr = ['<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">', css, '</style></head><body>', result.cover];
+                    if (result.toc != '') htmlArr.push(result.toc);
+                    if (result.tot != '') htmlArr.push(result.tot);
+                    if (result.tof != '') htmlArr.push(result.tof);
+                    htmlArr.push(result.contents, '</body></html>');
+                    var htmlString = htmlArr.join('');
+                    UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId, css: css})
+                        .then(function(result) {
+                            deferred.resolve(result);
+                        }, function(reason){
+                            deferred.reject(reason);
+                        });
+                }
             } else {
                 $rootScope.ve_fullDocMode = true;
                 $rootScope.ve_bbApi.setToggleState('tree-full-document', true);
@@ -263,41 +260,29 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
      * @description
      * Called by printModal to handle cleanup and building content needed for 
      * print, PDF or word export.
-     * Cleansup html i.e. removes mms errors, no-print, ng-hide
+     * Cleansup html i.e. removes no-print, ng-hide
      *
      * @param {Object} viewOrDocOb current document or view object
-     * @param {Object} refOb current branch/tag object
      * @param {Number} mode 1 = print, 2 = word, 3 = pdf
      * @param {Boolean} isDoc viewOrDocOb is view or doc
-     * @param {Boolean} genCover generate default cover page (option from the modal form)
      * @param {Boolean} genTotf whether to gen table of figures and tables (option from the modal form)
      * @param {Boolean} htmlTotf include DocGen generated tables and rapid tables (option from the modal form)
-     * @param {Boolean} landscape PDF in lanscape vie (option from the modal form)
-     * @returns {Promise} The promise returns object with content needed for print/word export/PDf generation
+     * @returns {Object} Returns object with content needed for print/word export/PDF generation
      * <pre>
      * {
-     *      cover: cover page html
-     *      contents: main content html
-     *      header: header string or ''
-     *      footer: footer string or ''
-     *      displayTime: human readable time
-     *      dnum: document d number
-     *      version: version string from doc tag
-     *      toc: toc html
-     *      tag: tagname or ''
+     *      cover: cover page html,
+     *      contents: main content html,
+     *      toc: table of contents html,
+     *      tof: table of figures html,
+     *      tot: table of tables html,
+     *      toe: table of equations html
      * }
      * </pre>
      */
-    var printOrGenerate = function(viewOrDocOb, refOb, mode, isDoc, genCover, genTotf, htmlTotf) {
-        var deferred = $q.defer();
+    var printOrGenerate = function(viewOrDocOb, mode, isDoc, genTotf, htmlTotf) {
         var printContents = '';
         var printElementCopy = angular.element("#print-div");
-        printElementCopy.find('table').addClass(function() {
-            if ($(this).find('table').length > 0 || $(this).find('img').length > 0) {
-                return 'big-table';
-            }
-            return '';
-        });
+
         // Conversion of canvas to its dataUrl must be done before "clone", because "clone" doesn't preserve
         // canvas' content
         var mapping = storeTomsawyerDiagramAsImg(printElementCopy);
@@ -311,13 +296,16 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
         var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
+
         // Conver to proper links for word/pdf
         UtilsService.convertViewLinks(printElementCopy);
+
         // Get correct table/image numbering based on doc hierarchy
         var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
+
         // Customize TOC based on user choice
         if (!isDoc) {
             toc = tof = tot = toe = '';
@@ -371,56 +359,19 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
         printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
         printElementCopy.find('script').remove();
         //printElementCopy.find('.MJX_Assistive_MathML').remove(); //pdf generation need mathml version
-        var coverTemplateString = $templateCache.get('partials/mms/docCover.html');
-        var coverTemplateElement = angular.element(coverTemplateString);
+
+        // Get doc cover page by doc ID
         var cover = '';
-        if (!genCover && isDoc) {
+        if (isDoc) {
             cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
             cover.remove();
+            // Add class to style cover page
+            cover.addClass('ve-cover-page');
             cover = cover[0].outerHTML;
         }
-        var newScope = $rootScope.$new();
-        //var useCover = false;
         printContents = printElementCopy[0].outerHTML;
-        var header = '';
-        var footer = '';
-        var displayTime = '';
-        var dnum = '';
-        var version = '';
-        var tagname = '';
-        if (refOb)
-            tagname = refOb.name;
-        if (!isDoc) {
-            deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
-            return deferred.promise;
-        }
-        ViewService.getDocMetadata({
-            elementId: viewOrDocOb.id,
-            projectId: viewOrDocOb._projectId,
-            refId: viewOrDocOb._refId
-        }, 2).then(function(metadata) {
-            //useCover = true;
-            newScope.meta = metadata;
-            newScope.tag = refOb;
-            newScope.time = refOb.type != 'Tag' ? new Date() : refOb._timestamp;
-            displayTime = $filter('date')(newScope.time, 'M/d/yy h:mm a');
-            newScope.meta.title = viewOrDocOb.name;
-            header = metadata.header ? metadata.header : header;
-            footer = metadata.footer ? metadata.footer : footer;
-            if (metadata.dnumber)
-                dnum = metadata.dnumber;
-            if (metadata.version)
-                version = metadata.version;
-            $compile(coverTemplateElement.contents())(newScope);
-        }).finally(function() {
-            $timeout(function() {
-                if (genCover) {
-                    cover = coverTemplateElement[0].innerHTML;
-                }
-                deferred.resolve({cover: cover, contents: printContents, header: header, footer: footer, displayTime: displayTime, dnum: dnum, version: version, toc: toc, tag: tagname, tof: tof, tot: tot, toe: toe});
-            }, 0, false);
-        });
-        return deferred.promise;
+
+        return { cover: cover, contents: printContents, toc: toc, tof: tof, tot: tot, toe: toe };
     };
 
     var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen) {

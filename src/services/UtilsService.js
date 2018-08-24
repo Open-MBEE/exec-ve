@@ -701,7 +701,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var result = '<div class="toc"><h1 class="header">Table of Contents</h1>';
         var root_branch = tree[0].branch;
         result += makeHtmlTOCChild(root_branch, true);
-        result += '</div>'; 
+        result += '</div>';
         return result;
     };
 
@@ -763,9 +763,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      */
     var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
         var ob = {
-            tables: '<div class="tot"><h1 class="header">List of Tables</h1><ul>',
-            figures: '<div class="tof"><h1 class="header">List of Figures</h1><ul>',
-            equations: '<div class="tof"><h1 class="header">List of Equations</h1><ul>',
+            tables: '',
+            figures: '',
+            equations: '',
             tableCount: 0,
             figureCount: 0,
             equationCount: 0
@@ -781,9 +781,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
             }
         }
-        ob.tables += '</ul></div>';
-        ob.figures += '</ul></div>';
-        ob.equations += '</ul></div>';
+        ob.tables    = ob.tables.length    ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>'    + ob.tables    + '</ul></div>' : '';
+        ob.figures   = ob.figures.length   ? '<div class="tof"><h1 class="header">List of Figures</h1><ul>'   + ob.figures   + '</ul></div>' : '';
+        ob.equations = ob.equations.length ? '<div class="tof"><h1 class="header">List of Equations</h1><ul>' + ob.equations + '</ul></div>' : '';
         return ob;
     };
 
@@ -1106,7 +1106,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "8. Signature Box\n" +
                 "9. Bookmark Level\n" +
                 "------------------------------------------------------------------*/\n" +
-                "\n" +                
+                "\n" +
                 "/*------------------------------------------------------------------\n" +
                 "1. Images\n" +
                 "------------------------------------------------------------------*/\n" +

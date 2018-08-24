@@ -25,8 +25,8 @@
     <br/>
     <div ng-if="type == 'DOCUMENT' && mode !== 1">
     </div>
-    <div ng-if="type == 'DOCUMENT' && mode !== 1"><input type="checkbox" ng-model="model.genTotf"> Include List of Tables and Figures</div>
-    <div ng-if="model.genTotf" class="indent"><input type="checkbox" ng-model="model.htmlTotf"> Use HTML for List (will not include equations and may differ from web numbering)</div>
+    <div ng-if="type == 'DOCUMENT' && mode !== 1"><input type="checkbox" ng-model="model.genTotf"> Include List of Tables, Figures and Equations</div>
+    <!-- <div ng-if="model.genTotf" class="indent"><input type="checkbox" ng-model="model.htmlTotf"> Use HTML for List (will not include equations and may differ from web numbering)</div> -->
     <br>
 
     <div ng-if="type == 'DOCUMENT' && mode === 3">
@@ -51,8 +51,8 @@
             <div ng-if="mode !== 1">
                 <label>Orientation</label><br>
                 <form>
-                    <input type="radio" name="export-orientation" checked="checked" > Portrait<br>
-                    <input type="radio" name="export-orientation" ng-model="model.landscape"> Landscape
+                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="false"> Portrait<br>
+                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="true"> Landscape
                 </form>
             </div>
             <br>
@@ -77,7 +77,7 @@
                     <div class="col-md-3">
                         <input class="ve-plain-input" type="text" ng-model="meta['bottom-left']" placeholder="Left" aria-labelledby="left footer">
                     </div>
-                    <div class="col-md-6">                    
+                    <div class="col-md-6">
                         <input class="ve-plain-input" type="text" ng-model="meta.bottom" placeholder="Center" aria-labelledby="center footer">
                     </div>
                     <div class="col-md-3">
@@ -94,8 +94,7 @@
         <form ng-submit="saveStyleUpdate()" role="form">
 
             <div class="form-group">
-           <!--      <label>Custom Style (Default CSS is provided below)</label> -->
-                <textarea class="form-control" rows="6" ng-model="customizeDoc.customCSS"></textarea>
+                <textarea class="form-control" rows="6" style="width:100%" ng-model="customizeDoc.customCSS"></textarea>
             </div>
             <button class="btn btn-default" type="submit"><i class="fa fa-save"></i>Save CSS for document<span ng-if="elementSaving"><i class="fa fa-spinner fa-spin"></i></span></button>
 
