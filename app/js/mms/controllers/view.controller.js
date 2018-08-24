@@ -3,10 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout',
+    .controller('ViewCtrl', ['$scope', '$rootScope', '$state',  '$timeout', '$window', '$location', '$http',
     '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'Utils', 'growl',
     'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
-    function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, Utils, growl,
+    function($scope, $rootScope, $state, $timeout, $window, $location, $http,
+             $element, hotkeys, MmsAppUtils, UxService, Utils, growl,
              search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb) {
 
     function isPageLoading() {
@@ -111,7 +112,7 @@ angular.module('mmsApp')
 
             if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
-                // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
                 if ($state.includes('project.ref.document')) {
                     var exportButtons = UxService.getButtonBarButton('export');
@@ -158,6 +159,17 @@ angular.module('mmsApp')
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show-edits');
         $rootScope.ve_editmode = !$rootScope.ve_editmode;
+    });
+
+    $scope.$on('share-url', function() {
+        var currentUrl = 'https://opencae-uat.jpl.nasa.gov'+$location.url();
+        var SHARE_URL = 'https://bwtj0li4ii.execute-api.us-gov-west-1.amazonaws.com/v1/url-shorten/';
+        $http.post(SHARE_URL, {'url': currentUrl})
+        .then(function(response) {
+            $window.alert('hi'+ currentUrl);
+        }, function(response) {
+            // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        });
     });
 
     $scope.$on('center-previous', function() {
