@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['$window', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
+    .directive('mmsSearch', ['$window', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -102,36 +102,31 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
 
         // event handler for multiselect metatype dropdown
         scope.multiselectEvent = {
-            onItemSelect: function(ob) {
-                $timeout( function(){
+            onItemSelect: function (ob) {
+                $timeout(function () {
                     scope.stringQueryUpdate();
-                }, 500 );
+                }, 500);
             },
-            onItemDeselect: function(ob) {
-                $timeout( function(){
+            onItemDeselect: function (ob) {
+                $timeout(function () {
                     scope.stringQueryUpdate();
-                }, 500 );
+                }, 500);
             },
-            onDeselectAll: function(ob) {
-                $timeout( function(){
+            onDeselectAll: function (ob) {
+                $timeout(function () {
                     scope.stringQueryUpdate();
-                }, 500 );
+                }, 500);
             }
         };
 
 
-        // Watch function - TODO might not need first one
-        scope.$watchGroup(['filterQuery.query', 'facet'], function(newVal, oldVal) {
-            scope.resultFilter = {};
-            scope.resultFilter[scope.facet] = scope.filterQuery.query;
-        });
-        scope.$watch('searchResults', function(newVal) {
+        scope.$watch('searchResults', function (newVal) {
             if (!newVal)
                 return;
             if (!scope.mmsOptions.getProperties) {
                 return;
             }
-            newVal.forEach(function(elem) {
+            newVal.forEach(function (elem) {
                 if (elem._properties) {
                     return;
                 }
@@ -140,7 +135,12 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                 // filter out results that have type = to Property and Slot
                 // for Property check that ownerId is same as the class id
                 if (elem.type === 'Class' || elem.type === 'Component') {
-                    var reqOb = {elementId: elem.id, projectId: elem._projectId, refId: elem._refId, depth: 2};
+                    var reqOb = {
+                        elementId: elem.id,
+                        projectId: elem._projectId,
+                        refId: elem._refId,
+                        depth: 2
+                    };
                     ElementService.getOwnedElements(reqOb, 2)
                         .then(function (data) {
                             var properties = [];
@@ -178,26 +178,26 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
          * @description
          * Updates advanced search main query input
          */
-        scope.stringQueryUpdate = function() {
+        scope.stringQueryUpdate = function () {
             var rowLength = scope.advanceSearchRows.length;
-            scope.stringQuery = Array(rowLength+1).join('(');
+            scope.stringQuery = Array(rowLength + 1).join('(');
             scope.stringQuery += scope.mainSearch.searchType.label + ':';
             if (scope.mainSearch.searchType.id === 'metatype') {
                 scope.stringQuery += getMetatypeSelection('#searchMetatypeSelectAdvance');
             } else {
                 scope.stringQuery += scope.mainSearch.searchText;
             }
-            for ( var i = 0; i < rowLength; i++) {
+            for (var i = 0; i < rowLength; i++) {
                 scope.stringQuery += ' ' + scope.advanceSearchRows[i].operator.toUpperCase() + ' ' + scope.advanceSearchRows[i].searchType.label + ':';
                 if (scope.advanceSearchRows[i].searchType.id === 'metatype') {
-                    scope.stringQuery += getMetatypeSelection('#searchMetatypeSelect-'+i) + ')';
+                    scope.stringQuery += getMetatypeSelection('#searchMetatypeSelect-' + i) + ')';
                 } else {
                     scope.stringQuery += scope.advanceSearchRows[i].searchText + ')';
                 }
             }
         };
 
-         /**
+        /**
          * @ngdoc function
          * @name mms.directives.directive:mmsSearch#addAdvanceSearchRow
          * @methodOf mms.directives.directive:mmsSearch
@@ -205,8 +205,16 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
          * @description
          * Adds new row with empty fields and updates advanced search main query input
          */
-        scope.addAdvanceSearchRow = function() {
-            scope.advanceSearchRows.push({operator:'And',searchType:{id:'all', label:'All Fields'},searchText:'',selectedSearchMetatypes:[]});
+        scope.addAdvanceSearchRow = function () {
+            scope.advanceSearchRows.push({
+                operator: 'And',
+                searchType: {
+                    id: 'all',
+                    label: 'All Fields'
+                },
+                searchText: '',
+                selectedSearchMetatypes: []
+            });
             scope.stringQueryUpdate();
         };
         scope.addAdvanceSearchRow(); // Second row created by default
@@ -221,28 +229,29 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
          *
          * @param {objecy} row advanced search row
          */
-        scope.removeRowAdvanceSearch = function(row) {
+        scope.removeRowAdvanceSearch = function (row) {
             scope.advanceSearchRows = _.without(scope.advanceSearchRows, row);
             scope.stringQueryUpdate();
         };
 
-        scope.modifyAdvanceSearch = function() {
+        scope.modifyAdvanceSearch = function () {
             scope.advanceSearch = !scope.advanceSearch;
             scope.advancedSearchResults = !scope.advancedSearchResults;
         };
 
-        scope.nextPage = function() {
-            if (scope.paginationCache[scope.currentPage+1]) {
-                scope.searchResults= scope.paginationCache[scope.currentPage+1];
+        scope.nextPage = function () {
+            if (scope.paginationCache[scope.currentPage + 1]) {
+                scope.searchResults = scope.paginationCache[scope.currentPage + 1];
                 scope.currentPage += 1;
-            } else{
+            } else {
                 scope.search(scope.mainSearch, scope.currentPage + 1, scope.itemsPerPage);
             }
+            // $anchorScroll();
         };
 
-        scope.prevPage = function() {
-            if (scope.paginationCache[scope.currentPage-1]) {
-                scope.searchResults= scope.paginationCache[scope.currentPage-1];
+        scope.prevPage = function () {
+            if (scope.paginationCache[scope.currentPage - 1]) {
+                scope.searchResults = scope.paginationCache[scope.currentPage - 1];
                 scope.currentPage -= 1;
             } else {
                 scope.search(scope.mainSearch, scope.currentPage - 1, scope.itemsPerPage);
@@ -283,33 +292,40 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
          * @param {number} page page number of search results
          * @param {number} numItems number of items to return per page
          */
-        scope.search = function(query, page, numItems) {
-            scope.searchClass = "fa fa-spin fa-spinner";
+        scope.search = function (query, page, numItems) {
+            scope.searchButtonIcon = "fa fa-spin fa-spinner";
             var queryOb = buildQuery(query);
-            queryOb.from = page*numItems + page;
+            queryOb.from = page * numItems + page;
             queryOb.size = numItems;
-            var reqOb = {projectId: scope.mmsProjectId, refId: scope.refId, checkType: true};
+            var reqOb = {
+                projectId: scope.mmsProjectId,
+                refId: scope.refId,
+                checkType: true
+            };
             ElementService.search(reqOb, queryOb, 2)
-            .then(function(data) {
-                if (scope.mmsOptions.filterCallback) {
-                  scope.searchResults = scope.mmsOptions.filterCallback(data);
-                } else {
-                  scope.searchResults = data;
-                }
-                scope.searchClass = "";
-                scope.currentPage = page;
-                scope.paginationCache.push(scope.searchResults);
-                if (scope.advanceSearch) {
-                    // scope.advanceSearch = !scope.advanceSearch;
-                    scope.advancedSearchResults = true;
-                }
-            }, function(reason) {
-                growl.error("Search Error: " + reason.message);
-                scope.searchClass = "";
-            });
+                .then(function (data) {
+                    if (scope.mmsOptions.filterCallback) {
+                        scope.searchResults = scope.mmsOptions.filterCallback(data);
+                        baseSearchResults = scope.searchResults;
+                    } else {
+                        scope.searchResults = data;
+                        baseSearchResults = data;
+                    }
+                    scope.currentPage = page;
+                    scope.paginationCache.push(scope.searchResults);
+                    if (scope.advanceSearch) {
+                        // scope.advanceSearch = !scope.advanceSearch;
+                        scope.advancedSearchResults = true;
+                    }
+                    scope.refineOptions = findRefineOptions(data);
+                }, function (reason) {
+                    growl.error("Search Error: " + reason.message);
+                }).finally(function () {
+                    scope.searchButtonIcon = "";
+                });
         };
 
-        scope.newSearch = function(query) {
+        scope.newSearch = function (query) {
             scope.paginationCache = [];
             scope.search(query, 0, scope.itemsPerPage);
         };
@@ -321,39 +337,41 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
          *
          * @description
          * Create a JSON object that returns a term key with a list of all mounted
-         * project ids within the current project. Elastic format
+         * project ids within the current project.
+         * 
+         * Elastic format
          *
          * @return {object} Elastic query JSON object with list of project mounts
          */
-        // TODO cache results
         var getProjectMountsQuery = function () {
             var projList = [];
             var projectTermsOb = {};
-            var cacheKey = ['project', scope.mmsProjectId, scope.refId];
-            var cachedProj = CacheService.get(cacheKey);
-            if (cachedProj) {
-                getAllMountsAsArray(cachedProj, projList);
+
+            var mountCacheKey = ['project-mounts', scope.mmsProjectId, scope.refId];
+            if (CacheService.exists(mountCacheKey)) {
+                projList = CacheService.get(mountCacheKey);
+            } else {
+                // Get project element data to gather mounted project list
+                var cacheKey = ['project', scope.mmsProjectId, scope.refId];
+                var cachedProj = CacheService.get(cacheKey);
+                if (cachedProj) {
+                    getAllMountsAsArray(cachedProj, projList);
+                } else {
+                    var project = {
+                        'id': scope.mmsProjectId,
+                        '_refId': scope.refId
+                    };
+                    getAllMountsAsArray(project, projList);
+                }
+                CacheService.put(mountCacheKey, projList, false);
             }
+
+            // Create Elastic filter
             var q = {};
-            if ( projList.length === 0 ) {
-                projList.push({
-                    bool: {
-                        must: [
-                            {
-                                term: {
-                                    _projectId: scope.mmsProjectId
-                                }
-                            }, {
-                                term:{
-                                    _inRefIds: scope.refId
-                                }
-                            }
-                        ]
-                    }
-                });
-            }
             q._projectId = projList;
-            projectTermsOb.bool = {should: projList};
+            projectTermsOb.bool = {
+                should: projList
+            };
             return projectTermsOb;
         };
 
@@ -367,24 +385,22 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
          * specified project.
          *
          */
-        var getAllMountsAsArray = function(project, projectsList) {
+        var getAllMountsAsArray = function (project, projectsList) {
             projectsList.push({
-                    bool: {
-                        must: [
-                            {
-                                term: {
-                                    _projectId: project.id
-                                }
-                            }, {
-                                term:{
-                                    _inRefIds: project._refId
-                                }
-                            }
-                        ]
-                    }
-                });
+                bool: {
+                    must: [{
+                        term: {
+                            _projectId: project.id
+                        }
+                    }, {
+                        term: {
+                            _inRefIds: project._refId
+                        }
+                    }]
+                }
+            });
             var mounts = project._mounts;
-            if ( angular.isArray(mounts) && mounts.length !== 0 ) {
+            if (angular.isArray(mounts) && mounts.length !== 0) {
                 for (var i = 0; i < mounts.length; i++) {
                     if (mounts[i]._mounts) {
                         getAllMountsAsArray(mounts[i], projectsList);
@@ -394,14 +410,19 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             return;
         };
 
-        var buildSearchClause = function(query) {
+        var buildSearchClause = function (query) {
             var clause = {};
             var q = {};
             var valueSearchFields = ["defaultValue.value^3", "value.value^3", "specification.value^3"];
             if (query.searchType.id === 'all') {
                 // Set query term for ID
                 var idQuery = {};
-                idQuery.term = {"id": {"value": query.searchText, "boost": 10.0}};
+                idQuery.term = {
+                    "id": {
+                        "value": query.searchText,
+                        "boost": 10.0
+                    }
+                };
 
                 // Set query for value,doc,name fields
                 var allQuery = {};
@@ -422,11 +443,16 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                 // "{"query":{"bool":{"must":[{"match":{"name":"val"}}]}}}"
                 // "{"query":{"bool":{"must":[{"match":{"documentation":"val"}}]}}}"
                 var type = query.searchType.id;
-                q[type] = { query: query.searchText, fuzziness: 'AUTO'};
+                q[type] = {
+                    query: query.searchText,
+                    fuzziness: 'AUTO'
+                };
                 clause.match = q;
             } else if (query.searchType.id === 'id') {
                 // "{"query":{"bool":{"must":[{"term":{"id":"val"}}]}}}"
-                clause.term = {"id": query.searchText};
+                clause.term = {
+                    "id": query.searchText
+                };
             } else if (query.searchType.id === 'value') {
                 // "{"query":{"bool":{"must":[{"multi_match":{"query":"val","fields":["defaultValue.value","value.value","specification.value"]}}]}}}"
                 q.query = query.searchText;
@@ -437,22 +463,21 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                 var metatypeFilterList = _.pluck(query.selectedSearchMetatypes, 'id');
 
                 // Get all _appliedStereotypeIds, which have `_`
-                var appliedStereotypeFilter = [], typeFilter = [];
+                var appliedStereotypeFilter = [],
+                    typeFilter = [];
                 for (var i = 0; i < metatypeFilterList.length; i++) {
                     //if underscore = appliedsterortype otherwise 'type'
-                    if ( metatypeFilterList[i].includes('_') ) {
+                    if (metatypeFilterList[i].includes('_')) {
                         console.log(metatypeFilterList[i]);
                         appliedStereotypeFilter.push(metatypeFilterList[i]);
                     } else {
                         typeFilter.push(metatypeFilterList[i]);
                     }
                 }
-
                 // metatype clause
                 clause = {
                     "bool": {
-                        "should": [
-                            {
+                        "should": [{
                                 "terms": {
                                     "_appliedStereotypeIds": appliedStereotypeFilter
                                 }
@@ -488,7 +513,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
 
             // Set custom filter options for query
             if (scope.mmsOptions.filterQueryList) {
-                angular.forEach(scope.mmsOptions.filterQueryList, function(filterOb){
+                angular.forEach(scope.mmsOptions.filterQueryList, function (filterOb) {
                     filterList.push(filterOb());
                 });
             }
@@ -496,11 +521,17 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             // Set filter for all views and docs, if selected
             if (scope.docsviews.selected) {
                 var viewsAndDocs = {
-                    terms : {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)}
+                    terms: {
+                        '_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)
+                    }
                 };
                 filterList.push(viewsAndDocs);
             }
-            filterList.push({"type": {"value": "element"}});
+            filterList.push({
+                "type": {
+                    "value": "element"
+                }
+            });
 
             // Set main query
             var mainBoolQuery = {};
@@ -508,9 +539,11 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             var rowLength = scope.advanceSearchRows.length;
             if (!scope.advanceSearch || rowLength === 0) {
                 mainBoolQuery = buildSearchClause(query);
-                mainBoolQuery = { "bool": {
+                mainBoolQuery = {
+                    "bool": {
                         "must": mainBoolQuery,
-                    } };
+                    }
+                };
             } else {
                 var clause2, clause1 = buildSearchClause(scope.mainSearch);
                 for (var i = 0; i < rowLength; i++) {
@@ -519,29 +552,79 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                     var operator = row.operator;
                     clause2 = buildSearchClause(row);
                     if (operator === "And") {
-                        clause1 = { "bool": { "must": [ clause1, clause2 ] } };
+                        clause1 = {
+                            "bool": {
+                                "must": [clause1, clause2]
+                            }
+                        };
                     } else if (operator === "Or") {
-                        clause1 = { "bool": { "should": [ clause1, clause2 ],
-                                    "minimum_should_match": 1 } };
+                        clause1 = {
+                            "bool": {
+                                "should": [clause1, clause2],
+                                "minimum_should_match": 1
+                            }
+                        };
                     } else if (operator === "And Not") {
-                        clause1 = { "bool": { "must": [ clause1, { "bool": {"must_not": clause2} } ] } };
+                        clause1 = {
+                            "bool": {
+                                "must": [clause1, {
+                                    "bool": {
+                                        "must_not": clause2
+                                    }
+                                }]
+                            }
+                        };
                     }
                 }
                 mainBoolQuery = clause1;
             }
 
             jsonQueryOb = {
-                "sort" : [
+                "sort": [
                     "_score",
-                    { "_modified" : {"order" : "desc"}}
+                    {
+                        "_modified": {
+                            "order": "desc"
+                        }
+                    }
                 ],
-                "query": { }
+                "query": {}
             };
             jsonQueryOb.query = mainBoolQuery;
             jsonQueryOb.query.bool.filter = filterList;
+            jsonQueryOb.aggs = getAggs();
             return jsonQueryOb;
         };
 
+        var getAggs = function () {
+            return {
+                "elements": {
+                    "filter": {
+                        "bool": {
+                            "must": [{
+                                    "term": {
+                                        "_projectId": 'PROJECT-5d574aa8-bc06-4e95-bf71-3f2151833e09'
+                                    }
+                                },
+                                {
+                                    "term": {
+                                        "_inRefIds": 'master'
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "aggs": {
+                        "types": {
+                            "terms": {
+                                "field": "type",
+                                "size": 20
+                            }
+                        }
+                    }
+                }
+            };
+        };
 
         // Set options
         if (scope.mmsOptions.searchResult) {
