@@ -185,7 +185,11 @@ Styles that apply to both the spec
     top: -.1em;
   }
 
-  /*Add light colored presentation element icons to the left of the title*/
+}
+
+/*Add light colored presentation element icons to the left of the title*/
+.search-results,
+.pane-right{
 
   .item-type-View,
   .item-type-Document,
@@ -209,7 +213,7 @@ Styles that apply to both the spec
       color: $ve-silver-darker-3;
       right: 0;
       padding: 0;
-      position:absolute;
+      position: absolute;
       right: 6px;
       top: 0;
       font-size: 14px;
