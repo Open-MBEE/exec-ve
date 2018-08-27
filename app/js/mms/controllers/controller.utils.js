@@ -133,7 +133,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                 if (isDoc) {
                     // If _printCss, use to set doc css for export/print
                     $scope.customizeDoc.useCustomStyle = false;
-                    if ( viewOrDocOb._printCss != undefined ) {
+                    if (viewOrDocOb._printCss) {
                         // If _printCss, show tab for custom css
                         $scope.customizeDoc.useCustomStyle = true;
                         $scope.customizeDoc.customCSS = viewOrDocOb._printCss;
@@ -187,6 +187,23 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
                         $scope.elementSaving = false;
                         growl.warning('Save was not complete. Please try again.');
                     });
+                };
+                $scope.preview = function() {
+                    if (!$scope.previewResult) {
+                        $scope.previewResult = printOrGenerate(viewOrDocOb, 3, true, true, false);
+                        $scope.previewResult.tof = $scope.previewResult.tof + $scope.previewResult.toe;
+                    }
+                    var result = $scope.previewResult;
+                    var htmlArr = ['<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">', $scope.customizeDoc.customCSS, '</style></head><body style="overflow: auto">', result.cover];
+                    if (result.toc != '') htmlArr.push(result.toc);
+                    if (result.tot != '' && $scope.model.genTotf) htmlArr.push(result.tot);
+                    if (result.tof != '' && $scope.model.genTotf) htmlArr.push(result.tof);
+                    htmlArr.push(result.contents, '</body></html>');
+                    var htmlString = htmlArr.join('');
+                    var popupWin = $window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
+                    popupWin.document.open();
+                    popupWin.document.write(htmlString);
+                    popupWin.document.close();
                 };
                 $scope.print = function() {
                     $scope.customization = $scope.customizeDoc.useCustomStyle ? $scope.customizeDoc.customCSS : false;
