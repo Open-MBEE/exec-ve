@@ -109,6 +109,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             function(data, status, headers, config) {
                 if (data.deleted && data.deleted.length > 0 && data.deleted[0].id === reqOb.elementId) {
                     data.recentVersionOfElement = data.deleted[0];
+                    cacheDeletedElement(reqOb, data.deleted[0]);
                 }
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
                 delete inProgress[key];
@@ -857,7 +858,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         response.data = elementObs;
         URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
     }
-
+/*
     function _getLatestVersionOfElement(reqOb) {
         var deferred = $q.defer();
         getElementHistory(reqOb).then(function(elementHistory) {
@@ -877,7 +878,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }, deferred.reject);
         return deferred.promise;
     }
-
+*/
     return {
         getElement: getElement,
         getElements: getElements,
