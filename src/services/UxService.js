@@ -30,7 +30,7 @@ function UxService($rootScope) {
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("element-editor-saveall")]};
       case "element-history":
-        return {id: button, icon: 'fa-history', selected: true, active: true, permission:true, tooltip: 'Element History', 
+        return {id: button, icon: 'fa-history', selected: false, active: true, permission:true, tooltip: 'Element History',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);},
                 dynamic_buttons: [getToolbarButton("element-editor-saveall")]};
       case "element-editor":
@@ -51,7 +51,7 @@ function UxService($rootScope) {
         return {id: button, icon: 'fa-code-fork', selected: false, active: true, permission: true, tooltip: 'Branches and Tags',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "jobs":
-        return {id: button, icon: 'fa-sort-amount-desc', selected: true, active: true, permission:true, tooltip: 'Jobs',
+        return {id: button, icon: 'fa-sort-amount-desc', selected: false, active: true, permission:true, tooltip: 'Jobs',
                 spinner: false, onClick: function() {$rootScope.$broadcast(button);}};
       case "element-editor-save":
         return {id: button, icon: 'fa-save', dynamic: true, selected: false, active: false, permission:true, tooltip: 'Save',
