@@ -28,7 +28,7 @@
                     <div id="searchMetatypeSelect" ng-dropdown-multiselect="" options="metatypeList" selected-model="mainSearch.selectedSearchMetatypes" extra-settings="metatypeSettings"></div>
                 </div>
                 <button class="btn btn-primary" type="button" ng-click="newSearch(mainSearch)">
-                    <span class="btn-text">Search</span> <i class="{{searchButtonIcon}}"></i>
+                    <span class="btn-text">Search</span> <i ng-if="searchLoading" class="fa fa-spin fa-spinner"></i>
                 </button>
             </form>
             <div>
@@ -169,7 +169,7 @@
         <a ng-show="searchResults.length > 0" class="pull-right" ng-click="nextPage()">Next ></a>
     </div>
 
-    <div class="container-no-results container-fluid" ng-show="searchResults.length === 0">
+    <div class="container-no-results container-fluid" ng-show="searchResults.length === 0 && !searchLoading">
         <h3>No Results Found.</h3>
     </div>
 </div>

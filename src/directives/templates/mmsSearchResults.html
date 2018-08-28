@@ -1,11 +1,33 @@
 <div class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
     <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
 </div>
+<div class="btn-group btn-group-sm" role="group" aria-label="mms-search-results-filter">
+    <!-- <span class="label-for-filter pull-left">FILTER: </span> -->
+    <button type="button" ng-repeat="item in filterOptions" ng-click="filterSearchResults(item)" 
+    title="Filter {{item}}" class="btn ve-btn-group-default pe-type-{{item}}"
+    ng-class="{'active': getActiveFilterClass(item)}">{{item}}</button>
+    <!-- <button ng-if="uniqFilterOptions.indexOf('Document') > -1"  ng-click="filterSearchResults('Document')" 
+        type="button" class="btn btn-default">Documents</button>
+    <button ng-if="uniqFilterOptions.indexOf('View') > -1"      ng-click="filterSearchResults('View')" 
+        type="button" class="btn btn-default">Section/Views</button>
+    <button ng-if="uniqFilterOptions.indexOf('Paragraph') > -1" ng-click="filterSearchResults('Paragraph')" 
+        type="button" class="btn btn-default pe-type-Paragraph" title="Filter text">Paragraph</button>
+    <button ng-if="uniqFilterOptions.indexOf('Table') > -1"     ng-click="filterSearchResults('Table')" 
+        type="button" class="btn btn-default pe-type-Table"     title="Filter table">Table</button>
+    <button ng-if="uniqFilterOptions.indexOf('Image') > -1"     ng-click="filterSearchResults('Image')" 
+        type="button" class="btn btn-default pe-type-Image"     title="Filter image">Image</button>
+    <button ng-if="uniqFilterOptions.indexOf('Equation') > -1"  ng-click="filterSearchResults('Equation')" 
+        type="button" class="btn btn-default pe-type-Equation"  title="Filter equation">Equation</button>
+    <button ng-if="uniqFilterOptions.indexOf('Section') > -1"   ng-click="filterSearchResults()" 
+        type="button" class="btn btn-default pe-type-Section"   title="Filter section">Section</button>
+    <button ng-if="uniqFilterOptions.indexOf('Comment') > -1"   ng-click="filterSearchResults('Comment')" 
+        type="button" class="btn btn-default pe-type-Comment"   title="Filter comment">Comment</button> -->
+</div><br><br>
 <div class="search-results" ng-show="searchResults.length > 0">
     <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
         <div class="elem-name-wrapper">
-            <span class="{{ getTypeClass(elem) }}">
-            <a class="elem-name" ng-click="userResultClick(elem, 'name')"></span>{{elem.name}}</a>
+            <span class="{{ getTypeClass(elem) }}"></span>
+            <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
             <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')">
                 <mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
             </a>

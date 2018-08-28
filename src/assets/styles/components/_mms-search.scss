@@ -206,6 +206,24 @@
     }
   }
 
+  .ve-btn-group-default {
+    @include button-variant($ve-light-text, $white, $ve-silver-darker-3);
+    text-transform: initial;
+    letter-spacing: normal;
+    line-height: 1.6;
+    .fa {
+      padding-right: 4px;
+      font-size: 16px;
+    }
+  }
+  .btn-group {
+    .ve-btn-group-default.active, .ve-btn-group-default:active {
+      color: #f0f0f0;
+      background-color: $brand_base;
+      border-color: darken($brand_base,10%);
+    }
+  }
+
 /*------------------------------------------------------------------
 4. Empty state
 -------------------------------------------------------------------*/

@@ -17,55 +17,81 @@ angular.module('mms.directives')
  */
 function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
+    return {
+        restrict: 'E',
+        template: template,
+        link: mmsSearchLink,
+        scope: {
+            mmsOptions: '<',
+            mmsProjectId: '@',
+            mmsRefId: '@'
+        }
+    };
 
-    var mmsSearchLink = function(scope, element, attrs) {
-        scope.paginationCache = [];
-        scope.searchClass = "";
-        scope.proposeClass = "";
-        scope.filter = '';
-        scope.mainSearch = {searchText:'', searchType:{id:'all', label:'All Fields'}, selectedSearchMetatypes: []};
-        scope.stringQuery = scope.mainSearch.searchText;
-        scope.facet = '$';
-        scope.filterQuery = {query: ""};
-        scope.currentPage = 0;
-        scope.itemsPerPage = 50;
-        scope.showSearchResultProps = false;
-        scope.switchText = 'More';
-        scope.limitForProps = 6;
-        scope.advanceSearch = false;
-        scope.advanceSearchRows = [];
+
+    function mmsSearchLink(scope, element, attrs) {
+        // Main search variables
+        var baseSearchResults = [];
+        scope.searchLoading = false;
+        scope.mainSearch = {
+            searchText: '',
+            searchType: {
+                id: 'all',
+                label: 'All Fields'
+            },
+            selectedSearchMetatypes: []
+        };
         scope.docsviews = {
             selected: false
         };
         scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
-        scope.closeSearch = function() {
+
+        // Search resulte settings
+        scope.activeFilter = [];
+
+        // Pagination settings
+        scope.paginationCache = [];
+        scope.currentPage = 0;
+        scope.itemsPerPage = 50;
+
+        // Advanced search settings
+        scope.advanceSearch = false;
+        scope.advanceSearchRows = [];
+        scope.stringQuery = scope.mainSearch.searchText; 
+
+        // View propery settings
+        scope.showSearchResultProps = false;
+        scope.switchText = 'More';
+        scope.limitForProps = 6;
+
+        scope.closeSearch = function () {
             $window.history.back();
         };
 
         // Set functions
         ProjectService.getProjectMounts(scope.mmsProjectId, scope.refId); //ensure project mounts object is cached
         // Function used to get string value of metatype names for advanced search
-        var getMetatypeSelection = function(id) {
+        var getMetatypeSelection = function (id) {
             var mainElement = angular.element(id);
             return mainElement.find('div').attr('value');
         };
 
         // Get metatypes for dropdown options
-        var getMetaTypes = function() {
+        var getMetaTypes = function () {
             scope.metatypeSearch = "fa fa-spin fa-spinner";
             ProjectService.getMetatypes(scope.mmsProjectId, scope.refId)
-            .then(function(data) {
-                // cache metatypes
-                scope.metatypeList = data;
-            }, function(reason) {
-                growl.error("Search Error: " + reason.message);
-            }).finally(function() {
-                scope.metatypeSearch = "";
-            });
+                .then(function (data) {
+                    // cache metatypes
+                    scope.metatypeList = data;
+                }, function (reason) {
+                    growl.error("Search Error: " + reason.message);
+                }).finally(function () {
+                    scope.metatypeSearch = "";
+                });
         };
         getMetaTypes();
 
-        scope.getTypeClass = function(element) {
+        scope.getTypeClass = function (element) {
             // Get Type
             scope.elementType = ViewService.getElementType(element);
             scope.elementTypeClass = '';
@@ -78,13 +104,30 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
         };
 
         // Set search options
-        scope.fieldTypeList = [
-            { id:'all', label:'All Fields' },
-            { id:'name', label:'Name' },
-            { id:'documentation', label:'Documentation' },
-            { id:'value', label:'Value' },
-            { id:'id', label:'ID' },
-            { id:'metatype', label:'Metatype' }
+        scope.fieldTypeList = [{
+                id: 'all',
+                label: 'All Fields'
+            },
+            {
+                id: 'name',
+                label: 'Name'
+            },
+            {
+                id: 'documentation',
+                label: 'Documentation'
+            },
+            {
+                id: 'value',
+                label: 'Value'
+            },
+            {
+                id: 'id',
+                label: 'ID'
+            },
+            {
+                id: 'metatype',
+                label: 'Metatype'
+            }
         ];
 
         scope.operatorList = ['And', 'Or', 'And Not'];
@@ -119,6 +162,40 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             }
         };
 
+        // Filter options
+        scope.filterSearchResults = function (type) {
+            var tempArr = _.clone(scope.activeFilter);
+            if (_.include(tempArr, type) ) {
+                _.pull(tempArr, type);
+            } else {
+                tempArr.push(type);
+            }
+            scope.activeFilter = tempArr;
+        };
+
+        scope.getActiveFilterClass = function (item) {
+            return _.includes(scope.activeFilter, item);
+        };
+
+        scope.$watch('activeFilter', function (newVal) {
+            if (!scope.activeFilter.length) {
+                scope.searchResults = baseSearchResults;
+            } else {
+                scope.searchResults = _.filter(baseSearchResults, function (item) {
+                    return _.includes(scope.activeFilter, ViewService.getElementType(item));
+                });
+            }
+        });
+
+        /* //TODO have a separate array that tracks the active filters 
+         * once user clicks on a new filter, get main results (cacheing may make it easier)
+         * and filter all that are not in active filters
+         */
+        var findRefineOptions = function (results) {
+            var presentationElements = _.map(results, ViewService.getElementType);
+            var uniqTypes = _.uniq(presentationElements);
+            scope.filterOptions = _.difference(uniqTypes, [false, undefined, '']);
+        };
 
         scope.$watch('searchResults', function (newVal) {
             if (!newVal)
@@ -260,27 +337,6 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSearch#setFilterFacet
-         * @methodOf mms.directives.directive:mmsSearch
-         *
-         * @description
-         * Activate selected filter facet button and use angularJS built-in filter component to filter
-         * on search results. Use object expression to filter based on filter type.
-         *
-         * @param {string} filterFacet filter facet type i.e. all, name, id
-         */
-        scope.setFilterFacet = function(filterFacet) {
-            if (filterFacet === 'all') {
-                scope.facet = '$';
-            } else {
-                scope.facet = filterFacet;
-            }
-            angular.element('.search-filter-type button').removeClass('active');
-            angular.element('.btn-filter-facet-' + filterFacet).addClass('active');
-        };
-
-        /**
-         * @ngdoc function
          * @name mms.directives.directive:mmsSearch#search
          * @methodOf mms.directives.directive:mmsSearch
          *
@@ -293,7 +349,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
          * @param {number} numItems number of items to return per page
          */
         scope.search = function (query, page, numItems) {
-            scope.searchButtonIcon = "fa fa-spin fa-spinner";
+            scope.searchLoading = true;
             var queryOb = buildQuery(query);
             queryOb.from = page * numItems + page;
             queryOb.size = numItems;
@@ -321,7 +377,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                 }, function (reason) {
                     growl.error("Search Error: " + reason.message);
                 }).finally(function () {
-                    scope.searchButtonIcon = "";
+                    scope.searchLoading = false;
                 });
         };
 
@@ -640,28 +696,17 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             scope.itemsPerPage = scope.mmsOptions.itemsPerPage;
         }
         scope.emptyDocTxt = scope.mmsOptions.emptyDocTxt;
-        scope.userResultClick = function(elem, property) {
+        scope.userResultClick = function (elem, property) {
             if (scope.mmsOptions.callback) {
                 scope.mmsOptions.callback(elem, property);
             }
         };
-        scope.userRelatedClick = function(event, doc, view, elem) {
+        scope.userRelatedClick = function (event, doc, view, elem) {
             event.preventDefault();
             event.stopPropagation();
             if (scope.mmsOptions.relatedCallback)
                 scope.mmsOptions.relatedCallback(doc, view, elem);
         };
-    };
+    }
 
-
-    return {
-        restrict: 'E',
-        template: template,
-        link: mmsSearchLink,
-        scope: {
-            mmsOptions: '<',
-            mmsProjectId: '@',
-            mmsRefId: '@'
-        }
-    };
 }
