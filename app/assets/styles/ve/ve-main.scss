@@ -16,6 +16,7 @@
 @import "layout/_ve-footer.scss";
 @import "layout/_ve-no-panes.scss";
 @import "layout/_ve-table-filter.scss";
+@import "layout/_ve-tabs.scss";
 /* Third party customizations */
 @import "thirdparty/_autosave-plugin.scss";
 
@@ -70,22 +71,21 @@ div.tooltip-inner {
     2.3.1 Wide Dropdown
     2.3.2 Narrow Dropdown
     2.3.3 Fixed Content Dropdown
-  2.4 Tab System
-    2.4.1 Light tab system
-    2.4.2 Dark Tab system
-  2.5 Banners
-  2.6 Input
-    2.6.1 Light input
-    2.6.2 Minor dark input
-  2.7 Animation
-  2.8 Special Icons
-    2.8.1 Section
+  2.4 Banners
+  2.5 Input
+    2.5.1 Light input
+    2.5.2 Minor dark input
+  2.6 Animation
+  2.7 Special Icons
+    2.7.1 Section
 3. Table filtering
 4. Modal fixes
 5. 404 bookmark
 6. Open document button
 7. Right pane
 8. Growl notification
+9. Well Customization
+10 Custom grid
 
 -------------------------------------------------------------------*/
 
@@ -333,9 +333,8 @@ h4{
     position: relative;
   }
 
-  /*Clear hover on list items with buttons in them and disabled branches*/
-  .dropdown-menu li.button-item:hover,
-  .dropdown-menu li.branch-disabled:hover,{
+  /*Clear hover on disabled branches*/
+  .dropdown-menu li.branch-disabled:hover{
     background-color: $ve-slate-lighter-1;
   }
 
@@ -570,114 +569,7 @@ span.fixed-content-dropdown{
   padding-bottom:12px;
 }
 
-/*------------------------------------------------------------------
-  2.4 Tab System
--------------------------------------------------------------------*/
 
-/*------------------------------------------------------------------
-    2.4.1 Dark Tabs
--------------------------------------------------------------------*/
-
-.ve-dark-dropdown-wide,
-.ve-dark-dropdown-nav{
-  .nav-tabs {
-    background-color: $ve-slate-base;
-  }
-
-  .list-with-tabs .button-item {
-    background-color: $ve-slate-base;
-  }
-
-  .nav-tabs > li.uib-tab {
-    width: 50%;
-    text-align: center;
-  }
-
-  .nav-tabs > li.uib-tab:hover,
-  .list-with-tabs li.button-item:hover {
-    background-color: $ve-slate-base;
-  }
-
-  .nav-tabs > li.uib-tab:hover,
-  .list-with-tabs li.button-item:hover {
-    background-color: $ve-slate-base;
-  }
-
-  .nav-tabs > li.active.uib-tab > a {
-    background-color: $ve-slate-base;
-    border: none;
-    border-bottom: 3px solid $ve-teal-base;
-    color: white;
-    margin: 0;
-  }
-
-  .nav-tabs > li.uib-tab > a {
-    background-color: $ve-slate-base;
-    border: none;
-    border-bottom: 3px solid $ve-slate-base;
-    color: $ve-white-text-lighter-2;
-    margin: 0;
-  }
-
-  li.uib-tab > a:hover {
-    background-color: $ve-slate-base;
-    border-bottom: 3px solid $ve-teal-darker-1;
-  }
-}
-
-/*------------------------------------------------------------------
-    2.4.2 Light Tabs
--------------------------------------------------------------------*/
-
-.ve-light-tabs {
-
-  background-color: $ve-silver-lighter-0;
-
-  .nav-tabs > li.uib-tab {
-    text-align: center;
-  }
-
-  .nav-tabs > li {
-    margin: 0 8px;
-  }
-
-  .nav-tabs > li.active.uib-tab > a{
-    border: none;
-    border-bottom: 3px solid $ve-teal-lighter-1;
-    margin: 0;
-    font-weight: 600;
-    color: #333;
-  }
-
-  .nav-tabs > li.uib-tab > a {
-    border: none;
-    border-bottom: 3px solid $ve-silver-lighter-0;
-    color: #333;
-    margin: 0;
-    background-color: $ve-silver-lighter-0;
-    line-height: 21px;
-  }
-
-  li.uib-tab > a:hover {
-    background-color: $ve-slate-base;
-    border-bottom: 3px solid $ve-teal-lighter-2;
-  }
-
-  .nav > li > a:focus,
-  .nav > li > a:hover {
-    background-color: $ve-silver-lighter-0;
-    border-bottom: 3px solid $ve-teal-lighter-1;
-  }
-
-  .fa{
-    opacity: .4;
-    padding-right: 6px;
-  }
-}
-
-.modal-body .ve-light-tabs{
-  margin:-15px -15px 20px;
-}
 
 /*------------------------------------------------------------------
   2.5 Banners
@@ -709,7 +601,13 @@ span.fixed-content-dropdown{
   margin: 2px 10px;
   width: calc(100% - 20px);
   font-weight: normal;
+
+  &:focus{
+    border-color: $ve-teal-lighter-2;
+    box-shadow: inset 0 1px 1px $ve-teal-lighter-3, 0 0 8px $ve-teal-lighter-3;
+  }
 }
+
 
 /*------------------------------------------------------------------
     2.6.2 Minor dark input
@@ -1143,3 +1041,43 @@ span.inline-btn-label{
   -o-transition:0.1s linear all;
   transition:0.1s linear all;
 }
+
+/*------------------------------------------------------------------
+9. Well customization
+-------------------------------------------------------------------*/
+.well{
+  clear: both;
+  border: 1px solid $ve-silver-darker-1;
+  border-radius: 3px;
+  background-color: $ve-silver-lighter-1;
+  padding: 12px;
+  margin: 18px 0;
+
+  &.empty-state{
+    padding-top: 20px;
+    padding-bottom: 30px;
+  }
+}
+
+
+/*------------------------------------------------------------------
+10. Custom grids 
+-------------------------------------------------------------------*/
+
+//Grid with narrower gutter so input can be wider
+.row.narrow-gutter-row{
+  margin-left: -3px;
+  margin-right: -3px;
+
+  .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {
+    padding-right: 3px;
+    padding-left: 3px;
+  }
+  .ve-plain-input{
+    margin: 0;
+    width: 100%;
+  }
+}
+
+
+

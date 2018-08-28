@@ -15,7 +15,7 @@
   a.dropdown-toggle{
     @include border-radius(4px 0 0 4px);
     border: 1px solid transparent;
-    color: darken($tertiary-grey, 12%);
+    color: $tertiary-grey;
   }
 
   //Padding, font size, and line height match for the toggle and dropdown
