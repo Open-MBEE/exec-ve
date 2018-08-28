@@ -1145,9 +1145,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
-    var getPresentationElementType = function (elementOb) {
-        if (elementOb.type === 'InstanceSpecification') {
-            return _.findKey(TYPE_TO_CLASSIFIER_ID, function(o) { return o === elementOb.classifierIds[0]; });
+    var getPresentationElementType = function (instanceSpec) {
+        if (instanceSpec.type === 'InstanceSpecification') {
+            if (isSection(instanceSpec)) {
+                return 'Section';
+            }  else if (isTable(instanceSpec)) {
+                return 'Table';
+            } else if (isFigure(instanceSpec)) {
+                return 'Image';
+            } else if (isEquation(instanceSpec)) {
+                return 'Equation';
+            } else if (instanceSpec.specification && instanceSpec.specification.value) {
+                // var type = JSON.parse(instanceSpec.specification.value).type;
+                // return type.toLowerCase();
+                return JSON.parse(instanceSpec.specification.value).type;
+            }
         }
         return false;
     };
