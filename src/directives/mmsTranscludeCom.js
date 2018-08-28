@@ -84,7 +84,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             } else {
                 domElement[0].innerHTML = doc;
             }
-            if (MathJax) {
+            if (MathJax && !scope.mmsGenerateForDiff) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             }
             scope.recompileScope = scope.$new();
@@ -188,7 +188,8 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsRefId: '@',
             mmsCommitId: '@',
             nonEditable: '<',
-            mmsCfLabel: '@'
+            mmsCfLabel: '@',
+            mmsGenerateForDiff: '<'
         },
         require: ['?^mmsView', '?^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeComCtrl],

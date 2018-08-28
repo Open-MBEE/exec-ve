@@ -141,6 +141,9 @@
                 <input type="checkbox" ng-model="docsviews.selected"> Search for Views and Documents
             </div>
         </div>
+        <span class="close-button" ng-if="mmsOptions.closeable" tooltip-placement="bottom" uib-tooltip="Close Search" ng-click="closeSearch()">
+            <i class="fa fa-times"></i>
+        </span>
 
         <!-- <div ng-show="advancedSearchResults" class="mms-search-input"> -->
             <!-- advanced search query input disabled -->

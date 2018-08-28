@@ -1,7 +1,7 @@
 # angular-mms
 
 ## Usage
-https://github.com/Open-MBEE/EMS-Webapp/blob/opensource/Documents/ViewEditorUserGuide-OpenMBEE.pdf
+https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 
 ## File Structure
 * /package.json - Manifest file specifying node module dependencies required to build and bundle the app

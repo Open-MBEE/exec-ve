@@ -1042,6 +1042,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getTreeType = function(instanceSpec) {
         if (isSection(instanceSpec))
             return 'section';
+        if (instanceSpec.specification && instanceSpec.specification.value && JSON.parse(instanceSpec.specification.value).excludeFromList) {
+            return null;
+        }
         if (isTable(instanceSpec))
             return 'table';
         if (isFigure(instanceSpec))

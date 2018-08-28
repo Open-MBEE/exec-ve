@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSearch', ['CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
+.directive('mmsSearch', ['$window', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -15,7 +15,7 @@ angular.module('mms.directives')
  * @scope
  *
  */
-function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
+function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
 
     var mmsSearchLink = function(scope, element, attrs) {
@@ -38,6 +38,9 @@ function mmsSearch(CacheService, ElementService, ProjectService, UtilsService, V
             selected: false
         };
         scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
+        scope.closeSearch = function() {
+            $window.history.back();
+        };
 
         // Set functions
         ProjectService.getProjectMounts(scope.mmsProjectId, scope.refId); //ensure project mounts object is cached

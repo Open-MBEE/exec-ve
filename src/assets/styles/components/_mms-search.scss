@@ -25,6 +25,14 @@
       box-shadow: 0 4px 4px -4px rgba(0,0,0,.1);
       padding-bottom: 0;
     }
+
+    .close-button {
+      position: absolute;
+      top: 1em;
+      right: 1em;
+      font-size: 1.5em;
+      color: gray;
+    }
   }
 
   /*Spacing for count of results at top of results*/
@@ -186,7 +194,7 @@
     .elem-specification,
     .elem-documentation,
     .elem-properties-wrapper > table > tbody > tr > td:first-child {
-      padding-left: 12px;
+      padding-left: 16px;
     }
     .ellipses {
       color: $brand_base;

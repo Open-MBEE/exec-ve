@@ -401,6 +401,37 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 instance.config.autosave = {enableAutosave: false};
             }
 
+            instance.on( 'instanceReady', function() {
+                addCkeditorHtmlFilterRule(instance);
+            } );
+
+            function addCkeditorHtmlFilterRule(instance) {
+                instance.dataProcessor.htmlFilter.addRules({
+                    elements: {
+                        $: function (element) {
+                            if (element.name === 'script') {
+                                element.remove();
+                                return;
+                            }
+                            
+                            if (element.name.startsWith('mms-')) {
+                                if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    element.replaceWithChildren();
+                                    return;
+                                }
+                            }
+
+                            var attributesToDelete = Object.keys(element.attributes).filter(function(attrKey) {
+                                return attrKey.startsWith('ng-');
+                            });
+                            attributesToDelete.forEach(function(attrToDelete) {
+                                delete element.attributes[attrToDelete];
+                            });
+                        }
+                    }
+                });
+            }
+
             instance.on( 'init', function(args) {
                 ngModelCtrl.$setPristine();
             });
