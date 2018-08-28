@@ -961,14 +961,14 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         }
     };
 
-    function focusOnEditorAfterAddingWidgetTag(editor) {
+    var focusOnEditorAfterAddingWidgetTag = function(editor) {
         var element = editor.widgets.focused.element.getParent();
         var range = editor.createRange();
         if(range) {
             range.moveToClosestEditablePosition(element, true);
             range.select();
         }
-    }
+    };
 
     return {
         save: save,
@@ -991,7 +991,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         reopenUnsavedElts: reopenUnsavedElts,
         checkForDuplicateInstances: checkForDuplicateInstances,
         fixImgSrc: fixImgSrc,
-        focusOnEditorAfterAddingWidgetTag: focusOnEditorAfterAddingWidgetTag
+        focusOnEditorAfterAddingWidgetTag: focusOnEditorAfterAddingWidgetTag,
         toggleLeftPane: toggleLeftPane
     };
 
