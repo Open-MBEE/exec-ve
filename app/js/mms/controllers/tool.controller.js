@@ -128,6 +128,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
         $scope.specInfo.mmsDisplayOldContent = displayOldContent;
+        if($scope.show.element) {
+            $rootScope.ve_tbApi.select('element-viewer');
+        }
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
         }
