@@ -17,9 +17,18 @@ angular.module('mms.directives')
  * @description
  *  Compares a element at two different refs/commits and generates a pretty diff.
  * ## Example
- * <mms-diff-attr mms-element-id="" mms-attr="name|doc|val"
- * (mms-project-id="" mms-base-ref-id="" mms-compare-ref-id=""
+ * <mms-diff-attr mms-base-element-id="" mms-attr="name|doc|val"
+ * (mms-base-project-id="" mms-base-ref-id="" mms-compare-ref-id=""
  * mms-base-commit-id="" mms-compare-commit-id="")></mms-diff-attr>
+ *
+ * @param {string} mmsAttr Attribute to use -  ie `name`, `doc` or `value`
+ * @param {string} mmsBaseElementId The id of the element to do comparison of
+ * @param {string} mmsBaseProjectId Base project ID for original/base element
+ * @param {string} mmsCompareProjectId Compare project ID for compare element
+ * @param {string=master} mmsBaseRefId Base ref ID or master, defaults to current ref or master
+ * @param {string=master} mmsCompareRefId Compare ref ID or master, defaults to base ref ID
+ * @param {string=latest} mmsBaseCommitId Base commit id, default is latest
+ * @param {string=latest} mmsCompareCommitId Compare commit id, default is latest
  */
 function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, ElementService) {
     var template = $templateCache.get('mms/templates/mmsDiffAttr.html');
@@ -28,26 +37,29 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
         restrict: 'E',
         scope: {
             mmsAttr: '@',
-            mmsProjectId: '@',
+
+            mmsBaseProjectId: '@',
+            mmsCompareProjectId: '@',
+
             mmsBaseRefId: '@',
-            mmsBaseCommitId: '@',
             mmsCompareRefId: '@',
+
+            mmsBaseCommitId: '@',
             mmsCompareCommitId: '@',
-            mmsElementId: '@'
+
+            mmsBaseElementId: '@',
+            mmsCompareElementId: '@'
         },
         template: template,
         link: mmsDiffAttrLink,
-        controller: ['$scope', mmsDiffAttrCtrl]
+        require: '?^^mmsView'
     };
 
-    function mmsDiffAttrLink(scope, element, attrs) {}
-
-    function mmsDiffAttrCtrl($scope) {
-        $scope.diffFinish = function() {
-            $scope.diffLoading = false;
-        };
-        $scope.$watch('mmsBaseCommitId', _commitIdChangeHandler);
-        $scope.$watch('mmsCompareCommitId', _commitIdChangeHandler);
+    function mmsDiffAttrLink(scope, element, attrs, mmsViewCtrl) {
+        var viewOrigin = mmsViewCtrl ? mmsViewCtrl.getElementOrigin() : null;
+        scope.diffFinish = function() { scope.diffLoading = false; };
+        scope.$watch('mmsBaseCommitId', _commitIdChangeHandler);
+        scope.$watch('mmsCompareCommitId', _commitIdChangeHandler);
 
         var baseNotFound = false;
         var compNotFound = false;
@@ -57,29 +69,37 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
         _setupDiff();
 
         function _setupDiff() {
-            $scope.diffLoading = true;
-            baseNotFound = false;
-            compNotFound = false;
-            baseDeleted = false;
-            compDeleted = false;
+            scope.diffLoading = true;
 
-            var projectId = $scope.mmsProjectId;
-            var elementId = $scope.mmsElementId;
+            var baseProjectId = scope.mmsBaseProjectId || (viewOrigin ? viewOrigin.projectId : null);
+            var compareProjectId = scope.mmsCompareProjectId || baseProjectId;
 
-            var baseRefId = $scope.mmsBaseRefId || 'master';
-            var baseCommitId = $scope.mmsBaseCommitId || 'latest';
+            var baseRefId = scope.mmsBaseRefId || (viewOrigin ? viewOrigin.refId : 'master');
+            var compareRefId = scope.mmsCompareRefId || baseRefId;
 
-            var compareRefId = $scope.mmsCompareRefId || baseRefId;
-            var compareCommitId = $scope.mmsCompareCommitId || 'latest';
+            var baseCommitId = scope.mmsBaseCommitId || 'latest';
+            var compareCommitId = scope.mmsCompareCommitId || 'latest';
 
-            if (baseCommitId === compareCommitId) {
-                $scope.message = ' Comparing same version.';
-                $scope.diffLoading = false;
-                return;
-            }
+            var baseElementId = scope.mmsBaseElementId;
+            var compareElementId = scope.mmsCompareElementId || baseElementId;
 
-            var baseElementPromise = _getElementData(projectId, baseRefId, baseCommitId, elementId);
-            var comparedElementPromise = _getElementData(projectId, compareRefId, compareCommitId, elementId);
+            _checkSameElement({
+                baseElementId: baseElementId,
+                compareElementId: compareElementId,
+
+                baseCommitId: baseCommitId,
+                compareCommitId: compareCommitId,
+
+                baseRefId: baseRefId,
+                compareRefId: compareRefId,
+
+                baseProjectId: baseProjectId,
+                compareProjectId: compareProjectId
+            });
+
+
+            var baseElementPromise = _getElementData(baseProjectId, baseRefId, baseCommitId, baseElementId);
+            var comparedElementPromise = _getElementData(compareProjectId, compareRefId, compareCommitId, compareElementId);
 
             $q.allSettled([baseElementPromise, comparedElementPromise]).then(function(responses) {
                 var message;
@@ -87,7 +107,7 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                 var respForBaseElement = responses[0];
                 if (respForBaseElement.state === 'fulfilled') {
                     _fullyRender(respForBaseElement.value, function(baseElementHtml) {
-                        $scope.baseElementHtml = baseElementHtml;
+                        scope.baseElementHtml = baseElementHtml;
                     });
                 } else {
                     message = respForBaseElement.reason.data.message;
@@ -95,14 +115,14 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                         baseDeleted = true;
                     } else {
                         baseNotFound = true;
-                        $scope.baseElementHtml = '';
+                        scope.baseElementHtml = '';
                     }
                 }
 
                 var respForComparedElement = responses[1];
                 if(respForComparedElement.state === 'fulfilled') {
                     _fullyRender(respForComparedElement.value, function(comparedElementHtml) {
-                        $scope.comparedElementHtml = comparedElementHtml;
+                        scope.comparedElementHtml = comparedElementHtml;
                     });
                 } else {
                     message = respForComparedElement.reason.data.message;
@@ -110,11 +130,11 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                         compDeleted = true;
                     } else {
                         compNotFound = true;
-                        $scope.comparedElementHtml = '';
+                        scope.comparedElementHtml = '';
                     }
                 }
 
-                $scope.message = _checkElement();
+                scope.message = _checkElementExistence();
             });
         }
 
@@ -134,7 +154,7 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
         }
 
         function _fullyRender(data, finishRenderCb) {
-            var element = _createElement($scope.mmsAttr, data.id, data._projectId, data._refId, data._commitId);
+            var element = _createElement(scope.mmsAttr, data.id, data._projectId, data._refId, data._commitId);
             var handler = $interval(function() {
                 var baseHtml = element.html();
                 if (!baseHtml.includes("(loading...)")) {
@@ -160,7 +180,7 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             return $compile(html)(newScope);
         }
 
-        function _checkElement() {
+        function _checkElementExistence() {
             var message = '';
             if (baseNotFound && compNotFound) {
                 message = ' Both base and compare elements do not exist.';
@@ -177,6 +197,15 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                 message = ' Comparison element has been deleted.';
             }
             return message;
+        }
+
+        function _checkSameElement(data) {
+            if ( (data.baseCommitId !== 'latest' && data.baseCommitId === data.compareCommitId ) ||
+                (data.baseCommitId === 'latest' && data.baseCommitId === data.compareCommitId && data.baseElementId === data.compareElementId && data.baseProjectId === data.compareProjectId && data.baseRefId === data.compareRefId )) {
+                scope.message = ' Comparing same version.';
+                scope.diffLoading = false;
+                return;
+            }
         }
     }
 }
