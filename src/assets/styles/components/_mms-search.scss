@@ -28,10 +28,10 @@
 
     .close-button {
       position: absolute;
-      top: 1em;
-      right: 1em;
+      top: .5em;
+      right: .5em;
       font-size: 1.5em;
-      color: gray;
+      color: $tertiary_grey;
     }
   }
 
@@ -232,7 +232,7 @@
       padding: 0;
       position:absolute;
       right: 6px;
-      top: 0;
+      top: -.1em;
       font-size: 14px;
     }
   }
