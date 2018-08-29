@@ -157,8 +157,11 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         $http.put(URLService.getPutElementsURL(reqOb), request)
         .then(function(response) {
             var data = response.data.elements;
-            for (var i = 0; i < data.length; i++) {
-                existing.push(cacheElement(reqOb, data[i]));
+            var i;
+            if (data && data.length > 0) {
+                for (i = 0; i < data.length; i++) {
+                    existing.push(cacheElement(reqOb, data[i]));
+                }
             }
             var deleted = response.data.deleted;
             if (deleted && deleted.length > 0) {
