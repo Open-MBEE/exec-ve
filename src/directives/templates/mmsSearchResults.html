@@ -24,7 +24,7 @@
         type="button" class="btn btn-default pe-type-Comment"   title="Filter comment">Comment</button> -->
 </div><br><br>
 <div class="search-results" ng-show="searchResults.length > 0">
-    <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
+    <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults)">
         <div class="elem-name-wrapper">
             <span class="{{ getTypeClass(elem) }}"></span>
             <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>

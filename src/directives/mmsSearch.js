@@ -165,7 +165,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
         // Filter options
         scope.filterSearchResults = function (type) {
             var tempArr = _.clone(scope.activeFilter);
-            if (_.include(tempArr, type) ) {
+            if (_.includes(tempArr, type) ) {
                 _.pull(tempArr, type);
             } else {
                 tempArr.push(type);
@@ -187,10 +187,6 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             }
         });
 
-        /* //TODO have a separate array that tracks the active filters 
-         * once user clicks on a new filter, get main results (cacheing may make it easier)
-         * and filter all that are not in active filters
-         */
         var findRefineOptions = function (results) {
             var presentationElements = _.map(results, ViewService.getElementType);
             var uniqTypes = _.uniq(presentationElements);
@@ -373,7 +369,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                         // scope.advanceSearch = !scope.advanceSearch;
                         scope.advancedSearchResults = true;
                     }
-                    scope.refineOptions = findRefineOptions(data);
+                    scope.refineOptions = findRefineOptions(baseSearchResults);
                 }, function (reason) {
                     growl.error("Search Error: " + reason.message);
                 }).finally(function () {
