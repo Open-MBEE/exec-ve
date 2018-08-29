@@ -293,7 +293,7 @@ nav.project-level-header {
 
 
 /*Hide breadcrumbs for mobile*/
-@media (max-width: 1000px){
+@media (max-width: 900px){
   .breadcrumbs {
     li {
       a, span{
@@ -317,7 +317,7 @@ nav.project-level-header {
 }
 
 /*Hide all but the first 2 breadcrumbs and add */
-@media (max-width: 1000px) and (min-width: 700px){
+@media (max-width: 900px) and (min-width: 700px){
   .breadcrumbs{
     li:nth-child(3):after{
       content: "\203A ...";
