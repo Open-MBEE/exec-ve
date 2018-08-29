@@ -50,7 +50,7 @@
                     <input class="search-input disabled-input" type="text" id="searchQuery" ng-model="stringQuery" disabled />
                 </div>
                 <button class="btn btn-primary" type="button" ng-click="newSearch(mainSearch)">
-                    <span class="btn-text">Search</span> <i class="{{searchButtonIcon}}"></i>
+                    <span class="btn-text">Search</span> <i ng-if="searchLoading" class="fa fa-spin fa-spinner"></i>
                 </button>
             </form>
 
