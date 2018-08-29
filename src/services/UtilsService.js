@@ -484,7 +484,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      */
     var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
         var result = ['<table class="table-bordered table-condensed">'];
-        if (ApplicationService.getState().inDoc && !table.isInformal) {
+        if (ApplicationService.getState().inDoc && !table.excludeFromList) {
             result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
         } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
@@ -701,7 +701,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var result = '<div class="toc"><h1 class="header">Table of Contents</h1>';
         var root_branch = tree[0].branch;
         result += makeHtmlTOCChild(root_branch, true);
-        result += '</div>'; 
+        result += '</div>';
         return result;
     };
 
@@ -763,9 +763,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      */
     var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
         var ob = {
-            tables: '<div class="tot"><h1 class="header">List of Tables</h1><ul>',
-            figures: '<div class="tof"><h1 class="header">List of Figures</h1><ul>',
-            equations: '<div class="tof"><h1 class="header">List of Equations</h1><ul>',
+            tables: '',
+            figures: '',
+            equations: '',
             tableCount: 0,
             figureCount: 0,
             equationCount: 0
@@ -781,9 +781,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
             }
         }
-        ob.tables += '</ul></div>';
-        ob.figures += '</ul></div>';
-        ob.equations += '</ul></div>';
+        ob.tables    = ob.tables.length    ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>'    + ob.tables    + '</ul></div>' : '';
+        ob.figures   = ob.figures.length   ? '<div class="tof"><h1 class="header">List of Figures</h1><ul>'   + ob.figures   + '</ul></div>' : '';
+        ob.equations = ob.equations.length ? '<div class="tof"><h1 class="header">List of Equations</h1><ul>' + ob.equations + '</ul></div>' : '';
         return ob;
     };
 
@@ -1083,49 +1083,87 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @description
      * Typeset HTML to PDF (resource: https://www.princexml.com/)
      *
-     * @param {string} header header slot on doc
-     * @param {string} footer footer slot on doc
-     * @param {string} dnum dnumber slot on doc
-     * @param {string} tag ve tag name if available
-     * @param {string} site the site name
      * @param {string} htmlFlag user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not(<-- this comment needs to be approved by Shakeh)
      * @param {string} landscape user input taken from the printConfirm modal
-     * @param {string} meta $scope.meta (in controller.utils.js) = {
+     * @param {string} meta metadata about document/view {
                     'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
                     'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
                 };
      * @returns {string} document/view content string to be passed to the server for conversion
      */
-    var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
+    var getPrintCss = function(htmlFlag, landscape, meta) {
+        var ret = "/*------------------------------------------------------------------\n" +
+                "Custom CSS Table of Contents\n" +
+                "1. Images\n" +
+                "2. Tables\n" +
+                "3. Typography\n" +
+                "   3.1 Diff\n" +
+                "   3.2 Errors\n" +
+                "4. Figure Captions\n" +
+                "5. Table of Contents\n" +
+                "6. Page Layout\n" +
+                "7. Headers and Footers\n" +
+                "8. Signature Box\n" +
+                "9. Bookmark Level\n" +
+                "------------------------------------------------------------------*/\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "1. Images\n" +
+                "------------------------------------------------------------------*/\n" +
+                "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
                 "img.image-center {display: block;}\n" +
                 "figure img {display: block;}\n" +
-                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
-                ".chapter {page-break-before: always}\n" + 
-                ".chapter h1.view-title {font-size: 20pt; }\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "2. Tables\n" +
+                "------------------------------------------------------------------*/\n" +
+                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 "table {width: 100%; border-collapse: collapse;}\n" + 
                 "table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}\n" +
                 "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
                 "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
                 "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
                 "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
-                //"table p {word-break: break-all;}\n" + 
-                ".signature-box td.signature-name-styling {width: 60%;}\n" + 
-                ".signature-box td.signature-space-styling {width: 1%;}\n" + 
-                ".signature-box td.signature-date-styling {width: 39%;}\n" + 
                 "th {background-color: #f2f3f2;}\n" + 
+                //"table p {word-break: break-all;}\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "3. Typography\n" +
+                "------------------------------------------------------------------*/\n" +
                 "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
                 "h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
                 ".ng-hide {display: none;}\n" +
+                ".chapter h1.view-title {font-size: 20pt; }\n" + 
                 "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "   3.1 Diff\n" +
+                "------------------------------------------------------------------*/\n" +
+                "ins, .ins {color: black; background: #dafde0;}\n" +
+                "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
+                ".match,.textdiff span {color: gray;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "   3.2 Errors\n" +
+                "------------------------------------------------------------------*/\n" +
+                ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "4. Figure Captions\n" +
+                "------------------------------------------------------------------*/\n" +
                 "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
+                "table, figure {margin-bottom: 10px;}\n" +
                 ".mms-equation-caption {float: right;}\n" +
-                "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
+                "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "5. Table of Contents\n" +
+                "------------------------------------------------------------------*/\n" +
                 ".toc, .tof, .tot {page-break-after:always;}\n" +
                 ".toc {page-break-before: always;}\n" +
                 ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
-                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" + 
+                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" +
                 ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
                 ".tof ul, .tot ul {padding-left:0;}\n" +
                 ".toc ul {padding-left:4em;}\n" +
@@ -1133,20 +1171,35 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
                 ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
-                ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
-                "p, div {widows: 2; orphans: 2;}\n" +
-                "table, figure {margin-bottom: 10px;}\n" +
-                "ins, .ins {color: black; background: #dafde0;}\n" +
-                "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
-                ".match,.textdiff span {color: gray;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "6. Page Layout\n" +
+                "------------------------------------------------------------------*/\n" +
                 "@page {margin: 0.5in;}\n" + 
-                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
                 "@page landscape {size: 11in 8.5in;}\n" +
-                ".landscape {page: landscape;}\n";
+                ".landscape {page: landscape;}\n" +
+                ".chapter {page-break-before: always}\n" + 
+                "p, div {widows: 2; orphans: 2;}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "7. Headers and Footers\n" +
+                "------------------------------------------------------------------*/\n" +
+                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "8. Signature Box\n" +
+                "------------------------------------------------------------------*/\n" +
+                ".signature-box td.signature-name-styling {width: 60%;}\n" + 
+                ".signature-box td.signature-space-styling {width: 1%;}\n" + 
+                ".signature-box td.signature-date-styling {width: 39%;}\n" + 
+                "\n" +
+                "/*------------------------------------------------------------------\n" +
+                "9. Bookmark Level\n" +
+                "------------------------------------------------------------------*/\n" ;
         for (var i = 1; i < 10; i++) {
             ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
         }
-        if(htmlFlag) {
+        if (htmlFlag) {
             ret += ".toc { counter-reset: table-counter figure-counter;}\n" +
                 "figure { counter-increment: figure-counter; }\n" +
                 "figcaption::before {content: \"Figure \" counter(figure-counter) \". \"; }\n" +
