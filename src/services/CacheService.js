@@ -59,7 +59,7 @@ function CacheService(_) {
                 continue;
             }
             if (key.indexOf('|latest') >= 0 && key.indexOf('element|') >= 0 && key.indexOf('|edit') < 0 && 
-                    key.indexOf(refId) >= 0 && key.indexOf(projectId) >= 0) {
+                    key.indexOf('deleted') < 0 && key.indexOf(refId) >= 0 && key.indexOf(projectId) >= 0) {
                 var val = get(key);
                 if (val) {
                     latestElements.push(val);
