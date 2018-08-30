@@ -23,6 +23,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         '_17_0_1_232f03dc_1325612611695_581988_21583', '_18_0beta_9150291_1392290067481_33752_4359'];
     var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
     var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
+    var REQUIREMENT_SID = ['_project-bundle_mission_PackageableElement-mission_u003aRequirement_PackageableElement',
+        '_18_0_5_f560360_1476403587924_687681_736366','_18_0_5_f560360_1476403587924_687681_736366',
+        '_11_5EAPbeta_be00301_1147873190330_159934_2220'];
     var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
     var CLASS_ELEMENT_TEMPLATE = {
         _appliedStereotypeIds: [],
@@ -1213,6 +1216,28 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return false;
     };
 
+        /**
+     * @ngdoc method
+     * @name mms.UtilsService#isRequirement
+     * @methodOf mms.UtilsService
+     *
+     * @description
+     * Evaluates if an given element is a requirement from list given above: REQUIREMENT_SID
+     *
+     * @param {Object} e element
+     * @returns {boolean} boolean
+     */
+    var isRequirement = function(e) {
+        if (e._appliedStereotypeIds) {
+            for (var i = 0; i < REQUIREMENT_SID.length; i++) {
+                if (e._appliedStereotypeIds.indexOf(REQUIREMENT_SID[i]) >= 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
     /**
      * @ngdoc method
      * @name mms.UtilsService#exportHtmlAs
@@ -1332,6 +1357,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         getPrintCss: getPrintCss,
         isView: isView,
         isDocument: isDocument,
+        isRequirement: isRequirement,
         exportHtmlAs: exportHtmlAs,
         generateTOCHtmlOption: generateTOCHtmlOption,
         generateAnchorId: generateAnchorId,

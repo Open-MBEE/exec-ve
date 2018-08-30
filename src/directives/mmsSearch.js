@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-    .directive('mmsSearch', ['$window', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
+    .directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -15,7 +15,7 @@ angular.module('mms.directives')
  * @scope
  *
  */
-function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
+function mmsSearch($window, $anchorScroll, CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
     var template = $templateCache.get('mms/templates/mmsSearch.html');
     return {
         restrict: 'E',
@@ -52,7 +52,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
         // Pagination settings
         scope.paginationCache = [];
         scope.currentPage = 0;
-        scope.itemsPerPage = 50;
+        scope.itemsPerPage = 100;
 
         // Advanced search settings
         scope.advanceSearch = false;
@@ -200,7 +200,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             { display: 'Comments', icon:"pe-type-Comment", type: "Comment" },
             { display: 'Sections', icon:"pe-type-Section", type: "Section" },
             { display: 'Views', icon:"pe-type-View", type: "View" },
-            // { display: 'Requirements', icon:"pe-type-Req?", type: "Requirements" }
+            { display: 'Requirements', icon:"pe-type-Req", type: "Requirement" }
         ];
 
         // var findRefineOptions = function (results) {
@@ -336,7 +336,7 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
             } else {
                 scope.search(scope.mainSearch, scope.currentPage + 1, scope.itemsPerPage);
             }
-            // $anchorScroll();
+            $anchorScroll('ve-search-results');
         };
 
         scope.prevPage = function () {
@@ -659,10 +659,12 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                         }
                     }
                 ],
-                "query": {}
+                "query": {},
+                "indices_boost" : [ {} ]
             };
             jsonQueryOb.query = mainBoolQuery;
             jsonQueryOb.query.bool.filter = filterList;
+            jsonQueryOb.indices_boost[0][scope.mmsProjectId.toLowerCase()] = 2;
             jsonQueryOb.aggs = getAggs();
             return jsonQueryOb;
         };

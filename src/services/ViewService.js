@@ -1167,7 +1167,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getElementType = function(element) {
         // Get Type
         var elementType = '';
-        if (UtilsService.isDocument(element)) {
+        if (UtilsService.isRequirement(element)) {
+            elementType = 'Requirement';
+        } else if (UtilsService.isDocument(element)) {
             elementType = 'Document';
         } else if (UtilsService.isView(element)) {
             elementType = 'View';

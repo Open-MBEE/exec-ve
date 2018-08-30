@@ -1,13 +1,14 @@
-<div class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
+<div id="ve-search-results" class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
     <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
 </div>
-<div class="btn-group btn-group-sm" role="group" aria-label="mms-search-results-filter">
+
+<div ng-show="searchResults.length > 0" class="btn-group btn-group-sm" role="group" aria-label="mms-search-results-filter">
     <!-- <span class="label-for-filter pull-left">FILTER: </span> -->
     <button type="button" ng-repeat="item in filterOptions" ng-click="filterSearchResults(item.type)"
     title="Filter {{item.display}}" class="btn ve-btn-group-default {{item.icon}}"
     ng-class="{'active': getActiveFilterClass(item.type)}">{{item.display}}</button>
-
 </div><br><br>
+
 <div class="search-results" ng-show="searchResults.length > 0">
     <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults)">
         <div class="elem-name-wrapper">
