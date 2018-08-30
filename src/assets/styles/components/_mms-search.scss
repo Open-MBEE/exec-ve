@@ -28,10 +28,10 @@
 
     .close-button {
       position: absolute;
-      top: 1em;
-      right: 1em;
+      top: .5em;
+      right: .5em;
       font-size: 1.5em;
-      color: gray;
+      color: $tertiary_grey;
     }
   }
 
@@ -203,6 +203,37 @@
       color: $medium_grey;
       font-size: 14px;
       margin-top:10px;
+    }
+  }
+
+  /*Add light colored presentation element icons to the left of the title*/
+
+  .item-type-View,
+  .item-type-Document,
+  .item-type-Group,
+  .pe-type-Paragraph,
+  .pe-type-ParagraphT,
+  .pe-type-Section,
+  .pe-type-SectionT,
+  .pe-type-Text,
+  .pe-type-TextT,
+  .pe-type-Table,
+  .pe-type-TableT,
+  .pe-type-Image,
+  .pe-type-ImageT,
+  .pe-type-Equation,
+  .pe-type-Comment{
+
+    position:relative;
+
+    &::before{
+      color: $ve-silver-darker-3;
+      right: 0;
+      padding: 0;
+      position:absolute;
+      right: 6px;
+      top: -.1em;
+      font-size: 14px;
     }
   }
 
