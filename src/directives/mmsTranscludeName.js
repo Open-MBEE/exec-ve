@@ -68,7 +68,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             if (!mmsViewCtrl)
                 return false;
 
-            if (scope.nonEditable) {
+            if (scope.nonEditable && mmsViewCtrl && mmsViewCtrl.isEditable()) {
                 growl.warning("Cross Reference is not editable.");
             }
             mmsViewCtrl.transcludeClicked(scope.element);

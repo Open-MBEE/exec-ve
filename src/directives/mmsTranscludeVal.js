@@ -71,7 +71,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             if (mmsViewCtrl) {
                 mmsViewCtrl.transcludeClicked(scope.element);
             }
-            if (scope.nonEditable) {
+            if (scope.nonEditable && mmsViewCtrl && mmsViewCtrl.isEditable()) {
                 growl.warning("Cross Reference is not editable.");
             }
             e.stopPropagation();
