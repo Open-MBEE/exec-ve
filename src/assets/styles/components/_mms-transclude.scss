@@ -67,8 +67,8 @@ mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
   @include border-radius(5px);
   background-color: lighten($yellow, 10%);
-  padding: 2px; 
-  //border: 2px solid darken($yellow, 8%);
+  padding: 2px;
+  display: block
 }
 
 mms-view:not(.editing):not(.outline) {

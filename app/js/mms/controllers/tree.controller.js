@@ -559,6 +559,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
+            if (!$rootScope.ve_editmode) {
+                $timeout(function() {
+                    $('.show-edits').click();
+                }, 0, false);
+            }
             var newbranch = {
                 label: data.name,
                 type: newBranchType,
@@ -643,7 +648,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 growl.info("Please wait...");
                 return;
             }
-            $scope.oking = true;  
+            $scope.oking = true;
             ViewService.addViewToParentView({
                 parentViewId: $scope.parentBranchData.id,
                 viewId: viewId,

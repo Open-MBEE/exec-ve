@@ -76,18 +76,9 @@
     @extend .content-table;
   }
 
-  mms-spec div {
+  mms-spec {
     mms-transclude-doc {
       cursor: auto;
-    }
-
-    mms-transclude-com {
-      background-color: $yellow;
-      cursor: auto;
-      display: block;
-      @include border-radius(5px);
-      padding: 2px;
-      margin-bottom: 5px;
     }
   }
 }

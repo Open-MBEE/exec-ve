@@ -697,14 +697,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             };
             ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
                 .then(function(data) {
-                    // Broadcast message to TreeCtrl:
-                    // $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
-                    $rootScope.$broadcast('view-reorder.refresh');
-                    $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
-                    growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                    var elemType = $scope.presentationElemType;
+                    successUpdates(elemType, $scope.viewOrSectionOb.id);
                     $uibModalInstance.close(data);
                 }, function(reason) {
-                    growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                    growl.error($scope.presentationElemType +" Add Error: " + reason.message);
                 }).finally(function() {
                 $scope.oking = false;
             });
@@ -744,14 +741,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             $scope.oking = true;
             ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
             .then(function(data) {
-                var elemType = $scope.presentationElemType.toLowerCase();
-                // $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
-                $rootScope.$broadcast('view-reorder.refresh');
-                $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
-                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                var elemType = $scope.presentationElemType;
+                successUpdates(elemType, $scope.viewOrSectionOb.id);
                 $uibModalInstance.close(data);
             }, function(reason) {
-                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                growl.error($scope.presentationElemType + " Add Error: " + reason.message);
             }).finally(function() {
                 $scope.oking = false;
             });
@@ -760,6 +754,18 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         $scope.cancel = function() {
             $uibModalInstance.dismiss();
         };
+    };
+
+    var successUpdates = function (elemType, id) {
+        $rootScope.$broadcast('view-reorder.refresh');
+        $rootScope.$broadcast('view.reorder.saved', id);
+        growl.success("Adding " + elemType + " Successful");
+        // Show comments when creating a comment PE
+        if (elemType === 'Comment' && !$rootScope.veCommentsOn) {
+            $timeout(function() {
+                $('.show-comments').click();
+            }, 0, false);
+        }
     };
 
     /**
