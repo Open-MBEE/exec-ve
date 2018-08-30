@@ -65,8 +65,8 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.element);
-            if (scope.nonEditable) {
-                growl.warning("Cross Reference is not editable.");
+            if (scope.nonEditable && mmsViewCtrl && mmsViewCtrl.isEditable()) {
+                growl.warning("Comment is not editable.");
             }
             e.stopPropagation();
         });
