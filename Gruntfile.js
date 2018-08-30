@@ -290,6 +290,7 @@ module.exports = function(grunt) {
         reporterOutput: '',
         evil: true, //allow eval for plot integration
         globalstrict: true,
+        validthis: true,
         globals: {
           angular: true,
           window: true,

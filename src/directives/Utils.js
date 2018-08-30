@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -967,6 +967,15 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         }
     };
 
+    var focusOnEditorAfterAddingWidgetTag = function(editor) {
+        var element = editor.widgets.focused.element.getParent();
+        var range = editor.createRange();
+        if(range) {
+            range.moveToClosestEditablePosition(element, true);
+            range.select();
+        }
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -988,6 +997,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         reopenUnsavedElts: reopenUnsavedElts,
         checkForDuplicateInstances: checkForDuplicateInstances,
         fixImgSrc: fixImgSrc,
+        focusOnEditorAfterAddingWidgetTag: focusOnEditorAfterAddingWidgetTag,
         toggleLeftPane: toggleLeftPane
     };
 
