@@ -210,7 +210,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, 
             }, function(response) {
                 // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
             });
-    });
+    };
 
     function _createViews() {
         var loadingViewsFromServer = growl.info('Loading data from server!', {ttl: -1});
