@@ -163,21 +163,24 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
         };
 
         // Filter options
-        scope.filterSearchResults = function (type) {
-            var tempArr = _.clone(scope.activeFilter);
-            if (_.includes(tempArr, type) ) {
-                _.pull(tempArr, type);
-            } else {
-                tempArr.push(type);
-            }
-            scope.activeFilter = tempArr;
-        };
-
         scope.getActiveFilterClass = function (item) {
+            if (!scope.activeFilter.length) {
+                return '';
+            }
             return _.includes(scope.activeFilter, item);
         };
 
-        scope.$watch('activeFilter', function (newVal) {
+        scope.filterSearchResults = function (type) {
+            var tempArr = _.clone(scope.activeFilter);
+            if (_.includes(scope.activeFilter, type) ) {
+                _.pull(scope.activeFilter, type);
+            } else {
+                scope.activeFilter.push(type);
+            }
+            _applyFilters();
+        };
+
+        var _applyFilters = function () {
             if (!scope.activeFilter.length) {
                 scope.searchResults = baseSearchResults;
             } else {
@@ -185,13 +188,26 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                     return _.includes(scope.activeFilter, ViewService.getElementType(item));
                 });
             }
-        });
-
-        var findRefineOptions = function (results) {
-            var presentationElements = _.map(results, ViewService.getElementType);
-            var uniqTypes = _.uniq(presentationElements);
-            scope.filterOptions = _.difference(uniqTypes, [false, undefined, '']);
         };
+
+        scope.filterOptions = [
+            { display: "Documents", icon: null, type: "Documents" },
+            // { display: "Sections/Views", icon: null, type: "View", "Section" },
+            { display: 'Text', icon:"pe-type-Paragraph", type: "Paragraph" },
+            { display: 'Tables', icon:"pe-type-Table", type: "Table" },
+            { display: 'Images', icon:"pe-type-Image", type: "Image" },
+            { display: 'Equations', icon:"pe-type-Equation", type: "Equation" },
+            { display: 'Comments', icon:"pe-type-Comment", type: "Comment" },
+            { display: 'Sections', icon:"pe-type-Section", type: "Section" },
+            { display: 'Views', icon:"pe-type-View", type: "View" },
+            // { display: 'Requirements', icon:"pe-type-Req?", type: "Requirements" }
+        ];
+
+        // var findRefineOptions = function (results) {
+        //     var presentationElements = _.map(results, ViewService.getElementType);
+        //     var uniqTypes = _.uniq(presentationElements);
+        //     scope.filterOptions = _.difference(uniqTypes, [false, undefined, '']);
+        // };
 
         scope.$watch('searchResults', function (newVal) {
             if (!newVal)
@@ -314,8 +330,9 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
 
         scope.nextPage = function () {
             if (scope.paginationCache[scope.currentPage + 1]) {
-                scope.searchResults = scope.paginationCache[scope.currentPage + 1];
+                baseSearchResults = scope.paginationCache[scope.currentPage + 1];
                 scope.currentPage += 1;
+                _applyFilters();
             } else {
                 scope.search(scope.mainSearch, scope.currentPage + 1, scope.itemsPerPage);
             }
@@ -324,8 +341,9 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
 
         scope.prevPage = function () {
             if (scope.paginationCache[scope.currentPage - 1]) {
-                scope.searchResults = scope.paginationCache[scope.currentPage - 1];
+                baseSearchResults = scope.paginationCache[scope.currentPage - 1];
                 scope.currentPage -= 1;
+                _applyFilters();
             } else {
                 scope.search(scope.mainSearch, scope.currentPage - 1, scope.itemsPerPage);
             }
@@ -369,7 +387,8 @@ function mmsSearch($window, CacheService, ElementService, ProjectService, UtilsS
                         // scope.advanceSearch = !scope.advanceSearch;
                         scope.advancedSearchResults = true;
                     }
-                    scope.refineOptions = findRefineOptions(baseSearchResults);
+                    _applyFilters();
+                    // scope.refineOptions = findRefineOptions(baseSearchResults);
                 }, function (reason) {
                     growl.error("Search Error: " + reason.message);
                 }).finally(function () {
