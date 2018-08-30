@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -697,14 +697,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             };
             ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
                 .then(function(data) {
-                    // Broadcast message to TreeCtrl:
-                    // $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
-                    $rootScope.$broadcast('view-reorder.refresh');
-                    $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
-                    growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                    var elemType = $scope.presentationElemType;
+                    successUpdates(elemType, $scope.viewOrSectionOb.id);
                     $uibModalInstance.close(data);
                 }, function(reason) {
-                    growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                    growl.error($scope.presentationElemType +" Add Error: " + reason.message);
                 }).finally(function() {
                 $scope.oking = false;
             });
@@ -744,14 +741,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             $scope.oking = true;
             ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
             .then(function(data) {
-                var elemType = $scope.presentationElemType.toLowerCase();
-                // $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
-                $rootScope.$broadcast('view-reorder.refresh');
-                $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
-                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                var elemType = $scope.presentationElemType;
+                successUpdates(elemType, $scope.viewOrSectionOb.id);
                 $uibModalInstance.close(data);
             }, function(reason) {
-                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                growl.error($scope.presentationElemType + " Add Error: " + reason.message);
             }).finally(function() {
                 $scope.oking = false;
             });
@@ -760,6 +754,18 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         $scope.cancel = function() {
             $uibModalInstance.dismiss();
         };
+    };
+
+    var successUpdates = function (elemType, id) {
+        $rootScope.$broadcast('view-reorder.refresh');
+        $rootScope.$broadcast('view.reorder.saved', id);
+        growl.success("Adding " + elemType + " Successful");
+        // Show comments when creating a comment PE
+        if (elemType === 'Comment' && !$rootScope.veCommentsOn) {
+            $timeout(function() {
+                $('.show-comments').click();
+            }, 0, false);
+        }
     };
 
     /**
@@ -785,7 +791,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
         });
         instance.result.then(function(data) {
-              // TODO: do anything here?
+            $timeout(function() { //auto open editor for added pe
+                $('#' + data.id).find('mms-transclude-doc').click();
+            }, 0, false);
         });
     };
 
@@ -959,6 +967,15 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         }
     };
 
+    var focusOnEditorAfterAddingWidgetTag = function(editor) {
+        var element = editor.widgets.focused.element.getParent();
+        var range = editor.createRange();
+        if(range) {
+            range.moveToClosestEditablePosition(element, true);
+            range.select();
+        }
+    };
+
     return {
         save: save,
         hasEdits: hasEdits,
@@ -980,6 +997,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         reopenUnsavedElts: reopenUnsavedElts,
         checkForDuplicateInstances: checkForDuplicateInstances,
         fixImgSrc: fixImgSrc,
+        focusOnEditorAfterAddingWidgetTag: focusOnEditorAfterAddingWidgetTag,
         toggleLeftPane: toggleLeftPane
     };
 

@@ -62,6 +62,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
         emptyDocTxt: 'This field is empty.',
         searchInput: search,
         getProperties: true,
+        closeable: true,
         callback: function(elementOb) {
             $rootScope.$broadcast('elementSelected', elementOb, 'latest');
             if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
@@ -256,7 +257,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
             },
             elementTranscluded: _elementTranscluded,
             elementClicked: _elementClicked
-        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
+        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1) : false), first: curSec == 1};
     }
 
     function _constructViews(viewId, curSection) {

@@ -82,17 +82,6 @@ VE Jobs Table Table of contents
   td h3{
     margin: 0;
   }
-
-/*------------------------------------------------------------------
-  Empy State Layout
--------------------------------------------------------------------*/
-  .empty-state{
-    background-color: $quaternary_grey-darker;
-    border: 1px solid $tertiary_grey;
-    @include border-radius(3px);
-    padding: 20px 10px 30px;
-    margin: 10px 0;
-  }
 }
 
 

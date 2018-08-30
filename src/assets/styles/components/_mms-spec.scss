@@ -32,10 +32,11 @@
     .pe-type-Comment{
 
       &::before{
-        left: 0;
-        bottom: 0;
-        font-size: .5em;
-        top: -1.1em;
+        color: $ve-silver-darker-3;
+        font-size: .6em;
+        top: -.3em;
+        padding-right: 6px;
+        position: relative;
       }
     }
   }
@@ -60,11 +61,10 @@
     font-family: $font-family-sans-serif;
     
     /* Add border to left to delineate*/
-    padding-left: 4px;
-    border-left: 3px solid $ve-silver-base;
+    padding-left: 8px;
+    border-left: 4px solid $ve-silver-base;
     max-width: $default-line-length;
     margin-top: 2px;
-    margin-left: -7px;
     //min-width: 15em;
   }
 
@@ -76,18 +76,9 @@
     @extend .content-table;
   }
 
-  mms-spec div {
+  mms-spec {
     mms-transclude-doc {
       cursor: auto;
-    }
-
-    mms-transclude-com {
-      background-color: $yellow;
-      cursor: auto;
-      display: block;
-      @include border-radius(5px);
-      padding: 2px;
-      margin-bottom: 5px;
     }
   }
 }
@@ -183,40 +174,5 @@ Styles that apply to both the spec
     font-size: .75em;
     position: relative;
     top: -.1em;
-  }
-
-}
-
-/*Add light colored presentation element icons to the left of the title*/
-.search-results,
-.pane-right{
-
-  .item-type-View,
-  .item-type-Document,
-  .item-type-Group,
-  .pe-type-Paragraph,
-  .pe-type-ParagraphT,
-  .pe-type-Section,
-  .pe-type-SectionT,
-  .pe-type-Text,
-  .pe-type-TextT,
-  .pe-type-Table,
-  .pe-type-TableT,
-  .pe-type-Image,
-  .pe-type-ImageT,
-  .pe-type-Equation,
-  .pe-type-Comment{
-
-    position:relative;
-
-    &::before{
-      color: $ve-silver-darker-3;
-      right: 0;
-      padding: 0;
-      position: absolute;
-      right: 6px;
-      top: 0;
-      font-size: 14px;
-    }
   }
 }
