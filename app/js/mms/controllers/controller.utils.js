@@ -14,6 +14,9 @@ angular.module('mmsApp')
 function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache,
     $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, _) {
 
+
+    var SHARE_URL = 'opencae.jpl.nasa.gov';
+
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
             templateUrl: 'partials/mms/tableExport.html',
@@ -472,6 +475,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     }
 
     return {
+        SHARE_URL: SHARE_URL,
         printModal: printModal,
         tableToCsv: tableToCsv,
         handleChildViews: handleChildViews,

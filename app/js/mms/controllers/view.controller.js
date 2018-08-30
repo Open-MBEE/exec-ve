@@ -3,11 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-    .controller('ViewCtrl', ['$scope', '$rootScope', '$state',  '$timeout', '$window', '$location', '$http',
-    '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'Utils', 'growl',
+    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$window', '$location',
+    '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService', 'Utils',
     'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
     function($scope, $rootScope, $state, $timeout, $window, $location, $http,
-             $element, hotkeys, MmsAppUtils, UxService, Utils, growl,
+             $element, growl, hotkeys, MmsAppUtils, UxService, URLService, UtilsService, Utils,
              search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb) {
 
     function isPageLoading() {
@@ -112,7 +112,7 @@ angular.module('mmsApp')
 
             if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
+                // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
                 $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
                 if ($state.includes('project.ref.document')) {
                     var exportButtons = UxService.getButtonBarButton('export');
@@ -161,17 +161,6 @@ angular.module('mmsApp')
         $rootScope.ve_editmode = !$rootScope.ve_editmode;
     });
 
-    $scope.$on('share-url', function() {
-        var currentUrl = 'https://opencae-uat.jpl.nasa.gov'+$location.url();
-        var SHARE_URL = 'https://bwtj0li4ii.execute-api.us-gov-west-1.amazonaws.com/v1/url-shorten/';
-        $http.post(SHARE_URL, {'url': currentUrl})
-        .then(function(response) {
-            $window.alert('hi'+ currentUrl);
-        }, function(response) {
-            // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-        });
-    });
-
     $scope.$on('center-previous', function() {
         var prev = $rootScope.ve_treeApi.get_prev_branch($rootScope.ve_treeApi.get_selected_branch());
         if (!prev)
@@ -199,6 +188,29 @@ angular.module('mmsApp')
         $rootScope.ve_treeApi.select_branch(next);
         $scope.bbApi.toggleButtonSpinner('center-next');
     });
+
+    // Share URL button settings
+    $scope.dynamicPopover = {
+        templateUrl: 'shareUrlTemplate.html',
+        title: 'Share'
+    };
+
+    $scope.copyToClipboard = function ($event) {
+        $event.stopPropagation();
+        var target = $('#ve-short-url');
+        UtilsService.copyToClipboard(target);
+    };
+
+    $scope.handleShareURL = function() {
+        var currentUrl = URLService.getMmsServer() + $location.url();
+        var SHARE_URL = MmsAppUtils.SHARE_URL;
+        $http.post(SHARE_URL + '/url-shorten/', {'url': currentUrl}, {withCredentials : false})
+        .then(function(response) {
+            $scope.shortUrl = SHARE_URL + '/get-link/' + response.data.body.link;
+        }, function(response) {
+            // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        });
+    };
 
     if (viewOb && $state.includes('project.ref')) {
         $timeout(function() {
