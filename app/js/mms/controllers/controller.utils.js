@@ -15,7 +15,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, Utils, _) {
 
 
-    var SHARE_URL = 'opencae.jpl.nasa.gov/goto/';
+    var SHARE_URL = 'https://opencae.jpl.nasa.gov/goto/';
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({

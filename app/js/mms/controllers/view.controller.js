@@ -206,7 +206,7 @@ angular.module('mmsApp')
         var SHARE_URL = MmsAppUtils.SHARE_URL;
         $http.post(SHARE_URL, {'url': currentUrl}, {withCredentials : false})
         .then(function(response) {
-            $scope.shortUrl = SHARE_URL + response.data.body.link;
+            $scope.shortUrl = SHARE_URL + response.data.link;
         }, function(response) {
             // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
