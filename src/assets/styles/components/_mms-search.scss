@@ -225,32 +225,34 @@
   }
 
   /*Add light colored presentation element icons to the left of the title*/
-  .item-type-View,
-  .item-type-Document,
-  .item-type-Group,
-  .pe-type-Paragraph,
-  .pe-type-ParagraphT,
-  .pe-type-Section,
-  .pe-type-SectionT,
-  .pe-type-Text,
-  .pe-type-TextT,
-  .pe-type-Table,
-  .pe-type-TableT,
-  .pe-type-Image,
-  .pe-type-ImageT,
-  .pe-type-Equation,
-  .pe-type-Comment{
+  .search-results{
+    .item-type-View,
+    .item-type-Document,
+    .item-type-Group,
+    .pe-type-Paragraph,
+    .pe-type-ParagraphT,
+    .pe-type-Section,
+    .pe-type-SectionT,
+    .pe-type-Text,
+    .pe-type-TextT,
+    .pe-type-Table,
+    .pe-type-TableT,
+    .pe-type-Image,
+    .pe-type-ImageT,
+    .pe-type-Equation,
+    .pe-type-Comment{
 
-    position:relative;
+      position:relative;
 
-    &::before{
-      color: $ve-silver-darker-3;
-      right: 0;
-      padding: 0;
-      position:absolute;
-      right: 6px;
-      top: -.1em;
-      font-size: 14px;
+      &::before{
+        color: $ve-silver-darker-3;
+        right: 0;
+        padding: 0;
+        position:absolute;
+        right: 6px;
+        top: -.1em;
+        font-size: 14px;
+      }
     }
   }
 
