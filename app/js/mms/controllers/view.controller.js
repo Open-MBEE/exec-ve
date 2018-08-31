@@ -3,10 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$stateParams', '$timeout',
-    '$element', 'hotkeys', 'MmsAppUtils', 'UxService', 'Utils', 'growl',
+    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$window', '$location',
+    '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService', 'Utils',
     'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
-    function($scope, $rootScope, $state, $stateParams, $timeout, $element, hotkeys, MmsAppUtils, UxService, Utils, growl,
+    function($scope, $rootScope, $state, $timeout, $window, $location, $http,
+             $element, growl, hotkeys, MmsAppUtils, UxService, URLService, UtilsService, Utils,
              search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb) {
 
     function isPageLoading() {
@@ -187,6 +188,29 @@ angular.module('mmsApp')
         $rootScope.ve_treeApi.select_branch(next);
         $scope.bbApi.toggleButtonSpinner('center-next');
     });
+
+    // Share URL button settings
+    $scope.dynamicPopover = {
+        templateUrl: 'shareUrlTemplate.html',
+        title: 'Share'
+    };
+
+    $scope.copyToClipboard = function ($event) {
+        $event.stopPropagation();
+        var target = $('#ve-short-url');
+        UtilsService.copyToClipboard(target);
+    };
+
+    $scope.handleShareURL = function() {
+        var currentUrl = $location.absUrl();
+        var SHARE_URL = MmsAppUtils.SHARE_URL;
+        $http.post(SHARE_URL, {'url': currentUrl}, {withCredentials : false})
+        .then(function(response) {
+            $scope.shortUrl = SHARE_URL + response.data.body.link;
+        }, function(response) {
+            // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+        });
+    };
 
     if (viewOb && $state.includes('project.ref')) {
         $timeout(function() {

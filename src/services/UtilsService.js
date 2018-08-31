@@ -1377,6 +1377,17 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return o;
     };
 
+    var copyToClipboard = function(target) {
+        var range = window.document.createRange();
+        range.selectNode(target[0]);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        try {
+            window.document.execCommand('copy');
+        } catch(err) {}
+        window.getSelection().removeAllRanges();
+    };
+
 
     return {
         VIEW_SID: VIEW_SID,
@@ -1416,6 +1427,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         generateAnchorId: generateAnchorId,
         tableConfig: tableConfig,
         _generateRowColNumber: _generateRowColNumber,
-        PROJECT_URL_PREFIX: PROJECT_URL_PREFIX
+        PROJECT_URL_PREFIX: PROJECT_URL_PREFIX,
+        copyToClipboard: copyToClipboard
     };
 }
