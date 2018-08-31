@@ -192,7 +192,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
         };
 
         scope.filterOptions = [
-            { display: "Documents", icon: null, type: "Documents" },
+            { display: "Documents", icon: null, type: "Document" },
             // { display: "Sections/Views", icon: null, type: "View", "Section" },
             { display: 'Text', icon:"pe-type-Paragraph", type: "Paragraph" },
             { display: 'Tables', icon:"pe-type-Table", type: "Table" },

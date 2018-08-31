@@ -1,8 +1,8 @@
-<div id="ve-search-results" class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
-    <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
+<div id="ve-search-results" class="misc-form-field ve-secondary-text results-count" ng-hide="searchLoading">
+    <div>Showing <b>{{searchResults.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
 </div>
 
-<div ng-show="searchResults.length > 0" class="btn-group btn-group-sm" role="group" aria-label="mms-search-results-filter">
+<div ng-hide="searchLoading" class="btn-group btn-group-sm" role="group" aria-label="mms-search-results-filter">
     <!-- <span class="label-for-filter pull-left">FILTER: </span> -->
     <button type="button" ng-repeat="item in filterOptions" ng-click="filterSearchResults(item.type)"
     title="Filter {{item.display}}" class="btn ve-btn-group-default {{item.icon}}"
