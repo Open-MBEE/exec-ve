@@ -202,11 +202,11 @@ angular.module('mmsApp')
     };
 
     $scope.handleShareURL = function() {
-        var currentUrl = URLService.getMmsServer() + $location.url();
+        var currentUrl = $location.absUrl();
         var SHARE_URL = MmsAppUtils.SHARE_URL;
-        $http.post(SHARE_URL + '/url-shorten/', {'url': currentUrl}, {withCredentials : false})
+        $http.post(SHARE_URL, {'url': currentUrl}, {withCredentials : false})
         .then(function(response) {
-            $scope.shortUrl = SHARE_URL + '/get-link/' + response.data.body.link;
+            $scope.shortUrl = SHARE_URL + response.data.body.link;
         }, function(response) {
             // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
