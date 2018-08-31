@@ -1,11 +1,19 @@
-<div class="misc-form-field ve-secondary-text results-count" ng-show="searchResults.length > 0">
-    <div>Showing <b>{{filteredElms.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
+<div id="ve-search-results" class="misc-form-field ve-secondary-text results-count" ng-hide="searchLoading">
+    <div>Showing <b>{{searchResults.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
 </div>
+
+<div ng-hide="searchLoading" class="btn-group btn-group-sm" role="group" aria-label="mms-search-results-filter">
+    <!-- <span class="label-for-filter pull-left">FILTER: </span> -->
+    <button type="button" ng-repeat="item in filterOptions" ng-click="filterSearchResults(item.type)"
+    title="Filter {{item.display}}" class="btn ve-btn-group-default {{item.icon}}"
+    ng-class="{'active': getActiveFilterClass(item.type)}">{{item.display}}</button>
+</div><br><br>
+
 <div class="search-results" ng-show="searchResults.length > 0">
-    <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults | filter: resultFilter)">
+    <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults)">
         <div class="elem-name-wrapper">
-            <span class="{{ getTypeClass(elem) }}">
-            <a class="elem-name" ng-click="userResultClick(elem, 'name')"></span>{{elem.name}}</a>
+            <span class="{{ getTypeClass(elem) }}"></span>
+            <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
             <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')">
                 <mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
             </a>
