@@ -731,7 +731,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 //    result.push(toAdd);
                 //}
                 //deferred.resolve(result);
-                deferred.resolve(data.data.elements);
+                deferred.resolve(data.data);
             }, function(data) {
                 URLService.handleHttpStatus(data, data.status, data.headers, data.config, deferred);
             });

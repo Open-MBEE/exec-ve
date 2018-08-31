@@ -50,6 +50,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
         scope.activeFilter = [];
 
         // Pagination settings
+        scope.totalResults = 0;
         scope.paginationCache = [];
         scope.currentPage = 0;
         scope.itemsPerPage = 100;
@@ -337,6 +338,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
                 scope.search(scope.mainSearch, scope.currentPage + 1, scope.itemsPerPage);
             }
             $anchorScroll('ve-search-results');
+
         };
 
         scope.prevPage = function () {
@@ -374,13 +376,16 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
             };
             ElementService.search(reqOb, queryOb, 2)
                 .then(function (data) {
+                    var elements = data.elements;
                     if (scope.mmsOptions.filterCallback) {
-                        scope.searchResults = scope.mmsOptions.filterCallback(data);
+                        scope.searchResults = scope.mmsOptions.filterCallback(elements);
                         baseSearchResults = scope.searchResults;
                     } else {
-                        scope.searchResults = data;
-                        baseSearchResults = data;
+                        scope.searchResults = elements;
+                        baseSearchResults = elements;
                     }
+                    scope.totalResults = data.total;
+                    scope.maxPages = Math.ceil(scope.totalResults/scope.itemsPerPage);
                     scope.currentPage = page;
                     scope.paginationCache.push(scope.searchResults);
                     if (scope.advanceSearch) {
