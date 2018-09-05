@@ -159,3 +159,9 @@ tr {
     color: lighten($ve-accent, 24%);
   }
 }
+
+
+/* Overwrite angularjs bootstrap's popuover so that the popover's container expands with its content */
+.popover {
+  max-width: none;
+}
