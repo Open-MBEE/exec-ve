@@ -149,6 +149,7 @@
 
   .search-results {
     border-top: 1px solid $ve-silver-darker-1;
+    max-width: 1200px;
   }
 
   /*Search result wrapper*/
@@ -189,12 +190,22 @@
         }
       }
     }
-    /*Indent content so it pops out*/
+
+
+    /* Add a grey border to the left of documentation since the preview can get spread out*/
+    .elem-documentation-wrapper{
+      .elem-documentation{
+        border-left: 4px solid $ve-silver-base;
+        padding-left: 14px;
+      }
+    }
+
+    /*Indent cross referenceable content so it pops out*/
     .elem-properties,
     .elem-specification,
     .elem-documentation,
     .elem-properties-wrapper > table > tbody > tr > td:first-child {
-      padding-left: 16px;
+      padding-left: 18px;
     }
     .ellipses {
       color: $brand_base;
@@ -211,6 +222,7 @@
     text-transform: initial;
     letter-spacing: normal;
     line-height: 1.6;
+    font-weight: normal;
     .fa {
       padding-right: 4px;
       font-size: 16px;
@@ -248,10 +260,10 @@
         color: $ve-silver-darker-3;
         right: 0;
         padding: 0;
-        position:absolute;
-        right: 6px;
+        position: absolute;
         top: -.1em;
-        font-size: 14px;
+        font-size: 15px;
+        padding-right: 6px;
       }
     }
   }
@@ -292,3 +304,4 @@
     }
   }
 }
+
