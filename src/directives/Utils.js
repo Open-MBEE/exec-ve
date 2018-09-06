@@ -791,8 +791,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
         });
         instance.result.then(function(data) {
-            $timeout(function() { //auto open editor for added pe
-                $('#' + data.id).find('mms-transclude-doc').click();
+            if (data.type !== 'InstanceSpecification') {
+                return; //do not open editor for existing pes added
+            }
+            $timeout(function() { //auto open editor for newly added pe
+                $('#' + data.id).find('mms-transclude-doc,mms-transclude-com').click();
             }, 0, false);
         });
     };
