@@ -121,7 +121,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
             return;
         }
 
-        var for_each_branch = function(func) {
+        var for_each_branch = function(func, excludeBranch) {
             var run = function(branch, level) {
                 func(branch, level);
                 if (branch.children) {
@@ -130,9 +130,8 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                     }
                 }
             };
-            for (var i = 0; i < scope.treeData.length; i++) {
-                run(scope.treeData[i], 1);
-            }
+            var rootLevelBranches = excludeBranch ? scope.treeData.filter(function(branch) { return branch !== excludeBranch; }) : scope.treeData;
+            rootLevelBranches.forEach(function (branch) { run(branch, 1); });
         };
 
         var remove_branch_impl = function (branch, singleBranch) {
@@ -174,6 +173,19 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                 });
             }
             return parent;
+        };
+
+        var get_selected_branch_root_ancestor = function() {
+            if (selected_branch) {
+                var root = helper(selected_branch);
+                // return null if selected branch is already at the root
+                return root === selected_branch ? null : root;
+            } else { return null; }
+
+            function helper(branch) {
+                var parent = get_parent(branch);
+                if (parent) { return helper(parent); } else { return branch; }
+            }
         };
 
         var for_all_ancestors = function(child, fn) {
@@ -454,12 +466,13 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
              * @description 
              * self explanatory
              */
-            tree.collapse_all = function() {
+            tree.collapse_all = function(excludeBranch) {
                 for_each_branch(function(b, level) {
                     b.expanded = false;
-                });
+                }, excludeBranch);
                 on_treeData_change();
             };
+
             tree.get_first_branch = function() {
                 if (scope.treeData.length > 0)
                     return scope.treeData[0];
@@ -555,6 +568,9 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                 }
                 on_treeData_change();
             };
+
+            tree.get_selected_branch_root_ancestor = get_selected_branch_root_ancestor;
+
             /**
              * @ngdoc function
              * @name mms.directives.directive:mmsTree#collapse_branch

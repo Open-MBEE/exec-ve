@@ -932,4 +932,15 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.user_clicks_branch = function(branch) {
         $rootScope.ve_treeApi.user_clicks_branch(branch);
     };
+
+    $scope.searchInputChangeHandler = function () {
+        if ($scope.treeOptions.search === '') {
+            // collapse all other subtree except the subtree of the selected branch
+            $scope.treeApi.collapse_all($scope.treeApi.get_selected_branch_root_ancestor());
+        } else {
+            // expand all branches so that the filter works correctly
+            $scope.treeApi.expand_all();
+        }
+    };
+
 }]);
