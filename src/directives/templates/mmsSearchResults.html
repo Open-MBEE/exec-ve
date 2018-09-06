@@ -1,5 +1,6 @@
-<div id="ve-search-results" class="misc-form-field results-count" ng-hide="searchLoading">
-    <div ng-hide="searchLoading" class="ve-search-filter">
+
+<div id="ve-search-results" class="misc-form-field results-count" ng-hide="searchLoading || !paginationCache.length">
+    <div class="ve-search-filter">
         <span class="label-for-filter ve-secondary-text">FILTER: </span>
         <div class="btn-group btn-group-sm" role="group"  aria-label="mms-search-results-filter">
             <button type="button" ng-repeat="item in filterOptions" ng-click="filterSearchResults(item.type)"
@@ -10,6 +11,7 @@
 
     <div class="ve-secondary-text">Showing <b>{{searchResults.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{currentPage + 1}})</div>
 </div>
+
 
 <div class="search-results" ng-show="searchResults.length > 0">
     <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults)">
