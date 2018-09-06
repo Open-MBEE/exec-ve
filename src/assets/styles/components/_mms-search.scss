@@ -42,6 +42,10 @@
     font-size: 14px;
   }
 
+  .results-filter {
+    padding-left: 20px;
+  }
+
   /*Spaceing for next and previous at bottom of results*/
   .search-nav {
     padding: 38px 38px 60px;
@@ -282,7 +286,8 @@
     font-size: 16px;
 
     .mms-search-input,
-    .results-count {
+    .results-count,
+    .results-filter {
       padding-left: 14px;
       padding-right: 14px;
     }
