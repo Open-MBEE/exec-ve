@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', '$templateCache', 'growl',
-    '$rootScope','$compile', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'Utils', '_', MmsAppUtils]);
+.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
+    '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -11,11 +11,8 @@ angular.module('mmsApp')
  * @description
  * Utilities
  */
-function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache, growl,
-    $rootScope, $compile, $filter, $state, ElementService, ViewService, UtilsService, Utils, _) {
-
-
-    var SHARE_URL = 'https://opencae.jpl.nasa.gov/goto/';
+function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
+    $rootScope, $filter, $state, ElementService, ViewService, UtilsService, _) {
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
@@ -479,7 +476,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, $templateCache
     }
 
     return {
-        SHARE_URL: SHARE_URL,
         printModal: printModal,
         tableToCsv: tableToCsv,
         handleChildViews: handleChildViews,
