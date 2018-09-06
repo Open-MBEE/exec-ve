@@ -158,8 +158,9 @@
     }
 
     .delete{
-      text-decoration: line-through !important;
-      background-color: #ffe3e3 !important;
+      background-color: #ffe3e3;
+      text-decoration: rgba(255,0,0,.4) line-through;
+      -webkit-text-decoration: rgba(255,0,0,.4) line-through;
     }
 
     td,
