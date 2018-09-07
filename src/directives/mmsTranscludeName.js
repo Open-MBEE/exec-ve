@@ -34,23 +34,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print placeholder">(no name)</span>';
     var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print placeholder">(no name)</span>';
 
-    var mmsTranscludeNameCtrl = function ($scope) {
-
-        $scope.bbApi = {};
-        $scope.buttons = [];
-        $scope.buttonsInit = false;
-
-        $scope.bbApi.init = function() {
-            if (!$scope.buttonsInit) {
-                $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
-            }
-        };
-    };
-
     var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         scope.recompileScope = null;
@@ -103,7 +86,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            
+
             domElement.html('(loading...)');
             domElement.addClass("isLoading");
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId, includeRecentVersionElement: true};
@@ -120,7 +103,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
                             //actions for stomp
-                            if(stompUpdate && scope.isEditing === true) {
+                            if (stompUpdate && scope.isEditing === true) {
                                 growl.warning("This value has been changed: " + elementOb.name +
                                     " modified by: " + elementOb._modifier, {ttl: -1});
                             } else {
@@ -150,15 +133,13 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             scope.elementSaving = false;
             scope.view = mmsViewCtrl.getView();
 
-            scope.save = function() {
+            scope.save = function(e) {
+                e.stopPropagation();
                 Utils.saveAction(scope, domElement, false);
             };
 
-            scope.saveC = function() {
-                Utils.saveAction(scope, domElement, true);
-            };
-
-            scope.cancel = function() {
+            scope.cancel = function(e) {
+                e.stopPropagation();
                 Utils.cancelAction(scope, recompile, domElement);
             };
 
@@ -166,9 +147,6 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                 Utils.startEdit(scope, mmsViewCtrl, domElement, template, false);
             };
 
-            scope.preview = function() {
-                Utils.previewAction(scope, recompile, domElement);
-            };
         }
     };
 
@@ -186,7 +164,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             mmsCfLabel: '@'
         },
         require: ['?^^mmsView'],
-        controller: ['$scope', mmsTranscludeNameCtrl],
+        // controller: ['$scope', mmsTranscludeNameCtrl],
         link: mmsTranscludeNameLink
     };
 }

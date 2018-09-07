@@ -101,7 +101,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     var cleanUpEdit = function(editOb, cleanAll) {
-        if (!Utils.hasEdits(editOb) || cleanAll) {//TODO Utils.hasEdits
+        if (!Utils.hasEdits(editOb) || cleanAll) {
             var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
             delete $rootScope.ve_edits[key];
             cleanUpSaveAll();

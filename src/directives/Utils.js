@@ -452,11 +452,14 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             return;
         }
         clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
-        if (!continueEdit) {
-            scope.bbApi.toggleButtonSpinner('presentation-element-save');
-        } else {
-            scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+        if (scope.bbApi) {
+            if (!continueEdit) {
+                scope.bbApi.toggleButtonSpinner('presentation-element-save');
+            } else {
+                scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+            }
         }
+        
         scope.elementSaving = true;
 
         var work = function() {
@@ -472,10 +475,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 scope.elementSaving = false;
                 handleError(reason);
             }).finally(function() {
-                if (!continueEdit) {
-                    scope.bbApi.toggleButtonSpinner('presentation-element-save');
-                } else {
-                    scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+                if (scope.bbApi) {
+                    if (!continueEdit) {
+                        scope.bbApi.toggleButtonSpinner('presentation-element-save');
+                    } else {
+                        scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+                    }
                 }
             });
         };
@@ -512,9 +517,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel', scope.edit);
             recompile();
-            scrollToElement(domElement);
+            // scrollToElement(domElement);
         };
-        scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+        if (scope.bbApi) {
+            scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+        }
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits(scope.edit)) {
             var instance = $uibModal.open({
@@ -533,11 +540,15 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             instance.result.then(function() {
                 cancelCleanUp();
             }).finally(function() {
-                scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+                if (scope.bbApi) {
+                    scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+                }
             });
         } else {
             cancelCleanUp();
-            scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+            if (scope.bbApi) {
+                scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+            }
         }
     };
 
