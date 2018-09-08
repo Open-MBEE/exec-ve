@@ -175,16 +175,10 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
             return parent;
         };
 
-        var get_selected_branch_root_ancestor = function() {
+        var expandPathToSelectedBranch = function() {
             if (selected_branch) {
-                var root = helper(selected_branch);
-                // return null if selected branch is already at the root
-                return root === selected_branch ? null : root;
-            } else { return null; }
-
-            function helper(branch) {
-                var parent = get_parent(branch);
-                if (parent) { return helper(parent); } else { return branch; }
+                expand_all_parents(selected_branch);
+                on_treeData_change();
             }
         };
 
@@ -569,7 +563,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                 on_treeData_change();
             };
 
-            tree.get_selected_branch_root_ancestor = get_selected_branch_root_ancestor;
+            tree.expandPathToSelectedBranch = expandPathToSelectedBranch;
 
             /**
              * @ngdoc function

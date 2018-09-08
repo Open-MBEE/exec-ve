@@ -935,8 +935,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
     $scope.searchInputChangeHandler = function () {
         if ($scope.treeOptions.search === '') {
-            // collapse all other subtree except the subtree of the selected branch
-            $scope.treeApi.collapse_all($scope.treeApi.get_selected_branch_root_ancestor());
+            $scope.treeApi.collapse_all();
+            $scope.treeApi.expandPathToSelectedBranch();
         } else {
             // expand all branches so that the filter works correctly
             $scope.treeApi.expand_all();
