@@ -7,7 +7,7 @@
             <mms-button-bar buttons="treeButtons" mms-bb-api="tbApi"></mms-button-bar>
             <input class="ve-plain-input" ng-model-optoins="{debounce: 1000}"
                 ng-model="treeOptions.search" type="text" placeholder="Filter tree"
-                ng-change="treeApi.expand_all()" style="flex:2">
+                ng-change="searchInputChangeHandler();" style="flex:2">
         </div>
     </div>
 </div>
