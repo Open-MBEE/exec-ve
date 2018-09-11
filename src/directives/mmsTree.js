@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTree', ["$timeout", "$log", '$templateCache', 'UtilsService', mmsTree]);
+.directive('mmsTree', ["$timeout", "$log", '$templateCache', '$filter', 'UtilsService', mmsTree]);
 
 /**
  * @ngdoc directive
@@ -97,7 +97,7 @@ angular.module('mms.directives')
  * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
  * @param {string='fa fa-file'} iconDefault default icon to use for nodes
  */
-function mmsTree($timeout, $log, $templateCache, UtilsService) {
+function mmsTree($timeout, $log, $templateCache, $filter, UtilsService) {
 
     var mmsTreeLink = function(scope, element, attrs) {
         scope.getHref = getHref;
@@ -310,12 +310,13 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                 } else
                     expand_icon = "fa fa-lg fa-fw";
 
-                if (branch.loading)
+                if (branch.loading) {
                     type_icon = "fa fa-spinner fa-spin";
-                else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase() + aggr])
+                } else if (scope.options && scope.options.types && scope.options.types[branch.type.toLowerCase() + aggr]) {
                     type_icon = scope.options.types[branch.type.toLowerCase() + aggr];
-                else
+                } else {
                     type_icon = attrs.iconDefault;
+                }
 
                 var number = section.join('.');
                 if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
@@ -346,7 +347,8 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                     label: branch.label,
                     expand_icon: expand_icon,
                     visible: visible,
-                    type_icon: type_icon
+                    type_icon: type_icon,
+                    children: branch.children
                 });
                 if (branch.children) {
                     if (scope.options.sort) {
@@ -383,7 +385,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
             }
 
         };
-        
+
         scope.expandCallback = function(obj, e){
             if(!obj.branch.expanded && scope.options.expandCallback) {
                scope.options.expandCallback(obj.branch.data.id, obj.branch, false);
@@ -399,6 +401,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
         scope.$watch('treeData', on_treeData_change, false);
         scope.$watch('initialSelection', on_initialSelection_change);
         scope.tree_rows = [];
+        scope.treeFilter = $filter('uiTreeFilter');
 
         if (attrs.initialSelection) {
             for_each_branch(function(b) {
@@ -408,7 +411,6 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                     });
                 }
             });
-
         }
 
         for_each_branch(function(b, level) {
@@ -416,7 +418,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
             b.expanded = b.level <= expand_level;
         });
 
-        on_treeData_change();
+        // on_treeData_change();
 
         scope.user_clicks_branch = function(branch) {
             if (branch !== selected_branch) 
@@ -752,7 +754,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
                 });
                 return branch;
             };
-            
+
             tree.get_rows = function() {
                 return scope.tree_rows;
             };
@@ -762,7 +764,7 @@ function mmsTree($timeout, $log, $templateCache, UtilsService) {
             };
 
         }
-        
+
         function getHref(row) {
             var data = row.branch.data;
             if (row.branch.type !== 'group' && UtilsService.isDocument(data)) {

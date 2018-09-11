@@ -1,4 +1,4 @@
-<div fa-pane pane-anchor="north" pane-size="75px" pane-no-toggle="true" pane-no-scroll="true">
+<div fa-pane pane-anchor="north" pane-size="78px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-left">
         <div class="pane-left-toolbar" role="toolbar">
             <mms-button-bar buttons="buttons" mms-bb-api="bbApi"></mms-button-bar>
@@ -17,9 +17,9 @@
                 tree-control="treeApi" initial-selection="{{ve_treeInitial}}" options="treeOptions"></mms-tree>
 
         <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
-            <h5 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h5>
+            <h4 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h4>
             <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-                <li ng-repeat=" row in view.branchList | filter:treeOptions.search track by $index  "
+                <li ng-repeat="row in view.branchList | filter:treeOptions.search track by $index"
                     class="abn-tree-row">
                     <div class="arrow" ng-click="user_clicks_branch(row)"
                         ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.id}}">
