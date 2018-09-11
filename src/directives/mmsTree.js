@@ -115,7 +115,7 @@ function mmsTree($timeout, $log, $templateCache, $filter, UtilsService) {
             attrs.iconDefault = 'fa fa-file fa-fw';
         if (!scope.options.expandLevel && scope.options.expandLevel !== 0)
             scope.options.expandLevel = 1;
-        var expand_level = scope.options.expandLevel;
+        // var expand_level = scope.options.expandLevel;
         if (!angular.isArray(scope.treeData)) {
             $log.warn('treeData is not an array!');
             return;
