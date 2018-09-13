@@ -686,7 +686,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             callback: addExistingView,
             itemsPerPage: 200,
             filterQueryList: [queryFilter]
-
         };
 
         $scope.ok = function() {

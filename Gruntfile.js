@@ -78,6 +78,7 @@ module.exports = function(grunt) {
       };
     }
   }
+
   var combineCustomJS = {
         options: {
             banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
@@ -373,7 +374,6 @@ module.exports = function(grunt) {
         }
     },
 
-
     protractor: {
       options: {
         keepAlive: true, // If false, the grunt process stops when the test fails.
@@ -446,7 +446,6 @@ module.exports = function(grunt) {
   grunt.registerTask('launch', function(build, arg1) {
     if (arg1) {
       grunt.log.writeln("Launching server with proxy");
-
       grunt.task.run('configureProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
@@ -463,5 +462,5 @@ module.exports = function(grunt) {
   grunt.registerTask('e2e',function(arg1) {
     grunt.log.writeln("Launching Protractor");
     grunt.task.run('e2e-test');
-  })
+  });
 };

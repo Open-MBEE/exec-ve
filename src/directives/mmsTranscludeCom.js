@@ -78,7 +78,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             domElement.empty();
             var doc = (preview ? scope.edit.documentation : scope.element.documentation) || '(No comment)';
-            doc += ' - ' + scope.element._creator;
+            doc += ' - <b>' + scope.element._creator + '</b>';
             if (preview) {
                 domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             } else {
