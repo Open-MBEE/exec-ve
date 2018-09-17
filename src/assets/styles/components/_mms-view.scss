@@ -1,6 +1,7 @@
 mms-view {
   .ve-view-number {
     float: left;
+    margin-right: 10px;
   }
 
   .view-title, .section-title {
@@ -9,6 +10,14 @@ mms-view {
     font-size: 35px;
     margin-top: 20px;
     margin-bottom: 15px;
+  }
+
+  // Keep title the same size as reading 
+  .view-title, .section-title {
+    .form-control{
+      height: inherit;
+      font-size: inherit;
+    }
   }
 
   &.editing {

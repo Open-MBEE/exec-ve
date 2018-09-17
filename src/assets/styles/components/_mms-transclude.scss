@@ -55,13 +55,6 @@ mms-view.editing {
 }
 
 
-
-// Keep title the same size as reading 
-.view-title .form-control{
-  height: inherit;
-  font-size: inherit;
-}
-
 /* comments */
 mms-view mms-transclude-com,
 mms-view.editing mms-transclude-com {
