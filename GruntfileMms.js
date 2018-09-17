@@ -4,6 +4,21 @@
 module.exports = function(grunt) {
     require('jit-grunt')(grunt);
 
+    var combineCustomJS = {
+        options: {
+            banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
+                wrap: 'mms',
+                mangle: true,
+                sourceMap: {
+                includeSources: true
+            }
+        },
+        files: {
+            'dist/mms.js': ['src/mms.js', 'src/services/*.js'],
+            'dist/mms.directives.js': ['src/mms.directives.js', 'src/directives/**/*.js']
+        }
+  };
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
@@ -28,6 +43,12 @@ module.exports = function(grunt) {
                 dest: 'dist/temp/js/mms.directives.tpls.js'
             }
         },
+
+        // concat only (no minification )
+        concat: {
+            combineCustomJS: combineCustomJS
+        },
+
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
@@ -65,5 +86,5 @@ module.exports = function(grunt) {
         clean: ['dist/temp']
     });
 
-    grunt.registerTask('default', ['html2js', 'uglify', 'clean']);
+    grunt.registerTask('default', ['html2js', 'concat', 'clean']);
 };

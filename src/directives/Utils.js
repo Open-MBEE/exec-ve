@@ -827,7 +827,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
      * @param {String} transcludeType name, documentation, or value
      */
     var reopenUnsavedElts = function(scope, transcludeType){
-        var unsavedEdits = scope.$root.ve_edits;
+        var unsavedEdits = {};
+        if (scope.$root.ve_edits) {
+            unsavedEdits = scope.$root.ve_edits;
+        }
         var key = scope.element.id + '|' + scope.element._projectId + '|' + scope.element._refId;
         var thisEdits = unsavedEdits[key];
         if (!thisEdits || scope.commitId !== 'latest') {
