@@ -153,7 +153,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(view) {
             var toGet = [];
             var results = [];
-            var toGetSet;
             if (view._displayedElementIds) {
                 var displayed = view._displayedElementIds;
                 if (!angular.isArray(displayed)) {
@@ -171,7 +170,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     }
                 }
             }
-            if (view.specification) {
+            if (view.specification && view.specification.operand) {
                 var specContents = view.specification.operand;
                 for (var j = 0; j < specContents.length; j++) {
                     if (specContents[j] && specContents[j].instanceId) {
@@ -179,14 +178,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     }
                 }
             }
-            toGetSet = new Set(toGet);
+            if (isTable(view) && view.specification && view.specification.value) {
+                try {
+                    var tableJson = JSON.parse(view.specification.value);
+                    if (tableJson.body) {
+                        collectTableSources(toGet, tableJson.body);
+                    }
+                } catch (e) {
+                }
+            }
             $http.get(URLService.getViewElementIdsURL(reqOb))
             .then(function(response) {
                 var data = response.data.elementIds;
-                for (var i = 0; i < data.length; i++) {
-                    toGetSet.add(data[i]);
-                }
+                toGet = toGet.concat(data);
             }).finally(function() {
+                var toGetSet = new Set(toGet);
                 reqOb.elementIds = Array.from(toGetSet);
                 ElementService.getElements(reqOb, weight, update)
                 .then(function(data) {
@@ -202,6 +208,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             delete inProgress[key];
         });
         return deferred.promise;
+    };
+
+    var collectTableSources = function(sources, body) {
+        var i, j, k;
+        for (i = 0; i < body.length; i++) {
+            var row = body[i];
+            for (j = 0; j < row.length; j++) {
+                var cell = row[j];
+                for (k = 0; k < cell.content.length; k++) {
+                    var thing = cell.content[k];
+                    if (thing.type === 'Table' && thing.body) {
+                        collectTableSources(sources, thing.body);
+                    } else if (thing.type === 'Paragraph' && thing.source) {
+                        sources.push(thing.source);
+                    }
+                }
+            }
+        }
     };
 
     /**

@@ -156,7 +156,7 @@ Put services under /src/services. For example, to add a service to do graph anal
         }
 
 ### Directives
-Put core directives under /src/directives. These should all be prefixed with mms. For example, this takes an element id argument and just displays the name.
+Put core [Directives](https://docs.angularjs.org/guide/directive "Angular Documentation about Directives") under /src/directives. These should all be prefixed with 'mms' in file names, and will be utilized as 'mms-' in html. For example, this takes an element id argument and just displays the name.
 
         /src/directives/mmsElementName.js
         
@@ -233,9 +233,13 @@ see src/services/UtilsService.getPrintCss
 
 ## Links
 * [node.js](http://nodejs.org/)
+* [angular](https://docs.angularjs.org/guide/directive)
 * [grunt](http://gruntjs.com/)
 * [sass](http://sass-lang.com/)
 * [ngdocs](https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax)
 * [grunt-ngdocs](https://github.com/m7r/grunt-ngdocs)
 * [jasmine](http://jasmine.github.io/)
-* [karma](http://karma-runner.github.io/0.12/index.html)# angularLessons
+
+## Rationale for using Karma for testing
+* [karma](http://karma-runner.github.io/0.12/index.html)
+* [thesis](https://github.com/karma-runner/karma/raw/master/thesis.pdf)

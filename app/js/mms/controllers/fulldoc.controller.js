@@ -3,9 +3,9 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', '$timeout', '$http', 'FullDocumentService',
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', '$timeout', '$http', 'FullDocumentService', 'ShortenUrlService',
     'hotkeys', 'growl', '_', 'MmsAppUtils', 'Utils', 'UxService', 'URLService', 'UtilsService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
-function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, FullDocumentService, hotkeys, growl, _,
+function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, FullDocumentService, ShortenUrlService, hotkeys, growl, _,
     MmsAppUtils, Utils, UxService, URLService, UtilsService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
@@ -191,27 +191,9 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, 
     });
 
     // Share URL button settings
-    $scope.dynamicPopover = {
-        templateUrl: 'shareUrlTemplate.html',
-        title: 'Share'
-    };
-
-    $scope.copyToClipboard = function ($event) {
-        $event.stopPropagation();
-        var target = $('#ve-short-url');
-        UtilsService.copyToClipboard(target);
-    };
-
-    $scope.handleShareURL = function() {
-        var currentUrl = URLService.getMmsServer() + $location.url();
-        var SHARE_URL = MmsAppUtils.SHARE_URL;
-        $http.post(SHARE_URL + '/url-shorten/', {'url': currentUrl}, {withCredentials : false})
-            .then(function(response) {
-                $scope.shortUrl = SHARE_URL + '/get-link/' + response.data.body.link;
-            }, function(response) {
-                // URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-            });
-    };
+    $scope.dynamicPopover = ShortenUrlService.dynamicPopover;
+    $scope.copyToClipboard = ShortenUrlService.copyToClipboard;
+    $scope.handleShareURL = ShortenUrlService.getShortUrl.bind(null, $location.absUrl(), $scope);
 
     function _createViews() {
         var loadingViewsFromServer = growl.info('Loading data from server!', {ttl: -1});

@@ -34,10 +34,10 @@
     z-index: 2;
     background: white !important;
     margin: 0;
-    font-weight: 500 !important;
-    letter-spacing: .14em;
-    font-size: 13px;
-    text-transform: uppercase;
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: .02em;
+    font-weight: 600;
     color: #535353;
     padding: 15px !important;
     border-bottom: 1px solid #e5e5e5 !important;
@@ -152,6 +152,27 @@
   table.diff{
     width: 100%;
     box-sizing: border-box;
+
+    .insert{
+      background-color: #dafde0 !important;
+    }
+
+    .delete{
+      background-color: #ffe3e3;
+      text-decoration: rgba(255,0,0,.4) line-through;
+      -webkit-text-decoration: rgba(255,0,0,.4) line-through;
+    }
+
+    td,
+    th{
+      padding: .4em .4em;
+
+    }
+
+    th {
+      font-weight: bold;
+    }
+
   }
 
   /* Hide credits for plugin author*/
@@ -162,12 +183,6 @@
   .cke_dialog_contents_body .cke_dialog_ui_vbox_child{
     table.diff tbody th{
       background-color:white !important;
-    }
-    th{
-      padding:4px;
-    }
-    .delete del{
-      text-decoration: line-through !important;
     }
   }
 }
