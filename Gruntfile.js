@@ -64,7 +64,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/mms-ts',
-            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
+            host: 'mms-ts-uat.jpl.nasa.gov',//'localhost',//'100.64.243.161',
             port: 8080
           },
           {
