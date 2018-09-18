@@ -1085,7 +1085,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {string} document/view content string to be passed to the server for conversion
      */
     var getPrintCss = function(header, footer, dnum, tag, displayTime, htmlFlag, landscape, meta) {
-        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
+        var ret = "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; text-align: left;}\n" +
                 "figure img {display: block;}\n" +
                 " tr, td, th, li, figure { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
                 ".pull-right {float: right;}\n" + 
@@ -1108,7 +1108,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 ".h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}\n" +
                 ".ng-hide {display: none;}\n" +
                 "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
-                "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
+                "caption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
+                "figcaption {text-align:left; font-weight:bold;}\n" +
                 ".mms-equation-caption {float: right;}\n" +
                 "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}" + 
                 ".toc, .tof, .tot {page-break-after:always; page: toc;}\n" +
