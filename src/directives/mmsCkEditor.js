@@ -580,7 +580,6 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 exec: function (editor) {
                     var selected_text = editor.getSelection().getSelectedText();
                     var newElement = new CKEDITOR.dom.element("code");
-                    newElement.setStyles({'background-color': 'aliceblue'});
                     newElement.setText(selected_text);
                     editor.insertElement(newElement);
                 }
@@ -591,7 +590,6 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 command: 'formatAsCode',
                 group: 'veGroup',
                 icon: 'codeSnippet'
-                // icon: this.path + 'icons/abbr.png'
             });
             editor.contextMenu.addListener(function (element) {
                 return {formatAsCode: CKEDITOR.TRISTATE_OFF};
