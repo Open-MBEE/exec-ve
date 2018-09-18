@@ -580,13 +580,14 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 exec: function (editor) {
                     var selected_text = editor.getSelection().getSelectedText();
                     var newElement = new CKEDITOR.dom.element("code");
+                    newElement.setStyles({'background-color': '#e8d4e8', color: 'black'});
                     newElement.setText(selected_text);
                     editor.insertElement(newElement);
                 }
             });
             editor.addMenuGroup('veGroup');
             editor.addMenuItem('formatAsCode', {
-                label: 'Format as Code',
+                label: 'Format as inline code',
                 command: 'formatAsCode',
                 group: 'veGroup',
                 icon: 'codeSnippet'
