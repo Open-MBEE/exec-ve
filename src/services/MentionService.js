@@ -266,11 +266,10 @@ function MentionService($rootScope, $compile, $timeout, CacheService) {
             var mentionElement = mentionState.mentionElement;
             var dropdownResultElement = mentionElement.find('ul.dropdown-menu');
             if (dropdownResultElement.children().length > 0 && !dropdownResultElement.isOnScreen()) {
-                var leftToolbar = $('.pane-left-toolbar');
-                var leftToolbarBox = leftToolbar[0].getBoundingClientRect();
+                var ckeditorBox = _getCkeditorFrame(editor).getBoundingClientRect();
                 mentionElement.css({
-                    top: leftToolbarBox.top + leftToolbar.height(),
-                    left: leftToolbarBox.left
+                    top: ckeditorBox.top,
+                    left: ckeditorBox.left
                 });
             }
         }, 0, false);
