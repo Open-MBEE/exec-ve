@@ -31,7 +31,7 @@ angular.module('mms.directives')
 function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils, ViewService) {
 
     var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
-    var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print placeholder">(no name)</span>';
+    var defaultTemplate = '<span ng-if="element.name" ng-bind-html="element.name"></span><span ng-if="!element.name" class="no-print placeholder">(no name)</span>';
     var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print placeholder">(no name)</span>';
 
     var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {

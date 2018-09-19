@@ -6,7 +6,7 @@
                 <a ng-href="{{getHref(row);}}" class="tree-item">
                     <i ng-class="{'active-text': row.branch.selected}" ng-click="expandCallback(row, $event)" class="indented tree-icon {{row.expand_icon}}" ></i>
                     <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
-                    <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
+                    <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} <span ng-bind-html="row.branch.data.name"></span></span>
                 </a>
             </div>
         </div>

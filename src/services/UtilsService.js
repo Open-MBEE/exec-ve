@@ -488,7 +488,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
     var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
         var result = ['<table class="table-bordered table-condensed">'];
         if (ApplicationService.getState().inDoc && !table.excludeFromList) {
-            result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
+            result.push('<caption>Table {{mmsPe._veNumber}}. <span ng-bind-html="table.title || mmsPe.name"></span></caption>');
         } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
         }
@@ -818,8 +818,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             //ob.tableCount++;
             prefix = 'Table ' + veNumber + '. ';
             var capTbl = el.find('table > caption');
-            name = capTbl.text();
-            if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
+            name = capTbl.html();
+            if (name && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
                 name = pe.name;
@@ -844,8 +844,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             //ob.figureCount++;
             prefix = 'Figure ' + veNumber + '. ';
             var capFig = el.find('figure > figcaption');
-            name = capFig.text();
-            if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
+            name = capFig.html();
+            if (name && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
                 name = pe.name;
@@ -898,8 +898,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         if (type === 'table') {
             prefix = 'Table ' + veNumber + '. ';
             var capTbl = el.find('table > caption');
-            name = capTbl.text();
-            if (name !== "" && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
+            name = capTbl.html();
+            if (name && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
                 name = pe.name;
@@ -914,8 +914,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         if (type === 'figure') {
             prefix = 'Figure ' + veNumber + '. ';
             var capFig = el.find('figure > figcaption');
-            name = capFig.text();
-            if (name !== "" && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
+            name = capFig.html();
+            if (name && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length);
             } else if (name === "") {
                 name = pe.name;
