@@ -580,7 +580,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 exec: function (editor) {
                     var selected_text = editor.getSelection().getSelectedText();
                     var newElement = new CKEDITOR.dom.element("code");
-                    newElement.setStyles({'background-color': '#e8d4e8', color: 'black'});
+                    newElement.addClass('inlineCode');
                     newElement.setText(selected_text);
                     editor.insertElement(newElement);
                 }
