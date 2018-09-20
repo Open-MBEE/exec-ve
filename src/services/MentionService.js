@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms')
-    .factory('MentionService', ['$rootScope', '$compile', 'CacheService', MentionService]);
+    .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'CacheService', MentionService]);
 
-function MentionService($rootScope, $compile, CacheService) {
+function MentionService($rootScope, $compile, $timeout, CacheService) {
     /** Used to maintain all mention in all ckeditors **/
     var mentions = {};
     var mentionPlacerHolderPrefix = 'mentionPlaceHolder';
@@ -53,6 +53,7 @@ function MentionService($rootScope, $compile, CacheService) {
                 var text = currentEditingElement.innerText;
                 text = text.substring(1); // ignore @
                 mentionScope.mmsMentionValue = text;
+                _repositionDropdownIfOffScreen(editor, mentionState);
             });
 
             _handleSpecialKeys(event, mentionId, editor, projectId, refId);
@@ -257,5 +258,21 @@ function MentionService($rootScope, $compile, CacheService) {
             // scroll if necessary
             target[0].parentNode.scrollTop = target[0].offsetTop;
         }
+    }
+
+    function _repositionDropdownIfOffScreen(editor, mentionState) {
+        // wait for dropdown result to render so that we can determine whether it is on/off-screen
+        $timeout(function() {
+            var mentionElement = mentionState.mentionElement;
+            var dropdownResultElement = mentionElement.find('ul.dropdown-menu');
+            if (dropdownResultElement.children().length > 0 && !dropdownResultElement.isOnScreen()) {
+                var ckeditorBox = _getCkeditorFrame(editor).getBoundingClientRect();
+                mentionElement.css({
+                    top: ckeditorBox.top,
+                    left: ckeditorBox.left
+                });
+            }
+        }, 0, false);
+
     }
 }
