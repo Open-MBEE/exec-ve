@@ -83,7 +83,7 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             var baseElementId = scope.mmsBaseElementId;
             var compareElementId = scope.mmsCompareElementId || baseElementId;
 
-            _checkSameElement({
+            var isSame = _checkSameElement({
                 baseElementId: baseElementId,
                 compareElementId: compareElementId,
 
@@ -96,7 +96,9 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                 baseProjectId: baseProjectId,
                 compareProjectId: compareProjectId
             });
-
+            if (isSame) {
+                return;
+            }
 
             var baseElementPromise = _getElementData(baseProjectId, baseRefId, baseCommitId, baseElementId);
             var comparedElementPromise = _getElementData(compareProjectId, compareRefId, compareCommitId, compareElementId);
@@ -110,13 +112,13 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                         scope.baseElementHtml = baseElementHtml;
                     });
                 } else {
-                    message = respForBaseElement.reason.data.message;
+                    message = respForBaseElement.reason.message;
                     if (message && message.toLowerCase().includes("deleted")) {
                         baseDeleted = true;
                     } else {
                         baseNotFound = true;
-                        scope.baseElementHtml = '';
                     }
+                    scope.baseElementHtml = '';
                 }
 
                 var respForComparedElement = responses[1];
@@ -125,16 +127,16 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                         scope.comparedElementHtml = comparedElementHtml;
                     });
                 } else {
-                    message = respForComparedElement.reason.data.message;
+                    message = respForComparedElement.reason.message;
                     if (message && message.toLowerCase().includes("deleted")) {
                         compDeleted = true;
                     } else {
                         compNotFound = true;
-                        scope.comparedElementHtml = '';
                     }
+                    scope.comparedElementHtml = '';
                 }
-
                 scope.message = _checkElementExistence();
+
             });
         }
 
@@ -204,7 +206,7 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
                 (data.baseCommitId === 'latest' && data.baseCommitId === data.compareCommitId && data.baseElementId === data.compareElementId && data.baseProjectId === data.compareProjectId && data.baseRefId === data.compareRefId )) {
                 scope.message = ' Comparing same version.';
                 scope.diffLoading = false;
-                return;
+                return true;
             }
         }
     }
