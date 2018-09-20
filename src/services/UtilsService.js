@@ -503,7 +503,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
             result.push('</colgroup>');
         }
-        if (table.header) {
+        if (table.header.length) {
             // only add styling to the filterable or sortable header
             if ( isFilterable || isSortable ) {
                 result.push('<thead class="doc-table-header" >');
