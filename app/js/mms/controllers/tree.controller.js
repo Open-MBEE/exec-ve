@@ -413,7 +413,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 }, 1000, false);
             }
         }
-        $rootScope.ve_tbApi.select('element-viewer');
+        //$rootScope.ve_tbApi.select('element-viewer');
     };
 
     var treeDblclickHandler = function(branch) {
