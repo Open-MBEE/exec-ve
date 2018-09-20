@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTree', ["$timeout", "$log", '$templateCache', '$filter', 'UtilsService', mmsTree]);
+.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter', 'UtilsService', mmsTree]);
 
 /**
  * @ngdoc directive
@@ -97,7 +97,7 @@ angular.module('mms.directives')
  * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
  * @param {string='fa fa-file'} iconDefault default icon to use for nodes
  */
-function mmsTree($timeout, $log, $templateCache, $filter, UtilsService) {
+function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, UtilsService) {
 
     var mmsTreeLink = function(scope, element, attrs) {
         scope.getHref = getHref;
@@ -767,7 +767,7 @@ function mmsTree($timeout, $log, $templateCache, $filter, UtilsService) {
 
         function getHref(row) {
             var data = row.branch.data;
-            if (row.branch.type !== 'group' && UtilsService.isDocument(data)) {
+            if (row.branch.type !== 'group' && UtilsService.isDocument(data) && !ApplicationService.getState().fullDoc) {
                 var ref = data._refId ? data._refId : 'master';
                 return UtilsService.PROJECT_URL_PREFIX + data._projectId + '/' + ref+ '/documents/' + data.id + '/views/' + data.id;
             }
