@@ -12,6 +12,23 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 * /src/directives/templates - html templates for our directives plus common styling
 * /app - MDEV developed application, this will be separated out in the future
 
+## Dependencies
+
+* Node.js - the Javascript based server this app _may_ be hosted from
+* npm - node package manager
+* angular.js - SPA framework du jour ;)
+* sass - css extension language
+* grunt - javascript task runner
+* grunt-cli - command line interface to the same
+
+### Optional dependencies
+* prince - for pdf generation
+* jasmine - browser and Node.js test framework
+* protractor - end-to-end tester for Angular.js that runs atop Selenium via `webdriver-manager`
+* karma - test runner
+* karma-cli - command line interface to the same
+
+
 
 ## Installation and Building
 
@@ -239,6 +256,7 @@ see src/services/UtilsService.getPrintCss
 * [ngdocs](https://github.com/idanush/ngdocs/wiki/API-Docs-Syntax)
 * [grunt-ngdocs](https://github.com/m7r/grunt-ngdocs)
 * [jasmine](http://jasmine.github.io/)
+* [protractor](https://www.protractortest.org/#/)
 
 ## Rationale for using Karma for testing
 * [karma](http://karma-runner.github.io/0.12/index.html)
