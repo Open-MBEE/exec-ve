@@ -1146,6 +1146,12 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "ins, .ins {color: black; background: #dafde0;}\n" +
                 "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
                 ".match,.textdiff span {color: gray;}\n" +
+                ".patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {background-color: #dafde0;}\n" +
+                ".patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {border: 2px dashed #abffb9;}\n" +
+                ".patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {background-color: #ffe3e3; text-decoration: line-through;}\n" +
+                ".patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {border: 2px dashed #ffb6b6;}\n" +
+                ".patcher-text-insertion, .patcher-text-deletion {display: inline !important;}\n" +
+                "[class*=\"patcher-\"]:not(td):not(tr) {display: inline-block;}\n" +
                 "\n" +
                 "/*------------------------------------------------------------------\n" +
                 "   3.2 Errors\n" +
