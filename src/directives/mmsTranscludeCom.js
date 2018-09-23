@@ -65,8 +65,8 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.element);
-            if (scope.nonEditable) {
-                growl.warning("Cross Reference is not editable.");
+            if (scope.nonEditable && mmsViewCtrl && mmsViewCtrl.isEditable()) {
+                growl.warning("Comment is not editable.");
             }
             e.stopPropagation();
         });
@@ -78,13 +78,13 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             scope.isEditing = false;
             domElement.empty();
             var doc = (preview ? scope.edit.documentation : scope.element.documentation) || '(No comment)';
-            doc += ' - ' + scope.element._creator;
+            doc += ' - <span class="mms-commenter"> Comment by <b>' + scope.element._creator + '</b></span>';
             if (preview) {
                 domElement[0].innerHTML = '<div class="panel panel-info">'+doc+'</div>';
             } else {
                 domElement[0].innerHTML = doc;
             }
-            if (MathJax) {
+            if (MathJax && !scope.mmsGenerateForDiff) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             }
             scope.recompileScope = scope.$new();
@@ -188,7 +188,8 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsRefId: '@',
             mmsCommitId: '@',
             nonEditable: '<',
-            mmsCfLabel: '@'
+            mmsCfLabel: '@',
+            mmsGenerateForDiff: '<'
         },
         require: ['?^mmsView', '?^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeComCtrl],

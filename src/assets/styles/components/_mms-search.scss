@@ -25,13 +25,26 @@
       box-shadow: 0 4px 4px -4px rgba(0,0,0,.1);
       padding-bottom: 0;
     }
+
+    .close-button {
+      position: absolute;
+      top: .5em;
+      right: .5em;
+      font-size: 1.5em;
+      color: $tertiary_grey;
+    }
   }
 
   /*Spacing for count of results at top of results*/
   .results-count {
-    padding: 20px 30px;
+    padding: 20px 42px;
     background: $ve-silver-lighter-2;
     font-size: 14px;
+    border-bottom: 1px solid $ve-silver-darker-1;
+  }
+
+  .results-filter {
+    padding-left: 20px;
   }
 
   /*Spaceing for next and previous at bottom of results*/
@@ -41,7 +54,7 @@
 
   .mms-search-input {
     max-width: 1200px;
-    padding: 30px 36px 30px 30px;
+    padding: 30px 36px 30px 42px;
     position: relative;
 
     /*Navigatiom back to basic search input, with a left back arrow*/
@@ -140,13 +153,13 @@
 -------------------------------------------------------------------*/
 
   .search-results {
-    border-top: 1px solid $ve-silver-darker-1;
+    max-width: 1200px;
   }
 
   /*Search result wrapper*/
   .elem-wrapper {
     padding: 44px 0;
-    margin: 0 30px;
+    margin: 0 42px;
     border-bottom: 1px solid $ve-silver-darker-1;
 
     .elem-name {
@@ -181,12 +194,22 @@
         }
       }
     }
-    /*Indent content so it pops out*/
+
+
+    /* Add a grey border to the left of documentation since the preview can get spread out*/
+    .elem-documentation-wrapper{
+      .elem-documentation{
+        border-left: 4px solid $ve-silver-base;
+        padding-left: 14px;
+      }
+    }
+
+    /*Indent cross referenceable content so it pops out*/
     .elem-properties,
     .elem-specification,
     .elem-documentation,
     .elem-properties-wrapper > table > tbody > tr > td:first-child {
-      padding-left: 12px;
+      padding-left: 18px;
     }
     .ellipses {
       color: $brand_base;
@@ -195,6 +218,66 @@
       color: $medium_grey;
       font-size: 14px;
       margin-top:10px;
+    }
+  }
+
+  .ve-search-filter{
+    padding-bottom: 10px;
+
+    .label-for-filter{
+      font-weight: 600;
+      letter-spacing: .12em;
+    }
+  }
+
+  .ve-btn-group-default {
+    @include button-variant($ve-light-text, $white, $ve-silver-darker-2);
+    text-transform: initial;
+    letter-spacing: normal;
+    line-height: 1.6;
+    font-weight: normal;
+    .fa {
+      padding-right: 4px;
+      font-size: 16px;
+    }
+  }
+  .btn-group {
+    .ve-btn-group-default.active, .ve-btn-group-default:active {
+      color: #f0f0f0;
+      background-color: $brand_base;
+      border-color: darken($brand_base,10%);
+    }
+  }
+
+  /*Add light colored presentation element icons to the left of the title*/
+  .search-results{
+    .item-type-View,
+    .item-type-Document,
+    .item-type-Group,
+    .pe-type-Paragraph,
+    .pe-type-ParagraphT,
+    .pe-type-Section,
+    .pe-type-SectionT,
+    .pe-type-Text,
+    .pe-type-TextT,
+    .pe-type-Table,
+    .pe-type-TableT,
+    .pe-type-Image,
+    .pe-type-ImageT,
+    .pe-type-Equation,
+    .pe-type-Comment{
+
+      position:relative;
+
+      &::before{
+        color: $ve-silver-darker-3;
+        right: 0;
+        padding: 0;
+        position: absolute;
+        top: -.1em;
+        font-size: 15px;
+        padding-right: 6px;
+      }
     }
   }
 
@@ -225,12 +308,13 @@
 
     .mms-search-input,
     .results-count {
-      padding-left: 14px;
-      padding-right: 14px;
+      padding-left: 22px;
+      padding-right: 22px;
     }
     .elem-wrapper {
-      margin-left: 14px;
-      margin-right: 14px;
+      margin-left: 22px;
+      margin-right: 22px;
     }
   }
 }
+

@@ -153,7 +153,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         .then(function(view) {
             var toGet = [];
             var results = [];
-            var toGetSet;
             if (view._displayedElementIds) {
                 var displayed = view._displayedElementIds;
                 if (!angular.isArray(displayed)) {
@@ -171,7 +170,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     }
                 }
             }
-            if (view.specification) {
+            if (view.specification && view.specification.operand) {
                 var specContents = view.specification.operand;
                 for (var j = 0; j < specContents.length; j++) {
                     if (specContents[j] && specContents[j].instanceId) {
@@ -179,14 +178,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     }
                 }
             }
-            toGetSet = new Set(toGet);
+            if (isTable(view) && view.specification && view.specification.value) {
+                try {
+                    var tableJson = JSON.parse(view.specification.value);
+                    if (tableJson.body) {
+                        collectTableSources(toGet, tableJson.body);
+                    }
+                } catch (e) {
+                }
+            }
             $http.get(URLService.getViewElementIdsURL(reqOb))
             .then(function(response) {
                 var data = response.data.elementIds;
-                for (var i = 0; i < data.length; i++) {
-                    toGetSet.add(data[i]);
-                }
+                toGet = toGet.concat(data);
             }).finally(function() {
+                var toGetSet = new Set(toGet);
                 reqOb.elementIds = Array.from(toGetSet);
                 ElementService.getElements(reqOb, weight, update)
                 .then(function(data) {
@@ -202,6 +208,24 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             delete inProgress[key];
         });
         return deferred.promise;
+    };
+
+    var collectTableSources = function(sources, body) {
+        var i, j, k;
+        for (i = 0; i < body.length; i++) {
+            var row = body[i];
+            for (j = 0; j < row.length; j++) {
+                var cell = row[j];
+                for (k = 0; k < cell.content.length; k++) {
+                    var thing = cell.content[k];
+                    if (thing.type === 'Table' && thing.body) {
+                        collectTableSources(sources, thing.body);
+                    } else if (thing.type === 'Paragraph' && thing.source) {
+                        sources.push(thing.source);
+                    }
+                }
+            }
+        }
     };
 
     /**
@@ -1042,6 +1066,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getTreeType = function(instanceSpec) {
         if (isSection(instanceSpec))
             return 'section';
+        if (instanceSpec.specification && instanceSpec.specification.value && JSON.parse(instanceSpec.specification.value).excludeFromList) {
+            return null;
+        }
         if (isTable(instanceSpec))
             return 'table';
         if (isFigure(instanceSpec))
@@ -1142,9 +1169,21 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return deferred.promise;
     };
 
-    var getPresentationElementType = function (elementOb) {
-        if (elementOb.type === 'InstanceSpecification') {
-            return _.findKey(TYPE_TO_CLASSIFIER_ID, function(o) { return o === elementOb.classifierIds[0]; });
+    var getPresentationElementType = function (instanceSpec) {
+        if (instanceSpec.type === 'InstanceSpecification') {
+            if (isSection(instanceSpec)) {
+                return 'Section';
+            }  else if (isTable(instanceSpec)) {
+                return 'Table';
+            } else if (isFigure(instanceSpec)) {
+                return 'Image';
+            } else if (isEquation(instanceSpec)) {
+                return 'Equation';
+            } else if (instanceSpec.specification && instanceSpec.specification.value) {
+                // var type = JSON.parse(instanceSpec.specification.value).type;
+                // return type.toLowerCase();
+                return JSON.parse(instanceSpec.specification.value).type;
+            }
         }
         return false;
     };
@@ -1152,7 +1191,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getElementType = function(element) {
         // Get Type
         var elementType = '';
-        if (UtilsService.isDocument(element)) {
+        if (UtilsService.isRequirement(element)) {
+            elementType = 'Requirement';
+        } else if (UtilsService.isDocument(element)) {
             elementType = 'Document';
         } else if (UtilsService.isView(element)) {
             elementType = 'View';

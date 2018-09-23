@@ -2,13 +2,13 @@
     <h4>{{title}}</h4>
 </div>
 <div class="modal-body">
-    <div class="ve-light-tabs" ng-show="showProposeLink">
+    <div class="ve-light-tabs modal-top-tabs" ng-show="showProposeLink">
         <ul class="nav nav-tabs">
             <li class="uib-tab nav-item tab-item" ng-class="{'active': !searchExisting}">
-                <a class="nav-link" ng-click="searchExisting = !searchExisting"><i class="fa fa-plus"></i>Create New</a>
+                <a class="nav-link" ng-click="searchExisting = false"><i class="fa fa-plus"></i>Create New</a>
             </li>
             <li class="uib-tab nav-item tab-item" ng-class="{'active': searchExisting}">
-                <a class="nav-link" ng-click="searchExisting = !searchExisting"><i class="fa fa-search"></i>Search for existing</a>
+                <a class="nav-link" ng-click="searchExisting = true"><i class="fa fa-search"></i>Search for existing</a>
             </li>
         </ul>
     </div>
@@ -19,7 +19,7 @@
             {{description}}
         </div>
         <div class="form-group" ng-show="!showProposeLink"><br>
-            <label>Link Title:</label>
+            <label>Link Text:</label>
             <div class="radio radio-with-label">
                 <label><input type="radio" ng-model="linkType" ng-value="1">&nbsp;Document auto-numbering
                 <a uib-tooltip="For links within current document, otherwise defaults to name" tooltip-trigger="mouseenter" tooltip-popup-delay="100"><i class="fa fa-info-circle"></i></a></label><br>

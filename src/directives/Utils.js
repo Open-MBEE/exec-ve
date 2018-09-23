@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', '_',Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl, _) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -452,11 +452,14 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             return;
         }
         clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
-        if (!continueEdit) {
-            scope.bbApi.toggleButtonSpinner('presentation-element-save');
-        } else {
-            scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+        if (scope.bbApi) {
+            if (!continueEdit) {
+                scope.bbApi.toggleButtonSpinner('presentation-element-save');
+            } else {
+                scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+            }
         }
+        
         scope.elementSaving = true;
 
         var work = function() {
@@ -472,10 +475,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 scope.elementSaving = false;
                 handleError(reason);
             }).finally(function() {
-                if (!continueEdit) {
-                    scope.bbApi.toggleButtonSpinner('presentation-element-save');
-                } else {
-                    scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+                if (scope.bbApi) {
+                    if (!continueEdit) {
+                        scope.bbApi.toggleButtonSpinner('presentation-element-save');
+                    } else {
+                        scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+                    }
                 }
             });
         };
@@ -512,9 +517,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
              // Broadcast message for the ToolCtrl:
             $rootScope.$broadcast('presentationElem.cancel', scope.edit);
             recompile();
-            scrollToElement(domElement);
+            // scrollToElement(domElement);
         };
-        scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+        if (scope.bbApi) {
+            scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+        }
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits(scope.edit)) {
             var instance = $uibModal.open({
@@ -533,11 +540,15 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             instance.result.then(function() {
                 cancelCleanUp();
             }).finally(function() {
-                scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+                if (scope.bbApi) {
+                    scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+                }
             });
         } else {
             cancelCleanUp();
-            scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+            if (scope.bbApi) {
+                scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+            }
         }
     };
 
@@ -594,7 +605,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                      // Broadcast message for the ToolCtrl:
                     $rootScope.$broadcast('presentationElem.cancel',scope.edit);
 
-                    growl.success('Delete Successful');
+                    growl.success('Remove Successful');
                 }, handleError);
 
             }).finally(function() {
@@ -697,14 +708,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             };
             ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
                 .then(function(data) {
-                    // Broadcast message to TreeCtrl:
-                    // $rootScope.$broadcast('viewctrl.add.element', elementOb, $scope.presentationElemType.toLowerCase(), $scope.viewOrSectionOb);
-                    $rootScope.$broadcast('view-reorder.refresh');
-                    $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
-                    growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                    var elemType = $scope.presentationElemType;
+                    successUpdates(elemType, $scope.viewOrSectionOb.id);
                     $uibModalInstance.close(data);
                 }, function(reason) {
-                    growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                    growl.error($scope.presentationElemType +" Add Error: " + reason.message);
                 }).finally(function() {
                 $scope.oking = false;
             });
@@ -744,14 +752,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             $scope.oking = true;
             ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
             .then(function(data) {
-                var elemType = $scope.presentationElemType.toLowerCase();
-                // $rootScope.$broadcast('viewctrl.add.element', data, elemType, $scope.viewOrSectionOb);
-                $rootScope.$broadcast('view-reorder.refresh');
-                $rootScope.$broadcast('view.reorder.saved', $scope.viewOrSectionOb.id);
-                growl.success("Adding "+$scope.presentationElemType+"  Successful");
+                var elemType = $scope.presentationElemType;
+                successUpdates(elemType, $scope.viewOrSectionOb.id);
                 $uibModalInstance.close(data);
             }, function(reason) {
-                growl.error($scope.presentationElemType+" Add Error: " + reason.message);
+                growl.error($scope.presentationElemType + " Add Error: " + reason.message);
             }).finally(function() {
                 $scope.oking = false;
             });
@@ -760,6 +765,18 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         $scope.cancel = function() {
             $uibModalInstance.dismiss();
         };
+    };
+
+    var successUpdates = function (elemType, id) {
+        $rootScope.$broadcast('view-reorder.refresh');
+        $rootScope.$broadcast('view.reorder.saved', id);
+        growl.success("Adding " + elemType + " Successful");
+        // Show comments when creating a comment PE
+        if (elemType === 'Comment' && !$rootScope.veCommentsOn) {
+            $timeout(function() {
+                $('.show-comments').click();
+            }, 0, false);
+        }
     };
 
     /**
@@ -785,7 +802,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
         });
         instance.result.then(function(data) {
-              // TODO: do anything here?
+            if (data.type !== 'InstanceSpecification') {
+                return; //do not open editor for existing pes added
+            }
+            $timeout(function() { //auto open editor for newly added pe
+                $('#' + data.id).find('mms-transclude-doc,mms-transclude-com').click();
+            }, 0, false);
         });
     };
 
@@ -805,7 +827,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
      * @param {String} transcludeType name, documentation, or value
      */
     var reopenUnsavedElts = function(scope, transcludeType){
-        var unsavedEdits = scope.$root.ve_edits;
+        var unsavedEdits = {};
+        if (scope.$root.ve_edits) {
+            unsavedEdits = scope.$root.ve_edits;
+        }
         var key = scope.element.id + '|' + scope.element._projectId + '|' + scope.element._refId;
         var thisEdits = unsavedEdits[key];
         if (!thisEdits || scope.commitId !== 'latest') {
@@ -937,6 +962,35 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
             }
         }
+        if (imgDom.width() < 860) { //keep image relative centered with text if less than 9 in
+            return;
+        }
+        var parent = imgDom.parent('p');
+        if (parent.length > 0) {
+            if (parent.css('text-align') == 'center' || parent.hasClass('image-center')) {
+                imgDom.addClass('image-center');
+            }
+            imgDom.unwrap(); //note this removes parent p and puts img and any of its siblings in its place
+        }
+    };
+
+    var toggleLeftPane = function (searchTerm) {
+        if ( searchTerm && !$rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
+
+        if ( !searchTerm && $rootScope.ve_tree_pane.closed ) {
+            $rootScope.ve_tree_pane.toggle();
+        }
+    };
+
+    var focusOnEditorAfterAddingWidgetTag = function(editor) {
+        var element = editor.widgets.focused.element.getParent();
+        var range = editor.createRange();
+        if(range) {
+            range.moveToClosestEditablePosition(element, true);
+            range.select();
+        }
     };
 
     return {
@@ -959,7 +1013,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         clearAutosaveContent: clearAutosaveContent,
         reopenUnsavedElts: reopenUnsavedElts,
         checkForDuplicateInstances: checkForDuplicateInstances,
-        fixImgSrc: fixImgSrc
+        fixImgSrc: fixImgSrc,
+        focusOnEditorAfterAddingWidgetTag: focusOnEditorAfterAddingWidgetTag,
+        toggleLeftPane: toggleLeftPane
     };
 
 }

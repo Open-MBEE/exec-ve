@@ -77,7 +77,7 @@ function mmsCf($compile) {
             scope.commitId = commitId ? commitId : 'latest';
             scope.templateElementHtml = domElement[0].innerHTML;
             if (scope.mmsCfType) {
-                domElement[0].innerHTML = '<mms-transclude-'+scope.mmsCfType+' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable" mms-cf-label="{{templateElementHtml}}"></mms-transclude-'+scope.mmsCfType+'>';
+                domElement[0].innerHTML = '<mms-transclude-' + scope.mmsCfType + (scope.mmsGenerateForDiff ? ' mms-generate-for-diff="mmsGenerateForDiff" ' : '') + ' mms-element-id="{{mmsElementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}" non-editable="nonEditable" mms-cf-label="{{templateElementHtml}}"></mms-transclude-'+scope.mmsCfType+'>';
                 $compile(domElement.contents())(scope);
             }
         };
@@ -95,7 +95,8 @@ function mmsCf($compile) {
             mmsCommitId: '@',
             mmsCfType: '@',
             mmsWatchId: '@',
-            nonEditable: '<'
+            nonEditable: '<',
+            mmsGenerateForDiff: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
         controller: ['$scope', mmsCfCtrl],

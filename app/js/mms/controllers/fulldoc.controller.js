@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', '$timeout', 'FullDocumentService',
-    'hotkeys', 'growl', '_', 'MmsAppUtils', 'UxService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
-function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDocumentService, hotkeys, growl, _,
-    MmsAppUtils, UxService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
+.controller('FullDocCtrl', ['$scope', '$rootScope', '$state', '$anchorScroll', '$location', '$timeout', '$http', 'FullDocumentService', 'ShortenUrlService',
+    'hotkeys', 'growl', '_', 'MmsAppUtils', 'Utils', 'UxService', 'URLService', 'UtilsService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
+function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, FullDocumentService, ShortenUrlService, hotkeys, growl, _,
+    MmsAppUtils, Utils, UxService, URLService, UtilsService, search, orgOb, projectOb, refOb, groupOb, documentOb) {
 
     $rootScope.ve_fullDocMode = true;
     if (!$rootScope.veCommentsOn)
@@ -17,6 +17,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
         $rootScope.ve_editmode = false;
 
     $scope.search = search;
+    Utils.toggleLeftPane(search);
     $scope.buttons = [];
     $scope.refOb = refOb;
     $scope.projectOb = projectOb;
@@ -61,6 +62,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
         emptyDocTxt: 'This field is empty.',
         searchInput: search,
         getProperties: true,
+        closeable: true,
         callback: function(elementOb) {
             $rootScope.$broadcast('elementSelected', elementOb, 'latest');
             if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
@@ -188,6 +190,11 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
         });
     });
 
+    // Share URL button settings
+    $scope.dynamicPopover = ShortenUrlService.dynamicPopover;
+    $scope.copyToClipboard = ShortenUrlService.copyToClipboard;
+    $scope.handleShareURL = ShortenUrlService.getShortUrl.bind(null, $location.absUrl(), $scope);
+
     function _createViews() {
         var loadingViewsFromServer = growl.info('Loading data from server!', {ttl: -1});
         views.push({id: documentOb.id, api: {
@@ -255,7 +262,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, FullDoc
             },
             elementTranscluded: _elementTranscluded,
             elementClicked: _elementClicked
-        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1 && curSec !== 1) : false)};
+        }, number: curSec, topLevel: (curSec ? (curSec.toString().indexOf('.') === -1) : false), first: curSec == 1};
     }
 
     function _constructViews(viewId, curSection) {

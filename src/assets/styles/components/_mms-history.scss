@@ -5,7 +5,6 @@
 /*Delete styling*/
 del {
   background-color: #ffe3e3 !important;
-  text-decoration: line-through !important;
 }
 
 /*Insert styling*/
@@ -67,7 +66,7 @@ mms-history {
 
   .inline-diff-buttons span:first-child {
     padding-left:0;
-    width: 4.5em;
+    width: 3.4em;
   }
 
   /*Custom styling to keep labels inline with dropdowns*/

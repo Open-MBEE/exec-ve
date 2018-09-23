@@ -186,10 +186,10 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         return deferred.promise;
     };
 
-    var createJobCacheKey = function(reqOb) {
-        var refId = !reqOb.refId ? 'master' : reqOb.refId;
-        return ['job', reqOb.projectId, refId, reqOb.elementId];
-    };
+    // var createJobCacheKey = function(reqOb) {
+    //     var refId = !reqOb.refId ? 'master' : reqOb.refId;
+    //     return ['job', reqOb.projectId, refId, reqOb.elementId];
+    // };
 
     return {
         createJob: createJob,
