@@ -1226,7 +1226,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 }
                 ret += '@page {@' + key + ' {font-size: 9px; content: ' + content + ';}}\n';
             }
-        });*/
+        });
         if (landscape) {
             ret += "@page {size: 11in 8.5in;}";
         }
