@@ -1,10 +1,23 @@
 mms-view {
+  .ve-view-number {
+    float: left;
+    margin-right: 10px;
+  }
+
   .view-title, .section-title {
     font-family: $light-font-family-sans-serif;
     font-weight: $light_font_weight;
     font-size: 35px;
     margin-top: 20px;
     margin-bottom: 15px;
+  }
+
+  // Keep title the same size as reading 
+  .view-title, .section-title {
+    .form-control{
+      height: inherit;
+      font-size: inherit;
+    }
   }
 
   &.editing {

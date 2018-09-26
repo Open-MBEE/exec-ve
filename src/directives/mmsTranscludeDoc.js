@@ -79,7 +79,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
             if (mmsViewCtrl)
                 mmsViewCtrl.transcludeClicked(scope.element);
-            if (scope.nonEditable) {
+            if (scope.nonEditable && mmsViewCtrl && mmsViewCtrl.isEditable()) {
                 growl.warning("Cross Reference is not editable.");
             }
             e.stopPropagation();
@@ -119,7 +119,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                     UtilsService.addLiveNumbering(pe, $('#' + pe.id), type);
                 }
             }
-            if (MathJax) {
+            if (MathJax && !scope.mmsGenerateForDiff) {
                 MathJax.Hub.Queue(["Typeset", MathJax.Hub, domElement[0]]);
             }
             scope.recompileScope = scope.$new();
@@ -250,7 +250,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             mmsCommitId: '@',
             mmsWatchId: '@',
             nonEditable: '<',
-            mmsCfLabel: '@'
+            mmsCfLabel: '@',
+            mmsGenerateForDiff: '<'
         },
         require: ['?^^mmsView','?^^mmsViewPresentationElem'],
         controller: ['$scope', mmsTranscludeDocCtrl],

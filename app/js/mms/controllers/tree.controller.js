@@ -413,7 +413,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 }, 1000, false);
             }
         }
-        $rootScope.ve_tbApi.select('element-viewer');
+        //$rootScope.ve_tbApi.select('element-viewer');
     };
 
     var treeDblclickHandler = function(branch) {
@@ -559,6 +559,11 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function(data) {
+            if (!$rootScope.ve_editmode) {
+                $timeout(function() {
+                    $('.show-edits').click();
+                }, 0, false);
+            }
             var newbranch = {
                 label: data.name,
                 type: newBranchType,
@@ -643,7 +648,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 growl.info("Please wait...");
                 return;
             }
-            $scope.oking = true;  
+            $scope.oking = true;
             ViewService.addViewToParentView({
                 parentViewId: $scope.parentBranchData.id,
                 viewId: viewId,
@@ -681,7 +686,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             callback: addExistingView,
             itemsPerPage: 200,
             filterQueryList: [queryFilter]
-
         };
 
         $scope.ok = function() {
@@ -773,6 +777,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             if ($rootScope.ve_fullDocMode) {
                 cb(branch);
             } else {
+                $scope.treeApi.clear_selected_branch();
                 $state.go('^', {search: undefined});
             }
         });
@@ -926,4 +931,15 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.user_clicks_branch = function(branch) {
         $rootScope.ve_treeApi.user_clicks_branch(branch);
     };
+
+    $scope.searchInputChangeHandler = function () {
+        if ($scope.treeOptions.search === '') {
+            $scope.treeApi.collapse_all();
+            $scope.treeApi.expandPathToSelectedBranch();
+        } else {
+            // expand all branches so that the filter works correctly
+            $scope.treeApi.expand_all();
+        }
+    };
+
 }]);

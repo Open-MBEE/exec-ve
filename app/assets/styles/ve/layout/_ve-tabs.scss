@@ -1,0 +1,136 @@
+
+/*------------------------------------------------------------------
+[Tabs Table of Contents]
+
+1. Dark Tabs
+2. Light Tabs
+  2.1 Silver Inset Tabs for Modals
+
+-------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+1. Dark Tabs
+-------------------------------------------------------------------*/
+
+.ve-dark-dropdown-wide,
+.ve-dark-dropdown-nav{
+  .nav-tabs {
+    background-color: $ve-slate-base;
+
+    > li.uib-tab {
+      width: 50%;
+      text-align: center;
+
+      > a {
+        background-color: $ve-slate-base;
+        border: none;
+        border-bottom: 3px solid $ve-slate-base;
+        color: $ve-white-text-lighter-2;
+        margin: 0;
+
+        &:hover {
+          background-color: $ve-slate-base;
+          border-bottom: 3px solid $ve-teal-darker-1;
+        }
+      }
+
+      &.active > a {
+        background-color: $ve-slate-base;
+        border: none;
+        border-bottom: 3px solid $ve-teal-base;
+        color: white;
+        margin: 0;
+      }
+    }
+  }
+
+  //Clear hoverstate for tabs and list items with buttons in them
+  .list-with-tabs li.button-item,
+  .list-with-tabs li.button-item:hover,
+  .nav-tabs > li.uib-tab {
+    background-color: $ve-slate-base;
+  }
+}
+
+/*------------------------------------------------------------------
+2. Light Tabs
+-------------------------------------------------------------------*/
+
+.ve-light-tabs {
+
+  .nav-tabs{
+    border-bottom: none;
+
+    > li {
+      margin: 0 8px;
+
+      &.uib-tab {
+        text-align: center;
+
+        > a {
+          border: none;
+          color: #333;
+          margin: 0;
+          line-height: 21px;
+
+          &:hover,
+          &:focus{
+            background-color: $ve-silver-lighter-0;
+            border-bottom: 3px solid $ve-teal-lighter-2;
+          }
+        }
+      }
+
+      &.active > a{
+        border: none;
+        border-bottom: 3px solid $ve-teal-lighter-1;
+        margin: 0;
+        font-weight: 600;
+        color: #333;
+      }
+    }
+  }
+
+  .fa{
+    opacity: .4;
+    padding-right: 6px;
+  }
+  
+  //If it's above a well, pull tabs down so it's touching
+  &~.well{
+    margin-top: 0;
+  }
+
+/*------------------------------------------------------------------
+  2.1 Silver Inset Tabs for modals
+-------------------------------------------------------------------*/
+
+  &.modal-top-tabs{
+
+    //Create silver background that extends to edges of modals
+    background-color: $ve-silver-lighter-0;
+    margin:-15px -15px 20px;
+
+    .nav-tabs{
+    //add bootstrap bottom border back
+    border-bottom: 1px solid #ddd;
+
+      > li.uib-tab{
+        > a{
+          background-color: $ve-silver-lighter-0;
+          border-bottom: 3px solid $ve-silver-lighter-0;
+        
+          &:hover,
+          &:focus{
+            background-color: $ve-silver-lighter-0;
+            border-bottom: 3px solid $ve-teal-lighter-2;
+          }
+        }
+
+        &.active > a{
+          border-bottom: 3px solid $ve-teal-lighter-1;
+        }
+      }
+    }
+  }
+}

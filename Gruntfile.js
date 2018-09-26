@@ -64,7 +64,7 @@ module.exports = function(grunt) {
         proxies: [
           {
             context: '/mms-ts',
-            host: 'cae-ts-test.jpl.nasa.gov',//'localhost',//'100.64.243.161',
+            host: 'mms-ts-uat.jpl.nasa.gov',//'localhost',//'100.64.243.161',
             port: 8080
           },
           {
@@ -78,6 +78,7 @@ module.exports = function(grunt) {
       };
     }
   }
+
   var combineCustomJS = {
         options: {
             banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
@@ -290,6 +291,7 @@ module.exports = function(grunt) {
         reporterOutput: '',
         evil: true, //allow eval for plot integration
         globalstrict: true,
+        validthis: true,
         globals: {
           angular: true,
           window: true,
@@ -355,7 +357,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: groupId + ':ve:zip',
-            version: '3.3.1',
+            version: '3.4.0',
             path: 'deploy/'
           }]
         }
@@ -371,7 +373,6 @@ module.exports = function(grunt) {
           logLevel: 'ERROR'
         }
     },
-
 
     protractor: {
       options: {
@@ -445,7 +446,6 @@ module.exports = function(grunt) {
   grunt.registerTask('launch', function(build, arg1) {
     if (arg1) {
       grunt.log.writeln("Launching server with proxy");
-
       grunt.task.run('configureProxies:' + arg1, 'connect:' + arg1);
     } else {
       grunt.log.writeln("Launching server with proxy API");
@@ -462,5 +462,5 @@ module.exports = function(grunt) {
   grunt.registerTask('e2e',function(arg1) {
     grunt.log.writeln("Launching Protractor");
     grunt.task.run('e2e-test');
-  })
+  });
 };

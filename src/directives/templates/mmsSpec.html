@@ -1,7 +1,7 @@
 <!-- HTML for edit mode -->
 <div ng-if="!noEdit && editing" class="editing">
 
-    <h1 class="prop" ng-if="edit.name"><input class="form-control ve-plain-input" type="text" ng-model="edit.name"></h1>
+    <h1 class="prop" ng-if="edit.name !== undefined"><input class="form-control ve-plain-input" type="text" ng-model="edit.name"></h1>
     <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
@@ -109,7 +109,7 @@
             <div ng-repeat="value in values" ng-switch on="value.type">
                 <span class="prop" ng-switch-when="LiteralInteger">{{value.value}}</span>
                 <span class="prop" ng-switch-when="LiteralBoolean">{{value.value}}</span>
-                <span class="prop" ng-switch-when="LiteralReal">{{value.value}}</span>
+                <span class="prop" ng-switch-when="LiteralReal">{{value.value | veRealNum}}</span>
                 <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.value}}</span>
                 <span class="prop" ng-switch-when="LiteralString" ng-bind-html="value.value"></span>
                 <span class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>
@@ -148,7 +148,7 @@
             <div ng-switch on="values[0].type">
                 <span class="prop" ng-switch-when="LiteralInteger">{{values[0].value}}</span>
                 <span class="prop" ng-switch-when="LiteralBoolean">{{values[0].value}}</span>
-                <span class="prop" ng-switch-when="LiteralReal">{{values[0].value}}</span>
+                <span class="prop" ng-switch-when="LiteralReal">{{values[0].value | veRealNum}}</span>
                 <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{values[0].value}}</span>
                 <span class="prop" ng-switch-when="LiteralString" ng-bind-html="values[0].value"></span>
                 <span class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.elementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}"></mms-transclude-name></span>
@@ -195,8 +195,8 @@
             <h2 class="prop-title">Location</h2>
             <span class="prop">{{element._qualifiedName}}</span>
             <h2 class="prop-title">ID&nbsp;
-                <button ng-click="copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default">
-                    <i class="fa fa-copy"></i>&nbsp;Copy
+                <button ng-click="copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default" uib-tooltip="Copy ID">
+                    <i class="fa fa-copy"></i>
                 </button>
             </h2>
             <span class="prop id" title="Copy ID">

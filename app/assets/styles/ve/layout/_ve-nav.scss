@@ -266,8 +266,9 @@ nav.project-level-header {
 
       a{
         padding: 0 7px 0 5px;
+        max-width: 100%;
 
-      /*Hover state over links to show it's clickable*/
+        /*Hover state over links to show it's clickable*/
         &:hover{
           text-decoration: underline;
         }
@@ -286,7 +287,7 @@ nav.project-level-header {
     .back-to-proj{
       font-size: 1.2em;
       top: .05em;
-      position: relative;    
+      position: relative;
     }
   }
 }
@@ -316,14 +317,14 @@ nav.project-level-header {
   }
 }
 
-/*Hide all but the first 2 breadcrumbs and add */
+/*Hide all but the last 2 breadcrumbs */
 @media (max-width: 1000px) and (min-width: 700px){
   .breadcrumbs{
-    li:nth-child(3):after{
-      content: "\203A ...";
-    }
+    // li:nth-child(2):after{
+    //   content: "\203A ...";
+    // }
 
-    li:nth-child(2){
+    li:nth-last-child(-n+2) {
       a, span{
         display: inline-block;
       }
@@ -334,9 +335,14 @@ nav.project-level-header {
 /*Add an ellipsis after the home to show there's more */
 @media (max-width: 700px){
   .breadcrumbs{
-    li:nth-child(2):after{
-      content: "\203A ...";
+    li:nth-last-child(2){
+      a, span{
+        display: inline-block;
+      }
     }
+  }
+  .navbar-right {
+    display: none;
   }
 }
 

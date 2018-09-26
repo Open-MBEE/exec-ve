@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsCkeditor', ['CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', '$uibModal', '$templateCache', '$window', '$timeout', 'growl', 'CKEDITOR', '_', mmsCkeditor]);
+.directive('mmsCkeditor', ['$uibModal', '$templateCache', '$timeout', 'growl', 'CKEDITOR', '_', 'CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'Utils', mmsCkeditor]);
 
 /**
  * @ngdoc directive
@@ -29,11 +29,8 @@ angular.module('mms.directives')
  * <pre>
    <textarea mms-ckeditor ng-model="element.documentation"></textarea>
    </pre>
- *
- * @param {string} mmsProjectId The project id for the view
- * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, URLService, $uibModal, $templateCache, $window, $timeout, growl, CKEDITOR, _) { //depends on angular bootstrap
+function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, CacheService, ElementService, UtilsService, ViewService, URLService, MentionService, Utils) { //depends on angular bootstrap
     var generatedIds = 0;
 
     var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl) {
@@ -42,29 +39,13 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
         }
 
         var instance = null;
-        var autocompleteModalTemplate = $templateCache.get('mms/templates/mmsAutocompleteModal.html');
         var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
         var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
 
         // Controller for inserting cross reference
         // Defines scope variables for html template and how to handle user click
         // Also defines options for search interfaces -- see mmsSearch.js for more info
-        var transcludeCtrl = function($scope, $uibModalInstance, autocomplete) {
-            var autocompleteName;
-            var autocompleteProperty;
-            var autocompleteElementId;
-            if (autocomplete) {
-                $scope.cacheElements = CacheService.getLatestElements(scope.mmsProjectId, scope.mmsRefId);
-                $scope.autocompleteItems = [];
-                $scope.cacheElements.forEach(function(cacheElement) {
-                    $scope.autocompleteItems.push({ 'id' : cacheElement.id, 'name' : cacheElement.name , 'type': ' - name' });
-                    $scope.autocompleteItems.push({ 'id' : cacheElement.id, 'name' : cacheElement.name , 'type': ' - documentation' });
-                    if (cacheElement.type === 'Property') {
-                        $scope.autocompleteItems.push({ 'id' : cacheElement.id, 'name' : cacheElement.name , 'type': ' - value' });
-                    }
-                });
-            }
-
+        var transcludeCtrl = function($scope, $uibModalInstance) {
             $scope.title = 'Insert cross reference';
             $scope.description = 'Begin by searching for an element, then click a field to cross-reference.';
             $scope.searchExisting = true;
@@ -131,63 +112,17 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                     $scope.requestDocumentation = true;
                 }
             };
-            $scope.autocompleteOnSelect = function($item, $model, $label) {
-                autocompleteElementId = $item.id;
-                var lastIndexOfName = $item.name.lastIndexOf(" ");
-                autocompleteName = $item.name.substring(0, lastIndexOfName);
-
-                var property = $label.split(' ');
-                property = property[property.length - 1];
-                if (property === 'name') {
-                    autocompleteProperty = 'name';
-                } else if (property === 'documentation') {
-                    autocompleteProperty = 'doc';
-                } else if (property === 'value') {
-                    autocompleteProperty = 'val';
-                }
-            };
-            $scope.autocomplete = function(success) {
-                if (success) {
-                    var tag = '<mms-cf mms-cf-type="' + autocompleteProperty + '" mms-element-id="' + autocompleteElementId + '">[cf:' + autocompleteName + '.' + autocompleteProperty + ']</mms-cf>';
-                    $uibModalInstance.close(tag);
-                } else {
-                    $uibModalInstance.close(false);
-                }
-            };
         };
 
-        var autocompleteCallback = function(ed) {
-            var instance = $uibModal.open({
-                template: autocompleteModalTemplate,
-                windowClass: 've-dropdown-short-modal',
-                scope: scope,
-                resolve: {autocomplete: true},
-                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
-                size: 'sm'
-            });
-
-            instance.result.then(function(tag) {
-                if (!tag) {
-                    transcludeCallback(ed, true);
-                } else {
-                    addWidgetTag(ed, tag);
-                }
-            }, function() {
-                ed.insertText('@');
-                ed.focus();
-            });
-        };
-
-        var transcludeCallback = function(ed, fromAutocomplete) {
+        var transcludeCallback = function(ed) {
             var instance = $uibModal.open({
                 template: transcludeModalTemplate,
                 scope: scope,
-                resolve: {autocomplete: false},
-                controller: ['$scope', '$uibModalInstance', 'autocomplete', transcludeCtrl],
+                controller: ['$scope', '$uibModalInstance', transcludeCtrl],
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                addWidgetTag(ed, tag);
+                _addWidgetTag(ed, tag);
             }, function() {
                 var focusManager = new CKEDITOR.focusManager( ed );
                 focusManager.focus();
@@ -315,7 +250,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 size: 'lg'
             });
             instance.result.then(function(tag) {
-                addWidgetTag(ed, tag);
+                _addWidgetTag(ed, tag);
             });
         };
 
@@ -359,7 +294,7 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 controller: ['$scope', '$uibModalInstance', commentCtrl]
             });
             instance.result.then(function(tag) {
-                addWidgetTag(ed, tag);
+                _addWidgetTag(ed, tag);
             });
         };
 
@@ -436,6 +371,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 break;
         }
 
+        var deb = _.debounce(function(e) {
+            update();
+        }, 1000);
+
         $timeout(function() {
             // Initialize ckeditor and set event handlers
             $(element).val(ngModelCtrl.$modelValue);
@@ -447,7 +386,6 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 mmsreset: {callback: mmsResetCallback},
                 contentsCss: CKEDITOR.basePath+'contents.css',
                 toolbar: thisToolbar
-                // height: $window.innerHeight*0.4,
             });
 
             // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
@@ -463,12 +401,41 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
                 instance.config.autosave = {enableAutosave: false};
             }
 
+            instance.on( 'instanceReady', function() {
+                addCkeditorHtmlFilterRule(instance);
+            } );
+
+            function addCkeditorHtmlFilterRule(instance) {
+                instance.dataProcessor.htmlFilter.addRules({
+                    elements: {
+                        $: function (element) {
+                            if (element.name === 'script') {
+                                element.remove();
+                                return;
+                            }
+                            
+                            if (element.name.startsWith('mms-')) {
+                                if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    element.replaceWithChildren();
+                                    return;
+                                }
+                            }
+
+                            var attributesToDelete = Object.keys(element.attributes).filter(function(attrKey) {
+                                return attrKey.startsWith('ng-');
+                            });
+                            attributesToDelete.forEach(function(attrToDelete) {
+                                delete element.attributes[attrToDelete];
+                            });
+                        }
+                    }
+                });
+            }
+
             instance.on( 'init', function(args) {
                 ngModelCtrl.$setPristine();
             });
-            var deb = _.debounce(function(e) {
-                update();
-            }, 1000);
+
             instance.on( 'change', deb);
             instance.on( 'afterCommandExec', deb);
             instance.on( 'resize', deb);
@@ -476,23 +443,10 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             instance.on( 'blur', function(e) {
                 instance.focusManager.blur();
             });
-            instance.on( 'key', function(e) {
-                if(e.data.domEvent.$.shiftKey && e.data.domEvent.$.key === '@') {
-                    autocompleteCallback(instance);
-                    // to prevent ckeditor from adding the @ symbol when user actually want to do cross referencing
-                    return false;
-                } else {
-                    if (e.data.keyCode == 9 || e.data.keyCode == (CKEDITOR.SHIFT + 9)) {
-                        //trying to prevent tab and shift tab jumping focus out of editor
-                        if (e.data.keyCode == 9) {
-                            instance.insertHtml('&nbsp;&nbsp;&nbsp;&nbsp;');
-                        }
-                        e.cancel();
-                        e.stop();
-                    }
-                    deb(e); 
-                }
-            }, null, null, 31); //priority is after indent list plugin's event handler
+            instance.on( 'key', _keyHandler , null, null, 31); //priority is after indent list plugin's event handler
+
+            _addInlineMention();
+
             if (scope.mmsEditorApi) {
                 scope.mmsEditorApi.save = function() {
                     update();
@@ -548,23 +502,72 @@ function mmsCkeditor(CacheService, ElementService, UtilsService, ViewService, UR
             if (!instance) {
                 instance = CKEDITOR.instances[attrs.id];
             } else {
+                MentionService.removeAllMentionForEditor(instance);
                 instance.destroy();
                 instance = null;
             }
         });
 
-        function addWidgetTag(editor, tag) {
+        function _addWidgetTag(editor, tag) {
             editor.insertHtml( tag );
-            focusOnEditorAfterAddingWidgetTag(editor);
+            Utils.focusOnEditorAfterAddingWidgetTag(editor);
         }
 
-        function focusOnEditorAfterAddingWidgetTag(editor) {
-            var element = editor.widgets.focused.element.getParent();
-            var range = editor.createRange();
-            if(range) {
-                range.moveToClosestEditablePosition(element, true);
-                range.select();
+        function _addInlineMention() {
+            var keyupHandler;
+            CKEDITOR.instances[attrs.id].on('contentDom', function() {
+                keyupHandler = CKEDITOR.instances[instance.name].document.on('keyup', function(e) {
+                    if(_isMentionKey(e.data.$)) {
+                        MentionService.createMention(instance, scope.mmsProjectId, scope.mmsRefId);
+                    } else {
+                        MentionService.handleInput(e, instance, scope.mmsProjectId, scope.mmsRefId);
+                    }
+                });
+            });
+
+            CKEDITOR.instances[attrs.id].on('contentDomUnload', function() {
+                if (keyupHandler) {
+                    keyupHandler.removeListener();
+                }
+            });
+        }
+
+        function _keyHandler(e) {
+            if (_isMentionKey(e.data.domEvent.$)) {
+                return false; // to prevent "@" from getting written to the editor
             }
+
+            // when tab is pressed or any of these special keys is pressed while the mention results show up, ignore default ckeditor's behaviour
+            var ignoreDefaultBehaviour = _isTabKey(e) || (_isSpecialKey(e) && MentionService.hasMentionResults(instance) );
+            if ( ignoreDefaultBehaviour ) {
+                e.cancel(); e.stop();
+            }
+
+            if (_isTabKey(e) && !_isShiftKeyOn(e.data.domEvent.$)) {
+                instance.insertHtml('&nbsp;&nbsp;&nbsp;&nbsp;');
+            }
+
+            if (!ignoreDefaultBehaviour) {
+                deb(e);
+            }
+        }
+
+        // 13 = enter, 38 = up arrow, 40 = down arrow
+        function _isSpecialKey(event) {
+            var key = event.data.domEvent.$.which;
+            return key === 13 || key === 38 || key === 40;
+        }
+
+        function _isTabKey(event) {
+            return event.data.domEvent.$.which === 9;
+        }
+
+        function _isMentionKey(keyboardEvent) {
+            return _isShiftKeyOn(keyboardEvent) && keyboardEvent.key === '@';
+        }
+
+        function _isShiftKeyOn(keyboardEvent) {
+            return keyboardEvent.shiftKey;
         }
     };
 

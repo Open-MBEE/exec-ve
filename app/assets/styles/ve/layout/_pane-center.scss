@@ -72,32 +72,19 @@ tr {
 .container-tree-reorder {
   margin-bottom: 24px;
 
-  .tree-reorder {
-    margin: 0 auto;
-    padding-top: 12px;
-    padding-bottom: 24px;
-    clear: both;
-    border: 1px solid $ve-silver-darker-1;
-    border-radius: 3px;
-    background-color: $ve-silver-lighter-1;
-    padding: 8px;
-    margin: 18px 0;
-  }
-
+  /*Float reorder buttons to the right */
   .btn-tree-reorder-save {
     float: right;
     margin-top: 24px;
     margin-right: 8px;
-    padding-left: 27px;
-    padding-right: 27px;
   }
 
   .angular-ui-tree-handle {
     font-family: $font-family-sans-serif;
-    color:$ve-slate-base;
-    padding:4px 6px;
+    color: $ve-slate-base;
+    padding: 4px 6px;
     border-radius: 2px;
-    font-weight:bold;
+    font-weight: bold;
     -webkit-transition: background-color .1s ease-out !important;
     -moz-transition: background-color .1s ease-out !important;
     -o-transition: background-color .1s ease-out !important;
@@ -129,6 +116,7 @@ tr {
     background-color:transparent;
   }
 
+  /*Add blue dotted line to visual feedback of where the item will be placed*/
   .angular-ui-tree-placeholder:before{
     background-image: url(../assets/location-feedback.svg);
     content: ' ';
@@ -170,4 +158,10 @@ tr {
   .fa-folder{
     color: lighten($ve-accent, 24%);
   }
+}
+
+
+/* Overwrite angularjs bootstrap's popuover so that the popover's container expands with its content */
+.popover {
+  max-width: none;
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veMenu', ['CacheService','$state','$templateCache','$sce', 'UtilsService',veMenu]);
+.directive('veMenu', ['CacheService','$state','$templateCache','$sce', '$timeout', 'UtilsService',veMenu]);
 
 /**
  * @ngdoc directive
@@ -22,17 +22,16 @@ angular.module('mmsApp')
  * and tags for selected view.
  *
  */
-function veMenu(CacheService, $state, $templateCache, $sce, UtilsService) {
+function veMenu(CacheService, $state, $templateCache, $sce, $timeout, UtilsService) {
     var template = $templateCache.get('partials/mms/veMenu.html');
 
     var veMenuLink = function(scope, element, attrs) {
         scope.getHrefForProject = getHrefForProject;
         scope.getHrefForBranch = getHrefForBranch;
         scope.getHrefForTag = getHrefForTag;
-
-
         scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.');
         scope.currentProject = scope.project.name;
+
         if (scope.ref) {
             scope.currentRef = scope.ref;
             if (scope.ref.type === 'Branch') {
@@ -119,13 +118,13 @@ function veMenu(CacheService, $state, $templateCache, $sce, UtilsService) {
                 }
             }
             scope.breadcrumbs = bcrumbs.reverse();
-            // if (scope.breadcrumbs.length) {
-            //     scope.breadcrumbs[scope.breadcrumbs.length-1].showAlf = true;
-            // }
-            var eltWidth = element.parent().width();
-            var crumbcount = scope.breadcrumbs.length;
-            var liWidth = (eltWidth * 0.65)/crumbcount;
-            scope.truncateStyle={'max-width': liWidth, 'white-space': 'nowrap', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'display': 'inline-block'};
+            $timeout(function() {
+                var eltChildren = element.children().children();
+                var eltWidth = element.parent().width() - eltChildren[0].scrollWidth - eltChildren[2].scrollWidth;
+                var crumbcount = scope.breadcrumbs.length;
+                var liWidth = (eltWidth * 0.85)/crumbcount;
+                scope.truncateStyle = {'max-width': liWidth, 'white-space': 'nowrap', 'overflow': 'hidden', 'text-overflow': 'ellipsis', 'display': 'inline-block'};
+            });
         }
 
         function getHrefForProject(project) {

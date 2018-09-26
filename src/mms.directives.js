@@ -71,12 +71,22 @@
     angular.module('exampleApp', ['mms', 'mms.directives']);
     </pre>
  */
-angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect'])
-.config(['$sceProvider', 'growlProvider', function($sceProvider, growlProvider) {
+angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter'])
+.config(['$sceProvider', 'growlProvider', 'uiTreeFilterSettingsProvider', function($sceProvider, growlProvider, uiTreeFilterSettingsProvider) {
     $sceProvider.enabled(false);
     growlProvider.onlyUniqueMessages(false);
     growlProvider.globalTimeToLive({success: 5000, error: -1, warning: 5000, info: 5000});
     growlProvider.globalPosition('bottom-right');
+    uiTreeFilterSettingsProvider.addresses = ['label'];
+    uiTreeFilterSettingsProvider.descendantCollection = 'children';
 }])
+.filter('veRealNum', function() {
+    return function(n) {
+        if (Number.isInteger(n)) {
+            return n + '.0';
+        }
+        return n;
+    };
+})
 .constant('CKEDITOR', window.CKEDITOR)
 .constant('MathJax', window.MathJax);
