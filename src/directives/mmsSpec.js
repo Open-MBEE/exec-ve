@@ -150,10 +150,11 @@ function mmsSpec(Utils, AuthService, ElementService, ViewService, $templateCache
                         size: 1,
                         sort : [{ _modified : {order : "desc"}}],
                         query: {bool: {filter: [{term: {id: data.id}}, {term: {'_projectId': data._projectId}}]}}
-                    }, 2).then(function(searchResult) {
+                    }, 2).then(function(searchResultOb) {
                         if (newVal !== lastid) {
                             return;
                         }
+                        var searchResult = searchResultOb.elements;
                         if (searchResult && searchResult.length == 1 && searchResult[0].id === data.id && searchResult[0]._relatedDocuments.length > 0) {
                             scope.relatedDocuments = searchResult[0]._relatedDocuments;
                         }
