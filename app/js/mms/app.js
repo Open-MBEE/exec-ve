@@ -30,6 +30,14 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             locationPath = '/' + locationPath;
         if (locationPath[locationPath.length-1] == '/')
             locationPath = locationPath.substring(0, locationPath.length-1);
+
+        // if loading 'full' route with an anchor id, switch to views route instead
+        var string = '/full#';
+        var index = locationPath.indexOf(string);
+        if ( index !== -1 && $location.hash()) {
+            locationPath = locationPath.substr(0, index) + '/views/' + $location.hash();
+        }
+
         if (locationPath !== $location.url())
             $location.url(locationPath);
     });
