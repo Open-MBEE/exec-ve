@@ -41,7 +41,7 @@
     "karma-junit-reporter": "^1.2.0",
     "karma-nyan-reporter": "^0.2.3",
     "karma-phantomjs-launcher": "^1.0.4",
-    "phantomjs": "^2.1.7",
+    "phantomjs-prebuilt": "^2.1.16",
     "protractor": "~5.2.0",
     "time-grunt": "^1.4.0"
   },

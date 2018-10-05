@@ -7,7 +7,4 @@ RUN git config --global url."https://".insteadOf git://
 # need this to install some binaries otherwise they fail in jenkins build
 WORKDIR /opt/ve
 COPY . /opt/ve
-
-RUN npm install 
-RUN node ./node_modules/node-sass/scripts/install.js
-RUN npm rebuild node-sass
+RUN npm install node-sass
