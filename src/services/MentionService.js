@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms')
-    .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', MentionService]);
+    .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', 'UtilsService' , MentionService]);
 
-function MentionService($rootScope, $compile, $timeout, moment, CacheService, ViewService) {
+function MentionService($rootScope, $compile, $timeout, moment, CacheService, ViewService, UtilsService) {
     /** Used to maintain all mention in all ckeditors **/
     var mentions = {};
     var mentionPlacerHolderPrefix = 'mentionPlaceHolder';
@@ -19,7 +19,7 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
 
     function getFastCfListing(projectId, refId) {
         return CacheService.getLatestElements(projectId, refId).reduce(function(result, cacheElement) {
-            var iconClass = 'pe-type-' + ViewService.getElementType(cacheElement);
+            var iconClass = UtilsService.getElementTypeClass(cacheElement, ViewService.getElementType(cacheElement));
             result.push({id: cacheElement.id, name: cacheElement.name, type: 'name',
                 iconClass: iconClass, documentation: cacheElement.documentation || 'no text',
                 editor: cacheElement._modifier, editTime: moment(cacheElement._modified).fromNow(),

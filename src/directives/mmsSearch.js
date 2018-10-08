@@ -94,7 +94,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
         scope.getTypeClass = function (element) {
             // Get Type
-            scope.elementTypeClass = UtilsService.getElementTypeClass(element);
+            scope.elementTypeClass = UtilsService.getElementTypeClass(element, ViewService.getElementType(element));
         };
 
         // Set search options

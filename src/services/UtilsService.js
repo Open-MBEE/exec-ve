@@ -1394,18 +1394,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         window.getSelection().removeAllRanges();
     };
 
-    var getElementTypeClass = function(element) {
-        var elementType = ViewService.getElementType(element);
+    var getElementTypeClass = function(element, elementType) {
         var elementTypeClass = '';
         if (element.type === 'InstanceSpecification') {
             elementTypeClass = 'pe-type-' + elementType;
         } else {
             elementTypeClass = 'item-type-' + elementType;
         }
-        return elementTypeClass
+        return elementTypeClass;
     };
-
-
 
     return {
         VIEW_SID: VIEW_SID,
