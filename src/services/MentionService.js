@@ -26,7 +26,7 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
                 elementType: cacheElement.type
             });
 
-            if (cacheElement.type === 'Property') {
+            if (cacheElement.type === 'Property' && cacheElement.defaultValue) {
                 var value = String(cacheElement.defaultValue.value);
                 if (!value || value === 'undefined') {
                     value = 'this field is empty';
