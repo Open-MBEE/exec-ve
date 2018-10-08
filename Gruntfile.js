@@ -94,6 +94,7 @@ module.exports = function(grunt) {
                 // mms module
                 'src/mms.js',
                 'src/services/*.js',
+                'src/filters/*.js',
 
                 // mms.directives module (need mms, mms.directives.tpls.js module )
                 'dist/jsTemp/mms.directives.tpls.js',
