@@ -1394,6 +1394,18 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         window.getSelection().removeAllRanges();
     };
 
+    var getElementTypeClass = function(element) {
+        var elementType = ViewService.getElementType(element);
+        var elementTypeClass = '';
+        if (element.type === 'InstanceSpecification') {
+            elementTypeClass = 'pe-type-' + elementType;
+        } else {
+            elementTypeClass = 'item-type-' + elementType;
+        }
+        return elementTypeClass
+    };
+
+
 
     return {
         VIEW_SID: VIEW_SID,
@@ -1434,6 +1446,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         tableConfig: tableConfig,
         _generateRowColNumber: _generateRowColNumber,
         PROJECT_URL_PREFIX: PROJECT_URL_PREFIX,
-        copyToClipboard: copyToClipboard
+        copyToClipboard: copyToClipboard,
+        getElementTypeClass: getElementTypeClass
     };
 }
