@@ -214,7 +214,7 @@ function mmsSpec(Utils, AuthService, ElementService, ViewService, $templateCache
             $event.stopPropagation();
             var target = domElement.find(selector);
             var range = window.document.createRange();
-            range.selectNode(target[0]);
+            range.selectNodeContents(target[0].childNodes[0]);
             window.getSelection().removeAllRanges();
             window.getSelection().addRange(range);
             try {
