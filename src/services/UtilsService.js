@@ -1383,9 +1383,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return o;
     };
 
-    var copyToClipboard = function(target) {
+    var copyToClipboard = function(target, $event) {
+        $event.stopPropagation();
         var range = window.document.createRange();
-        range.selectNode(target[0]);
+        range.selectNodeContents(target[0].childNodes[0]);
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
         try {
