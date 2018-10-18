@@ -35,9 +35,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         // if loading 'full' route with an anchor id, switch to views route instead
         if ( $state.current.name === '' || $state.current.name === 'login.redirect' ) {
             var string = '/full#';
+            var hash = $location.hash();
             var index = locationPath.indexOf(string);
-            if ( index !== -1 && $location.hash()) {
-                locationPath = locationPath.substr(0, index) + '/views/' + $location.hash();
+            if ( index !== -1 && hash && !hash.endsWith('_pei')) {
+                locationPath = locationPath.substr(0, index) + '/views/' + hash;
             }
         }
         if (locationPath !== $location.url())
