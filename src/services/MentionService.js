@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms')
-    .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'CacheService', MentionService]);
+    .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', 'UtilsService' , MentionService]);
 
-function MentionService($rootScope, $compile, $timeout, CacheService) {
+function MentionService($rootScope, $compile, $timeout, moment, CacheService, ViewService, UtilsService) {
     /** Used to maintain all mention in all ckeditors **/
     var mentions = {};
     var mentionPlacerHolderPrefix = 'mentionPlaceHolder';
@@ -19,10 +19,23 @@ function MentionService($rootScope, $compile, $timeout, CacheService) {
 
     function getFastCfListing(projectId, refId) {
         return CacheService.getLatestElements(projectId, refId).reduce(function(result, cacheElement) {
-            result.push({ id : cacheElement.id, name : cacheElement.name , type: 'name', label: cacheElement.name + ' - name' });
-            result.push({ id : cacheElement.id, name : cacheElement.name , type: 'doc', label: cacheElement.name + ' - documentation' });
-            if (cacheElement.type === 'Property') {
-                result.push({ id : cacheElement.id, name : cacheElement.name , type: 'val', label: cacheElement.name + ' - value' });
+            var iconClass = UtilsService.getElementTypeClass(cacheElement, ViewService.getElementType(cacheElement));
+            result.push({id: cacheElement.id, name: cacheElement.name, type: 'name',
+                iconClass: iconClass, documentation: cacheElement.documentation || 'no text',
+                editor: cacheElement._modifier, editTime: moment(cacheElement._modified).fromNow(),
+                elementType: cacheElement.type
+            });
+
+            if (cacheElement.type === 'Property' && cacheElement.defaultValue) {
+                var value = String(cacheElement.defaultValue.value);
+                if (!value || value === 'undefined') {
+                    value = 'this field is empty';
+                }
+                result.push({id: cacheElement.id, name: cacheElement.name, type: 'val',
+                    iconClass: iconClass, value: value,
+                    editor: cacheElement._modifier, editTime: moment(cacheElement._modified).fromNow(),
+                    elementType: cacheElement.type
+                });
             }
             return result;
         }, []);
@@ -210,17 +223,14 @@ function MentionService($rootScope, $compile, $timeout, CacheService) {
     function _getMentionItem(key, projectId, refId) {
         var cfListing = getFastCfListing(projectId, refId);
         return cfListing.find(function(cf) {
-            return cf.label === key;
+            return cf.name === key;
         });
     }
 
     function _handleEnterKey(editorId, mentionId, projectId, refId) {
-        var currentMentionMatchDom = $('#' + mentionId).find('ul').children().filter(function() {
-            return $(this).hasClass('active');
-        });
-
-        if (currentMentionMatchDom.length > 0) {
-            var key = currentMentionMatchDom.text().trim();
+        var matchDom = $('#' + mentionId + ' .active .matchName');
+        if (matchDom.length > 0) {
+            var key = matchDom.text().trim();
             var mentionItem = _getMentionItem(key, projectId, refId);
             var mentionState = _retrieveMentionState(editorId, mentionId);
             mentionState.mentionController.selectMentionItem(mentionItem);

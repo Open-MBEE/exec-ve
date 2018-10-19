@@ -61,4 +61,5 @@ angular.module('mms', [])
     $sceProvider.enabled(false);
 }])
 .constant('_', window._)
-.constant('HtmlRenderedDiff', window.HtmlRenderedDiff);
+.constant('HtmlRenderedDiff', window.HtmlRenderedDiff)
+.constant('moment', window.moment);
