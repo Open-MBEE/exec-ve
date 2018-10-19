@@ -48,7 +48,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             if (scope.startEdit)
                 scope.startEdit();
             if (mmsViewCtrl && mmsViewPresentationElemCtrl)
-                mmsViewCtrl.transcludeClicked(scope.section.id); //show instance spec if clicked
+                mmsViewCtrl.transcludeClicked(scope.section); //show instance spec if clicked
             e.stopPropagation();
         });
 
