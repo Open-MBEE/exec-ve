@@ -19,11 +19,12 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
 
     function getFastCfListing(projectId, refId) {
         return CacheService.getLatestElements(projectId, refId).reduce(function(result, cacheElement) {
-            var iconClass = UtilsService.getElementTypeClass(cacheElement, ViewService.getElementType(cacheElement));
+            var elementType = ViewService.getElementType(cacheElement);
+            var iconClass = UtilsService.getElementTypeClass(cacheElement, elementType);
             result.push({id: cacheElement.id, name: cacheElement.name, type: 'name',
                 iconClass: iconClass, documentation: cacheElement.documentation || 'no text',
                 editor: cacheElement._modifier, editTime: moment(cacheElement._modified).fromNow(),
-                elementType: cacheElement.type
+                elementType: elementType || cacheElement.type
             });
 
             if (cacheElement.type === 'Property' && cacheElement.defaultValue) {
