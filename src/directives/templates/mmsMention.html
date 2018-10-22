@@ -3,7 +3,7 @@
         <div class="leftItem">
             <i class="icon" ng-class="match.model.iconClass"></i>
             <span> name </span>
-            <span class="matchName" ng-bind-html="match.model.name | underlineMatch:query"></span>
+            <span id="{{match.model.id + match.model.type}}" class="matchName" ng-bind-html="match.model.name | underlineMatch:query"></span>
             <br>
             <span class="contentContainer">
                 <span ng-if="match.model.documentation">
