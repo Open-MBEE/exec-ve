@@ -224,14 +224,14 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
     function _getMentionItem(key, projectId, refId) {
         var cfListing = getFastCfListing(projectId, refId);
         return cfListing.find(function(cf) {
-            return cf.name === key;
+            return (cf.id + cf.type) === key;
         });
     }
 
     function _handleEnterKey(editorId, mentionId, projectId, refId) {
         var matchDom = $('#' + mentionId + ' .active .matchName');
         if (matchDom.length > 0) {
-            var key = matchDom.text().trim();
+            var key = matchDom.attr('id');
             var mentionItem = _getMentionItem(key, projectId, refId);
             var mentionState = _retrieveMentionState(editorId, mentionId);
             mentionState.mentionController.selectMentionItem(mentionItem);
