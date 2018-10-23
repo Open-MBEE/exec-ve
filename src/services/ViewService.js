@@ -1188,6 +1188,10 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         return false;
     };
 
+    var isGroup = function(instanceSpec) {
+        return instanceSpec._appliedStereotypeIds.length > 0 && instanceSpec._appliedStereotypeIds[0] === GROUP_ST_ID;
+    };
+
     var getElementType = function(element) {
         // Get Type
         var elementType = '';
@@ -1197,6 +1201,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             elementType = 'Document';
         } else if (UtilsService.isView(element)) {
             elementType = 'View';
+        } else if (isGroup(element)) {
+            elementType = 'Group';
         } else {
             elementType = getPresentationElementType(element);
         }
