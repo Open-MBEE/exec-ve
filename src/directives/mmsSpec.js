@@ -204,16 +204,7 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, ViewService, 
         scope.$watch('mmsRefId', changeElement);
 
         scope.copyToClipboard = function($event, selector) {
-            $event.stopPropagation();
-            var target = domElement.find(selector);
-            var range = window.document.createRange();
-            range.selectNode(target[0]);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            try {
-                window.document.execCommand('copy');
-            } catch(err) {}
-            window.getSelection().removeAllRanges();
+            UtilsService.copyToClipboard(domElement.find(selector), $event);
         };
 
         scope.cleanupVal = function(obj) {

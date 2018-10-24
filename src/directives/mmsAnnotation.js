@@ -2,9 +2,9 @@
 
 /** Used for annotating an element that doesn't have any commit history at all or for an element that is deleted but has commit history **/
 angular.module('mms.directives')
-    .directive('mmsAnnotation', ['$templateCache', '$rootScope', 'ViewService', mmsAnnotation]);
+    .directive('mmsAnnotation', ['$templateCache', '$rootScope', 'ViewService', 'UtilsService', mmsAnnotation]);
 
-function mmsAnnotation($templateCache, $rootScope, ViewService) {
+function mmsAnnotation($templateCache, $rootScope, ViewService, UtilsService) {
     var template = $templateCache.get('mms/templates/mmsAnnotation.html');
     return {
         restrict: 'A',
@@ -27,16 +27,7 @@ function mmsAnnotation($templateCache, $rootScope, ViewService) {
         });
 
         scope.copyToClipboard = function($event) {
-            $event.stopPropagation();
-            var target = element.find('#tooltipElementId');
-            var range = window.document.createRange();
-            range.selectNode(target[0]);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            try {
-                window.document.execCommand('copy');
-            } catch(err) {}
-            window.getSelection().removeAllRanges();
+            UtilsService.copyToClipboard(element.find('#tooltipElementId'), $event);
         };
     }
 

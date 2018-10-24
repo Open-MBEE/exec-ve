@@ -21,9 +21,7 @@ function ShortenUrlService($http, $q, URLService, UtilsService) {
             title: 'Share'
         },
         copyToClipboard: function ($event) {
-            $event.stopPropagation();
-            var target = $('#ve-short-url');
-            UtilsService.copyToClipboard(target);
+            UtilsService.copyToClipboard($('#ve-short-url'), $event);
         },
         getShortUrl: getShortUrl
     };
