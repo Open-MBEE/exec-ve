@@ -170,6 +170,9 @@
       font-size: 14px;
       font-style: italic;
       color: $medium_grey;
+      &:hover {
+        cursor: pointer;
+      }
     }
     .elem-documentation {
       color: $ve-link !important;
@@ -195,6 +198,23 @@
       }
     }
 
+    .show-more {
+      position: relative;
+      display: block;
+      padding-left: 17px;
+      margin-top: 10px;
+      &::after{
+        content:"\f0d7";
+        font-family: $icon-font-name;
+      }
+      &::before{
+        content: "...";
+        font-size: 16px;
+        color: $tertiary_grey;
+        position: absolute;
+        top: -19px;
+      }
+    }
 
     /* Add a grey border to the left of documentation since the preview can get spread out*/
     .elem-documentation-wrapper{
