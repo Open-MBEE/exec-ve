@@ -113,8 +113,8 @@
                 </div>
             </div>
 
-            <div ng-if="!elem.remainingRelatedDocuments && elem.allRelatedDocuments.length > elem.someRelatedDocuments.length">
-                <a class="show-more" ng-click="showMoreRelatedViews(elem);"> {{(elem.allRelatedDocuments.length - elem.someRelatedDocuments.length) + ' More'}}
+            <div class="show-more-container" ng-if="!elem.remainingRelatedDocuments && elem.allRelatedDocuments.length > elem.someRelatedDocuments.length">
+                <a class="show-more-btn" ng-click="showMoreRelatedViews(elem);"> {{(elem.allRelatedDocuments.length - elem.someRelatedDocuments.length) + ' More'}}
                 </a>
             </div>
 

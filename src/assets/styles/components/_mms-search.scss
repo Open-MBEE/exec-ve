@@ -198,21 +198,22 @@
       }
     }
 
-    .show-more {
-      position: relative;
-      display: block;
-      padding-left: 17px;
+    .show-more-container {
       margin-top: 10px;
-      &::after{
-        content:"\f0d7";
-        font-family: $icon-font-name;
-      }
-      &::before{
-        content: "...";
-        font-size: 16px;
-        color: $tertiary_grey;
-        position: absolute;
-        top: -19px;
+      .show-more-btn {
+        position: relative;
+        padding-left: 17px;
+        &::after{
+          content:"\f0d7";
+          font-family: $icon-font-name;
+        }
+        &::before{
+          content: "...";
+          font-size: 16px;
+          color: $tertiary_grey;
+          position: absolute;
+          top: -19px;
+        }
       }
     }
 
