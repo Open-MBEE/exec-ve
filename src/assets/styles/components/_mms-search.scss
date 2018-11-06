@@ -26,6 +26,13 @@
       padding-bottom: 0;
     }
 
+    .close-button-container {
+      position: fixed; top: 75px; right:75px;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
     .close-button {
       position: absolute;
       top: .5em;
