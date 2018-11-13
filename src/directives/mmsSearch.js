@@ -719,14 +719,16 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
         var combineRelatedViews = function(scope) {
             scope.searchResults.forEach(function(element) {
                 var allRelatedDocuments = [];
-                element._relatedDocuments.forEach(function(relatedDoc) {
-                    relatedDoc._parentViews.forEach(function(parentView) {
-                        allRelatedDocuments.push({
-                            relatedDocument: relatedDoc,
-                            relatedView: parentView
+                if (element._relatedDocuments) {
+                    element._relatedDocuments.forEach(function(relatedDoc) {
+                        relatedDoc._parentViews.forEach(function(parentView) {
+                            allRelatedDocuments.push({
+                                relatedDocument: relatedDoc,
+                                relatedView: parentView
+                            });
                         });
                     });
-                });
+                }
                 element.allRelatedDocuments = allRelatedDocuments;
                 element.someRelatedDocuments = allRelatedDocuments.slice(0, 3);
             });
