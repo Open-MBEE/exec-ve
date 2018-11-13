@@ -403,6 +403,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
 
             instance.on( 'instanceReady', function() {
                 addCkeditorHtmlFilterRule(instance);
+                _addContextMenuItems(instance);
             } );
 
             function addCkeditorHtmlFilterRule(instance) {
@@ -568,6 +569,33 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
 
         function _isShiftKeyOn(keyboardEvent) {
             return keyboardEvent.shiftKey;
+        }
+
+        function _addContextMenuItems(editor) {
+            _addFormatAsCodeMenuItem(editor);
+        }
+
+        function _addFormatAsCodeMenuItem(editor) {
+            editor.addCommand('formatAsCode', {
+                exec: function (editor) {
+                    var selected_text = editor.getSelection().getSelectedText();
+                    var newElement = new CKEDITOR.dom.element("code");
+                    newElement.addClass('inlineCode');
+                    newElement.setText(selected_text);
+                    editor.insertElement(newElement);
+                }
+            });
+            editor.addMenuGroup('veGroup');
+            editor.addMenuItem('formatAsCode', {
+                label: 'Format as inline code',
+                command: 'formatAsCode',
+                group: 'veGroup',
+                icon: 'codeSnippet'
+            });
+            editor.contextMenu.addListener(function (element) {
+                return {formatAsCode: CKEDITOR.TRISTATE_OFF};
+            });
+            editor.setKeystroke( CKEDITOR.CTRL + 75, 'formatAsCode' );
         }
     };
 
