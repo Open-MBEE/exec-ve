@@ -353,8 +353,42 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                                 deferred.resolve(null);
                             });
                         }
+                    } else if (reason.status === 410) { //resurrect
+                        var name = projectOb.name + ' Cover Page ';
+                        try {
+                            name = reason.data.deleted[0].name + ' ';
+                        } catch(e) {}
+                        ElementService.updateElements([
+                            {
+                                _projectId: $stateParams.projectId,
+                                _refId: $stateParams.refId,
+                                id: eid,
+                                name: name
+                            },
+                            {
+                                _projectId: $stateParams.projectId,
+                                _refId: $stateParams.refId,
+                                id: eid + "_asi",
+                                name: ' '
+                            }
+                        ]).then(function(data) {
+                            var resolved = false;
+                            if (data.length > 0) {
+                                data.forEach(function(e) {
+                                    if (e.id == eid) {
+                                        deferred.resolve(e);
+                                        resolved = true;
+                                    }
+                                });
+                            }
+                            if (!resolved) {
+                                deferred.resolve(null);
+                            }
+                        }, function(reason2) {
+                            deferred.resolve(null);
+                        });
                     } else {
-                        deferred.reject(reason);
+                        deferred.resolve(null); //let user get into project
                     }
                 });
                 return deferred.promise;
