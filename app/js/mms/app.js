@@ -23,6 +23,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     }]);
 
     $urlRouterProvider.rule(function ($injector, $location) {
+        var $state = $injector.get('$state');
         var locationPath = $location.url();
         if (locationPath.indexOf('full%23') > 0)
             locationPath = locationPath.replace('full%23', 'full#');
@@ -30,6 +31,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             locationPath = '/' + locationPath;
         if (locationPath[locationPath.length-1] == '/')
             locationPath = locationPath.substring(0, locationPath.length-1);
+
+        // if loading 'full' route with an anchor id, switch to views route instead
+        if ( $state.current.name === '' || $state.current.name === 'login.redirect' ) {
+            var string = '/full#';
+            var hash = $location.hash();
+            var index = locationPath.indexOf(string);
+            if ( index !== -1 && hash && !hash.endsWith('_pei')) {
+                locationPath = locationPath.substr(0, index) + '/views/' + hash;
+            }
+        }
         if (locationPath !== $location.url())
             $location.url(locationPath);
     });
