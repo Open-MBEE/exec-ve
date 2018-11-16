@@ -404,7 +404,19 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             instance.on( 'instanceReady', function() {
                 addCkeditorHtmlFilterRule(instance);
                 _addContextMenuItems(instance);
+                highlightActiveEditor(instance);
             } );
+
+            function highlightActiveEditor(instance) {
+                var activeEditorClass = 'active-editor';
+                $('mms-transclude-doc').children('div').removeClass(activeEditorClass);
+                $(instance.element.$).closest('mms-transclude-doc').children('div').addClass(activeEditorClass);
+
+                instance.on('focus', function() {
+                    $('mms-transclude-doc').children('div').removeClass(activeEditorClass);
+                    $(instance.element.$).closest('mms-transclude-doc').children('div').addClass(activeEditorClass);
+                });
+            }
 
             function addCkeditorHtmlFilterRule(instance) {
                 instance.dataProcessor.htmlFilter.addRules({
