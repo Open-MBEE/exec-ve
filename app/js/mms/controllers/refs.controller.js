@@ -143,13 +143,14 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
         $scope.oking = false;
         var displayName = "";
         // Item specific setup:
+        var now = new Date();
         if ($scope.itemType === 'Branch') {
             $scope.branch = {};
             $scope.branch.name = "";
             $scope.branch.description = "";
             $scope.branch.permission = "read";
             $scope.branch.lastCommit = true;
-            $scope.branch.timestamp = new Date();
+            $scope.branch.timestamp = now;
             displayName = "Branch";
             $scope.updateTimeOpt = function () {
                 $scope.branch.lastCommit = false;
@@ -159,12 +160,31 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             $scope.tag.name = "";
             $scope.tag.description = "";
             $scope.tag.lastCommit = true;
-            $scope.tag.timestamp = new Date();
+            $scope.tag.timestamp = now;
             displayName = "Tag";
             $scope.updateTimeOpt = function () {
                 $scope.tag.lastCommit = false;
             };
         }
+
+        window.setTimeout(function() {
+            window.flatpickr('.datetimepicker', {
+                enableTime: true,
+                enableSeconds: true,
+                defaultDate: now,
+                dateFormat: 'Y-m-d H:i:S',
+                time_24hr: true,
+                onClose: function(selectedDates, dateStr) {
+                    $scope.updateTimeOpt();
+
+                    if ($('.datetimepicker#branch') ) {
+                        $scope.branch.timestamp = selectedDates[0];
+                    } else if($('.datetimepicker#tag') ) {
+                        $scope.tag.timestamp = selectedDates[0];
+                    }
+                }
+            });
+        });
 
         var handlePromise = function(promise) {
             promise.then(function(data) {
