@@ -62,4 +62,5 @@ angular.module('mms', [])
 }])
 .constant('_', window._)
 .constant('HtmlRenderedDiff', window.HtmlRenderedDiff)
-.constant('moment', window.moment);
+.constant('moment', window.moment)
+.constant('flatpickr', window.flatpickr);

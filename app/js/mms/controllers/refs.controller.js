@@ -3,10 +3,10 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$timeout', '$window', 'growl', '_',
+.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$timeout', '$window', 'growl', '_', 'flatpickr',
                          'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
-function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, $window, growl, _,
+function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, $window, growl, _, flatpickr,
     ElementService, ProjectService, MmsAppUtils, ApplicationService,
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
@@ -167,21 +167,22 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             };
         }
 
-        window.setTimeout(function() {
-            window.flatpickr('.datetimepicker', {
+        $timeout(function() {
+            flatpickr('.datetimepicker', {
                 enableTime: true,
                 enableSeconds: true,
                 defaultDate: now,
-                dateFormat: 'Y-m-d H:i:S',
+                dateFormat: 'Y-m-dTH:i:S',
                 time_24hr: true,
-                onClose: function(selectedDates, dateStr) {
-                    $scope.updateTimeOpt();
-
-                    if ($('.datetimepicker#branch') ) {
-                        $scope.branch.timestamp = selectedDates[0];
-                    } else if($('.datetimepicker#tag') ) {
-                        $scope.tag.timestamp = selectedDates[0];
-                    }
+                onClose: function(selectedDates) {
+                    $scope.$apply(function() {
+                        $scope.updateTimeOpt();
+                        if ($('.datetimepicker#branch').length ) {
+                            $scope.branch.timestamp = selectedDates[0];
+                        } else if($('.datetimepicker#tag').length ) {
+                            $scope.tag.timestamp = selectedDates[0];
+                        }
+                    });
                 }
             });
         });
