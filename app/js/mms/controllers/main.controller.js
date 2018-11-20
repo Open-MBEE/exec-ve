@@ -9,14 +9,17 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
     $rootScope.ve_footer = '';
+    $rootScope.ve_fn = false;
 
     var modalOpen = false;
     var host = $location.host();
     // if (host.indexOf('europaems') !== -1 || host.indexOf('arrmems') !== -1 || host.indexOf('msmems') !== -1) {
     //     $rootScope.ve_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
     // }
-    if (host.indexOf('fn') !== -1)
+    if (host.indexOf('fn') !== -1){
         $rootScope.ve_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+        $rootScope.ve_fn = true;
+    }
 
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits)) {

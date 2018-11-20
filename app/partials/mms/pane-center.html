@@ -5,7 +5,7 @@
                 <a type="button" class="btn btn-tools btn-sm" target="_blank" rel="noopener noreferrer" ng-href="{{docLibLink}}" uib-tooltip="Manage files" tooltip-placement="bottom" tooltip-popup-delay="100">
                     <img src="assets/alfresco-icon-sm.png">DocLib
                 </a>
-                <button type="button" class="btn btn-tools btn-sm share-url" ng-click="handleShareURL()" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"
+                <button type="button" class="btn btn-tools btn-sm share-url" ng-if="!ve_fn" ng-click="handleShareURL()" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"
                 popover-trigger="outsideClick" uib-popover-template="dynamicPopover.templateUrl" popover-title="{{dynamicPopover.title}}" popover-placement="bottom-left">
                 <i class="fa fa-share-alt"></i></button>
             </div>
