@@ -1,4 +1,5 @@
 .mms-search {
+  position: relative;
 
 /*------------------------------------------------------------------
 
@@ -27,16 +28,16 @@
     }
 
     .close-button-container {
-      position: fixed; top: 75px; right:75px;
+      position: absolute;
+      top: .5em;
+      right: 2em;
       &:hover {
         cursor: pointer;
       }
     }
 
     .close-button {
-      position: absolute;
-      top: .5em;
-      right: .5em;
+      position: fixed;
       font-size: 1.5em;
       color: $tertiary_grey;
     }
