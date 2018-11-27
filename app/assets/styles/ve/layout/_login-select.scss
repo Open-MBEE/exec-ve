@@ -89,13 +89,13 @@
   }
 
   .form-control:focus {
-    box-shadow: none;
+    @include box-shadow(none);
     border: 1px solid $ve-teal-base;
   }
 
   .form-control {
     border: 1px solid $ve-slate-base;
-    box-shadow: none;
+    @include box-shadow(none);
   }
 
   .label-text {

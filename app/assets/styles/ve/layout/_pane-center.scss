@@ -162,7 +162,7 @@ tr {
 
 
 .active-editor {
-  box-shadow: 0 0 0 3px rgba(101, 182,255,0.47);
+  @include box-shadow( 0 0 0 2px rgba(51,158,255,.5),0 0 13px 4px rgba(51,158,255,.4));
 }
 
 /* Overwrite angularjs bootstrap's popuover so that the popover's container expands with its content */
