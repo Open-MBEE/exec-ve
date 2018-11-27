@@ -90,8 +90,16 @@
     border-color: darken($white, 12%);
     color: darken($tertiary-grey, 42%);
   }
-}
 
+
+}
+@media (max-width: 640px) {
+  .mms-add-pe-button {
+    span.icon-title {
+      display: none;
+    }
+  }
+}
 /* For section PEs, put the add button back into the document flow so that containment is clear*/
 mms-view-section .mms-add-pe-button {
   position: relative;
