@@ -174,6 +174,7 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                 defaultDate: now,
                 dateFormat: 'Y-m-dTH:i:S',
                 time_24hr: true,
+                maxDate: new Date(),
                 onClose: function(selectedDates) {
                     $scope.$apply(function() {
                         $scope.updateTimeOpt();
