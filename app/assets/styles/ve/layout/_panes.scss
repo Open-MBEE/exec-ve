@@ -12,6 +12,7 @@
   p {
     font-family: $font-family-sans-serif;
     font-size: $font-size-base;
+    line-height: 1.6em; /*Consistent with CK editor */
   }
 
   blockquote {
