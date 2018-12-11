@@ -1,4 +1,5 @@
 .mms-search {
+  position: relative;
 
 /*------------------------------------------------------------------
 
@@ -26,10 +27,17 @@
       padding-bottom: 0;
     }
 
-    .close-button {
+    .close-button-container {
       position: absolute;
       top: .5em;
-      right: .5em;
+      right: 2em;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    .close-button {
+      position: fixed;
       font-size: 1.5em;
       color: $tertiary_grey;
     }
@@ -170,6 +178,9 @@
       font-size: 14px;
       font-style: italic;
       color: $medium_grey;
+      &:hover {
+        cursor: pointer;
+      }
     }
     .elem-documentation {
       color: $ve-link !important;
@@ -195,6 +206,24 @@
       }
     }
 
+    .show-more-container {
+      margin-top: 10px;
+      .show-more-btn {
+        position: relative;
+        padding-left: 17px;
+        &::after{
+          content:"\f0d7";
+          font-family: $icon-font-name;
+        }
+        &::before{
+          content: "...";
+          font-size: 16px;
+          color: $tertiary_grey;
+          position: absolute;
+          top: -19px;
+        }
+      }
+    }
 
     /* Add a grey border to the left of documentation since the preview can get spread out*/
     .elem-documentation-wrapper{
