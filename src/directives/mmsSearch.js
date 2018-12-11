@@ -32,6 +32,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
     function mmsSearchLink(scope, element, attrs) {
         // Main search variables
         var baseSearchResults = [];
+        scope.showFilterOptions = !scope.mmsOptions.hideFilterOptions;
         scope.searchLoading = false;
         scope.mainSearch = {
             searchText: '',

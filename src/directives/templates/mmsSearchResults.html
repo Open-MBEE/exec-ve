@@ -1,6 +1,6 @@
 
 <div id="ve-search-results" class="misc-form-field results-count" ng-hide="searchLoading || !paginationCache.length">
-    <div class="ve-search-filter">
+    <div class="ve-search-filter" ng-hide="!showFilterOptions">
         <span class="label-for-filter ve-secondary-text">FILTER: </span>
         <div class="btn-group btn-group-sm" role="group"  aria-label="mms-search-results-filter">
             <button type="button" ng-repeat="item in filterOptions" ng-click="filterSearchResults(item.type)"
