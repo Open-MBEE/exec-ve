@@ -741,7 +741,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         $scope.searchOptions = {
             callback: addPECallback,
             itemsPerPage: 200,
-            filterQueryList: [peFilterQuery]
+            filterQueryList: [peFilterQuery],
+            hideFilterOptions: true
         };
 
         $scope.ok = function() {
