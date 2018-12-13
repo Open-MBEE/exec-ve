@@ -3,12 +3,17 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
                           'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'docMeta',
-function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl,
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
     orgOb, projectOb, refOb, refObs, groupObs, docMeta) {
+
+    $scope.filterInputPlaceholder = 'Filter groups/docs';
+    if ($state.current.name === 'project.ref.document.view' || $state.current.name === 'project.ref.document.full') {
+        $scope.filterInputPlaceholder = 'Filter table of contents';
+    }
 
     $rootScope.mms_refOb = refOb;
     $rootScope.ve_bbApi = $scope.bbApi = {};
