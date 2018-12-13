@@ -276,6 +276,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                             newArray.push(val[i]);
                         }
                     }
+                    newArray.sort(function(a, b) {
+                        return a.name.localeCompare(b.name);
+                    });
                     deferred.resolve({options: newArray, isEnumeration: isEnumeration});
                 },
                 function(reason) {
