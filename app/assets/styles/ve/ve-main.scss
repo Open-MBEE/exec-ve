@@ -353,8 +353,10 @@ h4{
     li{
 
       /*When a list item is selected, include a check mark before it. Add additional padding to these lists*/
-      a {
-        padding-left: 24px;
+      padding-left: 30px;
+
+      a{
+        padding-left: 4px
       }
 
       &.checked-list-item::before{
