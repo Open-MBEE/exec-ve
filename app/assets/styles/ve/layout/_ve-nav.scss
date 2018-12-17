@@ -352,5 +352,10 @@ nav.project-level-header {
 -------------------------------------------------------------------*/
 
 .project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
-  max-width: 300px;
+  max-width: 400px;
+  /*Clearing bootstrap styling so long names can wrap*/
+  > li > a{
+    white-space: normal;
+    word-wrap: break-word;
+  }
 }
