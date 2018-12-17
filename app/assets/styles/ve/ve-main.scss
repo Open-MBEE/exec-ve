@@ -64,9 +64,8 @@ div.tooltip-inner {
   2.3 Dropdown
     2.3.1 Lists with selected items or input
     2.3.2 Dark dropdowns
-      2.3.2.1 with buttons
-      2.3.2.2 with selected items
-      2.3.2.3 Branch being created
+      2.3.2.1 with buttons and selected items
+      2.3.2.2 Branch being created
     2.3.3 Light dropdown
     2.3.4 Wide Dropdown
     2.3.5 Narrow Dropdown
@@ -280,6 +279,7 @@ h4{
     border-radius: 2px !important;
     @include transition(background-color, .1s, ease-out);
     letter-spacing: .05em; /*overwriting user agent stylesheet */
+    background-color: $ve-slate-base;
 
     .fa-caret-down {
       padding: 2px 4px 2px 10px;
@@ -336,7 +336,7 @@ h4{
   }
 
   /*------------------------------------------------------------------
-      2.3.2.1 with buttons (this needs to be generalized)
+      2.3.2.1 with buttons and selected items (this needs to be generalized)
   -------------------------------------------------------------------*/
 
   /*Clear padding on top for lists with buttons*/
@@ -349,9 +349,6 @@ h4{
     min-width: 260px;
   }
 
-  /*------------------------------------------------------------------
-      2.3.2.2 with selected items (this needs to be generalized)
-  -------------------------------------------------------------------*/
   .dropdown-menu.list-with-selected-item{ 
     li{
 
@@ -371,7 +368,7 @@ h4{
   }
 
 /*------------------------------------------------------------------
-    2.3.2.3 Branch being created (this needs to be generalized)
+    2.3.2.2 Branch being created (this needs to be generalized)
 -------------------------------------------------------------------*/
 
   /*Clear hover on disabled branches*/
@@ -490,7 +487,6 @@ h4{
     height: 34px;
     line-height: 18px;
     margin-top: 6px;
-    background-color:$ve-slate-base;
   }
 
   .dropdown-menu {
@@ -514,13 +510,9 @@ h4{
 
   button.dropdown-toggle {
     height: 24px;
-    background-color: $ve-slate-base;
     font-size: 14px;
     padding: 3px 4px;
     line-height: 18px;
-    &:hover {
-      background-color: $ve-slate-darker-1;
-    }
   }
 
   .label-dropdown {
