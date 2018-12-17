@@ -353,8 +353,13 @@ h4{
     li{
 
       /*When a list item is selected, include a check mark before it. Add additional padding to these lists*/
-      padding-left: 30px;
-      position: relative;
+      a {
+        padding-left: 24px;
+      }
+
+      &.checked-list-item::before{
+        top:6px;
+      }
 
       /*Clear padding for check mark list items with buttons in them */
       &.button-item {
