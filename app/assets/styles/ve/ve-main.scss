@@ -240,7 +240,6 @@ h4{
     position: relative;
   }
 
-
   /*Clear padding at top of menu when there is input*/
   &.menu-with-input{
     padding-top:0px;
@@ -263,14 +262,6 @@ h4{
 
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav {
-
-  /*Clearing bootstrap*/
-  ul.dropdown-menu {
-    min-height: 0;
-    overflow-y: auto;
-    max-height: 360px;
-    overflow-x:hidden;
-  }
 
   button.dropdown-toggle {
     display: inline;
@@ -296,13 +287,17 @@ h4{
     background-color: $ve-slate-darker-1;
   }
 
-  .dropdown-menu {
+  ul.dropdown-menu {
     background-color: $ve-slate-lighter-1;
     border: none;
     border-radius: 3px;
     margin-top: 4px;
+    min-height: 0;
+    max-height: 360px;
     max-width: 300px;
     min-width: 100%;
+    overflow-x:hidden;
+    overflow-y: auto;
 
     & li {
       padding: 6px 8px;
@@ -349,17 +344,17 @@ h4{
     min-width: 260px;
   }
 
-  .dropdown-menu.list-with-selected-item{ 
-    li{
+  .dropdown-menu.list-with-selected-item {
+    li {
 
       /*When a list item is selected, include a check mark before it. Add additional padding to these lists*/
       padding-left: 30px;
 
-      a{
+      a {
         padding-left: 4px;
       }
 
-      &.checked-list-item::before{
+      &.checked-list-item::before {
         top:6px;
       }
 
@@ -368,7 +363,7 @@ h4{
         padding-left: 8px;
       }
       /*Clear padding for check mark list items with tabs in them */
-      &.tab-item{
+      &.tab-item {
         padding: 0px;
       }
     }
@@ -444,6 +439,10 @@ h4{
     }
   }
 
+  &.open .dropdown-toggle{
+    background-color:$ve-silver-darker-1;
+  }
+
   ul{
     border-color:$ve-silver-base;
     min-width:100%;
@@ -466,17 +465,12 @@ h4{
     color:$ve-white-text-darker-1
   }
 
-  &.open .dropdown-toggle{
-    background-color:$ve-silver-darker-1;
-  }
 }
-
 
 
 /*------------------------------------------------------------------
     2.3.4 Wide Dropdown
 -------------------------------------------------------------------*/
-
 
 .ve-dark-dropdown-wide {
 
@@ -508,6 +502,7 @@ h4{
   }
 
 }
+
 
 /*------------------------------------------------------------------
     2.3.5 Narrow Dropdown
@@ -542,6 +537,7 @@ h4{
   }
 }
 
+
 /*------------------------------------------------------------------
     2.3.6 Fixed Content Dropdown
 -------------------------------------------------------------------*/
@@ -560,7 +556,6 @@ span.fixed-content-dropdown{
   }
   padding-bottom:12px;
 }
-
 
 
 /*------------------------------------------------------------------

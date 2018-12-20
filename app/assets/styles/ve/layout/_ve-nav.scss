@@ -344,6 +344,29 @@ nav.project-level-header {
   .navbar-right {
     display: none;
   }
+  .project-level-header .ve-dark-dropdown-nav {
+    max-width: calc(100% - 50px);
+
+    & button.dropdown-toggle {
+      text-align: left;
+      max-width: 100%;
+    }
+    & .selected-dropdown {
+      display: block;
+      min-width: 200px;
+      max-width: calc(100% - 25px);
+      overflow: hidden;
+      white-space: nowrap;
+      float: left;
+      text-overflow: ellipsis;
+    }
+    & .ul.dropdown-menu {
+      max-width: 400px;
+      overflow: hidden;
+      text-align: left;
+    }
+  }
+
 }
 
 
@@ -353,6 +376,8 @@ nav.project-level-header {
 
 .project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
   max-width: 400px;
+  overflow: hidden;
+  text-align: left;
   /*Clearing bootstrap styling so long names can wrap*/
   > li > a{
     white-space: normal;
