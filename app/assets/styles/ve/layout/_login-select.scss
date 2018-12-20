@@ -24,19 +24,22 @@
     width: 320px;
     margin: 120px auto;
     height: 320px;
-    position: relative;
+    padding: 0 10px;
   }
 
   .account-wall .btn-block {
     margin-top: 34px;
-    position: absolute;
     bottom: 0;
     padding: 10px;
   }
 
+  .select-logout-button {
+    position: relative;
+  }
+
   @media (max-height:500px){
     .account-wall{
-      margin: 40px auto;    
+      margin: 40px auto;
     }
   }
 
