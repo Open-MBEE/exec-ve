@@ -62,9 +62,14 @@ div.tooltip-inner {
     2.1.2 Small Button
   2.2 Dark Modal
   2.3 Dropdown
-    2.3.1 Wide Dropdown
-    2.3.2 Narrow Dropdown
-    2.3.3 Fixed Content Dropdown
+    2.3.1 Lists with selected items or input
+    2.3.2 Dark dropdowns
+      2.3.2.1 with buttons and selected items
+      2.3.2.2 Branch being created
+    2.3.3 Light dropdown
+    2.3.4 Wide Dropdown
+    2.3.5 Narrow Dropdown
+    2.3.6 Fixed Content Dropdown
   2.4 Banners
   2.5 Input
     2.5.1 Light input
@@ -149,12 +154,13 @@ h4{
   color: $ve-light-text-darker-1;
   margin: 0 5px 5px 10px;
   float: right;
+
+  &:hover {
+    color: $ve-silver-base;
+    background-color: $ve-teal-base;
+  }
 }
 
-.btn-copy:hover {
-  color: $ve-silver-base;
-  background-color: $ve-teal-base;
-}
 
 /*------------------------------------------------------------------
   2.2 Modals
@@ -194,6 +200,10 @@ h4{
   2.3 Dropdown
 -------------------------------------------------------------------*/
 
+/*------------------------------------------------------------------
+  2.3.1 Lists with selected items or input
+-------------------------------------------------------------------*/
+
 @mixin fa-menu-content($content, $color) {
   content: $content;
   font-family: FontAwesome;
@@ -202,7 +212,6 @@ h4{
   color: $color;
 }
 
-// selected item styling
 .dropdown-menu {
 
   // Standardize font size across VE
@@ -230,6 +239,11 @@ h4{
   li.secondary-checked-list-item {
     position: relative;
   }
+
+  /*Clear padding at top of menu when there is input*/
+  &.menu-with-input{
+    padding-top:0px;
+  }
 }
 
 // Fix checkbox in multiselect
@@ -241,96 +255,84 @@ h4{
   }
 }
 
+
+/*------------------------------------------------------------------
+  2.3.2 Dark dropdowns
+-------------------------------------------------------------------*/
+
 .ve-dark-dropdown-wide,
 .ve-dark-dropdown-nav {
-
-  /*Clearing bootstrap*/
-  ul.dropdown-menu {
-    min-height: 0;
-    overflow-y: auto;
-    max-height: 360px;
-    overflow-x:hidden;
-  }
 
   button.dropdown-toggle {
     display: inline;
     color: white;
     border: none;
     border-radius: 2px !important;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
+    @include transition(background-color, .1s, ease-out);
     letter-spacing: .05em; /*overwriting user agent stylesheet */
+    background-color: $ve-slate-base;
+
+    .fa-caret-down {
+      padding: 2px 4px 2px 10px;
+      color: $ve-white-text-darker-1;
+      float: right;
+    }
+    &:hover {
+      background-color: $ve-slate-darker-1;
+    }
   }
 
-  button.dropdown-toggle .fa-caret-down {
-    padding: 2px 4px 2px 10px;
-    color: $ve-white-text-darker-1;
-    float: right;
+  /*Darken button when open*/
+  &.btn-group.open button.dropdown-toggle {
+    background-color: $ve-slate-darker-1;
   }
 
-  .dropdown-menu {
+  ul.dropdown-menu {
     background-color: $ve-slate-lighter-1;
     border: none;
     border-radius: 3px;
     margin-top: 4px;
+    min-height: 0;
+    max-height: 360px;
     max-width: 300px;
     min-width: 100%;
+    overflow-x:hidden;
+    overflow-y: auto;
+
+    & li {
+      padding: 6px 8px;
+      word-wrap: normal;
+      width: 100%;
+      @include transition(background-color, .1s, ease-out);
+      cursor: pointer;
+
+      &:hover {
+        background-color: $ve-slate-lighter-2;
+      }
+
+      &.divider {
+        height: 1px;
+        margin: 6px 0;
+        background-color: $ve-slate-lighter-2;
+        padding: 0;
+      }
+    }
+
+    /*Clearing bootstrap styling*/
+    > li > a {
+      padding: 1px 10px;
+      color: white;
+
+      &:hover {
+        background-color: $ve-clear;
+        color: white;
+      }
+    }
   }
 
-  .dropdown-menu li {
-    padding: 6px 8px;
-    word-wrap: break-word;
-    width: 100%;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
-    cursor: pointer;
-  }
-
-  .dropdown-menu li:hover {
-    background-color: $ve-slate-lighter-2;
-  }
-
-  .dropdown-menu li.divider {
-    height: 1px;
-    margin: 6px 0;
-    background-color: $ve-slate-lighter-2;
-    padding: 0;
-  }
-
-  /*Clearing bootstrap styling*/
-  .dropdown-menu > li > a:hover {
-    background-color: $ve-clear;
-    color: white;
-  }
-
-  /*Clearing bootstrap styling*/
-  .dropdown-menu > li > a {
-    padding: 1px 10px;
-    color: white;
-  }
-
-  button.dropdown-toggle:hover {
-    background-color: $ve-slate-darker-1;
-  }
-
-  .btn-group.open button.dropdown-toggle {
-    background-color: $ve-slate-darker-1;
-  }
-
-  /*When a list item is selected, include a check mark before it. Add additional padding to these lists*/
-  .dropdown-menu.list-with-selected-item li {
-    padding-left: 30px;
-    position: relative;
-  }
-
-  /*Clear hover on disabled branches*/
-  .dropdown-menu li.branch-disabled:hover{
-    background-color: $ve-slate-lighter-1;
-  }
+  /*------------------------------------------------------------------
+      2.3.2.1 with buttons and selected items (this needs to be generalized)
+  -------------------------------------------------------------------*/
 
   /*Clear padding on top for lists with buttons*/
   ul.list-with-button {
@@ -342,29 +344,52 @@ h4{
     min-width: 260px;
   }
 
-  /*Clear padding for check mark list items with buttons in them */
-  .dropdown-menu.list-with-selected-item li.button-item {
-    padding-left: 8px;
+  .dropdown-menu.list-with-selected-item {
+    li {
+
+      /*When a list item is selected, include a check mark before it. Add additional padding to these lists*/
+      padding-left: 30px;
+
+      a {
+        padding-left: 4px;
+      }
+
+      &.checked-list-item::before {
+        top:6px;
+      }
+
+      /*Clear padding for check mark list items with buttons in them */
+      &.button-item {
+        padding-left: 8px;
+      }
+      /*Clear padding for check mark list items with tabs in them */
+      &.tab-item {
+        padding: 0px;
+      }
+    }
   }
 
-  /*Clear padding for check mark list items with tabs in them */
-  .dropdown-menu.list-with-selected-item li.tab-item {
-    padding: 0px;
-  }
+/*------------------------------------------------------------------
+    2.3.2.2 Branch being created (this needs to be generalized)
+-------------------------------------------------------------------*/
 
-  /*Styling for Branch that is being created. */
-
-  .branch-disabled {
+  /*Clear hover on disabled branches*/
+  li.branch-disabled {
     color:$ve-white-text-darker-1;
-  }
 
-  li.branch-disabled::before {
-    font-family:FontAwesome;
-    content: "\2026";
-    position: absolute;
-    left: 10px;
-    top: 3px;
-    color: $ve-silver-base;
+    &:hover{
+      background-color: $ve-slate-lighter-1;
+    }
+
+    /*Add ... to branch being created*/
+    &::before {
+      font-family:FontAwesome;
+      content: "\2026";
+      position: absolute;
+      left: 10px;
+      top: 3px;
+      color: $ve-silver-base;
+    }
   }
 
   li.ve-secondary{
@@ -376,6 +401,7 @@ h4{
   }
 }
 
+
 @media (max-width: 767px) {
   .ve-dark-dropdown-nav {
     .dropdown-menu li.divider {
@@ -383,6 +409,11 @@ h4{
     }
   }
 }
+
+
+/*------------------------------------------------------------------
+    2.3.3 Light dropdown
+-------------------------------------------------------------------*/
 
 .ve-light-dropdown{
   display: block;
@@ -397,83 +428,57 @@ h4{
     display: inline;
     border: none;
     border-radius: 2px !important;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
+    @include transition(background-color, .1s, ease-out);
     letter-spacing: .05em;
     background-color:$ve-silver-lighter-0;
     min-height: 30px;
     width:100%;
+
+    &:hover{
+      background-color:$ve-silver-base;
+    }
+  }
+
+  &.open .dropdown-toggle{
+    background-color:$ve-silver-darker-1;
   }
 
   ul{
     border-color:$ve-silver-base;
-  }
-
-  li.dropdown-input{
-    border-bottom: 1px solid $ve-silver-base;
-    padding: 6px 0;
-    margin-bottom: 6px;
-    background:$ve-silver-lighter-1;
-  }
-
-  li a{
-    padding-left: 32px;
-  }
-
-  ul{
     min-width:100%;
+  }
+
+  li{
+    &.dropdown-input{
+      border-bottom: 1px solid $ve-silver-base;
+      padding: 6px 0;
+      margin-bottom: 6px;
+      background:$ve-silver-lighter-1;
+    }
+    a{
+      padding-left: 32px;
+    }
   }
 
   .fa-caret-down{
     float:right;
     color:$ve-white-text-darker-1
   }
+
 }
-
-/*Clear padding at top of menu when there is input*/
-.dropdown-menu.menu-with-input{
-  padding-top:0px;
-}
-
-.ve-light-dropdown .dropdown-toggle:hover{
-  background-color:$ve-silver-base;
-}
-
-
-.ve-light-dropdown.open .dropdown-toggle{
-  background-color:$ve-silver-darker-1;
-}
-
-/*Special height for button that is inline with dropdown*/
-.inline-dropdown-btn.btn-primary{
-  float:right;
-  margin:2px 0 8px;
-  height:28px;
-  line-height:13px;
-  width:78px;
-}
-
-.inline-dropdown-btn.ve-light-dropdown{
-  width:calc(100% - 82px);
-  display:inline-block;
-  margin-top:2px;
-}
-
 
 
 /*------------------------------------------------------------------
-    2.3.1 Wide Dropdown
+    2.3.4 Wide Dropdown
 -------------------------------------------------------------------*/
 
-.ve-dark-dropdown-wide.btn-group {
-  display: block;
-  width: 100%;
-  margin: 0 0 18px;
-}
-
 .ve-dark-dropdown-wide {
+
+  &.btn-group {
+    display: block;
+    width: 100%;
+    margin: 0 0 18px;
+  }
 
   button.dropdown-toggle {
     width: 100%;
@@ -483,7 +488,6 @@ h4{
     height: 34px;
     line-height: 18px;
     margin-top: 6px;
-    background-color:$ve-slate-base;
   }
 
   .dropdown-menu {
@@ -499,26 +503,18 @@ h4{
 
 }
 
-/*------------------------------------------------------------------
-    2.3.2 Narrow Dropdown
--------------------------------------------------------------------*/
 
-.btn-group.ve-dark-dropdown-nav {
-  margin: 6px 0 6px 6px;
-}
+/*------------------------------------------------------------------
+    2.3.5 Narrow Dropdown
+-------------------------------------------------------------------*/
 
 .ve-dark-dropdown-nav {
 
   button.dropdown-toggle {
     height: 24px;
-    background-color: $ve-slate-base;
     font-size: 14px;
     padding: 3px 4px;
     line-height: 18px;
-  }
-
-  button.dropdown-toggle:hover {
-    background-color: $ve-slate-darker-1;
   }
 
   .label-dropdown {
@@ -527,8 +523,8 @@ h4{
     padding: 0 0 0 4px;
   }
 
-  .btn-group.open button.dropdown-toggle {
-    background-color: $ve-slate-darker-3;
+  &.btn-group{
+    margin: 6px 0 6px 6px;
   }
 
   /* over write bootstrap*/
@@ -541,32 +537,29 @@ h4{
   }
 }
 
+
 /*------------------------------------------------------------------
-    2.3.3 Fixed Content Dropdown
+    2.3.6 Fixed Content Dropdown
 -------------------------------------------------------------------*/
 
-.fixed-content-dropdown ul.dropdown-menu{
-  overflow-y: auto !important;
-  border: 1px solid $ve-slate-lighter-2;
-}
-
-.fixed-content-dropdown.open > a.dropdown-toggle,
-.fixed-content-dropdown li > a.dropdown-toggle{
-  color: $white;
-}
-
-.fixed-content-dropdown .fa-caret-down {
-  float: none;
-}
-
 span.fixed-content-dropdown{
+  ul.dropdown-menu{
+    overflow-y: auto !important;
+    border: 1px solid $ve-slate-lighter-2;
+  }
+  &.open > a.dropdown-toggle,
+    li > a.dropdown-toggle{
+    color: $white;
+  }
+   .fa-caret-down {
+    float: none;
+  }
   padding-bottom:12px;
 }
 
 
-
 /*------------------------------------------------------------------
-  2.5 Banners
+  2.4 Banners
 -------------------------------------------------------------------*/
 
 .ve-notify-banner{
@@ -580,11 +573,11 @@ span.fixed-content-dropdown{
 
 
 /*------------------------------------------------------------------
-  2.6 Input
+  2.5 Input
 -------------------------------------------------------------------*/
 
 /*------------------------------------------------------------------
-    2.6.1 Light Input
+    2.5.1 Light Input
 -------------------------------------------------------------------*/
 
 .ve-plain-input{
@@ -604,7 +597,7 @@ span.fixed-content-dropdown{
 
 
 /*------------------------------------------------------------------
-    2.6.2 Minor dark input
+    2.5.2 Minor dark input
 -------------------------------------------------------------------*/
 
 .ve-dark-minor-search input{
@@ -614,16 +607,16 @@ span.fixed-content-dropdown{
   background-color: $ve-slate-darker-2;
   padding: 3px 5px;
   letter-spacing: .05em;
-}
 
-.ve-dark-minor-search input:focus {
-  outline:none;
-  background-color: $ve-slate-darker-3;
-  border: 1px solid $ve-teal-base;
+  &:focus {
+    outline:none;
+    background-color: $ve-slate-darker-3;
+    border: 1px solid $ve-teal-base;
+  }
 }
 
 /*------------------------------------------------------------------
-  2.7 Animation
+  2.6 Animation
 -------------------------------------------------------------------*/
 
 .fade-in-out.ng-hide-add,
@@ -653,11 +646,11 @@ span.fixed-content-dropdown{
 // }
 
 /*------------------------------------------------------------------
-  2.8 Special Icons
+  2.7 Special Icons
 -------------------------------------------------------------------*/
 
 /*------------------------------------------------------------------
-    2.8.1 Section icon
+    2.7.1 Section icon
 -------------------------------------------------------------------*/
 
 /*set pseudoclass and reset italic from <i>*/
@@ -677,7 +670,7 @@ i.section-icon{
 }
 
 /*------------------------------------------------------------------
-    2.8.2 Ref icons
+    2.7.2 Ref icons
 -------------------------------------------------------------------*/
 
 /*add to branch labels*/

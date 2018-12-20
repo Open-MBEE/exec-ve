@@ -1,8 +1,10 @@
 <nav class="project-level-header navbar navbar-inverse navbar-fixed-top block" role="navigation">
     <div class="btn-group ve-dark-dropdown-nav select-project-dropdown" uib-dropdown keyboard-nav>
-        <button id="simple-btn-keyboard-nav" type="button" class="dropdown-toggle" ng-click="updateProjectChecked()" uib-dropdown-toggle>
-            <span class="label-dropdown">Project:</span>
-            <span class = "selected-dropdown">{{ currentProject }}<i class="fa fa-caret-down" aria-hidden="true"></i></span>
+        <button type="button" class="dropdown-toggle" ng-click="updateProjectChecked()" uib-dropdown-toggle>
+            <span class="selected-dropdown">
+                <span class="label-dropdown">Project:&nbsp;</span>{{ currentProject }}
+            </span>
+            <span><i class="fa fa-caret-down" aria-hidden="true"></i></span>
         </button>
         <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
             <li ng-repeat="project in projects | orderBy: 'name'" ng-click="updateProject(project)"
