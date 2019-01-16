@@ -57,10 +57,7 @@
     font-weight: 600;
     letter-spacing: .14em;
     font-size: 12px;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
+    @include transition($background_easeout_transition);
     border: none !important;
     text-transform: uppercase;
     border-radius:3px;
