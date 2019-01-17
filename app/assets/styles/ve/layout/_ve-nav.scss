@@ -72,7 +72,7 @@ a.switch-org:hover {
   img{
     height: 26px;
     border-radius: 50%;
-    transition: $background_hover_transition;
+    @include transition($background_hover_transition);
 
     &:hover{
       background-color: #0096FF;
@@ -164,12 +164,11 @@ ul.global-menu {
     margin: 5px 0;
     letter-spacing: .05em;
     line-height: 1;
-  }
-
-  input:focus {
-    outline: none;
-    background-color: $ve-slate-darker-3;
-    border: 1px solid $ve-teal-base;
+    &:focus {
+      outline: none;
+      background-color: $ve-slate-darker-3;
+      border: 1px solid $ve-teal-base;
+    }
   }
 
   button {
@@ -215,10 +214,10 @@ ul.global-menu {
   background:$ve-accent;
   text-align: center;
   color:white;
-}
-
-#login-dropdown:hover {
-  background-color:$ve-accent-darker;
+  
+  &:hover {
+    background-color:$ve-accent-darker;
+  }
 }
 
 
@@ -320,10 +319,6 @@ nav.project-level-header {
 /*Hide all but the last 2 breadcrumbs */
 @media (max-width: 1000px) and (min-width: 700px){
   .breadcrumbs{
-    // li:nth-child(2):after{
-    //   content: "\203A ...";
-    // }
-
     li:nth-last-child(-n+2) {
       a, span{
         display: inline-block;

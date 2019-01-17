@@ -103,10 +103,7 @@ ul.ve-light-list {
     padding: 6px 10px 6px 28px;
     font-size: 16px;
     cursor: pointer;
-    -webkit-transition: background-color .1s ease-out;
-    -moz-transition: background-color .1s ease-out;
-    -o-transition: background-color .1s ease-out;
-    transition: background-color .1s ease-out;
+    @include transition($background_easeout_transition);
   }
 
   li.ref-item:hover {
