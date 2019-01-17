@@ -7,9 +7,9 @@ ve-footer {
     font-weight: $default_font_weight;
     color: rgba(64, 64, 64, .7);
     position: absolute;
-    background-color: transparent;
+    background-color: $ve-silver-lighter-1;
     text-align: center;
-    z-index: -10;
+    z-index: 10;
     cursor: default;
     bottom: 0px;
     padding-top: 1px;
