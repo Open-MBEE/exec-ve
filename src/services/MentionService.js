@@ -26,6 +26,13 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
                 editor: cacheElement._modifier, editTime: moment(cacheElement._modified).fromNow(),
                 elementType: elementType || cacheElement.type
             });
+            if (cacheElement.documentation != undefined) {
+                result.push({id: cacheElement.id, name: cacheElement.name, type: 'doc',
+                    iconClass: iconClass, documentation: cacheElement.documentation || 'no text',
+                    editor: cacheElement._modifier, editTime: moment(cacheElement._modified).fromNow(),
+                    elementType: elementType || cacheElement.type
+                });
+            }
 
             if (cacheElement.type === 'Property' && cacheElement.defaultValue) {
                 var value = String(cacheElement.defaultValue.value);
