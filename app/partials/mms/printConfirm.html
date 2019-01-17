@@ -35,26 +35,22 @@
     <div ng-if="type == 'DOCUMENT' && mode === 3">
         <br>
         <form class="ve-light-tabs">
-            <input type="radio" name="Options" value="Basic" id="Basic" ng-click="customizeDoc.useCustomStyle = false" data-ng-model="customizeDoc.useCustomStyle" data-ng-value="false">
+            <input type="radio" name="Options" ng-click="customizeDoc.useCustomStyle = false" data-ng-model="customizeDoc.useCustomStyle" data-ng-value="false">
             <label for="Basic">Basic Options</label>&nbsp;&nbsp;&nbsp;
-            <input type="radio" name="Options" value="Advanced" id="Advanced" ng-click="customizeDoc.useCustomStyle = true" data-ng-model="customizeDoc.useCustomStyle" data-ng-value="true">
+            <input type="radio" name="Options" ng-click="customizeDoc.useCustomStyle = true" data-ng-model="customizeDoc.useCustomStyle" data-ng-value="true">
             <label for="Advanced">Advanced Options (CSS)</label>
         </form>
 
-        <!-- <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-default" ng-class="{'active': !customizeDoc.useCustomStyle}" ng-click="customizeDoc.useCustomStyle = false">Export Options (Default CSS)</button>
-            <button type="button" class="btn btn-default" ng-class="{'active': customizeDoc.useCustomStyle}" ng-click="customizeDoc.useCustomStyle = true">Custom Styling</button>
-        </div> -->
         <div class="well" ng-show="!customizeDoc.useCustomStyle">
         <form role="form">
 
             <div ng-if="mode !== 1">
                 <label>Orientation</label><br>
                 <form>
-                    <input type="radio" name="export-orientation" id="portrait" ng-model="model.landscape" ng-value="false">
-                    <label for="portrait" class="ve-font-weight-normal"><i class="fa fa-file ve-secondary-text"></i> Portrait</label><br>
-                    <input type="radio" name="export-orientation" id="landscape" ng-model="model.landscape" ng-value="true">
-                    <label for="landscape" class="ve-font-weight-normal"><i class="fa fa-file fa-rotate-270 ve-secondary-text"></i> Landscape
+                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="false">
+                    <label for="portrait" class="ve-font-weight-normal">&nbsp;<i class="fa fa-file ve-secondary-text"></i> Portrait</label><br>
+                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="true">
+                    <label for="landscape" class="ve-font-weight-normal">&nbsp;<i class="fa fa-file fa-rotate-270 ve-secondary-text"></i> Landscape
                 </form>
             </div>
             <br>
