@@ -236,7 +236,7 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
     }
 
     function _handleEnterKey(editorId, mentionId, projectId, refId) {
-        var matchDom = $('#' + mentionId + ' .active .matchName');
+        var matchDom = $('#' + mentionId + ' .active .mentionMatch');
         if (matchDom.length > 0) {
             var key = matchDom.attr('id');
             var mentionItem = _getMentionItem(key, projectId, refId);

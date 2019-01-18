@@ -1,30 +1,28 @@
 <script type="text/ng-template" id="customTemplate.html">
-    <a class="itemContainer">
-        <span class="nameContainer" ng-if="match.model.type === 'name'">
-        <div class="leftItem">
-            <i class="icon" ng-class="match.model.iconClass"></i>
-            <span> name </span>
-            <span id="{{match.model.id + match.model.type}}" class="matchName" ng-bind-html="match.model.name | underlineMatch:query"></span>
-            <br>
-        </div>
-        <div class="rightItem">
-            <span class="elementType">{{match.model.elementType}}</span>
-            <span>last mod {{match.model.editTime}} by
-                <span class="editor">{{match.model.editor}}</span>
-            </span>
-        </div>
-        </span>
-        <div class="leftItem">
-            <span class="contentContainer" ng-if="match.model.type === 'doc'">
-                <span ng-if="match.model.documentation">
-                    <span> documentation </span>
-                    <span class="content">{{match.model.documentation}}</span>
+    <a class="itemContainer" ng-switch="match.model.type">
+        <span ng-switch-when="name" class="nameContainer">
+            <div class="leftItem">
+                <i class="icon" ng-class="match.model.iconClass"></i>
+                <span> name </span>
+                <span id="{{match.model.id + match.model.type}}" class="matchName mentionMatch" ng-bind-html="match.model.name | underlineMatch:query"></span>
+                <br>
+            </div>
+            <div class="rightItem">
+                <span class="elementType">{{match.model.elementType}}</span>
+                <span>last mod {{match.model.editTime}} by
+                    <span class="editor">{{match.model.editor}}</span>
                 </span>
-            </span>
-            <span class="contentContainer" ng-if="match.model.type === 'val'">
-                <span> value </span>
-                <span class="content">{{match.model.value}}</span>
-            </span>
+            </div>
+        </span>
+        <span ng-switch-when="doc" class="contentContainer">
+            <div ng-if="match.model.documentation">
+                <span> documentation </span>
+                <span id="{{match.model.id + match.model.type}}" class="content mentionMatch">{{match.model.documentation}}</span>
+            </div>
+        </span>
+        <div ng-switch-when="val" class="contentContainer" ng-if="match.model.type === 'val'">
+            <span> value </span>
+            <span id="{{match.model.id + match.model.type}}" class="content mentionMatch">{{match.model.value}}</span>
         </div>
     </a>
 </script>
