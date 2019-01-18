@@ -107,6 +107,10 @@ div.tooltip-inner {
   font-size: .9em;
 }
 
+.ve-font-weight-normal{
+  font-weight: $default_font_weight;
+}
+
 .placeholder{
   color: $ve-light-text;
   font-style: italic; 

@@ -22,6 +22,9 @@
       Please wait until the full document appears in this pane before continuing. You will receive an email with subject line "HTML to {{label}} generation completed" with a link to the generated {{label}}.
      </span>
     </p>
+    <p ng-if="type == 'DOCUMENT' && mode === 3">
+      Choose either basic or advanced styling options.
+    </p>    
     <br/>
     <div ng-if="type == 'DOCUMENT' && mode !== 1">
     </div>
@@ -31,28 +34,23 @@
 
     <div ng-if="type == 'DOCUMENT' && mode === 3">
         <br>
-        <div class="ve-nav-tabs ve-light-tabs">
-            <ul class="nav nav-tabs">
-                <li class="uib-tab nav-item tab-item" ng-class="{'active': !customizeDoc.useCustomStyle}">
-                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = false">Basic Options</a>
-                </li>
-                <li class="uib-tab nav-item tab-item" ng-class="{'active': customizeDoc.useCustomStyle}">
-                    <a class="nav-link" ng-click="customizeDoc.useCustomStyle = true">Advanced Options</a>
-                </li>
-            </ul>
-        </div>
-        <!-- <div class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-default" ng-class="{'active': !customizeDoc.useCustomStyle}" ng-click="customizeDoc.useCustomStyle = false">Export Options (Default CSS)</button>
-            <button type="button" class="btn btn-default" ng-class="{'active': customizeDoc.useCustomStyle}" ng-click="customizeDoc.useCustomStyle = true">Custom Styling</button>
-        </div> -->
+        <form class="ve-light-tabs">
+            <input type="radio" name="Options" ng-click="customizeDoc.useCustomStyle = false" data-ng-model="customizeDoc.useCustomStyle" data-ng-value="false">
+            <label for="Basic">Basic Options</label>&nbsp;&nbsp;&nbsp;
+            <input type="radio" name="Options" ng-click="customizeDoc.useCustomStyle = true" data-ng-model="customizeDoc.useCustomStyle" data-ng-value="true">
+            <label for="Advanced">Advanced Options (CSS)</label>
+        </form>
+
         <div class="well" ng-show="!customizeDoc.useCustomStyle">
         <form role="form">
 
             <div ng-if="mode !== 1">
                 <label>Orientation</label><br>
                 <form>
-                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="false"> Portrait<br>
-                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="true"> Landscape
+                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="false">
+                    <label for="portrait" class="ve-font-weight-normal">&nbsp;<i class="fa fa-file ve-secondary-text"></i> Portrait</label><br>
+                    <input type="radio" name="export-orientation" ng-model="model.landscape" ng-value="true">
+                    <label for="landscape" class="ve-font-weight-normal">&nbsp;<i class="fa fa-file fa-rotate-270 ve-secondary-text"></i> Landscape
                 </form>
             </div>
             <br>
@@ -91,14 +89,17 @@
         </div>
 
         <div class="well" ng-show="customizeDoc.useCustomStyle">
-        <form ng-submit="saveStyleUpdate()" role="form">
+            <form ng-submit="saveStyleUpdate()" role="form">
 
-            <div class="form-group">
-                <textarea class="form-control" rows="6" style="width:100%" ng-model="customizeDoc.customCSS"></textarea>
-            </div>
-            <button class="btn btn-default" type="submit"><i class="fa fa-save"></i>Save CSS for document<span ng-if="elementSaving"><i class="fa fa-spinner fa-spin"></i></span></button>
-            <button class="btn btn-default" type="button" ng-click="preview()">Preview</button>
-        </form>
+                <div class="form-group">
+                    <textarea class="form-control" rows="6" style="width:100%" ng-model="customizeDoc.customCSS"></textarea>
+                </div>
+                <p class="help-block">
+                    <a target="_blank" href="https://wiki.jpl.nasa.gov/display/opencae/View+Editor+User+Guide%3A+8+PDF+Customization">Example CSS customizations</a>
+                </p>
+                <button class="btn btn-default" type="submit"><i class="fa fa-save"></i>Save CSS for document<span ng-if="elementSaving"><i class="fa fa-spinner fa-spin"></i></span></button>
+                <button class="btn btn-default" type="button" ng-click="preview()">Preview</button>
+            </form>
         </div>
     </div>
 
