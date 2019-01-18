@@ -15,10 +15,8 @@
             </div>
         </span>
         <span ng-switch-when="doc" class="contentContainer">
-            <div ng-if="match.model.documentation">
-                <span> documentation </span>
-                <span id="{{match.model.id + match.model.type}}" class="content mentionMatch">{{match.model.documentation}}</span>
-            </div>
+            <span> documentation </span>
+            <span id="{{match.model.id + match.model.type}}" class="content mentionMatch">{{match.model.documentation}}</span>
         </span>
         <div ng-switch-when="val" class="contentContainer" ng-if="match.model.type === 'val'">
             <span> value </span>
