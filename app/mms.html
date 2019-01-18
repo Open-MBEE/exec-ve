@@ -49,7 +49,9 @@
             </div>
         </div>
         </div>
-        <ve-footer ng-if="ve_footer">{{ve_footer}}</ve-footer>
+        <ve-footer ng-if="ve_footer">
+            <span ng-bind-html="ve_footer"></span>
+        </ve-footer>
     </div>
 </div>
 

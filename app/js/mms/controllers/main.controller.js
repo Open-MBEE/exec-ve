@@ -17,7 +17,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     //     $rootScope.ve_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
     // }
     if (host.indexOf('fn') !== -1){
-        $rootScope.ve_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server.';
+        $rootScope.ve_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server. <a target="_blank" href="https://wiki.jpl.nasa.gov/x/GaByE">More</a>';
         $rootScope.ve_fn = true;
     }
 
