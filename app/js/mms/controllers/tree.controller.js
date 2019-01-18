@@ -754,7 +754,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             growl.warning("Select item to remove.");
             return;
         }
-        if ($state.includes('project.ref.document')) { 
+        var type = ViewService.getElementType(branch.data);
+        if ($state.includes('project.ref.document')) {
+            if (type == 'Document') {
+                growl.warning("Cannot remove a document from this view. To remove this item, go to project home.");
+                return;
+            }
             if (branch.type !== 'view' || (!UtilsService.isView(branch.data))) {
                 growl.warning("Cannot remove non-view item. To remove this item, open it in the center pane.");
                 return;
