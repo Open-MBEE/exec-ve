@@ -19,16 +19,18 @@
 
   background-color: $ve-slate-darker-2;
   height:100%;
+  margin: 0;
 
   .account-wall {
-    width: 320px;
+    min-width: 320px;
+    max-width: 420px;
     margin: 120px auto;
     height: 320px;
     padding: 0 10px;
   }
 
   .account-wall .btn-block {
-    margin-top: 34px;
+    margin-top: 40px;
     bottom: 0;
     padding: 10px;
   }
@@ -65,51 +67,36 @@
     font-size: 18px;
   }
 
-/*------------------------------------------------------------------
-3. Input
--------------------------------------------------------------------*/
-
-  .form-control {
-    display: inline;
-    border: none;
-    font-size: 16px;
-    padding: 6px 10px;
-    border-radius: 2px !important;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
-    background-color: $ve-slate-base;
-    width: 100%;
-    text-align: left;
-    font-size: 16px;
-    padding: 5px 8px;
-    height: 34px;
-    line-height: 18px;
-    margin: 6px 0 18px;
-    color:white;
-    letter-spacing:.05em;
-  }
-
-  .form-control:focus {
-    box-shadow: none;
-    border: 1px solid $ve-teal-base;
-  }
-
-  .form-control {
-    border: 1px solid $ve-slate-base;
-    box-shadow: none;
-  }
-
   .label-text {
     color: $ve-white-text-lighter-2;
     font-size: 14px;
   }
 
+/*------------------------------------------------------------------
+3. Input
+-------------------------------------------------------------------*/
+
+  .login-input {
+    background-color: $ve-slate-base;
+    border: 1px solid $ve-slate-base;
+    border-radius: 2px !important;
+    box-shadow: none;
+    color:white;
+    line-height: 18px;
+    margin: 6px 0 18px;
+    letter-spacing:.05em;
+    height: 36px;
+
+    &:focus {
+      box-shadow: none;
+      border: 1px solid $ve-teal-base;
+    }
+  }
+
 }
 
 /*------------------------------------------------------------------
-4. Animation
+4. Animation - slide in selection options when no project provided
 -------------------------------------------------------------------*/
 
 @keyframes slideInFromLeft {
