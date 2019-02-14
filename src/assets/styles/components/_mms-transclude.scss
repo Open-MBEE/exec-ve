@@ -101,7 +101,6 @@ mms-transclude-name .input-group > .input-group-addon.transclude-name-label{
   visibility: 0;
   opacity: 0;
   @include transition(all .3s);
-  z-index: 100;
 }
 
 /*Label becomes visible on hover*/
