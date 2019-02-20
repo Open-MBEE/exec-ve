@@ -11,7 +11,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     orgOb, projectOb, refOb, refObs, groupObs, docMeta) {
 
     $scope.filterInputPlaceholder = 'Filter groups/docs';
-    if ($state.current.name === 'project.ref.document.view' || $state.current.name === 'project.ref.document.full') {
+    if ($state.includes('project.ref.document')) {
         $scope.filterInputPlaceholder = 'Filter table of contents';
     }
 
