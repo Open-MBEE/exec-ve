@@ -286,7 +286,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                     aggr = "";
                 else
                     aggr = '-' + aggr.toLowerCase();
-                var i, j = 0;
+                var i = 0;
                 if (!branch.expanded)
                     branch.expanded = false;
                 if ((branch.children && branch.children.length > 0) || (branch.expandable === true)) {
@@ -355,14 +355,17 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                     if (scope.options.sort) {
                         branch.children.sort(scope.options.sort);
                     }
-                    for (i = 0, j = 0; i < branch.children.length; i++) {
+                    var j = scope.options.startChapter;
+                    if (j === null || j === undefined || level != 1) {
+                        j = 1;
+                    }
+                    for (i = 0; i < branch.children.length; i++) {
                         var child_visible = visible && branch.expanded;
                         //if (branch.children[i].type === 'section')
                         //    add_branch_to_list(level + 1, '§ ', branch.children[i], child_visible);
                         if (branch.children[i].type === 'figure' || branch.children[i].type === 'table' || branch.children[i].type === 'equation') {
                             add_branch_to_list(level + 1, section, branch.children[i], child_visible, peNums);
                         } else {
-                            j++;
                             if (scope.options.sectionNumbering) {
                                 if (branch.children[i].data._isAppendix) {
                                     alpha = true;
@@ -374,8 +377,10 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                                     peNums.table = 0; peNums.figure = 0; peNums.equaton = 0;
                                 }
                                 add_branch_to_list(level + 1, nextSection, branch.children[i], child_visible, peNums);
-                            } else
+                            } else {
                                 add_branch_to_list(level + 1, [], branch.children[i], child_visible, peNums);
+                            }
+                            j++;
                         }
                     }
                 }

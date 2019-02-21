@@ -253,3 +253,8 @@ a[title='mms-br'] > hr {
 .cke_panel_listItem a {
 	padding-left: 20px !important;
 }
+
+.inlineCode {
+	background-color: #e8d4e8;
+	color: black;
+}

@@ -23,12 +23,23 @@
   .dropdown-menu a{
     padding: 8px;
     font-size: 14px;
+    text-align: center;
+
+    /*light grey button labels*/
+    span{
+      display: block;
+      font-size: 12px;
+      color: $ve-light-text;
+      line-height: 18px;
+      letter-spacing: .03em;
+    }
   }
 
   /*Special line-height so icons align*/
   .dropdown-menu a::before,
   a.dropdown-toggle .fa{
     line-height: 1.5;
+    padding-right: 0;
   }
 
   /*Special horizontal dropdown menu */
@@ -36,7 +47,7 @@
     position: relative;
     padding: 0;
     margin: 0;
-    @include border-radius(0 4px 4px 0);
+    @include border-radius(4px);
     border-color: darken($white, 12%);
     @include box-shadow( 6px 6px 12px rgba(0,0,0,.175));
 
@@ -57,8 +68,8 @@
     li{
       display: inline-block;
       a{
-        padding-left: 14px;
-        padding-right: 14px;
+        padding: 11px 0;
+        min-width: 62px;
       }
     }
   }
@@ -68,6 +79,7 @@
   .dropdown-toggle:hover + .dropdown-menu,
   span:hover .dropdown-menu{
     display: block;
+    margin-top: -11.5px;
   }
 
   /*When hovering over button or opening toggle, darken text and background to show activated*/
@@ -78,8 +90,16 @@
     border-color: darken($white, 12%);
     color: darken($tertiary-grey, 42%);
   }
-}
 
+
+}
+@media (max-width: 640px) {
+  .mms-add-pe-button {
+    span.icon-title {
+      display: none;
+    }
+  }
+}
 /* For section PEs, put the add button back into the document flow so that containment is clear*/
 mms-view-section .mms-add-pe-button {
   position: relative;

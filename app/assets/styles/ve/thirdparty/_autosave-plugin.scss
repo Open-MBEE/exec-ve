@@ -10,6 +10,7 @@
   1.2 Diff modal
 2. Save success message
 3. Firefox table overflow fix
+4. Flip buttons so they match the direction of the diff
 
 -------------------------------------------------------------------*/
 
@@ -56,10 +57,7 @@
     font-weight: 600;
     letter-spacing: .14em;
     font-size: 12px;
-    -webkit-transition: background-color .1s ease-out !important;
-    -moz-transition: background-color .1s ease-out !important;
-    -o-transition: background-color .1s ease-out !important;
-    transition: background-color .1s ease-out !important;
+    @include transition($background_easeout_transition);
     border: none !important;
     text-transform: uppercase;
     border-radius:3px;
@@ -222,6 +220,25 @@ table.diff{
   &:not(.inlinediff){
     tr > th:nth-child(3){
       width: 20px;
+    }
+  }
+}
+
+
+/*------------------------------------------------------------------
+4. Flip buttons so they match the direction of the diff
+-------------------------------------------------------------------*/
+
+.autosave{
+  .cke_dialog_ui_hbox.cke_dialog_footer_buttons{
+    tr{
+      display: block;
+      float: left;
+    }
+
+    td:first-child{
+      float: right;
+      margin-left: 10px;
     }
   }
 }

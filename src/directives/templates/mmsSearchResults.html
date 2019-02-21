@@ -1,6 +1,6 @@
 
 <div id="ve-search-results" class="misc-form-field results-count" ng-hide="searchLoading || !paginationCache.length">
-    <div class="ve-search-filter">
+    <div class="ve-search-filter" ng-hide="!showFilterOptions">
         <span class="label-for-filter ve-secondary-text">FILTER: </span>
         <div class="btn-group btn-group-sm" role="group"  aria-label="mms-search-results-filter">
             <button type="button" ng-repeat="item in filterOptions" ng-click="filterSearchResults(item.type)"
@@ -23,8 +23,8 @@
             </a>
         </div>
         <div class="elem-qualified-name-wrapper">
-            <div class="elem-qualified-name">
-                {{elem._qualifiedName}}
+            <div ng-click="expandQualifiedName($event, elem._qualifiedName);" class="elem-qualified-name">
+                {{qualifiedNameFormatter(elem._qualifiedName)}}
             </div>
         </div>
         <div ng-if="elem.type === 'Diagram' && elem._artifactIds">
@@ -97,14 +97,27 @@
                 </tr>
             </table>
         </div>
-        <div ng-if="elem._relatedDocuments.length > 0" class="elem-related-docs-wrapper">
+        <div ng-if="elem.allRelatedDocuments.length > 0" class="elem-related-docs-wrapper">
             <label>Related Documents</label>
-            <div ng-repeat="relatedDocument in elem._relatedDocuments" class="elem-documentation">
-                <span ng-repeat="relatedView in relatedDocument._parentViews">
-                    <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedDocument.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedDocument, elem)"></mms-view-link>
-                    > <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{relatedDocument.id}}" mms-element-id="{{relatedView.id}}" ng-click="userRelatedClick($event, relatedDocument, relatedView, elem)"></mms-view-link><br/>
-                </span>
+            <!-- show no more than three related views here-->
+            <div ng-repeat="doc in elem.someRelatedDocuments" class="elem-documentation">
+                <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedDocument.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedDocument, elem)"></mms-view-link>
+                > <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedView.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedView, elem)"></mms-view-link><br/>
             </div>
+
+            <!-- show the remaining related views when users click on "More" -->
+            <div ng-if="elem.remainingRelatedDocuments">
+                <div ng-repeat="doc in elem.remainingRelatedDocuments" class="elem-documentation">
+                    <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedDocument.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedDocument, elem)"></mms-view-link>
+                    > <mms-view-link suppress-numbering="true" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" mms-doc-id="{{doc.relatedDocument.id}}" mms-element-id="{{doc.relatedView.id}}" ng-click="userRelatedClick($event, doc.relatedDocument, doc.relatedView, elem)"></mms-view-link><br/>
+                </div>
+            </div>
+
+            <div class="show-more-container" ng-if="!elem.remainingRelatedDocuments && elem.allRelatedDocuments.length > elem.someRelatedDocuments.length">
+                <a class="show-more-btn" ng-click="showMoreRelatedViews(elem);"> {{(elem.allRelatedDocuments.length - elem.someRelatedDocuments.length) + ' More'}}
+                </a>
+            </div>
+
         </div>
         <div ng-if="elem.type != 'InstanceSpecification'">
             <label>Metatypes</label>

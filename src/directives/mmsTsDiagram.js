@@ -21,6 +21,7 @@ angular.module('mms.directives')
  *
  */
 function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, ApplicationService, AuthService, URLService) {
+    var importedTsJs = false;
     var template = $templateCache.get('mms/templates/mmsTsDiagram.html');
     var mapping = {};
     // var deferreds = {};
@@ -71,12 +72,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         REQ: 'REQ Relationships',
         UC: 'UC Relationships'
     };
-   /* $('body').append(
-    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/tsperspectives.nocache.js"></script>\n' +
-    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
-    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSHovering.js"></script>\n' +
-    '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSButtonTooltip.js"></script>');
-*/
+    
     $window.onPerspectivesCommandSuccess = function(successfulCommand) {
         console.log("Perspectives command: " + successfulCommand.command + " completed successfully");
         $window.hidePerspectivesProgressIndicator();
@@ -122,6 +118,15 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
     };
     //store global mapping of project name to hash, on*** functions can lookup the hash 
     var mmsTsDiagramLink = function(scope, element, attrs) {
+        if (!$window.invokePerspectivesCommand && !importedTsJs) {
+            $('body').append(
+            '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/tsperspectives.nocache.js"></script>\n' +
+            '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/dojo/dojo/dojo.js"></script>\n' +
+            '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSHovering.js"></script>\n' +
+            '<script type="text/javascript" language="javascript" src="/mms-ts/tsperspectives/TSButtonTooltip.js"></script>');
+
+            importedTsJs = true;
+        }
         var id = ApplicationService.createUniqueId();
         if (peId2projectId[scope.mmsPeId]) {
             id = peId2projectId[scope.mmsPeId];

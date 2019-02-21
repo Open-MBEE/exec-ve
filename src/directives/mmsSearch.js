@@ -32,6 +32,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
     function mmsSearchLink(scope, element, attrs) {
         // Main search variables
         var baseSearchResults = [];
+        scope.showFilterOptions = !scope.mmsOptions.hideFilterOptions;
         scope.searchLoading = false;
         scope.mainSearch = {
             searchText: '',
@@ -46,6 +47,24 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
         };
         scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
 
+        scope.qualifiedNameFormatter = function(qualifiedName) {
+            if (qualifiedName) {
+                var parts = qualifiedName.split('/');
+                var result = qualifiedName;
+                if (parts.length > 7) {
+                    result = parts.slice(0, 4).join('/') + '/.../' + parts.slice(parts.length - 3, parts.length).join('/');
+                }
+                return result;
+            }
+        };
+
+        scope.expandQualifiedName = function($event, qualifiedName) {
+            $event.currentTarget.innerHTML = qualifiedName;
+        };
+
+        scope.showMoreRelatedViews = function(element) {
+            element.remainingRelatedDocuments = element.allRelatedDocuments.slice(3, element.allRelatedDocuments.length);
+        };
         // Search resulte settings
         scope.activeFilter = [];
 
@@ -94,14 +113,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
         scope.getTypeClass = function (element) {
             // Get Type
-            scope.elementType = ViewService.getElementType(element);
-            scope.elementTypeClass = '';
-            if (element.type === 'InstanceSpecification') {
-                scope.elementTypeClass = 'pe-type-' + scope.elementType;
-            } else {
-                scope.elementTypeClass = 'item-type-' + scope.elementType;
-            }
-            return scope.elementTypeClass;
+            scope.elementTypeClass = UtilsService.getElementTypeClass(element, ViewService.getElementType(element));
         };
 
         // Set search options
@@ -384,6 +396,7 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
                         scope.searchResults = elements;
                         baseSearchResults = elements;
                     }
+                    combineRelatedViews(scope);
                     scope.totalResults = data.total;
                     scope.maxPages = Math.ceil(scope.totalResults/scope.itemsPerPage);
                     scope.currentPage = page;
@@ -702,6 +715,24 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
                     }
                 }
             };
+        };
+
+        var combineRelatedViews = function(scope) {
+            scope.searchResults.forEach(function(element) {
+                var allRelatedDocuments = [];
+                if (element._relatedDocuments) {
+                    element._relatedDocuments.forEach(function(relatedDoc) {
+                        relatedDoc._parentViews.forEach(function(parentView) {
+                            allRelatedDocuments.push({
+                                relatedDocument: relatedDoc,
+                                relatedView: parentView
+                            });
+                        });
+                    });
+                }
+                element.allRelatedDocuments = allRelatedDocuments;
+                element.someRelatedDocuments = allRelatedDocuments.slice(0, 3);
+            });
         };
 
         // Set options

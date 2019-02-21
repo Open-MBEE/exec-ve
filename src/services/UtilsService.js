@@ -486,7 +486,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {string} generated html string
      */
     var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
-        var result = ['<table class="table-bordered table-condensed">'];
+        var result = ['<table class="table-bordered table-condensed ' + (table.style ? table.style : '') + '">'];
         if (ApplicationService.getState().inDoc && !table.excludeFromList) {
             result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
         } else if (table.title) {
@@ -1384,9 +1384,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return o;
     };
 
-    var copyToClipboard = function(target) {
+    var copyToClipboard = function(target, $event) {
+        $event.stopPropagation();
         var range = window.document.createRange();
-        range.selectNode(target[0]);
+        range.selectNodeContents(target[0].childNodes[0]);
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
         try {
@@ -1395,6 +1396,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         window.getSelection().removeAllRanges();
     };
 
+    var getElementTypeClass = function(element, elementType) {
+        var elementTypeClass = '';
+        if (element.type === 'InstanceSpecification') {
+            elementTypeClass = 'pe-type-' + elementType;
+        } else {
+            elementTypeClass = 'item-type-' + elementType;
+        }
+        return elementTypeClass;
+    };
 
     return {
         VIEW_SID: VIEW_SID,
@@ -1435,6 +1445,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         tableConfig: tableConfig,
         _generateRowColNumber: _generateRowColNumber,
         PROJECT_URL_PREFIX: PROJECT_URL_PREFIX,
-        copyToClipboard: copyToClipboard
+        copyToClipboard: copyToClipboard,
+        getElementTypeClass: getElementTypeClass
     };
 }

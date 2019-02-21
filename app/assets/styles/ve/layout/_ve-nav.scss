@@ -11,9 +11,8 @@
     2.2.2 Search
   2.3 User Profile
 3. Project Level Header
-  3.1 Select Project Dropdown
-  3.2 Breadcrumbs
-  3.3 Dropdowns
+  3.1 Breadcrumbs
+  3.2 Dropdowns
 
 -------------------------------------------------------------------*/
 
@@ -72,7 +71,7 @@ a.switch-org:hover {
   img{
     height: 26px;
     border-radius: 50%;
-    transition: $background_hover_transition;
+    @include transition($background_hover_transition);
 
     &:hover{
       background-color: #0096FF;
@@ -164,12 +163,11 @@ ul.global-menu {
     margin: 5px 0;
     letter-spacing: .05em;
     line-height: 1;
-  }
-
-  input:focus {
-    outline: none;
-    background-color: $ve-slate-darker-3;
-    border: 1px solid $ve-teal-base;
+    &:focus {
+      outline: none;
+      background-color: $ve-slate-darker-3;
+      border: 1px solid $ve-teal-base;
+    }
   }
 
   button {
@@ -215,10 +213,10 @@ ul.global-menu {
   background:$ve-accent;
   text-align: center;
   color:white;
-}
-
-#login-dropdown:hover {
-  background-color:$ve-accent-darker;
+  
+  &:hover {
+    background-color:$ve-accent-darker;
+  }
 }
 
 
@@ -237,15 +235,7 @@ nav.project-level-header {
 }
 
 /*------------------------------------------------------------------
-  3.1 Select Project Dropdown
--------------------------------------------------------------------*/
-
-.select-project-dropdown {
-  float: left;
-}
-
-/*------------------------------------------------------------------
-  3.2 Breadcrumbs
+  3.1 Breadcrumbs
 -------------------------------------------------------------------*/
 
 .navbar{
@@ -320,10 +310,6 @@ nav.project-level-header {
 /*Hide all but the last 2 breadcrumbs */
 @media (max-width: 1000px) and (min-width: 700px){
   .breadcrumbs{
-    // li:nth-child(2):after{
-    //   content: "\203A ...";
-    // }
-
     li:nth-last-child(-n+2) {
       a, span{
         display: inline-block;
@@ -344,13 +330,43 @@ nav.project-level-header {
   .navbar-right {
     display: none;
   }
+  .project-level-header .ve-dark-dropdown-nav {
+    max-width: calc(100% - 50px);
+
+    & button.dropdown-toggle {
+      text-align: left;
+      max-width: 100%;
+    }
+    & .selected-dropdown {
+      display: block;
+      min-width: 200px;
+      max-width: calc(100% - 25px);
+      overflow: hidden;
+      white-space: nowrap;
+      float: left;
+      text-overflow: ellipsis;
+    }
+    & .ul.dropdown-menu {
+      max-width: 400px;
+      overflow: hidden;
+      text-align: left;
+    }
+  }
+
 }
 
 
 /*------------------------------------------------------------------
-  3.3 Dropdowns
+  3.2 Dropdowns
 -------------------------------------------------------------------*/
 
 .project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
-  max-width: 300px;
+  max-width: 400px;
+  text-align: left;
+  min-width: 260px;
+  /*Clearing bootstrap styling so long names can wrap*/
+  > li > a{
+    white-space: normal;
+    word-wrap: break-word;
+  }
 }

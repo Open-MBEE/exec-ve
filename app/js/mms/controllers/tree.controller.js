@@ -3,12 +3,17 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl', 
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
                           'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'docMeta',
-function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, 
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl,
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
     orgOb, projectOb, refOb, refObs, groupObs, docMeta) {
+
+    $scope.filterInputPlaceholder = 'Filter groups/docs';
+    if ($state.includes('project.ref.document')) {
+        $scope.filterInputPlaceholder = 'Filter table of contents';
+    }
 
     $rootScope.mms_refOb = refOb;
     $rootScope.ve_bbApi = $scope.bbApi = {};
@@ -479,6 +484,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     if (documentOb && docMeta) {
         $scope.treeOptions.numberingDepth = docMeta.numberingDepth;
         $scope.treeOptions.numberingSeparator = docMeta.numberingSeparator;
+        $scope.treeOptions.startChapter = documentOb._startChapter;
     }
 
     $scope.fullDocMode = function() {
@@ -749,7 +755,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             growl.warning("Select item to remove.");
             return;
         }
-        if ($state.includes('project.ref.document')) { 
+        var type = ViewService.getElementType(branch.data);
+        if ($state.includes('project.ref.document')) {
+            if (type == 'Document') {
+                growl.warning("Cannot remove a document from this view. To remove this item, go to project home.");
+                return;
+            }
             if (branch.type !== 'view' || (!UtilsService.isView(branch.data))) {
                 growl.warning("Cannot remove non-view item. To remove this item, open it in the center pane.");
                 return;

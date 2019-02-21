@@ -276,6 +276,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                             newArray.push(val[i]);
                         }
                     }
+                    newArray.sort(function(a, b) {
+                        return a.name.localeCompare(b.name);
+                    });
                     deferred.resolve({options: newArray, isEnumeration: isEnumeration});
                 },
                 function(reason) {
@@ -741,7 +744,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         $scope.searchOptions = {
             callback: addPECallback,
             itemsPerPage: 200,
-            filterQueryList: [peFilterQuery]
+            filterQueryList: [peFilterQuery],
+            hideFilterOptions: true
         };
 
         $scope.ok = function() {
@@ -802,8 +806,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
         });
         instance.result.then(function(data) {
-            if (data.type !== 'InstanceSpecification') {
-                return; //do not open editor for existing pes added
+            if (data.type !== 'InstanceSpecification' || ViewService.isSection(data)) {
+                return; //do not open editor for existing pes added or if pe/owner is a section
             }
             $timeout(function() { //auto open editor for newly added pe
                 $('#' + data.id).find('mms-transclude-doc,mms-transclude-com').click();
