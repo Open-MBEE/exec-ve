@@ -138,8 +138,11 @@
     }
 
     /*Clearing bootstrap styling*/
-    >li>a {
+    >li>a,
+    >li>span {
       padding: 1px 10px;
+    }
+    >li>a{
       color: white;
 
       &:hover {

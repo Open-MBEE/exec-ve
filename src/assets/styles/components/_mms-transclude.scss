@@ -89,6 +89,25 @@ mms-view:not(.reviewing) mms-transclude-com {
   display: none;
 }
 
+/*Add a name label that is hidden by default*/
+mms-transclude-name .input-group > .input-group-addon.transclude-name-label{
+  position: absolute;
+  top: -1.8em;
+  display: table;
+  opacity: 0;
+  border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+  visibility: 0;
+  opacity: 0;
+  @include transition(all .3s);
+}
+
+/*Label becomes visible on hover*/
+mms-transclude-name:hover .input-group > .input-group-addon.transclude-name-label{
+  visibility: 1;
+  opacity: 1;
+}
 
 /*------------------------------------------------------------------
 Element not found styling

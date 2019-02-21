@@ -11,9 +11,8 @@
     2.2.2 Search
   2.3 User Profile
 3. Project Level Header
-  3.1 Select Project Dropdown
-  3.2 Breadcrumbs
-  3.3 Dropdowns
+  3.1 Breadcrumbs
+  3.2 Dropdowns
 
 -------------------------------------------------------------------*/
 
@@ -236,15 +235,7 @@ nav.project-level-header {
 }
 
 /*------------------------------------------------------------------
-  3.1 Select Project Dropdown
--------------------------------------------------------------------*/
-
-.select-project-dropdown {
-  float: left;
-}
-
-/*------------------------------------------------------------------
-  3.2 Breadcrumbs
+  3.1 Breadcrumbs
 -------------------------------------------------------------------*/
 
 .navbar{
@@ -366,13 +357,13 @@ nav.project-level-header {
 
 
 /*------------------------------------------------------------------
-  3.3 Dropdowns
+  3.2 Dropdowns
 -------------------------------------------------------------------*/
 
 .project-level-header .ve-dark-dropdown-nav ul.dropdown-menu {
   max-width: 400px;
-  overflow: hidden;
   text-align: left;
+  min-width: 260px;
   /*Clearing bootstrap styling so long names can wrap*/
   > li > a{
     white-space: normal;
