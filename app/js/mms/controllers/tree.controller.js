@@ -484,6 +484,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     if (documentOb && docMeta) {
         $scope.treeOptions.numberingDepth = docMeta.numberingDepth;
         $scope.treeOptions.numberingSeparator = docMeta.numberingSeparator;
+        $scope.treeOptions.startChapter = documentOb._startChapter;
     }
 
     $scope.fullDocMode = function() {
