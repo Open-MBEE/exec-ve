@@ -68,6 +68,12 @@ module.exports = function(grunt) {
             port: 8080
           },
           {
+            context: '/xlrapi',
+            https: serverHttps,
+            host: servers[key],
+            port: serverPort
+          },
+          {
             context: '/alfresco',  // '/api'
             host: servers[key],
             changeOrigin: true,
