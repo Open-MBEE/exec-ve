@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms.directives')
+angular.module('mmsApp')
     .directive('runXlr', ['$http', '$uibModal', '$window', 'growl', 'ApplicationService', runXlr]);
 
 function runXlr($http, $uibModal, $window, growl, ApplicationService) {
