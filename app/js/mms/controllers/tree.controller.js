@@ -691,7 +691,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.searchOptions = {
             callback: addExistingView,
             itemsPerPage: 200,
-            filterQueryList: [queryFilter]
+            filterQueryList: [queryFilter],
+            hideFilterOptions: true
         };
 
         $scope.ok = function() {

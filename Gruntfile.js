@@ -68,6 +68,12 @@ module.exports = function(grunt) {
             port: 8080
           },
           {
+            context: '/xlrapi',
+            https: serverHttps,
+            host: servers[key],
+            port: serverPort
+          },
+          {
             context: '/alfresco',  // '/api'
             host: servers[key],
             changeOrigin: true,
@@ -347,7 +353,7 @@ module.exports = function(grunt) {
     artifactory: {
       options: {
         url: artifactoryUrl,
-        repository: releaseRepo, //snapshotRepo,
+        repository: releaseRepo,
         username: artifactoryUser,
         password: artifactoryPassword
       },
@@ -358,7 +364,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: groupId + ':ve:zip',
-            version: '3.5.1',
+            version: '3.5.2',
             path: 'deploy/'
           }]
         }
