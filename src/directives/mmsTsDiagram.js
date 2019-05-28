@@ -79,6 +79,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
     };
     $window.onPerspectivesCommandFailure = function(failedCommand, message, callstack) {
         console.log("Perspectives command " + failedCommand.commmand + " failed. Reason is: " + message);
+        $window.hidePerspectivesProgressIndicator();
         console.log(callstack);
     };
     $window.onPerspectivesProjectLoad = function(projectID) {
@@ -309,6 +310,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
     function _createUpdateCommand(scope, viewName, id) {
         var updateCommand = {
             "command": "Group",
+            "onsuccess": "onPerspectivesCommandSuccess",
             "data": [
                 {
                     "command": "Custom",
