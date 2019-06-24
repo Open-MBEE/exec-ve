@@ -87,7 +87,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.5.5';
+            scope.veV = '3.5.4';
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
