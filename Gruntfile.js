@@ -364,7 +364,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: groupId + ':ve:zip',
-            version: '3.5.4-SNAPSHOT',
+            version: '3.5.5-SNAPSHOT',
             path: 'deploy/'
           }]
         }
