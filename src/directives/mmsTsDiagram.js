@@ -42,7 +42,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
     var controlMapping = {
         IBD: 'IBD Controls',
         BDD: 'BDD Controls',
-        STM: 'Controls',
+        STM: 'STM Controls',
         ACT: 'ACT Controls',
         SD: 'Controls',
         PKG: 'PKG Controls',

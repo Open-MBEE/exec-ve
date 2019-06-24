@@ -7,7 +7,7 @@ function ShortenUrlService($http, $q, URLService, UtilsService) {
 
     function getShortUrl(currentUrl, scope) {
         var SHARE_URL = 'https://opencae.jpl.nasa.gov/goto/';
-        return $http.post(SHARE_URL, {'url': currentUrl}, {withCredentials: false})
+        return $http.post('https://purl-prod-lb.jpl.nasa.gov/create', {'url': currentUrl}, {withCredentials: false})
             .then(function (response) {
                 scope.shortUrl = SHARE_URL + response.data.link;
             }, function (response) {
