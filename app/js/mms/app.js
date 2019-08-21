@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies'])
-.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider, $locationProvider) {
     // override uibTypeaheadPopup functionality
     $provide.decorator('uibTypeaheadPopupDirective', ['$delegate', function($delegate) {
         var originalLinkFn = $delegate[0].link;
@@ -22,6 +22,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         return $delegate;
     }]);
 
+    $locationProvider.hashPrefix('');
+  
     $urlRouterProvider.rule(function ($injector, $location) {
         var $state = $injector.get('$state');
         var locationPath = $location.url();
