@@ -80,7 +80,7 @@
 <script type="text/javascript">
     function getHostname() {
         var host = location.hostname.slice(0,location.hostname.indexOf('.'));
-        var matomo = "//piwik.jpl.nasa.gov";
+        var matomo = "//piwik.jpl.nasa.gov/";
         var uat = location.href.indexOf('uat') > 0;
         var idSite;
         switch(host) {
@@ -88,7 +88,7 @@
                 idSite = 139;
                 if (uat) {
                     idSite = 3;
-                    matomo = "https://cae-matomo-test.jpl.nasa.gov";
+                    matomo = "https://cae-matomo-test.jpl.nasa.gov/";
                 }
                 break;
             case 'opencae-fn':
