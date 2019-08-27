@@ -80,10 +80,16 @@
 <script type="text/javascript">
     function getHostname() {
         var host = location.hostname.slice(0,location.hostname.indexOf('.'));
+        var matomo = "//piwik.jpl.nasa.gov";
+        var uat = location.href.indexOf('uat') > 0;
         var idSite;
         switch(host) {
             case 'opencae':
                 idSite = 139;
+                if (uat) {
+                    idSite = 3;
+                    matomo = "https://cae-matomo-test.jpl.nasa.gov";
+                }
                 break;
             case 'opencae-fn':
                 idSite = 210;
@@ -91,27 +97,28 @@
             default:
                 idSite = -1;
         }
-        return idSite;
+        return [matomo, idSite];
     }
 </script>
 
-<!-- Piwik -->
+<!-- Matomo -->
 <script type="text/javascript">
-    var _paq = _paq || [];
-    var host = getHostname();
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    if(host !== -1){
+    var urlAndSite = getHostname();
+    if (urlAndSite[1] != -1) {
+        var _paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        //_paq.push(['trackPageView']); //comment for angulartics
+        _paq.push(['enableLinkTracking']);
         (function() {
-            var u="//piwik.jpl.nasa.gov/";
-            _paq.push(['setTrackerUrl', u+'piwik.php']);
-            _paq.push(['setSiteId', host]);
+            var u=urlAndSite[0];
+            _paq.push(['setTrackerUrl', u+'matomo.php']);
+            _paq.push(['setSiteId', urlAndSite[1]]);
             var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
         })();
     }
-</script>
-<!-- End Piwik Code -->
-
+  </script>
+  <!-- End Matomo Code -->
+  
 </body>
 </html>
