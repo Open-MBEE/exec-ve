@@ -8,7 +8,8 @@ function runXlr($http, $uibModal, $window, growl, ApplicationService) {
         template: '<button class="btn btn-primary" ng-click="runXLR()">{{xlrTaskName}}</button>',
         scope: {
             templateId: '@',
-            xlrTaskName: '@'
+            xlrTaskName: '@',
+            xlrReleaseName: '@'
         },
         controller: ['$scope', runXlrCtrl],
         link: runXlrLink
@@ -47,7 +48,7 @@ function runXlr($http, $uibModal, $window, growl, ApplicationService) {
                         var baseAuth = make_base_auth(credentials.username, credentials.password);
                         var email = credentials.username + '@jpl.nasa.gov';
                         var postBody = {
-                            "releaseTitle": "CAE Portal Sync",
+                            "releaseTitle": $scope.xlrReleaseName ? $scope.xlrReleaseName : "CAE Portal Sync",
                             "releaseVariables": {
                                 "contentEditor": credentials.username,
                                 "editorEmail": email
