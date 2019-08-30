@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', '$window', AuthService]);
+.factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', '$window', '$analytics', AuthService]);
 
 /**
  * @ngdoc service
@@ -17,7 +17,7 @@ angular.module('mms')
  * @description
  * Provide general authorization functions. I.e. login, logout, etc...
  */
-function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window) {
+function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window, $analytics) {
     
     var ticket = $window.localStorage.getItem('ticket');
     var getAuthorized = function (credentials) {
@@ -59,6 +59,7 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
 
         $http.get(URLService.getCheckTicketURL(ticket)).then(function (success) {
             deferred.resolve(success.data.username);
+            $analytics.setUsername(success.data.username);
         }, function(fail){
             deferred.reject(fail);
             removeTicket();
