@@ -503,7 +503,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
             result.push('</colgroup>');
         }
-        if (table.header.length) {
+        if (table.header && table.header.length) {
             // only add styling to the filterable or sortable header
             if ( isFilterable || isSortable ) {
                 result.push('<thead class="doc-table-header" >');
@@ -1329,10 +1329,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             'name': data.name,
             'css': data.css
         })
-        .success(function(data, status, headers, config){
+        .then(function() {
             deferred.resolve('ok');
-        }).error(function(data, status, headers, config){
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        }, function(error) {
+            URLService.handleHttpStatus(error.data, error.status, error.headers, error.config, deferred);
         });
         return deferred.promise;
     };

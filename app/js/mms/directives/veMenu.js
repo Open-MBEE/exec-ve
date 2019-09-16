@@ -133,11 +133,18 @@ function veMenu(CacheService, $state, $templateCache, $sce, $timeout, UtilsServi
         }
 
         function getHrefForBranch(branch) {
-            return UtilsService.PROJECT_URL_PREFIX + scope.project.id + '/' + branch.id;
+            var res = UtilsService.PROJECT_URL_PREFIX + scope.project.id + '/' + branch.id;
+            if (scope.document) {
+                res += '/documents/' + scope.document.id;
+            }
+            if (scope.view) {
+                res += '/views/' + scope.view.id;
+            }
+            return res;
         }
 
         function getHrefForTag(tag) {
-            return UtilsService.PROJECT_URL_PREFIX + scope.project.id + '/' + tag.id;
+            return getHrefForBranch(tag);
         }
     };
 
@@ -156,7 +163,8 @@ function veMenu(CacheService, $state, $templateCache, $sce, $timeout, UtilsServi
             branches: '<mmsBranches',
             tag: '<mmsTag',
             tags: '<mmsTags',
-            document: '<mmsDocument'
+            document: '<mmsDocument',
+            view: '<mmsView'
         },
         link: veMenuLink
     };

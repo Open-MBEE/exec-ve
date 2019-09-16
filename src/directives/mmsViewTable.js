@@ -183,6 +183,9 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
         /** Add watchers to all header columns inputs for filtering **/
         function _addWatchersForAllHeaderColumnsInput(tableConfig) {
             var columnsInputWatchers = {};
+            if (!$scope.table.header) {
+                return;
+            }
             $scope.table.header.forEach(function (headerRow) {
                 headerRow.forEach(function(cell) {
                     var filterInputBinding = tableConfig.filterTermColumnPrefixBinding + cell.startCol + cell.endCol;

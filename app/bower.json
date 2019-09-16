@@ -24,12 +24,12 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "~2.1.4",
-    "angular": "~1.5.5",
-    "angular-cookies": "~1.5.0",
-    "angular-animate": "~1.5.5",
+    "jquery": "~3.4.1",
+    "angular": "~1.7.8",
+    "angular-cookies": "~1.7.8",
+    "angular-animate": "~1.7.8",
     "angular-borderlayout": "https://github.com/dlamoris/angular-borderlayout.git#master",
-    "angular-ui-router": "~0.3.1",
+    "angular-ui-router": "~0.4.2",
     "angular-ui-bootstrap-bower": "~1.3.3",
     "angular-ui-tree": "~2.17.0",
     "angular-ui-tree-filter": "~0.1.1",
@@ -42,7 +42,7 @@
     "c3": "~0.5.4",
     "angulartics": "~1.1.0",
     "angulartics-piwik": "~1.0.4",
-    "ngStorage": "https://github.com/gsklee/ngStorage.git#master",
+    "ngstorage": "~0.3.11",
     "angular-promise-extras": "^0.1.8",
     "HtmlRenderedDiff": "https://github.com/chhaymenghong/HtmlRenderedDiff.git#release",
     "moment": "^2.22.0"
@@ -50,9 +50,9 @@
   "resolutions": {
     "lodash": "3.9.3",
     "d3": "~5.1.0",
-    "angular": "~1.5.5"
+    "angular": "~1.7.8"
   },
   "devDependencies": {
-    "angular-mocks": "~1.5.8"
+    "angular-mocks": "~1.7.8"
   }
 }

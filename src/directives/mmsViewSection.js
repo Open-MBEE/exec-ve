@@ -13,7 +13,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
         $scope.bbApi = {};
         $scope.buttons = [];
         $scope.buttonsInit = false;
-        $scope.element = $scope.section;  // This is for methods in Utils
+        //$scope.element = $scope.section;  
 
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
@@ -30,7 +30,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
     };
 
     var mmsViewSectionLink = function(scope, domElement, attrs, controllers) {
-
+        scope.element = scope.section; // This is for methods in Utils
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.setPeLineVisibility = function($event) {
