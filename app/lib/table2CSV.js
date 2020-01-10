@@ -34,16 +34,15 @@ jQuery.fn.table2CSV = function(options) {
         });
         row2CSV(tmpRow);
     });
+    var mydata = csvData.join('\n');
     if (options.delivery == 'popup') {
-        var mydata = csvData.join('\n');
         return popup(mydata);
     } else {
-        var mydata = csvData.join('\n');
         return mydata;
     }
 
     function row2CSV(tmpRow) {
-        var tmp = tmpRow.join('') // to remove any blank rows
+        var tmp = tmpRow.join(''); // to remove any blank rows
         if (tmpRow.length > 0 && tmp != '') {
             var mystr = tmpRow.join(options.separator);
             csvData[csvData.length] = mystr;
