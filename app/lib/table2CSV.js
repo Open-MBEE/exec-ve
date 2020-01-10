@@ -17,12 +17,49 @@ jQuery.fn.table2CSV = function(options) {
             tmpRow[tmpRow.length] = formatData(options.header[i]);
         }
     } else {
+        var spanData = {}; //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
+        var curRow = 0;
         $(el).children('thead').children('tr').each(function() {
             tmpRow = [];
+            var curCol = 0;
             $(this).children('th').each(function() {
-                tmpRow[tmpRow.length] = formatData($(this).text());  
+                while(spanData[curRow] && spanData[curRow][curCol]) {
+                    tmpRow.push('""');
+                    curCol++;
+                }
+                tmpRow.push(formatData($(this).text()));
+                var rowspan = $(this).attr('rowspan');
+                if (rowspan) {
+                    rowspan = parseInt(rowspan);
+                    if (rowspan > 1) {
+                        for (var i = 1; i < rowspan; i++) {
+                            if (!spanData[curRow + i]) {
+                                spanData[curRow + i] = {};
+                            }
+                            spanData[curRow + i][curCol] = true;
+                        }
+                    }
+                }
+                var colspan = $(this).attr('colspan');
+                if (!colspan){
+                    curCol++;
+                    return;
+                }
+                colspan = parseInt(colspan);
+                while (colspan > 1) {
+                    curCol++;
+                    tmpRow.push('""');
+                    colspan--;
+                    if (rowspan > 1) {
+                        for (var i = 1; i < rowspan; i++) {
+                            spanData[curRow + i][curCol] = true;
+                        }
+                    }
+                }
+                curCol++;
             });
             row2CSV(tmpRow);
+            curRow++;
         });
     }
 
