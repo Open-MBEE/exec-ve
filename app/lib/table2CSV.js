@@ -56,6 +56,10 @@ jQuery.fn.table2CSV = function(options) {
         //HTML
         // var regexp = new RegExp(/\<[^\<]+\>/g);
         // var output = output.replace(regexp, "");
+        var i = output.search(/\S/); //index of first non whitespace char
+        if (i > 0) {
+            output = '_'.repeat(i) + $.trim(output);
+        }
         output = $.trim(output);
         if (output == "") return '';
         if (output[0] == '+' || output[0] == '=' || output[0] == '-') {
