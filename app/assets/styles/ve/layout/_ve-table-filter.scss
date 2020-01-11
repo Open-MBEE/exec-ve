@@ -18,7 +18,8 @@
 -------------------------------------------------------------------*/
   .export-csv-button.btn,
   .filter-table-button.btn,
-  .reset-sort-button.btn {
+  .reset-sort-button.btn,
+  .fixed-header-button.btn {
     margin: 30px 0 6px;
     font-weight:500;
   }
@@ -86,3 +87,12 @@
   }
 }
 
+.tableFixHead { 
+  overflow-y: auto;
+  height: 700px; 
+
+  table th {
+    background-color: $ve-silver-lighter-1;
+    border: 1px solid #ddd;
+  }
+}

@@ -30,14 +30,15 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
 
         var html = UtilsService.makeHtmlTable(scope.table, true, true, scope.mmsPe);
         html = '<div class="tableSearch ve-table-filter">' +
-                '<button class="btn btn-sm export-csv-button btn-default" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm export-csv-button btn-default" ng-click="makeCsv()">Export CSV</button> ' +
                 '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
+                '<button class="btn btn-sm fixed-header-button btn-default" ng-click="makeFixed()">Toggle Fixed Headers</button> ' +
                 '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
                 '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + html;
 
-        scope.doClick = function() {
+        scope.makeCsv = function() {
             var csvString = element.children('table').table2CSV({delivery:'value'});
             // var bom = "\xEF\xBB\xBF"; //just for excel
             var bom2 = "\uFEFF";      //just for excel
@@ -60,6 +61,20 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
                     downloadLink.remove();
                 }, null);
             }
+        };
+
+        var fixedHeaders;
+        scope.makeFixed = function() {
+            if (element.find('.tableFixHead').length > 0) {
+                element.find('.tableFixHead').find('table').unwrap();
+                fixedHeaders.css('transform', 'translateY(0px)');
+                return;
+            }
+            element.children('table').wrap('<div class="tableFixHead"></div>');
+            fixedHeaders = element.find('.tableFixHead').find('thead'); //thead th
+            element.find('.tableFixHead').on('scroll', function() {
+                fixedHeaders.css('transform', 'translateY('+ this.scrollTop +'px)');
+            });
         };
 
         element[0].innerHTML = html;
