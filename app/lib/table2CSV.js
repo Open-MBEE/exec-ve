@@ -8,21 +8,14 @@ jQuery.fn.table2CSV = function(options) {
 
     var csvData = [];
     var el = this;
-
-    //header
-    var numCols = options.header.length;
-    var tmpRow = []; 
-    if (numCols > 0) {
-        for (var i = 0; i < numCols; i++) {
-            tmpRow[tmpRow.length] = formatData(options.header[i]);
-        }
-    } else {
+    
+    function handleMatrix(bodyTag, cellTag) {
         var spanData = {}; //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
         var curRow = 0;
-        $(el).children('thead').children('tr').each(function() {
+        $(el).children(bodyTag).children('tr').each(function() {
             tmpRow = [];
             var curCol = 0;
-            $(this).children('th').each(function() {
+            $(this).children(cellTag).each(function() {
                 while(spanData[curRow] && spanData[curRow][curCol]) {
                     tmpRow.push('""');
                     curCol++;
@@ -63,14 +56,18 @@ jQuery.fn.table2CSV = function(options) {
         });
     }
 
+    //header
+    var numCols = options.header.length;
+    var tmpRow = []; 
+    if (numCols > 0) {
+        for (var i = 0; i < numCols; i++) {
+            tmpRow[tmpRow.length] = formatData(options.header[i]);
+        }
+    } else {
+        handleMatrix('thead', 'th');
+    }
     // actual data
-    $(el).children('tbody').children('tr').each(function() {
-        var tmpRow = [];
-        $(this).children('td').each(function() {
-            tmpRow[tmpRow.length] = formatData($(this).text());
-        });
-        row2CSV(tmpRow);
-    });
+    handleMatrix('tbody', 'td');
     var mydata = csvData.join('\n');
     if (options.delivery == 'popup') {
         return popup(mydata);
