@@ -87,12 +87,18 @@
   }
 }
 
-.tableFixHead { 
+.table-fix-head { 
   overflow-y: auto;
   height: 700px; 
-
+  table{
+    border-collapse: separate; 
+    //https://stackoverflow.com/questions/49209548/why-css-transform-translate-leaves-border-of-table-row-where-it-was
+  }
   table th {
     background-color: $ve-silver-lighter-1;
-    border: 1px solid #ddd;
+  }
+
+  caption {
+    background-color: $white;
   }
 }

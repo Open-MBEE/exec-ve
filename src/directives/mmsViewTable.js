@@ -36,10 +36,11 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
                 '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
-                '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + html;
+                '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + 
+                '<div class="table-wrapper">' + html + '</div>';
 
         scope.makeCsv = function() {
-            var csvString = element.children('table').table2CSV({delivery:'value'});
+            var csvString = element.find('.table-wrapper').children('table').table2CSV({delivery:'value'});
             // var bom = "\xEF\xBB\xBF"; //just for excel
             var bom2 = "\uFEFF";      //just for excel
             var blob = new Blob([bom2 + csvString], {
@@ -63,16 +64,17 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
             }
         };
 
-        var fixedHeaders;
+        var fixedHeaders = null;
         scope.makeFixed = function() {
-            if (element.find('.tableFixHead').length > 0) {
-                element.find('.tableFixHead').find('table').unwrap();
-                fixedHeaders.css('transform', 'translateY(0px)');
+            if (fixedHeaders) {
+                element.find('.table-wrapper').removeClass('table-fix-head');
+                fixedHeaders.css('transform', '');
+                fixedHeaders = null;
                 return;
             }
-            element.children('table').wrap('<div class="tableFixHead"></div>');
-            fixedHeaders = element.find('.tableFixHead').find('thead'); //thead th
-            element.find('.tableFixHead').on('scroll', function() {
+            element.find('.table-wrapper').addClass('table-fix-head');
+            fixedHeaders = element.find('.table-fix-head thead').add(element.find('.table-fix-head caption'));
+            element.find('.table-fix-head').on('scroll', function() {
                 fixedHeaders.css('transform', 'translateY('+ this.scrollTop +'px)');
             });
         };
@@ -84,11 +86,11 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
         var nextIndex = 0;
         var thead = element.find('thead');
         $compile(thead)(scope);
-        var searchbar = element.children('div');
+        var searchbar = element.children('div')[0];
         $compile(searchbar)(scope);
         $compile(element.find('caption'))(scope);
         //Add the search input here (before the TRS, aka the columns/rows)
-        var tbody = element.children('table').children('tbody');
+        var tbody = element.find('.table-wrapper').children('table').children('tbody');
         var trs = tbody.children('tr');
 
         var lastIndex = trs.length;
