@@ -70,12 +70,14 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
             if (!scope.fixedHeaders) {
                 element.find('.table-wrapper').removeClass('table-fix-head').css('height', '');
                 fixedHeaders.css('transform', '');
+                fixedHeaders.css('will-change', '');
                 fixedHeaders = null;
                 return;
             }
             element.find('.table-wrapper').addClass('table-fix-head').css('height', $window.innerHeight - 36*3);
             //heights for navbar, menu, toolbar
             fixedHeaders = element.find('.table-fix-head thead').add(element.find('.table-fix-head caption'));
+            fixedHeaders.css('will-change', 'transform'); //browser optimization
             element.find('.table-fix-head').on('scroll', function() {
                 fixedHeaders.css('transform', 'translateY('+ this.scrollTop +'px)');
             });
