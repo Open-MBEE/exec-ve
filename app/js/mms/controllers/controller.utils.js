@@ -352,6 +352,10 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
 
+        //remove frozen headers
+        printElementCopy.find('.table-wrapper').css('height', '');
+        printElementCopy.find('.table-fix-head thead').css('transform', '');
+        printElementCopy.find('.table-fix-head caption').css('transform', '');
         // word doesn't support svg only png.
         if (mode === 2) {
             printElementCopy.find('.mms-svg').remove();

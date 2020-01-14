@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$document', 'UtilsService', 'Utils', mmsViewTable]);
+.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$window', 'UtilsService', 'Utils', mmsViewTable]);
 
-function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
+function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Utils) {
 
     var mmsViewTableLink = function(scope, element, attrs, ctrl) {
         if (!scope.table.showIfEmpty && scope.table.body.length === 0)
@@ -31,8 +31,8 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
         var html = UtilsService.makeHtmlTable(scope.table, true, true, scope.mmsPe);
         html = '<div class="tableSearch ve-table-filter">' +
                 '<button class="btn btn-sm export-csv-button btn-default" ng-click="makeCsv()">Export CSV</button> ' +
+                '<label class="btn btn-sm btn-default fixed-header-label">Freeze Headers: <input type="checkbox" class="fixed-header-checkbox" ng-model="fixedHeaders" ng-change="makeFixed()" /></label> ' +
                 '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
-                '<button class="btn btn-sm fixed-header-button btn-default" ng-click="makeFixed()">Toggle Fixed Headers</button> ' +
                 '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
@@ -65,14 +65,16 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
         };
 
         var fixedHeaders = null;
+        scope.fixedHeaders = false;
         scope.makeFixed = function() {
-            if (fixedHeaders) {
-                element.find('.table-wrapper').removeClass('table-fix-head');
+            if (!scope.fixedHeaders) {
+                element.find('.table-wrapper').removeClass('table-fix-head').css('height', '');
                 fixedHeaders.css('transform', '');
                 fixedHeaders = null;
                 return;
             }
-            element.find('.table-wrapper').addClass('table-fix-head');
+            element.find('.table-wrapper').addClass('table-fix-head').css('height', $window.innerHeight - 36*3);
+            //heights for navbar, menu, toolbar
             fixedHeaders = element.find('.table-fix-head thead').add(element.find('.table-fix-head caption'));
             element.find('.table-fix-head').on('scroll', function() {
                 fixedHeaders.css('transform', 'translateY('+ this.scrollTop +'px)');

@@ -19,7 +19,7 @@
   .export-csv-button.btn,
   .filter-table-button.btn,
   .reset-sort-button.btn,
-  .fixed-header-button.btn {
+  .fixed-header-label {
     margin: 30px 0 6px;
     font-weight:500;
   }
@@ -89,7 +89,7 @@
 
 .table-fix-head { 
   overflow-y: auto;
-  height: 700px; 
+  //height: 700px; 
   table{
     border-collapse: separate; 
     //https://stackoverflow.com/questions/49209548/why-css-transform-translate-leaves-border-of-table-row-where-it-was
