@@ -86,7 +86,9 @@
     color:$ve-light-text;
   }
 }
-
+input[type=checkbox].fixed-header-checkbox {
+  margin: 3px 0 0;
+}
 .table-fix-head { 
   overflow-y: auto;
   //height: 700px; 
