@@ -354,8 +354,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
 
         //remove frozen headers
         printElementCopy.find('.table-wrapper').css('height', '');
-        printElementCopy.find('.table-fix-head thead').css('transform', '');
-        printElementCopy.find('.table-fix-head caption').css('transform', '');
+        printElementCopy.find('.table-fix-head thead').css('transform', '').css('will-change', '');
+        printElementCopy.find('.table-fix-head caption').css('transform', '').css('will-change', '');
         // word doesn't support svg only png.
         if (mode === 2) {
             printElementCopy.find('.mms-svg').remove();
