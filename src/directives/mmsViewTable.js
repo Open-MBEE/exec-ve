@@ -31,8 +31,8 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
         var html = UtilsService.makeHtmlTable(scope.table, true, true, scope.mmsPe);
         html = '<div class="tableSearch ve-table-filter">' +
                 '<button class="btn btn-sm export-csv-button btn-default" ng-click="makeCsv()">Export CSV</button> ' +
-                '<label class="btn btn-sm btn-default fixed-header-label"><input type="checkbox" class="fixed-header-checkbox" ng-model="fixedHeaders" ng-change="makeFixed()" /> Freeze Headers</label> ' +
                 '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
+                '<label class="btn btn-sm btn-default fixed-header-label"><input type="checkbox" class="fixed-header-checkbox" ng-model="fixedHeaders" ng-change="makeFixed()" /> Freeze Headers</label> ' +
                 '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
