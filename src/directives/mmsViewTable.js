@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$document', 'UtilsService', 'Utils', mmsViewTable]);
+.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$window', 'UtilsService', 'Utils', mmsViewTable]);
 
-function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
+function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Utils) {
 
     var mmsViewTableLink = function(scope, element, attrs, ctrl) {
         if (!scope.table.showIfEmpty && scope.table.body.length === 0)
@@ -30,15 +30,17 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
 
         var html = UtilsService.makeHtmlTable(scope.table, true, true, scope.mmsPe);
         html = '<div class="tableSearch ve-table-filter">' +
-                '<button class="btn btn-sm export-csv-button btn-default" ng-click="doClick()">Export CSV</button> ' +
+                '<button class="btn btn-sm export-csv-button btn-default" ng-click="makeCsv()">Export CSV</button> ' +
+                '<label class="btn btn-sm btn-default fixed-header-label"><input type="checkbox" class="fixed-header-checkbox" ng-model="fixedHeaders" ng-change="makeFixed()" /> Freeze Headers</label> ' +
                 '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
                 '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
-                '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + html;
+                '<span class = "ve-filter-status">Showing <strong>{{numFiltered}}</strong> of <strong>{{numTotal}}</strong> Rows: </span></span></div>' + 
+                '<div class="table-wrapper">' + html + '</div>';
 
-        scope.doClick = function() {
-            var csvString = element.children('table').table2CSV({delivery:'value'});
+        scope.makeCsv = function() {
+            var csvString = element.find('.table-wrapper').children('table').table2CSV({delivery:'value'});
             // var bom = "\xEF\xBB\xBF"; //just for excel
             var bom2 = "\uFEFF";      //just for excel
             var blob = new Blob([bom2 + csvString], {
@@ -62,6 +64,25 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
             }
         };
 
+        var fixedHeaders = null;
+        scope.fixedHeaders = false;
+        scope.makeFixed = function() {
+            if (!scope.fixedHeaders) {
+                element.find('.table-wrapper').removeClass('table-fix-head').css('height', '');
+                fixedHeaders.css('transform', '');
+                fixedHeaders.css('will-change', '');
+                fixedHeaders = null;
+                return;
+            }
+            element.find('.table-wrapper').addClass('table-fix-head').css('height', $window.innerHeight - 36*3);
+            //heights for navbar, menu, toolbar
+            fixedHeaders = element.find('.table-fix-head thead').add(element.find('.table-fix-head caption'));
+            fixedHeaders.css('will-change', 'transform'); //browser optimization
+            element.find('.table-fix-head').on('scroll', function() {
+                fixedHeaders.css('transform', 'translateY('+ this.scrollTop +'px)');
+            });
+        };
+
         element[0].innerHTML = html;
         $(element[0]).find('img').each(function(index) {
             Utils.fixImgSrc($(this));
@@ -69,11 +90,11 @@ function mmsViewTable($compile, $timeout, $document, UtilsService, Utils) {
         var nextIndex = 0;
         var thead = element.find('thead');
         $compile(thead)(scope);
-        var searchbar = element.children('div');
+        var searchbar = element.children('div')[0];
         $compile(searchbar)(scope);
         $compile(element.find('caption'))(scope);
         //Add the search input here (before the TRS, aka the columns/rows)
-        var tbody = element.children('table').children('tbody');
+        var tbody = element.find('.table-wrapper').children('table').children('tbody');
         var trs = tbody.children('tr');
 
         var lastIndex = trs.length;
