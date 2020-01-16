@@ -18,7 +18,8 @@
 -------------------------------------------------------------------*/
   .export-csv-button.btn,
   .filter-table-button.btn,
-  .reset-sort-button.btn {
+  .reset-sort-button.btn,
+  .fixed-header-label {
     margin: 30px 0 6px;
     font-weight:500;
   }
@@ -85,4 +86,21 @@
     color:$ve-light-text;
   }
 }
+input[type=checkbox].fixed-header-checkbox {
+  margin: 3px 0 0;
+}
+.table-fix-head { 
+  overflow-y: auto;
+  //height: 700px; 
+  table{
+    border-collapse: separate; 
+    //https://stackoverflow.com/questions/49209548/why-css-transform-translate-leaves-border-of-table-row-where-it-was
+  }
+  table th {
+    background-color: $ve-silver-lighter-1;
+  }
 
+  caption {
+    background-color: $white;
+  }
+}
