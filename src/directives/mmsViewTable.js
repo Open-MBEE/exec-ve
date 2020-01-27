@@ -32,7 +32,10 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
         html = '<div class="tableSearch ve-table-filter">' +
                 '<button class="btn btn-sm export-csv-button btn-default" ng-click="makeCsv()">Export CSV</button> ' +
                 '<button class="btn btn-sm filter-table-button btn-default" ng-click="showFilter = !showFilter">Filter table</button> ' +
-                '<label class="btn btn-sm btn-default fixed-header-label"><input type="checkbox" class="fixed-header-checkbox" ng-model="fixedHeaders" ng-change="makeFixed()" /> Freeze Headers</label> ' +
+                '<label class="btn btn-sm btn-default table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="fixedHeaders" ng-change="makeFixedHeader()" /> Freeze Headers</label> ' +
+                '<label class="btn btn-sm btn-default table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="fixedColumns" ng-change="makeFixedColumn()" /> Freeze Columns</label> ' +
+                '<label class="btn btn-sm table-button column-input-label" ng-show="fixedColumns">Columns to Freeze <input type="text" ng-show="fixedColumns" size="3" class="column-input" ng-model="numFixedColumns" /></label> ' +
+                '<button class="btn btn-sm btn-default table-button" ng-show="fixedColumns" ng-click="updateFixedColumns()">Update</button> ' +
                 '<button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="resetSort()">Reset Sort</button>' +
                 '<span class = "ve-show-filter" ng-show="showFilter">' +
                     '<form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model-options="{debounce: '+ tableConfig.filterDebounceRate  + '}" ng-model="searchTerm"></form>' +
@@ -66,21 +69,99 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
 
         var fixedHeaders = null;
         scope.fixedHeaders = false;
-        scope.makeFixed = function() {
+        var fixedColumns = null;
+        scope.fixedColumns = false;
+        scope.numFixedColumns = 2;
+        var scroll = function() {
+            if (fixedColumns) {
+                fixedColumns.css('transform', 'translateX('+ this.scrollLeft +'px)');
+            }
+            if (fixedHeaders) {
+                fixedHeaders.css('transform', 'translateY('+ this.scrollTop +'px)');
+            }
+            if (fixedHeaders && fixedColumns) {
+                element.find('caption').css('transform', 'translate(' + this.scrollLeft + 'px, ' + this.scrollTop + 'px)');
+            }
+        };
+        scope.makeFixedHeader = function() {
             if (!scope.fixedHeaders) {
                 element.find('.table-wrapper').removeClass('table-fix-head').css('height', '');
-                fixedHeaders.css('transform', '');
-                fixedHeaders.css('will-change', '');
+                fixedHeaders.css('transform', '').css('will-change', '');
                 fixedHeaders = null;
                 return;
             }
             element.find('.table-wrapper').addClass('table-fix-head').css('height', $window.innerHeight - 36*3);
             //heights for navbar, menu, toolbar
-            fixedHeaders = element.find('.table-fix-head thead').add(element.find('.table-fix-head caption'));
+            fixedHeaders = element.find('thead, caption');
             fixedHeaders.css('will-change', 'transform'); //browser optimization
-            element.find('.table-fix-head').on('scroll', function() {
-                fixedHeaders.css('transform', 'translateY('+ this.scrollTop +'px)');
+            element.find('.table-fix-head').on('scroll', scroll);
+        };
+        scope.makeFixedColumn = function() {
+            if (!scope.fixedColumns) {
+                element.find('.table-wrapper').removeClass('table-fix-column').css('width', '');
+                fixedColumns.css('transform', '').css('will-change', '');
+                fixedColumns = null;
+                return;
+            }
+            element.find('.table-wrapper').addClass('table-fix-column').css('width', $window.innerWidth - 400);
+            fixedColumns = findColumnCells('thead', 'th', scope.numFixedColumns);
+            fixedColumns = fixedColumns.add(findColumnCells('tbody', 'td', scope.numFixedColumns));
+            fixedColumns = fixedColumns.add(element.find('.table-fix-column caption'));
+            fixedColumns.css('will-change', 'transform'); //browser optimization
+            element.find('.table-fix-column').on('scroll', scroll);
+        };
+        scope.updateFixedColumns = function() {
+            scope.fixedColumns = false;
+            scope.makeFixedColumn();
+            scope.fixedColumns = true;
+            scope.makeFixedColumn();
+        };
+        var findColumnCells = function(bodyTag, cellTag, n) {
+            var spanData = {}; //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
+            var curRow = 0;
+            var data = $();
+            element.find('.table-fix-column table').children(bodyTag).children('tr').each(function() {
+                var curCol = 0;
+                $(this).children(cellTag).each(function() {
+                    while(spanData[curRow] && spanData[curRow][curCol]) {
+                        curCol++;
+                    }
+                    if (curCol >= n) {
+                        return;
+                    }
+                    data = data.add($(this));
+                    var rowspan = $(this).attr('rowspan');
+                    if (rowspan) {
+                        rowspan = parseInt(rowspan);
+                        if (rowspan > 1) {
+                            for (var i = 1; i < rowspan; i++) {
+                                if (!spanData[curRow + i]) {
+                                    spanData[curRow + i] = {};
+                                }
+                                spanData[curRow + i][curCol] = true;
+                            }
+                        }
+                    }
+                    var colspan = $(this).attr('colspan');
+                    if (!colspan) {
+                        curCol++;
+                        return;
+                    }
+                    colspan = parseInt(colspan);
+                    while (colspan > 1) {
+                        curCol++;
+                        colspan--;
+                        if (rowspan > 1) {
+                            for (var j = 1; j < rowspan; j++) {
+                                spanData[curRow + j][curCol] = true;
+                            }
+                        }
+                    }
+                    curCol++;
+                });
+                curRow++;
             });
+            return data;
         };
 
         element[0].innerHTML = html;
