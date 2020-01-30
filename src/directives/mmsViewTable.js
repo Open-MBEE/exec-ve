@@ -202,7 +202,7 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
                         scope.makeFixedHeader();
                     }
                     var columnFix = $window.localStorage.getItem('ve-table-column-' + scope.mmsPe.id);
-                    if (columnFix != 'false' && columnFix != null && columnFix != undefined) {
+                    if (columnFix != 'false' && columnFix != null && columnFix != 'null') {
                         scope.fixedColumns = true;
                         scope.numFixedColumns = columnFix;
                         scope.makeFixedColumn();
