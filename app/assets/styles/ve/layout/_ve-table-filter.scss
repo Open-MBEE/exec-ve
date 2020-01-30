@@ -109,8 +109,8 @@ input[type=text].column-input {
   overflow-y: auto;
 }
 .table-fix-column {
-  overflow-x: scroll;
+  overflow-x: auto;
   td.table-fixed-cell {
-    background-color: rgb(252, 252, 252);
+    background-color: $ve-silver-lighter-1;
   }
 }
