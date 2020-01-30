@@ -110,4 +110,7 @@ input[type=text].column-input {
 }
 .table-fix-column {
   overflow-x: scroll;
+  td.table-fixed-cell {
+    background-color: rgb(252, 252, 252);
+  }
 }

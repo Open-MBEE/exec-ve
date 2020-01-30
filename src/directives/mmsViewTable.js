@@ -85,10 +85,10 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
         };
         scope.makeFixedHeader = function() {
             if (!scope.fixedHeaders) {
-                $window.localStorage.setItem('ve-table-header-' + scope.mmsPe.id, false);
                 element.find('.table-wrapper').removeClass('table-fix-head').css('height', '');
                 fixedHeaders.css('transform', '').css('will-change', '');
                 fixedHeaders = null;
+                $window.localStorage.setItem('ve-table-header-' + scope.mmsPe.id, 'false');
                 return;
             }
             element.find('.table-wrapper').addClass('table-fix-head').css('height', $window.innerHeight - 36*3);
@@ -96,14 +96,14 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
             fixedHeaders = element.find('thead, caption');
             fixedHeaders.css('will-change', 'transform'); //browser optimization
             element.find('.table-fix-head').on('scroll', scroll);
-            $window.localStorage.setItem('ve-table-header-' + scope.mmsPe.id, true);
+            $window.localStorage.setItem('ve-table-header-' + scope.mmsPe.id, 'true');
         };
         scope.makeFixedColumn = function() {
             if (!scope.fixedColumns) {
-                $window.localStorage.setItem('ve-table-column-' + scope.mmsPe.id, false);
                 element.find('.table-wrapper').removeClass('table-fix-column').css('width', '');
-                fixedColumns.css('transform', '').css('will-change', '');
+                fixedColumns.css('transform', '').css('will-change', '').removeClass('table-fixed-cell');
                 fixedColumns = null;
+                $window.localStorage.setItem('ve-table-column-' + scope.mmsPe.id, 'false');
                 return;
             }
             element.find('.table-wrapper').addClass('table-fix-column').css('width', $window.innerWidth - 400);
@@ -111,6 +111,7 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
             fixedColumns = fixedColumns.add(findColumnCells('tbody', 'td', scope.numFixedColumns));
             fixedColumns = fixedColumns.add(element.find('.table-fix-column caption'));
             fixedColumns.css('will-change', 'transform'); //browser optimization
+            fixedColumns.addClass('table-fixed-cell');
             element.find('.table-fix-column').on('scroll', scroll);
             $window.localStorage.setItem('ve-table-column-' + scope.mmsPe.id, scope.numFixedColumns);
         };
@@ -196,13 +197,14 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
                 if (nextIndex < lastIndex)
                     compile();
                 else {
-                    if ($window.localStorage.getItem('ve-table-header-' + scope.mmsPe.id)) {
+                    if ($window.localStorage.getItem('ve-table-header-' + scope.mmsPe.id) == 'true') {
                         scope.fixedHeaders = true;
                         scope.makeFixedHeader();
                     }
-                    if ($window.localStorage.getItem('ve-table-column-' + scope.mmsPe.id)) {
+                    var columnFix = $window.localStorage.getItem('ve-table-column-' + scope.mmsPe.id);
+                    if (columnFix != 'false' && columnFix != null && columnFix != undefined) {
                         scope.fixedColumns = true;
-                        scope.numFixedColumns = $window.localStorage.getItem('ve-table-column-' + scope.mmsPe.id);
+                        scope.numFixedColumns = columnFix;
                         scope.makeFixedColumn();
                     }
                 }
