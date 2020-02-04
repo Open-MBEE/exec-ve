@@ -352,10 +352,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         printElementCopy.find('.no-print').remove();
         printElementCopy.find('.ng-hide').remove();
 
-        //remove frozen headers
-        printElementCopy.find('.table-wrapper').css('height', '');
-        printElementCopy.find('.table-fix-head thead').css('transform', '').css('will-change', '');
-        printElementCopy.find('.table-fix-head caption').css('transform', '').css('will-change', '');
         // word doesn't support svg only png.
         if (mode === 2) {
             printElementCopy.find('.mms-svg').remove();
@@ -376,6 +372,9 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
             this.style.removeProperty('width');
             this.style.removeProperty('min-width');
             this.style.removeProperty('height');
+            //remove frozen headers and column
+            this.style.removeProperty('transform');
+            this.style.removeProperty('will-change');
         });
         printElementCopy.find('.math').remove(); //this won't work in chrome for popups since chrome can't display mathml
         printElementCopy.find('script').remove();
