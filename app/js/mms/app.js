@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies'])
-.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider, $locationProvider) {
     // override uibTypeaheadPopup functionality
     $provide.decorator('uibTypeaheadPopupDirective', ['$delegate', function($delegate) {
         var originalLinkFn = $delegate[0].link;
@@ -22,6 +22,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         return $delegate;
     }]);
 
+    $locationProvider.hashPrefix('');
+  
     $urlRouterProvider.rule(function ($injector, $location) {
         var $state = $injector.get('$state');
         var locationPath = $location.url();
@@ -688,8 +690,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
+                template: '<ve-menu mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-view="view"></ve-menu>',
+                controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'viewOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb) {
                     $rootScope.ve_title = documentOb.name;
                     $scope.org = orgOb;
                     $scope.group = groupOb;
@@ -703,6 +705,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.tag = tagOb;
                     $scope.tags = tagObs;
                     $scope.document = documentOb;
+                    $scope.view = viewOb;
                 }]
             },
             'pane-center@': {

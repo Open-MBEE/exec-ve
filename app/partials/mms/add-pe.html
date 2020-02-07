@@ -25,6 +25,7 @@
     </div>
 
     <div ng-show="!createForm">
+        <p>Begin by searching for the {{presentationElemType | lowercase}}, then click its name or documentation to add the {{presentationElemType | lowercase}}.</p>
         <mms-search mms-options="searchOptions" mms-project-id="{{viewOrSectionOb._projectId}}" mms-ref-id="{{viewOrSectionOb._refId}}"></mms-search>
     </div>
 </div>

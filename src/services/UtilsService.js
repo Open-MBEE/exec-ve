@@ -487,11 +487,6 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      */
     var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
         var result = ['<table class="table-bordered table-condensed ' + (table.style ? table.style : '') + '">'];
-        if (ApplicationService.getState().inDoc && !table.excludeFromList) {
-            result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
-        } else if (table.title) {
-            result.push('<caption>' + table.title + '</caption>');
-        }
         if (table.colwidths && table.colwidths.length > 0) {
             result.push('<colgroup>');
             for (var i = 0; i < table.colwidths.length; i++) {
@@ -503,7 +498,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
             result.push('</colgroup>');
         }
-        if (table.header.length) {
+        result.push('<tbody>'); //put tbody before thead to control stacking context so if freeze header/columns are both used headers cover cells (?)
+        //https://stackoverflow.com/questions/45676848/stacking-context-on-table-elementhead-and-body
+        result.push(makeTableBody(table.body, false));
+        result.push('</tbody>');
+        if (table.header && table.header.length) {
             // only add styling to the filterable or sortable header
             if ( isFilterable || isSortable ) {
                 result.push('<thead class="doc-table-header" >');
@@ -514,9 +513,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             result.push(makeTableBody(table.header, true, isFilterable, isSortable));
             result.push('</thead>');
         }
-        result.push('<tbody>');
-        result.push(makeTableBody(table.body, false));
-        result.push('</tbody>');
+        if (ApplicationService.getState().inDoc && !table.excludeFromList) {
+            result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
+        } else if (table.title) {
+            result.push('<caption>' + table.title + '</caption>');
+        } //same for caption to control stacking context
         result.push('</table>');
         return result.join('');
     };
@@ -1330,10 +1331,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             'name': data.name,
             'css': data.css
         })
-        .success(function(data, status, headers, config){
+        .then(function() {
             deferred.resolve('ok');
-        }).error(function(data, status, headers, config){
-            URLService.handleHttpStatus(data, status, headers, config, deferred);
+        }, function(error) {
+            URLService.handleHttpStatus(error.data, error.status, error.headers, error.config, deferred);
         });
         return deferred.promise;
     };

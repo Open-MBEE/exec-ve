@@ -733,7 +733,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 //deferred.resolve(result);
                 deferred.resolve(data.data);
             }, function(data) {
-                URLService.handleHttpStatus(data, data.status, data.headers, data.config, deferred);
+                URLService.handleHttpStatus(data.data, data.status, data.headers, data.config, deferred);
             });
         return deferred.promise;
     };
