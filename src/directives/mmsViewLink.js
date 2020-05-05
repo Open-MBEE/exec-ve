@@ -134,6 +134,11 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                     element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                 }
                 scope.loading = false;
+                //for omg doc - if we're in a doc, just assume the link is within current doc
+                if (ApplicationService.getState().inDoc) {
+                    scope.docid = ApplicationService.getState().currentDoc;
+                }
+                //end omg specific fix
                 if (ApplicationService.getState().fullDoc) {
                     scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
                 } else {
