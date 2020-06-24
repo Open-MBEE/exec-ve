@@ -97,7 +97,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }
         inProgress[key] = deferred.promise;
 
-        HttpService.get(url,
+        HttpService.get(url, URLService.getStandardHeaders(),
             function(data, status, headers, config) {
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(cacheElement(reqOb, data.elements[0]));
@@ -154,7 +154,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.resolve(existing);
             return deferred.promise;
         }
-        $http.put(URLService.getPutElementsURL(reqOb), request)
+        $http.put(URLService.getPutElementsURL(reqOb),URLService.getStandardHeaders(), request)
         .then(function(response) {
             var data = response.data.elements;
             var i;

@@ -210,7 +210,7 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getGroupsURL = function(projectId, refId) {
-        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/groups');
+        return mmsServer + '/projects/' + projectId + '/refs/' + refId + '/groups';
     };
 
     /**
@@ -225,10 +225,10 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getProjectDocumentsURL = function(reqOb) {
-        var r = root + "/projects/" + reqOb.projectId + 
+        var r = mmsServer + "/projects/" + reqOb.projectId + 
                       "/refs/" + reqOb.refId + 
                       "/documents";
-        return addExtended(addTicket(addVersion(r, reqOb.commitId)), reqOb.extended);
+        return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
     /**
@@ -243,9 +243,9 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The path for image url queries.
      */
     var getImageURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
                        reqOb.elementId;
-        return addTicket(addVersion(r, reqOb.commitId));
+        return addVersion(r, reqOb.commitId);
     };
 
     /**
@@ -260,27 +260,27 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
-        return addExtended(addTicket(addVersion(r, reqOb.commitId)), reqOb.extended);
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
     var getViewElementIdsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
-        return addTicket(r);
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
+        return r;
     };
 
     var getOwnedElementURL = function(reqOb) {
         var recurseString = 'recurse=true';
         if (reqOb.depth)
             recurseString = 'depth=' + reqOb.depth;
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         r = addVersion(r, reqOb.commitId);
         if (r.indexOf('?') > 0) {
             r += '&' + recurseString;
         } else {
             r += '?' + recurseString;
         }
-        return addTicket(addExtended(r, reqOb.extended));
+        return addExtended(r, reqOb.extended);
     };
 
     /**
@@ -295,10 +295,10 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(reqOb) {
-        var r = root + "/projects/" + reqOb.projectId + "/refs/" + reqOb.refId + 
+        var r = mmsServer + "/projects/" + reqOb.projectId + "/refs/" + reqOb.refId + 
             '/documents/' + reqOb.elementId + "/views";
         r = addVersion(r, reqOb.commitId);
-        return addExtended(addTicket(r), reqOb.extended);
+        return addExtended(r, reqOb.extended);
     };
 
     /**
@@ -313,7 +313,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        return addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits');
+        return mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
     };
 
     /**
@@ -328,7 +328,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
-        return addExtended(addChildViews(addTicket(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements'), reqOb.returnChildViews), reqOb.extended);
+        return addExtended(addChildViews(mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements', reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -343,8 +343,8 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPutElementsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements';
-        return addExtended(addTicket(addVersion(r, reqOb.commitId)), reqOb.extended);
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements';
+        return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
     /**
@@ -359,8 +359,8 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
-        return addExtended(addTicket(r), true);
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
+        return addExtended(r, true);
     };
 
     /**
@@ -381,11 +381,11 @@ function urlService(baseUrl, mmsUrl) {
         var r;
         if (urlParams !== null || urlParams !== ''){
             // ie '/search?checkType=true&literal=true';
-            r = root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
+            r = mmsServer + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
-            r = root + '/projects/' + projectId + '/refs/' + refId + '/search';
+            r = mmsServer + '/projects/' + projectId + '/refs/' + refId + '/search';
         }
-        return addTicket(r);
+        return r;
     };
 
     /**
@@ -400,8 +400,8 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
-        return addTicket(addVersion(r, reqOb.commitId));
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
+        return addVersion(r, reqOb.commitId);
     };
 
     /**
@@ -416,8 +416,8 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getPutArtifactsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
-        return addTicket(addVersion(r, reqOb.commitId));
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
+        return addVersion(r, reqOb.commitId);
     };
 
     /**
@@ -432,8 +432,8 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactHistoryURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
-        return addTicket(r);
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
+        return r;
     };
 
     var setJobsUrl = function(jobUrl) {
@@ -441,11 +441,11 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getJobsURL = function(projectId, refId, machine) {
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs', machine) );
+        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs', machine) ;
     };
 
     var getJobURL = function(projectId, refId, jobId, machine){
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId , machine) );
+        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId , machine);
     };
 
     var getRunJobURL = function(projectId, refId, jobId) {
@@ -457,11 +457,11 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getJobInstancesURL = function(projectId, refId, jobId, machine) {
-        return addTicket( addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine) );
+        return  addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine);
     };
 
     var getLogoutURL = function() {
-        return addTicket(root + '/api/login/ticket/' + ticket);
+        return root + '/api/login/ticket/' + ticket;
     };
 
     var getCheckTicketURL = function() {
