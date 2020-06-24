@@ -50,6 +50,14 @@ function urlService(baseUrl, mmsUrl) {
     var setTicket = function(t) {
         ticket = t;
     };
+
+    var getAuthorizationHeader = function() {
+        return {'Authorization': 'Bearer ' + ticket};
+    };
+
+    var getStandardHeaders = function() {
+        return {headers: getAuthorizationHeader()};
+    };
     
     var getJMSHostname = function(){
         return root + '/connection/jms';
@@ -147,6 +155,11 @@ function urlService(baseUrl, mmsUrl) {
           "/refs/" + refId + '/convert');
       };
 
+
+    var getAuthenticationUrl = function() {
+        return mmsServer + "/authentication";
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#getCheckLoginURL
@@ -158,37 +171,35 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getCheckLoginURL = function() {
-        return root + "/checklogin";
+        return mmsServer + "/checklogin";
     };
 
     var getOrgURL = function(orgId) {
-        return addTicket(root + '/orgs/' + orgId);
+        return mmsServer + '/orgs/' + orgId;
     };
     
     var getOrgsURL = function() {
-        return addTicket(root + "/orgs");
+        return mmsServer + "/orgs";
     };
 
-    var getProjectsURL = function(orgId) {
-        if (orgId)
-            return addTicket(root + "/orgs/" + orgId + '/projects');
-        return addTicket(root + '/projects');
+    var getProjectsURL = function() {
+        return mmsServer + '/projects';
     };
 
     var getProjectURL = function(projectId) {
-        return addTicket(root + "/projects/" + projectId);
+        return mmsServer + "/projects/" + projectId;
     };
 
     var getProjectMountsURL = function(projectId, refId) {
-        return addTicket(root + '/projects/' + projectId + '/refs/' + refId + '/mounts');
+        return mmsServer + '/projects/' + projectId + '/refs/' + refId + '/mounts';
     };
 
     var getRefsURL = function(projectId) {
-        return addTicket(root + '/projects/' + projectId + '/refs');
+        return mmsServer + '/projects/' + projectId + '/refs';
     };
 
     var getRefURL = function(projectId, refId) {
-        return addTicket(root + '/projects/' + projectId + '/refs/' + refId);
+        return mmsServer + '/projects/' + projectId + '/refs/' + refId;
     };
 
     var getRefHistoryURL = function(projectId, refId, timestamp) {
@@ -453,8 +464,8 @@ function urlService(baseUrl, mmsUrl) {
         return addTicket(root + '/api/login/ticket/' + ticket);
     };
 
-    var getCheckTicketURL = function(t) {
-        return root + '/mms/login/ticket/' + t; //TODO remove when server returns 404
+    var getCheckTicketURL = function() {
+        return mmsUrl + '/checkAuth'; //TODO remove when server returns 404
     };
 
         /**
@@ -615,6 +626,9 @@ function urlService(baseUrl, mmsUrl) {
         getCheckTicketURL: getCheckTicketURL,
         getLogoutURL: getLogoutURL,
         handleHttpStatus: handleHttpStatus,
+        getAuthenticationUrl: getAuthenticationUrl,
+        getAuthorizationHeader: getAuthorizationHeader,
+        getStandardHeaders: getStandardHeaders
     };
 
 }
