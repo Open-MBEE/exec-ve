@@ -187,22 +187,33 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 } catch (e) {
                 }
             }
-            $http.get(URLService.getViewElementIdsURL(reqOb), URLService.getStandardHeaders())
-            .then(function(response) {
-                var data = response.data.elementIds;
-                toGet = toGet.concat(data);
-            }).finally(function() {
-                var toGetSet = new Set(toGet);
-                reqOb.elementIds = Array.from(toGetSet);
-                ElementService.getElements(reqOb, weight, update)
-                .then(function(data) {
-                    results = data;
-                }).finally(function() {
-                    CacheService.put(requestCacheKey, results);
-                    deferred.resolve(results);
-                    delete inProgress[key];
-                });
-            });
+            // $http.get(URLService.getViewElementIdsURL(reqOb), URLService.getStandardHeaders())
+            // .then(function(response) {
+            //     var data = response.data.elementIds;
+            //     toGet = toGet.concat(data);
+            // }).finally(function() {
+            //     var toGetSet = new Set(toGet);
+            //     reqOb.elementIds = Array.from(toGetSet);
+            //     ElementService.getElements(reqOb, weight, update)
+            //     .then(function(data) {
+            //         results = data;
+            //     }).finally(function() {
+            //         CacheService.put(requestCacheKey, results);
+            //         deferred.resolve(results);
+            //         delete inProgress[key];
+            //     });
+            // });
+
+            $http.get(URLService.getViewsURL(reqOb), URLService.getStandardHeaders())
+            .then(function(data) {
+                        results = data;
+                    }).finally(function() {
+                        CacheService.put(requestCacheKey, results);
+                        deferred.resolve(results);
+                        delete inProgress[key];
+                    });
+
+            //************************* */
         }, function(reason) {
             deferred.reject(reason);
             delete inProgress[key];

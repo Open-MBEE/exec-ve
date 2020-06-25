@@ -269,6 +269,11 @@ function urlService(baseUrl, mmsUrl) {
         return r;
     };
 
+    var getViewsURL = function(reqOb) {
+        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
+        return r;
+    };
+
     var getOwnedElementURL = function(reqOb) {
         var recurseString = 'recurse=true';
         if (reqOb.depth)
@@ -628,7 +633,8 @@ function urlService(baseUrl, mmsUrl) {
         handleHttpStatus: handleHttpStatus,
         getAuthenticationUrl: getAuthenticationUrl,
         getAuthorizationHeader: getAuthorizationHeader,
-        getStandardHeaders: getStandardHeaders
+        getStandardHeaders: getStandardHeaders,
+        getViewsURL: getViewsURL
     };
 
 }
