@@ -34,7 +34,7 @@ function VizService($q, $http, URLService, CacheService, UtilsService, AuthServi
             deferred.resolve(makeImageUrl(CacheService.get(cacheKey)));
             return deferred.promise;
         }
-        $http.get(URLService.getImageURL(reqOb), {headers: {Accept: reqOb.accept}})
+        $http.get(URLService.getImageURL(reqOb), {headers: {Accept: reqOb.accept}}) //TODO
         .then(function(data) {
             CacheService.put(cacheKey, data.data.artifacts[0], false);
             deferred.resolve(makeImageUrl(data.data.artifacts[0]));

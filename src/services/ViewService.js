@@ -187,7 +187,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 } catch (e) {
                 }
             }
-            $http.get(URLService.getViewElementIdsURL(reqOb))
+            $http.get(URLService.getViewElementIdsURL(reqOb), URLService.getStandardHeaders())
             .then(function(response) {
                 var data = response.data.elementIds;
                 toGet = toGet.concat(data);
@@ -873,7 +873,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 elementId: elementOb.id + '_asi', 
                 refId: elementOb._refId, 
                 projectId: elementOb._projectId
-            }));
+            }), URLService.getStandardHeaders());
         }
         return ElementService.updateElements(toUpdate, false)
             .then(function(data) {

@@ -97,7 +97,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }
         inProgress[key] = deferred.promise;
 
-        HttpService.get(url, URLService.getStandardHeaders(),
+        HttpService.get(url,
             function(data, status, headers, config) {
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(cacheElement(reqOb, data.elements[0]));
@@ -114,7 +114,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
                 delete inProgress[key];
             },
-            weight
+            weight,
+            URLService.getStandardHeaders()
         );
         return deferred.promise;
     };
@@ -154,7 +155,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.resolve(existing);
             return deferred.promise;
         }
-        $http.put(URLService.getPutElementsURL(reqOb),URLService.getStandardHeaders(), request)
+        $http.put(URLService.getPutElementsURL(reqOb),request, URLService.getStandardHeaders())
         .then(function(response) {
             var data = response.data.elements;
             var i;
@@ -351,7 +352,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
                 delete inProgress[url];
             },
-            weight
+            weight,
+            URLService.getStandardHeaders()
         );
         return deferred.promise;
     };
@@ -463,7 +465,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 }), {
                     elements: [postElem],
                     source: ApplicationService.getSource()
-                }, {timeout: 60000})
+                }, {
+                    headers: URLService.getAuthorizationHeader(),
+                    timeout: 60000})
             .then(function(response) {
                 var rejected = response.data.rejected;
                 if (rejected && rejected.length > 0 && rejected[0].code === 304 && rejected[0].element) { //elem will be rejected if server detects no changes
@@ -595,7 +599,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var deferred = $q.defer();
 
         var url = URLService.getPostElementsURL(reqOb);
-        $http.post(url, {'elements': [reqOb.element], 'source': ApplicationService.getSource()})
+        $http.post(url, {'elements': [reqOb.element], 'source': ApplicationService.getSource()}, URLService.getStandardHeaders())
         .then(function(response) {
             if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
                 deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
@@ -638,7 +642,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
         var url = URLService.getPostElementsURL(reqOb);
-        $http.post(url, {'elements': reqOb.elements, 'source': ApplicationService.getSource()})
+        $http.post(url, {'elements': reqOb.elements, 'source': ApplicationService.getSource()}, URLService.getStandardHeaders())
         .then(function(response) {
             if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
                 deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
@@ -720,7 +724,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         UtilsService.normalize(reqOb);
         var url = URLService.getElementSearchURL(reqOb);
         var deferred = $q.defer();
-        $http.put(url, query)
+        $http.put(url, query, URLService.getStandardHeaders())
             .then(function(data) {
                 //var result = [];
                 //for (var i = 0; i < data.data.elements.length; i++) {
@@ -765,7 +769,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             return deferred.promise;
         }
         inProgress[key] = deferred.promise;
-        $http.get(URLService.getElementHistoryURL(reqOb))
+        $http.get(URLService.getElementHistoryURL(reqOb), URLService.getStandardHeaders())
         .then(function(response){
             deferred.resolve(CacheService.put(requestCacheKey, response.data.commits, true));
             delete inProgress[key];
@@ -820,7 +824,9 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }), {
             elements: elements,
             source: ApplicationService.getSource()
-        }, {timeout: 60000})
+        }, {
+            headers: URLService.getAuthorizationHeader(),
+            timeout: 60000})
             .then(function (response) {
                 _bulkUpdateSuccessHandler(response, deferred);
             }, function (response) {
