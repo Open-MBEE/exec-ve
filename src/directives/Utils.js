@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,7 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, growl) {
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, PermissionsService, growl) {
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -373,7 +373,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
     * @param {boolean} doNotScroll whether to scroll to element
     */
     var startEdit = function(scope, mmsViewCtrl, domElement, template, doNotScroll) {
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element && scope.element._editable && scope.commitId === 'latest') {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element && scope.commitId === 'latest' && PermissionsService.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId)) {
             var elementOb = scope.element;
             var reqOb = {elementId: elementOb.id, projectId: elementOb._projectId, refId: elementOb._refId};
             ElementService.getElementForEdit(reqOb)

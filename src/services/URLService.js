@@ -160,6 +160,10 @@ function urlService(baseUrl, mmsUrl) {
         return mmsServer + "/authentication";
     };
 
+    var getPermissionsLookupURL = function() {
+        return mmsServer + "/permissions";
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#getCheckLoginURL
@@ -634,7 +638,8 @@ function urlService(baseUrl, mmsUrl) {
         getAuthenticationUrl: getAuthenticationUrl,
         getAuthorizationHeader: getAuthorizationHeader,
         getStandardHeaders: getStandardHeaders,
-        getViewsURL: getViewsURL
+        getViewsURL: getViewsURL,
+        getPermissionsLookupURL: getPermissionsLookupURL
     };
 
 }
