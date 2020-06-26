@@ -67,7 +67,7 @@ function PermissionsService($q, $http, URLService, CacheService, _) {
         
         inProgress[progressKey] = deferred.promise;
 
-        $http.put(url, { "lookups" : [ lookup ] }, URLService.getStandardHeaders())
+        $http.put(url, { "lookups" : [ lookup ] })
         .then(function(response) {
             var data = response.data.lookups;
             if (angular.isArray(data) && data.length > 0) {

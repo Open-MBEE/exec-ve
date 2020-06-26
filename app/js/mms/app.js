@@ -734,8 +734,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     });
 
     // anonymous factory intercepts requests
-    $httpProvider.interceptors.push(['$q', '$location', '$rootScope', '$injector', function($q, $location, $rootScope, $injector) {
+    $httpProvider.interceptors.push(['$q', '$location', '$rootScope', '$injector', 'URLService', function($q, $location, $rootScope, $injector, URLService) {
         return {
+            request: function(config) {
+                config.headers = URLService.getAuthorizationHeader(config.headers);                
+                return config;
+            },
             'responseError': function(rejection) {
                 if(rejection.status === 401){ //rejection.config.url
                     $rootScope.$broadcast("mms.unauthorized", rejection);

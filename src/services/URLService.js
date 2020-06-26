@@ -51,12 +51,15 @@ function urlService(baseUrl, mmsUrl) {
         ticket = t;
     };
 
-    var getAuthorizationHeader = function() {
-        return {'Authorization': 'Bearer ' + ticket};
-    };
-
-    var getStandardHeaders = function() {
-        return {headers: getAuthorizationHeader()};
+    var getAuthorizationHeader = function(headers) {
+        if(!ticket) {
+            return headers;
+        }
+        if(!headers) {
+            headers = {};
+        }
+        headers.Authorization = ('Bearer ' + ticket);
+        return headers;
     };
     
     var getJMSHostname = function(){
@@ -638,7 +641,6 @@ function urlService(baseUrl, mmsUrl) {
         handleHttpStatus: handleHttpStatus,
         getAuthenticationUrl: getAuthenticationUrl,
         getAuthorizationHeader: getAuthorizationHeader,
-        getStandardHeaders: getStandardHeaders,
         getViewsURL: getViewsURL,
         getPermissionsLookupURL: getPermissionsLookupURL
     };
