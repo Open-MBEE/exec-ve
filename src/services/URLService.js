@@ -2,7 +2,7 @@
 
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
-    var baseUrl = '/alfresco/service';
+    var baseUrl = '/api';
     var mmsUrl = '';
     this.setBaseUrl = function(base) {
         baseUrl = base;
@@ -26,12 +26,12 @@ angular.module('mms')
  * should rarely be used directly by applications.
  *
  * To configure the base url of the mms server, you can use the URLServiceProvider
- * in your application module's config. By default, the baseUrl is '/alfresco/service'
- * which assumes your application is hosted on the same machine as the mms and ve.
+ * in your application module's config. By default, the baseUrl is '/api', but is
+ * effectively '/' relative to the service layer due to the rewrite rule.
  *  <pre>
         angular.module('myApp', ['mms'])
         .config(function(URLServiceProvider) {
-            URLServiceProvider.setBaseUrl('https://url/alfresco/service');
+            URLServiceProvider.setBaseUrl('https://url/context/path');
         });
     </pre>
  * (You may run into problems like cross origin security policy that prevents it from
@@ -68,6 +68,7 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     /**
+     * @deprecated
      * @ngdoc method
      * @name mms.URLService#addTicket
      * @methodOf mms.URLService
@@ -157,11 +158,11 @@ function urlService(baseUrl, mmsUrl) {
 
 
     var getAuthenticationUrl = function() {
-        return mmsServer + "/authentication";
+        return root + "/authentication";
     };
 
     var getPermissionsLookupURL = function() {
-        return mmsServer + "/permissions";
+        return root + "/permissions";
     };
 
     /**
@@ -175,35 +176,35 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getCheckLoginURL = function() {
-        return mmsServer + "/checklogin";
+        return root + "/checklogin";
     };
 
     var getOrgURL = function(orgId) {
-        return mmsServer + '/orgs/' + orgId;
+        return root + '/orgs/' + orgId;
     };
     
     var getOrgsURL = function() {
-        return mmsServer + "/orgs";
+        return root + "/orgs";
     };
 
     var getProjectsURL = function() {
-        return mmsServer + '/projects';
+        return root + '/projects';
     };
 
     var getProjectURL = function(projectId) {
-        return mmsServer + "/projects/" + projectId;
+        return root + "/projects/" + projectId;
     };
 
     var getProjectMountsURL = function(projectId, refId) {
-        return mmsServer + '/projects/' + projectId + '/refs/' + refId + '/mounts';
+        return root + '/projects/' + projectId + '/refs/' + refId + '/mounts';
     };
 
     var getRefsURL = function(projectId) {
-        return mmsServer + '/projects/' + projectId + '/refs';
+        return root + '/projects/' + projectId + '/refs';
     };
 
     var getRefURL = function(projectId, refId) {
-        return mmsServer + '/projects/' + projectId + '/refs/' + refId;
+        return root + '/projects/' + projectId + '/refs/' + refId;
     };
 
     var getRefHistoryURL = function(projectId, refId, timestamp) {
@@ -214,7 +215,7 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getGroupsURL = function(projectId, refId) {
-        return mmsServer + '/projects/' + projectId + '/refs/' + refId + '/groups';
+        return root + '/projects/' + projectId + '/refs/' + refId + '/groups';
     };
 
     /**
@@ -229,7 +230,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getProjectDocumentsURL = function(reqOb) {
-        var r = mmsServer + "/projects/" + reqOb.projectId + 
+        var r = root + "/projects/" + reqOb.projectId + 
                       "/refs/" + reqOb.refId + 
                       "/documents";
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
@@ -247,7 +248,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The path for image url queries.
      */
     var getImageURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
                        reqOb.elementId;
         return addVersion(r, reqOb.commitId);
     };
@@ -264,17 +265,17 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
     var getViewElementIdsURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
         return r;
     };
 
     var getViewsURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
         return r;
     };
 
@@ -282,7 +283,7 @@ function urlService(baseUrl, mmsUrl) {
         var recurseString = 'recurse=true';
         if (reqOb.depth)
             recurseString = 'depth=' + reqOb.depth;
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         r = addVersion(r, reqOb.commitId);
         if (r.indexOf('?') > 0) {
             r += '&' + recurseString;
@@ -304,7 +305,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getDocumentViewsURL = function(reqOb) {
-        var r = mmsServer + "/projects/" + reqOb.projectId + "/refs/" + reqOb.refId + 
+        var r = root + "/projects/" + reqOb.projectId + "/refs/" + reqOb.refId + 
             '/documents/' + reqOb.elementId + "/views";
         r = addVersion(r, reqOb.commitId);
         return addExtended(r, reqOb.extended);
@@ -322,7 +323,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        return mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
+        return root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
     };
 
     /**
@@ -337,7 +338,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
-        return addExtended(addChildViews(mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements', reqOb.returnChildViews), reqOb.extended);
+        return addExtended(addChildViews(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements', reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -352,7 +353,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPutElementsURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements';
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
@@ -368,7 +369,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
         return addExtended(r, true);
     };
 
@@ -390,9 +391,9 @@ function urlService(baseUrl, mmsUrl) {
         var r;
         if (urlParams !== null || urlParams !== ''){
             // ie '/search?checkType=true&literal=true';
-            r = mmsServer + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
-            r = mmsServer + '/projects/' + projectId + '/refs/' + refId + '/search';
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search';
         }
         return r;
     };
@@ -409,7 +410,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
         return addVersion(r, reqOb.commitId);
     };
 
@@ -425,7 +426,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getPutArtifactsURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
         return addVersion(r, reqOb.commitId);
     };
 
@@ -441,7 +442,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactHistoryURL = function(reqOb) {
-        var r = mmsServer + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
         return r;
     };
 
@@ -474,7 +475,7 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getCheckTicketURL = function() {
-        return mmsUrl + '/checkAuth'; //TODO remove when server returns 404
+        return root + '/checkAuth'; //TODO remove when server returns 404
     };
 
         /**
