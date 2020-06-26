@@ -74,7 +74,7 @@ module.exports = function(grunt) {
             port: serverPort
           },
           {
-            context: '/api',  // '/api'
+            context: '/api',
             host: servers[key],
             changeOrigin: true,
             https: serverHttps,

@@ -135,7 +135,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
         }
-        var editable = $scope.refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission($scope.refOb) && commitId === 'latest' ;
+        var editable = $scope.refOb.type === 'Branch' && commitId === 'latest' && PermissionsService.hasBranchEditPermission($scope.refOb);
         $rootScope.ve_tbApi.setPermission('element-editor', editable);
         $rootScope.$digest();
     };
@@ -164,7 +164,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.$on('viewSelected', function(event, elementOb, commitId) {
         elementSelected(event, elementOb, commitId);
         $scope.viewOb = elementOb;
-        var editable = $scope.refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission($scope.refOb) && commitId === 'latest';
+        var editable = $scope.refOb.type === 'Branch' && commitId === 'latest' && PermissionsService.hasBranchEditPermission($scope.refOb);
         $scope.viewCommitId = commitId ? commitId : elementOb._commitId;
         $rootScope.ve_tbApi.setPermission('view-reorder', editable);
     });

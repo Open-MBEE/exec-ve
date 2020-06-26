@@ -154,7 +154,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
             deferred.resolve(existing);
             return deferred.promise;
         }
-        $http.put(URLService.getPutElementsURL(reqOb),request)
+        $http.put(URLService.getPutElementsURL(reqOb), request)
         .then(function(response) {
             var data = response.data.elements;
             var i;
@@ -463,9 +463,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 }), {
                     elements: [postElem],
                     source: ApplicationService.getSource()
-                }, {
-                    headers: URLService.getAuthorizationHeader(),
-                    timeout: 60000})
+                }, {timeout: 60000})
             .then(function(response) {
                 var rejected = response.data.rejected;
                 if (rejected && rejected.length > 0 && rejected[0].code === 304 && rejected[0].element) { //elem will be rejected if server detects no changes
@@ -822,9 +820,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }), {
             elements: elements,
             source: ApplicationService.getSource()
-        }, {
-            headers: URLService.getAuthorizationHeader(),
-            timeout: 60000})
+        }, {timeout: 60000})
             .then(function (response) {
                 _bulkUpdateSuccessHandler(response, deferred);
             }, function (response) {

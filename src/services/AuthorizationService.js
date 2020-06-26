@@ -50,10 +50,6 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         return ticket;
     };
 
-    var getAuthorizationHeader = function(){
-        return {'Authorization': 'Bearer ' + getTicket()};
-    };
-
     var checkLogin = function(){
         var deferred = $q.defer();
         if (!ticket) {
@@ -61,7 +57,7 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
             return deferred.promise;
         }
 
-        $http.get(URLService.getCheckTicketURL(), {headers: getAuthorizationHeader()}).then(function (success) {
+        $http.get(URLService.getCheckTicketURL()).then(function (success) {
             deferred.resolve(success.data.username);
             $analytics.setUsername(success.data.username);
         }, function(fail){

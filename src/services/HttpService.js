@@ -42,14 +42,14 @@ function HttpService($http) {
      * @param {function} error function
      * @param {string} proirity by weight
      */
-    var get = function(url, successCallback, errorCallback, weight, headers) {
+    var get = function(url, successCallback, errorCallback, weight) {
         if(weight === undefined){
             weight = 1;
         }
         var request = { url : url, successCallback: successCallback, errorCallback: errorCallback , weight: weight };
         if (inProgress >= GET_OUTBOUND_LIMIT) {
             if(request.weight === 2){
-                $http.get(url, headers).then(
+                $http.get(url).then(
                     function(response){successCallback(response.data, response.status, response.headers, response.config);},
                     function(response){errorCallback(response.data, response.status, response.headers, response.config);})
                     .finally(function(){
@@ -75,7 +75,7 @@ function HttpService($http) {
         else {
             inProgress++;
             cache[url] = request;
-            $http.get(url, headers).then(
+            $http.get(url).then(
                 function(response){successCallback(response.data, response.status, response.headers, response.config);},
                 function(response){errorCallback(response.data, response.status, response.headers, response.config);})
                 .finally( function() {

@@ -29,14 +29,14 @@ function($scope, $rootScope, $state, UxService, refOb, documentOb, PermissionsSe
             tbApi.addButton(UxService.getToolbarButton("jobs"));
         // }
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            editable = PermissionsService.hasBranchEditPermission(refOb) && refOb.type === 'Branch';
+            editable = refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission(refOb);
             tbApi.setPermission('element-editor', editable);
             if ($state.includes('project.ref.preview')) {
                 tbApi.addButton(UxService.getToolbarButton("view-reorder"));
                 tbApi.setPermission("view-reorder", editable);
             }
         } else if ($state.includes('project.ref.document')) {
-            editable = PermissionsService.hasBranchEditPermission(refOb) && refOb.type === 'Branch';
+            editable = refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission(refOb);
             tbApi.addButton(UxService.getToolbarButton("view-reorder"));
             tbApi.setPermission('element-editor', editable);
             tbApi.setPermission("view-reorder", editable);
