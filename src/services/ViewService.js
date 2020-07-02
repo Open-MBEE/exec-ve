@@ -1183,7 +1183,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     };
 
     var isGroup = function(instanceSpec) {
-        return instanceSpec._appliedStereotypeIds.length > 0 && instanceSpec._appliedStereotypeIds[0] === GROUP_ST_ID;
+        return instanceSpec._appliedStereotypeIds !== undefined && instanceSpec._appliedStereotypeIds.length > 0 && instanceSpec._appliedStereotypeIds[0] === GROUP_ST_ID;
     };
 
     var getElementType = function(element) {

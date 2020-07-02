@@ -392,7 +392,7 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getSearchURL = function(projectId, refId, urlParams) {
         var r;
-        if (urlParams !== null || urlParams !== ''){
+        if (urlParams !== undefined && urlParams !== null && urlParams !== ''){
             // ie '/search?checkType=true&literal=true';
             r = root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
