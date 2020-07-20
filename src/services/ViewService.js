@@ -221,40 +221,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
         }
     };
-
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#getDocumentViews
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Gets the view objects for a document. The references are 
-     * the same as ones gotten from ElementService.
-     * 
-     * @param {object} reqOb see ElementService.getElement
-     * @param {integer} [weight=1] the priority of the request
-     * @param {boolean} [update=false] whether to always get the latest 
-     *      from server
-     * @returns {Promise} The promise will be resolved with array of view objects. 
-     */
-    var getDocumentViews = function(reqOb, weight, update) {
-        UtilsService.normalize(reqOb);
-        var deferred = $q.defer();
-        var url = URLService.getDocumentViewsURL(reqOb);
-        var cacheKey = ['views', reqOb.projectId, reqOb.refId, reqOb.elementId];
-        if (CacheService.exists(cacheKey) && !update) {
-            deferred.resolve(CacheService.get(cacheKey));
-        } else {
-            ElementService.getGenericElements(url, reqOb, 'views', weight, update).
-            then(function(data) {
-                deferred.resolve(CacheService.put(cacheKey, data, false));
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-        }
-        return deferred.promise;
-    };
-
+    
     /**
      * @ngdoc method
      * @name mms.ViewService#addViewToParentView
@@ -1231,7 +1198,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeGroup: removeGroup,
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
-        getDocumentViews: getDocumentViews,
         getProjectDocuments: getProjectDocuments,
         getPresentationElementSpec: getPresentationElementSpec,
         isSection: isSection,

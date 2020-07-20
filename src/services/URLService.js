@@ -298,24 +298,6 @@ function urlService(baseUrl, mmsUrl) {
 
     /**
      * @ngdoc method
-     * @name mms.URLService#getDocumentViewsURL
-     * @methodOf mms.URLService
-     * 
-     * @description
-     * Gets the url to get all views in a document
-     *
-     * @param {object} reqOb object with keys as described in ElementService.
-     * @returns {string} The url.
-     */
-    var getDocumentViewsURL = function(reqOb) {
-        var r = root + "/projects/" + reqOb.projectId + "/refs/" + reqOb.refId + 
-            '/documents/' + reqOb.elementId + "/views";
-        r = addVersion(r, reqOb.commitId);
-        return addExtended(r, reqOb.extended);
-    };
-
-    /**
-     * @ngdoc method
      * @name mms.URLService#getElementVersionsURL
      * @methodOf mms.URLService
      * 
@@ -341,7 +323,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
-        return addExtended(addChildViews(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements', reqOb.returnChildViews), reqOb.extended);
+        return addExtended(addChildViews(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views', reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -356,7 +338,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPutElementsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views';
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
@@ -623,7 +605,6 @@ function urlService(baseUrl, mmsUrl) {
         getElementSearchURL: getElementSearchURL,
         getSearchURL: getSearchURL,
         getProjectDocumentsURL: getProjectDocumentsURL,
-        getDocumentViewsURL: getDocumentViewsURL,
         getImageURL: getImageURL,
         getExportHtmlUrl: getExportHtmlUrl,
         getArtifactURL: getArtifactURL,
