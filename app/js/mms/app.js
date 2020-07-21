@@ -417,6 +417,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }],
             docMeta: [function(){
                 return {};
+            }],
+            permissions: ['projectOb', 'refOb', 'PermissionsService', function(projectOb, refOb, PermissionsService){
+                return PermissionsService.initializePermissions(projectOb, refOb);
             }]
         },
         views: {

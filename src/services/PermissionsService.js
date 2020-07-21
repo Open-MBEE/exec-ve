@@ -13,78 +13,62 @@ angular.module('mms')
  */
 function PermissionsService($q, $http, URLService, CacheService, _) {
 
-    var inProgress = {};
+    var permissions = {project: {}, ref:{}};
 
-    var hasProjectEditPermission = function(projectOb) {
-        var requestCacheKey = ['project_permission', projectOb.id];
-        var key = projectOb.id;
-        return permissionsLookup(requestCacheKey, key, 
-        {
-            "type" : "PROJECT",
-            "projectId": projectOb.id,
-            "privilege": "PROJECT_EDIT"
-        });
-    };
-
-    var hasBranchEditPermission = function(refOb) {
-        var requestCacheKey = ['branch_permission', refOb._projectId, refOb.id];
-        var key = refOb._projectId + "||" + refOb.id;
-        return permissionsLookup(requestCacheKey, key, 
-        {
-            "type" : "BRANCH",
-            "projectId": refOb.projectId,
-            "refId": refOb.id,
-            "privilege": "BRANCH_EDIT_CONTENT"
-        });
-    };
-
-    var hasProjectIdBranchIdEditPermission = function(projectId, refId) {
-        var requestCacheKey = ['branch_permission', projectId, refId];
-        var key = projectId + "||" + refId;
-        return permissionsLookup(requestCacheKey, key, 
-        {
-            "type" : "BRANCH",
-            "projectId": projectId,
-            "refId": refId,
-            "privilege": "BRANCH_EDIT_CONTENT"
-        });
-    };
-
-    var permissionsLookup = function(cacheKey, progressKey, lookup) {
-        
+    var initializePermissions = function(projectOb, refOb) {
         var url = URLService.getPermissionsLookupURL();
-        
-        if (inProgress.hasOwnProperty(progressKey)) { //change to change proirity if it's already in the queue            
-            return inProgress[progressKey];
-        }
+       
+        var deferred = $q.defer();                
 
-        var deferred = $q.defer();
-        var cached = CacheService.get(cacheKey);
-        if (cached) {
-            deferred.resolve(cached);
-            return deferred.promise;
-        }
-        
-        inProgress[progressKey] = deferred.promise;
-
-        $http.put(url, { "lookups" : [ lookup ] })
+        $http.put(url, { "lookups" : [ 
+            {
+                "type" : "PROJECT",
+                "projectId": projectOb.id,
+                "privilege": "PROJECT_EDIT"
+            },
+            {
+                "type" : "BRANCH",
+                "projectId": refOb._projectId,
+                "refId": refOb.id,
+                "privilege": "BRANCH_EDIT_CONTENT"
+            }
+         ] })
         .then(function(response) {
             var data = response.data.lookups;
             if (angular.isArray(data) && data.length > 0) {
-                deferred.resolve(CacheService.put(cacheKey,  data[0].hasPrivilege, true));
+                for(var i in data) {
+                    var d = data[i];                    
+                    if(d.type == 'PROJECT'){
+                        permissions.project[d.projectId] = d.hasPrivilege;                        
+                    } else {
+                        permissions.ref[d.projectId + '/' + d.refId] = d.hasPrivilege;
+                    }                    
+                }                
+                deferred.resolve(permissions);
             } else {
                 deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
             }
-            delete inProgress[progressKey];
         }, function(response) {
             URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-            delete inProgress[progressKey];
         });   
         
         return deferred.promise;
     };
+
+    var hasProjectEditPermission = function(projectOb) {
+        return permissions.project[projectOb];
+    };
+
+    var hasBranchEditPermission = function(refOb) {
+        return hasProjectIdBranchIdEditPermission(refOb._projectId, refOb.id);
+    };
+
+    var hasProjectIdBranchIdEditPermission = function(projectId, refId) {
+        return permissions.ref[projectId + "/" + refId];
+    };
   
     return {
+        initializePermissions: initializePermissions,
         hasProjectEditPermission: hasProjectEditPermission,
         hasBranchEditPermission: hasBranchEditPermission,
         hasProjectIdBranchIdEditPermission: hasProjectIdBranchIdEditPermission
