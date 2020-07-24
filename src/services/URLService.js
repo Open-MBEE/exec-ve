@@ -51,6 +51,10 @@ function urlService(baseUrl, mmsUrl) {
         ticket = t;
     };
 
+    var getAuthorizationHeaderValue = function() {
+        return ('Bearer ' + ticket);
+    };
+
     var getAuthorizationHeader = function(headers) {
         if(!ticket) {
             return headers;
@@ -58,7 +62,7 @@ function urlService(baseUrl, mmsUrl) {
         if(!headers) {
             headers = {};
         }
-        headers.Authorization = ('Bearer ' + ticket);
+        headers.Authorization = getAuthorizationHeaderValue();
         return headers;
     };
     
@@ -395,7 +399,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + reqOb.artifactExtension;
         return addVersion(r, reqOb.commitId);
     };
 
@@ -411,7 +415,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getPutArtifactsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addVersion(r, reqOb.commitId);
     };
 
@@ -621,6 +625,7 @@ function urlService(baseUrl, mmsUrl) {
         getLogoutURL: getLogoutURL,
         handleHttpStatus: handleHttpStatus,
         getAuthenticationUrl: getAuthenticationUrl,
+        getAuthorizationHeaderValue: getAuthorizationHeaderValue,
         getAuthorizationHeader: getAuthorizationHeader,
         getViewsURL: getViewsURL,
         getPermissionsLookupURL: getPermissionsLookupURL
