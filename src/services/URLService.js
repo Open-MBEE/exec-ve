@@ -93,9 +93,9 @@ function urlService(baseUrl, mmsUrl) {
         // if (r.indexOf('commitId') > 0) //TODO check mms cache rules
         //     return r;
         if (r.indexOf('?') > 0)
-            r += '&alf_ticket=' + ticket;
+            r += '&token=' + ticket;
         else
-            r += '?alf_ticket=' + ticket;
+            r += '?token=' + ticket;
         return r;
     };
 
@@ -129,7 +129,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {object} Returns object with mmsversion
      */
     var getMmsVersionURL = function() {
-        return addTicket(root + "/mmsversion");
+        return root + "/mmsversion";
     };
 
     /**
@@ -586,6 +586,7 @@ function urlService(baseUrl, mmsUrl) {
     return {
         getRoot: getRoot,
         setTicket: setTicket,
+        addTicket: addTicket,
         getJMSHostname: getJMSHostname,
         getMmsServer: getMmsServer,
         isTimestamp: isTimestamp,
