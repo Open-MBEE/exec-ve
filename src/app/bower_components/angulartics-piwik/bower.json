@@ -1,0 +1,32 @@
+{
+  "name": "angulartics-piwik",
+  "description": "Piwik plugin for Angulartics",
+  "authors": [
+    "Ivan Nolasco <ivan.nolasco@me.com>"
+  ],
+  "license": "MIT",
+  "main": [
+    "src/angulartics-piwik.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "test",
+    "example",
+    "package.json",
+    "Gruntfile.js"
+  ],
+  "dependencies": {
+    "angular": ">= 1.1.5",
+    "angulartics": "*"
+  },
+  "devDependencies": {
+    "angular-mocks": ">= 1.1.5",
+    "angular-route": "~1.2",
+    "angular-ui-router": "~0.2"
+  },
+  "resolutions": {
+    "angular": ">= 1.1.5"
+  }
+}

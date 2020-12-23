@@ -1,0 +1,48 @@
+{
+  "name": "angular-ui-tree-filter",
+  "version": "0.1.1",
+  "description": "A module providing an AngularJS filter which can be used with angular-ui-tree to match tree nodes",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ee/angular-ui-tree-filter.git"
+  },
+  "keywords": [
+    "Angular",
+    "AngularJS",
+    "angular-ui",
+    "angular-ui-tree",
+    "filter"
+  ],
+  "author": "Jarek Rencz <jarek.rencz@laboratorium.ee>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ee/angular-ui-tree-filter/issues"
+  },
+  "homepage": "https://github.com/ee/angular-ui-tree-filter",
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-cli": "~0.1.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-connect": "~0.8.0",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-uglify": "~0.5.0",
+    "grunt-contrib-watch": "~0.6.0",
+    "grunt-defs": "~0.7.0",
+    "grunt-gh-pages": "~0.9.0",
+    "grunt-jscs": "~0.6.0",
+    "grunt-merge-conflict": "~0.0.2",
+    "grunt-ng-annotate": "~0.3.0",
+    "grunt-karma": "~0.8.2",
+    "karma": "~0.12.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-phantomjs-launcher": "~0.1.0",
+    "karma-jasmine": "~0.2.0",
+    "jit-grunt": "~0.7.0",
+    "jscs-trailing-comma": "~0.3.0"
+  }
+}

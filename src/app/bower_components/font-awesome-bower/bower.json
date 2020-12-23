@@ -1,0 +1,28 @@
+{
+  "authors": ["dev@tdg5.com"],
+  "description": "Font-Awesome bower component with reduced footprint",
+  "devDependencies": {
+    "fontawesome": "4.6.3"
+  },
+  "homepage": "https://github.com/tdg5/font-awesome-bower",
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "keywords": [
+    "fontawesome",
+    "Font-Awesome"
+  ],
+  "license": "MIT",
+  "main": [
+    "css/font-awesome.css",
+    "fonts/FontAwesome.otf",
+    "fonts/fontawesome-webfont.eot",
+    "fonts/fontawesome-webfont.svg",
+    "fonts/fontawesome-webfont.ttf",
+    "fonts/fontawesome-webfont.woff",
+    "fonts/fontawesome-webfont.woff2"
+  ],
+  "name": "font-awesome-bower",
+  "version": "4.6.3"
+}

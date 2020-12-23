@@ -1,0 +1,35 @@
+{
+  "name": "vdomdiff",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack",
+    "test": "npm run build && karma start",
+    "uiTest": "node uiTest.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "virtual-dom": "https://github.com/chhaymenghong/virtual-dom.git#master",
+    "diff": "^3.5.0",
+    "html-to-vdom": "^0.7.0",
+    "vdom-to-html": "^2.3.1"
+  },
+  "devDependencies": {
+    "babel-core": "~6.26.0",
+    "babel-loader": "~7.1.2",
+    "babel-preset-env": "^1.7.0",
+    "base64-img": "^1.0.4",
+    "escape-html": "^1.0.3",
+    "html-webpack-plugin": "^3.0.6",
+    "jasmine-core": "^3.1.0",
+    "karma": "^2.0.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.1",
+    "webpack": "^3.10.0",
+    "webpack-cli": "^2.0.10",
+    "webpack-dev-server": "^2.11.1"
+  }
+}
