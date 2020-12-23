@@ -34,7 +34,7 @@ function VizService($q, $http, URLService, CacheService, UtilsService, AuthServi
             deferred.resolve(makeImageUrl(CacheService.get(cacheKey)));
             return deferred.promise;
         }
-        $http.get(URLService.getImageURL(reqOb), {headers: {Accept: reqOb.accept}})
+        $http.get(URLService.getImageURL(reqOb), {headers: {Accept: reqOb.accept, Authorization: 'Bearer ' + AuthService.getToken()}})
         .then(function(data) {
             CacheService.put(cacheKey, data.data.artifacts[0], false);
             deferred.resolve(makeImageUrl(data.data.artifacts[0]));
@@ -52,7 +52,7 @@ function VizService($q, $http, URLService, CacheService, UtilsService, AuthServi
             if (parts.length >= 3)
                 newroot = parts[0] + '/' + parts[1] + '/' + parts[2];
         }
-        return newroot + '/alfresco' + data.url + '?alf_ticket=' + AuthService.getTicket();
+        return newroot + '/alfresco' + data.url + '?alf_ticket=' + AuthService.getToken();
     };
 
     var createImageCacheKey = function(reqOb) {

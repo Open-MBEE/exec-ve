@@ -38,18 +38,19 @@ function HttpService($http) {
      * Put a new get request in the queue, the queue is FIFO
      *
      * @param {string} url url to get
-     * @param {function} success success function
-     * @param {function} error function
-     * @param {string} proirity by weight
+     * @param {function} successCallback success function
+     * @param {function} errorCallback function
+     * @param {string} weight by weight
+     * @param {Object} config object containing http configuration parameters
      */
-    var get = function(url, successCallback, errorCallback, weight) {
+    var get = function(url, successCallback, errorCallback, weight, config) {
         if(weight === undefined){
             weight = 1;
         }
         var request = { url : url, successCallback: successCallback, errorCallback: errorCallback , weight: weight };
         if (inProgress >= GET_OUTBOUND_LIMIT) {
             if(request.weight === 2){
-                $http.get(url).then(
+                $http.get(url,config).then(
                     function(response){successCallback(response.data, response.status, response.headers, response.config);},
                     function(response){errorCallback(response.data, response.status, response.headers, response.config);})
                     .finally(function(){
@@ -75,7 +76,7 @@ function HttpService($http) {
         else {
             inProgress++;
             cache[url] = request;
-            $http.get(url).then(
+            $http.get(url,config).then(
                 function(response){successCallback(response.data, response.status, response.headers, response.config);},
                 function(response){errorCallback(response.data, response.status, response.headers, response.config);})
                 .finally( function() {

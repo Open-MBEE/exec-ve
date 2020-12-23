@@ -963,7 +963,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 src.replace('../', '/alfresco/');
             }
             if (src.startsWith('/alfresco/')) {
-                imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getTicket());
+                imgDom.attr('src', URLService.getMmsServer() + src + '?alf_ticket=' + AuthService.getToken());
             }
         }
         if (imgDom.width() < 860) { //keep image relative centered with text if less than 9 in

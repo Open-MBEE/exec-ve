@@ -36,10 +36,10 @@
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a href="https://wiki.jpl.nasa.gov/display/opencae/View+Editor+User+Guide" target="_blank">View Editor User Guide</a>
+                                <a href="https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf" target="_blank">View Editor Help</a>
                             </li>
                             <li>
-                                <a href="https://jira.jpl.nasa.gov/servicedesk/customer/portal/5" target="_blank">Report Issue</a>
+                                <a href="https://openmbee.atlassian.net/secure/Dashboard.jspa" target="_blank">Report Issue</a>
                             </li>
                             <li class="divider"></li>
                             <li class="list-section-bottom">
@@ -51,11 +51,11 @@
                 <li class="dropdown">
                     <span class="dropdown ve-dark-dropdown-nav fixed-content-dropdown user-profile" uib-dropdown on-toggle="toggled(open)">
                         <a href id="login-dropdown" class="dropdown-toggle" uib-dropdown-toggle>
-                            {{ username | limitTo:1 | uppercase }}
+                            {{ user.firstName | limitTo:1 | uppercase }}{{ user.lastName | limitTo:1 | uppercase }}
                         </a>
                         <ul class="dropdown-menu pull-right" uib-dropdown-menu aria-labelledby="login-dropdown" style="white-space: nowrap" role="login-menu">
                             <li ng-if="username" class="ve-secondary">
-                                <span>Logged in as <b>{{ username }}</b></span>
+                                Logged in as <b>{{ user.firstName }} {{ user.lastName }}</b> ({{ username }})
                             </li>
                             <li class="divider"></li>
                             <li>

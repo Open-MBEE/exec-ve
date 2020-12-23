@@ -816,7 +816,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         var cap = '';
         var name = '';
         if (child.type === 'table') {
-            //ob.tableCount++;
+            ob.tableCount++;
             prefix = 'Table ' + veNumber + '. ';
             var capTbl = el.find('table > caption');
             name = capTbl.text();
@@ -842,7 +842,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             refs.filter('[suppress-numbering!="true"]').filter(':not([link-text])').find('a').html('Table ' + cap);
         }
         if (child.type === 'figure') {
-            //ob.figureCount++;
+            ob.figureCount++;
             prefix = 'Figure ' + veNumber + '. ';
             var capFig = el.find('figure > figcaption');
             name = capFig.text();
@@ -868,7 +868,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             refs.filter('[suppress-numbering!="true"]').filter(':not([link-text])').find('a').html('Fig. ' + cap);
         }
         if (child.type === 'equation') {
-            //ob.equationCount++;
+            ob.equationCount++;
             cap = veNumber + '. ' + pe.name;
             ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var equationCap = '(' + veNumber + ')';
@@ -1136,7 +1136,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "3. Typography\n" +
                 "------------------------------------------------------------------*/\n" +
                 "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
-                "h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
+                //"h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
+                ".h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}\n" +
                 ".ng-hide {display: none;}\n" +
                 ".chapter h1.view-title {font-size: 20pt; }\n" + 
                 "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
@@ -1224,7 +1225,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 } else {
                     content = '"' + meta[key] + '"';
                 }
-                ret += '@page {@' + key + ' {font-size: 10px; content: ' + content + ';}}\n';
+                ret += '@page {@' + key + ' {font-size: 9px; content: ' + content + ';}}\n';
             }
         });
         if (landscape) {
@@ -1323,7 +1324,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
               accept = 'application/pdf';
         }
         var deferred = $q.defer();
-        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId), {
+        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId, URLService.getRequestConfig()), {
             'Content-Type' : 'text/html',
             'Accepts' : accept,
             'body': data.htmlString,

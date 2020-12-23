@@ -40,7 +40,7 @@ function mmsTranscludeArt(ArtifactService, AuthService, URLService) {
             var reqOb = {artifactId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
             var server = URLService.getMmsServer();
-            var ticket = '?alf_ticket=' + AuthService.getTicket();
+            var ticket = '?alf_ticket=' + AuthService.getToken();
             element.addClass('isLoading');
             
             // Get the artifacts of the element
