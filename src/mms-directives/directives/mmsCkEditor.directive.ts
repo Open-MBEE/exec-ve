@@ -139,6 +139,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             $scope.showProposeLink = false;
             $scope.searchExisting = true;
             $scope.suppressNumbering = false;
+            $scope.suppressName = true;
             $scope.linkType = 1;
             $scope.linkText = '';
 
@@ -154,11 +155,20 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 if (peid) {
                     tag += ' mms-pe-id="' + peid + '"';
                 }
+                if ($scope.linkType == 1) {
+                    tag += ' suppress-numbering="false"';
+                    tag += ' show-name="false"';
+                }
                 if ($scope.linkType == 2) {
                     tag += ' suppress-numbering="true"';
+                    tag += ' show-name="true"';
                 }
                 if ($scope.linkType == 3 && $scope.linkText) {
                     tag += ' link-text="' + $scope.linkText + '"';
+                }
+                if ($scope.linkType == 4) {
+                    tag += ' suppress-numbering="false"';
+                    tag += ' show-name="true"';
                 }
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>';
                 return tag;
@@ -340,7 +350,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         };
         
         // Formatting editor toolbar
-        var stylesToolbar = { name: 'styles', items : ['Format','FontSize','TextColor','BGColor' ] };
+        var stylesToolbar = { name: 'styles', items : ['Styles',/*'Format',*/'FontSize','TextColor','BGColor'] };
         var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
         var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
         var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
@@ -349,7 +359,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
         var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var sourceToolbar = { name: 'source', items: [ 'Maximize','Source' ] };
+        var sourceToolbar = { name: 'source', items: [ 'Maximize','Sourcedialog' ] };
         var combinedToolbar = { name: 'combined', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'},
             {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, 'Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', {name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}, 'mmsExtraFeature' ]};
         // var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
@@ -379,7 +389,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             // Initialize ckeditor and set event handlers
             $(element).val(ngModelCtrl.$modelValue);
             instance = CKEDITOR.replace(attrs.id, {
-                // customConfig: '/lib/ckeditor/config.js',
+                customConfig: '/lib/ckeditor/config.js',
                 mmscf: {callbackModalFnc: transcludeCallback},
                 mmscomment: {callbackModalFnc: commentCallback},
                 mmsvlink: {callbackModalFnc: viewLinkCallback},
@@ -427,6 +437,30 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                                 return;
                             }
                             
+                            if (element.name.startsWith('mms-')) {
+                                if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    element.replaceWithChildren();
+                                    return;
+                                }
+                            }
+
+                            var attributesToDelete = Object.keys(element.attributes).filter(function(attrKey) {
+                                return attrKey.startsWith('ng-');
+                            });
+                            attributesToDelete.forEach(function(attrToDelete) {
+                                delete element.attributes[attrToDelete];
+                            });
+                        }
+                    }
+                });
+                instance.dataProcessor.dataFilter.addRules({
+                    elements: {
+                        $: function (element) {
+                            if (element.name === 'script') {
+                                element.remove();
+                                return;
+                            }
+
                             if (element.name.startsWith('mms-')) {
                                 if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
                                     element.replaceWithChildren();

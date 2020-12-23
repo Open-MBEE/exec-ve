@@ -38,7 +38,7 @@ function ApplicationService($q, $http, URLService) {
 
     var getMmsVersion = function () {
         var deferred = $q.defer();
-        $http.get(URLService.getMmsVersionURL())
+        $http.get(URLService.getMmsVersionURL(),URLService.getRequestConfig())
             .then(function (response) {
                 deferred.resolve(response.data.mmsVersion);
             }, function (response) {

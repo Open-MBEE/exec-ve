@@ -47,7 +47,7 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
             var server = URLService.getMmsServer();
-            var ticket = '?alf_ticket=' + AuthService.getTicket();
+            var ticket = '?alf_ticket=' + AuthService.getToken();
             element.addClass('isLoading');
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {

@@ -351,6 +351,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                     children: branch.children
                 });
                 if (branch.children) {
+                    var alpha = false;
                     if (scope.options.sort) {
                         branch.children.sort(scope.options.sort);
                     }
@@ -366,8 +367,12 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                             add_branch_to_list(level + 1, section, branch.children[i], child_visible, peNums);
                         } else {
                             if (scope.options.sectionNumbering) {
+                                if (branch.children[i].data._isAppendix) {
+                                    alpha = true;
+                                    j = 0;
+                                }
                                 var nextSection = section.slice(); 
-                                nextSection.push(j);
+                                nextSection.push(alpha ? String.fromCharCode(j + 65) : j);
                                 if (nextSection.length <= scope.options.numberingDepth) {
                                     peNums.table = 0; peNums.figure = 0; peNums.equaton = 0;
                                 }

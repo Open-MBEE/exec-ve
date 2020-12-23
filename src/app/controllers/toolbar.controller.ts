@@ -26,7 +26,7 @@ function($scope, $rootScope, $state, UxService, refOb, documentOb) {
         tbApi.addButton(UxService.getToolbarButton("element-history"));
         tbApi.addButton(UxService.getToolbarButton("tags"));
         // if ($state.includes('project.ref.document')) {
-            tbApi.addButton(UxService.getToolbarButton("jobs"));
+            //tbApi.addButton(UxService.getToolbarButton("jobs"));
         // }
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             editable = documentOb._editable && refOb.type === 'Branch';

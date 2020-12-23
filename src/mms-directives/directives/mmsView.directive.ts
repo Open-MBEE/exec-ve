@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsView', ['Utils', 'ViewService', 'ElementService', '$templateCache', 'growl', mmsView]);
+.directive('mmsView', ['Utils', 'AuthService', 'ViewService', 'ElementService', '$templateCache', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -54,7 +54,7 @@ angular.module('mms.directives')
  *              view being clicked, this should be a function whose argument is 'elementId'
  */
 
-function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
+function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache, growl) {
     var template = $templateCache.get('mms/templates/mmsView.html');
 
     var mmsViewCtrl = function($scope) {
@@ -104,8 +104,11 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
             if (elem) {
                 if (elem._modified > $scope.modified && type !== 'Comment') {
                     $scope.modified = elem._modified;
-                    if (elem._modifier)
-                        $scope.modifier = elem._modifier;
+                    if (elem._modifier) {
+                        AuthService.getUserData(elem._modifier).then(function(modifierData){
+                                $scope.modifier = modifierData;
+                        });
+                    }
                 }
                 if ($scope.mmsViewApi && $scope.mmsViewApi.elementTranscluded)
                     $scope.mmsViewApi.elementTranscluded(elem, type);
@@ -149,6 +152,7 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
             });
         };
         scope.isSection = false;
+
         var changeView = function(newVal, oldVal) {
             if (!newVal || (newVal === oldVal && processed))
                 return;
@@ -180,14 +184,18 @@ function mmsView(Utils, ViewService, ElementService, $templateCache, growl) {
                     //getting cached individual elements should be faster
                     scope.view = data;
                     scope.modified = data._modified;
-                    scope.modifier = data._modifier;
+                    AuthService.getUserData(data._modifier).then(function(modifierData){
+                        scope.modifier = modifierData;
+                    });
                     return;
                 }
                 ViewService.getViewElements(reqOb, 1)
                 .finally(function() {
                     scope.view = data;
                     scope.modified = data._modified;
-                    scope.modifier = data._modifier;
+                    AuthService.getUserData(data._modifier).then(function(modifierData){
+                        scope.modifier = modifierData;
+                    });
                     element.removeClass('isLoading');
                 });
             }, function(reason) {

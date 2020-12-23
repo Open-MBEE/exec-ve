@@ -132,10 +132,15 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             var address = "https://uatlinkhere";
             if (hostName !== 'localhost' && hostName.split('.')[0].substr(-3) !== 'uat')
                 address = 'https://' + hostName.split('.')[0] + '-uat.jpl.nasa.gov';
+            // TODO (jk) - Move branding into config.
+            address = "https://mms.openmbee.org";
             window.open(address ,'_blank');
         };
         AuthService.checkLogin().then(function(data) {
-            scope.username = data;
+            scope.username = data.username;
+            AuthService.getUserData(data.username).then(function(userData){
+                scope.user = userData;
+            });
         });
         
     };
