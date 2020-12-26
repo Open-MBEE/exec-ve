@@ -1,4 +1,5 @@
-'use strict';
+import * as angular from 'angular';
+import * as $ from 'jquery';
 
 angular.module('mms')
     .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', 'UtilsService' , MentionService]);
@@ -187,7 +188,7 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
         return null;
     }
 
-    function _cleanup(editor, mentionId, unwrapOnly) {
+    function _cleanup(editor, mentionId, unwrapOnly?) {
         var mentionState = _retrieveMentionState(editor.id, mentionId);
         var mentionPlaceHolderId = mentionState.mentionPlaceHolderId;
         var mentionPlaceHolderDom = editor.document.getById(mentionPlaceHolderId); 
@@ -274,7 +275,7 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
             target.addClass('active');
             $(allOptions[activeIndex]).removeClass('active');
             // scroll if necessary
-            target[0].parentNode.scrollTop = target[0].offsetTop;
+            (<Element>target[0].parentNode).scrollTop = target[0].offsetTop;
         }
     }
 

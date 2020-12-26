@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
@@ -520,7 +520,7 @@ function urlService(baseUrl, mmsUrl) {
      *      ```
      */
     var handleHttpStatus = function(data, status, header, config, deferred) {
-        var result = {status: status, data: data};
+        var result = {status: status, data: data, message: ''};
         if (status === 404)
             result.message = "Not Found";
         else if (status === 500) {
@@ -539,7 +539,7 @@ function urlService(baseUrl, mmsUrl) {
         else if (status === 408)
             result.message = "Timed Out";
         else if (status === 501) {
-            result.message = "Cacheing";
+            result.message = "Caching";
         } else
             result.message = "Timed Out (Please check network)";
         deferred.reject(result);

@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .factory('HttpService', ['$http', HttpService]);
@@ -43,7 +43,7 @@ function HttpService($http) {
      * @param {string} weight by weight
      * @param {Object} config object containing http configuration parameters
      */
-    var get = function(url, successCallback, errorCallback, weight, config) {
+    var get = function(url, successCallback, errorCallback, weight, config?) {
         if(weight === undefined){
             weight = 1;
         }
@@ -87,11 +87,11 @@ function HttpService($http) {
                     }
                     if (queue[1].length > 0) {
                         next = queue[1].shift();
-                        get(next.url, next.successCallback, next.errorCallback, next.weight);
+                        get(next.url, next.successCallback, next.errorCallback, next.weight, next.config);
                     }
                     else if(queue[0].length > 0){
                         next = queue[0].shift();
-                        get(next.url, next.successCallback, next.errorCallback, next.weight);
+                        get(next.url, next.successCallback, next.errorCallback, next.weight, next.config);
                     }
                 });
         }

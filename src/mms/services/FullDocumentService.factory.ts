@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
     .factory('FullDocumentService', ['$timeout', "$interval", '$http', '_', 'growl', FullDocumentService]);

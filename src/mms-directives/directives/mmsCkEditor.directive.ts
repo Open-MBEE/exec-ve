@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsCkeditor', ['$uibModal', '$templateCache', '$timeout', 'growl', 'CKEDITOR', '_', 'CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'Utils', mmsCkeditor]);
@@ -222,7 +222,9 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             };
 
             var mainSearchFilter = function() {
-                var stereoQuery = {};
+                var stereoQuery = {
+                    terms: {}
+                };
                 stereoQuery.terms = {"_appliedStereotypeIds": [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)};
 
                 var classifierList = [];
@@ -232,7 +234,9 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                         classifierList.push(allClassifierIds[k]);
                     }
                 }
-                var classifierIdQuery = {};
+                var classifierIdQuery = {
+                    terms: {}
+                };
                 classifierIdQuery.terms = {"classifierIds": classifierList};
                 return {
                     "bool": {

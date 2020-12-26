@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .factory('ElementService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', '_', ElementService]);
@@ -193,7 +193,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {boolean} [edit=false] whether object to cache is for editing
      * @returns {object} cached object
      */
-    var cacheElement = function(reqOb, elementOb, edit) {
+    var cacheElement = function(reqOb, elementOb, edit?) {
         var result = UtilsService.cleanElement(elementOb, edit);
         var requestCacheKey = getElementKey(reqOb, result.id, edit);
         var origResultCommit = result._commitId;
@@ -778,7 +778,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         return deferred.promise;
     };
 
-    var getElementKey = function(reqOb, id, edit) {
+    var getElementKey = function(reqOb, id?, edit?) {
         var cacheKey = UtilsService.makeElementKey({
             _projectId: reqOb.projectId,
             id: id ? id : reqOb.elementId,

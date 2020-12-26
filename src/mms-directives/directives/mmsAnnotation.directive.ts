@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 /** Used for annotating an element that doesn't have any commit history at all or for an element that is deleted but has commit history **/
 angular.module('mms.directives')

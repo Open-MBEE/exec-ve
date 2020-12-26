@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
     .factory('ShortenUrlService', ['$http', '$q', 'URLService', 'UtilsService', ShortenUrlService]);

@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .factory('ProjectService', ['$q','$http','ApplicationService','CacheService','ElementService','URLService','_', ProjectService]);
@@ -343,7 +343,7 @@ function ProjectService($q, $http,ApplicationService,CacheService,ElementService
                     return;
                 }
                 var groups = [];
-                var reqOb = {projectId: projectId, refId: refId, commitId: 'latest'};
+                var reqOb = {projectId: projectId, refId: refId, commitId: 'latest', elementId: ''};
                 for (var i = 0; i < response.data.groups.length; i++) {
                     var group = response.data.groups[i];
                     reqOb.elementId = group.id;

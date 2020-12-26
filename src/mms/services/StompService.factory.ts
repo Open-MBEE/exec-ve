@@ -1,4 +1,5 @@
-'use strict';
+import * as angular from 'angular';
+import * as Stomp from 'stompjs';
 
 angular.module('mms')
 .factory('StompService', ['$rootScope', 'ApplicationService', 'ElementService', 'URLService','$http', 'UtilsService', 'CacheService', '_', StompService]);
@@ -77,7 +78,7 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
 
         // this should happen in where...
         $rootScope.$on('$destroy', function() {
-            stompClient.unsubscribe('/topic/master'/*, whatToDoWhenUnsubscribe*/);
+            (<Stomp.Client>stompClient).unsubscribe() //'/topic/master'/*, whatToDoWhenUnsubscribe*/);
         });
     };
 
@@ -89,9 +90,9 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
 
     var stompConnect = function(){
         stompClient = Stomp.client(host);
-        stompClient.debug = null;
-        stompClient.connect("guest", "guest", function(){ // on success
-            stompClient.subscribe("/topic/master", stompSuccessCallback );
+        (<Stomp.Client>stompClient).debug = null;
+        (<Stomp.Client>stompClient).connect("guest", "guest", function(){ // on success
+            (<Stomp.Client>stompClient).subscribe("/topic/master", stompSuccessCallback );
         }, stompFailureCallback, '/');
     };
 

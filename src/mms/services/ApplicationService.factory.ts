@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular'
 
 angular.module('mms')
 .factory('ApplicationService', ['$q', '$http', 'URLService', ApplicationService]);

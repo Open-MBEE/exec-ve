@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .factory('ArtifactService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService', ArtifactService]);
@@ -35,7 +35,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
      * @param {boolean} [edit=false] whether object to cache is for editing
      * @returns {object} cached object
      */
-    var cacheArtifact = function(reqOb, artifactOb, edit) {
+    var cacheArtifact = function(reqOb, artifactOb, edit?) {
         var requestCacheKey = getArtifactCacheKey(reqOb, artifactOb.id);
         var origResultCommit = artifactOb._commitId;
         if (reqOb.commmitId === 'latest') {
@@ -270,7 +270,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
     //     return deferred.promise;
     // };
 
-    var getArtifactCacheKey = function(reqOb, id, edit) {
+    var getArtifactCacheKey = function(reqOb, id?, edit?) {
         var refId = !reqOb.refId ? 'master' : reqOb.refId;
         var commitId = !reqOb.commitId ? 'latest' : reqOb.commitId;
         var artifactId = id ? id : reqOb.artifactId;

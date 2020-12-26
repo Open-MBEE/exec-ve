@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsButtonBar', ['$templateCache', mmsButtonBar]);
@@ -56,8 +56,10 @@ function mmsButtonBar($templateCache) {
             };
 
             api.getToggleState = function (id) {
-                var buttonTemp = {};
-                buttonTemp.toggle_state = false;
+                var buttonTemp = {
+                    toggle_state: false
+                };
+                //buttonTemp.toggle_state = false;
 
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id) {

@@ -1,0 +1,3 @@
+#Bundle Builders
+src/mms/services/([a-zA-Z.]*)\.ts
+import "./$1";
