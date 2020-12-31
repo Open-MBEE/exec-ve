@@ -1,4 +1,44 @@
-'use strict';
+import * as angular from 'angular';
+
+
+// let mmsToolbarComponent = {
+// 	selector: 'mmsToolbar', //<mms-toolbar>
+// 	template: `
+// 	<div class="right-toolbar">
+//     <div class="toolbox">
+//         <div ng-repeat="button in buttons | filter: {active: true, permission: true} | orderBy:'priority'">
+//             <a class="tools {{button.id}}"
+//                ng-class="{selected: button.selected, dynamic: button.dynamic, pulldown: button.pullDown}"
+//                ng-click="clicked(button)" uib-tooltip="{{button.tooltip}}" tooltip-trigger="mouseenter"
+//                tooltip-popup-delay="100" tooltip-placement="left" tooltip-append-to-body="true"><i
+//                 class="fa {{button.icon}}"></i></a>
+//         </div>
+//     </div>
+// </div>
+// 	`,
+// 	bindings: {
+// 		buttons: '<',
+// 		mmsTbApi: '<',
+// 		onClick: '&',
+// 		direction: '@'
+// 	},
+// 	controller: class MMSToolbar {
+// 		buttons = [];
+// 		mmsTbApi;
+// 		onClick;
+// 		direction;
+// 		MMSToolbarService;
+
+// 		constructor(buttons, onClick, direction, mmsTbApi, MMSToolbarService) {
+// 			this.buttons=buttons;
+// 			this.mmsTbApi=mmsTbApi;
+// 			this.onClick=onClick;
+// 			this.direction=direction;
+// 			this.MMSToolbarService = MMSToolbarService;
+// 		}
+
+// 	}
+// }
 
 angular.module('mms.directives').directive('mmsToolbar', ['$templateCache', '$rootScope', mmsToolbar]);
 

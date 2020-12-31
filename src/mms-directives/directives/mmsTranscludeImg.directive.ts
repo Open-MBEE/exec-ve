@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsTranscludeImg', ['ArtifactService','AuthService','ElementService','URLService','growl', mmsTranscludeImg]);

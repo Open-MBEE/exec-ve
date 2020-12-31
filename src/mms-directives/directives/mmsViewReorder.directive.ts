@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsViewReorder', ['ElementService', 'ViewService', '$templateCache', 'growl', '$q', '_', mmsViewReorder]);
@@ -111,7 +111,8 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                     _refId: elementReference.instanceSpecification._refId,
                     type: elementReference.instanceSpecification.type,
                     specification: {
-                        type: "Expression"
+                        type: "Expression",
+                        operand: null
                     }
                 };
                 //sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
@@ -141,7 +142,10 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 //_modified: scope.view._modified,
                 _projectId: scope.view._projectId,
                 _refId: scope.view._refId,
-                type: scope.view.type
+                type: scope.view.type,
+                _contents: null,
+                specification: null,
+                view2view: null
             };
             //viewEdit.specialization = _.cloneDeep(scope.view.specialization);
             if (scope.view._contents)

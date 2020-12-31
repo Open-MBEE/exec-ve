@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .factory('VizService', ['$q', '$http', 'URLService', 'CacheService', 'UtilsService', 'AuthService', VizService]);

@@ -1,40 +1,43 @@
-src/mms-directives/directives/mmsAnnotation.directive.ts
-src/mms-directives/directives/mmsButtonBar.directive.ts
-src/mms-directives/directives/mmsCf.directive.ts
-src/mms-directives/directives/mmsCkEditor.directive.ts
-src/mms-directives/directives/mmsDiagramBlock.directive.ts
-src/mms-directives/directives/mmsDiffAttr.directive.ts
-src/mms-directives/directives/mmsGroupDocs.directive.ts
-src/mms-directives/directives/mmsHistory.directive.ts
-src/mms-directives/directives/mmsHtmlDiff.directive.ts
-src/mms-directives/directives/mmsJobs.directive.ts
-src/mms-directives/directives/mmsMaturityBar.directive.ts
-src/mms-directives/directives/mmsMention.directive.ts
-src/mms-directives/directives/mmsRefList.directive.ts
-src/mms-directives/directives/mmsSearch.directive.ts
-src/mms-directives/directives/mmsSpec.directive.ts
-src/mms-directives/directives/mmsToolbar.directive.ts
-src/mms-directives/directives/mmsTranscludeArt.directive.ts
-src/mms-directives/directives/mmsTranscludeCom.directive.ts
-src/mms-directives/directives/mmsTranscludeDoc.directive.ts
-src/mms-directives/directives/mmsTranscludeImg.directive.ts
-src/mms-directives/directives/mmsTranscludeName.directive.ts
-src/mms-directives/directives/mmsTranscludeVal.directive.ts
-src/mms-directives/directives/mmsTree.directive.ts
-src/mms-directives/directives/mmsTsDiagram.directive.ts
-src/mms-directives/directives/mmsValueLink.directive.ts
-src/mms-directives/directives/mmsView.directive.ts
-src/mms-directives/directives/mmsViewEquation.directive.ts
-src/mms-directives/directives/mmsViewFigure.directive.ts
-src/mms-directives/directives/mmsViewImg.directive.ts
-src/mms-directives/directives/mmsViewLink.directive.ts
-src/mms-directives/directives/mmsViewList.directive.ts
-src/mms-directives/directives/mmsViewListT.directive.ts
-src/mms-directives/directives/mmsViewPara.directive.ts
-src/mms-directives/directives/mmsViewPlot.directive.ts
-src/mms-directives/directives/mmsViewPresentationElem.directive.ts
-src/mms-directives/directives/mmsViewReorder.directive.ts
-src/mms-directives/directives/mmsViewSection.directive.ts
-src/mms-directives/directives/mmsViewTable.directive.ts
-src/mms-directives/directives/mmsViewTableT.directive.ts
-src/mms-directives/directives/ngDropdownMultiselect.directive.ts
+import "./charts"
+import "./templates"
+
+import "./mmsAnnotation.directive";
+import "./mmsButtonBar.directive";
+import "./mmsCf.directive";
+import "./mmsCkEditor.directive";
+import "./mmsDiagramBlock.directive";
+import "./mmsDiffAttr.directive";
+import "./mmsGroupDocs.directive";
+import "./mmsHistory.directive";
+import "./mmsHtmlDiff.directive";
+import "./mmsJobs.directive";
+import "./mmsMaturityBar.directive";
+import "./mmsMention.directive";
+import "./mmsRefList.directive";
+import "./mmsSearch.directive";
+import "./mmsSpec.directive";
+import "./mmsToolbar.directive";
+import "./mmsTranscludeArt.directive";
+import "./mmsTranscludeCom.directive";
+import "./mmsTranscludeDoc.directive";
+import "./mmsTranscludeImg.directive";
+import "./mmsTranscludeName.directive";
+import "./mmsTranscludeVal.directive";
+import "./mmsTree.directive";
+import "./mmsTsDiagram.directive";
+import "./mmsValueLink.directive";
+import "./mmsView.directive";
+import "./mmsViewEquation.directive";
+import "./mmsViewFigure.directive";
+import "./mmsViewImg.directive";
+import "./mmsViewLink.directive";
+import "./mmsViewList.directive";
+import "./mmsViewListT.directive";
+import "./mmsViewPara.directive";
+import "./mmsViewPlot.directive";
+import "./mmsViewPresentationElem.directive";
+import "./mmsViewReorder.directive";
+import "./mmsViewSection.directive";
+import "./mmsViewTable.directive";
+import "./mmsViewTableT.directive";
+import "./ngDropdownMultiselect.directive";

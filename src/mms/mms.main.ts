@@ -1,3 +1,5 @@
 
+import "angular"
 
-import "./mms.module.ts"
+import "./services"
+import "./mms.module"

@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsDiagramBlock', ['go', 'growl', 'ElementService', mmsDiagramBlock]);
@@ -29,7 +29,13 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
           if (elem.type === 'Element') {
 
-            var node = { key: elem.id ,iskey: true, figure: "Decision", label: elem.name, children: [] };
+            var node = { 
+              key: elem.id ,
+              iskey: true, 
+              figure: "Decision", 
+              label: elem.name, 
+              parent: '',
+              children: [] };
             
             // does it have an owner and is the owner a member of this model?
             if (elem.hasOwnProperty('ownerId') && 
@@ -77,7 +83,13 @@ function mmsDiagramBlock(go, growl, ElementService) {
         for (i = 0; i < graph.nodes.length; i++) {
           elem = graph.nodes[i];
 
-          var diagramNode = { key: elem.key, text: elem.label, color: "lightblue"};
+          var diagramNode = { 
+            key: elem.key, 
+            text: elem.label, 
+            color: "lightblue",
+            group: null,
+            isGroup: false
+          };
 
           /*var diagramNode = 
                     

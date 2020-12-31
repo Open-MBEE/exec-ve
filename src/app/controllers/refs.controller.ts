@@ -1,3 +1,4 @@
+import * as angular from 'angular';
 'use strict';
 
 /* Controllers */
@@ -212,11 +213,15 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
             var promise, ts;
             // Item specific promise:
             if ($scope.itemType === 'Branch' && $scope.branch.name !== '') {
-                var branchObj = {"name": $scope.branch.name, "type": "Branch",
-                                "description": $scope.branch.description};
-                branchObj.parentRefId = $scope.createParentRefId;
-                branchObj.permission = $scope.branch.permission;
-                branchObj.id = ApplicationService.createUniqueId();
+                var branchObj = {
+                    name: $scope.branch.name,
+                    type: "Branch",
+                    description: $scope.branch.description,
+                    parentRefId: $scope.createParentRefId,
+                    permission: $scope.branch.permission,
+                    id: ApplicationService.createUniqueId(),
+                    parentCommitId: ''
+                };
                 if (!$scope.branch.lastCommit) {
                     // Make call to history?maxTimestamp to get closest commit id to branch off
                     ts = $filter('date')($scope.branch.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
@@ -231,10 +236,14 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
                     handlePromise(promise);
                 }
             } else if ($scope.itemType === 'Tag' && $scope.tag.name !== '') {
-                var tagObj = {"name": $scope.tag.name, "type": "Tag",
-                                "description": $scope.tag.description};
-                tagObj.parentRefId =  $scope.createParentRefId;
-                tagObj.id = ApplicationService.createUniqueId();
+                var tagObj = {
+                        name: $scope.tag.name, 
+                        type: "Tag",
+                        description: $scope.tag.description,
+                        parentRefId:  $scope.createParentRefId,
+                        id: ApplicationService.createUniqueId(),
+                        parentCommitId: ''
+                    };
                 if (!$scope.tag.lastCommit) {
                     ts = $filter('date')($scope.tag.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
                     ProjectService.getRefHistory(tagObj.parentRefId, projectOb.id, ts)

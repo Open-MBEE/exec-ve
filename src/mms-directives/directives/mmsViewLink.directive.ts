@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', 'ApplicationService', mmsViewLink]);

@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '$animate', '$uibModal', '_', mmsHistory]);

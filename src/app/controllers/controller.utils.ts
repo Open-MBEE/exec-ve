@@ -1,3 +1,4 @@
+import * as angular from 'angular';
 'use strict';
 
 angular.module('mmsApp')
@@ -65,13 +66,13 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                var tableCSV = [];
                // Grab all tables and run export to csv fnc
                 angular.element('#print-div').find("table").each(function(elt){
-                    var tableObj = {};
+                    var tableObj = {
+                        caption: 'no caption',
+                        val: angular.element(this).table2CSV({delivery:'value'})
+                    };
                     if (this.caption) {
                         tableObj.caption = this.caption.innerHTML;
-                    } else {
-                        tableObj.caption = 'no caption';
                     }
-                    tableObj.val = angular.element(this).table2CSV({delivery:'value'});
                     tableCSV.push(tableObj);
                 });
                 var exportPopup = function(data) {
@@ -178,8 +179,12 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                 $scope.saveStyleUpdate = function() {
                     // To only update _printCss, create new ob with doc info
                     $scope.elementSaving = true;
-                    var docOb = {id: viewOrDocOb.id, _projectId: viewOrDocOb._projectId, _refId: viewOrDocOb._refId};
-                    docOb._printCss = $scope.customizeDoc.customCSS;
+                    var docOb = {
+                        id: viewOrDocOb.id, 
+                        _projectId: viewOrDocOb._projectId, 
+                        _refId: viewOrDocOb._refId,
+                        _printCss: $scope.customizeDoc.customCSS
+                    };
                     ElementService.updateElement(docOb).then(function() {
                         $scope.elementSaving = false;
                         growl.success('Save Successful');
@@ -381,17 +386,17 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         //printElementCopy.find('.MJX_Assistive_MathML').remove(); //pdf generation need mathml version
 
         // Get doc cover page by doc ID
-        var cover = '';
+        var coverHtml = '';
         if (isDoc) {
-            cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
+            var cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
             cover.remove();
             // Add class to style cover page
             cover.addClass('ve-cover-page');
-            cover = cover[0].outerHTML;
+            coverHtml = cover[0].outerHTML;
         }
         printContents = printElementCopy[0].outerHTML;
 
-        return { cover: cover, contents: printContents, toc: toc, tof: tof, tot: tot, toe: toe };
+        return { cover: coverHtml, contents: printContents, toc: toc, tof: tof, tot: tot, toe: toe };
     };
 
     var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen) {

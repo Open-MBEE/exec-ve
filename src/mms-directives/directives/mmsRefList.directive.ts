@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsRefList', ['$templateCache', '$http', 'growl', '_', '$q', '$uibModal',

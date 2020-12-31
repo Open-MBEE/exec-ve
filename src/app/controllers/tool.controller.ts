@@ -1,3 +1,6 @@
+import { ElementObject } from '../../lib/elementOb';
+import * as angular from 'angular';
+
 'use strict';
 
 /* Controllers */
@@ -100,7 +103,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         showPane('tags');
     });
 
-    var cleanUpEdit = function(editOb, cleanAll) {
+    var cleanUpEdit = function(editOb, cleanAll?) {
         if (!Utils.hasEdits(editOb) || cleanAll) {
             var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
             delete $rootScope.ve_edits[key];
@@ -122,7 +125,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         cleanUpEdit(editOb);
     });
 
-    var elementSelected = function(event, elementOb, commitId, displayOldContent) {
+    var elementSelected = function(event, elementOb, commitId, displayOldContent?) {
         $scope.specInfo.id = elementOb.id;
         $scope.specInfo.projectId = elementOb._projectId;
         $scope.specInfo.refId = elementOb._refId;
@@ -255,7 +258,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             return;
         }
 
-        Object.values(ve_edits).forEach(function(ve_edit) {
+        Object.values(ve_edits).forEach(function(ve_edit: ElementObject) {
            Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
         });
 
@@ -275,7 +278,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
 
             }, function(responses) {
                 // reset the last edit elementOb to one of the existing element
-                var elementToSelect = Object.values($rootScope.ve_edits)[0];
+                var elementToSelect = (<ElementObject> Object.values($rootScope.ve_edits)[0]);
                 $scope.tracker.etrackerSelected = elementToSelect.id + '|' + elementToSelect._projectId + '|' + elementToSelect._refId;
                 $scope.specApi.keepMode();
                 $scope.specInfo.id = elementToSelect.id;

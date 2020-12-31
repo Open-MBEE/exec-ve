@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 var directiveModule = angular.module('angularjs-dropdown-multiselect', []);
 

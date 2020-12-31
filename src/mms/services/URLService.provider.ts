@@ -1,18 +1,27 @@
 import * as angular from 'angular';
 
+class URLServiceProvider {
+    private baseUrl = '/alfresco/service';
+    private mmsUrl = '';
+
+    constructor() {
+    };
+
+    setBaseUrl(base) {
+        this.baseUrl = base;
+    };
+
+    setMmsUrl(mms) {
+        this.mmsUrl = mms;
+      };
+
+    $get() {
+        return urlService(this.baseUrl,this.mmsUrl);
+    }
+};
+
 angular.module('mms')
-.provider('URLService', function URLServiceProvider() {
-  var baseUrl = '/alfresco/service';
-  var mmsUrl = '';
-  this.setBaseUrl = function(base) {
-    baseUrl = base;
-  };
-  this.setMmsUrl = function(mms) {
-    mmsUrl = mms;
-  };
-  this.$get = [function URLServiceFactory() {
-    return urlService(baseUrl, mmsUrl);
-  }];
+.provider('URLService', URLServiceProvider)
 //     var initInjector = angular.injector(['ng']);
 //     var $http = initInjector.get('$http');
 //     var $scope = initInjector.get('$scope');

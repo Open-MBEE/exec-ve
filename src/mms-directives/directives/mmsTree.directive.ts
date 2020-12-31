@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter', 'UtilsService', mmsTree]);
@@ -121,7 +121,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             return;
         }
 
-        var for_each_branch = function(func, excludeBranch) {
+        var for_each_branch = function(func, excludeBranch?) {
             var run = function(branch, level) {
                 func(branch, level);
                 if (branch.children) {
@@ -211,7 +211,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
          *
          * @param {Object} branch branch to select
          */
-        var select_branch = function(branch, noClick) {
+        var select_branch = function(branch, noClick?) {
             if (!branch) {
                 if (selected_branch)
                     selected_branch.selected = false;
@@ -242,7 +242,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                 if (branch.data.id) {
                     $timeout(function() {
                         var el = angular.element('#tree-branch-' + branch.data.id);
-                        if (!el.isOnScreen()) {
+                        if (!(<JQueryIsOnScreen>el).isOnScreen()) {
                             el.get(0).scrollIntoView();
                         }
                     }, 500, false);

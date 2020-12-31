@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
@@ -85,7 +85,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
             e.stopPropagation();
         });
 
-        var recompile = function(preview) {
+        var recompile = function(preview?) {
             if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
             }

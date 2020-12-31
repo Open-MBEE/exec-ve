@@ -1,3 +1,5 @@
+import * as angular from 'angular';
+import { any } from 'angular-ui-router';
 'use strict';
 
 /* Controllers */
@@ -321,7 +323,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeData = [viewId2node[documentOb.id]];
     }
 
-    function addSectionElements(element, viewNode, parentNode, initial) {
+    function addSectionElements(element, viewNode, parentNode, initial?) {
         var contents = null;
 
         var addContentsSectionTreeNode = function(operand) {
@@ -574,7 +576,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 label: data.name,
                 type: newBranchType,
                 data: data,
-                children: []
+                children: [],
+                aggr: null,
             };
             var top = itemType === 'Group' ? true : false;
             $scope.treeApi.add_branch(branch, newbranch, top);
@@ -683,8 +686,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
 
 
         var queryFilter = function() {
-            var obj = {};
-            obj.terms = {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)};
+            var obj = {
+                terms: {'_appliedStereotypeIds': [UtilsService.VIEW_SID, UtilsService.DOCUMENT_SID].concat(UtilsService.OTHER_VIEW_SID)}
+            };
             return obj;
         };
 

@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsViewTable', ['$compile', '$timeout', '$document', '$window', 'UtilsService', 'Utils', mmsViewTable]);
@@ -135,9 +135,9 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
                         return;
                     }
                     data = data.add($(this));
-                    var rowspan = $(this).attr('rowspan');
-                    if (rowspan) {
-                        rowspan = parseInt(rowspan);
+                    var rowstring = $(this).attr('rowspan');
+                    if (rowstring) {
+                        var rowspan = parseInt(rowstring);
                         if (rowspan > 1) {
                             for (var i = 1; i < rowspan; i++) {
                                 if (!spanData[curRow + i]) {
@@ -147,12 +147,12 @@ function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Util
                             }
                         }
                     }
-                    var colspan = $(this).attr('colspan');
-                    if (!colspan) {
+                    var colstring = $(this).attr('colspan');
+                    if (!colstring) {
                         curCol++;
                         return;
                     }
-                    colspan = parseInt(colspan);
+                    var colspan = parseInt(colstring);
                     while (colspan > 1) {
                         curCol++;
                         colspan--;

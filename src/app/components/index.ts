@@ -1,0 +1,1 @@
+import "./toolbar.component"

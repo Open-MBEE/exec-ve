@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', 'ViewService', mmsTranscludeName]);
@@ -58,7 +58,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             e.stopPropagation();
         });
 
-        var recompile = function(preview) {
+        var recompile = function(preview?) {
             if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
             }

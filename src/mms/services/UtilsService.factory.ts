@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .factory('UtilsService', ['$q', '$http', 'CacheService', 'URLService', 'ApplicationService', '_', UtilsService]);
@@ -234,11 +234,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         if (forEdit) { //only keep editable or needed keys in edit object instead of everything
             var keys = Object.keys(elem);
-            for (i in keys) {
-                if (editKeys.indexOf(keys[i]) >= 0) {
+            for (var keyIndex in keys) {
+                if (editKeys.indexOf(keys[keyIndex]) >= 0) {
                     continue;
                 }
-                delete elem[keys[i]];
+                delete elem[keys[keyIndex]];
             }
         }
         return elem;
@@ -485,7 +485,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} isSortable table content
      * @returns {string} generated html string
      */
-    var makeHtmlTable = function(table, isFilterable, isSortable, pe) {
+    var makeHtmlTable = function(table, isFilterable?, isSortable?, pe?) {
         var result = ['<table class="table-bordered table-condensed ' + (table.style ? table.style : '') + '">'];
         if (table.colwidths && table.colwidths.length > 0) {
             result.push('<colgroup>');
@@ -566,7 +566,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} isSortable is sortable
      * @returns {string} generated html string
      */
-    var makeTableBody = function(body, isHeader, isFilterable, isSortable) {
+    var makeTableBody = function(body, isHeader, isFilterable?, isSortable?) {
         if ( isHeader && (isFilterable || isSortable ) ) {
             _generateRowColNumber(body);
         }
@@ -721,7 +721,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} skip skip adding li for this branch
      * @returns {string} toc string
      */
-    var makeHtmlTOCChild = function(branch, skip) {
+    var makeHtmlTOCChild = function(branch, skip?) {
         var result = '';
         var child;
         if (!skip) {

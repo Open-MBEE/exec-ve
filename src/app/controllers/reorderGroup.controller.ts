@@ -1,3 +1,5 @@
+import * as angular from 'angular';
+
 'use strict';
 
 angular.module('mmsApp')

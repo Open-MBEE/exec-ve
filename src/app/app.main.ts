@@ -1,3 +1,6 @@
 
+import "./components"
+import "./controllers"
+import "./directives"
 
-import "./app.routes.ts"
+import "./app.module"

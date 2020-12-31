@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsTsDiagram', ['ElementService', '$templateCache', '$window', '$timeout', 'growl', 'ApplicationService', 'AuthService', 'URLService', mmsTsDiagram]);

@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms')
 .factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
@@ -286,12 +286,11 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 _projectId: data._projectId,
                 _refId: data._refId,
                 //_modified: data._modified,
-                id: data.id
+                id: data.id,
+                _childViews: []
             };
             if (data._childViews) {
                 clone._childViews = JSON.parse(JSON.stringify(data._childViews));
-            } else {
-                clone._childViews = [];
             }
             clone._childViews.push({id: reqOb.viewId, aggregation: reqOb.aggr});
             ElementService.updateElement(clone, true)
@@ -636,7 +635,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {string} peDoc optional documentation to set for pe creation
      * @returns {Promise} The promise will be resolved with the new view.
      */
-    var createView = function(ownerOb, viewOb, peDoc) {
+    var createView = function(ownerOb, viewOb, peDoc?) {
         var deferred = $q.defer();
 
         var newViewId = viewOb.viewId ? viewOb.viewId : UtilsService.createMmsId();
@@ -858,16 +857,15 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             _refId: elementOb._refId,
             _appliedStereotypeIds: elementOb._appliedStereotypeIds,
             appliedStereotypeInstanceId: elementOb.appliedStereotypeInstanceId,
-            _isGroup: elementOb._isGroup
+            _isGroup: elementOb._isGroup,
+            classifierIds: null
         };
         var toUpdate = [updatedElement];
         if (updatedElement.appliedStereotypeInstanceId !== null) {
-            toUpdate.push({
-                id: elementOb.id + '_asi', 
-                _refId: elementOb._refId, 
-                _projectId: elementOb._projectId,
-                classifierIds: updatedElement._appliedStereotypeIds
-            });
+            toUpdate[0].id = elementOb.id + '_asi';
+            toUpdate[0]._refId = elementOb._refId;
+            toUpdate[0]._projectId = elementOb._projectId;
+            toUpdate[0].classifierIds = updatedElement._appliedStereotypeIds;
         } else {
             $http.delete(URLService.getElementURL({
                 elementId: elementOb.id + '_asi', 
@@ -977,7 +975,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of tree node objects
      */
-    var getElementReferenceTree = function(reqOb, contents, weight) {
+    var getElementReferenceTree = function(reqOb, contents, weight?) {
         var promises = [];
         for (var i = 0; i < contents.operand.length; i++) {
             promises.push(getElementReference(reqOb, contents.operand[i], weight));
@@ -988,10 +986,14 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getElementReference = function(reqOb, instanceVal, weight) {
         var deferred = $q.defer();
 
-        var elementObject = {};
-        elementObject.instanceId = instanceVal.instanceId;
-        elementObject.instanceVal = instanceVal;
-        elementObject.sectionElements = [];
+        var elementObject = {
+            instanceId: instanceVal.instanceId,
+            instanceVal: instanceVal,
+            sectionElements: [],
+            instanceSpecification: [],
+            isOpaque: false,
+            presentationElement: []
+        };
 
         var req = JSON.parse(JSON.stringify(reqOb));
         req.elementId = instanceVal.instanceId;
@@ -1002,8 +1004,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     instanceSpecification.classifierIds.length > 0 && 
                     opaqueClassifiers.indexOf(instanceSpecification.classifierIds[0]) >= 0) {
                 elementObject.isOpaque = true;
-            } else {
-                elementObject.isOpaque = false;
             }
             var presentationElement = getPresentationElementSpec(instanceSpecification);
             elementObject.presentationElement = presentationElement;
@@ -1124,7 +1124,16 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      */
     var getDocMetadata = function(reqOb, weight) {
         var deferred = $q.defer();
-        var metadata = {numberingDepth: 0, numberingSeparator: '.'};
+        var metadata = {
+            numberingDepth: 0, 
+            numberingSeparator: '.',
+            top: null,
+            topl: null,
+            topr: null,
+            bottom: null,
+            bottoml: null,
+            bottomr: null,
+        };
         reqOb.elementIds = [
             reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234342817_186479_2256', //header
             reqOb.elementId + '_asi-slot-_17_0_1_407019f_1326234349580_411867_2258', //footer

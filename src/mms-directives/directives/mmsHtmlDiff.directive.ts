@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
     .directive('mmsHtmlDiff', ['$templateCache', '$timeout', 'MathJax', 'HtmlRenderedDiff', mmsHtmlDiff]);

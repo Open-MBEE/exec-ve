@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
@@ -88,7 +88,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             obj.value = parseInt(obj.value);
         };
 
-        var recompile = function(preview) {
+        var recompile = function(preview?) {
             if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
             }

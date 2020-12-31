@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsJobs', ['$templateCache', '$http', '$location', '$window', 'growl', '_', '$q', '$rootScope',

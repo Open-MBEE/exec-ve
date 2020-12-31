@@ -1,4 +1,4 @@
-'use strict';
+import * as angular from 'angular';
 
 angular.module('mms.directives')
 .directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '$templateCache', '$q', 'ElementService', mmsDiffAttr]);

@@ -1,3 +1,5 @@
+import * as angular from 'angular';
+
 'use strict';
 
 /* Controllers */
@@ -102,7 +104,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
         saving = true;
         $scope.saveClass = "fa fa-spin fa-spinner";
         var toSave = [];
-        angular.forEach(viewIds2node, function(node, id) {
+        angular.forEach(viewIds2node, function(node: { aggr: string, children : any[]}, id) {
             if (node.aggr == 'none') {//cannot process views whose aggr is none since their children are not shown
                 return;
             }
