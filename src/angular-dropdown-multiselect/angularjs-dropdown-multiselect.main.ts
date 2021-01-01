@@ -1,0 +1,1 @@
+import "./angularjs-dropdown-multiselect.module"

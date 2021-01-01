@@ -208,7 +208,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
      * @param {object} editOb scope with common properties
      * @param {object} editorApi editor api to kill editor if reverting changes
      */
-    var revertEdits = function(scope, editOb, editorApi) {
+    var revertEdits = function(scope, editOb, editorApi?) {
         if (editorApi && editorApi.destroy) {
             editorApi.destroy();
         }
@@ -722,7 +722,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         };
 
         var peFilterQuery = function () {
-            var classIdOb = {};
+            var classIdOb = {
+                classifierIds: []
+            };
             if ($scope.presentationElemType === 'Table') {
                 classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.TableT, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
             } else if ($scope.presentationElemType === 'List') {
@@ -736,8 +738,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             } else {
                 classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]];
             }
-            var obj = {};
-            obj.terms = classIdOb;
+            var obj = {
+                terms: classIdOb
+            };
             return obj;
         };
 
@@ -900,7 +903,15 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                         return;
                     }
                     $scope.oking = true;
-                    var revertEltInfo = {id: $scope.mmsElementId, _projectId : $scope.mmsProjectId, _refId: $scope.mmsRefId};
+                    var revertEltInfo = {
+                        id: $scope.mmsElementId,
+                        name: null,
+                        documentation: null,
+                        _projectId : $scope.mmsProjectId,
+                        _refId: $scope.mmsRefId,
+                        defaultValue: null,
+                        value: null
+                    };
                     var reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.baseCommit.refSelected.id, commitId: $scope.baseCommit.commitSelected.id};
                     ElementService.getElement(reqOb, 2, false)
                     .then(function(data) {

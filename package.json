@@ -11,7 +11,7 @@
     "rimraf": "^2.6.2",
     "serve": "^5.1.2",
     "ts-loader": "^3.2.0",
-    "typescript": "^3.9.7",
+    "typescript": "^2.6.2",
     "webpack": "^3.10.0"
   },
   "dependencies": {
