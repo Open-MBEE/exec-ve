@@ -242,7 +242,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                 if (branch.data.id) {
                     $timeout(function() {
                         var el = angular.element('#tree-branch-' + branch.data.id);
-                        if (!(<JQueryIsOnScreen>el).isOnScreen()) {
+                        if (!el.isOnScreen()) {
                             el.get(0).scrollIntoView();
                         }
                     }, 500, false);

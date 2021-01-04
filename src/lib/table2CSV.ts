@@ -1,4 +1,5 @@
 
+import * as jQuery from 'jquery';
 
 jQuery.fn.table2CSV = function(inputOptions) {
     var options = jQuery.extend({

@@ -374,6 +374,8 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
                 break;
             case 'ListT':
+                // @ts-ignore
+                // TODO: Figure out why this doesnt work in typescript or how to make it work
                 thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, equationToolbar, 'mmsExtraFeature', clipboardToolbar, editingToolbar, sourceToolbar];
                 break;
             case 'Equation':

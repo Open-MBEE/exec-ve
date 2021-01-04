@@ -1,5 +1,5 @@
 import * as angular from 'angular';
-import * as $ from 'jquery';
+import $ from 'jquery';
 
 angular.module('mms')
     .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', 'UtilsService' , MentionService]);

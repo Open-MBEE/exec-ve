@@ -70,8 +70,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                         caption: 'no caption',
                         val: angular.element(this).table2CSV({delivery:'value'})
                     };
-                    if (this.caption) {
-                        tableObj.caption = this.caption.innerHTML;
+                    if ((<HTMLTableElement> this).caption) {
+                        tableObj.caption = (<HTMLTableElement> this).caption.innerHTML;
                     }
                     tableCSV.push(tableObj);
                 });

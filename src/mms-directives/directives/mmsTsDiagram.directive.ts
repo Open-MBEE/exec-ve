@@ -311,60 +311,59 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         var updateCommand = {
             "command": "Group",
             "onsuccess": "onPerspectivesCommandSuccess",
-            "data": [
-                {
-                    "command": "Custom",
-                    "data": {
-                        "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                        "args": ["int-add-" + id, URLService.getMmsServer() + URLService.getRoot()],
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    }
-                }, 
-                {
-                    "command": "SetModelAttribute",
-                    "data": {
-                        "attributeName": "Ticket",
-                        "attributeValue": AuthService.getToken(),
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    },
-                    "onfailure": "onPerspectivesCommandFailure",
-                },
-                {
-                    "command": "SetModelAttribute",
-                    "data": {
-                        "attributeName": "MMSRefId",
-                        "attributeValue": scope.mmsRefId,
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    },
-                    "onfailure": "onPerspectivesCommandFailure",
-                },
-                {
-                    "command": "SetModelAttribute",
-                    "data": {
-                        "attributeName": "MMSProjectId",
-                        "attributeValue": scope.mmsProjectId,
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
-                    },
-                    "onfailure": "onPerspectivesCommandFailure",
-                }
-            ]
+            "data": []
         };
+        updateCommand.data.push({
+              "command": "Custom",
+              "data": {
+                  "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
+                  "args": ["int-add-" + id, URLService.getMmsServer() + URLService.getRoot()],
+                  "modelID": 'model-' + id,
+                  "module": "SysML",
+                  "project": id,
+                  "viewID": "view-" + id,
+                  "viewName": viewName
+              }
+          },
+          {
+              "command": "SetModelAttribute",
+              "data": {
+                  "attributeName": "Ticket",
+                  "attributeValue": AuthService.getToken(),
+                  "modelID": 'model-' + id,
+                  "module": "SysML",
+                  "project": id,
+                  "viewID": "view-" + id,
+                  "viewName": viewName
+              },
+              "onfailure": "onPerspectivesCommandFailure",
+          },
+          {
+              "command": "SetModelAttribute",
+              "data": {
+                  "attributeName": "MMSRefId",
+                  "attributeValue": scope.mmsRefId,
+                  "modelID": 'model-' + id,
+                  "module": "SysML",
+                  "project": id,
+                  "viewID": "view-" + id,
+                  "viewName": viewName
+              },
+              "onfailure": "onPerspectivesCommandFailure",
+          },
+          {
+              "command": "SetModelAttribute",
+              "data": {
+                  "attributeName": "MMSProjectId",
+                  "attributeValue": scope.mmsProjectId,
+                  "modelID": 'model-' + id,
+                  "module": "SysML",
+                  "project": id,
+                  "viewID": "view-" + id,
+                  "viewName": viewName
+              },
+              "onfailure": "onPerspectivesCommandFailure",
+          });
         if (scope.context || (scope.initElements.length > 0)) {
             var initialIntegratorIds = [];
             if (scope.initElements.length > 0) {

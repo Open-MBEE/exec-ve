@@ -1,4 +1,4 @@
-import { ElementObject } from '../../lib/elementOb';
+import { ElementObject } from '../lib/elementOb';
 import * as angular from 'angular';
 
 'use strict';

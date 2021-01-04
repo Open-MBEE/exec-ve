@@ -1,6 +1,8 @@
+import $ from 'jquery';
+
 (function ($) {
 
-    $.fn.isOnScreen = function(x, y){
+    $.fn.isOnScreen = function(x?, y?){
 
         if(x == null || typeof x == 'undefined') x = 1;
         if(y == null || typeof y == 'undefined') y = 1;

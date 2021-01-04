@@ -1,10 +1,40 @@
 import * as angular from 'angular';
 
+interface NgDropdownMultiselectScope extends angular.IScope {
+    open;
+    externalEvents : any;
+    settings;
+    texts;
+    searchFilter;
+    orderedItems;
+    singleSelection;
+    selectedModel;
+    getGroupTitle;
+    extraSettings;
+    events;
+    translationTexts;
+    getButtonText;
+    options;
+
+
+    toggleDropdown() : void;
+    checkboxClick($event, id) : void;
+    setSelectedItem(id : string, dontRemove? : boolean) : void;
+    isChecked(id : string) : any | boolean;
+    getPropertyForObject(object, property) : any | string;
+
+    selectAll() : void;
+    deselectAll(sendEvent : boolean)
+
+}
+
 var directiveModule = angular.module('angularjs-dropdown-multiselect', []);
 
-directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$compile', '$parse', '_',
+// @ts-ignore
+// TODO: Figure out why this is failing ts type checking
+(<angular.IModule> directiveModule).directive('ngDropdownMultiselect', ['$filter', '$document', '$compile', '$parse', '_', ngDropdownMultiselect]);
 
-function ($filter, $document, $compile, $parse, _) {
+function ngDropdownMultiselect($filter, $document, $compile, $parse, _) {
 
     return {
         restrict: 'AE',
@@ -18,8 +48,8 @@ function ($filter, $document, $compile, $parse, _) {
             groupBy: '@'
         },
         template: function (element, attrs) {
-            var checkboxes = attrs.checkboxes ? true : false;
-            var groups = attrs.groupBy ? true : false;
+            var checkboxes = !!attrs.checkboxes;
+            var groups = !!attrs.groupBy;
 
             var template = '<div class="multiselect-parent btn-group dropdown-multiselect ve-light-dropdown" ng-value="getButtonText()">';
             template += '<button type="button" class="dropdown-toggle" ng-class="settings.buttonClasses" ng-click="toggleDropdown()">{{getButtonText()}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i></button>';
@@ -55,7 +85,7 @@ function ($filter, $document, $compile, $parse, _) {
 
             element.html(template);
         },
-        link: function ($scope, $element, $attrs) {
+        link: function ($scope : NgDropdownMultiselectScope, $element, $attrs) {
             var $dropdownTrigger = $element.children()[0];
 
             $scope.toggleDropdown = function () {
@@ -248,7 +278,7 @@ function ($filter, $document, $compile, $parse, _) {
                 }
             };
 
-            $scope.setSelectedItem = function (id, dontRemove) {
+            $scope.setSelectedItem = function (id, dontRemove?) {
                 var findObj = getFindObj(id);
                 var finalObj = null;
 
@@ -292,4 +322,4 @@ function ($filter, $document, $compile, $parse, _) {
             $scope.externalEvents.onInitDone();
         }
     };
-}]);
+}

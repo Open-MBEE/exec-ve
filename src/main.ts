@@ -1,3 +1,4 @@
+import 'jquery';
 import 'angular';
 import 'angular-animate';
 import 'angular-borderlayout';
@@ -14,13 +15,18 @@ import 'angulartics-piwik';
 import 'c3';
 import 'd3';
 //import 'font-awesome';
-import 'jquery';
 import 'lodash';
 import 'moment';
 import 'ngstorage';
 import 'stompjs';
 import 'vdomdiff';
 
+import "./lib"
 import "./mms/mms.main"
 import "./mms-directives/mms-directives.main"
-import "./app/app.main"
+
+import "./components"
+import "./controllers"
+import "./directives"
+
+import "./mms-app.main"
