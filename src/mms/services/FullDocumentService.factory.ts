@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-    .factory('FullDocumentService', ['$timeout', "$interval", '$http', '_', 'growl', FullDocumentService]);
+mms.factory('FullDocumentService', ['$timeout', "$interval", '$http', '_', 'growl', FullDocumentService]);
 
 function FullDocumentService($timeout, $interval, $http, _, growl) {
     return function (views) {

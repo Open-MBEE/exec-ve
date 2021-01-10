@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mms = angular.module('mms');
 
-angular.module('mms')
-    .factory('ShortenUrlService', ['$http', '$q', 'URLService', 'UtilsService', ShortenUrlService]);
+mms.factory('ShortenUrlService', ['$http', '$q', 'URLService', 'UtilsService', ShortenUrlService]);
 
 function ShortenUrlService($http, $q, URLService, UtilsService) {
 

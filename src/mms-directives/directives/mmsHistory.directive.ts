@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '$animate', '$uibModal', '_', mmsHistory]);
+mmsDirectives.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '$animate', '$uibModal', '_', mmsHistory]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsHistory
+ * @name mmsDirectives.directive:mmsHistory
  *
  * @requires mms.ElementService
  * @requires mms.ProjectService
@@ -65,8 +65,8 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsHistory#changeElement
-         * @methodOf mms.directives.directive:mmsHistory
+         * @name mmsDirectives.directive:mmsHistory#changeElement
+         * @methodOf mmsDirectives.directive:mmsHistory
          *
          * @description
          * Change scope history when another element is selected

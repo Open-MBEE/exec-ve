@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$window', 'UtilsService', 'Utils', mmsViewTable]);
+mmsDirectives.directive('mmsViewTable', ['$compile', '$timeout', '$document', '$window', 'UtilsService', 'Utils', mmsViewTable]);
 
 function mmsViewTable($compile, $timeout, $document, $window, UtilsService, Utils) {
 

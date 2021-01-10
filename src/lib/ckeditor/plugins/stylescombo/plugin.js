@@ -4,7 +4,7 @@
  */
 
 ( function() {
-	'use strict';
+
 
 	CKEDITOR.plugins.add( 'stylescombo', {
 		requires: 'richcombo',

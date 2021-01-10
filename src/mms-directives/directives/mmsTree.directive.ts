@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter', 'UtilsService', mmsTree]);
+mmsDirectives.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter', 'UtilsService', mmsTree]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsTree
+ * @name mmsDirectives.directive:mmsTree
  *
  * @requires $timeout
  * @requires $templateCache
@@ -46,7 +46,7 @@ angular.module('mms.directives')
  * ## Example 
  * ### controller (js)
  *  <pre>
-    angular.module('app', ['mms.directives'])
+    angular.module('app', ['mmsDirectives'])
     .controller('TreeCtrl', ['$scope', function($scope) {
         $scope.api = {}; //empty object to be populated by the spec api
         $scope.handler = function(branch) {
@@ -203,8 +203,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
         var selected_branch = null;
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsTree#select_branch
-         * @methodOf mms.directives.directive:mmsTree
+         * @name mmsDirectives.directive:mmsTree#select_branch
+         * @methodOf mmsDirectives.directive:mmsTree
          * 
          * @description 
          * self explanatory
@@ -451,8 +451,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             var tree = scope.treeControl;
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#expand_all
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#expand_all
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -466,8 +466,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#collapse_all
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#collapse_all
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -489,8 +489,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#get_selected_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#get_selected_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -517,8 +517,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#add_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#add_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -557,8 +557,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#expand_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#expand_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -579,8 +579,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#collapse_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#collapse_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -646,8 +646,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#get_next_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#get_next_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -670,8 +670,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#select_next_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#select_next_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -693,8 +693,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#get_prev_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#get_prev_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -710,8 +710,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#select_prev_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#select_prev_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * self explanatory
@@ -726,8 +726,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#refresh
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#refresh
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * rerender the tree when data or options change
@@ -746,8 +746,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsTree#get_branch
-             * @methodOf mms.directives.directive:mmsTree
+             * @name mmsDirectives.directive:mmsTree#get_branch
+             * @methodOf mmsDirectives.directive:mmsTree
              * 
              * @description 
              * Returns the branch with the specified data

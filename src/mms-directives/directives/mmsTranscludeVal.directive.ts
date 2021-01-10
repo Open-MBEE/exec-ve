@@ -1,12 +1,12 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
+mmsDirectives.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
     '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsTranscludeVal
+ * @name mmsDirectives.directive:mmsTranscludeVal
  *
  * @requires mms.ElementService
  * @requires mms.UtilsService

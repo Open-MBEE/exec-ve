@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mms = angular.module('mms');
 
-angular.module('mms')
-.factory('ProjectService', ['$q','$http','ApplicationService','CacheService','ElementService','URLService','_', ProjectService]);
+mms.factory('ProjectService', ['$q','$http','ApplicationService','CacheService','ElementService','URLService','_', ProjectService]);
 
 /**
  * @ngdoc service

@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsJobs', ['$templateCache', '$http', '$location', '$window', 'growl', '_', '$q', '$rootScope',
+mmsDirectives.directive('mmsJobs', ['$templateCache', '$http', '$location', '$window', 'growl', '_', '$q', '$rootScope',
         'AuthService', 'ElementService', 'ProjectService', 'UtilsService', 'JobService', mmsJobs]);
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsJobs
+ * @name mmsDirectives.directive:mmsJobs
  *
  * @requires $templateCache
  * @requires $http

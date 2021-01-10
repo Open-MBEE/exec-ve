@@ -1,6 +1,7 @@
-'use strict';
- angular.module('mms.directives')
-  .directive('mmsD3NormalizedStackedBarPlot', ['TableService','$window', mmsD3NormalizedStackedBarPlot]);
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
+
+mmsDirectives.directive('mmsD3NormalizedStackedBarPlot', ['TableService','$window', mmsD3NormalizedStackedBarPlot]);
   
   /**
   /* reference https://bl.ocks.org/mbostock/3886394

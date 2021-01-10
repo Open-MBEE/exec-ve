@@ -1,6 +1,7 @@
-'use strict';
- angular.module('mms.directives')
-    .directive('mmsD3ParallelAxisPlot', ['TableService', '$window', mmsD3ParallelAxisPlot]);
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
+
+mmsDirectives.directive('mmsD3ParallelAxisPlot', ['TableService', '$window', mmsD3ParallelAxisPlot]);
 function mmsD3ParallelAxisPlot(TableService,  $window) {
       
   var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {

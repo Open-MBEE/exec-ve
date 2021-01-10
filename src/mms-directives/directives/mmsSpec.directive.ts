@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService', '$templateCache', 'growl', '_', mmsSpec]);
+mmsDirectives.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService', '$templateCache', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsSpec
+ * @name mmsDirectives.directive:mmsSpec
  *
  * @requires mms.Utils
  * @required mms.URLService
@@ -31,7 +31,7 @@ angular.module('mms.directives')
  * ## Example spec with full edit (given permission)
  * ### controller (js)
  *  <pre>
-    angular.module('app', ['mms.directives'])
+    angular.module('app', ['mmsDirectives'])
     .controller('SpecCtrl', ['$scope', function($scope) {
         $scope.api = {}; //empty object to be populated by the spec api
         $scope.edit = function() {
@@ -114,8 +114,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSpec#changeElement
-         * @methodOf mms.directives.directive:mmsSpec
+         * @name mmsDirectives.directive:mmsSpec#changeElement
+         * @methodOf mmsDirectives.directive:mmsSpec
          *
          * @description
          * change element in the spec, this would reevaluate whether it's editable
@@ -225,8 +225,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSpec#revertEdits
-         * @methodOf mms.directives.directive:mmsSpec
+         * @name mmsDirectives.directive:mmsSpec#revertEdits
+         * @methodOf mmsDirectives.directive:mmsSpec
          *
          * @description
          * reset editing object back to base element values for name, doc, values
@@ -238,8 +238,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSpec#save
-         * @methodOf mms.directives.directive:mmsSpec
+         * @name mmsDirectives.directive:mmsSpec#save
+         * @methodOf mmsDirectives.directive:mmsSpec
          *
          * @description
          * save edited element
@@ -260,8 +260,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsSpec#hasEdits
-         * @methodOf mms.directives.directive:mmsSpec
+         * @name mmsDirectives.directive:mmsSpec#hasEdits
+         * @methodOf mmsDirectives.directive:mmsSpec
          *
          * @description
          * whether editing object has changes compared to base element,
@@ -280,8 +280,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
             var api = scope.mmsSpecApi;
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsSpec#toggleEditing
-             * @methodOf mms.directives.directive:mmsSpec
+             * @name mmsDirectives.directive:mmsSpec#toggleEditing
+             * @methodOf mmsDirectives.directive:mmsSpec
              *
              * @description
              * toggles editing
@@ -301,8 +301,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsSpec#setEditing
-             * @methodOf mms.directives.directive:mmsSpec
+             * @name mmsDirectives.directive:mmsSpec#setEditing
+             * @methodOf mmsDirectives.directive:mmsSpec
              *
              * @description
              * sets editing state
@@ -322,8 +322,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
             };
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsSpec#getEditing
-             * @methodOf mms.directives.directive:mmsSpec
+             * @name mmsDirectives.directive:mmsSpec#getEditing
+             * @methodOf mmsDirectives.directive:mmsSpec
              *
              * @description
              * get editing state
@@ -339,8 +339,8 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
             api.hasEdits = scope.hasEdits;
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsSpec#getEdits
-             * @methodOf mms.directives.directive:mmsSpec
+             * @name mmsDirectives.directive:mmsSpec#getEdits
+             * @methodOf mmsDirectives.directive:mmsSpec
              *
              * @description
              * get current edit object

@@ -1,7 +1,7 @@
 import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-.factory('ApplicationService', ['$q', '$http', 'URLService', ApplicationService]);
+mms.factory('ApplicationService', ['$q', '$http', 'URLService', ApplicationService]);
 
 /**
  * @ngdoc service

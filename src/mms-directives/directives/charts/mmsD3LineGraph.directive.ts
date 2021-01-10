@@ -1,13 +1,15 @@
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
+
 //not usable using stereotype <<Plot>> in mdk so commented out for now.
 /*
 (function() {
-  'use strict';
-  angular.module('mms.directives')
-    .directive('mmsLineGraph', ['TableService', '$window', '$q', '$log', mmsLineGraph]);
+
+ mmsDirectives.directive('mmsLineGraph', ['TableService', '$window', '$q', '$log', mmsLineGraph]);
 
   /**
    * @ngdoc directive
-   * @name mms.directives.directive:mmsLineGraph
+   * @name mmsDirectives.directive:mmsLineGraph
    * @restrict EA
    * @scope
    * @param {string} eid Element ID or comma separated IDs to table elements

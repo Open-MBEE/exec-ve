@@ -1,4 +1,5 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var angularjsDropdownMultiselect = angular.module('angularjs-dropdown-multiselect');
 
 interface NgDropdownMultiselectScope extends angular.IScope {
     open;
@@ -28,11 +29,9 @@ interface NgDropdownMultiselectScope extends angular.IScope {
 
 }
 
-var directiveModule = angular.module('angularjs-dropdown-multiselect', []);
-
 // @ts-ignore
 // TODO: Figure out why this is failing ts type checking
-(<angular.IModule> directiveModule).directive('ngDropdownMultiselect', ['$filter', '$document', '$compile', '$parse', '_', ngDropdownMultiselect]);
+angularjsDropdownMultiselect.directive('ngDropdownMultiselect', ['$filter', '$document', '$compile', '$parse', '_', ngDropdownMultiselect]);
 
 function ngDropdownMultiselect($filter, $document, $compile, $parse, _) {
 

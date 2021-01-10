@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsViewImg', [mmsViewImg]);
+mmsDirectives.directive('mmsViewImg', [mmsViewImg]);
 
 function mmsViewImg() {
     var template = '<figure><mms-cf mms-cf-type="img" mms-element-id="{{image.id}}"></mms-cf><figcaption><span ng-if="!image.excludeFromList">Figure {{mmsPe._veNumber}}. </span>{{image.title || mmsPe.name}}</figcaption></figure>';

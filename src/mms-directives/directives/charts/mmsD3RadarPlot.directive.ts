@@ -1,7 +1,7 @@
-import * as angular from 'angular';
-'use strict';
- angular.module('mms.directives')
-  .directive('mmsD3RadarPlot', ['TableService','$window', mmsD3RadarPlot]);
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
+
+mmsDirectives.directive('mmsD3RadarPlot', ['TableService','$window', mmsD3RadarPlot]);
   function mmsD3RadarPlot(TableService, $window) {
       
     var mmsRadarChartLink = function(scope, element, attrs, mmsViewCtrl) {

@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsGroupDocs', ['ElementService', 'ViewService', 'growl', '$q', '$templateCache', '_', mmsGroupDocs]);
+mmsDirectives.directive('mmsGroupDocs', ['ElementService', 'ViewService', 'growl', '$q', '$templateCache', '_', mmsGroupDocs]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsGroupDocs
+ * @name mmsDirectives.directive:mmsGroupDocs
  *
  * @requires mms.ElementService
  *

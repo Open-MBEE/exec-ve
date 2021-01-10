@@ -1,8 +1,8 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
 /** Used for annotating an element that doesn't have any commit history at all or for an element that is deleted but has commit history **/
-angular.module('mms.directives')
-    .directive('mmsAnnotation', ['$templateCache', '$rootScope', 'ViewService', 'UtilsService', mmsAnnotation]);
+mmsDirectives.directive('mmsAnnotation', ['$templateCache', '$rootScope', 'ViewService', 'UtilsService', mmsAnnotation]);
 
 function mmsAnnotation($templateCache, $rootScope, ViewService, UtilsService) {
     var template = $templateCache.get('mms/templates/mmsAnnotation.html');

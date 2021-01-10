@@ -1,8 +1,9 @@
-'use strict';
+import * as angular from "angular";
+
 
 /**
  * @ngdoc overview
- * @name mms.directives
+ * @name mmsDirectives
  * 
  * @requires mms
  * @requires ui.bootstrap
@@ -10,7 +11,7 @@
  * @requires angular-growl
  *
  * @description
- * # mms.directives module
+ * # mmsDirectives module
  * This module provides prebuilt components that are commonly used by the mms
  * client applications, for example, cross referencing and element "spec window".
  * Since this module contains directives with ui elements, there's more dependencies
@@ -58,8 +59,8 @@
 
         <!-- mms -->
         <script src="mms.js"></script>
-        <script src="mms.directives.tpls.js"></script>
-        <script src="mms.directives.js"></script>
+        <script src="mmsDirectives.tpls.js"></script>
+        <script src="mmsDirectives.js"></script>
 
         <!-- your app -->
         <script src="app.js"></script>
@@ -68,11 +69,13 @@
     </pre>
  * ### JS (app.js)
  *  <pre>
-    angular.module('exampleApp', ['mms', 'mms.directives']);
+    angular.module('exampleApp', ['mms', 'mmsDirectives']);
     </pre>
  */
-angular.module('mms.directives', ['mms', 'mms.directives.tpls', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter'])
-.config(['$sceProvider', 'growlProvider', 'uiTreeFilterSettingsProvider', function($sceProvider, growlProvider, uiTreeFilterSettingsProvider) {
+
+var mmsDirectives = angular.module('mmsDirectives', ['mms', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter']);
+
+  mmsDirectives.config(['$sceProvider', 'growlProvider', 'uiTreeFilterSettingsProvider', function($sceProvider, growlProvider, uiTreeFilterSettingsProvider) {
     $sceProvider.enabled(false);
     growlProvider.onlyUniqueMessages(false);
     growlProvider.globalTimeToLive({success: 5000, error: -1, warning: 5000, info: 5000});

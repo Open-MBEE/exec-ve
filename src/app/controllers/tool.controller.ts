@@ -1,12 +1,13 @@
-import { ElementObject } from '../lib/elementOb';
 import * as angular from 'angular';
+var mmsApp = angular.module('mmsApp');
+import { ElementObject } from '../../lib/elementOb';
 
-'use strict';
+
+
 
 /* Controllers */
 
-angular.module('mmsApp')
-.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
+mmsApp.controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
             'ElementService', 'JobService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     ElementService, JobService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils) {

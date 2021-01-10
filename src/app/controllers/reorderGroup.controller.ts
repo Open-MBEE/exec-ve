@@ -1,9 +1,9 @@
 import * as angular from 'angular';
+var mmsApp = angular.module('mmsApp');
 
-'use strict';
 
-angular.module('mmsApp')
-.controller('ReorderGroupCtrl', ['$scope', '$rootScope', '$stateParams', '$state', 'growl', '_', 'ElementService', 'CacheService', 'projectOb', 'refOb', 'groupObs', 'documentObs',
+
+mmsApp.controller('ReorderGroupCtrl', ['$scope', '$rootScope', '$stateParams', '$state', 'growl', '_', 'ElementService', 'CacheService', 'projectOb', 'refOb', 'groupObs', 'documentObs',
 
 function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, CacheService, projectOb, refOb, groupObs, documentObs) {
     $scope.isSaving = false;

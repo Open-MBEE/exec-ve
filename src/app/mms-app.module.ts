@@ -1,8 +1,10 @@
 import * as angular from 'angular';
-'use strict';
+//import * as uiRouter from '@uirouter/angularjs';
 
-angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies'])
-.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider, $locationProvider) {
+var mmsApp = angular.module('mmsApp', ['mms', 'mmsDirectives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
+//var mmsApp = angular.module('mmsApp', ['mms', 'mmsDirectives', 'fa.directive.borderLayout', 'ui.bootstrap', uiRouter.default, 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
+
+mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider, $locationProvider) {
     // override uibTypeaheadPopup functionality
     $provide.decorator('uibTypeaheadPopupDirective', ['$delegate', function($delegate) {
         var originalLinkFn = $delegate[0].link;
@@ -51,8 +53,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     var mmsHost = window.location.protocol + '//' + window.location.host;
 
     URLServiceProvider.setBaseUrl('/plugins/mms3-adapter/alfresco/service');
-    //URLServiceProvider.setMmsUrl('https://mcf.openmbee.org');
-    URLServiceProvider.setMmsUrl(mmsHost);
+    URLServiceProvider.setMmsUrl('http://localhost:9080');
+    //URLServiceProvider.setMmsUrl(mmsHost);
 
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped

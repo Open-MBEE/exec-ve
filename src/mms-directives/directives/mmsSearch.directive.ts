@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-  .directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
+mmsDirectives.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsSearch
+ * @name mmsDirectives.directive:mmsSearch
  *
  * @restrict E
  *
@@ -274,8 +274,8 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSearch#stringQueryUpdate
-     * @methodOf mms.directives.directive:mmsSearch
+     * @name mmsDirectives.directive:mmsSearch#stringQueryUpdate
+     * @methodOf mmsDirectives.directive:mmsSearch
      *
      * @description
      * Updates advanced search main query input
@@ -301,8 +301,8 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSearch#addAdvanceSearchRow
-     * @methodOf mms.directives.directive:mmsSearch
+     * @name mmsDirectives.directive:mmsSearch#addAdvanceSearchRow
+     * @methodOf mmsDirectives.directive:mmsSearch
      *
      * @description
      * Adds new row with empty fields and updates advanced search main query input
@@ -323,8 +323,8 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSearch#removeRowAdvanceSearch
-     * @methodOf mms.directives.directive:mmsSearch
+     * @name mmsDirectives.directive:mmsSearch#removeRowAdvanceSearch
+     * @methodOf mmsDirectives.directive:mmsSearch
      *
      * @description
      * Removes selected row and updates advanced search main query input
@@ -365,8 +365,8 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSearch#search
-     * @methodOf mms.directives.directive:mmsSearch
+     * @name mmsDirectives.directive:mmsSearch#search
+     * @methodOf mmsDirectives.directive:mmsSearch
      *
      * @description
      * Call ElementService to make search post and get search results. Check for filterCallback
@@ -421,8 +421,8 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSearch#getProjectMountsQuery
-     * @methodOf mms.directives.directive:mmsSearch
+     * @name mmsDirectives.directive:mmsSearch#getProjectMountsQuery
+     * @methodOf mmsDirectives.directive:mmsSearch
      *
      * @description
      * Create a JSON object that returns a term key with a list of all mounted
@@ -469,8 +469,8 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSearch#getAllMountsAsArray
-     * @methodOf mms.directives.directive:mmsSearch
+     * @name mmsDirectives.directive:mmsSearch#getAllMountsAsArray
+     * @methodOf mmsDirectives.directive:mmsSearch
      *
      * @description
      * Use projectsList to populate list with all the mounted project ids for
@@ -598,8 +598,8 @@ function mmsSearch($window, $anchorScroll, CacheService, ElementService, Project
 
     /**
      * @ngdoc function
-     * @name mms.directives.directive:mmsSearch#buildQuery
-     * @methodOf mms.directives.directive:mmsSearch
+     * @name mmsDirectives.directive:mmsSearch#buildQuery
+     * @methodOf mmsDirectives.directive:mmsSearch
      *
      * @description
      * Build JSON object for Elastic query.

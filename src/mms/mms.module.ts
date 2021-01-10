@@ -1,7 +1,5 @@
 import * as angular from 'angular';
 
-'use strict';
-
 /**
  * @ngdoc overview
  * @name mms
@@ -60,8 +58,9 @@ import * as angular from 'angular';
  */
 //declare let window : mmsWindow;
 
-angular.module('mms', [])
-.config(['$sceProvider', function($sceProvider) {
+var mms = angular.module('mms', []);
+
+mms.config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
 }])
 .constant('_', window._)

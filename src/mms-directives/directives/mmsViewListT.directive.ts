@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsViewListT', [mmsViewListT]);
+mmsDirectives.directive('mmsViewListT', [mmsViewListT]);
 
 function mmsViewListT() {
 

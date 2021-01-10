@@ -1,7 +1,8 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mms = angular.module('mms');
 
-angular.module('mms')
-  .factory('TableService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', '_', 'ElementService', TableService]);
+
+mms.factory('TableService', ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', '_', 'ElementService', TableService]);
 
 function TableService($q, $http, URLService, UtilsService, CacheService, _, ElementService) {
 

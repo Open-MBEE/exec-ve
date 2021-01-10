@@ -1,11 +1,11 @@
 import * as angular from 'angular';
+var mmsApp = angular.module('mmsApp');
 
-'use strict';
+
 
 /* Controllers */
 
-angular.module('mmsApp')
-.controller('ReorderCtrl', ['$scope', '$rootScope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
+mmsApp.controller('ReorderCtrl', ['$scope', '$rootScope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
 function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtils, $state, growl, $q, _) {
     $scope.doc = documentOb;
 

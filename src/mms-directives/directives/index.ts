@@ -40,4 +40,3 @@ import "./mmsViewReorder.directive";
 import "./mmsViewSection.directive";
 import "./mmsViewTable.directive";
 import "./mmsViewTableT.directive";
-import "./ngDropdownMultiselect.directive";

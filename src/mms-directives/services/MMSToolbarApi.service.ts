@@ -1,5 +1,6 @@
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-import * as angular from 'angular';
 
 export class MMSToolbarApi {
 

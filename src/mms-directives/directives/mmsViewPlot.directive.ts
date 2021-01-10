@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsViewPlot', ['$compile','$window', mmsViewPlot]);
+mmsDirectives.directive('mmsViewPlot', ['$compile','$window', mmsViewPlot]);
 
 function mmsViewPlot($compile, $window) {
     var mmsViewLink = function(scope, domElement, element, attrs, mmsViewCtrl) {

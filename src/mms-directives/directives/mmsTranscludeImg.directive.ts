@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['ArtifactService','AuthService','ElementService','URLService','growl', mmsTranscludeImg]);
+mmsDirectives.directive('mmsTranscludeImg', ['ArtifactService','AuthService','ElementService','URLService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsTranscludeImg
+ * @name mmsDirectives.directive:mmsTranscludeImg
  *
  * @requires mms.ArtifactService
  * @requires mms.AuthService

@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsDiagramBlock', ['go', 'growl', 'ElementService', mmsDiagramBlock]);
+mmsDirectives.directive('mmsDiagramBlock', ['go', 'growl', 'ElementService', mmsDiagramBlock]);
 
 function mmsDiagramBlock(go, growl, ElementService) {
 

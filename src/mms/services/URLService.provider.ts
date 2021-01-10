@@ -1,4 +1,6 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mms = angular.module('mms');
+
 
 class URLServiceProvider {
     private baseUrl = '/alfresco/service';
@@ -20,8 +22,7 @@ class URLServiceProvider {
     }
 };
 
-angular.module('mms')
-.provider('URLService', URLServiceProvider)
+mms.provider('URLService', URLServiceProvider)
 //     var initInjector = angular.injector(['ng']);
 //     var $http = initInjector.get('$http');
 //     var $scope = initInjector.get('$scope');

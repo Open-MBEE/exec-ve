@@ -1,12 +1,12 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$timeout', '$location',
+mmsDirectives.directive('mmsViewPresentationElem', ['ViewService', 'ElementService', '$templateCache', '$timeout', '$location',
     '$anchorScroll', '$compile', mmsViewPresentationElem]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsViewPresentationElem
+ * @name mmsDirectives.directive:mmsViewPresentationElem
  *
  * @requires mms.ViewService
  * @requires mms.ElementService

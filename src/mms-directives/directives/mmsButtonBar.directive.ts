@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsButtonBar', ['$templateCache', mmsButtonBar]);
+mmsDirectives.directive('mmsButtonBar', ['$templateCache', mmsButtonBar]);
 
 function mmsButtonBar($templateCache) {
     var template = $templateCache.get('mms/templates/mmsButtonBar.html');

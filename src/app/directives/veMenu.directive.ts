@@ -1,8 +1,8 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
 
-angular.module('mmsApp')
-.directive('veMenu', ['CacheService','$state','$templateCache','$sce', '$timeout', 'UtilsService',veMenu]);
+
+mmsApp.directive('veMenu', ['CacheService','$state','$templateCache','$sce', '$timeout', 'UtilsService',veMenu]);
 
 /**
  * @ngdoc directive

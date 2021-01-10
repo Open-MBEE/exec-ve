@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsViewEquation', [mmsViewEquation]);
+mmsDirectives.directive('mmsViewEquation', [mmsViewEquation]);
 
 function mmsViewEquation() {
 

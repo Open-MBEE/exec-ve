@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', 'ApplicationService', mmsViewLink]);
+mmsDirectives.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', 'ApplicationService', mmsViewLink]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsViewLink
+ * @name mmsDirectives.directive:mmsViewLink
  *
  * @requires mms.ElementService
  * @requires $compile

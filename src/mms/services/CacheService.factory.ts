@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-.factory('CacheService', ['_', CacheService]);
+mms.factory('CacheService', ['_', CacheService]);
 
 /**
  * @ngdoc service

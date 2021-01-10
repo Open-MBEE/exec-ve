@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsMaturityBar', ['$window', mmsMaturityBar]);
+mmsDirectives.directive('mmsMaturityBar', ['$window', mmsMaturityBar]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsMaturityBar
+ * @name mmsDirectives.directive:mmsMaturityBar
  *
  * @restrict E
  *

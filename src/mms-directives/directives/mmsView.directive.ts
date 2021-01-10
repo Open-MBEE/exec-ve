@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsView', ['Utils', 'AuthService', 'ViewService', 'ElementService', '$templateCache', 'growl', mmsView]);
+mmsDirectives.directive('mmsView', ['Utils', 'AuthService', 'ViewService', 'ElementService', '$templateCache', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsView
+ * @name mmsDirectives.directive:mmsView
  *
  * @requires mms.ViewService
  * @requires mms.ElementService
@@ -23,7 +23,7 @@ angular.module('mms.directives')
  * ## Example
  * ### controller (js)
  *  <pre>
-    angular.module('app', ['mms.directives'])
+    angular.module('app', ['mmsDirectives'])
     .controller('ViewCtrl', ['$scope', function($scope) {
         $scope.api = {}; //empty object to be populated by the view directive
         $scope.handler = function(elementId) {
@@ -213,8 +213,8 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsView#addEltAction
-         * @methodOf mms.directives.directive:mmsView
+         * @name mmsDirectives.directive:mmsView#addEltAction
+         * @methodOf mmsDirectives.directive:mmsView
          *
          * @description
          * Add specified element at the defined 'index'
@@ -229,8 +229,8 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsView#toggleShowElements
-         * @methodOf mms.directives.directive:mmsView
+         * @name mmsDirectives.directive:mmsView#toggleShowElements
+         * @methodOf mmsDirectives.directive:mmsView
          *
          * @description
          * toggle elements highlighting
@@ -242,8 +242,8 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsView#toggleShowComments
-         * @methodOf mms.directives.directive:mmsView
+         * @name mmsDirectives.directive:mmsView#toggleShowComments
+         * @methodOf mmsDirectives.directive:mmsView
          *
          * @description
          * toggle comments visibility
@@ -255,8 +255,8 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
 
         /**
          * @ngdoc function
-         * @name mms.directives.directive:mmsView#toggleShowEdits
-         * @methodOf mms.directives.directive:mmsView
+         * @name mmsDirectives.directive:mmsView#toggleShowEdits
+         * @methodOf mmsDirectives.directive:mmsView
          *
          * @description
          * toggle elements editing panel
@@ -279,8 +279,8 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
 
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsView#setShowElements
-             * @methodOf mms.directives.directive:mmsView
+             * @name mmsDirectives.directive:mmsView#setShowElements
+             * @methodOf mmsDirectives.directive:mmsView
              *
              * @description
              * self explanatory
@@ -297,8 +297,8 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
 
             /**
              * @ngdoc function
-             * @name mms.directives.directive:mmsView#setShowComments
-             * @methodOf mms.directives.directive:mmsView
+             * @name mmsDirectives.directive:mmsView#setShowComments
+             * @methodOf mmsDirectives.directive:mmsView
              *
              * @description
              * self explanatory

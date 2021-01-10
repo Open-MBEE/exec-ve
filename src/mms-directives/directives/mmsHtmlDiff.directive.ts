@@ -1,7 +1,7 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-    .directive('mmsHtmlDiff', ['$templateCache', '$timeout', 'MathJax', 'HtmlRenderedDiff', mmsHtmlDiff]);
+mmsDirectives.directive('mmsHtmlDiff', ['$templateCache', '$timeout', 'MathJax', 'HtmlRenderedDiff', mmsHtmlDiff]);
 
 function mmsHtmlDiff($templateCache, $timeout, MathJax, HtmlRenderedDiff) {
     var template = $templateCache.get('mms/templates/mmsHtmlDiff.html');

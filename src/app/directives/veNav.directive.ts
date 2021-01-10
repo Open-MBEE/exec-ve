@@ -1,12 +1,12 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
 
-angular.module('mmsApp')
-.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', 'ProjectService', veNav]);
+
+mmsApp.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', 'ProjectService', veNav]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:veNav
+ * @name mmsDirectives.directive:veNav
  *
  * @requires $templateCache
  *

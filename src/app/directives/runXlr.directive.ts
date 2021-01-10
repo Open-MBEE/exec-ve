@@ -1,8 +1,8 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
 
-angular.module('mmsApp')
-    .directive('runXlr', ['$http', '$uibModal', '$window', 'growl', 'ApplicationService', runXlr]);
+
+mmsApp.directive('runXlr', ['$http', '$uibModal', '$window', 'growl', 'ApplicationService', runXlr]);
 
 function runXlr($http, $uibModal, $window, growl, ApplicationService) {
     return {

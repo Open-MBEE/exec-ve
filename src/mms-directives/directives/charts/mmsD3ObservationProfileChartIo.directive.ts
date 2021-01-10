@@ -1,7 +1,9 @@
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
+
 //not usable using stereotype <<Plot>> in mdk so commented out for now.
-/*'use strict';
- angular.module('mms.directives')
-    .directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
+/*
+mmsDirectives.directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService', 'TableService', '$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
 function mmsD3ObservationProfileChartIo(ElementService, UtilsService, TableService, $compile, growl, $window) {
       
   var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {

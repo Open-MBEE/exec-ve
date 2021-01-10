@@ -1,5 +1,6 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
+
 
 angular.module('mmsApp').directive('veFooter', [ '$templateCache', veFooter]);
 

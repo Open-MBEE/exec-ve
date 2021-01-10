@@ -1,6 +1,7 @@
-'use strict';
+import * as angular from 'angular';
+var mmsApp = angular.module('mmsApp');
 
-angular.module('mmsApp').directive('veSystemBanner', [ '$templateCache', veSystemBanner]);
+mmsApp.directive('veSystemBanner', [ '$templateCache', veSystemBanner]);
 
 function veSystemBanner($templateCache) {
     var template = $templateCache.get('partials/mms/veBanner.html');

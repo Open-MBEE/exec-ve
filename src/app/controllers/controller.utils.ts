@@ -1,8 +1,8 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
 
-angular.module('mmsApp')
-.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
+
+mmsApp.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
     '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', '_', MmsAppUtils]);
 
 /**

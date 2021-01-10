@@ -1,8 +1,8 @@
-import * as angular from 'angular';
 import $ from 'jquery';
+import * as angular from "angular";
+var mms = angular.module('mms');
 
-angular.module('mms')
-    .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', 'UtilsService' , MentionService]);
+mms.factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', 'UtilsService' , MentionService]);
 
 function MentionService($rootScope, $compile, $timeout, moment, CacheService, ViewService, UtilsService) {
     /** Used to maintain all mention in all ckeditors **/

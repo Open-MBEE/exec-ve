@@ -460,11 +460,6 @@
   dependencies:
     "@types/node" "*"
 
-"@uirouter/core@6.0.7":
-  version "6.0.7"
-  resolved "https://registry.yarnpkg.com/@uirouter/core/-/core-6.0.7.tgz#a66743dceb13a56d8908474ff891d63e5d5a2b01"
-  integrity sha512-KUTJxL+6q0PiBnFx4/Z+Hsyg0pSGiaW5yZQeJmUxknecjpTbnXkLU8H2EqRn9N2B+qDRa7Jg8RcgeNDPY72O1w==
-
 accepts@~1.3.5:
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/accepts/-/accepts-1.3.7.tgz#531bc726517a3b2b41f850021c6cc15eaab507cd"
@@ -559,12 +554,12 @@ angular-ui-bootstrap@^2.5.6:
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
   integrity sha512-yzcHpPMLQl0232nDzm5P4iAFTFQ9dMw0QgFLuKYbDj9M0xJ62z0oudYD/Lvh1pWfRsukiytP4Xj6BHOSrSXP8A==
 
-angular-ui-router@^1.0.29:
-  version "1.0.29"
-  resolved "https://registry.yarnpkg.com/angular-ui-router/-/angular-ui-router-1.0.29.tgz#20ab76096613df60d3e3fb0e15eaea264c61df87"
-  integrity sha512-VurVxwueqEFD0JJBHkATOvLinhebc8/052jyhYrFVbHtWEc//IX4Wr55WvmJoTZJ6lnQ3nBlpX9VBKS5wiRsOg==
+angular-ui-router@~0.4.2:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/angular-ui-router/-/angular-ui-router-0.4.3.tgz#6c29546fe50b8d2f74614dcb8660d6fc40d6e167"
+  integrity sha512-EGBG7G7ArFVkJPM+ZIgPKuMYuT16UQrr3zj3BEiXHKwxss867bGt3u7QD9g4BxR+K2qQOSWok6JGvgTWXAko3A==
   dependencies:
-    "@uirouter/core" "6.0.7"
+    angular "^1.0.8"
 
 "angular-ui-tree-filter@git+https://github.com/enquier/angular-ui-tree-filter.git#master":
   version "0.1.1"
@@ -575,7 +570,7 @@ angular-ui-tree@^2.22.6:
   resolved "https://registry.yarnpkg.com/angular-ui-tree/-/angular-ui-tree-2.22.6.tgz#849727fdd1d13d84c1a590bb08934cc224e5a407"
   integrity sha512-VzuXM6NdYeQD0Y1RF5oTYc3o8yoW9mtxhnJs5Fvwu40V1Alzq7ybJj+kvApXZ69M0mvRd8LLM+3Q4pI26md+fA==
 
-angular@^1.3.0, angular@^1.8.2:
+angular@^1.0.8, angular@^1.3.0, angular@^1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
   integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==

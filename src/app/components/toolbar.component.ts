@@ -1,6 +1,7 @@
 import * as angular from 'angular';
+var mmsApp = angular.module('mmsApp');
 
-'use strict';
+
 
 /* Interfaces (Temporary) */
 interface ToolbarApi extends Object {
@@ -69,7 +70,7 @@ let ToolbarComponent = {
 
 /* Controllers */
 
-angular.module('mmsApp').component(ToolbarComponent.selector, ToolbarComponent)
+mmsApp.component(ToolbarComponent.selector, ToolbarComponent)
 // .controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', 'UxService', 'refOb', 'documentOb', 
 // function($scope, $rootScope, $state, UxService, refOb, documentOb) {
 

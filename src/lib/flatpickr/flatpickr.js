@@ -3,7 +3,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     (global.flatpickr = factory());
-}(this, (function () { 'use strict';
+}(this, (function () {
 
     var pad = function pad(number) {
       return ("0" + number).slice(-2);

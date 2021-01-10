@@ -1,11 +1,10 @@
 import * as angular from 'angular';
-import { any } from 'angular-ui-router';
-'use strict';
+var mmsApp = angular.module('mmsApp');
+
 
 /* Controllers */
 
-angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
+mmsApp.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
                           'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'docMeta',
 function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl,

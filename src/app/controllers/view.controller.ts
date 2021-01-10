@@ -1,10 +1,10 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
+
 
 /* Controllers */
 
-angular.module('mmsApp')
-    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$window', '$location',
+mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$window', '$location',
     '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService', 'ShortenUrlService', 'Utils',
     'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
     function($scope, $rootScope, $state, $timeout, $window, $location, $http,

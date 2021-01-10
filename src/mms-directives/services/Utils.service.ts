@@ -1,11 +1,11 @@
-'use strict';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', Utils]);
+mmsDirectives.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'growl', Utils]);
 
 /**
  * @ngdoc service
- * @name mms.directives.Utils
+ * @name mmsDirectives.Utils
  * @requires $q
  * @requires $uibModal
  * @requires $templateCache
@@ -106,8 +106,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
      * @ngdoc function
-     * @name mms.directives.Utils#save
-     * @methodOf mms.directives.Utils
+     * @name mmsDirectives.Utils#save
+     * @methodOf mmsDirectives.Utils
      *
      * @description
      * save edited element
@@ -166,8 +166,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
      * @ngdoc function
-     * @name mms.directives.Utils#hasEdits
-     * @methodOf  mms.directives.Utils
+     * @name mmsDirectives.Utils#hasEdits
+     * @methodOf  mmsDirectives.Utils
      *
      * @description
      * whether editing object has changes compared to base element,
@@ -199,8 +199,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
      * @ngdoc function
-     * @name mms.directives.Utils#revertEdits
-     * @methodOf mms.directives.Utils
+     * @name mmsDirectives.Utils#revertEdits
+     * @methodOf mmsDirectives.Utils
      *
      * @description
      * reset editing object back to base element values for name, doc, values
@@ -247,8 +247,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
      * @ngdoc function
-     * @name mms.directives.Utils#isEnumeration
-     * @methodOf mms.directives.Utils
+     * @name mmsDirectives.Utils#isEnumeration
+     * @methodOf mmsDirectives.Utils
      *
      * @description
      * Check if element is enumeration and if true get enumerable options
@@ -349,8 +349,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
     * @ngdoc function
-    * @name mms.directives.Utils#startEdit
-    * @methodOf mms.directives.Utils
+    * @name mmsDirectives.Utils#startEdit
+    * @methodOf mmsDirectives.Utils
     * @description
     * called by transcludes and section, adds the editing frame
     * uses these in the scope:
@@ -432,8 +432,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
     * @ngdoc function
-    * @name mms.directives.Utils#saveAction
-    * @methodOf mms.directives.Utils
+    * @name mmsDirectives.Utils#saveAction
+    * @methodOf mmsDirectives.Utils
     * @description
     * called by transcludes and section, saves edited element
     * uses these in the scope:
@@ -492,8 +492,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
     * @ngdoc function
-    * @name mms.directives.Utils#cancelAction
-    * @methodOf mms.directives.Utils
+    * @name mmsDirectives.Utils#cancelAction
+    * @methodOf mmsDirectives.Utils
     * @description
     * called by transcludes and section, cancels edited element
     * uses these in the scope:
@@ -619,8 +619,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
     * @ngdoc function
-    * @name mms.directives.Utils#previewAction
-    * @methodOf mms.directives.Utils
+    * @name mmsDirectives.Utils#previewAction
+    * @methodOf mmsDirectives.Utils
     * @description
     * called by transcludes and section, previews edited element
     * uses these in the scope:
@@ -788,8 +788,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
      * @ngdoc method
-     * @name mms.directives.Utils#addPresentationElement
-     * @methodOf mms.directives.Utils
+     * @name mmsDirectives.Utils#addPresentationElement
+     * @methodOf mmsDirectives.Utils
      *
      * @description
      * Utility to add a new presentation element to view or section
@@ -820,8 +820,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
 
     /**
      * @ngdoc method
-     * @name mms.directives.Utils#reopenUnsavedElts
-     * @methodOf mms.directives.Utils
+     * @name mmsDirectives.Utils#reopenUnsavedElts
+     * @methodOf mmsDirectives.Utils
      * @description
      * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
      * the editor will reopen if there are unsaved edits.
@@ -871,8 +871,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
     };
     /**
      * @ngdoc method
-     * @name mms.directives.Utils#revertAction
-     * @methodOf mms.directives.Utils
+     * @name mmsDirectives.Utils#revertAction
+     * @methodOf mmsDirectives.Utils
      * @description
      * called by transcludes and section, cancels edited element
      * uses these in the scope:

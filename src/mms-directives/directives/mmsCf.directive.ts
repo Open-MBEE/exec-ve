@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsCf', ['$compile', mmsCf]);
+mmsDirectives.directive('mmsCf', ['$compile', mmsCf]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsCf
+ * @name mmsDirectives.directive:mmsCf
  *
  * @requires $compile
  *

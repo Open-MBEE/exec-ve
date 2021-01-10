@@ -1,11 +1,11 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
-angular.module('mms.directives')
-.directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '$templateCache', '$q', 'ElementService', mmsDiffAttr]);
+mmsDirectives.directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '$templateCache', '$q', 'ElementService', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
- * @name mms.directives.directive:mmsDiffAttr
+ * @name mmsDirectives.directive:mmsDiffAttr
  *
  * @requires mms.ElementService
  * @requires $compile

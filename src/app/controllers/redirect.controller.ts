@@ -1,5 +1,6 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
+
 
 /* Controllers */
     // /workspaces/master/sites/{siteid}                    {siteid}_cover      /projects/{projectid}/master/document/{siteid}_cover
@@ -12,8 +13,7 @@ import * as angular from 'angular';
     // (see _relatedDocuments of element in search result)
     // /workspaces/master/sites/{siteid}/documents/{docid}/full	{docid}	/projects/{projectid}/master/documents/{docid}/full
 
-angular.module('mmsApp')
-.controller('RedirectCtrl', ['$scope', '$rootScope', '$state', '$location', '$timeout',
+mmsApp.controller('RedirectCtrl', ['$scope', '$rootScope', '$state', '$location', '$timeout',
         'ProjectService', 'ElementService', 'growl', 
     function($scope, $rootScope, $state, $location, $timeout, ProjectService, ElementService, growl) {
         $rootScope.ve_title = 'View Editor'; //what to name this?

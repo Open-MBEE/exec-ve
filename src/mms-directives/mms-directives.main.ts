@@ -1,4 +1,5 @@
-import "./mms-directives.module.ts"
 
-import "./services/index.ts"
-import "./directives/index.ts"
+import "./mms-directives.module"
+
+import "./services"
+import "./directives"

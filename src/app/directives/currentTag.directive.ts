@@ -1,8 +1,8 @@
 import * as angular from 'angular';
-'use strict';
+var mmsApp = angular.module('mmsApp');
 
-angular.module('mmsApp')
-.directive('mmsCurrentTag',['$rootScope', mmsCurrentTag]);
+
+mmsApp.directive('mmsCurrentTag',['$rootScope', mmsCurrentTag]);
 
 /**
 * @ngdoc directive

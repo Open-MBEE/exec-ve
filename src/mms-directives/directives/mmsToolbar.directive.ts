@@ -1,4 +1,5 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
 
 
 // let mmsToolbarComponent = {
@@ -40,7 +41,7 @@ import * as angular from 'angular';
 // 	}
 // }
 
-angular.module('mms.directives').directive('mmsToolbar', ['$templateCache', '$rootScope', mmsToolbar]);
+mmsDirectives.directive('mmsToolbar', ['$templateCache', '$rootScope', mmsToolbar]);
 
 function mmsToolbar($templateCache, $rootScope)
 {

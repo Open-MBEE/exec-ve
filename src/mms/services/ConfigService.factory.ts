@@ -1,6 +1,7 @@
-import * as angular from 'angular';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms').service('ConfigService', ['$http', ConfigService]);
+mms.service('ConfigService', ['$http', ConfigService]);
 /**
  * @ngdoc service
  * @name mms.ConfigService

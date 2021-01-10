@@ -1,4 +1,6 @@
-import * as angular from 'angular';
+import * as angular from "angular";
+var mms = angular.module('mms');
+
 
 
 /**
@@ -295,4 +297,4 @@ export class UxService {
 };
 
 
-angular.module('mms').service('UxService', UxService);
+mms.service('UxService', UxService);

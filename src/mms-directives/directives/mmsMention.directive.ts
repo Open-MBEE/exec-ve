@@ -1,7 +1,6 @@
-import * as angular from 'angular';
-
-angular.module('mms.directives')
-    .directive('mmsMention', ['$templateCache', 'MentionService', 'Utils', mmsMention]);
+import * as angular from "angular";
+var mmsDirectives = angular.module('mmsDirectives');
+mmsDirectives.directive('mmsMention', ['$templateCache', 'MentionService', 'Utils', mmsMention]);
 
 function mmsMention($templateCache, MentionService, Utils) {
     return {
@@ -38,8 +37,8 @@ function mmsMention($templateCache, MentionService, Utils) {
 }
 
 // Used to sync value between input from the ckeditor and the uib-typeahead directive
-angular.module('mms.directives')
-    .directive('mmsMentionIntercept', ['$templateCache',  mmsMentionIntercept]);
+
+mmsDirectives.directive('mmsMentionIntercept', ['$templateCache',  mmsMentionIntercept]);
 
 function mmsMentionIntercept() {
     return {
