@@ -126,7 +126,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         cleanUpEdit(editOb);
     });
 
-    var elementSelected = function(event, elementOb, commitId, displayOldContent?) {
+    var elementSelected = (event, elementOb, commitId, displayOldContent?) => {
         $scope.specInfo.id = elementOb.id;
         $scope.specInfo.projectId = elementOb._projectId;
         $scope.specInfo.refId = elementOb._refId;

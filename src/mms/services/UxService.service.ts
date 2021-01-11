@@ -15,7 +15,7 @@ export class UxService {
   MetaTypes = ['tag', 'connector', 'dependency', 'directedrelationship', 'element', 'property', 'generalization', 'package', 'section', 'group', 'snapshot', 'view', 'branch', 'table', 'figure', 'equation', 'view-composite', 'view-shared', 'view-none' ];
 
   constructor($rootScope) {
-    this.$rootScope = this.$rootScope;
+    this.$rootScope = $rootScope;
   }
   /**
    * @ngdoc method
@@ -25,7 +25,7 @@ export class UxService {
    * @description
    * Get pre-defined toolbar buttons
    * 
-   * @param {<string>} id of button
+   * @param {<string>} button id
    * @returns {Object} Button object
    */
   getToolbarButton(button : string) {
@@ -227,14 +227,14 @@ export class UxService {
   getTreeTypes() {
     var treeTypes = {};
 
-    this.MetaTypes.forEach(function (type) {
+    this.MetaTypes.forEach((type) => {
       treeTypes[type] = this.getTypeIcon(type) + " fa-fw";
     });
 
     return treeTypes;
   };
 
-  getTypeIcon(type) {
+  getTypeIcon = (type) : string => {
     var t = type;
     if (!t)
       t = "unknown";
@@ -294,7 +294,8 @@ export class UxService {
         return "Removal";
     }
   };
-};
+}
 
+UxService.$inject = ['$rootScope'];
 
 mms.service('UxService', UxService);

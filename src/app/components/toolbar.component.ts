@@ -4,39 +4,44 @@ var mmsApp = angular.module('mmsApp');
 
 
 /* Interfaces (Temporary) */
-interface ToolbarApi extends Object {
-    init() : void
-    addButton(any) : void
-    setIcon(id : string, icon : string) : void
-    setPermission(id : string, permission : any) : void
-}
+// interface ToolbarApi extends Object {
+//     init() : void
+//     addButton(any) : void
+//     setIcon(id : string, icon : string) : void
+//     setPermission(id : string, permission : any) : void
+// }
 
 /* Classes */
 let ToolbarComponent = {
     selector: "toolbarComponent", //toolbar-component
-    template: `<mms-toolbar buttons="$ctrl.buttons" on-click="onClick(button)" mms-tb-api="$ctrl.tbApi"></mms-toolbar>`,
-    bindings: {},
-    controller: class ToolbarComponent {
+    template: `<mms-toolbar buttons="$ctrl.buttons" on-click="onClick(button)" mms-tb-api="$ctrl.tbApi" />`,
+    bindings: {
+        refOb: '<',
+        documentOb: '<'
+    },
+    controller: class ToolbarController {
+        static $inject = ['$rootScope', '$state', 'UxService', 'ToolbarApiService'];
         private $rootScope
         private $state
         private UxService
         private refOb
         private documentOb
 
-        public tbApi = (<ToolbarApi> {});
+        public tbApi;
         public buttons = [];
 
-        constructor($rootScope, $state, UxService, refOb, documentOb) {
+        constructor($rootScope, $state, UxService, ToolbarApiService) {
             this.$rootScope = $rootScope;
             this.$state = $state;
             this.UxService = UxService;
-            this.refOb = refOb;
-            this.documentOb = documentOb;
+            this.tbApi = ToolbarApiService;
 
             $rootScope.ve_tbApi = this.tbApi;
+
+            this.init();
         }
 
-        init() {
+        init = () => {
         this.tbApi.addButton(this.UxService.getToolbarButton("element-viewer"));
         this.tbApi.addButton(this.UxService.getToolbarButton("element-editor"));
         if (this.$rootScope.ve_edits && Object.keys(this.$rootScope.ve_edits).length > 0) {
@@ -65,7 +70,7 @@ let ToolbarComponent = {
     };
 
 
-    },
+    }
 };
 
 /* Controllers */

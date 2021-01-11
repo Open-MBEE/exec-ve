@@ -2,17 +2,12 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 
-export class MMSToolbarApi {
+export class ToolbarApiService {
 
-  mmsTbApi
   buttons = [];
 
-  constructor(buttons, mmsTbApi?) {
+  constructor(buttons) {
     this.buttons = buttons;
-
-    if (mmsTbApi) {
-      this.mmsTbApi = mmsTbApi;
-    }
   }
 
 
@@ -159,7 +154,7 @@ export class MMSToolbarApi {
       });
     };
 
-    //if (api.init)
-    //{
-    //init() {};
-};
+}
+
+mmsDirectives
+  .service("ToolbarApiService", ToolbarApiService);

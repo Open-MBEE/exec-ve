@@ -518,7 +518,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 controller: 'ToolCtrl'
             },
             'toolbar-right@': {
-                template: '<toolbar-component></toolbar-component>'
+                template: '<toolbar-component refOb="$resolve.refOb" documentOb="$resolve.documentOb"></toolbar-component>'
             },
             'footer@': {
                 template: '<ve-footer mms-footer="footer" ng-if="ve_footer"></ve-footer>',
@@ -721,7 +721,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 controller: 'ToolCtrl'
             },
             'toolbar-right@': {
-                template: '<toolbar-component></toolbar-component>'
+                template: '<toolbar-component refOb="$resolve.refOb" documentOb="$resolve.documentOb"></toolbar-component>'
             }
         }
     })
