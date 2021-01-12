@@ -20,7 +20,7 @@ let ToolbarComponent = {
         documentOb: '<'
     },
     controller: class ToolbarController {
-        static $inject = ['$rootScope', '$state', 'UxService', 'ToolbarApiService'];
+        static $inject = ['$rootScope', '$state', 'UxService', 'ToolbarService'];
         private $rootScope
         private $state
         private UxService
@@ -30,11 +30,11 @@ let ToolbarComponent = {
         public tbApi;
         public buttons = [];
 
-        constructor($rootScope, $state, UxService, ToolbarApiService) {
+        constructor($rootScope, $state, UxService, ToolbarService) {
             this.$rootScope = $rootScope;
             this.$state = $state;
             this.UxService = UxService;
-            this.tbApi = ToolbarApiService;
+            this.tbApi = ToolbarService;
 
             $rootScope.ve_tbApi = this.tbApi;
 

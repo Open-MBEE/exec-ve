@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 
-export class ToolbarApiService {
+export class ToolbarService {
 
   buttons = [];
 
@@ -15,8 +15,8 @@ export class ToolbarApiService {
 			//{
 				//var api = $scope.mmsTbApi;
 
-  select(id) {
-    this.buttons.forEach(function(button)
+  select = (id) => {
+    this.buttons.forEach((button) =>
     {
       if (button.id === id && button.active)
       {
@@ -24,17 +24,13 @@ export class ToolbarApiService {
         // $scope.clicked(button);
         if (!button.dynamic)
         {
-          this.buttons.forEach(function(b)
+          this.buttons.forEach((b) =>
           {
-            if (b === button)
-            {
-              b.selected = true;
-            }
-            else b.selected = false;
+            b.selected = b === button;
           });
 
           // de-activate all dynamic buttons
-          this.buttons.forEach(function(b)
+          this.buttons.forEach((b) =>
           {
             if (b.dynamic)
             {
@@ -44,7 +40,7 @@ export class ToolbarApiService {
 
           if (button.dynamic_buttons)
           {
-            button.dynamic_buttons.forEach(function(b)
+            button.dynamic_buttons.forEach((b) =>
             {
               b.active = true;
             });
@@ -57,15 +53,15 @@ export class ToolbarApiService {
     });
   };
 
-  deactivate(id) {
-    this.buttons.forEach(function(button)
+  deactivate = (id) => {
+    this.buttons.forEach((button) =>
     {
       if (button.id === id)
       {
         if (button.dynamic_buttons)
         {
           // de-activate all dynamic buttons
-          button.dynamic_buttons.forEach(function(b)
+          button.dynamic_buttons.forEach((b) =>
           {
             b.active = false;
           });
@@ -74,8 +70,8 @@ export class ToolbarApiService {
     });
   };
 
-  setPermission(id, permission) {
-    this.buttons.forEach(function(button)
+  setPermission = (id, permission) => {
+    this.buttons.forEach((button) =>
     {
       if (button.id === id) {
         button.permission = permission;
@@ -83,28 +79,28 @@ export class ToolbarApiService {
     });
   };
 
-  setSelected = function(id, selected) {
-    this.buttons.forEach(function(button) {
+  setSelected = (id, selected) => {
+    this.buttons.forEach((button) => {
       if (button.id === id) {
         button.selected = selected;
       }
     });
   };
 
-  setIcon(id, icon) {
-    this.buttons.forEach(function(button) {
+  setIcon = (id, icon) => {
+    this.buttons.forEach((button) => {
       if (button.id === id) {
         button.icon = icon;
       }
     });
   };
 
-  addButton(button) {
+  addButton = (button) => {
     button.priority = this.buttons.length;
     this.buttons.push(button);
     if (button.dynamic_buttons) {
       var firstButton = true;
-      button.dynamic_buttons.forEach(function(button)
+      button.dynamic_buttons.forEach((button) =>
       {
         if (firstButton)
         {
@@ -117,8 +113,8 @@ export class ToolbarApiService {
     }
   };
 
-  toggleButtonSpinner(id) {
-      this.buttons.forEach(function(button)
+  toggleButtonSpinner = (id) => {
+      this.buttons.forEach((button) =>
       {
         if (button.id === id)
         {
@@ -136,9 +132,9 @@ export class ToolbarApiService {
       });
     };
 
-    setOptions(id, options)
+    setOptions = (id, options) =>
     {
-      this.buttons.forEach(function(button)
+      this.buttons.forEach((button) =>
       {
         if (button.id === id)
         {
@@ -156,5 +152,7 @@ export class ToolbarApiService {
 
 }
 
+ToolbarService.$inject = [];
+
 mmsDirectives
-  .service("ToolbarApiService", ToolbarApiService);
+  .service("ToolbarService", ToolbarService);
