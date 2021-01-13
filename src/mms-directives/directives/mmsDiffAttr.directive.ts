@@ -31,7 +31,7 @@ mmsDirectives.directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '
  * @param {string=latest} mmsCompareCommitId Compare commit id, default is latest
  */
 function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, ElementService) {
-    var template = $templateCache.get('mms/templates/mmsDiffAttr.html');
+    var template = 'partials/mms-directives/mmsDiffAttr.html';
 
     return {
         restrict: 'E',
@@ -50,7 +50,7 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             mmsBaseElementId: '@',
             mmsCompareElementId: '@'
         },
-        template: template,
+        templateUrl: template,
         link: mmsDiffAttrLink,
         require: '?^^mmsView'
     };

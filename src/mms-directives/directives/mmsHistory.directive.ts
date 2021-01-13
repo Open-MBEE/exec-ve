@@ -31,7 +31,7 @@ mmsDirectives.directive('mmsHistory', ['Utils','ElementService', 'ProjectService
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
 function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $animate, $uibModal, _) {
-    var template = $templateCache.get('mms/templates/mmsHistory.html');
+    var template = 'partials/mms-directives/mmsHistory.html';
 
     var mmsHistoryLink = function(scope, element, attrs) {
         var ran = false;
@@ -160,7 +160,7 @@ function mmsHistory(Utils, ElementService, ProjectService, $templateCache, $q, $
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

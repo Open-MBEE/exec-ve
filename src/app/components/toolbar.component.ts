@@ -24,17 +24,19 @@ let ToolbarComponent = {
         private $rootScope
         private $state
         private UxService
-        private refOb
-        private documentOb
+
+        public refOb
+        public documentOb
 
         public tbApi;
-        public buttons = [];
+        public buttons;
 
         constructor($rootScope, $state, UxService, ToolbarService) {
             this.$rootScope = $rootScope;
             this.$state = $state;
             this.UxService = UxService;
             this.tbApi = ToolbarService;
+            this.buttons = this.tbApi.buttons;
 
             $rootScope.ve_tbApi = this.tbApi;
 
@@ -55,14 +57,18 @@ let ToolbarComponent = {
             //tbApi.addButton(UxService.getToolbarButton("jobs"));
         // }
         if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-            editable = this.documentOb._editable && this.refOb.type === 'Branch';
+            if(this.documentOb !== undefined) {
+                editable = this.documentOb._editable && this.refOb.type === 'Branch';
+            }
             this.tbApi.setPermission('element-editor', editable);
             if (this.$state.includes('project.ref.preview')) {
                 this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
                 this.tbApi.setPermission("view-reorder", editable);
             }
         } else if (this.$state.includes('project.ref.document')) {
-            editable = this.documentOb._editable && this.refOb.type === 'Branch';
+            if(this.documentOb !== undefined) {
+                editable = this.documentOb._editable && this.refOb.type === 'Branch';
+            }
             this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
             this.tbApi.setPermission('element-editor', editable);
             this.tbApi.setPermission("view-reorder", editable);

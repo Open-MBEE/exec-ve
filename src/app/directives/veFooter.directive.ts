@@ -5,7 +5,7 @@ var mmsApp = angular.module('mmsApp');
 angular.module('mmsApp').directive('veFooter', [ '$templateCache', veFooter]);
 
 function veFooter($templateCache) {
-    var template = $templateCache.get('partials/mms/veFooter.html');
+    var template = 'partials/mms/veFooter.html';
 
     //var no_banner = { template: '' };
     //if ( !BrandingService.hasOwnProperty('banner') ||
@@ -18,7 +18,7 @@ function veFooter($templateCache) {
 
 
     return {
-        template: template,
+        templateUrl: template,
         link: veFooterLink
     };
 }

@@ -21,7 +21,7 @@ mmsDirectives.directive('mmsViewReorder', ['ElementService', 'ViewService', '$te
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, _) {
-    var template = $templateCache.get('mms/templates/mmsViewReorder.html');
+    var template = 'partials/mms-directives/mmsViewReorder.html';
 
     var mmsViewReorderCtrl = function($scope, ViewService) {
         this.getEditing = function() {
@@ -221,7 +221,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

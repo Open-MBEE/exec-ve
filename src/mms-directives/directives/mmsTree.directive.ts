@@ -786,7 +786,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
     return {
         restrict: 'E',
-        template: $templateCache.get('mms/templates/mmsTree.html'),
+        template: $templateCache.get('partials/mms-directives/mmsTree.html'),
         // replace: true,
         scope: {
             treeData: '<',

@@ -16,10 +16,10 @@ mmsDirectives.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService'
  *
  */
 function mmsSearch($window, $anchorScroll, CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
-  var template = $templateCache.get('mms/templates/mmsSearch.html');
+  var template = 'partials/mms-directives/mmsSearch.html';
   return {
     restrict: 'E',
-    template: template,
+    templateUrl: template,
     link: mmsSearchLink,
     scope: {
       mmsOptions: '<',

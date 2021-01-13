@@ -4,7 +4,7 @@ var mmsDirectives = angular.module('mmsDirectives');
 mmsDirectives.directive('mmsViewPlot', ['$compile','$window', mmsViewPlot]);
 
 function mmsViewPlot($compile, $window) {
-    var mmsViewLink = function(scope, domElement, element, attrs, mmsViewCtrl) {
+    var mmsViewLink = function(scope, domElement : angular.IAugmentedJQuery, element, attrs, mmsViewCtrl) {
         if ( scope.plot.type === "Plot") {
             if ( scope.plot.config !== undefined  && scope.plot.config.trim().length !== 0){
                 try{

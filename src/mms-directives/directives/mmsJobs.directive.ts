@@ -30,7 +30,7 @@ mmsDirectives.directive('mmsJobs', ['$templateCache', '$http', '$location', '$wi
 function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootScope,
         AuthService, ElementService, ProjectService, UtilsService, JobService) {
 
-    var template = $templateCache.get('mms/templates/mmsJobs.html');
+    var template = 'partials/mms-directives/mmsJobs.html';
     //:TODO have cases for each null; "running"; "failed"; "completed"; "aborted";"unstable"; "disabled"; "waiting";
     var mmsJobsLink = function (scope, element, attrs) {
         var ran;
@@ -221,7 +221,7 @@ function mmsJobs($templateCache, $http, $location, $window, growl, _, $q, $rootS
     };
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsProjectId: '@',
             mmsRefId: '@',

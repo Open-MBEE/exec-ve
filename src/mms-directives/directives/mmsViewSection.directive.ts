@@ -5,7 +5,7 @@ mmsDirectives.directive('mmsViewSection', ['$compile', '$templateCache', '$rootS
 
 function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils, growl) {
 
-    var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
+    var defaultTemplate = 'partials/mms-directives/mmsViewSection.html';
 
     var mmsViewSectionCtrl = function($scope, $rootScope) {
 
@@ -29,7 +29,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
 
     };
 
-    var mmsViewSectionLink = function(scope, domElement, attrs, controllers) {
+    var mmsViewSectionLink = function(scope, domElement : angular.IAugmentedJQuery, attrs, controllers) {
         scope.element = scope.section; // This is for methods in Utils
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
@@ -43,7 +43,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
                 }
             });
         };
-        domElement.click(function(e) {
+        domElement.on("click",function(e) {
             //should not do anything if section is not an instancespec
             if (scope.startEdit)
                 scope.startEdit();

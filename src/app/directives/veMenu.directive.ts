@@ -24,7 +24,7 @@ mmsApp.directive('veMenu', ['CacheService','$state','$templateCache','$sce', '$t
  *
  */
 function veMenu(CacheService, $state, $templateCache, $sce, $timeout, UtilsService) {
-    var template = $templateCache.get('partials/mms/veMenu.html');
+    var template = 'partials/mms/veMenu.html';
 
     var veMenuLink = function(scope, element, attrs) {
         scope.getHrefForProject = getHrefForProject;
@@ -151,7 +151,7 @@ function veMenu(CacheService, $state, $templateCache, $sce, $timeout, UtilsServi
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             org: '<mmsOrg',
             project: '<mmsProject',

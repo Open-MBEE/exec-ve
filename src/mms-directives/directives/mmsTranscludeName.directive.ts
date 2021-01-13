@@ -30,14 +30,14 @@ mmsDirectives.directive('mmsTranscludeName', ['ElementService', 'UxService', '$c
  */
 function mmsTranscludeName(ElementService, UxService, $compile, growl, $templateCache, Utils, ViewService) {
 
-    var template = $templateCache.get('mms/templates/mmsTranscludeName.html');
+    var template = 'partials/mms-directives/mmsTranscludeName.html';
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print placeholder">(no name)</span>';
     var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print placeholder">(no name)</span>';
 
-    var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
+    var mmsTranscludeNameLink = function(scope, domElement : angular.IAugmentedJQuery, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         scope.recompileScope = null;
-        domElement.click(function(e) {
+        domElement.on("click",function(e) {
             if (scope.noClick)
                 return;
 

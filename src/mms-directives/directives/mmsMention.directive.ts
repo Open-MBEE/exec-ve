@@ -4,7 +4,7 @@ mmsDirectives.directive('mmsMention', ['$templateCache', 'MentionService', 'Util
 
 function mmsMention($templateCache, MentionService, Utils) {
     return {
-        template: $templateCache.get('mms/templates/mmsMention.html'),
+        template: $templateCache.get('partials/mms-directives/mmsMention.html'),
         scope: {
             mmsEditor: '<',
             mmsMentionValue: '<',

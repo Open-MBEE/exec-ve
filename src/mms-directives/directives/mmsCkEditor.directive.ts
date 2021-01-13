@@ -39,8 +39,8 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         }
 
         var instance = null;
-        var transcludeModalTemplate = $templateCache.get('mms/templates/mmsCfModal.html');
-        var commentModalTemplate = $templateCache.get('mms/templates/mmsCommentModal.html');
+        var transcludeModalTemplate = 'partials/mms-directives/mmsCfModal.html';
+        var commentModalTemplate = 'partials/mms-directives/mmsCommentModal.html';
 
         // Controller for inserting cross reference
         // Defines scope variables for html template and how to handle user click

@@ -55,7 +55,7 @@ mmsDirectives.directive('mmsView', ['Utils', 'AuthService', 'ViewService', 'Elem
  */
 
 function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache, growl) {
-    var template = $templateCache.get('mms/templates/mmsView.html');
+    var template = 'partials/mms-directives/mmsView.html';
 
     var mmsViewCtrl = function($scope) {
         $scope.presentationElemCleanUpFncs = [];
@@ -325,7 +325,7 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

@@ -25,7 +25,7 @@ mmsDirectives.directive('mmsRefList', ['$templateCache', '$http', 'growl', '_', 
 function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
     UtilsService, JobService, ElementService, URLService) {
 
-    var template = $templateCache.get('mms/templates/mmsRefList.html');
+    var template = 'partials/mms-directives/mmsRefList.html';
 
     var mmsRefListLink = function (scope, element, attrs) {
         var ran;
@@ -131,7 +131,7 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
 
 
         scope.docMergeAction = function (srcRef) {
-            var templateUrlStr = 'mms/templates/mergeConfirm.html';
+            var templateUrlStr = 'partials/mms-directives/mergeConfirm.html';
             scope.srcRefOb = srcRef;
 
             var instance = $uibModal.open({
@@ -184,7 +184,7 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
     };
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsProjectId: '@',
             mmsRefId: '@',

@@ -135,7 +135,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             if (reason.status === 409) {
                 scope.latest = reason.data.elements[0];
                 var instance = $uibModal.open({
-                    template: $templateCache.get('mms/templates/saveConflict.html'),
+                    template: $templateCache.get('partials/mms-directives/saveConflict.html'),
                     controller: ['$scope', '$uibModalInstance', conflictCtrl],
                     scope: scope,
                     size: 'lg'
@@ -889,7 +889,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
      * @param {object} domElement dom of the directive, jquery wrapped
      */
     var revertAction = function($scope, preview, domElement) {
-        var templateUrlStr = 'mms/templates/revertConfirm.html';
+        var templateUrlStr = 'partials/mms-directives/revertConfirm.html';
 
         var instance = $uibModal.open({
             templateUrl: templateUrlStr,

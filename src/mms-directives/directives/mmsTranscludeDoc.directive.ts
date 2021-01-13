@@ -39,7 +39,7 @@ mmsDirectives.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsSer
  */
 function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, $compile, $templateCache, growl, _, MathJax) {
 
-    var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
+    var template = 'partials/mms-directives/mmsTranscludeDoc.html';
 
     var fixPreSpanRegex = /<\/span>\s*<mms-cf/g;
     var fixPostSpanRegex = /<\/mms-cf>\s*<span[^>]*>/g;
@@ -67,13 +67,13 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
         };
     };
 
-    var mmsTranscludeDocLink = function(scope, domElement, attrs, controllers) {
+    var mmsTranscludeDocLink = function(scope, domElement : angular.IAugmentedJQuery, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
         scope.cfType = 'doc';
         scope.editorApi = {};
-        domElement.click(function(e) {
+        domElement.on("click",function(e) {
             if (scope.startEdit && !scope.nonEditable)
                 scope.startEdit();
 

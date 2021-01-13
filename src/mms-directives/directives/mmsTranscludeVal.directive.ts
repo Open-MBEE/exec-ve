@@ -35,9 +35,9 @@ mmsDirectives.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', '
  */
 function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http,
                           _, $compile, $templateCache, growl, MathJax, ViewService) {
-    var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
-    var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
-    var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
+    var valTemplate = 'partials/mms-directives/mmsTranscludeVal.html';
+    var frameTemplate = 'partials/mms-directives/mmsTranscludeValFrame.html';
+    var editTemplate = 'partials/mms-directives/mmsTranscludeValEdit.html';
     var emptyRegex = /^\s*$/;
     var spacePeriod = />(?:\s|&nbsp;)\./g;
     var spaceSpace = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g;
@@ -62,12 +62,12 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         };
     };
 
-    var mmsTranscludeValLink = function(scope, domElement, attrs, controllers) {
+    var mmsTranscludeValLink = function(scope, domElement : angular.IAugmentedJQuery, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
         scope.cfType = 'val';
-        domElement.click(function(e) {
+        domElement.on("click",function(e) {
             if (scope.startEdit && !scope.nonEditable) {
                 scope.startEdit();
             }
@@ -261,7 +261,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
 
     return {
         restrict: 'E',
-        //template: template,
+        //templateUrl: template,
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

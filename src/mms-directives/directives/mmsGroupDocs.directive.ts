@@ -75,7 +75,7 @@ function mmsGroupDocs(ElementService, ViewService, growl, $q, $templateCache, _)
 
     return {
         restrict: 'E',
-        template: $templateCache.get('mms/templates/mmsGroupDocs.html'),
+        template: $templateCache.get('partials/mms-directives/mmsGroupDocs.html'),
         scope: {
             mmsRefId: '@',
             mmsProjectId: '@',

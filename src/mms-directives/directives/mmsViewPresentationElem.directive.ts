@@ -28,7 +28,7 @@ mmsDirectives.directive('mmsViewPresentationElem', ['ViewService', 'ElementServi
  * @param {Object} mmsParentSection the parent section if available
  */
 function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $timeout, $location, $anchorScroll, $compile) {
-    var template = $templateCache.get('mms/templates/mmsViewPresentationElem.html');
+    var template = 'partials/mms-directives/mmsViewPresentationElem.html';
 
     var mmsViewPresentationElemCtrl = function($scope) {
         
@@ -106,7 +106,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $t
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         require: '?^^mmsView',
         scope: {
             mmsInstanceVal: '<',

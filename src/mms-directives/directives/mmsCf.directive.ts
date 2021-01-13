@@ -36,7 +36,7 @@ function mmsCf($compile) {
         };
     };
 
-    var mmsCfLink = function(scope, domElement, attrs, controllers) {
+    var mmsCfLink = function(scope, domElement : angular.IAugmentedJQuery, attrs, controllers) {
         var mmsCfCtrl = controllers[0];
         var mmsViewCtrl = controllers[1];
 

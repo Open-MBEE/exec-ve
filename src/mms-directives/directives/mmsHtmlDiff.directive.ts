@@ -4,7 +4,7 @@ var mmsDirectives = angular.module('mmsDirectives');
 mmsDirectives.directive('mmsHtmlDiff', ['$templateCache', '$timeout', 'MathJax', 'HtmlRenderedDiff', mmsHtmlDiff]);
 
 function mmsHtmlDiff($templateCache, $timeout, MathJax, HtmlRenderedDiff) {
-    var template = $templateCache.get('mms/templates/mmsHtmlDiff.html');
+    var template = 'partials/mms-directives/mmsHtmlDiff.html';
     var htmlDiffIdPrefix = 'htmlDiff-';
     return {
         restrict: 'E',
@@ -13,7 +13,7 @@ function mmsHtmlDiff($templateCache, $timeout, MathJax, HtmlRenderedDiff) {
             mmsComparedHtml: '<',
             mmsDiffFinish: '<'
         },
-        template: template,
+        templateUrl: template,
         controller: ['$scope', mmsHtmlDiffCtrl],
         link: mmsHtmlDiffLink
     };

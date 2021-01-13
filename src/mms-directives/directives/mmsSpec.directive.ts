@@ -73,9 +73,9 @@ mmsDirectives.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'Eleme
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, ViewService, $templateCache, growl, _) {
-    var template = $templateCache.get('mms/templates/mmsSpec.html');
+    var template = 'partials/mms-directives/mmsSpec.html';
 
-    var mmsSpecLink = function(scope, domElement, attrs) {
+    var mmsSpecLink = function(scope, domElement : angular.IAugmentedJQuery, attrs) {
         var ran = false;
         var lastid = null; //race condition check
         var keepMode = false;
@@ -369,7 +369,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

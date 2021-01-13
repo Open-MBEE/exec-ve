@@ -20,12 +20,13 @@ mmsApp.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 
  * 
  */
 function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
-    var template = $templateCache.get('partials/mms/veNav.html');
+    var template = 'partials/mms/veNav.html';
 
     var veNavLink = function(scope, element, attrs) {
         ProjectService.getOrgs().then(function(orgs){
             scope.orgs = orgs;
         });
+        console.log(scope);
         scope.isNavCollapsed = true;
         scope.updateOrg = function() {
             $uibModal.open({
@@ -148,7 +149,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             title: '<mmsTitle', //page title - used in mobile view only
             org: '<mmsOrg',

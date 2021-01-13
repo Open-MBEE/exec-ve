@@ -22,7 +22,7 @@ mmsDirectives.directive('mmsTsDiagram', ['ElementService', '$templateCache', '$w
  */
 function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, ApplicationService, AuthService, URLService) {
     var importedTsJs = false;
-    var template = $templateCache.get('mms/templates/mmsTsDiagram.html');
+    var template = 'partials/mms-directives/mmsTsDiagram.html';
     var mapping = {};
     // var deferreds = {};
     var projectId2PeId = {};
@@ -414,7 +414,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
 
     return {
         restrict: 'E',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsProjectId: '@',
             mmsRefId: '@',

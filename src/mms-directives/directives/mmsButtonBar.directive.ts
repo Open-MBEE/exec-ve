@@ -4,7 +4,7 @@ var mmsDirectives = angular.module('mmsDirectives');
 mmsDirectives.directive('mmsButtonBar', ['$templateCache', mmsButtonBar]);
 
 function mmsButtonBar($templateCache) {
-    var template = $templateCache.get('mms/templates/mmsButtonBar.html');
+    var template = 'partials/mms-directives/mmsButtonBar.html';
 
     var mmsButtonBarLink = function(scope, element, attrs){
 
@@ -132,7 +132,7 @@ function mmsButtonBar($templateCache) {
 
     return {
         restrict: 'E', 
-        template: template,
+        templateUrl: template,
         link: mmsButtonBarLink,
         controller: ['$scope', mmsButtonBarCtrl],
         scope: {

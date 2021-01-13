@@ -32,7 +32,7 @@ mmsDirectives.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsSe
  */
 function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $templateCache, $compile, growl, MathJax) {
 
-    var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
+    var template = 'partials/mms-directives/mmsTranscludeDoc.html';
     
     var mmsTranscludeComCtrl = function ($scope) {
 
@@ -53,13 +53,13 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         };
     };
 
-    var mmsTranscludeComLink = function(scope, domElement, attrs, controllers) {
+    var mmsTranscludeComLink = function(scope, domElement : angular.IAugmentedJQuery, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
         scope.cfType = 'doc';
 
-        domElement.click(function(e) {
+        domElement.on("click",function(e) {
             if (scope.startEdit && !scope.nonEditable)
                 scope.startEdit();
 

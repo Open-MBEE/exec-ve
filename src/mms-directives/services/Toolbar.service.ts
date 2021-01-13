@@ -6,15 +6,6 @@ export class ToolbarService {
 
   buttons = [];
 
-  constructor(buttons) {
-    this.buttons = buttons;
-  }
-
-
-			//if ($scope.mmsTbApi)
-			//{
-				//var api = $scope.mmsTbApi;
-
   select = (id) => {
     this.buttons.forEach((button) =>
     {

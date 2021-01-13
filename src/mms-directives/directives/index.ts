@@ -1,5 +1,4 @@
 import "./charts"
-import "./templates"
 
 import "./mmsAnnotation.directive";
 import "./mmsButtonBar.directive";

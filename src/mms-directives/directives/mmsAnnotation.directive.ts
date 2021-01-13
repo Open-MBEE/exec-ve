@@ -5,10 +5,10 @@ var mmsDirectives = angular.module('mmsDirectives');
 mmsDirectives.directive('mmsAnnotation', ['$templateCache', '$rootScope', 'ViewService', 'UtilsService', mmsAnnotation]);
 
 function mmsAnnotation($templateCache, $rootScope, ViewService, UtilsService) {
-    var template = $templateCache.get('mms/templates/mmsAnnotation.html');
+    var template = 'partials/mms-directives/mmsAnnotation.html';
     return {
         restrict: 'A',
-        template: template,
+        templateUrl: template,
         scope: {
             mmsReqOb: '<',
             mmsRecentElement: '<',
