@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 
-export class ToolbarService {
+export class ToolbarApi {
 
   buttons = [];
 
@@ -143,7 +143,9 @@ export class ToolbarService {
 
 }
 
-ToolbarService.$inject = [];
-
+toolbarService.$inject = [];
+function toolbarService() {
+  return new ToolbarApi();
+}
 mmsDirectives
-  .service("ToolbarService", ToolbarService);
+  .service("ToolbarService", toolbarService);

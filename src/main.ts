@@ -20,7 +20,6 @@ import 'd3';
 import 'lodash';
 import 'moment';
 import 'ngstorage';
-import 'stompjs';
 import 'vdomdiff';
 
 import "./lib"

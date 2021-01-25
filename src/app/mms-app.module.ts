@@ -468,7 +468,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'banner@': {
-                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                template: '<ve-system-banner banner="banner"></ve-system-banner>',
                 controller: ['$scope', 'bannerOb', function($scope, bannerOb){
                     $scope.banner = bannerOb;
                 }]
@@ -506,8 +506,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 }]
             },
             'pane-left@': {
-                templateUrl: 'partials/mms/pane-left.html',
-                controller: 'TreeCtrl'
+                template: '<tree-pane documentOb="$resolve.documentOb" orgOb="$resolve.orgOb" projectOb="$resolve.projectOb" refOb="$resolve.refOb" refObs="$resolve.refOb" groupObs="$resolve.groupObs" docMeta="$resolve.docMeta"></tree-pane>'
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
@@ -521,7 +520,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 template: '<toolbar-component refOb="$resolve.refOb" documentOb="$resolve.documentOb"></toolbar-component>'
             },
             'footer@': {
-                template: '<ve-footer mms-footer="footer" ng-if="ve_footer"></ve-footer>',
+                template: '<ve-footer footer="footer" ng-if="ve_footer"></ve-footer>',
                 controller: ['$scope', 'footerOb', function ($scope, footerOb) {
                     $scope.footer = footerOb;
                 }]
@@ -709,8 +708,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 }]
             },
             'pane-left@': {
-                templateUrl: 'partials/mms/pane-left.html',
-                controller: 'TreeCtrl'
+                template: '<tree-pane documentOb="$resolve.documentOb" orgOb="$resolve.orgOb" projectOb="$resolve.projectOb" refOb="$resolve.refOb" refObs="$resolve.refOb" groupObs="$resolve.groupObs" docMeta="$resolve.docMeta"></tree-pane>'
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',

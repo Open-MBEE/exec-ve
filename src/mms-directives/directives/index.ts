@@ -22,7 +22,7 @@ import "./mmsTranscludeDoc.directive";
 import "./mmsTranscludeImg.directive";
 import "./mmsTranscludeName.directive";
 import "./mmsTranscludeVal.directive";
-import "./mmsTree.directive";
+//import "./mmsTree.directive";
 import "./mmsTsDiagram.directive";
 import "./mmsValueLink.directive";
 import "./mmsView.directive";

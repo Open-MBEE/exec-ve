@@ -1,7 +1,17 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter', 'UtilsService', mmsTree]);
+let TreeComponent = {
+
+}
+
+
+
+
+
+
+
+mmsDirectives.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter', 'UtilsService', 'TreeService', mmsTree]);
 
 /**
  * @ngdoc directive
@@ -52,7 +62,7 @@ mmsDirectives.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$
         $scope.handler = function(branch) {
             //branch selected
         };
-        $scope.treeData = [
+        $treeData = [
             {
                 label: 'Root',
                 type: 'Package',
@@ -97,9 +107,12 @@ mmsDirectives.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$
  * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
  * @param {string='fa fa-file'} iconDefault default icon to use for nodes
  */
-function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, UtilsService) {
+function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, UtilsService, TreeService) {
 
     var mmsTreeLink = function(scope, element, attrs) {
+        const treeApi = TreeService;
+        let treeData = scope.treeData;
+        
         scope.getHref = getHref;
         if (!scope.options) {
             scope.options = {
@@ -116,7 +129,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
         if (!scope.options.expandLevel && scope.options.expandLevel !== 0)
             scope.options.expandLevel = 1;
         var expand_level = scope.options.expandLevel;
-        if (!angular.isArray(scope.treeData)) {
+        if (!angular.isArray(treeData)) {
             $log.warn('treeData is not an array!');
             return;
         }
@@ -130,16 +143,16 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                     }
                 }
             };
-            var rootLevelBranches = excludeBranch ? scope.treeData.filter(function(branch) { return branch !== excludeBranch; }) : scope.treeData;
+            var rootLevelBranches = excludeBranch ? treeData.filter(function(branch) { return branch !== excludeBranch; }) : treeData;
             rootLevelBranches.forEach(function (branch) { run(branch, 1); });
         };
 
         var remove_branch_impl = function (branch, singleBranch) {
             var parent_branch = get_parent(branch);
             if (!parent_branch) {
-                for (var j = 0; j < scope.treeData.length; j++) {
-                    if (scope.treeData[j].uid === branch.uid) {
-                        scope.treeData.splice(j,1);
+                for (var j = 0; j < treeData.length; j++) {
+                    if (treeData[j].uid === branch.uid) {
+                        treeData.splice(j,1);
                         break;
                     }
                 }
@@ -277,7 +290,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                     }
                 }
             });
-            scope.tree_rows = [];
+            scope.treeRows = [];
             var add_branch_to_list = function(level, section, branch, visible, peNums) {
                 var expand_icon = "";
                 var type_icon = "";
@@ -340,7 +353,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                 }
                 if (branch.hide)
                     visible = false;
-                scope.tree_rows.push({
+                scope.treeRows.push({
                     level: level,
                     section: number,
                     branch: branch,
@@ -387,11 +400,11 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             };
 
             if (scope.options.sort) {
-                scope.treeData.sort(scope.options.sort);
+                treeData.sort(scope.options.sort);
             }
 
-            for (var i = 0; i < scope.treeData.length; i++) {
-                add_branch_to_list(1, [], scope.treeData[i], true, {figure: 0, table: 0, equation: 0});
+            for (var i = 0; i < treeData.length; i++) {
+                add_branch_to_list(1, [], treeData[i], true, {figure: 0, table: 0, equation: 0});
             }
 
         };
@@ -410,7 +423,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
         scope.on_treeData_change = on_treeData_change;
         scope.$watch('treeData', on_treeData_change, false);
         scope.$watch('initialSelection', on_initialSelection_change);
-        scope.tree_rows = [];
+        scope.treeRows = [];
         scope.treeFilter = $filter('uiTreeFilter');
 
         if (attrs.initialSelection) {
@@ -447,334 +460,6 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             }
         };
 
-        if (angular.isObject(scope.treeControl)) {
-            var tree = scope.treeControl;
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#expand_all
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             */
-            tree.expand_all = function() {
-                for_each_branch(function(b, level) {
-                    scope.expandCallback({ branch: b });
-                    b.expanded = true;
-                });
-                on_treeData_change();
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#collapse_all
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             */
-            tree.collapse_all = function(excludeBranch) {
-                for_each_branch(function(b, level) {
-                    b.expanded = false;
-                }, excludeBranch);
-                on_treeData_change();
-            };
-
-            tree.get_first_branch = function() {
-                if (scope.treeData.length > 0)
-                    return scope.treeData[0];
-            };
-            tree.select_first_branch = function() {
-                var b = tree.get_first_branch();
-                select_branch(b);
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#get_selected_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @return {Object} current selected branch
-             */
-            tree.get_selected_branch = function() {
-                return selected_branch;
-            };
-
-            tree.clear_selected_branch = function() {
-                selected_branch = null;
-            };
-
-            tree.get_parent_branch = get_parent;
-            tree.select_branch = select_branch;
-            tree.get_children = function(b) {
-                return b.children;
-            };
-            tree.select_parent_branch = function(b) {
-                var p = tree.get_parent_branch(b);
-                if (p) 
-                    tree.select_branch(p);
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#add_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @param {Object} parent parent branch or null 
-             * @param {Object} new_branch branch to add to parent or root
-             */
-            tree.add_branch = function(parent, new_branch, top) {
-                if (parent) {
-                    if (top)
-                        parent.children.unshift(new_branch);
-                    else
-                        parent.children.push(new_branch);
-                    parent.expanded = true;
-                } else {
-                    if (top)
-                        scope.treeData.unshift(new_branch);
-                    else
-                        scope.treeData.push(new_branch);
-                }
-                on_treeData_change();
-            };
-
-            tree.remove_branch = function(branch) {
-                remove_branch(branch);
-                on_treeData_change();
-            };
-
-            tree.remove_single_branch = function(branch) {
-                remove_single_branch(branch);
-                on_treeData_change();
-            };
-
-            tree.add_root_branch = function(new_branch) {
-                tree.add_branch(null, new_branch);
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#expand_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @param {Object} branch branch to expand
-             */
-            tree.expand_branch = function(b) {
-                if (!b)
-                    b = tree.get_selected_branch();
-                if (b) {
-                    scope.expandCallback({ branch: b });
-                    b.expanded = true;
-                }
-                on_treeData_change();
-            };
-
-            tree.expandPathToSelectedBranch = expandPathToSelectedBranch;
-
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#collapse_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @param {Object} branch branch to collapse
-             */
-            tree.collapse_branch = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b)
-                    b.expanded = false;
-                on_treeData_change();
-            };
-            tree.get_siblings = function(b) {
-                var siblings;
-                var p = tree.get_parent_branch(b);
-                if (p)
-                    siblings = p.children;
-                else
-                    siblings = scope.treeData;
-                return siblings;
-            };
-            tree.get_next_sibling = function(b) {
-                var siblings = tree.get_siblings(b);
-                if (angular.isArray(siblings)) {
-                    var i = siblings.indexOf(b);
-                    if (i < siblings.length - 1)
-                        return siblings[i + 1];
-                }
-            };
-            tree.get_prev_sibling = function(b) {
-                var siblings = tree.get_siblings(b);
-                if (angular.isArray(siblings)) {
-                    var i = siblings.indexOf(b);
-                    if (i > 0) 
-                        return siblings[i - 1];
-                }
-            };
-            tree.select_next_sibling = function(b) {
-                var next = tree.get_next_silbing(b);
-                if (next)
-                    tree.select_branch(next);
-            };
-            tree.select_prev_sibling = function(b) {
-                var prev = tree.get_prev_sibling(b);
-                if (prev)
-                    tree.select_branch(prev);
-            };
-            tree.get_first_child = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b && b.children && b.children.length > 0)
-                    return b.children[0];
-            };
-            tree.get_closest_ancestor_next_sibling = function(b) {
-                var next = tree.get_next_sibling(b);
-                if (next)
-                    return next;
-                else {
-                    next = tree.get_parent_branch(b);
-                    return tree.get_closest_ancestor_next_sibling(next);
-                }
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#get_next_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @param {Object} branch current branch
-             * @return {Object} next branch
-             */
-            tree.get_next_branch = function(b) {
-                if (!b)
-                    b = selected_branch;
-                if (b) {
-                    var next = tree.get_first_child(b);
-                    if (next)
-                        return next;
-                    else {
-                        next = tree.get_closest_ancestor_next_sibling(b);
-                        return next;
-                    }
-                }
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#select_next_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @param {Object} branch current branch
-             */
-            tree.select_next_branch = function(b) {
-                var next = tree.get_next_branch(b);
-                if (next)
-                    tree.select_branch(next);
-            };
-            tree.last_descendant = function(b) {
-                if (b) {
-                    if (b.children.length === 0)
-                        return b;
-                    var last = b.children[b.children.length - 1];
-                    return tree.last_descendant(last);
-                }
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#get_prev_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @param {Object} branch current branch
-             * @return {Object} previous branch
-             */
-            tree.get_prev_branch = function(b) {
-                var prev_sibling = tree.get_prev_sibling(b);
-                if (prev_sibling)
-                    return tree.last_descendant(prev_sibling);
-                return tree.get_parent_branch(b);
-            };
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#select_prev_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * self explanatory
-             *
-             * @param {Object} branch current branch
-             */
-            tree.select_prev_branch = function(b) {
-                var prev = tree.get_prev_branch(b);
-                if (prev)
-                    tree.select_branch(prev);
-            };
-
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#refresh
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * rerender the tree when data or options change
-             */
-            tree.refresh = function() {
-                on_treeData_change();
-            };
-
-            tree.initialSelect = function() {
-                on_initialSelection_change();
-            };
-
-            tree.sort_branch = function(b, sortFunction) {
-                b.children.sort(sortFunction);
-            };
-
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsTree#get_branch
-             * @methodOf mmsDirectives.directive:mmsTree
-             * 
-             * @description 
-             * Returns the branch with the specified data
-             */
-            tree.get_branch = function(data) {
-                var branch = null;
-                for_each_branch(function(b) {
-                    // if (angular.equals(b.data,data)) {
-                    //     branch = b;
-                    // }
-                    if (b.data.id === data.id) {
-                        branch = b;
-                    }
-                });
-                return branch;
-            };
-
-            tree.get_rows = function() {
-                return scope.tree_rows;
-            };
-
-            tree.user_clicks_branch = function(branch) {
-                return scope.user_clicks_branch(branch);
-            };
-
-        }
-
         function getHref(row) {
             var data = row.branch.data;
             if (row.branch.type !== 'group' && UtilsService.isDocument(data) && !ApplicationService.getState().fullDoc) {
@@ -786,7 +471,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
     return {
         restrict: 'E',
-        template: $templateCache.get('partials/mms-directives/mmsTree.html'),
+        templateUrl: 'partials/mms-directives/mmsTree.html',
         // replace: true,
         scope: {
             treeData: '<',

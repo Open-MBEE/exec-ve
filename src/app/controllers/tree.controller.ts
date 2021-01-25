@@ -815,7 +815,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.oking = true;
             var promise = null;
             if (branch.type === 'view') {
-                var parentBranch = $scope.treeApi.get_parent_branch(branch);
+                var parentBranch = $scope.treeApi.get_parent_object(branch);
                 if (!$state.includes('project.ref.document')) {
                     promise = ViewService.downgradeDocument(branch.data);
                 } else {

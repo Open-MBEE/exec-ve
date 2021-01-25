@@ -2,9 +2,9 @@ import * as angular from 'angular';
 var mmsApp = angular.module('mmsApp');
 
 
-angular.module('mmsApp').directive('veFooter', [ '$templateCache', veFooter]);
+mmsApp.directive('veFooter', veFooter);
 
-function veFooter($templateCache) {
+function veFooter() {
     var template = 'partials/mms/veFooter.html';
 
     //var no_banner = { template: '' };
