@@ -506,7 +506,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 }]
             },
             'pane-left@': {
-                template: '<tree-pane documentOb="$resolve.documentOb" orgOb="$resolve.orgOb" projectOb="$resolve.projectOb" refOb="$resolve.refOb" refObs="$resolve.refOb" groupObs="$resolve.groupObs" docMeta="$resolve.docMeta"></tree-pane>'
+                template: '<tree-pane document-ob="$resolve.documentOb" org-ob="$resolve.orgOb" project-ob="$resolve.projectOb" ref-ob="$resolve.refOb" ref-obs="$resolve.refOb" group-obs="$resolve.groupObs" doc-meta="$resolve.docMeta"></tree-pane>'
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',

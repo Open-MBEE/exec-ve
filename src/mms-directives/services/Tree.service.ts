@@ -1,28 +1,28 @@
 import * as angular from "angular";
+import { tree } from "d3";
 import {ToolbarApi} from "./Toolbar.service";
 var mmsDirectives = angular.module('mmsDirectives');
 
 class TreeApi {
-  static $inject = ['$timeout']
-  private $scope;
-  private $attrs;
   private $timeout;
   private options;
   private expandPathToSelectedBranch;
 
   private selected_branch;
 
-  //public treeData;
-  //public treeRows;
+  public treeData;
+  public treeRows;
+  public initialSelection;
+  public treeOptions;
+  public treeIcons;
   
   
-  constructor($scope) {
-    this.$scope = $scope;
-    this.$attrs = this.$scope.$attrs;
-    this.$timeout = this.$scope.$timeout;
-    //this.treeData = this.$scope.treeData;
-    //this.treeRows = this.$scope.treeRows;
-    this.options = this.$scope.treeOptions;
+  constructor($timeout) {
+    this.$timeout = $timeout;
+    this.treeData = {};
+    this.treeRows = [];
+    //this.treeRows = this.treeRows;
+    this.options = {};
   }
 
   for_each_branch = (func, excludeBranch?) => {
@@ -34,14 +34,14 @@ class TreeApi {
             }
         }
     };
-    var rootLevelBranches = excludeBranch ? this.$scope.treeData.filter((branch) => { return branch !== excludeBranch; }) : this.$scope.treeData;
+    var rootLevelBranches = excludeBranch ? this.treeData.filter((branch) => { return branch !== excludeBranch; }) : this.treeData;
     rootLevelBranches.forEach(function (branch) { run(branch, 1); });
   };
 
   on_initialSelection_change = () => {
-    if (this.$scope.initialSelection) {
+    if (this.initialSelection) {
         this.for_each_branch((b) => {
-            if (b.data.id === this.$scope.initialSelection) {
+            if (b.data.id === this.initialSelection) {
                 this.select_branch(b, true);
             }
         });
@@ -62,7 +62,7 @@ class TreeApi {
             }
         }
     });
-    this.$scope.treeRows = [];
+    this.treeRows = [];
     var add_branch_to_list = (level, section, branch, visible, peNums) => {
         var expand_icon = "";
         var type_icon = "";
@@ -86,9 +86,9 @@ class TreeApi {
             }
             if (haveVisibleChild) {
                 if (branch.expanded) {
-                    expand_icon = this.$attrs.iconCollapse;
+                    expand_icon = this.treeIcons.iconCollapse;
                 } else {
-                    expand_icon = this.$attrs.iconExpand;
+                    expand_icon = this.treeIcons.iconExpand;
                 }
             } else
                 expand_icon = "fa fa-lg fa-fw";
@@ -100,7 +100,7 @@ class TreeApi {
         } else if (this.options && this.options.types && this.options.types[branch.type.toLowerCase() + aggr]) {
             type_icon = this.options.types[branch.type.toLowerCase() + aggr];
         } else {
-            type_icon = this.$attrs.iconDefault;
+            type_icon = this.treeIcons.iconDefault;
         }
 
         var number = section.join('.');
@@ -125,7 +125,7 @@ class TreeApi {
         }
         if (branch.hide)
             visible = false;
-        this.$scope.treeRows.push({
+        this.treeRows.push({
             level: level,
             section: number,
             branch: branch,
@@ -172,11 +172,11 @@ class TreeApi {
     };
 
     if (this.options.sort) {
-      this.$scope.treeData.sort(this.options.sort);
+      this.treeData.sort(this.options.sort);
     }
 
-    for (var i = 0; i < this.$scope.treeData.length; i++) {
-        add_branch_to_list(1, [], this.$scope.treeData[i], true, {figure: 0, table: 0, equation: 0});
+    for (var i = 0; i < this.treeData.length; i++) {
+        add_branch_to_list(1, [], this.treeData[i], true, {figure: 0, table: 0, equation: 0});
     }
 
 };
@@ -307,8 +307,8 @@ get_parent = (child) => {
   };
 
   get_first_branch = () => {
-    if (this.$scope.treeData.length > 0)
-      return this.$scope.treeData[0];
+    if (this.treeData.length > 0)
+      return this.treeData[0];
   };
   select_first_branch = () => {
     var b = this.get_first_branch();
@@ -363,9 +363,9 @@ get_parent = (child) => {
       parent.expanded = true;
     } else {
       if (top)
-      this.$scope.treeData.unshift(new_branch);
+      this.treeData.unshift(new_branch);
       else
-      this.$scope.treeData.push(new_branch);
+      this.treeData.push(new_branch);
     }
     this.on_treeData_change();
   };
@@ -427,7 +427,7 @@ get_parent = (child) => {
     if (p)
       siblings = p.children;
     else
-      siblings = this.$scope.treeData;
+      siblings = this.treeData;
     return siblings;
   };
 
@@ -597,7 +597,7 @@ get_parent = (child) => {
   };
 
   get_rows = () => {
-    return this.$scope.treeRows;
+    return this.treeRows;
   };
 
   user_clicks_branch = (branch) => {
@@ -605,9 +605,10 @@ get_parent = (child) => {
   };
 
 }
-
-function TreeService(scope) {
-  return new TreeApi(scope);
+function treeService($timeout) {
+  return new TreeApi($timeout);
 }
+treeService.$inject = ['$timeout'];
+
 mmsDirectives
-  .service("TreeService", ['treeData', TreeService]);
+  .service("TreeService", treeService);

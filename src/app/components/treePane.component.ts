@@ -23,7 +23,7 @@ let TreePaneComponent = {
 <div fa-pane pane-anchor="center" pane-no-toggle="true">
     <div class="pane-left" style="display:table;">
         <tree ng-show="'showTree'==(activeMenu)" tree-data="$ctrl.treeData"
-                tree-control="$ctrl.treeApi" initial-selection="{{$ctrl.$rootScope.ve_treeInitial}}" options="$ctrl.treeOptions"></tree>
+                tree-control="$ctrl.treeControl" initial-selection="{{$ctrl.initialSelection}}" options="$ctrl.treeOptions"></tree>
 
         <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
             <h4 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h4>
@@ -47,17 +47,18 @@ let TreePaneComponent = {
 </div>
 `,
   bindings: {
-    documentOb: "<",
-    orgOb: "<",
-    projectOb: "<",
-    refOb: "<",
-    refObs: "<",
-    groupObs: "<",
-    docMeta: "<"
+    documentOb: "=",
+    orgOb: "=",
+    projectOb: "=",
+    refOb: "=",
+    refObs: "=",
+    groupObs: "=",
+    docMeta: "="
   },
   controller: class TreePaneController {
     static $inject = ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
-      'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'ToolbarService', 'ButtonBarService', 'TreeService'];
+      'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'ToolbarService', 'ButtonBarService', 
+      'TreeService'];
 
     //Injected Dependencies
     private $anchorScroll
@@ -83,7 +84,7 @@ let TreePaneComponent = {
     public tbApi
     public buttons
     public treeButtons
-    public treeApi
+    public treeControl
     public treeOptions
     public treeData
     public filterInputPlaceholder
@@ -100,16 +101,17 @@ let TreePaneComponent = {
     public oking
     public searchOptions
     public removeObject
+    public initialSelection
 
     //Bindings
-    public documentOb
-    public viewOb
-    public orgOb
-    public projectOb
-    public refOb
-    public refObs
-    public groupObs
-    public docMeta
+    private documentOb
+    private viewOb
+    private orgOb
+    private projectOb
+    private refOb
+    private refObs
+    private groupObs
+    private docMeta
 
     //Local Variables
     private docEditable;
@@ -118,7 +120,9 @@ let TreePaneComponent = {
     private newDoc: any;
     private createForm: boolean;
 
-    constructor($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, ToolbarService, ButtonBarService, TreeService) {
+    constructor($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, UxService, 
+      ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, ToolbarService, ButtonBarService, TreeService) {
+
       this.$anchorScroll = $anchorScroll;
       this.$q = $q;
       this.$filter = $filter;
@@ -135,7 +139,7 @@ let TreePaneComponent = {
       this.ViewService = ViewService;
       this.ProjectService = ProjectService;
       this.MmsAppUtils = MmsAppUtils;
-
+      this.initialSelection = $rootScope.ve_treeInitial
 
       this.filterInputPlaceholder = 'Filter groups/docs';
       if (this.$state.includes('project.ref.document')) {
@@ -144,9 +148,9 @@ let TreePaneComponent = {
 
       //$rootScope.mms_refOb = this.refOb;
       //$rootScope.ve_bbApi = this.bbApi;
-      $rootScope.ve_tree_pane = this;
-      if (!$rootScope.veTreeShowPe) {
-        $rootScope.veTreeShowPe = false;
+      this.$rootScope.ve_tree_pane = this;
+      if (!this.$rootScope.veTreeShowPe) {
+        this.$rootScope.veTreeShowPe = false;
       }
 
       this.tbApi = ToolbarService;
@@ -154,13 +158,21 @@ let TreePaneComponent = {
       this.buttons = this.bbApi.buttons;
       this.treeButtons = this.tbApi.buttons;
 
-      this.treeData = {};
-      this.treeApi = TreeService(this);
+      this.treeControl = TreeService;
+      this.treeData = this.treeControl.treeData;
+      this.treeOptions = this.treeControl.treeOptions;
 
+      this.$rootScope.ve_fullDocMode = false;
+      if (this.$state.includes('project.ref.document.full')) {
+        this.$rootScope.ve_fullDocMode = true;
+      }
+      
+    }
 
+    $onInit = () => {
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-        this.treeData = UtilsService.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func);
-        ViewService.getProjectDocuments({
+        this.treeData = this.UtilsService.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func);
+        this.ViewService.getProjectDocuments({
           projectId: this.projectOb.id,
           refId: this.refOb.id
         }, 2).then((documentObs) => {
@@ -174,8 +186,8 @@ let TreePaneComponent = {
               });
             }
           }
-          if (this.treeApi.initialSelect) {
-            this.treeApi.initialSelect();
+          if (this.treeControl.initialSelect) {
+            this.treeControl.initialSelect();
           }
         });
       } else {
@@ -193,7 +205,7 @@ let TreePaneComponent = {
                 }
               }
             }
-            ElementService.getElements({
+            this.ElementService.getElements({
               elementIds: bulkGet,
               projectId: this.projectOb.id,
               refId: this.refOb.id
@@ -201,7 +213,7 @@ let TreePaneComponent = {
               for (var i in this.viewId2node) {
                 this.addSectionElements(this.viewId2node[i].data, this.viewId2node[i], this.viewId2node[i], true);
               }
-              this.treeApi.refresh();
+              this.treeControl.refresh();
             });
           }, (reason) =>  {
             console.log(reason);
@@ -210,11 +222,11 @@ let TreePaneComponent = {
       }
 
       this.treeOptions = {
-        types: UxService.getTreeTypes(),
+        types: this.UxService.getTreeTypes(),
         sectionNumbering: this.$state.includes('project.ref.document') ? true : false,
         numberingDepth: 0,
         numberingSeparator: '.',
-        expandLevel: this.$state.includes('project.ref.document') ? 3 : ($state.includes('project.ref') ? 0 : 1),
+        expandLevel: this.$state.includes('project.ref.document') ? 3 : (this.$state.includes('project.ref') ? 0 : 1),
         search: '',
         onSelect: this.treeClickHandler,
         onDblclick: this.treeDblclickHandler,
@@ -226,13 +238,6 @@ let TreePaneComponent = {
         this.treeOptions.startChapter = this.documentOb._startChapter;
       }
 
-
-
-
-      $rootScope.ve_fullDocMode = false;
-      if ($state.includes('project.ref.document.full')) {
-        $rootScope.ve_fullDocMode = true;
-      }
       this.docEditable = false;
       if(this.documentOb !== undefined && this.refOb !== undefined) {
         this.docEditable = this.documentOb && this.documentOb._editable && this.refOb.type === 'Branch' && this.UtilsService.isView(this.documentOb);
@@ -268,11 +273,11 @@ let TreePaneComponent = {
       this.toggle('showTree');
 
       this.$scope.$on('tree-expand', () => {
-        this.treeApi.expand_all();
+        this.treeControl.expand_all();
       });
 
       this.$scope.$on('tree-collapse', () => {
-        this.treeApi.collapse_all();
+        this.treeControl.collapse_all();
       });
 
       this.$scope.$on('tree-add-document', () => {
@@ -293,12 +298,12 @@ let TreePaneComponent = {
 
       this.$scope.$on('tree-delete-view', () => {
         this.deleteItem((deleteBranch) =>  {
-          $rootScope.$broadcast('mms-full-doc-view-deleted', deleteBranch);
+          this.$rootScope.$broadcast('mms-full-doc-view-deleted', deleteBranch);
         });
       });
 
       this.$scope.$on('tree-reorder-view', () => {
-        $rootScope.ve_fullDocMode = false;
+        this.$rootScope.ve_fullDocMode = false;
         this.bbApi.setToggleState("tree-full-document", false);
         this.$state.go('project.ref.document.order', {search: undefined});
       });
@@ -313,16 +318,16 @@ let TreePaneComponent = {
 
       this.$scope.$on('tree-show-pe', () => {
         this.toggle('showTree');
-        $rootScope.veTreeShowPe = true;
+        this.$rootScope.veTreeShowPe = true;
         this.setPeVisibility(this.viewId2node[this.documentOb.id]);
-        this.treeApi.refresh();
+        this.treeControl.refresh();
       });
 
       this.$scope.$on('tree-show-views', () => {
         this.toggle('showTree');
-        $rootScope.veTreeShowPe = false;
+        this.$rootScope.veTreeShowPe = false;
         this.setPeVisibility(this.viewId2node[this.documentOb.id]);
-        this.treeApi.refresh();
+        this.treeControl.refresh();
       });
 
       this.$scope.$on('tree-show-tables', () => {
@@ -343,7 +348,7 @@ let TreePaneComponent = {
       this.$scope.$on('viewctrl.add.element', (event, instanceSpec, elemType, parentBranchData) =>  {
         if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
           return;
-        var branch = this.treeApi.get_branch(parentBranchData);
+        var branch = this.treeControl.get_branch(parentBranchData);
         var viewId = null;
         if (branch.type === 'section') {
           viewId = branch.viewId;
@@ -356,7 +361,7 @@ let TreePaneComponent = {
           type: (elemType === 'image' ? 'figure' : elemType),
           viewId: viewId,
           data: instanceSpec,
-          hide: !$rootScope.veTreeShowPe && elemType !== 'section',
+          hide: !this.$rootScope.veTreeShowPe && elemType !== 'section',
           children: []
         };
         var i = 0;
@@ -376,15 +381,15 @@ let TreePaneComponent = {
         if (elemType === 'section') {
           this.addSectionElements(instanceSpec, viewNode, newbranch);
         }
-        this.treeApi.refresh();
+        this.treeControl.refresh();
         this.resetPeTreeList(elemType);
       });
 
       // Utils creates this event when deleting instances from the view
       this.$scope.$on('viewctrl.delete.element', (event, elementData) =>  {
-        var branch = this.treeApi.get_branch(elementData);
+        var branch = this.treeControl.get_branch(elementData);
         if (branch) {
-          this.treeApi.remove_single_branch(branch);
+          this.treeControl.remove_single_branch(branch);
         }
         this.resetPeTreeList(branch.type);
       });
@@ -506,8 +511,8 @@ let TreePaneComponent = {
           });
         }
         groupNode.loading = false;
-        if (this.treeApi.initialSelect) {
-          this.treeApi.initialSelect();
+        if (this.treeControl.initialSelect) {
+          this.treeControl.initialSelect();
         }
       });
     };
@@ -544,8 +549,8 @@ let TreePaneComponent = {
       }
       curNode.children.push.apply(curNode.children, newChildNodes);
       curNode.loading = false;
-      if (this.treeApi.refresh) {
-        this.treeApi.refresh();
+      if (this.treeControl.refresh) {
+        this.treeControl.refresh();
       }
     };
 
@@ -614,9 +619,9 @@ let TreePaneComponent = {
                 parentNode.children.unshift(otherTreeNode);
               }
             }
-            this.treeApi.refresh();
+            this.treeControl.refresh();
             if (initial) {
-              this.treeApi.initialSelect();
+              this.treeControl.initialSelect();
             }
             this.resetPeTreeList('all');
           }, (reason) => {
@@ -667,12 +672,12 @@ let TreePaneComponent = {
     treeDblclickHandler = (branch) =>  {
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
         if (branch.type === 'group')
-          this.$rootScope.ve_treeApi.expand_branch(branch);
+          this.$rootScope.ve_treeControl.expand_branch(branch);
         else if (branch.type === 'view' || branch.type === 'snapshot') {
           this.$state.go('project.ref.document', {documentId: branch.data.id, search: undefined});
         }
       } else if (this.$state.includes('project.ref.document')) {
-        this.$rootScope.ve_treeApi.expand_branch(branch);
+        this.$rootScope.ve_treeControl.expand_branch(branch);
       }
     };
 
@@ -719,7 +724,7 @@ let TreePaneComponent = {
       if (this.$rootScope.ve_fullDocMode) {
         this.$rootScope.ve_fullDocMode = false;
         this.bbApi.setToggleState("tree-full-document", false);
-        var curBranch = this.treeApi.get_selected_branch();
+        var curBranch = this.treeControl.get_selected_branch();
         if (curBranch) {
           var viewId;
           if (curBranch.type !== 'view') {
@@ -743,7 +748,7 @@ let TreePaneComponent = {
     addItem = (itemType) =>  {
       this.itemType = itemType;
       this.newViewAggr = {type: 'shared'};
-      var branch = this.treeApi.get_selected_branch();
+      var branch = this.treeControl.get_selected_branch();
       var templateUrlStr = "";
       var newBranchType = "";
 
@@ -806,7 +811,7 @@ let TreePaneComponent = {
           aggr: null,
         };
         var top = itemType === 'Group' ? true : false;
-        this.treeApi.add_branch(branch, newbranch, top);
+        this.treeControl.add_branch(branch, newbranch, top);
 
         const addToFullDocView = (node, curSection, prevSysml) =>  {
           var lastChild = prevSysml;
@@ -827,9 +832,9 @@ let TreePaneComponent = {
           this.seenViewIds[data.id] = newbranch;
           newbranch.aggr = this.newViewAggr.type;
           var curNum = branch.children[branch.children.length-1].section;
-          var prevBranch = this.treeApi.get_prev_branch(newbranch);
+          var prevBranch = this.treeControl.get_prev_branch(newbranch);
           while (prevBranch.type !== 'view') {
-            prevBranch = this.treeApi.get_prev_branch(prevBranch);
+            prevBranch = this.treeControl.get_prev_branch(prevBranch);
           }
           this.MmsAppUtils.handleChildViews(data, this.newViewAggr.type, undefined, this.projectOb.id, this.refOb.id, this.handleSingleView, this.handleChildren)
             .then((node) =>  {
@@ -978,7 +983,7 @@ let TreePaneComponent = {
     };
 
     deleteItem = (cb?) => {
-      var branch = this.treeApi.get_selected_branch();
+      var branch = this.treeControl.get_selected_branch();
       if (!branch) {
         this.growl.warning("Select item to remove.");
         return;
@@ -1008,14 +1013,14 @@ let TreePaneComponent = {
         component: 'confirmRemove'
       });
       instance.result.then((data) =>  {
-        this.treeApi.remove_branch(branch);
+        this.treeControl.remove_branch(branch);
         if (this.$state.includes('project.ref.document') && branch.type === 'view') {
           this.processDeletedViewBranch(branch);
         }
         if (this.$rootScope.ve_fullDocMode) {
           cb(branch);
         } else {
-          this.treeApi.clear_selected_branch();
+          this.treeControl.clear_selected_branch();
           this.$state.go('^', {search: undefined});
         }
       });
@@ -1048,16 +1053,16 @@ let TreePaneComponent = {
 
     //TODO refresh table and fig list when new item added, deleted or reordered
     user_clicks_branch = (branch) =>  {
-      this.$rootScope.ve_treeApi.user_clicks_branch(branch);
+      this.$rootScope.ve_treeControl.user_clicks_branch(branch);
     };
 
     searchInputChangeHandler = function () {
       if (this.treeOptions.search === '') {
-        this.treeApi.collapse_all();
-        this.treeApi.expandPathToSelectedBranch();
+        this.treeControl.collapse_all();
+        this.treeControl.expandPathToSelectedBranch();
       } else {
         // expand all branches so that the filter works correctly
-        this.treeApi.expand_all();
+        this.treeControl.expand_all();
       }
     };
 

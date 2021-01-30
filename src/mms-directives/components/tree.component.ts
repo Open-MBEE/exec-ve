@@ -86,12 +86,13 @@ let TreeComponent = {
             this.$scope.$watch('treeData', this.treeControl.on_treeData_change, false);
             this.$scope.$watch('initialSelection', this.treeControl.on_initialSelection_change);
 
-            this.treeRows = [];
+            this.treeRows = this.treeControl.treeRows;
+            this.treeControl.treeIcons = this.$attrs;
             this.treeFilter = $filter('uiTreeFilter');
 
-            if (this.$attrs.initialSelection) {
+            if (this.initialSelection) {
                 this.for_each_branch((b) => {
-                    if (b.data.id === this.$attrs.initialSelection) {
+                    if (b.data.id === this.initialSelection) {
                         this.$timeout(() => {
                             this.treeControl.select_branch(b);
                         });
