@@ -2,7 +2,6 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 export class ButtonBarApi {
-  buttons = [];
 
   select = (parentButton, childButton) => {
     if(parentButton && childButton) {
@@ -12,46 +11,46 @@ export class ButtonBarApi {
     }
   };
 
-  setPermission = (id, permission) => {
-    this.buttons.forEach((button) => {
+  setPermission = (id, permission, buttons) => {
+    buttons.forEach((button) => {
       if (button.id === id)
         button.permission = permission;
     });
   };
 
-  setTooltip = (id, tooltip) => {
-    this.buttons.forEach((button) => {
+  setTooltip = (id, tooltip, buttons) => {
+    buttons.forEach((button) => {
       if (button.id === id)
         button.tooltip = tooltip;
     });
   };
 
-  setIcon = (id, icon) => {
-    this.buttons.forEach((button) => {
+  setIcon = (id, icon, buttons) => {
+    buttons.forEach((button) => {
       if (button.id === id)
         button.icon = icon;
     });
   };
 
-  setToggleState = (id, state) => {
-    this.buttons.forEach((button) => {
+  setToggleState = (id, state, buttons) => {
+    buttons.forEach((button) => {
       if (button.id === id) {
         if (button.togglable) {
           var original = button.toggle_state;
           if ((!original && state) || (original && !state))
-            this.toggleButtonState(id);
+            this.toggleButtonState(id, buttons);
         }
       }
     });
   };
 
-  getToggleState = (id) => {
+  getToggleState = (id, buttons) => {
     var buttonTemp = {
       toggle_state: false
     };
     //buttonTemp.toggle_state = false;
 
-    this.buttons.forEach((button) => {
+    buttons.forEach((button) => {
       if (button.id === id) {
         buttonTemp = button;
         if (! button.togglable) button.toggle_state = false;
@@ -62,9 +61,9 @@ export class ButtonBarApi {
     return buttonTemp.toggle_state;
   };
 
-  addButton = (button) => {
+  addButton = (button, buttons) => {
     //TODO: Determine if count can actually be replaced by length here
-    if (this.buttons.length === 0) {
+    if (buttons.length === 0) {
       button.placement = "bottom-left";
     }
     else if (!button.placement) {
@@ -78,11 +77,11 @@ export class ButtonBarApi {
     }
     button.icon_original = button.icon;
 
-    this.buttons.push(button);
+    buttons.push(button);
   };
 
-  toggleButtonSpinner = (id) => {
-    this.buttons.forEach((button) => {
+  toggleButtonSpinner = (id, buttons) => {
+    buttons.forEach((button) => {
       if (button.id === id) {
         if (button.spinner) {
           button.icon = button.icon_original;
@@ -96,8 +95,8 @@ export class ButtonBarApi {
     });
   };
 
-  toggleButtonState = (id) => {
-    this.buttons.forEach((button) => {
+  toggleButtonState = (id, buttons) => {
+    buttons.forEach((button) => {
       if (button.id === id) {
         if (button.togglable) {
           button.toggle_state = !button.toggle_state;
@@ -115,7 +114,9 @@ export class ButtonBarApi {
   };
 }
 
-const buttonBarService = () => {
+buttonBarService.$inject = [];
+
+function buttonBarService() {
   return new ButtonBarApi();
 }
 

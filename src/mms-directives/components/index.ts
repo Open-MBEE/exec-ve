@@ -1,2 +1,3 @@
 import './confirmRemove.component'
-import './tree.component'
+import './Tree.component'
+import './ButtonBar.component'

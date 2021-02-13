@@ -1,31 +1,26 @@
 import * as angular from "angular";
 import { tree } from "d3";
-import {ToolbarApi} from "./Toolbar.service";
 var mmsDirectives = angular.module('mmsDirectives');
 
-class TreeApi {
+class TreeService {
+  static $inject = ['$timeout'];
+
   private $timeout;
-  private options;
   private expandPathToSelectedBranch;
 
   private selected_branch;
 
-  public treeData;
+  public attrs;
   public treeRows;
-  public initialSelection;
-  public treeOptions;
-  public treeIcons;
   
   
   constructor($timeout) {
     this.$timeout = $timeout;
-    this.treeData = {};
-    this.treeRows = [];
-    //this.treeRows = this.treeRows;
-    this.options = {};
+    this.treeRows;
+    
   }
 
-  for_each_branch = (func, excludeBranch?) => {
+  for_each_branch = (func, treeData, excludeBranch?) => {
     var run = function(branch, level) {
         func(branch, level);
         if (branch.children) {
@@ -34,26 +29,26 @@ class TreeApi {
             }
         }
     };
-    var rootLevelBranches = excludeBranch ? this.treeData.filter((branch) => { return branch !== excludeBranch; }) : this.treeData;
+    var rootLevelBranches = excludeBranch ? treeData.filter((branch) => { return branch !== excludeBranch; }) : treeData;
     rootLevelBranches.forEach(function (branch) { run(branch, 1); });
   };
 
-  on_initialSelection_change = () => {
-    if (this.initialSelection) {
+  on_initialSelection_change = (initialSelection?, treeData?, options?) => {
+    if (initialSelection) {
         this.for_each_branch((b) => {
-            if (b.data.id === this.initialSelection) {
+            if (b.data.id === initialSelection) {
                 this.select_branch(b, true);
             }
-        });
-        this.on_treeData_change();
+        }, treeData);
+        this.on_treeData_change(treeData, options);
     }
-};
+  };
 
-  on_treeData_change = () => {
+  on_treeData_change = (treeData, options) => {
     this.for_each_branch((b, level) => {
         if (!b.uid)
             b.uid = '' + Math.random();
-    });
+    }, treeData);
     this.for_each_branch((b) => {
         if (angular.isArray(b.children)) {
             for (var i = 0; i < b.children.length; i++) {
@@ -61,8 +56,7 @@ class TreeApi {
                 child.parent_uid = b.uid;
             }
         }
-    });
-    this.treeRows = [];
+    }, treeData);
     var add_branch_to_list = (level, section, branch, visible, peNums) => {
         var expand_icon = "";
         var type_icon = "";
@@ -86,9 +80,9 @@ class TreeApi {
             }
             if (haveVisibleChild) {
                 if (branch.expanded) {
-                    expand_icon = this.treeIcons.iconCollapse;
+                    expand_icon = this.attrs.iconCollapse;
                 } else {
-                    expand_icon = this.treeIcons.iconExpand;
+                    expand_icon = this.attrs.iconExpand;
                 }
             } else
                 expand_icon = "fa fa-lg fa-fw";
@@ -97,50 +91,51 @@ class TreeApi {
 
         if (branch.loading) {
             type_icon = "fa fa-spinner fa-spin";
-        } else if (this.options && this.options.types && this.options.types[branch.type.toLowerCase() + aggr]) {
-            type_icon = this.options.types[branch.type.toLowerCase() + aggr];
+        } else if (options && options.types && options.types[branch.type.toLowerCase() + aggr]) {
+            type_icon = options.types[branch.type.toLowerCase() + aggr];
         } else {
-            type_icon = this.treeIcons.iconDefault;
+            type_icon = this.attrs.iconDefault;
         }
 
         var number = section.join('.');
         if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
             peNums[branch.type]++;
-            if (this.options.numberingDepth == 0) {
+            if (options.numberingDepth == 0) {
                 number = peNums[branch.type];
-            } else if (section.length >= this.options.numberingDepth) {
-                number = section.slice(0, this.options.numberingDepth).join('.') + this.options.numberingSeparator + peNums[branch.type];
+            } else if (section.length >= options.numberingDepth) {
+                number = section.slice(0, options.numberingDepth).join('.') + options.numberingSeparator + peNums[branch.type];
             } else {
                 var sectionCopy = section.slice();
-                while (sectionCopy.length < this.options.numberingDepth) {
+                while (sectionCopy.length < options.numberingDepth) {
                     sectionCopy.push(0);
                 }
-                number = sectionCopy.join('.') + this.options.numberingSeparator + peNums[branch.type]; 
+                number = sectionCopy.join('.') + options.numberingSeparator + peNums[branch.type]; 
             }
         } else if (branch.type !== 'view' && branch.type !== 'section') {
             number = '';
         }
-        if (branch.data && branch.data.id && this.options.sectionNumbering) {
+        if (branch.data && branch.data.id && options.sectionNumbering) {
             branch.data._veNumber = number;
         }
         if (branch.hide)
             visible = false;
-        this.treeRows.push({
-            level: level,
-            section: number,
-            branch: branch,
-            label: branch.label,
-            expand_icon: expand_icon,
-            visible: visible,
-            type_icon: type_icon,
-            children: branch.children
-        });
+        var newRow = {
+          level: level,
+          section: number,
+          branch: branch,
+          label: branch.label,
+          expand_icon: expand_icon,
+          visible: visible,
+          type_icon: type_icon,
+          children: branch.children
+        }
+        this.treeRows.push(newRow);
         if (branch.children) {
             var alpha = false;
-            if (this.options.sort) {
-                branch.children.sort(this.options.sort);
+            if (options.sort) {
+                branch.children.sort(options.sort);
             }
-            var j = this.options.startChapter;
+            var j = options.startChapter;
             if (j === null || j === undefined || level != 1) {
                 j = 1;
             }
@@ -151,14 +146,14 @@ class TreeApi {
                 if (branch.children[i].type === 'figure' || branch.children[i].type === 'table' || branch.children[i].type === 'equation') {
                     add_branch_to_list(level + 1, section, branch.children[i], child_visible, peNums);
                 } else {
-                    if (this.options.sectionNumbering) {
+                    if (options.sectionNumbering) {
                         if (branch.children[i].data._isAppendix) {
                             alpha = true;
                             j = 0;
                         }
                         var nextSection = section.slice(); 
                         nextSection.push(alpha ? String.fromCharCode(j + 65) : j);
-                        if (nextSection.length <= this.options.numberingDepth) {
+                        if (nextSection.length <= options.numberingDepth) {
                             peNums.table = 0; peNums.figure = 0; peNums.equaton = 0;
                         }
                         add_branch_to_list(level + 1, nextSection, branch.children[i], child_visible, peNums);
@@ -171,109 +166,111 @@ class TreeApi {
         }
     };
 
-    if (this.options.sort) {
-      this.treeData.sort(this.options.sort);
+    if (options.sort) {
+      treeData.sort(options.sort);
     }
-
-    for (var i = 0; i < this.treeData.length; i++) {
-        add_branch_to_list(1, [], this.treeData[i], true, {figure: 0, table: 0, equation: 0});
+    console.log('TreeData:' + treeData.toString());
+    //SOMETHINE WRONG HERE
+    for (var i = 0; i < treeData.length; i++) {
+      console.log('loopz' + i);
+        add_branch_to_list(1, [], treeData[i], true, {figure: 0, table: 0, equation: 0});
     }
+  
+  };
 
-};
+  expandCallback = (obj, treeData, options, e?) => {
+    if(!obj.branch.expanded && options.expandCallback) {
+      options.expandCallback(obj.branch.data.id, obj.branch, false);
+    }
+    obj.branch.expanded = !obj.branch.expanded;
+    if (e) {
+        e.stopPropagation();
+        this.on_treeData_change(treeData, options);
+    }
+  };
 
-expandCallback = (obj, e?) => {
-  if(!obj.branch.expanded && this.options.expandCallback) {
-    this.options.expandCallback(obj.branch.data.id, obj.branch, false);
-  }
-  obj.branch.expanded = !obj.branch.expanded;
-  if (e) {
-      e.stopPropagation();
-      this.on_treeData_change();
-  }
-};
-
-get_parent = (child) => {
-  var parent = null;
-  if (child.parent_uid) {
-      this.for_each_branch((b) => {
-          if (b.uid === child.parent_uid) {
-              parent = b;
-          }
-      });
-  }
-  return parent;
-};
+  get_parent = (child, treeData) => {
+    var parent = null;
+    if (child.parent_uid) {
+        this.for_each_branch((b) => {
+            if (b.uid === child.parent_uid) {
+                parent = b;
+            }
+        }, treeData);
+    }
+    return parent;
+  };
 
 /**
-         * @ngdoc function
-         * @name mmsDirectives.directive:mmsTree#select_branch
-         * @methodOf mmsDirectives.directive:mmsTree
-         * 
-         * @description 
-         * self explanatory
-         *
-         * @param {Object} branch branch to select
-         */
-        select_branch = (branch, noClick?) => {
-          if (!branch) {
-              if (this.selected_branch) {
-                  this.selected_branch.selected = false;
-              }
-              this.selected_branch = null;
-              return;
-          }
-          if (branch !== this.selected_branch) {
-              if (this.selected_branch) {
-                  this.selected_branch.selected = false;
-              }
-              branch.selected = true;
-              this.selected_branch = branch;
-              /*if(branch.expandable === true)
-              {
-                  scope.expandCallback({ branch: branch });
-              }*/
-              this.expand_all_parents(branch);
-              if (!noClick) {
-                  if (branch.onSelect) {
-                      this.$timeout(() => {
-                          branch.onSelect(branch);
-                      });
-                  } else if (this.options.onSelect) {
-                      this.$timeout(() => {
-                          this.options.onSelect(branch);
-                      });
-                  }
-              }
-              if (branch.data.id) {
-                  this.$timeout(() => {
-                      var el = angular.element('#tree-branch-' + branch.data.id);
-                      if (!el.isOnScreen()) {
-                          el.get(0).scrollIntoView();
-                      }
-                  }, 500, false);
-              }
-          // fix for when user presses browser back button
-          } else {
-              this.expand_all_parents(branch);
-          }
-      };
-
-      expand_all_parents = (child) => {
-        this.for_all_ancestors(child, (b) => {
-            if(b.expandable === true)
-            {
-                this.expandCallback({ branch: b });
+ * @ngdoc function
+ * @name mmsDirectives.directive:mmsTree#select_branch
+ * @methodOf mmsDirectives.directive:mmsTree
+ * 
+ * @description 
+ * self explanatory
+ *
+ * @param {Object} branch branch to select
+ */
+  select_branch = (branch, treeData, options, noClick?) => {
+    if (!branch) {
+        if (this.selected_branch) {
+            this.selected_branch.selected = false;
+        }
+        this.selected_branch = null;
+        return;
+    }
+    if (branch !== this.selected_branch) {
+        if (this.selected_branch) {
+            this.selected_branch.selected = false;
+        }
+        branch.selected = true;
+        this.selected_branch = branch;
+        /*if(branch.expandable === true)
+        {
+            scope.expandCallback({ branch: branch });
+        }*/
+        this.expand_all_parents(branch);
+        if (!noClick) {
+            if (branch.onSelect) {
+                this.$timeout(() => {
+                    branch.onSelect(branch);
+                });
+            } else if (options.onSelect) {
+                this.$timeout(() => {
+                    options.onSelect(branch);
+                });
             }
-            b.expanded = true;
-        });
-    };
+        }
+        if (branch.data.id) {
+            this.$timeout(() => {
+                var el = angular.element('#tree-branch-' + branch.data.id);
+                if (!el.isOnScreen()) {
+                    el.get(0).scrollIntoView();
+                }
+            }, 500, false);
+        }
+    // fix for when user presses browser back button
+    } else {
+        this.expand_all_parents(branch, treeData, options);
+    }
+  };
 
-    for_all_ancestors = (child, fn) => {
-      var parent = this.get_parent(child);
-      if (parent) {
-          fn(parent);
-          this.for_all_ancestors(parent, fn);
-      }
+  expand_all_parents = (child, treeData, options) => {
+    this.for_all_ancestors(child, treeData, options, (b) => {
+        if(b.expandable === true)
+        {
+            this.expandCallback({ branch: b }, treeData, options);
+        }
+        b.expanded = true;
+    });
+  };
+
+  for_all_ancestors = (child, treeData, options, fn) => {
+    var parent = this.get_parent(child, treeData);
+    if (parent) {
+        fn(parent);
+        this.for_all_ancestors(parent, treeData, options, fn);
+    }
   };
 
   /**
@@ -284,12 +281,12 @@ get_parent = (child) => {
    * @description
    * self explanatory
    */
-  expand_all = () => {
+  expand_all = (treeData, options) => {
     this.for_each_branch(function(b, level) {
       this.expandCallback({ branch: b });
       b.expanded = true;
-    });
-    this.on_treeData_change();
+    }, treeData, options);
+    this.on_treeData_change(treeData, options);
   };
   /**
    * @ngdoc function
@@ -299,20 +296,20 @@ get_parent = (child) => {
    * @description
    * self explanatory
    */
-  collapse_all = (excludeBranch) => {
+  collapse_all = (excludeBranch, treeData, options) => {
     this.for_each_branch(function(b, level) {
       b.expanded = false;
     }, excludeBranch);
-    this.on_treeData_change();
+    this.on_treeData_change(treeData, options);
   };
 
-  get_first_branch = () => {
-    if (this.treeData.length > 0)
-      return this.treeData[0];
+  get_first_branch = (treeData) => {
+    if (treeData.length > 0)
+      return treeData[0];
   };
-  select_first_branch = () => {
-    var b = this.get_first_branch();
-    this.select_branch(b);
+  select_first_branch = (treeData, options) => {
+    var b = this.get_first_branch(treeData);
+    this.select_branch(b, treeData, options);
   };
   /**
    * @ngdoc function
@@ -338,10 +335,10 @@ get_parent = (child) => {
   get_children = (b) => {
     return b.children;
   };
-  select_parent_branch = (b) => {
-    var p = this.get_parent_object(b);
+  select_parent_branch = (b, treeData, options) => {
+    var p = this.get_parent_object(b, treeData);
     if (p)
-      this.select_branch(p);
+      this.select_branch(p, treeData, options);
   };
   /**
    * @ngdoc function
@@ -354,7 +351,7 @@ get_parent = (child) => {
    * @param {Object} parent parent branch or null
    * @param {Object} new_branch branch to add to parent or root
    */
-  add_branch = function(parent, new_branch, top) {
+  add_branch = function(parent, new_branch, top, treeData, options) {
     if (parent) {
       if (top)
         parent.children.unshift(new_branch);
@@ -363,22 +360,43 @@ get_parent = (child) => {
       parent.expanded = true;
     } else {
       if (top)
-      this.treeData.unshift(new_branch);
+        treeData.unshift(new_branch);
       else
-      this.treeData.push(new_branch);
+        treeData.push(new_branch);
     }
-    this.on_treeData_change();
+    this.on_treeData_change(treeData, options);
   };
 
-  remove_branch = (branch) => {
-    this.remove_branch(branch);
-    this.on_treeData_change();
-  };
+  remove_branch_impl = (branch, treeData, options, singleBranch?) => {
+    var parent_branch = this.get_parent(branch, treeData);
+    if (!parent_branch) {
+        for (var j = 0; j < treeData.length; j++) {
+            if (treeData[j].uid === branch.uid) {
+                treeData.splice(j,1);
+                break;
+            }
+        }
+        return;
+    }
+    for (var i = 0; i < parent_branch.children.length; i++) {
+        if (parent_branch.children[i].uid === branch.uid) {
+            parent_branch.children.splice(i,1);
+            if (singleBranch) {
+                break;
+            }
+        }
+    }
+};
 
-  remove_single_branch = (branch) => {
-    this.remove_single_branch(branch);
-    this.on_treeData_change();
-  };
+remove_branch = (branch, treeData, options) => {
+    this.remove_branch_impl(branch, treeData, options, false);
+    this.on_treeData_change(treeData, options);
+};
+
+remove_single_branch = (branch, treeData, options) => {
+    this.remove_branch_impl(branch, treeData, options, true);
+    this.on_treeData_change(treeData, options);
+};
 
   add_root_branch = function(new_branch) {
     this.add_branch(null, new_branch);
@@ -427,7 +445,7 @@ get_parent = (child) => {
     if (p)
       siblings = p.children;
     else
-      siblings = this.treeData;
+      siblings = treeData;
     return siblings;
   };
 
@@ -605,10 +623,6 @@ get_parent = (child) => {
   };
 
 }
-function treeService($timeout) {
-  return new TreeApi($timeout);
-}
-treeService.$inject = ['$timeout'];
 
 mmsDirectives
-  .service("TreeService", treeService);
+  .service("TreeService", TreeService);

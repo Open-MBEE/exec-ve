@@ -27,8 +27,8 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, 
     $scope.bbApi = {
         init: function() {
             if (documentOb && documentOb._editable && refOb.type === 'Branch') {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
-                $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
+                $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'), $scope.buttons);
+                $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode, $scope.buttons);
                 hotkeys.bindTo($scope)
                 .add({
                     combo: 'alt+d',
@@ -37,16 +37,16 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, 
                 });
             }
 
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'), $scope.buttons);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'), $scope.buttons);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'), $scope.buttons);
             // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
-            $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+            $scope.bbApi.addButton(UxService.getButtonBarButton('print'), $scope.buttons);
             var exportButtons = UxService.getButtonBarButton('export');
-            exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
-            $scope.bbApi.addButton(exportButtons);
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
-            $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
+            exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"), $scope.buttons);
+            $scope.bbApi.addButton(exportButtons, $scope.buttons);
+            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn, $scope.buttons);
+            $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn, $scope.buttons);
             hotkeys.bindTo($scope)
             .add({
                 combo: 'alt+c',
@@ -123,7 +123,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, 
         for (var i = 0; i < $scope.views.length; i++) {
             $scope.views[i].api.toggleShowComments();
         }
-        $scope.bbApi.toggleButtonState('show-comments');
+        $scope.bbApi.toggleButtonState('show-comments', $scope.buttons);
         $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
     });
 
@@ -131,7 +131,7 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, 
         for (var i = 0; i < $scope.views.length; i++) {
             $scope.views[i].api.toggleShowElements();
         }
-        $scope.bbApi.toggleButtonState('show-elements');
+        $scope.bbApi.toggleButtonState('show-elements', $scope.buttons);
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
 
@@ -141,10 +141,10 @@ function($scope, $rootScope, $state, $anchorScroll, $location, $timeout, $http, 
             for (i = 0; i < $scope.views.length; i++) {
                 $scope.views[i].api.toggleShowElements();
             }
-            $scope.bbApi.toggleButtonState('show-elements');
+            $scope.bbApi.toggleButtonState('show-elements', $scope.buttons);
             $rootScope.veElementsOn = !$rootScope.veElementsOn;
         }
-        $scope.bbApi.toggleButtonState('show-edits');
+        $scope.bbApi.toggleButtonState('show-edits', $scope.buttons);
         $rootScope.ve_editmode = !$rootScope.ve_editmode;
         for (i = 0; i < $scope.views.length; i++) {
             $scope.views[i].api.toggleShowEdits();

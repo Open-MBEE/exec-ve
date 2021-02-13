@@ -85,8 +85,8 @@ mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$w
     $scope.bbApi = {
         init: function() {
             if (viewOb && viewOb._editable && refOb.type === 'Branch') {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
-                $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
+                $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'), $scope.buttons);
+                $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode, $scope.buttons);
                 hotkeys.bindTo($scope)
                 .add({
                     combo: 'alt+d',
@@ -94,10 +94,10 @@ mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$w
                     callback: function() {$scope.$broadcast('show-edits');}
                 });
             }
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
-            $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
-            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'), $scope.buttons);
+            $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn, $scope.buttons);
+            $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'), $scope.buttons);
+            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn, $scope.buttons);
 
             // Set hotkeys for toolbar
             hotkeys.bindTo($scope)
@@ -112,15 +112,15 @@ mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$w
             });
 
             if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
-                $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'));
-                // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'));
-                $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
+                $scope.bbApi.addButton(UxService.getButtonBarButton('refresh-numbering'), $scope.buttons);
+                // $scope.bbApi.addButton(UxService.getButtonBarButton('share-url'), $scope.buttons);
+                $scope.bbApi.addButton(UxService.getButtonBarButton('print'), $scope.buttons);
                 if ($state.includes('project.ref.document')) {
                     var exportButtons = UxService.getButtonBarButton('export');
-                    exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
-                    $scope.bbApi.addButton(exportButtons);
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'));
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'));
+                    exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"), $scope.buttons);
+                    $scope.bbApi.addButton(exportButtons, $scope.buttons);
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('center-previous'), $scope.buttons);
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('center-next'), $scope.buttons);
                     // Set hotkeys for toolbar
                     hotkeys.bindTo($scope)
                     .add({
@@ -133,7 +133,7 @@ mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$w
                         callback: function() {$scope.$broadcast('center-previous');}
                     });
                 } else {
-                    $scope.bbApi.addButton(UxService.getButtonBarButton('export'));
+                    $scope.bbApi.addButton(UxService.getButtonBarButton('export'), $scope.buttons);
                 }
             }
         }
@@ -141,24 +141,24 @@ mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$w
 
     $scope.$on('show-comments', function() {
         $scope.viewApi.toggleShowComments();
-        $scope.bbApi.toggleButtonState('show-comments');
+        $scope.bbApi.toggleButtonState('show-comments', $scope.buttons);
         $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
     });
 
     $scope.$on('show-elements', function() {
         $scope.viewApi.toggleShowElements();
-        $scope.bbApi.toggleButtonState('show-elements');
+        $scope.bbApi.toggleButtonState('show-elements', $scope.buttons);
         $rootScope.veElementsOn = !$rootScope.veElementsOn;
     });
 
     $scope.$on('show-edits', function() {
         if( ($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
             $scope.viewApi.toggleShowElements();
-            $scope.bbApi.toggleButtonState('show-elements');
+            $scope.bbApi.toggleButtonState('show-elements', $scope.buttons);
             $rootScope.veElementsOn = !$rootScope.veElementsOn;
         }
         $scope.viewApi.toggleShowEdits();
-        $scope.bbApi.toggleButtonState('show-edits');
+        $scope.bbApi.toggleButtonState('show-edits', $scope.buttons);
         $rootScope.ve_editmode = !$rootScope.ve_editmode;
     });
 
@@ -171,9 +171,9 @@ mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$w
             if (!prev)
                 return;
         }
-        $scope.bbApi.toggleButtonSpinner('center-previous');
+        $scope.bbApi.toggleButtonSpinner('center-previous', $scope.buttons);
         $rootScope.ve_treeApi.select_branch(prev);
-        $scope.bbApi.toggleButtonSpinner('center-previous');
+        $scope.bbApi.toggleButtonSpinner('center-previous', $scope.buttons);
     });
 
     $scope.$on('center-next', function() {
@@ -185,9 +185,9 @@ mmsApp.controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$w
             if (!next)
                 return;
         }
-        $scope.bbApi.toggleButtonSpinner('center-next');
+        $scope.bbApi.toggleButtonSpinner('center-next', $scope.buttons);
         $rootScope.ve_treeApi.select_branch(next);
-        $scope.bbApi.toggleButtonSpinner('center-next');
+        $scope.bbApi.toggleButtonSpinner('center-next', $scope.buttons);
     });
 
     // Share URL button settings

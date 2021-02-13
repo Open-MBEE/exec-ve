@@ -1,7 +1,7 @@
 import "./charts"
 
 import "./mmsAnnotation.directive";
-import "./mmsButtonBar.directive";
+//import "./mmsButtonBar.directive";
 import "./mmsCf.directive";
 import "./mmsCkEditor.directive";
 import "./mmsDiagramBlock.directive";
@@ -15,7 +15,7 @@ import "./mmsMention.directive";
 import "./mmsRefList.directive";
 import "./mmsSearch.directive";
 import "./mmsSpec.directive";
-import "./mmsToolbar.directive";
+//import "./mmsToolbar.directive";
 import "./mmsTranscludeArt.directive";
 import "./mmsTranscludeCom.directive";
 import "./mmsTranscludeDoc.directive";

@@ -3,7 +3,7 @@ var mmsApp = angular.module('mmsApp');
 
 
 mmsApp.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
-    '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', '_', MmsAppUtils]);
+    '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'ButtonBarService', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -13,7 +13,9 @@ mmsApp.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$wind
  * Utilities
  */
 function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
-    $rootScope, $filter, $state, ElementService, ViewService, UtilsService, _) {
+    $rootScope, $filter, $state, ElementService, ViewService, UtilsService, ButtonBarService, _) {
+    
+    let bbApi = ButtonBarService;
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
@@ -266,7 +268,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                 }
             } else {
                 $rootScope.ve_fullDocMode = true;
-                $rootScope.ve_bbApi.setToggleState('tree-full-document', true);
+                bbApi.setToggleState('tree-full-document', true, $rootScope.ve_tree_pane.buttons);
                 $state.go('project.ref.document.full', {search: undefined});
             }
         });

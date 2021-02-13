@@ -457,9 +457,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
         if (scope.bbApi) {
             if (!continueEdit) {
-                scope.bbApi.toggleButtonSpinner('presentation-element-save');
+                scope.bbApi.toggleButtonSpinner('presentation-element-save', scope.buttons);
             } else {
-                scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+                scope.bbApi.toggleButtonSpinner('presentation-element-saveC', scope.buttons);
             }
         }
         
@@ -480,9 +480,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             }).finally(function() {
                 if (scope.bbApi) {
                     if (!continueEdit) {
-                        scope.bbApi.toggleButtonSpinner('presentation-element-save');
+                        scope.bbApi.toggleButtonSpinner('presentation-element-save', scope.buttons);
                     } else {
-                        scope.bbApi.toggleButtonSpinner('presentation-element-saveC');
+                        scope.bbApi.toggleButtonSpinner('presentation-element-saveC', scope.buttons);
                     }
                 }
             });
@@ -523,7 +523,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             // scrollToElement(domElement);
         };
         if (scope.bbApi) {
-            scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+            scope.bbApi.toggleButtonSpinner('presentation-element-cancel', scope.buttons);
         }
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits(scope.edit)) {
@@ -544,13 +544,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 cancelCleanUp();
             }).finally(function() {
                 if (scope.bbApi) {
-                    scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+                    scope.bbApi.toggleButtonSpinner('presentation-element-cancel', scope.buttons);
                 }
             });
         } else {
             cancelCleanUp();
             if (scope.bbApi) {
-                scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
+                scope.bbApi.toggleButtonSpinner('presentation-element-cancel', scope.buttons);
             }
         }
     };
@@ -577,7 +577,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         //     growl.error('Checking if view contents is up to date failed: ' + reason.message);
         // });
         function realDelete() {
-            bbApi.toggleButtonSpinner('presentation-element-delete');
+            bbApi.toggleButtonSpinner('presentation-element-delete', scope.buttons);
             scope.name = scope.edit.name;
 
             var instance = $uibModal.open({
@@ -612,7 +612,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 }, handleError);
 
             }).finally(function() {
-                scope.bbApi.toggleButtonSpinner('presentation-element-delete');
+                scope.bbApi.toggleButtonSpinner('presentation-element-delete', scope.buttons);
             });
         }
     };

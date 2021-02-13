@@ -10,11 +10,11 @@ let TreePaneComponent = {
   <div fa-pane pane-anchor="north" pane-size="78px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-left">
         <div class="pane-left-toolbar" role="toolbar">
-            <mms-button-bar buttons="$ctrl.buttons" mms-bb-api="$ctrl.bbApi"></mms-button-bar>
+            <button-bar-component buttons="$ctrl.buttons" button-control="$ctrl.bbApi"></button-bar-component>
         </div>
         <div class="tree-options">
-            <mms-button-bar buttons="$ctrl.treeButtons" mms-bb-api="$ctrl.tbApi"></mms-button-bar>
-            <input class="ve-plain-input" ng-model-optoins="{debounce: 1000}"
+            <button-bar-component buttons="$ctrl.treeButtons" button-control="$ctrl.tbApi"></button-bar-component>
+            <input class="ve-plain-input" ng-model-options="{debounce: 1000}"
                 ng-model="$ctrl.treeOptions.search" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
                 ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
         </div>
@@ -22,8 +22,8 @@ let TreePaneComponent = {
 </div>
 <div fa-pane pane-anchor="center" pane-no-toggle="true">
     <div class="pane-left" style="display:table;">
-        <tree ng-show="'showTree'==(activeMenu)" tree-data="$ctrl.treeData"
-                tree-control="$ctrl.treeControl" initial-selection="{{$ctrl.initialSelection}}" options="$ctrl.treeOptions"></tree>
+        <tree ng-show="'showTree'==(activeMenu)" tree-data="$ctrl.treeControl.treeData" tree-control="$ctrl.treeControl"
+                initial-selection="{{$ctrl.initialSelection}}" options="$ctrl.treeControl.options"></tree>
 
         <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
             <h4 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h4>
@@ -139,28 +139,27 @@ let TreePaneComponent = {
       this.ViewService = ViewService;
       this.ProjectService = ProjectService;
       this.MmsAppUtils = MmsAppUtils;
-      this.initialSelection = $rootScope.ve_treeInitial
+      this.treeControl = TreeService;
 
       this.filterInputPlaceholder = 'Filter groups/docs';
       if (this.$state.includes('project.ref.document')) {
         this.filterInputPlaceholder = 'Filter table of contents';
       }
 
-      //$rootScope.mms_refOb = this.refOb;
-      //$rootScope.ve_bbApi = this.bbApi;
+      
+      //this.$rootScope.ve_bbApi = this.bbApi;
       this.$rootScope.ve_tree_pane = this;
       if (!this.$rootScope.veTreeShowPe) {
         this.$rootScope.veTreeShowPe = false;
       }
 
       this.tbApi = ToolbarService;
-      this.bbApi = ButtonBarService;
-      this.buttons = this.bbApi.buttons;
-      this.treeButtons = this.tbApi.buttons;
+      this.treeButtons = [];
 
-      this.treeControl = TreeService;
-      this.treeData = this.treeControl.treeData;
-      this.treeOptions = this.treeControl.treeOptions;
+      this.bbApi = ButtonBarService;
+      this.buttons = [];
+            
+      this.initialSelection = $rootScope.ve_treeInitial;
 
       this.$rootScope.ve_fullDocMode = false;
       if (this.$state.includes('project.ref.document.full')) {
@@ -170,15 +169,20 @@ let TreePaneComponent = {
     }
 
     $onInit = () => {
+
+      
+
+      this.$rootScope.mms_refOb = this.refOb;
+
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-        this.treeData = this.UtilsService.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func);
+        this.treeControl.treeData = this.UtilsService.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func);
         this.ViewService.getProjectDocuments({
           projectId: this.projectOb.id,
           refId: this.refOb.id
         }, 2).then((documentObs) => {
           for (var i = 0; i < documentObs.length; i++) {
             if (!documentObs[i]._groupId || documentObs[i]._groupId == this.projectOb.id) {
-              this.treeData.push({
+              this.treeControl.treeData.push({
                 label: documentObs[i].name,
                 type: 'view',
                 data: documentObs[i],
@@ -218,10 +222,10 @@ let TreePaneComponent = {
           }, (reason) =>  {
             console.log(reason);
           });
-        this.treeData = [this.viewId2node[this.documentOb.id]];
+        this.treeControl.treeData = [this.viewId2node[this.documentOb.id]];
       }
 
-      this.treeOptions = {
+      this.treeControl.options = {
         types: this.UxService.getTreeTypes(),
         sectionNumbering: this.$state.includes('project.ref.document') ? true : false,
         numberingDepth: 0,
@@ -233,9 +237,9 @@ let TreePaneComponent = {
         sort: this.$state.includes('project.ref.document') ? null : this.treeSortFunction
       };
       if (this.documentOb && this.docMeta) {
-        this.treeOptions.numberingDepth = this.docMeta.numberingDepth;
-        this.treeOptions.numberingSeparator = this.docMeta.numberingSeparator;
-        this.treeOptions.startChapter = this.documentOb._startChapter;
+        this.treeControl.options.numberingDepth = this.docMeta.numberingDepth;
+        this.treeControl.options.numberingSeparator = this.docMeta.numberingSeparator;
+        this.treeControl.options.startChapter = this.documentOb._startChapter;
       }
 
       this.docEditable = false;
@@ -414,38 +418,40 @@ let TreePaneComponent = {
         this.addSectionElements(node.data, viewNode, node);
       });
 
+      this.treeControl.on_treeData_change();
+
     }
 
     tbInit = () => {
       if (this.$state.includes('project.ref.document')) {
         var viewModeButton = this.UxService.getButtonBarButton("view-mode-dropdown");
-        this.tbApi.addButton(viewModeButton);
-        this.tbApi.select(viewModeButton, this.$rootScope.veTreeShowPe ? this.UxService.getButtonBarButton('tree-show-pe') : this.UxService.getButtonBarButton('tree-show-views'));
+        this.tbApi.addButton(viewModeButton, this.treeButtons);
+        this.tbApi.select(viewModeButton, this.$rootScope.veTreeShowPe ? this.UxService.getButtonBarButton('tree-show-pe') : this.UxService.getButtonBarButton('tree-show-views'), this.treeButtons);
       }
     };
 
     bbInit = () => {
-      this.bbApi.addButton(this.UxService.getButtonBarButton("tree-expand"));
-      this.bbApi.addButton(this.UxService.getButtonBarButton("tree-collapse"));
+      this.bbApi.addButton(this.UxService.getButtonBarButton("tree-expand"), this.buttons);
+      this.bbApi.addButton(this.UxService.getButtonBarButton("tree-collapse"), this.buttons);
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-reorder-group"));
-        this.bbApi.setPermission("tree-reorder-group", this.projectOb && this.projectOb._editable);
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-add-document-or-group"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-delete-document"));
-        this.bbApi.setPermission( "tree-add-document-or-group", this.documentOb._editable && (this.refOb.type !== 'Tag') );
-        this.bbApi.setPermission( "tree-delete-document", this.documentOb._editable &&  (this.refOb.type !== 'Tag') );
+        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-reorder-group"), this.buttons);
+        this.bbApi.setPermission("tree-reorder-group", this.projectOb && this.projectOb._editable, this.buttons);
+        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-add-document-or-group"), this.buttons);
+        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-delete-document"), this.buttons);
+        this.bbApi.setPermission( "tree-add-document-or-group", this.documentOb._editable && (this.refOb.type !== 'Tag'), this.buttons);
+        this.bbApi.setPermission( "tree-delete-document", this.documentOb._editable &&  (this.refOb.type !== 'Tag'), this.buttons);
       } else if (this.$state.includes('project.ref.document')) {
         // $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
         //$scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-reorder-view"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-full-document"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-add-view"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-delete-view"));
-        this.bbApi.setPermission("tree-add-view", this.docEditable);
-        this.bbApi.setPermission("tree-reorder-view", this.docEditable);
-        this.bbApi.setPermission("tree-delete-view", this.docEditable);
+        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-reorder-view"), this.buttons);
+        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-full-document"), this.buttons);
+        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-add-view"), this.buttons);
+        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-delete-view"), this.buttons);
+        this.bbApi.setPermission("tree-add-view", this.docEditable, this.buttons);
+        this.bbApi.setPermission("tree-reorder-view", this.docEditable, this.buttons);
+        this.bbApi.setPermission("tree-delete-view", this.docEditable, this.buttons);
         if (this.$rootScope.ve_fullDocMode) {
-          this.bbApi.setToggleState('tree-full-document', true);
+          this.bbApi.setToggleState('tree-full-document', true, this.buttons);
         }
       }
     };
@@ -1057,7 +1063,7 @@ let TreePaneComponent = {
     };
 
     searchInputChangeHandler = function () {
-      if (this.treeOptions.search === '') {
+      if (this.treeControl.options.search === '') {
         this.treeControl.collapse_all();
         this.treeControl.expandPathToSelectedBranch();
       } else {

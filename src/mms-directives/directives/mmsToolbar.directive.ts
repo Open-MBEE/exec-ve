@@ -41,28 +41,6 @@ var mmsDirectives = angular.module('mmsDirectives');
 // 	}
 // }
 
-class ToolbarDirective {
-	restrict;
-	templateUrl;
-	scope;
-
-	constructor() {
-		this.restrict = 'E';
-		this.templateUrl = 'templates/mmsToolbar.html';
-		this.scope = {
-				buttons: '<',
-				mmsTbApi: '<',
-				onClick: '&',
-				direction: '@'
-		};
-	}
-
-	controller($scope) {
-
-	}
-}
-
-
 mmsDirectives.directive('mmsToolbar', ['$templateCache', '$rootScope', mmsToolbar]);
 
 function mmsToolbar($templateCache, $rootScope)

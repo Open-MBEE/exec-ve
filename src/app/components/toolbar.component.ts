@@ -36,42 +36,42 @@ let ToolbarComponent = {
             this.$state = $state;
             this.UxService = UxService;
             this.tbApi = ToolbarService;
-            this.buttons = this.tbApi.buttons;
+            this.buttons = [];
 
             $rootScope.ve_tbApi = this.tbApi;
-
-            this.init();
+            $rootScope.ve_tbButtons = this.buttons;
+            //this.init();
         }
 
-        init = () => {
-        this.tbApi.addButton(this.UxService.getToolbarButton("element-viewer"));
-        this.tbApi.addButton(this.UxService.getToolbarButton("element-editor"));
-        if (this.$rootScope.ve_edits && Object.keys(this.$rootScope.ve_edits).length > 0) {
-            this.tbApi.setIcon('element-editor', 'fa-edit-asterisk');
-            this.tbApi.setPermission('element-editor-saveall', true);
-        }
-        var editable = false;
-        this.tbApi.addButton(this.UxService.getToolbarButton("element-history"));
-        this.tbApi.addButton(this.UxService.getToolbarButton("tags"));
-        // if ($state.includes('project.ref.document')) {
-            //tbApi.addButton(UxService.getToolbarButton("jobs"));
-        // }
-        if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-            if(this.documentOb !== undefined) {
-                editable = this.documentOb._editable && this.refOb.type === 'Branch';
+        $onInit = () => {
+            this.tbApi.addButton(this.UxService.getToolbarButton("element-viewer"), this.buttons);
+            this.tbApi.addButton(this.UxService.getToolbarButton("element-editor"), this.buttons);
+            if (this.$rootScope.ve_edits && Object.keys(this.$rootScope.ve_edits).length > 0) {
+                this.tbApi.setIcon('element-editor', 'fa-edit-asterisk', this.buttons);
+                this.tbApi.setPermission('element-editor-saveall', true, this.buttons);
             }
-            this.tbApi.setPermission('element-editor', editable);
-            if (this.$state.includes('project.ref.preview')) {
-                this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
-                this.tbApi.setPermission("view-reorder", editable);
-            }
-        } else if (this.$state.includes('project.ref.document')) {
-            if(this.documentOb !== undefined) {
-                editable = this.documentOb._editable && this.refOb.type === 'Branch';
-            }
-            this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
-            this.tbApi.setPermission('element-editor', editable);
-            this.tbApi.setPermission("view-reorder", editable);
+            var editable = false;
+            this.tbApi.addButton(this.UxService.getToolbarButton("element-history"), this.buttons);
+            this.tbApi.addButton(this.UxService.getToolbarButton("tags"), this.buttons);
+            // if ($state.includes('project.ref.document')) {
+                //tbApi.addButton(UxService.getToolbarButton("jobs"));
+            // }
+            if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
+                if(this.documentOb !== undefined) {
+                    editable = this.documentOb._editable && this.refOb.type === 'Branch';
+                }
+                this.tbApi.setPermission('element-editor', editable, this.buttons);
+                if (this.$state.includes('project.ref.preview')) {
+                    this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"), this.buttons);
+                    this.tbApi.setPermission("view-reorder", editable, this.buttons);
+                }
+            } else if (this.$state.includes('project.ref.document')) {
+                if(this.documentOb !== undefined) {
+                    editable = this.documentOb._editable && this.refOb.type === 'Branch';
+                }
+                this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"), this.buttons);
+                this.tbApi.setPermission('element-editor', editable, this.buttons);
+                this.tbApi.setPermission("view-reorder", editable, this.buttons);
         }
     };
 

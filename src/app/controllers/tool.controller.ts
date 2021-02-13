@@ -64,7 +64,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.projectId = info[1];
         $scope.specInfo.refId = info[2];
         $scope.specInfo.commitId = 'latest';
-        $rootScope.ve_tbApi.setPermission('element-editor', true);
+        $rootScope.ve_tbApi.setPermission('element-editor', true, $rootScope.ve_tbButtons);
     };
 
     var showPane = function(pane) {
@@ -79,11 +79,11 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
     var cleanUpSaveAll = function() {
         if ($scope.veEditsLength() > 0) {
-            $rootScope.ve_tbApi.setPermission('element-editor-saveall', true);
-            $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit-asterisk');
+            $rootScope.ve_tbApi.setPermission('element-editor-saveall', true, $rootScope.ve_tbButtons);
+            $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit-asterisk', $rootScope.ve_tbButtons);
         } else {
-            $rootScope.ve_tbApi.setPermission('element-editor-saveall', false);
-            $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+            $rootScope.ve_tbApi.setPermission('element-editor-saveall', false, $rootScope.ve_tbButtons);
+            $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit', $rootScope.ve_tbButtons);
         }
     };
 
@@ -100,7 +100,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
     });
 
     $scope.$on('gotoTagsBranches', function(){
-        $rootScope.ve_tbApi.select('tags');
+        $rootScope.ve_tbApi.select('tags', $rootScope.ve_tbButtons);
         showPane('tags');
     });
 
@@ -133,13 +133,13 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
         $scope.specInfo.mmsDisplayOldContent = displayOldContent;
         if($scope.show.element) {
-            $rootScope.ve_tbApi.select('element-viewer');
+            $rootScope.ve_tbApi.select('element-viewer', $rootScope.ve_tbButtons);
         }
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
         }
         var editable = elementOb._editable && $scope.refOb.type === 'Branch' && commitId === 'latest' ;
-        $rootScope.ve_tbApi.setPermission('element-editor', editable);
+        $rootScope.ve_tbApi.setPermission('element-editor', editable, $rootScope.ve_tbButtons);
         $rootScope.$digest();
     };
     $scope.$on('elementSelected', elementSelected);
@@ -169,7 +169,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.viewOb = elementOb;
         var editable = elementOb._editable && $scope.refOb.type === 'Branch' && commitId === 'latest';
         $scope.viewCommitId = commitId ? commitId : elementOb._commitId;
-        $rootScope.ve_tbApi.setPermission('view-reorder', editable);
+        $rootScope.ve_tbApi.setPermission('view-reorder', editable, $rootScope.ve_tbButtons);
     });
 
     $scope.$on('view-reorder.refresh', function() {
@@ -197,9 +197,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
         elementSaving = true;
         if (!continueEdit)
-            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save');
+            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save', $rootScope.ve_tbButtons);
         else
-            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveC');
+            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveC', $rootScope.ve_tbButtons);
         $timeout(function() {
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
@@ -220,7 +220,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 $scope.specInfo.commitId = 'latest';
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.ve_tbApi.select('element-viewer');
+                $rootScope.ve_tbApi.select('element-viewer', $rootScope.ve_tbButtons);
                 cleanUpSaveAll();
             }
         }, function(reason) {
@@ -233,12 +233,12 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 growl.error(reason.message);
         }).finally(function() {
             if (!continueEdit)
-                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save');
+                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save', $rootScope.ve_tbButtons);
             else
-                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveC');
+                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveC', $rootScope.ve_tbButtons);
         });
         }, 1000, false);
-        $rootScope.ve_tbApi.select('element-editor');
+        $rootScope.ve_tbApi.select('element-editor', $rootScope.ve_tbButtons);
     };
 
     hotkeys.bindTo($scope)
@@ -266,13 +266,13 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         if ($scope.specApi && $scope.specApi.editorSave)
             $scope.specApi.editorSave();
         savingAll = true;
-        $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
+        $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall', $rootScope.ve_tbButtons);
         ElementService.updateElements(Object.values($rootScope.ve_edits))
             .then(function(responses) {
                 responses.forEach(function(elementOb) {
                     delete $rootScope.ve_edits[elementOb.id + '|' + elementOb._projectId + '|' + elementOb._refId];
                     $rootScope.$broadcast('element.updated', elementOb, false);
-                    $rootScope.ve_tbApi.select('element-viewer');
+                    $rootScope.ve_tbApi.select('element-viewer', $rootScope.ve_tbButtons);
                     $scope.specApi.setEditing(false);
                 });
                 growl.success("Save All Successful");
@@ -293,7 +293,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 savingAll = false;
                 cleanUpSaveAll();
                 if (Object.keys($rootScope.ve_edits).length === 0) {
-                    $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+                    $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit', $rootScope.ve_tbButtons);
                 }
             });
     });
@@ -313,8 +313,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 $scope.specInfo.commitId = 'latest';
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.ve_tbApi.select('element-viewer');
-                $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+                $rootScope.ve_tbApi.select('element-viewer', $rootScope.ve_tbButtons);
+                $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit', $rootScope.ve_tbButtons);
                 cleanUpSaveAll();
             }
         };
@@ -347,26 +347,26 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             return;
         }
         viewSaving = true;
-        $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
+        $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save', $rootScope.ve_tbButtons);
         $scope.viewContentsOrderApi.save().then(function(data) {
             viewSaving = false;
             $scope.viewContentsOrderApi.refresh();
             growl.success('Save Succesful');
-            $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
+            $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save', $rootScope.ve_tbButtons);
             $rootScope.$broadcast('view.reorder.saved', $scope.viewOb.id);
         }, function(response) {
             $scope.viewContentsOrderApi.refresh();
             viewSaving = false;
             var reason = response.failedRequests[0];
             growl.error(reason.message);
-            $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
+            $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save', $rootScope.ve_tbButtons);
         });
-        $rootScope.ve_tbApi.select('view-reorder');
+        $rootScope.ve_tbApi.select('view-reorder', $rootScope.ve_tbButtons);
     });
     $scope.$on('view-reorder-cancel', function() {
         $scope.specApi.setEditing(false);
         $scope.viewContentsOrderApi.refresh();
-        $rootScope.ve_tbApi.select('element-viewer');
+        $rootScope.ve_tbApi.select('element-viewer', $rootScope.ve_tbButtons);
         showPane('element');
     });
 }]);
