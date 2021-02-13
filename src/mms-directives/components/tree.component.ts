@@ -5,7 +5,7 @@ let TreeComponent = {
     selector: "tree",
     template: `
 <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-    <li ng-repeat="row in $ctrl.treeRows | filter:{visible:true} track by row.branch.uid" ng-hide="!$ctrl.treeFilter(row, $ctrl.options.search)"
+    <li ng-repeat="row in $ctrl.treeControl.treeRows | filter:{visible:true} track by row.branch.uid" ng-hide="!$ctrl.treeFilter(row, $ctrl.options.search)"
         ng-class="'level-' + {{row.level}}" class="abn-tree-row">
         <div class="arrow" ng-click="user_clicks_branch(row.branch)" ng-dblclick="user_dblclicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
             <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
@@ -21,25 +21,23 @@ let TreeComponent = {
 `,
     bindings: {
         treeData: '<',
-        initialSelection: '@',
         treeControl: '<',
+        initialSelection: '@',
         options: '<'
     },
     controller: class TreeController {
         static $inject = ['ApplicationService', '$timeout', '$log', '$filter', '$scope', '$attrs', 'UtilsService']
 
-        private ApplicationService
-        private $timeout
-        private $log
-        private $filter
-        private $scope
-        private $attrs
-        private UtilsService
+        private ApplicationService;
+        private $timeout;
+        private $log;
+        private $filter;
+        private $attrs;
+        private UtilsService;
 
         //bindings
-        public treeData;
-        public initialSelection;
-        public treeControl;
+        private treeControl;
+        private initialSelection;
         public options;
 
         //public data
@@ -48,16 +46,21 @@ let TreeComponent = {
 
         //local Variables
         private expand_level
-        private selected_branch
+        public selected_branch
 
-        constructor(ApplicationService, $timeout, $log, $filter, $scope, $attrs, UtilsService) {
+        //DEBUG VARIABLES
+        private changes
+
+        constructor(ApplicationService, $timeout, $log, $filter, $attrs, UtilsService) {
             this.ApplicationService = ApplicationService;
             this.$timeout = $timeout;
             this.$log = $log;
             this.$filter = $filter;
-            this.$scope = $scope
             this.$attrs = $attrs;
             this.UtilsService = UtilsService;
+        }
+
+        $onInit = () => {
 
             if (!this.options) {
                 this.options = {
@@ -71,24 +74,22 @@ let TreeComponent = {
             if (!this.$attrs.iconCollapse)
                 this.$attrs.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
             if (!this.$attrs.iconDefault)
-                $attrs.iconDefault = 'fa fa-file fa-fw';
+                this.$attrs.iconDefault = 'fa fa-file fa-fw';
             if (!this.options.expandLevel && this.options.expandLevel !== 0)
                 this.options.expandLevel = 1;
 
             this.expand_level = this.options.expandLevel;
             this.selected_branch = this.treeControl.selected_branch;
 
-            if (!angular.isArray(this.treeData)) {
-                $log.warn('treeData is not an array!');
-                return;
+            
+
+            this.treeControl.attrs = this.$attrs;
+            this.treeFilter = this.$filter('uiTreeFilter');
+            
+            if (!angular.isArray(this.treeControl.treeData)) {
+                this.$log.warn('treeData is not an array!');
+                //return;
             }
-
-            this.$scope.$watch('treeData', this.treeControl.on_treeData_change, false);
-            this.$scope.$watch('initialSelection', this.treeControl.on_initialSelection_change);
-
-            this.treeRows = this.treeControl.treeRows;
-            this.treeControl.treeIcons = this.$attrs;
-            this.treeFilter = $filter('uiTreeFilter');
 
             if (this.initialSelection) {
                 this.for_each_branch((b) => {
@@ -105,10 +106,23 @@ let TreeComponent = {
                 b.expanded = b.level <= this.expand_level;
             });
 
+            
         }
 
-        for_each_branch = function(func, excludeBranch?) {
-            var run = function(branch, level) {
+        $onChanges = (changes) => {
+            this.changes = changes
+            console.log("Change Detected:" + changes.toString());
+            if (changes.treeData) {
+                this.treeControl.treeData = this.changes.treeData.currentValue;
+                this.treeControl.on_treeData_change();
+            }
+            if (changes.initialSelection) {
+                this.treeControl.on_initialSelection_change();
+            }
+        }
+
+        for_each_branch = (func, excludeBranch?) => {
+            var run = (branch, level) => {
                 func(branch, level);
                 if (branch.children) {
                     for (var i = 0; i < branch.children.length; i++) {
@@ -116,37 +130,8 @@ let TreeComponent = {
                     }
                 }
             };
-            var rootLevelBranches = excludeBranch ? this.treeData.filter((branch) => { return branch !== excludeBranch; }) : this.treeData;
-            rootLevelBranches.forEach(function (branch) { run(branch, 1); });
-        };
-
-        remove_branch_impl = function (branch, singleBranch) {
-            var parent_branch = this.get_parent(branch);
-            if (!parent_branch) {
-                for (var j = 0; j < this.treeData.length; j++) {
-                    if (this.treeData[j].uid === branch.uid) {
-                        this.treeData.splice(j,1);
-                        break;
-                    }
-                }
-                return;
-            }
-            for (var i = 0; i < parent_branch.children.length; i++) {
-                if (parent_branch.children[i].uid === branch.uid) {
-                    parent_branch.children.splice(i,1);
-                    if (singleBranch) {
-                        break;
-                    }
-                }
-            }
-        };
-
-        remove_branch = (branch) => {
-            this.remove_branch_impl(branch, false);
-        };
-
-        remove_single_branch = (branch) => {
-            this.remove_branch_impl(branch, true);
+            var rootLevelBranches = excludeBranch ? this.treeControl.treeData.filter((branch) => { return branch !== excludeBranch; }) : this.treeControl.treeData;
+            rootLevelBranches.forEach((branch) => { run(branch, 1); });
         };
 
         get_parent = (child) => {
