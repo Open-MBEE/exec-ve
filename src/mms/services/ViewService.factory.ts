@@ -903,7 +903,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
-    var getProjectDocuments = function(reqOb, weight, update) {
+    var getProjectDocuments = function(reqOb, weight, update?) {
         UtilsService.normalize(reqOb);
         var deferred = $q.defer();
         var url = URLService.getProjectDocumentsURL(reqOb);
@@ -911,6 +911,9 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         if (CacheService.exists(cacheKey) && !update) {
             deferred.resolve(CacheService.get(cacheKey));
         } else {
+            if (update === undefined) {
+                update = false;
+            }
             ElementService.getGenericElements(url, reqOb, 'documents', weight, update).
             then(function(data) {
                 deferred.resolve(CacheService.put(cacheKey, data, false));

@@ -22,13 +22,13 @@ let TreePaneComponent = {
 </div>
 <div fa-pane pane-anchor="center" pane-no-toggle="true">
     <div class="pane-left" style="display:table;">
-        <tree ng-show="'showTree'==(activeMenu)" tree-data="$ctrl.treeControl.treeData" tree-control="$ctrl.treeControl"
-                initial-selection="{{$ctrl.initialSelection}}" options="$ctrl.treeControl.options"></tree>
+        <tree ng-show="'showTree'==(activeMenu)" tree-data="$ctrl.treeData" tree-control="$ctrl.treeControl"
+                initial-selection="{{$ctrl.initialSelection}}" options="$ctrl.treeOptions"></tree>
 
         <div data-ng-repeat="view in ::treeViewModes" ng-show="view.id==(activeMenu)">
             <h4 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h4>
             <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-                <li ng-repeat="row in view.branchList | filter:treeOptions.search track by $index"
+                <li ng-repeat="row in view.branchList | filter:$ctrl.treeOptions.search track by $index"
                     class="abn-tree-row">
                     <div class="arrow" ng-click="user_clicks_branch(row)"
                         ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.id}}">
@@ -47,13 +47,13 @@ let TreePaneComponent = {
 </div>
 `,
   bindings: {
-    documentOb: "=",
-    orgOb: "=",
-    projectOb: "=",
-    refOb: "=",
-    refObs: "=",
-    groupObs: "=",
-    docMeta: "="
+    documentOb: "<",
+    orgOb: "<",
+    projectOb: "<",
+    refOb: "<",
+    refObs: "<",
+    groupObs: "<",
+    docMeta: "<"
   },
   controller: class TreePaneController {
     static $inject = ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
@@ -119,6 +119,7 @@ let TreePaneComponent = {
     private newGroup: { name: string };
     private newDoc: any;
     private createForm: boolean;
+    private resolvedBindings;
 
     constructor($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, UxService, 
       ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, ToolbarService, ButtonBarService, TreeService) {
@@ -141,6 +142,8 @@ let TreePaneComponent = {
       this.MmsAppUtils = MmsAppUtils;
       this.treeControl = TreeService;
 
+      this.$rootScope.ve_treeApi = this.treeControl;
+
       this.filterInputPlaceholder = 'Filter groups/docs';
       if (this.$state.includes('project.ref.document')) {
         this.filterInputPlaceholder = 'Filter table of contents';
@@ -155,6 +158,7 @@ let TreePaneComponent = {
 
       this.tbApi = ToolbarService;
       this.treeButtons = [];
+      this.treeOptions = {}
 
       this.bbApi = ButtonBarService;
       this.buttons = [];
@@ -165,87 +169,13 @@ let TreePaneComponent = {
       if (this.$state.includes('project.ref.document.full')) {
         this.$rootScope.ve_fullDocMode = true;
       }
+
+      this.resolvedBindings = 0;
       
     }
 
     $onInit = () => {
-
-      
-
       this.$rootScope.mms_refOb = this.refOb;
-
-      if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-        this.treeControl.treeData = this.UtilsService.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func);
-        this.ViewService.getProjectDocuments({
-          projectId: this.projectOb.id,
-          refId: this.refOb.id
-        }, 2).then((documentObs) => {
-          for (var i = 0; i < documentObs.length; i++) {
-            if (!documentObs[i]._groupId || documentObs[i]._groupId == this.projectOb.id) {
-              this.treeControl.treeData.push({
-                label: documentObs[i].name,
-                type: 'view',
-                data: documentObs[i],
-                children: []
-              });
-            }
-          }
-          if (this.treeControl.initialSelect) {
-            this.treeControl.initialSelect();
-          }
-        });
-      } else {
-        if (!this.documentOb._childViews) {
-          this.documentOb._childViews = [];
-        }
-        this.MmsAppUtils.handleChildViews(this.documentOb, 'composite', undefined, this.projectOb.id, this.refOb.id, this.handleSingleView, this.handleChildren)
-          .then((node) => {
-            var bulkGet = [];
-            for (var i in this.viewId2node) {
-              var view = this.viewId2node[i].data;
-              if (view._contents && view._contents.operand) {
-                for (var j = 0; j < view._contents.operand.length; j++) {
-                  bulkGet.push(view._contents.operand[j].instanceId);
-                }
-              }
-            }
-            this.ElementService.getElements({
-              elementIds: bulkGet,
-              projectId: this.projectOb.id,
-              refId: this.refOb.id
-            }, 0).finally(() => {
-              for (var i in this.viewId2node) {
-                this.addSectionElements(this.viewId2node[i].data, this.viewId2node[i], this.viewId2node[i], true);
-              }
-              this.treeControl.refresh();
-            });
-          }, (reason) =>  {
-            console.log(reason);
-          });
-        this.treeControl.treeData = [this.viewId2node[this.documentOb.id]];
-      }
-
-      this.treeControl.options = {
-        types: this.UxService.getTreeTypes(),
-        sectionNumbering: this.$state.includes('project.ref.document') ? true : false,
-        numberingDepth: 0,
-        numberingSeparator: '.',
-        expandLevel: this.$state.includes('project.ref.document') ? 3 : (this.$state.includes('project.ref') ? 0 : 1),
-        search: '',
-        onSelect: this.treeClickHandler,
-        onDblclick: this.treeDblclickHandler,
-        sort: this.$state.includes('project.ref.document') ? null : this.treeSortFunction
-      };
-      if (this.documentOb && this.docMeta) {
-        this.treeControl.options.numberingDepth = this.docMeta.numberingDepth;
-        this.treeControl.options.numberingSeparator = this.docMeta.numberingSeparator;
-        this.treeControl.options.startChapter = this.documentOb._startChapter;
-      }
-
-      this.docEditable = false;
-      if(this.documentOb !== undefined && this.refOb !== undefined) {
-        this.docEditable = this.documentOb && this.documentOb._editable && this.refOb.type === 'Branch' && this.UtilsService.isView(this.documentOb);
-      }
 
       this.tbInit();
       this.bbInit();
@@ -277,11 +207,11 @@ let TreePaneComponent = {
       this.toggle('showTree');
 
       this.$scope.$on('tree-expand', () => {
-        this.treeControl.expand_all();
+        this.treeControl.expand_all(this.treeData, this.treeOptions);
       });
 
       this.$scope.$on('tree-collapse', () => {
-        this.treeControl.collapse_all();
+        this.treeControl.collapse_all(this.treeData, this.treeOptions);
       });
 
       this.$scope.$on('tree-add-document', () => {
@@ -324,14 +254,14 @@ let TreePaneComponent = {
         this.toggle('showTree');
         this.$rootScope.veTreeShowPe = true;
         this.setPeVisibility(this.viewId2node[this.documentOb.id]);
-        this.treeControl.refresh();
+        this.treeControl.refresh(this.treeData, this.treeOptions);
       });
 
       this.$scope.$on('tree-show-views', () => {
         this.toggle('showTree');
         this.$rootScope.veTreeShowPe = false;
         this.setPeVisibility(this.viewId2node[this.documentOb.id]);
-        this.treeControl.refresh();
+        this.treeControl.refresh(this.treeData, this.treeOptions);
       });
 
       this.$scope.$on('tree-show-tables', () => {
@@ -352,7 +282,7 @@ let TreePaneComponent = {
       this.$scope.$on('viewctrl.add.element', (event, instanceSpec, elemType, parentBranchData) =>  {
         if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
           return;
-        var branch = this.treeControl.get_branch(parentBranchData);
+        var branch = this.treeControl.get_branch(parentBranchData, this.treeData, this.treeOptions);
         var viewId = null;
         if (branch.type === 'section') {
           viewId = branch.viewId;
@@ -385,15 +315,15 @@ let TreePaneComponent = {
         if (elemType === 'section') {
           this.addSectionElements(instanceSpec, viewNode, newbranch);
         }
-        this.treeControl.refresh();
+        this.treeControl.refresh(this.treeData, this.treeOptions);
         this.resetPeTreeList(elemType);
       });
 
       // Utils creates this event when deleting instances from the view
       this.$scope.$on('viewctrl.delete.element', (event, elementData) =>  {
-        var branch = this.treeControl.get_branch(elementData);
+        var branch = this.treeControl.get_branch(elementData, this.treeData, this.treeOptions);
         if (branch) {
-          this.treeControl.remove_single_branch(branch);
+          this.treeControl.remove_single_branch(branch, this.treeData);
         }
         this.resetPeTreeList(branch.type);
       });
@@ -417,10 +347,101 @@ let TreePaneComponent = {
         }
         this.addSectionElements(node.data, viewNode, node);
       });
+    }
+  $onChanges = (changes) => {
+      for (const [name, binding] of Object.entries(changes)) {
+        this[name] = angular.copy(changes[name].currentValue);
+        console.log(name + ':');
+        console.log(changes[name].currentValue.id);
+      }
 
-      this.treeControl.on_treeData_change();
+      
+
+      this.treeOptions = {
+        types: this.UxService.getTreeTypes(),
+        sectionNumbering: this.$state.includes('project.ref.document') ? true : false,
+        numberingDepth: 0,
+        numberingSeparator: '.',
+        expandLevel: this.$state.includes('project.ref.document') ? 3 : (this.$state.includes('project.ref') ? 0 : 1),
+        search: '',
+        onSelect: this.treeClickHandler,
+        onDblclick: this.treeDblclickHandler,
+        sort: this.$state.includes('project.ref.document') ? null : this.treeSortFunction
+      };
+      if (this.documentOb && this.docMeta) {
+        this.treeOptions.numberingDepth = this.docMeta.numberingDepth;
+        this.treeOptions.numberingSeparator = this.docMeta.numberingSeparator;
+        this.treeOptions.startChapter = this.documentOb._startChapter;
+      }
+
+      this.docEditable = false;
+      if(this.documentOb !== undefined && this.refOb !== undefined) {
+        this.docEditable = this.documentOb && this.documentOb._editable && this.refOb.type === 'Branch' && this.UtilsService.isView(this.documentOb);
+      }
+
+      if(this.documentOb !== undefined && this.groupObs !== undefined && this.projectOb !== undefined && this.refOb !== undefined) {
+        console.log('Ready Player One!')
+        this.updateTreeData();
+      }
+        
 
     }
+
+    updateTreeData = () => {
+
+      if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
+        console.log('1')
+        this.treeData = this.UtilsService.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func);
+        this.ViewService.getProjectDocuments({
+          projectId: this.projectOb.id,
+          refId: this.refOb.id
+        }, 2).then((documentObs) => {
+          for (var i = 0; i < documentObs.length; i++) {
+            if (!documentObs[i]._groupId || documentObs[i]._groupId == this.projectOb.id) {
+              this.treeData.push({
+                label: documentObs[i].name,
+                type: 'view',
+                data: documentObs[i],
+                children: []
+              });
+            }
+          }
+          if (this.treeControl.initialSelect) {
+            this.treeControl.initialSelect(this.treeData, this.treeOptions);
+          }
+        });
+      } else {
+        if (!this.documentOb._childViews) {
+          this.documentOb._childViews = [];
+        }
+        this.MmsAppUtils.handleChildViews(this.documentOb, 'composite', undefined, this.projectOb.id, this.refOb.id, this.handleSingleView, this.handleChildren)
+          .then((node) => {
+            var bulkGet = [];
+            for (var i in this.viewId2node) {
+              var view = this.viewId2node[i].data;
+              if (view._contents && view._contents.operand) {
+                for (var j = 0; j < view._contents.operand.length; j++) {
+                  bulkGet.push(view._contents.operand[j].instanceId);
+                }
+              }
+            }
+            this.ElementService.getElements({
+              elementIds: bulkGet,
+              projectId: this.projectOb.id,
+              refId: this.refOb.id
+            }, 0).finally(() => {
+              for (var i in this.viewId2node) {
+                this.addSectionElements(this.viewId2node[i].data, this.viewId2node[i], this.viewId2node[i], true);
+              }
+              this.treeControl.refresh(this.treeData, this.treeOptions);
+            });
+          }, (reason) =>  {
+            console.log(reason);
+          });
+        this.treeData = [this.viewId2node[this.documentOb.id]];
+      }
+    };
+
 
     tbInit = () => {
       if (this.$state.includes('project.ref.document')) {
@@ -518,7 +539,7 @@ let TreePaneComponent = {
         }
         groupNode.loading = false;
         if (this.treeControl.initialSelect) {
-          this.treeControl.initialSelect();
+          this.treeControl.initialSelect(this.treeData, this.treeOptions);
         }
       });
     };
@@ -556,7 +577,7 @@ let TreePaneComponent = {
       curNode.children.push.apply(curNode.children, newChildNodes);
       curNode.loading = false;
       if (this.treeControl.refresh) {
-        this.treeControl.refresh();
+        this.treeControl.refresh(this.treeData, this.treeOptions);
       }
     };
 
@@ -625,9 +646,9 @@ let TreePaneComponent = {
                 parentNode.children.unshift(otherTreeNode);
               }
             }
-            this.treeControl.refresh();
+            this.treeControl.refresh(this.treeData, this.treeOptions);
             if (initial) {
-              this.treeControl.initialSelect();
+              this.treeControl.initialSelect(this.treeData, this.treeOptions);
             }
             this.resetPeTreeList('all');
           }, (reason) => {
@@ -678,12 +699,12 @@ let TreePaneComponent = {
     treeDblclickHandler = (branch) =>  {
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
         if (branch.type === 'group')
-          this.$rootScope.ve_treeControl.expand_branch(branch);
+          this.treeControl.expand_branch(branch, this.treeData, this.treeOptions);
         else if (branch.type === 'view' || branch.type === 'snapshot') {
           this.$state.go('project.ref.document', {documentId: branch.data.id, search: undefined});
         }
       } else if (this.$state.includes('project.ref.document')) {
-        this.$rootScope.ve_treeControl.expand_branch(branch);
+        this.treeControl.expand_branch(branch, this.treeData, this.treeOptions);
       }
     };
 
@@ -817,7 +838,7 @@ let TreePaneComponent = {
           aggr: null,
         };
         var top = itemType === 'Group' ? true : false;
-        this.treeControl.add_branch(branch, newbranch, top);
+        this.treeControl.add_branch(branch, newbranch, top, this.treeData, this.treeOptions);
 
         const addToFullDocView = (node, curSection, prevSysml) =>  {
           var lastChild = prevSysml;
@@ -838,9 +859,9 @@ let TreePaneComponent = {
           this.seenViewIds[data.id] = newbranch;
           newbranch.aggr = this.newViewAggr.type;
           var curNum = branch.children[branch.children.length-1].section;
-          var prevBranch = this.treeControl.get_prev_branch(newbranch);
+          var prevBranch = this.treeControl.get_prev_branch(newbranch, this.treeData);
           while (prevBranch.type !== 'view') {
-            prevBranch = this.treeControl.get_prev_branch(prevBranch);
+            prevBranch = this.treeControl.get_prev_branch(prevBranch, this.treeData);
           }
           this.MmsAppUtils.handleChildViews(data, this.newViewAggr.type, undefined, this.projectOb.id, this.refOb.id, this.handleSingleView, this.handleChildren)
             .then((node) =>  {
@@ -1019,7 +1040,7 @@ let TreePaneComponent = {
         component: 'confirmRemove'
       });
       instance.result.then((data) =>  {
-        this.treeControl.remove_branch(branch);
+        this.treeControl.remove_branch(branch, this.treeData, this.treeOptions);
         if (this.$state.includes('project.ref.document') && branch.type === 'view') {
           this.processDeletedViewBranch(branch);
         }
@@ -1058,14 +1079,14 @@ let TreePaneComponent = {
     
 
     //TODO refresh table and fig list when new item added, deleted or reordered
-    user_clicks_branch = (branch) =>  {
-      this.$rootScope.ve_treeControl.user_clicks_branch(branch);
+    user_clicks_branch = (branch, treeData, options) =>  {
+      this.treeControl.user_clicks_branch(branch, treeData, options);
     };
 
     searchInputChangeHandler = function () {
       if (this.treeControl.options.search === '') {
-        this.treeControl.collapse_all();
-        this.treeControl.expandPathToSelectedBranch();
+        this.treeControl.collapse_all(this.treeData, this.options);
+        this.treeControl.expandPathToSelectedBranch(this.treeData, this.options);
       } else {
         // expand all branches so that the filter works correctly
         this.treeControl.expand_all();

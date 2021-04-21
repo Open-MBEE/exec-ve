@@ -6,7 +6,6 @@ class TreeService {
   static $inject = ['$timeout'];
 
   private $timeout;
-  private expandPathToSelectedBranch;
 
   private selected_branch;
 
@@ -16,7 +15,7 @@ class TreeService {
   
   constructor($timeout) {
     this.$timeout = $timeout;
-    this.treeRows;
+    // this.treeRows = [];
     
   }
 
@@ -33,11 +32,11 @@ class TreeService {
     rootLevelBranches.forEach(function (branch) { run(branch, 1); });
   };
 
-  on_initialSelection_change = (initialSelection?, treeData?, options?) => {
+  on_initialSelection_change = (initialSelection, treeData, options) => {
     if (initialSelection) {
         this.for_each_branch((b) => {
             if (b.data.id === initialSelection) {
-                this.select_branch(b, true);
+                this.select_branch(b, true, treeData, options);
             }
         }, treeData);
         this.on_treeData_change(treeData, options);
@@ -45,6 +44,7 @@ class TreeService {
   };
 
   on_treeData_change = (treeData, options) => {
+    this.treeRows = [];
     this.for_each_branch((b, level) => {
         if (!b.uid)
             b.uid = '' + Math.random();
@@ -129,6 +129,7 @@ class TreeService {
           type_icon: type_icon,
           children: branch.children
         }
+        console.log(newRow);
         this.treeRows.push(newRow);
         if (branch.children) {
             var alpha = false;
@@ -169,12 +170,12 @@ class TreeService {
     if (options.sort) {
       treeData.sort(options.sort);
     }
-    console.log('TreeData:' + treeData.toString());
-    //SOMETHINE WRONG HERE
+
     for (var i = 0; i < treeData.length; i++) {
-      console.log('loopz' + i);
         add_branch_to_list(1, [], treeData[i], true, {figure: 0, table: 0, equation: 0});
     }
+
+    //return this.treeRows;
   
   };
 
@@ -200,6 +201,13 @@ class TreeService {
     }
     return parent;
   };
+
+  expandPathToSelectedBranch = (treeData, options) => {
+    if (this.selected_branch) {
+        this.expand_all_parents(this.selected_branch, treeData, options);
+        this.on_treeData_change(treeData, options);
+    }
+};
 
 /**
  * @ngdoc function
@@ -229,7 +237,7 @@ class TreeService {
         {
             scope.expandCallback({ branch: branch });
         }*/
-        this.expand_all_parents(branch);
+        this.expand_all_parents(branch, treeData, options);
         if (!noClick) {
             if (branch.onSelect) {
                 this.$timeout(() => {
@@ -296,10 +304,17 @@ class TreeService {
    * @description
    * self explanatory
    */
-  collapse_all = (excludeBranch, treeData, options) => {
-    this.for_each_branch(function(b, level) {
-      b.expanded = false;
-    }, excludeBranch);
+  collapse_all = (treeData, options, excludeBranch?) => {
+    if (excludeBranch) {
+      this.for_each_branch(function(b, level) {
+        b.expanded = false;
+      }, treeData, excludeBranch);
+    }else {
+      this.for_each_branch(function(b, level) {
+        b.expanded = false;
+      }, treeData);
+    }
+    
     this.on_treeData_change(treeData, options);
   };
 
@@ -367,7 +382,7 @@ class TreeService {
     this.on_treeData_change(treeData, options);
   };
 
-  remove_branch_impl = (branch, treeData, options, singleBranch?) => {
+  remove_branch_impl = (branch, treeData, singleBranch?) => {
     var parent_branch = this.get_parent(branch, treeData);
     if (!parent_branch) {
         for (var j = 0; j < treeData.length; j++) {
@@ -389,12 +404,12 @@ class TreeService {
 };
 
 remove_branch = (branch, treeData, options) => {
-    this.remove_branch_impl(branch, treeData, options, false);
+    this.remove_branch_impl(branch, treeData, false);
     this.on_treeData_change(treeData, options);
 };
 
 remove_single_branch = (branch, treeData, options) => {
-    this.remove_branch_impl(branch, treeData, options, true);
+    this.remove_branch_impl(branch, treeData, true);
     this.on_treeData_change(treeData, options);
 };
 
@@ -411,14 +426,14 @@ remove_single_branch = (branch, treeData, options) => {
    *
    * @param {Object} branch branch to expand
    */
-  expand_branch = (b) => {
+  expand_branch = (b, treeData, options) => {
     if (!b)
       b = this.get_selected_branch();
     if (b) {
-      this.expandCallback({ branch: b });
+      this.expandCallback({ branch: b }, treeData, options);
       b.expanded = true;
     }
-    this.on_treeData_change();
+    this.on_treeData_change(treeData, options);
   };
 
   /**
@@ -431,17 +446,17 @@ remove_single_branch = (branch, treeData, options) => {
    *
    * @param {Object} branch branch to collapse
    */
-  collapse_branch = (b) => {
+  collapse_branch = (b, treeData, options) => {
     if (!b)
       b = this.selected_branch;
     if (b)
       b.expanded = false;
-    this.on_treeData_change();
+    this.on_treeData_change(treeData, options);
   };
 
-  get_siblings = (b) => {
+  get_siblings = (b, treeData) => {
     var siblings;
-    var p = this.get_parent_object(b);
+    var p = this.get_parent_object(b, treeData);
     if (p)
       siblings = p.children;
     else
@@ -449,8 +464,8 @@ remove_single_branch = (branch, treeData, options) => {
     return siblings;
   };
 
-  get_next_sibling = (b) => {
-    var siblings = this.get_siblings(b);
+  get_next_sibling = (b, treeData) => {
+    var siblings = this.get_siblings(b, treeData);
     if (angular.isArray(siblings)) {
       var i = siblings.indexOf(b);
       if (i < siblings.length - 1)
@@ -458,24 +473,24 @@ remove_single_branch = (branch, treeData, options) => {
     }
   };
 
-  get_prev_sibling = (b) => {
-    var siblings = this.get_siblings(b);
+  get_prev_sibling = (b, treeData) => {
+    var siblings = this.get_siblings(b, treeData);
     if (angular.isArray(siblings)) {
       var i = siblings.indexOf(b);
       if (i > 0)
         return siblings[i - 1];
     }
   };
-  select_next_sibling = (b) => {
-    var next = this.get_next_sibling(b);
+  select_next_sibling = (b, treeData, options) => {
+    var next = this.get_next_sibling(b, treeData);
     if (next)
-      this.select_branch(next);
+      this.select_branch(next, treeData, options);
   };
 
-  select_prev_sibling = (b) => {
-    var prev = this.get_prev_sibling(b);
+  select_prev_sibling = (b, treeData, options) => {
+    var prev = this.get_prev_sibling(b, treeData);
     if (prev)
-      this.select_branch(prev);
+      this.select_branch(prev, treeData, options);
   };
 
   get_first_child = (b) => {
@@ -484,13 +499,13 @@ remove_single_branch = (branch, treeData, options) => {
     if (b && b.children && b.children.length > 0)
       return b.children[0];
   };
-  get_closest_ancestor_next_sibling = (b) => {
-    var next = this.get_next_sibling(b);
+  get_closest_ancestor_next_sibling = (b, treeData) => {
+    var next = this.get_next_sibling(b, treeData);
     if (next)
       return next;
     else {
-      next = this.get_parent_object(b);
-      return this.get_closest_ancestor_next_sibling(next);
+      next = this.get_parent_object(b, treeData);
+      return this.get_closest_ancestor_next_sibling(next, treeData);
     }
   };
   /**
@@ -504,7 +519,7 @@ remove_single_branch = (branch, treeData, options) => {
    * @param {Object} branch current branch
    * @return {Object} next branch
    */
-  get_next_branch = (b) => {
+  get_next_branch = (b, treeData) => {
     if (!b)
       b = this.selected_branch;
     if (b) {
@@ -512,7 +527,7 @@ remove_single_branch = (branch, treeData, options) => {
       if (next)
         return next;
       else {
-        next = this.get_closest_ancestor_next_sibling(b);
+        next = this.get_closest_ancestor_next_sibling(b, treeData);
         return next;
       }
     }
@@ -527,10 +542,10 @@ remove_single_branch = (branch, treeData, options) => {
    *
    * @param {Object} branch current branch
    */
-  select_next_branch = (b) => {
-    var next = this.get_next_branch(b);
+  select_next_branch = (b, treeData, options) => {
+    var next = this.get_next_branch(b, treeData);
     if (next)
-      this.select_branch(next);
+      this.select_branch(next, treeData, options);
   };
   last_descendant = (b) => {
     if (b) {
@@ -551,11 +566,11 @@ remove_single_branch = (branch, treeData, options) => {
    * @param {Object} branch current branch
    * @return {Object} previous branch
    */
-  get_prev_branch = (b) => {
-    var prev_sibling = this.get_prev_sibling(b);
+  get_prev_branch = (b, treeData) => {
+    var prev_sibling = this.get_prev_sibling(b, treeData);
     if (prev_sibling)
       return this.last_descendant(prev_sibling);
-    return this.get_parent_object(b);
+    return this.get_parent_object(b, treeData);
   };
   /**
    * @ngdoc function
@@ -567,10 +582,10 @@ remove_single_branch = (branch, treeData, options) => {
    *
    * @param {Object} branch current branch
    */
-  select_prev_branch = (b) => {
-    var prev = this.get_prev_branch(b);
+  select_prev_branch = (b, treeData, options) => {
+    var prev = this.get_prev_branch(b, treeData);
     if (prev)
-      this.select_branch(prev);
+      this.select_branch(prev, treeData, options);
   };
 
   /**
@@ -581,12 +596,12 @@ remove_single_branch = (branch, treeData, options) => {
    * @description
    * rerender the tree when data or options change
    */
-  refresh = () => {
-    this.on_treeData_change();
+  refresh = (treeData, options) => {
+    this.on_treeData_change(treeData, options);
   };
 
-  initialSelect = () => {
-    this.on_initialSelection_change();
+  initialSelect = (treeData, options) => {
+    this.on_initialSelection_change("", treeData, options);
   };
 
   sort_branch = (b, sortFunction) => {
@@ -601,7 +616,7 @@ remove_single_branch = (branch, treeData, options) => {
    * @description
    * Returns the branch with the specified data
    */
-  get_branch = (data) => {
+  get_branch = (data, treeData, options) => {
     var branch = null;
     this.for_each_branch(function(b) {
       // if (angular.equals(b.data,data)) {
@@ -610,7 +625,7 @@ remove_single_branch = (branch, treeData, options) => {
       if (b.data.id === data.id) {
         branch = b;
       }
-    });
+    }, treeData, options);
     return branch;
   };
 
@@ -618,8 +633,9 @@ remove_single_branch = (branch, treeData, options) => {
     return this.treeRows;
   };
 
-  user_clicks_branch = (branch) => {
-    return this.user_clicks_branch(branch);
+  user_clicks_branch = (branch, treeData, options) => {
+    if (branch !== this.selected_branch) 
+                this.select_branch(branch, treeData, options);;
   };
 
 }

@@ -5,7 +5,7 @@ let TreeComponent = {
     selector: "tree",
     template: `
 <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-    <li ng-repeat="row in $ctrl.treeControl.treeRows | filter:{visible:true} track by row.branch.uid" ng-hide="!$ctrl.treeFilter(row, $ctrl.options.search)"
+    <li ng-repeat="row in $ctrl.treeRows | filter:{visible:true} track by row.branch.uid" ng-hide="!$ctrl.treeFilter(row, $ctrl.options.search)"
         ng-class="'level-' + {{row.level}}" class="abn-tree-row">
         <div class="arrow" ng-click="user_clicks_branch(row.branch)" ng-dblclick="user_dblclicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
             <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
@@ -36,6 +36,7 @@ let TreeComponent = {
         private UtilsService;
 
         //bindings
+        public treeData;
         private treeControl;
         private initialSelection;
         public options;
@@ -86,80 +87,49 @@ let TreeComponent = {
             this.treeControl.attrs = this.$attrs;
             this.treeFilter = this.$filter('uiTreeFilter');
             
-            if (!angular.isArray(this.treeControl.treeData)) {
+            if (!angular.isArray(this.treeData)) {
                 this.$log.warn('treeData is not an array!');
                 //return;
             }
 
             if (this.initialSelection) {
-                this.for_each_branch((b) => {
+                this.treeControl.for_each_branch((b) => {
                     if (b.data.id === this.initialSelection) {
                         this.$timeout(() => {
                             this.treeControl.select_branch(b);
                         });
                     }
-                });
+                },this.treeData);
             }
 
-            this.for_each_branch((b, level) => {
+            this.treeControl.for_each_branch((b, level) => {
                 b.level = level;
                 b.expanded = b.level <= this.expand_level;
-            });
+            },this.treeData);
 
             
         }
 
         $onChanges = (changes) => {
-            this.changes = changes
-            console.log("Change Detected:" + changes.toString());
             if (changes.treeData) {
-                this.treeControl.treeData = this.changes.treeData.currentValue;
-                this.treeControl.on_treeData_change();
+                this.treeRows = [];
+                this.treeData = angular.copy(changes.treeData.currentValue);
+                console.log(this.treeData.length);
+                console.log(this.treeData);
+                this.treeControl.on_treeData_change(this.treeData, this.options);
+                this.treeRows = angular.copy(this.treeControl.treeRows);
             }
             if (changes.initialSelection) {
-                this.treeControl.on_initialSelection_change();
+                this.treeRows = [];
+                this.initialSelection = angular.copy(changes.initialSelection.currentValue);
+                this.treeControl.on_initialSelection_change(this.initialSelection, this.treeData, this.options);
+                this.treeRows = angular.copy(this.treeControl.treeRows);
             }
         }
 
-        for_each_branch = (func, excludeBranch?) => {
-            var run = (branch, level) => {
-                func(branch, level);
-                if (branch.children) {
-                    for (var i = 0; i < branch.children.length; i++) {
-                        run(branch.children[i], level + 1);
-                    }
-                }
-            };
-            var rootLevelBranches = excludeBranch ? this.treeControl.treeData.filter((branch) => { return branch !== excludeBranch; }) : this.treeControl.treeData;
-            rootLevelBranches.forEach((branch) => { run(branch, 1); });
-        };
-
-        get_parent = (child) => {
-            var parent = null;
-            if (child.parent_uid) {
-                this.for_each_branch((b) => {
-                    if (b.uid === child.parent_uid) {
-                        parent = b;
-                    }
-                });
-            }
-            return parent;
-        };
-
-        expandPathToSelectedBranch = () => {
-            if (this.selected_branch) {
-                this.treeControl.expand_all_parents(this.selected_branch);
-                this.treeControl.on_treeData_change();
-            }
-        };
-
-
-        // on_treeData_change();
-
-        user_clicks_branch = (branch) => {
-            if (branch !== this.selected_branch) 
-                this.treeControl.select_branch(branch);
-        };
+        user_clicks_branch = (branch, treeData, options) =>  {
+            this.treeControl.user_clicks_branch(branch, treeData, options);
+          };
 
         user_dblclicks_branch = (branch) => {
             if (branch.onDblclick) {

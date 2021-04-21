@@ -326,7 +326,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
      * @param {integer} [weight=1] priority
      * @param {boolean} [update=false] update from server
      */
-    var getGenericElements = function(url, reqOb, jsonKey, weight, update) {
+    var getGenericElements = function(url, reqOb, jsonKey, weight, update?) {
         UtilsService.normalize(reqOb);
         if (inProgress.hasOwnProperty(url)) {
             HttpService.ping(url, weight);

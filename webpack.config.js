@@ -4,6 +4,9 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: "./src/main.ts",
+  optimization: {
+    minimize: false
+  },
   output: {
       path: path.join(process.cwd(),'src','dist'),
       filename: "bundle.js"
