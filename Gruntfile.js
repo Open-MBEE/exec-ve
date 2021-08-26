@@ -20,100 +20,92 @@ module.exports = function(grunt) {
   var connectObject = {
     docs: {
       options: {
-        hostname: 'localhost',
+        hostname: '*',
         port: 10000,
         base: './dist/docs'
       }
     }
   };
 
-  if (grunt.file.exists('angular-mms-grunt-servers.json')) {
-    var servers = grunt.file.readJSON('angular-mms-grunt-servers.json');
-
-    // Set proxie info for server list
-    for (var key in servers) {
-      var serverPort = 443;
-      var serverHttps = true;
-      if (key === "localhost") {
-        serverPort = 8080;
-        serverHttps = false;
-      }
-      connectObject[key] = {
+  //if (grunt.file.exists('angular-mms-grunt-servers.json')) {
+  //var server = grunt.file.readJSON('angular-mms-grunt-servers.json');
+  //ar serverPort = server.mms_port;
+  //var serverHttps = true;
+  var serveStatic = require('serve-static');
+  var modRewrite = require('connect-modrewrite');
+  connectObject["docker"] = {
+    options: {
+      hostname: '0.0.0.0',
+      port: 9000,
+      protocol: 'http',
+      //open: true,
+      //key: grunt.file.read('/run/secrets/server.key').toString(),
+      //cert: grunt.file.read('/run/secrets/server.crt').toString(),
+      debug: true,
+      base: {
+        path: './dist',
         options: {
-          hostname: '*',
-          port: 9000,
-          open: true,
-          base: {
-            path: './dist',
-            options: {
-              // Add this so that the browser doesn't re-validate static resources
-              // Also, we have cache-busting, so we don't have to worry about stale resources
-              maxAge: 31536000000
-            }
-          },
-          middleware: function (connect, options, middlewares) {
-            middlewares.unshift(
-              require('grunt-connect-proxy-updated/lib/utils').proxyRequest,
-              // add gzip compression to local server to reduce static resources' size and improve load speed
-              require('compression')(),
-              // need to add livereload as a middleware at this specific order to avoid issues with other middlewares
-              require('connect-livereload')());
-            return middlewares;
-          }
-        },
-        proxies: [
-          {
-            context: '/mms-ts',
-            host: 'mms-ts-uat.jpl.nasa.gov',//'localhost',//'100.64.243.161',
-            port: 8080
-          },
-          {
-            context: '/xlrapi',
-            https: serverHttps,
-            host: servers[key],
-            port: serverPort
-          },
-          {
-            context: '/alfresco',  // '/api'
-            host: servers[key],
-            changeOrigin: true,
-            https: serverHttps,
-            port: serverPort
-          }
-        ]
-      };
+          index: 'mms.html',
+          // Add this so that the browser doesn't re-validate static resources
+          // Also, we have cache-busting, so we don't have to worry about stale resources
+          maxAge: 31536000000
+        }
+      },
+      middleware: function(connect, options) {
+        var middlewares;
+        middlewares = [];
+        if (!Array.isArray(options.base)) {
+          options.base = [options.base];
+        }
+        middlewares.push(
+            require('grunt-connect-proxy-updated/lib/utils').proxyRequest,
+            // add gzip compression to local server to reduce static resources' size and improve load speed
+            require('compression')()
+            //require('connect-modrewrite')(['!\\.html|\\.js|\\.css|\\.svg|\\.jp(e?)g|\\.png|\\.gif$ /mms.html']),
+
+            // need to add livereload as a middleware at this specific order to avoid issues with other middlewares
+        );
+        middlewares.push( modRewrite( ['^[^\\.]*$ /mms.html [L]'] ) );
+        options.base.forEach(function(base) {
+          // Serve static files.
+          var path = base.path || base;
+          var staticOptions = base.options || defaultStaticOptions;
+          middlewares.push(serveStatic(path, staticOptions));
+        });
+        return middlewares;
+      }
     }
-  }
+  };
+  //}
 
   var combineCustomJS = {
-        options: {
-            banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
-                wrap: 'mms',
-                mangle: true,
-                sourceMap: {
-                includeSources: true
-            }
-        },
-        files: {
-            'dist/js/ve-mms.min.js': [
+    options: {
+      banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd HH:MM:ss") %> */\n',
+      wrap: 'mms',
+      mangle: true,
+      sourceMap: {
+        includeSources: true
+      }
+    },
+    files: {
+      'dist/js/ve-mms.min.js': [
 
-                // mms module
-                'src/mms.js',
-                'src/services/*.js',
-                'src/filters/*.js',
+        // mms module
+        'src/mms.js',
+        'src/services/*.js',
 
-                // mms.directives module (need mms, mms.directives.tpls.js module )
-                'dist/jsTemp/mms.directives.tpls.js',
-                'src/mms.directives.js',
-                'src/directives/**/*.js',
+        // mms.directives module (need mms, mms.directives.tpls.js module )
+        'dist/jsTemp/mms.directives.tpls.js',
+        'src/mms.directives.js',
+        'src/directives/**/*.js',
 
-                // app module ( need app.tpls.js, mms, mms.directives module )
-                'dist/jsTemp/app.tpls.js',
-                'app/js/mms/app.js',
-                'app/js/mms/controllers/*.js',
-                'app/js/mms/directives/*.js'
-            ]
-        }
+        // app module ( need app.tpls.js, mms, mms.directives module )
+        'dist/jsTemp/app.tpls.js',
+        'app/js/mms/app.js',
+        'app/js/mms/controllers/*.js',
+        'app/js/mms/directives/*.js'
+      ]
+    }
   };
   // Project configuration.
   grunt.initConfig({
@@ -157,7 +149,7 @@ module.exports = function(grunt) {
         files: [
 
           // Entry html files
-          {expand: true, cwd: 'app', src: ['mms.html', 'index.html'], dest: 'dist/'},
+          {expand: true, cwd: 'app', src: ['mms.html', 'index.html', 'env.js'], dest: 'dist/'},
 
           // External deps
           {expand: true, cwd: 'app', src: ['bower.json', 'bower_components/**'], dest: 'dist/'},
@@ -261,7 +253,7 @@ module.exports = function(grunt) {
 
     // concat only (no minification )
     concat: {
-        combineCustomJS: combineCustomJS
+      combineCustomJS: combineCustomJS
     },
 
     /** Concat + Minify JS files **/
@@ -364,7 +356,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: groupId + ':ve:zip',
-            version: '3.6.1',
+            version: '3.4.1',
             path: 'deploy/'
           }]
         }
@@ -372,13 +364,13 @@ module.exports = function(grunt) {
     },
 
     karma: {
-        unit:{
-            configFile:'config/develop/karma.develop.conf.js'
-        },
-        continuous:{
-          configFile:'config/develop/karma.develop.conf.js',
-          logLevel: 'ERROR'
-        }
+      unit:{
+        configFile:'config/develop/karma.develop.conf.js'
+      },
+      continuous:{
+        configFile:'config/develop/karma.develop.conf.js',
+        logLevel: 'ERROR'
+      }
     },
 
     protractor: {
@@ -429,11 +421,11 @@ module.exports = function(grunt) {
   grunt.registerTask('e2e-test', ['protractor']);
 
   grunt.registerTask('release', function(arg1) {
-      grunt.task.run('release-build');
-      if (arguments.length !== 0)
-        grunt.task.run('launch:release:' + arg1);
-      else
-        grunt.task.run('launch:release');
+    grunt.task.run('release-build');
+    if (arguments.length !== 0)
+      grunt.task.run('launch:release:' + arg1);
+    else
+      grunt.task.run('launch:release');
   });
 
   grunt.registerTask('server', function(arg1) {
@@ -445,9 +437,9 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('docs', function() {
-      grunt.task.run('ngdocs');
-      grunt.task.run('connect:docs');
-      grunt.task.run('watch:docs');
+    grunt.task.run('ngdocs');
+    grunt.task.run('connect:docs');
+    grunt.task.run('watch:docs');
   });
 
   grunt.registerTask('launch', function(build, arg1) {
@@ -462,8 +454,8 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('debug', function () {
-      grunt.log.writeln("Launching Karma");
-      grunt.task.run('test');
+    grunt.log.writeln("Launching Karma");
+    grunt.task.run('test');
   });
 
   grunt.registerTask('e2e',function(arg1) {

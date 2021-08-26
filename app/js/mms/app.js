@@ -47,11 +47,28 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             $location.url(locationPath);
     });
 
-    var mmsHost = window.location.protocol + '//' + window.location.host;
+    var env = {};
+    if(window) {
+        Object.assign(env,window.__env);
+    }
 
-    URLServiceProvider.setBaseUrl('/plugins/mms3-adapter/alfresco/service');
-    //URLServiceProvider.setMmsUrl('https://mcf.openmbee.org');
-    URLServiceProvider.setMmsUrl(mmsHost);
+    if(__env.baseUrl) {
+        URLServiceProvider.setBaseUrl(__env.baseUrl);
+    }
+    else {
+        URLServiceProvider.setBaseUrl('/');
+    }
+
+    if(__env.apiUrl) {
+        URLServiceProvider.setMmsUrl(__env.apiUrl);
+    }
+    else {
+        var mmsHost = window.location.protocol + '//' + window.location.host;
+        URLServiceProvider.setMmsUrl(mmsHost);
+    }
+
+
+
 
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped

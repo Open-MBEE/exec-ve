@@ -43,7 +43,8 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "phantomjs-prebuilt": "^2.1.16",
     "protractor": "~5.2.0",
-    "time-grunt": "^1.4.0"
+    "time-grunt": "^1.4.0",
+    "connect-modrewrite": "^0.10.2"
   },
   "dependencies": {
     "c3": "^0.5.4",

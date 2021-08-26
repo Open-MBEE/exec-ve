@@ -2,17 +2,18 @@
 
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
-  var baseUrl = '/alfresco/service';
-  var mmsUrl = '';
-  this.setBaseUrl = function(base) {
-    baseUrl = base;
-  };
-  this.setMmsUrl = function(mms) {
-    mmsUrl = mms;
-  };
-  this.$get = [function URLServiceFactory() {
-    return urlService(baseUrl, mmsUrl);
-  }];
+    var baseUrl = '/plugins/mms-adapter/alfresco/service';
+    var mmsUrl = 'localhost:9080';
+    this.setBaseUrl = function (base) {
+        baseUrl = base;
+    };
+    this.setMmsUrl = function (mms) {
+        mmsUrl = mms;
+    };
+    this.$get = [function URLServiceFactory() {
+        return urlService(baseUrl, mmsUrl);
+    }];
+});
 //     var initInjector = angular.injector(['ng']);
 //     var $http = initInjector.get('$http');
 //     var $scope = initInjector.get('$scope');
@@ -398,7 +399,7 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getSearchURL = function(projectId, refId, urlParams) {
         var r;
-        if (urlParams !== null || urlParams !== ''){
+        if (urlParams !== null || urlParams !== '') {
             // ie '/search?checkType=true&literal=true';
             r = mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
@@ -658,5 +659,6 @@ function urlService(baseUrl, mmsUrl) {
         getLogoutURL: getLogoutURL,
         handleHttpStatus: handleHttpStatus,
     };
+
 
 }
