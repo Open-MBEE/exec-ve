@@ -123,6 +123,8 @@ For Protractor - place new tests within test/develop/e2e
 * _grunt docs_ - this would generate the docs and run the server at localhost:10000
 
 ## Contributing and Experimenting, Add Components
+For general contributing guidelines, please see <https://www.openmbee.org/contribute.html>
+
 Fork this repo, switch to the develop branch and use our existing build process and structure to add in services/directives/apps - in the future will have a better repo structure for pulling in dependencies and module management
 
 ### Services
