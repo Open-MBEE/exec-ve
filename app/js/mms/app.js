@@ -47,20 +47,15 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             $location.url(locationPath);
     });
 
-    var env = {};
-    if(window) {
-        Object.assign(env,window.__env);
-    }
-
-    if(__env.baseUrl) {
-        URLServiceProvider.setBaseUrl(__env.baseUrl);
+    if(window.__env.baseUrl) {
+        URLServiceProvider.setBaseUrl(window.__env.baseUrl);
     }
     else {
-        URLServiceProvider.setBaseUrl('/');
+        URLServiceProvider.setBaseUrl('');
     }
 
-    if(__env.apiUrl) {
-        URLServiceProvider.setMmsUrl(__env.apiUrl);
+    if(window.__env.apiUrl) {
+        URLServiceProvider.setMmsUrl(window.__env.apiUrl);
     }
     else {
         var mmsHost = window.location.protocol + '//' + window.location.host;
@@ -124,7 +119,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         console.log(credentials.username);
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                        AuthService.getAuthorized(credentialsJSON)
+                        AuthService.getAuthorized(credentials)
                         .then(function(user) {
                             console.log(user);
                             if ($rootScope.ve_redirect) {

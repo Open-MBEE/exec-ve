@@ -2,7 +2,7 @@
     window.__env = window.__env || {};
 
     // API url
-    window.__env.apiUrl = 'https://dev.your-api.com';
+    window.__env.apiUrl = 'https://cae-mms-uat-lb.jpl.nasa.gov';
 
     // Base url
     window.__env.baseUrl = '';

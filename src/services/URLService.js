@@ -189,7 +189,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getCheckLoginURL = function() {
-        return mmsAPIroot + "/api/users/whoami";
+        return mmsAPIroot + "/checkAuth";
     };
 
     var getOrgURL = function(orgId) {
@@ -485,7 +485,7 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getCheckTokenURL = function() {
-        return mmsAPIroot + '/api/users/whoami'; //TODO remove when server returns 404
+        return mmsAPIroot + '/checkAuth'; //TODO remove when server returns 404
     };
 
     var getCheckSessionURL = function() {
