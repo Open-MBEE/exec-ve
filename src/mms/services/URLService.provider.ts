@@ -198,7 +198,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getCheckLoginURL = function() {
-        return mmsAPIroot + "/checklogin";
+        return mmsAPIroot + "/checkAuth";
     };
 
     var getOrgURL = function(orgId) {
@@ -408,7 +408,7 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getSearchURL = function(projectId, refId, urlParams) {
         var r;
-        if (urlParams !== null || urlParams !== ''){
+        if (urlParams !== null || urlParams !== '') {
             // ie '/search?checkType=true&literal=true';
             r = mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
@@ -494,7 +494,7 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getCheckTokenURL = function() {
-        return mmsAPIroot + '/checklogin'; //TODO remove when server returns 404
+        return mmsAPIroot + '/checkAuth'; //TODO remove when server returns 404
     };
 
     var getCheckSessionURL = function() {

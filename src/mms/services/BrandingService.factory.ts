@@ -1,7 +1,7 @@
 import * as angular from 'angular'
 var mms = angular.module('mms');
 
-mms.factory('BrandingService', ['$rootScope', BrandingService]);
+mms.factory('BrandingService', ['$rootScope', '$window', BrandingService]);
 
 /**
  * @ngdoc service
@@ -10,7 +10,7 @@ mms.factory('BrandingService', ['$rootScope', BrandingService]);
  * @description
  * Branding Service
  */
-function BrandingService($rootScope) {
+function BrandingService($rootScope, $window) {
     //TODO: Refactor to Classes
     var b = {
         label : {
@@ -42,17 +42,32 @@ function BrandingService($rootScope) {
 
     // The banner is optional. It is generated in the mmsApp directive veSystemBanner.
     // If you use a banner, the message field is required. Other fields are optional.
-    banner.message    = b.label.pi;
+    if($window.__env.banner) {
+        banner = $window.__env.banner;
+    }
+    else {
+        banner.message = b.label.pi;
+    }
 
-    loginBanner.labels = b.applied_labels;
+    if($window.__env.loginBanner) {
+        loginBanner = $window.__env.loginBanner;
+    }
+    else {
+        loginBanner.labels = b.applied_labels;
+    }
+
     //b.banner.background = '#0D47A1';
     //b.banner.color      = '#e8e8e8';
 
-    
-    footer.message = b.label.pi + ' - ' + b.label.no_public_release;
+    if($window.__env.footer) {
+        footer = $window.__env.footer;
+    }
+    else {
+        footer.message = b.label.pi + ' - ' + b.label.no_public_release;
+    }
     
     // Navigation and URLs 
-    b.veNav_address = 'https://cae-ems-uat.jpl.nasa.gov';
+    //b.veNav_address = 'https://cae-ems-uat.jpl.nasa.gov';
 
     var getBanner = function() {
         return banner;

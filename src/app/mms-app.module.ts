@@ -50,11 +50,23 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             $location.url(locationPath);
     });
 
-    var mmsHost = window.location.protocol + '//' + window.location.host;
+    if(window.__env.baseUrl) {
+        URLServiceProvider.setBaseUrl(window.__env.baseUrl);
+    }
+    else {
+        URLServiceProvider.setBaseUrl('');
+    }
 
-    URLServiceProvider.setBaseUrl('/plugins/mms3-adapter/alfresco/service');
-    URLServiceProvider.setMmsUrl('http://localhost:9080');
-    //URLServiceProvider.setMmsUrl(mmsHost);
+    if(window.__env.apiUrl) {
+        URLServiceProvider.setMmsUrl(window.__env.apiUrl);
+    }
+    else {
+        var mmsHost = window.location.protocol + '//' + window.location.host;
+        URLServiceProvider.setMmsUrl(mmsHost);
+    }
+
+
+
 
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
@@ -104,13 +116,13 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                     };
                     $rootScope.ve_title = 'Login';
                     $scope.pageTitle = 'View Editor';
-                    $scope.loginBanner = loginBannerOb.labels;
+                    $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                         console.log(credentials.username);
                         $scope.spin = true;
-                        var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                        AuthService.getAuthorized(credentialsJSON)
+                        //var credentialsJSON = {"username":credentials.username, "password":credentials.password};
+                        AuthService.getAuthorized(credentials)
                         .then(function(user) {
                             console.log(user);
                             if ($rootScope.ve_redirect) {
@@ -170,6 +182,9 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             bannerOb: ['BrandingService', function(BrandingService) {
                 return BrandingService.getBanner();
             }],
+            loginBannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getLoginBanner();
+            }],
             orgObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getOrgs();
             }]
@@ -188,7 +203,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                     $scope.pageTitle = 'View Editor';
                     $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
-                    $scope.loginBanner = loginBannerOb.labels;
+                    $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.orgs = orgObs;
                     var orgId, projectId;

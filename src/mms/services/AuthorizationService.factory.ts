@@ -25,9 +25,10 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         var deferred = $q.defer();
         var mmsURL = URLService.getMmsServer();
         var root = URLService.getRoot();
-        var loginURL = mmsURL + root + '/api/login/ticket';
-        $http.post(loginURL,'',{headers: {
-                Authorization: 'Basic ' + auth
+        console.log(auth);
+        var loginURL = mmsURL + root + '/authentication';
+        $http.get(loginURL,{headers: {
+                'Authorization': 'Basic ' + auth
             }
         }).then(function (success) {
             URLService.setToken(success.data.token);

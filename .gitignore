@@ -7,6 +7,7 @@ build
 dist
 deploy
 docs
+app
 app/bower_components
 app/bower_components_target
 .sass-cache

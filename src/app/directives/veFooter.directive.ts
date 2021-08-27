@@ -13,7 +13,7 @@ function veFooter() {
     //    return no_banner;
     //};
     var veFooterLink = function(scope) {
-        scope.ve_footer = scope.footer.message;
+        scope.ve_footer = scope.footer;
     };
 
 

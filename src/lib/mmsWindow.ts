@@ -8,5 +8,6 @@ declare global {
     flatpickr;
     MathJax;
     CKEDITOR;
+    __env;
   }
 }
