@@ -95,7 +95,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }],
             loginBannerOb: ['BrandingService', function(BrandingService) {
                 return BrandingService.getLoginBanner();
-            }],
+            }]
         },
         views: {
             'banner@': {
@@ -113,7 +113,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     };
                     $rootScope.ve_title = 'Login';
                     $scope.pageTitle = 'View Editor';
-                    $scope.loginBanner = loginBannerOb.labels;
+                    $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.login = function (credentials) {
                         console.log(credentials.username);
@@ -179,6 +179,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             bannerOb: ['BrandingService', function(BrandingService) {
                 return BrandingService.getBanner();
             }],
+            loginBannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getLoginBanner();
+            }],
             orgObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getOrgs();
             }]
@@ -197,7 +200,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.pageTitle = 'View Editor';
                     $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
-                    $scope.loginBanner = loginBannerOb.labels;
+                    $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.orgs = orgObs;
                     var orgId, projectId;

@@ -326,15 +326,15 @@ module.exports = function(grunt) {
 
     watch: {
       dev: {
-        files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
+        files: ['app/env.js', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['dev-build']
       },
       release: {
-        files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
+        files: ['app/env.js', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['release-build']
       },
       docs: {
-        files: ['app/**/*', '!app/bower_components/**', 'src/**/*'],
+        files: ['app/env.js', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['ngdocs']
       },
       options: {

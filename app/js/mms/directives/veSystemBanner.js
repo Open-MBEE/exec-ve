@@ -11,7 +11,7 @@ function veSystemBanner($templateCache) {
     //    return no_banner;
     //};
     var veBannerLink = function(scope) {
-        scope.ve_banner = scope.banner.message;
+        scope.ve_banner = scope.banner;
     };
 
 
