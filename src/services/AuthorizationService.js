@@ -20,17 +20,12 @@ angular.module('mms')
 function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window, $analytics) {
 
     var token = $window.localStorage.getItem('token');
-    var getAuthorized = function (credentials) {
-        var auth = $window.btoa(credentials.username + ":" + credentials.password);
+    var getAuthorized = function (credentialsJSON) {
         var deferred = $q.defer();
         var mmsURL = URLService.getMmsServer();
         var root = URLService.getRoot();
-        console.log(auth);
         var loginURL = mmsURL + root + '/authentication';
-        $http.get(loginURL,{headers: {
-                'Authorization': 'Basic ' + auth
-            }
-        }).then(function (success) {
+        $http.post(loginURL,credentialsJSON).then(function (success) {
             URLService.setToken(success.data.token);
             token = success.data.token;
             $window.localStorage.setItem('token', token);

@@ -119,7 +119,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         console.log(credentials.username);
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                        AuthService.getAuthorized(credentials)
+                        AuthService.getAuthorized(credentialsJSON)
                         .then(function(user) {
                             console.log(user);
                             if ($rootScope.ve_redirect) {

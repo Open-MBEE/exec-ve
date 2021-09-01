@@ -202,7 +202,7 @@ function urlService(baseUrl, mmsUrl) {
 
     var getProjectsURL = function(orgId) {
         if (orgId)
-            return mmsAPIroot + "/orgs/" + orgId + '/projects';
+            return mmsAPIroot + '/projects?orgId=' + orgId;
         return mmsAPIroot + '/projects';
     };
 
