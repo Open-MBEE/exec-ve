@@ -139,7 +139,7 @@ module.exports = function(grunt) {
       options: {
         color: true,
         cwd: './app', // where to look for bower.json
-        directory: 'bower_components' // where to store these libs,
+        directory: 'bower_components' // where to mmsStoreModule these libs,
       },
       all: {}
     },

@@ -85,6 +85,7 @@ let TreePaneComponent = {
     public buttons
     public treeButtons
     public treeControl
+    public treeUI
     public treeOptions
     public treeData
     public filterInputPlaceholder
@@ -158,7 +159,7 @@ let TreePaneComponent = {
 
       this.tbApi = ToolbarService;
       this.treeButtons = [];
-      this.treeOptions = {}
+      this.treeOptions =
 
       this.bbApi = ButtonBarService;
       this.buttons = [];
@@ -357,7 +358,7 @@ let TreePaneComponent = {
 
       
 
-      this.treeOptions = {
+      this.treeUI = {
         types: this.UxService.getTreeTypes(),
         sectionNumbering: this.$state.includes('project.ref.document') ? true : false,
         numberingDepth: 0,

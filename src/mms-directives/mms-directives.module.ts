@@ -73,7 +73,7 @@ import * as angular from "angular";
     </pre>
  */
 
-var mmsDirectives = angular.module('mmsDirectives', ['mms', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter']);
+var mmsDirectives = angular.module('mmsDirectives', ['mmsStore', 'mms', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter', 'ngRedux']);
 
   mmsDirectives.config(['$sceProvider', 'growlProvider', 'uiTreeFilterSettingsProvider', function($sceProvider, growlProvider, uiTreeFilterSettingsProvider) {
     $sceProvider.enabled(false);

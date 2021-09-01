@@ -390,7 +390,7 @@ describe('Directive: mmsViewTable', function() {
         replaceDom(this.trs);
     });
 
-    it('store rows order as an attribute so that it can reset the sort order', function() {
+    it('mmsStoreModule rows order as an attribute so that it can reset the sort order', function() {
         this.trs.each(function(index) {
             expect(Number($(this).attr(self.mmsViewTableController._rowSortOrderAttrName))).toEqual(index);
         });

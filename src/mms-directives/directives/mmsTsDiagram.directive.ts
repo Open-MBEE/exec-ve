@@ -117,7 +117,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
         console.log(message);
         console.log(callStackString);
     };
-    //store global mapping of project name to hash, on*** functions can lookup the hash 
+    //mmsStoreModule global mapping of project name to hash, on*** functions can lookup the hash
     var mmsTsDiagramLink = function(scope, element, attrs) {
         if (!$window.invokePerspectivesCommand && !importedTsJs) {
             $('body').append(

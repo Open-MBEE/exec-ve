@@ -1,4 +1,5 @@
 import * as angular from 'angular';
+import ngRedux from "ng-redux";
 
 /**
  * @ngdoc overview
@@ -58,7 +59,7 @@ import * as angular from 'angular';
  */
 //declare let window : mmsWindow;
 
-var mms = angular.module('mms', []);
+var mms = angular.module('mms', ['mmsStore', ngRedux]);
 
 mms.config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
