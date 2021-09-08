@@ -56,8 +56,8 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
             deferred.reject(false);
             return deferred.promise;
         }
-        var config = URLService.getRequestConfig();
-        $http.get(URLService.getCheckTokenURL(),config).then(function (success) {
+        URLService.setToken(token);
+        $http.get(URLService.getCheckTokenURL(),URLService.getRequestConfig()).then(function (success) {
             deferred.resolve(success.data);
             $analytics.setUsername(success.data.username);
         }, function(fail){
