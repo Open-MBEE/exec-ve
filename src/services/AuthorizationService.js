@@ -56,7 +56,7 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
             deferred.reject(false);
             return deferred.promise;
         }
-
+        URLService.setTicket(ticket);
         $http.get(URLService.getCheckTicketURL()).then(function (success) {
             deferred.resolve(success.data.username);
             $analytics.setUsername(success.data.username);
