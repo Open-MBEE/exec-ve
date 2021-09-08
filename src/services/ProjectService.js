@@ -114,16 +114,20 @@ function ProjectService($q, $http,ApplicationService,CacheService,ElementService
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
-                var projects = [];
+                var orgProjects = {};
                 for (var i = 0; i < response.data.projects.length; i++) {
                     var project = response.data.projects[i];
-                    if (orgId) {
-                        project.orgId = orgId;
-                    }
+                    var porg = project.orgId;
                     CacheService.put(['project', project.id], project, true);
-                    projects.push(CacheService.get(['project', project.id]));
+                    if(orgProjects[porg] === undefined) {
+                        orgProjects[porg] = [];
+                    }
+                    orgProjects[porg].push(CacheService.get(['project', project.id]));
                 }
-                CacheService.put(cacheKey, projects, false);
+                $.each(orgProjects, function(i, val) {
+                    var orgCacheKey = ['projects', i];
+                    CacheService.put(orgCacheKey, val, false);
+                });
                 deferred.resolve(CacheService.get(cacheKey));
             }, function(response) {
                 URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
@@ -390,7 +394,7 @@ function ProjectService($q, $http,ApplicationService,CacheService,ElementService
         } else {
             inProgress[url] = deferred.promise;
             var query = getMetatypeFilter(projectId, refId);
-            $http.put(url, query, URLService.getRequestConfig()).then(function(response) {
+            $http.put(url, query).then(function(response) {
                 var aggregations = response.data.aggregations;
                 if (!angular.isDefined(aggregations)) {
                     deferred.reject({status: 500, data: '', message: "Could not find metatypes"});

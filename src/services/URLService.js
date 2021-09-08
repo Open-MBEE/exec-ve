@@ -2,8 +2,8 @@
 
 angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
-    var baseUrl = '/plugins/mms-adapter/alfresco/service';
-    var mmsUrl = 'localhost:9080';
+    var baseUrl = '/api';
+    var mmsUrl = 'localhost:8080';
     this.setBaseUrl = function (base) {
         baseUrl = base;
     };
@@ -14,35 +14,6 @@ angular.module('mms')
         return urlService(baseUrl, mmsUrl);
     }];
 });
-//     var initInjector = angular.injector(['ng']);
-//     var $http = initInjector.get('$http');
-//     var $scope = initInjector.get('$scope');
-//     var config = $http.get('config/config.json');
-//     console.log(config);
-//     var blah = $http.get('config/config.json').then(function(conf){$http.get(conf.apiUrl);});
-//     console.log(blah);
-//     var getConfig = function() {
-//       return $http.get('config/config.json');
-//     };
-//   console.log(baseUrl);
-//     var mmsUrl = '';
-//     this.setBaseUrl = getConfig().then(
-//       function(data) {
-//         $scope.config = data;
-//         console.log($scope.config);
-//     });
-//     this.setMmsUrl = function() {
-//         $http.get('config/config.json')
-//           .then(function(config) {
-//             mmsUrl = config.apiUrl;
-//           });
-//     };
-//     this.$get = [function URLServiceFactory() {
-//
-//         return urlService(baseUrl, mmsUrl);
-//     }];
-// });
-
 
 /**
  * @ngdoc service
@@ -55,12 +26,12 @@ angular.module('mms')
  * should rarely be used directly by applications.
  *
  * To configure the base url of the mms server, you can use the URLServiceProvider
- * in your application module's config. By default, the baseUrl is '/alfresco/service'
- * which assumes your application is hosted on the same machine as the mms and ve.
+ * in your application module's config. By default, the baseUrl is '/api', but is
+ * effectively '/' relative to the service layer due to the rewrite rule.
  *  <pre>
- angular.module('myApp', ['mms'])
- .config(function(URLServiceProvider) {
-            URLServiceProvider.setBaseUrl('https://url/alfresco/service');
+        angular.module('myApp', ['mms'])
+        .config(function(URLServiceProvider) {
+            URLServiceProvider.setBaseUrl('https://url/context/path');
         });
  </pre>
  * (You may run into problems like cross origin security policy that prevents it from
@@ -80,7 +51,7 @@ function urlService(baseUrl, mmsUrl) {
     var setToken = function(t) {
         token = t;
     };
-
+    
     var getJMSHostname = function(){
         return mmsAPIroot + '/connection/jms';
     };
@@ -112,6 +83,31 @@ function urlService(baseUrl, mmsUrl) {
                 Authorization: 'Bearer ' + token
             }
         };
+    };
+
+    /**
+     * @deprecated
+     * @ngdoc method
+     * @name mms.URLService#addTicket
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds alf_ticket parameter to URL string
+     *
+     * @param {String} url The url string for which to add alf_ticket parameter argument.
+     * @returns {string} The url with alf_ticket parameter added.
+     */
+    var addToken = function(url) {
+        var r = url;
+        if (!token)
+            return r;
+        // if (r.indexOf('commitId') > 0) //TODO check mms cache rules
+        //     return r;
+        if (r.indexOf('?') > 0)
+            r += '&token=' + token;
+        else
+            r += '?token=' + token;
+        return r;
     };
 
     /**
@@ -178,6 +174,15 @@ function urlService(baseUrl, mmsUrl) {
             "/refs/" + refId + '/convert';
     };
 
+
+    var getAuthenticationUrl = function() {
+        return mmsAPIroot + "/authentication";
+    };
+
+    var getPermissionsLookupURL = function() {
+        return mmsAPIroot + "/permissions";
+    };
+
     /**
      * @ngdoc method
      * @name mms.URLService#getCheckLoginURL
@@ -189,7 +194,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getCheckLoginURL = function() {
-        return mmsAPIroot + "/checkAuth";
+        return root + "/checklogin";
     };
 
     var getOrgURL = function(orgId) {
@@ -289,6 +294,11 @@ function urlService(baseUrl, mmsUrl) {
         return r;
     };
 
+    var getViewsURL = function(reqOb) {
+        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
+        return r;
+    };
+
     var getOwnedElementURL = function(reqOb) {
         var recurseString = 'recurse=true';
         if (reqOb.depth)
@@ -300,24 +310,6 @@ function urlService(baseUrl, mmsUrl) {
         } else {
             r += '?' + recurseString;
         }
-        return addExtended(r, reqOb.extended);
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.URLService#getDocumentViewsURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets the url to get all views in a document
-     *
-     * @param {object} reqOb object with keys as described in ElementService.
-     * @returns {string} The url.
-     */
-    var getDocumentViewsURL = function(reqOb) {
-        var r = mmsAPIroot + "/projects/" + reqOb.projectId + "/refs/" + reqOb.refId +
-            '/documents/' + reqOb.elementId + "/views";
-        r = addVersion(r, reqOb.commitId);
         return addExtended(r, reqOb.extended);
     };
 
@@ -399,7 +391,7 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getSearchURL = function(projectId, refId, urlParams) {
         var r;
-        if (urlParams !== null || urlParams !== '') {
+        if (urlParams !== undefined && urlParams !== null && urlParams !== ''){
             // ie '/search?checkType=true&literal=true';
             r = mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
@@ -420,7 +412,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
+        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + reqOb.artifactExtension;
         return addVersion(r, reqOb.commitId);
     };
 
@@ -436,7 +428,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getPutArtifactsURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
+        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addVersion(r, reqOb.commitId);
     };
 
@@ -480,12 +472,8 @@ function urlService(baseUrl, mmsUrl) {
         return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine);
     };
 
-    var getLogoutURL = function() {
-        return mmsAPIroot + '/logout';
-    };
-
-    var getCheckTokenURL = function() {
-        return mmsAPIroot + '/checkAuth'; //TODO remove when server returns 404
+    var getCheckTokenURL = function(t) {
+        return root + '/checkAuth'; //TODO remove when server returns 404
     };
 
     var getCheckSessionURL = function() {
@@ -496,7 +484,7 @@ function urlService(baseUrl, mmsUrl) {
         return mmsAPIroot + '/api/users/' + username;
     };
 
-    /**
+        /**
      * @ngdoc method
      * @name mms.URLService#handleHttpStatus
      * @methodOf mms.URLService
@@ -615,6 +603,7 @@ function urlService(baseUrl, mmsUrl) {
     return {
         getRoot: getRoot,
         setToken: setToken,
+        addToken: addToken,
         getHeaders: getHeaders,
         getRequestConfig: getRequestConfig,
         getJMSHostname: getJMSHostname,
@@ -640,7 +629,6 @@ function urlService(baseUrl, mmsUrl) {
         getElementSearchURL: getElementSearchURL,
         getSearchURL: getSearchURL,
         getProjectDocumentsURL: getProjectDocumentsURL,
-        getDocumentViewsURL: getDocumentViewsURL,
         getImageURL: getImageURL,
         getExportHtmlUrl: getExportHtmlUrl,
         getArtifactURL: getArtifactURL,
@@ -656,8 +644,10 @@ function urlService(baseUrl, mmsUrl) {
         getCheckTokenURL: getCheckTokenURL,
         getCheckSessionURL: getCheckSessionURL,
         getPersonURL: getPersonURL,
-        getLogoutURL: getLogoutURL,
         handleHttpStatus: handleHttpStatus,
+        getAuthenticationUrl: getAuthenticationUrl,
+        getViewsURL: getViewsURL,
+        getPermissionsLookupURL: getPermissionsLookupURL
     };
 
 

@@ -22,10 +22,8 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
     var token = $window.localStorage.getItem('token');
     var getAuthorized = function (credentialsJSON) {
         var deferred = $q.defer();
-        var mmsURL = URLService.getMmsServer();
-        var root = URLService.getRoot();
-        var loginURL = mmsURL + root + '/authentication';
-        $http.post(loginURL,credentialsJSON).then(function (success) {
+        var loginURL = URLService.getAuthenticationUrl();
+        $http.post(loginURL, credentialsJSON).then(function (success) {
             URLService.setToken(success.data.token);
             token = success.data.token;
             $window.localStorage.setItem('token', token);

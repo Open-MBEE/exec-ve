@@ -91,23 +91,24 @@
     }
 </script>
 
-<!--&lt;!&ndash; Matomo &ndash;&gt;-->
-<!--<script type="text/javascript">-->
-<!--    var siteid = getHostname();-->
-<!--    var _paq = window._paq || [];-->
-<!--    if (siteid != -1) {-->
-<!--        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */-->
-<!--        //_paq.push(['trackPageView']); //comment for angulartics-->
-<!--        _paq.push(['enableLinkTracking']);-->
-<!--        (function() {-->
-<!--            var u="https://cae-matomo.jpl.nasa.gov/";-->
-<!--            _paq.push(['setTrackerUrl', u+'matomo.php']);-->
-<!--            _paq.push(['setSiteId', siteid]);-->
-<!--            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];-->
-<!--            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);-->
-<!--        })();-->
-<!--    }-->
-<!--  </script>-->
-<!--  &lt;!&ndash; End Matomo Code &ndash;&gt;-->
+<!-- Matomo -->
+<script type="text/javascript">
+    var siteid = getHostname();
+    var _paq = window._paq || [];
+    if (siteid != -1) {
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        //_paq.push(['trackPageView']); //comment for angulartics
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u="https://cae-matomo.jpl.nasa.gov/";
+            _paq.push(['setTrackerUrl', u+'matomo.php']);
+            _paq.push(['setSiteId', siteid]);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+        })();
+    }
+  </script>
+  <!-- End Matomo Code -->
+  
 </body>
 </html>

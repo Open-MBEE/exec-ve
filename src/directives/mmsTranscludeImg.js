@@ -47,7 +47,7 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
             var server = URLService.getMmsServer();
-            var ticket = '?alf_ticket=' + AuthService.getToken();
+            var token = '?token=' + AuthService.getToken();
             element.addClass('isLoading');
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
@@ -66,9 +66,9 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
                     for(var i = 0; i < artifacts.length; i++) {
                         var artifact = artifacts[i];
                         if (artifact.contentType == "image/svg+xml") {
-                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
+                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
                         } else if (artifact.contentType == "image/png") {
-                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
+                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
                         }
                     }
                 }, function(reason) {

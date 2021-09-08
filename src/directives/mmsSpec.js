@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService', '$templateCache', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService', 'PermissionsService', '$templateCache', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -12,6 +12,7 @@ angular.module('mms.directives')
  * @requires mms.AuthService
  * @requires mms.ElementService
  * @requires mms.ViewService
+ * @requires mms.PermissionsService
  * @requires $compile
  * @requires $templateCache
  * @requires growl
@@ -72,7 +73,7 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, ViewService, $templateCache, growl, _) {
+function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, ViewService, PermissionsService, $templateCache, growl, _) {
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, domElement, attrs) {
@@ -165,8 +166,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                         }
                     });
                 }
-                if (!scope.element._editable ||
-                        (scope.mmsCommitId !== 'latest' && scope.mmsCommitId)) {
+                if ((scope.mmsCommitId !== 'latest' && scope.mmsCommitId) || !PermissionsService.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId)) {
                     scope.editable = false;
                     scope.edit = null;
                     scope.editing = false;
@@ -202,7 +202,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                     });
                 }
                 getTypeClass(scope.element);
-                scope.elementDataLink = URLService.getRoot() + '/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&alf_ticket='+AuthService.getToken();
+                scope.elementDataLink = URLService.getRoot() + '/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&token='+AuthService.getToken();
                 scope.gettingSpec = false;
             }, function(reason) {
                 scope.gettingSpec = false;
