@@ -14,8 +14,8 @@
     // View Editor Version
     window.__env.version = '3.7.0'
     // API url
-    window.__env.apiUrl = 'https://cae-mms-uat-lb.jpl.nasa.gov';
-    //window.__env.apiUrl = 'http://localhost:8080';
+
+    window.__env.apiUrl = 'http://localhost:8080';
 
     // Base url
     window.__env.baseUrl = '';
