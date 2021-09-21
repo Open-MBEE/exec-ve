@@ -7,6 +7,8 @@ module.exports = function(grunt) {
     configureProxies: 'grunt-connect-proxy-updated',
     artifactory: 'grunt-artifactory-artifact'
   });
+  // Project configuration.
+  var env = grunt.option('env') || 'example';
 
   var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
 
@@ -103,13 +105,15 @@ module.exports = function(grunt) {
         'dist/jsTemp/app.tpls.js',
         'app/js/mms/app.js',
         'app/js/mms/controllers/*.js',
-        'app/js/mms/directives/*.js'
+        'app/js/mms/directives/*.js',
+
+        // config files
+        'app/config/config.' + env + '.js'
       ]
     }
   };
-  // Project configuration.
-  grunt.initConfig({
 
+  grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
     concurrent: {
@@ -149,7 +153,7 @@ module.exports = function(grunt) {
         files: [
 
           // Entry html files
-          {expand: true, cwd: 'app', src: ['mms.html', 'index.html', 'env.js'], dest: 'dist/'},
+          {expand: true, cwd: 'app', src: ['mms.html', 'index.html'], dest: 'dist/'},
 
           // External deps
           {expand: true, cwd: 'app', src: ['bower.json', 'bower_components/**'], dest: 'dist/'},

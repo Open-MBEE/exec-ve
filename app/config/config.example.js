@@ -1,7 +1,5 @@
 (function (window) {
 
-
-
     var b = {};
     b.label                     = {};
     b.label.pi                = 'PROPRIETARY: Proprietary Information';
@@ -14,7 +12,6 @@
     // View Editor Version
     window.__env.version = '3.7.0'
     // API url
-
     window.__env.apiUrl = 'http://localhost:8080';
 
     // Base url
