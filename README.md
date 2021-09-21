@@ -25,14 +25,6 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 
        npm install
        
-5. Create a file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.
-    * The _grunt_ command will build with these default and fake values, but will not be runnable.  
-    * You should update "ems" key to point to the value of the **actual** hostname serving the Model Management Server (MMS).
-```json
-{
-  "ems": "hostnameurl"
-}
-```
 
 6. In the angular-mms directory, run. . .
 * . . .to build and bundle the app in development mode. The final artifact will be available in the dist folder:
@@ -47,17 +39,21 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 
       grunt server
       
-* . . .to build a proxied service.  "hostnameurl" is the key from the angular-mms-grunt-servers.json. Its value is the server's base url that you would like the proxy to forward requests to:
+* . . .to build a proxied service in develop mode with default configuration:
 
-      grunt server:hostnameurl
+      grunt server:docker
       
 * . . .to build and bundle the app in production mode as well as launching a web server locally and a proxy:
 
       grunt release
       
-* . . .to builid and bundle the app in production mode as well as launching a webserver locally and a psroxy, where the server url pertains to a different url you want. Make sure that "hostnameurl" exists in the angular-mms-grunt-servers.json:
+* . . .to build and bundle the app in production mode as well as launching a webserver locally with default configuration:
 
-      grunt release:hostnameurl
+      grunt release:docker
+
+* . . .to build and bundle the app with a custom configuration in dev/production mode as well as launching a webserver locally (defaults to `example`):
+
+      grunt <server/release>:docker --env=<env_file_name>
       
 * . . .to build and bundle the app in production modes, generate documentation and publish the final artifact to Artifactory:
 
@@ -71,9 +67,23 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 
 For more information, please consult the Gruntfile.js and the links at the bottom.
 
+## Configuration
+_(added View Editor 4.7)_
+
+You can now configure view editor to work with external sites. This is done using the configuration file
+located in `app/config`. It is recommended that you create your own configuration file by copying `config.example.js` and
+replacing it with:  `config.<your_env_here>.js`. To deploy view editor using this custom file, use `--env <your_env_here>`
+appended to your `grunt` command (e.g. `grunt release:docker --env=prod`).
+
+For more information regarding the available configuration options see (`app/config/config.example.js`).
+
 ## Building and Running with Docker
 To build the container, run the following command: `docker build -t ve .`.
 To run the container, run `docker run -it -p 80:9000 --name ve ve`.
+
+#### After View Editor 4.7
+To use a custom configuration file with the docker container you can mount the desired file using a docker config or volume.
+Using your custom configuration can be done by specifying `--env VE_ENV=<your_env_here>` or adding `VE_ENV` to your compose file.
 
 ## Problems?
 If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_

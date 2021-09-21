@@ -11,6 +11,8 @@
 ################################################################################
 FROM node:8
 
+ENV VE_ENV 'example'
+
 WORKDIR /opt/mbee/ve
 COPY . /opt/mbee/ve
 
@@ -56,4 +58,4 @@ EXPOSE 9000
 
 # When the container runs, we run grunt. The second argument should reference a 
 # server defined in the angular-mms-grunt-servers.json file. 
-CMD ["grunt", "server:dev"]
+CMD ["sh", "-c", "grunt release:docker --env=${VE_ENV}"]
