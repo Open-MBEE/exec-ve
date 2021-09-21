@@ -480,8 +480,8 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getPersonURL = function(username) {
-        return root + '/checkAuth';
-        //return root + '/users?user=' + username;
+        //return root + '/checkAuth';
+        return root + '/users?user=' + username;
     };
 
         /**
