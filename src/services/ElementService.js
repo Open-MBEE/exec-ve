@@ -353,7 +353,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 URLService.handleHttpStatus(data, status, headers, config, deferred);
                 delete inProgress[url];
             },
-            weight
+            weight,
+            URLService.getRequestConfig()
         );
         return deferred.promise;
     };

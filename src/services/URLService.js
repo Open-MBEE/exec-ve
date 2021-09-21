@@ -194,7 +194,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getCheckLoginURL = function() {
-        return root + "/checklogin";
+        return mmsAPIroot + "/checkAuth";
     };
 
     var getOrgURL = function(orgId) {
@@ -473,15 +473,16 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getCheckTokenURL = function(t) {
-        return root + '/checkAuth'; //TODO remove when server returns 404
+        return mmsAPIroot + '/checkAuth'; //TODO remove when server returns 404
     };
 
     var getCheckSessionURL = function() {
-        return mmsAPIroot + '/api/version'; //TODO remove when server returns 404
+        return mmsAPIroot + '/checkAuth'; //TODO remove when server returns 404
     };
 
     var getPersonURL = function(username) {
-        return mmsAPIroot + '/api/users/' + username;
+        return mmsAPIroot + '/checkAuth';
+        //return mmsAPIroot + '/users?user=' + username;
     };
 
         /**

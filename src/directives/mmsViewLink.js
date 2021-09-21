@@ -75,7 +75,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
             .then(function(data) {
                 scope.element = data;
                 scope.name = data.name;
-                scope.type = 'Clause ';
+                scope.type = 'Section ';
                 scope.suffix = '';
                 scope.hash = '#' + data.id;
                 if (scope.mmsPeId && scope.mmsPeId !== '') {
@@ -105,20 +105,9 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                             var numbers = data._veNumber.split('.');
                             if (numbers.length > 1) {
                                 scope.type = '';
-                            } else if (isNaN(parseInt(numbers[0]))) {
-                                scope.type = 'Annex ';
                             }
                         }
                     });
-                } else {
-                    if (data._veNumber) {
-                        var numbers = data._veNumber.split('.');
-                        if (numbers.length > 1) {
-                            scope.type = '';
-                        } else if (isNaN(parseInt(numbers[0]))) {
-                            scope.type = 'Annex ';
-                        }
-                    }
                 }
                 if (UtilsService.isDocument(data)) {
                     docid = data.id;
@@ -134,11 +123,6 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                     element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
                 }
                 scope.loading = false;
-                //for omg doc - if we're in a doc, just assume the link is within current doc
-                if (ApplicationService.getState().inDoc) {
-                    scope.docid = ApplicationService.getState().currentDoc;
-                }
-                //end omg specific fix
                 if (ApplicationService.getState().fullDoc) {
                     scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/full' + scope.hash;
                 } else {

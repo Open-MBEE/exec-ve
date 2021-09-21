@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', 'ProjectService', veNav]);
+.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', '$window', 'ApplicationService','AuthService', 'ProjectService', veNav]);
 
 /**
  * @ngdoc directive
@@ -18,7 +18,7 @@ angular.module('mmsApp')
  * The navbar is mobile friendly.
  * 
  */
-function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
+function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, $window, ApplicationService, AuthService, ProjectService) {
     var template = $templateCache.get('partials/mms/veNav.html');
 
     var veNavLink = function(scope, element, attrs) {
@@ -87,7 +87,13 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.6.1';
+            if ($window.__env.version) {
+                scope.veV = window.__env.version;
+            }
+            else {
+                scope.veV = '3.6.1';
+            }
+
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
@@ -139,7 +145,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         AuthService.checkLogin().then(function(data) {
             scope.username = data.username;
             AuthService.getUserData(data.username).then(function(userData){
-                scope.user = userData;
+                scope.user = userData.users[0];
             });
         });
         
