@@ -164,37 +164,42 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
      *      multiple calls to this method with the same parameters would give the
      *      same objects
      */
-    var getArtifacts = function(reqOb, weight, update) {
-        var deferred = $q.defer();
-        var request = {artifacts: []};
-        var existing = [];
-        UtilsService.normalize(reqOb);
-        for (var i = 0; i < reqOb.artifactIds.length; i++) {
-            var id = reqOb.artifactIds[i];
-            var requestCacheKey = getArtifactCacheKey(reqOb, id);
-            var exist = CacheService.get(requestCacheKey);
-            if (exist && !update) {
-                existing.push(exist);
-                continue;
-            }
-            request.artifacts.push({id: id});
-        }
-        if (request.artifacts.length === 0) {
-            deferred.resolve(existing);
-            return deferred.promise;
-        }
-        $http.put(URLService.getPutArtifactsURL(reqOb), request)
-        .then(function(response) {
-            var data = response.data.artifacts;
-            for (var i = 0; i < data.length; i++) {
-                existing.push(cacheArtifact(reqOb, data[i]));
-            }
-            deferred.resolve(existing);
-        }, function(response) {
-            URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-        });
-        return deferred.promise;
-    };
+    // var getArtifactUrls = function(reqOb, weight, update) {
+    //
+    // };
+
+
+    // var getArtifacts = function(reqOb, weight, update) {
+    //     var deferred = $q.defer();
+    //     var request = {artifacts: []};
+    //     var existing = [];
+    //     UtilsService.normalize(reqOb);
+    //     for (var i = 0; i < reqOb.artifactIds.length; i++) {
+    //         var id = reqOb.artifactIds[i];
+    //         var requestCacheKey = getArtifactCacheKey(reqOb, id);
+    //         var exist = CacheService.get(requestCacheKey);
+    //         if (exist && !update) {
+    //             existing.push(exist);
+    //             continue;
+    //         }
+    //         request.artifacts.push({id: id});
+    //     }
+    //     if (request.artifacts.length === 0) {
+    //         deferred.resolve(existing);
+    //         return deferred.promise;
+    //     }
+    //     $http.put(URLService.getPutArtifactsURL(reqOb), request)
+    //     .then(function(response) {
+    //         var data = response.data.artifacts;
+    //         for (var i = 0; i < data.length; i++) {
+    //             existing.push(cacheArtifact(reqOb, data[i]));
+    //         }
+    //         deferred.resolve(existing);
+    //     }, function(response) {
+    //         URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+    //     });
+    //     return deferred.promise;
+    // };
 
     /**
      * @ngdoc method
@@ -289,7 +294,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
     return {
         cacheArtifact: cacheArtifact,
         getArtifact: getArtifact,
-        getArtifacts: getArtifacts,
+        //getArtifacts: getArtifacts,
         getArtifactHistory: getArtifactHistory,
         // createArtifact: createArtifact,
         // updateArtifact: updateArtifact,

@@ -45,35 +45,33 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
-
-            var server = URLService.getMmsServer();
-            var token = '?token=' + AuthService.getToken();
             element.addClass('isLoading');
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
-                // var artifactOb = {
-                //     projectId: data._projectId,
-                //     refId: data._refId,
-                //     artifactIds : data._artifactIds,
-                //     commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
-                // };
-
-                // Get the artifacts of the element
-                ArtifactService.getArtifacts(data)
-                .then(function(artifacts) {
-                    scope.artifacts = artifacts;
-                    for(var i = 0; i < artifacts.length; i++) {
-                        var artifact = artifacts[i];
-                        if (artifact.contentType == "image/svg+xml") {
-                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
-                        } else if (artifact.contentType == "image/png") {
-                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
+                scope.img = {};
+                var artifactOb = {
+                    elementId: data.id,
+                    projectId: data._projectId,
+                    refId: data._refId,
+                    commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
+                };
+                var allowedExtensions = [
+                    'svg', 'png'
+                ];
+                var artifacts = data._artifacts;
+                if (artifacts !== undefined) {
+                    for (var i = 0; i < allowedExtensions.length; i++) {
+                        const artifactExtension = allowedExtensions[i];
+                        var extExists = (obj) => {
+                            return obj.extension === artifactExtension;
+                        };
+                        if (artifacts.filter(extExists).length > 0) {
+                            scope.img[artifactExtension] = URLService.getArtifactURL(artifactOb,artifactExtension);
                         }
                     }
-                }, function(reason) {
-                    console.log('Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
-                });
+                }
+
             }, function(reason) {
                 console.log('Cf Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
@@ -88,7 +86,7 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
 
     return {
         restrict: 'E',
-        template: '<img class="mms-svg" ng-src="{{svgImgUrl}}"></img><img class="mms-png" ng-src="{{pngImgUrl}}"></img>',
+        template: '<img class="mms-svg" ng-src="{{img.svg}}"></img><img class="mms-png" ng-src="{{img.png}}"></img>',
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',
