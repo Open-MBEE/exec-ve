@@ -296,6 +296,7 @@ module.exports = function(grunt) {
         evil: true, //allow eval for plot integration
         globalstrict: true,
         validthis: true,
+        esversion: 6,
         globals: {
           angular: true,
           window: true,

@@ -78,8 +78,8 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
             deferred.resolve(success.data);
         }, function(fail){
             deferred.reject(fail);
-            if (fail.status !== '404') {
-                //removeToken();
+            if (fail.status === '401') {
+                removeToken();
             }
 
         });

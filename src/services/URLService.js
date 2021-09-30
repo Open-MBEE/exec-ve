@@ -38,7 +38,6 @@ angular.module('mms')
  *  actually getting the resources from a different server, solution TBD)
  */
 function urlService(baseUrl, mmsUrl) {
-    var mmsServer = mmsUrl;
     var root = mmsUrl + baseUrl;
     var jobsRoot = 'https://cae-pma-int:8443/';
     var token;
@@ -71,7 +70,7 @@ function urlService(baseUrl, mmsUrl) {
     };
 
     var getMmsServer = function() {
-        return mmsServer;
+        return mmsUrl;
     };
 
     /**
@@ -162,20 +161,6 @@ function urlService(baseUrl, mmsUrl) {
 
     var getPermissionsLookupURL = function() {
         return root + "/permissions";
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.URLService#getCheckLoginURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets url that checks the login
-     *
-     * @returns {string} The url
-     */
-    var getCheckLoginURL = function() {
-        return root + "/checkAuth";
     };
 
     var getOrgURL = function(orgId) {
@@ -390,11 +375,13 @@ function urlService(baseUrl, mmsUrl) {
      * Gets the url for an artifact
      *
      * @param {object} reqOb object with keys
+     * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    var getArtifactURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + reqOb.artifactExtension;
-        return addVersion(r, reqOb.commitId);
+    var getArtifactURL = function(reqOb,artifactExtension) {
+        var ext = (artifactExtension !== undefined) ? artifactExtension : reqOb.artifactExtension;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
+        return addToken(addVersion(r, reqOb.commitId));
     };
 
     /**
@@ -425,39 +412,10 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactHistoryURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
-        return r;
-    };
-
-    var setJobsUrl = function(jobUrl) {
-        jobsRoot = jobUrl + ':8443/';
-    };
-
-    var getJobsURL = function(projectId, refId, machine) {
-        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs', machine);
-    };
-
-    var getJobURL = function(projectId, refId, jobId, machine){
-        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId , machine);
-    };
-
-    var getRunJobURL = function(projectId, refId, jobId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances';
-    };
-
-    var getCreateJobURL = function(projectId, refId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs';
-    };
-
-    var getJobInstancesURL = function(projectId, refId, jobId, machine) {
-        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine);
+        return getElementHistoryURL(reqOb);
     };
 
     var getCheckTokenURL = function(t) {
-        return root + '/checkAuth'; //TODO remove when server returns 404
-    };
-
-    var getCheckSessionURL = function() {
         return root + '/checkAuth'; //TODO remove when server returns 404
     };
 
@@ -581,6 +539,24 @@ function urlService(baseUrl, mmsUrl) {
         return r;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addToken
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds token parameter to URL string
+     *
+     * @param {String} url The url string for which to add token parameter argument.
+     * @returns {string} The url with commitId parameter added.
+     */
+    var addToken = function(url) {
+            if (url.indexOf('?') > 0)
+                return url + '&token=' + token;
+            else
+                return url + '?token=' + token;
+    };
+
 
     return {
         getRoot: getRoot,
@@ -616,15 +592,7 @@ function urlService(baseUrl, mmsUrl) {
         getArtifactURL: getArtifactURL,
         getPutArtifactsURL: getPutArtifactsURL,
         getArtifactHistoryURL: getArtifactHistoryURL,
-        setJobsUrl: setJobsUrl,
-        getJobsURL: getJobsURL,
-        getJobURL: getJobURL,
-        getRunJobURL: getRunJobURL,
-        getCreateJobURL: getCreateJobURL,
-        getJobInstancesURL: getJobInstancesURL,
-        getCheckLoginURL: getCheckLoginURL,
         getCheckTokenURL: getCheckTokenURL,
-        getCheckSessionURL: getCheckSessionURL,
         getPersonURL: getPersonURL,
         handleHttpStatus: handleHttpStatus,
         getAuthenticationUrl: getAuthenticationUrl,

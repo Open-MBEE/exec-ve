@@ -146,6 +146,8 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             scope.username = data.username;
             AuthService.getUserData(data.username).then(function(userData){
                 scope.user = userData.users[0];
+            }, function() {
+                scope.user = data.username;
             });
         });
         

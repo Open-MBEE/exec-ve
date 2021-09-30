@@ -25,9 +25,6 @@ function($scope, $rootScope, $state, UxService, refOb, documentOb, PermissionsSe
         var editable = false;
         tbApi.addButton(UxService.getToolbarButton("element-history"));
         tbApi.addButton(UxService.getToolbarButton("tags"));
-        // if ($state.includes('project.ref.document')) {
-            //tbApi.addButton(UxService.getToolbarButton("jobs"));
-        // }
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             editable = refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission(refOb);
             tbApi.setPermission('element-editor', editable);

@@ -11,7 +11,7 @@
     </h1>
 
     <div class="ve-secondary-text last-modified no-print">
-      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by <b>{{ modifier.email }}</b>
+      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by <b ng-if="modifier.email != undefined">{{ modifier.email }}</b><b ng-if="modifier.email == undefined">{{ modifier }}</b>
     </div>
 
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
