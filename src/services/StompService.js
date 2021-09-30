@@ -15,7 +15,7 @@ function StompService($rootScope, ApplicationService, ElementService, URLService
      var stompClient = {};
      var host;
 
-    $http.get(URLService.getJMSHostname(),URLService.getRequestConfig()).then(function successCallback(response) {
+    $http.get(URLService.getJMSHostname()).then(function successCallback(response) {
         if(response.data.connections[0].hasOwnProperty("uri")){
             var removeProtocol = response.data.connections[0].uri.replace(/.*?:\/\//g, "");
             host = 'wss://' + removeProtocol.substring(0, removeProtocol.length-6) + ':61614';

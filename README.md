@@ -12,7 +12,28 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 * /src/directives/templates - html templates for our directives plus common styling
 * /app - MDEV developed application, this will be separated out in the future
 
+## Configuration
+_(View Editor 3.7.0 and newer)_
 
+You can now configure view editor to work with external sites without using Grunt. This file also allows the configuration
+of certain branding and other features that will be expanded in future versions
+
+1. In the `app/config` directory copy `config.example.js` into a new file and rename it to `config.<your_env_here>.js`
+2. You should update the `baseUrl` and `apiUrl` fields to point to your MMS server (eg. `apiURL: 'https://localhost:8080'`
+& (`baseUrl: ''`)
+3. To deploy view editor using this custom file, use `--env <your_env_here>`
+   appended to your `grunt` command (e.g. `grunt release:docker --env=prod`).
+3. For more information regarding the available configuration options see [Config](docs/Config.md).
+
+_Versions Prior to 3.7.0_
+5. Create a file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.
+    * The _grunt_ command will build with these default and fake values, but will not be runnable.  
+    * You should update "ems" key to point to the value of the **actual** hostname serving the Model Management Server (MMS).
+```json
+{
+  "ems": "hostnameurl"
+}
+```
 ## Installation and Building
 
 1. Install the latest stable version of Node ( at the time of this writing 8.9.4 )
@@ -24,9 +45,9 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 4. to install all node module dependencies specified in package.json
 
        npm install
-       
 
-6. In the angular-mms directory, run. . .
+
+6. In the root directory, run. . .
 * . . .to build and bundle the app in development mode. The final artifact will be available in the dist folder:
   
       grunt
@@ -67,15 +88,6 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 
 For more information, please consult the Gruntfile.js and the links at the bottom.
 
-## Configuration
-_(added View Editor 4.7)_
-
-You can now configure view editor to work with external sites. This is done using the configuration file
-located in `app/config`. It is recommended that you create your own configuration file by copying `config.example.js` and
-replacing it with:  `config.<your_env_here>.js`. To deploy view editor using this custom file, use `--env <your_env_here>`
-appended to your `grunt` command (e.g. `grunt release:docker --env=prod`).
-
-For more information regarding the available configuration options see (`app/config/config.example.js`).
 
 ## Building and Running with Docker
 To build the container, run the following command: `docker build -t ve .`.

@@ -8,12 +8,12 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
-    $rootScope.ve_footer = '';
+    //TODO: Figure out why this needs to be set here for VE footer to work
+    $rootScope.ve_footer = "ALWAYS REPLACED";
     $rootScope.ve_fn = false;
 
     var modalOpen = false;
 
-    $rootScope.ve_footer = "Proprietary Information - Not for Public  Release or Redistribution.";
 
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits)) {
@@ -40,7 +40,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         //check if error is ticket error
         if (!error || error.status === 401 || 
                 (error.status === 404 && error.config && error.config.url && 
-                error.config.url.indexOf('/mms/login/ticket') !== -1)) { //check if 404 if checking valid ticket
+                error.config.url.indexOf('/authentication') !== -1)) { //check if 404 if checking valid ticket
             event.preventDefault();
             $rootScope.ve_redirect = {toState: toState, toParams: toParams};
             $state.go('login', {notify: false});

@@ -57,7 +57,7 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         if (jobRunOb.post) {
             _.merge(post, jobRunOb.post);
         }
-        $http.post(link, post, URLService.getRequestConfig()).then(function(data) {
+        $http.post(link, post).then(function(data) {
             deferred.resolve(data.data.jobInstances);
         }, function(error) {
             deferred.reject(error);
@@ -83,7 +83,7 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         var deferred = $q.defer();
         var link = URLService.getJobsURL(projectId, refId, serverSentPMA);
         var docJobs = [];
-        $http.get(link,URLService.getRequestConfig()).then(function(data) {
+        $http.get(link).then(function(data) {
             var jobs;
             if (data.data.jobs) {
                 jobs = data.data.jobs;
@@ -116,7 +116,7 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
     var getJobInstances = function (jobId, projectId, refId) {
         var deferred = $q.defer();
         var link = URLService.getJobInstancesURL(projectId, refId, jobId, serverSentPMA);
-        $http.get(link,URLService.getRequestConfig()).then(function(data) {
+        $http.get(link).then(function(data) {
             deferred.resolve(data.data.jobInstances);
         }, function(error) {
             deferred.reject(error);
@@ -178,7 +178,7 @@ function JobService($q, $http, $location, URLService, CacheService, AuthService,
         };
 
         var link = URLService.getCreateJobURL(projectId, refId);
-        $http.post(link, post, URLService.getRequestConfig()).then(function(data) {
+        $http.post(link, post).then(function(data) {
             deferred.resolve(data.data.jobs[0]);
         }, function(error) {
             deferred.reject(error);

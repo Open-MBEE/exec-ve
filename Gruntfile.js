@@ -95,6 +95,7 @@ module.exports = function(grunt) {
         // mms module
         'src/mms.js',
         'src/services/*.js',
+        'src/filters/*.js',
 
         // mms.directives module (need mms, mms.directives.tpls.js module )
         'dist/jsTemp/mms.directives.tpls.js',
@@ -360,7 +361,7 @@ module.exports = function(grunt) {
         options: {
           publish: [{
             id: groupId + ':ve:zip',
-            version: '3.4.1',
+            version: '3.7.0-SNAPSHOT',
             path: 'deploy/'
           }]
         }

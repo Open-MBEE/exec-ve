@@ -52,15 +52,15 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
-                var artifactOb = {
-                    projectId: data._projectId,
-                    refId: data._refId,
-                    artifactIds : data._artifactIds,
-                    commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
-                };
+                // var artifactOb = {
+                //     projectId: data._projectId,
+                //     refId: data._refId,
+                //     artifactIds : data._artifactIds,
+                //     commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
+                // };
 
                 // Get the artifacts of the element
-                ArtifactService.getArtifacts(artifactOb)
+                ArtifactService.getArtifacts(data)
                 .then(function(artifacts) {
                     scope.artifacts = artifacts;
                     for(var i = 0; i < artifacts.length; i++) {

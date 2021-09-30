@@ -837,7 +837,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 elementId: elementOb.id + '_asi', 
                 refId: elementOb._refId, 
                 projectId: elementOb._projectId
-            }), URLService.getRequestConfig());
+            }));
         }
         return ElementService.updateElements(toUpdate, false)
             .then(function(data) {

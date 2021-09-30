@@ -32,7 +32,7 @@ function PermissionsService($q, $http, URLService, CacheService, _) {
                 "refId": refOb.id,
                 "privilege": "BRANCH_EDIT_CONTENT"
             }
-         ] },URLService.getRequestConfig())
+         ] })
         .then(function(response) {
             var data = response.data.lookups;
             if (angular.isArray(data) && data.length > 0) {

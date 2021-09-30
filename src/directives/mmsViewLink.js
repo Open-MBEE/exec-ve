@@ -92,20 +92,11 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                         } else if (ViewService.isEquation(pe)) {
                             scope.type = "Eq. (";
                             scope.suffix = ')';
-                        } else if (ViewService.isSection(pe)) {
-                            scope.type = '';
                         }
                         if (ApplicationService.getState().fullDoc) {
                             scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + "/full" + scope.hash;
                         } else {
                             scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid + scope.hash;
-                        }
-                    }, function() {
-                        if (data._veNumber) {
-                            var numbers = data._veNumber.split('.');
-                            if (numbers.length > 1) {
-                                scope.type = '';
-                            }
                         }
                     });
                 }

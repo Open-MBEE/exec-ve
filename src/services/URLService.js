@@ -50,6 +50,21 @@ function urlService(baseUrl, mmsUrl) {
     var setToken = function(t) {
         token = t;
     };
+
+    var getAuthorizationHeaderValue = function() {
+        return ('Bearer ' + token);
+    };
+
+    var getAuthorizationHeader = function(headers) {
+        if(!token) {
+            return headers;
+        }
+        if(!headers) {
+            headers = getHeaders();
+        }
+        headers.Authorization = getAuthorizationHeaderValue();
+        return headers;
+    };
     
     var getJMSHostname = function(){
         return root + '/connection/jms';
@@ -65,7 +80,7 @@ function urlService(baseUrl, mmsUrl) {
      * @methodOf mms.URLService
      *
      * @description
-     * Adds generates Authorization Header using token
+     * Adds generates Default Headers using token
      *
      * @returns {object} The HTTP header format
      */
@@ -74,39 +89,6 @@ function urlService(baseUrl, mmsUrl) {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + token
         };
-    };
-
-    var getRequestConfig = function() {
-        return {headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
-            }
-        };
-    };
-
-    /**
-     * @deprecated
-     * @ngdoc method
-     * @name mms.URLService#addTicket
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Adds alf_ticket parameter to URL string
-     *
-     * @param {String} url The url string for which to add alf_ticket parameter argument.
-     * @returns {string} The url with alf_ticket parameter added.
-     */
-    var addToken = function(url) {
-        var r = url;
-        if (!token)
-            return r;
-        // if (r.indexOf('commitId') > 0) //TODO check mms cache rules
-        //     return r;
-        if (r.indexOf('?') > 0)
-            r += '&token=' + token;
-        else
-            r += '?token=' + token;
-        return r;
     };
 
     /**
@@ -603,9 +585,9 @@ function urlService(baseUrl, mmsUrl) {
     return {
         getRoot: getRoot,
         setToken: setToken,
-        addToken: addToken,
+        getAuthorizationHeaderValue: getAuthorizationHeaderValue,
+        getAuthorizationHeader: getAuthorizationHeader,
         getHeaders: getHeaders,
-        getRequestConfig: getRequestConfig,
         getJMSHostname: getJMSHostname,
         getMmsServer: getMmsServer,
         isTimestamp: isTimestamp,

@@ -183,7 +183,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
             deferred.resolve(existing);
             return deferred.promise;
         }
-        $http.put(URLService.getPutArtifactsURL(reqOb), request, URLService.getRequestConfig())
+        $http.put(URLService.getPutArtifactsURL(reqOb), request)
         .then(function(response) {
             var data = response.data.artifacts;
             for (var i = 0; i < data.length; i++) {
@@ -222,7 +222,7 @@ function ArtifactService($q, $http, URLService, UtilsService, CacheService, Http
             return deferred.promise;
         }
         inProgress[key] = deferred.promise;
-        $http.get(URLService.getArtifactHistoryURL(reqOb),URLService.getRequestConfig())
+        $http.get(URLService.getArtifactHistoryURL(reqOb))
         .then(function(response) {
             deferred.resolve(CacheService.put(requestCacheKey, response.data.commits, true));
             delete inProgress[key];

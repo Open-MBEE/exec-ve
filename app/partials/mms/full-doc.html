@@ -21,7 +21,7 @@
         </div>
         <div class="container-fluid ve-secondary-text"> Document Last Modified: {{ latestElement | date:'M/d/yy h:mm a' }}</div>
         <div class="pane-center container-fluid" id="print-div">
-            <div ng-repeat="view in views track by view.id" ng-class="{chapter: view.topLevel}">
+            <div ng-repeat="view in views track by view.id" ng-class="{chapter: view.topLevel, 'first-chapter': view.first}">
                 <mms-view mms-element-id="{{view.id}}" mms-commit-id="latest" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}" mms-number="{{view.number}}" mms-view-api="view.api"></mms-view>
             </div>
         </div>
