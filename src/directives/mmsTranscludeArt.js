@@ -1,13 +1,12 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeArt', ['ArtifactService','ElementService','AuthService','URLService', mmsTranscludeArt]);
+.directive('mmsTranscludeArt', ['ElementService','AuthService','URLService', mmsTranscludeArt]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeArt
  *
- * @requires mms.ArtifactService
  * @requires mms.AuthService
  * @requires mms.ElementService
  * @requires mms.URLService
@@ -23,7 +22,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeArt(ArtifactService, ElementService, AuthService, URLService) {
+function mmsTranscludeArt(ElementService, AuthService, URLService) {
 
     var mmsTranscludeArtLink = function(scope, element, attrs, controllers) {
         // var mmsViewCtrl = controllers[0];
