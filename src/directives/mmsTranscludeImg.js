@@ -49,27 +49,21 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
-                scope.img = {};
-                var artifactOb = {
-                    elementId: data.id,
-                    projectId: data._projectId,
-                    refId: data._refId,
-                    commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
-                };
-                var allowedExtensions = [
+                var includeExt = [
                     'svg', 'png'
                 ];
-                var artifacts = data._artifacts;
+                var artifacts = data._artifact;
                 if (artifacts !== undefined) {
-                    for (var i = 0; i < allowedExtensions.length; i++) {
-                        const artifactExtension = allowedExtensions[i];
-                        var extExists = (obj) => {
-                            return obj.extension === artifactExtension;
-                        };
-                        if (artifacts.filter(extExists).length > 0) {
-                            scope.img[artifactExtension] = URLService.getArtifactURL(artifactOb,artifactExtension);
-                        }
-                    }
+                    scope.artifacts = artifacts.filter(a => includeExt.includes(a.extension))
+                        .map(a => {
+                            return {
+                                url: URLService.getArtifactURL(reqOb, a.extension),
+                                image: (a.mimetype.indexOf('image') > -1),
+                                ext: a.extension
+                            };
+                        });
+                    scope.svg = scope.artifacts.filter(a => a.ext = 'svg');
+                    scope.png = scope.artifacts.filter(a => a.ext = 'png');
                 }
 
             }, function(reason) {
@@ -86,7 +80,7 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
 
     return {
         restrict: 'E',
-        template: '<img class="mms-svg" ng-src="{{img.svg}}"></img><img class="mms-png" ng-src="{{img.png}}"></img>',
+        template: '<img class="mms-svg" ng-src="{{svg.url}}"></img><img class="mms-png" ng-src="{{png.url}}"></img>',
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

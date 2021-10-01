@@ -63,6 +63,7 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
         this.isTranscludedElement = function(elementName) {
             if (elementName === 'MMS-TRANSCLUDE-COM' ||
                 elementName === 'MMS-TRANSCLUDE-DOC' ||
+                elementName === 'MMS-TRANSCLUDE-ART' ||
                 elementName === 'MMS-TRANSCLUDE-IMG' ||
                 elementName === 'MMS-TRANSCLUDE-NAME' ||
                 elementName === 'MMS-TRANSCLUDE-VAL') {

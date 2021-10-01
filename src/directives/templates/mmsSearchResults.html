@@ -27,8 +27,11 @@
                 {{qualifiedNameFormatter(elem._qualifiedName)}}
             </div>
         </div>
-        <div ng-if="elem.type === 'Diagram' && elem._artifactIds">
+        <div ng-if="elem.type === 'Diagram' && elem._artifacts">
             <mms-transclude-img ng-click="userResultClick(elem, 'img')" mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></mms-transclude-img>
+        </div>
+        <div ng-if="elem.type !== 'Diagram' && elem._artifacts">
+            <mms-transclude-art mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></mms-transclude-art>
         </div>
         <div class="elem-documentation-wrapper">
             <label>Documentation</label>
