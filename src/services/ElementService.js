@@ -820,7 +820,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         }), {
             elements: elements,
             source: ApplicationService.getSource()
-        },  Object.assign({timeout: 60000}))
+        }, {timeout: 60000})
             .then(function (response) {
                 _bulkUpdateSuccessHandler(response, deferred);
             }, function (response) {
