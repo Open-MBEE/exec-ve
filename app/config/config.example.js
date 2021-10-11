@@ -1,4 +1,4 @@
-(function (window) {
+(function () {
     //Examples of commonly used banner statements
     var label = {
         pi: 'PROPRIETARY: Proprietary Information',
@@ -37,4 +37,4 @@
         }
     }
 
-}(this));
+}());
