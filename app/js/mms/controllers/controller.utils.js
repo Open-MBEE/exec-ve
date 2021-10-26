@@ -2,7 +2,7 @@
 
 angular.module('mmsApp')
 .factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
-    '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', '_', MmsAppUtils]);
+    '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'SessionService', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -12,7 +12,9 @@ angular.module('mmsApp')
  * Utilities
  */
 function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
-    $rootScope, $filter, $state, ElementService, ViewService, UtilsService, _) {
+    $rootScope, $filter, $state, ElementService, ViewService, UtilsService, SessionService, _) {
+
+    let session = SessionService;
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
@@ -260,7 +262,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                         });
                 }
             } else {
-                $rootScope.ve_fullDocMode = true;
+                session.veFullDocMode(true);
                 $rootScope.ve_bbApi.setToggleState('tree-full-document', true);
                 $state.go('project.ref.document.full', {search: undefined});
             }

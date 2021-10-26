@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache','$rootScope','$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService', 'growl', Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$rootScope', '$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService', 'TreeService', 'SessionService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -19,8 +19,9 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, PermissionsService, growl) {
-
+function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, PermissionsService, TreeService, SessionService, growl) {
+    const tree = TreeService.getTree();
+    const session = SessionService;
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
             Object.keys($window.localStorage)
@@ -776,7 +777,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         $rootScope.$broadcast('view.reorder.saved', id);
         growl.success("Adding " + elemType + " Successful");
         // Show comments when creating a comment PE
-        if (elemType === 'Comment' && !$rootScope.veCommentsOn) {
+        if (elemType === 'Comment' && !session.veCommentsOn()) {
             $timeout(function() {
                 $('.show-comments').click();
             }, 0, false);
@@ -974,12 +975,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
     };
 
     var toggleLeftPane = function (searchTerm) {
-        if ( searchTerm && !$rootScope.ve_tree_pane.closed ) {
-            $rootScope.ve_tree_pane.toggle();
+        if ( searchTerm && !tree.getPane().closed ) {
+            tree.getPane().toggle();
         }
 
-        if ( !searchTerm && $rootScope.ve_tree_pane.closed ) {
-            $rootScope.ve_tree_pane.toggle();
+        if ( !searchTerm && tree.getPane().closed ) {
+            tree.getPane().toggle();
         }
     };
 

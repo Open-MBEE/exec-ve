@@ -3,13 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', '$interval',
-function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, $interval) {
+.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'StompService', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'SessionService', 'TreeService', '$interval',
+function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, StompService, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, SessionService, TreeService, $interval) {
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
-    //TODO: Figure out why this needs to be set here for VE footer to work
-    $rootScope.ve_footer = "ALWAYS REPLACED";
     $rootScope.ve_fn = false;
 
     var modalOpen = false;

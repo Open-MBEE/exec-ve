@@ -537,7 +537,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: 'ToolbarCtrl'
             },
             'footer@': {
-                template: '<ve-footer mms-footer="footer" ng-if="ve_footer"></ve-footer>',
+                template: '<ve-footer mms-footer="footer"></ve-footer>',
                 controller: ['$scope', 'footerOb', function ($scope, footerOb) {
                     $scope.footer = footerOb;
                 }]

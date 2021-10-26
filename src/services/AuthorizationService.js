@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-    .factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', '$window', '$analytics', AuthService]);
+    .factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', 'SessionService', '$window', '$analytics', AuthService]);
 
 /**
  * @ngdoc service
@@ -17,7 +17,7 @@ angular.module('mms')
  * @description
  * Provide general authorization functions. I.e. login, logout, etc...
  */
-function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window, $analytics) {
+function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, SessionService, $window, $analytics) {
 
     var token = $window.localStorage.getItem('token');
     var getAuthorized = function (credentialsJSON) {
@@ -44,6 +44,7 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         ProjectService.reset();
         ViewService.reset();
         CacheService.reset();
+        SessionService.clear();
     };
 
     var getToken = function(){

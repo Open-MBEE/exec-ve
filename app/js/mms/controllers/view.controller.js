@@ -5,10 +5,13 @@
 angular.module('mmsApp')
     .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$window', '$location',
     '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService', 'ShortenUrlService', 'Utils',
-    'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb', 'PermissionsService',
+    'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb', 'PermissionsService', 'SessionService', 'TreeService',
     function($scope, $rootScope, $state, $timeout, $window, $location, $http,
              $element, growl, hotkeys, MmsAppUtils, UxService, URLService, UtilsService, ShortenUrlService, Utils,
-             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb, PermissionsService) {
+             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb, PermissionsService, SessionService, TreeService) {
+        
+    let session = SessionService;
+    let tree = TreeService.getTree().getApi();
 
     function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
@@ -23,12 +26,13 @@ angular.module('mmsApp')
         $scope.vidLink = true;
     }
 
-    if (!$rootScope.veCommentsOn)
-        $rootScope.veCommentsOn = false;
-    if (!$rootScope.veElementsOn)
-        $rootScope.veElementsOn = false;
-    if (!$rootScope.ve_editmode)
-        $rootScope.ve_editmode = false;
+    session.veFullDocMode(true);
+    if (!session.veCommentsOn())
+        session.veCommentsOn(false);
+    if (!session.veElementsOn())
+        session.veElementsOn(false);
+    if (!session.veEditMode())
+        session.veEditMode(false);
 
     $scope.search = search;
     Utils.toggleLeftPane(search);
@@ -39,13 +43,13 @@ angular.module('mmsApp')
     $scope.buttons = [];
     $scope.viewApi = {
         init: function() {
-            if ($rootScope.veCommentsOn) {
+            if (session.veCommentsOn()) {
                 $scope.viewApi.toggleShowComments();
             }
-            if ($rootScope.veElementsOn) {
+            if (session.veElementsOn()) {
                 $scope.viewApi.toggleShowElements();
             }
-            if ($rootScope.ve_editmode) {
+            if (session.veEditMode()) {
                 $scope.viewApi.toggleShowEdits();
             }
         },
@@ -85,7 +89,7 @@ angular.module('mmsApp')
         init: function() {
             if (viewOb && refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission(refOb)) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
-                $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
+                $scope.bbApi.setToggleState('show-edits', session.veEditMode());
                 hotkeys.bindTo($scope)
                 .add({
                     combo: 'alt+d',
@@ -94,9 +98,9 @@ angular.module('mmsApp')
                 });
             }
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
-            $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
+            $scope.bbApi.setToggleState('show-elements', session.veElementsOn());
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
+            $scope.bbApi.setToggleState('show-comments', session.veCommentsOn());
 
             // Set hotkeys for toolbar
             hotkeys.bindTo($scope)
@@ -141,51 +145,51 @@ angular.module('mmsApp')
     $scope.$on('show-comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show-comments');
-        $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
+        session.veCommentsOn(!session.veCommentsOn());
     });
 
     $scope.$on('show-elements', function() {
         $scope.viewApi.toggleShowElements();
         $scope.bbApi.toggleButtonState('show-elements');
-        $rootScope.veElementsOn = !$rootScope.veElementsOn;
+        session.veElementsOn(!session.veElementsOn());
     });
 
     $scope.$on('show-edits', function() {
-        if( ($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
+        if( (session.veElementsOn() && session.veEditMode()) || (!session.veElementsOn() && !session.veEditMode()) ){
             $scope.viewApi.toggleShowElements();
             $scope.bbApi.toggleButtonState('show-elements');
-            $rootScope.veElementsOn = !$rootScope.veElementsOn;
+            session.veElementsOn(!session.veElementsOn());
         }
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show-edits');
-        $rootScope.ve_editmode = !$rootScope.ve_editmode;
+        session.veEditMode(!session.veEditMode());
     });
 
     $scope.$on('center-previous', function() {
-        var prev = $rootScope.ve_treeApi.get_prev_branch($rootScope.ve_treeApi.get_selected_branch());
+        var prev = tree.get_prev_branch(tree.get_selected_branch());
         if (!prev)
             return;
         while (prev.type !== 'view' && prev.type !== 'section') {
-            prev = $rootScope.ve_treeApi.get_prev_branch(prev);
+            prev = tree.get_prev_branch(prev);
             if (!prev)
                 return;
         }
         $scope.bbApi.toggleButtonSpinner('center-previous');
-        $rootScope.ve_treeApi.select_branch(prev);
+        tree.select_branch(prev);
         $scope.bbApi.toggleButtonSpinner('center-previous');
     });
 
     $scope.$on('center-next', function() {
-        var next = $rootScope.ve_treeApi.get_next_branch($rootScope.ve_treeApi.get_selected_branch());
+        var next = tree.get_next_branch(tree.get_selected_branch());
         if (!next)
             return;
         while (next.type !== 'view' && next.type !== 'section') {
-            next = $rootScope.ve_treeApi.get_next_branch(next);
+            next = tree.get_next_branch(next);
             if (!next)
                 return;
         }
         $scope.bbApi.toggleButtonSpinner('center-next');
-        $rootScope.ve_treeApi.select_branch(next);
+        tree.select_branch(next);
         $scope.bbApi.toggleButtonSpinner('center-next');
     });
 
@@ -253,6 +257,6 @@ angular.module('mmsApp')
         if (isPageLoading())
             return;
         var printElementCopy = angular.element("#print-div");
-        MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
+        MmsAppUtils.refreshNumbering(tree.get_rows(), printElementCopy);
     });
 }]);
