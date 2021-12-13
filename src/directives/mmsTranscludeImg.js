@@ -47,28 +47,28 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
             var server = URLService.getMmsServer();
-            var ticket = '?alf_ticket=' + AuthService.getTicket();
+            var token = '?token=' + AuthService.getToken();
             element.addClass('isLoading');
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
-                var artifactOb = {
-                    projectId: data._projectId,
-                    refId: data._refId,
-                    artifactIds : data._artifactIds,
-                    commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
-                };
+                // var artifactOb = {
+                //     projectId: data._projectId,
+                //     refId: data._refId,
+                //     artifactIds : data._artifactIds,
+                //     commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
+                // };
 
                 // Get the artifacts of the element
-                ArtifactService.getArtifacts(artifactOb)
+                ArtifactService.getArtifacts(data)
                 .then(function(artifacts) {
                     scope.artifacts = artifacts;
                     for(var i = 0; i < artifacts.length; i++) {
                         var artifact = artifacts[i];
                         if (artifact.contentType == "image/svg+xml") {
-                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
+                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
                         } else if (artifact.contentType == "image/png") {
-                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + ticket;
+                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
                         }
                     }
                 }, function(reason) {

@@ -91,9 +91,9 @@
 }
 
 #main-pane {
-  top: 72px;
+  top: $navTotal;
 }
 
 .content-container {
-  top: $navHeight;
+  top: $navTotal;
 }

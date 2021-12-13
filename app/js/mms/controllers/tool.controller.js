@@ -4,10 +4,10 @@
 
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'JobService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
+            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
             'PermissionsService',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, JobService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils, PermissionsService) {
+    ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils, PermissionsService) {
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -39,8 +39,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         element: true,
         history: false,
         tags: false,
-        reorder: false,
-        jobs: false
+        reorder: false
     };
     $scope.tracker = {};
     if (!$rootScope.ve_edits)
@@ -83,10 +82,6 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
         }
     };
-
-    $scope.$on('jobs', function() {
-        showPane('jobs');
-    });
 
     $scope.$on('element-history', function() {
         showPane('history');

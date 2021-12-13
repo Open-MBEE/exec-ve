@@ -187,7 +187,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 } catch (e) {
                 }
             }
-            
+
             var toGetSet = new Set(toGet);
             reqOb.elementIds = Array.from(toGetSet);
             ElementService.getElements(reqOb, weight, update)
@@ -198,8 +198,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 deferred.resolve(results);
                 delete inProgress[key];
             });
-            
-            
+
+
         }, function(reason) {
             deferred.reject(reason);
             delete inProgress[key];
@@ -224,7 +224,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             }
         }
     };
-    
+
     /**
      * @ngdoc method
      * @name mms.ViewService#addViewToParentView

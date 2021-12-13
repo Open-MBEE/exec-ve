@@ -8,18 +8,12 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
-    $rootScope.ve_footer = '';
+    //TODO: Figure out why this needs to be set here for VE footer to work
+    $rootScope.ve_footer = "ALWAYS REPLACED";
     $rootScope.ve_fn = false;
 
     var modalOpen = false;
-    var host = $location.host();
-    // if (host.indexOf('europaems') !== -1 || host.indexOf('arrmems') !== -1 || host.indexOf('msmems') !== -1) {
-    //     $rootScope.ve_footer = 'The technical data in this document is controlled under the U.S. Export Regulations, release to foreign persons may require an export authorization.';
-    // }
-    if (host.indexOf('fn') !== -1){
-        $rootScope.ve_footer = 'JPL/Caltech PROPRIETARY — Not for Public Release or Redistribution. No export controlled documents allowed on this server. <a target="_blank" href="https://wiki.jpl.nasa.gov/x/GaByE">More</a>';
-        $rootScope.ve_fn = true;
-    }
+
 
     $window.addEventListener('beforeunload', function(event) {
         if ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits)) {
@@ -46,7 +40,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         //check if error is ticket error
         if (!error || error.status === 401 || 
                 (error.status === 404 && error.config && error.config.url && 
-                error.config.url.indexOf('/login/ticket') !== -1)) { //check if 404 if checking valid ticket
+                error.config.url.indexOf('/authentication') !== -1)) { //check if 404 if checking valid ticket
             event.preventDefault();
             $rootScope.ve_redirect = {toState: toState, toParams: toParams};
             $state.go('login', {notify: false});
@@ -70,10 +64,10 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                 return;
             modalOpen = true;
             $uibModal.open({
-                template: '<div class="modal-header"><h4>You have been logged out, please login again.</h4></div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' + 
-                                '<input type="text" class="form-control" ng-model="credentials.username" placeholder="Username" style="margin-bottom: 1.5em;" autofocus>' + 
-                                '<input type="password" class="form-control" ng-model="credentials.password" placeholder="Password" style="margin-bottom: 1.5em;">' + 
-                                '<button class="btn btn-block btn-primary" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' + 
+                template: '<div class="modal-header"><h4>You have been logged out, please login again.</h4></div><div class="modal-body"><form name="loginForm" ng-submit="login(credentials)">' +
+                                '<input type="text" class="form-control" ng-model="credentials.username" placeholder="Username" style="margin-bottom: 1.5em;" autofocus>' +
+                                '<input type="password" class="form-control" ng-model="credentials.password" placeholder="Password" style="margin-bottom: 1.5em;">' +
+                                '<button class="btn btn-block btn-primary" type="submit">LOG IN <span ng-if="spin" ><i class="fa fa-spin fa-spinner"></i>' +
                             '</span></button></form></div>',
                 scope: $scope,
                 backdrop: 'static',

@@ -45,7 +45,7 @@ function mmsTranscludeArt(ArtifactService, AuthService, URLService) {
             ArtifactService.getArtifact(reqOb)
             .then(function(artifact) {
                 scope.artifact = artifact;
-                scope.url =  URLService.addTicket(
+                scope.url =  URLService.addToken(
                     URLService.getArtifactURL({
                     'projectId': scope.projectId,
                     'refId': scope.refId,

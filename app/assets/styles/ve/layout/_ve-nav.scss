@@ -30,6 +30,7 @@
   // position: relative;
   width: 100%;
   height: $navHeight;
+  top: $navBanner;
   min-height: 30px;
   border: 0;
   background-color: $ve-slate-base;
@@ -70,7 +71,7 @@ a.switch-org:hover {
 
   img{
     height: 26px;
-    border-radius: 50%;
+    //border-radius: 50%;
     @include transition($background_hover_transition);
 
     &:hover{
@@ -213,7 +214,7 @@ ul.global-menu {
   background:$ve-accent;
   text-align: center;
   color:white;
-  
+
   &:hover {
     background-color:$ve-accent-darker;
   }
@@ -226,7 +227,7 @@ ul.global-menu {
 
 nav.project-level-header {
   background-color: $ve-slate-darker-2;
-  top: $navHeight;
+  top: $navProject;
   z-index: 150;
 
   .navbar-nav {
@@ -368,5 +369,23 @@ nav.project-level-header {
   > li > a{
     white-space: normal;
     word-wrap: break-word;
+  }
+}
+
+/*------------------------------------------------------------------
+4. Banner Header
+-------------------------------------------------------------------*/
+nav.nav-level-banner {
+  background-color: $ve-slate-darker-2;
+  color: white;
+  float: none;
+  height: $navBanner;
+
+  .navbar-nav {
+    margin: 0;
+  }
+  .navbar-banner-header {
+    display: flex;
+    justify-content: center;
   }
 }

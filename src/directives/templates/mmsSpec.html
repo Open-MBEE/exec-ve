@@ -2,7 +2,7 @@
 <div ng-if="!noEdit && editing" class="editing">
 
     <h1 class="prop" ng-if="edit.name !== undefined"><input class="form-control ve-plain-input" type="text" ng-model="edit.name"></h1>
-    <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
+    <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="modifier.email != undefined">{{ modifier.email }}</b><b ng-if="modifier.email == undefined">{{ modifier }}</b></span>
 
     <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
         <h2 class="prop-title spec-view-value-heading">Property Value</h2>
@@ -102,7 +102,7 @@
             <b> Element not found:</b> displaying last found content
         </div>
         <h1 class="prop element-title" ng-class="{'mms-error': mmsDisplayOldContent}"><span class="{{ elementTypeClass }}"></span>{{element.name}}</h1>
-        <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b>{{element._modifier}}</b></span>
+        <span class="elem-updated-wrapper">Last modified {{element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="modifier.email != undefined">{{ modifier.email }}</b><b ng-if="modifier.email == undefined">{{ modifier }}</b></span>
 
         <div ng-if="element.type === 'Property' || element.type === 'Port' || element.type === 'Slot'">
             <h2 class="prop-title spec-view-value-heading">Property Value</h2>
@@ -157,7 +157,7 @@
             </div>
         </div>
 
-        <div ng-if="element.type === 'Diagram' && element._artifactIds">
+        <div ng-if="element.type === 'Diagram' && element._artifacts">
             <mms-transclude-img mms-element-id="{{element.id}}" mms-ref-id="{{element._refId}}" mms-project-id="{{element._projectId}}" mms-commit-id="{{element._commitId}}"></mms-transclude-img>
         </div>
 

@@ -23,7 +23,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     }]);
 
     $locationProvider.hashPrefix('');
-  
+
     $urlRouterProvider.rule(function ($injector, $location) {
         var $state = $injector.get('$state');
         var locationPath = $location.url();
@@ -47,9 +47,23 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             $location.url(locationPath);
     });
 
-    var mmsHost = window.location.protocol + '//' + window.location.host;
-    URLServiceProvider.setMmsUrl(mmsHost);
-    //URLServiceProvider.setMmsUrl('https://opencae-uat.jpl.nasa.gov');
+    if(window.__env.baseUrl) {
+        URLServiceProvider.setBaseUrl(window.__env.baseUrl);
+    }
+    else {
+        URLServiceProvider.setBaseUrl('');
+    }
+
+    if(window.__env.apiUrl) {
+        URLServiceProvider.setMmsUrl(window.__env.apiUrl);
+    }
+    else {
+        var mmsHost = window.location.protocol + '//' + window.location.host;
+        URLServiceProvider.setMmsUrl(mmsHost);
+    }
+
+
+
 
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
@@ -75,23 +89,39 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     $stateProvider
     .state('login', {
         url: '/login',
-        resolve: { },
+        resolve: {
+            bannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getBanner();
+            }],
+            loginBannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getLoginBanner();
+            }]
+        },
         views: {
+            'banner@': {
+                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                controller: ['$scope', 'bannerOb', function($scope, bannerOb){
+                    $scope.banner = bannerOb;
+                }]
+            },
             'login@': {
                 templateUrl: 'partials/mms/login.html',
-                controller: ['$scope', '$rootScope', '$state', 'AuthService', 'growl', function ($scope, $rootScope, $state, AuthService, growl) {
+                controller: ['$scope', '$rootScope', '$state', 'AuthService', 'loginBannerOb', 'growl', function ($scope, $rootScope, $state, AuthService, loginBannerOb, growl) {
                     $scope.credentials = {
                       username: '',
                       password: ''
                     };
                     $rootScope.ve_title = 'Login';
                     $scope.pageTitle = 'View Editor';
+                    $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.login = function (credentials) {
+                        console.log(credentials.username);
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                         AuthService.getAuthorized(credentialsJSON)
                         .then(function(user) {
+                            console.log(user);
                             if ($rootScope.ve_redirect) {
                                 var toState = $rootScope.ve_redirect.toState;
                                 var toParams = $rootScope.ve_redirect.toParams;
@@ -111,12 +141,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('login.redirect', {
         url: '/redirect',
         resolve: {
-            ticket: ['$window', 'URLService', 'AuthService', '$q', '$cookies', 'ApplicationService', function($window, URLService, AuthService, $q, $cookies, ApplicationService) {
+            token: ['$window', 'URLService', 'AuthService', '$q', '$cookies', 'ApplicationService', function($window, URLService, AuthService, $q, $cookies, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
-                    URLService.setTicket($window.localStorage.getItem('ticket'));
-                    deferred.resolve($window.localStorage.getItem('ticket'));
+                    URLService.setToken($window.localStorage.getItem('token'));
+                    deferred.resolve($window.localStorage.getItem('token'));
                     $cookies.put('com.tomsawyer.web.license.user', data, {path: '/'});
                 }, function(rejection) {
                     deferred.reject(rejection);
@@ -134,29 +164,43 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('login.select', {
         url: '/select?fromLogin',
         resolve: {
-            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
+            token: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
+                    console.error('select-fromlogin');
                     ApplicationService.setUserName(data);
-                    URLService.setTicket($window.localStorage.getItem('ticket'));
-                    deferred.resolve($window.localStorage.getItem('ticket'));
+                    URLService.setToken($window.localStorage.getItem('token'));
+                    deferred.resolve($window.localStorage.getItem('token'));
                 }, function(rejection) {
                     deferred.reject(rejection);
                 });
                 return deferred.promise;
             }],
-            orgObs: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
+            bannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getBanner();
+            }],
+            loginBannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getLoginBanner();
+            }],
+            orgObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getOrgs();
             }]
         },
         views: {
+            'banner@': {
+                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                controller: ['$scope', 'bannerOb', function($scope, bannerOb){
+                    $scope.banner = bannerOb;
+                }]
+            },
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: ['$scope', '$rootScope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'growl', '$localStorage', function($scope, $rootScope, $state, $stateParams, orgObs, ProjectService, AuthService, growl, $localStorage) {
+                controller: ['$scope', '$rootScope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService','loginBannerOb', 'growl', '$localStorage', function($scope, $rootScope, $state, $stateParams, orgObs, ProjectService, AuthService, loginBannerOb, growl, $localStorage) {
                     $rootScope.ve_title = 'Projects';
                     $scope.pageTitle = 'View Editor';
                     $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
+                    $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.orgs = orgObs;
                     var orgId, projectId;
@@ -223,31 +267,31 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project', { //TODO this will be the ui to diff and merge and manage refs
         url: '/projects/:projectId',
         resolve: {
-            ticket: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', '$cookies', function($window, URLService, AuthService, $q, ApplicationService, $cookies) {
+            token: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', '$cookies', function($window, URLService, AuthService, $q, ApplicationService, $cookies) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
                     ApplicationService.setUserName(data);
-                    URLService.setTicket($window.localStorage.getItem('ticket'));
-                    deferred.resolve($window.localStorage.getItem('ticket'));
+                    URLService.setToken($window.localStorage.getItem('token'));
+                    deferred.resolve($window.localStorage.getItem('token'));
                     $cookies.put('com.tomsawyer.web.license.user', data, {path: '/'});
                 }, function(rejection) {
                     deferred.reject(rejection);
                 });
                 return deferred.promise;
             }],
-            //orgObs: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
+            //orgObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
             //    return ProjectService.getOrgs();
             //}],
-            projectOb: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
+            projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getProject($stateParams.projectId);
             }],
-            projectObs: ['$stateParams', 'ProjectService', 'ticket', 'projectOb', function($stateParams, ProjectService, ticket, projectOb) {
+            projectObs: ['$stateParams', 'ProjectService', 'token', 'projectOb', function($stateParams, ProjectService, token, projectOb) {
                 return ProjectService.getProjects(projectOb.orgId);
             }],
-            orgOb: ['ProjectService', 'projectOb', 'ticket', function(ProjectService, projectOb, ticket) {
+            orgOb: ['ProjectService', 'projectOb', 'token', function(ProjectService, projectOb, token) {
                 return ProjectService.getOrg(projectOb.orgId);
             }],
-            refObs: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
+            refObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getRefs($stateParams.projectId);
             }],
             tagObs: ['refObs', function(refObs) {
@@ -266,6 +310,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 }
                 return ret;
             }],
+            bannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getBanner();
+            }],
             refOb: function() { return null;},
             tagOb: function() { return null;},
             branchOb: function() { return null;},
@@ -274,6 +321,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             search: function(){ return null;}
         },
         views: {
+            'banner@': {
+                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                controller: ['$scope', 'bannerOb', function($scope, bannerOb){
+                    $scope.banner = bannerOb;
+                }]
+            },
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
                 controller: ['$scope', '$rootScope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
@@ -314,10 +367,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref', { // equivalent to old sites and documents page
         url: '/:refId?search',
         resolve: {
-            projectOb: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
+            projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getProjectMounts($stateParams.projectId, $stateParams.refId);
             }],
-            refOb: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
+            refOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getRef($stateParams.refId, $stateParams.projectId);
             }],
             tagOb: ['refOb', function(refOb) {
@@ -334,11 +387,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     return [];
                 }
             }],
-            groupObs: ['$stateParams', 'ProjectService', 'ticket', function($stateParams, ProjectService, ticket) {
+            groupObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getGroups($stateParams.projectId, $stateParams.refId);
             }],
             groupOb: function(){ return null;},
-            documentOb: ['$stateParams', '$q', 'ElementService', 'ViewService', 'refOb', 'projectOb', 'ticket', function($stateParams, $q, ElementService, ViewService, refOb, projectOb, ticket) {
+            documentOb: ['$stateParams', '$q', 'ElementService', 'ViewService', 'refOb', 'projectOb', 'token', function($stateParams, $q, ElementService, ViewService, refOb, projectOb, token) {
                 var deferred = $q.defer();
                 var eid = $stateParams.projectId + '_cover';
                 ElementService.getElement({
@@ -409,11 +462,17 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewOb: ['documentOb', function(documentOb) {
                 return documentOb;
             }],
-            search: ['$stateParams', 'ElementService', 'ticket', function($stateParams, ElementService, ticket) {
+            search: ['$stateParams', 'ElementService', 'token', function($stateParams, ElementService, token) {
                 if ($stateParams.search === undefined) {
                     return null;
                 }
                 return $stateParams.search;
+            }],
+            bannerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getBanner();
+            }],
+            footerOb: ['BrandingService', function(BrandingService) {
+                return BrandingService.getFooter();
             }],
             docMeta: [function(){
                 return {};
@@ -423,6 +482,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             }]
         },
         views: {
+            'banner@': {
+                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                controller: ['$scope', 'bannerOb', function($scope, bannerOb){
+                    $scope.banner = bannerOb;
+                }]
+            },
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
                 controller: ['$scope', '$rootScope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
@@ -470,13 +535,19 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             'toolbar-right@': {
                 template: '<mms-toolbar buttons="buttons" on-click="onClick(button)" mms-tb-api="tbApi"></mms-toolbar>',
                 controller: 'ToolbarCtrl'
+            },
+            'footer@': {
+                template: '<ve-footer mms-footer="footer" ng-if="ve_footer"></ve-footer>',
+                controller: ['$scope', 'footerOb', function ($scope, footerOb) {
+                    $scope.footer = footerOb;
+                }]
             }
         }
     })
     .state('project.ref.groupReorder', {
         url: '/group-reorder',
         resolve: {
-            documentObs: ['ViewService', '$stateParams', 'ticket', function(ViewService, $stateParams, ticket) {
+            documentObs: ['ViewService', '$stateParams', 'token', function(ViewService, $stateParams, token) {
                 return ViewService.getProjectDocuments({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId
@@ -496,7 +567,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.preview', {
         url: '/document/:documentId',
         resolve: {
-            documentOb: ['$stateParams', '$q', 'ElementService', 'ViewService', 'refOb', 'ticket', function($stateParams, $q, ElementService, ViewService, refOb, ticket) {
+            projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
+                return ProjectService.getProjectMounts($stateParams.projectId, $stateParams.refId);
+            }],
+            documentOb: ['$stateParams', '$q', 'ElementService', 'ViewService', 'refOb', 'token', function($stateParams, $q, ElementService, ViewService, refOb, token) {
                 var deferred = $q.defer();
                 var eid = $stateParams.documentId;
                 var coverIndex = eid.indexOf('_cover');
@@ -555,7 +629,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             viewOb: ['documentOb', function(documentOb) {
                 return documentOb;
             }],
-            groupOb: ['groupObs', 'documentOb', 'ProjectService', 'ticket', function(groupObs, documentOb, ProjectService, ticket) {
+            groupOb: ['groupObs', 'documentOb', 'ProjectService', 'token', function(groupObs, documentOb, ProjectService, token) {
                 var group = null;
                 if (documentOb) {
                     for (var i = 0; i < groupObs.length; i++) {
@@ -600,7 +674,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.document', {
         url: '/documents/:documentId',
         resolve: {
-            documentOb: ['$stateParams', 'ElementService', 'ticket', function($stateParams, ElementService, ticket) {
+            documentOb: ['$stateParams', 'ElementService', 'token', function($stateParams, ElementService, token) {
                 return ElementService.getElement({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
@@ -671,7 +745,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.document.view', {
         url: '/views/:viewId',
         resolve: {
-            viewOb: ['$stateParams', 'ElementService', 'ticket', function($stateParams, ElementService, ticket) {
+            viewOb: ['$stateParams', 'ElementService', 'token', function($stateParams, ElementService, token) {
                 return ElementService.getElement({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
@@ -740,7 +814,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     $httpProvider.interceptors.push(['$q', '$location', '$rootScope', '$injector', 'URLService', function($q, $location, $rootScope, $injector, URLService) {
         return {
             request: function(config) {
-                config.headers = URLService.getAuthorizationHeader(config.headers);                
+                config.headers = URLService.getAuthorizationHeader(config.headers);
                 return config;
             },
             'responseError': function(rejection) {

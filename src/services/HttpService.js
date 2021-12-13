@@ -38,9 +38,10 @@ function HttpService($http) {
      * Put a new get request in the queue, the queue is FIFO
      *
      * @param {string} url url to get
-     * @param {function} success success function
-     * @param {function} error function
-     * @param {string} proirity by weight
+     * @param {function} successCallback success function
+     * @param {function} errorCallback function
+     * @param {string} weight by weight
+     * @param {Object} config object containing http configuration parameters
      */
     var get = function(url, successCallback, errorCallback, weight) {
         if(weight === undefined){

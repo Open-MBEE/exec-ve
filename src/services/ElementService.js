@@ -463,7 +463,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 }), {
                     elements: [postElem],
                     source: ApplicationService.getSource()
-                }, {timeout: 60000})
+                }, Object.assign({timeout: 60000}))
             .then(function(response) {
                 var rejected = response.data.rejected;
                 if (rejected && rejected.length > 0 && rejected[0].code === 304 && rejected[0].element) { //elem will be rejected if server detects no changes
