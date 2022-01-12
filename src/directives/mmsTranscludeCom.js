@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
+.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', 'EventService', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,9 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $templateCache, $compile, growl, MathJax) {
+function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, EventService, $templateCache, $compile, growl, MathJax) {
+
+    const eventSvc = EventService;
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
     
@@ -113,7 +115,9 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 recompile();
                 scope.panelType = "Comment";
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function (event, elementOb, continueEdit) {
+                    eventSvc.$on('element.updated', function (event) {
+                        let elementOb = data.element;
+                        let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();

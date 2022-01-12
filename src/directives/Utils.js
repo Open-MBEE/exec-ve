@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('mms.directives')
-.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$rootScope', '$compile', '$window', 'URLService', 'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService', 'TreeService', 'SessionService', 'growl', Utils]);
+.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$compile', '$window', 'URLService',
+    'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService', 'TreeService',
+    'SessionService', 'EventService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -19,9 +21,14 @@ angular.module('mms.directives')
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $window, URLService, CacheService, ElementService, ViewService, UtilsService, AuthService, PermissionsService, TreeService, SessionService, growl) {
-    const tree = TreeService.getTree();
+function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLService, CacheService,
+               ElementService, ViewService, UtilsService, AuthService, PermissionsService, TreeService, SessionService,
+               EventService, growl) {
+
+    const tree = TreeService;
     const session = SessionService;
+    const eventSvc = EventService;
+
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
             Object.keys($window.localStorage)
@@ -128,10 +135,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             editorApi.save();
         }
         ElementService.updateElement(edit)
-        .then(function(data) {
-            deferred.resolve(data);
+        .then(function(element) {
+            deferred.resolve(element);
             setupValCf(scope);
-            $rootScope.$broadcast('element.updated', data, continueEdit);
+            let data = {};
+            data.element = element;
+            data.continueEdit = (continueEdit) ? continueEdit : false;
+            eventSvc.$broadcast('element.updated', data);
         }, function(reason) {
             if (reason.status === 409) {
                 scope.latest = reason.data.elements[0];
@@ -413,7 +423,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 }
                 if (!scope.skipBroadcast) {
                     // Broadcast message for the toolCtrl:
-                    $rootScope.$broadcast('presentationElem.edit',scope.edit);
+                    eventSvc.$broadcast('presentationElem.edit',scope.edit);
                 } else {
                     scope.skipBroadcast = false;
                 }
@@ -471,7 +481,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 scope.elementSaving = false;
                 if (!continueEdit) {
                     scope.isEditing = false;
-                    $rootScope.$broadcast('presentationElem.save', scope.edit);
+                    eventSvc.$broadcast('presentationElem.save', scope.edit);
                 }
                 growl.success('Save Successful');
                 //scrollToElement(domElement);
@@ -519,7 +529,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
             scope.isEditing = false;
             revertEdits(scope, scope.edit);
              // Broadcast message for the ToolCtrl:
-            $rootScope.$broadcast('presentationElem.cancel', scope.edit);
+            eventSvc.$broadcast('presentationElem.cancel', scope.edit);
             recompile();
             // scrollToElement(domElement);
         };
@@ -601,13 +611,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                 .then(function(data) {
                     if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {
                         // Broadcast message to TreeCtrl:
-                        $rootScope.$broadcast('viewctrl.delete.element', scope.instanceSpec);
+                        eventSvc.$broadcast('viewctrl.delete.element', scope.instanceSpec);
                     }
 
-                    $rootScope.$broadcast('view-reorder.refresh');
+                    eventSvc.$broadcast('view-reorder.refresh');
 
                      // Broadcast message for the ToolCtrl:
-                    $rootScope.$broadcast('presentationElem.cancel',scope.edit);
+                    eventSvc.$broadcast('presentationElem.cancel',scope.edit);
 
                     growl.success('Remove Successful');
                 }, handleError);
@@ -653,7 +663,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
         } else { //nothing has changed, cancel instead of preview
             if (scope.edit && scope.isEditing) {
                 // Broadcast message for the ToolCtrl to clear out the tracker window:
-                $rootScope.$broadcast('presentationElem.cancel', scope.edit);
+                eventSvc.$broadcast('presentationElem.cancel', scope.edit);
                 if (scope.element) {
                     recompile();
                 }
@@ -773,8 +783,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
     };
 
     var successUpdates = function (elemType, id) {
-        $rootScope.$broadcast('view-reorder.refresh');
-        $rootScope.$broadcast('view.reorder.saved', id);
+        eventSvc.$broadcast('view-reorder.refresh');
+        eventSvc.$broadcast('view.reorder.saved', id);
         growl.success("Adding " + elemType + " Successful");
         // Show comments when creating a comment PE
         if (elemType === 'Comment' && !session.veCommentsOn()) {
@@ -917,8 +927,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
                         }
 
                         ElementService.updateElement(revertEltInfo)
-                        .then(function(data) {
-                            $rootScope.$broadcast('element.updated', data, false);
+                        .then(function(element) {
+                            let data = {};
+                            data.element = element;
+                            data.continueEdit = false;
+                            eventSvc.$broadcast('element.updated', data);
                             $uibModalInstance.close();
                             growl.success("Element reverted");
                         }, function(reason) {
@@ -975,12 +988,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $rootScope, $compile, $w
     };
 
     var toggleLeftPane = function (searchTerm) {
-        if ( searchTerm && !tree.getPane().closed ) {
-            tree.getPane().toggle();
+        if ( searchTerm && !session.treePaneClosed() ) {
+            eventSvc.$broadcast('tree-pane-closed', true);
         }
 
-        if ( !searchTerm && tree.getPane().closed ) {
-            tree.getPane().toggle();
+        if ( !searchTerm && session.treePaneClosed() ) {
+            eventSvc.$broadcast('tree-pane-closed', false);
         }
     };
 

@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService', 'PermissionsService', '$templateCache', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService',
+    'PermissionsService', 'EventService', '$templateCache', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -73,7 +74,11 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, ViewService, PermissionsService, $templateCache, growl, _) {
+function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, ViewService, PermissionsService,
+                 EventService, $templateCache, growl, _) {
+
+    const eventSvc = EventService;
+
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, domElement, attrs) {
@@ -86,13 +91,13 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
         scope.isEnumeration = false;
         //TODO pass proper args
         scope.propertyTypeClicked = function(id) {
-            var elmentOb = {id: id, _projectId: scope.mmsProjectId, _refId: scope.mmsRefId};
-            scope.$emit('elementSelected', elmentOb);
+            var elementOb = {id: id, _projectId: scope.mmsProjectId, _refId: scope.mmsRefId};
+            eventSvc.$emit('elementSelected', {elementOb: elementOb});
         };
 
         var getModifier = function(modifier) {
             AuthService.getUserData(modifier).then(function(modifierData){
-                return modifierData;
+                return modifierData.users[0];
             }, function() {
                 return modifier;
             });
@@ -150,7 +155,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                 }
                 scope.element = data;
                 AuthService.getUserData(data._modifier).then(function(modifierData){
-                    scope.modifier = modifierData;
+                    scope.modifier = modifierData.users[0];
                 }, function() {
                     scope.modifier = data._modifier;
                 });

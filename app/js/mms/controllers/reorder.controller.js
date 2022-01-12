@@ -3,11 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ReorderCtrl', ['$scope', '$rootScope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', 'TreeService', '$state', 'growl', '$q', '_',
-function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtils, TreeService, $state, growl, $q, _) {
+.controller('ReorderCtrl', ['$scope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', 'TreeService', '$state', 'growl', '$q', '_',
+function($scope, documentOb, ElementService, ViewService, MmsAppUtils, TreeService, $state, growl, $q, _) {
     $scope.doc = documentOb;
 
-    let treeApi = TreeService.getTree().getApi();
+    let treeApi = TreeService.getApi();
 
     var viewIds2node = {};
     var origViews = {};

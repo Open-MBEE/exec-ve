@@ -66,24 +66,6 @@ function veMenu(CacheService, $state, $templateCache, $sce, $timeout, UtilsServi
                 return false;
             }
         };
-        scope.$on("stomp.branchCreated", function(event, createdRef, projectId) {
-            var cacheKey = ['refs', scope.project.id];
-            if (CacheService.exists(cacheKey) && scope.project.id === projectId) {
-                var refObs = CacheService.get(cacheKey);
-                var tag = [];
-                for (var i = 0; i < refObs.length; i++) {
-                    if (refObs[i].type === "Tag")
-                        tag.push(refObs[i]);
-                }
-                scope.tags = tag;
-                var branches = [];
-                for (var j = 0; j < refObs.length; j++) {
-                    if (refObs[j].type === "Branch")
-                        branches.push(refObs[j]);
-                }
-                scope.branches = branches;
-            }
-        });
 
         var bcrumbs = [];
         var child, parentId;

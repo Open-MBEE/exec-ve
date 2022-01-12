@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('mms').factory('BrandingService', ['$rootScope', '$window', BrandingService]);
+angular.module('mms').factory('BrandingService', ['$window', BrandingService]);
 
 /**
  * @ngdoc service
@@ -9,7 +9,7 @@ angular.module('mms').factory('BrandingService', ['$rootScope', '$window', Brand
  * @description
  * Branding Service
  */
-function BrandingService($rootScope, $window) {
+function BrandingService($window) {
 
     var b = {};
     b.label                     = {};

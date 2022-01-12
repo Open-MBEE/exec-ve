@@ -6,31 +6,48 @@ angular.module('mmsApp')
 .controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
                           'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'docMeta', 'PermissionsService', 'SessionService', 'TreeService',
+                          'EventService',
 function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl,
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
-    orgOb, projectOb, refOb, refObs, groupObs, docMeta, PermissionsService, SessionService, TreeService) {
+    orgOb, projectOb, refOb, refObs, groupObs, docMeta, PermissionsService, SessionService, TreeService, EventService) {
 
     //Register with the Session Service
     let session = SessionService;
     let tree = TreeService;
-    //session.register($scope);
+    let eventSvc = EventService;
 
     $scope.filterInputPlaceholder = 'Filter groups/docs';
     if ($state.includes('project.ref.document')) {
         $scope.filterInputPlaceholder = 'Filter table of contents';
     }
 
-    //$rootScope.mmsRefOb = refOb;
     session.mmsRefOb(refOb);
 
-    $rootScope.ve_bbApi = $scope.bbApi = {};
-    //session.setStorage('ve_bbApi', $scope.bbApi = {});
+    $scope.bbApi = {};
 
     $scope.tbApi = {};
 
-    $scope.treeApi = tree.getTree().getApi();
+    $scope.treeApi = tree.getApi();
 
-    tree.getTree().setPane($scope.$pane);
+    session.treePaneClosed($scope.$pane.closed);
+    $scope.$watch($scope.$pane.closed,() => {
+        session.treePaneClosed($scope.$pane.closed);
+    });
+
+    eventSvc.$on('tree-pane-toggle',(paneClosed) => {
+       if (paneClosed === undefined) {
+           $scope.$pane.toggle();
+           session.treePaneClosed($scope.$pane.closed);
+       }
+       else if (paneClosed && !$scope.$pane.closed) {
+           $scope.$pane.toggle();
+           session.treePaneClosed($scope.$pane.closed);
+       }
+       else if (!paneClosed && $scope.$pane.closed) {
+           $scope.$pane.toggle();
+           session.treePaneClosed($scope.$pane.closed);
+       }
+    });
 
     if (session.veTreeShowPe() != null) {
         session.veTreeShowPe(false);
@@ -40,7 +57,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     $scope.projectOb = projectOb;
     $scope.refOb = refOb;
 
-    session.veFullDocMode(false);
+    //session.veFullDocMode(false);
     if ($state.includes('project.ref.document.full')) {
         session.veFullDocMode(true);
     }
@@ -65,8 +82,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             $scope.bbApi.setPermission( "tree-add-document-or-group", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );
             $scope.bbApi.setPermission( "tree-delete-document", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );
         } else if ($state.includes('project.ref.document')) {
-            // $scope.tbApi.addButton(UxService.getButtonBarButton("view-mode-dropdown"));
-            //$scope.bbApi.setToggleState('tree-show-pe', $rootScope.veTreeShowPe);
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-view"));
@@ -80,58 +95,58 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     };
 
-    $scope.$on('tree-expand', function () {
+    eventSvc.$on('tree-expand', function () {
         $scope.treeApi.expand_all();
     });
 
-    $scope.$on('tree-collapse', function () {
+    eventSvc.$on('tree-collapse', function () {
         $scope.treeApi.collapse_all();
     });
 
-    $scope.$on('tree-add-document', function () {
+    eventSvc.$on('tree-add-document', function () {
         addItem('Document');
     });
 
-    $scope.$on('tree-delete-document', function () {
+    eventSvc.$on('tree-delete-document', function () {
         $scope.deleteItem();
     });
 
-    $scope.$on('tree-add-view', function () {
+    eventSvc.$on('tree-add-view', function () {
         addItem('View');
     });
 
-    $scope.$on('tree-delete', function () {
+    eventSvc.$on('tree-delete', function () {
         $scope.deleteItem();
     });
 
-    $scope.$on('tree-delete-view', function () {
+    eventSvc.$on('tree-delete-view', function () {
         $scope.deleteItem(function (deleteBranch) {
-            $rootScope.$broadcast('mms-full-doc-view-deleted', deleteBranch);
+            eventSvc.$broadcast('mms-full-doc-view-deleted', deleteBranch);
         });
     });
 
-    $scope.$on('tree-reorder-view', function () {
+    eventSvc.$on('tree-reorder-view', function () {
         session.veFullDocMode(false);
         $scope.bbApi.setToggleState("tree-full-document", false);
         $state.go('project.ref.document.order', {search: undefined});
     });
 
-    $scope.$on('tree-reorder-group', function () {
+    eventSvc.$on('tree-reorder-group', function () {
         $state.go('project.ref.groupReorder');
     });
 
-    $scope.$on('tree-add-group', function () {
+    eventSvc.$on('tree-add-group', function () {
         addItem('Group');
     });
 
-    $scope.$on('tree-show-pe', function () {
+    eventSvc.$on('tree-show-pe', function () {
         toggle('showTree');
         session.veTreeShowPe(true);
         setPeVisibility(viewId2node[documentOb.id]);
         $scope.treeApi.refresh();
     });
 
-    $scope.$on('tree-show-views', function () {
+    eventSvc.$on('tree-show-views', function () {
         toggle('showTree');
         session.veTreeShowPe(false);
         setPeVisibility(viewId2node[documentOb.id]);
@@ -164,13 +179,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     // Set active tree view to tree
     toggle('showTree');
 
-    $scope.$on('tree-show-tables', function () {
+    eventSvc.$on('tree-show-tables', function () {
         toggle('table');
     });
-    $scope.$on('tree-show-figures', function () {
+    eventSvc.$on('tree-show-figures', function () {
         toggle('figure');
     });
-    $scope.$on('tree-show-equations', function () {
+    eventSvc.$on('tree-show-equations', function () {
         toggle('equation');
     });
 
@@ -200,7 +215,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     }
 
-    $scope.$on('tree-full-document', function () {
+    eventSvc.$on('tree-full-document', function () {
         $scope.fullDocMode();
     });
 
@@ -423,7 +438,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             // var sectionId = branch.type === 'section' ? branch.data.id : null;
             var hash = branch.data.id;
             if (session.veFullDocMode()) {
-                $rootScope.$broadcast('mms-tree-click', branch);
+                eventSvc.$broadcast('mms-tree-click', branch);
             } else if (branch.type === 'view' || branch.type === 'section') {
                 $state.go('project.ref.document.view', {viewId: branch.data.id, search: undefined});
             } else {
@@ -434,7 +449,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                 }, 1000, false);
             }
         }
-        //$rootScope.ve_tbApi.select('element-viewer');
     };
 
     var treeDblclickHandler = function (branch) {
@@ -449,42 +463,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     };
 
-    // TODO: Update sort function to handle all cases
-    var treeSortFunction = function (a, b) {
 
-        a.priority = 100;
-        if (a.type === 'tag') {
-            a.priority = 0;
-        } else if (a.type === 'group') {
-            a.priority = 1;
-        } else if (a.type === 'view') {
-            a.priority = 2;
-        }
-        b.priority = 100;
-        if (b.type === 'tag') {
-            b.priority = 0;
-        } else if (b.type === 'group') {
-            b.priority = 1;
-        } else if (b.type === 'view') {
-            b.priority = 2;
-        }
-
-        if (a.priority < b.priority)
-            return -1;
-        if (a.priority > b.priority)
-            return 1;
-        if (!a.label) {
-            a.label = '';
-        }
-        if (!b.label) {
-            b.label = '';
-        }
-        if (a.label.toLowerCase() < b.label.toLowerCase())
-            return -1;
-        if (a.label.toLowerCase() > b.label.toLowerCase())
-            return 1;
-        return 0;
-    };
 
     $scope.treeOptions = {
         types: UxService.getTreeTypes(),
@@ -495,7 +474,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         search: '',
         onSelect: 'tree-click',
         onDblclick: 'tree-double-click',
-        sort: $state.includes('project.ref.document') ? null : treeSortFunction
+        sort: !$state.includes('project.ref.document')
     };
     if (documentOb && docMeta) {
         $scope.treeOptions.numberingDepth = docMeta.numberingDepth;
@@ -503,11 +482,13 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.treeOptions.startChapter = documentOb._startChapter;
     }
 
-    $scope.$on($scope.treeOptions.onDblclick, (event, args) => {
+    session.treeOptions($scope.treeOptions);
+
+    eventSvc.$on($scope.treeOptions.onDblclick, (args) => {
         treeDblclickHandler(args.branch);
     });
 
-    $scope.$on($scope.treeOptions.onSelect, (event, args) => {
+    eventSvc.$on($scope.treeOptions.onSelect, (args) => {
         treeClickHandler(args.branch);
     });
 
@@ -589,7 +570,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
             controller: ['$scope', '$uibModalInstance', '$filter', addItemCtrl]
         });
         instance.result.then(function (data) {
-            if (!$rootScope.ve_editmode) {
+            if (!session.veEditMode()) {
                 $timeout(function () {
                     $('.show-edits').click();
                 }, 0, false);
@@ -609,7 +590,12 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     var num = 1;
                     for (var i = 0; i < node.children.length; i++) {
                         var cNode = node.children[i];
-                        $rootScope.$broadcast('mms-new-view-added', cNode.data.id, curSection + '.' + num, lastChild);
+                        var data = {
+                            vId: cNode.data.id,
+                            curSec: curSection + '.' + num,
+                            prevSibId: lastChild
+                        };
+                        eventSvc.$broadcast('mms-new-view-added', data);
                         lastChild = addToFullDocView(cNode, curSection + '.' + num, cNode.data.id);
                         num = num + 1;
                     }
@@ -638,9 +624,9 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     $state.go('project.ref.document.view', {viewId: data.id, search: undefined});
                 } else {
                     if (prevBranch) {
-                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, prevBranch.data.id);
+                        eventSvc.$broadcast('mms-new-view-added', {vId: data.id, curSec: curNum, prevSibId: prevBranch.data.id});
                     } else {
-                        $rootScope.$broadcast('mms-new-view-added', data.id, curNum, branch.data.id);
+                        eventSvc.$broadcast('mms-new-view-added', {vId: data.id, curSec: curNum, prevSibId: branch.data.id});
                     }
                 }
             }
@@ -894,7 +880,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     }
 
     // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
-    $scope.$on('viewctrl.add.element', function (event, instanceSpec, elemType, parentBranchData) {
+    eventSvc.$on('viewctrl.add.element', function (event, instanceSpec, elemType, parentBranchData) {
         if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
             return;
         var branch = $scope.treeApi.get_branch(parentBranchData);
@@ -935,7 +921,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
     });
 
     // Utils creates this event when deleting instances from the view
-    $scope.$on('viewctrl.delete.element', function (event, elementData) {
+    eventSvc.$on('viewctrl.delete.element', function (elementData) {
         var branch = $scope.treeApi.get_branch(elementData);
         if (branch) {
             $scope.treeApi.remove_single_branch(branch);
@@ -943,7 +929,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         resetPeTreeList(branch.type);
     });
 
-    $scope.$on('view.reorder.saved', function (event, vid) {
+    eventSvc.$on('view.reorder.saved', function (vid) {
         var node = viewId2node[vid];
         var viewNode = node;
         var newChildren = [];

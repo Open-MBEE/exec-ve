@@ -1,11 +1,12 @@
 'use strict';
 
 angular.module('mms')
-    .factory('SessionService', ['$window', '$rootScope', '_', SessionService]);
+    .factory('SessionService', ['$window', 'EventService', '_', SessionService]);
 
-function SessionService($window, $rootScope) {
+function SessionService($window, EventService) {
     this.scopes = [];
     let sessionStorage = $window.sessionStorage;
+    let eventSvc = EventService;
 
     let setStorage = (key, value) => {
         let i, len, ref, scope;
@@ -24,6 +25,10 @@ function SessionService($window, $rootScope) {
             return null;
         }
         return JSON.parse(sessionValue);
+    };
+
+    const removeStorage = (key) => {
+        return sessionStorage.removeItem(key);
     };
 
     const register = (scope) => {
@@ -55,13 +60,22 @@ function SessionService($window, $rootScope) {
         if (value == null) {
             return getStorage(name);
         }
+        if (value === constants.DELETEKEY) {
+            return removeStorage(name);
+        }
+        const result = setStorage(name, value);
         if (emit === undefined || emit === true)
-            $rootScope.$broadcast(name);
+            eventSvc.$broadcast(name,{data: value});
 
-        return setStorage(name, value);
+        return result;
     };
 
     const constants = {
+        DELETEKEY: 'session-delete',
+        VETITLE: 've-title',
+        VEFN: 've-fn',
+        VEVIEWCONTENTLOADING: 've-view-content-loading',
+        TREEINITIAL: 'tree-initial',
         TREEDATA: 'tree-data',
         TREEROWS: 'tree-rows',
         TREEOPTIONS: 'tree-options',
@@ -74,10 +88,59 @@ function SessionService($window, $rootScope) {
         return accessor('mms-ref-ob', value);
     };
 
+    const mmsPaneToggleable = (value=null) => {
+        return accessor('mms-pane-toggleable', value);
+    };
+
+    const mmsPaneClosed = (value=null) => {
+        return accessor('mms-pane-closed', value);
+    };
+
+    const veTitle = (value=null) => {
+        return accessor(constants.VETITLE, value);
+    };
+
+    const veFn = (value=null) => {
+        return accessor(constants.VEFN, value);
+    };
+
+
+    const veStateChanging = (value=null) => {
+        return accessor('ve-state-changing', value);
+    };
+
+    const veViewContentLoading = (value=null) => {
+        return accessor(constants.VEVIEWCONTENTLOADING, value);
+    };
+
+    const veRedirect = (value=null) => {
+        return accessor('ve-redirect', value);
+    };
+
+    const redirectFromOld = (value=null) => {
+        return accessor('redirect-old', value);
+    };
+
+    const crushUrl = (value=null) => {
+        return accessor('crush-url', value);
+    };
+
+    const diffPerspective = (value=null) => {
+        return accessor('diff-perspective', value);
+    };
+
     const veTreeShowPe = (value=null) => {
         return accessor('ve-tree-show-pe', value);
     };
     const veFullDocMode = (value=null) => {
+        if (!value) {
+            let fullDoc = accessor('ve-full-doc-mode', value);
+            if (!fullDoc) {
+                fullDoc = false;
+                accessor('ve-full-doc-mode', fullDoc, false);
+            }
+            return fullDoc;
+        }
         return accessor('ve-full-doc-mode', value);
     };
 
@@ -93,18 +156,6 @@ function SessionService($window, $rootScope) {
         return accessor('ve-edit-mode', value);
     };
 
-    const treeData = (value=null) => {
-        if (!value) {
-            var td = accessor(constants.TREEDATA, value);
-            if (!td) {
-                td = {};
-                accessor(constants.TREEDATA, td, false);
-            }
-            return td;
-        }
-
-        return accessor(constants.TREEDATA, value);
-    };
     const treeRows  = (value=null) => {
         return accessor(constants.TREEROWS, value);
     };
@@ -128,20 +179,34 @@ function SessionService($window, $rootScope) {
         return accessor(constants.TREEICONS, value);
     };
 
+    const treePaneClosed = (value=null) => {
+        return accessor('tree-pane-closed', value);
+    };
+
     return {
         register: register,
         clear: clear,
         mmsRefOb: mmsRefOb,
+        mmsPaneToggleable: mmsPaneToggleable,
+        mmsPaneClosed: mmsPaneClosed,
+        veTitle: veTitle,
+        veFn: veFn,
+        veStateChanging: veStateChanging,
+        veViewContentLoading: veViewContentLoading,
+        veRedirect: veRedirect,
+        redirectFromOld: redirectFromOld,
+        crushUrl: crushUrl,
+        diffPerspective: diffPerspective,
         veTreeShowPe: veTreeShowPe,
         veFullDocMode: veFullDocMode,
         veCommentsOn: veCommentsOn,
         veElementsOn: veElementsOn,
         veEditMode: veEditMode,
-        treeData: treeData,
         treeRows: treeRows,
         treeOptions: treeOptions,
         treeInitialSelection: treeInitialSelection,
         treeIcons: treeIcons,
+        treePaneClosed: treePaneClosed,
         constants: constants
     };
 }

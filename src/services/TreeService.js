@@ -1,58 +1,39 @@
 'use strict';
 
 angular.module('mms')
-    .factory('TreeService', ['$rootScope', '$timeout', 'SessionService', TreeService]);
+    .factory('TreeService', ['$timeout', 'SessionService', 'EventService', TreeService]);
 
-function TreeService($rootScope, $timeout, SessionService) {
-    this.tree = null;
+function TreeService($timeout, SessionService, EventService) {
 
-    var getTree = () => {
-        if (this.tree !== null) {
-            return this.tree;
+    this.treeApi = {};
+    this.treeData = [];
+    this.treeRows = [];
+
+    const getApi = (treeData, treeRows) => {
+        if (treeData) {
+            this.treeData = treeData;
         }
-        this.tree = new Tree($rootScope, $timeout, SessionService);
-        return this.tree;
+        if (treeRows) {
+            this.treeRows = treeRows;
+        }
+        else if (!(this.treeApi instanceof TreeApi)) {
+            this.treeApi = new TreeApi($timeout, SessionService, EventService, this);
+        }
+        return this.treeApi;
     };
 
     return {
-        getTree: getTree
+        getApi: getApi,
+        treeData: this.treeData,
+        treeRows: this.treeRows
     };
 }
 
-function Tree($rootScope, $timeout, SessionService) {
-    let ve_tree_pane = null;
-
-    let ve_treeApi = {};
-
-    const setPane = (pane) => {
-        ve_tree_pane = pane;
-    };
-
-    const getPane = () => {
-        return ve_tree_pane;
-    };
-
-    const getApi = () => {
-        if (!(ve_treeApi instanceof TreeApi)) {
-            ve_treeApi = new TreeApi($rootScope, $timeout, SessionService);
-        }
-        return ve_treeApi;
-    };
-
-    return {
-        getPane: getPane,
-        setPane: setPane,
-        getApi: getApi
-    };
-
-
-}
-function TreeApi($rootScope, $timeout, SessionService) {
-    const tree = this;
+function TreeApi($timeout, SessionService, EventService, TreeService) {
+    const eventSvc = EventService;
+    const tree = TreeService;
     let selected_branch = null;
     const session = SessionService;
-
-    //var get_parent = get_parent;
 
     /**
      * @ngdoc function
@@ -62,11 +43,11 @@ function TreeApi($rootScope, $timeout, SessionService) {
      * @description
      * self explanatory
      */
-    tree.expand_all = function() {
-        for_each_branch(function(b, level) {
+    this.expand_all = function() {
+        for_each_branch( function(b, level) {
             //scope.expandCallback({ branch: b });
             b.expanded = true;
-        });
+        },null,true);
         on_treeData_change();
     };
     /**
@@ -77,19 +58,19 @@ function TreeApi($rootScope, $timeout, SessionService) {
      * @description
      * self explanatory
      */
-    tree.collapse_all = function(excludeBranch) {
+    this.collapse_all = function(excludeBranch) {
         for_each_branch(function(b, level) {
             b.expanded = false;
-        }, excludeBranch);
+        }, excludeBranch, true);
         on_treeData_change();
     };
 
-    tree.get_first_branch = function() {
-        if (session.treeData().length > 0)
-            return session.treeData()[0];
+    this.get_first_branch = function() {
+        if (tree.treeData.length > 0)
+            return tree.treeData[0];
     };
-    tree.select_first_branch = function() {
-        var b = tree.get_first_branch();
+    this.select_first_branch = function() {
+        var b = this.get_first_branch();
         select_branch(b);
     };
     /**
@@ -102,19 +83,19 @@ function TreeApi($rootScope, $timeout, SessionService) {
      *
      * @return {Object} current selected branch
      */
-    tree.get_selected_branch = function() {
+    this.get_selected_branch = function() {
         return selected_branch;
     };
 
-    tree.clear_selected_branch = function() {
+    this.clear_selected_branch = function() {
         selected_branch = null;
     };
 
 
-    tree.get_children = function(b) {
+    this.get_children = function(b) {
         return b.children;
     };
-    tree.select_parent_branch = function(b) {
+    this.select_parent_branch = function(b) {
         var p = get_parent(b);
         if (p)
             select_branch(p);
@@ -130,7 +111,7 @@ function TreeApi($rootScope, $timeout, SessionService) {
      * @param {Object} parent parent branch or null
      * @param {Object} new_branch branch to add to parent or root
      */
-    tree.add_branch = function(parent, new_branch, top) {
+    this.add_branch = function(parent, new_branch, top) {
         if (parent) {
             if (top)
                 parent.children.unshift(new_branch);
@@ -138,29 +119,26 @@ function TreeApi($rootScope, $timeout, SessionService) {
                 parent.children.push(new_branch);
             parent.expanded = true;
         } else {
-            var td = session.treeData();
             if (top)
-                td.unshift(new_branch);
+                tree.treeData.unshift(new_branch);
             else
-                td.push(new_branch);
-            session.treeData(td);
+                tree.treeData.push(new_branch);
         }
-        on_treeData_change();
     };
 
-    tree.remove_branch = function(branch) {
+    this.remove_branch = function(branch) {
         remove_branch(branch);
         on_treeData_change();
     };
 
-    tree.remove_single_branch = function(branch) {
+    this.remove_single_branch = function(branch) {
         remove_single_branch(branch);
         on_treeData_change();
     };
 
-    tree.add_root_branch = function(new_branch) {
-        tree.add_branch(null, new_branch);
-    };
+    // this.add_root_branch = function(new_branch) {
+    //     this.add_branch(null, new_branch);
+    // };
     /**
      * @ngdoc function
      * @name mms.directives.directive:mmsTree#expand_branch
@@ -171,9 +149,9 @@ function TreeApi($rootScope, $timeout, SessionService) {
      *
      * @param {Object} branch branch to expand
      */
-    tree.expand_branch = function(b) {
+    this.expand_branch = function(b) {
         if (!b)
-            b = tree.get_selected_branch();
+            b = this.get_selected_branch();
         if (b) {
             //scope.expandCallback({ branch: b });
             b.expanded = true;
@@ -191,61 +169,61 @@ function TreeApi($rootScope, $timeout, SessionService) {
      *
      * @param {Object} branch branch to collapse
      */
-    tree.collapse_branch = function(b) {
+    this.collapse_branch = function(b) {
         if (!b)
             b = selected_branch;
         if (b)
             b.expanded = false;
         on_treeData_change();
     };
-    tree.get_siblings = function(b) {
+    this.get_siblings = function(b) {
         var siblings;
         var p = get_parent(b);
         if (p)
             siblings = p.children;
         else
-            siblings = session.treeData();
+            siblings = tree.treeData;
         return siblings;
     };
-    tree.get_next_sibling = function(b) {
-        var siblings = tree.get_siblings(b);
+    this.get_next_sibling = function(b) {
+        var siblings = this.get_siblings(b);
         if (angular.isArray(siblings)) {
             var i = siblings.indexOf(b);
             if (i < siblings.length - 1)
                 return siblings[i + 1];
         }
     };
-    tree.get_prev_sibling = function(b) {
-        var siblings = tree.get_siblings(b);
+    this.get_prev_sibling = function(b) {
+        var siblings = this.get_siblings(b);
         if (angular.isArray(siblings)) {
             var i = siblings.indexOf(b);
             if (i > 0)
                 return siblings[i - 1];
         }
     };
-    tree.select_next_sibling = function(b) {
-        var next = tree.get_next_silbing(b);
+    this.select_next_sibling = function(b) {
+        var next = this.get_next_silbing(b);
         if (next)
             select_branch(next);
     };
-    tree.select_prev_sibling = function(b) {
-        var prev = tree.get_prev_sibling(b);
+    this.select_prev_sibling = function(b) {
+        var prev = this.get_prev_sibling(b);
         if (prev)
             select_branch(prev);
     };
-    tree.get_first_child = function(b) {
+    this.get_first_child = function(b) {
         if (!b)
             b =  selected_branch;
         if (b && b.children && b.children.length > 0)
             return b.children[0];
     };
-    tree.get_closest_ancestor_next_sibling = function(b) {
-        var next = tree.get_next_sibling(b);
+    this.get_closest_ancestor_next_sibling = function(b) {
+        var next = this.get_next_sibling(b);
         if (next)
             return next;
         else {
             next = get_parent(b);
-            return tree.get_closest_ancestor_next_sibling(next);
+            return this.get_closest_ancestor_next_sibling(next);
         }
     };
     /**
@@ -259,15 +237,15 @@ function TreeApi($rootScope, $timeout, SessionService) {
      * @param {Object} branch current branch
      * @return {Object} next branch
      */
-    tree.get_next_branch = function(b) {
+    this.get_next_branch = function(b) {
         if (!b)
             b =  selected_branch;
         if (b) {
-            var next = tree.get_first_child(b);
+            var next = this.get_first_child(b);
             if (next)
                 return next;
             else {
-                next = tree.get_closest_ancestor_next_sibling(b);
+                next = this.get_closest_ancestor_next_sibling(b);
                 return next;
             }
         }
@@ -282,17 +260,17 @@ function TreeApi($rootScope, $timeout, SessionService) {
      *
      * @param {Object} branch current branch
      */
-    tree.select_next_branch = function(b) {
-        var next = tree.get_next_branch(b);
+    this.select_next_branch = function(b) {
+        var next = this.get_next_branch(b);
         if (next)
             select_branch(next);
     };
-    tree.last_descendant = function(b) {
+    this.last_descendant = function(b) {
         if (b) {
             if (b.children.length === 0)
                 return b;
             var last = b.children[b.children.length - 1];
-            return tree.last_descendant(last);
+            return this.last_descendant(last);
         }
     };
     /**
@@ -306,10 +284,10 @@ function TreeApi($rootScope, $timeout, SessionService) {
      * @param {Object} branch current branch
      * @return {Object} previous branch
      */
-    tree.get_prev_branch = function(b) {
-        var prev_sibling = tree.get_prev_sibling(b);
+    this.get_prev_branch = function(b) {
+        var prev_sibling = this.get_prev_sibling(b);
         if (prev_sibling)
-            return tree.last_descendant(prev_sibling);
+            return this.last_descendant(prev_sibling);
         return get_parent(b);
     };
     /**
@@ -322,8 +300,8 @@ function TreeApi($rootScope, $timeout, SessionService) {
      *
      * @param {Object} branch current branch
      */
-    tree.select_prev_branch = function(b) {
-        var prev = tree.get_prev_branch(b);
+    this.select_prev_branch = function(b) {
+        var prev = this.get_prev_branch(b);
         if (prev)
             select_branch(prev);
     };
@@ -336,15 +314,15 @@ function TreeApi($rootScope, $timeout, SessionService) {
      * @description
      * rerender the tree when data or options change
      */
-    tree.refresh = function() {
+    this.refresh = function() {
         on_treeData_change();
     };
 
-    tree.initialSelect = function() {
+    this.initialSelect = function() {
         on_initialSelection_change();
     };
 
-    tree.sort_branch = function(b, sortFunction) {
+    this.sort_branch = function(b, sortFunction) {
         b.children.sort(sortFunction);
     };
 
@@ -356,7 +334,7 @@ function TreeApi($rootScope, $timeout, SessionService) {
      * @description
      * Returns the branch with the specified data
      */
-    tree.get_branch = function(data) {
+    this.get_branch = function(data) {
         var branch = null;
         for_each_branch(function(b) {
             // if (angular.equals(b.data,data)) {
@@ -369,18 +347,17 @@ function TreeApi($rootScope, $timeout, SessionService) {
         return branch;
     };
 
-    tree.get_rows = function() {
-        return session.treeRows();
+    this.get_rows = function() {
+        return tree.treeRows;
     };
 
-    tree.user_clicks_branch = function(branch) {
+    this.user_clicks_branch = function(branch) {
         if (branch !== selected_branch)
-            tree.select_branch(branch);
+            this.select_branch(branch);
         //return scope.user_clicks_branch(branch);
     };
 
-    var for_each_branch = function(func, excludeBranch) {
-        var treeData = session.treeData();
+    var for_each_branch = function(func, excludeBranch, modify) {
         var run = function(branch, level) {
             func(branch, level);
             if (branch.children) {
@@ -389,21 +366,19 @@ function TreeApi($rootScope, $timeout, SessionService) {
                 }
             }
         };
-        var rootLevelBranches = excludeBranch ? treeData.filter(function(branch) { return branch !== excludeBranch; }) : treeData;
+        var rootLevelBranches = excludeBranch ? tree.treeData.filter(function(branch) { return branch !== excludeBranch; }) : tree.treeData;
         rootLevelBranches.forEach(function (branch) { run(branch, 1); });
     };
 
     var remove_branch_impl = function (branch, singleBranch) {
         var parent_branch = get_parent(branch);
         if (!parent_branch) {
-            var td = session.treeData();
-            for (var j = 0; j < td.length; j++) {
-                if (td[j].uid === branch.uid) {
-                    td.splice(j,1);
+            for (var j = 0; j < tree.treeData.length; j++) {
+                if (tree.treeData[j].uid === branch.uid) {
+                    tree.treeData.splice(j,1);
                     break;
                 }
             }
-            session.treeData(td);
             return;
         }
         for (var i = 0; i < parent_branch.children.length; i++) {
@@ -490,13 +465,14 @@ function TreeApi($rootScope, $timeout, SessionService) {
             if (!noClick) {
                 var options = session.treeOptions();
                 if (branch.onSelect) {
-                    $rootScope.$broadcast(branch.onSelect,{ branch: branch });
+                    eventSvc.$broadcast(branch.onSelect,{ branch: branch });
                 } else if (options.onSelect) {
-                    $rootScope.$broadcast(options.onSelect,{ branch: branch });
+                    eventSvc.$broadcast(options.onSelect,{ branch: branch });
                 }
             }
             if (branch.data.id) {
-                $rootScope.$broadcast('tree-get-branch-element', { id: branch.data.id });
+                console.log(branch.data.id);
+                eventSvc.$broadcast('tree-get-branch-element', { id: branch.data.id });
                 // $timeout(function() {
                 //     var el = angular.element('#tree-branch-' + branch.data.id);
                 //     if (!el.isOnScreen()) {
@@ -523,7 +499,6 @@ function TreeApi($rootScope, $timeout, SessionService) {
     };
 
     var on_treeData_change = function() {
-        let td = session.treeData();
         for_each_branch(function(b, level) {
             if (!b.uid)
                 b.uid = '' + Math.random();
@@ -536,10 +511,15 @@ function TreeApi($rootScope, $timeout, SessionService) {
                 }
             }
         });
-        session.treeRows([]);
-        let tree_rows = session.treeRows();
-        var options = session.treeOptions();
-        var icons = session.treeIcons();
+        //session.treeRows(['bar']);
+        tree.treeRows.length = 0;
+        const tree_rows = [];
+        const options = session.treeOptions();
+        const icons = session.treeIcons();
+
+        if (options.sort) {
+            tree.treeData.sort(treeSortFunction);
+        }
         var add_branch_to_list = function(level, section, branch, visible, peNums) {
             var expand_icon = "";
             var type_icon = "";
@@ -616,7 +596,7 @@ function TreeApi($rootScope, $timeout, SessionService) {
             if (branch.children) {
                 var alpha = false;
                 if (options.sort) {
-                    branch.children.sort(options.sort);
+                    branch.children.sort(treeSortFunction);
                 }
                 var j = options.startChapter;
                 if (j === null || j === undefined || level != 1) {
@@ -649,20 +629,53 @@ function TreeApi($rootScope, $timeout, SessionService) {
             }
         };
 
-        if (options.sort) {
-            td.sort(options.sort);
-            session.treeData(td);
-        }
 
-        for (var i = 0; i < td.length; i++) {
-            add_branch_to_list(1, [], td[i], true, {figure: 0, table: 0, equation: 0});
+        for (var i = 0; i < tree.treeData.length; i++) {
+            add_branch_to_list(1, [], tree.treeData[i], true, {figure: 0, table: 0, equation: 0});
         }
-        session.treeRows(tree_rows);
+        tree.treeRows.push.apply(tree.treeRows,tree_rows);
     };
 
-    tree.select_branch = select_branch;
-    tree.for_each_branch = for_each_branch;
-    tree.on_treeData_change = on_treeData_change;
-    tree.on_initialSelection_change = on_initialSelection_change;
+    // TODO: Update sort function to handle all cases
+    var treeSortFunction = function (a, b) {
+
+        a.priority = 100;
+        if (a.type === 'tag') {
+            a.priority = 0;
+        } else if (a.type === 'group') {
+            a.priority = 1;
+        } else if (a.type === 'view') {
+            a.priority = 2;
+        }
+        b.priority = 100;
+        if (b.type === 'tag') {
+            b.priority = 0;
+        } else if (b.type === 'group') {
+            b.priority = 1;
+        } else if (b.type === 'view') {
+            b.priority = 2;
+        }
+
+        if (a.priority < b.priority)
+            return -1;
+        if (a.priority > b.priority)
+            return 1;
+        if (!a.label) {
+            a.label = '';
+        }
+        if (!b.label) {
+            b.label = '';
+        }
+        if (a.label.toLowerCase() < b.label.toLowerCase())
+            return -1;
+        if (a.label.toLowerCase() > b.label.toLowerCase())
+            return 1;
+        return 0;
+    };
+
+    this.select_branch = select_branch;
+    this.for_each_branch = for_each_branch;
+    this.on_treeData_change = on_treeData_change;
+    this.on_initialSelection_change = on_initialSelection_change;
 
 }

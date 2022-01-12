@@ -5,9 +5,15 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$rootScope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
             'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
-            'PermissionsService',
+            'PermissionsService', 'SessionService', 'EventService', 'EditService', 'ToolbarService',
 function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
-    ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils, PermissionsService) {
+            ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils,
+            PermissionsService, SessionService, EventService, EditService, ToolbarService) {
+
+    const session = SessionService;
+    const eventSvc = EventService;
+    const edit = EditService;
+    let toolbar = ToolbarService.getApi();
 
     $scope.specInfo = {
         refId: refOb.id,
@@ -33,7 +39,23 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
 
     $scope.specApi = {};
     $scope.viewContentsOrderApi = {};
-    $rootScope.ve_togglePane = $scope.$pane;
+
+    session.mmsPaneClosed($scope.$pane.closed);
+    $scope.$watch($scope.$pane.closed,() => {
+        session.mmsPaneClosed($scope.$pane.closed);
+    });
+
+    eventSvc.$on('mms-pane-toggle',(paneClosed) => {
+        if (paneClosed === undefined) {
+            $scope.$pane.toggle();
+        }
+        else if (paneClosed && !$scope.$pane.closed) {
+            $scope.$pane.toggle();
+        }
+        else if (!paneClosed && $scope.$pane.closed) {
+            $scope.$pane.toggle();
+        }
+    });
 
     $scope.show = {
         element: true,
@@ -42,13 +64,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         reorder: false
     };
     $scope.tracker = {};
-    if (!$rootScope.ve_edits)
-        $rootScope.ve_edits = {};
 
-    // Set edit count for tracker view
-    $scope.veEditsLength = function() {
-        return Object.keys($rootScope.ve_edits).length;
-    };
 
     $scope.etrackerChange = function() {
         $scope.specApi.keepMode();
@@ -60,7 +76,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.specInfo.projectId = info[1];
         $scope.specInfo.refId = info[2];
         $scope.specInfo.commitId = 'latest';
-        $rootScope.ve_tbApi.setPermission('element-editor', true);
+        toolbar.setPermission('element-editor', true);
     };
 
     var showPane = function(pane) {
@@ -74,25 +90,25 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
     var cleanUpSaveAll = function() {
-        if ($scope.veEditsLength() > 0) {
-            $rootScope.ve_tbApi.setPermission('element-editor-saveall', true);
-            $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit-asterisk');
+        if (edit.openEdits() > 0) {
+            toolbar.setPermission('element-editor-saveall', true);
+            toolbar.setIcon('element-editor', 'fa-edit-asterisk');
         } else {
-            $rootScope.ve_tbApi.setPermission('element-editor-saveall', false);
-            $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+            toolbar.setPermission('element-editor-saveall', false);
+            toolbar.setIcon('element-editor', 'fa-edit');
         }
     };
 
-    $scope.$on('element-history', function() {
+    eventSvc.$on('element-history', function() {
         showPane('history');
     });
 
-    $scope.$on('tags', function() {
+    eventSvc.$on('tags', function() {
         showPane('tags');
     });
 
-    $scope.$on('gotoTagsBranches', function(){
-        $rootScope.ve_tbApi.select('tags');
+    eventSvc.$on('gotoTagsBranches', function(){
+        toolbar.select('tags');
         showPane('tags');
     });
 
@@ -104,50 +120,53 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         }
     };
 
-    $scope.$on('presentationElem.edit', function(event, editOb) {
+    eventSvc.$on('presentationElem.edit', function(event, editOb) {
         var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-        $rootScope.ve_edits[key] = editOb;
+        edit.addOrUpdate(key, editOb);
         cleanUpSaveAll();
     });
 
-    $scope.$on('presentationElem.save', function(event, editOb) {
+    eventSvc.$on('presentationElem.save', function(event, editOb) {
         cleanUpEdit(editOb, true);
     });
 
-    $scope.$on('presentationElem.cancel', function(event, editOb) {
+    eventSvc.$on('presentationElem.cancel', function(event, editOb) {
         cleanUpEdit(editOb);
     });
 
-    var elementSelected = function(event, elementOb, commitId, displayOldContent) {
+    var elementSelected = function(data) {
+        let elementOb = data.elementOb;
+        let commitId = (data.commitId) ? data.commitId : null;
+        let displayOldContent = (data.displayOldContent) ? data.displayOldContent : null;
         $scope.specInfo.id = elementOb.id;
         $scope.specInfo.projectId = elementOb._projectId;
         $scope.specInfo.refId = elementOb._refId;
         $scope.specInfo.commitId = commitId ? commitId : elementOb._commitId;
         $scope.specInfo.mmsDisplayOldContent = displayOldContent;
         if($scope.show.element) {
-            $rootScope.ve_tbApi.select('element-viewer');
+            toolbar.select('element-viewer');
         }
         if ($scope.specApi.setEditing) {
             $scope.specApi.setEditing(false);
         }
         var editable = $scope.refOb.type === 'Branch' && commitId === 'latest' && PermissionsService.hasBranchEditPermission($scope.refOb);
-        $rootScope.ve_tbApi.setPermission('element-editor', editable);
+        toolbar.setPermission('element-editor', editable);
         $rootScope.$digest();
     };
-    $scope.$on('elementSelected', elementSelected);
-    $scope.$on('element-viewer', function() {
+    eventSvc.$on('elementSelected', elementSelected);
+    eventSvc.$on('element-viewer', function() {
         $scope.specApi.setEditing(false);
         cleanUpSaveAll();
         showPane('element');
     });
-    $scope.$on('element-editor', function() {
+    eventSvc.$on('element-editor', function() {
         $scope.specApi.setEditing(true);
         showPane('element');
         var editOb = $scope.specApi.getEdits();
         if (editOb) {
             var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
             $scope.tracker.etrackerSelected = key;
-            $rootScope.ve_edits[key] = editOb;
+            edit.addOrUpdate(key, editOb);
             cleanUpSaveAll();
         }
         ElementService.isCacheOutdated(editOb)
@@ -156,28 +175,30 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 growl.error('This element has been updated on the server. Please refresh the page to get the latest version.');
         });
     });
-    $scope.$on('viewSelected', function(event, elementOb, commitId) {
-        elementSelected(event, elementOb, commitId);
+    eventSvc.$on('viewSelected', function(event, data) {
+        let elementOb = data.elementOb;
+        let commitId = (data.commitId) ? data.commitId : null;
+        elementSelected(event, data);
         $scope.viewOb = elementOb;
         var editable = $scope.refOb.type === 'Branch' && commitId === 'latest' && PermissionsService.hasBranchEditPermission($scope.refOb);
         $scope.viewCommitId = commitId ? commitId : elementOb._commitId;
-        $rootScope.ve_tbApi.setPermission('view-reorder', editable);
+        toolbar.setPermission('view-reorder', editable);
     });
 
-    $scope.$on('view-reorder.refresh', function() {
+    eventSvc.$on('view-reorder.refresh', function() {
         $scope.viewContentsOrderApi.refresh();
     });
 
-    $scope.$on('view-reorder', function() {
+    eventSvc.$on('view-reorder', function() {
         $scope.viewContentsOrderApi.setEditing(true);
         showPane('reorder');
     });
 
     var elementSaving = false;
-    $scope.$on('element-editor-save', function() {
+    eventSvc.$on('element-editor-save', function() {
         save(false);
     });
-    $scope.$on('element-editor-saveC', function() {
+    eventSvc.$on('element-editor-saveC', function() {
         save(true);
     });
     var save = function(continueEdit) {
@@ -189,9 +210,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
         Utils.clearAutosaveContent(edit._projectId + edit._refId + edit.id, edit.type);
         elementSaving = true;
         if (!continueEdit)
-            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save');
+            toolbar.toggleButtonSpinner('element-editor-save');
         else
-            $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveC');
+            toolbar.toggleButtonSpinner('element-editor-saveC');
         $timeout(function() {
         $scope.specApi.save().then(function(data) {
             elementSaving = false;
@@ -200,9 +221,9 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 return;
             var edit = $scope.specApi.getEdits();
             var key = edit.id + '|' + edit._projectId + '|' + edit._refId;
-            delete $rootScope.ve_edits[key];
-            if (Object.keys($rootScope.ve_edits).length > 0) {
-                var next = Object.keys($rootScope.ve_edits)[0];
+            edit.remove(key);
+            if (edit.openEdits() > 0) {
+                var next = edit.getAll()[0];
                 var id = next.split('|');
                 $scope.tracker.etrackerSelected = next;
                 $scope.specApi.keepMode();
@@ -212,7 +233,7 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 $scope.specInfo.commitId = 'latest';
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.ve_tbApi.select('element-viewer');
+                toolbar.select('element-viewer');
                 cleanUpSaveAll();
             }
         }, function(reason) {
@@ -225,46 +246,48 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 growl.error(reason.message);
         }).finally(function() {
             if (!continueEdit)
-                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-save');
+                toolbar.toggleButtonSpinner('element-editor-save');
             else
-                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveC');
+                toolbar.toggleButtonSpinner('element-editor-saveC');
         });
         }, 1000, false);
-        $rootScope.ve_tbApi.select('element-editor');
+        toolbar.select('element-editor');
     };
 
     hotkeys.bindTo($scope)
     .add({
         combo: 'alt+a',
         description: 'save all',
-        callback: function() {$scope.$broadcast('element-editor-saveall');}
+        callback: function() {eventSvc.$broadcast('element-editor-saveall');}
     });
     var savingAll = false;
-    $scope.$on('element-editor-saveall', function() {
+    eventSvc.$on('element-editor-saveall', function() {
         if (savingAll) {
             growl.info('Please wait...');
             return;
         }
-        var ve_edits = $rootScope.ve_edits;
-        if (Object.keys(ve_edits).length === 0) {
+        if (edit.openEdits() === 0) {
             growl.info('Nothing to save');
             return;
         }
 
-        Object.values(ve_edits).forEach(function(ve_edit) {
+        Object.values(edit.getAll()).forEach(function(ve_edit) {
            Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
         });
 
         if ($scope.specApi && $scope.specApi.editorSave)
             $scope.specApi.editorSave();
         savingAll = true;
-        $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
+        toolbar.toggleButtonSpinner('element-editor-saveall');
         ElementService.updateElements(Object.values($rootScope.ve_edits))
             .then(function(responses) {
                 responses.forEach(function(elementOb) {
-                    delete $rootScope.ve_edits[elementOb.id + '|' + elementOb._projectId + '|' + elementOb._refId];
-                    $rootScope.$broadcast('element.updated', elementOb, false);
-                    $rootScope.ve_tbApi.select('element-viewer');
+                    edit.remove(elementOb.id + '|' + elementOb._projectId + '|' + elementOb._refId);
+                    let data = {};
+                    data.element = elementOb;
+                    data.continueEdit = false;
+                    eventSvc.$broadcast('element.updated', data);
+                    toolbar.select('element-viewer');
                     $scope.specApi.setEditing(false);
                 });
                 growl.success("Save All Successful");
@@ -281,15 +304,15 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 growl.error("Some elements failed to save, resolve individually in edit pane");
 
             }).finally(function() {
-                $rootScope.ve_tbApi.toggleButtonSpinner('element-editor-saveall');
+                toolbar.toggleButtonSpinner('element-editor-saveall');
                 savingAll = false;
                 cleanUpSaveAll();
                 if (Object.keys($rootScope.ve_edits).length === 0) {
-                    $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+                    toolbar.setIcon('element-editor', 'fa-edit');
                 }
             });
     });
-    $scope.$on('element-editor-cancel', function() {
+    eventSvc.$on('element-editor-cancel', function() {
         var go = function() {
             var edit = $scope.specApi.getEdits();
             delete $rootScope.ve_edits[edit.id + '|' + edit._projectId + '|' + edit._refId];
@@ -305,8 +328,8 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
                 $scope.specInfo.commitId = 'latest';
             } else {
                 $scope.specApi.setEditing(false);
-                $rootScope.ve_tbApi.select('element-viewer');
-                $rootScope.ve_tbApi.setIcon('element-editor', 'fa-edit');
+                toolbar.select('element-viewer');
+                toolbar.setIcon('element-editor', 'fa-edit');
                 cleanUpSaveAll();
             }
         };
@@ -333,32 +356,32 @@ function($scope, $rootScope, $state, $uibModal, $q, $timeout, hotkeys,
             go();
     });
     var viewSaving = false;
-    $scope.$on('view-reorder-save', function() {
+    eventSvc.$on('view-reorder-save', function() {
         if (viewSaving) {
             growl.info('Please Wait...');
             return;
         }
         viewSaving = true;
-        $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
+        toolbar.toggleButtonSpinner('view-reorder-save');
         $scope.viewContentsOrderApi.save().then(function(data) {
             viewSaving = false;
             $scope.viewContentsOrderApi.refresh();
             growl.success('Save Succesful');
-            $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
+            toolbar.toggleButtonSpinner('view-reorder-save');
             $rootScope.$broadcast('view.reorder.saved', $scope.viewOb.id);
         }, function(response) {
             $scope.viewContentsOrderApi.refresh();
             viewSaving = false;
             var reason = response.failedRequests[0];
             growl.error(reason.message);
-            $rootScope.ve_tbApi.toggleButtonSpinner('view-reorder-save');
+            toolbar.toggleButtonSpinner('view-reorder-save');
         });
-        $rootScope.ve_tbApi.select('view-reorder');
+        toolbar.select('view-reorder');
     });
-    $scope.$on('view-reorder-cancel', function() {
+    eventSvc.$on('view-reorder-cancel', function() {
         $scope.specApi.setEditing(false);
         $scope.viewContentsOrderApi.refresh();
-        $rootScope.ve_tbApi.select('element-viewer');
+        toolbar.select('element-viewer');
         showPane('element');
     });
 }]);

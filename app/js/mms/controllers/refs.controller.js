@@ -5,11 +5,13 @@
 angular.module('mmsApp')
 .controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', '$window', 'growl', '_', 'flatpickr',
                          'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'SessionService',
+                         'EventService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
 function($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $window, growl, _, flatpickr,
-    ElementService, ProjectService, MmsAppUtils, ApplicationService, SessionService,
+    ElementService, ProjectService, MmsAppUtils, ApplicationService, SessionService, EventService,
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
+    const eventSvc = EventService;
     SessionService.mmsRefOb(refOb);
     $scope.refManageView = true;
     $scope.refData = [];
@@ -50,14 +52,11 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $win
     $scope.deleteRef = function(e) {
         deleteItem();
     };
-    $scope.$on('fromParamChange', function(event, fromParams) {
+    eventSvc.$on('fromParamChange', function(fromParams) {
         var index = _.findIndex(refObs, {name: fromParams.refId});
         if ( index > -1 ) {
             $scope.fromParams = refObs[index];
         }
-    });
-    $scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
-        growl.success(updateRef.name + " " + updateRef.type + " Created");
     });
 
     $scope.refClickHandler = function(ref) {

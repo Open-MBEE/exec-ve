@@ -2,7 +2,7 @@
 
 angular.module('mms.directives')
 .directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
-    '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', mmsTranscludeVal]);
+    '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', 'EventService', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -34,7 +34,10 @@ angular.module('mms.directives')
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http,
-                          _, $compile, $templateCache, growl, MathJax, ViewService) {
+                          _, $compile, $templateCache, growl, MathJax, ViewService, EventService) {
+
+    let eventSvc = EventService;
+
     var valTemplate = $templateCache.get('mms/templates/mmsTranscludeVal.html');
     var frameTemplate = $templateCache.get('mms/templates/mmsTranscludeValFrame.html');
     var editTemplate = $templateCache.get('mms/templates/mmsTranscludeValEdit.html');
@@ -43,7 +46,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
     var spaceSpace = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g;
     var spaceComma = />(?:\s|&nbsp;),/g;
 
-    var mmsTranscludeCtrl = function ($scope, $rootScope) {
+    var mmsTranscludeCtrl = function ($scope) {
 
         $scope.bbApi = {};
         $scope.buttons = [];
@@ -173,17 +176,13 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 recompile();
                 Utils.reopenUnsavedElts(scope, 'value');
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
+                    eventSvc.$on('element.updated', function (event, data) {
+                        let elementOb = data.element;
+                        let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
-                            //actions for stomp
-                            if(stompUpdate && scope.isEditing === true) {
-                                growl.warning("This value has been changed: " + elementOb.name +
-                                    " modified by: " + elementOb._modifier, {ttl: -1});
-                            } else {
-                                Utils.setupValCf(scope);
-                                recompile();
-                            }
+                            Utils.setupValCf(scope);
+                            recompile();
                         }
                     });
                 }

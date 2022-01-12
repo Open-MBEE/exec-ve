@@ -12,10 +12,10 @@
     // /workspaces/master/sites/{siteid}/documents/{docid}/full	{docid}	/projects/{projectid}/master/documents/{docid}/full
 
 angular.module('mmsApp')
-.controller('RedirectCtrl', ['$scope', '$rootScope', '$state', '$location', '$timeout',
-        'ProjectService', 'ElementService', 'growl', 
-    function($scope, $rootScope, $state, $location, $timeout, ProjectService, ElementService, growl) {
-        $rootScope.ve_title = 'View Editor'; //what to name this?
+.controller('RedirectCtrl', ['$scope', '$state', '$location', '$timeout',
+        'ProjectService', 'ElementService', 'SessionService', 'growl',
+    function($scope, $state, $location, $timeout, ProjectService, ElementService, SessionService, growl) {
+        SessionService.veTitle('View Editor'); //what to name this?
         $scope.redirect_noResults = false;
         $scope.redirect_element = null;
         $scope.spin = false;

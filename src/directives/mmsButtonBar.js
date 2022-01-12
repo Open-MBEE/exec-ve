@@ -6,9 +6,9 @@ angular.module('mms.directives')
 function mmsButtonBar($templateCache) {
     var template = $templateCache.get('mms/templates/mmsButtonBar.html');
 
-    var mmsButtonBarLink = function(scope, element, attrs){
-
-    };
+    // var mmsButtonBarLink = function(scope, element, attrs){
+    //
+    // };
 
     var mmsButtonBarCtrl = function($scope) {
         if ($scope.mmsBbApi) {
@@ -28,7 +28,7 @@ function mmsButtonBar($templateCache) {
                         button.permission = permission;
                 });
             };
-            
+
             api.setTooltip = function (id, tooltip) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id)
@@ -46,7 +46,7 @@ function mmsButtonBar($templateCache) {
             api.setToggleState = function (id, state) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id) {
-                        if (button.togglable) {
+                        if (button.toggleable) {
                             var original = button.toggle_state;
                             if ((!original && state) || (original && !state))
                                 api.toggleButtonState(id);
@@ -62,7 +62,7 @@ function mmsButtonBar($templateCache) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id) {
                         buttonTemp = button;
-                        if (! button.togglable) button.toggle_state = false;
+                        if (! button.toggleable) button.toggle_state = false;
                         if (! button.toggle_state) button.toggle_state = false;
                     }
                 });
@@ -71,7 +71,7 @@ function mmsButtonBar($templateCache) {
             };
 
             api.addButton = function(button) {
-                
+
                 if ($scope.buttons.count === 0) {
                     button.placement = "bottom-left";
                 }
@@ -80,7 +80,7 @@ function mmsButtonBar($templateCache) {
                     button.placement = "bottom";
                 }
 
-                if (button.togglable) {
+                if (button.toggleable) {
                     button.toggle_state = false;
                     button.tooltip_orginal = button.tooltip;
                 }
@@ -107,7 +107,7 @@ function mmsButtonBar($templateCache) {
             api.toggleButtonState = function (id) {
                 $scope.buttons.forEach(function(button) {
                     if (button.id === id) {
-                        if (button.togglable) {
+                        if (button.toggleable) {
                             button.toggle_state = !button.toggle_state;
                             if (button.toggle_state && button.toggle_icon && button.toggle_tooltip) {
                                 button.icon = button.toggle_icon;
@@ -131,7 +131,7 @@ function mmsButtonBar($templateCache) {
     return {
         restrict: 'E', 
         template: template,
-        link: mmsButtonBarLink,
+        //link: mmsButtonBarLink,
         controller: ['$scope', mmsButtonBarCtrl],
         scope: {
             buttons: '<',

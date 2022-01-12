@@ -180,7 +180,7 @@ function ($scope, $stateParams, $state, growl, _, ElementService, CacheService, 
     }
 
     function navigateAway(reload) {
-        var curBranch = TreeService.getTree().getApi().get_selected_branch();
+        var curBranch = TreeService.getApi().get_selected_branch();
         if (curBranch) {
             var documentId = curBranch.type === 'group' ? 'site_' + curBranch.data.id + '_cover' : curBranch.data.id;
             $state.go('project.ref.preview', {documentId: documentId}, {reload: reload});

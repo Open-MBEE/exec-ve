@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
+.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService',
+    'EventService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -37,7 +38,9 @@ angular.module('mms.directives')
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, $compile, $templateCache, growl, _, MathJax) {
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, EventService, $compile, $templateCache, growl, _, MathJax) {
+
+    const eventSvc = EventService;
 
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
 
@@ -157,16 +160,12 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 Utils.reopenUnsavedElts(scope, "documentation");
 
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
+                    eventSvc.$on('element.updated', function (event, data) {
+                        let elementOb = data.element;
+                        let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
-                            //actions for stomp
-                            if(stompUpdate && scope.isEditing === true) {
-                                growl.warning("This value has been changed: " + elementOb.name +
-                                    " modified by: " + elementOb._modifier, {ttl: -1});
-                            } else {
-                                recompile();
-                            }
+                            recompile();
                         }
                     });
                 }

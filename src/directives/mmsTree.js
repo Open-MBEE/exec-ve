@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter', 'UtilsService', 'TreeService', 'SessionService', mmsTree]);
+.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter',
+    'UtilsService', 'TreeService', 'SessionService', 'EventService', mmsTree]);
 
 /**
  * @ngdoc directive
@@ -52,7 +53,7 @@ angular.module('mms.directives')
         $scope.handler = function(branch) {
             //branch selected
         };
-        $scope.treeData = [
+        $tree.treeData = [
             {
                 label: 'Root',
                 type: 'Package',
@@ -97,45 +98,115 @@ angular.module('mms.directives')
  * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
  * @param {string='fa fa-file'} iconDefault default icon to use for nodes
  */
-function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, UtilsService, TreeService, SessionService) {
+function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, UtilsService, TreeService, SessionService, EventService) {
+
+    const eventSvc = EventService;
+    const session = SessionService;
 
     var mmsTreeLink = function(scope, element, attrs) {
 
         //Initialize Tree API
-        var tree = TreeService.getTree().getApi();
-        var session = SessionService;
-
-        scope.selected_branch = tree.selected_branch;
+        scope.tree = TreeService;
 
         scope.getHref = getHref;
-        if (!scope.options) {
-            scope.options = {
-                expandLevel: 1,
-                search: ''
-            };
-        }
-        let icons = session.treeIcons();
-        if (!icons)
-            icons = {};
-        if (!icons.iconExpand)
-            icons.iconExpand = 'fa fa-caret-right fa-lg fa-fw';
-        if (!icons.iconCollapse)
-            icons.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
-        if (!icons.iconDefault)
-            icons.iconDefault = 'fa fa-file fa-fw';
-        session.treeIcons(icons);
-        if (!scope.options.expandLevel && scope.options.expandLevel !== 0)
-            scope.options.expandLevel = 1;
-        var expand_level = scope.options.expandLevel;
-        if (!angular.isArray(scope.treeData)) {
-            $log.warn('treeData is not an array!');
-            return;
-        }
 
-        scope.$watch('treeData',session.treeData(scope.treeData));
-        scope.$watch('treeOptions',session.treeOptions(scope.treeOptions));
-        scope.$watch('initialSelection', session.treeInitialSelection(scope.initialSelection));
+        scope.init = false;
+        scope.$watch(() => {
+            return scope.treeData;
+        },() => {
+            if (!scope.treeData){
+                return null;
+            }
+            if (scope.init === false && scope.treeData.length > 0) {
+                init();
+            }else if (scope.treeData.length === 0) {
+                scope.init = false;
+            }
+            console.log(scope.treeData);
+        });
 
+        const init = () => {
+            scope.tree_rows = [];
+            scope.treeApi = scope.tree.getApi(scope.treeData, scope.tree_rows);
+
+            scope.selected_branch = scope.treeApi.selected_branch;
+
+            if (!scope.options) {
+                scope.options = {
+                    expandLevel: 1,
+                    search: ''
+                };
+            }
+
+            let icons = session.treeIcons();
+            if (!icons)
+                icons = {};
+            if (!icons.iconExpand)
+                icons.iconExpand = 'fa fa-caret-right fa-lg fa-fw';
+            if (!icons.iconCollapse)
+                icons.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
+            if (!icons.iconDefault)
+                icons.iconDefault = 'fa fa-file fa-fw';
+            session.treeIcons(icons);
+            
+            if (!scope.options.expandLevel && scope.options.expandLevel !== 0)
+                scope.options.expandLevel = 1;
+            var expand_level = scope.options.expandLevel;
+            if (!angular.isArray(scope.treeData)) {
+                $log.warn('treeData is not an array!');
+                return;
+            }
+
+            scope.treeApi.on_treeData_change();
+
+            scope.$watch(() => { return scope.treeOptions; },() => {
+                session.treeOptions(scope.treeOptions);
+            });
+
+            eventSvc.$on('tree-get-branch-element', (args) => {
+                console.log(args);
+                $timeout(function() {
+                    var el = angular.element('#tree-branch-' + args.id);
+                    if (!el.isOnScreen() && el.get(0) !== undefined) {
+                        el.get(0).scrollIntoView();
+                    }
+                }, 500, false);
+            });
+
+
+
+            scope.treeFilter = $filter('uiTreeFilter');
+
+            eventSvc.$on(session.constants.TREEINITIALSELECTION, () => {
+                scope.treeApi.on_initialSelection_change();
+            });
+
+            scope.treeApi.for_each_branch(function(b, level) {
+                b.level = level;
+                b.expanded = b.level <= expand_level;
+            });
+
+            scope.$on('$destroy', (() => {
+                console.log("I'm Destroyed");
+                session.treeRows([]);
+                session.treeInitialSelection(session.constants.DELETEKEY);
+            }));
+
+            if (session.treeInitialSelection()) {
+                //Triggers Event
+                scope.treeApi.on_initialSelection_change();
+            }else {
+                scope.treeApi.on_treeData_change();
+            }
+
+            scope.init = true;
+        };
+
+
+
+
+
+        //scope.$watch('initialSelection', session.treeInitialSelection(scope.initialSelection));
 
         scope.expandCallback = function(obj, e){
             if(!obj.branch.expanded && scope.options.expandCallback) {
@@ -144,43 +215,12 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             obj.branch.expanded = !obj.branch.expanded;
             if (e) {
                 e.stopPropagation();
-                tree.on_treeData_change();
+                scope.treeApi.on_treeData_change();
             }
         };
 
-        scope.$root.$on(session.constants.TREEDATA, tree.on_treeData_change, false);
-        scope.$root.$on(session.constants.TREEINITIALSELECTION, tree.on_initialSelection_change);
-
-        scope.tree_rows = [];
-        session.treeRows([]);
-        scope.$root.$on(session.constants.TREEROWS, () => {scope.tree_rows = session.treeRows();});
-
-        scope.$root.$on('tree-get-branch-element', (event, args) => {
-            $timeout(function() {
-                var el = angular.element('#tree-branch-' + args.id);
-                if (!el.isOnScreen() && el.get(0) !== undefined) {
-                    el.get(0).scrollIntoView();
-                }
-            }, 500, false);
-        });
-
-
-        scope.treeFilter = $filter('uiTreeFilter');
-
-        if (attrs.initialSelection) {
-            //Triggers Event
-            session.treeInitialSelection(attrs.initialSelection);
-        }
-
-        tree.for_each_branch(function(b, level) {
-            b.level = level;
-            b.expanded = b.level <= expand_level;
-        });
-
-        // on_treeData_change();
-
         scope.user_clicks_branch = function(branch) {
-            tree.select_branch(branch);
+            scope.treeApi.select_branch(branch);
         };
 
         scope.user_dblclicks_branch = function(branch) {
@@ -190,6 +230,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                 scope.$root.$broadcast(scope.options.onDblclick,{ branch: branch });
             }
         };
+
 
     };
 
@@ -206,11 +247,26 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
     return {
         restrict: 'E',
-        template: $templateCache.get('mms/templates/mmsTree.html'),
+        template: `
+            <ul class="nav nav-list nav-pills nav-stacked abn-tree">
+                <li ng-repeat="row in tree_rows | filter:{visible:true} track by row.branch.data.id" ng-hide="!treeFilter(row, options.search)"
+                    ng-class="'level-' + {{ row.level }}" class="abn-tree-row">
+                    <div class="arrow" ng-click="user_clicks_branch(row.branch)" ng-dblclick="user_dblclicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
+                        <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
+                            <a ng-href="{{getHref(row);}}" class="tree-item">
+                                <i ng-class="{'active-text': row.branch.selected}" ng-click="expandCallback(row, $event)" class="indented tree-icon {{row.expand_icon}}" ></i>
+                                <i ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
+                                <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        `,
         // replace: true,
         scope: {
             treeData: '<',
-            initialSelection: '@',
+            //initialSelection: '@',
             options: '<'
         },
         link: mmsTreeLink
