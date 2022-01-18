@@ -861,10 +861,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @description
      * Gets all the documents in a site
      * 
-     * @param {string} site Site name
+     * @param {Object} reqOb object containing project and ref ids needed to resolve request
      * @param {boolean} [update=false] Update latest
-     * @param {string} [workspace=master] workspace to use 
-     * @param {string} [version=latest] timestamp
      * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
@@ -885,6 +883,42 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }
         return deferred.promise;
     };
+
+
+
+        /**
+         * @ngdoc method
+         * @name mms.ViewService#getProjectDocument
+         * @methodOf mms.ViewService
+         *
+         * @description
+         * Gets a specific the document from a Site
+         *
+         * @param {object} reqOb object containing project, ref, document ids needed to resolve request
+         * @param {int} weight the priority of the request
+         * @param {boolean} update [default=false] Update latest
+         * @returns {Promise} The promise will be resolved with array of document objects
+         */
+        var getProjectDocument = function(reqOb, weight, update) {
+            reqOb.elementId = reqOb.documentId;
+            var cacheKey = ElementService.getElementKey(reqOb);
+            var deferred = $q.defer();
+            var cached = CacheService.get(cacheKey);
+            if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
+                deferred.resolve(cached);
+                return deferred.promise;
+            }
+            getProjectDocuments(reqOb, weight, update).then((result) => {
+                var documentOb = result.filter(
+                    (resultOb) => {
+                        return resultOb.id === reqOb.documentId;
+                    })[0];
+                deferred.resolve(CacheService.put(cacheKey, documentOb, true));
+            }, (reason) => {
+                    deferred.reject(reason);
+            });
+            return deferred.promise;
+        };
 
     /**
      * @ngdoc method
@@ -1202,6 +1236,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
         getProjectDocuments: getProjectDocuments,
+        getProjectDocument: getProjectDocument,
         getPresentationElementSpec: getPresentationElementSpec,
         isSection: isSection,
         isFigure: isFigure,

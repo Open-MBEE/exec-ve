@@ -431,7 +431,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
                     search: undefined
                 });
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
-                $state.go('project.ref.preview', {documentId: branch.data.id, search: undefined});
+                $state.go('project.ref.document', {documentId: branch.data.id, search: undefined});
             }
         } else if ($state.includes('project.ref.document')) {
             var viewId = (branch.type !== 'view') ? branch.viewId : branch.data.id;

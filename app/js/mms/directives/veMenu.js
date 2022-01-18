@@ -30,7 +30,7 @@ function veMenu(CacheService, $state, $templateCache, $sce, $timeout, UtilsServi
         scope.getHrefForBranch = getHrefForBranch;
         scope.getHrefForTag = getHrefForTag;
         scope.htmlTooltip = $sce.trustAsHtml('Branch temporarily unavailable during duplication.');
-        scope.currentProject = scope.project.name;
+        scope.currentProject = scope.projects.filter((e) => {return e.id === scope.project.id; })[0].name;
 
         if (scope.ref) {
             scope.currentRef = scope.ref;

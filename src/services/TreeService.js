@@ -471,14 +471,7 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
                 }
             }
             if (branch.data.id) {
-                console.log(branch.data.id);
                 eventSvc.$broadcast('tree-get-branch-element', { id: branch.data.id });
-                // $timeout(function() {
-                //     var el = angular.element('#tree-branch-' + branch.data.id);
-                //     if (!el.isOnScreen()) {
-                //         el.get(0).scrollIntoView();
-                //     }
-                // }, 500, false);
             }
             // fix for when user presses browser back button
         } else {

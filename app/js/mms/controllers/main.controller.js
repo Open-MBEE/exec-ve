@@ -58,8 +58,6 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     });
 
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-        console.log("To:" + toState);
-        console.log("From:" + fromState);
         session.veViewContentLoading(true);
         HttpService.transformQueue();
         session.veStateChanging(true);

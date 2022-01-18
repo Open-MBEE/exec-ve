@@ -122,7 +122,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             }else if (scope.treeData.length === 0) {
                 scope.init = false;
             }
-            console.log(scope.treeData);
+            //console.log(scope.treeData);
         });
 
         const init = () => {
@@ -164,7 +164,6 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             });
 
             eventSvc.$on('tree-get-branch-element', (args) => {
-                console.log(args);
                 $timeout(function() {
                     var el = angular.element('#tree-branch-' + args.id);
                     if (!el.isOnScreen() && el.get(0) !== undefined) {
@@ -187,7 +186,6 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             });
 
             scope.$on('$destroy', (() => {
-                console.log("I'm Destroyed");
                 session.treeRows([]);
                 session.treeInitialSelection(session.constants.DELETEKEY);
             }));

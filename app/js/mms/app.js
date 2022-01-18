@@ -117,12 +117,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.login = function (credentials) {
-                        console.log(credentials.username);
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                         AuthService.getAuthorized(credentialsJSON)
                         .then(function(user) {
-                            console.log(user);
                             if (session.veRedirect()) {
                                 let veRedirect = session.veRedirect();
                                 var toState = veRedirect.toState.name;
@@ -284,16 +282,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             //orgObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
             //    return ProjectService.getOrgs();
             //}],
-            projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
+            projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService) {
                 return ProjectService.getProject($stateParams.projectId);
             }],
             projectObs: ['$stateParams', 'ProjectService', 'token', 'projectOb', function($stateParams, ProjectService, token, projectOb) {
                 return ProjectService.getProjects(projectOb.orgId);
             }],
-            orgOb: ['ProjectService', 'projectOb', 'token', function(ProjectService, projectOb, token) {
+            orgOb: ['ProjectService', 'projectOb', 'token', function(ProjectService, projectOb) {
                 return ProjectService.getOrg(projectOb.orgId);
             }],
-            refObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
+            refObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService) {
                 return ProjectService.getRefs($stateParams.projectId);
             }],
             tagObs: ['refObs', function(refObs) {
@@ -677,12 +675,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.document', {
         url: '/documents/:documentId',
         resolve: {
-            documentOb: ['$stateParams', 'ElementService', 'token', function($stateParams, ElementService, token) {
-                return ElementService.getElement({
+            documentOb: ['$stateParams', 'ViewService', 'token', function($stateParams, ViewService) {
+                return ViewService.getProjectDocument({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
                     extended: true,
-                    elementId: $stateParams.documentId
+                    documentId: $stateParams.documentId
                 }, 2);
             }],
             viewOb: ['documentOb', function(documentOb) {

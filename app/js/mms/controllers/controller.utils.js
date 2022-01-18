@@ -406,7 +406,6 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         var childIds = [];
         var childAggrs = [];
         var childPropIds = [];
-        console.log(v._childViews);
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             if (angular.isObject(curItem) && curItem.loading) {
                 curItem.loading = false;
