@@ -41,16 +41,16 @@ function mmsToolbar($templateCache, SessionService, EventService, ToolbarService
 				}
 
 				var toggleDecativeFlag = false;
-				if (session.mmsPaneClosed().isBoolean() && session.mmsPaneToggleable() !== false)
+				if (typeof session.mmsPaneClosed() === 'boolean' && session.mmsPaneToggleable() !== false)
 				{
 					if (button.selected || session.mmsPaneClosed())
 					{
 						if (button.selected && !session.mmsPaneClosed()) toggleDecativeFlag = true;
-						eventSvc.$broadcast('mms-pane-toggle');
+						eventSvc.$broadcast('mms-pane-toggle', {closed: !session.mmsPaneClosed()});
 					}
 				}
 
-				if (this.$root.ve_tbApi) this.$root.ve_tbApi.select(button.id);
+				if (scope.mmsTbApi) scope.mmsTbApi.select(button.id);
 
 				if (button.onClick) {
 					button.onClick();
@@ -58,8 +58,8 @@ function mmsToolbar($templateCache, SessionService, EventService, ToolbarService
 					scope.onClick({ button: button });
 				}
 
-				if (toggleDecativeFlag) {
-					this.$root.ve_tbApi.deactivate(button.id);
+				if (toggleDecativeFlag && scope.mmsTbApi) {
+					scope.mmsTbApi.deactivate(button.id);
 				}
 
 /*if (! button.dynamic)

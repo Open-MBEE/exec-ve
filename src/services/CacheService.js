@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('CacheService', ['_', CacheService]);
+.factory('CacheService', ['SessionService', '_', CacheService]);
 
 /**
  * @ngdoc service
@@ -11,8 +11,9 @@ angular.module('mms')
  * @description
  * Provides cache of key value pairs. Key can be a string or an array of strings.
  */
-function CacheService(_) {
+function CacheService(SessionService, _) {
     var cache = {};
+    var session = SessionService;
 
     /**
      * @ngdoc method
@@ -36,6 +37,11 @@ function CacheService(_) {
                 return get(realval);
             }
             return realval;
+        }
+        else if (session.accessor(realkey)) {
+            var val = session.accessor(realkey);
+            cache[realkey] = {}; //Init for thaw
+            return put(key,val,false,false);
         }
         return null;
     };
@@ -116,6 +122,7 @@ function CacheService(_) {
             }
             val = value;
         }
+        session.accessor(realkey,val,false);
         return val;
     };
 
@@ -140,6 +147,7 @@ function CacheService(_) {
         }
         var result = cache[realkey];
         delete cache[realkey];
+        session.accessor(realkey,session.constants.DELETEKEY);
         if (angular.isString(result)) {
             return remove(result);
         }
@@ -163,6 +171,12 @@ function CacheService(_) {
             realkey = makeKey(key);
         }
         if (!cache.hasOwnProperty(realkey)) {
+            if (session.accessor(realkey)) {
+                var sessionVal = session.accessor(realkey);
+                cache[realkey] = {}; //Init for thaw
+                put(key,sessionVal,false,false);
+                return true;
+            }
             return false;
         }
         var val = cache[realkey];
@@ -179,15 +193,12 @@ function CacheService(_) {
         return keys.join('|');
     };
 
-    var getCache = function() {
-        return cache;
-    };
-
     var reset = function() {
         var keys = Object.keys(cache);
         for (var i = 0; i < keys.length; i++) {
             delete cache[keys[i]];
         }
+        session.clear();
     };
 
     return {
@@ -196,7 +207,6 @@ function CacheService(_) {
         put: put,
         exists: exists,
         remove: remove,
-        getCache: getCache,
         reset: reset
     };
 }

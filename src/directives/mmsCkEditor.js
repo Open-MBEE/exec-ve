@@ -533,7 +533,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 } else {
                     //TODO does this need to be smarter?
                     var element = response.elements[0];
-                    data.url = URLService.getArtifactURL({projectId: element._projectId, refId: element._refId, elementId: element.id, artifactExtension: element._artifacts[0].extension });
+                    data.url = URLService.getArtifactEmbedURL({projectId: element._projectId, refId: element._refId, elementId: element.id, artifactExtension: element._artifacts[0].extension });
                 }
             } );
         }, 0, false);

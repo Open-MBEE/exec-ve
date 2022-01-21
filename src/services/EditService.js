@@ -21,7 +21,7 @@ function EditService(EventService) {
     };
 
     const openEdits = () => {
-        return edits.length;
+        return Object.keys(edits).length;
     };
 
     const addOrUpdate = (key, value) => {

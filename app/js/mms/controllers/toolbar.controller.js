@@ -14,7 +14,7 @@ function($scope, $state, UxService, refOb, documentOb, PermissionsService, EditS
 
     const tbInit = function()
     {
-        let tbApi = ToolbarService.getApi();
+        let tbApi = $scope.tbApi;
         tbApi.addButton(UxService.getToolbarButton("element-viewer"));
         tbApi.addButton(UxService.getToolbarButton("element-editor"));
         if (edit.openEdits() > 0) {

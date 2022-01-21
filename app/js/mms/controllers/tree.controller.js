@@ -3,11 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state','$timeout', 'growl',
+.controller('TreeCtrl', ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$state','$timeout', 'growl',
                           'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'documentOb', 'viewOb',
                           'orgOb', 'projectOb', 'refOb', 'refObs', 'groupObs', 'docMeta', 'PermissionsService', 'SessionService', 'TreeService',
                           'EventService',
-function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl,
+function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $state, $timeout, growl,
     UxService, ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, documentOb, viewOb,
     orgOb, projectOb, refOb, refObs, groupObs, docMeta, PermissionsService, SessionService, TreeService, EventService) {
 
@@ -879,47 +879,6 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         }
     }
 
-    // MmsAppUtils.addElementCtrl creates this event when adding sections, table and figures to the view
-    eventSvc.$on('viewctrl.add.element', function (event, instanceSpec, elemType, parentBranchData) {
-        if (elemType === 'paragraph' || elemType === 'list' || elemType === 'comment')
-            return;
-        var branch = $scope.treeApi.get_branch(parentBranchData);
-        var viewId = null;
-        if (branch.type === 'section') {
-            viewId = branch.viewId;
-        } else {
-            viewId = branch.data.id;
-        }
-        var viewNode = viewId2node[viewId];
-        var newbranch = {
-            label: instanceSpec.name,
-            type: (elemType === 'image' ? 'figure' : elemType),
-            viewId: viewId,
-            data: instanceSpec,
-            hide: !session.veTreeShowPe() && elemType !== 'section',
-            children: []
-        };
-        var i = 0;
-        var lastSection = -1;
-        var childViewFound = false;
-        for (i = 0; i < branch.children.length; i++) {
-            if (branch.children[i].type === 'view') {
-                lastSection = i - 1;
-                childViewFound = true;
-                break;
-            }
-        }
-        if (lastSection === -1 && !childViewFound) {//case when first child is view
-            lastSection = branch.children.length - 1;
-        }
-        branch.children.splice(lastSection + 1, 0, newbranch);
-        if (elemType === 'section') {
-            addSectionElements(instanceSpec, viewNode, newbranch);
-        }
-        $scope.treeApi.refresh();
-        resetPeTreeList(elemType);
-    });
-
     // Utils creates this event when deleting instances from the view
     eventSvc.$on('viewctrl.delete.element', function (elementData) {
         var branch = $scope.treeApi.get_branch(elementData);
@@ -929,8 +888,8 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         resetPeTreeList(branch.type);
     });
 
-    eventSvc.$on('view.reorder.saved', function (vid) {
-        var node = viewId2node[vid];
+    eventSvc.$on('view.reorder.saved', function (data) {
+        var node = viewId2node[data.id];
         var viewNode = node;
         var newChildren = [];
         for (var i = 0; i < node.children.length; i++) {

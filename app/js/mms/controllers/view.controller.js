@@ -3,11 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$window', '$location',
+    .controller('ViewCtrl', ['$scope', '$state', '$timeout', '$window', '$location',
         '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService',
         'ShortenUrlService', 'Utils', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
         'PermissionsService', 'SessionService', 'TreeService', 'EventService',
-    function($scope, $rootScope, $state, $timeout, $window, $location, $http,
+    function($scope, $state, $timeout, $window, $location, $http,
              $element, growl, hotkeys, MmsAppUtils, UxService, URLService, UtilsService, ShortenUrlService, Utils,
              search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb, PermissionsService, SessionService,
              TreeService, EventService) {
@@ -207,7 +207,11 @@ angular.module('mmsApp')
 
     if (viewOb && $state.includes('project.ref')) {
         $timeout(function() {
-            $rootScope.$broadcast('viewSelected', viewOb, 'latest');
+            let data = {
+                elementOb: viewOb,
+                commitId: 'latest'
+            };
+            eventSvc.$broadcast('viewSelected', data);
         }, 1000);
     }
 
@@ -222,8 +226,8 @@ angular.module('mmsApp')
                 commitId: 'latest'
             };
             eventSvc.$broadcast('elementSelected', data);
-            if (session.mmsPaneClosed().isBoolean() && session.mmsPaneClosed())
-                eventSvc.$broadcast('mms-pane-toggle', false);
+            if (typeof session.mmsPaneClosed() === 'boolean' && session.mmsPaneClosed())
+                eventSvc.$broadcast('mms-pane-toggle', {closed: false});
         },
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});

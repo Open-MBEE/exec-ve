@@ -31,22 +31,6 @@ function SessionService($window, EventService) {
         return sessionStorage.removeItem(key);
     };
 
-    const register = (scope) => {
-        let key, value;
-        for (key in sessionStorage) {
-            value = sessionStorage[key];
-            scope[key] = ((value != null) && value !== "undefined" && typeof value !== 'function') ? JSON.parse(value) : null;
-        }
-        this.scopes.push(scope);
-        return scope.$on('$destroy', (function(_this) {
-            return function() {
-                _this.scopes = _this.scopes.filter(function(s) {
-                    return s.$id !== scope.$id;
-                });
-            };
-        })(this));
-    };
-
     const clear = () => {
         let key, results;
         results = [];
@@ -184,8 +168,8 @@ function SessionService($window, EventService) {
     };
 
     return {
-        register: register,
         clear: clear,
+        accessor: accessor,
         mmsRefOb: mmsRefOb,
         mmsPaneToggleable: mmsPaneToggleable,
         mmsPaneClosed: mmsPaneClosed,

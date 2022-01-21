@@ -57,13 +57,13 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         growl.error('Error: ' + error.message);
     });
 
-    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+    $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
         session.veViewContentLoading(true);
         HttpService.transformQueue();
         session.veStateChanging(true);
     });
 
-    eventSvc.$on("mms.unauthorized", function(event, response) {
+    eventSvc.$on('mms.unauthorized', function(response) {
         // add a boolean to the 'or' statement to check for modal window
         if ($state.$current.name === 'login' || session.veStateChanging() || modalOpen)
             return;
@@ -117,7 +117,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         eventSvc.$broadcast('mms.unauthorized');
     }, 600000, 0, false);
 
-    $rootScope.$on('$stateChangeSuccess', 
+    $scope.$on('$stateChangeSuccess',
         function(event, toState, toParams, fromState, fromParams) {
             session.veStateChanging(false);
             $scope.hidePanes = false;
@@ -173,7 +173,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     );
 
     var workingModalOpen = false;
-    eventSvc.$on('mms.working', function(event, response) {
+    eventSvc.$on('mms.working', function(response) {
         session.veViewContentLoading(false);
         if (workingModalOpen) {
             return;
@@ -192,7 +192,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         });
     });
 
-    eventSvc.$on('element.updated', function(event, data) {
+    eventSvc.$on('element.updated', function(data) {
         let element = data.element;
         //if element is not being edited and there's a cached edit object, update the edit object also
         //so next time edit forms will show updated data (mainly for stomp updates)

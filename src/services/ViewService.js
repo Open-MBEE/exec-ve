@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
+.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'UtilsService', 'CacheService', 'EventService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -19,7 +19,8 @@ angular.module('mms')
  * CRUD for views and products/documents/group
  *
  */
-function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
+function ViewService($q, $http, URLService, ElementService, UtilsService, CacheService, EventService, _) {
+    var eventSvc = EventService;
     var inProgress = {}; //only used for view elements over limit
 
     // The type of opaque element to the sysmlId of the classifierIds:
@@ -569,7 +570,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var elem = data[i];
                 if (elem.id === newInstanceId) {
                     if (type === "Section") {
-                        $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSectionOb);
+                        eventSvc.$broadcast('viewctrl.add.section', {elementOb: elem, viewOb: viewOrSectionOb});
                     }
                     deferred.resolve(elem);
                     return;

@@ -1,24 +1,21 @@
 'use strict';
 
 angular.module('mms')
-    .factory('ToolbarService', [ToolbarService]);
+    .factory('ToolbarService', ['EventService', ToolbarService]);
 
-function ToolbarService() {
-
-    this.tbApi = {};
-    this.buttons = [];
-    this.initFn = null;
+function ToolbarService(EventService) {
+    const eventSvc = EventService;
+    // this.buttons = [];
+    // this.initFn = null;
 
     const getApi = (buttons, initFn) => {
-        if (buttons) {
-            this.buttons = buttons;
+        if (!buttons) {
+            buttons = [];
         }
-        if (initFn) {
-            this.initFn = initFn;
+        if (!initFn) {
+            initFn = () => {};
         }
-        else if (!(this.tbApi instanceof ToolbarApi)) {
-            this.tbApi = new ToolbarApi(this, initFn);
-        }
+        this.tbApi = new ToolbarApi(buttons,initFn,EventService,this);
         return this.tbApi;
     };
 
@@ -26,16 +23,40 @@ function ToolbarService() {
         return tbApi instanceof ToolbarApi;
     };
 
+    const constants = {
+        SETPERMISSION: 'tb-set-permission',
+        SETICON: 'tb-set-icon',
+        TOGGLEICONSPINNER: 'tb-toggle-icon-spinner',
+        SELECT: 'tb-select'
+    };
+
+    eventSvc.$on(constants.SETPERMISSION, (data) => {
+        this.tbApi.setPermission(data.id,data.value);
+    });
+
+    eventSvc.$on(constants.SETICON, (data) => {
+        this.tbApi.setIcon(data.id,data.value);
+    });
+
+    eventSvc.$on(constants.TOGGLEICONSPINNER, (data) => {
+        this.tbApi.toggleButtonSpinner(data.id);
+    });
+
+    eventSvc.$on(constants.SELECT, (data) => {
+        this.tbApi.select(data.id);
+    });
+
     return {
         getApi: getApi,
         isApi: isApi,
-        buttons: this.buttons
+        constants: constants,
+
     };
 }
 
-function ToolbarApi(ToolbarService, initFn) {
+function ToolbarApi(buttons, initFn) {
 
-    let buttons = ToolbarService.buttons;
+    this.buttons = buttons;
 
     this.select = (id) => {
         buttons.forEach((button) =>

@@ -160,7 +160,7 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 Utils.reopenUnsavedElts(scope, "documentation");
 
                 if (scope.commitId === 'latest') {
-                    eventSvc.$on('element.updated', function (event, data) {
+                    eventSvc.$on('element.updated', function (data) {
                         let elementOb = data.element;
                         let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&

@@ -784,7 +784,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
 
     var successUpdates = function (elemType, id) {
         eventSvc.$broadcast('view-reorder.refresh');
-        eventSvc.$broadcast('view.reorder.saved', id);
+        eventSvc.$broadcast('view.reorder.saved', {id: id});
         growl.success("Adding " + elemType + " Successful");
         // Show comments when creating a comment PE
         if (elemType === 'Comment' && !session.veCommentsOn()) {

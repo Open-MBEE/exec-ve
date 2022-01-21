@@ -80,7 +80,7 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
                 commitId: 'latest'
             };
             eventSvc.$broadcast('elementSelected', data);
-            if (session.mmsPaneClosed().isBoolean() && session.mmsPaneClosed())
+            if (typeof session.mmsPaneClosed() === 'boolean' && session.mmsPaneClosed())
                 eventSvc.$broadcast('tree-pane-toggle');
         },
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
