@@ -1,13 +1,12 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsTranscludeImg', ['ArtifactService','AuthService','ElementService','URLService','growl', mmsTranscludeImg]);
+.directive('mmsTranscludeImg', ['AuthService','ElementService','URLService','growl', mmsTranscludeImg]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsTranscludeImg
  *
- * @requires mms.ArtifactService
  * @requires mms.AuthService
  * @requires mms.ElementService
  * @requires mms.URLService
@@ -23,7 +22,7 @@ angular.module('mms.directives')
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLService, growl) {
+function mmsTranscludeImg(AuthService, ElementService, URLService, growl) {
 
     var mmsTranscludeImgLink = function(scope, element, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
@@ -45,35 +44,27 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
             var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
-
-            var server = URLService.getMmsServer();
-            var token = '?token=' + AuthService.getToken();
             element.addClass('isLoading');
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {
                 scope.element = data;
-                // var artifactOb = {
-                //     projectId: data._projectId,
-                //     refId: data._refId,
-                //     artifactIds : data._artifactIds,
-                //     commitId: scope.commitId === 'latest' ? 'latest' : data._commitId
-                // };
+                var includeExt = [
+                    'svg', 'png'
+                ];
+                var artifacts = data._artifact;
+                if (artifacts !== undefined) {
+                    scope.artifacts = artifacts.filter(a => includeExt.includes(a.extension))
+                        .map(a => {
+                            return {
+                                url: URLService.getArtifactURL(reqOb, a.extension),
+                                image: (a.mimetype.indexOf('image') > -1),
+                                ext: a.extension
+                            };
+                        });
+                    scope.svg = scope.artifacts.filter(a => a.ext = 'svg');
+                    scope.png = scope.artifacts.filter(a => a.ext = 'png');
+                }
 
-                // Get the artifacts of the element
-                ArtifactService.getArtifacts(data)
-                .then(function(artifacts) {
-                    scope.artifacts = artifacts;
-                    for(var i = 0; i < artifacts.length; i++) {
-                        var artifact = artifacts[i];
-                        if (artifact.contentType == "image/svg+xml") {
-                            scope.svgImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
-                        } else if (artifact.contentType == "image/png") {
-                            scope.pngImgUrl = server + '/alfresco' + artifact.artifactLocation + token;
-                        }
-                    }
-                }, function(reason) {
-                    console.log('Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
-                });
             }, function(reason) {
                 console.log('Cf Artifacts Error: ' + reason.message + ': ' + scope.mmsElementId);
             }).finally(function() {
@@ -88,7 +79,7 @@ function mmsTranscludeImg(ArtifactService, AuthService, ElementService, URLServi
 
     return {
         restrict: 'E',
-        template: '<img class="mms-svg" ng-src="{{svgImgUrl}}"></img><img class="mms-png" ng-src="{{pngImgUrl}}"></img>',
+        template: '<img class="mms-svg" ng-src="{{svg.url}}"></img><img class="mms-png" ng-src="{{png.url}}"></img>',
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',
