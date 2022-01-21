@@ -34,12 +34,20 @@ function EditService(EventService) {
         trigger();
     };
 
+    var reset = function() {
+        var keys = Object.keys(edits);
+        for (var i = 0; i < keys.length; i++) {
+            delete edits[keys[i]];
+        }
+    };
+
     return {
         get: get,
         getAll: getAll,
         openEdits: openEdits,
         addOrUpdate: addOrUpdate,
         remove: remove,
+        reset: reset,
         EVENT: EVENT
     };
 }

@@ -4,17 +4,11 @@ angular.module('mms')
     .factory('SessionService', ['$window', 'EventService', '_', SessionService]);
 
 function SessionService($window, EventService) {
-    this.scopes = [];
+
     let sessionStorage = $window.sessionStorage;
     let eventSvc = EventService;
 
     let setStorage = (key, value) => {
-        let i, len, ref, scope;
-        ref = this.scopes;
-        for (i = 0; len = ref.length, i < len; i++) {
-            scope = ref[i];
-            scope[key] = value;
-        }
         value = value === void 0 ? null : JSON.stringify(value);
         return sessionStorage.setItem(key, value);
     };

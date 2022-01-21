@@ -198,7 +198,6 @@ function CacheService(SessionService, _) {
         for (var i = 0; i < keys.length; i++) {
             delete cache[keys[i]];
         }
-        session.clear();
     };
 
     return {
