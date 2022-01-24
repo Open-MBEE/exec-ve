@@ -167,7 +167,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             token: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
-                    console.error('select-fromlogin');
                     ApplicationService.setUserName(data);
                     URLService.setToken($window.localStorage.getItem('token'));
                     deferred.resolve($window.localStorage.getItem('token'));
@@ -614,11 +613,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         }
                     });
                 } else {
-                    ElementService.getElement({
+                    ViewService.getProjectDocument({
                         projectId: $stateParams.projectId,
                         refId: $stateParams.refId,
-                        extended: true,
-                        elementId: $stateParams.documentId
+                        extended: false,
+                        documentId: $stateParams.documentId
                     }, 2).then(function(data){
                         deferred.resolve(data);
                     }, function(reason) {
@@ -679,7 +678,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 return ViewService.getProjectDocument({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
-                    extended: true,
+                    extended: false,
                     documentId: $stateParams.documentId
                 }, 2);
             }],
