@@ -27,8 +27,16 @@ function EventService(rx) {
         if (!this.subjects[fnName]) {
             (this.subjects[fnName] = new rx.Subject());
         }
-        return this.subjects[fnName].subscribe(handler);
+        let sub = [];
+        sub[fnName] = this.subjects[fnName].subscribe(handler);
+        return sub;
     };
+
+    // const destroy = (subs) => {
+    //     subs.forEach((sub) => {
+    //
+    //     });
+    // };
 
     return {
         $emit: emit,

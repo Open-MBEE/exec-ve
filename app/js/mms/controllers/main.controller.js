@@ -8,12 +8,21 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     var tree = TreeService;
     var session = SessionService;
     var edit = EditService;
+    $scope.subs = [];
     var eventSvc = EventService;
     var openEdits = {};
 
     session.veViewContentLoading(false);
     session.treeInitialSelection('');
+
+    $scope.subs.push(eventSvc.$on(session.constants.VETITLE, (value) => {
+        $window.document.title = value + ' | View Editor';
+    }));
+
     session.veTitle('');
+
+
+
     session.veFn(false);
 
     var modalOpen = false;

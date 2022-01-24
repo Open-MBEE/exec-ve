@@ -43,7 +43,7 @@ function SessionService($window, EventService) {
         }
         const result = setStorage(name, value);
         if (emit === undefined || emit === true)
-            eventSvc.$broadcast(name,{data: value});
+            eventSvc.$broadcast(name,value);
 
         return result;
     };

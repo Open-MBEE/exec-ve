@@ -2,8 +2,8 @@
 
 angular.module('mms.directives')
 .factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$compile', '$window', 'URLService',
-    'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService', 'TreeService',
-    'SessionService', 'EventService', 'growl', Utils]);
+    'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService',
+    'SessionService', 'EventService', 'EditService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -22,12 +22,12 @@ angular.module('mms.directives')
  *
  */
 function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLService, CacheService,
-               ElementService, ViewService, UtilsService, AuthService, PermissionsService, TreeService, SessionService,
-               EventService, growl) {
+               ElementService, ViewService, UtilsService, AuthService, PermissionsService, SessionService,
+               EventService, EditService, growl) {
 
-    const tree = TreeService;
     const session = SessionService;
     const eventSvc = EventService;
+    const editSvc = EditService;
 
     function clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
@@ -843,8 +843,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      */
     var reopenUnsavedElts = function(scope, transcludeType){
         var unsavedEdits = {};
-        if (scope.$root.ve_edits) {
-            unsavedEdits = scope.$root.ve_edits;
+        if (editSvc.openEdits() > 0) {
+            unsavedEdits = editSvc.getAll();
         }
         var key = scope.element.id + '|' + scope.element._projectId + '|' + scope.element._refId;
         var thisEdits = unsavedEdits[key];

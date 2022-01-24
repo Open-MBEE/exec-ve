@@ -223,9 +223,9 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
         scope.user_dblclicks_branch = function(branch) {
             if (branch.onDblclick) {
-                scope.$root.$broadcast(branch.onDblclick,{ branch: branch });
+                eventSvc.$broadcast(branch.onDblclick,{ branch: branch });
             } else if (scope.options.onDblclick) {
-                scope.$root.$broadcast(scope.options.onDblclick,{ branch: branch });
+                eventSvc.$broadcast(scope.options.onDblclick,{ branch: branch });
             }
         };
 
