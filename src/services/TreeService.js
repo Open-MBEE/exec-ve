@@ -124,6 +124,7 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
             else
                 tree.treeData.push(new_branch);
         }
+        on_treeData_change();
     };
 
     this.remove_branch = function(branch) {
@@ -159,6 +160,7 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
         on_treeData_change();
     };
 
+    tree.expandPathToSelectedBranch = expandPathToSelectedBranch;
     /**
      * @ngdoc function
      * @name mms.directives.directive:mmsTree#collapse_branch

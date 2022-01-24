@@ -389,7 +389,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             // Initialize ckeditor and set event handlers
             $(element).val(ngModelCtrl.$modelValue);
             instance = CKEDITOR.replace(attrs.id, {
-                customConfig: '/lib/ckeditor/config.js',
+                //customConfig: '/lib/ckeditor/config.js', not needed, this is default and prevents absolute path
                 mmscf: {callbackModalFnc: transcludeCallback},
                 mmscomment: {callbackModalFnc: commentCallback},
                 mmsvlink: {callbackModalFnc: viewLinkCallback},

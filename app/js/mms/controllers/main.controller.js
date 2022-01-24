@@ -169,14 +169,11 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
             session.veViewContentLoading(false);
             if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project' || fromState.name === 'login.redirect')) {
                 $timeout(function() {
-                    let originalState = session.treePaneClosed();
                     eventSvc.$broadcast('tree-pane-toggle');
-                    //Wait for pane to toggle
-                    while (session.treePaneClosed() === originalState) {}
-                    eventSvc.$broadcast('tree-pane-toggle');
-                    //Wait again for toggle
-                    while (session.treePaneClosed() !== originalState) {}
                 }, 1, false);
+                $timeout(function() {
+                    eventSvc.$broadcast('tree-pane-toggle');
+                }, 100, false);
             }
         }
     );

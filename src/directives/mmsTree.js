@@ -237,10 +237,10 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
     function getHref(row) {
         var data = row.branch.data;
-        if (row.branch.type !== 'group' && UtilsService.isDocument(data) && !ApplicationService.getState().fullDoc) {
+        /*if (row.branch.type !== 'group' && UtilsService.isDocument(data) && !ApplicationService.getState().fullDoc) {
             var ref = data._refId ? data._refId : 'master';
             return UtilsService.PROJECT_URL_PREFIX + data._projectId + '/' + ref+ '/documents/' + data.id + '/views/' + data.id;
-        }
+        }*/
     }
 
     return {

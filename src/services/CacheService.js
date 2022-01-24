@@ -38,11 +38,6 @@ function CacheService(SessionService, _) {
             }
             return realval;
         }
-        else if (session.accessor(realkey)) {
-            var val = session.accessor(realkey);
-            cache[realkey] = {}; //Init for thaw
-            return put(key,val,false,false);
-        }
         return null;
     };
 
@@ -122,7 +117,6 @@ function CacheService(SessionService, _) {
             }
             val = value;
         }
-        session.accessor(realkey,val,false);
         return val;
     };
 
@@ -147,7 +141,6 @@ function CacheService(SessionService, _) {
         }
         var result = cache[realkey];
         delete cache[realkey];
-        session.accessor(realkey,session.constants.DELETEKEY);
         if (angular.isString(result)) {
             return remove(result);
         }
@@ -171,12 +164,6 @@ function CacheService(SessionService, _) {
             realkey = makeKey(key);
         }
         if (!cache.hasOwnProperty(realkey)) {
-            if (session.accessor(realkey)) {
-                var sessionVal = session.accessor(realkey);
-                cache[realkey] = {}; //Init for thaw
-                put(key,sessionVal,false,false);
-                return true;
-            }
             return false;
         }
         var val = cache[realkey];
