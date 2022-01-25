@@ -9,6 +9,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     var session = SessionService;
     var edit = EditService;
     $scope.subs = [];
+    $scope.$on('$destroy',())
     var eventSvc = EventService;
     var openEdits = {};
 
