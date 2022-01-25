@@ -110,14 +110,14 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
             var type = "name";
 
             if (scope.commitId === 'latest') {
-                eventSvc.$on('element.updated', function(data) {
+                scope.subs.push(eventSvc.$on('element.updated', function(data) {
                     let elementOb = data.element;
                     let continueEdit = data.continueEdit;
                     if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                         elementOb._refId === scope.element._refId && !continueEdit) {
                         recompile();
                     }
-                });
+                }));
             }
 
             scope.save = function() {

@@ -7,8 +7,8 @@
         </div>
     </div>
     <div fa-pane pane-anchor="center">
-        <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="session.veViewContentLoading()"></i>
-        <div ng-hide="session.veViewContentLoading()" class="container-fluid">
+        <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="ve_viewContentLoading"></i>
+        <div ng-hide="ve_viewContentLoading" class="container-fluid">
             <div class="pane-center-inner">
                 <div class="ve-notify-banner" ng-show="refOb.type === 'Tag'">
                     <span><strong>Tags are read only:</strong> Switch to a branch to edit</span>
@@ -28,7 +28,7 @@
 </div>
 
 <div ng-if="search !== null">
-    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="session.veViewContentLoading()"></i>
+    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="ve_viewContentLoading"></i>
     <mms-search mms-options="searchOptions" mms-project-id="{{projectOb.id}}" mms-ref-id="{{refOb.id}}"></mms-search>
 </div>
 

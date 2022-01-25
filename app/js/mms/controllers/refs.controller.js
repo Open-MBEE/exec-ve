@@ -52,12 +52,12 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $win
     $scope.deleteRef = function(e) {
         deleteItem();
     };
-    eventSvc.$on('fromParamChange', function(fromParams) {
+   $scope.subs.push(eventSvc.$on('fromParamChange', function(fromParams) {
         var index = _.findIndex(refObs, {name: fromParams.refId});
         if ( index > -1 ) {
             $scope.fromParams = refObs[index];
         }
-    });
+    }));
 
     $scope.refClickHandler = function(ref) {
         ProjectService.getRef(ref.id, projectOb.id).then(

@@ -115,14 +115,14 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 recompile();
                 scope.panelType = "Comment";
                 if (scope.commitId === 'latest') {
-                    eventSvc.$on('element.updated', function () {
+                   scope.subs.push(eventSvc.$on('element.updated', function () {
                         let elementOb = data.element;
                         let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }
-                    });
+                    }));
                 }
             }, function(reason) {
                 domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');

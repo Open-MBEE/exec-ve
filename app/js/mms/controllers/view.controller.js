@@ -14,7 +14,9 @@ angular.module('mmsApp')
         
     let session = SessionService;
     let tree = TreeService.getApi();
+
     let eventSvc = EventService;
+    eventSvc.$init($scope);
 
     function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
@@ -28,6 +30,11 @@ angular.module('mmsApp')
     if ($state.includes('project.ref.preview') && viewOb && viewOb.id.indexOf('_cover') < 0) {
         $scope.vidLink = true;
     }
+
+    $scope.ve_viewContentLoading = false;
+    $scope.subs.push(eventSvc.$on(session.constants.VEVIEWCONTENTLOADING, (newValue) => {
+        $scope.ve_viewContentLoading = newValue;
+    }));
 
     session.veFullDocMode(false);
     if (!session.veCommentsOn())
@@ -149,19 +156,19 @@ angular.module('mmsApp')
         }
     };
 
-    eventSvc.$on('show-comments', function() {
+   $scope.subs.push(eventSvc.$on('show-comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show-comments');
         session.veCommentsOn(!session.veCommentsOn());
-    });
+    }));
 
-    eventSvc.$on('show-elements', function() {
+   $scope.subs.push(eventSvc.$on('show-elements', function() {
         $scope.viewApi.toggleShowElements();
         $scope.bbApi.toggleButtonState('show-elements');
         session.veElementsOn(!session.veElementsOn());
-    });
+    }));
 
-    eventSvc.$on('show-edits', function() {
+   $scope.subs.push(eventSvc.$on('show-edits', function() {
         if( (session.veElementsOn() && session.veEditMode()) || (!session.veElementsOn() && !session.veEditMode()) ){
             $scope.viewApi.toggleShowElements();
             $scope.bbApi.toggleButtonState('show-elements');
@@ -170,9 +177,9 @@ angular.module('mmsApp')
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show-edits');
         session.veEditMode(!session.veEditMode());
-    });
+    }));
 
-    eventSvc.$on('center-previous', function() {
+   $scope.subs.push(eventSvc.$on('center-previous', function() {
         var prev = tree.get_prev_branch(tree.get_selected_branch());
         if (!prev)
             return;
@@ -184,9 +191,9 @@ angular.module('mmsApp')
         $scope.bbApi.toggleButtonSpinner('center-previous');
         tree.select_branch(prev);
         $scope.bbApi.toggleButtonSpinner('center-previous');
-    });
+    }));
 
-    eventSvc.$on('center-next', function() {
+   $scope.subs.push(eventSvc.$on('center-next', function() {
         var next = tree.get_next_branch(tree.get_selected_branch());
         if (!next)
             return;
@@ -198,7 +205,7 @@ angular.module('mmsApp')
         $scope.bbApi.toggleButtonSpinner('center-next');
         tree.select_branch(next);
         $scope.bbApi.toggleButtonSpinner('center-next');
-    });
+    }));
 
     // Share URL button settings
     $scope.dynamicPopover = ShortenUrlService.dynamicPopover;
@@ -234,7 +241,7 @@ angular.module('mmsApp')
         }
     };
 
-    eventSvc.$on('convert-pdf', function() {
+   $scope.subs.push(eventSvc.$on('convert-pdf', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 3)
@@ -243,15 +250,15 @@ angular.module('mmsApp')
         }, function(reason){
             growl.error("Exporting as PDF file Failed: " + reason.message);
         });
-    });
+    }));
 
-    eventSvc.$on('print', function() {
+   $scope.subs.push(eventSvc.$on('print', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 1);
-    });
+    }));
 
-    eventSvc.$on('word', function() {
+   $scope.subs.push(eventSvc.$on('word', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 2)
@@ -260,18 +267,18 @@ angular.module('mmsApp')
         }, function(reason){
             growl.error("Exporting as Word file Failed: " + reason.message);
         });
-    });
+    }));
 
-    eventSvc.$on('tabletocsv', function() {
+   $scope.subs.push(eventSvc.$on('tabletocsv', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.tableToCsv(false);
-    });
+    }));
 
-    eventSvc.$on('refresh-numbering', function() {
+   $scope.subs.push(eventSvc.$on('refresh-numbering', function() {
         if (isPageLoading())
             return;
         var printElementCopy = angular.element("#print-div");
         MmsAppUtils.refreshNumbering(tree.get_rows(), printElementCopy);
-    });
+    }));
 }]);

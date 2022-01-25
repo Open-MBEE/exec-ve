@@ -46,12 +46,12 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         session.mmsPaneClosed($scope.$pane.closed);
     });
 
-    eventSvc.$on(editSvc.EVENT, function() {
+   $scope.subs.push(eventSvc.$on(editSvc.EVENT, function() {
         $scope.openEdits = editSvc.openEdits();
-    });
+    }));
     $scope.edits = editSvc.getAll();
     
-    eventSvc.$on('mms-pane-toggle',(data) => {
+   $scope.subs.push(eventSvc.$on('mms-pane-toggle',(data) => {
         let paneClosed = data;
         if (paneClosed === undefined) {
             $scope.$pane.toggle();
@@ -62,7 +62,7 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         else if (!paneClosed && $scope.$pane.closed) {
             $scope.$pane.toggle();
         }
-    });
+    }));
 
     $scope.show = {
         element: true,
@@ -106,18 +106,18 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         }
     };
 
-    eventSvc.$on('element-history', function() {
+   $scope.subs.push(eventSvc.$on('element-history', function() {
         showPane('history');
-    });
+    }));
 
-    eventSvc.$on('tags', function() {
+   $scope.subs.push(eventSvc.$on('tags', function() {
         showPane('tags');
-    });
+    }));
 
-    eventSvc.$on('gotoTagsBranches', function(){
+   $scope.subs.push(eventSvc.$on('gotoTagsBranches', function(){
         eventSvc.$broadcast(toolbar.constants.SELECT, {id: 'tags'});
         showPane('tags');
-    });
+    }));
 
     var cleanUpEdit = function(editOb, cleanAll) {
         if (!Utils.hasEdits(editOb) || cleanAll) {
@@ -127,21 +127,21 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         }
     };
 
-    eventSvc.$on('presentationElem.edit', function(editOb) {
+   $scope.subs.push(eventSvc.$on('presentationElem.edit', function(editOb) {
         var key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
         editSvc.addOrUpdate(key, editOb);
         cleanUpSaveAll();
-    });
+    }));
 
-    eventSvc.$on('presentationElem.save', function(editOb) {
+   $scope.subs.push(eventSvc.$on('presentationElem.save', function(editOb) {
         cleanUpEdit(editOb, true);
-    });
+    }));
 
-    eventSvc.$on('presentationElem.cancel', function(editOb) {
+   $scope.subs.push(eventSvc.$on('presentationElem.cancel', function(editOb) {
         cleanUpEdit(editOb);
-    });
+    }));
 
-    eventSvc.$on('elementSelected', function(data) {
+   $scope.subs.push(eventSvc.$on('elementSelected', function(data) {
         let elementOb = data.elementOb;
         let commitId = (data.commitId) ? data.commitId : null;
         let displayOldContent = (data.displayOldContent) ? data.displayOldContent : null;
@@ -159,14 +159,14 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         var editable = $scope.refOb.type === 'Branch' && commitId === 'latest' && PermissionsService.hasBranchEditPermission($scope.refOb);
         eventSvc.$broadcast(toolbar.constants.SETPERMISSION, {id: 'element-editor', value: editable});
         $scope.$apply();
-    });
+    }));
 
-    eventSvc.$on('element-viewer', function() {
+   $scope.subs.push(eventSvc.$on('element-viewer', function() {
         $scope.specApi.setEditing(false);
         cleanUpSaveAll();
         showPane('element');
-    });
-    eventSvc.$on('element-editor', function() {
+    }));
+   $scope.subs.push(eventSvc.$on('element-editor', function() {
         $scope.specApi.setEditing(true);
         showPane('element');
         var editOb = $scope.specApi.getEdits();
@@ -181,8 +181,8 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             if (data.status && data.server._modified > data.cache._modified)
                 growl.error('This element has been updated on the server. Please refresh the page to get the latest version.');
         });
-    });
-    eventSvc.$on('viewSelected', function(data) {
+    }));
+   $scope.subs.push(eventSvc.$on('viewSelected', function(data) {
         let elementOb = data.elementOb;
         let commitId = (data.commitId) ? data.commitId : null;
         eventSvc.$broadcast('elementSelected', {elementOb: elementOb, commitId: commitId});
@@ -190,24 +190,24 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         var editable = $scope.refOb.type === 'Branch' && commitId === 'latest' && PermissionsService.hasBranchEditPermission($scope.refOb);
         $scope.viewCommitId = commitId ? commitId : elementOb._commitId;
         eventSvc.$broadcast(toolbar.constants.SETPERMISSION, {id: 'view-reorder', value: editable});
-    });
+    }));
 
-    eventSvc.$on('view-reorder.refresh', function() {
+   $scope.subs.push(eventSvc.$on('view-reorder.refresh', function() {
         $scope.viewContentsOrderApi.refresh();
-    });
+    }));
 
-    eventSvc.$on('view-reorder', function() {
+   $scope.subs.push(eventSvc.$on('view-reorder', function() {
         $scope.viewContentsOrderApi.setEditing(true);
         showPane('reorder');
-    });
+    }));
 
     var elementSaving = false;
-    eventSvc.$on('element-editor-save', function() {
+   $scope.subs.push(eventSvc.$on('element-editor-save', function() {
         save(false);
-    });
-    eventSvc.$on('element-editor-saveC', function() {
+    }));
+   $scope.subs.push(eventSvc.$on('element-editor-saveC', function() {
         save(true);
-    });
+    }));
     var save = function(continueEdit) {
         if (elementSaving) {
             growl.info('Please Wait...');
@@ -268,7 +268,7 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         callback: function() {eventSvc.$broadcast('element-editor-saveall');}
     });
     var savingAll = false;
-    eventSvc.$on('element-editor-saveall', function() {
+   $scope.subs.push(eventSvc.$on('element-editor-saveall', function() {
         if (savingAll) {
             growl.info('Please wait...');
             return;
@@ -318,8 +318,8 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
                     eventSvc.$broadcast(toolbar.constants.SETICON, {id: 'element-editor', value: 'fa-edit'});
                 }
             });
-    });
-    eventSvc.$on('element-editor-cancel', function() {
+    }));
+   $scope.subs.push(eventSvc.$on('element-editor-cancel', function() {
         var go = function() {
             var rmEdit = $scope.specApi.getEdits();
             editSvc.remove(rmEdit.id + '|' + rmEdit._projectId + '|' + rmEdit._refId);
@@ -361,9 +361,9 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             });
         } else
             go();
-    });
+    }));
     var viewSaving = false;
-    eventSvc.$on('view-reorder-save', function() {
+   $scope.subs.push(eventSvc.$on('view-reorder-save', function() {
         if (viewSaving) {
             growl.info('Please Wait...');
             return;
@@ -384,11 +384,11 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             eventSvc.$broadcast(toolbar.constants.TOGGLEICONSPINNER, {id: 'view-reorder-save'});
         });
         eventSvc.$broadcast(toolbar.constants.SELECT, {id: 'view-reorder'});
-    });
-    eventSvc.$on('view-reorder-cancel', function() {
+    }));
+   $scope.subs.push(eventSvc.$on('view-reorder-cancel', function() {
         $scope.specApi.setEditing(false);
         $scope.viewContentsOrderApi.refresh();
         eventSvc.$broadcast(toolbar.constants.SELECT, {id: 'element-viewer'});
         showPane('element');
-    });
+    }));
 }]);

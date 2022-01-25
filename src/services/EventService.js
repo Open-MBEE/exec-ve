@@ -27,16 +27,22 @@ function EventService(rx) {
         if (!this.subjects[fnName]) {
             (this.subjects[fnName] = new rx.Subject());
         }
-        let sub = [];
-        sub[fnName] = this.subjects[fnName].subscribe(handler);
-        return sub;
+        return this.subjects[fnName].subscribe(handler);
     };
 
     const destroy = (subs) => {
-        var keys = Object.keys(subs);
-        for (var i = 0; i < keys.length; i++) {
-            subs[keys[i]].unsubscribe();
+        if (subs.length > 0) {
+            for (var i = 0; i < subs.length; i++) {
+                subs[i].unsubscribe();
+            }
         }
+    };
+
+    const initEventSvc = (scope) => {
+        scope.subs = [];
+        scope.$on('$destroy', () => {
+            destroy(scope.subs);
+        });
     };
 
     return {
@@ -44,7 +50,8 @@ function EventService(rx) {
         $broadcast: emit,
         $listen: listen,
         $on: listen,
-        $destroy: destroy
+        $destroy: destroy,
+        $init: initEventSvc
     };
 
 }

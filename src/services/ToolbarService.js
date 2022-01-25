@@ -30,22 +30,6 @@ function ToolbarService(EventService) {
         SELECT: 'tb-select'
     };
 
-    eventSvc.$on(constants.SETPERMISSION, (data) => {
-        this.tbApi.setPermission(data.id,data.value);
-    });
-
-    eventSvc.$on(constants.SETICON, (data) => {
-        this.tbApi.setIcon(data.id,data.value);
-    });
-
-    eventSvc.$on(constants.TOGGLEICONSPINNER, (data) => {
-        this.tbApi.toggleButtonSpinner(data.id);
-    });
-
-    eventSvc.$on(constants.SELECT, (data) => {
-        this.tbApi.select(data.id);
-    });
-
     return {
         getApi: getApi,
         isApi: isApi,

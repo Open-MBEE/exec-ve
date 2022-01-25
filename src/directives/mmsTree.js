@@ -105,6 +105,8 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
     var mmsTreeLink = function(scope, element, attrs) {
 
+        eventSvc.$init(scope);
+
         //Initialize Tree API
         scope.tree = TreeService;
 
@@ -163,22 +165,22 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                 session.treeOptions(scope.treeOptions);
             });
 
-            eventSvc.$on('tree-get-branch-element', (args) => {
+           scope.subs.push(eventSvc.$on('tree-get-branch-element', (args) => {
                 $timeout(function() {
                     var el = angular.element('#tree-branch-' + args.id);
                     if (!el.isOnScreen() && el.get(0) !== undefined) {
                         el.get(0).scrollIntoView();
                     }
                 }, 500, false);
-            });
+            }));
 
 
 
             scope.treeFilter = $filter('uiTreeFilter');
 
-            eventSvc.$on(session.constants.TREEINITIALSELECTION, () => {
+            scope.subs.push(eventSvc.$on(session.constants.TREEINITIALSELECTION, () => {
                 scope.treeApi.on_initialSelection_change();
-            });
+            }));
 
             scope.treeApi.for_each_branch(function(b, level) {
                 b.level = level;

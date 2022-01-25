@@ -3,14 +3,13 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'SessionService', 'TreeService', 'EditService', 'EventService', '$interval',
-function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, SessionService, TreeService, EditService, EventService, $interval) {
-    var tree = TreeService;
+.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'SessionService', 'EditService', 'EventService', '$interval',
+function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, SessionService, EditService, EventService, $interval) {
     var session = SessionService;
     var edit = EditService;
-    $scope.subs = [];
-    $scope.$on('$destroy',())
     var eventSvc = EventService;
+    eventSvc.$init($scope);
+
     var openEdits = {};
 
     session.veViewContentLoading(false);
@@ -28,9 +27,9 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
 
     var modalOpen = false;
 
-    eventSvc.$on(edit.EVENT, () => {
+    $scope.subs.push(eventSvc.$on(edit.EVENT, () => {
         openEdits = edit.getAll();
-    });
+    }));
 
 
     $window.addEventListener('beforeunload', function(event) {
@@ -73,7 +72,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         session.veStateChanging(true);
     });
 
-    eventSvc.$on('mms.unauthorized', function(response) {
+   $scope.subs.push(eventSvc.$on('mms.unauthorized', function(response) {
         // add a boolean to the 'or' statement to check for modal window
         if ($state.$current.name === 'login' || session.veStateChanging() || modalOpen)
             return;
@@ -121,7 +120,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                 modalOpen = false;
             });
         });
-    });
+    }));
     // broadcast mms.unauthorized every 10 minutes with interval service
     $interval(function() {
         eventSvc.$broadcast('mms.unauthorized');
@@ -180,7 +179,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     );
 
     var workingModalOpen = false;
-    eventSvc.$on('mms.working', function(response) {
+   $scope.subs.push(eventSvc.$on('mms.working', function(response) {
         session.veViewContentLoading(false);
         if (workingModalOpen) {
             return;
@@ -197,9 +196,9 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         }).result.finally(function(){
             workingModalOpen = false;
         });
-    });
+    }));
 
-    eventSvc.$on('element.updated', function(data) {
+   $scope.subs.push(eventSvc.$on('element.updated', function(data) {
         let element = data.element;
         //if element is not being edited and there's a cached edit object, update the edit object also
         //so next time edit forms will show updated data (mainly for stomp updates)
@@ -208,5 +207,5 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         if (edit.getAll() && !edit.get(veEditsKey) && CacheService.exists(editKey)) {
             ElementService.cacheElement({projectId: element._projectId, refId: element._refId, elementId: element.id, commitId: 'latest'}, JSON.parse(JSON.stringify(element)), true);
         }
-    });
+    }));
 }]);

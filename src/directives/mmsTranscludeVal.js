@@ -48,6 +48,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
 
     var mmsTranscludeCtrl = function ($scope) {
 
+
         $scope.bbApi = {};
         $scope.buttons = [];
         $scope.buttonsInit = false;
@@ -66,6 +67,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
     };
 
     var mmsTranscludeValLink = function(scope, domElement, attrs, controllers) {
+
+        eventSvc.$init(scope);
+
         var mmsViewCtrl = controllers[0];
         var mmsViewPresentationElemCtrl = controllers[1];
         scope.recompileScope = null;
@@ -176,7 +180,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 recompile();
                 Utils.reopenUnsavedElts(scope, 'value');
                 if (scope.commitId === 'latest') {
-                    eventSvc.$on('element.updated', function (data) {
+                   scope.subs.push(eventSvc.$on('element.updated', function (data) {
                         let elementOb = data.element;
                         let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
@@ -184,7 +188,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                             Utils.setupValCf(scope);
                             recompile();
                         }
-                    });
+                    }));
                 }
             }, function(reason) {
                 domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');

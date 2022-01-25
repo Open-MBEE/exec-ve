@@ -9,15 +9,18 @@ angular.module('mmsApp')
 function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocumentService, ShortenUrlService, hotkeys, growl, _,
     MmsAppUtils, Utils, UxService, URLService, UtilsService, search, orgOb, projectOb, refOb, groupOb, documentOb, PermissionsService,
     SessionService, TreeService, EventService) {
+
     let session = SessionService;
     let tree = TreeService.getApi();
+
     let eventSvc = EventService;
+    eventSvc.$init($scope);
 
     $scope.viewContentLoading = false;
 
-    eventSvc.$on(session.constants.VEVIEWCONTENTLOADING,(data) => {
+    $scope.subs.push(eventSvc.$on(session.constants.VEVIEWCONTENTLOADING,(data) => {
         $scope.viewContentLoading = data;
-    });
+    }));
 
     session.veFullDocMode(true);
     if (!session.veCommentsOn())
@@ -118,38 +121,38 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
 
     _initializeDocLibLink();
 
-    eventSvc.$on('mms-tree-click', function(branch) {
+    $scope.subs.push(eventSvc.$on('mms-tree-click', function(branch) {
         fullDocumentService.handleClickOnBranch(branch, function() {
             $location.hash(branch.data.id);
             $anchorScroll();
         });
-    });
+    }));
 
-    eventSvc.$on('mms-full-doc-view-deleted', function(deletedBranch) {
+    $scope.subs.push(eventSvc.$on('mms-full-doc-view-deleted', function(deletedBranch) {
        fullDocumentService.handleViewDelete(deletedBranch);
-    });
+    }));
 
-    eventSvc.$on('mms-new-view-added', function(data) {
+    $scope.subs.push(eventSvc.$on('mms-new-view-added', function(data) {
         fullDocumentService.handleViewAdd(_buildViewElement(data.vId, data.curSec), data.prevSibId);
-    });
+    }));
 
-    eventSvc.$on('show-comments', function() {
+   $scope.subs.push(eventSvc.$on('show-comments', function() {
         for (var i = 0; i < $scope.views.length; i++) {
             $scope.views[i].api.toggleShowComments();
         }
         $scope.bbApi.toggleButtonState('show-comments');
         session.veCommentsOn(!session.veCommentsOn());
-    });
+    }));
 
-    eventSvc.$on('show-elements', function() {
+   $scope.subs.push(eventSvc.$on('show-elements', function() {
         for (var i = 0; i < $scope.views.length; i++) {
             $scope.views[i].api.toggleShowElements();
         }
         $scope.bbApi.toggleButtonState('show-elements');
         session.veElementsOn(!session.veElementsOn());
-    });
+    }));
 
-    eventSvc.$on('show-edits', function() {
+   $scope.subs.push(eventSvc.$on('show-edits', function() {
         var i = 0;
         if ((session.veElementsOn() && session.veEditMode()) || (!session.veElementsOn() && !session.veEditMode()) ){
             for (i = 0; i < $scope.views.length; i++) {
@@ -163,9 +166,9 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
         for (i = 0; i < $scope.views.length; i++) {
             $scope.views[i].api.toggleShowEdits();
         }
-    });
+    }));
 
-    eventSvc.$on('convert-pdf', function() {
+   $scope.subs.push(eventSvc.$on('convert-pdf', function() {
         fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.printModal(documentOb, refOb, true, 3)
             .then(function(ob) {
@@ -174,15 +177,15 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
                 growl.error("Exporting as PDF file Failed: " + reason.message);
             });
         });
-    });
+    }));
 
-    eventSvc.$on('print', function() {
+   $scope.subs.push(eventSvc.$on('print', function() {
         fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.printModal(documentOb, refOb, true, 1);
         });
-    });
+    }));
 
-    eventSvc.$on('word', function() {
+   $scope.subs.push(eventSvc.$on('word', function() {
         fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.printModal(documentOb, refOb, true, 2)
             .then(function(ob) {
@@ -191,19 +194,19 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
                 growl.error("Exporting as Word file Failed: " + reason.message);
             });
         });
-    });
+    }));
 
-    eventSvc.$on('tabletocsv', function() {
+   $scope.subs.push(eventSvc.$on('tabletocsv', function() {
         fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.tableToCsv(true);
         });
-    });
+    }));
 
-    eventSvc.$on('refresh-numbering', function() {
+   $scope.subs.push(eventSvc.$on('refresh-numbering', function() {
         fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.refreshNumbering(tree.get_rows(), angular.element("#print-div"));
         });
-    });
+    }));
 
     // Share URL button settings
     $scope.dynamicPopover = ShortenUrlService.dynamicPopover;

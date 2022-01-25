@@ -53,6 +53,8 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
 
     var mmsTranscludeDocCtrl = function($scope) {
 
+        eventSvc.$init($scope);
+
         $scope.bbApi = {};
         $scope.buttons = [];
         $scope.buttonsInit = false;
@@ -160,14 +162,14 @@ function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxSe
                 Utils.reopenUnsavedElts(scope, "documentation");
 
                 if (scope.commitId === 'latest') {
-                    eventSvc.$on('element.updated', function (data) {
+                   scope.subs.push(eventSvc.$on('element.updated', function (data) {
                         let elementOb = data.element;
                         let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }
-                    });
+                    }));
                 }
             }, function(reason) {
                 domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');

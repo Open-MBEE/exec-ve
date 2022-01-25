@@ -53,9 +53,6 @@ function SessionService($window, EventService) {
         VETITLE: 've-title',
         VEFN: 've-fn',
         VEVIEWCONTENTLOADING: 've-view-content-loading',
-        TREEINITIAL: 'tree-initial',
-        TREEDATA: 'tree-data',
-        TREEROWS: 'tree-rows',
         TREEOPTIONS: 'tree-options',
         TREEINITIALSELECTION: 'tree-initialSelection',
         TREEICONS: 'tree-icons'
@@ -134,9 +131,6 @@ function SessionService($window, EventService) {
         return accessor('ve-edit-mode', value);
     };
 
-    const treeRows  = (value=null) => {
-        return accessor(constants.TREEROWS, value);
-    };
     const treeOptions = (value=null) => {
         if (!value) {
             var topts = accessor(constants.TREEOPTIONS, value);
@@ -180,7 +174,6 @@ function SessionService($window, EventService) {
         veCommentsOn: veCommentsOn,
         veElementsOn: veElementsOn,
         veEditMode: veEditMode,
-        treeRows: treeRows,
         treeOptions: treeOptions,
         treeInitialSelection: treeInitialSelection,
         treeIcons: treeIcons,

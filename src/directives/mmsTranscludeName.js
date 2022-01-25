@@ -36,6 +36,10 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
     var defaultTemplate = '<span ng-if="element.name">{{element.name}}</span><span ng-if="!element.name" class="no-print placeholder">(no name)</span>';
     var editTemplate = '<span ng-if="edit.name">{{edit.name}}</span><span ng-if="!edit.name" class="no-print placeholder">(no name)</span>';
 
+    var mmsTranscludeNameCtrl = function($scope) {
+        eventSvc.$init($scope);
+    };
+
     var mmsTranscludeNameLink = function(scope, domElement, attrs, controllers) {
         var mmsViewCtrl = controllers[0];
         scope.recompileScope = null;
@@ -101,14 +105,14 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
                     mmsViewCtrl.elementTranscluded(scope.element);
                 }
                 if (scope.commitId === 'latest') {
-                    eventSvc.$on('element.updated', function (data) {
+                   scope.subs.push(eventSvc.$on('element.updated', function (data) {
                         let elementOb = data.element;
                         let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }
-                    });
+                    }));
                 }
             }, function(reason) {
                 domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');
@@ -162,7 +166,7 @@ function mmsTranscludeName(ElementService, UxService, $compile, growl, $template
             mmsCfLabel: '@'
         },
         require: ['?^^mmsView'],
-        // controller: ['$scope', mmsTranscludeNameCtrl],
+        controller: ['$scope', mmsTranscludeNameCtrl],
         link: mmsTranscludeNameLink
     };
 }

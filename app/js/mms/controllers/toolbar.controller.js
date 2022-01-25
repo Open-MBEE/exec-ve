@@ -4,10 +4,16 @@
 
 angular.module('mmsApp')
 .controller('ToolbarCtrl', ['$scope', '$state', 'UxService', 'refOb', 'documentOb', 'PermissionsService',
-    'EditService', 'ToolbarService',
-function($scope, $state, UxService, refOb, documentOb, PermissionsService, EditService, ToolbarService) {
+    'EditService', 'EventService', 'ToolbarService',
+function($scope, $state, UxService, refOb, documentOb, PermissionsService, EditService, EventService, ToolbarService) {
 
     let edit = EditService;
+
+    let eventSvc = EventService;
+    eventSvc.$init($scope);
+
+    let toolbar = ToolbarService;
+    eventSvc.$init($scope);
     $scope.buttons = [];
 
 
@@ -40,5 +46,21 @@ function($scope, $state, UxService, refOb, documentOb, PermissionsService, EditS
     };
 
     $scope.tbApi = ToolbarService.getApi($scope.buttons, tbInit);
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.SETPERMISSION, (data) => {
+        $scope.tbApi.setPermission(data.id,data.value);
+    }));
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.SETICON, (data) => {
+        $scope.tbApi.setIcon(data.id,data.value);
+    }));
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.TOGGLEICONSPINNER, (data) => {
+        $scope.tbApi.toggleButtonSpinner(data.id);
+    }));
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.SELECT, (data) => {
+        $scope.tbApi.select(data.id);
+    }));
 
 }]);
