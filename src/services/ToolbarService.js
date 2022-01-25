@@ -150,7 +150,7 @@ function ToolbarApi(buttons, initFn) {
                     buttonLoop.pullDown = true;
                     firstButton = false;
                 }
-                buttonLoop.priority = buttonLoop.length + 1000;
+                buttonLoop.priority = buttons.length + 1000;
                 buttons.push(buttonLoop);
             });
         }

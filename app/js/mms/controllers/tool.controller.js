@@ -42,16 +42,17 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.viewContentsOrderApi = {};
 
     session.mmsPaneClosed($scope.$pane.closed);
-    $scope.$watch($scope.$pane.closed,() => {
+    $scope.$watch('$pane.closed',() => {
         session.mmsPaneClosed($scope.$pane.closed);
     });
 
-    $scope.$watch(editSvc.openEdits(), () => {
+    eventSvc.$on(editSvc.EVENT, function() {
         $scope.openEdits = editSvc.openEdits();
     });
-
+    $scope.edits = editSvc.getAll();
+    
     eventSvc.$on('mms-pane-toggle',(data) => {
-        let paneClosed = data.closed;
+        let paneClosed = data;
         if (paneClosed === undefined) {
             $scope.$pane.toggle();
         }
