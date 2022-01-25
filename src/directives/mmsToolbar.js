@@ -46,7 +46,7 @@ function mmsToolbar($templateCache, SessionService, EventService, ToolbarService
 					if (button.selected || session.mmsPaneClosed())
 					{
 						if (button.selected && !session.mmsPaneClosed()) toggleDecativeFlag = true;
-						eventSvc.$broadcast('mms-pane-toggle', {closed: !session.mmsPaneClosed()});
+						eventSvc.$broadcast('mms-pane-toggle');
 					}
 				}
 

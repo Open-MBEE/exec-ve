@@ -93,7 +93,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
         //TODO pass proper args
         scope.propertyTypeClicked = function(id) {
             var elementOb = {id: id, _projectId: scope.mmsProjectId, _refId: scope.mmsRefId};
-            eventSvc.$emit('elementSelected', {elementOb: elementOb});
+            eventSvc.$broadcast('elementSelected', {elementOb: elementOb});
         };
 
         var getModifier = function(modifier) {
