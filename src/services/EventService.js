@@ -27,14 +27,24 @@ function EventService(rx) {
         if (!this.subjects[fnName]) {
             (this.subjects[fnName] = new rx.Subject());
         }
-        return this.subjects[fnName].subscribe(handler);
+        let sub = [];
+        sub[fnName] = this.subjects[fnName].subscribe(handler);
+        return sub;
+    };
+
+    const destroy = (subs) => {
+        var keys = Object.keys(subs);
+        for (var i = 0; i < keys.length; i++) {
+            subs[keys[i]].unsubscribe();
+        }
     };
 
     return {
         $emit: emit,
         $broadcast: emit,
         $listen: listen,
-        $on: listen
+        $on: listen,
+        $destroy: destroy
     };
 
 }
