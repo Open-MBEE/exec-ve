@@ -11,9 +11,7 @@
     </h1>
 
     <div class="ve-secondary-text last-modified no-print">
-      Last Modified: {{modified | date:'M/d/yy h:mm a'}} by <b ng-if="modifier.email != undefined">{{ modifier.email }}</b><b ng-if="modifier.email == undefined">{{ modifier }}</b>
-    </div>
-
+        Last Modified: {{modified | date:'M/d/yy h:mm a'}} by <b ng-if="modifier.email !== undefined">{{ modifier.email }}</b><b ng-if="modifier.email == undefined">{{ modifier }}</b>    </div>
     <i ng-hide="view" class="fa fa-2x fa-spinner fa-spin"></i>
 
     <div class="add-pe-button-container no-print" ng-init="$index = -1" ng-include="'mms/templates/mmsAddPeButton.html'"></div>

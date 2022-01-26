@@ -47,7 +47,7 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-group"));
-            $scope.bbApi.setPermission("tree-reorder-group", projectOb && PermissionsService.hasProjectEditPermission(projectOb));
+            $scope.bbApi.setPermission("tree-reorder-group", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
             $scope.bbApi.setPermission( "tree-add-document-or-group", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );

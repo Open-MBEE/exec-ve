@@ -8,8 +8,6 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     $rootScope.ve_viewContentLoading = false;
     $rootScope.ve_treeInitial = '';
     $rootScope.ve_title = '';
-    //TODO: Figure out why this needs to be set here for VE footer to work
-    $rootScope.ve_footer = "ALWAYS REPLACED";
     $rootScope.ve_fn = false;
 
     var modalOpen = false;

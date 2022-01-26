@@ -92,7 +92,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
 
         var getModifier = function(modifier) {
             AuthService.getUserData(modifier).then(function(modifierData){
-                return modifierData;
+                return modifierData.users[0];
             }, function() {
                 return modifier;
             });
@@ -150,7 +150,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                 }
                 scope.element = data;
                 AuthService.getUserData(data._modifier).then(function(modifierData){
-                    scope.modifier = modifierData;
+                    scope.modifier = modifierData.users[0];
                 }, function() {
                     scope.modifier = data._modifier;
                 });

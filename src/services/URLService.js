@@ -366,6 +366,24 @@ function urlService(baseUrl, mmsUrl) {
         return r;
     };
 
+        /**
+     * @ngdocs method
+     * @name mms.URLService#getArtifactEmbedURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets the url without added token for an artifact
+     *
+     * @param {object} reqOb object with keys
+     * @param {string} artifactExtension (optional) string with the desired artifact extension
+     * @returns {string} url
+     */
+         var getArtifactEmbedURL = function(reqOb,artifactExtension) {
+            var ext = (artifactExtension !== undefined) ? artifactExtension : reqOb.artifactExtension;
+            var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
+            return addVersion(r, reqOb.commitId);
+        };
+    
     /**
      * @ngdocs method
      * @name mms.URLService#getArtifactURL
@@ -589,6 +607,7 @@ function urlService(baseUrl, mmsUrl) {
         getProjectDocumentsURL: getProjectDocumentsURL,
         getImageURL: getImageURL,
         getExportHtmlUrl: getExportHtmlUrl,
+        getArtifactEmbedURL: getArtifactEmbedURL,
         getArtifactURL: getArtifactURL,
         getPutArtifactsURL: getPutArtifactsURL,
         getArtifactHistoryURL: getArtifactHistoryURL,

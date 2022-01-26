@@ -116,12 +116,10 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.login = function (credentials) {
-                        console.log(credentials.username);
                         $scope.spin = true;
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                         AuthService.getAuthorized(credentialsJSON)
                         .then(function(user) {
-                            console.log(user);
                             if ($rootScope.ve_redirect) {
                                 var toState = $rootScope.ve_redirect.toState;
                                 var toParams = $rootScope.ve_redirect.toParams;
@@ -167,7 +165,6 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             token: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
-                    console.error('select-fromlogin');
                     ApplicationService.setUserName(data);
                     URLService.setToken($window.localStorage.getItem('token'));
                     deferred.resolve($window.localStorage.getItem('token'));
@@ -368,7 +365,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         url: '/:refId?search',
         resolve: {
             projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
-                return ProjectService.getProjectMounts($stateParams.projectId, $stateParams.refId);
+                return ProjectService.getProject($stateParams.projectId);
             }],
             refOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
                 return ProjectService.getRef($stateParams.refId, $stateParams.projectId);
@@ -537,7 +534,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                 controller: 'ToolbarCtrl'
             },
             'footer@': {
-                template: '<ve-footer mms-footer="footer" ng-if="ve_footer"></ve-footer>',
+                template: '<ve-footer mms-footer="footer"></ve-footer>',
                 controller: ['$scope', 'footerOb', function ($scope, footerOb) {
                     $scope.footer = footerOb;
                 }]
@@ -613,11 +610,11 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         }
                     });
                 } else {
-                    ElementService.getElement({
+                    ViewService.getProjectDocument({
                         projectId: $stateParams.projectId,
                         refId: $stateParams.refId,
-                        extended: true,
-                        elementId: $stateParams.documentId
+                        extended: false,
+                        documentId: $stateParams.documentId
                     }, 2).then(function(data){
                         deferred.resolve(data);
                     }, function(reason) {
@@ -674,12 +671,12 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     .state('project.ref.document', {
         url: '/documents/:documentId',
         resolve: {
-            documentOb: ['$stateParams', 'ElementService', 'token', function($stateParams, ElementService, token) {
-                return ElementService.getElement({
+            documentOb: ['$stateParams', 'ViewService', 'token', function($stateParams, ViewService, token) {
+                return ViewService.getProjectDocument({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
-                    extended: true,
-                    elementId: $stateParams.documentId
+                    extended: false,
+                    documentId: $stateParams.documentId
                 }, 2);
             }],
             viewOb: ['documentOb', function(documentOb) {

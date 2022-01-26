@@ -389,7 +389,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             // Initialize ckeditor and set event handlers
             $(element).val(ngModelCtrl.$modelValue);
             instance = CKEDITOR.replace(attrs.id, {
-                customConfig: '/lib/ckeditor/config.js',
+                //customConfig: '/lib/ckeditor/config.js',
                 mmscf: {callbackModalFnc: transcludeCallback},
                 mmscomment: {callbackModalFnc: commentCallback},
                 mmsvlink: {callbackModalFnc: viewLinkCallback},
@@ -533,7 +533,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 } else {
                     //TODO does this need to be smarter?
                     var element = response.elements[0];
-                    data.url = URLService.getArtifactURL({projectId: element._projectId, refId: element._refId, elementId: element.id, artifactExtension: element._artifacts[0].extension });
+                    data.url = URLService.getArtifactEmbedURL({projectId: element._projectId, refId: element._refId, elementId: element.id, artifactExtension: element._artifacts[0].extension });
                 }
             } );
         }, 0, false);
