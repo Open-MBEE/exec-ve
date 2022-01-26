@@ -103,38 +103,30 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
     const eventSvc = EventService;
     const session = SessionService;
 
-    var mmsTreeLink = function(scope, element, attrs) {
+    var mmsTreeCtrl = function($scope) {
 
-        eventSvc.$init(scope);
+        eventSvc.$init($scope);
+        if (!$scope.treeData) {
+            $scope.treeData = [];
+        }
 
-        //Initialize Tree API
-        scope.tree = TreeService;
-
-        scope.getHref = getHref;
-
-        scope.init = false;
-        scope.$watch(() => {
-            return scope.treeData;
-        },() => {
-            if (!scope.treeData){
-                return null;
-            }
-            if (scope.init === false && scope.treeData.length > 0) {
+        let unwatch = $scope.$watch($scope.treeData,() => {
+            if ($scope.treeData.length > 0) {
+                unwatch();
                 init();
-            }else if (scope.treeData.length === 0) {
-                scope.init = false;
             }
-            //console.log(scope.treeData);
-        });
+        },true);
 
         const init = () => {
-            scope.tree_rows = [];
-            scope.treeApi = scope.tree.getApi(scope.treeData, scope.tree_rows);
+            //Initialize Tree API
+            $scope.tree = TreeService;
+            $scope.tree_rows = [];
+            $scope.treeApi = $scope.tree.getApi($scope.treeData, $scope.tree_rows);
 
-            scope.selected_branch = scope.treeApi.selected_branch;
+            $scope.selected_branch = $scope.treeApi.get_selected_branch();
 
-            if (!scope.options) {
-                scope.options = {
+            if (!$scope.options) {
+                $scope.options = {
                     expandLevel: 1,
                     search: ''
                 };
@@ -150,22 +142,22 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             if (!icons.iconDefault)
                 icons.iconDefault = 'fa fa-file fa-fw';
             session.treeIcons(icons);
-            
-            if (!scope.options.expandLevel && scope.options.expandLevel !== 0)
-                scope.options.expandLevel = 1;
-            var expand_level = scope.options.expandLevel;
-            if (!angular.isArray(scope.treeData)) {
+
+            if (!$scope.options.expandLevel && $scope.options.expandLevel !== 0)
+                $scope.options.expandLevel = 1;
+            var expand_level = $scope.options.expandLevel;
+            if (!angular.isArray($scope.treeData)) {
                 $log.warn('treeData is not an array!');
                 return;
             }
 
-            scope.treeApi.on_treeData_change();
+            $scope.treeApi.on_treeData_change();
 
-            scope.$watch(() => { return scope.treeOptions; },() => {
-                session.treeOptions(scope.treeOptions);
+            $scope.$watch(() => { return $scope.treeOptions; },() => {
+                session.treeOptions($scope.treeOptions);
             });
 
-           scope.subs.push(eventSvc.$on('tree-get-branch-element', (args) => {
+            $scope.subs.push(eventSvc.$on('tree-get-branch-element', (args) => {
                 $timeout(function() {
                     var el = angular.element('#tree-branch-' + args.id);
                     if (!el.isOnScreen() && el.get(0) !== undefined) {
@@ -176,35 +168,35 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
 
 
-            scope.treeFilter = $filter('uiTreeFilter');
+            $scope.treeFilter = $filter('uiTreeFilter');
 
-            scope.subs.push(eventSvc.$on(session.constants.TREEINITIALSELECTION, () => {
-                scope.treeApi.on_initialSelection_change();
+            $scope.subs.push(eventSvc.$on(session.constants.TREEINITIALSELECTION, () => {
+                $scope.treeApi.on_initialSelection_change();
             }));
 
-            scope.treeApi.for_each_branch(function(b, level) {
+            $scope.treeApi.for_each_branch(function(b, level) {
                 b.level = level;
                 b.expanded = b.level <= expand_level;
             });
 
-            scope.$on('$destroy', (() => {
-                session.treeRows([]);
+            $scope.$on('$destroy', (() => {
+                //session.treeRows([]);
                 session.treeInitialSelection(session.constants.DELETEKEY);
             }));
 
             if (session.treeInitialSelection()) {
                 //Triggers Event
-                scope.treeApi.on_initialSelection_change();
+                $scope.treeApi.on_initialSelection_change();
             }else {
-                scope.treeApi.on_treeData_change();
+                $scope.treeApi.on_treeData_change();
             }
-
-            scope.init = true;
         };
 
+    };
 
+    var mmsTreeLink = function(scope, element, attrs) {
 
-
+        scope.getHref = getHref;
 
         //scope.$watch('initialSelection', session.treeInitialSelection(scope.initialSelection));
 
@@ -265,10 +257,11 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
         `,
         // replace: true,
         scope: {
-            treeData: '<',
+            treeData: '=',
             //initialSelection: '@',
             options: '<'
         },
+        controller: ['$scope', mmsTreeCtrl],
         link: mmsTreeLink
     };
 }

@@ -27,13 +27,17 @@ function EventService(rx) {
         if (!this.subjects[fnName]) {
             (this.subjects[fnName] = new rx.Subject());
         }
-        return this.subjects[fnName].subscribe(handler);
+        let sub = this.subjects[fnName].subscribe(handler);
+        return sub;
     };
 
     const destroy = (subs) => {
         if (subs.length > 0) {
             for (var i = 0; i < subs.length; i++) {
-                subs[i].unsubscribe();
+                if (typeof subs[i].unsubscribe === 'function'){
+                    subs[i].unsubscribe();
+                }
+
             }
         }
     };
