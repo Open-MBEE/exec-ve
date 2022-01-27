@@ -46,7 +46,7 @@ function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $wi
                             $scope.selectedProject = "";
                             ProjectService.getProjects(orgId).then(function(data) {
                                 $scope.projects = data;
-                                if (data.length > 0) {
+                                if (data && data.length > 0) {
                                     $scope.selectProject(data[0]);
                                 } else {
                                     //no projects

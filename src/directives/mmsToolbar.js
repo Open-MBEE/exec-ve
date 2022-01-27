@@ -1,11 +1,11 @@
 'use strict';
 
-angular.module('mms.directives').directive('mmsToolbar', ['$templateCache', 'SessionService', 'EventService',
+angular.module('mms.directives').directive('mmsToolbar', ['$templateCache', 'RootScopeService', 'EventService',
 	'ToolbarService', mmsToolbar]);
 
-function mmsToolbar($templateCache, SessionService, EventService, ToolbarService)
+function mmsToolbar($templateCache, RootScopeService, EventService, ToolbarService)
 {
-	const session = SessionService;
+	const rootScopeSvc = RootScopeService;
 	const eventSvc = EventService;
 	var template = $templateCache.get('mms/templates/mmsToolbar.html');
 
@@ -41,11 +41,11 @@ function mmsToolbar($templateCache, SessionService, EventService, ToolbarService
 				}
 
 				var toggleDecativeFlag = false;
-				if (typeof session.mmsPaneClosed() === 'boolean' && session.mmsPaneToggleable() !== false)
+				if (typeof rootScopeSvc.mmsPaneClosed() === 'boolean' && rootScopeSvc.mmsPaneToggleable() !== false)
 				{
-					if (button.selected || session.mmsPaneClosed())
+					if (button.selected || rootScopeSvc.mmsPaneClosed())
 					{
-						if (button.selected && !session.mmsPaneClosed()) toggleDecativeFlag = true;
+						if (button.selected && !rootScopeSvc.mmsPaneClosed()) toggleDecativeFlag = true;
 						eventSvc.$broadcast('mms-pane-toggle');
 					}
 				}

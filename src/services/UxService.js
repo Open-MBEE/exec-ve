@@ -1,22 +1,22 @@
 'use strict';
 
 angular.module('mms')
-.factory('UxService', ['EventService', 'SessionService', UxService]);
+.factory('UxService', ['EventService', 'RootScopeService', UxService]);
 
 /**
  * @ngdoc service
  * @name mms.UxService
  *
  * @requires EventService
- * @requires SessionService
+ * @requires RootScopeService
  * 
  * @description
  * Ux Service
  */
-function UxService(EventService, SessionService) {
+function UxService(EventService, RootScopeService) {
 
     const eventSvc = EventService;
-    const session = SessionService;
+    const rootScopeSvc = RootScopeService;
 
     /**
      * @ngdoc method
@@ -80,12 +80,6 @@ function UxService(EventService, SessionService) {
       case "document-snapshot-create":
         return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
                 spinner: false, onClick: function() {eventSvc.$broadcast(button);}};
-      case "diff-perspective-detail":
-        return {id: button, icon: 'fa-info-circle', selected: true, active: true, permission: true, tooltip: 'Detail',
-                spinner: false, onClick: function() {session.diffPerspective('detail'); }};
-      case "diff-perspective-tree":
-        return {id: button, icon: 'fa-sitemap', selected: false, active: true, permission: true, tooltip: 'Context',
-                spinner: false, onClick: function() {session.diffPerspective('tree'); }};
     }    
   };
 

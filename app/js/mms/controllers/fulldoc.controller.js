@@ -5,12 +5,12 @@
 angular.module('mmsApp')
 .controller('FullDocCtrl', ['$scope', '$state', '$anchorScroll', '$location', '$timeout', '$http', 'FullDocumentService', 'ShortenUrlService',
     'hotkeys', 'growl', '_', 'MmsAppUtils', 'Utils', 'UxService', 'URLService', 'UtilsService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
-    'PermissionsService', 'SessionService', 'TreeService', 'EventService',
+    'PermissionsService', 'RootScopeService', 'TreeService', 'EventService',
 function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocumentService, ShortenUrlService, hotkeys, growl, _,
     MmsAppUtils, Utils, UxService, URLService, UtilsService, search, orgOb, projectOb, refOb, groupOb, documentOb, PermissionsService,
-    SessionService, TreeService, EventService) {
+    RootScopeService, TreeService, EventService) {
 
-    let session = SessionService;
+    let rootScopeSvc = RootScopeService;
     let tree = TreeService.getApi();
 
     let eventSvc = EventService;
@@ -18,17 +18,17 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
 
     $scope.viewContentLoading = false;
 
-    $scope.subs.push(eventSvc.$on(session.constants.VEVIEWCONTENTLOADING,(data) => {
+    $scope.subs.push(eventSvc.$on(rootScopeSvc.constants.VEVIEWCONTENTLOADING,(data) => {
         $scope.viewContentLoading = data;
     }));
 
-    session.veFullDocMode(true);
-    if (!session.veCommentsOn())
-        session.veCommentsOn(false);
-    if (!session.veElementsOn())
-        session.veElementsOn(false);
-    if (!session.veEditMode())
-        session.veEditMode(false);
+    rootScopeSvc.veFullDocMode(true);
+    if (!rootScopeSvc.veCommentsOn())
+        rootScopeSvc.veCommentsOn(false);
+    if (!rootScopeSvc.veElementsOn())
+        rootScopeSvc.veElementsOn(false);
+    if (!rootScopeSvc.veEditMode())
+        rootScopeSvc.veEditMode(false);
 
     $scope.search = search;
     Utils.toggleLeftPane(search);
@@ -41,7 +41,7 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
         init: function() {
             if (documentOb && refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission(refOb)) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
-                $scope.bbApi.setToggleState('show-edits', session.veEditMode());
+                $scope.bbApi.setToggleState('show-edits', rootScopeSvc.veEditMode());
                 hotkeys.bindTo($scope)
                 .add({
                     combo: 'alt+d',
@@ -58,8 +58,8 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
             var exportButtons = UxService.getButtonBarButton('export');
             exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
             $scope.bbApi.addButton(exportButtons);
-            $scope.bbApi.setToggleState('show-comments', session.veCommentsOn());
-            $scope.bbApi.setToggleState('show-elements', session.veElementsOn());
+            $scope.bbApi.setToggleState('show-comments', rootScopeSvc.veCommentsOn());
+            $scope.bbApi.setToggleState('show-elements', rootScopeSvc.veElementsOn());
             hotkeys.bindTo($scope)
             .add({
                 combo: 'alt+c',
@@ -83,7 +83,7 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
                 commitId: 'latest'
             };
             eventSvc.$broadcast('elementSelected', data);
-            if (typeof session.mmsPaneClosed() === 'boolean' && session.mmsPaneClosed())
+            if (typeof rootScopeSvc.mmsPaneClosed() === 'boolean' && rootScopeSvc.mmsPaneClosed())
                 eventSvc.$broadcast('tree-pane-toggle');
         },
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
@@ -141,7 +141,7 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
             $scope.views[i].api.toggleShowComments();
         }
         $scope.bbApi.toggleButtonState('show-comments');
-        session.veCommentsOn(!session.veCommentsOn());
+        rootScopeSvc.veCommentsOn(!rootScopeSvc.veCommentsOn());
     }));
 
    $scope.subs.push(eventSvc.$on('show-elements', function() {
@@ -149,20 +149,20 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
             $scope.views[i].api.toggleShowElements();
         }
         $scope.bbApi.toggleButtonState('show-elements');
-        session.veElementsOn(!session.veElementsOn());
+        rootScopeSvc.veElementsOn(!rootScopeSvc.veElementsOn());
     }));
 
    $scope.subs.push(eventSvc.$on('show-edits', function() {
         var i = 0;
-        if ((session.veElementsOn() && session.veEditMode()) || (!session.veElementsOn() && !session.veEditMode()) ){
+        if ((rootScopeSvc.veElementsOn() && rootScopeSvc.veEditMode()) || (!rootScopeSvc.veElementsOn() && !rootScopeSvc.veEditMode()) ){
             for (i = 0; i < $scope.views.length; i++) {
                 $scope.views[i].api.toggleShowElements();
             }
             $scope.bbApi.toggleButtonState('show-elements');
-            session.veElementsOn(!session.veElementsOn());
+            rootScopeSvc.veElementsOn(!rootScopeSvc.veElementsOn());
         }
         $scope.bbApi.toggleButtonState('show-edits');
-        session.veEditMode(!session.veEditMode());
+        rootScopeSvc.veEditMode(!rootScopeSvc.veEditMode());
         for (i = 0; i < $scope.views.length; i++) {
             $scope.views[i].api.toggleShowEdits();
         }
@@ -217,13 +217,13 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
         var loadingViewsFromServer = growl.info('Loading data from server!', {ttl: -1});
         views.push({id: documentOb.id, api: {
             init: function(dis) {
-                if (session.veCommentsOn()) {
+                if (rootScopeSvc.veCommentsOn()) {
                     dis.toggleShowComments();
                 }
-                if (session.veElementsOn()) {
+                if (rootScopeSvc.veElementsOn()) {
                     dis.toggleShowElements();
                 }
-                if (session.veEditMode()) {
+                if (rootScopeSvc.veEditMode()) {
                     dis.toggleShowEdits();
                 }
             },
@@ -272,13 +272,13 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
     function _buildViewElement(vId, curSec) {
         return {id: vId, api: {
             init: function(dis) {
-                if (session.veCommentsOn()) {
+                if (rootScopeSvc.veCommentsOn()) {
                     dis.toggleShowComments();
                 }
-                if (session.veElementsOn()) {
+                if (rootScopeSvc.veElementsOn()) {
                     dis.toggleShowElements();
                 }
-                if (session.veEditMode()) {
+                if (rootScopeSvc.veEditMode()) {
                     dis.toggleShowEdits();
                 }
             },

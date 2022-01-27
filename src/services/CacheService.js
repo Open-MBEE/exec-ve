@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('CacheService', ['SessionService', '_', CacheService]);
+.factory('CacheService', ['_', CacheService]);
 
 /**
  * @ngdoc service
@@ -11,9 +11,8 @@ angular.module('mms')
  * @description
  * Provides cache of key value pairs. Key can be a string or an array of strings.
  */
-function CacheService(SessionService, _) {
+function CacheService(_) {
     var cache = {};
-    var session = SessionService;
 
     /**
      * @ngdoc method

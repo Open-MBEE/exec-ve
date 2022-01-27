@@ -3,27 +3,27 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'SessionService', 'EditService', 'EventService', '$interval',
-function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, SessionService, EditService, EventService, $interval) {
-    var session = SessionService;
+.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'EditService', 'EventService', '$interval',
+function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, RootScopeService, EditService, EventService, $interval) {
+    var rootScopeSvc = RootScopeService;
     var edit = EditService;
     var eventSvc = EventService;
     eventSvc.$init($scope);
 
     var openEdits = {};
 
-    session.veViewContentLoading(false);
-    session.treeInitialSelection('');
+    rootScopeSvc.veViewContentLoading(false);
+    rootScopeSvc.treeInitialSelection('');
 
-    $scope.subs.push(eventSvc.$on(session.constants.VETITLE, (value) => {
+    $scope.subs.push(eventSvc.$on(rootScopeSvc.constants.VETITLE, (value) => {
         $window.document.title = value + ' | View Editor';
     }));
 
-    session.veTitle('');
+    rootScopeSvc.veTitle('');
 
 
 
-    session.veFn(false);
+    rootScopeSvc.veFn(false);
 
     var modalOpen = false;
 
@@ -52,14 +52,14 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         });
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        session.veStateChanging(false);
-        session.veViewContentLoading(false);
+        rootScopeSvc.veStateChanging(false);
+        rootScopeSvc.veViewContentLoading(false);
         //check if error is ticket error
         if (!error || error.status === 401 || 
                 (error.status === 404 && error.config && error.config.url && 
                 error.config.url.indexOf('/authentication') !== -1)) { //check if 404 if checking valid ticket
             event.preventDefault();
-            session.veRedirect({toState: toState, toParams: toParams});
+            rootScopeSvc.veRedirect({toState: toState, toParams: toParams});
             $state.go('login', {notify: false});
             return;
         }
@@ -67,14 +67,14 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
     });
 
     $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-        session.veViewContentLoading(true);
+        rootScopeSvc.veViewContentLoading(true);
         HttpService.transformQueue();
-        session.veStateChanging(true);
+        rootScopeSvc.veStateChanging(true);
     });
 
    $scope.subs.push(eventSvc.$on('mms.unauthorized', function(response) {
         // add a boolean to the 'or' statement to check for modal window
-        if ($state.$current.name === 'login' || session.veStateChanging() || modalOpen)
+        if ($state.$current.name === 'login' || rootScopeSvc.veStateChanging() || modalOpen)
             return;
         AuthService.checkLogin().then(function(){}, function() {
             if ($state.$current.name === 'login' || modalOpen)
@@ -128,7 +128,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
 
     $scope.$on('$stateChangeSuccess',
         function(event, toState, toParams, fromState, fromParams) {
-            session.veStateChanging(false);
+            rootScopeSvc.veStateChanging(false);
             $scope.hidePanes = false;
             $scope.showManageRefs = false;
             $scope.showLogin = false;
@@ -141,18 +141,18 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                 eventSvc.$broadcast('fromParamChange', fromParams);
             }
             if ($state.current.name === 'project.ref') {
-                session.treeInitialSelection(toParams.refId);
+                rootScopeSvc.treeInitialSelection(toParams.refId);
             } else if ($state.current.name === 'project.ref.preview') {
                 var index = toParams.documentId.indexOf('_cover');
                 if (index > 0)
-                    session.treeInitialSelection(toParams.documentId.substring(5, index));
+                    rootScopeSvc.treeInitialSelection(toParams.documentId.substring(5, index));
                 else
-                    session.treeInitialSelection(toParams.documentId);
+                    rootScopeSvc.treeInitialSelection(toParams.documentId);
             } else if ($state.includes('project.ref.document') && ($state.current.name !== 'project.ref.document.order')) {
                 if (toParams.viewId !== undefined)
-                    session.treeInitialSelection(toParams.viewId);
+                    rootScopeSvc.treeInitialSelection(toParams.viewId);
                 else
-                    session.treeInitialSelection(toParams.documentId);
+                    rootScopeSvc.treeInitialSelection(toParams.documentId);
             }
             if ($state.includes('project.ref.document')) {
                 ApplicationService.getState().inDoc = true;
@@ -166,7 +166,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
                 ApplicationService.getState().inDoc = false;
                 ApplicationService.getState().fullDoc = false;
             }
-            session.veViewContentLoading(false);
+            rootScopeSvc.veViewContentLoading(false);
             if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project' || fromState.name === 'login.redirect')) {
                 $timeout(function() {
                     eventSvc.$broadcast('tree-pane-toggle');
@@ -180,7 +180,7 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
 
     var workingModalOpen = false;
    $scope.subs.push(eventSvc.$on('mms.working', function(response) {
-        session.veViewContentLoading(false);
+        rootScopeSvc.veViewContentLoading(false);
         if (workingModalOpen) {
             return;
         }

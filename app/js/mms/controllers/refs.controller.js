@@ -4,15 +4,18 @@
 
 angular.module('mmsApp')
 .controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', '$window', 'growl', '_', 'flatpickr',
-                         'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'SessionService',
+                         'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'RootScopeService',
                          'EventService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
 function($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $window, growl, _, flatpickr,
-    ElementService, ProjectService, MmsAppUtils, ApplicationService, SessionService, EventService,
+    ElementService, ProjectService, MmsAppUtils, ApplicationService, RootScopeService, EventService,
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
+    const rootScopeSvc = RootScopeService;
     const eventSvc = EventService;
-    SessionService.mmsRefOb(refOb);
+    eventSvc.$init($scope);
+
+    rootScopeSvc.mmsRefOb(refOb);
     $scope.refManageView = true;
     $scope.refData = [];
     $scope.bbApi = {};

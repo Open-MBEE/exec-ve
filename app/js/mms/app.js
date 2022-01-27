@@ -68,16 +68,16 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
     $urlRouterProvider.otherwise(function($injector, $location) {
-        var session = $injector.get('SessionService');
+        var rootScopeSvc = $injector.get('RootScopeService');
         var $state = $injector.get('$state');
         var checkLogin = $injector.get('AuthService').checkLogin();
         if (checkLogin) {
             if ($location.url().includes('workspace')) {
-                session.redirectFromOld(true);
-                session.crushUrl($location.path());
+                rootScopeSvc.veRedirectFromOld(true);
+                rootScopeSvc.veCrushUrl($location.path());
                 $state.go('login.redirect');
             } else {
-                session.redirectFromOld(false);
+                rootScopeSvc.veRedirectFromOld(false);
                 $state.go('login.select');
             }
         } else {
@@ -106,13 +106,13 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             'login@': {
                 templateUrl: 'partials/mms/login.html',
-                controller: ['$scope', '$state', 'AuthService', 'loginBannerOb', 'SessionService', 'growl', function ($scope, $state, AuthService, loginBannerOb, SessionService, growl) {
-                    const session = SessionService;
+                controller: ['$scope', '$state', 'AuthService', 'loginBannerOb', 'RootScopeService', 'growl', function ($scope, $state, AuthService, loginBannerOb, RootScopeService, growl) {
+                    const rootScopeSvc = RootScopeService;
                     $scope.credentials = {
                       username: '',
                       password: ''
                     };
-                    session.veTitle('Login');
+                    rootScopeSvc.veTitle('Login');
                     $scope.pageTitle = 'View Editor';
                     $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
@@ -121,8 +121,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                         var credentialsJSON = {"username":credentials.username, "password":credentials.password};
                         AuthService.getAuthorized(credentialsJSON)
                         .then(function(user) {
-                            if (session.veRedirect()) {
-                                let veRedirect = session.veRedirect();
+                            if (rootScopeSvc.veRedirect()) {
+                                let veRedirect = rootScopeSvc.veRedirect();
                                 var toState = veRedirect.toState.name;
                                 var toParams = veRedirect.toParams;
                                 $state.go(toState, toParams);
@@ -194,8 +194,18 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: ['$scope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'SessionService', 'loginBannerOb', 'growl', '$localStorage', function($scope, $state, $stateParams, orgObs, ProjectService, AuthService, SessionService, loginBannerOb, growl, $localStorage) {
-                    SessionService.veTitle('Projects');
+                controller: ['$scope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'RootScopeService', 'EventService', 'loginBannerOb', 'growl', '$localStorage', function($scope, $state, $stateParams, orgObs, ProjectService, AuthService, RootScopeService, EventService, loginBannerOb, growl, $localStorage) {
+                    const rootScopeSvc = RootScopeService;
+                    const eventSvc = EventService;
+                    eventSvc.$init($scope);
+
+                    rootScopeSvc.veTitle('View Editor'); //what to name this?
+
+                    $scope.redirect_from_old = rootScopeSvc.veRedirectFromOld();
+                    $scope.$on(rootScopeSvc.constants.VEREDIRECTFROMOLD, (data) => {
+                        $scope.redirect_from_old = data;
+                    });
+                    RootScopeService.veTitle('Projects');
                     $scope.pageTitle = 'View Editor';
                     $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
@@ -245,7 +255,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                     $scope.continue = function() {
                         if (orgId && projectId) {
                             $scope.spin = true;
-                            SessionService.redirectFromOld(false);
+                            RootScopeService.veRedirectFromOld(false);
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'}).then(function(data) {
                             }, function(reject) {
                                 $scope.spin = false;
@@ -328,8 +338,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
-                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'SessionService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, SessionService) {
-                    SessionService.veTitle(orgOb.name);
+                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, RootScopeService) {
+                    RootScopeService.veTitle(orgOb.name);
                     $scope.org = orgOb;
                     //$scope.orgs = orgObs;
                     $scope.project = projectOb;
@@ -344,8 +354,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller:['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'SessionService', function ($scope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, SessionService) {
-                    SessionService.veTitle(projectOb.name);
+                controller:['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, RootScopeService) {
+                    RootScopeService.veTitle(projectOb.name);
                     $scope.org = orgOb;
                     $scope.project = projectOb;
                     $scope.projects = projectObs;
@@ -489,8 +499,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
-                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'SessionService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, SessionService) {
-                    SessionService.veTitle(orgOb.name);
+                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, RootScopeService) {
+                    RootScopeService.veTitle(orgOb.name);
                     $scope.org = orgOb;
                     //$scope.orgs = orgObs;
                     $scope.project = projectOb;
@@ -505,8 +515,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
             },
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'SessionService', function ($scope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, SessionService) {
-                    SessionService.veTitle(projectOb.name);
+                controller: ['$scope', 'orgOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'RootScopeService', function ($scope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, RootScopeService) {
+                    RootScopeService.veTitle(projectOb.name);
                     $scope.org = orgOb;
                     $scope.groups = groupObs;
                     $scope.project = projectOb;
@@ -645,8 +655,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'SessionService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, SessionService) {
-                    SessionService.veTitle(documentOb.name);
+                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, RootScopeService) {
+                    RootScopeService.veTitle(documentOb.name);
                     $scope.org = orgOb;
                     $scope.ref = refOb;
                     $scope.group = groupOb;
@@ -708,8 +718,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'SessionService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, SessionService) {
-                    SessionService.veTitle(documentOb.name);
+                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, RootScopeService) {
+                    RootScopeService.veTitle(documentOb.name);
                     $scope.org = orgOb;
                     $scope.group = groupOb;
                     $scope.groups = groupObs;
@@ -768,8 +778,8 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         views: {
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-view="view"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'viewOb', 'SessionService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb, SessionService) {
-                    SessionService.veTitle(documentOb.name);
+                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'viewOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb, RootScopeService) {
+                    RootScopeService.veTitle(documentOb.name);
                     $scope.org = orgOb;
                     $scope.group = groupOb;
                     $scope.groups = groupObs;

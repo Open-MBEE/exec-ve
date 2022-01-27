@@ -1,23 +1,17 @@
 'use strict';
 
 angular.module('mms')
-    .factory('TreeService', ['$timeout', 'SessionService', 'EventService', TreeService]);
+    .factory('TreeService', ['$timeout', 'RootScopeService', 'EventService', TreeService]);
 
-function TreeService($timeout, SessionService, EventService) {
+function TreeService($timeout, RootScopeService, EventService) {
 
     this.treeApi = {};
     this.treeData = [];
     this.treeRows = [];
 
-    const getApi = (treeData, treeRows) => {
-        if (treeData) {
-            this.treeData = treeData;
-        }
-        if (treeRows) {
-            this.treeRows = treeRows;
-        }
-        else if (!(this.treeApi instanceof TreeApi)) {
-            this.treeApi = new TreeApi($timeout, SessionService, EventService, this);
+    const getApi = () => {
+        if (!(this.treeApi instanceof TreeApi)) {
+            this.treeApi = new TreeApi($timeout, RootScopeService, EventService, this);
         }
         return this.treeApi;
     };
@@ -29,11 +23,11 @@ function TreeService($timeout, SessionService, EventService) {
     };
 }
 
-function TreeApi($timeout, SessionService, EventService, TreeService) {
+function TreeApi($timeout, RootScopeService, EventService, TreeService) {
     const eventSvc = EventService;
     const tree = TreeService;
     let selected_branch = null;
-    const session = SessionService;
+    const rootScopeSvc = RootScopeService;
 
     /**
      * @ngdoc function
@@ -160,7 +154,6 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
         on_treeData_change();
     };
 
-    tree.expandPathToSelectedBranch = expandPathToSelectedBranch;
     /**
      * @ngdoc function
      * @name mms.directives.directive:mmsTree#collapse_branch
@@ -240,7 +233,7 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
      * @return {Object} next branch
      */
     this.get_next_branch = function(b) {
-        if (!b)
+         if (!b)
             b =  selected_branch;
         if (b) {
             var next = this.get_first_child(b);
@@ -465,7 +458,7 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
             }*/
             expand_all_parents(branch);
             if (!noClick) {
-                var options = session.treeOptions();
+                var options = rootScopeSvc.treeOptions();
                 if (branch.onSelect) {
                     eventSvc.$broadcast(branch.onSelect,{ branch: branch });
                 } else if (options.onSelect) {
@@ -482,7 +475,7 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
     };
 
     var on_initialSelection_change = function() {
-        let initialSelection = session.treeInitialSelection();
+        let initialSelection = rootScopeSvc.treeInitialSelection();
         if (initialSelection) {
             for_each_branch(function(b) {
                 if (b.data.id === initialSelection) {
@@ -506,11 +499,11 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
                 }
             }
         });
-        //session.treeRows(['bar']);
+        //rootScopeSvc.treeRows(['bar']);
         tree.treeRows.length = 0;
         const tree_rows = [];
-        const options = session.treeOptions();
-        const icons = session.treeIcons();
+        const options = rootScopeSvc.treeOptions();
+        const icons = rootScopeSvc.treeIcons();
 
         if (options.sort) {
             tree.treeData.sort(treeSortFunction);
@@ -628,7 +621,7 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
         for (var i = 0; i < tree.treeData.length; i++) {
             add_branch_to_list(1, [], tree.treeData[i], true, {figure: 0, table: 0, equation: 0});
         }
-        tree.treeRows.push.apply(tree.treeRows,tree_rows);
+        tree.treeRows.push(...tree_rows);
     };
 
     // TODO: Update sort function to handle all cases
@@ -672,5 +665,6 @@ function TreeApi($timeout, SessionService, EventService, TreeService) {
     this.for_each_branch = for_each_branch;
     this.on_treeData_change = on_treeData_change;
     this.on_initialSelection_change = on_initialSelection_change;
+    this.expandPathToSelectedBranch = expandPathToSelectedBranch;
 
 }

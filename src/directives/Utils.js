@@ -3,7 +3,7 @@
 angular.module('mms.directives')
 .factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$compile', '$window', 'URLService',
     'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService',
-    'SessionService', 'EventService', 'EditService', 'growl', Utils]);
+    'RootScopeService', 'EventService', 'EditService', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -22,10 +22,10 @@ angular.module('mms.directives')
  *
  */
 function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLService, CacheService,
-               ElementService, ViewService, UtilsService, AuthService, PermissionsService, SessionService,
+               ElementService, ViewService, UtilsService, AuthService, PermissionsService, RootScopeService,
                EventService, EditService, growl) {
 
-    const session = SessionService;
+    const rootScopeSvc = RootScopeService;
     const eventSvc = EventService;
     const editSvc = EditService;
 
@@ -787,7 +787,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         eventSvc.$broadcast('view.reorder.saved', {id: id});
         growl.success("Adding " + elemType + " Successful");
         // Show comments when creating a comment PE
-        if (elemType === 'Comment' && !session.veCommentsOn()) {
+        if (elemType === 'Comment' && !rootScopeSvc.veCommentsOn()) {
             $timeout(function() {
                 $('.show-comments').click();
             }, 0, false);
@@ -988,11 +988,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     };
 
     var toggleLeftPane = function (searchTerm) {
-        if ( searchTerm && !session.treePaneClosed() ) {
+        if ( searchTerm && !rootScopeSvc.treePaneClosed() ) {
             eventSvc.$broadcast('tree-pane-closed', true);
         }
 
-        if ( !searchTerm && session.treePaneClosed() ) {
+        if ( !searchTerm && rootScopeSvc.treePaneClosed() ) {
             eventSvc.$broadcast('tree-pane-closed', false);
         }
     };

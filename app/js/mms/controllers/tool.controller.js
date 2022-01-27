@@ -5,12 +5,12 @@
 angular.module('mmsApp')
 .controller('ToolCtrl', ['$scope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
             'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
-            'PermissionsService', 'SessionService', 'EventService', 'EditService', 'ToolbarService',
+            'PermissionsService', 'RootScopeService', 'EventService', 'EditService', 'ToolbarService',
 function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils,
-            PermissionsService, SessionService, EventService, EditService, ToolbarService) {
+            PermissionsService, RootScopeService, EventService, EditService, ToolbarService) {
 
-    const session = SessionService;
+    const rootScopeSvc = RootScopeService;
     const eventSvc = EventService;
     const editSvc = EditService;
 
@@ -41,9 +41,9 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.specApi = {};
     $scope.viewContentsOrderApi = {};
 
-    session.mmsPaneClosed($scope.$pane.closed);
+    rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
     $scope.$watch('$pane.closed',() => {
-        session.mmsPaneClosed($scope.$pane.closed);
+        rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
     });
 
    $scope.subs.push(eventSvc.$on(editSvc.EVENT, function() {

@@ -2,7 +2,7 @@
 
 angular.module('mms.directives')
 .directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter',
-    'UtilsService', 'TreeService', 'SessionService', 'EventService', mmsTree]);
+    'UtilsService', 'TreeService', 'RootScopeService', 'EventService', mmsTree]);
 
 /**
  * @ngdoc directive
@@ -98,30 +98,29 @@ angular.module('mms.directives')
  * @param {string='fa fa-caret-down'} iconCollapse icon to use when branch is expanded
  * @param {string='fa fa-file'} iconDefault default icon to use for nodes
  */
-function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, UtilsService, TreeService, SessionService, EventService) {
+function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, UtilsService, TreeService, RootScopeService, EventService) {
 
     const eventSvc = EventService;
-    const session = SessionService;
+    const rootScopeSvc = RootScopeService;
+    const tree = TreeService;
 
     var mmsTreeCtrl = function($scope) {
 
         eventSvc.$init($scope);
-        if (!$scope.treeData) {
-            $scope.treeData = [];
-        }
+        $scope.treeApi = tree.getApi();
+        $scope.treeData = tree.treeData;
+        $scope.treeRows = tree.treeRows;
 
-        let unwatch = $scope.$watch($scope.treeData,() => {
-            if ($scope.treeData.length > 0) {
-                unwatch();
-                init();
-            }
-        },true);
+        // let unwatch = $scope.$watch($scope.treeData,() => {
+        //     if ($scope.treeData.length > 0) {
+        //         unwatch();
+        //         init();
+        //     }
+        // },true);
+        //
+        // const init = () => {
+            $scope.treeRows.length = 0;
 
-        const init = () => {
-            //Initialize Tree API
-            $scope.tree = TreeService;
-            $scope.tree_rows = [];
-            $scope.treeApi = $scope.tree.getApi($scope.treeData, $scope.tree_rows);
 
             $scope.selected_branch = $scope.treeApi.get_selected_branch();
 
@@ -132,7 +131,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                 };
             }
 
-            let icons = session.treeIcons();
+            let icons = rootScopeSvc.treeIcons();
             if (!icons)
                 icons = {};
             if (!icons.iconExpand)
@@ -141,7 +140,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
                 icons.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
             if (!icons.iconDefault)
                 icons.iconDefault = 'fa fa-file fa-fw';
-            session.treeIcons(icons);
+            rootScopeSvc.treeIcons(icons);
 
             if (!$scope.options.expandLevel && $scope.options.expandLevel !== 0)
                 $scope.options.expandLevel = 1;
@@ -154,7 +153,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             $scope.treeApi.on_treeData_change();
 
             $scope.$watch(() => { return $scope.treeOptions; },() => {
-                session.treeOptions($scope.treeOptions);
+                rootScopeSvc.treeOptions($scope.treeOptions);
             });
 
             $scope.subs.push(eventSvc.$on('tree-get-branch-element', (args) => {
@@ -170,7 +169,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
             $scope.treeFilter = $filter('uiTreeFilter');
 
-            $scope.subs.push(eventSvc.$on(session.constants.TREEINITIALSELECTION, () => {
+            $scope.subs.push(eventSvc.$on(rootScopeSvc.constants.TREEINITIALSELECTION, () => {
                 $scope.treeApi.on_initialSelection_change();
             }));
 
@@ -180,17 +179,19 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
             });
 
             $scope.$on('$destroy', (() => {
-                //session.treeRows([]);
-                session.treeInitialSelection(session.constants.DELETEKEY);
+                //rootScopeSvc.treeRows([]);
+                rootScopeSvc.treeInitialSelection(rootScopeSvc.constants.DELETEKEY);
+                $scope.treeData.length = 0;
+                $scope.treeRows.length = 0;
             }));
 
-            if (session.treeInitialSelection()) {
+            if (rootScopeSvc.treeInitialSelection()) {
                 //Triggers Event
                 $scope.treeApi.on_initialSelection_change();
             }else {
                 $scope.treeApi.on_treeData_change();
             }
-        };
+        //};
 
     };
 
@@ -198,7 +199,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
 
         scope.getHref = getHref;
 
-        //scope.$watch('initialSelection', session.treeInitialSelection(scope.initialSelection));
+        //scope.$watch('initialSelection', rootScopeSvc.treeInitialSelection(scope.initialSelection));
 
         scope.expandCallback = function(obj, e){
             if(!obj.branch.expanded && scope.options.expandCallback) {
@@ -241,7 +242,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
         restrict: 'E',
         template: `
             <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-                <li ng-repeat="row in tree_rows | filter:{visible:true} track by row.branch.data.id" ng-hide="!treeFilter(row, options.search)"
+                <li ng-repeat="row in treeRows | filter:{visible:true} track by row.branch.data.id" ng-hide="!treeFilter(row, options.search)"
                     ng-class="'level-' + {{ row.level }}" class="abn-tree-row">
                     <div class="arrow" ng-click="user_clicks_branch(row.branch)" ng-dblclick="user_dblclicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
                         <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
@@ -257,7 +258,7 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
         `,
         // replace: true,
         scope: {
-            treeData: '=',
+            //treeData: '=',
             //initialSelection: '@',
             options: '<'
         },

@@ -6,13 +6,13 @@ angular.module('mmsApp')
     .controller('ViewCtrl', ['$scope', '$state', '$timeout', '$window', '$location',
         '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService',
         'ShortenUrlService', 'Utils', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
-        'PermissionsService', 'SessionService', 'TreeService', 'EventService',
+        'PermissionsService', 'RootScopeService', 'TreeService', 'EventService',
     function($scope, $state, $timeout, $window, $location, $http,
              $element, growl, hotkeys, MmsAppUtils, UxService, URLService, UtilsService, ShortenUrlService, Utils,
-             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb, PermissionsService, SessionService,
+             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb, PermissionsService, RootScopeService,
              TreeService, EventService) {
         
-    let session = SessionService;
+    let rootScopeSvc = RootScopeService;
     let tree = TreeService.getApi();
 
     let eventSvc = EventService;
@@ -32,17 +32,17 @@ angular.module('mmsApp')
     }
 
     $scope.ve_viewContentLoading = false;
-    $scope.subs.push(eventSvc.$on(session.constants.VEVIEWCONTENTLOADING, (newValue) => {
+    $scope.subs.push(eventSvc.$on(rootScopeSvc.constants.VEVIEWCONTENTLOADING, (newValue) => {
         $scope.ve_viewContentLoading = newValue;
     }));
 
-    session.veFullDocMode(false);
-    if (!session.veCommentsOn())
-        session.veCommentsOn(false);
-    if (!session.veElementsOn())
-        session.veElementsOn(false);
-    if (!session.veEditMode())
-        session.veEditMode(false);
+    rootScopeSvc.veFullDocMode(false);
+    if (!rootScopeSvc.veCommentsOn())
+        rootScopeSvc.veCommentsOn(false);
+    if (!rootScopeSvc.veElementsOn())
+        rootScopeSvc.veElementsOn(false);
+    if (!rootScopeSvc.veEditMode())
+        rootScopeSvc.veEditMode(false);
 
     $scope.search = search;
     Utils.toggleLeftPane(search);
@@ -53,13 +53,13 @@ angular.module('mmsApp')
     $scope.buttons = [];
     $scope.viewApi = {
         init: function() {
-            if (session.veCommentsOn()) {
+            if (rootScopeSvc.veCommentsOn()) {
                 $scope.viewApi.toggleShowComments();
             }
-            if (session.veElementsOn()) {
+            if (rootScopeSvc.veElementsOn()) {
                 $scope.viewApi.toggleShowElements();
             }
-            if (session.veEditMode()) {
+            if (rootScopeSvc.veEditMode()) {
                 $scope.viewApi.toggleShowEdits();
             }
         },
@@ -103,7 +103,7 @@ angular.module('mmsApp')
         init: function() {
             if (viewOb && refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission(refOb)) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
-                $scope.bbApi.setToggleState('show-edits', session.veEditMode());
+                $scope.bbApi.setToggleState('show-edits', rootScopeSvc.veEditMode());
                 hotkeys.bindTo($scope)
                 .add({
                     combo: 'alt+d',
@@ -112,9 +112,9 @@ angular.module('mmsApp')
                 });
             }
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
-            $scope.bbApi.setToggleState('show-elements', session.veElementsOn());
+            $scope.bbApi.setToggleState('show-elements', rootScopeSvc.veElementsOn());
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', session.veCommentsOn());
+            $scope.bbApi.setToggleState('show-comments', rootScopeSvc.veCommentsOn());
 
             // Set hotkeys for toolbar
             hotkeys.bindTo($scope)
@@ -159,24 +159,24 @@ angular.module('mmsApp')
    $scope.subs.push(eventSvc.$on('show-comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show-comments');
-        session.veCommentsOn(!session.veCommentsOn());
+        rootScopeSvc.veCommentsOn(!rootScopeSvc.veCommentsOn());
     }));
 
    $scope.subs.push(eventSvc.$on('show-elements', function() {
         $scope.viewApi.toggleShowElements();
         $scope.bbApi.toggleButtonState('show-elements');
-        session.veElementsOn(!session.veElementsOn());
+        rootScopeSvc.veElementsOn(!rootScopeSvc.veElementsOn());
     }));
 
    $scope.subs.push(eventSvc.$on('show-edits', function() {
-        if( (session.veElementsOn() && session.veEditMode()) || (!session.veElementsOn() && !session.veEditMode()) ){
+        if( (rootScopeSvc.veElementsOn() && rootScopeSvc.veEditMode()) || (!rootScopeSvc.veElementsOn() && !rootScopeSvc.veEditMode()) ){
             $scope.viewApi.toggleShowElements();
             $scope.bbApi.toggleButtonState('show-elements');
-            session.veElementsOn(!session.veElementsOn());
+            rootScopeSvc.veElementsOn(!rootScopeSvc.veElementsOn());
         }
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show-edits');
-        session.veEditMode(!session.veEditMode());
+        rootScopeSvc.veEditMode(!rootScopeSvc.veEditMode());
     }));
 
    $scope.subs.push(eventSvc.$on('center-previous', function() {
@@ -233,7 +233,7 @@ angular.module('mmsApp')
                 commitId: 'latest'
             };
             eventSvc.$broadcast('elementSelected', data);
-            if (typeof session.mmsPaneClosed() === 'boolean' && session.mmsPaneClosed())
+            if (typeof rootScopeSvc.mmsPaneClosed() === 'boolean' && rootScopeSvc.mmsPaneClosed())
                 eventSvc.$broadcast('mms-pane-toggle', {closed: false});
         },
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
