@@ -1,9 +1,8 @@
 import * as angular from 'angular';
 var mmsApp = angular.module('mmsApp');
 
-
 mmsApp.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
-    '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'ButtonBarService', '_', MmsAppUtils]);
+    '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventService', 'TreeService', 'EditService', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -13,9 +12,11 @@ mmsApp.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$wind
  * Utilities
  */
 function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
-    $rootScope, $filter, $state, ElementService, ViewService, UtilsService, ButtonBarService, _) {
-    
-    let bbApi = ButtonBarService;
+    $filter, $state, ElementService, ViewService, UtilsService, EventService, TreeService, EditService, _) {
+
+    let eventSvc = EventService;
+    let tree = TreeService;
+    let edit = EditService;
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
@@ -174,7 +175,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                         $scope.meta['bottom-right'] = 'counter(page)';
                     });
                 }
-                $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
+                $scope.unsaved = (edit.getAll() && !_.isEmpty(edit.getAll()));
                 $scope.docOption = (!isDoc && (mode === 3 || mode === 2));
                 $scope.model = { genTotf: false, landscape: false, htmlTotf: false };
                 
@@ -182,8 +183,8 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                     // To only update _printCss, create new ob with doc info
                     $scope.elementSaving = true;
                     var docOb = {
-                        id: viewOrDocOb.id, 
-                        _projectId: viewOrDocOb._projectId, 
+                        id: viewOrDocOb.id,
+                        _projectId: viewOrDocOb._projectId,
                         _refId: viewOrDocOb._refId,
                         _printCss: $scope.customizeDoc.customCSS
                     };
@@ -267,9 +268,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                         });
                 }
             } else {
-                $rootScope.ve_fullDocMode = true;
-                bbApi.setToggleState('tree-full-document', true, $rootScope.ve_tree_pane.buttons);
-                $state.go('project.ref.document.full', {search: undefined});
+                eventSvc.$broadcast('tree-full-document', {search: undefined});
             }
         });
         return deferred.promise;
@@ -319,13 +318,13 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
-        var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
+        var toc = UtilsService.makeHtmlTOC(tree.treeRows);
 
         // Conver to proper links for word/pdf
         UtilsService.convertViewLinks(printElementCopy);
 
         // Get correct table/image numbering based on doc hierarchy
-        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC(tree.treeRows, printElementCopy, false, htmlTotf);
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
@@ -390,7 +389,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         // Get doc cover page by doc ID
         var coverHtml = '';
         if (isDoc) {
-            var cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
+            let cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
             cover.remove();
             // Add class to style cover page
             cover.addClass('ve-cover-page');
@@ -400,7 +399,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
 
         return { cover: coverHtml, contents: printContents, toc: toc, tof: tof, tot: tot, toe: toe };
     };
-
+    //TODO: Evaluate moving to Tree Service
     var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen) {
         var seenViews = seen;
         if (!seenViews)

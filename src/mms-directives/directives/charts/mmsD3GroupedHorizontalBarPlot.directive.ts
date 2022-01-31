@@ -360,9 +360,9 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
       },true); 
 
       //rect bar is clicked or table cell (Except rowHeaders) is clicked
-      scope.$on('elementSelected', function(event, eid, type) {
-          d3.selectAll("rect").transition(200).style("fill-opacity", opacitynotselected);
-      });
+      // eventSvc.$on('elementSelected', function(data) {
+      //     d3.selectAll("rect").transition(200).style("fill-opacity", opacitynotselected);
+      // });
      
     }; //end of link
 

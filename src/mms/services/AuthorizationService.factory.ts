@@ -17,20 +17,13 @@ mms.factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpSe
  * @description
  * Provide general authorization functions. I.e. login, logout, etc...
  */
-function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, $window, $analytics) {
+function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, SessionService, EditService, $window, $analytics) {
 
     var token = $window.localStorage.getItem('token');
-    var getAuthorized = function (credentials) {
-        var auth = $window.btoa(credentials.username + ":" + credentials.password);
+    var getAuthorized = function (credentialsJSON) {
         var deferred = $q.defer();
-        var mmsURL = URLService.getMmsServer();
-        var root = URLService.getRoot();
-        console.log(auth);
-        var loginURL = mmsURL + root + '/authentication';
-        $http.get(loginURL,{headers: {
-                'Authorization': 'Basic ' + auth
-            }
-        }).then(function (success) {
+        var loginURL = URLService.getAuthenticationUrl();
+        $http.post(loginURL, credentialsJSON).then(function (success) {
             URLService.setToken(success.data.token);
             token = success.data.token;
             $window.localStorage.setItem('token', token);
@@ -51,6 +44,8 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
         ProjectService.reset();
         ViewService.reset();
         CacheService.reset();
+        EditService.reset();
+        SessionService.clear();
     };
 
     var getToken = function(){
@@ -63,8 +58,8 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
             deferred.reject(false);
             return deferred.promise;
         }
-        var config = URLService.getRequestConfig();
-        $http.get(URLService.getCheckTokenURL(),config).then(function (success) {
+        URLService.setToken(token);
+        $http.get(URLService.getCheckTokenURL()).then(function (success) {
             deferred.resolve(success.data);
             $analytics.setUsername(success.data.username);
         }, function(fail){
@@ -81,11 +76,11 @@ function AuthService($q, $http, CacheService, URLService, HttpService, ElementSe
             return deferred.promise;
         }
 
-        $http.get(URLService.getPersonURL(username),URLService.getRequestConfig()).then(function (success) {
+        $http.get(URLService.getPersonURL(username)).then(function (success) {
             deferred.resolve(success.data);
         }, function(fail){
             deferred.reject(fail);
-            if (fail.status !== '404') {
+            if (fail.status === '401') {
                 removeToken();
             }
 

@@ -43,14 +43,14 @@ function HttpService($http) {
      * @param {string} weight by weight
      * @param {Object} config object containing http configuration parameters
      */
-    var get = function(url, successCallback, errorCallback, weight, config?) {
+    var get = function(url, successCallback, errorCallback, weight) {
         if(weight === undefined){
             weight = 1;
         }
         var request = { url : url, successCallback: successCallback, errorCallback: errorCallback , weight: weight };
         if (inProgress >= GET_OUTBOUND_LIMIT) {
             if(request.weight === 2){
-                $http.get(url,config).then(
+                $http.get(url).then(
                     function(response){successCallback(response.data, response.status, response.headers, response.config);},
                     function(response){errorCallback(response.data, response.status, response.headers, response.config);})
                     .finally(function(){
@@ -76,7 +76,7 @@ function HttpService($http) {
         else {
             inProgress++;
             cache[url] = request;
-            $http.get(url,config).then(
+            $http.get(url).then(
                 function(response){successCallback(response.data, response.status, response.headers, response.config);},
                 function(response){errorCallback(response.data, response.status, response.headers, response.config);})
                 .finally( function() {
@@ -87,11 +87,11 @@ function HttpService($http) {
                     }
                     if (queue[1].length > 0) {
                         next = queue[1].shift();
-                        get(next.url, next.successCallback, next.errorCallback, next.weight, next.config);
+                        get(next.url, next.successCallback, next.errorCallback, next.weight);
                     }
                     else if(queue[0].length > 0){
                         next = queue[0].shift();
-                        get(next.url, next.successCallback, next.errorCallback, next.weight, next.config);
+                        get(next.url, next.successCallback, next.errorCallback, next.weight);
                     }
                 });
         }

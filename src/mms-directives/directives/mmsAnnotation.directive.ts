@@ -2,10 +2,12 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 /** Used for annotating an element that doesn't have any commit history at all or for an element that is deleted but has commit history **/
-mmsDirectives.directive('mmsAnnotation', ['$templateCache', '$rootScope', 'ViewService', 'UtilsService', mmsAnnotation]);
+mmsDirectives.directive('mmsAnnotation', ['$templateCache', 'ViewService', 'UtilsService', 'EventService', mmsAnnotation]);
 
-function mmsAnnotation($templateCache, $rootScope, ViewService, UtilsService) {
-    var template = 'partials/mms-directives/mmsAnnotation.html';
+function mmsAnnotation($templateCache, ViewService, UtilsService, EventService) {
+    const template = 'partials/mms-directives/mmsAnnotation.html';
+    const eventSvc = EventService;
+
     return {
         restrict: 'A',
         templateUrl: template,
@@ -22,7 +24,12 @@ function mmsAnnotation($templateCache, $rootScope, ViewService, UtilsService) {
     function mmsAnnotationLink(scope, element, attrs) {
         element.on('click', function() {
             if(scope.mmsRecentElement) {
-                $rootScope.$broadcast('elementSelected', scope.mmsRecentElement, scope.mmsRecentElement._commitId, true);
+                let data = {
+                    elementOb: scope.mmsRecentElement,
+                    commitId: scope.mmsRecentElement._commitId,
+                    displayOldContent: true
+                };
+                eventSvc.$broadcast('elementSelected', data);
             }
         });
 

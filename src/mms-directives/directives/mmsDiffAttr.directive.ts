@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '$templateCache', '$q', 'ElementService', mmsDiffAttr]);
+mmsDirectives.directive('mmsDiffAttr', ['$compile', '$interval', '$templateCache', '$q', 'ElementService', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
@@ -9,8 +9,8 @@ mmsDirectives.directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '
  *
  * @requires mms.ElementService
  * @requires $compile
- * @requires $rootScope
  * @requires $interval
+ * @requires ElementService
  *
  * @restrict E
  *
@@ -30,8 +30,8 @@ mmsDirectives.directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '
  * @param {string=latest} mmsBaseCommitId Base commit id, default is latest
  * @param {string=latest} mmsCompareCommitId Compare commit id, default is latest
  */
-function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, ElementService) {
-    var template = 'partials/mms-directives/mmsDiffAttr.html';
+function mmsDiffAttr($compile, $interval, $templateCache, $q, ElementService) {
+    const template = 'partials/mms-directives/mmsDiffAttr.html';
 
     return {
         restrict: 'E',
@@ -170,7 +170,8 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             var html;
             var ignoreMathjaxAutoFormatting = type === 'doc' || type === 'val' || type === 'com';
             html = '<mms-cf ' + (ignoreMathjaxAutoFormatting ? 'mms-generate-for-diff="mmsGenerateForDiff" ' : '') +  'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>';
-            var newScope = $rootScope.$new();
+            //Todo: Refactor in Angular to @codehint-ng/html-compiler
+            var newScope = scope.$new();
             newScope = Object.assign(newScope, {
                 type: type,
                 mmsElementId: mmsElementId,

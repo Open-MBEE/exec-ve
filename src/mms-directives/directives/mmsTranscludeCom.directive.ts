@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
+mmsDirectives.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', 'EventService', '$templateCache', '$compile', 'growl', 'MathJax', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive
@@ -30,9 +30,11 @@ mmsDirectives.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsSe
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, $templateCache, $compile, growl, MathJax) {
+function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxService, EventService, $templateCache, $compile, growl, MathJax) {
 
-    var template = 'partials/mms-directives/mmsTranscludeDoc.html';
+    const eventSvc = EventService;
+
+    const template = 'partials/mms-directives/mmsTranscludeDoc.html';
     
     var mmsTranscludeComCtrl = function ($scope) {
 
@@ -43,12 +45,12 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope), $scope.buttons);
-                $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement, $scope.buttons);
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
+                $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }     
         };
     };
@@ -113,12 +115,14 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
                 recompile();
                 scope.panelType = "Comment";
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function (event, elementOb, continueEdit) {
+                   scope.subs.push(eventSvc.$on('element.updated', function () {
+                        let elementOb = data.element;
+                        let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
                             recompile();
                         }
-                    });
+                    }));
                 }
             }, function(reason) {
                 domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');

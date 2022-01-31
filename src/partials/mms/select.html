@@ -1,5 +1,5 @@
 <div id="ve-origin-select" class="row">
-    <div class="account-wall-lg" ng-if="redirect_from_old_site">
+    <div class="account-wall-lg" ng-if="redirect_from_old">
         <h2>This is not a valid link</h2>
         <div class="flex">
             <div class="two-thirds-flex">
@@ -37,7 +37,7 @@
             </div>
         </div>
     </div>
-    <div class="account-wall" ng-if="!redirect_from_old_site">
+    <div class="account-wall" ng-if="!redirect_from_old">
         <div ng-class="{'fade-in': fromLogin}">
             <a class="select-logout-button" ng-click="logout()"><i class="fa fa-arrow-left back-to-account" aria-hidden="true"></i></a>
             <img src="assets/openmbee.svg" alt="Program Logo">
@@ -76,7 +76,7 @@
         <div class="login-banner">
             <div class="login-box login-banner">
                 <ul>
-                    <li ng-repeat="label in loginBanner">{{label}}</li>
+                    <li ng-repeat="label in loginBanner.labels">{{label}}</li>
                 </ul>
             </div>
         </div>

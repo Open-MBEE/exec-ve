@@ -2,7 +2,7 @@ import * as angular from 'angular';
 var mmsApp = angular.module('mmsApp');
 
 
-mmsApp.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', 'ApplicationService','AuthService', 'ProjectService', veNav]);
+mmsApp.directive('veNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$uibModal', '$window', 'ApplicationService','AuthService', 'ProjectService', veNav]);
 
 /**
  * @ngdoc directive
@@ -19,14 +19,13 @@ mmsApp.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 
  * The navbar is mobile friendly.
  * 
  */
-function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, ApplicationService, AuthService, ProjectService) {
+function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $window, ApplicationService, AuthService, ProjectService) {
     var template = 'partials/mms/veNav.html';
 
     var veNavLink = function(scope, element, attrs) {
         ProjectService.getOrgs().then(function(orgs){
             scope.orgs = orgs;
         });
-        console.log(scope);
         scope.isNavCollapsed = true;
         scope.updateOrg = function() {
             $uibModal.open({
@@ -48,7 +47,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                             $scope.selectedProject = "";
                             ProjectService.getProjects(orgId).then(function(data) {
                                 $scope.projects = data;
-                                if (data.length > 0) {
+                                if (data && data.length > 0) {
                                     $scope.selectProject(data[0]);
                                 } else {
                                     //no projects
@@ -89,7 +88,13 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
             hotkeys.toggleCheatSheet();
         };
         scope.toggleAbout = function() {
-            scope.veV = '3.6.1';
+            if ($window.__env.version) {
+                scope.veV = window.__env.version;
+            }
+            else {
+                scope.veV = '3.6.1';
+            }
+
             scope.mmsV = 'Loading...';
             ApplicationService.getMmsVersion().then(function(data) {
                 scope.mmsV = data;
@@ -141,7 +146,9 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
         AuthService.checkLogin().then(function(data) {
             scope.username = data.username;
             AuthService.getUserData(data.username).then(function(userData){
-                scope.user = userData;
+                scope.user = userData.users[0];
+            }, function() {
+                scope.user = data.username;
             });
         });
         

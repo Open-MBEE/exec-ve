@@ -1,13 +1,12 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsTranscludeArt', ['ArtifactService','AuthService','URLService', mmsTranscludeArt]);
+mmsDirectives.directive('mmsTranscludeArt', ['ElementService','AuthService','URLService', mmsTranscludeArt]);
 
 /**
  * @ngdoc directive
  * @name mmsDirectives.directive:mmsTranscludeArt
  *
- * @requires mms.ArtifactService
  * @requires mms.AuthService
  * @requires mms.ElementService
  * @requires mms.URLService
@@ -16,14 +15,14 @@ mmsDirectives.directive('mmsTranscludeArt', ['ArtifactService','AuthService','UR
  * @restrict E
  *
  * @description
- * Given an artifact id, puts in an img or link to artifact. 
+ * Given an artifact id, puts in an img or link to artifact.
  *
  * @param {string} mmsElementId The id of the artifact
- * @param {string} mmsProjectId The project id 
+ * @param {string} mmsProjectId The project id
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsTranscludeArt(ArtifactService, AuthService, URLService) {
+function mmsTranscludeArt(ElementService, AuthService, URLService) {
 
     var mmsTranscludeArtLink = function(scope, element, attrs, controllers) {
         // var mmsViewCtrl = controllers[0];
@@ -37,22 +36,33 @@ function mmsTranscludeArt(ArtifactService, AuthService, URLService) {
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {artifactId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            scope.artExt = scope.mmsArtExt;
+            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
 
-            var server = URLService.getMmsServer();
-            var ticket = '?alf_ticket=' + AuthService.getToken();
             element.addClass('isLoading');
             
             // Get the artifacts of the element
-            ArtifactService.getArtifact(reqOb)
-            .then(function(artifact) {
-                scope.artifact = artifact;
-                scope.url = server + '/alfresco' + artifact.artifactLocation + ticket;
-                if (artifact.contentType.indexOf('image') > -1) {
-                    scope.image = true;
+            ElementService.getElement(reqOb, 1, false)
+            .then(function(data) {
+                scope.element = data;
+                var artifacts = data._artifact;
+                if (artifacts !== undefined) {
+                    var allExt = artifacts.map(a => a.extension);
+                    var includeExt = allExt;
+                    if (scope.artExt !== '' || scope.artExt !== undefined) {
+                        includeExt = scope.artExt.split(',').filter(a => allExt.includes(a));
+                    }
+                    scope.artifacts = artifacts.filter(a => includeExt.includes(a.extension))
+                        .map(a => {
+                            return {
+                                url: URLService.getArtifactURL(reqOb, a.extension),
+                                image: (a.mimetype.indexOf('image') > -1),
+                                ext: a.extension
+                            };
+                        });
                 }
             }, function(reason) {
-                console.log('Error getting artifact ' + scope.mmsElementId);
+                console.log('Error getting artifacts for ' + scope.mmsElementId);
             }).finally(function() {
                 element.removeClass('isLoading');
             });
@@ -61,13 +71,14 @@ function mmsTranscludeArt(ArtifactService, AuthService, URLService) {
 
     return {
         restrict: 'E',
-        template: '<img ng-if="image" ng-src="{{url}}"></img><a ng-if="!image" ng-href="{{url}}">{{artifact.name}}</a>',
+        template: '<div ng-repeat="artifact in artifacts"><img ng-if="artifact.image" ng-src="{{artifact.url}}"></img><a ng-if="!artifact.image" ng-href="{{artifact.url}}">{{element.name}} - {{artifact.ext}}</a></div>',
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',
             mmsRefId: '@',
             mmsCommitId: '@',
-            mmsCfLabel: '@'
+            mmsCfLabel: '@',
+            mmsArtExt: '@'
         },
         require: ['?^^mmsView'],
         link: mmsTranscludeArtLink

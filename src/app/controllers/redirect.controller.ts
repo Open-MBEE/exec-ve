@@ -13,10 +13,19 @@ var mmsApp = angular.module('mmsApp');
     // (see _relatedDocuments of element in search result)
     // /workspaces/master/sites/{siteid}/documents/{docid}/full	{docid}	/projects/{projectid}/master/documents/{docid}/full
 
-mmsApp.controller('RedirectCtrl', ['$scope', '$rootScope', '$state', '$location', '$timeout',
-        'ProjectService', 'ElementService', 'growl', 
-    function($scope, $rootScope, $state, $location, $timeout, ProjectService, ElementService, growl) {
-        $rootScope.ve_title = 'View Editor'; //what to name this?
+mmsApp.controller('RedirectCtrl', ['$scope', '$state', '$location', '$timeout',
+        'ProjectService', 'ElementService', 'RootScopeService', 'EventService', 'growl',
+    function($scope, $state, $location, $timeout, ProjectService, ElementService, RootScopeService, EventService, growl) {
+        const rootScopeSvc = RootScopeService;
+        const eventSvc = EventService;
+        eventSvc.$init($scope);
+
+        rootScopeSvc.veTitle('View Editor'); //what to name this?
+
+        $scope.redirect_from_old = rootScopeSvc.veRedirectFromOld();
+        $scope.$on(rootScopeSvc.constants.VEREDIRECTFROMOLD, (data) => {
+            $scope.redirect_from_old = data;
+        });
         $scope.redirect_noResults = false;
         $scope.redirect_element = null;
         $scope.spin = false;
@@ -196,6 +205,6 @@ mmsApp.controller('RedirectCtrl', ['$scope', '$rootScope', '$state', '$location'
         ProjectService.getProjects().then(function(projectObs) {
             projectList = projectObs.map(function(a) {return a.id;});
             reqOb = {projectId: projectList[0], refId: 'master'};
-            oldUrlTest($scope.crush_url);
+            oldUrlTest(rootScopeSvc.veCrushUrl());
         });
 }]);

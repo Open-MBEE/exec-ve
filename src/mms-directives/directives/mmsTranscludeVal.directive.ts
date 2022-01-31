@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 mmsDirectives.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
-    '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', mmsTranscludeVal]);
+    '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', 'EventService', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -34,7 +34,10 @@ mmsDirectives.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', '
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http,
-                          _, $compile, $templateCache, growl, MathJax, ViewService) {
+                          _, $compile, $templateCache, growl, MathJax, ViewService, EventService) {
+
+    let eventSvc = EventService;
+
     var valTemplate = 'partials/mms-directives/mmsTranscludeVal.html';
     var frameTemplate = 'partials/mms-directives/mmsTranscludeValFrame.html';
     var editTemplate = 'partials/mms-directives/mmsTranscludeValEdit.html';
@@ -43,7 +46,9 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
     var spaceSpace = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g;
     var spaceComma = />(?:\s|&nbsp;),/g;
 
-    var mmsTranscludeCtrl = function ($scope, $rootScope) {
+    var mmsTranscludeCtrl = function ($scope) {
+
+        eventSvc.$init($scope);
 
         $scope.bbApi = {};
         $scope.buttons = [];
@@ -52,11 +57,11 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
         $scope.bbApi.init = function() {
             if (!$scope.buttonsInit) {
                 $scope.buttonsInit = true;
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope), $scope.buttons);
-                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope), $scope.buttons);
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-preview", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-save", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-saveC", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-cancel", $scope));
+                $scope.bbApi.addButton(UxService.getButtonBarButton("presentation-element-delete", $scope));
                 $scope.bbApi.setPermission("presentation-element-delete", $scope.isDirectChildOfPresentationElement);
             }
         };
@@ -173,19 +178,15 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
                 recompile();
                 Utils.reopenUnsavedElts(scope, 'value');
                 if (scope.commitId === 'latest') {
-                    scope.$on('element.updated', function (event, elementOb, continueEdit, stompUpdate) {
+                   scope.subs.push(eventSvc.$on('element.updated', function (data) {
+                        let elementOb = data.element;
+                        let continueEdit = data.continueEdit;
                         if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                             elementOb._refId === scope.element._refId && !continueEdit) {
-                            //actions for stomp
-                            if(stompUpdate && scope.isEditing === true) {
-                                growl.warning("This value has been changed: " + elementOb.name +
-                                    " modified by: " + elementOb._modifier, {ttl: -1});
-                            } else {
-                                Utils.setupValCf(scope);
-                                recompile();
-                            }
+                            Utils.setupValCf(scope);
+                            recompile();
                         }
-                    });
+                    }));
                 }
             }, function(reason) {
                 domElement.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></span>');

@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mms = angular.module('mms');
 
 
-mms.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementService', 'UtilsService', 'CacheService', '_', ViewService]);
+mms.factory('ViewService', ['$q', '$http', 'URLService', 'ElementService', 'UtilsService', 'CacheService', 'EventService', '_', ViewService]);
 
 /**
  * @ngdoc service
@@ -20,7 +20,8 @@ mms.factory('ViewService', ['$q', '$http', '$rootScope', 'URLService', 'ElementS
  * CRUD for views and products/documents/group
  *
  */
-function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsService, CacheService, _) {
+function ViewService($q, $http, URLService, ElementService, UtilsService, CacheService, EventService, _) {
+    var eventSvc = EventService;
     var inProgress = {}; //only used for view elements over limit
 
     // The type of opaque element to the sysmlId of the classifierIds:
@@ -188,22 +189,19 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 } catch (e) {
                 }
             }
-            $http.get(URLService.getViewElementIdsURL(reqOb),URLService.getRequestConfig())
-            .then(function(response) {
-                var data = response.data.elementIds;
-                toGet = toGet.concat(data);
+
+            var toGetSet = new Set(toGet);
+            reqOb.elementIds = Array.from(toGetSet);
+            ElementService.getElements(reqOb, weight, update)
+            .then(function(data) {
+                results = data;
             }).finally(function() {
-                var toGetSet = new Set(toGet);
-                reqOb.elementIds = Array.from(toGetSet);
-                ElementService.getElements(reqOb, weight, update)
-                .then(function(data) {
-                    results = data;
-                }).finally(function() {
-                    CacheService.put(requestCacheKey, results);
-                    deferred.resolve(results);
-                    delete inProgress[key];
-                });
+                CacheService.put(requestCacheKey, results);
+                deferred.resolve(results);
+                delete inProgress[key];
             });
+
+
         }, function(reason) {
             deferred.reject(reason);
             delete inProgress[key];
@@ -227,39 +225,6 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 }
             }
         }
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.ViewService#getDocumentViews
-     * @methodOf mms.ViewService
-     * 
-     * @description
-     * Gets the view objects for a document. The references are 
-     * the same as ones gotten from ElementService.
-     * 
-     * @param {object} reqOb see ElementService.getElement
-     * @param {integer} [weight=1] the priority of the request
-     * @param {boolean} [update=false] whether to always get the latest 
-     *      from server
-     * @returns {Promise} The promise will be resolved with array of view objects. 
-     */
-    var getDocumentViews = function(reqOb, weight, update) {
-        UtilsService.normalize(reqOb);
-        var deferred = $q.defer();
-        var url = URLService.getDocumentViewsURL(reqOb);
-        var cacheKey = ['views', reqOb.projectId, reqOb.refId, reqOb.elementId];
-        if (CacheService.exists(cacheKey) && !update) {
-            deferred.resolve(CacheService.get(cacheKey));
-        } else {
-            ElementService.getGenericElements(url, reqOb, 'views', weight, update).
-            then(function(data) {
-                deferred.resolve(CacheService.put(cacheKey, data, false));
-            }, function(reason) {
-                deferred.reject(reason);
-            });
-        }
-        return deferred.promise;
     };
 
     /**
@@ -292,6 +257,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
             };
             if (data._childViews) {
                 clone._childViews = JSON.parse(JSON.stringify(data._childViews));
+            } else {
+                clone._childViews = [];
             }
             clone._childViews.push({id: reqOb.viewId, aggregation: reqOb.aggr});
             ElementService.updateElement(clone, true)
@@ -605,7 +572,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                 var elem = data[i];
                 if (elem.id === newInstanceId) {
                     if (type === "Section") {
-                        $rootScope.$broadcast('viewctrl.add.section', elem, viewOrSectionOb);
+                        eventSvc.$broadcast('viewctrl.add.section', {elementOb: elem, viewOb: viewOrSectionOb});
                     }
                     deferred.resolve(elem);
                     return;
@@ -863,16 +830,22 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         };
         var toUpdate = [updatedElement];
         if (updatedElement.appliedStereotypeInstanceId !== null) {
-            toUpdate[0].id = elementOb.id + '_asi';
-            toUpdate[0]._refId = elementOb._refId;
-            toUpdate[0]._projectId = elementOb._projectId;
-            toUpdate[0].classifierIds = updatedElement._appliedStereotypeIds;
+            let updateOb = {
+                id: elementOb.id + '_asi',
+                _refId: elementOb._refId,
+                _projectId: elementOb._projectId,
+                classifierIds: updatedElement._appliedStereotypeIds,
+                _isGroup: elementOb._isGroup,
+                _appliedStereotypeIds: null,
+                appliedStereotypeInstanceId: null,
+            }
+            toUpdate.push(updateOb);
         } else {
             $http.delete(URLService.getElementURL({
                 elementId: elementOb.id + '_asi', 
                 refId: elementOb._refId, 
                 projectId: elementOb._projectId
-            }), URLService.getRequestConfig());
+            }));
         }
         return ElementService.updateElements(toUpdate, false)
             .then(function(data) {
@@ -896,10 +869,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
      * @description
      * Gets all the documents in a site
      * 
-     * @param {string} site Site name
+     * @param {Object} reqOb object containing project and ref ids needed to resolve request
      * @param {boolean} [update=false] Update latest
-     * @param {string} [workspace=master] workspace to use 
-     * @param {string} [version=latest] timestamp
      * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of document objects 
      */
@@ -923,6 +894,45 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         }
         return deferred.promise;
     };
+
+
+
+        /**
+         * @ngdoc method
+         * @name mms.ViewService#getProjectDocument
+         * @methodOf mms.ViewService
+         *
+         * @description
+         * Gets a specific the document from a Site
+         *
+         * @param {object} reqOb object containing project, ref, document ids needed to resolve request
+         * @param {int} weight the priority of the request
+         * @param {boolean} update [default=false] Update latest
+         * @returns {Promise} The promise will be resolved with array of document objects
+         */
+        var getProjectDocument = function(reqOb, weight, update?) {
+            reqOb.elementId = reqOb.documentId;
+            var cacheKey = ElementService.getElementKey(reqOb);
+            var deferred = $q.defer();
+            var cached = CacheService.get(cacheKey);
+            if (update === undefined) {
+                update = false;
+            }
+            if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
+                deferred.resolve(cached);
+                return deferred.promise;
+            }
+            getProjectDocuments(reqOb, weight, update).then((result) => {
+                var documentOb = result.filter(
+                    (resultOb) => {
+                        return resultOb.id === reqOb.documentId;
+                    })[0];
+                deferred.resolve(CacheService.put(cacheKey, documentOb, true));
+            }, (reason) => {
+                    deferred.reject(reason);
+            });
+            return deferred.promise;
+        };
 
     /**
      * @ngdoc method
@@ -1008,6 +1018,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
                     instanceSpecification.classifierIds.length > 0 && 
                     opaqueClassifiers.indexOf(instanceSpecification.classifierIds[0]) >= 0) {
                 elementObject.isOpaque = true;
+            } else {
+                elementObject.isOpaque = false;
             }
             var presentationElement = getPresentationElementSpec(instanceSpecification);
             elementObject.presentationElement = presentationElement;
@@ -1129,7 +1141,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     var getDocMetadata = function(reqOb, weight) {
         var deferred = $q.defer();
         var metadata = {
-            numberingDepth: 0, 
+            numberingDepth: 0,
             numberingSeparator: '.',
             top: null,
             topl: null,
@@ -1202,7 +1214,7 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
     };
 
     var isGroup = function(instanceSpec) {
-        return instanceSpec._appliedStereotypeIds.length > 0 && instanceSpec._appliedStereotypeIds[0] === GROUP_ST_ID;
+        return instanceSpec._appliedStereotypeIds !== undefined && instanceSpec._appliedStereotypeIds.length > 0 && instanceSpec._appliedStereotypeIds[0] === GROUP_ST_ID;
     };
 
     var getElementType = function(element) {
@@ -1250,8 +1262,8 @@ function ViewService($q, $http, $rootScope, URLService, ElementService, UtilsSer
         removeGroup: removeGroup,
         downgradeDocument: downgradeDocument,
         addViewToParentView: addViewToParentView,
-        getDocumentViews: getDocumentViews,
         getProjectDocuments: getProjectDocuments,
+        getProjectDocument: getProjectDocument,
         getPresentationElementSpec: getPresentationElementSpec,
         isSection: isSection,
         isFigure: isFigure,

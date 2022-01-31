@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsViewReorder', ['ElementService', 'ViewService', '$templateCache', 'growl', '$q', '_', mmsViewReorder]);
+mmsDirectives.directive('mmsViewReorder', ['ElementService', 'ViewService', 'PermissionsService', '$templateCache', 'growl', '$q', '_', mmsViewReorder]);
 
 /**
  * @ngdoc directive
@@ -20,7 +20,7 @@ mmsDirectives.directive('mmsViewReorder', ['ElementService', 'ViewService', '$te
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, _) {
+function mmsViewReorder(ElementService, ViewService, PermissionsService, $templateCache, growl, $q, _) {
     var template = 'partials/mms-directives/mmsViewReorder.html';
 
     var mmsViewReorderCtrl = function($scope, ViewService) {
@@ -56,7 +56,7 @@ function mmsViewReorder(ElementService, ViewService, $templateCache, growl, $q, 
                 if (newVal !== lastid)
                     return;
                 scope.view = data;
-                scope.editable = scope.view._editable && commitId === 'latest';
+                scope.editable = commitId === 'latest' && PermissionsService.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId);
 
                 var contents = data._contents || data.specification;
                 if (contents) {

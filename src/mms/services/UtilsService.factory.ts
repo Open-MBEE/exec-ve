@@ -1325,7 +1325,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
               accept = 'application/pdf';
         }
         var deferred = $q.defer();
-        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId, URLService.getRequestConfig()), {
+        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId), {
             'Content-Type' : 'text/html',
             'Accepts' : accept,
             'body': data.htmlString,

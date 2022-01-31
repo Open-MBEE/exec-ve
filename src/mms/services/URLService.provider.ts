@@ -3,56 +3,24 @@ var mms = angular.module('mms');
 
 
 class URLServiceProvider {
-    private baseUrl = '/alfresco/service';
-    private mmsUrl = '';
+    private baseUrl = '/api';
+    private mmsUrl = 'localhost:8080';
 
     constructor() {
     };
 
-    setBaseUrl(base) {
+    setBaseUrl = function (base) {
         this.baseUrl = base;
     };
-
-    setMmsUrl(mms) {
+    setMmsUrl = function (mms) {
         this.mmsUrl = mms;
-      };
-
+    };
     $get() {
         return urlService(this.baseUrl,this.mmsUrl);
     }
-}
+};
 
 mms.provider('URLService', URLServiceProvider)
-//     var initInjector = angular.injector(['ng']);
-//     var $http = initInjector.get('$http');
-//     var $scope = initInjector.get('$scope');
-//     var config = $http.get('config/config.json');
-//     console.log(config);
-//     var blah = $http.get('config/config.json').then(function(conf){$http.get(conf.apiUrl);});
-//     console.log(blah);
-//     var getConfig = function() {
-//       return $http.get('config/config.json');
-//     };
-//   console.log(baseUrl);
-//     var mmsUrl = '';
-//     this.setBaseUrl = getConfig().then(
-//       function(data) {
-//         $scope.config = data;
-//         console.log($scope.config);
-//     });
-//     this.setMmsUrl = function() {
-//         $http.get('config/config.json')
-//           .then(function(config) {
-//             mmsUrl = config.apiUrl;
-//           });
-//     };
-//     this.$get = [function URLServiceFactory() {
-//
-//         return urlService(baseUrl, mmsUrl);
-//     }];
-// });
-
-
 /**
  * @ngdoc service
  * @name mms.URLService
@@ -64,21 +32,19 @@ mms.provider('URLService', URLServiceProvider)
  * should rarely be used directly by applications.
  *
  * To configure the base url of the mms server, you can use the URLServiceProvider
- * in your application module's config. By default, the baseUrl is '/alfresco/service'
- * which assumes your application is hosted on the same machine as the mms and ve.
+ * in your application module's config. By default, the baseUrl is '/api', but is
+ * effectively '/' relative to the service layer due to the rewrite rule.
  *  <pre>
- angular.module('myApp', ['mms'])
- .config(function(URLServiceProvider) {
-            URLServiceProvider.setBaseUrl('https://url/alfresco/service');
+        angular.module('myApp', ['mms'])
+        .config(function(URLServiceProvider) {
+            URLServiceProvider.setBaseUrl('https://url/context/path');
         });
  </pre>
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
 function urlService(baseUrl, mmsUrl) {
-    var root = baseUrl;
-    var mmsServer = mmsUrl;
-    var mmsAPIroot = mmsUrl + baseUrl;
+    var root = mmsUrl + baseUrl;
     var jobsRoot = 'https://cae-pma-int:8443/';
     var token;
 
@@ -90,12 +56,27 @@ function urlService(baseUrl, mmsUrl) {
         token = t;
     };
 
+    var getAuthorizationHeaderValue = function() {
+        return ('Bearer ' + token);
+    };
+
+    var getAuthorizationHeader = function(headers) {
+        if(!token) {
+            return headers;
+        }
+        if(!headers) {
+            headers = getHeaders();
+        }
+        headers.Authorization = getAuthorizationHeaderValue();
+        return headers;
+    };
+
     var getJMSHostname = function(){
-        return mmsAPIroot + '/connection/jms';
+        return root + '/connection/jms';
     };
 
     var getMmsServer = function() {
-        return mmsServer;
+        return mmsUrl;
     };
 
     /**
@@ -104,7 +85,7 @@ function urlService(baseUrl, mmsUrl) {
      * @methodOf mms.URLService
      *
      * @description
-     * Adds generates Authorization Header using token
+     * Adds generates Default Headers using token
      *
      * @returns {object} The HTTP header format
      */
@@ -112,14 +93,6 @@ function urlService(baseUrl, mmsUrl) {
         return {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + token
-        };
-    };
-
-    var getRequestConfig = function() {
-        return {headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
-            }
         };
     };
 
@@ -150,10 +123,10 @@ function urlService(baseUrl, mmsUrl) {
      * @description
      * self explanatory
      *
-     * @returns {string} Returns object with mmsversion url
+     * @returns {object} Returns object with mmsversion
      */
     var getMmsVersionURL = function() {
-        return mmsAPIroot + "/api/version";
+        return root + "/mmsversion";
     };
 
     /**
@@ -168,7 +141,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The path for site dashboard.
      */
     var getSiteDashboardURL = function(site) {
-        return mmsAPIroot + "/orgs/" + site + "/projects/" + site + "/branches/master/elements";
+        return root + "/orgs/" + site + "/projects/" + site + "/branches/master/elements";
     };
 
     /**
@@ -183,63 +156,58 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getExportHtmlUrl = function(projectId, refId) {
-        return mmsAPIroot + "/projects/" + projectId +
+        return root + "/projects/" + projectId +
             "/refs/" + refId + '/convert';
     };
 
-    /**
-     * @ngdoc method
-     * @name mms.URLService#getCheckLoginURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets url that checks the login
-     *
-     * @returns {string} The url
-     */
-    var getCheckLoginURL = function() {
-        return mmsAPIroot + "/checkAuth";
+
+    var getAuthenticationUrl = function() {
+        return root + "/authentication";
+    };
+
+    var getPermissionsLookupURL = function() {
+        return root + "/permissions";
     };
 
     var getOrgURL = function(orgId) {
-        return mmsAPIroot + '/orgs/' + orgId;
+        return root + '/orgs/' + orgId;
     };
 
     var getOrgsURL = function() {
-        return mmsAPIroot + "/orgs";
+        return root + "/orgs";
     };
 
     var getProjectsURL = function(orgId) {
         if (orgId)
-            return mmsAPIroot + "/orgs/" + orgId + '/projects';
-        return mmsAPIroot + '/projects';
+            return root + '/projects?orgId=' + orgId;
+        return root + '/projects';
     };
 
     var getProjectURL = function(projectId) {
-        return mmsAPIroot + "/projects/" + projectId;
+        return root + "/projects/" + projectId;
     };
 
     var getProjectMountsURL = function(projectId, refId) {
-        return mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/mounts';
+        return root + '/projects/' + projectId + '/refs/' + refId + '/mounts';
     };
 
     var getRefsURL = function(projectId) {
-        return mmsAPIroot + '/projects/' + projectId + '/refs';
+        return root + '/projects/' + projectId + '/refs';
     };
 
     var getRefURL = function(projectId, refId) {
-        return mmsAPIroot + '/projects/' + projectId + '/refs/' + refId;
+        return root + '/projects/' + projectId + '/refs/' + refId;
     };
 
     var getRefHistoryURL = function(projectId, refId, timestamp) {
         if (timestamp !== '' && isTimestamp(timestamp)) {
-            return mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/commits' + '&maxTimestamp=' + timestamp + '&limit=1';
+            return root + '/projects/' + projectId + '/refs/' + refId + '/commits' + '&maxTimestamp=' + timestamp + '&limit=1';
         }
-        return mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/commits';
+        return root + '/projects/' + projectId + '/refs/' + refId + '/commits';
     };
 
     var getGroupsURL = function(projectId, refId) {
-        return mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/groups';
+        return root + '/projects/' + projectId + '/refs/' + refId + '/groups';
     };
 
     /**
@@ -254,7 +222,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url
      */
     var getProjectDocumentsURL = function(reqOb) {
-        var r = mmsAPIroot + "/projects/" + reqOb.projectId +
+        var r = root + "/projects/" + reqOb.projectId +
             "/refs/" + reqOb.refId +
             "/documents";
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
@@ -272,7 +240,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The path for image url queries.
      */
     var getImageURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
             reqOb.elementId;
         return addVersion(r, reqOb.commitId);
     };
@@ -289,12 +257,17 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
     var getViewElementIdsURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
+        return r;
+    };
+
+    var getViewsURL = function(reqOb) {
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
         return r;
     };
 
@@ -302,31 +275,13 @@ function urlService(baseUrl, mmsUrl) {
         var recurseString = 'recurse=true';
         if (reqOb.depth)
             recurseString = 'depth=' + reqOb.depth;
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         r = addVersion(r, reqOb.commitId);
         if (r.indexOf('?') > 0) {
             r += '&' + recurseString;
         } else {
             r += '?' + recurseString;
         }
-        return addExtended(r, reqOb.extended);
-    };
-
-    /**
-     * @ngdoc method
-     * @name mms.URLService#getDocumentViewsURL
-     * @methodOf mms.URLService
-     *
-     * @description
-     * Gets the url to get all views in a document
-     *
-     * @param {object} reqOb object with keys as described in ElementService.
-     * @returns {string} The url.
-     */
-    var getDocumentViewsURL = function(reqOb) {
-        var r = mmsAPIroot + "/projects/" + reqOb.projectId + "/refs/" + reqOb.refId +
-            '/documents/' + reqOb.elementId + "/views";
-        r = addVersion(r, reqOb.commitId);
         return addExtended(r, reqOb.extended);
     };
 
@@ -342,7 +297,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementHistoryURL = function(reqOb) {
-        return mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
+        return root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
     };
 
     /**
@@ -357,7 +312,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPostElementsURL = function(reqOb) {
-        return addExtended(addChildViews(mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements', reqOb.returnChildViews), reqOb.extended);
+        return addExtended(addChildViews(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views', reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -372,7 +327,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getPutElementsURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views';
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
@@ -388,7 +343,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The post elements url.
      */
     var getElementSearchURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
         return addExtended(r, true);
     };
 
@@ -408,11 +363,11 @@ function urlService(baseUrl, mmsUrl) {
      */
     var getSearchURL = function(projectId, refId, urlParams) {
         var r;
-        if (urlParams !== null || urlParams !== '') {
+        if (urlParams !== undefined && urlParams !== null && urlParams !== ''){
             // ie '/search?checkType=true&literal=true';
-            r = mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
-            r = mmsAPIroot + '/projects/' + projectId + '/refs/' + refId + '/search';
+            r = root + '/projects/' + projectId + '/refs/' + refId + '/search';
         }
         return r;
     };
@@ -426,10 +381,31 @@ function urlService(baseUrl, mmsUrl) {
      * Gets the url for an artifact
      *
      * @param {object} reqOb object with keys
+     * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    var getArtifactURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId;
+    var getArtifactURL = function(reqOb,artifactExtension) {
+        var ext = (artifactExtension !== undefined) ? artifactExtension : reqOb.artifactExtension;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
+        return addToken(addVersion(r, reqOb.commitId));
+    };
+
+    /**
+     * @ngdocs method
+     * @name mms.URLService#getArtifactEmbedURL
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Gets the url without added token for an artifact
+     *
+     * @param {object} reqOb object with keys
+     * @param {string} artifactExtension (optional) string with the desired artifact extension
+     * @returns {string} url
+     */
+    var getArtifactEmbedURL = function(reqOb,artifactExtension) {
+        addToken = (addToken) ? addToken : false;
+        var ext = (artifactExtension !== undefined) ? artifactExtension : reqOb.artifactExtension;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
         return addVersion(r, reqOb.commitId);
     };
 
@@ -445,7 +421,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getPutArtifactsURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts';
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
         return addVersion(r, reqOb.commitId);
     };
 
@@ -461,51 +437,19 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactHistoryURL = function(reqOb) {
-        var r = mmsAPIroot + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/artifacts/' + reqOb.artifactId + '/commits';
-        return r;
+        return getElementHistoryURL(reqOb);
     };
 
-    var setJobsUrl = function(jobUrl) {
-        jobsRoot = jobUrl + ':8443/';
-    };
-
-    var getJobsURL = function(projectId, refId, machine) {
-        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs', machine);
-    };
-
-    var getJobURL = function(projectId, refId, jobId, machine){
-        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId , machine);
-    };
-
-    var getRunJobURL = function(projectId, refId, jobId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances';
-    };
-
-    var getCreateJobURL = function(projectId, refId) {
-        return jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs';
-    };
-
-    var getJobInstancesURL = function(projectId, refId, jobId, machine) {
-        return addServer(jobsRoot + 'projects/'+ projectId + '/refs/' + refId + '/jobs/' + jobId + '/instances', machine);
-    };
-
-    var getLogoutURL = function() {
-        return mmsAPIroot + '/logout';
-    };
-
-    var getCheckTokenURL = function() {
-        return mmsAPIroot + '/checkAuth'; //TODO remove when server returns 404
-    };
-
-    var getCheckSessionURL = function() {
-        return mmsAPIroot + '/api/version'; //TODO remove when server returns 404
+    var getCheckTokenURL = function(t) {
+        return root + '/checkAuth'; //TODO remove when server returns 404
     };
 
     var getPersonURL = function(username) {
-        return mmsAPIroot + '/api/users/' + username;
+        //return root + '/checkAuth';
+        return root + '/users?user=' + username;
     };
 
-    /**
+        /**
      * @ngdoc method
      * @name mms.URLService#handleHttpStatus
      * @methodOf mms.URLService
@@ -620,12 +564,31 @@ function urlService(baseUrl, mmsUrl) {
         return r;
     };
 
+    /**
+     * @ngdoc method
+     * @name mms.URLService#addToken
+     * @methodOf mms.URLService
+     *
+     * @description
+     * Adds token parameter to URL string
+     *
+     * @param {String} url The url string for which to add token parameter argument.
+     * @returns {string} The url with commitId parameter added.
+     */
+    var addToken = function(url) {
+            if (url.indexOf('?') > 0)
+                return url + '&token=' + token;
+            else
+                return url + '?token=' + token;
+    };
+
 
     return {
         getRoot: getRoot,
         setToken: setToken,
+        getAuthorizationHeaderValue: getAuthorizationHeaderValue,
+        getAuthorizationHeader: getAuthorizationHeader,
         getHeaders: getHeaders,
-        getRequestConfig: getRequestConfig,
         getJMSHostname: getJMSHostname,
         getMmsServer: getMmsServer,
         isTimestamp: isTimestamp,
@@ -649,24 +612,18 @@ function urlService(baseUrl, mmsUrl) {
         getElementSearchURL: getElementSearchURL,
         getSearchURL: getSearchURL,
         getProjectDocumentsURL: getProjectDocumentsURL,
-        getDocumentViewsURL: getDocumentViewsURL,
         getImageURL: getImageURL,
         getExportHtmlUrl: getExportHtmlUrl,
         getArtifactURL: getArtifactURL,
+        getArtifactEmbedURL: getArtifactEmbedURL,
         getPutArtifactsURL: getPutArtifactsURL,
         getArtifactHistoryURL: getArtifactHistoryURL,
-        setJobsUrl: setJobsUrl,
-        getJobsURL: getJobsURL,
-        getJobURL: getJobURL,
-        getRunJobURL: getRunJobURL,
-        getCreateJobURL: getCreateJobURL,
-        getJobInstancesURL: getJobInstancesURL,
-        getCheckLoginURL: getCheckLoginURL,
         getCheckTokenURL: getCheckTokenURL,
-        getCheckSessionURL: getCheckSessionURL,
         getPersonURL: getPersonURL,
-        getLogoutURL: getLogoutURL,
         handleHttpStatus: handleHttpStatus,
+        getAuthenticationUrl: getAuthenticationUrl,
+        getViewsURL: getViewsURL,
+        getPermissionsLookupURL: getPermissionsLookupURL
     };
 
 }

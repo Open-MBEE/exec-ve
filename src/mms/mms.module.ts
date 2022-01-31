@@ -56,9 +56,7 @@ import * as angular from 'angular';
     ]);
     </pre>
  */
-//declare let window : mmsWindow;
-
-var mms = angular.module('mms', []);
+var mms = angular.module('mms', ['rx'])
 
 mms.config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);

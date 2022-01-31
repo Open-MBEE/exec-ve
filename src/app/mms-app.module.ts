@@ -71,16 +71,16 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
     $httpProvider.defaults.withCredentials = true;
 // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
     $urlRouterProvider.otherwise(function($injector, $location) {
-        var $rootScope = $injector.get('$rootScope');
+        var rootScopeSvc = $injector.get('RootScopeService');
         var $state = $injector.get('$state');
         var checkLogin = $injector.get('AuthService').checkLogin();
         if (checkLogin) {
             if ($location.url().includes('workspace')) {
-                $rootScope.redirect_from_old_site = true;
-                $rootScope.crush_url = $location.path();
+                rootScopeSvc.veRedirectFromOld(true);
+                rootScopeSvc.veCrushUrl($location.path());
                 $state.go('login.redirect');
             } else {
-                $rootScope.redirect_from_old_site = false;
+                rootScopeSvc.veRedirectFromOld(false);
                 $state.go('login.select');
             }
         } else {
@@ -109,25 +109,25 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             },
             'login@': {
                 templateUrl: 'partials/mms/login.html',
-                controller: ['$scope', '$rootScope', '$state', 'AuthService', 'loginBannerOb', 'growl', function ($scope, $rootScope, $state, AuthService, loginBannerOb, growl) {
+                controller: ['$scope', '$state', 'AuthService', 'loginBannerOb', 'RootScopeService', 'growl', function ($scope, $state, AuthService, loginBannerOb, RootScopeService, growl) {
+                    const rootScopeSvc = RootScopeService;
                     $scope.credentials = {
                       username: '',
                       password: ''
                     };
-                    $rootScope.ve_title = 'Login';
+                    rootScopeSvc.veTitle('Login');
                     $scope.pageTitle = 'View Editor';
                     $scope.loginBanner = loginBannerOb;
                     $scope.spin = false;
                     $scope.login = function (credentials) {
-                        console.log(credentials.username);
                         $scope.spin = true;
-                        //var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                        AuthService.getAuthorized(credentials)
+                        var credentialsJSON = {"username":credentials.username, "password":credentials.password};
+                        AuthService.getAuthorized(credentialsJSON)
                         .then(function(user) {
-                            console.log(user);
-                            if ($rootScope.ve_redirect) {
-                                var toState = $rootScope.ve_redirect.toState;
-                                var toParams = $rootScope.ve_redirect.toParams;
+                            if (rootScopeSvc.veRedirect()) {
+                                let veRedirect = rootScopeSvc.veRedirect();
+                                var toState = veRedirect.toState.name;
+                                var toParams = veRedirect.toParams;
                                 $state.go(toState, toParams);
                             } else {
                                 $state.go('login.select', {fromLogin: true});
@@ -170,7 +170,6 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             token: ['$window', 'URLService', 'AuthService', '$q', 'ApplicationService', function($window, URLService, AuthService, $q, ApplicationService) {
                 var deferred = $q.defer();
                 AuthService.checkLogin().then(function(data) {
-                    console.error('select-fromlogin');
                     ApplicationService.setUserName(data);
                     URLService.setToken($window.localStorage.getItem('token'));
                     deferred.resolve($window.localStorage.getItem('token'));
@@ -198,8 +197,18 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             },
             'login@': {
                 templateUrl: 'partials/mms/select.html',
-                controller: ['$scope', '$rootScope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService','loginBannerOb', 'growl', '$localStorage', function($scope, $rootScope, $state, $stateParams, orgObs, ProjectService, AuthService, loginBannerOb, growl, $localStorage) {
-                    $rootScope.ve_title = 'Projects';
+                controller: ['$scope', '$state', '$stateParams', 'orgObs', 'ProjectService', 'AuthService', 'RootScopeService', 'EventService', 'loginBannerOb', 'growl', '$localStorage', function($scope, $state, $stateParams, orgObs, ProjectService, AuthService, RootScopeService, EventService, loginBannerOb, growl, $localStorage) {
+                    const rootScopeSvc = RootScopeService;
+                    const eventSvc = EventService;
+                    eventSvc.$init($scope);
+
+                    rootScopeSvc.veTitle('View Editor'); //what to name this?
+
+                    $scope.redirect_from_old = rootScopeSvc.veRedirectFromOld();
+                    $scope.$on(rootScopeSvc.constants.VEREDIRECTFROMOLD, (data) => {
+                        $scope.redirect_from_old = data;
+                    });
+                    RootScopeService.veTitle('Projects');
                     $scope.pageTitle = 'View Editor';
                     $scope.fromLogin = $stateParams.fromLogin;
                     $localStorage.$default({org: orgObs[0]});
@@ -249,7 +258,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                     $scope.continue = function() {
                         if (orgId && projectId) {
                             $scope.spin = true;
-                            $rootScope.redirect_from_old_site = false;
+                            RootScopeService.veRedirectFromOld(false);
                             $state.go('project.ref', {orgId: orgId, projectId: projectId, refId: 'master'}).then(function(data) {
                             }, function(reject) {
                                 $scope.spin = false;
@@ -285,16 +294,16 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             //orgObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
             //    return ProjectService.getOrgs();
             //}],
-            projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
+            projectOb: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService) {
                 return ProjectService.getProject($stateParams.projectId);
             }],
             projectObs: ['$stateParams', 'ProjectService', 'token', 'projectOb', function($stateParams, ProjectService, token, projectOb) {
                 return ProjectService.getProjects(projectOb.orgId);
             }],
-            orgOb: ['ProjectService', 'projectOb', 'token', function(ProjectService, projectOb, token) {
+            orgOb: ['ProjectService', 'projectOb', 'token', function(ProjectService, projectOb) {
                 return ProjectService.getOrg(projectOb.orgId);
             }],
-            refObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService, token) {
+            refObs: ['$stateParams', 'ProjectService', 'token', function($stateParams, ProjectService) {
                 return ProjectService.getRefs($stateParams.projectId);
             }],
             tagObs: ['refObs', function(refObs) {
@@ -332,8 +341,8 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             },
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
-                    $rootScope.ve_title = orgOb.name;
+                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, RootScopeService) {
+                    RootScopeService.veTitle(orgOb.name);
                     $scope.org = orgOb;
                     //$scope.orgs = orgObs;
                     $scope.project = projectOb;
@@ -348,8 +357,8 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             },
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller:['$scope', '$rootScope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
-                    $rootScope.ve_title = projectOb.name;
+                controller:['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, RootScopeService) {
+                    RootScopeService.veTitle(projectOb.name);
                     $scope.org = orgOb;
                     $scope.project = projectOb;
                     $scope.projects = projectObs;
@@ -479,19 +488,22 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             }],
             docMeta: [function(){
                 return {};
+            }],
+            permissions: ['projectOb', 'refOb', 'PermissionsService', function(projectOb, refOb, PermissionsService){
+                return PermissionsService.initializePermissions(projectOb, refOb);
             }]
         },
         views: {
             'banner@': {
-                template: '<ve-system-banner banner="banner"></ve-system-banner>',
+                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
                 controller: ['$scope', 'bannerOb', function($scope, bannerOb){
                     $scope.banner = bannerOb;
                 }]
             },
             'nav@': {
                 template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', function ($scope, $rootScope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search) {
-                    $rootScope.ve_title = orgOb.name;
+                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, RootScopeService) {
+                    RootScopeService.veTitle(orgOb.name);
                     $scope.org = orgOb;
                     //$scope.orgs = orgObs;
                     $scope.project = projectOb;
@@ -506,8 +518,8 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
             },
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', function ($scope, $rootScope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs) {
-                    $rootScope.ve_title = projectOb.name;
+                controller: ['$scope', 'orgOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'RootScopeService', function ($scope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, RootScopeService) {
+                    RootScopeService.veTitle(projectOb.name);
                     $scope.org = orgOb;
                     $scope.groups = groupObs;
                     $scope.project = projectOb;
@@ -611,11 +623,11 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                         }
                     });
                 } else {
-                    ElementService.getElement({
+                    ViewService.getProjectDocument({
                         projectId: $stateParams.projectId,
                         refId: $stateParams.refId,
-                        extended: true,
-                        elementId: $stateParams.documentId
+                        extended: false,
+                        documentId: $stateParams.documentId
                     }, 2).then(function(data){
                         deferred.resolve(data);
                     }, function(reason) {
@@ -643,8 +655,8 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         views: {
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
-                    $rootScope.ve_title = documentOb.name;
+                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, RootScopeService) {
+                    RootScopeService.veTitle(documentOb.name);
                     $scope.org = orgOb;
                     $scope.ref = refOb;
                     $scope.group = groupOb;
@@ -672,12 +684,12 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
     .state('project.ref.document', {
         url: '/documents/:documentId',
         resolve: {
-            documentOb: ['$stateParams', 'ElementService', 'token', function($stateParams, ElementService, token) {
-                return ElementService.getElement({
+            documentOb: ['$stateParams', 'ViewService', 'token', function($stateParams, ViewService) {
+                return ViewService.getProjectDocument({
                     projectId: $stateParams.projectId,
                     refId: $stateParams.refId,
-                    extended: true,
-                    elementId: $stateParams.documentId
+                    extended: false,
+                    documentId: $stateParams.documentId
                 }, 2);
             }],
             viewOb: ['documentOb', function(documentOb) {
@@ -706,8 +718,8 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         views: {
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb) {
-                    $rootScope.ve_title = documentOb.name;
+                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, RootScopeService) {
+                    RootScopeService.veTitle(documentOb.name);
                     $scope.org = orgOb;
                     $scope.group = groupOb;
                     $scope.groups = groupObs;
@@ -764,8 +776,8 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         views: {
             'menu@': {
                 template: '<ve-menu mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-view="view"></ve-menu>',
-                controller: ['$scope', '$rootScope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'viewOb', function ($scope, $rootScope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb) {
-                    $rootScope.ve_title = documentOb.name;
+                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'viewOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb, RootScopeService) {
+                    RootScopeService.veTitle(documentOb.name);
                     $scope.org = orgOb;
                     $scope.group = groupOb;
                     $scope.groups = groupObs;
@@ -807,17 +819,21 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
     });
 
     // anonymous factory intercepts requests
-    $httpProvider.interceptors.push(['$q', '$location', '$rootScope', '$injector', function($q, $location, $rootScope, $injector) {
+    $httpProvider.interceptors.push(['$q', '$location', '$injector', 'URLService', 'EventService', function($q, $location, $injector, URLService, EventService) {
         return {
+            request: function(config) {
+                config.headers = URLService.getAuthorizationHeader(config.headers);
+                return config;
+            },
             'responseError': function(rejection) {
                 if(rejection.status === 401){ //rejection.config.url
-                    $rootScope.$broadcast("mms.unauthorized", rejection);
+                    EventService.$broadcast("mms.unauthorized", rejection);
                 }
                 return $q.reject(rejection);
             },
             response: function(response) {
                 if (response.status === 202) {
-                    $rootScope.$broadcast("mms.working", response);
+                    EventService.$broadcast("mms.working", response);
                 }
                 response.status = 501;
                 return response;
