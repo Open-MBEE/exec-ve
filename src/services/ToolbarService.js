@@ -1,10 +1,9 @@
 'use strict';
 
 angular.module('mms')
-    .factory('ToolbarService', ['EventService', ToolbarService]);
+    .factory('ToolbarService', [ToolbarService]);
 
-function ToolbarService(EventService) {
-    const eventSvc = EventService;
+function ToolbarService() {
     // this.buttons = [];
     // this.initFn = null;
 
@@ -15,7 +14,7 @@ function ToolbarService(EventService) {
         if (!initFn) {
             initFn = () => {};
         }
-        this.tbApi = new ToolbarApi(buttons,initFn,EventService,this);
+        this.tbApi = new ToolbarApi(buttons,initFn);
         return this.tbApi;
     };
 

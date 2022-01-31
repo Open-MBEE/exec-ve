@@ -6,7 +6,6 @@ angular.module('mms')
 
 
 function EventService($rootScope, rx) {
-    let hasOwnProp = {}.hasOwnProperty;
 
     function createName (name) {
         return `$ ${name}`;

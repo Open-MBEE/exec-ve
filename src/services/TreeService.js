@@ -348,7 +348,7 @@ function TreeApi($timeout, RootScopeService, EventService, TreeService) {
 
     this.user_clicks_branch = function(branch) {
         if (branch !== selected_branch)
-            this.select_branch(branch);
+            select_branch(branch);
         //return scope.user_clicks_branch(branch);
     };
 
@@ -396,7 +396,7 @@ function TreeApi($timeout, RootScopeService, EventService, TreeService) {
 
     var get_parent = function(child) {
         var parent = null;
-        if (child.parent_uid) {
+        if (child !== null && child.parent_uid) {
             for_each_branch(function(b) {
                 if (b.uid === child.parent_uid) {
                     parent = b;

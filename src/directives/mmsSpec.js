@@ -2,7 +2,7 @@
 
 angular.module('mms.directives')
 .directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService',
-    'PermissionsService', 'EventService', 'EditService', '$templateCache', 'growl', '_', mmsSpec]);
+    'PermissionsService', 'EventService', '$templateCache', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
@@ -75,9 +75,8 @@ angular.module('mms.directives')
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, ViewService, PermissionsService,
-                 EventService, EditService, $templateCache, growl, _) {
+                 EventService, $templateCache, growl, _) {
 
-    const editSvc = EditService;
     const eventSvc = EventService;
 
     var template = $templateCache.get('mms/templates/mmsSpec.html');

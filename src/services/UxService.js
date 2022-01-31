@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms')
-.factory('UxService', ['EventService', 'RootScopeService', UxService]);
+.factory('UxService', ['EventService', UxService]);
 
 /**
  * @ngdoc service
@@ -13,10 +13,9 @@ angular.module('mms')
  * @description
  * Ux Service
  */
-function UxService(EventService, RootScopeService) {
+function UxService(EventService) {
 
     const eventSvc = EventService;
-    const rootScopeSvc = RootScopeService;
 
     /**
      * @ngdoc method

@@ -190,6 +190,7 @@ angular.module('mmsApp')
         }
         $scope.bbApi.toggleButtonSpinner('center-previous');
         tree.select_branch(prev);
+        tree.on_treeData_change();
         $scope.bbApi.toggleButtonSpinner('center-previous');
     }));
 
@@ -204,6 +205,7 @@ angular.module('mmsApp')
         }
         $scope.bbApi.toggleButtonSpinner('center-next');
         tree.select_branch(next);
+        tree.on_treeData_change();
         $scope.bbApi.toggleButtonSpinner('center-next');
     }));
 
