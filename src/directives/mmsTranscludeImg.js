@@ -51,7 +51,7 @@ function mmsTranscludeImg(AuthService, ElementService, URLService, growl) {
                 var includeExt = [
                     'svg', 'png'
                 ];
-                var artifacts = data._artifact;
+                var artifacts = data._artifacts;
                 if (artifacts !== undefined) {
                     scope.artifacts = artifacts.filter(a => includeExt.includes(a.extension))
                         .map(a => {
