@@ -397,7 +397,6 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} url
      */
     var getArtifactEmbedURL = function(reqOb,artifactExtension) {
-        addToken = (addToken) ? addToken : false;
         var ext = (artifactExtension !== undefined) ? artifactExtension : reqOb.artifactExtension;
         var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
         return addVersion(r, reqOb.commitId);
