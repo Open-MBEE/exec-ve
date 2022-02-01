@@ -43,7 +43,12 @@ function mmsTranscludeImg(AuthService, ElementService, URLService, growl) {
             scope.projectId = scope.mmsProjectId;
             scope.refId = scope.mmsRefId ? scope.mmsRefId : 'master';
             scope.commitId = scope.mmsCommitId ? scope.mmsCommitId : 'latest';
-            var reqOb = {elementId: scope.mmsElementId, projectId: scope.projectId, refId: scope.refId, commitId: scope.commitId};
+            var reqOb = {
+                elementId: scope.mmsElementId,
+                projectId: scope.projectId,
+                refId: scope.refId,
+                commitId: scope.commitId
+            };
             element.addClass('isLoading');
             ElementService.getElement(reqOb, 1, false)
             .then(function(data) {

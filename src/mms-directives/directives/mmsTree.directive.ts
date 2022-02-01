@@ -12,7 +12,7 @@ let TreeComponent = {
 
 
 mmsDirectives.directive('mmsTree', ['ApplicationService', '$timeout', '$log', '$templateCache', '$filter',
-    'UtilsService', 'TreeService', 'RootScopeService', 'EventService', mmsTree]);
+    'UtilsService', 'TreeService', 'RootScopeServiceFactory', 'EventServiceFactory', mmsTree]);
 
 /**
  * @ngdoc directive

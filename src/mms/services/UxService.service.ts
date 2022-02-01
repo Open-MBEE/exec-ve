@@ -51,7 +51,7 @@ export class UxService {
       case "view-reorder":
         return {id: button, icon: 'fa-arrows-v', selected: false, active: true, permission:false, tooltip: 'Reorder Content',
                 spinner: false, onClick: () => {this.eventSvc.$broadcast(button);},
-                dynamic_buttons: [this.getToolbarButton("view-reorder-save"), getToolbarButton("view-reorder-cancel")]};
+                dynamic_buttons: [this.getToolbarButton("view-reorder-save"), this.getToolbarButton("view-reorder-cancel")]};
       case "document-snapshot":
         return  {id: button, icon: 'fa-camera', selected: false, active: true, permission:true, tooltip: 'Snapshots',
                 spinner: false, onClick: () => {this.eventSvc.$broadcast(button);},
@@ -86,12 +86,6 @@ export class UxService {
       case "document-snapshot-create":
         return {id: button, icon: 'fa-plus', dynamic: true, selected: false, active: false, permission:false, tooltip: 'Create Tag',
                 spinner: false, onClick: () => {this.eventSvc.$broadcast(button);}};
-      case "diff-perspective-detail":
-        return {id: button, icon: 'fa-info-circle', selected: true, active: true, permission: true, tooltip: 'Detail',
-                spinner: false, onClick: () => {$rootScope.diffPerspective = 'detail'; }};
-      case "diff-perspective-tree":
-        return {id: button, icon: 'fa-sitemap', selected: false, active: true, permission: true, tooltip: 'Context',
-                spinner: false, onClick: () => {$rootScope.diffPerspective = 'tree'; }};
     }    
   };
 
@@ -109,7 +103,7 @@ export class UxService {
       case "tree-add-document-or-group":
         return {id: button, icon: 'fa-plus', selected: true, active: true, permission: false, tooltip: 'Add Group or Document',
                 spinner: false, togglable: false, placement: 'bottom-right', action: () => {this.eventSvc.$broadcast(button);},
-                dropdown_buttons: [ this.getButtonBarButton("tree-add-group"), getButtonBarButton("tree-add-document")]};
+                dropdown_buttons: [ this.getButtonBarButton("tree-add-group"), this.getButtonBarButton("tree-add-document")]};
       case "tree-delete-document":
         return {id: button, icon: 'fa-trash', selected: true, active: true, permission: false, tooltip: 'Remove', 
                 spinner: false, togglable: false, action: () => {this.eventSvc.$broadcast(button);}};
@@ -304,4 +298,4 @@ const uxService = (EventService) => {
   return new UxService(EventService);
 }
 
-mms.service('UxService', ['EventService', uxService]);
+mms.service('UxService', ['EventServiceFactory', uxService]);

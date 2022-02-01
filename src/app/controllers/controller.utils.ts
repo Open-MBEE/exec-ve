@@ -2,7 +2,7 @@ import * as angular from 'angular';
 var mmsApp = angular.module('mmsApp');
 
 mmsApp.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
-    '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventService', 'TreeService', 'EditService', '_', MmsAppUtils]);
+    '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventServiceFactory', 'TreeService', 'EditServiceFactory', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service

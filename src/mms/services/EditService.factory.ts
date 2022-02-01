@@ -1,7 +1,7 @@
-'use strict';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-    .factory('EditService', ['EventService', EditService]);
+mms.factory('EditService', ['EventServiceFactory', EditService]);
 
 function EditService(EventService) {
     let eventSvc = EventService;

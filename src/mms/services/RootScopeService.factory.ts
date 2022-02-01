@@ -1,7 +1,7 @@
-'use strict';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-    .factory('RootScopeService', ['SessionService', '_', RootScopeService]);
+mms.factory('RootScopeService', ['SessionService', '_', RootScopeService]);
 
 function RootScopeService(SessionService) {
 

@@ -1,7 +1,7 @@
 import "./charts"
 
 import "./mmsAnnotation.directive";
-//import "./mmsButtonBar.directive";
+import "./mmsButtonBar.directive";
 import "./mmsCf.directive";
 import "./mmsCkEditor.directive";
 import "./mmsDiagramBlock.directive";
@@ -9,20 +9,19 @@ import "./mmsDiffAttr.directive";
 import "./mmsGroupDocs.directive";
 import "./mmsHistory.directive";
 import "./mmsHtmlDiff.directive";
-import "./mmsJobs.directive";
 import "./mmsMaturityBar.directive";
 import "./mmsMention.directive";
 import "./mmsRefList.directive";
 import "./mmsSearch.directive";
 import "./mmsSpec.directive";
-//import "./mmsToolbar.directive";
+import "./mmsToolbar.directive";
 import "./mmsTranscludeArt.directive";
 import "./mmsTranscludeCom.directive";
 import "./mmsTranscludeDoc.directive";
 import "./mmsTranscludeImg.directive";
 import "./mmsTranscludeName.directive";
 import "./mmsTranscludeVal.directive";
-//import "./mmsTree.directive";
+import "./mmsTree.directive";
 import "./mmsTsDiagram.directive";
 import "./mmsValueLink.directive";
 import "./mmsView.directive";

@@ -1,7 +1,7 @@
-'use strict';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-.factory('PermissionsService', ['$q', '$http', 'URLService', 'CacheService', '_', PermissionsService]);
+mms.factory('PermissionsService', ['$q', '$http', 'URLService', 'CacheService', '_', PermissionsService]);
 
 
 /**

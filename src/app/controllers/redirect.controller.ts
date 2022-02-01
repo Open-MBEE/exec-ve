@@ -14,7 +14,7 @@ var mmsApp = angular.module('mmsApp');
     // /workspaces/master/sites/{siteid}/documents/{docid}/full	{docid}	/projects/{projectid}/master/documents/{docid}/full
 
 mmsApp.controller('RedirectCtrl', ['$scope', '$state', '$location', '$timeout',
-        'ProjectService', 'ElementService', 'RootScopeService', 'EventService', 'growl',
+        'ProjectService', 'ElementService', 'RootScopeServiceFactory', 'EventServiceFactory', 'growl',
     function($scope, $state, $location, $timeout, ProjectService, ElementService, RootScopeService, EventService, growl) {
         const rootScopeSvc = RootScopeService;
         const eventSvc = EventService;

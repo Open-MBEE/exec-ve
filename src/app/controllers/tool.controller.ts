@@ -9,7 +9,7 @@ import { ElementObject } from '../../lib/elementOb';
 
 mmsApp.controller('ToolCtrl', ['$scope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
             'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
-            'PermissionsService', 'RootScopeService', 'EventService', 'EditService', 'ToolbarService',
+            'PermissionsService', 'RootScopeServiceFactory', 'EventServiceFactory', 'EditServiceFactory', 'ToolbarService',
 function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils,
             PermissionsService, RootScopeService, EventService, EditService, ToolbarService) {
@@ -282,7 +282,7 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             return;
         }
 
-        Object.values(editSvc.getAll()).forEach(function(ve_edit) {
+        Object.values(editSvc.getAll()).forEach(function(ve_edit : ElementObject) {
            Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
         });
 

@@ -12,48 +12,45 @@ mms.factory('BrandingService', ['$window', BrandingService]);
  */
 function BrandingService($window) {
 
-    var b = {};
-    b.label                     = {};
-    b.label.pi                = 'PROPRIETARY: Proprietary Information';
-    b.label.export_ctrl         = 'EXPORT WARNING: No export controlled documents allowed on this server';
-    b.label.no_public_release   = 'Not for Public  Release or Redistribution';
-    b.label.unclassified        = 'CLASSIFICATION: This system is UNCLASSIFIED';
-
-    // An ordered list of the labels that will be applied to footer and other key areas 
-    b.applied_labels = [b.label.unclassified,
-                        b.label.pi + ' - ' +
-                        b.label.no_public_release];
+    var b = {
+        label: {
+            pi: 'PROPRIETARY: Proprietary Information',
+            export_ctrl: 'EXPORT WARNING: No export controlled documents allowed on this server',
+            no_public_release: 'Not for Public  Release or Redistribution',
+            unclassified: 'CLASSIFICATION: This system is UNCLASSIFIED'
+        }
+    };
 
     //b.banner.background = '#0D47A1';
     //b.banner.color      = '#e8e8e8';
 
     // The banner is optional. It is generated in the mmsApp directive veSystemBanner.
     // If you use a banner, the message field is required. Other fields are optional.
-    var banner = {};
+    var banner = {
+        message: b.label.pi
+    };
     if($window.__env.banner) {
         banner = $window.__env.banner;
     }
-    else {
-        banner.message = b.label.pi;
-    }
 
-    var loginBanner = {};
+    var loginBanner = {
+        labels: [
+            b.label.unclassified,
+            b.label.pi + ' - ' + b.label.no_public_release
+        ]
+    };
     if($window.__env.loginBanner) {
         loginBanner = $window.__env.loginBanner;
-    }
-    else {
-        loginBanner.labels = b.applied_labels;
     }
 
     //b.banner.background = '#0D47A1';
     //b.banner.color      = '#e8e8e8';
 
-    var footer = {};
+    var footer = {
+        message: b.label.pi + ' - ' + b.label.no_public_release
+    };
     if($window.__env.footer) {
         footer = $window.__env.footer;
-    }
-    else {
-        footer.message = b.label.pi + ' - ' + b.label.no_public_release;
     }
     
     // Navigation and URLs 

@@ -4,7 +4,7 @@ var mmsApp = angular.module('mmsApp');
 
 /* Controllers */
 
-mmsApp.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'EditService', 'EventService', '$interval',
+mmsApp.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'RootScopeServiceFactory', 'EditServiceFactory', 'EventServiceFactory', '$interval',
 function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, RootScopeService, EditService, EventService, $interval) {
     var rootScopeSvc = RootScopeService;
     var edit = EditService;

@@ -12,7 +12,7 @@ var mmsApp = angular.module('mmsApp');
 // }
 
 /* Classes */
-let ToolbarComponent = {
+const ToolbarComponent = {
     selector: "toolbarComponent", //toolbar-component
     template: `<mms-toolbar buttons="$ctrl.buttons" on-click="onClick(button)" mms-tb-api="$ctrl.tbApi" />`,
     bindings: {
@@ -20,10 +20,14 @@ let ToolbarComponent = {
         documentOb: '<'
     },
     controller: class ToolbarController {
-        static $inject = ['$rootScope', '$state', 'UxService', 'ToolbarService'];
-        private $rootScope
+        static $inject = ['$state', 'UxService', 'PermissionsService', 'EditServiceFactory', 'EventServiceFactory', 'ToolbarService'];
         private $state
         private UxService
+        private PermissionsService
+        private edit;
+        private toolbar;
+        private eventSvc;
+        private subs;
 
         public refOb
         public documentOb
@@ -31,94 +35,65 @@ let ToolbarComponent = {
         public tbApi;
         public buttons;
 
-        constructor($rootScope, $state, UxService, ToolbarService) {
-            this.$rootScope = $rootScope;
+        constructor($state, UxService, refOb, documentOb, PermissionsService, EditService, EventService, ToolbarService) {
             this.$state = $state;
             this.UxService = UxService;
-            this.tbApi = ToolbarService;
+            this.PermissionsService = PermissionsService;
+            this.toolbar = ToolbarService;
+            this.edit = EditService;
+            this.eventSvc = EventService;
             this.buttons = [];
-
-            $rootScope.ve_tbApi = this.tbApi;
-            $rootScope.ve_tbButtons = this.buttons;
-            //this.init();
         }
 
         $onInit = () => {
-            this.tbApi.addButton(this.UxService.getToolbarButton("element-viewer"), this.buttons);
-            this.tbApi.addButton(this.UxService.getToolbarButton("element-editor"), this.buttons);
-            if (this.$rootScope.ve_edits && Object.keys(this.$rootScope.ve_edits).length > 0) {
-                this.tbApi.setIcon('element-editor', 'fa-edit-asterisk', this.buttons);
-                this.tbApi.setPermission('element-editor-saveall', true, this.buttons);
+            this.eventSvc.$init(this);
+
+            this.tbApi = this.toolbar.getApi(this.buttons, this.tbInit);
+
+            this.subs.push(this.eventSvc.$on(this.toolbar.constants.SETPERMISSION, (data) => {
+                this.tbApi.setPermission(data.id, data.value);
+            }));
+
+            this.subs.push(this.eventSvc.$on(this.toolbar.constants.SETICON, (data) => {
+                this.tbApi.setIcon(data.id, data.value);
+            }));
+
+            this.subs.push(this.eventSvc.$on(this.toolbar.constants.TOGGLEICONSPINNER, (data) => {
+                this.tbApi.toggleButtonSpinner(data.id);
+            }));
+
+            this.subs.push(this.eventSvc.$on(this.toolbar.constants.SELECT, (data) => {
+                this.tbApi.select(data.id);
+            }));
+        };
+
+        tbInit = () => {
+            let tbApi = this.tbApi;
+            tbApi.addButton(this.UxService.getToolbarButton("element-viewer"));
+            tbApi.addButton(this.UxService.getToolbarButton("element-editor"));
+            if (this.edit.openEdits() > 0) {
+                tbApi.setIcon('element-editor', 'fa-edit-asterisk');
+                tbApi.setPermission('element-editor-saveall', true);
             }
-            var editable = false;
-            this.tbApi.addButton(this.UxService.getToolbarButton("element-history"), this.buttons);
-            this.tbApi.addButton(this.UxService.getToolbarButton("tags"), this.buttons);
-            // if ($state.includes('project.ref.document')) {
-                //tbApi.addButton(UxService.getToolbarButton("jobs"));
-            // }
+            let editable = false;
+            tbApi.addButton(this.UxService.getToolbarButton("element-history"));
+            tbApi.addButton(this.UxService.getToolbarButton("tags"));
             if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-                if(this.documentOb !== undefined) {
-                    editable = this.documentOb._editable && this.refOb.type === 'Branch';
-                }
-                this.tbApi.setPermission('element-editor', editable, this.buttons);
+                editable = this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
+                tbApi.setPermission('element-editor', editable);
                 if (this.$state.includes('project.ref.preview')) {
-                    this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"), this.buttons);
-                    this.tbApi.setPermission("view-reorder", editable, this.buttons);
+                    tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
+                    tbApi.setPermission("view-reorder", editable);
                 }
             } else if (this.$state.includes('project.ref.document')) {
-                if(this.documentOb !== undefined) {
-                    editable = this.documentOb._editable && this.refOb.type === 'Branch';
-                }
-                this.tbApi.addButton(this.UxService.getToolbarButton("view-reorder"), this.buttons);
-                this.tbApi.setPermission('element-editor', editable, this.buttons);
-                this.tbApi.setPermission("view-reorder", editable, this.buttons);
-        }
-    };
-
-
+                editable = this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
+                tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
+                tbApi.setPermission('element-editor', editable);
+                tbApi.setPermission("view-reorder", editable);
+            }
+        };
     }
-};
-
+}
 /* Controllers */
 
 mmsApp.component(ToolbarComponent.selector, ToolbarComponent)
-// .controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', 'UxService', 'refOb', 'documentOb', 
-// function($scope, $rootScope, $state, UxService, refOb, documentOb) {
-
-//     var tbApi = (<ToolbarApi> {});
-//     $scope.tbApi = tbApi;
-//     $scope.buttons = [];
-
-//     // TODO: Manage rootScope in controllers, for now set/get in one area of the code
-//     // Set MMS $rootScope variables
-//     $rootScope.ve_tbApi = tbApi;
-
-//     tbApi.init = function()
-//     {
-//         tbApi.addButton(UxService.getToolbarButton("element-viewer"));
-//         tbApi.addButton(UxService.getToolbarButton("element-editor"));
-//         if ($rootScope.ve_edits && Object.keys($rootScope.ve_edits).length > 0) {
-//             tbApi.setIcon('element-editor', 'fa-edit-asterisk');
-//             tbApi.setPermission('element-editor-saveall', true);
-//         }
-//         var editable = false;
-//         tbApi.addButton(UxService.getToolbarButton("element-history"));
-//         tbApi.addButton(UxService.getToolbarButton("tags"));
-//         // if ($state.includes('project.ref.document')) {
-//             //tbApi.addButton(UxService.getToolbarButton("jobs"));
-//         // }
-//         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-//             editable = documentOb._editable && refOb.type === 'Branch';
-//             tbApi.setPermission('element-editor', editable);
-//             if ($state.includes('project.ref.preview')) {
-//                 tbApi.addButton(UxService.getToolbarButton("view-reorder"));
-//                 tbApi.setPermission("view-reorder", editable);
-//             }
-//         } else if ($state.includes('project.ref.document')) {
-//             editable = documentOb._editable && refOb.type === 'Branch';
-//             tbApi.addButton(UxService.getToolbarButton("view-reorder"));
-//             tbApi.setPermission('element-editor', editable);
-//             tbApi.setPermission("view-reorder", editable);
-//         }
-//     };
-// }]);

@@ -3,7 +3,7 @@ var mmsDirectives = angular.module('mmsDirectives');
 
 mmsDirectives.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$compile', '$window', 'URLService',
     'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService',
-    'RootScopeService', 'EventService', 'EditService', 'growl', Utils]);
+    'RootScopeServiceFactory', 'EventServiceFactory', 'EditServiceFactory', 'growl', Utils]);
 
 /**
  * @ngdoc service
@@ -138,9 +138,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         .then(function(element) {
             deferred.resolve(element);
             setupValCf(scope);
-            let data = {};
-            data.element = element;
-            data.continueEdit = (continueEdit) ? continueEdit : false;
+            let data = {
+                element: element,
+                continueEdit: (continueEdit) ? continueEdit : false
+            };
+
             eventSvc.$broadcast('element.updated', data);
         }, function(reason) {
             if (reason.status === 409) {
@@ -939,9 +941,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
 
                         ElementService.updateElement(revertEltInfo)
                         .then(function(element) {
-                            let data = {};
-                            data.element = element;
-                            data.continueEdit = false;
+                            let data = {
+                                element: element,
+                                continueEdit: false
+                            }
                             eventSvc.$broadcast('element.updated', data);
                             $uibModalInstance.close();
                             growl.success("Element reverted");

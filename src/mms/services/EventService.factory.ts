@@ -1,11 +1,11 @@
-'use strict';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-    .factory('EventService', ['$rootScope', 'rx', EventService]);
+mms.factory('EventService', ['$rootScope', 'rx', EventServiceFactory]);
 
 
 
-function EventService($rootScope, rx) {
+function EventServiceFactory($rootScope, rx) {
 
     function createName (name) {
         return `$ ${name}`;

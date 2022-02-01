@@ -1,7 +1,7 @@
-'use strict';
+import * as angular from 'angular'
+var mms = angular.module('mms');
 
-angular.module('mms')
-    .factory('SessionService', ['$window', 'EventService', '_', SessionService]);
+mms.factory('SessionService', ['$window', 'EventService', '_', SessionService]);
 
 function SessionService($window, EventService) {
 
