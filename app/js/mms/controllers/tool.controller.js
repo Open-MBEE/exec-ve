@@ -232,7 +232,7 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             var key = saveEdit.id + '|' + saveEdit._projectId + '|' + saveEdit._refId;
             editSvc.remove(key);
             if (editSvc.openEdits() > 0) {
-                var next = editSvc.getAll()[0];
+                var next = Object.keys(editSvc.getAll())[0];
                 var id = next.split('|');
                 $scope.tracker.etrackerSelected = next;
                 $scope.specApi.keepMode();
