@@ -236,7 +236,7 @@ angular.module('mmsApp')
             };
             eventSvc.$broadcast('elementSelected', data);
             if (typeof rootScopeSvc.mmsPaneClosed() === 'boolean' && rootScopeSvc.mmsPaneClosed())
-                eventSvc.$broadcast('mms-pane-toggle', {closed: false});
+                eventSvc.$broadcast('mms-pane-toggle', false);
         },
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});

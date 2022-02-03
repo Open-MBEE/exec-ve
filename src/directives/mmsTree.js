@@ -111,87 +111,76 @@ function mmsTree(ApplicationService, $timeout, $log, $templateCache, $filter, Ut
         $scope.treeData = tree.treeData;
         $scope.treeRows = tree.treeRows;
 
-        // let unwatch = $scope.$watch($scope.treeData,() => {
-        //     if ($scope.treeData.length > 0) {
-        //         unwatch();
-        //         init();
-        //     }
-        // },true);
-        //
-        // const init = () => {
+
+        $scope.selected_branch = $scope.treeApi.get_selected_branch();
+
+        if (!$scope.options) {
+            $scope.options = {
+                expandLevel: 1,
+                search: ''
+            };
+        }
+
+        let icons = rootScopeSvc.treeIcons();
+        if (!icons)
+            icons = {};
+        if (!icons.iconExpand)
+            icons.iconExpand = 'fa fa-caret-right fa-lg fa-fw';
+        if (!icons.iconCollapse)
+            icons.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
+        if (!icons.iconDefault)
+            icons.iconDefault = 'fa fa-file fa-fw';
+        rootScopeSvc.treeIcons(icons);
+
+        if (!$scope.options.expandLevel && $scope.options.expandLevel !== 0)
+            $scope.options.expandLevel = 1;
+        var expand_level = $scope.options.expandLevel;
+        if (!angular.isArray($scope.treeData)) {
+            $log.warn('treeData is not an array!');
+            return;
+        }
+
+        $scope.treeApi.on_treeData_change();
+
+        $scope.$watch(() => { return $scope.treeOptions; },() => {
+            rootScopeSvc.treeOptions($scope.treeOptions);
+        });
+
+        $scope.subs.push(eventSvc.$on('tree-get-branch-element', (args) => {
+            $timeout(function() {
+                var el = angular.element('#tree-branch-' + args.id);
+                if (!el.isOnScreen() && el.get(0) !== undefined) {
+                    el.get(0).scrollIntoView();
+                }
+            }, 500, false);
+        }));
+
+
+
+        $scope.treeFilter = $filter('uiTreeFilter');
+
+        $scope.subs.push(eventSvc.$on(rootScopeSvc.constants.TREEINITIALSELECTION, () => {
+            $scope.treeApi.on_initialSelection_change();
+        }));
+
+        $scope.treeApi.for_each_branch(function(b, level) {
+            b.level = level;
+            b.expanded = b.level <= expand_level;
+        });
+
+        $scope.$on('$destroy', (() => {
+            //rootScopeSvc.treeRows([]);
+            rootScopeSvc.treeInitialSelection(rootScopeSvc.constants.DELETEKEY);
+            $scope.treeData.length = 0;
             $scope.treeRows.length = 0;
+        }));
 
-
-            $scope.selected_branch = $scope.treeApi.get_selected_branch();
-
-            if (!$scope.options) {
-                $scope.options = {
-                    expandLevel: 1,
-                    search: ''
-                };
-            }
-
-            let icons = rootScopeSvc.treeIcons();
-            if (!icons)
-                icons = {};
-            if (!icons.iconExpand)
-                icons.iconExpand = 'fa fa-caret-right fa-lg fa-fw';
-            if (!icons.iconCollapse)
-                icons.iconCollapse = 'fa fa-caret-down fa-lg fa-fw';
-            if (!icons.iconDefault)
-                icons.iconDefault = 'fa fa-file fa-fw';
-            rootScopeSvc.treeIcons(icons);
-
-            if (!$scope.options.expandLevel && $scope.options.expandLevel !== 0)
-                $scope.options.expandLevel = 1;
-            var expand_level = $scope.options.expandLevel;
-            if (!angular.isArray($scope.treeData)) {
-                $log.warn('treeData is not an array!');
-                return;
-            }
-
+        if (rootScopeSvc.treeInitialSelection()) {
+            //Triggers Event
+            $scope.treeApi.on_initialSelection_change();
+        }else {
             $scope.treeApi.on_treeData_change();
-
-            $scope.$watch(() => { return $scope.treeOptions; },() => {
-                rootScopeSvc.treeOptions($scope.treeOptions);
-            });
-
-            $scope.subs.push(eventSvc.$on('tree-get-branch-element', (args) => {
-                $timeout(function() {
-                    var el = angular.element('#tree-branch-' + args.id);
-                    if (!el.isOnScreen() && el.get(0) !== undefined) {
-                        el.get(0).scrollIntoView();
-                    }
-                }, 500, false);
-            }));
-
-
-
-            $scope.treeFilter = $filter('uiTreeFilter');
-
-            $scope.subs.push(eventSvc.$on(rootScopeSvc.constants.TREEINITIALSELECTION, () => {
-                $scope.treeApi.on_initialSelection_change();
-            }));
-
-            $scope.treeApi.for_each_branch(function(b, level) {
-                b.level = level;
-                b.expanded = b.level <= expand_level;
-            });
-
-            $scope.$on('$destroy', (() => {
-                //rootScopeSvc.treeRows([]);
-                rootScopeSvc.treeInitialSelection(rootScopeSvc.constants.DELETEKEY);
-                $scope.treeData.length = 0;
-                $scope.treeRows.length = 0;
-            }));
-
-            if (rootScopeSvc.treeInitialSelection()) {
-                //Triggers Event
-                $scope.treeApi.on_initialSelection_change();
-            }else {
-                $scope.treeApi.on_treeData_change();
-            }
-        //};
+        }
 
     };
 

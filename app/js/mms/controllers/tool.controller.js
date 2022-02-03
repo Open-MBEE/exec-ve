@@ -51,16 +51,18 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
     }));
     $scope.edits = editSvc.getAll();
     
-   $scope.subs.push(eventSvc.$on('mms-pane-toggle',(data) => {
-        let paneClosed = data;
+   $scope.subs.push(eventSvc.$on('mms-pane-toggle',(paneClosed) => {
         if (paneClosed === undefined) {
             $scope.$pane.toggle();
+            rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
         }
         else if (paneClosed && !$scope.$pane.closed) {
             $scope.$pane.toggle();
+            rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
         }
         else if (!paneClosed && $scope.$pane.closed) {
             $scope.$pane.toggle();
+            rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
         }
     }));
 

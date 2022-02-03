@@ -13,7 +13,6 @@ function($scope, $state, UxService, refOb, documentOb, PermissionsService, EditS
     eventSvc.$init($scope);
 
     let toolbar = ToolbarService;
-    eventSvc.$init($scope);
     $scope.buttons = [];
 
 
