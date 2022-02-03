@@ -38,7 +38,7 @@ function SessionService($window, EventService) {
         return results;
     };
 
-    const accessor = (name, value, defaultValue=null, emit=false) => {
+    const accessor = (name, value, defaultValue=null, emit=true) => {
         if (value == null) {
             let val = getStorage(name);
             if (val == null) {
