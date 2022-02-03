@@ -5,8 +5,8 @@ var mmsApp = angular.module('mmsApp');
 /* Controllers */
 
 mmsApp.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', '$window', 'growl', '_', 'flatpickr',
-                         'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'RootScopeServiceFactory',
-                         'EventServiceFactory',
+                         'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'RootScopeService',
+                         'EventService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
 function($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $window, growl, _, flatpickr,
     ElementService, ProjectService, MmsAppUtils, ApplicationService, RootScopeService, EventService,

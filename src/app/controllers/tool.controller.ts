@@ -9,7 +9,7 @@ import { ElementObject } from '../../lib/elementOb';
 
 mmsApp.controller('ToolCtrl', ['$scope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
             'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
-            'PermissionsService', 'RootScopeServiceFactory', 'EventServiceFactory', 'EditServiceFactory', 'ToolbarService',
+            'PermissionsService', 'RootScopeService', 'EventService', 'EditService', 'ToolbarService',
 function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             ElementService, ProjectService, growl, projectOb, refOb, tagObs, branchObs, documentOb, viewOb, Utils,
             PermissionsService, RootScopeService, EventService, EditService, ToolbarService) {

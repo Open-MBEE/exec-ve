@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsToolbar', ['$templateCache', 'RootScopeServiceFactory', 'EventServiceFactory',
+mmsDirectives.directive('mmsToolbar', ['$templateCache', 'RootScopeService', 'EventService',
 	'ToolbarService', mmsToolbar]);
 
 function mmsToolbar($templateCache, RootScopeService, EventService, ToolbarService)

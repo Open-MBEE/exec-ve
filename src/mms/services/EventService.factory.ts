@@ -1,11 +1,11 @@
 import * as angular from 'angular'
 var mms = angular.module('mms');
 
-mms.factory('EventService', ['$rootScope', 'rx', EventServiceFactory]);
+mms.factory('EventService', ['$rootScope', 'rx', EventService]);
 
 
 
-function EventServiceFactory($rootScope, rx) {
+function EventService($rootScope, rx) {
 
     function createName (name) {
         return `$ ${name}`;

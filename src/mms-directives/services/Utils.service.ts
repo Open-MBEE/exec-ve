@@ -3,7 +3,7 @@ var mmsDirectives = angular.module('mmsDirectives');
 
 mmsDirectives.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$compile', '$window', 'URLService',
     'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService',
-    'RootScopeServiceFactory', 'EventServiceFactory', 'EditServiceFactory', 'growl', Utils]);
+    'RootScopeService', 'EventService', 'EditService', 'growl', Utils]);
 
 /**
  * @ngdoc service

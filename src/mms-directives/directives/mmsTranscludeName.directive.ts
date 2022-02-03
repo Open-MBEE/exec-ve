@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', 'ViewService', 'EventServiceFactory', mmsTranscludeName]);
+mmsDirectives.directive('mmsTranscludeName', ['ElementService', 'UxService', '$compile', 'growl', '$templateCache', 'Utils', 'ViewService', 'EventService', mmsTranscludeName]);
 
 /**
  * @ngdoc directive

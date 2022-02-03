@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'UxService', 'Utils', 'EventServiceFactory', 'growl', mmsViewSection]);
+mmsDirectives.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'UxService', 'Utils', 'EventService', 'growl', mmsViewSection]);
 
 function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils, EventService, growl) {
 

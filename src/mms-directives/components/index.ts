@@ -1,3 +1,3 @@
-import './confirmRemove.component'
+//import '../../app/components/confirmRemove.component'
 //import './Tree.component'
 //import './ButtonBar.component'

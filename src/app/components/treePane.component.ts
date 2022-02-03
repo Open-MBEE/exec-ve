@@ -58,7 +58,7 @@ let TreePaneComponent = {
   controller: class TreePaneController {
     static $inject = ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$state','$timeout', 'growl',
       'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'ToolbarService', 'ButtonBarService', 
-      'TreeService', 'PermissionsService', 'RootScopeServiceFactory', 'TreeService', 'EventServiceFactory'];
+      'TreeService', 'PermissionsService', 'RootScopeService', 'TreeService', 'EventService'];
 
     //Injected Dependencies
     private $anchorScroll

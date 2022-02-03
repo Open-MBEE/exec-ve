@@ -7,7 +7,7 @@ var mmsApp = angular.module('mmsApp');
 mmsApp.controller('ViewCtrl', ['$scope', '$state', '$timeout', '$window', '$location',
         '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService',
         'ShortenUrlService', 'Utils', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
-        'PermissionsService', 'RootScopeServiceFactory', 'TreeService', 'EventServiceFactory',
+        'PermissionsService', 'RootScopeService', 'TreeService', 'EventService',
     function($scope, $state, $timeout, $window, $location, $http,
              $element, growl, hotkeys, MmsAppUtils, UxService, URLService, UtilsService, ShortenUrlService, Utils,
              search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb, PermissionsService, RootScopeService,

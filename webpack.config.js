@@ -3,13 +3,31 @@ const webpack = require('webpack');
 const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  entry: "./src/main.ts",
+  entry: {
+        mmsApp: {
+            import: './src/main.ts',
+           //dependOn: 'shared',
+        },
+        // mms: {
+        //     import: './src/mms/mms.main.ts',
+        //     dependOn: 'shared',
+        // },
+        // mmsDirectives: {
+        //     import: './src/mms-directives/mms-directives.main.ts',
+        //     dependOn: 'shared',
+        // },
+        // shared: [
+        //     'angular',
+        //     //'@uirouter/angularjs'
+        // ],
+      },
+
   optimization: {
     minimize: false
   },
   output: {
-      path: path.join(process.cwd(),'src','dist'),
-      filename: "bundle.js"
+      path: path.resolve(__dirname, 'src/dist'),
+      filename: '[name].bundle.js',
   },
   watch: true,
   resolve: {

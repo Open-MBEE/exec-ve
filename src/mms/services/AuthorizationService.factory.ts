@@ -19,14 +19,14 @@ mms.factory('AuthService', ['$q', '$http', 'CacheService', 'URLService', 'HttpSe
  */
 function AuthService($q, $http, CacheService, URLService, HttpService, ElementService, ViewService, ProjectService, SessionService, EditService, $window, $analytics) {
 
-    var token = $window.localStorage.getItem('token');
+    var token = localStorage.getItem('token');
     var getAuthorized = function (credentialsJSON) {
         var deferred = $q.defer();
         var loginURL = URLService.getAuthenticationUrl();
         $http.post(loginURL, credentialsJSON).then(function (success) {
             URLService.setToken(success.data.token);
             token = success.data.token;
-            $window.localStorage.setItem('token', token);
+            localStorage.setItem('token', token);
             deferred.resolve(token);
         }, function(fail){
             URLService.handleHttpStatus(fail.data, fail.status, fail.header, fail.config, deferred);

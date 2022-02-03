@@ -1,20 +1,20 @@
 import 'jquery';
 import 'angular';
 
-//import '@uirouter/angularjs';
-
 import 'angular-animate';
 import 'angular-borderlayout';
 import 'angular-cookies';
 import 'angular-growl-v2';
 import 'angular-hotkeys';
 import 'angular-promise-extras';
-import 'angular-ui-router';
+import '@uirouter/angularjs';
+//import 'angular-ui-router';
 import 'angular-ui-bootstrap';
 import 'angular-ui-tree';
 import 'angular-ui-tree-filter';
 import 'angulartics';
 import 'angulartics-piwik';
+import 'rx-angular';
 import 'c3';
 import 'd3';
 import 'lodash';

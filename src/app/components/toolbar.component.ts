@@ -20,7 +20,7 @@ const ToolbarComponent = {
         documentOb: '<'
     },
     controller: class ToolbarController {
-        static $inject = ['$state', 'UxService', 'PermissionsService', 'EditServiceFactory', 'EventServiceFactory', 'ToolbarService'];
+        static $inject = ['$state', 'UxService', 'PermissionsService', 'EditService', 'EventService', 'ToolbarService'];
         private $state
         private UxService
         private PermissionsService

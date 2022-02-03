@@ -4,7 +4,7 @@ var mmsDirectives = angular.module('mmsDirectives');
 
 'use strict';
 
-mmsDirectives.factory('TreeService', ['$timeout', 'RootScopeServiceFactory', 'EventServiceFactory', TreeService]);
+mmsDirectives.factory('TreeService', ['$timeout', 'RootScopeService', 'EventService', TreeService]);
 
 function TreeService($timeout, RootScopeService, EventService) {
 

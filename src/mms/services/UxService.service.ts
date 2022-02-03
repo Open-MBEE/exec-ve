@@ -298,4 +298,4 @@ const uxService = (EventService) => {
   return new UxService(EventService);
 }
 
-mms.service('UxService', ['EventServiceFactory', uxService]);
+mms.service('UxService', ['EventService', uxService]);
