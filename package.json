@@ -6,8 +6,8 @@
     "babel-polyfill": "^6.26.0",
     "compression": "^1.7.1",
     "connect-livereload": "^0.6.0",
+    "connect-modrewrite": "^0.10.2",
     "grunt": "^1.0.1",
-    "grunt-artifactory-artifact": "~1.0.1",
     "grunt-bower-install-simple": "1.2.4",
     "grunt-cache-bust": "~1.6.0",
     "grunt-concurrent": "^2.3.1",
@@ -18,7 +18,7 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^2.1.0",
     "grunt-contrib-jshint": "^1.1.0",
-    "grunt-contrib-uglify": "^3.2.1",
+    "grunt-contrib-uglify": "^5.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-html2js": "^0.5.1",
     "grunt-karma": "^2.0.0",
@@ -26,6 +26,7 @@
     "grunt-ngdocs": "^0.2.11",
     "grunt-protractor-runner": "^5.0.0",
     "grunt-sass": "^2.0.0",
+    "grunt-terser": "^2.0.0",
     "grunt-usemin": "^3.0.0",
     "grunt-wiredep": "~3.0.1",
     "jasmine-core": "~2.8.0",
@@ -43,8 +44,8 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "phantomjs-prebuilt": "^2.1.16",
     "protractor": "~5.2.0",
-    "time-grunt": "^1.4.0",
-    "connect-modrewrite": "^0.10.2"
+    "terser": "^5.10.0",
+    "time-grunt": "^1.4.0"
   },
   "dependencies": {
     "c3": "^0.5.4",

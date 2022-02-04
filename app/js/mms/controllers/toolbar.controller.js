@@ -3,22 +3,26 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ToolbarCtrl', ['$scope', '$rootScope', '$state', 'UxService', 'refOb', 'documentOb', 'PermissionsService',
-function($scope, $rootScope, $state, UxService, refOb, documentOb, PermissionsService) {
+.controller('ToolbarCtrl', ['$scope', '$state', 'UxService', 'refOb', 'documentOb', 'PermissionsService',
+    'EditService', 'EventService', 'ToolbarService',
+function($scope, $state, UxService, refOb, documentOb, PermissionsService, EditService, EventService, ToolbarService) {
 
-    var tbApi = {};
-    $scope.tbApi = tbApi;
+    let edit = EditService;
+
+    let eventSvc = EventService;
+    eventSvc.$init($scope);
+
+    let toolbar = ToolbarService;
     $scope.buttons = [];
 
-    // TODO: Manage rootScope in controllers, for now set/get in one area of the code
-    // Set MMS $rootScope variables
-    $rootScope.ve_tbApi = tbApi;
 
-    tbApi.init = function()
+
+    const tbInit = function()
     {
+        let tbApi = $scope.tbApi;
         tbApi.addButton(UxService.getToolbarButton("element-viewer"));
         tbApi.addButton(UxService.getToolbarButton("element-editor"));
-        if ($rootScope.ve_edits && Object.keys($rootScope.ve_edits).length > 0) {
+        if (edit.openEdits() > 0) {
             tbApi.setIcon('element-editor', 'fa-edit-asterisk');
             tbApi.setPermission('element-editor-saveall', true);
         }
@@ -39,4 +43,23 @@ function($scope, $rootScope, $state, UxService, refOb, documentOb, PermissionsSe
             tbApi.setPermission("view-reorder", editable);
         }
     };
+
+    $scope.tbApi = ToolbarService.getApi($scope.buttons, tbInit);
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.SETPERMISSION, (data) => {
+        $scope.tbApi.setPermission(data.id,data.value);
+    }));
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.SETICON, (data) => {
+        $scope.tbApi.setIcon(data.id,data.value);
+    }));
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.TOGGLEICONSPINNER, (data) => {
+        $scope.tbApi.toggleButtonSpinner(data.id);
+    }));
+
+   $scope.subs.push(eventSvc.$on(toolbar.constants.SELECT, (data) => {
+        $scope.tbApi.select(data.id);
+    }));
+
 }]);

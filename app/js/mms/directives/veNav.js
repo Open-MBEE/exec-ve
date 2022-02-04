@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mmsApp')
-.directive('veNav', ['$templateCache', '$rootScope', '$state', 'hotkeys', 'growl', '$location', '$uibModal', '$window', 'ApplicationService','AuthService', 'ProjectService', veNav]);
+.directive('veNav', ['$templateCache', '$state', 'hotkeys', 'growl', '$location', '$uibModal', '$window', 'ApplicationService','AuthService', 'ProjectService', veNav]);
 
 /**
  * @ngdoc directive
@@ -18,7 +18,7 @@ angular.module('mmsApp')
  * The navbar is mobile friendly.
  * 
  */
-function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $uibModal, $window, ApplicationService, AuthService, ProjectService) {
+function veNav($templateCache, $state, hotkeys, growl, $location, $uibModal, $window, ApplicationService, AuthService, ProjectService) {
     var template = $templateCache.get('partials/mms/veNav.html');
 
     var veNavLink = function(scope, element, attrs) {
@@ -46,7 +46,7 @@ function veNav($templateCache, $rootScope, $state, hotkeys, growl, $location, $u
                             $scope.selectedProject = "";
                             ProjectService.getProjects(orgId).then(function(data) {
                                 $scope.projects = data;
-                                if (data.length > 0) {
+                                if (data && data.length > 0) {
                                     $scope.selectProject(data[0]);
                                 } else {
                                     //no projects

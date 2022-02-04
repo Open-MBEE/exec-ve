@@ -102,15 +102,6 @@ function mmsRefList($templateCache, $http, growl, _ , $q, $uibModal,
             };
         };
 
-        // actions for stomp
-        scope.$on("stomp.updateJob", function(event, updateJob) {
-            if (updateJob.type === 'docmerge' && updateJob.associatedElementId === scope.mmsDocId && 
-                updateJob.refId === scope.mmsRefId && updateJob.jobStatus === 'completed') {
-                    growl.success(scope.docName + ' has been merged');
-                    scope.runCleared = true; // disable apply until stomp gets completed message
-                }
-        });
-
 
     };
     return {

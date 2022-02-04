@@ -56,7 +56,7 @@
     ]);
     </pre>
  */
-angular.module('mms', [])
+angular.module('mms', ['rx'])
 .config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
 }])

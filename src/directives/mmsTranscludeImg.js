@@ -51,7 +51,7 @@ function mmsTranscludeImg(AuthService, ElementService, URLService, growl) {
                 var includeExt = [
                     'svg', 'png'
                 ];
-                var artifacts = data._artifact;
+                var artifacts = data._artifacts;
                 if (artifacts !== undefined) {
                     scope.artifacts = artifacts.filter(a => includeExt.includes(a.extension))
                         .map(a => {
@@ -61,8 +61,8 @@ function mmsTranscludeImg(AuthService, ElementService, URLService, growl) {
                                 ext: a.extension
                             };
                         });
-                    scope.svg = scope.artifacts.filter(a => a.ext = 'svg');
-                    scope.png = scope.artifacts.filter(a => a.ext = 'png');
+                    scope.svg = scope.artifacts.filter(a => a.ext === 'svg');
+                    scope.png = scope.artifacts.filter(a => a.ext === 'png');
                 }
 
             }, function(reason) {
@@ -79,7 +79,7 @@ function mmsTranscludeImg(AuthService, ElementService, URLService, growl) {
 
     return {
         restrict: 'E',
-        template: '<img class="mms-svg" ng-src="{{svg.url}}"></img><img class="mms-png" ng-src="{{png.url}}"></img>',
+        template: '<img class="mms-svg" ng-src="{{svg[0].url}}"></img><img class="mms-png" ng-src="{{png[0].url}}"></img>',
         scope: {
             mmsElementId: '@',
             mmsProjectId: '@',

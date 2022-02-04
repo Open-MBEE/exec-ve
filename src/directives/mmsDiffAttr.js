@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsDiffAttr', ['$compile', '$rootScope', '$interval', '$templateCache', '$q', 'ElementService', mmsDiffAttr]);
+.directive('mmsDiffAttr', ['$compile', '$interval', '$templateCache', '$q', 'ElementService', mmsDiffAttr]);
 
 /**
  * @ngdoc directive
@@ -9,8 +9,8 @@ angular.module('mms.directives')
  *
  * @requires mms.ElementService
  * @requires $compile
- * @requires $rootScope
  * @requires $interval
+ * @requires ElementService
  *
  * @restrict E
  *
@@ -30,7 +30,7 @@ angular.module('mms.directives')
  * @param {string=latest} mmsBaseCommitId Base commit id, default is latest
  * @param {string=latest} mmsCompareCommitId Compare commit id, default is latest
  */
-function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, ElementService) {
+function mmsDiffAttr($compile, $interval, $templateCache, $q, ElementService) {
     var template = $templateCache.get('mms/templates/mmsDiffAttr.html');
 
     return {
@@ -170,7 +170,8 @@ function mmsDiffAttr($compile, $rootScope, $interval, $templateCache, $q, Elemen
             var html;
             var ignoreMathjaxAutoFormatting = type === 'doc' || type === 'val' || type === 'com';
             html = '<mms-cf ' + (ignoreMathjaxAutoFormatting ? 'mms-generate-for-diff="mmsGenerateForDiff" ' : '') +  'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>';
-            var newScope = $rootScope.$new();
+            //Todo: Refactor in Angular to @codehint-ng/html-compiler
+            var newScope = scope.$new();
             newScope = Object.assign(newScope, {
                 type: type,
                 mmsElementId: mmsElementId,

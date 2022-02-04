@@ -3,7 +3,7 @@
 angular.module('mms')
     .factory('MentionService', ['$rootScope', '$compile', '$timeout', 'moment', 'CacheService', 'ViewService', 'UtilsService' , MentionService]);
 
-function MentionService($rootScope, $compile, $timeout, moment, CacheService, ViewService, UtilsService) {
+function MentionService($rootScope, $interpolate, $timeout, moment, CacheService, ViewService, UtilsService) {
     /** Used to maintain all mention in all ckeditors **/
     var mentions = {};
     var mentionPlacerHolderPrefix = 'mentionPlaceHolder';
@@ -117,7 +117,7 @@ function MentionService($rootScope, $compile, $timeout, moment, CacheService, Vi
                 mmsProjectId: projectId,
                 mmsRefId: refId
             });
-        var element = $compile('<span mms-mention mms-editor="mmsEditor" mms-mention-value="mmsMentionValue" mms-mention-id="mmsMentionId" mms-project-id="mmsProjectId" mms-ref-id="mmsRefId"></span>')(newScope);
+        var element = $interpolate('<span mms-mention mms-editor="mmsEditor" mms-mention-value="mmsMentionValue" mms-mention-id="mmsMentionId" mms-project-id="mmsProjectId" mms-ref-id="mmsRefId"></span>')(newScope);
         return {
             scope: newScope,
             controller: element.controller('mms-mention'),

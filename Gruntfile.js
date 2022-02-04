@@ -4,20 +4,12 @@ module.exports = function(grunt) {
   require('jit-grunt')(grunt, {
     // static mapping for tasks that don't match their modules' name
     useminPrepare: 'grunt-usemin',
-    configureProxies: 'grunt-connect-proxy-updated',
-    artifactory: 'grunt-artifactory-artifact'
+    configureProxies: 'grunt-connect-proxy-updated'
   });
   // Project configuration.
   var env = grunt.option('env') || 'example';
 
   var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
-
-  var artifactoryUrl = grunt.option('ARTIFACTORY_URL');
-  var artifactoryUser = grunt.option('ARTIFACTORY_USER');
-  var artifactoryPassword = grunt.option('ARTIFACTORY_PASSWORD');
-  var snapshotRepo = grunt.option('SNAPSHOT_REPO');
-  var releaseRepo = grunt.option('RELEASE_REPO');
-  var groupId = grunt.option('GROUP_ID');
 
   var connectObject = {
     docs: {
@@ -263,9 +255,6 @@ module.exports = function(grunt) {
 
     /** Concat + Minify JS files **/
     uglify: {
-      combineCustomJS: combineCustomJS,
-
-      // this target is for files handled by usemin task.
       generated: {
         options: {
           mangle: true
@@ -276,6 +265,40 @@ module.exports = function(grunt) {
           // }
         }
       }
+    },
+    terser: {
+      combineCustomJS: {
+        options: {
+          wrap: 'mms',
+          mangle: true,
+          sourceMap: true
+        },
+        files: {
+          'dist/js/ve-mms.min.js': [
+
+          // mms module
+          'src/mms.js',
+          'src/services/*.js',
+          'src/filters/*.js',
+
+          // mms.directives module (need mms, mms.directives.tpls.js module )
+          'dist/jsTemp/mms.directives.tpls.js',
+          'src/mms.directives.js',
+          'src/directives/**/*.js',
+
+          // app module ( need app.tpls.js, mms, mms.directives module )
+          'dist/jsTemp/app.tpls.js',
+          'app/js/mms/app.js',
+          'app/js/mms/controllers/*.js',
+          'app/js/mms/directives/*.js',
+
+          // config files
+          'app/config/config.' + env + '.js'
+        ]
+      }
+    },
+
+      // this target is for files handled by usemin task.
     },
 
     /** Add hashing to static resources' names so that the browser doesn't use the stale cached resources **/
@@ -348,27 +371,6 @@ module.exports = function(grunt) {
       }
     },
 
-    artifactory: {
-      options: {
-        url: artifactoryUrl,
-        repository: releaseRepo,
-        username: artifactoryUser,
-        password: artifactoryPassword
-      },
-      client: {
-        files: [{
-          src: ['dist/**/*']
-        }],
-        options: {
-          publish: [{
-            id: groupId + ':ve:zip',
-            version: '3.7.0-SNAPSHOT',
-            path: 'deploy/'
-          }]
-        }
-      }
-    },
-
     karma: {
       unit:{
         configFile:'config/develop/karma.develop.conf.js'
@@ -402,7 +404,7 @@ module.exports = function(grunt) {
   grunt.registerTask('lint', ['jshint']);
   grunt.registerTask('processAppStyleSheets', ['sass', 'cssmin']);
   grunt.registerTask('processAppJSInDev', ['html2js', 'concat:combineCustomJS']);
-  grunt.registerTask('processAppJSInProd', ['html2js', 'uglify:combineCustomJS']);
+  grunt.registerTask('processAppJSInProd', ['html2js', 'terser:combineCustomJS']);
   grunt.registerTask('processExternalDeps', ['wiredep', 'useminPrepare', 'concat:generated', 'cssmin:generated', 'uglify:generated', 'usemin']);
 
   // for dev mode, we don't need to minify vendor files because it slows down the build process
@@ -421,7 +423,7 @@ module.exports = function(grunt) {
       grunt.task.run(['concurrent:devStep1', 'concurrent:devStep2', 'concurrent:devStep3', 'concurrent:devStep4']);
     }
   });
-  grunt.registerTask('deploy', ['release-build', 'ngdocs', 'artifactory:client:publish']);
+  grunt.registerTask('deploy', ['release-build', 'ngdocs']);
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('continuous', ['karma:continuous']);
   grunt.registerTask('e2e-test', ['protractor']);

@@ -885,6 +885,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
     return {
         getElement: getElement,
         getElements: getElements,
+        getElementKey: getElementKey,
         getElementForEdit: getElementForEdit,
         getOwnedElements: getOwnedElements,
         updateElement: updateElement,

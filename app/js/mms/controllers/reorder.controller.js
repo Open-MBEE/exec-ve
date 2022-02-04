@@ -3,9 +3,11 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('ReorderCtrl', ['$scope', '$rootScope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', '$state', 'growl', '$q', '_',
-function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtils, $state, growl, $q, _) {
+.controller('ReorderCtrl', ['$scope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', 'TreeService', '$state', 'growl', '$q', '_',
+function($scope, documentOb, ElementService, ViewService, MmsAppUtils, TreeService, $state, growl, $q, _) {
     $scope.doc = documentOb;
+
+    let treeApi = TreeService.getApi();
 
     var viewIds2node = {};
     var origViews = {};
@@ -156,7 +158,7 @@ function($scope, $rootScope, documentOb, ElementService, ViewService, MmsAppUtil
     };
 
     function navigate(reload) {
-        var curBranch = $rootScope.ve_treeApi.get_selected_branch();
+        var curBranch = treeApi.get_selected_branch();
         if (!curBranch) {
             $state.go('project.ref.document', {}, {reload:true});
         } else {

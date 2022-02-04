@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('mmsApp')
-.controller('ReorderGroupCtrl', ['$scope', '$rootScope', '$stateParams', '$state', 'growl', '_', 'ElementService', 'CacheService', 'projectOb', 'refOb', 'groupObs', 'documentObs',
+.controller('ReorderGroupCtrl', ['$scope', '$stateParams', '$state', 'growl', '_', 'ElementService', 'CacheService', 'TreeService', 'projectOb', 'refOb', 'groupObs', 'documentObs',
 
-function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, CacheService, projectOb, refOb, groupObs, documentObs) {
+function ($scope, $stateParams, $state, growl, _, ElementService, CacheService, TreeService, projectOb, refOb, groupObs, documentObs) {
     $scope.isSaving = false;
     $scope.targetId = '';
     $scope.treeOptions = {
@@ -180,7 +180,7 @@ function ($scope, $rootScope, $stateParams, $state, growl, _, ElementService, Ca
     }
 
     function navigateAway(reload) {
-        var curBranch = $rootScope.ve_treeApi.get_selected_branch();
+        var curBranch = TreeService.getApi().get_selected_branch();
         if (curBranch) {
             var documentId = curBranch.type === 'group' ? 'site_' + curBranch.data.id + '_cover' : curBranch.data.id;
             $state.go('project.ref.preview', {documentId: documentId}, {reload: reload});

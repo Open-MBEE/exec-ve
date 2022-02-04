@@ -3,14 +3,19 @@
 /* Controllers */
 
 angular.module('mmsApp')
-.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$rootScope', '$state', '$timeout', '$window', 'growl', '_', 'flatpickr',
-                         'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService',
+.controller('RefsCtrl', ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', '$window', 'growl', '_', 'flatpickr',
+                         'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'RootScopeService',
+                         'EventService',
                          'orgOb', 'projectOb', 'refOb', 'refObs', 'tagObs', 'branchObs',
-function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, $window, growl, _, flatpickr,
-    ElementService, ProjectService, MmsAppUtils, ApplicationService,
+function($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $window, growl, _, flatpickr,
+    ElementService, ProjectService, MmsAppUtils, ApplicationService, RootScopeService, EventService,
     orgOb, projectOb, refOb, refObs, tagObs, branchObs) {
 
-    $rootScope.mms_refOb = refOb;
+    const rootScopeSvc = RootScopeService;
+    const eventSvc = EventService;
+    eventSvc.$init($scope);
+
+    rootScopeSvc.mmsRefOb(refOb);
     $scope.refManageView = true;
     $scope.refData = [];
     $scope.bbApi = {};
@@ -50,15 +55,12 @@ function($sce, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $t
     $scope.deleteRef = function(e) {
         deleteItem();
     };
-    $scope.$on('fromParamChange', function(event, fromParams) {
+   $scope.subs.push(eventSvc.$on('fromParamChange', function(fromParams) {
         var index = _.findIndex(refObs, {name: fromParams.refId});
         if ( index > -1 ) {
             $scope.fromParams = refObs[index];
         }
-    });
-    $scope.$on("stomp.branchCreated", function(event, updateRef, projectId) {
-        growl.success(updateRef.name + " " + updateRef.type + " Created");
-    });
+    }));
 
     $scope.refClickHandler = function(ref) {
         ProjectService.getRef(ref.id, projectOb.id).then(

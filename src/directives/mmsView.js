@@ -107,7 +107,7 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
                     $scope.modified = elem._modified;
                     if (elem._modifier) {
                         AuthService.getUserData(elem._modifier).then(function(modifierData){
-                                $scope.modifier = modifierData;
+                                $scope.modifier = modifierData.users[0];
                         }, function() {
                             $scope.modifier = elem._modifier;
                         });
@@ -188,7 +188,7 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
                     scope.view = data;
                     scope.modified = data._modified;
                     AuthService.getUserData(data._modifier).then(function(modifierData){
-                        scope.modifier = modifierData;
+                        scope.modifier = modifierData.users[0];
                     }, function() {
                         scope.modifier = data._modifier;
                     });
@@ -199,7 +199,7 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
                     scope.view = data;
                     scope.modified = data._modified;
                     AuthService.getUserData(data._modifier).then(function(modifierData){
-                        scope.modifier = modifierData;
+                        scope.modifier = modifierData.users[0];
                     }, function() {
                         scope.modifier = data._modifier;
                     });
