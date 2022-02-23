@@ -400,7 +400,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         return { cover: coverHtml, contents: printContents, toc: toc, tof: tof, tot: tot, toe: toe };
     };
     //TODO: Evaluate moving to Tree Service
-    var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen) {
+    var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen?) {
         var seenViews = seen;
         if (!seenViews)
             seenViews = {};

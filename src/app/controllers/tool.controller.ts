@@ -54,17 +54,19 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
         $scope.openEdits = editSvc.openEdits();
     }));
     $scope.edits = editSvc.getAll();
-
-   $scope.subs.push(eventSvc.$on('mms-pane-toggle',(data) => {
-        let paneClosed = data;
+    
+   $scope.subs.push(eventSvc.$on('mms-pane-toggle',(paneClosed) => {
         if (paneClosed === undefined) {
             $scope.$pane.toggle();
+            rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
         }
         else if (paneClosed && !$scope.$pane.closed) {
             $scope.$pane.toggle();
+            rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
         }
         else if (!paneClosed && $scope.$pane.closed) {
             $scope.$pane.toggle();
+            rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
         }
     }));
 
@@ -234,7 +236,7 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             var key = saveEdit.id + '|' + saveEdit._projectId + '|' + saveEdit._refId;
             editSvc.remove(key);
             if (editSvc.openEdits() > 0) {
-                var next = editSvc.getAll()[0];
+                var next = Object.keys(editSvc.getAll())[0];
                 var id = next.split('|');
                 $scope.tracker.etrackerSelected = next;
                 $scope.specApi.keepMode();
@@ -346,22 +348,13 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
             }
         };
         if ($scope.specApi.hasEdits()) {
-            var instance = $uibModal.open({
-                templateUrl: 'partials/mms/cancelConfirm.html',
-                scope: $scope,
-                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-                    $scope.ok = function() {
-                        var ve_edit = $scope.specApi.getEdits();
-                        Utils.clearAutosaveContent(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type);
+            var ve_edit = $scope.specApi.getEdits();
+            let deleteOb = {
+                type: ve_edit.type,
+                element: ve_edit.element,
+            }
 
-                        $uibModalInstance.close('ok');
-                    };
-                    $scope.cancel = function() {
-                        $uibModalInstance.dismiss();
-                    };
-                }]
-            });
-            instance.result.then(function() {
+            Utils.deleteEditModal(deleteOb).result.then(function() {
                 go();
             });
         } else

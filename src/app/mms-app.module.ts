@@ -102,7 +102,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'banner@': {
-                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                template: '<ve-system-banner mms-banner="$resolve.bannerOb"></ve-system-banner>',
                 controller: ['$scope', 'bannerOb', function($scope, bannerOb){
                     $scope.banner = bannerOb;
                 }]
@@ -190,7 +190,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'banner@': {
-                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                template: '<ve-system-banner mms-banner="$resolve.bannerOb"></ve-system-banner>',
                 controller: ['$scope', 'bannerOb', function($scope, bannerOb){
                     $scope.banner = bannerOb;
                 }]
@@ -222,7 +222,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                             orgId = org.id;
                             $localStorage.org.orgName = org.name;
                             $scope.selectedOrg = $localStorage.org.name;
-                            $scope.selectedProject = ""; // default here?
+                            $scope.selectedProject = "$resolve.Ob"; // default here?
                             ProjectService.getProjects(orgId).then(function(data){
                                 $scope.projects = data;
                                 if (data.length > 0) {
@@ -334,41 +334,16 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'banner@': {
-                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
+                template: '<ve-system-banner mms-banner="$resolve.bannerOb"></ve-system-banner>',
                 controller: ['$scope', 'bannerOb', function($scope, bannerOb){
                     $scope.banner = bannerOb;
                 }]
             },
             'nav@': {
-                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
-                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, RootScopeService) {
-                    RootScopeService.veTitle(orgOb.name);
-                    $scope.org = orgOb;
-                    //$scope.orgs = orgObs;
-                    $scope.project = projectOb;
-                    $scope.projects = projectObs;
-                    $scope.ref = refOb;
-                    $scope.branch = branchOb;
-                    $scope.branches = branchObs;
-                    $scope.tag = tagOb;
-                    $scope.tags = tagObs;
-                    $scope.search = search;
-                }]
+                template: '<ve-nav mms-title="$resolve.orgOb.name" mms-org="$resolve.orgOb" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-ref="$resolve.refOb" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs" mms-search="$resolve.search"></ve-nav>'
             },
             'menu@': {
-                template: '<ve-menu mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller:['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, RootScopeService) {
-                    RootScopeService.veTitle(projectOb.name);
-                    $scope.org = orgOb;
-                    $scope.project = projectOb;
-                    $scope.projects = projectObs;
-                    $scope.ref = refOb;
-                    $scope.refs = refObs;
-                    $scope.branch = branchOb;
-                    $scope.branches = branchObs;
-                    $scope.tag = tagOb;
-                    $scope.tags = tagObs;
-                }]
+                template: '<ve-menu mms-org="$resolve.orgOb" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-ref="$resolve.refOb" mms-refs="$resolve.refObs" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs"></ve-menu>'
             },
             'manageRefs@': {
                 templateUrl: 'partials/mms/manage-refs.html',
@@ -495,45 +470,16 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'banner@': {
-                template: '<ve-system-banner mms-banner="banner"></ve-system-banner>',
-                controller: ['$scope', 'bannerOb', function($scope, bannerOb){
-                    $scope.banner = bannerOb;
-                }]
+                template: '<ve-system-banner mms-banner="$resolve.bannerOb"></ve-system-banner>'
             },
             'nav@': {
-                template: '<ve-nav mms-title="ve_title" mms-org="org" mms-project="project" mms-projects="projects" mms-ref="ref" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-search="search"></ve-nav>',
-                controller: ['$scope', 'orgOb', 'projectOb', 'projectObs', 'refOb', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'search', 'RootScopeService', function ($scope, orgOb, projectOb, projectObs, refOb, branchOb, branchObs, tagOb, tagObs, search, RootScopeService) {
-                    RootScopeService.veTitle(orgOb.name);
-                    $scope.org = orgOb;
-                    //$scope.orgs = orgObs;
-                    $scope.project = projectOb;
-                    $scope.projects = projectObs;
-                    $scope.ref = refOb;
-                    $scope.branch = branchOb;
-                    $scope.branches = branchObs;
-                    $scope.tag = tagOb;
-                    $scope.tags = tagObs;
-                    $scope.search = search;
-                }]
+                template: '<ve-nav mms-title="$resolve.orgOb.name" mms-org="$resolve.orgOb" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-ref="$resolve.refOb" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs" mms-search="$resolve.search"></ve-nav>'
             },
             'menu@': {
-                template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'RootScopeService', function ($scope, orgOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, RootScopeService) {
-                    RootScopeService.veTitle(projectOb.name);
-                    $scope.org = orgOb;
-                    $scope.groups = groupObs;
-                    $scope.project = projectOb;
-                    $scope.projects = projectObs;
-                    $scope.ref = refOb;
-                    $scope.refs = refObs;
-                    $scope.branch = branchOb;
-                    $scope.branches = branchObs;
-                    $scope.tag = tagOb;
-                    $scope.tags = tagObs;
-                }]
+                template: '<ve-menu mms-org="$resolve.orgOb" mms-ref="$resolve.refOb" mms-refs="$resolve.refObs" mms-groups="$resolve.groupObs" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs"></ve-menu>'
             },
             'pane-left@': {
-                template: '<tree-pane document-ob="$resolve.documentOb" org-ob="$resolve.orgOb" project-ob="$resolve.projectOb" ref-ob="$resolve.refOb" ref-obs="$resolve.refOb" group-obs="$resolve.groupObs" doc-meta="$resolve.docMeta"></tree-pane>'
+                template: '<left-pane document-ob="$resolve.documentOb" org-ob="$resolve.orgOb" project-ob="$resolve.projectOb" ref-ob="$resolve.refOb" ref-obs="$resolve.refOb" group-obs="$resolve.groupObs" doc-meta="$resolve.docMeta"></left-pane>'
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
@@ -547,10 +493,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 template: '<toolbar-component refOb="$resolve.refOb" documentOb="$resolve.documentOb"></toolbar-component>'
             },
             'footer@': {
-                template: '<ve-footer footer="footer" ng-if="ve_footer"></ve-footer>',
-                controller: ['$scope', 'footerOb', function ($scope, footerOb) {
-                    $scope.footer = footerOb;
-                }]
+                template: '<ve-footer footer="$resolve.footerOb" ng-if="ve_footer"></ve-footer>',
             }
         }
     })
@@ -654,22 +597,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, RootScopeService) {
-                    RootScopeService.veTitle(documentOb.name);
-                    $scope.org = orgOb;
-                    $scope.ref = refOb;
-                    $scope.group = groupOb;
-                    $scope.groups = groupObs;
-                    $scope.project = projectOb;
-                    $scope.projects = projectObs;
-                    $scope.ref = refOb;
-                    $scope.refs = refObs;
-                    $scope.branch = branchOb;
-                    $scope.branches = branchObs;
-                    $scope.tag = tagOb;
-                    $scope.tags = tagObs;
-                }]
+                template: '<ve-menu mms-org="$resolve.orgOb" mms-ref="$resolve.refOb" mms-refs="$resolve.refObs" mms-group="$resolve.groupOb" mms-groups="$resolve.groupObs" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs" mms-document="$resolve.documentOb" mms-view="$resolve.viewOb"></ve-menu>'
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
@@ -717,25 +645,10 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-org="org" mms-ref="ref" mms-refs="refs" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, RootScopeService) {
-                    RootScopeService.veTitle(documentOb.name);
-                    $scope.org = orgOb;
-                    $scope.group = groupOb;
-                    $scope.groups = groupObs;
-                    $scope.project = projectOb;
-                    $scope.projects = projectObs;
-                    $scope.ref = refOb;
-                    $scope.refs = refObs;
-                    $scope.branch = branchOb;
-                    $scope.branches = branchObs;
-                    $scope.tag = tagOb;
-                    $scope.tags = tagObs;
-                    $scope.document = documentOb;
-                }]
+                template: '<ve-menu mms-org="$resolve.orgOb" mms-ref="$resolve.refOb" mms-refs="$resolve.refObs" mms-group="$resolve.groupOb" mms-groups="$resolve.groupObs" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs" mms-document="$resolve.documentOb"></ve-menu>'
             },
             'pane-left@': {
-                template: '<tree-pane documentOb="$resolve.documentOb" orgOb="$resolve.orgOb" projectOb="$resolve.projectOb" refOb="$resolve.refOb" refObs="$resolve.refOb" groupObs="$resolve.groupObs" docMeta="$resolve.docMeta"></tree-pane>'
+                template: '<left-pane documentOb="$resolve.documentOb" orgOb="$resolve.orgOb" projectOb="$resolve.projectOb" refOb="$resolve.refOb" refObs="$resolve.refOb" groupObs="$resolve.groupObs" docMeta="$resolve.docMeta"></left-pane>'
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',
@@ -775,23 +688,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
         },
         views: {
             'menu@': {
-                template: '<ve-menu mms-org="org" mms-group="group" mms-groups="groups" mms-project="project" mms-projects="projects" mms-ref="ref" mms-refs="refs" mms-branch="branch" mms-branches="branches" mms-tag="tag" mms-tags="tags" mms-document="document" mms-view="view"></ve-menu>',
-                controller: ['$scope', 'orgOb', 'groupOb', 'groupObs', 'projectOb', 'projectObs', 'refOb', 'refObs', 'branchOb', 'branchObs', 'tagOb', 'tagObs', 'documentOb', 'viewOb', 'RootScopeService', function ($scope, orgOb, groupOb, groupObs, projectOb, projectObs, refOb, refObs, branchOb, branchObs, tagOb, tagObs, documentOb, viewOb, RootScopeService) {
-                    RootScopeService.veTitle(documentOb.name);
-                    $scope.org = orgOb;
-                    $scope.group = groupOb;
-                    $scope.groups = groupObs;
-                    $scope.project = projectOb;
-                    $scope.projects = projectObs;
-                    $scope.ref = refOb;
-                    $scope.refs = refObs;
-                    $scope.branch = branchOb;
-                    $scope.branches = branchObs;
-                    $scope.tag = tagOb;
-                    $scope.tags = tagObs;
-                    $scope.document = documentOb;
-                    $scope.view = viewOb;
-                }]
+                template: '<ve-menu mms-org="$resolve.orgOb" mms-group="$resolve.groupOb" mms-groups="$resolve.groupObs" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-ref="$resolve.refOb" mms-refs="$resolve.refObs" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs" mms-document="$resolve.documentOb" mms-view="$resolve.viewOb"></ve-menu>'
             },
             'pane-center@': {
                 templateUrl: 'partials/mms/pane-center.html',

@@ -191,7 +191,6 @@ mmsApp.controller('ViewCtrl', ['$scope', '$state', '$timeout', '$window', '$loca
         }
         $scope.bbApi.toggleButtonSpinner('center-previous');
         tree.select_branch(prev);
-        tree.on_treeData_change();
         $scope.bbApi.toggleButtonSpinner('center-previous');
     }));
 
@@ -206,7 +205,6 @@ mmsApp.controller('ViewCtrl', ['$scope', '$state', '$timeout', '$window', '$loca
         }
         $scope.bbApi.toggleButtonSpinner('center-next');
         tree.select_branch(next);
-        tree.on_treeData_change();
         $scope.bbApi.toggleButtonSpinner('center-next');
     }));
 
@@ -237,7 +235,7 @@ mmsApp.controller('ViewCtrl', ['$scope', '$state', '$timeout', '$window', '$loca
             };
             eventSvc.$broadcast('elementSelected', data);
             if (typeof rootScopeSvc.mmsPaneClosed() === 'boolean' && rootScopeSvc.mmsPaneClosed())
-                eventSvc.$broadcast('mms-pane-toggle', {closed: false});
+                eventSvc.$broadcast('mms-pane-toggle', false);
         },
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});

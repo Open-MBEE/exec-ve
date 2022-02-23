@@ -5,7 +5,7 @@
   "main": "mms.js",
   "scripts": {
     "start": "cd src && serve",
-    "build": "yarn install && rimraf src/dist && webpack --bail --progress --profile"
+    "build": "yarn install && rimraf src/dist && webpack --bail --progress --profile --mode=development"
   },
   "devDependencies": {
     "rimraf": "^2.6.2",

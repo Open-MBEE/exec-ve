@@ -20,8 +20,6 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         $window.document.title = value + ' | View Editor';
     }));
 
-    rootScopeSvc.veTitle('');
-
 
 
     rootScopeSvc.veFn(false);

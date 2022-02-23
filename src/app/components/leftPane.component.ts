@@ -4,8 +4,8 @@ var mmsApp = angular.module('mmsApp');
 
 
 /* Controllers */
-let TreePaneComponent = {
-  selector: "treePane",
+let LeftPaneComponent = {
+  selector: "leftPane",
   template: `
   <div fa-pane pane-anchor="north" pane-size="78px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-left">
@@ -56,8 +56,8 @@ let TreePaneComponent = {
     docMeta: "<"
   },
   controller: class TreePaneController {
-    static $inject = ['$anchorScroll' , '$q', '$filter', '$location', '$uibModal', '$scope', '$state','$timeout', 'growl',
-      'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'ToolbarService', 'ButtonBarService', 
+    static $inject = ['$anchorScroll', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', 'growl',
+      'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'ToolbarService',
       'TreeService', 'PermissionsService', 'RootScopeService', 'TreeService', 'EventService'];
 
     //Injected Dependencies
@@ -71,13 +71,13 @@ let TreePaneComponent = {
     private $state
     private $timeout
     private growl
-    private UxService
-    private ElementService
-    private UtilsService
-    private ViewService
-    private ProjectService
+    private uxSvc
+    private elementSvc
+    private utilsSvc
+    private viewSvc
+    private projectSvc
     private MmsAppUtils
-    private PermissionsService
+    private permissionsSvc
     private rootScopeSvc
     private tree
     private eventSvc
@@ -121,15 +121,16 @@ let TreePaneComponent = {
 
     //Local Variables
     readonly docEditable;
+    public addItemData
     // private newView: any;
     // private newGroup: { name: string };
     // private newDoc: any;
     // private createForm: boolean;
     // private resolvedBindings;
 
-    constructor($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, UxService, 
-      ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, ToolbarService, ButtonBarService, TreeService,
-    PermissionsService, RootScopeService, EventService) {
+    constructor($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, UxService,
+                ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, ToolbarService, TreeService,
+                PermissionsService, RootScopeService, EventService) {
 
       this.$anchorScroll = $anchorScroll;
       this.$q = $q;
@@ -137,50 +138,34 @@ let TreePaneComponent = {
       this.$location = $location;
       this.$uibModal = $uibModal;
       this.$scope = $scope;
+      this.$pane = $scope.$pane;
       this.$rootScope = $rootScope;
       this.$state = $state;
       this.$timeout = $timeout;
       this.growl = growl;
-      this.UxService = UxService;
-      this.ElementService = ElementService;
-      this.UtilsService = UtilsService;
-      this.ViewService = ViewService;
-      this.ProjectService = ProjectService;
+      this.uxSvc = UxService;
+      this.elementSvc = ElementService;
+      this.utilsSvc = UtilsService;
+      this.viewSvc = ViewService;
+      this.projectSvc = ProjectService;
       this.MmsAppUtils = MmsAppUtils;
-      this.PermissionsService = PermissionsService;
+      this.permissionsSvc = PermissionsService;
 
       this.tree = TreeService;
       this.eventSvc = EventService;
       this.rootScopeSvc = RootScopeService;
 
-      this.treeApi = this.tree.getApi();
-      this.treeData = this.tree.treeData;
-
 
       this.bbApi = {};
 
       this.tbApi = {};
-
-
-
-
-      this.rootScopeSvc.treePaneClosed($scope.$pane.closed);
-
-
-
-      if (this.rootScopeSvc.treeShowPe() === null) {
-        this.rootScopeSvc.treeShowPe(false);
-      }
       this.buttons = [];
       this.treeButtons = [];
 
       if ($state.includes('project.ref.document.full')) {
         this.rootScopeSvc.veFullDocMode(true);
       }
-      this.docEditable = this.documentOb && this.refOb && this.refOb.type === 'Branch' && this.UtilsService.isView(this.documentOb) && this.PermissionsService.hasBranchEditPermission(this.refOb);
-
-
-
+      this.docEditable = this.documentOb && this.refOb && this.refOb.type === 'Branch' && this.utilsSvc.isView(this.documentOb) && this.permissionsSvc.hasBranchEditPermission(this.refOb);
 
 
       this.tableList = [];
@@ -206,11 +191,19 @@ let TreePaneComponent = {
       this.toggle('showTree');
 
 
-      
     }
 
     $onInit = () => {
       this.eventSvc.$init(this);
+
+      this.rootScopeSvc.leftPaneClosed(this.$pane.closed);
+
+      if (this.rootScopeSvc.treeShowPe() === null) {
+        this.rootScopeSvc.treeShowPe(false);
+      }
+
+      this.treeApi = this.tree.getApi();
+      this.treeData = this.tree.treeData;
 
       this.bbApi.init = this.bbInit();
       this.tbApi.init = this.tbInit();
@@ -220,18 +213,16 @@ let TreePaneComponent = {
         this.tree.treeRows.length = 0;
       }
 
-      this.subs.push(this.eventSvc.$on('tree-pane-toggle',(paneClosed) => {
+      this.subs.push(this.eventSvc.$on('tree-pane-toggle', (paneClosed) => {
         if (paneClosed === undefined) {
           this.$pane.toggle();
-          this.rootScopeSvc.treePaneClosed(this.$pane.closed);
-        }
-        else if (paneClosed && !this.$pane.closed) {
+          this.rootScopeSvc.leftPaneClosed(this.$pane.closed);
+        } else if (paneClosed && !this.$pane.closed) {
           this.$pane.toggle();
-          this.rootScopeSvc.treePaneClosed(this.$pane.closed);
-        }
-        else if (!paneClosed && this.$pane.closed) {
+          this.rootScopeSvc.leftPaneClosed(this.$pane.closed);
+        } else if (!paneClosed && this.$pane.closed) {
           this.$pane.toggle();
-          this.rootScopeSvc.treePaneClosed(this.$pane.closed);
+          this.rootScopeSvc.leftPaneClosed(this.$pane.closed);
         }
       }));
 
@@ -309,8 +300,8 @@ let TreePaneComponent = {
 
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
         //TODO: Evaluate putting this directly into session service as opposed to handing down
-        this.treeData.push(...this.UtilsService.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func));
-        this.ViewService.getProjectDocuments({
+        this.treeData.push(...this.utilsSvc.buildTreeHierarchy(this.groupObs, "id", "group", "_parentId", this.groupLevel2Func));
+        this.viewSvc.getProjectDocuments({
           projectId: this.projectOb.id,
           refId: this.refOb.id
         }, 2).then((documentObs) => {
@@ -343,7 +334,7 @@ let TreePaneComponent = {
                   }
                 }
               }
-              this.ElementService.getElements({
+              this.elementSvc.getElements({
                 elementIds: bulkGet,
                 projectId: this.projectOb.id,
                 refId: this.refOb.id
@@ -360,7 +351,7 @@ let TreePaneComponent = {
       }
 
       this.treeOptions = {
-        types: this.UxService.getTreeTypes(),
+        types: this.uxSvc.getTreeTypes(),
         sectionNumbering: !!this.$state.includes('project.ref.document'),
         numberingDepth: 0,
         numberingSeparator: '.',
@@ -417,38 +408,38 @@ let TreePaneComponent = {
 
     }
 
-    $onChanges = (changes) => {
+    $onChanges(changes) {
       if (changes.$pane) {
-        if (changes.$pane.currentValue.closed != this.rootScopeSvc.treePaneClosed()) {
-          this.rootScopeSvc.treePaneClosed(changes.$pane.currentValue.closed);
+        if (changes.$pane.currentValue.closed != this.rootScopeSvc.leftPaneClosed()) {
+          this.rootScopeSvc.leftPaneClosed(changes.$pane.currentValue.closed);
         }
 
       }
     }
 
-    tbInit = () => {
+    tbInit() {
       if (this.$state.includes('project.ref.document')) {
-        const viewModeButton = this.UxService.getButtonBarButton("view-mode-dropdown");
+        const viewModeButton = this.uxSvc.getButtonBarButton("view-mode-dropdown");
         this.tbApi.addButton(viewModeButton);
-        this.tbApi.select(viewModeButton, this.rootScopeSvc.treeShowPe() ? this.UxService.getButtonBarButton('tree-show-pe') : this.UxService.getButtonBarButton('tree-show-views'));
+        this.tbApi.select(viewModeButton, this.rootScopeSvc.treeShowPe() ? this.uxSvc.getButtonBarButton('tree-show-pe') : this.uxSvc.getButtonBarButton('tree-show-views'));
       }
     };
 
-    bbInit = () => {
-      this.bbApi.addButton(this.UxService.getButtonBarButton("tree-expand"));
-      this.bbApi.addButton(this.UxService.getButtonBarButton("tree-collapse"));
+    bbInit() {
+      this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-expand"));
+      this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-collapse"));
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-reorder-group"));
-        this.bbApi.setPermission("tree-reorder-group", this.projectOb && this.PermissionsService.hasProjectEditPermission(this.projectOb));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-add-document-or-group"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-delete-document"));
-        this.bbApi.setPermission( "tree-add-document-or-group", (this.refOb.type !== 'Tag') && this.PermissionsService.hasBranchEditPermission(this.refOb) );
-        this.bbApi.setPermission( "tree-delete-document", (this.refOb.type !== 'Tag') && this.PermissionsService.hasBranchEditPermission(this.refOb) );
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-reorder-group"));
+        this.bbApi.setPermission("tree-reorder-group", this.projectOb && this.permissionsSvc.hasProjectEditPermission(this.projectOb));
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-add-document-or-group"));
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-delete-document"));
+        this.bbApi.setPermission("tree-add-document-or-group", (this.refOb.type !== 'Tag') && this.permissionsSvc.hasBranchEditPermission(this.refOb));
+        this.bbApi.setPermission("tree-delete-document", (this.refOb.type !== 'Tag') && this.permissionsSvc.hasBranchEditPermission(this.refOb));
       } else if (this.$state.includes('project.ref.document')) {
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-reorder-view"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-full-document"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-add-view"));
-        this.bbApi.addButton(this.UxService.getButtonBarButton("tree-delete-view"));
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-reorder-view"));
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-full-document"));
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-add-view"));
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-delete-view"));
         this.bbApi.setPermission("tree-add-view", this.docEditable);
         this.bbApi.setPermission("tree-reorder-view", this.docEditable);
         this.bbApi.setPermission("tree-delete-view", this.docEditable);
@@ -490,7 +481,7 @@ let TreePaneComponent = {
 
     groupLevel2Func(groupOb, groupNode) {
       groupNode.loading = true;
-      this.ViewService.getProjectDocuments({
+      this.viewSvc.getProjectDocuments({
         projectId: this.projectOb.id,
         refId: this.refOb.id
       }, 2).then((documentObs) => {
@@ -577,14 +568,14 @@ let TreePaneComponent = {
         for (i = 0; i < operand.length; i++) {
           bulkGet.push(operand[i].instanceId);
         }
-        this.ElementService.getElements({
+        this.elementSvc.getElements({
           elementIds: bulkGet,
           projectId: this.projectOb.id,
           refId: this.refOb.id,
         }, 0).then((ignore) => {
           var instances = [];
           for (var i = 0; i < operand.length; i++) {
-            instances.push(this.ElementService.getElement({
+            instances.push(this.elementSvc.getElement({
               projectId: this.projectOb.id,
               refId: this.refOb.id,
               elementId: operand[i].instanceId,
@@ -595,7 +586,7 @@ let TreePaneComponent = {
             for (; k >= 0; k--) {
               var instance = results[k];
               var hide = !this.rootScopeSvc.treeShowPe();
-              if (this.ViewService.isSection(instance)) {
+              if (this.viewSvc.isSection(instance)) {
                 var sectionTreeNode = {
                   label: instance.name,
                   type: "section",
@@ -606,10 +597,10 @@ let TreePaneComponent = {
                 this.viewId2node[instance.id] = sectionTreeNode;
                 parentNode.children.unshift(sectionTreeNode);
                 this.addSectionElements(instance, viewNode, sectionTreeNode, initial);
-              } else if (this.ViewService.getTreeType(instance)) {
+              } else if (this.viewSvc.getTreeType(instance)) {
                 var otherTreeNode = {
                   label: instance.name,
-                  type: this.ViewService.getTreeType(instance),
+                  type: this.viewSvc.getTreeType(instance),
                   viewId: viewNode.data.id,
                   data: instance,
                   hide: hide,
@@ -629,10 +620,10 @@ let TreePaneComponent = {
         }, (reason) => {
         });
       };
-    
+
       if (element._contents) {
         contents = element._contents;
-      } else if (this.ViewService.isSection(element) && element.specification) {
+      } else if (this.viewSvc.isSection(element) && element.specification) {
         contents = element.specification; // For Sections, the contents expression is the specification
       } else {
         //bad?
@@ -681,7 +672,7 @@ let TreePaneComponent = {
         this.treeApi.expand_branch(branch);
       }
     };
-    
+
     fullDocMode() {
       if (this.rootScopeSvc.veFullDocMode()) {
         this.rootScopeSvc.veFullDocMode(false);
@@ -708,76 +699,63 @@ let TreePaneComponent = {
     };
 
     addItem(itemType) {
-      let addItemScope = {
+      this.addItemData = {
         itemType: itemType,
         newViewAggr: {type: 'shared'},
         parentBranchData: {},
+        branchType: ""
       }
       var branch = this.treeApi.get_selected_branch();
-      var templateUrlStr = "";
-      var newBranchType = "";
-    
       if (itemType === 'Document') {
-        if (!branch) {
-          addItemScope.parentBranchData = {id: "holding_bin_" + this.projectOb.id};
-        } else if (branch.type !== 'group') {
-          this.growl.warning("Select a group to add document under");
-          return;
-        } else {
-          addItemScope.parentBranchData = branch.data;
-        }
-        templateUrlStr = 'partials/mms/new-doc-or-group.html';
-        newBranchType = 'view';
+        this.addDocument(branch);
       } else if (itemType === 'Group') {
-        if (branch && branch.type === 'group') {
-          addItemScope.parentBranchData = branch.data;
-        } else {
-          addItemScope.parentBranchData = {id: "holding_bin_" + this.projectOb.id};
-          // Always create group at root level if the selected branch is not a group branch
-          branch = null;
-        }
-        templateUrlStr = 'partials/mms/new-doc-or-group.html';
-        newBranchType = 'group';
+        this.addGroup(branch);
       } else if (itemType === 'View') {
-        if (!branch) {
-          this.growl.warning("Add View Error: Select parent view first");
-          return;
-        } else if (branch.type === "section") {
-          this.growl.warning("Add View Error: Cannot add a child view to a section");
-          return;
-        } else if (branch.aggr === 'none') {
-          this.growl.warning("Add View Error: Cannot add a child view to a non-owned and non-shared view.");
-          return;
-        }
-        addItemScope.parentBranchData = branch.data;
-        templateUrlStr = 'partials/mms/new-view.html';
-        newBranchType = 'view';
+        this.addView(branch);
       } else {
         this.growl.error("Add Item of Type " + itemType + " is not supported");
         return;
       }
-      // Adds the branch:
-      var instance = this.$uibModal.open({
-        templateUrl: templateUrlStr,
-        scope: addItemScope,
-        controller: ['$scope', '$uibModalInstance', '$filter', this.addItemCtrl]
-      });
-      instance.result.then((data) => {
+      let instance = this.$uibModal.open({
+        component: 'addItem',
+        resolve: {
+          getAddData: () => {
+            return this.addItemData;
+          },
+          getFilter: () => {
+            return this.$filter;
+          },
+          getProjectOb: () => {
+            return this.projectOb;
+          },
+          getRefOb: () => {
+            return this.refOb;
+          },
+          getOrgOb: () => {
+            return this.orgOb;
+          },
+          getSeenViewIds: () => {
+            return this.seenViewIds;
+          }
+      }});
+      instance.result.then((result) => {
+
+        let data = result.$value;
         if (!this.rootScopeSvc.veEditMode()) {
           this.$timeout(() => {
             $('.show-edits').click();
           }, 0, false);
         }
-        var newbranch = {
+        let newbranch = {
           label: data.name,
-          type: newBranchType,
+          type: this.addItemData.branchType,
           data: data,
           children: [],
           aggr: null,
         };
         var top = itemType === 'Group';
         this.treeApi.add_branch(branch, newbranch, top);
-    
+
         const addToFullDocView = (node, curSection, prevSysml) => {
           var lastChild = prevSysml;
           if (node.children) {
@@ -796,17 +774,17 @@ let TreePaneComponent = {
           }
           return lastChild;
         };
-    
+
         if (itemType === 'View') {
           this.viewId2node[data.id] = newbranch;
           this.seenViewIds[data.id] = newbranch;
-          newbranch.aggr = addItemScope.newViewAggr.type;
+          newbranch.aggr = this.addItemData.newViewAggr.type;
           var curNum = branch.children[branch.children.length - 1].section;
           var prevBranch = this.treeApi.get_prev_branch(newbranch);
           while (prevBranch.type !== 'view') {
             prevBranch = this.treeApi.get_prev_branch(prevBranch);
           }
-          this.MmsAppUtils.handleChildViews(data, addItemScope.newViewAggr.type, undefined, this.projectOb.id, this.refOb.id, this.handleSingleView, this.handleChildren)
+          this.MmsAppUtils.handleChildViews(data, this.addItemData.newViewAggr.type, undefined, this.projectOb.id, this.refOb.id, this.handleSingleView, this.handleChildren)
               .then((node) => {
                 // handle full doc mode
                 if (this.rootScopeSvc.veFullDocMode()) {
@@ -818,141 +796,57 @@ let TreePaneComponent = {
             this.$state.go('project.ref.document.view', {viewId: data.id, search: undefined});
           } else {
             if (prevBranch) {
-              this.eventSvc.$broadcast('mms-new-view-added', {vId: data.id, curSec: curNum, prevSibId: prevBranch.data.id});
+              this.eventSvc.$broadcast('mms-new-view-added', {
+                vId: data.id,
+                curSec: curNum,
+                prevSibId: prevBranch.data.id
+              });
             } else {
               this.eventSvc.$broadcast('mms-new-view-added', {vId: data.id, curSec: curNum, prevSibId: branch.data.id});
             }
           }
         }
       });
-    };
+    }
 
-    addItemCtrl($scope, $uibModalInstance) {
-      $scope.createForm = true;
-      $scope.oking = false;
-      $scope.projectOb = this.projectOb;
-      $scope.refOb = this.refOb;
-      var displayName = "";
-    
-      if ($scope.itemType === 'Document') {
-        $scope.newDoc = {name: ''};
-        displayName = "Document";
-      } else if ($scope.itemType === 'View') {
-        $scope.newView = {name: ''};
-        displayName = "View";
-      } else if ($scope.itemType === 'Group') {
-        $scope.newGroup = {name: ''};
-        displayName = "Group";
+    addDocument(branch) {
+      if (!branch) {
+        this.addItemData.parentBranchData = {id: "holding_bin_" + this.projectOb.id};
+      } else if (branch.type !== 'group') {
+        this.growl.warning("Select a group to add document under");
+        return;
       } else {
-        this.growl.error("Add Item of Type " + $scope.itemType + " is not supported");
+        this.addItemData.parentBranchData = branch.data;
+      }
+      this.addItemData.branchType = 'view';
+    }
+
+    addGroup(branch) {
+      if (branch && branch.type === 'group') {
+        this.addItemData.parentBranchData = branch.data;
+      } else {
+        this.addItemData.parentBranchData = {id: "holding_bin_" + this.projectOb.id};
+        // Always create group at root level if the selected branch is not a group branch
+        branch = null;
+      }
+      this.addItemData.branchType = 'group';
+    }
+
+    addView(branch) {
+
+      if (!branch) {
+        this.growl.warning("Add View Error: Select parent view first");
+        return;
+      } else if (branch.type === "section") {
+        this.growl.warning("Add View Error: Cannot add a child view to a section");
+        return;
+      } else if (branch.aggr === 'none') {
+        this.growl.warning("Add View Error: Cannot add a child view to a non-owned and non-shared view.");
         return;
       }
-    
-      var addExistingView = (view) => {
-        var viewId = view.id;
-        if (this.seenViewIds[viewId]) {
-          this.growl.error("Error: View " + view.name + " is already in this document.");
-          return;
-        }
-        if ($scope.oking) {
-          this.growl.info("Please wait...");
-          return;
-        }
-        $scope.oking = true;
-        this.ViewService.addViewToParentView({
-          parentViewId: $scope.parentBranchData.id,
-          viewId: viewId,
-          projectId: $scope.parentBranchData._projectId,
-          refId: $scope.parentBranchData._refId,
-          aggr: $scope.newViewAggr.type
-        }).then((data) => {
-          this.ElementService.getElement({
-            elementId: viewId,
-            projectId: view._projectId,
-            refId: view._refId
-          }, 2, false)
-              .then((realView) => {
-                $uibModalInstance.close(realView);
-              },() => {
-                $uibModalInstance.close(view);
-              }).finally(() => {
-            this.growl.success("View Added");
-          });
-        },(reason) => {
-          this.growl.error("View Add Error: " + reason.message);
-        }).finally(() => {
-          $scope.oking = false;
-        });
-      };
-    
-    
-      var queryFilter = () => {
-        return {
-          terms: {'_appliedStereotypeIds': [this.UtilsService.VIEW_SID, this.UtilsService.DOCUMENT_SID].concat(this.UtilsService.OTHER_VIEW_SID)}
-        };
-      };
-    
-      $scope.searchOptions = {
-        callback: addExistingView,
-        itemsPerPage: 200,
-        filterQueryList: [queryFilter],
-        hideFilterOptions: true
-      };
-    
-      $scope.ok = () => {
-        if ($scope.oking) {
-          this.growl.info("Please wait...");
-          return;
-        }
-        $scope.oking = true;
-        var promise;
-    
-        // Item specific promise: //TODO branch and tags
-        if ($scope.itemType === 'Document') {
-          promise = this.ViewService.createDocument({
-            _projectId: this.projectOb.id,
-            _refId: this.refOb.id,
-            id: $scope.parentBranchData.id
-          }, {
-            viewName: $scope.newDoc.name,
-            isDoc: true
-          });
-        } else if ($scope.itemType === 'View') {
-          $scope.newViewAggr.type = "composite";
-          promise = this.ViewService.createView($scope.parentBranchData, {
-            viewName: $scope.newView.name
-          });
-        } else if ($scope.itemType === 'Group') {
-          promise = this.ViewService.createGroup($scope.newGroup.name,
-              {
-                _projectId: this.projectOb.id,
-                _refId: this.refOb.id,
-                id: $scope.parentBranchData.id
-              }, this.orgOb.id
-          );
-        } else {
-          this.growl.error("Add Item of Type " + $scope.itemType + " is not supported");
-          $scope.oking = false;
-          return;
-        }
-    
-        promise.then((data) => {
-          this.growl.success(displayName + " Created");
-          if ($scope.itemType === 'Tag') {
-            this.growl.info('Please wait for a completion email prior to viewing of the tag.');
-          }
-          $uibModalInstance.close(data);
-        }, (reason) => {
-          this.growl.error("Create " + displayName + " Error: " + reason.message);
-        }).finally(() => {
-          $scope.oking = false;
-        });
-      };
-    
-      $scope.cancel = () => {
-        $uibModalInstance.dismiss();
-      };
-    };
+      this.addItemData.parentBranchData = branch.data;
+      this.addItemData.branchType = 'view';
+    }
 
     deleteItem(cb?) {
       var branch = this.treeApi.get_selected_branch();
@@ -960,32 +854,66 @@ let TreePaneComponent = {
         this.growl.warning("Select item to remove.");
         return;
       }
-      var type = this.ViewService.getElementType(branch.data);
+      var type = this.viewSvc.getElementType(branch.data);
       if (this.$state.includes('project.ref.document')) {
         if (type == 'Document') {
           this.growl.warning("Cannot remove a document from this view. To remove this item, go to project home.");
           return;
         }
-        if (branch.type !== 'view' || (!this.UtilsService.isView(branch.data))) {
+        if (branch.type !== 'view' || (!this.utilsSvc.isView(branch.data))) {
           this.growl.warning("Cannot remove non-view item. To remove this item, open it in the center pane.");
           return;
         }
       }
-    
+
       // when in project.ref state, allow deletion for view/document/group
       if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-        if (branch.type !== 'view' && !this.UtilsService.isDocument(branch.data) && (branch.type !== 'group' || branch.children.length > 0)) {
+        if (branch.type !== 'view' && !this.utilsSvc.isDocument(branch.data) && (branch.type !== 'group' || branch.children.length > 0)) {
           this.growl.warning("Cannot remove group with contents. Empty contents and try again.");
           return;
         }
       }
-      let deleteScope = {
-        deleteBranch: branch
-      };
       var instance = this.$uibModal.open({
-        templateUrl: 'partials/mms/confirmRemove.html',
-        scope: deleteScope,
-        controller: ['$scope', '$uibModalInstance', this.deleteCtrl]
+        component: 'confirmDelete',
+        resolve: {
+          getType: () => {
+            let type = branch.type;
+            if (this.utilsSvc.isDocument(branch.data)) {
+              type = 'Document';
+            }
+            return type;
+          },
+          getName: () => {
+            return branch.name;
+          },
+          ok: () => {
+            let promise = null;
+            if (branch.type === 'view') {
+              var parentBranch = this.treeApi.get_parent_branch(branch);
+              if (!this.$state.includes('project.ref.document')) {
+                promise = this.viewSvc.downgradeDocument(branch.data);
+              } else {
+                promise = this.viewSvc.removeViewFromParentView({
+                  projectId: parentBranch.data._projectId,
+                  refId: parentBranch.data._refId,
+                  parentViewId: parentBranch.data.id,
+                  viewId: branch.data.id
+                });
+              }
+            } else if (branch.type === 'group') {
+              promise = branch.removeGroup(branch.data);
+            }
+            if (promise) {
+              promise.then(() => {
+                return true;
+              }, (reason) => {
+                return reason;
+              });
+            }else {
+              return false;
+            }
+          }
+        }
       });
       instance.result.then((data) => {
         this.treeApi.remove_branch(branch);
@@ -1000,63 +928,12 @@ let TreePaneComponent = {
         }
       });
     };
-    
-    // TODO: Make this a generic delete controller
-    deleteCtrl($scope, $uibModalInstance) {
-      var branch = $scope.deleteBranch;
-      $scope.oking = false;
-      $scope.type = branch.type;
-      if (this.UtilsService.isDocument(branch.data)) {
-        $scope.type = 'Document';
-      }
-      $scope.name = branch.data.name;
-      $scope.ok = () => {
-        if ($scope.oking) {
-          this.growl.info("Please wait...");
-          return;
-        }
-        $scope.oking = true;
-        var promise = null;
-        if (branch.type === 'view') {
-          var parentBranch = $scope.treeApi.get_parent_branch(branch);
-          if (!this.$state.includes('project.ref.document')) {
-            promise = this.ViewService.downgradeDocument(branch.data);
-          } else {
-            promise = this.ViewService.removeViewFromParentView({
-              projectId: parentBranch.data._projectId,
-              refId: parentBranch.data._refId,
-              parentViewId: parentBranch.data.id,
-              viewId: branch.data.id
-            });
-          }
-        } else if (branch.type === 'group') {
-          promise = this.ViewService.removeGroup(branch.data);
-        }
-    
-        if (promise) {
-          promise.then((data) => {
-            this.growl.success($scope.type + " Removed");
-            $uibModalInstance.close('ok');
-          },(reason) => {
-            this.growl.error($scope.type + ' Removal Error: ' + reason.message);
-          }).finally(() => {
-            $scope.oking = false;
-          });
-        } else {
-          $scope.oking = false;
-          $uibModalInstance.dismiss();
-        }
-      };
-      $scope.cancel = () => {
-        $uibModalInstance.dismiss();
-      };
-    };
 
     addViewSections(view) {
       var node = this.viewId2node[view.id];
       this.addSectionElements(view, node, node);
     }
-    
+
     addViewSectionsRecursivelyForNode(node) {
       this.addViewSections(node.data);
       for (var i = 0; i < node.children.length; i++) {
@@ -1065,7 +942,7 @@ let TreePaneComponent = {
         }
       }
     }
-    
+
     setPeVisibility(branch) {
       if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
         branch.hide = !this.rootScopeSvc.treeShowPe();
@@ -1075,22 +952,22 @@ let TreePaneComponent = {
       }
     }
 
-  //TODO refresh table and fig list when new item added, deleted or reordered
-  user_clicks_branch = (branch) => {
-    this.treeApi.user_clicks_branch(branch);
-  };
+    //TODO refresh table and fig list when new item added, deleted or reordered
+    user_clicks_branch(branch) {
+      this.treeApi.user_clicks_branch(branch);
+    };
 
-  searchInputChangeHandler = () => {
-    if (this.treeOptions.search === '') {
-      this.treeApi.collapse_all();
-      this.treeApi.expandPathToSelectedBranch();
-    } else {
-      // expand all branches so that the filter works correctly
-      this.treeApi.expand_all();
+    searchInputChangeHandler() {
+      if (this.treeOptions.search === '') {
+        this.treeApi.collapse_all();
+        this.treeApi.expandPathToSelectedBranch();
+      } else {
+        // expand all branches so that the filter works correctly
+        this.treeApi.expand_all();
+      }
     }
-  };
 
-}
-}
+  }
+};
 
-mmsApp.component(TreePaneComponent.selector,TreePaneComponent);
+mmsApp.component(LeftPaneComponent.selector,LeftPaneComponent);

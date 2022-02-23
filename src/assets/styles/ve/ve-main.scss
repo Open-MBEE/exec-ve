@@ -317,16 +317,6 @@ i.section-icon{
   position: relative;
 }
 
-/*add to tag labels*/
-.Tag-icon::before,
-.tag-icon::before{
-  content: "\f02b";
-  font-family: FontAwesome;
-  color: $ve-silver-darker-3;
-  padding-right: 6px;
-  top: 1px;
-  position: relative;
-}
 
 /*------------------------------------------------------------------
 3. Table Filtering & Sorting

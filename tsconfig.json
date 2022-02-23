@@ -5,13 +5,13 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    //"lib": ["es6", "dom", "ES2017.object"],
+    "lib": ["es6", "dom", "ES2017.object", "ES2016.Array.Include", "es2018.promise"],
     "mapRoot": "./",
     "module": "es6",
     "moduleResolution": "node",
     "outDir": "../dist/out-tsc",
     "sourceMap": true,
-    "target": "es2017",
+    "target": "es5",
     "typeRoots": [
       "./src/node_modules/@types"
     ]

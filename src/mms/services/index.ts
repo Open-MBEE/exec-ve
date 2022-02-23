@@ -15,6 +15,7 @@ import "./SessionService.factory";
 import "./ShortenUrlService.factory";
 import "./StompService.factory";
 import "./TableService.factory";
+import "./TreeService.factory";
 import "./URLService.provider";
 import "./UtilsService.factory";
 import "./UxService.service";

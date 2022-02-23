@@ -43,7 +43,7 @@ function RootScopeService(SessionService) {
     };
 
     const veTitle = (value=null) => {
-        return session.accessor(constants.VETITLE, value, 'View Editor');
+        return session.accessor(constants.VETITLE, value, 'View Editor', true);
     };
 
     const veFn = (value=null) => {
@@ -55,7 +55,7 @@ function RootScopeService(SessionService) {
     };
 
     const veViewContentLoading = (value=null) => {
-        return session.accessor(constants.VEVIEWCONTENTLOADING, value, false);
+        return session.accessor(constants.VEVIEWCONTENTLOADING, value, false, true);
     };
 
     const veRedirect = (value=null) => {
@@ -63,7 +63,7 @@ function RootScopeService(SessionService) {
     };
 
     const veRedirectFromOld = (value=null) => {
-        return session.accessor(constants.VEREDIRECTFROMOLD, value, null);
+        return session.accessor(constants.VEREDIRECTFROMOLD, value, null, true);
     };
 
     const veCrushUrl = (value=null) => {
@@ -95,14 +95,14 @@ function RootScopeService(SessionService) {
     };
 
     const treeInitialSelection  = (value=null) => {
-        return session.accessor(constants.TREEINITIALSELECTION, value, null);
+        return session.accessor(constants.TREEINITIALSELECTION, value, null, true);
     };
 
     const treeIcons = (value=null) => {
         return session.accessor(constants.TREEICONS, value, {});
     };
 
-    const treePaneClosed = (value=null) => {
+    const leftPaneClosed = (value=null) => {
         return session.accessor(constants.TREEPANECLOSED, value, false);
     };
 
@@ -125,7 +125,7 @@ function RootScopeService(SessionService) {
         treeOptions: treeOptions,
         treeInitialSelection: treeInitialSelection,
         treeIcons: treeIcons,
-        treePaneClosed: treePaneClosed,
+        leftPaneClosed: leftPaneClosed,
         constants: constants
     };
 }

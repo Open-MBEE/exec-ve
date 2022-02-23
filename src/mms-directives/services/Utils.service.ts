@@ -540,19 +540,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         }
         // Only need to confirm the cancellation if edits have been made:
         if (hasEdits(scope.edit)) {
-            var instance = $uibModal.open({
-                templateUrl: 'partials/mms/cancelConfirm.html',
-                scope: scope,
-                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-                    $scope.ok = function() {
-                        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
-                        $uibModalInstance.close('ok');
-                    };
-                    $scope.cancel = function() {
-                        $uibModalInstance.dismiss();
-                    };
-                }]
-            });
+            let deleteOb = {
+                type: scope.edit.type,
+                element: scope.element,
+            }
+            let instance = deleteEditModal(deleteOb)
             instance.result.then(function() {
                 cancelCleanUp();
             }).finally(function() {
@@ -567,6 +559,24 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
             }
         }
     };
+
+    var deleteEditModal = function(deleteOb) {
+        return $uibModal.open({
+            controller: 'confirmDelete',
+            resolve: {
+                getName: () => {
+                    return deleteOb.type + " " + deleteOb.element.id;
+                },
+                getType: () => {
+                    return 'edit';
+                },
+                ok: () => {
+                    clearAutosaveContent(deleteOb.element._projectId + deleteOb.element._refId + deleteOb.element.id, deleteOb.type);
+                    return true;
+                }
+            }
+        });
+    }
 
     var deleteAction = function(scope, bbApi, section) {
         if (scope.elementSaving) {
@@ -591,20 +601,21 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         // });
         function realDelete() {
             bbApi.toggleButtonSpinner('presentation-element-delete');
-            scope.name = scope.edit.name;
 
-            var instance = $uibModal.open({
-                templateUrl: 'partials/mms/confirmRemove.html',
-                scope: scope,
-                controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-                    $scope.ok = function() {
+            let instance = $uibModal.open({
+                component: 'confirmDelete',
+                resolve: {
+                    getType: () => {
+                        return (scope.edit.type) ? scope.edit.type : 'element';
+                    },
+                    getName: () => {
+                        return (scope.edit.name) ? scope.edit.name : 'Element';
+                    },
+                    ok: () => {
                         clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
-                        $uibModalInstance.close('ok');
-                    };
-                    $scope.cancel = function() {
-                        $uibModalInstance.dismiss();
-                    };
-                }]
+                        return true;
+                    }
+                }
             });
             instance.result.then(function() {
                 var viewOrSec = section ? section : scope.view;
@@ -1002,11 +1013,11 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     };
 
     var toggleLeftPane = function (searchTerm) {
-        if ( searchTerm && !rootScopeSvc.treePaneClosed() ) {
+        if ( searchTerm && !rootScopeSvc.leftPaneClosed() ) {
             eventSvc.$broadcast('tree-pane-closed', true);
         }
 
-        if ( !searchTerm && rootScopeSvc.treePaneClosed() ) {
+        if ( !searchTerm && rootScopeSvc.leftPaneClosed() ) {
             eventSvc.$broadcast('tree-pane-closed', false);
         }
     };
@@ -1028,6 +1039,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         saveAction: saveAction,
         cancelAction: cancelAction,
         deleteAction: deleteAction,
+        deleteEditModal: deleteEditModal,
         previewAction: previewAction,
         isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
         hasHtml: hasHtml,
