@@ -7,9 +7,7 @@ build
 dist
 deploy
 docs
-app
-app/bower_components
-app/bower_components_target
+/app/*
 .sass-cache
 .idea
 PhantomJS_*
