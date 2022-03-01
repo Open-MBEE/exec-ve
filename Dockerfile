@@ -12,6 +12,8 @@
 FROM node:8
 
 ENV VE_ENV 'example'
+    VE_PORT 9000
+    VE_PROTOCOL 'http'
 
 WORKDIR /opt/mbee/ve
 COPY . /opt/mbee/ve
@@ -54,8 +56,8 @@ RUN node ./node_modules/node-sass/scripts/install.js
 RUN npm rebuild node-sass
 
 # Expose ports
-EXPOSE 9000
+EXPOSE ${VE_PORT}
 
 # When the container runs, we run grunt. The second argument should reference a 
 # server defined in the angular-mms-grunt-servers.json file. 
-CMD ["sh", "-c", "grunt release:docker --env=${VE_ENV}"]
+CMD ["sh", "-c", "grunt release:docker --env=${VE_ENV} --port=${VE_PORT} --protocol=${VE_PROTOCOL}"]
