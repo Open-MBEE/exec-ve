@@ -93,8 +93,17 @@ For more information, please consult the Gruntfile.js and the links at the botto
 To build the container, run the following command: `docker build -t ve .`.
 To run the container, run `docker run -it -p 80:9000 --name ve ve`.
 
-#### After View Editor 4.7
-To use a custom configuration file with the docker container you can mount the desired file using a docker config or volume.
+### Using the docker container
+The docker container can be configured using a number of options
+#### Specifying Port
+To specify the port use `--env VE_ENV=<desired_port>` (default = 9000)
+
+#### Enabling HTTPS
+Use `--env VE_PROTOCOL='https'` in order for this to work you will need to mount your https certificates and key to
+`/run/secrets/cert.key` and `/run/secrets/cert.crt`
+
+#### Config file (View Editor 4.0+)
+To use a custom configuration file with the docker container you can mount the desired file using a docker config (mounted to `/opt/mbee/ve/app/config/config.<env_file_name>.js`) or volume mounted at `/opt/mbee/ve/app/config`.
 Using your custom configuration can be done by specifying `--env VE_ENV=<your_env_here>` or adding `VE_ENV` to your compose file.
 
 ## Problems?

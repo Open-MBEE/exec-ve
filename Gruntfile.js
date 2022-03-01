@@ -8,6 +8,9 @@ module.exports = function(grunt) {
   });
   // Project configuration.
   var env = grunt.option('env') || 'example';
+  var port = grunt.option('port') || 9000;
+
+  var protocol = grunt.option('protocol') || 'http';
 
   var jsFiles = ['app/js/**/*.js', 'src/directives/**/*.js', 'src/services/*.js'];
 
@@ -27,48 +30,50 @@ module.exports = function(grunt) {
   //var serverHttps = true;
   var serveStatic = require('serve-static');
   var modRewrite = require('connect-modrewrite');
-  connectObject["docker"] = {
-    options: {
-      hostname: '0.0.0.0',
-      port: 9000,
-      protocol: 'http',
-      //open: true,
-      //key: grunt.file.read('/run/secrets/server.key').toString(),
-      //cert: grunt.file.read('/run/secrets/server.crt').toString(),
-      debug: true,
-      base: {
-        path: './dist',
-        options: {
-          index: 'mms.html',
-          // Add this so that the browser doesn't re-validate static resources
-          // Also, we have cache-busting, so we don't have to worry about stale resources
-          maxAge: 31536000000
-        }
-      },
-      middleware: function(connect, options) {
-        var middlewares;
-        middlewares = [];
-        if (!Array.isArray(options.base)) {
-          options.base = [options.base];
-        }
-        middlewares.push(
-            require('grunt-connect-proxy-updated/lib/utils').proxyRequest,
-            // add gzip compression to local server to reduce static resources' size and improve load speed
-            require('compression')()
-            //require('connect-modrewrite')(['!\\.html|\\.js|\\.css|\\.svg|\\.jp(e?)g|\\.png|\\.gif$ /mms.html']),
-
-            // need to add livereload as a middleware at this specific order to avoid issues with other middlewares
-        );
-        middlewares.push( modRewrite( ['^[^\\.]*$ /mms.html [L]'] ) );
-        options.base.forEach(function(base) {
-          // Serve static files.
-          var path = base.path || base;
-          var staticOptions = base.options || defaultStaticOptions;
-          middlewares.push(serveStatic(path, staticOptions));
-        });
-        return middlewares;
+  var docker_opts = {
+    hostname: '0.0.0.0',
+    protocol: protocol,
+    port: port,
+    debug: true,
+    base: {
+      path: './dist',
+      options: {
+        index: 'mms.html',
+        // Add this so that the browser doesn't re-validate static resources
+        // Also, we have cache-busting, so we don't have to worry about stale resources
+        maxAge: 31536000000
       }
     }
+  }
+  if (protocol === 'https') {
+    docker_opts.key = grunt.file.read('/run/secrets/server.key').toString()
+    docker_opts.cert =grunt.file.read('/run/secrets/server.crt').toString()
+  }
+  docker_opts.middleware = function (connect, options) {
+    var middlewares;
+    middlewares = [];
+    if (!Array.isArray(options.base)) {
+      options.base = [options.base];
+    }
+    middlewares.push(
+        require('grunt-connect-proxy-updated/lib/utils').proxyRequest,
+        // add gzip compression to local server to reduce static resources' size and improve load speed
+        require('compression')()
+        //require('connect-modrewrite')(['!\\.html|\\.js|\\.css|\\.svg|\\.jp(e?)g|\\.png|\\.gif$ /mms.html']),
+
+        // need to add livereload as a middleware at this specific order to avoid issues with other middlewares
+    );
+    middlewares.push(modRewrite(['^[^\\.]*$ /mms.html [L]']));
+    options.base.forEach(function (base) {
+      // Serve static files.
+      var path = base.path || base;
+      var staticOptions = base.options || defaultStaticOptions;
+      middlewares.push(serveStatic(path, staticOptions));
+    });
+    return middlewares;
+  };
+  connectObject["docker"] = {
+      options: docker_opts,
   };
   //}
 
