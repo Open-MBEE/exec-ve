@@ -24,12 +24,15 @@ class BrandingService {
                 ]
             };
             config = this.$window.__env;
+            banner = {
+                message: this.defaultLabels.pi,
+                background: '#0D47A1',
+                color: '#e8e8e8'
+            }
+            footer = {
+                message: this.defaultLabels.pi + ' - ' + this.defaultLabels.no_public_release
+            };
 
-    public banner = {
-        message: this.defaultLabels.pi,
-        background: '#0D47A1',
-        color: '#e8e8e8'
-    }
     constructor(private $window) {
         if(this.config.banner) {
             this.banner = this.config.banner;
@@ -38,39 +41,24 @@ class BrandingService {
         if(this.config.loginBanner) {
             this.loginBanner = this.config.loginBanner;
         }
+        if(this.config.footer) {
+            this.footer = this.config.footer;
+        }
     }
 
-
-
-    //b.banner.background = '#0D47A1';
-    //b.banner.color      = '#e8e8e8';
-
-    var footer = {
-        message: b.label.pi + ' - ' + b.label.no_public_release
-    };
-    if($window.__env.footer) {
-        footer = $window.__env.footer;
-    }
-    
-    // Navigation and URLs 
-    //b.veNav_address = 'https://cae-ems-uat.jpl.nasa.gov';
-
-    var getBanner = function() {
-        return banner;
+    getBanner() {
+        return this.banner;
     };
 
-    var getLoginBanner = function() {
-        return loginBanner;
+    getLoginBanner() {
+        return this.loginBanner;
     };
 
-    var getFooter = function() {
-        return footer;
-    };
-    return {
-        getBanner: getBanner,
-        getLoginBanner: getLoginBanner,
-        getFooter: getFooter
+    getFooter() {
+        return this.footer;
     };
 }
 
-mms.factory('BrandingService', ['$window', BrandingService]);
+BrandingService.$inject = ['$window']
+
+mms.service('BrandingService', BrandingService)

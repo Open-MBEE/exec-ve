@@ -4,7 +4,7 @@ import "./TreeService.service";
 import "./URLService.provider";
 import "./ApplicationService.service";
 import "./AuthorizationService.service";
-import "./BrandingService.factory";
+import "./BrandingService.service";
 import "./CacheService.factory";
 import "./EditService.factory";
 import "./ElementService.factory";
