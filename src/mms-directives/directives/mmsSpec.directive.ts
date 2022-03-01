@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 mmsDirectives.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService',
-    'PermissionsService', 'EventService', '$templateCache', 'growl', '_', mmsSpec]);
+    'PermissionsService', 'EventService', '$templateCache', 'growl', mmsSpec]);
 
 /**
  * @ngdoc directive

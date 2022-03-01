@@ -13,7 +13,7 @@ var mmsApp = angular.module('mmsApp');
 
 /* Classes */
 const ToolbarComponent = {
-    selector: "toolbarComponent", //toolbar-component
+    selector: "toolbar", //toolbar-component
     template: `<mms-toolbar buttons="$ctrl.buttons" on-click="onClick(button)" mms-tb-api="$ctrl.tbApi" />`,
     bindings: {
         refOb: '<',
@@ -21,6 +21,8 @@ const ToolbarComponent = {
     },
     controller: class ToolbarController {
         static $inject = ['$state', 'UxService', 'PermissionsService', 'EditService', 'EventService', 'ToolbarService'];
+
+        //Injected Deps
         private $state
         private UxService
         private PermissionsService
@@ -29,13 +31,16 @@ const ToolbarComponent = {
         private eventSvc;
         private subs;
 
+        //Bindings
         public refOb
         public documentOb
 
+        //Local
         public tbApi;
         public buttons;
+        private tbInitFlag;
 
-        constructor($state, UxService, refOb, documentOb, PermissionsService, EditService, EventService, ToolbarService) {
+        constructor($state, UxService, PermissionsService, EditService, EventService, ToolbarService) {
             this.$state = $state;
             this.UxService = UxService;
             this.PermissionsService = PermissionsService;
@@ -43,6 +48,7 @@ const ToolbarComponent = {
             this.edit = EditService;
             this.eventSvc = EventService;
             this.buttons = [];
+            this.tbInitFlag = false;
         }
 
         $onInit = () => {
@@ -67,6 +73,13 @@ const ToolbarComponent = {
             }));
         };
 
+        $onChanges = (changes) => {
+            if (changes.refOb && changes.refOb.currentValue && !this.tbInitFlag) {
+                //this.tbApi = this.toolbar.getApi(this.buttons, this.tbInit);
+                this.tbInitFlag = true;
+            }
+        }
+
         tbInit = () => {
             let tbApi = this.tbApi;
             tbApi.addButton(this.UxService.getToolbarButton("element-viewer"));
@@ -79,14 +92,14 @@ const ToolbarComponent = {
             tbApi.addButton(this.UxService.getToolbarButton("element-history"));
             tbApi.addButton(this.UxService.getToolbarButton("tags"));
             if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-                editable = this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
+                editable = this.refOb && this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
                 tbApi.setPermission('element-editor', editable);
                 if (this.$state.includes('project.ref.preview')) {
                     tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
                     tbApi.setPermission("view-reorder", editable);
                 }
             } else if (this.$state.includes('project.ref.document')) {
-                editable = this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
+                editable = this.refOb && this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
                 tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
                 tbApi.setPermission('element-editor', editable);
                 tbApi.setPermission("view-reorder", editable);

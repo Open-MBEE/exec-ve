@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', '_', 'growl', '$templateCache', '$timeout', mmsSearch]);
+mmsDirectives.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 /**
  * @ngdoc directive
@@ -15,7 +15,8 @@ mmsDirectives.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService'
  * @scope
  *
  */
-function mmsSearch($window, $anchorScroll, CacheService, ElementService, ProjectService, UtilsService, ViewService, _, growl, $templateCache, $timeout) {
+function mmsSearch($window, $anchorScroll, CacheService, ElementService, ProjectService, UtilsService, ViewService, growl, $templateCache, $timeout) {
+  var _ = $window._;
   var template = 'partials/mms-directives/mmsSearch.html';
   return {
     restrict: 'E',

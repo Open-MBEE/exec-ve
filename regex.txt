@@ -1,0 +1,7 @@
+(var|const|let)? ([a-zA-Z]*) = function? ?(\([A-Za-z, \?]*\))( =>)?
+public $2$3
+Region\.prototype\.([a-zA-Z]*) = (\([a-z,]*\)) =>
+(width|right|left|top|bottom|height)
+([a-zA-Z]*)Service\.(?!provider|factory)
+function ?(\([a-zA-Z_ ,]*\))
+((\$interval|\$http|\$window|\$q|growl)(\.|\())

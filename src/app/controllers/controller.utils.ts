@@ -2,7 +2,7 @@ import * as angular from 'angular';
 var mmsApp = angular.module('mmsApp');
 
 mmsApp.factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
-    '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventService', 'TreeService', 'EditService', '_', MmsAppUtils]);
+    '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventService', 'TreeService', 'EditService', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -317,7 +317,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         var protocol = $location.protocol();
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
-        var mmsIndex = absurl.indexOf('mms.html');
+        var mmsIndex = absurl.indexOf('index.html');
         var toc = UtilsService.makeHtmlTOC(tree.treeRows);
 
         // Conver to proper links for word/pdf

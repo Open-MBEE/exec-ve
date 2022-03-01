@@ -3,7 +3,29 @@ var mmsDirectives = angular.module('mmsDirectives');
 
 export class ButtonBarApi {
 
-  select = (parentButton, childButton) => {
+  public buttons
+  public id
+          init
+  
+  constructor(init?,id?) {
+    this.id = (id) ? id : 0;
+    this.buttons = [];
+
+    if (init) {
+      this.init = init;
+      this.init();
+    }
+  }
+  
+  getId() {
+    return this.id;
+  }
+  
+  getButtons() {
+    return this.buttons;
+  }
+
+  select(parentButton, childButton) {
     if(parentButton && childButton) {
       parentButton.dropdown_buttons.forEach((dropdownButton) => {
         dropdownButton.selected = dropdownButton.id === childButton.id;
@@ -11,46 +33,46 @@ export class ButtonBarApi {
     }
   };
 
-  setPermission = (id, permission, buttons) => {
-    buttons.forEach((button) => {
+  setPermission(id, permission) {
+    this.buttons.forEach((button) => {
       if (button.id === id)
         button.permission = permission;
     });
   };
 
-  setTooltip = (id, tooltip, buttons) => {
-    buttons.forEach((button) => {
+  setTooltip(id, tooltip) {
+    this.buttons.forEach((button) => {
       if (button.id === id)
         button.tooltip = tooltip;
     });
   };
 
-  setIcon = (id, icon, buttons) => {
-    buttons.forEach((button) => {
+  setIcon(id, icon) {
+    this.buttons.forEach((button) => {
       if (button.id === id)
         button.icon = icon;
     });
   };
 
-  setToggleState = (id, state, buttons) => {
-    buttons.forEach((button) => {
+  setToggleState(id, state) {
+    this.buttons.forEach((button) => {
       if (button.id === id) {
         if (button.togglable) {
           var original = button.toggle_state;
           if ((!original && state) || (original && !state))
-            this.toggleButtonState(id, buttons);
+            this.toggleButtonState(id);
         }
       }
     });
   };
 
-  getToggleState = (id, buttons) => {
+  getToggleState(id) {
     var buttonTemp = {
       toggle_state: false
     };
     //buttonTemp.toggle_state = false;
 
-    buttons.forEach((button) => {
+    this.buttons.forEach((button) => {
       if (button.id === id) {
         buttonTemp = button;
         if (! button.togglable) button.toggle_state = false;
@@ -61,9 +83,9 @@ export class ButtonBarApi {
     return buttonTemp.toggle_state;
   };
 
-  addButton = (button, buttons) => {
+  addButton(button) {
     //TODO: Determine if count can actually be replaced by length here
-    if (buttons.length === 0) {
+    if (this.buttons.length === 0) {
       button.placement = "bottom-left";
     }
     else if (!button.placement) {
@@ -77,11 +99,11 @@ export class ButtonBarApi {
     }
     button.icon_original = button.icon;
 
-    buttons.push(button);
+    this.buttons.push(button);
   };
 
-  toggleButtonSpinner = (id, buttons) => {
-    buttons.forEach((button) => {
+  toggleButtonSpinner(id) {
+    this.buttons.forEach((button) => {
       if (button.id === id) {
         if (button.spinner) {
           button.icon = button.icon_original;
@@ -95,8 +117,8 @@ export class ButtonBarApi {
     });
   };
 
-  toggleButtonState = (id, buttons) => {
-    buttons.forEach((button) => {
+  toggleButtonState(id) {
+    this.buttons.forEach((button) => {
       if (button.id === id) {
         if (button.togglable) {
           button.toggle_state = !button.toggle_state;
@@ -114,11 +136,61 @@ export class ButtonBarApi {
   };
 }
 
-buttonBarService.$inject = [];
 
-function buttonBarService() {
-  return new ButtonBarApi();
+
+class ButtonBarService {
+
+  private buttonBars = {}
+          barCounter = 0
+
+  getApi(id) {
+    if (this.buttonBars.hasOwnProperty(id)) {
+      return this.buttonBars[id];
+    }
+    return null;
+  }
+
+  initApi(id?, init?, componentOrScope?) {
+    if (id && this.buttonBars.hasOwnProperty(id)) {
+      return this.buttonBars[id];
+    }else if (!id) {
+      id = this.barCounter++;
+    }
+    if (componentOrScope) {
+      componentOrScope.bars = [];
+      if (componentOrScope.$on) {
+        componentOrScope.$on('$destroy', () => {
+          this.destroy(componentOrScope.bars);
+        });
+      }
+      else if (!componentOrScope.$onDestroy) {
+          componentOrScope.$onDestroy = () => {
+            this.destroy(componentOrScope.bars);
+      };
+    }
+      componentOrScope.bars.push(id);
+    }
+    if (!init) {
+      return new Error("Illegal Bar initialization")
+    }
+      let api = new ButtonBarApi(id,init);
+      this.buttonBars[id] = api;
+      return api;
+  }
+
+  destroy(bars) {
+      if (bars.length > 0) {
+        for (var i = 0; i < bars.length; i++) {
+          if (this.buttonBars.hasOwnProperty(bars[i])){
+            delete this.buttonBars[bars[i]];
+          }
+        }
+      }
+  };
+
 }
 
+ButtonBarService.$inject = [];
+
 mmsDirectives
-  .service("ButtonBarService", buttonBarService);
+  .service("ButtonBarService", ButtonBarService);

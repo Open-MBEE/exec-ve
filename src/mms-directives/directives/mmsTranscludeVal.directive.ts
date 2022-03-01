@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 mmsDirectives.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
-    '$http', '_', '$compile', '$templateCache', 'growl', 'MathJax', 'ViewService', 'EventService', mmsTranscludeVal]);
+    '$http', '$compile', 'growl', 'MathJax', 'ViewService', 'EventService', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
@@ -34,7 +34,7 @@ mmsDirectives.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', '
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLService, AuthService, $http,
-                          _, $compile, $templateCache, growl, MathJax, ViewService, EventService) {
+                          $compile, growl, MathJax, ViewService, EventService) {
 
     let eventSvc = EventService;
 

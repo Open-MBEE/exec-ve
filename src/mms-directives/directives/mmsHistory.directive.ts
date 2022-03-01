@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '$animate', '$uibModal', '_', mmsHistory]);
+mmsDirectives.directive('mmsHistory', ['Utils','ElementService', 'ProjectService', '$templateCache', '$q', '$animate', '$uibModal', mmsHistory]);
 
 /**
  * @ngdoc directive

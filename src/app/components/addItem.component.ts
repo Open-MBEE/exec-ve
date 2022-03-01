@@ -94,7 +94,7 @@ let AddItemComponent = {
     },
     controller: class AddItemController {
 
-        static $inject = ['growl', '$timeout', 'flatpickr', 'ViewService', 'ElementService', 'ProjectService', 'ApplicationService', 'UtilsService'];
+        static $inject = ['growl', '$timeout', 'ViewService', 'ElementService', 'ProjectService', 'ApplicationService', 'UtilsService'];
 
         private growl
         private flatpickr
@@ -124,7 +124,7 @@ let AddItemComponent = {
                 newItem
                 now
 
-        constructor(growl, $timeout, flatpickr, ViewService, ElementService, ProjectService, UtilsService, ApplicationService) {
+        constructor(growl, $timeout, ViewService, ElementService, ProjectService, ApplicationService, UtilsService, flatpickr) {
             this.viewSvc = ViewService;
             this.elementSvc = ElementService;
             this.projectSvc = ProjectService;

@@ -2,7 +2,7 @@ import * as angular from 'angular';
 var mmsApp = angular.module('mmsApp');
 
 let RefsComponent = {
-    selector: 'mmsRefs',
+    selector: 'refs',
     template: `
     <div class="container-fluid ve-no-panes">
     <div class="row">
@@ -42,7 +42,7 @@ let RefsComponent = {
                             <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addTag()"><i class="fa fa-plus"></i> Tag</button>
                             <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addBranch()"><i class="fa fa-plus"></i> Branch</button>
                             </div>
-                            <!-- <button-bar-component buttons="buttons" mms-bb-api="bbApi"></button-bar-component> -->
+                            <!-- <button-bar buttons="buttons" mms-bb-api="bbApi"></button-bar> -->
                         </div>
                         <dl class="dl-horizontal ve-light-panels-detail-content">
                             <dt></dt>
@@ -81,15 +81,15 @@ let RefsComponent = {
 </div>      
 `,
     bindings: {
-        orgOb: "<",
-        projectOb: "<",
-        refOb: "<",
-        refObs: "<",
-        tagObs: "<",
-        branchObs: "<"
+        mmsOrg: "<",
+        mmsProject: "<",
+        mmsRef: "<",
+        mmsRefs: "<",
+        mmsTags: "<",
+        mmsBranches: "<"
     },
     controller: class RefsController{
-        static $inject = ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', '$window', 'growl', '_', 'flatpickr',
+        static $inject = ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', '$window', 'growl',
             'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'RootScopeService',
             'EventService']
 
@@ -114,12 +114,12 @@ let RefsComponent = {
         private subs
 
         //Bindings
-         public orgOb
-            projectOb
-            refOb
-            refObs
-            tagObs
-            branchObs
+         public mmsOrg
+            mmsProject
+            mmsRef
+            mmsRefs
+            mmsTags
+            mmsBranches
 
         //Local
         public refManageView;
@@ -136,8 +136,9 @@ let RefsComponent = {
             htmlTooltip
             addItemData
 
-        constructor($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $window, growl, _, flatpickr,
-                    ElementService, ProjectService, MmsAppUtils, ApplicationService, RootScopeService, EventService) {
+        constructor($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $window, growl,
+                    ElementService, ProjectService, MmsAppUtils, ApplicationService, RootScopeService, EventService, flatpickr) {
+
             this.$sce = $sce;
             this.$q = $q;
             this.$filter = $filter;
@@ -148,7 +149,7 @@ let RefsComponent = {
             this.$timeout = $timeout;
             this.$window = $window;
             this.growl = growl;
-            this._ = _;
+            this._ = this.$window._;
             this.flatpickr = flatpickr;
             this.elementSvc = ElementService;
             this.projectSvc = ProjectService;
@@ -161,42 +162,42 @@ let RefsComponent = {
         $onInit() {
             this.eventSvc.$init(this);
 
-            this.rootScopeSvc.mmsRefOb(this.refOb);
+            this.rootScopeSvc.mmsRefOb(this.mmsRef);
             this.refManageView = true;
             this.refData = [];
             this.bbApi = {};
             this.buttons = [];
-            this.branches = this.branchObs;
-            this.tags = this.tagObs;
+            this.branches = this.mmsBranches;
+            this.tags = this.mmsTags;
             this.activeTab = 0;
             this.refSelected = null;
             this.search = null;
             this.view = null;
             this.fromParams = {};
 
-            if (this._.isEmpty(this.refOb)) {
+            if (this._.isEmpty(this.mmsRef)) {
                 this.selectMasterDefault();
             } else {
-                this.fromParams = this.refOb;
-                this.refSelected = this.refOb;
+                this.fromParams = this.mmsRef;
+                this.refSelected = this.mmsRef;
             }
 
             this.htmlTooltip = this.$sce.trustAsHtml('Branch temporarily unavailable during duplication.');
 
             this.subs.push(this.eventSvc.$on('fromParamChange', (fromParams) => {
-                let index = this._.findIndex(this.refObs, {name: fromParams.refId});
+                let index = this._.findIndex(this.mmsRefs, {name: fromParams.refId});
                 if ( index > -1 ) {
-                    this.fromParams = this.refObs[index];
+                    this.fromParams = this.mmsRefs[index];
                 }
             }));
 
         }
 
         selectMasterDefault() {
-            var masterIndex = this._.findIndex(this.refObs, {name: 'master'});
+            var masterIndex = this._.findIndex(this.mmsRefs, {name: 'master'});
             if (masterIndex > -1) {
-                this.fromParams = this.refObs[masterIndex];
-                this.refSelected = this.refObs[masterIndex];
+                this.fromParams = this.mmsRefs[masterIndex];
+                this.refSelected = this.mmsRefs[masterIndex];
             }
         };
 
@@ -215,7 +216,7 @@ let RefsComponent = {
 
 
         refClickHandler(ref) {
-            this.projectSvc.getRef(ref.id, this.projectOb.id).then(
+            this.projectSvc.getRef(ref.id, this.mmsProject.id).then(
             (data) => {
                 this.refSelected = data;
             },
@@ -263,14 +264,14 @@ let RefsComponent = {
                     getFilter: () => {
                         return this.$filter;
                     },
-                    getProjectOb: () => {
-                        return this.projectOb;
+                    getPmmsRoject: () => {
+                        return this.mmsProject;
                     },
-                    getRefOb: () => {
-                        return this.refOb;
+                    getRmmsEf: () => {
+                        return this.mmsRef;
                     },
-                    getOrgOb: () => {
-                        return this.orgOb;
+                    getOmmsRg: () => {
+                        return this.mmsOrg;
                     },
                     getSeenViewIds: () => {
                         return null;
@@ -280,16 +281,16 @@ let RefsComponent = {
         instance.result.then((data) => {
         //TODO add load handling once mms returns status
         let tag = [];
-        for (let i = 0; i < this.refObs.length; i++) {
-            if (this.refObs[i].type === "Tag")
-                tag.push(this.refObs[i]);
+        for (let i = 0; i < this.mmsRefs.length; i++) {
+            if (this.mmsRefs[i].type === "Tag")
+                tag.push(this.mmsRefs[i]);
         }
         this.tags = tag;
 
         let branches = [];
-        for (let j = 0; j < this.refObs.length; j++) {
-            if (this.refObs[j].type === "Branch")
-                branches.push(this.refObs[j]);
+        for (let j = 0; j < this.mmsRefs.length; j++) {
+            if (this.mmsRefs[j].type === "Branch")
+                branches.push(this.mmsRefs[j]);
         }
         this.branches = branches;
         if (data.type === 'Branch') {
@@ -326,7 +327,7 @@ deleteItem() {
                 }
             },
             ok: () => {
-                let promise = this.projectSvc.deleteRef(branch.id, this.projectOb.id);
+                let promise = this.projectSvc.deleteRef(branch.id, this.mmsProject.id);
                 if (promise) {
                     promise.then(() => {
                         return true;

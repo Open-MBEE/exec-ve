@@ -3,7 +3,7 @@ var mmsDirectives = angular.module('mmsDirectives');
 
 
 let ButtonBarComponent = {
-    selector: "buttonBarComponent", //button-bar-component
+    selector: "buttonBar", //button-bar
     template: `
     <span ng-repeat="button in $ctrl.buttons | filter: {permission: true}">
 

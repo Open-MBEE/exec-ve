@@ -31,7 +31,7 @@ interface NgDropdownMultiselectScope extends angular.IScope {
 
 // @ts-ignore
 // TODO: Figure out why this is failing ts type checking
-angularjsDropdownMultiselect.directive('ngDropdownMultiselect', ['$filter', '$document', '$compile', '$parse', '_', ngDropdownMultiselect]);
+angularjsDropdownMultiselect.directive('ngDropdownMultiselect', ['$filter', '$document', '$compile', '$parse', ngDropdownMultiselect]);
 
 function ngDropdownMultiselect($filter, $document, $compile, $parse, _) {
 

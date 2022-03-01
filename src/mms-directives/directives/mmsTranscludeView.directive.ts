@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 mmsDirectives.directive('mmsTranscludeView', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService',
-    'EventService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeView]);
+    'EventService', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeView]);
 
 
 const TranscludeViewComponent = {
@@ -28,7 +28,7 @@ const TranscludeViewComponent = {
     },
     controller: class TranscludeViewController {
         static $inject = ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService',
-            'EventService', '$compile', '$element', 'growl', '_', 'MathJax'];
+            'EventService', '$compile', '$element', 'growl', 'MathJax'];
 
         //bindings
         private mmsElementId

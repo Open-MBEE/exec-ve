@@ -1,47 +1,46 @@
 import * as angular from 'angular'
 var mms = angular.module('mms');
 
-mms.factory('BrandingService', ['$window', BrandingService]);
+
 
 /**
  * @ngdoc service
- * @name mms.BrandingService
+ * @name BrandingService
  * 
  * @description
  * Branding Service
  */
-function BrandingService($window) {
+class BrandingService {
+    private defaultLabels = {
+                pi: 'PROPRIETARY: Proprietary Information',
+                export_ctrl: 'EXPORT WARNING: No export controlled documents allowed on this server',
+                no_public_release: 'Not for Public  Release or Redistribution',
+                unclassified: 'CLASSIFICATION: This system is UNCLASSIFIED'
+            }
+            loginBanner = {
+                labels: [
+                    this.defaultLabels.unclassified,
+                    this.defaultLabels.pi + ' - ' + this.defaultLabels.no_public_release
+                ]
+            };
+            config = this.$window.__env;
 
-    var b = {
-        label: {
-            pi: 'PROPRIETARY: Proprietary Information',
-            export_ctrl: 'EXPORT WARNING: No export controlled documents allowed on this server',
-            no_public_release: 'Not for Public  Release or Redistribution',
-            unclassified: 'CLASSIFICATION: This system is UNCLASSIFIED'
+    public banner = {
+        message: this.defaultLabels.pi,
+        background: '#0D47A1',
+        color: '#e8e8e8'
+    }
+    constructor(private $window) {
+        if(this.config.banner) {
+            this.banner = this.config.banner;
         }
-    };
 
-    //b.banner.background = '#0D47A1';
-    //b.banner.color      = '#e8e8e8';
-
-    // The banner is optional. It is generated in the mmsApp directive veSystemBanner.
-    // If you use a banner, the message field is required. Other fields are optional.
-    var banner = {
-        message: b.label.pi
-    };
-    if($window.__env.banner) {
-        banner = $window.__env.banner;
+        if(this.config.loginBanner) {
+            this.loginBanner = this.config.loginBanner;
+        }
     }
 
-    var loginBanner = {
-        labels: [
-            b.label.unclassified,
-            b.label.pi + ' - ' + b.label.no_public_release
-        ]
-    };
-    if($window.__env.loginBanner) {
-        loginBanner = $window.__env.loginBanner;
-    }
+
 
     //b.banner.background = '#0D47A1';
     //b.banner.color      = '#e8e8e8';
@@ -73,3 +72,5 @@ function BrandingService($window) {
         getFooter: getFooter
     };
 }
+
+mms.factory('BrandingService', ['$window', BrandingService]);

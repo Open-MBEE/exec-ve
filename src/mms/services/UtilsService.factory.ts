@@ -1,8 +1,112 @@
 import * as angular from "angular";
+import * as _ from "lodash";
+import {CacheService} from "./CacheService.factory";
+import {URLService} from "./URLService.provider";
+import {ApplicationService} from "./ApplicationService.service";
+
 var mms = angular.module('mms');
 
+export class Element {
+    _appliedStereotypeIds: []
+    appliedStereotypeInstanceId: null
+    documentation: String
+    mdExtensionsIds: []
+    syncElementId: null
+    type: String
+}
 
-mms.factory('UtilsService', ['$q', '$http', 'CacheService', 'URLService', 'ApplicationService', '_', UtilsService]);
+export class StructuredElement extends Element {
+    name: String
+    nameExpression: null
+    ownerId: null
+}
+
+export class Property extends StructuredElement {
+    type: "Property"
+    defaultValue: []
+}
+
+export class Class extends StructuredElement {
+    classifierBehaviorId: null
+    clientDependencyIds: []
+    collaborationUseIds: []
+    elementImportIds: []
+    generalizationIds: []
+    classRealizationIds: []
+    isAbstract: false
+    isActive: false
+    isFinalSpecialization: false
+    isLeaf: false
+    ownedAttributeIds: []
+    ownedOperationIds: []
+    packageImportIds: []
+    powertypeExtentIds: []
+    redefinedClassifierIds: []
+    representationI: []
+    supplierDeonIdspendencyIds: []
+    templateBindingIds: []
+    templateParameterId: null
+    type: "Class"
+    useCaseIds: []
+    visibility: 'public'
+}
+export class InstanceSpec extends Element {
+    classifierIds: []
+    clientDependencyIds: []
+    deploymentIds: []
+    documentation: ''
+    name: ''
+    ownerId: null
+    slotIds: []
+    specification: null
+    stereotypedElementId: null
+    supplierDependencyIds: []
+    templateParameterId: null
+    type: "InstanceSpecification"
+    visibility: "public"
+}
+export class ValueSpec extends Element {
+    clientDependencyIds: []
+    documentation: ""
+    name: ""
+    valueExpression: ""
+    operand: []
+    supplierDependencyIds: []
+    templateParameterId: null
+    typeId: null
+    visibility: "public"
+};
+
+export class Package extends Element {
+    type: "Package"
+    clientDependencyIds: []
+    supplierDependencyIds: []
+    name: ""
+    documentation: ""
+    nameExpression: null
+    visibility: null
+    templateParameterId: null
+    elementImportIds: []
+    packageImportIds: []
+    templateBindingIds: []
+    URI: ""
+    packageMergeIds: []
+    profileApplicationIds: []
+};
+export class Generalization extends Element {
+    generalizationSetIds: []
+    isSubstitutable: true
+    type: "Generalization"
+};
+export class Dependency extends Element {
+    clientDependencyIds: []
+    name: ""
+    nameExpression: null
+    supplierDependencyIds: []
+    templateParameterId: null
+    type: "Dependency"
+    visibility: null
+};
 
 /**
  * @ngdoc service
@@ -13,147 +117,31 @@ mms.factory('UtilsService', ['$q', '$http', 'CacheService', 'URLService', 'Appli
  * @requires URLService
  * @requires ApplicationService
  * @requires _
- * 
+ *
  * @description
  * Utilities
  */
-function UtilsService($q, $http, CacheService, URLService, ApplicationService, _) {
-    var PROJECT_URL_PREFIX = 'mms.html#/projects/';
-    var VIEW_SID = '_11_5EAPbeta_be00301_1147420760998_43940_227';
-    var OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
-        '_17_0_1_232f03dc_1325612611695_581988_21583', '_18_0beta_9150291_1392290067481_33752_4359'];
-    var DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
-    var BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
-    var REQUIREMENT_SID = ['_project-bundle_mission_PackageableElement-mission_u003aRequirement_PackageableElement',
-        '_18_0_5_f560360_1476403587924_687681_736366','_18_0_5_f560360_1476403587924_687681_736366',
-        '_11_5EAPbeta_be00301_1147873190330_159934_2220'];
-    var editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
-    var CLASS_ELEMENT_TEMPLATE = {
-        _appliedStereotypeIds: [],
-        appliedStereotypeInstanceId: null,
-        classifierBehaviorId: null,
-        clientDependencyIds: [],
-        collaborationUseIds: [],
-        documentation: "",
-        elementImportIds: [],
-        generalizationIds: [],
-        interfaceRealizationIds: [],
-        isAbstract: false,
-        isActive: false,
-        isFinalSpecialization: false,
-        isLeaf: false,
-        mdExtensionsIds: [],
-        name: "",
-        nameExpression: null,
-        ownedAttributeIds: [],
-        ownedOperationIds: [],
-        ownerId: null,
-        packageImportIds: [],
-        powertypeExtentIds: [],
-        redefinedClassifierIds: [],
-        representationId: null,
-        substitutionIds: [],
-        supplierDependencyIds: [],
-        syncElementId: null,
-        templateBindingIds: [],
-        templateParameterId: null,
-        type: "Class",
-        useCaseIds: [],
-        visibility: 'public'
-    };
-    var INSTANCE_ELEMENT_TEMPLATE = {
-        appliedStereotypeInstanceId: null,
-        classifierIds: [],
-        clientDependencyIds: [],
-        deploymentIds: [],
-        documentation: '',
-        mdExtensionsIds: [],
-        name: '',
-        nameExpression: null,
-        ownerId: null,
-        slotIds: [],
-        specification: null,
-        stereotypedElementId: null,
-        supplierDependencyIds: [],
-        syncElementId: null,
-        templateParameterId: null,
-        type: "InstanceSpecification",
-        visibility: "public",
-        _appliedStereotypeIds: [],
-    };
-    var VALUESPEC_ELEMENT_TEMPLATE = {
-        appliedStereotypeInstanceId: null,
-        clientDependencyIds: [ ],
-        documentation: "",
-        mdExtensionsIds: [ ],
-        name: "",
-        nameExpression: null,
-        supplierDependencyIds: [ ],
-        syncElementId: null,
-        templateParameterId: null,
-        typeId: null,
-        visibility: "public",
-        _appliedStereotypeIds: [ ],
-    };
-    var PACKAGE_ELEMENT_TEMPLATE = {
-        _appliedStereotypeIds : [ ],
-        documentation : "",
-        type : "Package",
-        mdExtensionsIds : [ ],
-        syncElementId : null,
-        appliedStereotypeInstanceId : null,
-        clientDependencyIds : [ ],
-        supplierDependencyIds : [ ],
-        name : "",
-        nameExpression : null,
-        visibility : null,
-        templateParameterId : null,
-        elementImportIds : [ ],
-        packageImportIds : [ ],
-        templateBindingIds : [ ],
-        URI : "",
-        packageMergeIds : [ ],
-        profileApplicationIds : [ ]
-    };
-    var GENERALIZATION_ELEMENT_TEMPLATE = {
-        appliedStereotypeInstanceId : null,
-        documentation : "",
-        generalizationSetIds : [ ],
-        isSubstitutable : true,
-        mdExtensionsIds : [ ],
-        syncElementId : null,
-        type : "Generalization",
-        _appliedStereotypeIds : [ ],
-    };
-    var DEPENDENCY_ELEMENT_TEMPLATE = {
-        _appliedStereotypeIds : [ ],
-        appliedStereotypeInstanceId : null,
-        clientDependencyIds : [ ],
-        documentation : "",
-        mdExtensionsIds : [ ],
-        name : "",
-        nameExpression : null,
-        supplierDependencyIds : [ ],
-        syncElementId : null,
-        templateParameterId : null,
-        type : "Dependency",
-        visibility : null,
-    };
+export class UtilsService {
+    private editKeys = ['name', 'documentation', 'defaultValue', 'value', 'specification', 'id', '_projectId', '_refId', 'type'];
+    public VIEW_SID = '_11_5EAPbeta_be00301_1147420760998_43940_227';
+            PROJECT_URL_PREFIX = 'index.html#/projects/';
+            OTHER_VIEW_SID = ['_17_0_1_407019f_1332453225141_893756_11936',
+                '_17_0_1_232f03dc_1325612611695_581988_21583', '_18_0beta_9150291_1392290067481_33752_4359'];
+            DOCUMENT_SID = '_17_0_2_3_87b0275_1371477871400_792964_43374';
+            BLOCK_SID = '_11_5EAPbeta_be00301_1147424179914_458922_958';
+            REQUIREMENT_SID = ['_project-bundle_mission_PackageableElement-mission_u003aRequirement_PackageableElement',
+                '_18_0_5_f560360_1476403587924_687681_736366','_18_0_5_f560360_1476403587924_687681_736366',
+                '_11_5EAPbeta_be00301_1147873190330_159934_2220'];
+            tableConfig = {
+                sortByColumnFn: 'sortByColumnFn',
+                showBindingForSortIcon: 'sortColumnNum',
+                filterDebounceRate: 200,
+                filterTermColumnPrefixBinding: 'filterTermForColumn'
+            };
 
-    /**
-     * @ngdoc method
-     * @name mms.UtilsService#hasCircularReference
-     * @methodOf mms.UtilsService
-     *
-     * @description
-     * Tells whether or not there exists a circular reference
-     *
-     * @param {Object} scope scope
-     * @param {string} curId current id
-     * @param {string} curType current type
-     * @returns {boolean} true or false
-     */
-    var hasCircularReference = function(scope, curId, curType) {
+    constructor(private $q, private $http, private cacheSvc : CacheService, private uRLSvc : URLService, private applicationSvc : ApplicationService) {}
+
+    public hasCircularReference(scope, curId, curType) {
         var curscope = scope;
         while (curscope.$parent) {
             var parent = curscope.$parent;
@@ -175,12 +163,12 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {Object} vs value spec object
      * @returns {void} nothing
      */
-    var cleanValueSpec = function(vs) {
+    cleanValueSpec(vs : ValueSpec) {
         if (vs.hasOwnProperty('valueExpression'))
             delete vs.valueExpression;
         if (vs.operand) {
             for (var i = 0; i < vs.operand.length; i++) {
-                cleanValueSpec(vs.operand[i]);
+                this.cleanValueSpec(vs.operand[i]);
             }
         }
     };
@@ -189,15 +177,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @ngdoc method
      * @name mms.UtilsService#cleanElement
      * @methodOf mms.UtilsService
-     * 
-     * @description
-     * Cleans 
      *
-     * @param {Object} elem the element object to be cleaned 
+     * @description
+     * Cleans
+     *
+     * @param {Object} elem the element object to be cleaned
      * @param {boolean} [forEdit=false] (optional) forEdit.
      * @returns {Object} clean elem
      */
-    var cleanElement = function(elem, forEdit) {
+    public cleanElement(elem, forEdit?) {
         var i = 0;
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
@@ -210,14 +198,14 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         if (elem.value) {
             for (i = 0; i < elem.value.length; i++) {
-                cleanValueSpec(elem.value[i]);
+                this.cleanValueSpec(elem.value[i]);
             }
         }
         if (elem._contents) {
-            cleanValueSpec(elem._contents);
+            this.cleanValueSpec(elem._contents);
         }
         if (elem.specification) {
-            cleanValueSpec(elem.specification);
+            this.cleanValueSpec(elem.specification);
         }
         if (elem.type === 'Class') {
             if (elem._contents && elem.contains) {
@@ -228,15 +216,15 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
             if (elem._allowedElementIds) {
                 delete elem._allowedElementIds;
-            }
-        }
-        if (elem.hasOwnProperty('specialization')) {
+            }      }
+
+  if (elem.hasOwnProperty('specialization')) {
             delete elem.specialization;
         }
         if (forEdit) { //only keep editable or needed keys in edit object instead of everything
             var keys = Object.keys(elem);
             for (var keyIndex in keys) {
-                if (editKeys.indexOf(keys[keyIndex]) >= 0) {
+                if (this.editKeys.indexOf(keys[keyIndex]) >= 0) {
                     continue;
                 }
                 delete elem[keys[keyIndex]];
@@ -260,7 +248,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {callback} level2_Func function to get childen objects
      * @returns {void} root node
      */
-    var buildTreeHierarchy = function (array, id, type, parent, level2_Func) {
+    buildTreeHierarchy(array, id, type, parent, level2_Func) {
         var rootNodes = [];
         var data2Node = {};
         var i = 0;
@@ -268,11 +256,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         // make first pass to create all nodes
         for (i = 0; i < array.length; i++) {
             data = array[i];
-            data2Node[data[id]] = { 
-                label : data.name, 
-                type : type,
-                data : data, 
-                children : [] 
+            data2Node[data[id]] = {
+                label: data.name,
+                type: type,
+                data: data,
+                children: []
             };
         }
         // make second pass to associate data to parent nodes
@@ -283,8 +271,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             if (data[parent] && data2Node[data[parent]]) {//bad data!
                 data2Node[data[parent]].children.push(data2Node[data[id]]);
             } else {
-            // If theres not an element in data2Node whose key matches the 'parent' value in the array element
-            // it's a "root node" and so it should be pushed to the root nodes array along with its children
+                // If theres not an element in data2Node whose key matches the 'parent' value in the array element
+                // it's a "root node" and so it should be pushed to the root nodes array along with its children
                 rootNodes.push(data2Node[data[id]]);
             }
         }
@@ -298,21 +286,21 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             }
         }
 
-        var sortFunction = function(a, b) {
+        const sortFunction = (a, b) => {
             if (a.children.length > 1) {
                 a.children.sort(sortFunction);
             }
             if (b.children.length > 1) {
                 b.children.sort(sortFunction);
             }
-            if (a.label.toLowerCase() < b.label.toLowerCase()) {
+            if (a.label.this.toLowerCase() < b.label.this.toLowerCase()) {
                 return -1;
             }
-            if (a.label.toLowerCase() > b.label.toLowerCase()) {
+            if (a.label.this.toLowerCase() > b.label.this.toLowerCase()) {
                 return 1;
             }
             return 0;
-        };
+        }
         rootNodes.sort(sortFunction);
         return rootNodes;
     };
@@ -321,7 +309,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @ngdoc method
      * @name mms.UtilsService#normalize
      * @methodOf mms.UtilsService
-     * 
+     *
      * @description
      * Normalize common arguments
      *
@@ -329,10 +317,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @returns {Object} object with update, ws, ver keys based on the input.
      *      default values: {update: false, ws: 'master', ver: 'latest'}
      */
-    var normalize = function(reqOb) {
-        reqOb.extended = !reqOb.extended ? false : true;
-        reqOb.refId = !reqOb.refId ? 'master' : reqOb.refId;
-        reqOb.commitId = !reqOb.commitId ? 'latest' : reqOb.commitId;
+    public normalize(reqOb) {
+        reqOb.extended = !reqOb.extended ? false: true;
+        reqOb.refId = !reqOb.refId ? 'master': reqOb.refId;
+        reqOb.commitId = !reqOb.commitId ? 'latest': reqOb.commitId;
         return reqOb;
     };
 
@@ -340,7 +328,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @ngdoc method
      * @name mms.UtilsService#makeElementKey
      * @methodOf mms.UtilsService
-     * 
+     *
      * @description
      * Make key for element for use in CacheService
      *
@@ -348,9 +336,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} [edited=false] element is to be edited
      * @returns {Array} key to be used in CacheService
      */
-    var makeElementKey = function(elementOb, edit) {
-        var refId = !elementOb._refId ? 'master' : elementOb._refId;
-        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+    public makeElementKey(elementOb, edit?) {
+        var refId = !elementOb._refId ? 'master': elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest': elementOb._commitId;
         var key = ['element', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
@@ -361,7 +349,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @ngdoc method
      * @name mms.UtilsService#makeArtifactKey
      * @methodOf mms.UtilsService
-     * 
+     *
      * @description
      * Make key for element for use in CacheService
      *
@@ -369,9 +357,9 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} [edited=false] element is to be edited
      * @returns {Array} key to be used in CacheService
      */
-    var makeArtifactKey = function(elementOb, edit) {
-        var refId = !elementOb._refId ? 'master' : elementOb._refId;
-        var commitId = !elementOb._commitId ? 'latest' : elementOb._commitId;
+    public makeArtifactKey(elementOb, edit) {
+        var refId = !elementOb._refId ? 'master': elementOb._refId;
+        var commitId = !elementOb._commitId ? 'latest': elementOb._commitId;
         var key = ['artifact', elementOb._projectId, refId, elementOb.id, commitId];
         if (edit)
             key.push('edit');
@@ -382,36 +370,36 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @ngdoc method
      * @name mms.UtilsService#mergeElement
      * @methodOf mms.UtilsService
-     * 
+     *
      * @description
      * Make key for element for use in CacheService
      *
-     * @param {object} source the element object to merge in 
+     * @param {object} source the element object to merge in
      * @param {boolean} [updateEdit=false] updateEdit
-     * @returns {void} nothing 
+     * @returns {void} nothing
      */
-    var mergeElement = function(source, updateEdit) {
-        //TODO remove calls to this, shoudl use ElementService.cacheElement
+    public mergeElement(source, updateEdit) {
+        //TODO remove calls to this, should use this.elementSvc.cacheElement
     };
 
     /**
      * @ngdoc method
      * @name mms.UtilsService#filterProperties
      * @methodOf mms.UtilsService
-     * 
+     *
      * @description
      * given element object a and element object b,
-     * returns new object with b data minus keys not in a 
+     * returns new object with b data minus keys not in a
      * (set notation A intersect B)
      *
      * @param {Object} a Element Object
      * @param {Object} b Element Object
      * @returns {Object} new object
      */
-    var filterProperties = function(a, b) {
+    public filterProperties(a, b) {
         var res = {};
         for (var key in a) {
-            if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
+            if (a.this.hasOwnProperty(key) && b.this.hasOwnProperty(key)) {
                 res[key] = b[key];
             }
         }
@@ -422,28 +410,28 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @ngdoc method
      * @name mms.UtilsService#hasConflict
      * @methodOf mms.UtilsService
-     * 
-     * @description		
+     *
+     * @description
      *  Checks if sever and cache version of the element are
-     *  the same so that the user is aware that they are overriding 
+     *  the same so that the user is aware that they are overriding
      *  changes to the element that they have not seen in the cache element.
      *  Given edit object with only keys that were edited,
-     * 'orig' object and 'server' object, should only return true 
-     *	if key is in edit object and value in orig object is different 
-     *  from value in server object. 
+     * 'orig' object and 'server' object, should only return true
+     *	if key is in edit object and value in orig object is different
+     *  from value in server object.
      *
      * @param {Object} edit An object that contains element id and any property changes to be saved.
      * @param {Object} orig version of elem object in cache.
      * @param {Object} server version of elem object from server.
      * @returns {Boolean} true if conflict, false if not
      */
-    var hasConflict = function(edit, orig, server) {
+    public hasConflict(edit, orig, server) {
         for (var i in edit) {
-            if (i === '_read' || i === '_modified' || i === '_modifier' || 
-                    i === '_creator' || i === '_created' || i === '_commitId') {
+            if (i === '_read' || i === '_modified' || i === '_modifier' ||
+                i === '_creator' || i === '_created' || i === '_commitId') {
                 continue;
             }
-            if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
+            if (edit.this.hasOwnProperty(i) && orig.this.hasOwnProperty(i) && server.this.hasOwnProperty(i)) {
                 if (!angular.equals(orig[i], server[i])) {
                     return true;
                 }
@@ -463,11 +451,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {string} table table content
      * @returns {boolean} boolean
      */
-    function isRestrictedValue(values) {
+    public isRestrictedValue(values) {
         if (values.length > 0 && values[0].type === 'Expression' &&
-                values[0].operand.length === 3 && values[0].operand[0].value === 'RestrictedValue' &&
-                values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
-                values[0].operand[1].type === 'ElementValue') {
+            values[0].operand.length === 3 && values[0].operand[0].value === 'RestrictedValue' &&
+            values[0].operand[2].type === 'Expression' && values[0].operand[2].operand.length > 0 &&
+            values[0].operand[1].type === 'ElementValue') {
             return true;
         }
         return false;
@@ -486,8 +474,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} isSortable table content
      * @returns {string} generated html string
      */
-    var makeHtmlTable = function(table, isFilterable?, isSortable?, pe?) {
-        var result = ['<table class="table-bordered table-condensed ' + (table.style ? table.style : '') + '">'];
+    public makeHtmlTable(table, isFilterable?, isSortable?, pe?) {
+        var result = ['<table class="table-bordered table-condensed ' + (table.style ? table.style: '') + '">'];
         if (table.colwidths && table.colwidths.length > 0) {
             result.push('<colgroup>');
             for (var i = 0; i < table.colwidths.length; i++) {
@@ -501,7 +489,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         }
         result.push('<tbody>'); //put tbody before thead to control stacking context so if freeze header/columns are both used headers cover cells (?)
         //https://stackoverflow.com/questions/45676848/stacking-context-on-table-elementhead-and-body
-        result.push(makeTableBody(table.body, false));
+        result.push(this.makeTableBody(table.body, false));
         result.push('</tbody>');
         if (table.header && table.header.length) {
             // only add styling to the filterable or sortable header
@@ -511,10 +499,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 result.push('<thead>');
             }
 
-            result.push(makeTableBody(table.header, true, isFilterable, isSortable));
+            result.push(this.makeTableBody(table.header, true, isFilterable, isSortable));
             result.push('</thead>');
         }
-        if (ApplicationService.getState().inDoc && !table.excludeFromList) {
+        if (this.applicationSvc.getState().inDoc && !table.excludeFromList) {
             result.push('<caption>Table {{mmsPe._veNumber}}. {{table.title || mmsPe.name}}</caption>');
         } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>');
@@ -523,34 +511,27 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return result.join('');
     };
 
-    var tableConfig = {
-        sortByColumnFn: 'sortByColumnFn',
-        showBindingForSortIcon: 'sortColumnNum',
-        filterDebounceRate: 200,
-        filterTermColumnPrefixBinding: 'filterTermForColumn'
-    };
-
     /** Include row and column number for table's header data object **/
-    var _generateRowColNumber = function(header) {
-      header.forEach(function (row, rowIndex) {
-          var startCol = 0;
-          var colCounter = 0;
-          row.forEach(function (cell, cellIndex) {
-              // startCol is always 0 except when row > 0th and on cell === 0th && rowSpan of the previous row's first element is larger than 1
-              // This is the only time when we need to offset the starting colNumber for cells under merged column(s)
-              if ( rowIndex !== 0 && cellIndex === 0 && Number(header[rowIndex - 1][0].rowspan) > 1 ) {
-                  startCol = Number(header[rowIndex - 1][0].colspan);
-              }
-              var colSpan = Number(cell.colspan);
-              cell.startRow = rowIndex;
-              cell.endRow = cell.startRow + Number(cell.rowspan) - 1;
-              cell.startCol = startCol + colCounter;
-              cell.endCol = cell.startCol +  colSpan - 1;
-              colCounter += colSpan;
-          });
-          startCol = 0;
-          colCounter = 0;
-      });
+    public generateRowColNumber(header) {
+        header.forEach(function (row, rowIndex) {
+            var startCol = 0;
+            var colCounter = 0;
+            row.forEach(function (cell, cellIndex) {
+                // startCol is always 0 except when row > 0th and on cell === 0th && rowSpan of the previous row's first element is larger than 1
+                // This is the only time when we need to offset the starting colNumber for cells under merged this.column(s)
+                if ( rowIndex !== 0 && cellIndex === 0 && Number(header[rowIndex - 1][0].rowspan) > 1 ) {
+                    startCol = Number(header[rowIndex - 1][0].colspan);
+                }
+                var colSpan = Number(cell.colspan);
+                cell.startRow = rowIndex;
+                cell.endRow = cell.startRow + Number(cell.rowspan) - 1;
+                cell.startCol = startCol + colCounter;
+                cell.endCol = cell.startCol +  colSpan - 1;
+                colCounter += colSpan;
+            });
+            startCol = 0;
+            colCounter = 0;
+        });
     };
 
     /**
@@ -567,12 +548,12 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} isSortable is sortable
      * @returns {string} generated html string
      */
-    var makeTableBody = function(body, isHeader, isFilterable?, isSortable?) {
+    public makeTableBody(body, isHeader, isFilterable?, isSortable?) {
         if ( isHeader && (isFilterable || isSortable ) ) {
-            _generateRowColNumber(body);
+            this.generateRowColNumber(body);
         }
         var result = [], i, j, k, row, cell, thing;
-        var dtag = (isHeader ? 'th' : 'td');
+        var dtag = (isHeader ? 'th': 'td');
         for (i = 0; i < body.length; i++) {
             result.push('<tr>');
             row = body[i];
@@ -588,16 +569,16 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                     }
 
                     if (thing.type === 'Paragraph') {
-                        var para = makeHtmlPara(thing);
+                        var para = this.makeHtmlPara(thing);
                         // add special styling for header's title
                         if ( ( isFilterable || isSortable ) && thing.sourceType === 'text' ) {
                             para = para.replace('<p>', '<p ng-style="{display: \'inline\'}">' );
                         }
                         result.push(para);
                     } else if (thing.type === 'Table') {
-                        result.push(makeHtmlTable(thing));
+                        result.push(this.makeHtmlTable(thing));
                     } else if (thing.type === 'List') {
-                        result.push(makeHtmlList(thing));
+                        result.push(this.makeHtmlList(thing));
                     } else if (thing.type === 'Image') {
                         //todo use mmsCf
                         result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
@@ -605,10 +586,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                     result.push('</div>');
                     if ( isHeader ) {
                         if ( isSortable && Number(cell.colspan) === 1 ) {
-                            result.push('<span' + ' ng-click=\"'+ tableConfig.sortByColumnFn + "(" + cell.startCol + ")" + '\"' + ' ng-class=\"'+ 'getSortIconClass('+ cell.startCol + ')' + '\"></span>');
+                            result.push('<span' + ' ng-click=\"'+ this.tableConfig.sortByColumnFn + "(" + cell.startCol + ")" + '\"' + ' ng-class=\"'+ 'getSortIconClass('+ cell.startCol + ')' + '\"></span>');
                         }
                         if ( isFilterable ) {
-                            result.push('<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column"' + ' ng-show="showFilter" ng-model-options=\"{debounce: '+ tableConfig.filterDebounceRate  + '}\"' + ' ng-model=\"' + tableConfig.filterTermColumnPrefixBinding + cell.startCol + cell.endCol + '\">');
+                            result.push('<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column"' + ' ng-show="showFilter" ng-model-options=\"{debounce: '+ this.tableConfig.filterDebounceRate  + '}\"' + ' ng-model=\"' + this.tableConfig.filterTermColumnPrefixBinding + cell.startCol + cell.endCol + '\">');
                         }
                     }
                 }
@@ -630,7 +611,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {object} list list specification object
      * @returns {string} generated html string
      */
-    var makeHtmlList = function(list) {
+    public makeHtmlList(list) {
         var result = [], i, j, item, thing;
         if (list.ordered)
             result.push('<ol>');
@@ -643,11 +624,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 thing = item[j];
                 result.push('<div>');
                 if (thing.type === 'Paragraph') {
-                    result.push(makeHtmlPara(thing));
+                    result.push(this.makeHtmlPara(thing));
                 } else if (thing.type === 'Table') {
-                    result.push(makeHtmlTable(thing));
+                    result.push(this.makeHtmlTable(thing));
                 } else if (thing.type === 'List') {
-                    result.push(makeHtmlList(thing));
+                    result.push(this.makeHtmlList(thing));
                 } else if (thing.type === 'Image') {
                     result.push('<mms-cf mms-cf-type="img" mms-element-id="' + thing.id + '"></mms-cf>');
                 }
@@ -673,7 +654,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {object} para paragraph spec object
      * @returns {string} generated html string
      */
-    var makeHtmlPara = function(para) {
+    public makeHtmlPara(para) {
         if (para.sourceType === 'text')
             return para.text;
         var t = 'doc';
@@ -702,10 +683,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {string} tree the root element (document or view)
      * @returns {string} toc string
      */
-    var makeHtmlTOC = function (tree) {
+    public makeHtmlTOC(tree) {
         var result = '<div class="toc"><h1 class="header">Table of Contents</h1>';
         var root_branch = tree[0].branch;
-        result += makeHtmlTOCChild(root_branch, true);
+        result += this.makeHtmlTOCChild(root_branch, true);
         result += '</div>';
         return result;
     };
@@ -722,7 +703,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} skip skip adding li for this branch
      * @returns {string} toc string
      */
-    var makeHtmlTOCChild = function(branch, skip?) {
+    public makeHtmlTOCChild(branch, skip?) {
         var result = '';
         var child;
         if (!skip) {
@@ -739,7 +720,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 result += '<ul>';
                 ulAdded = true;
             }
-            result += makeHtmlTOCChild(child);
+            result += this.makeHtmlTOCChild(child);
         }
         if (ulAdded) {
             result += '</ul>';
@@ -766,7 +747,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} html whether to generated list of tables and figures using html content, outside of the corresponding PE or not
      * @returns {object} results
      */
-    var makeTablesAndFiguresTOC = function(tree, printElement, live, html) {
+    public makeTablesAndFiguresTOC(tree, printElement, live, html) {
         var ob = {
             tables: '',
             figures: '',
@@ -779,16 +760,16 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
         // If both "Generate List of Tables and Figures" && "Use HTML for List of Tables and Figures " options are checked...
         if (html) {
-            ob = generateTOCHtmlOption(ob, tree, printElement);
+            ob = this.generateTOCHtmlOption(ob, tree, printElement);
             // return obHTML;
         } else {
             for (var i = 0; i < root_branch.children.length; i++) {
-                makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
+                this.makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
             }
         }
-        ob.tables    = ob.tables.length    ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>'    + ob.tables    + '</ul></div>' : '';
-        ob.figures   = ob.figures.length   ? '<div class="tof"><h1 class="header">List of Figures</h1><ul>'   + ob.figures   + '</ul></div>' : '';
-        ob.equations = ob.equations.length ? '<div class="tof"><h1 class="header">List of Equations</h1><ul>' + ob.equations + '</ul></div>' : '';
+        ob.tables    = ob.tables.length    ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>'    + ob.tables    + '</ul></div>': '';
+        ob.figures   = ob.figures.length   ? '<div class="tof"><h1 class="header">List of Figures</h1><ul>'   + ob.figures   + '</ul></div>': '';
+        ob.equations = ob.equations.length ? '<div class="tof"><h1 class="header">List of Equations</h1><ul>' + ob.equations + '</ul></div>': '';
         return ob;
     };
 
@@ -807,7 +788,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {boolean} showRefName the tree hierarchy of the document or view (what is displayed in the left pane)
      * @returns {void} nothing
      */
-    var makeTablesAndFiguresTOCChild = function(child, printElement, ob, live, showRefName) {
+    public makeTablesAndFiguresTOCChild(child, printElement, ob, live, showRefName) {
         var pe = child.data;
         var sysmlId = pe.id;
         var veNumber = pe._veNumber;
@@ -885,11 +866,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             refs.filter('[suppress-numbering!="true"]').filter(':not([link-text])').find('a').html('Eq. ' + equationCap);
         }
         for (var i = 0; i < child.children.length; i++) {
-            makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
+            this.makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
         }
     };
 
-    var addLiveNumbering = function(pe, el, type) {
+    public addLiveNumbering(pe, el, type) {
         var veNumber = pe._veNumber;
         if (!veNumber) {
             return;
@@ -942,7 +923,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
 
     /**
      * @ngdoc method
-     * @name mms.UtilsService#generateAnchorId
+     * @name mms.UtilsService#this.generateAnchorId
      * @methodOf mms.UtilsService
      *
      * @description
@@ -951,8 +932,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {string} prefix "tbl_" when creating an id for a table, "fig_" when creating an id for a figuer
      * @returns {string} unique ID wit prefix, tbl_ or fig_
      */
-    var generateAnchorId = function(prefix){
-        return prefix + ApplicationService.createUniqueId();
+    public generateAnchorId(prefix){
+        return prefix + this.applicationSvc.createUniqueId();
     };
 
     /**
@@ -968,11 +949,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {string} printElement contents to be printed (what is displayed in the center pane)
      * @returns {string} populates the object fed to the function (the first argument) and return
      */
-    var generateTOCHtmlOption = function(ob, tree, printElement){
+    public generateTOCHtmlOption(ob, tree, printElement){
         // Grab all existing tables and figures inside the center pane, and assign them to tables and figures
         var tables = printElement.find('table'),
             figures = printElement.find('figure');
-            // equations = printElement.find('.math-tex');
+        // equations = printElement.find('.math-tex');
         var anchorId = '', thisCap='', tblCap, tbl, fig, j;
 
         ob.tableCount = tables.length;
@@ -984,11 +965,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             tblCap = $('caption', tbl);
 
             // Set the link from the List of Tables to the actual tables
-            anchorId = generateAnchorId('tbl_');
+            anchorId = this.generateAnchorId('tbl_');
             tbl.attr('id', anchorId);
 
             // Append li to the List of Tables
-            thisCap = (tblCap && tblCap.text() !== '') ? (j+1) + ". " + tblCap.text() : (j+1) + ". ";
+            thisCap = (tblCap && tblCap.text() !== '') ? (j+1) + ". " + tblCap.text(): (j+1) + ". ";
             ob.tables += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>';
 
             // If no caption exists, add empty caption for numbering
@@ -1003,11 +984,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
             var figcap = $('figcaption',fig);
 
             // Set the link from the List of Tables to the actual tables
-            anchorId = generateAnchorId('fig_');
+            anchorId = this.generateAnchorId('fig_');
             fig.attr('id', anchorId);
 
             // Append li to the List of Figures
-            thisCap = (figcap && figcap.text() !== '') ? (j + 1) + ". " + figcap.text() : (j+1);
+            thisCap = (figcap && figcap.text() !== '') ? (j + 1) + ". " + figcap.text(): (j+1);
             ob.figures += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>';
 
             // If no caption exists, add empty caption for numbering
@@ -1022,12 +1003,12 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         //     eq = $(equations[j]);
         //
         //     // Set the link from the List of Tables to the actual tables
-        //     anchorId = generateAnchorId('eq_');
+        //     anchorId = this.generateAnchorId('eq_');
         //     eq.attr('id', anchorId);
         //
         //     // Append li to the List of Equations
         //     ob.equations += '<li><a href="#' + anchorId + '">' + j + '. </a></li>';
-        //     if(noCaption){ // If user did not add the caption, add a mock caption
+        //     public if(noCaption){ // If user did not add the caption, add a mock caption
         //         eq.append('<caption>&nbsp;</caption>');
         //     }
         // }
@@ -1044,12 +1025,12 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      *
      * @returns {string} unique SysML element ID
      */
-    var createMmsId = function() {
+    public createMmsId() {
         var d = Date.now();
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
             var r = (d + Math.random()*16)%16 | 0;
             d = Math.floor(d/16);
-            return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+            return (c=='x' ? r: (r&0x3|0x8)).toString(16);
         });
         return 'MMS_' + Date.now() + '_' + uuid;
     };
@@ -1065,8 +1046,8 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {string} printElement the content of the view/document currently selected on the center pane
      * @returns {void} nothing
      */
-    var convertViewLinks = function(printElement) {
-        printElement.find('mms-view-link').each(function(index) {
+    public convertViewLinks(printElement) {
+        printElement.find('mms-view-link').each((index) => {
             var $this = $(this);
             var elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id');
             if (!elementId) {
@@ -1096,118 +1077,118 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 };
      * @returns {string} document/view content string to be passed to the server for conversion
      */
-    var getPrintCss = function(htmlFlag, landscape, meta) {
+    public getPrintCss(htmlFlag, landscape, meta) {
         var ret = "/*------------------------------------------------------------------\n" +
-                "Custom CSS Table of Contents\n" +
-                "1. Images\n" +
-                "2. Tables\n" +
-                "3. Typography\n" +
-                "   3.1 Diff\n" +
-                "   3.2 Errors\n" +
-                "4. Figure Captions\n" +
-                "5. Table of Contents\n" +
-                "6. Page Layout\n" +
-                "7. Headers and Footers\n" +
-                "8. Signature Box\n" +
-                "9. Bookmark Level\n" +
-                "------------------------------------------------------------------*/\n" +
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "1. Images\n" +
-                "------------------------------------------------------------------*/\n" +
-                "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
-                "img.image-center {display: block;}\n" +
-                "figure img {display: block;}\n" +
-                ".pull-right {float: right;}\n" + 
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "2. Tables\n" +
-                "------------------------------------------------------------------*/\n" +
-                " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" + 
-                "table {width: 100%; border-collapse: collapse;}\n" + 
-                "table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}\n" +
-                "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
-                "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
-                "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
-                "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
-                "th {background-color: #f2f3f2;}\n" + 
-                //"table p {word-break: break-all;}\n" + 
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "3. Typography\n" +
-                "------------------------------------------------------------------*/\n" +
-                "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
-                //"h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
-                ".h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}\n" +
-                ".ng-hide {display: none;}\n" +
-                ".chapter h1.view-title {font-size: 20pt; }\n" + 
-                "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" + 
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "   3.1 Diff\n" +
-                "------------------------------------------------------------------*/\n" +
-                "ins, .ins {color: black; background: #dafde0;}\n" +
-                "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
-                ".match,.textdiff span {color: gray;}\n" +
-                ".patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {background-color: #dafde0;}\n" +
-                ".patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {border: 2px dashed #abffb9;}\n" +
-                ".patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {background-color: #ffe3e3; text-decoration: line-through;}\n" +
-                ".patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {border: 2px dashed #ffb6b6;}\n" +
-                ".patcher-text-insertion, .patcher-text-deletion {display: inline !important;}\n" +
-                "[class*=\"patcher-\"]:not(td):not(tr) {display: inline-block;}\n" +
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "   3.2 Errors\n" +
-                "------------------------------------------------------------------*/\n" +
-                ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "4. Figure Captions\n" +
-                "------------------------------------------------------------------*/\n" +
-                "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
-                "table, figure {margin-bottom: 10px;}\n" +
-                ".mms-equation-caption {float: right;}\n" +
-                "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}\n" +
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "5. Table of Contents\n" +
-                "------------------------------------------------------------------*/\n" +
-                ".toc, .tof, .tot {page-break-after:always;}\n" +
-                ".toc {page-break-before: always;}\n" +
-                ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" + 
-                ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" +
-                ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
-                ".tof ul, .tot ul {padding-left:0;}\n" +
-                ".toc ul {padding-left:4em;}\n" +
-                ".toc > ul {padding-left:0;}\n" +
-                ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
-                ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
-                ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" + 
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "6. Page Layout\n" +
-                "------------------------------------------------------------------*/\n" +
-                "@page {margin: 0.5in;}\n" + 
-                "@page landscape {size: 11in 8.5in;}\n" +
-                ".landscape {page: landscape;}\n" +
-                ".chapter {page-break-before: always}\n" + 
-                "p, div {widows: 2; orphans: 2;}\n" +
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "7. Headers and Footers\n" +
-                "------------------------------------------------------------------*/\n" +
-                "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "8. Signature Box\n" +
-                "------------------------------------------------------------------*/\n" +
-                ".signature-box td.signature-name-styling {width: 60%;}\n" + 
-                ".signature-box td.signature-space-styling {width: 1%;}\n" + 
-                ".signature-box td.signature-date-styling {width: 39%;}\n" + 
-                "\n" +
-                "/*------------------------------------------------------------------\n" +
-                "9. Bookmark Level\n" +
-                "------------------------------------------------------------------*/\n" ;
+            "Custom CSS Table of Contents\n" +
+            "1. Images\n" +
+            "2. Tables\n" +
+            "3. Typography\n" +
+            "   3.1 Diff\n" +
+            "   3.2 Errors\n" +
+            "4. Figure Captions\n" +
+            "5. Table of Contents\n" +
+            "6. Page Layout\n" +
+            "7. Headers and Footers\n" +
+            "8. Signature Box\n" +
+            "9. Bookmark Level\n" +
+            "------------------------------------------------------------------*/\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "1. Images\n" +
+            "------------------------------------------------------------------*/\n" +
+            "img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n" +
+            "img.image-center {display: block;}\n" +
+            "figure img {display: block;}\n" +
+            ".pull-right {float: right;}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "2. Tables\n" +
+            "------------------------------------------------------------------*/\n" +
+            " tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n" +
+            "table {width: 100%; border-collapse: collapse;}\n" +
+            "table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}\n" +
+            "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
+            "table, th > p, td > p {margin: 0px; padding: 0px;}\n" +
+            "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
+            "table mms-transclude-doc p {margin: 0 0 5px;}\n" +
+            "th {background-color: #f2f3f2;}\n" +
+            //"table p {word-break: break-all;}\n" + 
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "3. Typography\n" +
+            "------------------------------------------------------------------*/\n" +
+            "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
+            //"h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
+            ".h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}\n" +
+            ".ng-hide {display: none;}\n" +
+            ".chapter h1.view-title {font-size: 20pt; }\n" +
+            "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "   3.1 Diff\n" +
+            "------------------------------------------------------------------*/\n" +
+            "ins, .ins {color: black; background: #dafde0;}\n" +
+            "del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n" +
+            ".match,.textdiff span {color: gray;}\n" +
+            ".patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {background-color: #dafde0;}\n" +
+            ".patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {border: 2px dashed #abffb9;}\n" +
+            ".patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {background-color: #ffe3e3; text-decoration: line-through;}\n" +
+            ".patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {border: 2px dashed #ffb6b6;}\n" +
+            ".patcher-text-insertion, .patcher-text-deletion {display: inline !important;}\n" +
+            "[class*=\"patcher-\"]:not(td):not(tr) {display: inline-block;}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "   3.2 Errors\n" +
+            "------------------------------------------------------------------*/\n" +
+            ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "4. Figure Captions\n" +
+            "------------------------------------------------------------------*/\n" +
+            "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
+            "table, figure {margin-bottom: 10px;}\n" +
+            ".mms-equation-caption {float: right;}\n" +
+            "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "5. Table of Contents\n" +
+            "------------------------------------------------------------------*/\n" +
+            ".toc, .tof, .tot {page-break-after:always;}\n" +
+            ".toc {page-break-before: always;}\n" +
+            ".toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n" +
+            ".toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n" +
+            ".toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n" +
+            ".tof ul, .tot ul {padding-left:0;}\n" +
+            ".toc ul {padding-left:4em;}\n" +
+            ".toc > ul {padding-left:0;}\n" +
+            ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
+            ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
+            ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "6. Page Layout\n" +
+            "------------------------------------------------------------------*/\n" +
+            "@page {margin: 0.5in;}\n" +
+            "@page landscape {size: 11in 8.5in;}\n" +
+            ".landscape {page: landscape;}\n" +
+            ".chapter {page-break-before: always}\n" +
+            "p, div {widows: 2; orphans: 2;}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "7. Headers and Footers\n" +
+            "------------------------------------------------------------------*/\n" +
+            "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "8. Signature Box\n" +
+            "------------------------------------------------------------------*/\n" +
+            ".signature-box td.signature-name-styling {width: 60%;}\n" +
+            ".signature-box td.signature-space-styling {width: 1%;}\n" +
+            ".signature-box td.signature-date-styling {width: 39%;}\n" +
+            "\n" +
+            "/*------------------------------------------------------------------\n" +
+            "9. Bookmark Level\n" +
+            "------------------------------------------------------------------*/\n" ;
         for (var i = 1; i < 10; i++) {
             ret += ".h" + i + " {bookmark-level: " + i + ";}\n";
         }
@@ -1218,10 +1199,10 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
                 "table { counter-increment: table-counter; }\n" +
                 "caption::before {content: \"Table \" counter(table-counter) \". \"; }\n";
         }
-        Object.keys(meta).forEach(function(key) {
+        Object.keys(meta).forEach((key) => {
             if (meta[key]) {
                 var content;
-                if (meta[key] === 'counter(page)') {
+                if (meta[key] === 'this.counter(page)') {
                     content = meta[key];
                 } else {
                     content = '"' + meta[key] + '"';
@@ -1246,13 +1227,13 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    var isView = function(e) {
+    public isView(e) {
         if (e._appliedStereotypeIds) {
-            if (e._appliedStereotypeIds.indexOf(VIEW_SID) >= 0 || e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
+            if (e._appliedStereotypeIds.indexOf(this.VIEW_SID) >= 0 || e._appliedStereotypeIds.indexOf(this.DOCUMENT_SID) >= 0) {
                 return true;
             }
-            for (var i = 0; i < OTHER_VIEW_SID.length; i++) {
-                if (e._appliedStereotypeIds.indexOf(OTHER_VIEW_SID[i]) >= 0) {
+            for (var i = 0; i < this.OTHER_VIEW_SID.length; i++) {
+                if (e._appliedStereotypeIds.indexOf(this.OTHER_VIEW_SID[i]) >= 0) {
                     return true;
                 }
             }
@@ -1271,28 +1252,28 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    var isDocument = function(e) {
-        if (e._appliedStereotypeIds && e._appliedStereotypeIds.indexOf(DOCUMENT_SID) >= 0) {
+    public isDocument(e) {
+        if (e._appliedStereotypeIds && e._appliedStereotypeIds.indexOf(this.DOCUMENT_SID) >= 0) {
             return true;
         }
         return false;
     };
 
-        /**
+    /**
      * @ngdoc method
      * @name mms.UtilsService#isRequirement
      * @methodOf mms.UtilsService
      *
      * @description
-     * Evaluates if an given element is a requirement from list given above: REQUIREMENT_SID
+     * Evaluates if an given element is a requirement from list given above: this.REQUIREMENT_SID
      *
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    var isRequirement = function(e) {
+    public isRequirement(e) {
         if (e._appliedStereotypeIds) {
-            for (var i = 0; i < REQUIREMENT_SID.length; i++) {
-                if (e._appliedStereotypeIds.indexOf(REQUIREMENT_SID[i]) >= 0) {
+            for (var i = 0; i < this.REQUIREMENT_SID.length; i++) {
+                if (e._appliedStereotypeIds.indexOf(this.REQUIREMENT_SID[i]) >= 0) {
                     return true;
                 }
             }
@@ -1312,31 +1293,31 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @param {Object} data contains htmlString, name, projectId, refId
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    var exportHtmlAs = function(exportType, data){
+    public exportHtmlAs(exportType, data){
         var accept;
         switch (exportType) {
-          case 2:
-              accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-              break;
-          case 3:
-              accept = 'application/pdf';
-              break;
-          default:
-              accept = 'application/pdf';
+            case 2:
+                accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                break;
+            case 3:
+                accept = 'application/pdf';
+                break;
+            default:
+                accept = 'application/pdf';
         }
-        var deferred = $q.defer();
-        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId), {
-            'Content-Type' : 'text/html',
-            'Accepts' : accept,
+        var deferred = this.$q.defer();
+        this.$http.post(this.uRLSvc.getExportHtmlUrl(data.projectId, data.refId), {
+            'Content-Type': 'text/html',
+            'Accepts': accept,
             'body': data.htmlString,
             'name': data.name,
             'css': data.css
         })
-        .then(function() {
-            deferred.resolve('ok');
-        }, function(error) {
-            URLService.handleHttpStatus(error.data, error.status, error.headers, error.config, deferred);
-        });
+            .then(() => {
+                deferred.resolve('ok');
+            }, (error) => {
+                this.uRLSvc.handleHttpStatus(error.data, error.status, error.headers, error.config, deferred);
+            });
         return deferred.promise;
     };
 
@@ -1348,46 +1329,46 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
      * @description
      * returns a class json object with all emf fields set to default, with
      * fields from passed in object substituted
-     * 
+     *
      */
-    var createClassElement = function(obj) {
-        var o = JSON.parse(JSON.stringify(CLASS_ELEMENT_TEMPLATE));
+    public createClassElement(obj) {
+        var o = JSON.parse(JSON.stringify(new Class()));
         Object.assign(o, obj);
         return o;
     };
 
-    var createInstanceElement = function(obj) {
-        var o = JSON.parse(JSON.stringify(INSTANCE_ELEMENT_TEMPLATE));
+    public createInstanceElement(obj) {
+        var o = JSON.parse(JSON.stringify(new InstanceSpec()));
         Object.assign(o, obj);
         return o;
     };
 
-    var createValueSpecElement = function(obj) {
-        var o = JSON.parse(JSON.stringify(VALUESPEC_ELEMENT_TEMPLATE));
+    public createValueSpecElement(obj) {
+        var o = JSON.parse(JSON.stringify(new ValueSpec()));
         Object.assign(o, obj);
         return o;
     };
 
-    var createGeneralizationElement = function(obj) {
-        var o = JSON.parse(JSON.stringify(GENERALIZATION_ELEMENT_TEMPLATE));
+    public createGeneralizationElement(obj) {
+        var o = JSON.parse(JSON.stringify(new Generalization()));
         Object.assign(o, obj);
         return o;
     };
 
-    var createPackageElement = function(obj) {
-        var o = JSON.parse(JSON.stringify(PACKAGE_ELEMENT_TEMPLATE));
+    public createPackageElement(obj) {
+        var o = JSON.parse(JSON.stringify(new Package()));
         Object.assign(o, obj);
         return o;
     };
 
-    var createDependencyElement = function(obj) {
-        var o = JSON.parse(JSON.stringify(DEPENDENCY_ELEMENT_TEMPLATE));
+    public createDependencyElement(obj) {
+        var o = JSON.parse(JSON.stringify(new Dependency()));
         Object.assign(o, obj);
         return o;
     };
 
-    var copyToClipboard = function(target, $event) {
-        $event.stopPropagation();
+    public copyToClipboard(target, $event) {
+        $event.this.stopPropagation();
         var range = window.document.createRange();
         range.selectNodeContents(target[0].childNodes[0]);
         window.getSelection().removeAllRanges();
@@ -1398,7 +1379,7 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         window.getSelection().removeAllRanges();
     };
 
-    var getElementTypeClass = function(element, elementType) {
+    public getElementTypeClass(element, elementType) {
         var elementTypeClass = '';
         if (element.type === 'InstanceSpecification') {
             elementTypeClass = 'pe-type-' + elementType;
@@ -1408,46 +1389,11 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
         return elementTypeClass;
     };
 
-    return {
-        VIEW_SID: VIEW_SID,
-        OTHER_VIEW_SID: OTHER_VIEW_SID,
-        DOCUMENT_SID: DOCUMENT_SID,
-        BLOCK_SID: BLOCK_SID,
-        createClassElement: createClassElement,
-        createInstanceElement: createInstanceElement,
-        createValueSpecElement: createValueSpecElement,
-        createGeneralizationElement: createGeneralizationElement,
-        createDependencyElement: createDependencyElement,
-        createPackageElement: createPackageElement,
-        hasCircularReference: hasCircularReference,
-        cleanElement: cleanElement,
-        normalize: normalize,
-        makeElementKey: makeElementKey,
-        makeArtifactKey: makeArtifactKey,
-        buildTreeHierarchy: buildTreeHierarchy,
-        filterProperties: filterProperties,
-        mergeElement: mergeElement,
-        hasConflict: hasConflict,
-        isRestrictedValue: isRestrictedValue,
-        makeHtmlTable : makeHtmlTable,
-        makeHtmlPara: makeHtmlPara,
-        makeHtmlList: makeHtmlList,
-        makeHtmlTOC: makeHtmlTOC,
-        makeTablesAndFiguresTOC: makeTablesAndFiguresTOC,
-        addLiveNumbering: addLiveNumbering,
-        convertViewLinks: convertViewLinks,
-        createMmsId: createMmsId,
-        getPrintCss: getPrintCss,
-        isView: isView,
-        isDocument: isDocument,
-        isRequirement: isRequirement,
-        exportHtmlAs: exportHtmlAs,
-        generateTOCHtmlOption: generateTOCHtmlOption,
-        generateAnchorId: generateAnchorId,
-        tableConfig: tableConfig,
-        _generateRowColNumber: _generateRowColNumber,
-        PROJECT_URL_PREFIX: PROJECT_URL_PREFIX,
-        copyToClipboard: copyToClipboard,
-        getElementTypeClass: getElementTypeClass
-    };
+
+
 }
+
+UtilsService.$inject = ['$q', '$http', 'CacheService', 'URLService', 'ApplicationService'];
+
+mms.service('UtilsService', UtilsService);
+

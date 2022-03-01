@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsC3Plot', ['TableService', '$window', '_', mmsC3Plot]);
+mmsDirectives.directive('mmsC3Plot', ['TableService', '$window', mmsC3Plot]);
 function mmsC3Plot(TableService, $window, _) {
       
   var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {

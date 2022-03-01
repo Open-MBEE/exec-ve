@@ -4,13 +4,13 @@ var mmsApp = angular.module('mmsApp');
 
 /* Controllers */
 
-mmsApp.controller('FullDocCtrl', ['$scope', '$state', '$anchorScroll', '$location', '$timeout', '$http', 'FullDocumentService', 'ShortenUrlService',
-    'hotkeys', 'growl', '_', 'MmsAppUtils', 'Utils', 'UxService', 'URLService', 'UtilsService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
+mmsApp.controller('FullDocCtrl', ['$scope', '$window', '$state', '$anchorScroll', '$location', '$timeout', '$http', 'FullDocumentService', 'ShortenUrlService',
+    'hotkeys', 'growl', 'MmsAppUtils', 'Utils', 'UxService', 'URLService', 'UtilsService', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb',
     'PermissionsService', 'RootScopeService', 'TreeService', 'EventService',
-function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocumentService, ShortenUrlService, hotkeys, growl, _,
+function($scope, $window, $state, $anchorScroll, $location, $timeout, $http, FullDocumentService, ShortenUrlService, hotkeys, growl,
     MmsAppUtils, Utils, UxService, URLService, UtilsService, search, orgOb, projectOb, refOb, groupOb, documentOb, PermissionsService,
     RootScopeService, TreeService, EventService) {
-
+    const _ = $window._;
     let rootScopeSvc = RootScopeService;
     let tree = TreeService.getApi();
 
@@ -114,7 +114,7 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
         // to let them finish first because in this case
         // we rely on fa-pane directive to setup isScrollVisible
         $timeout(function() {
-            fullDocumentService = new FullDocumentService(views);
+            fullDocumentService = FullDocumentService.get(views);
             fullDocumentService.addInitialViews($scope.scrollApi.isScrollVisible);
             $scope.views = fullDocumentService.viewsBuffer;
         });

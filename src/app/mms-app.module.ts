@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 //import * as uiRouter from '@uirouter/angularjs';
 
-var mmsApp = angular.module('mmsApp', ['mms', 'mmsDirectives', 'fa.directive.borderLayout', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
+var mmsApp = angular.module('mmsApp', ['mms', 'mmsDirectives', 'ui.bootstrap', 'ui.router', 'ui.tree', 'angular-growl', 'rx', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
 //var mmsApp = angular.module('mmsApp', ['mms', 'mmsDirectives', 'fa.directive.borderLayout', 'ui.bootstrap', uiRouter.default, 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
 
 mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $httpProvider, $provide, URLServiceProvider, $locationProvider) {
@@ -346,8 +346,7 @@ mmsApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$provid
                 template: '<ve-menu mms-org="$resolve.orgOb" mms-project="$resolve.projectOb" mms-projects="$resolve.projectObs" mms-ref="$resolve.refOb" mms-refs="$resolve.refObs" mms-branch="$resolve.branchOb" mms-branches="$resolve.branchObs" mms-tag="$resolve.tagOb" mms-tags="$resolve.tagObs"></ve-menu>'
             },
             'manageRefs@': {
-                templateUrl: 'partials/mms/manage-refs.html',
-                controller: 'RefsCtrl'
+                template: '<refs mms-org="$resolve.orgOb" mms-project="$resolve.projectOb" mms-ref="$resolve.refOb" mms-refs="$resolve.refObs" mms-branches="$resolve.branchObs" mms-tags="$resolve.tagObs"></refs>'
             }
         }
     })

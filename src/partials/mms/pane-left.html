@@ -1,10 +1,10 @@
 <div fa-pane pane-anchor="north" pane-size="78px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-left">
         <div class="pane-left-toolbar" role="toolbar">
-            <button-bar-component buttons="buttons" mms-bb-api="bbApi"></button-bar-component>
+            <button-bar buttons="buttons" mms-bb-api="bbApi"></button-bar>
         </div>
         <div class="tree-options">
-            <button-bar-component buttons="treeButtons" mms-bb-api="tbApi"></button-bar-component>
+            <button-bar buttons="treeButtons" mms-bb-api="tbApi"></button-bar>
             <input class="ve-plain-input" ng-model-optoins="{debounce: 1000}"
                 ng-model="treeOptions.search" type="text" placeholder="{{filterInputPlaceholder}}"
                 ng-change="searchInputChangeHandler();" style="flex:2">

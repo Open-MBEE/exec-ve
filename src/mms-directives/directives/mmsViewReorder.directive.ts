@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsViewReorder', ['ElementService', 'ViewService', 'PermissionsService', '$templateCache', 'growl', '$q', '_', mmsViewReorder]);
+mmsDirectives.directive('mmsViewReorder', ['ElementService', 'ViewService', 'PermissionsService', '$templateCache', 'growl', '$q', mmsViewReorder]);
 
 /**
  * @ngdoc directive

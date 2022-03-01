@@ -7,20 +7,20 @@ var mmsApp = angular.module('mmsApp');
 let LeftPaneComponent = {
   selector: "leftPane",
   template: `
-  <div fa-pane pane-anchor="north" pane-size="78px" pane-no-toggle="true" pane-no-scroll="true">
+  <fa-pane pane-anchor="north" pane-size="78px" pane-no-toggle="true" pane-no-scroll="true">
     <div class="pane-left">
         <div class="pane-left-toolbar" role="toolbar">
-            <button-bar-component buttons="$ctrl.buttons" button-control="$ctrl.bbApi"></button-bar-component>
+            <button-bar buttons="$ctrl.buttons" button-control="$ctrl.bbApi"></button-bar>
         </div>
         <div class="tree-options">
-            <button-bar-component buttons="$ctrl.treeButtons" button-control="$ctrl.tbApi"></button-bar-component>
+            <button-bar buttons="$ctrl.treeButtons" button-control="$ctrl.tbApi"></button-bar>
             <input class="ve-plain-input" ng-model-options="{debounce: 1000}"
                 ng-model="$ctrl.treeOptions.search" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
                 ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
         </div>
     </div>
-</div>
-<div fa-pane pane-anchor="center" pane-no-toggle="true">
+</fa-pane>
+<fa-pane fa-pane pane-anchor="center" pane-no-toggle="true">
     <div class="pane-left" style="display:table;">
         <tree ng-show="'showTree'==(activeMenu)" tree-data="$ctrl.treeData" tree-control="$ctrl.treeControl"
                 initial-selection="{{$ctrl.initialSelection}}" options="$ctrl.treeOptions"></tree>
@@ -44,7 +44,7 @@ let LeftPaneComponent = {
         </div>
 
     </div>
-</div>
+</fa-pane>
 `,
   bindings: {
     documentOb: "<",
@@ -55,10 +55,10 @@ let LeftPaneComponent = {
     groupObs: "<",
     docMeta: "<"
   },
-  controller: class TreePaneController {
+  controller: class LeftPaneController {
     static $inject = ['$anchorScroll', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', 'growl',
       'UxService', 'ElementService', 'UtilsService', 'ViewService', 'ProjectService', 'MmsAppUtils', 'ToolbarService',
-      'TreeService', 'PermissionsService', 'RootScopeService', 'TreeService', 'EventService'];
+      'TreeService', 'PermissionsService', 'RootScopeService', 'EventService'];
 
     //Injected Dependencies
     private $anchorScroll
@@ -67,7 +67,6 @@ let LeftPaneComponent = {
     private $location
     private $uibModal
     private $scope
-    private $rootScope
     private $state
     private $timeout
     private growl
@@ -81,9 +80,11 @@ let LeftPaneComponent = {
     private rootScopeSvc
     private tree
     private eventSvc
+    private buttonBarSvc
 
     //Scope
     private subs
+    private bars
     private $pane
     private treeApi
 
@@ -120,7 +121,7 @@ let LeftPaneComponent = {
     private docMeta
 
     //Local Variables
-    readonly docEditable;
+    public docEditable;
     public addItemData
     // private newView: any;
     // private newGroup: { name: string };
@@ -128,7 +129,7 @@ let LeftPaneComponent = {
     // private createForm: boolean;
     // private resolvedBindings;
 
-    constructor($anchorScroll, $q, $filter, $location, $uibModal, $scope, $rootScope, $state, $timeout, growl, UxService,
+    constructor($anchorScroll, $q, $filter, $location, $uibModal, $scope, $state, $timeout, growl, UxService,
                 ElementService, UtilsService, ViewService, ProjectService, MmsAppUtils, ToolbarService, TreeService,
                 PermissionsService, RootScopeService, EventService) {
 
@@ -137,9 +138,9 @@ let LeftPaneComponent = {
       this.$filter = $filter;
       this.$location = $location;
       this.$uibModal = $uibModal;
+      //TODO: Replace $scope.$pane with re-implemented pane component
       this.$scope = $scope;
-      this.$pane = $scope.$pane;
-      this.$rootScope = $rootScope;
+      this.$pane = this.$scope.$parent.$parent.$parent.$pane;
       this.$state = $state;
       this.$timeout = $timeout;
       this.growl = growl;
@@ -154,18 +155,15 @@ let LeftPaneComponent = {
       this.tree = TreeService;
       this.eventSvc = EventService;
       this.rootScopeSvc = RootScopeService;
+      //this.buttonBarSvc = ButtonBarService;
 
 
-      this.bbApi = {};
 
-      this.tbApi = {};
       this.buttons = [];
       this.treeButtons = [];
 
-      if ($state.includes('project.ref.document.full')) {
-        this.rootScopeSvc.veFullDocMode(true);
-      }
-      this.docEditable = this.documentOb && this.refOb && this.refOb.type === 'Branch' && this.utilsSvc.isView(this.documentOb) && this.permissionsSvc.hasBranchEditPermission(this.refOb);
+
+
 
 
       this.tableList = [];
@@ -193,8 +191,14 @@ let LeftPaneComponent = {
 
     }
 
-    $onInit = () => {
+    $onInit() {
       this.eventSvc.$init(this);
+
+      if (this.$state.includes('project.ref.document.full')) {
+        this.rootScopeSvc.veFullDocMode(true);
+      }
+
+      this.docEditable = this.documentOb && this.refOb && this.refOb.type === 'Branch' && this.utilsSvc.isView(this.documentOb) && this.permissionsSvc.hasBranchEditPermission(this.refOb);
 
       this.rootScopeSvc.leftPaneClosed(this.$pane.closed);
 
@@ -204,6 +208,11 @@ let LeftPaneComponent = {
 
       this.treeApi = this.tree.getApi();
       this.treeData = this.tree.treeData;
+
+      //this.bbApi = this.buttonBarSvc.initApi("tree-button-bar",this.bbInit(),this);
+      //this.tbApi = this.buttonBarSvc.initApi("tree-tool-bar",this.tbInit(),this);
+      this.bbApi = {};
+      this.tbApi = {};
 
       this.bbApi.init = this.bbInit();
       this.tbApi.init = this.tbInit();
@@ -417,6 +426,11 @@ let LeftPaneComponent = {
       }
     }
 
+    $onDestroy() {
+      this.buttonBarSvc.destroy(this.bars);
+      this.eventSvc.destroy(this.subs);
+    }
+
     tbInit() {
       if (this.$state.includes('project.ref.document')) {
         const viewModeButton = this.uxSvc.getButtonBarButton("view-mode-dropdown");
@@ -426,27 +440,31 @@ let LeftPaneComponent = {
     };
 
     bbInit() {
-      this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-expand"));
-      this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-collapse"));
-      if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-reorder-group"));
-        this.bbApi.setPermission("tree-reorder-group", this.projectOb && this.permissionsSvc.hasProjectEditPermission(this.projectOb));
-        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-add-document-or-group"));
-        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-delete-document"));
-        this.bbApi.setPermission("tree-add-document-or-group", (this.refOb.type !== 'Tag') && this.permissionsSvc.hasBranchEditPermission(this.refOb));
-        this.bbApi.setPermission("tree-delete-document", (this.refOb.type !== 'Tag') && this.permissionsSvc.hasBranchEditPermission(this.refOb));
-      } else if (this.$state.includes('project.ref.document')) {
-        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-reorder-view"));
-        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-full-document"));
-        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-add-view"));
-        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-delete-view"));
-        this.bbApi.setPermission("tree-add-view", this.docEditable);
-        this.bbApi.setPermission("tree-reorder-view", this.docEditable);
-        this.bbApi.setPermission("tree-delete-view", this.docEditable);
-        if (this.rootScopeSvc.veFullDocMode()) {
-          this.bbApi.setToggleState('tree-full-document', true);
+      if (typeof this.bbApi.addButton === 'function') {
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-expand"));
+        this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-collapse"));
+        if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
+          this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-reorder-group"));
+          this.bbApi.setPermission("tree-reorder-group", this.projectOb && this.permissionsSvc.hasProjectEditPermission(this.projectOb));
+          this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-add-document-or-group"));
+          this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-delete-document"));
+          this.bbApi.setPermission("tree-add-document-or-group", (this.refOb.type !== 'Tag') && this.permissionsSvc.hasBranchEditPermission(this.refOb));
+          this.bbApi.setPermission("tree-delete-document", (this.refOb.type !== 'Tag') && this.permissionsSvc.hasBranchEditPermission(this.refOb));
+        } else if (this.$state.includes('project.ref.document')) {
+          this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-reorder-view"));
+          this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-full-document"));
+          this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-add-view"));
+          this.bbApi.addButton(this.uxSvc.getButtonBarButton("tree-delete-view"));
+          this.bbApi.setPermission("tree-add-view", this.docEditable);
+          this.bbApi.setPermission("tree-reorder-view", this.docEditable);
+          this.bbApi.setPermission("tree-delete-view", this.docEditable);
+          if (this.rootScopeSvc.veFullDocMode()) {
+            this.bbApi.setToggleState('tree-full-document', true);
+          }
         }
+
       }
+
     };
 
     toggle(id) {

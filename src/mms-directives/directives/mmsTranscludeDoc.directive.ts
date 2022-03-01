@@ -2,7 +2,7 @@ import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
 mmsDirectives.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService',
-    'EventService', '$compile', '$templateCache', 'growl', '_', 'MathJax', mmsTranscludeDoc]);
+    'EventService', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeDoc]);
 
 /**
  * @ngdoc directive
@@ -38,8 +38,7 @@ mmsDirectives.directive('mmsTranscludeDoc', ['Utils','ElementService', 'UtilsSer
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, EventService, $compile, $templateCache, growl, _, MathJax) {
-
+function mmsTranscludeDoc(Utils, ElementService, UtilsService, ViewService, UxService, AuthService, EventService, $compile, growl, MathJax) {
     const eventSvc = EventService;
 
     var template = 'partials/mms-directives/mmsTranscludeDoc.html';

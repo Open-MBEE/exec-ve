@@ -1,23 +1,23 @@
 import * as angular from 'angular'
+import {EventService} from "./EventService.factory";
 var mms = angular.module('mms');
 
-mms.factory('SessionService', ['$window', 'EventService', '_', SessionService]);
+export class SessionService {
 
-function SessionService($window, EventService) {
+    private sessionStorage = this.$window.sessionStorage;
 
-    let sessionStorage = $window.sessionStorage;
-    let eventSvc = EventService;
+    public constants = {
+                DELETEKEY: 'session-delete'
+            };
 
-    const constants = {
-        DELETEKEY: 'session-delete'
-    };
+    constructor(private $window, private eventSvc : EventService) {}
 
-    let setStorage = (key, value) => {
+    private _setStorage = (key, value) => {
         value = value === void 0 ? null : JSON.stringify(value);
         return sessionStorage.setItem(key, value);
     };
 
-    const getStorage = (key) => {
+    private _getStorage = (key) => {
         let sessionValue = sessionStorage.getItem(key);
         if (sessionValue === "undefined") {
             return null;
@@ -25,41 +25,39 @@ function SessionService($window, EventService) {
         return JSON.parse(sessionValue);
     };
 
-    const removeStorage = (key) => {
+    private _removeStorage = (key) => {
         return sessionStorage.removeItem(key);
     };
 
-    const clear = () => {
+    public clear = () => {
         let key, results;
         results = [];
         for (key in sessionStorage) {
-            results.push(setStorage(key, null));
+            results.push(this._setStorage(key, null));
         }
         return results;
     };
 
-    const accessor = (name, value, defaultValue=null, emit=false) => {
+    public accessor = (name, value, defaultValue=null, emit=false) => {
         if (value == null) {
-            let val = getStorage(name);
+            let val = this._getStorage(name);
             if (val == null) {
                 val = defaultValue;
-                setStorage(name, val);
+                this._setStorage(name, val);
             }
             return val;
         }
-        if (value === constants.DELETEKEY) {
-            return removeStorage(name);
+        if (value === this.constants.DELETEKEY) {
+            return this._removeStorage(name);
         }
-        const result = setStorage(name, value);
+        const result = this._setStorage(name, value);
         if (emit) {
-            eventSvc.$broadcast(name,value);
+            this.eventSvc.$broadcast(name,value);
         }
         return result;
     };
-
-    return {
-        clear: clear,
-        accessor: accessor,
-        constants: constants
-    };
 }
+
+SessionService.$inject = ['$window', 'EventService'];
+
+mms.service('SessionService', SessionService);

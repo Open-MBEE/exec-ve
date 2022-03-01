@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsCkeditor', ['$uibModal', '$templateCache', '$timeout', 'growl', 'CKEDITOR', '_', 'CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'Utils', mmsCkeditor]);
+mmsDirectives.directive('mmsCkeditor', ['$window', '$uibModal', '$templateCache', '$timeout', 'growl', 'CKEDITOR', 'CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'Utils', mmsCkeditor]);
 
 /**
  * @ngdoc directive
@@ -30,7 +30,8 @@ mmsDirectives.directive('mmsCkeditor', ['$uibModal', '$templateCache', '$timeout
    <textarea mms-ckeditor ng-model="element.documentation"></textarea>
    </pre>
  */
-function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, CacheService, ElementService, UtilsService, ViewService, URLService, MentionService, Utils) { //depends on angular bootstrap
+function mmsCkeditor($window, $uibModal, $templateCache, $timeout, growl, CKEDITOR, CacheService, ElementService, UtilsService, ViewService, URLService, MentionService, Utils) { //depends on angular bootstrap
+    const _ = $window._;
     var generatedIds = 0;
 
     var mmsCkeditorLink = function(scope, element, attrs, ngModelCtrl) {

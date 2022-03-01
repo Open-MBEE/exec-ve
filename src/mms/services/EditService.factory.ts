@@ -1,53 +1,46 @@
 import * as angular from 'angular'
+import {EventService} from "./EventService.factory";
 var mms = angular.module('mms');
 
-mms.factory('EditService', ['EventService', EditService]);
+export class EditService {
+    private edits = {};
+    public EVENT = 've-edits';
+    constructor ( private eventSvc : EventService) {}
 
-function EditService(EventService) {
-    let eventSvc = EventService;
-    let edits = {};
-    let EVENT = 've-edits';
-
-    const trigger = () => {
-        eventSvc.$broadcast(EVENT);
+    trigger() {
+        this.eventSvc.$broadcast(this.EVENT);
     };
 
-    const get = (key) => {
-        return edits[key];
+    get(key) {
+        return this.edits[key];
     };
 
-    const getAll = () => {
-        return edits;
+    getAll() {
+        return this.edits;
     };
 
-    const openEdits = () => {
-        return Object.keys(edits).length;
+    openEdits() {
+        return Object.keys(this.edits).length;
     };
 
-    const addOrUpdate = (key, value) => {
-        edits[key] = value;
-        trigger();
+    addOrUpdate(key, value) {
+        this.edits[key] = value;
+        this.trigger();
     };
 
-    const remove = (key) => {
-        delete edits[key];
-        trigger();
+    remove(key) {
+        delete this.edits[key];
+        this.trigger();
     };
 
-    var reset = function() {
-        var keys = Object.keys(edits);
-        for (var i = 0; i < keys.length; i++) {
-            delete edits[keys[i]];
+    reset() {
+        let keys = Object.keys(this.edits);
+        for (let i = 0; i < keys.length; i++) {
+            delete this.edits[keys[i]];
         }
     };
-
-    return {
-        get: get,
-        getAll: getAll,
-        openEdits: openEdits,
-        addOrUpdate: addOrUpdate,
-        remove: remove,
-        reset: reset,
-        EVENT: EVENT
-    };
 }
+
+EditService.$inject = ['EventService'];
+
+mms.service('EditService', EditService);

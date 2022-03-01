@@ -4,8 +4,9 @@ var mmsApp = angular.module('mmsApp');
 
 /* Controllers */
 
-mmsApp.controller('MainCtrl', ['$scope', '$timeout', '$location', '$rootScope', '$state', '_', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'EditService', 'EventService', '$interval',
-function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, RootScopeService, EditService, EventService, $interval) {
+mmsApp.controller('MainCtrl', ['$scope', '$timeout', '$location', '$state', '$window', '$uibModal', 'growl', '$http', 'URLService', 'hotkeys', 'growlMessages', 'UtilsService', 'HttpService', 'AuthService', 'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'EditService', 'EventService', '$interval',
+function($scope, $timeout, $location, $state, $window, $uibModal, growl, $http, URLService, hotkeys, growlMessages, UtilsService, HttpService, AuthService, ElementService, CacheService, ApplicationService, RootScopeService, EditService, EventService, $interval) {
+    var _ = $window._;
     var rootScopeSvc = RootScopeService;
     var edit = EditService;
     var eventSvc = EventService;
@@ -51,25 +52,40 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         });
 
     $scope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
-        rootScopeSvc.veStateChanging(false);
-        rootScopeSvc.veViewContentLoading(false);
-        //check if error is ticket error
-        if (!error || error.status === 401 || 
-                (error.status === 404 && error.config && error.config.url && 
-                error.config.url.indexOf('/authentication') !== -1)) { //check if 404 if checking valid ticket
-            event.preventDefault();
-            rootScopeSvc.veRedirect({toState: toState, toParams: toParams});
-            $state.go('login', {notify: false});
-            return;
+        let data = {
+            event: event,
+            toState: toState,
+            toParams: toParams,
+            fromState: fromState,
+            fromParams: fromParams,
+            error: error
         }
-        growl.error('Error: ' + error.message);
+        eventSvc.$broadcast('$stateChangeError', data)
     });
 
-    $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
-        rootScopeSvc.veViewContentLoading(true);
-        HttpService.transformQueue();
-        rootScopeSvc.veStateChanging(true);
+    $scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+        let data = {
+            event: event,
+            toState: toState,
+            toParams: toParams,
+            fromState: fromState,
+            fromParams: fromParams
+        }
+        eventSvc.$broadcast('$stateChangeStart', data)
     });
+
+    $scope.$on('$stateChangeSuccess',
+        function(event, toState, toParams, fromState, fromParams) {
+            let data = {
+                event: event,
+                toState: toState,
+                toParams: toParams,
+                fromState: fromState,
+                fromParams: fromParams
+            }
+            eventSvc.$broadcast('$stateChangeSuccess', data)
+        }
+    );
 
    $scope.subs.push(eventSvc.$on('mms.unauthorized', function(response) {
         // add a boolean to the 'or' statement to check for modal window
@@ -125,57 +141,76 @@ function($scope, $timeout, $location, $rootScope, $state, _, $window, $uibModal,
         eventSvc.$broadcast('mms.unauthorized');
     }, 600000, 0, false);
 
-    $scope.$on('$stateChangeSuccess',
-        function(event, toState, toParams, fromState, fromParams) {
-            rootScopeSvc.veStateChanging(false);
-            $scope.hidePanes = false;
-            $scope.showManageRefs = false;
-            $scope.showLogin = false;
-            if ($state.current.name === 'login' || $state.current.name === 'login.select' || $state.current.name === 'login.redirect') {
-                $scope.hidePanes = true;
-                $scope.showLogin = true;
-            } else if ( $state.includes('project') && !($state.includes('project.ref')) ) {
-                $scope.hidePanes = true;
-                $scope.showManageRefs = true;
-                eventSvc.$broadcast('fromParamChange', fromParams);
-            }
-            if ($state.current.name === 'project.ref') {
-                rootScopeSvc.treeInitialSelection(toParams.refId);
-            } else if ($state.current.name === 'project.ref.preview') {
-                var index = toParams.documentId.indexOf('_cover');
-                if (index > 0)
-                    rootScopeSvc.treeInitialSelection(toParams.documentId.substring(5, index));
-                else
-                    rootScopeSvc.treeInitialSelection(toParams.documentId);
-            } else if ($state.includes('project.ref.document') && ($state.current.name !== 'project.ref.document.order')) {
-                if (toParams.viewId !== undefined)
-                    rootScopeSvc.treeInitialSelection(toParams.viewId);
-                else
-                    rootScopeSvc.treeInitialSelection(toParams.documentId);
-            }
-            if ($state.includes('project.ref.document')) {
-                ApplicationService.getState().inDoc = true;
-                ApplicationService.getState().currentDoc = toParams.documentId;
-                if ($state.includes('project.ref.document.full')) {
-                    ApplicationService.getState().fullDoc = true;
-                } else {
-                    ApplicationService.getState().fullDoc = false;
-                }
+    $scope.subs.push(eventSvc.$on('$stateChangeError', (data) => {
+        rootScopeSvc.veStateChanging(false);
+        rootScopeSvc.veViewContentLoading(false);
+        //check if error is ticket error
+        if (!data.error || data.error.status === 401 ||
+            (data.error.status === 404 && data.error.config && data.error.config.url &&
+                data.error.config.url.indexOf('/authentication') !== -1)) { //check if 404 if checking valid ticket
+            data.event.preventDefault();
+            rootScopeSvc.veRedirect({toState: data.toState, toParams: data.toParams});
+            $state.go('login', {notify: false});
+            return;
+        }
+        growl.error('Error: ' + data.error.message);
+    }));
+
+    $scope.subs.push(eventSvc.$on('$stateChangeStart', (data) => {
+        rootScopeSvc.veViewContentLoading(true);
+        HttpService.transformQueue();
+        rootScopeSvc.veStateChanging(true);
+    }));
+
+    $scope.subs.push(eventSvc.$on('$stateChangeSuccess', (data) => {
+        rootScopeSvc.veStateChanging(false);
+        $scope.hidePanes = false;
+        $scope.showManageRefs = false;
+        $scope.showLogin = false;
+        if ($state.current.name === 'login' || $state.current.name === 'login.select' || $state.current.name === 'login.redirect') {
+            $scope.hidePanes = true;
+            $scope.showLogin = true;
+        } else if ( $state.includes('project') && !($state.includes('project.ref')) ) {
+            $scope.hidePanes = true;
+            $scope.showManageRefs = true;
+            eventSvc.$broadcast('fromParamChange', data.fromParams);
+        }
+        if ($state.current.name === 'project.ref') {
+            rootScopeSvc.treeInitialSelection(data.toParams.refId);
+        } else if ($state.current.name === 'project.ref.preview') {
+            var index = data.toParams.documentId.indexOf('_cover');
+            if (index > 0)
+                rootScopeSvc.treeInitialSelection(data.toParams.documentId.substring(5, index));
+            else
+                rootScopeSvc.treeInitialSelection(data.toParams.documentId);
+        } else if ($state.includes('project.ref.document') && ($state.current.name !== 'project.ref.document.order')) {
+            if (data.toParams.viewId !== undefined)
+                rootScopeSvc.treeInitialSelection(data.toParams.viewId);
+            else
+                rootScopeSvc.treeInitialSelection(data.toParams.documentId);
+        }
+        if ($state.includes('project.ref.document')) {
+            ApplicationService.getState().inDoc = true;
+            ApplicationService.getState().currentDoc = data.toParams.documentId;
+            if ($state.includes('project.ref.document.full')) {
+                ApplicationService.getState().fullDoc = true;
             } else {
-                ApplicationService.getState().inDoc = false;
                 ApplicationService.getState().fullDoc = false;
             }
-            rootScopeSvc.veViewContentLoading(false);
-            if ($state.includes('project.ref') && (fromState.name === 'login' || fromState.name === 'login.select' || fromState.name === 'project' || fromState.name === 'login.redirect')) {
-                $timeout(function() {
-                    eventSvc.$broadcast('tree-pane-toggle');
-                }, 1, false);
-                $timeout(function() {
-                    eventSvc.$broadcast('tree-pane-toggle');
-                }, 100, false);
-            }
+        } else {
+            ApplicationService.getState().inDoc = false;
+            ApplicationService.getState().fullDoc = false;
         }
-    );
+        rootScopeSvc.veViewContentLoading(false);
+        if ($state.includes('project.ref') && (data.fromState.name === 'login' || data.fromState.name === 'login.select' || data.fromState.name === 'project' || data.fromState.name === 'login.redirect')) {
+            $timeout(function() {
+                eventSvc.$broadcast('tree-pane-toggle');
+            }, 1, false);
+            $timeout(function() {
+                eventSvc.$broadcast('tree-pane-toggle');
+            }, 100, false);
+        }
+    }));
 
     var workingModalOpen = false;
    $scope.subs.push(eventSvc.$on('mms.working', function(response) {

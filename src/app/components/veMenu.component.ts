@@ -128,7 +128,7 @@ let VeMenuComponent = {
         public mmsDocument;
         public mmsView;
 
-        constructor($state, $templateCache, $sce, $timeout, $element, CacheService, UtilsService, RootScopeService) {
+        constructor($state, $sce, $timeout, $element, CacheService, UtilsService, RootScopeService) {
 
             this.$state = $state;
             this.$sce = $sce
@@ -136,6 +136,7 @@ let VeMenuComponent = {
             this.$element = $element;
             this.cache = CacheService;
             this.utils = UtilsService;
+            this.rootScopeSvc = RootScopeService;
 
             this.htmlTooltip = "Branch temporarily unavailable during duplication.";
 

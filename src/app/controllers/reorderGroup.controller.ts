@@ -3,9 +3,10 @@ var mmsApp = angular.module('mmsApp');
 
 
 
-mmsApp.controller('ReorderGroupCtrl', ['$scope', '$stateParams', '$state', 'growl', '_', 'ElementService', 'CacheService', 'TreeService', 'projectOb', 'refOb', 'groupObs', 'documentObs',
+mmsApp.controller('ReorderGroupCtrl', ['$scope', '$stateParams', '$state', 'growl', 'ElementService', 'CacheService', 'TreeService', 'projectOb', 'refOb', 'groupObs', 'documentObs',
 
-function ($scope, $stateParams, $state, growl, _, ElementService, CacheService, TreeService, projectOb, refOb, groupObs, documentObs) {
+function ($scope, $stateParams, $state, $window, growl, ElementService, CacheService, TreeService, projectOb, refOb, groupObs, documentObs) {
+    const _ = $window._;
     $scope.isSaving = false;
     $scope.targetId = '';
     $scope.treeOptions = {

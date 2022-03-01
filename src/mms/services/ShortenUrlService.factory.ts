@@ -1,28 +1,33 @@
 import * as angular from "angular";
+import {URLService} from "./URLService.provider";
+import {UtilsService} from "./UtilsService.factory";
 var mms = angular.module('mms');
 
-mms.factory('ShortenUrlService', ['$http', '$q', 'URLService', 'UtilsService', ShortenUrlService]);
 
-function ShortenUrlService($http, $q, URLService, UtilsService) {
 
-    function getShortUrl(currentUrl, scope) {
+class ShortenUrlService {
+
+    public dynamicPopover: {
+        templateUrl: 'shareUrlTemplate.html',
+        title: 'Share'
+    }
+    constructor(private $http, private $q, private uRLSvc : URLService, private utilsSvc : UtilsService) {}
+
+    public getShortUrl(currentUrl, scope) {
         var SHARE_URL = 'https://opencae.jpl.nasa.gov/goto/';
-        return $http.post('https://purl-prod.jpl.nasa.gov/create', {'url': currentUrl}, {headers: {'Authorization': 'Basic Og=='}})
-            .then(function (response) {
+        return this.$http.post('https://purl-prod.jpl.nasa.gov/create', {'url': currentUrl}, {headers: {'Authorization': 'Basic Og=='}})
+            .then((response) => {
                 scope.shortUrl = SHARE_URL + response.data.link;
-            }, function (response) {
-                return URLService.handleHttpStatus(response.data, response.status, response.headers, response.config, $q.defer());
+            }, (response) => {
+                return this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, this.$q.defer());
             });
     }
 
-    return {
-        dynamicPopover: {
-            templateUrl: 'shareUrlTemplate.html',
-            title: 'Share'
-        },
-        copyToClipboard: function ($event) {
-            UtilsService.copyToClipboard($('#ve-short-url'), $event);
-        },
-        getShortUrl: getShortUrl
-    };
+    public copyToClipboard($event) {
+        this.utilsSvc.copyToClipboard($('#ve-short-url'), $event);
+    }
 }
+
+ShortenUrlService.$inject = ['$http', '$q', 'URLService', 'UtilsService'];
+
+mms.service('ShortenUrlService', ShortenUrlService);

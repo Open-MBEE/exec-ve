@@ -2,23 +2,23 @@ import * as angular from "angular";
 var mms = angular.module('mms');
 
 
-class URLServiceProvider {
+export class URLServiceProvider {
     private baseUrl = '/api';
     private mmsUrl = 'localhost:8080';
 
     constructor() {
     };
 
-    setBaseUrl = function (base) {
+   setBaseUrl(base) {
         this.baseUrl = base;
     };
-    setMmsUrl = function (mms) {
+   setMmsUrl(mms) {
         this.mmsUrl = mms;
     };
     $get() {
-        return urlService(this.baseUrl,this.mmsUrl);
+        return new URLService(this.baseUrl,this.mmsUrl);
     }
-};
+}
 
 mms.provider('URLService', URLServiceProvider)
 /**
@@ -43,40 +43,44 @@ mms.provider('URLService', URLServiceProvider)
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
-function urlService(baseUrl, mmsUrl) {
-    var root = mmsUrl + baseUrl;
-    var jobsRoot = 'https://cae-pma-int:8443/';
-    var token;
+export class URLService {
+    readonly root
 
-    var getRoot = function() {
-        return root;
+    private  token
+
+    constructor(private baseUrl, private mmsUrl) {
+        this.root = this.mmsUrl + this.baseUrl;
+    }
+
+    getRoot() {
+        return this.root;
     };
 
-    var setToken = function(t) {
-        token = t;
+    setToken(t) {
+        this.token = t;
     };
 
-    var getAuthorizationHeaderValue = function() {
-        return ('Bearer ' + token);
+    getAuthorizationHeaderValue() {
+        return ('Bearer ' + this.token);
     };
 
-    var getAuthorizationHeader = function(headers) {
-        if(!token) {
+    getAuthorizationHeader(headers) {
+        if (!this.token) {
             return headers;
         }
-        if(!headers) {
-            headers = getHeaders();
+        if (!headers) {
+            headers = this.getHeaders();
         }
-        headers.Authorization = getAuthorizationHeaderValue();
+        headers.Authorization = this.getAuthorizationHeaderValue();
         return headers;
     };
 
-    var getJMSHostname = function(){
-        return root + '/connection/jms';
+    getJMSHostname() {
+        return this.root + '/connection/jms';
     };
 
-    var getMmsServer = function() {
-        return mmsUrl;
+    getMmsServer() {
+        return this.mmsUrl;
     };
 
     /**
@@ -85,14 +89,14 @@ function urlService(baseUrl, mmsUrl) {
      * @methodOf mms.URLService
      *
      * @description
-     * Adds generates Default Headers using token
+     * Adds generates Default Headers using this.token
      *
      * @returns {object} The HTTP header format
      */
-    var getHeaders = function() {
+    getHeaders() {
         return {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token
+            Authorization: 'Bearer ' + this.token
         };
     };
 
@@ -107,10 +111,10 @@ function urlService(baseUrl, mmsUrl) {
      * @param {string} version A version string or timestamp
      * @returns {boolean} Returns true if the string has '-' in it
      */
-    var isTimestamp = function(version) {
+    isTimestamp(version?) {
         if (!version)
             return false;
-        if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim()))
+        else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim()))
             return true;
         return false;
     };
@@ -125,8 +129,8 @@ function urlService(baseUrl, mmsUrl) {
      *
      * @returns {object} Returns object with mmsversion
      */
-    var getMmsVersionURL = function() {
-        return root + "/mmsversion";
+    getMmsVersionURL() {
+        return this.root + "/mmsversion";
     };
 
     /**
@@ -140,8 +144,8 @@ function urlService(baseUrl, mmsUrl) {
      * @param {string} site Site name (not title!).
      * @returns {string} The path for site dashboard.
      */
-    var getSiteDashboardURL = function(site) {
-        return root + "/orgs/" + site + "/projects/" + site + "/branches/master/elements";
+    getSiteDashboardURL(site) {
+        return this.root + "/orgs/" + site + "/projects/" + site + "/branches/master/elements";
     };
 
     /**
@@ -155,59 +159,59 @@ function urlService(baseUrl, mmsUrl) {
      * @param {string} refId id of the ref
      * @returns {string} The url
      */
-    var getExportHtmlUrl = function(projectId, refId) {
-        return root + "/projects/" + projectId +
+    getExportHtmlUrl(projectId, refId) {
+        return this.root + "/projects/" + projectId +
             "/refs/" + refId + '/convert';
     };
 
 
-    var getAuthenticationUrl = function() {
-        return root + "/authentication";
+    getAuthenticationUrl() {
+        return this.root + "/authentication";
     };
 
-    var getPermissionsLookupURL = function() {
-        return root + "/permissions";
+    getPermissionsLookupURL() {
+        return this.root + "/permissions";
     };
 
-    var getOrgURL = function(orgId) {
-        return root + '/orgs/' + orgId;
+    getOrgURL(orgId) {
+        return this.root + '/orgs/' + orgId;
     };
 
-    var getOrgsURL = function() {
-        return root + "/orgs";
+    getOrgsURL() {
+        return this.root + "/orgs";
     };
 
-    var getProjectsURL = function(orgId) {
+    getProjectsURL(orgId) {
         if (orgId)
-            return root + '/projects?orgId=' + orgId;
-        return root + '/projects';
+            return this.root + '/projects?orgId=' + orgId;
+        return this.root + '/projects';
     };
 
-    var getProjectURL = function(projectId) {
-        return root + "/projects/" + projectId;
+    getProjectURL(projectId) {
+        return this.root + "/projects/" + projectId;
     };
 
-    var getProjectMountsURL = function(projectId, refId) {
-        return root + '/projects/' + projectId + '/refs/' + refId + '/mounts';
+    getProjectMountsURL(projectId, refId) {
+        return this.root + '/projects/' + projectId + '/refs/' + refId + '/mounts';
     };
 
-    var getRefsURL = function(projectId) {
-        return root + '/projects/' + projectId + '/refs';
+    getRefsURL(projectId) {
+        return this.root + '/projects/' + projectId + '/refs';
     };
 
-    var getRefURL = function(projectId, refId) {
-        return root + '/projects/' + projectId + '/refs/' + refId;
+    getRefURL(projectId, refId) {
+        return this.root + '/projects/' + projectId + '/refs/' + refId;
     };
 
-    var getRefHistoryURL = function(projectId, refId, timestamp) {
-        if (timestamp !== '' && isTimestamp(timestamp)) {
-            return root + '/projects/' + projectId + '/refs/' + refId + '/commits' + '&maxTimestamp=' + timestamp + '&limit=1';
+    getRefHistoryURL(projectId, refId, timestamp?) {
+        if (timestamp !== '' && this.isTimestamp(timestamp)) {
+            return this.root + '/projects/' + projectId + '/refs/' + refId + '/commits' + '&maxTimestamp=' + timestamp + '&limit=1';
         }
-        return root + '/projects/' + projectId + '/refs/' + refId + '/commits';
+        return this.root + '/projects/' + projectId + '/refs/' + refId + '/commits';
     };
 
-    var getGroupsURL = function(projectId, refId) {
-        return root + '/projects/' + projectId + '/refs/' + refId + '/groups';
+    getGroupsURL(projectId, refId) {
+        return this.root + '/projects/' + projectId + '/refs/' + refId + '/groups';
     };
 
     /**
@@ -221,11 +225,11 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url
      */
-    var getProjectDocumentsURL = function(reqOb) {
-        var r = root + "/projects/" + reqOb.projectId +
+    getProjectDocumentsURL(reqOb) {
+        var r = this.root + "/projects/" + reqOb.projectId +
             "/refs/" + reqOb.refId +
             "/documents";
-        return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
+        return this.addExtended(this.addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
     /**
@@ -239,10 +243,10 @@ function urlService(baseUrl, mmsUrl) {
      *
      * @returns {string} The path for image url queries.
      */
-    var getImageURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
+    getImageURL(reqOb) {
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' +
             reqOb.elementId;
-        return addVersion(r, reqOb.commitId);
+        return this.addVersion(r, reqOb.commitId);
     };
 
     /**
@@ -256,33 +260,33 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
-    var getElementURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
-        return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
+    getElementURL(reqOb) {
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        return this.addExtended(this.addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
-    var getViewElementIdsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
+    getViewElementIdsURL(reqOb) {
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/cfids';
         return r;
     };
 
-    var getViewsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
+    getViewsURL(reqOb) {
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
         return r;
     };
 
-    var getOwnedElementURL = function(reqOb) {
+    getOwnedElementURL(reqOb) {
         var recurseString = 'recurse=true';
         if (reqOb.depth)
             recurseString = 'depth=' + reqOb.depth;
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
-        r = addVersion(r, reqOb.commitId);
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        r = this.addVersion(r, reqOb.commitId);
         if (r.indexOf('?') > 0) {
             r += '&' + recurseString;
         } else {
             r += '?' + recurseString;
         }
-        return addExtended(r, reqOb.extended);
+        return this.addExtended(r, reqOb.extended);
     };
 
     /**
@@ -296,8 +300,8 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
-    var getElementHistoryURL = function(reqOb) {
-        return root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
+    getElementHistoryURL(reqOb) {
+        return this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/commits';
     };
 
     /**
@@ -311,8 +315,8 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
-    var getPostElementsURL = function(reqOb) {
-        return addExtended(addChildViews(root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views', reqOb.returnChildViews), reqOb.extended);
+    getPostElementsURL(reqOb) {
+        return this.addExtended(this.addChildViews(this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views', reqOb.returnChildViews), reqOb.extended);
     };
 
     /**
@@ -326,9 +330,9 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
-    var getPutElementsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views';
-        return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
+    getPutElementsURL(reqOb) {
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views';
+        return this.addExtended(this.addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
     /**
@@ -342,9 +346,9 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
-    var getElementSearchURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
-        return addExtended(r, true);
+    getElementSearchURL(reqOb) {
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/search' + (reqOb.checkType ? '?checkType=true' : '');
+        return this.addExtended(r, true);
     };
 
     /**
@@ -361,13 +365,13 @@ function urlService(baseUrl, mmsUrl) {
      * @param {string} urlParams provide optional query parameters
      * @returns {string} The url with ticket
      */
-    var getSearchURL = function(projectId, refId, urlParams) {
+    getSearchURL(projectId, refId, urlParams?) {
         var r;
-        if (urlParams !== undefined && urlParams !== null && urlParams !== ''){
+        if (urlParams !== undefined && urlParams !== null && urlParams !== '') {
             // ie '/search?checkType=true&literal=true';
-            r = root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
+            r = this.root + '/projects/' + projectId + '/refs/' + refId + '/search?' + urlParams;
         } else {
-            r = root + '/projects/' + projectId + '/refs/' + refId + '/search';
+            r = this.root + '/projects/' + projectId + '/refs/' + refId + '/search';
         }
         return r;
     };
@@ -384,10 +388,10 @@ function urlService(baseUrl, mmsUrl) {
      * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    var getArtifactURL = function(reqOb,artifactExtension) {
+    getArtifactURL(reqOb, artifactExtension) {
         var ext = (artifactExtension !== undefined) ? artifactExtension : reqOb.artifactExtension;
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
-        return addToken(addVersion(r, reqOb.commitId));
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
+        return this.addToken(this.addVersion(r, reqOb.commitId));
     };
 
     /**
@@ -396,16 +400,16 @@ function urlService(baseUrl, mmsUrl) {
      * @methodOf mms.URLService
      *
      * @description
-     * Gets the url without added token for an artifact
+     * Gets the url without added this.token for an artifact
      *
      * @param {object} reqOb object with keys
      * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    var getArtifactEmbedURL = function(reqOb,artifactExtension) {
+    getArtifactEmbedURL(reqOb, artifactExtension) {
         var ext = (artifactExtension !== undefined) ? artifactExtension : reqOb.artifactExtension;
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
-        return addVersion(r, reqOb.commitId);
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId + '/' + ext;
+        return this.addVersion(r, reqOb.commitId);
     };
 
     /**
@@ -419,9 +423,9 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys
      * @returns {string} url
      */
-    var getPutArtifactsURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
-        return addVersion(r, reqOb.commitId);
+    getPutArtifactsURL(reqOb) {
+        var r = this.root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        return this.addVersion(r, reqOb.commitId);
     };
 
     /**
@@ -435,20 +439,20 @@ function urlService(baseUrl, mmsUrl) {
      * @param {object} reqOb object with keys
      * @returns {string} url
      */
-    var getArtifactHistoryURL = function(reqOb) {
-        return getElementHistoryURL(reqOb);
+    getArtifactHistoryURL(reqOb) {
+        return this.getElementHistoryURL(reqOb);
     };
 
-    var getCheckTokenURL = function(t) {
-        return root + '/checkAuth'; //TODO remove when server returns 404
+    getCheckTokenURL() {
+        return this.root + '/checkAuth'; //TODO remove when server returns 404
     };
 
-    var getPersonURL = function(username) {
-        //return root + '/checkAuth';
-        return root + '/users?user=' + username;
+    getPersonURL(username) {
+        //return this.root + '/checkAuth';
+        return this.root + '/users?user=' + username;
     };
 
-        /**
+    /**
      * @ngdoc method
      * @name mms.URLService#handleHttpStatus
      * @methodOf mms.URLService
@@ -472,7 +476,7 @@ function urlService(baseUrl, mmsUrl) {
      *          }
      *      ```
      */
-    var handleHttpStatus = function(data, status, header, config, deferred) {
+    handleHttpStatus(data, status, header, config, deferred) {
         var result = {status: status, data: data, message: ''};
         if (status === 404)
             result.message = "Not Found";
@@ -510,7 +514,7 @@ function urlService(baseUrl, mmsUrl) {
      * @param {String} server The mms server url for where elements are stored
      * @returns {string} The url with server parameter added.
      */
-    var addServer = function(url, server) {
+    private addServer(url, server) {
         if (url.indexOf('?') > 0)
             return url + '&mmsServer=' + server;
         else
@@ -529,7 +533,7 @@ function urlService(baseUrl, mmsUrl) {
      * @param {String} version The commit id
      * @returns {string} The url with commitId parameter added.
      */
-    var addVersion = function(url, version) {
+    private addVersion(url, version) {
         if (version === 'latest')
             return url;
         else if (version) {
@@ -541,7 +545,7 @@ function urlService(baseUrl, mmsUrl) {
         return url;
     };
 
-    var addExtended = function(url, extended) {
+    private addExtended(url, extended) {
         var r = url;
         if (!extended)
             return r;
@@ -552,7 +556,7 @@ function urlService(baseUrl, mmsUrl) {
         return r;
     };
 
-    var addChildViews = function(url, add) {
+    private addChildViews(url, add) {
         var r = url;
         if (!add)
             return r;
@@ -574,55 +578,10 @@ function urlService(baseUrl, mmsUrl) {
      * @param {String} url The url string for which to add token parameter argument.
      * @returns {string} The url with commitId parameter added.
      */
-    var addToken = function(url) {
+    addToken(url) {
             if (url.indexOf('?') > 0)
-                return url + '&token=' + token;
+                return url + '&token=' + this.token;
             else
-                return url + '?token=' + token;
+                return url + '?token=' + this.token;
     };
-
-
-    return {
-        getRoot: getRoot,
-        setToken: setToken,
-        getAuthorizationHeaderValue: getAuthorizationHeaderValue,
-        getAuthorizationHeader: getAuthorizationHeader,
-        getHeaders: getHeaders,
-        getJMSHostname: getJMSHostname,
-        getMmsServer: getMmsServer,
-        isTimestamp: isTimestamp,
-        getMmsVersionURL: getMmsVersionURL,
-        getSiteDashboardURL: getSiteDashboardURL,
-        getOrgURL: getOrgURL,
-        getOrgsURL: getOrgsURL,
-        getProjectsURL: getProjectsURL,
-        getProjectURL: getProjectURL,
-        getProjectMountsURL: getProjectMountsURL,
-        getRefsURL: getRefsURL,
-        getRefURL: getRefURL,
-        getRefHistoryURL: getRefHistoryURL,
-        getGroupsURL: getGroupsURL,
-        getElementURL: getElementURL,
-        getViewElementIdsURL: getViewElementIdsURL,
-        getPutElementsURL: getPutElementsURL,
-        getPostElementsURL: getPostElementsURL,
-        getOwnedElementURL: getOwnedElementURL,
-        getElementHistoryURL: getElementHistoryURL,
-        getElementSearchURL: getElementSearchURL,
-        getSearchURL: getSearchURL,
-        getProjectDocumentsURL: getProjectDocumentsURL,
-        getImageURL: getImageURL,
-        getExportHtmlUrl: getExportHtmlUrl,
-        getArtifactURL: getArtifactURL,
-        getArtifactEmbedURL: getArtifactEmbedURL,
-        getPutArtifactsURL: getPutArtifactsURL,
-        getArtifactHistoryURL: getArtifactHistoryURL,
-        getCheckTokenURL: getCheckTokenURL,
-        getPersonURL: getPersonURL,
-        handleHttpStatus: handleHttpStatus,
-        getAuthenticationUrl: getAuthenticationUrl,
-        getViewsURL: getViewsURL,
-        getPermissionsLookupURL: getPermissionsLookupURL
-    };
-
 }
