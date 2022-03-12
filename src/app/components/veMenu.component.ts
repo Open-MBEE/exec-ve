@@ -1,8 +1,12 @@
 import * as angular from 'angular';
+import { StateService } from '@uirouter/angularjs';
+import {CacheService} from "../../mms/services/CacheService.service";
+import {UtilsService} from "../../mms/services/UtilsService.service";
+import { RootScopeService } from 'src/mms/services/RootScopeService.service';
 var mmsApp = angular.module('mmsApp');
 
 
-let VeMenuComponent = {
+let VeMenuComponent: angular.ve.ComponentOptions = {
     selector: "veMenu",
     template: `
     <nav class="project-level-header navbar navbar-inverse navbar-fixed-top block" role="navigation">
@@ -21,7 +25,7 @@ let VeMenuComponent = {
     <div class="breadcrumbs">
         <ul>
             <li ng-style="truncateStyle">
-                <a class="back-to-proj" ui-sref="project.ref({refId: $ctrl.mmsBranch.id? branch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
+                <a class="back-to-proj" ui-sref="main.project.ref({refId: $ctrl.mmsBranch.id? branch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
                     uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa fa-home" aria-hidden="true"></i>
                 </a>
@@ -78,31 +82,29 @@ let VeMenuComponent = {
 </nav>
 `,
     bindings: {
-        mmsOrg: '<',
         mmsProject: '<',
         mmsProjects: '<',
         mmsGroup: '<',
         mmsGroups: '<',
         mmsBranch: '<',
         mmsRef: '<',
-        mmsRefs: '<',
         mmsBranches: '<',
         mmsTag: '<',
         mmsTags: '<',
         mmsDocument: '<',
         mmsView: '<'
     },
-    controller: class VeMenuController {
+    controller: class VeMenuController implements angular.IComponentController {
 
         static $inject = ['$state', '$sce', '$timeout', '$element', 'CacheService', 'UtilsService', 'RootScopeService'];
 
-        private cache
-        private $state
-        private $sce
-        private $timeout
-        private $element
-        private utils
-        private rootScopeSvc
+        // private cache
+        // private $state
+        // private $sce
+        // private $timeout
+        // private $element
+        // private utils
+        // private rootScopeSvc
 
         //local
         public htmlTooltip;
@@ -114,38 +116,40 @@ let VeMenuComponent = {
         public truncateStyle;
 
         //bindings
-        public mmsOrg;
         public mmsProject;
         public mmsProjects;
         public mmsGroup;
         public mmsGroups;
         public mmsBranch;
         public mmsRef;
-        public mmsRefs;
         public mmsBranches;
         public mmsTag;
         public mmsTags;
         public mmsDocument;
         public mmsView;
 
-        constructor($state, $sce, $timeout, $element, CacheService, UtilsService, RootScopeService) {
+        //Locals
+        public child
+        parentId
+        crumbs = [];
+        groups = this.mmsGroups;
+        groupsMap
 
-            this.$state = $state;
-            this.$sce = $sce
-            this.$timeout = $timeout;
-            this.$element = $element;
-            this.cache = CacheService;
-            this.utils = UtilsService;
-            this.rootScopeSvc = RootScopeService;
+        constructor(private $state: StateService, private $sce: angular.ISCEService,
+                    private $timeout: angular.ITimeoutService, private $element: angular.IRootElementService,
+                    private cacheSvc: CacheService, private utilsSvc: UtilsService, private rootScopeSvc: RootScopeService) {
 
             this.htmlTooltip = "Branch temporarily unavailable during duplication.";
 
         }
 
         $onInit() {
-            this.currentProject = this.mmsProjects.filter((e) => {return e.id === this.mmsProject.id; })[0].name;
 
-            if (this.mmsRef) {
+        //$doCheck() {
+            if (this.mmsProject && !this.currentProject) {
+                this.currentProject = this.mmsProject.name;
+            }
+            if (this.mmsRef && (this.mmsBranch || this.mmsTag) && !this.currentRef) {
                 this.currentRef = this.mmsRef;
                 if (this.mmsRef.type === 'Branch') {
                     this.currentBranch = this.mmsBranch.name;
@@ -153,44 +157,39 @@ let VeMenuComponent = {
                     this.currentTag = this.mmsTag.name;
                 }
             }
-
-            let bcrumbs = [];
-            let child, parentId;
-            let groups = this.mmsGroups;
-            let groupsMap = {};
-
-            if (this.mmsGroup !== undefined) {
-                for (var i = 0; i < groups.length; i++) {
-                    groupsMap[groups[i].id] = {id: groups[i].id, name: groups[i].name, parentId: groups[i]._parentId};
-                }
-                child = this.mmsGroup;
-            }
+            let oldChild = this.child;
             if (this.mmsDocument !== undefined) {
-                child = this.mmsDocument;
+                this.child = this.mmsDocument;
                 this.rootScopeSvc.veTitle(this.mmsDocument.name);
-            }else{
+            }
+            else if (this.mmsGroup !== undefined) {
+                for (var i = 0; i < this.groups.length; i++) {
+                    this.groupsMap[this.groups[i].id] = {id: this.groups[i].id, name: this.groups[i].name, parentId: this.groups[i]._parentId};
+                }
+                this.child = this.mmsGroup;
                 this.rootScopeSvc.veTitle(this.currentProject);
             }
-            if (child) {
-                if (child.type === 'Package') {//child.hasOwnProperty('_id')) {
-                    bcrumbs.push({name: child.name, id: child.id, type: "group", alfLink: child._link, link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
-                    if(child._parentId) {
-                        parentId = child._parentId;
+
+            if (this.child && this.child != oldChild) {
+                if (this.child.type === 'Package') {//child.hasOwnProperty('_id')) {
+                    this.crumbs.push({name: this.child.name, id: this.child.id, type: "group", alfLink: this.child._link, link: "main.project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
+                    if(this.child._parentId) {
+                        this.parentId = this.child._parentId;
                     }
                 } else {
-                    bcrumbs.push({name: child.name, id: child.id, type: "doc", link: "project.ref.document({documentId: breadcrumb.id, search: undefined})"});
-                    if(child._groupId) {
-                        parentId = child._groupId;
+                    this.crumbs.push({name: this.child.name, id: this.child.id, type: "doc", link: "main.project.ref.document({documentId: breadcrumb.id, search: undefined})"});
+                    if(this.child._groupId) {
+                        this.parentId = this.child._groupId;
                     }
                 }
-                if (parentId) {
-                    while(groupsMap[parentId] !== undefined) {
-                        var id = groupsMap[parentId].id;
-                        bcrumbs.push({name: groupsMap[id].name, id: id, type: "group", link: "project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
-                        parentId = groupsMap[id].parentId;
+                if (this.parentId) {
+                    while(this.groupsMap[this.parentId] !== undefined) {
+                        var id = this.groupsMap[this.parentId].id;
+                        this.crumbs.push({name: this.groupsMap[id].name, id: id, type: "group", link: "main.project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
+                        this.parentId = this.groupsMap[id].parentId;
                     }
                 }
-                this.breadcrumbs = bcrumbs.reverse();
+                this.breadcrumbs = this.crumbs.reverse();
                 this.$timeout(() => {
                     var eltChildren = this.$element.children().children();
                     var eltWidth = this.$element.parent().width() - eltChildren[0].scrollWidth - eltChildren[2].scrollWidth;
@@ -200,12 +199,11 @@ let VeMenuComponent = {
                 });
             }
 
-
         }
 
         updateProject(project) {
             if (project) {
-                this.$state.go('project.ref', {projectId: project.id, refId: 'master', search: undefined}, {reload: true});
+                this.$state.go('main.project.ref', {projectId: project.id, refId: 'master', search: undefined}, {reload: true});
             }
         };
 
@@ -226,17 +224,17 @@ let VeMenuComponent = {
         };
 
         isRefsView() {
-            return this.$state.includes('project') && !(this.$state.includes('project.ref'));
+            return this.$state.includes('project') && !(this.$state.includes('main.project.ref'));
         };
 
 
         getHrefForProject(project) {
             var refId = project._refId || 'master';
-            return this.utils.PROJECT_URL_PREFIX + project.id + '/' + refId;
+            return this.utilsSvc.PROJECT_URL_PREFIX + project.id + '/' + refId;
         }
 
         getHrefForBranch(branch) {
-            var res = this.utils.PROJECT_URL_PREFIX + this.mmsProject.id + '/' + branch.id;
+            var res = this.utilsSvc.PROJECT_URL_PREFIX + this.mmsProject.id + '/' + branch.id;
             if (this.mmsDocument) {
                 res += '/documents/' + this.mmsDocument.id;
             }

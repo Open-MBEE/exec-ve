@@ -1,4 +1,7 @@
 import * as angular from 'angular';
+import { TransitionService } from '@uirouter/angularjs';
+import {EventService} from "../../mms/services/EventService.service";
+import {PaneService} from "../../mms/services/PaneManager.service";
 
 var mmsApp = angular.module('mmsApp');
 
@@ -249,7 +252,7 @@ var generateSerialId = (() => {
     };
 })();
 
-let PaneComponent = {
+let PaneComponent: angular.ve.ComponentOptions = {
     selector: "faPane",
     bindings: {
         anchor: "@paneAnchor",
@@ -274,16 +277,14 @@ let PaneComponent = {
 `,
     controllerAs: "$pane",
     transclude: true,
-    controller: class FaPaneController {
+    controller: class FaPaneController implements angular.IComponentController {
 
-        static $inject = ['$window', '$scope', '$timeout', '$transclude', '$interval', '$element', '$attrs',
+        static $inject = ['$window', '$scope', '$transitions', '$timeout', '$transclude', '$interval', '$element', '$attrs',
             'PaneService', 'EventService'];
 
 
         //Injected
-         private paneSvc
-                 eventSvc
-                 $evalAsync
+         private readonly $evalAsync
                  subs
 
 
@@ -318,12 +319,10 @@ let PaneComponent = {
                 $region
 
 
-        constructor(private $window, private $scope, private $timeout, private $transclude,
-                     private $interval, private $element, private $attrs,
-                    PaneService, EventService) {
-            this.paneSvc = PaneService;
-            this.eventSvc = EventService;
-            this.$scope = $scope;
+        constructor(private $window, private $scope: angular.IScope, private $transitions: TransitionService,
+                    private $timeout: angular.ITimeoutService, private $transclude: angular.ITranscludeFunction,
+                    private $interval: angular.IIntervalService, private $element: angular.IRootElementService,
+                    private $attrs: angular.IAttributes, private paneSvc: PaneService, private eventSvc: EventService) {
             this.$evalAsync = this.$scope.$evalAsync;
 
             this.children = [];
@@ -450,7 +449,7 @@ let PaneComponent = {
                 if (this.$attrs.paneNoScroll !== 'true') {
                     $transcludeElement.addClass("fa-pane-scroller");
                     if (this.$attrs.paneScrollApi) {
-                        this.setupScrollEvent(this.$element[0], $transcludeElement);
+                        this.setupScrollEvent(this.$element[0], $transcludeElement, $transcludeScope);
                     }
                 }
 
@@ -479,12 +478,12 @@ let PaneComponent = {
         });
         }
 
-        setupScrollEvent(elementWithScrollbar, elementInsideScrollbar) {
+        setupScrollEvent(elementWithScrollbar, elementInsideScrollbar, elementScope) {
             // This assignment gives access to this method to the client of the library
 
-            var thresholdFromScrollbarAndBottom = this.scrollApi.threshold || 2000 ;
-            var scrollThrottleRate = this.scrollApi.throttleRate || 500;
-            var frequency = this.scrollApi.frequency || 100;
+            var thresholdFromScrollbarAndBottom = elementScope.scrollApi.threshold || 2000 ;
+            var scrollThrottleRate = elementScope.scrollApi.throttleRate || 500;
+            var frequency = elementScope.scrollApi.frequency || 100;
             var waiting = false;
             var intervalHandler;
 
@@ -520,7 +519,7 @@ let PaneComponent = {
                 return hiddenContentHeight - elementInsideScrollbar.scrollTop() <= thresholdFromScrollbarAndBottom;
             }
 
-            this.scrollApi.isScrollVisible = _isScrollbarVisible;
+            elementScope.scrollApi.isScrollVisible = _isScrollbarVisible;
             elementInsideScrollbar.removeAttr('pane-scroll-api');
             elementWithScrollbar.addEventListener('scroll', _scrollHandler, true);
         };
@@ -774,6 +773,10 @@ let PaneComponent = {
         }
 
         this.closed = !open;
+        if (this.paneId) {
+            this.eventSvc.$broadcast(this.paneId + "-toggled");
+        }
+
 
         var reflow = () => {
             if (this.parent) {

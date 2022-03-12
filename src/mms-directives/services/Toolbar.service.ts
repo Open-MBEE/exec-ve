@@ -1,45 +1,36 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-function ToolbarService() {
-
-  const getApi = (buttons, initFn) => {
-    if (!buttons) {
-      buttons = [];
-    }
-    if (!initFn) {
-      initFn = () => {};
-    }
-    this.tbApi = new ToolbarApi(buttons,initFn);
-    return this.tbApi;
-  };
-
-  const isApi = (tbApi) => {
-    return tbApi instanceof ToolbarApi;
-  };
-
-  const constants = {
+export class ToolbarService {
+  
+  public constants = {
     SETPERMISSION: 'tb-set-permission',
     SETICON: 'tb-set-icon',
     TOGGLEICONSPINNER: 'tb-toggle-icon-spinner',
     SELECT: 'tb-select'
   };
 
-  return {
-    getApi: getApi,
-    isApi: isApi,
-    constants: constants,
+  private readonly tbApi
+  
+  public buttons = [];
+  
+  constructor() {
+    this.tbApi = new ToolbarApi(this.buttons);
+  }
 
+  getApi() {
+    return this.tbApi;
   };
+
 }
 
-class ToolbarApi {
+export class ToolbarApi {
 
   public buttons
 
   public init
 
-  constructor(buttons, initFn) {
+  constructor(buttons, initFn?) {
     this.buttons = buttons;
 
     if (initFn) {
@@ -47,8 +38,12 @@ class ToolbarApi {
     }
 
   }
+  
+  setInit(initFn) {
+    this.init = initFn;
+  }
 
-  select = (id) => {
+  select(id) {
     this.buttons.forEach((button) =>
     {
       if (button.id === id && button.active)
@@ -86,7 +81,7 @@ class ToolbarApi {
     });
   };
 
-  deactivate = (id) => {
+  deactivate(id) {
     this.buttons.forEach((button) =>
     {
       if (button.id === id)
@@ -103,7 +98,7 @@ class ToolbarApi {
     });
   };
 
-  setPermission = (id, permission) => {
+  setPermission(id, permission) {
     this.buttons.forEach((button) =>
     {
       if (button.id === id) {
@@ -112,7 +107,7 @@ class ToolbarApi {
     });
   };
 
-  setSelected = (id, selected) => {
+  setSelected(id, selected) {
     this.buttons.forEach((button) => {
       if (button.id === id) {
         button.selected = selected;
@@ -120,7 +115,7 @@ class ToolbarApi {
     });
   };
 
-  setIcon = (id, icon) => {
+  setIcon(id, icon) {
     this.buttons.forEach((button) => {
       if (button.id === id) {
         button.icon = icon;
@@ -128,7 +123,7 @@ class ToolbarApi {
     });
   };
 
-  addButton = (button) => {
+  addButton(button) {
     button.priority = this.buttons.length;
     this.buttons.push(button);
     if (button.dynamic_buttons) {
@@ -146,7 +141,7 @@ class ToolbarApi {
     }
   };
 
-  toggleButtonSpinner = (id) => {
+  toggleButtonSpinner(id) {
     this.buttons.forEach((button) =>
     {
       if (button.id === id)
@@ -165,7 +160,7 @@ class ToolbarApi {
     });
   };
 
-  setOptions = (id, options) =>
+  setOptions(id, options)
   {
     this.buttons.forEach((button) =>
     {

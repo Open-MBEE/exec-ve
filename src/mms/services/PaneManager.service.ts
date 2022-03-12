@@ -1,7 +1,7 @@
 import angular from 'angular';
 var mms = angular.module("mms", []);
 
-class PaneService {
+export class PaneService {
     private counter = 0
     private panes = {}
 

@@ -6,6 +6,7 @@ export class URLServiceProvider {
     private baseUrl = '/api';
     private mmsUrl = 'localhost:8080';
 
+
     constructor() {
     };
 
@@ -50,6 +51,7 @@ export class URLService {
 
     constructor(private baseUrl, private mmsUrl) {
         this.root = this.mmsUrl + this.baseUrl;
+        this.token = window.localStorage.getItem('token');
     }
 
     getRoot() {

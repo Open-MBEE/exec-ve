@@ -1,4 +1,6 @@
 import './table2CSV'
 import './isOnScreen'
+import './componentOptions'
+import './mmsWindow'
 //import 'extendJQuery'
 //import 'elementOb'

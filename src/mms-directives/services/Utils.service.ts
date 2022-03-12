@@ -1,19 +1,28 @@
 import * as angular from "angular";
+import {URLService} from "../../mms/services/URLService.provider";
+import {RootScopeService} from "../../mms/services/RootScopeService.service";
+import {CacheService} from "../../mms/services/CacheService.service";
+import {ElementService} from "../../mms/services/ElementService.service";
+import {ViewService} from "../../mms/services/ViewService.service";
+import {UtilsService} from "../../mms/services/UtilsService.service";
+import {AuthService} from "../../mms/services/AuthorizationService.service";
+import {PermissionsService} from "../../mms/services/PermissionsService.service";
+import {EventService} from "../../mms/services/EventService.service";
+import {EditService} from "../../mms/services/EditService.service";
 var mmsDirectives = angular.module('mmsDirectives');
-
-mmsDirectives.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '$compile', '$window', 'URLService',
-    'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService',
-    'RootScopeService', 'EventService', 'EditService', 'growl', Utils]);
 
 /**
  * @ngdoc service
- * @name mmsDirectives.Utils
+ * @name Utils
  * @requires $q
  * @requires $uibModal
- * @requires $templateCache
- * @requires mms.WorkspaceService
- * @requires mms.ConfigService
- * @requires mms.ElementService
+ * @requires $timeout
+ * @requires $compile
+ * @requires $window
+ * @requires URLService
+ * @requires CacheService
+ * @requires ElementService
+ * @requires EditService
  * @requires _
  *
  * @description
@@ -21,57 +30,51 @@ mmsDirectives.factory('Utils', ['$q','$uibModal','$timeout', '$templateCache', '
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
-function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLService, CacheService,
-               ElementService, ViewService, UtilsService, AuthService, PermissionsService, RootScopeService,
-               EventService, EditService, growl) {
+export class Utils {
+    
+    //locals
+    private addItemData
 
-    const rootScopeSvc = RootScopeService;
-    const eventSvc = EventService;
-    const editSvc = EditService;
+    private revertData: { elementId: string; baseCommit: object; refId: string; compareCommit: object;
+                        projectId: string; element: object };
 
-    function clearAutosaveContent(autosaveKey, elementType) {
+    constructor(private $q, private $uibModal, private $timeout, private $compile, private $window, private growl,
+                private uRLSvc : URLService, private cacheSvc : CacheService, private elementSvc : ElementService, 
+                private viewSvc : ViewService, private utilsSvc : UtilsService, private authSvc : AuthService, 
+                private permissionsSvc : PermissionsService, private rootScopeSvc : RootScopeService,
+                private eventSvc : EventService, private editSvc : EditService) {
+
+    }
+
+    public clearAutosaveContent(autosaveKey, elementType) {
         if ( elementType === 'Slot' ) {
-            Object.keys($window.localStorage)
-                .forEach(function(key){
+            Object.keys(this.$window.localStorage)
+                .forEach((key) =>{
                     if ( key.indexOf(autosaveKey) !== -1 ) {
-                        $window.localStorage.removeItem(key);
+                        this.$window.localStorage.removeItem(key);
                     }
                 });
         } else {
-            $window.localStorage.removeItem(autosaveKey);
+            this.$window.localStorage.removeItem(autosaveKey);
         }
     }
 
     // var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     // var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
 
-    var conflictCtrl = function($scope, $uibModalInstance) {
-        $scope.ok = function() {
-            $uibModalInstance.close('ok');
-        };
-        $scope.cancel = function() {
-            $uibModalInstance.close('cancel');
-        };
-        $scope.force = function() {
-            $uibModalInstance.close('force');
-        };
-        $scope.merge = function() {
-            $uibModalInstance.close('merge');
-        };
-    };
 
-    var setupValEditFunctions = function(scope) {
+    public setupValEditFunctions(scope) {
         scope.addValueTypes = {string: 'LiteralString', boolean: 'LiteralBoolean', integer: 'LiteralInteger', real: 'LiteralReal'};
-        scope.addValue = function(type) {
+        scope.addValue = (type) => {
             var newValueSpec = null;
             if (type === 'LiteralBoolean')
-                newValueSpec = UtilsService.createValueSpecElement({type: type, value: false, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+                newValueSpec = this.utilsSvc.createValueSpecElement({type: type, value: false, id: this.utilsSvc.createMmsId(), ownerId: scope.element.id});
             else if (type === 'LiteralInteger')
-                newValueSpec = UtilsService.createValueSpecElement({type: type, value: 0, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+                newValueSpec = this.utilsSvc.createValueSpecElement({type: type, value: 0, id: this.utilsSvc.createMmsId(), ownerId: scope.element.id});
             else if (type === 'LiteralString')
-                newValueSpec = UtilsService.createValueSpecElement({type: type, value: '', id: UtilsService.createMmsId(), ownerId: scope.element.id});
+                newValueSpec = this.utilsSvc.createValueSpecElement({type: type, value: '', id: this.utilsSvc.createMmsId(), ownerId: scope.element.id});
             else if (type === 'LiteralReal')
-                newValueSpec = UtilsService.createValueSpecElement({type: type, value: 0.0, id: UtilsService.createMmsId(), ownerId: scope.element.id});
+                newValueSpec = this.utilsSvc.createValueSpecElement({type: type, value: 0.0, id: this.utilsSvc.createMmsId(), ownerId: scope.element.id});
             scope.editValues.push(newValueSpec);
             if (scope.element.type == 'Property' || scope.element.type == 'Port') {
                 scope.edit.defaultValue = newValueSpec;
@@ -79,20 +82,20 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         };
         scope.addValueType = 'LiteralString';
         
-        scope.addEnumerationValue = function() {
-            var newValueSpec = UtilsService.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: UtilsService.createMmsId(), ownerId: scope.element.id});
+        scope.addEnumerationValue = () => {
+            var newValueSpec = this.utilsSvc.createValueSpecElement({type: "InstanceValue", instanceId: scope.options[0], id: this.utilsSvc.createMmsId(), ownerId: scope.element.id});
             scope.editValues.push(newValueSpec);
             if (scope.element.type == 'Property' || scope.element.type == 'Port') {
                 scope.edit.defaultValue = newValueSpec;
             }
         };
 
-        scope.removeVal = function(i) {
+        scope.removeVal = (i) => {
             scope.editValues.splice(i, 1);
         };
     };
 
-    var setupValCf = function(scope) {
+    public setupValCf(scope) {
         var data = scope.element;
         if (data.type === 'Property' || data.type === 'Port') {
             if (data.defaultValue) {
@@ -129,41 +132,45 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      *      or force save. If the user decides to discord or merge, type will be info even though
      *      the original save failed. Error means an actual error occured.
      */
-    var save = function(edit, editorApi, scope, continueEdit) {
-        var deferred = $q.defer();
+    public save(edit, editorApi, scope, continueEdit) {
+        var deferred = this.$q.defer();
         if (editorApi && editorApi.save) {
             editorApi.save();
         }
-        ElementService.updateElement(edit)
-        .then(function(element) {
+        this.elementSvc.updateElement(edit)
+        .then((element) => {
             deferred.resolve(element);
-            setupValCf(scope);
+            this.setupValCf(scope);
             let data = {
                 element: element,
                 continueEdit: (continueEdit) ? continueEdit : false
             };
 
-            eventSvc.$broadcast('element.updated', data);
-        }, function(reason) {
+            this.eventSvc.$broadcast('element.updated', data);
+        }, (reason) => {
             if (reason.status === 409) {
-                scope.latest = reason.data.elements[0];
-                var instance = $uibModal.open({
-                    templateUrl: 'partials/mms-directives/saveConflict.html',
-                    controller: ['$scope', '$uibModalInstance', conflictCtrl],
-                    scope: scope,
-                    size: 'lg'
+                let latest = reason.data.elements[0]
+                var instance = this.$uibModal.open({
+                    component: 'saveConflict',
+                    size: 'lg',
+                    resolve: {
+                        latest: () => {
+                            return latest
+                        }
+                    }
                 });
-                instance.result.then(function(choice) {
+                instance.result.then((data) => {
+                    let choice = data.$value;
                     if (choice === 'ok') {
-                        var reqOb = {elementId: scope.latest.id, projectId: scope.latest._projectId, refId: scope.latest._refId, commitId: 'latest'};
-                        ElementService.cacheElement(reqOb, scope.latest, true);
-                        ElementService.cacheElement(reqOb, scope.latest, false);
+                        var reqOb = {elementId: latest.id, projectId: latest._projectId, refId: latest._refId, commitId: 'latest'};
+                        this.elementSvc.cacheElement(reqOb, latest, true);
+                        this.elementSvc.cacheElement(reqOb, latest, false);
                     } else if (choice === 'force') {
-                        edit._read = scope.latest._read;
-                        edit._modified = scope.latest._modified;
-                        save(edit, editorApi, scope, continueEdit).then(function(resolved) {
+                        edit._read = latest._read;
+                        edit._modified = latest._modified;
+                        this.save(edit, editorApi, scope, continueEdit).then((resolved) => {
                             deferred.resolve(resolved);
-                        }, function(error) {
+                        }, (error) => {
                             deferred.reject(error);
                         });
                     } else {
@@ -190,10 +197,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      * @param {object} editOb edit object
      * @return {boolean} has changes or not
      */
-    var hasEdits = function (editOb) {
+    public hasEdits(editOb) {
         editOb._commitId = 'latest';
-        var cachedKey = UtilsService.makeElementKey(editOb);
-        var elementOb = CacheService.get(cachedKey);
+        var cachedKey = this.utilsSvc.makeElementKey(editOb);
+        var elementOb = this.cacheSvc.get(cachedKey);
         if (editOb.name !== elementOb.name) {
             return true;
         }
@@ -221,13 +228,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      * @param {object} editOb scope with common properties
      * @param {object} editorApi editor api to kill editor if reverting changes
      */
-    var revertEdits = function(scope, editOb, editorApi?) {
+    public revertEdits(editValues, editOb, editorApi?) {
         if (editorApi && editorApi.destroy) {
             editorApi.destroy();
         }
         editOb._commitId = 'latest';
-        var cachedKey = UtilsService.makeElementKey(editOb);
-        var elementOb = CacheService.get(cachedKey);
+        var cachedKey = this.utilsSvc.makeElementKey(editOb);
+        var elementOb = this.cacheSvc.get(cachedKey);
 
         if (elementOb.name) {
             editOb.name = elementOb.name;
@@ -236,26 +243,27 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         if (editOb.type === 'Property' || editOb.type === 'Port') {
             editOb.defaultValue = JSON.parse(JSON.stringify(elementOb.defaultValue));
             if (editOb.defaultValue) {
-                scope.editValues = [editOb.defaultValue];
+                editValues = [editOb.defaultValue];
             } else {
-                scope.editValues = [];
+                editValues = [];
             }
         } else if (editOb.type === 'Slot') {
             editOb.value = JSON.parse(JSON.stringify(elementOb.value));
-            scope.editValues = editOb.value;
+            editValues = editOb.value;
         } else if (editOb.type === 'Constraint' && editOb.specification) {
             editOb.specification = JSON.parse(JSON.stringify(elementOb.specification));
-            scope.editValues = [editOb.specification];
+            editValues = [editOb.specification];
         }
+        return editValues;
     };
 
-    var handleError = function(reason) {
+    public handleError(reason) {
         if (reason.type === 'info')
-            growl.info(reason.message);
+            this.growl.info(reason.message);
         else if (reason.type === 'warning')
-            growl.warning(reason.message);
+            this.growl.warning(reason.message);
         else if (reason.type === 'error')
-            growl.error(reason.message);
+            this.growl.error(reason.message);
     };
 
     /**
@@ -270,8 +278,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      * @return {Promise} promise would be resolved with options and if object is enumerable.
      *      For unsuccessful saves, it will be rejected with an object with reason.
      */
-    var isEnumeration = function(elementOb) {
-        var deferred = $q.defer();
+    public isEnumeration(elementOb) {
+        var deferred = this.$q.defer();
         if (elementOb.type === 'Enumeration') {
             var isEnumeration = true;
             var reqOb = {
@@ -280,8 +288,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                 refId: elementOb._refId,
                 depth: 1
             };
-            ElementService.getOwnedElements(reqOb).then(
-                function(val) {
+            this.elementSvc.getOwnedElements(reqOb).then(
+                (val) => {
                     var newArray = [];
                      // Filter for enumeration type
                     for (var i = 0; i < val.length; i++) {
@@ -289,12 +297,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                             newArray.push(val[i]);
                         }
                     }
-                    newArray.sort(function(a, b) {
+                    newArray.sort((a, b) => {
                         return a.name.localeCompare(b.name);
                     });
                     deferred.resolve({options: newArray, isEnumeration: isEnumeration});
                 },
-                function(reason) {
+                (reason) => {
                     deferred.reject(reason);
                 }
             );
@@ -304,8 +312,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         return deferred.promise;
     };
 
-    var getPropertySpec = function(elementOb) {
-        var deferred = $q.defer();
+    public getPropertySpec(elementOb) {
+        var deferred = this.$q.defer();
         var id = elementOb.typeId;
         var isSlot = false;
         var isEnum = false;
@@ -320,8 +328,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         }
         // Get defining feature or type info
         var reqOb = {elementId: id, projectId: elementOb._projectId, refId: elementOb._refId};
-        ElementService.getElement(reqOb)
-        .then(function(value) {
+        this.elementSvc.getElement(reqOb)
+        .then((value) => {
             if (isSlot) {
                 if (!value.typeId) {
                     deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
@@ -329,32 +337,32 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                 }
                 //if it is a slot
                 reqOb.elementId = value.typeId;
-                ElementService.getElement(reqOb) //this gets tyep of defining feature
-                .then(function(val) {
-                    isEnumeration(val)
-                    .then(function(enumValue) {
+                this.elementSvc.getElement(reqOb) //this gets tyep of defining feature
+                .then((val) => {
+                    this.isEnumeration(val)
+                    .then((enumValue) => {
                         if (enumValue.isEnumeration) {
                             isEnum = enumValue.isEnumeration;
                             options = enumValue.options;
                         }
                         deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
-                    }, function(reason) {
+                    }, (reason) => {
                         deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
                     });
                 });
             } else {
-                isEnumeration(value)
-                .then(function(enumValue) {
+                this.isEnumeration(value)
+                .then((enumValue) => {
                     if (enumValue.isEnumeration) {
                         isEnum = enumValue.isEnumeration;
                         options = enumValue.options;
                     }
                     deferred.resolve({options: options, isEnumeration: isEnum, isSlot:isSlot });
-                }, function(reason) {
+                }, (reason) => {
                     deferred.reject(reason);
                 });
             }
-        }, function(reason) {
+        }, (reason) => {
             deferred.resolve({options: options, isEnumeration: isEnum, isSlot: isSlot});
         });
         return deferred.promise;
@@ -385,12 +393,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     * @param {string} template template to compile
     * @param {boolean} doNotScroll whether to scroll to element
     */
-    var startEdit = function(scope, mmsViewCtrl, domElement, template, doNotScroll) {
-        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element && scope.commitId === 'latest' && PermissionsService.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId)) {
+    public startEdit(scope, mmsViewCtrl, domElement, template, doNotScroll) {
+        if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element && scope.commitId === 'latest' && this.permissionsSvc.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId)) {
             var elementOb = scope.element;
             var reqOb = {elementId: elementOb.id, projectId: elementOb._projectId, refId: elementOb._refId};
-            ElementService.getElementForEdit(reqOb)
-            .then(function(data) {
+            this.elementSvc.getElementForEdit(reqOb)
+            .then((data) => {
                 scope.isEditing = true;
                 scope.inPreviewMode = false;
                 scope.edit = data;
@@ -421,23 +429,23 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                     scope.recompileScope = scope.$new();
                     domElement.empty();
                     domElement.append(template);
-                    $compile(domElement.contents())(scope.recompileScope);
+                    this.$compile(domElement.contents())(scope.recompileScope);
                 }
                 if (!scope.skipBroadcast) {
                     // Broadcast message for the toolCtrl:
-                    eventSvc.$broadcast('presentationElem.edit',scope.edit);
+                    this.eventSvc.$broadcast('presentationElem.edit',scope.edit);
                 } else {
                     scope.skipBroadcast = false;
                 }
                 if (!doNotScroll) {
-                    scrollToElement(domElement);
+                    this._scrollToElement(domElement);
                 }
-            }, handleError);
+            }, this.handleError);
 
-            ElementService.isCacheOutdated(scope.element)
-            .then(function(data) {
+            this.elementSvc.isCacheOutdated(scope.element)
+            .then((data) => {
                 if (data.status && data.server._modified > data.cache._modified) {
-                    growl.warning('This element has been updated on the server');
+                    this.growl.warning('This element has been updated on the server');
                 }
             });
         }
@@ -462,12 +470,12 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     * @param {object} domElement dom of the directive, jquery wrapped
     * @param {boolean} continueEdit save and continue
     */
-    var saveAction = function(scope, domElement, continueEdit) {
+    public saveAction(scope, domElement, continueEdit) {
         if (scope.elementSaving) {
-            growl.info('Please Wait...');
+            this.growl.info('Please Wait...');
             return;
         }
-        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
+        this.clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
         if (scope.bbApi) {
             if (!continueEdit) {
                 scope.bbApi.toggleButtonSpinner('presentation-element-save');
@@ -478,19 +486,19 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         
         scope.elementSaving = true;
 
-        var work = function() {
-            save(scope.edit, scope.editorApi, scope, continueEdit).then(function(data) {
+        const work = () => {
+            this.save(scope.edit, scope.editorApi, scope, continueEdit).then((data) => {
                 scope.elementSaving = false;
                 if (!continueEdit) {
                     scope.isEditing = false;
-                    eventSvc.$broadcast('presentationElem.save', scope.edit);
+                    this.eventSvc.$broadcast('presentationElem.save', scope.edit);
                 }
-                growl.success('Save Successful');
+                this.growl.success('Save Successful');
                 //scrollToElement(domElement);
-            }, function(reason) {
+            }, (reason) => {
                 scope.elementSaving = false;
-                handleError(reason);
-            }).finally(function() {
+                this.handleError(reason);
+            }).finally(() => {
                 if (scope.bbApi) {
                     if (!continueEdit) {
                         scope.bbApi.toggleButtonSpinner('presentation-element-save');
@@ -500,7 +508,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                 }
             });
         };
-        $timeout(work, 1000, false); //to give ckeditor time to save any changes
+        this.$timeout(work, 1000, false); //to give ckeditor time to save any changes
     };
 
     /**
@@ -522,16 +530,16 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     * @param {object} recompile recompile function object
     * @param {object} domElement dom of the directive, jquery wrapped
     */
-    var cancelAction = function(scope, recompile, domElement) {
+    public cancelAction(scope, recompile, domElement) {
         if (scope.elementSaving) {
-            growl.info('Please Wait...');
+            this.growl.info('Please Wait...');
             return;
         }
-        var cancelCleanUp = function() {
+        const cancelCleanUp = () => {
             scope.isEditing = false;
-            revertEdits(scope, scope.edit);
+            this.revertEdits(scope, scope.edit);
              // Broadcast message for the ToolCtrl:
-            eventSvc.$broadcast('presentationElem.cancel', scope.edit);
+            this.eventSvc.$broadcast('presentationElem.cancel', scope.edit);
             recompile();
             // scrollToElement(domElement);
         };
@@ -539,15 +547,15 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
             scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
         }
         // Only need to confirm the cancellation if edits have been made:
-        if (hasEdits(scope.edit)) {
+        if (this.hasEdits(scope.edit)) {
             let deleteOb = {
                 type: scope.edit.type,
                 element: scope.element,
             }
-            let instance = deleteEditModal(deleteOb)
-            instance.result.then(function() {
+            let instance = this.deleteEditModal(deleteOb)
+            instance.result.then(() => {
                 cancelCleanUp();
-            }).finally(function() {
+            }).finally(() => {
                 if (scope.bbApi) {
                     scope.bbApi.toggleButtonSpinner('presentation-element-cancel');
                 }
@@ -560,9 +568,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         }
     };
 
-    var deleteEditModal = function(deleteOb) {
-        return $uibModal.open({
-            controller: 'confirmDelete',
+    public deleteEditModal(deleteOb) {
+        return this.$uibModal.open({
+            component: 'confirmDeleteModal',
             resolve: {
                 getName: () => {
                     return deleteOb.type + " " + deleteOb.element.id;
@@ -571,75 +579,58 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                     return 'edit';
                 },
                 ok: () => {
-                    clearAutosaveContent(deleteOb.element._projectId + deleteOb.element._refId + deleteOb.element.id, deleteOb.type);
+                    this.clearAutosaveContent(deleteOb.element._projectId + deleteOb.element._refId + deleteOb.element.id, deleteOb.type);
                     return true;
                 }
             }
         });
     }
 
-    var deleteAction = function(scope, bbApi, section) {
+    public deleteAction(scope, bbApi, section) {
         if (scope.elementSaving) {
-            growl.info('Please Wait...');
+            this.growl.info('Please Wait...');
             return;
         }
-        // var id = section ? section.id : scope.view.id;
-        // ElementService.isCacheOutdated(id, scope.ws)
-        // .then(function(status) {
-        //     if (status.status) {
-        //         if (section && section.specification && !angular.equals(section.specification, status.server.specification)) {
-        //             growl.error('The view section contents is outdated, refresh the page first!');
-        //             return;
-        //         } else if (!section && scope.view._contents && !angular.equals(scope.view._contents, status.server._contents)) {
-        //             growl.error('The view contents is outdated, refresh the page first!');
-        //             return;
-        //         }
-        //     }
-             realDelete();
-        // }, function(reason) {
-        //     growl.error('Checking if view contents is up to date failed: ' + reason.message);
-        // });
-        function realDelete() {
-            bbApi.toggleButtonSpinner('presentation-element-delete');
 
-            let instance = $uibModal.open({
-                component: 'confirmDelete',
-                resolve: {
-                    getType: () => {
-                        return (scope.edit.type) ? scope.edit.type : 'element';
-                    },
-                    getName: () => {
-                        return (scope.edit.name) ? scope.edit.name : 'Element';
-                    },
-                    ok: () => {
-                        clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
-                        return true;
-                    }
+        bbApi.toggleButtonSpinner('presentation-element-delete');
+
+        let instance = this.$uibModal.open({
+            component: 'confirmDeleteModal',
+            resolve: {
+                getType: () => {
+                    return (scope.edit.type) ? scope.edit.type : 'element';
+                },
+                getName: () => {
+                    return (scope.edit.name) ? scope.edit.name : 'Element';
+                },
+                ok: () => {
+                    this.clearAutosaveContent(scope.element._projectId + scope.element._refId + scope.element.id, scope.edit.type);
+                    return true;
                 }
-            });
-            instance.result.then(function() {
-                var viewOrSec = section ? section : scope.view;
-                var reqOb = {elementId: viewOrSec.id, projectId: viewOrSec._projectId, refId: viewOrSec._refId, commitId: 'latest'};
-                ViewService.removeElementFromViewOrSection(reqOb, scope.instanceVal)
-                .then(function(data) {
-                    if (ViewService.isSection(scope.instanceSpec) || ViewService.isTable(scope.instanceSpec) || ViewService.isFigure(scope.instanceSpec) || ViewService.isEquation(scope.instanceSpec)) {
-                        // Broadcast message to TreeCtrl:
-                        eventSvc.$broadcast('viewctrl.delete.element', scope.instanceSpec);
-                    }
+            }
+        });
+        instance.result.then(() => {
+            var viewOrSec = section ? section : scope.view;
+            var reqOb = {elementId: viewOrSec.id, projectId: viewOrSec._projectId, refId: viewOrSec._refId, commitId: 'latest'};
+            this.viewSvc.removeElementFromViewOrSection(reqOb, scope.instanceVal)
+            .then((data) => {
+                if (this.viewSvc.isSection(scope.instanceSpec) || this.viewSvc.isTable(scope.instanceSpec) || this.viewSvc.isFigure(scope.instanceSpec) || this.viewSvc.isEquation(scope.instanceSpec)) {
+                    // Broadcast message to TreeCtrl:
+                    this.eventSvc.$broadcast('viewctrl.delete.element', scope.instanceSpec);
+                }
 
-                    eventSvc.$broadcast('view-reorder.refresh');
+                this.eventSvc.$broadcast('view-reorder.refresh');
 
-                     // Broadcast message for the ToolCtrl:
-                    eventSvc.$broadcast('presentationElem.cancel',scope.edit);
+                 // Broadcast message for the ToolCtrl:
+                this.eventSvc.$broadcast('presentationElem.cancel',scope.edit);
 
-                    growl.success('Remove Successful');
-                }, handleError);
+                this.growl.success('Remove Successful');
+            }, this.handleError);
 
-            }).finally(function() {
-                scope.bbApi.toggleButtonSpinner('presentation-element-delete');
-            });
+        }).finally(() => {
+            scope.bbApi.toggleButtonSpinner('presentation-element-delete');
+        });
         }
-    };
 
     /**
     * @ngdoc function
@@ -664,19 +655,19 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     * @param {object} recompile recompile function object
     * @param {object} domElement dom of the directive, jquery wrapped
     */
-    var previewAction = function(scope, recompile, domElement) {
+    public previewAction(scope, recompile, domElement) {
         if (scope.elementSaving) {
-            growl.info('Please Wait...');
+            this.growl.info('Please Wait...');
             return;
         }
-        if (scope.edit && hasEdits(scope.edit) && !scope.inPreviewMode) {
+        if (scope.edit && this.hasEdits(scope.edit) && !scope.inPreviewMode) {
             scope.skipBroadcast = true; //preview next click to go into edit mode from broadcasting
             scope.inPreviewMode = true;
             recompile(true);
         } else { //nothing has changed, cancel instead of preview
             if (scope.edit && scope.isEditing) {
                 // Broadcast message for the ToolCtrl to clear out the tracker window:
-                eventSvc.$broadcast('presentationElem.cancel', scope.edit);
+                this.eventSvc.$broadcast('presentationElem.cancel', scope.edit);
                 if (scope.element) {
                     recompile();
                 }
@@ -684,10 +675,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         }
         scope.isEditing = false;
         scope.elementSaving = false;
-        scrollToElement(domElement);
+        this._scrollToElement(domElement);
     };
 
-    var isDirectChildOfPresentationElementFunc = function(element, mmsViewCtrl) {
+    public isDirectChildOfPresentationElementFunc(element, mmsViewCtrl) {
         var parent = element[0].parentElement;
         while (parent && parent.nodeName !== 'MMS-VIEW-PRESENTATION-ELEM' && parent.nodeName !== 'MMS-VIEW') {
             if (mmsViewCtrl.isTranscludedElement(parent.nodeName)) {
@@ -697,20 +688,17 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                 return false;
             parent = parent.parentElement;
         }
-        if (parent && parent.nodeName !== 'MMS-VIEW'){
-            return true;
-        }
-        return false;
+        return parent && parent.nodeName !== 'MMS-VIEW';
+
     };
 
-    var hasHtml = function(s) {
-        if (s.indexOf('<p>') === -1)
-            return false;
-        return true;
+    public hasHtml(s) {
+        return s.indexOf('<p>') !== -1;
+
     };
 
-    var scrollToElement = function(domElement) {
-        $timeout(function() {
+    private _scrollToElement(domElement) {
+        this.$timeout(() => {
             var el = domElement.get(0);
             if (domElement.isOnScreen())
                 return;
@@ -718,93 +706,13 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         }, 500, false);
     };
 
-    var addPeCtrl = function($scope, $uibModalInstance, $filter) {
-        $scope.oking = false;
-        $scope.newPe = {name:''};
-        $scope.createForm = true;
-
-        var addPECallback = function(elementOb) {
-            if ($scope.oking) {
-                growl.info("Please wait...");
-                return;
-            }
-            $scope.oking = true;
-            var instanceVal = {
-                instanceId: elementOb.id,
-                type: "InstanceValue"
-            };
-            ViewService.addElementToViewOrSection($scope.viewOrSectionOb, instanceVal, $scope.addPeIndex)
-                .then(function(data) {
-                    var elemType = $scope.presentationElemType;
-                    successUpdates(elemType, $scope.viewOrSectionOb.id);
-                    $uibModalInstance.close(data);
-                }, function(reason) {
-                    growl.error($scope.presentationElemType +" Add Error: " + reason.message);
-                }).finally(function() {
-                $scope.oking = false;
-            });
-        };
-
-        var peFilterQuery = function () {
-            var classIdOb = {
-                classifierIds: []
-            };
-            if ($scope.presentationElemType === 'Table') {
-                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.TableT, ViewService.TYPE_TO_CLASSIFIER_ID.Table];
-            } else if ($scope.presentationElemType === 'List') {
-                classIdOb.classifierIds  = [ViewService.TYPE_TO_CLASSIFIER_ID.ListT, ViewService.TYPE_TO_CLASSIFIER_ID.List];
-            } else if ($scope.presentationElemType === 'Image') {
-                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.ImageT, ViewService.TYPE_TO_CLASSIFIER_ID.Image];
-            } else if ($scope.presentationElemType === 'Paragraph') {
-                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.ParagraphT, ViewService.TYPE_TO_CLASSIFIER_ID.Paragraph];
-            } else if ($scope.presentationElemType === 'Section') {
-                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID.SectionT, ViewService.TYPE_TO_CLASSIFIER_ID.Section];
-            } else {
-                classIdOb.classifierIds = [ViewService.TYPE_TO_CLASSIFIER_ID[$scope.presentationElemType]];
-            }
-            var obj = {
-                terms: classIdOb
-            };
-            return obj;
-        };
-
-        $scope.searchOptions = {
-            callback: addPECallback,
-            itemsPerPage: 200,
-            filterQueryList: [peFilterQuery],
-            hideFilterOptions: true
-        };
-
-        $scope.ok = function() {
-            if ($scope.oking) {
-                growl.info("Please wait...");
-                return;
-            }
-            $scope.oking = true;
-            ViewService.createInstanceSpecification($scope.viewOrSectionOb, $scope.presentationElemType, $scope.newPe.name, $scope.addPeIndex)
-            .then(function(data) {
-                var elemType = $scope.presentationElemType;
-                successUpdates(elemType, $scope.viewOrSectionOb.id);
-                $uibModalInstance.close(data);
-            }, function(reason) {
-                growl.error($scope.presentationElemType + " Add Error: " + reason.message);
-            }).finally(function() {
-                $scope.oking = false;
-            });
-        };
-
-        $scope.cancel = function() {
-            $uibModalInstance.dismiss();
-        };
-    };
-
-    var successUpdates = function (elemType, id) {
-        eventSvc.$broadcast('view-reorder.refresh');
-        eventSvc.$broadcast('view.reorder.saved', {id: id});
-        growl.success("Adding " + elemType + " Successful");
+    public successUpdates(elemType, id) {
+        this.eventSvc.$broadcast('view-reorder.refresh');
+        this.eventSvc.$broadcast('view.reorder.saved', {id: id});
+        this.growl.success("Adding " + elemType + " Successful");
         // Show comments when creating a comment PE
-        if (elemType === 'Comment' && !rootScopeSvc.veCommentsOn()) {
-            $timeout(function() {
+        if (elemType === 'Comment' && !this.rootScopeSvc.veCommentsOn()) {
+            this.$timeout(() => {
                 $('.show-comments').click();
             }, 0, false);
         }
@@ -822,21 +730,27 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      * @param {string} type type of presentation element (Paragraph, Section)
      * @param {Object} viewOrSection the view or section (instance spec) object
      */
-    var addPresentationElement = function($scope, type, viewOrSectionOb) {
-        $scope.viewOrSectionOb = viewOrSectionOb;
-        $scope.presentationElemType = type;
-        var templateUrlStr = 'partials/mms/add-pe.html';
-
-        var instance = $uibModal.open({
-            templateUrl: templateUrlStr,
-            scope: $scope,
-            controller: ['$scope', '$uibModalInstance', '$filter', addPeCtrl]
-        });
-        instance.result.then(function(data) {
-            if (data.type !== 'InstanceSpecification' || ViewService.isSection(data)) {
+    public addPresentationElement($scope, type, viewOrSectionOb) {
+        // $scope.viewOrSectionOb = viewOrSectionOb;
+        // $scope.presentationElemType = type;
+        this.addItemData = {
+            addType: 'pe',
+            itemType: type,
+            viewOrSectionOb: viewOrSectionOb,
+            addPeIndex: $scope.addPeIndex
+        }
+        let instance = this.$uibModal.open({
+            component: 'addItemModal',
+            resolve: {
+                getAddData: () => {
+                    return this.addItemData;
+                }
+            }});
+        instance.result.then((data) => {
+            if (data.type !== 'InstanceSpecification' || this.viewSvc.isSection(data)) {
                 return; //do not open editor for existing pes added or if pe/owner is a section
             }
-            $timeout(function() { //auto open editor for newly added pe
+            this.$timeout(() => { //auto open editor for newly added pe
                 $('#' + data.id).find('mms-transclude-doc,mms-transclude-com').click();
             }, 0, false);
         });
@@ -857,10 +771,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      * @param {object} scope scope of the transclude directives or view section directive
      * @param {String} transcludeType name, documentation, or value
      */
-    var reopenUnsavedElts = function(scope, transcludeType){
+    public reopenUnsavedElts(scope, transcludeType){
         var unsavedEdits = {};
-        if (editSvc.openEdits() > 0) {
-            unsavedEdits = editSvc.getAll();
+        if (this.editSvc.openEdits() > 0) {
+            unsavedEdits = this.editSvc.getAll();
         }
         var key = scope.element.id + '|' + scope.element._projectId + '|' + scope.element._refId;
         var thisEdits = unsavedEdits[key];
@@ -912,71 +826,31 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
      * @param {object} recompile recompile function object
      * @param {object} domElement dom of the directive, jquery wrapped
      */
-    var revertAction = function($scope, preview, domElement) {
-        var templateUrlStr = 'partials/mms-directives/revertConfirm.html';
-
-        var instance = $uibModal.open({
-            templateUrl: templateUrlStr,
-            scope: $scope,
+    public revertAction($scope, preview, domElement) {
+        this.revertData = {
+            elementId: $scope.mmsElementId,
+            projectId : $scope.mmsProjectId,
+            refId: $scope.mmsRefId,
+            baseCommit: $scope.baseCommit,
+            compareCommit: $scope.compareCommit,
+            element: $scope.element
+        }
+        var instance = this.$uibModal.open({
             size: 'lg',
             windowClass: 'revert-spec',
-            controller: ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-                $scope.ok = function() {
-                    if ($scope.oking) {
-                        growl.info("Please wait...");
-                        return;
-                    }
-                    $scope.oking = true;
-                    var revertEltInfo = {
-                        id: $scope.mmsElementId,
-                        name: null,
-                        documentation: null,
-                        _projectId : $scope.mmsProjectId,
-                        _refId: $scope.mmsRefId,
-                        defaultValue: null,
-                        value: null
-                    };
-                    var reqOb = {elementId: $scope.mmsElementId, projectId: $scope.mmsProjectId, refId: $scope.baseCommit.refSelected.id, commitId: $scope.baseCommit.commitSelected.id};
-                    ElementService.getElement(reqOb, 2, false)
-                    .then(function(data) {
-                        if (data.name) {
-                            revertEltInfo.name = data.name;
-                        }
-                        revertEltInfo.documentation = data.documentation;
-                        if (data.defaultValue) {
-                            revertEltInfo.defaultValue = data.defaultValue;
-                        }
-                        if (data.value) {
-                            revertEltInfo.value = data.value;
-                        }
-
-                        ElementService.updateElement(revertEltInfo)
-                        .then(function(element) {
-                            let data = {
-                                element: element,
-                                continueEdit: false
-                            }
-                            eventSvc.$broadcast('element.updated', data);
-                            $uibModalInstance.close();
-                            growl.success("Element reverted");
-                        }, function(reason) {
-                            growl.error("Revert not compeleted - Error: " + reason.message);
-                        }).finally(function() {
-                            $scope.oking = false;
-                        });
-                    });
-                };
-                $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                };
-            }]
+            component: 'revertConfirm',
+            resolve: {
+                getRevertData: () => {
+                    return this.revertData
+                }
+            }
         });
-        instance.result.then(function(data) {
+        instance.result.then((data) => {
               // TODO: do anything here?
         });
     };
 
-    var checkForDuplicateInstances = function(operand) {
+    public checkForDuplicateInstances(operand) {
         var seen = {}, dups = [], curr;
         for (var i = 0; i < operand.length; i++) {
             curr = operand[i].instanceId;
@@ -995,10 +869,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         return dups;
     };
 
-    var fixImgSrc = function(imgDom) {
+    public fixImgSrc(imgDom) {
         var src = imgDom.attr('src');
         if (src) {
-            imgDom.attr('src', src + '?token=' + AuthService.getToken());
+            imgDom.attr('src', src + '?token=' + this.authSvc.getToken());
         }
         if (imgDom.width() < 860) { //keep image relative centered with text if less than 9 in
             return;
@@ -1012,17 +886,17 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         }
     };
 
-    var toggleLeftPane = function (searchTerm) {
-        if ( searchTerm && !rootScopeSvc.leftPaneClosed() ) {
-            eventSvc.$broadcast('tree-pane-closed', true);
+    public toggleLeftPane(searchTerm) {
+        if ( searchTerm && !this.rootScopeSvc.leftPaneClosed() ) {
+            this.eventSvc.$broadcast('tree-pane-closed', true);
         }
 
-        if ( !searchTerm && rootScopeSvc.leftPaneClosed() ) {
-            eventSvc.$broadcast('tree-pane-closed', false);
+        if ( !searchTerm && this.rootScopeSvc.leftPaneClosed() ) {
+            this.eventSvc.$broadcast('tree-pane-closed', false);
         }
     };
 
-    var focusOnEditorAfterAddingWidgetTag = function(editor) {
+    public focusOnEditorAfterAddingWidgetTag(editor) {
         var element = editor.widgets.focused.element.getParent();
         var range = editor.createRange();
         if(range) {
@@ -1030,31 +904,10 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
             range.select();
         }
     };
-
-    return {
-        save: save,
-        hasEdits: hasEdits,
-        revertEdits: revertEdits,
-        startEdit: startEdit,
-        saveAction: saveAction,
-        cancelAction: cancelAction,
-        deleteAction: deleteAction,
-        deleteEditModal: deleteEditModal,
-        previewAction: previewAction,
-        isDirectChildOfPresentationElementFunc: isDirectChildOfPresentationElementFunc,
-        hasHtml: hasHtml,
-        isEnumeration: isEnumeration,
-        getPropertySpec: getPropertySpec,
-        addPresentationElement: addPresentationElement,
-        setupValCf: setupValCf,
-        setupValEditFunctions: setupValEditFunctions,
-        revertAction: revertAction,
-        clearAutosaveContent: clearAutosaveContent,
-        reopenUnsavedElts: reopenUnsavedElts,
-        checkForDuplicateInstances: checkForDuplicateInstances,
-        fixImgSrc: fixImgSrc,
-        focusOnEditorAfterAddingWidgetTag: focusOnEditorAfterAddingWidgetTag,
-        toggleLeftPane: toggleLeftPane
-    };
-
 }
+
+Utils.$inject = ['$q','$uibModal','$timeout', '$templateCache', '$compile', '$window', 'growl', 'URLService',
+    'CacheService', 'ElementService','ViewService','UtilsService','AuthService', 'PermissionsService',
+    'RootScopeService', 'EventService'];
+
+mmsDirectives.service('Utils',  Utils)

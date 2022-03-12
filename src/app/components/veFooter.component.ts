@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 var mmsApp = angular.module('mmsApp');
 
-let VeFooterComponent = {
+let VeFooterComponent: angular.ve.ComponentOptions = {
     selector: "veFooter",
     template: `
     <footer class="footer">
@@ -15,7 +15,7 @@ let VeFooterComponent = {
     bindings: {
         footer: "<"
     },
-    controller: class FooterController {
+    controller: class FooterController implements angular.IComponentController {
         public footer
 
         constructor() {}

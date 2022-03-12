@@ -305,7 +305,7 @@ function mmsD3GroupedHorizontalBarPlot(TableService, $window) {
             .text(function (d, i) {return d; });
       }
       scope.render = function() {
-        TableService.readvalues(scope.plot, projectId, refId, commitId)
+        TableService.readValues(scope.plot, projectId, refId, commitId)
        .then( function(value){
         var tablebody = value.tablebody;
         var tableheader = value.tableheader;

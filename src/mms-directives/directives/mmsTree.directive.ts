@@ -1,9 +1,9 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-let TreeComponent = {
-
-}
+// let TreeComponent: angular.ve.ComponentOptions = {
+//
+// }
 
 
 

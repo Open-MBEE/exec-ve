@@ -1,7 +1,37 @@
-(var|const|let)? ([a-zA-Z]*) = function? ?(\([A-Za-z, \?]*\))( =>)?
+Step 1
+(var|const|let)? ?\$?scope\.?([a-zA-Z]*) = function? ?(\([A-Za-z, \$\?]*\))( =>)?
+public $2$3
+
+function? ?([a-zA-Z]*) ?(\([A-Za-z, \?]*\))( =>)?
+public $1$2
+
+Step 2
+([a-zA-Z]*)Service\.(?!provider|factory|service)
+this.\l$1Svc.
+
+(this\.)?((\$interval|\$http|\$window|\$q|\$timeout|\$uibModal|\$state|\$localStorage|editSvc|growl|hotkeys|rootScopeSvc|eventSvc|edit)(\.|\())
+this.$2
+
+function ?(\([0-9a-zA-Z_ ,:]*\))
+$1 =>
+
+
 public $2$3
 Region\.prototype\.([a-zA-Z]*) = (\([a-z,]*\)) =>
 (width|right|left|top|bottom|height)
-([a-zA-Z]*)Service\.(?!provider|factory)
+([a-zA-Z]*)Service\.(?!provider|factory|service)
 function ?(\([a-zA-Z_ ,]*\))
-((\$interval|\$http|\$window|\$q|growl)(\.|\())
+
+
+([a-zA-Z]*)Service,
+private \l$1Svc: $1Service,
+
+//Bindings
+([A-Za-z]{2,15}),
+$1: "<",\n
+
+: '?"?[@<\?>a-zA-Z]{1,15}'?"?,?
+;
+
+
+this\.(editing|editable|edit|keepMode|editValue)

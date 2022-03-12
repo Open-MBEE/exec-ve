@@ -14,7 +14,7 @@
     <div class="breadcrumbs">
         <ul>
             <li ng-style="truncateStyle">
-                <a class="back-to-proj" ui-sref="project.ref({refId: branch.id? branch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
+                <a class="back-to-proj" ui-sref="main.project.ref({refId: branch.id? branch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
                     uib-tooltip="{{ currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa fa-home" aria-hidden="true"></i>
                 </a>

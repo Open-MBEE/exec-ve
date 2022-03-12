@@ -120,7 +120,7 @@ mmsDirectives.directive('mmsD3NormalizedStackedBarPlot', ['TableService','$windo
 
 
  scope.render = function() {
-      TableService.readvalues2(scope.plot, projectId, refId, commitId)
+      TableService.readValues2(scope.plot, projectId, refId, commitId)
        .then( function(value){
         scope.tablebody = value.tablebody;
         scope.tablecolumnheader = value.tableheader;

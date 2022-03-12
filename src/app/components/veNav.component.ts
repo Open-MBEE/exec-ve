@@ -1,22 +1,19 @@
 import * as angular from 'angular';
+import { StateService } from '@uirouter/angularjs';
+import {ApplicationService} from "../../mms/services/ApplicationService.service";
+import {AuthService} from "../../mms/services/AuthorizationService.service";
+import {ProjectService} from "../../mms/services/ProjectService.service";
+import {RootScopeService} from "../../mms/services/RootScopeService.service";
 var mmsApp = angular.module('mmsApp');
 
 
-let VeNavComponent = {
-    selector: "ve-nav",
+let VeNavComponent: angular.ve.ComponentOptions = {
+    selector: "veNav",
     bindings: {
         mmsOrg: '<',
         mmsProject: '<',
         mmsProjects: '<',
-        mmsGroup: '<',
-        mmsGroups: '<',
-        mmsBranch: '<',
         mmsRef: '<',
-        mmsRefs: '<',
-        mmsBranches: '<',
-        mmsTag: '<',
-        mmsTags: '<',
-        mmsSearch: '<',
     },
     template: `
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -27,10 +24,10 @@ let VeNavComponent = {
                 <i class="fa fa-bars" aria-hidden="true"></i>
             </button>
             <span>
-            <a class="navbar-brand" ui-sref="login.select">
+            <a class="navbar-brand" ui-sref="main.login.select">
                 <img src="assets/logo.svg" alt="View Editor Logo">
             </a>
-            <a ng-if="!$ctrl.mmsOrg.homeLink" class="org-title" ui-sref="project.ref({projectId: $ctrl.mmsProject.id, refId: $ctrl.mmsRef.id})">{{ $ctrl.mmsOrg.name }}</a>
+            <a ng-if="!$ctrl.mmsOrg.homeLink" class="org-title" ui-sref="main.project.ref({projectId: $ctrl.mmsProject.id, refId: $ctrl.mmsRef.id})">{{ $ctrl.mmsOrg.name }}</a>
             <a ng-if="$ctrl.mmsOrg.homeLink" class="org-title" ng-href="{{$ctrl.mmsOrg.homeLink}}">{{ $ctrl.mmsOrg.name }}</a>
             <a class="switch-org" ng-click="$ctrl.updateOrg()">Switch Org</a>
             </span>
@@ -90,32 +87,14 @@ let VeNavComponent = {
     </div>
 </nav>
 `,
-    controller: class VeNavController {
-        static $inject = ['$state', 'hotkeys', 'growl', '$location', '$uibModal', '$window', 'ApplicationService','AuthService', 'ProjectService', 'RootScopeService'];
-
-        private $state
-        private hotkeys
-        private growl
-        private $location
-        private $uibModal
-        private $window
-        private applicationSvc
-        private authSvc
-        private projectSvc
-        private rootScopeSvc
+    controller: class VeNavController implements angular.IComponentController {
+        static $inject = ['$state', '$location', '$uibModal', '$window', 'hotkeys', 'growl', 'ApplicationService', 'AuthService', 'ProjectService'];
 
         //bindings
         public mmsOrg;
         public mmsProject;
         public mmsProjects;
-        public mmsGroup;
-        public mmsGroups;
-        public mmsBranch;
         public mmsRef;
-        public mmsRefs;
-        public mmsBranches;
-        public mmsTag;
-        public mmsTags;
 
         //local
         public mmsOrgs;
@@ -126,17 +105,11 @@ let VeNavComponent = {
         public user;
 e
 
-        constructor($state, hotkeys, growl, $location, $uibModal, $window, ApplicationService, AuthService, ProjectService, RootScopeService) {
-            this.$state = $state
-            this.hotkeys = hotkeys;
-            this.growl = growl;
-            this.$location = $location;
-            this.$uibModal = $uibModal;
-            this.$window = $window;
-            this.applicationSvc = ApplicationService;
-            this.authSvc = AuthService;
-            this.projectSvc = ProjectService;
-            this.rootScopeSvc = RootScopeService;
+        constructor(private $state: StateService, private $location: angular.ILocationService,
+                    private $uibModal: angular.ui.bootstrap.IModalService, private $window: angular.IWindowService,
+                    private hotkeys: angular.hotkeys.HotkeysProvider, private growl: angular.growl.IGrowlService,
+                    private applicationSvc: ApplicationService, private authSvc: AuthService,
+                    private projectSvc: ProjectService) {
 
             this.projectSvc.getOrgs().then((orgs) => {
                 this.mmsOrgs = orgs;
@@ -185,23 +158,23 @@ e
 
         toggleAbout() {
             this.$uibModal.open({
-                component: 'about'
+                component: 'aboutModal'
             });
         };
 
         logout() {
             this.authSvc.logout().then(() => {
-                this.$state.go('login');
+                this.$state.go('main.login');
             },() => {
                 this.growl.error('You were not logged out');
             });
         };
 
         search(searchText) {
-            if (this.$state.includes('project.ref.document.order')) {
+            if (this.$state.includes('main.project.ref.document.order')) {
                 this.growl.warning("Please finish reorder action first.");
                 return;
-                // } else if ($state.includes('project.diff')) {
+                // } else if ($state.includes('main.project.diff')) {
                 //     growl.warning("Please finish diff action first.");
                 //     return;
             } else {

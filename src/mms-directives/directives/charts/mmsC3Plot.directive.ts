@@ -45,7 +45,7 @@ function mmsC3Plot(TableService, $window, _) {
     }
   
     scope.render = function() {
-      TableService.readvalues(scope.plot, projectId, refId, commitId)
+      TableService.readValues(scope.plot, projectId, refId, commitId)
       .then( function(value) {
           scope.valuesO = value.tablebody.valuesO; //value objects used in watch
           var c3options;

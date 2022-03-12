@@ -10,7 +10,7 @@ var mms = angular.module('mms');
  * @description
  * Branding Service
  */
-class BrandingService {
+export class BrandingService {
     private defaultLabels = {
                 pi: 'PROPRIETARY: Proprietary Information',
                 export_ctrl: 'EXPORT WARNING: No export controlled documents allowed on this server',

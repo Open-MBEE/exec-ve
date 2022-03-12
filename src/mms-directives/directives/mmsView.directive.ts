@@ -1,7 +1,8 @@
 import * as angular from "angular";
+import {RootScopeService} from "../../mms/services/RootScopeService.service";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsView', ['Utils', 'AuthService', 'ViewService', 'ElementService', '$templateCache', 'growl', mmsView]);
+mmsDirectives.directive('mmsView', ['Utils', 'AuthService', 'ViewService', 'ElementService', 'EventService', 'RootScopeService', '$templateCache', 'growl', mmsView]);
 
 /**
  * @ngdoc directive
@@ -54,10 +55,14 @@ mmsDirectives.directive('mmsView', ['Utils', 'AuthService', 'ViewService', 'Elem
  *              view being clicked, this should be a function whose argument is 'elementId'
  */
 
-function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache, growl) {
+function mmsView(Utils, AuthService, ViewService, ElementService, EventService, RootScopeService, $templateCache, growl) {
     var template = 'partials/mms-directives/mmsView.html';
+    var eventSvc = EventService;
+    var rootScopeSvc = RootScopeService;
 
     var mmsViewCtrl = function($scope) {
+        eventSvc.$init($scope);
+
         $scope.presentationElemCleanUpFncs = [];
 
         this.isTranscludedElement = function(elementName) {
@@ -278,56 +283,18 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
             }
         };
 
-        if (angular.isObject(scope.mmsViewApi)) {
-            var api = scope.mmsViewApi;
-            api.toggleShowElements = scope.toggleShowElements;
-            api.toggleShowEdits = scope.toggleShowEdits;
-            api.toggleShowComments = scope.toggleShowComments;
-
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsView#setShowElements
-             * @methodOf mmsDirectives.directive:mmsView
-             *
-             * @description
-             * self explanatory
-             *
-             * @param {boolean} mode arg
-             */
-            api.setShowElements = function(mode) {
-                scope.showElements = mode;
-                if (mode)
-                    element.addClass('outline');
-                else
-                    element.removeClass('outline');
-            };
-
-            /**
-             * @ngdoc function
-             * @name mmsDirectives.directive:mmsView#setShowComments
-             * @methodOf mmsDirectives.directive:mmsView
-             *
-             * @description
-             * self explanatory
-             *
-             * @param {boolean} mode arg
-             */
-            api.setShowComments = function(mode) {
-                scope.showComments = mode;
-                if (mode)
-                    element.addClass('reviewing');
-                else
-                    element.removeClass('reviewing');
-            };
-
-            api.changeView = function(vid) {
-                scope.changeView(vid);
-            };
-
-            if (api.init) {
-                api.init(api);
+        scope.subs.push(eventSvc.$on('show-comments', () => {
+            scope.toggleShowComments();
+        }));
+        scope.subs.push(eventSvc.$on('show-elements', () => {
+            scope.toggleShowElements();
+        }));
+        scope.subs.push(eventSvc.$on('show-edits', () => {
+            if( (rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) || (!this.rootScopeSvc.veElementsOn() && !this.rootScopeSvc.veEditMode()) ){
+                scope.toggleShowElements();
             }
-        }
+            scope.toggleShowEdits();
+        }));
     };
 
     return {

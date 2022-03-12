@@ -14,8 +14,8 @@ var mms = angular.module('mms');
  * creating unique IDs, etc...
  */
 export class ApplicationService {
-    private state
-            username
+    private state: { inDoc: boolean, fullDoc: boolean, currentDoc: string } = {inDoc: false, fullDoc: false, currentDoc: null}
+            username: any = null;
     
     constructor(private $q, private $http, private urlSvc : URLService) {}
     

@@ -2,13 +2,13 @@ import * as angular from 'angular'
 var mms = angular.module('mms');
 
 
-class TreeService {
+export class TreeService {
 
     private readonly $timeout
     private readonly rootScopeSvc
     private readonly eventSvc
 
-    public treeApi
+    private readonly treeApi
     public treeData
     public treeRows
 
@@ -31,7 +31,7 @@ class TreeService {
     };
 }
 
-class TreeApi {
+export class TreeApi {
     
     private $timeout
     private rootScopeSvc

@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var mmsDirectives = angular.module('mmsDirectives');
 
-mmsDirectives.directive('mmsToolbar', ['$templateCache', 'RootScopeService', 'EventService',
+mmsDirectives.directive('veToolbar', ['$templateCache', 'RootScopeService', 'EventService',
 	'ToolbarService', mmsToolbar]);
 
 function mmsToolbar($templateCache, RootScopeService, EventService, ToolbarService)
@@ -12,20 +12,7 @@ function mmsToolbar($templateCache, RootScopeService, EventService, ToolbarServi
 
 	var mmsToolbarCtrl = function($scope)
 	{
-		$scope.init = false;
-		$scope.$watch(() => {
-			return $scope.mmsTbApi;
-		},() => {
-			if (!$scope.mmsTbApi){
-				return null;
-			}
-			if ($scope.init === false && ToolbarService.isApi($scope.mmsTbApi)) {
-				if ($scope.mmsTbApi.init) {
-					$scope.mmsTbApi.init();
-				}
-				$scope.init = true;
-			}
-		});
+		$scope.buttons = ToolbarService.buttons;
 	};
 
 	var mmsToolbarLink = function(scope, element, attrs)
@@ -42,12 +29,12 @@ function mmsToolbar($templateCache, RootScopeService, EventService, ToolbarServi
 			}
 
 			var toggleDecativeFlag = false;
-			if (typeof rootScopeSvc.mmsPaneClosed() === 'boolean' && rootScopeSvc.mmsPaneToggleable() !== false)
+			if (typeof rootScopeSvc.rightPaneClosed() === 'boolean' && rootScopeSvc.rightPaneToggleable() !== false)
 			{
-				if (button.selected || rootScopeSvc.mmsPaneClosed())
+				if (button.selected || rootScopeSvc.rightPaneClosed())
 				{
-					if (button.selected && !rootScopeSvc.mmsPaneClosed()) toggleDecativeFlag = true;
-					eventSvc.$broadcast('mms-pane-toggle');
+					if (button.selected && !rootScopeSvc.rightPaneClosed()) toggleDecativeFlag = true;
+					eventSvc.$broadcast('right-pane-toggle');
 				}
 			}
 
@@ -95,7 +82,6 @@ function mmsToolbar($templateCache, RootScopeService, EventService, ToolbarServi
 		controller: ['$scope', mmsToolbarCtrl],
 		link: mmsToolbarLink,
 		scope: {
-			buttons: '<',
 			mmsTbApi: '<',
 			onClick: '&',
 			direction: '@'

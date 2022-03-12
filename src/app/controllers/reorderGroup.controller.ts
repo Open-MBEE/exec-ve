@@ -186,9 +186,9 @@ function ($scope, $stateParams, $state, $window, growl, ElementService, CacheSer
         var curBranch = TreeService.getApi().get_selected_branch();
         if (curBranch) {
             var documentId = curBranch.type === 'group' ? 'site_' + curBranch.data.id + '_cover' : curBranch.data.id;
-            $state.go('project.ref.preview', {documentId: documentId}, {reload: reload});
+            $state.go('main.project.ref.preview', {documentId: documentId}, {reload: reload});
         } else {
-            $state.go('project.ref', {}, {reload: reload});
+            $state.go('main.project.ref', {}, {reload: reload});
         }
     }
 }]);

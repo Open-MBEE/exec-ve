@@ -34,7 +34,8 @@
         },
         footer: {
             message: "OpenMBEE View Editor | Licensed under Apache 2.0"
-        }
+        },
+        loginTimout: 600000 //Check login frequency (should roughly match with mms settings)
     }
 
 }());

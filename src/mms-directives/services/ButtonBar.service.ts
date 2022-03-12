@@ -138,7 +138,7 @@ export class ButtonBarApi {
 
 
 
-class ButtonBarService {
+export class ButtonBarService {
 
   private buttonBars = {}
           barCounter = 0

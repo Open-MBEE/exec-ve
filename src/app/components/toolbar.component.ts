@@ -1,4 +1,11 @@
 import * as angular from 'angular';
+import {ToolbarApi, ToolbarService} from "../../mms-directives/services/Toolbar.service";
+import {StateService} from "@uirouter/angularjs";
+import {EditService} from "../../mms/services/EditService.service";
+import {UxService} from "../../mms/services/UxService.service";
+import {PermissionsService} from "../../mms/services/PermissionsService.service"
+import {EventService} from "../../mms/services/EventService.service";
+
 var mmsApp = angular.module('mmsApp');
 
 
@@ -12,23 +19,17 @@ var mmsApp = angular.module('mmsApp');
 // }
 
 /* Classes */
-const ToolbarComponent = {
+const ToolbarComponent: angular.ve.ComponentOptions = {
     selector: "toolbar", //toolbar-component
-    template: `<mms-toolbar buttons="$ctrl.buttons" on-click="onClick(button)" mms-tb-api="$ctrl.tbApi" />`,
+    template: `<ve-toolbar on-click="onClick(button)" mms-tb-api="$ctrl.tbApi" />`,
     bindings: {
         refOb: '<',
         documentOb: '<'
     },
-    controller: class ToolbarController {
+    controller: class ToolbarController implements angular.IComponentController {
         static $inject = ['$state', 'UxService', 'PermissionsService', 'EditService', 'EventService', 'ToolbarService'];
 
         //Injected Deps
-        private $state
-        private UxService
-        private PermissionsService
-        private edit;
-        private toolbar;
-        private eventSvc;
         private subs;
 
         //Bindings
@@ -36,25 +37,26 @@ const ToolbarComponent = {
         public documentOb
 
         //Local
-        public tbApi;
+        public tbApi: ToolbarApi;
         public buttons;
         private tbInitFlag;
 
-        constructor($state, UxService, PermissionsService, EditService, EventService, ToolbarService) {
-            this.$state = $state;
-            this.UxService = UxService;
-            this.PermissionsService = PermissionsService;
-            this.toolbar = ToolbarService;
-            this.edit = EditService;
-            this.eventSvc = EventService;
-            this.buttons = [];
+        constructor(private $state: StateService, private uxSvc: UxService, private permissionsSvc: PermissionsService,
+                    private editSvc: EditService, private eventSvc: EventService, private toolbar: ToolbarService) {
             this.tbInitFlag = false;
         }
 
-        $onInit = () => {
+        $onInit() {
             this.eventSvc.$init(this);
 
-            this.tbApi = this.toolbar.getApi(this.buttons, this.tbInit);
+            this.tbApi = this.toolbar.getApi();
+            this.tbApi.setInit(this.tbInit);
+            this.tbApi.init(this);
+            this.buttons = this.toolbar.buttons;
+
+            if (this.toolbar.buttons.length > 0) {
+                this.toolbar.buttons.length = 0;
+            }
 
             this.subs.push(this.eventSvc.$on(this.toolbar.constants.SETPERMISSION, (data) => {
                 this.tbApi.setPermission(data.id, data.value);
@@ -73,34 +75,27 @@ const ToolbarComponent = {
             }));
         };
 
-        $onChanges = (changes) => {
-            if (changes.refOb && changes.refOb.currentValue && !this.tbInitFlag) {
-                //this.tbApi = this.toolbar.getApi(this.buttons, this.tbInit);
-                this.tbInitFlag = true;
-            }
-        }
-
-        tbInit = () => {
-            let tbApi = this.tbApi;
-            tbApi.addButton(this.UxService.getToolbarButton("element-viewer"));
-            tbApi.addButton(this.UxService.getToolbarButton("element-editor"));
-            if (this.edit.openEdits() > 0) {
+        tbInit(tbCtrl) {
+            let tbApi = tbCtrl.tbApi;
+            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("element-viewer"));
+            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("element-editor"));
+            if (tbCtrl.editSvc.openEdits() > 0) {
                 tbApi.setIcon('element-editor', 'fa-edit-asterisk');
                 tbApi.setPermission('element-editor-saveall', true);
             }
             let editable = false;
-            tbApi.addButton(this.UxService.getToolbarButton("element-history"));
-            tbApi.addButton(this.UxService.getToolbarButton("tags"));
-            if (this.$state.includes('project.ref') && !this.$state.includes('project.ref.document')) {
-                editable = this.refOb && this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
+            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("element-history"));
+            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("tags"));
+            if (tbCtrl.$state.includes('main.project.ref') && !tbCtrl.$state.includes('main.project.ref.document')) {
+                editable = tbCtrl.refOb && tbCtrl.refOb.type === 'Branch' && tbCtrl.permissionsSvc.hasBranchEditPermission(tbCtrl.refOb);
                 tbApi.setPermission('element-editor', editable);
-                if (this.$state.includes('project.ref.preview')) {
-                    tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
+                if (tbCtrl.$state.includes('main.project.ref.preview')) {
+                    tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("view-reorder"));
                     tbApi.setPermission("view-reorder", editable);
                 }
-            } else if (this.$state.includes('project.ref.document')) {
-                editable = this.refOb && this.refOb.type === 'Branch' && this.PermissionsService.hasBranchEditPermission(this.refOb);
-                tbApi.addButton(this.UxService.getToolbarButton("view-reorder"));
+            } else if (tbCtrl.$state.includes('main.project.ref.document')) {
+                editable = tbCtrl.refOb && tbCtrl.refOb.type === 'Branch' && tbCtrl.permissionsSvc.hasBranchEditPermission(tbCtrl.refOb);
+                tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("view-reorder"));
                 tbApi.setPermission('element-editor', editable);
                 tbApi.setPermission("view-reorder", editable);
             }

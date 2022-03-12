@@ -5,8 +5,8 @@ var mmsApp = angular.module('mmsApp');
 
 /* Controllers */
 
-mmsApp.controller('ReorderCtrl', ['$scope', 'documentOb', 'ElementService', 'ViewService', 'MmsAppUtils', 'TreeService', '$state', 'growl', '$q', '_',
-function($scope, documentOb, ElementService, ViewService, MmsAppUtils, TreeService, $state, growl, $q, _) {
+mmsApp.controller('ReorderCtrl', ['$scope', 'documentOb', 'ElementService', 'ViewService', 'AppUtilsService', 'TreeService', '$state', 'growl', '$q', '_',
+function($scope, documentOb, ElementService, ViewService, AppUtilsService, TreeService, $state, growl, $q, _) {
     $scope.doc = documentOb;
 
     let treeApi = TreeService.getApi();
@@ -80,7 +80,7 @@ function($scope, documentOb, ElementService, ViewService, MmsAppUtils, TreeServi
         curNode.children.push.apply(curNode.children, newChildNodes);
     }
 
-    MmsAppUtils.handleChildViews(documentOb, 'composite', undefined, documentOb._projectId, 
+    AppUtilsService.handleChildViews(documentOb, 'composite', undefined, documentOb._projectId,
         documentOb._refId, handleSingleView, handleChildren)
     .then(function(docNode) {
         var num = 1;
@@ -162,13 +162,13 @@ function($scope, documentOb, ElementService, ViewService, MmsAppUtils, TreeServi
     function navigate(reload) {
         var curBranch = treeApi.get_selected_branch();
         if (!curBranch) {
-            $state.go('project.ref.document', {}, {reload:true});
+            $state.go('main.project.ref.document', {}, {reload:true});
         } else {
             var goToId = curBranch.data.id;
             if (curBranch.type !== 'section' && curBranch.type !== 'view') {
                 goToId = curBranch.viewId;
             }
-            $state.go('project.ref.document.view', {viewId: goToId}, {reload: reload});
+            $state.go('main.project.ref.document.view', {viewId: goToId}, {reload: reload});
         }
     }
 }]);

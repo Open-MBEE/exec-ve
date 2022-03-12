@@ -1,76 +1,86 @@
 import * as angular from 'angular';
+import * as _ from 'lodash';
+
+import { StateService } from '@uirouter/angularjs';
+import {IWindowService} from "angular";
+import {ElementService} from "../../mms/services/ElementService.service";
+import {ProjectService} from "../../mms/services/ProjectService.service";
+import {AppUtilsService} from "../services/AppUtils.service";
+import {ApplicationService} from "../../mms/services/ApplicationService.service";
+import {RootScopeService} from "../../mms/services/RootScopeService.service";
+import {EventService} from "../../mms/services/EventService.service";
 var mmsApp = angular.module('mmsApp');
 
-let RefsComponent = {
+let RefsComponent: angular.ve.ComponentOptions = {
     selector: 'refs',
     template: `
     <div class="container-fluid ve-no-panes">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
-            <a class="back-to-docs" ui-sref="project.ref({refId: fromParams.id, search: undefined})"
-               ui-sref-opts="{reload:true}">Back to Project Documents ({{fromParams.name}})</a>
+            <a class="back-to-docs" ui-sref="main.project.ref({refId: $ctrl.fromParams.id, search: undefined})"
+               ui-sref-opts="{reload:true}">Back to Project Documents ({{$ctrl.fromParams.name}})</a>
             <h1 class="panel-title">Manage Project branches/tags</h1>
             <div class="panel panel-default">
                 <div class="panel-body no-padding-panel">
-                    <div ng-show="refManageView" class="col-md-4 ve-light-list-panels">
+                    <div ng-show="$ctrl.refManageView" class="col-md-4 ve-light-list-panels">
                         <ul class="ve-light-list">
                             <li class="ve-light-input">
-                                <input placeholder="Filter branches/tags" class="ve-plain-input" ng-model="refFilter">
+                                <input placeholder="Filter branches/tags" class="ve-plain-input" ng-model="$ctrl.refFilter">
                             </li>
                             <li class="ref-title">
                                 <h2><i class="fa fa-code-fork" aria-hidden="true"></i>Branches</h2>
                             </li>
-                            <li class="ref-item" ng-repeat="branch in branches | orderBy:'name' | filter:{name:refFilter}" ng-click="refClickHandler(branch)"
-                                ng-class="{'selected': branch.id === refSelected.id}">
+                            <li class="ref-item" ng-repeat="branch in $ctrl.branches | orderBy:'name' | filter:{name:$ctrl.refFilter}" ng-click="$ctrl.refClickHandler(branch)"
+                                ng-class="{'selected': branch.id === $ctrl.refSelected.id}">
                                 <a>{{ branch.name }}</a>
                             </li>
                             <li class="ref-title">
                                 <h2><i class="fa fa-tag" aria-hidden="true"></i>Tags</h2>
                             </li>
-                            <li class="ref-item" ng-repeat="tag in tags | orderBy:'name' | filter:{name:refFilter}" ng-click="refClickHandler(tag)"
-                                ng-class="{'selected': tag.id === refSelected.id}">
+                            <li class="ref-item" ng-repeat="tag in $ctrl.tags | orderBy:'name' | filter:{name:$ctrl.refFilter}" ng-click="$ctrl.refClickHandler(tag)"
+                                ng-class="{'selected': tag.id === $ctrl.refSelected.id}">
                                 <a>{{ tag.name }}</a>
                             </li>
                             <li ng-if="!tags.length" class="ve-secondary-text">No Tags</li>
                         </ul>
                     </div>
-                    <div class="col-md-8 ve-light-panels-detail" ng-show="refSelected">
+                    <div class="col-md-8 ve-light-panels-detail" ng-show="$ctrl.refSelected">
                         <div class="panels-detail-title clearfix">
-                            <h3 class="{{refSelected.type}}-icon">{{refSelected.name}}</h3>
+                            <h3 class="{{$ctrl.refSelected.type}}-icon">{{$ctrl.refSelected.name}}</h3>
                             <div class="ref-button-options" style="float:right">
-                            <button class="btn btn-default" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="deleteRef()" ng-if="refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
-                            <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addTag()"><i class="fa fa-plus"></i> Tag</button>
-                            <button class="btn btn-primary" ng-disabled="refSelected.status === 'creating'" type="button" ng-click="addBranch()"><i class="fa fa-plus"></i> Branch</button>
+                            <button class="btn btn-default" ng-disabled="$ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.deleteRef()" ng-if="$ctrl.refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
+                            <button class="btn btn-primary" ng-disabled="$ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addTag()"><i class="fa fa-plus"></i> Tag</button>
+                            <button class="btn btn-primary" ng-disabled="$ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addBranch()"><i class="fa fa-plus"></i> Branch</button>
                             </div>
                             <!-- <button-bar buttons="buttons" mms-bb-api="bbApi"></button-bar> -->
                         </div>
                         <dl class="dl-horizontal ve-light-panels-detail-content">
                             <dt></dt>
-                            <dd ng-hide="refSelected.status === 'creating'" class="link-section">
-                                <a ui-sref="project.ref({refId: refSelected.id, search: undefined})" ui-sref-opts="{reload:true}">Project Documents</a>
+                            <dd ng-hide="$ctrl.refSelected.status === 'creating'" class="link-section">
+                                <a ui-sref="main.project.ref({refId: $ctrl.refSelected.id, search: undefined})" ui-sref-opts="{reload:true}">Project Documents</a>
                             </dd>
-                            <dd ng-show="refSelected.status === 'creating'" class="link-section">
-                                <span uib-tooltip-html="htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"
-                                    tooltip-append-to-body="refSelected.status == 'creating'" tooltip-enable="refSelected.status == 'creating'"
-                                    ng-class="{'branch-disabled': refSelected.status == 'creating'}">Project Documents</span>
+                            <dd ng-show="$ctrl.refSelected.status === 'creating'" class="link-section">
+                                <span uib-tooltip-html="$ctrl.htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"
+                                    tooltip-append-to-body="$ctrl.refSelected.status == 'creating'" tooltip-enable="$ctrl.refSelected.status == 'creating'"
+                                    ng-class="{'branch-disabled': $ctrl.refSelected.status == 'creating'}">Project Documents</span>
                             </dd>
                             <dt>Id</dt>
-                            <dd>{{refSelected.id}}</dd>
+                            <dd>{{$ctrl.refSelected.id}}</dd>
                             <dt>Type</dt>
-                            <dd>{{refSelected.type}}</dd>
+                            <dd>{{$ctrl.refSelected.type}}</dd>
                             <dt>Description</dt>
-                            <dd>{{refSelected.description}}</dd>
+                            <dd>{{$ctrl.refSelected.description}}</dd>
                             <span ng-if="refSelected.id != 'master'">
                             <dt>Time Created</dt>
-                            <dd>{{refSelected._created}}</dd>
+                            <dd>{{$ctrl.refSelected._created}}</dd>
                             <dt>Creator</dt>
-                            <dd>{{refSelected._creator}}</dd>
+                            <dd>{{$ctrl.refSelected._creator}}</dd>
                             <!-- <dt>Last Modified</dt>
                             <dd>{{refSelected._modified}}</dd> -->
                             <dt>Modifier</dt>
-                            <dd>{{refSelected._modifier}}</dd>
+                            <dd>{{$ctrl.refSelected._modifier}}</dd>
                             <dt>Parent Ref</dt>
-                            <dd>{{refSelected.parentRefId}}</dd>
+                            <dd>{{$ctrl.refSelected.parentRefId}}</dd>
                             </span>
                         </dl>
                     </div>
@@ -89,28 +99,10 @@ let RefsComponent = {
         mmsBranches: "<"
     },
     controller: class RefsController{
-        static $inject = ['$sce', '$q', '$filter', '$location', '$uibModal', '$scope', '$state', '$timeout', '$window', 'growl',
-            'ElementService', 'ProjectService', 'MmsAppUtils', 'ApplicationService', 'RootScopeService',
+        static $inject = ['$sce', '$q', '$filter', '$location', '$uibModal', '$state', '$timeout', '$window', 'growl',
+            'ElementService', 'ProjectService', 'AppUtilsService', 'ApplicationService', 'RootScopeService',
             'EventService']
 
-        private $sce
-        private $q
-        private $filter
-        private $location
-        private $uibModal
-        private $scope
-        private $state
-        private $timeout
-        private $window
-        private growl
-        private _
-        private flatpickr
-        private elementSvc
-        private projectSvc
-        private mmsAppUtils
-        private applicationSvc
-        private rootScopeSvc
-        private eventSvc
         private subs
 
         //Bindings
@@ -136,28 +128,14 @@ let RefsComponent = {
             htmlTooltip
             addItemData
 
-        constructor($sce, $q, $filter, $location, $uibModal, $scope, $state, $timeout, $window, growl,
-                    ElementService, ProjectService, MmsAppUtils, ApplicationService, RootScopeService, EventService, flatpickr) {
-
-            this.$sce = $sce;
-            this.$q = $q;
-            this.$filter = $filter;
-            this.$location = $location;
-            this.$uibModal = $uibModal;
-            this.$scope = $scope;
-            this.$state = $state;
-            this.$timeout = $timeout;
-            this.$window = $window;
-            this.growl = growl;
-            this._ = this.$window._;
-            this.flatpickr = flatpickr;
-            this.elementSvc = ElementService;
-            this.projectSvc = ProjectService;
-            this.mmsAppUtils = MmsAppUtils;
-            this.applicationSvc = ApplicationService;
-            this.rootScopeSvc = RootScopeService;
-            this.eventSvc = EventService;
-        }
+        constructor(private $sce: angular.ISCEService, private $q: angular.IQService,
+                    private $filter: angular.IFilterService, private $location: angular.ILocationService,
+                    private $uibModal: angular.ui.bootstrap.IModalService, private $state: StateService,
+                    private $timeout: angular.ITimeoutService, private $window: IWindowService,
+                    private growl: angular.growl.IGrowlService, private elementSvc: ElementService,
+                    private projectSvc: ProjectService, private appUtilsSvc: AppUtilsService,
+                    private applicationSvc: ApplicationService, private rootScopeSvc: RootScopeService,
+                    private eventSvc: EventService) {}
 
         $onInit() {
             this.eventSvc.$init(this);
@@ -175,7 +153,7 @@ let RefsComponent = {
             this.view = null;
             this.fromParams = {};
 
-            if (this._.isEmpty(this.mmsRef)) {
+            if (_.isEmpty(this.mmsRef)) {
                 this.selectMasterDefault();
             } else {
                 this.fromParams = this.mmsRef;
@@ -185,7 +163,7 @@ let RefsComponent = {
             this.htmlTooltip = this.$sce.trustAsHtml('Branch temporarily unavailable during duplication.');
 
             this.subs.push(this.eventSvc.$on('fromParamChange', (fromParams) => {
-                let index = this._.findIndex(this.mmsRefs, {name: fromParams.refId});
+                let index = _.findIndex(this.mmsRefs, {name: fromParams.refId});
                 if ( index > -1 ) {
                     this.fromParams = this.mmsRefs[index];
                 }
@@ -194,7 +172,7 @@ let RefsComponent = {
         }
 
         selectMasterDefault() {
-            var masterIndex = this._.findIndex(this.mmsRefs, {name: 'master'});
+            var masterIndex = _.findIndex(this.mmsRefs, {name: 'master'});
             if (masterIndex > -1) {
                 this.fromParams = this.mmsRefs[masterIndex];
                 this.refSelected = this.mmsRefs[masterIndex];
@@ -256,7 +234,7 @@ let RefsComponent = {
                 return;
             }
             let instance = this.$uibModal.open({
-                component: 'addItem',
+                component: 'addItemModal',
                 resolve: {
                     getAddData: () => {
                         return this.addItemData;
@@ -314,7 +292,7 @@ deleteItem() {
         return;
     }
     let instance = this.$uibModal.open({
-        component: "confirmDelete",
+        component: "confirmDeleteModal",
         resolve: {
             getName: () => {
                 return branch.name;

@@ -5,7 +5,7 @@ mmsDirectives.directive('mmsTranscludeView', ['Utils','ElementService', 'UtilsSe
     'EventService', '$compile', '$templateCache', 'growl', 'MathJax', mmsTranscludeView]);
 
 
-const TranscludeViewComponent = {
+const TranscludeViewComponent: angular.ve.ComponentOptions = {
     selector: "mms-transclude-view",
     template: `
     <div class="panel panel-default no-print">
@@ -26,7 +26,7 @@ const TranscludeViewComponent = {
         mmsViewCtrl: '?^^mmsView',
         mmsViewPresentationElemCtrl: '?^^mmsViewPresentationElem'
     },
-    controller: class TranscludeViewController {
+    controller: class TranscludeViewController implements angular.IComponentController {
         static $inject = ['Utils','ElementService', 'UtilsService', 'ViewService', 'UxService', 'AuthService',
             'EventService', '$compile', '$element', 'growl', 'MathJax'];
 

@@ -6,8 +6,8 @@ export class RootScopeService {
     
     public constants = {
         MMSREFOB: 'mms-ref-ob',
-        MMSPANETOGGLEABLE: 'mms-pane-togglable',
-        MMSPANECLOSED: 'mms-pane-closed',
+        RIGHTPANETOGGLEABLE: 'mms-pane-togglable',
+        RIGHTPANECLOSED: 'mms-pane-closed',
         VETITLE: 've-title',
         VEFN: 've-fn',
         VESTATECHANGING: 've-state-changing',
@@ -19,11 +19,14 @@ export class RootScopeService {
         VEFULLDOCMODE: 've-full-doc-mode',
         VEELEMENTSON: 've-elements-on',
         VEEDITMODE: 've-edit-mode',
+        VEHIDEPANES: 've-hide-panes',
+        VESHOWMANAGEREFS: 've-show-manage-refs',
+        VESHOWLOGIN: 've-show-login',
         TREESHOWPE: 'tree-show-pe',
         TREEOPTIONS: 'tree-options',
         TREEINITIALSELECTION: 'tree-initialSelection',
         TREEICONS: 'tree-icons',
-        TREEPANECLOSED: 'tree-pane-closed'
+        LEFTPANECLOSED: 'tree-pane-closed'
     };
 
     constructor(SessionService) {
@@ -34,12 +37,12 @@ export class RootScopeService {
         return this.sessionSvc.accessor(this.constants.MMSREFOB, value);
     };
 
-    mmsPaneToggleable(value=null) {
-        return this.sessionSvc.accessor(this.constants.MMSPANETOGGLEABLE, value, true);
+    rightPaneToggleable(value=null) {
+        return this.sessionSvc.accessor(this.constants.RIGHTPANETOGGLEABLE, value, true);
     };
 
-    mmsPaneClosed(value=null) {
-        return this.sessionSvc.accessor(this.constants.MMSPANECLOSED, value, false);
+    rightPaneClosed(value=null) {
+        return this.sessionSvc.accessor(this.constants.RIGHTPANECLOSED, value, false);
     };
 
     veTitle(value=null) {
@@ -86,6 +89,18 @@ export class RootScopeService {
         return this.sessionSvc.accessor(this.constants.VEEDITMODE, value, false);
     };
 
+    veHidePanes(value=null) {
+        return this.sessionSvc.accessor(this.constants.VEHIDEPANES, value, false, true)
+    };
+
+    veShowManageRefs(value=null) {
+        return this.sessionSvc.accessor(this.constants.VESHOWMANAGEREFS, value, false, true);
+    }
+
+    veShowLogin(value=null) {
+        return this.sessionSvc.accessor(this.constants.VESHOWLOGIN, value, false, true);
+    }
+
     treeShowPe(value=null) {
         return this.sessionSvc.accessor(this.constants.TREESHOWPE, value, false);
     };
@@ -103,7 +118,7 @@ export class RootScopeService {
     };
 
     leftPaneClosed(value=null) {
-        return this.sessionSvc.accessor(this.constants.TREEPANECLOSED, value, false);
+        return this.sessionSvc.accessor(this.constants.LEFTPANECLOSED, value, false);
     };
 
 }

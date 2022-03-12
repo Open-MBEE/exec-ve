@@ -262,7 +262,7 @@ function mmsD3ParallelAxisPlot(TableService,  $window) {
 
     scope.render = function() {
 
-      TableService.readvalues(scope.plot, projectId, refId, commitId)
+      TableService.readValues(scope.plot, projectId, refId, commitId)
        .then( function(value){
         scope.tablebody = value.tablebody;
         scope.tableheader = value.tableheader;

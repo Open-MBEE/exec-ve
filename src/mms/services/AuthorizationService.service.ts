@@ -1,12 +1,12 @@
 import * as angular from 'angular'
-import {CacheService} from "./CacheService.factory";
+import {CacheService} from "./CacheService.service";
 import {URLService} from "./URLService.provider";
-import {HttpService} from "./HttpService.factory";
-import {ElementService} from "./ElementService.factory";
-import {ViewService} from "./ViewService.factory";
-import {ProjectService} from "./ProjectService.factory";
-import {SessionService} from "./SessionService.factory";
-import {EditService} from "./EditService.factory";
+import {HttpService} from "./HttpService.service";
+import {ElementService} from "./ElementService.service";
+import {ViewService} from "./ViewService.service";
+import {ProjectService} from "./ProjectService.service";
+import {SessionService} from "./SessionService.service";
+import {EditService} from "./EditService.service";
 var mms = angular.module('mms');
 
 
@@ -24,11 +24,14 @@ var mms = angular.module('mms');
  * @description
  * Provide general authorization functions. I.e. login, logout, etc...
  */
-class AuthService {
+export class AuthService {
     
     private token = this.$window.localStorage.getItem('token');
-    
-    constructor(private $q, private $http, private $window, private $analytics, private cacheSvc : CacheService, private uRLSvc : URLService, private httpSvc : HttpService, private elementSvc : ElementService, private viewSvc : ViewService, private projectSvc : ProjectService, private sessionSvc : SessionService, private editSvc : EditService) {
+    static injector = ['$q', '$http', '$window', '$analytics', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', 'SessionService', 'EditService'];
+    constructor(private $q, private $http, private $window, private $analytics,
+                private cacheSvc : CacheService, private uRLSvc : URLService, private httpSvc : HttpService,
+                private elementSvc : ElementService, private viewSvc : ViewService, private projectSvc : ProjectService,
+                private sessionSvc : SessionService, private editSvc : EditService) {
     
     }
 
@@ -112,6 +115,6 @@ class AuthService {
     };
 }
 
-this.authSvc.$inject = ['this.$q', '$http', '$window', '$analytics', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService'];
+AuthService.$inject = AuthService.injector;
 
 mms.service('AuthService', AuthService);
