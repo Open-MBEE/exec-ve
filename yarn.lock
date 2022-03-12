@@ -764,10 +764,6 @@ angular-animate@^1.8.2:
   resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.8.2.tgz#a3045e523ffb8d7fcbebd3cb68d1fdd474665ced"
   integrity sha512-Jbr9+grNMs9Kj57xuBU3Ju3NOPAjS1+g2UAwwDv7su1lt0/PLDy+9zEwDiu8C8xJceoTbmBNKiWGPJGBdCQLlA==
 
-"angular-borderlayout@git+https://github.com/dlamoris/angular-borderlayout.git#master":
-  version "0.4.2"
-  resolved "git+https://github.com/dlamoris/angular-borderlayout.git#517db571c1cb3ed4efdaacb4a4d5f891c08f65ae"
-
 angular-cookies@^1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.8.2.tgz#0791c37c395d9fba8144781f3b2ed135ca7c5925"
@@ -783,27 +779,17 @@ angular-hotkeys@^1.7.0:
   resolved "https://registry.yarnpkg.com/angular-hotkeys/-/angular-hotkeys-1.7.0.tgz#052e6b6f44dfcd824427798b7f10e1917e8700a1"
   integrity sha1-BS5rb0TfzYJEJ3mLfxDhkX6HAKE=
 
-"angular-promise-extras@https://github.com/insidewhy/angular-promise-extras#master":
-  version "0.1.9"
-  resolved "https://github.com/insidewhy/angular-promise-extras#2a37bd756d2e72655f5ead3a26ddbcc8ca93201b"
-  dependencies:
-    angular "^1.3.0"
-
 angular-ui-bootstrap@^2.5.6:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
   integrity sha512-yzcHpPMLQl0232nDzm5P4iAFTFQ9dMw0QgFLuKYbDj9M0xJ62z0oudYD/Lvh1pWfRsukiytP4Xj6BHOSrSXP8A==
-
-"angular-ui-tree-filter@git+https://github.com/enquier/angular-ui-tree-filter.git#master":
-  version "0.1.1"
-  resolved "git+https://github.com/enquier/angular-ui-tree-filter.git#ddaa1f1dc75faef34d2bff1047b90c6607eafe3d"
 
 angular-ui-tree@^2.22.6:
   version "2.22.6"
   resolved "https://registry.yarnpkg.com/angular-ui-tree/-/angular-ui-tree-2.22.6.tgz#849727fdd1d13d84c1a590bb08934cc224e5a407"
   integrity sha512-VzuXM6NdYeQD0Y1RF5oTYc3o8yoW9mtxhnJs5Fvwu40V1Alzq7ybJj+kvApXZ69M0mvRd8LLM+3Q4pI26md+fA==
 
-angular@^1.3.0, angular@^1.8.2:
+angular@^1.8.2:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
   integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==

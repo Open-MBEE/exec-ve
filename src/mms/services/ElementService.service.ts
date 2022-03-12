@@ -529,8 +529,8 @@ export class ElementService {
      *      update is successful and will be rejected with an object with the following format:
      *      {failedRequests: list of rejection reasons, successfulRequests: array of updated elements }
      */
-    updateElements(elementObs, returnChildViews?) {
-        var deferred = this.$q.defer();
+    updateElements(elementObs: Array<ElementObject>, returnChildViews?): angular.IPromise<Array<ElementObject>> {
+        var deferred: angular.IDeferred<Array<ElementObject>> = this.$q.defer();
         if ( this._validate(elementObs) ) {
             var postElements = elementObs.map((elementOb) => {
                 return this.fillInElement(elementOb);
@@ -725,12 +725,12 @@ export class ElementService {
      * @returns {Promise} The promise will be resolved with an array of element objects.
      *                  The element results returned will be a clone of the original server response and not cache references
      */
-    search(reqOb, query, weight?) {
+    search(reqOb, query, weight?): angular.IPromise<angular.mms.ElementsResponse> {
         this.utilsSvc.normalize(reqOb);
         var url = this.uRLSvc.getElementSearchURL(reqOb);
-        var deferred = this.$q.defer();
+        var deferred: angular.IDeferred<angular.mms.ElementsResponse> = this.$q.defer();
         this.$http.post(url, query)
-            .then((data) => {
+            .then((data:angular.mms.ElementsResponse) => {
                 //var result = [];
                 //for (var i = 0; i < data.data.elements.length; i++) {
                 //    var element = data.data.elements[i];

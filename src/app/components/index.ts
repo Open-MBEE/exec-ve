@@ -16,6 +16,7 @@ import "./main.component";
 import "./pane.component";
 import "./redirect.component";
 import "./refs.component";
+import "./rightPane.component"
 import "./select.component"
 import "./toolbar.component";
 import "./veFooter.component";

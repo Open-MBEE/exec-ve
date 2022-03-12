@@ -61,5 +61,5 @@ var mms = angular.module('mms', ['rx'])
 mms.config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);
 }])
-.constant('HtmlRenderedDiff', window.HtmlRenderedDiff)
+//.constant('HtmlRenderedDiff', window.HtmlRenderedDiff)
 .constant('moment', window.moment)

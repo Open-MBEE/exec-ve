@@ -5,6 +5,5 @@
 //import "../components/refs.component"
 import "./reorder.controller"
 import "./reorderGroup.controller"
-import "./tool.controller"
 //import "./tree.controller"
 //import "./view.controller"

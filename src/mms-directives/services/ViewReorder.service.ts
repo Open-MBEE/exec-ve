@@ -4,11 +4,14 @@ import {Injectable, IQService} from "angular";
 import {ElementService} from "../../mms/services/ElementService.service";
 import {ViewService} from "../../mms/services/ViewService.service";
 import {SpecService} from "./Spec.service";
+import {ElementObject} from "../../lib/elementOb";
 var mmsDirectives = angular.module('mmsDirectives');
 
 
 export class ViewReorderService implements Injectable<any> {
     private reorderApi:ViewReorderApi;
+
+    static injector = ['$q', 'ElementService', 'ViewService']
     constructor(private $q: IQService, private elementSvc: ElementService, private viewSvc: ViewService) {
         this.reorderApi = new ViewReorderApi(this.$q, this.elementSvc, this.viewSvc);
     }
@@ -25,7 +28,7 @@ export class ViewReorderApi {
     editable: boolean;
     elementReferenceTree = [];
     originalElementReferenceTree = [];
-    view;
+    view: ElementObject = {_projectId: "", _refId: "", id: ""}
     mmsElementId: string
     mmsProjectId: string
     mmsCommitId: string
@@ -153,4 +156,6 @@ export class ViewReorderApi {
     };
 }
 
-mmsDirectives.service('SpecService', SpecService);
+ViewReorderService.$inject = ViewReorderService.injector;
+
+mmsDirectives.service('ViewReorderService', ViewReorderService);

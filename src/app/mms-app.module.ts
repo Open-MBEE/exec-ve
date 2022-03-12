@@ -215,8 +215,7 @@ mmsApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$
                     component: 'view'
                 },
                 'pane-right@main': {
-                    templateUrl: 'partials/mms/pane-right.html',
-                    controller: 'ToolCtrl'
+                    component: 'rightPane'
                 },
                 'toolbar-right@main': {
                     component: 'toolbar'

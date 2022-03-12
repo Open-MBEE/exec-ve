@@ -27,6 +27,8 @@ export class SpecService implements Injectable<any> {
     };
 
     public editValues = [];
+
+    static injector = ['$timeout', 'growl', 'EventService']
     constructor(private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService,
                 private eventSvc: EventService, private toolbarSvc: ToolbarService, private editSvc: EditService, private utils: Utils) {
     }

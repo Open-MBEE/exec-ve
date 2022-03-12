@@ -8,7 +8,7 @@ import "./mmsDiagramBlock.directive";
 import "./mmsDiffAttr.directive";
 import "./mmsGroupDocs.directive";
 import "./mmsHistory.directive";
-import "./mmsHtmlDiff.directive";
+//import "./mmsHtmlDiff.directive";
 import "./mmsMaturityBar.directive";
 import "./mmsRefList.directive";
 import "./mmsSearch.directive";

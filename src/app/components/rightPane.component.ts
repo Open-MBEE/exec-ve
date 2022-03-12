@@ -18,9 +18,7 @@ import {ViewReorderApi, ViewReorderService} from "../../mms-directives/services/
 
 /* Controllers */
 
-mmsApp.controller('ToolCtrl', ['this', '$state', '$uibModal', '$q', '$timeout', 'hotkeys',
-            'ElementService', 'ProjectService', 'growl', 'projectOb', 'refOb', 'tagObs', 'branchObs', 'documentOb', 'viewOb', 'Utils',
-            'PermissionsService', 'RootScopeService', 'EventService', 'EditService', 'ToolbarService']);
+//mmsApp.controller('ToolCtrl', ['this', ]);
 
 let RightPaneComponent: angular.ve.ComponentOptions = {
     selector: 'rightPane',
@@ -105,6 +103,10 @@ let RightPaneComponent: angular.ve.ComponentOptions = {
         edits: {};
         viewCommitId: any;
         $pane
+
+        static $inject = ['$scope', '$state', '$uibModal', '$q', '$timeout', 'hotkeys', 'growl',
+            'ElementService', 'ProjectService', 'Utils', 'PermissionsService', 'RootScopeService', 'EventService',
+            'EditService', 'ToolbarService', 'SpecService', 'ViewReorderService']
 
         constructor(private $scope, private $state: StateService, private $uibModal: angular.ui.bootstrap.IModalService,
                     private $q: angular.IQService, private $timeout: angular.ITimeoutService,
