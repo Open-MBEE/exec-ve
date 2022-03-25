@@ -146,7 +146,7 @@
         Region.prototype.getSize = function(orientation) {
           switch (orientation) {
             case "vertical":
-              return this.height;
+              returref this.height;
             case "horizontal":
               return this.width;
           }

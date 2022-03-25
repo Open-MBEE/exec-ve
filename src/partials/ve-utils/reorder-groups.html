@@ -1,0 +1,24 @@
+<!-- Nested node template -->
+<div class="group-reorder-container">
+    <script type="text/ng-template" id="nodes_renderer_group.html">
+        <div ng-class="targetId === node.id ? 'highlighted' : ''" ui-tree-handle>
+            <i ng-class="node.type === 'view' ? 'fa fa-file' : node.type === 'group' ? 'fa fa-folder' : 'fa fa-home'"></i> {{node.name}}
+        </div>
+        <ol ui-tree-nodes="" ng-model="node.children">
+            <li ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer_group.html'">
+            </li>
+        </ol>
+    </script>
+
+    <div class="container-tree-reorder container-fluid">
+        <button class="btn-tree-reorder-save btn btn-primary" ng-click="saveReorder()">Save <i ng-If="isSaving" class='fa fa-spin fa-spinner'></i></button>
+        <button class="btn-tree-reorder-save btn btn-default" ng-click="cancelReorder()">Cancel</button>
+        <br>
+        <p>Move group/document to/from a group. Only Grouping is preserved. Ordering is not.</p>
+        <div class="well" ui-tree="treeOptions">
+            <ol ui-tree-nodes="" class="root" ng-model="tree">
+                <li ng-repeat="node in tree" ui-tree-node ng-include="'nodes_renderer_group.html'"></li>
+            </ol>
+        </div>
+    </div>
+</div>

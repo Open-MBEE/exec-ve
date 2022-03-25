@@ -1,5 +1,5 @@
 Step 1
-(var|const|let)? ?\$?scope\.?([a-zA-Z]*) = function? ?(\([A-Za-z, \$\?]*\))( =>)?
+(var|const|let)? ?\$?scope\.?([a-zA-Z]*) = function? ?$( =>)?
 public $2$3
 
 function? ?([a-zA-Z]*) ?(\([A-Za-z, \?]*\))( =>)?
@@ -22,9 +22,13 @@ Region\.prototype\.([a-zA-Z]*) = (\([a-z,]*\)) =>
 ([a-zA-Z]*)Service\.(?!provider|factory|service)
 function ?(\([a-zA-Z_ ,]*\))
 
+//Services in constructors
+([a-zA-Z]*)Service(,?)
+private \l$1Svc: $1Service$2
 
-([a-zA-Z]*)Service,
-private \l$1Svc: $1Service,
+//Angular providers in constructors
+(\$)?([a-zA-Z]{2,20})(,?)
+private $1$2: angular.I\u$2Service
 
 //Bindings
 ([A-Za-z]{2,15}),
@@ -35,3 +39,18 @@ $1: "<",\n
 
 
 this\.(editing|editable|edit|keepMode|editValue)
+
+private ([a-zA-Z]{0,20}) ?:? ?([a-zA-Z$]*)
+
+
+//Change existing prototypes to instances for callback
+(   )([a-zA-Z]{2,50})(\([A-Za-z:=>\(\), \$\?]*\))(: [A-Za-z]*)? \{
+$1 public $2 = $3$4 => {
+
+
+
+myStr
+angular.module('veDirectives')['_invokeQueue'].forEach(function(value){
+    var tag = value[2][0].replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
+    console.log(value[1] + ": " + tag);
+});

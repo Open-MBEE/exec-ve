@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <h4>Confirm Remove</h4>
+</div>
+
+<div class="modal-body">
+    <p>Are you sure you want to remove {{type}} <b>&ldquo;{{name}}&rdquo;</b>?</p>
+    <p ng-if="type != 'Document' && type != 'group'">This will remove <b>&ldquo;{{name}}&rdquo;</b> from the hierarchy, but you can still access it in search.</p>
+    <p ng-if="type === 'Document' || type === 'group'">This will remove <b>&ldquo;{{name}}&rdquo;</b> from the project navigation, but you can still access it in search.</p>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-warning" ng-click="ok()">Remove <i ng-show="oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+</div>

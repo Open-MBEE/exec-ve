@@ -1,0 +1,23 @@
+<!-- Nested node template -->
+<script type="text/ng-template" id="nodes_renderer.html">
+    <div ui-tree-handle>
+        {{node.old}} &rarr; {{node.new}} {{node.name}} ({{node.aggr}})
+    </div>
+    <ol ui-tree-nodes="" ng-model="node.children">
+        <li ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
+        </li>
+    </ol>
+</script>
+
+<div class="container-tree-reorder container-fluid">
+    <button class="btn-tree-reorder-save btn btn-primary" ng-click="save()">Save <i class="{{saveClass}}"></i></button>
+    <button class="btn-tree-reorder-save btn btn-default" ng-click="cancel()">Cancel</button>
+    <br>
+    <!--<p>Note: you cannot reorder views under a view that's labeled (none) - these views may have children but are not shown and is not part of this document</p>-->
+    <p>To reorder text, tables, images, equations, and sections, use the <i class="fa fa-arrows-v"></i> in the right pane.</p>
+    <div class="well" ui-tree="treeOptions">
+        <ol ui-tree-nodes="" class="root" ng-model="tree">
+            <li ng-repeat="node in tree" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+        </ol>
+    </div>
+</div>

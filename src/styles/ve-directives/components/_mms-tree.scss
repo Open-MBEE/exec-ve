@@ -1,0 +1,52 @@
+ul.abn-tree {
+  font-size: 14px;
+  cursor: pointer;
+
+  li.abn-tree-row {
+    width: 100%;
+    padding: 0px;
+    line-height: 1.8em;
+    margin-top: 0;
+
+    a.tree-item {
+      @include border-radius(0);
+      margin-top: 3px;
+      margin-bottom: 3px;
+      margin-left: 10px;  
+      color: $black;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+  }
+
+  i.indented {
+    padding: 2px;
+  }
+
+  @for $i from 1 through 25 {
+    .level-#{$i} .tree-item {
+      position: relative;
+      padding-left: 20px * ($i - 1);
+    }
+  }
+}
+
+.arrow {
+  position: relative;
+  width: 100%;
+  clear: left;
+}
+
+.shaft {
+  width: 100%;
+  background: $tertiary_grey;
+}
+
+.shaft-hidden {
+  background: transparent;
+  //@include transition($background_hover_transition);
+
+  &:hover {
+    background: $ve-silver-darker-1;
+  }
+}

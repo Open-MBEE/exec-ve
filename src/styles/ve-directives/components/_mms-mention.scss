@@ -1,0 +1,62 @@
+.mmsMention {
+
+  .itemContainer {
+    color: grey;
+    padding: 0 10px 0 10px;
+
+    .nameContainer {
+      display: flex;
+      justify-content: space-between;
+
+      .leftItem {
+        font-size: 12px;
+
+        .icon {
+          display: inline-block;
+          width: 9px;
+          font-size: 9px;
+          font-style: normal;
+        }
+        .matchName {
+          font-weight: bold;
+          color: black;
+        }
+        
+      }
+
+      .rightItem {
+        margin-left: 10px;
+        font-size: 10px;
+
+        .elementType {
+          padding: 1px 5px;
+          background-color: #f3f3f3;
+        }
+
+        .editor {
+          font-weight: bold;
+        }
+      }
+    }
+    .contentContainer {
+      font-size: 10px;
+      margin-left: 20px;
+      display: inline-block;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      .content {
+        font-weight: bold;
+        color: black;
+        font-style: italic;
+      }
+    }
+  }
+
+  .dropdown-menu > .active > .itemContainer, .dropdown-menu > .active > .itemContainer:focus, .dropdown-menu > .active > .itemContainer:hover {
+    background-color: whitesmoke;
+    color: black;
+  }
+}

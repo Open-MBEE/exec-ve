@@ -1,0 +1,95 @@
+/*************************
+  Colors for MMS that correspond to
+  the MMS app design guide
+*************************/
+
+/* Default color template */
+$brand_base: #2c7e8f; //$base_blue;
+$brand_secondary: #bdd3e5; //secondary_blue
+$brand_base_dark: #366590; //$dark_blue
+$dark_blue: #366590;
+$light_blue: #dfeaf3;
+$link_blue: #0065bf;
+
+$red: #d2322d;
+$secondary_red: #b94e4b;
+$green: #9bbe81;
+$yellow: #faf5ac;
+$purple: #5b027a;
+$light_purple: lighten(#8e47ad, 35%);
+
+/* Grayscale template */
+$black: #333;
+$base_grey: #404040;
+$secondary_grey: #505050;
+$dark_grey: #606060;
+$medium_grey: #707070;
+$light_grey: #808080;
+$white: #fff;
+$ve-slate-darker-2:#313131;
+$ve-light-text-darker-1:#535353;
+
+$tertiary_grey: #d3d3d3;
+$quaternary_grey: #f5f5f5;
+$quaternary_grey-darker: #fafafa;
+$highlight_grey: #f3f3f3;
+$ve-silver-lighter-2:#fdfdfd;
+$ve-silver-base:#f0f0f0;
+
+
+/* Some specific object coloring */
+$tool_inset: rgba(0,0,0,0.7);
+$secondary_link: #2F889A;
+$seconday_link_hover:#296f83;
+
+
+
+$ve-light-text:#7a7a7a;
+$ve-light-text-darker-1:#535353;
+
+$ve-white-text-darker-1:#a3a3a3;
+$ve-white-text-lighter-2:#d0d0d0;
+
+$ve-slate-lighter-2:#5c5c5c;
+$ve-slate-lighter-1:#505050;
+$ve-slate-base:#404040;
+$ve-slate-darker-1:#383838;
+$ve-slate-darker-2:#313131;
+$ve-slate-darker-3:#212121;
+
+$ve-silver-lighter-2:#fdfdfd;
+$ve-silver-lighter-1:#f9f9f9;
+$ve-silver-lighter-0:#f4f4f4;
+$ve-silver-base:#f0f0f0;
+$ve-silver-darker-1:#e2e2e2;
+$ve-silver-darker-2:#d8d8d8;
+$ve-silver-darker-3:#b8b8b8;
+
+$ve-green-lighter-1:#60b9a6;
+$ve-green-base:#439886;
+$ve-green-darker-1:#398272;
+
+$ve-teal-lighter-4:#f4f9fa;
+$ve-teal-lighter-3:#bfdae0;
+$ve-teal-lighter-2:#58b9cc;
+$ve-teal-lighter-1:#369cb1;
+$ve-teal-base:#2c7e8f;
+$ve-teal-darker-1:#296f83;
+$ve-teal-darker-2:#1a5e71;
+
+$ve-accent:#456e9d;
+$ve-accent-darker:#376391;
+
+$ve-yellow-base:#f8d768;
+
+$ve-clear:rgba(0,0,0,0);
+
+/*Light saturated blue for cross referencing and reordering*/
+$ve-active:rgb(0, 153, 255);
+
+$ve-link:#4885bd;
+
+$ve-warning: #c5544e;
+$ve-warning-darker-1: #b8423c;
+$ve-warning-orange: #ffb462;
+$ve-warning-orange-light: #fff2e4;

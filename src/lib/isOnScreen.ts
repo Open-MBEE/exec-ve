@@ -12,8 +12,8 @@ import $ from 'jquery';
         var viewport = {
             top : win.scrollTop(),
             left : win.scrollLeft(),
-            right: viewport.left + win.width(),
-            bottom: viewport.top + win.height()
+            right: win.scrollLeft() + win.width(),
+            bottom: win.scrollTop() + win.height()
         };
         
 

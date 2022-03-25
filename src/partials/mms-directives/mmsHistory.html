@@ -124,7 +124,7 @@
 
 <!-- Spec window -->
 <div ng-hide="ModelData.ShowDiffPrototype">
-    <mms-spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></mms-spec>
+    <spec mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{historyVer}}" no-edit="true"></spec>
 </div>
 
 <div ng-show="ModelData.ShowDiffPrototype && compareCommit.ref.type === 'Tag'" class="revert-section fade-in-out">
