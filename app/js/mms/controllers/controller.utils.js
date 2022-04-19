@@ -2,7 +2,7 @@
 
 angular.module('mmsApp')
 .factory('MmsAppUtils', ['$q', '$uibModal','$timeout', '$location', '$window', 'growl',
-    '$rootScope', '$filter', '$state', 'ElementService','ViewService', 'UtilsService', '_', MmsAppUtils]);
+    '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventService', 'TreeService', 'EditService', '_', MmsAppUtils]);
 
 /**
  * @ngdoc service
@@ -12,7 +12,11 @@ angular.module('mmsApp')
  * Utilities
  */
 function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
-    $rootScope, $filter, $state, ElementService, ViewService, UtilsService, _) {
+    $filter, $state, ElementService, ViewService, UtilsService, EventService, TreeService, EditService, _) {
+
+    let eventSvc = EventService;
+    let tree = TreeService;
+    let edit = EditService;
 
     var tableToCsv = function(isDoc) { //Export to CSV button Pop-up Generated Here
          var modalInstance = $uibModal.open({
@@ -171,7 +175,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                         $scope.meta['bottom-right'] = 'counter(page)';
                     });
                 }
-                $scope.unsaved = ($rootScope.ve_edits && !_.isEmpty($rootScope.ve_edits));
+                $scope.unsaved = (edit.getAll() && !_.isEmpty(edit.getAll()));
                 $scope.docOption = (!isDoc && (mode === 3 || mode === 2));
                 $scope.model = { genTotf: false, landscape: false, htmlTotf: false };
                 
@@ -260,9 +264,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                         });
                 }
             } else {
-                $rootScope.ve_fullDocMode = true;
-                $rootScope.ve_bbApi.setToggleState('tree-full-document', true);
-                $state.go('project.ref.document.full', {search: undefined});
+                eventSvc.$broadcast('tree-full-document', {search: undefined});
             }
         });
         return deferred.promise;
@@ -312,13 +314,13 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
         var absurl = $location.absUrl();
         var prefix = protocol + '://' + hostname + ((port == 80 || port == 443) ? '' : (':' + port));
         var mmsIndex = absurl.indexOf('mms.html');
-        var toc = UtilsService.makeHtmlTOC($rootScope.ve_treeApi.get_rows());
+        var toc = UtilsService.makeHtmlTOC(tree.treeRows);
 
         // Conver to proper links for word/pdf
         UtilsService.convertViewLinks(printElementCopy);
 
         // Get correct table/image numbering based on doc hierarchy
-        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC($rootScope.ve_treeApi.get_rows(), printElementCopy, false, htmlTotf);
+        var tableAndFigTOC = UtilsService.makeTablesAndFiguresTOC(tree.treeRows, printElementCopy, false, htmlTotf);
         var tof = tableAndFigTOC.figures;
         var tot = tableAndFigTOC.tables;
         var toe = tableAndFigTOC.equations;
@@ -393,7 +395,7 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
 
         return { cover: cover, contents: printContents, toc: toc, tof: tof, tot: tot, toe: toe };
     };
-
+    //TODO: Evaluate moving to Tree Service
     var handleChildViews = function(v, aggr, propId, projectId, refId, curItemFunc, childrenFunc, seen) {
         var seenViews = seen;
         if (!seenViews)

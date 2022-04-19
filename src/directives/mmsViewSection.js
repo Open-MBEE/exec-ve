@@ -1,13 +1,17 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsViewSection', ['$compile', '$templateCache', '$rootScope', 'ViewService', 'UxService', 'Utils', 'growl', mmsViewSection]);
+.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'UxService', 'Utils', 'EventService', 'growl', mmsViewSection]);
 
-function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxService, Utils, growl) {
+function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils, EventService, growl) {
+
+    const eventSvc = EventService;
 
     var defaultTemplate = $templateCache.get('mms/templates/mmsViewSection.html');
 
-    var mmsViewSectionCtrl = function($scope, $rootScope) {
+    var mmsViewSectionCtrl = function($scope) {
+
+
 
         $scope.sectionInstanceVals = [];
         $scope.bbApi = {};
@@ -106,12 +110,14 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             var type = "name";
 
             if (scope.commitId === 'latest') {
-                scope.$on('element.updated', function(event, elementOb, continueEdit) {
+                scope.subs.push(eventSvc.$on('element.updated', function(data) {
+                    let elementOb = data.element;
+                    let continueEdit = data.continueEdit;
                     if (elementOb.id === scope.element.id && elementOb._projectId === scope.element._projectId &&
                         elementOb._refId === scope.element._refId && !continueEdit) {
                         recompile();
                     }
-                });
+                }));
             }
 
             scope.save = function() {
@@ -156,7 +162,7 @@ function mmsViewSection($compile, $templateCache, $rootScope, ViewService, UxSer
             section: '<mmsSection' //this is json if contains, the instancespec if contents
         },
         require: ['?^mmsView','?^mmsViewPresentationElem'],
-        controller: ['$scope', '$rootScope', mmsViewSectionCtrl],
+        controller: ['$scope', mmsViewSectionCtrl],
         link: mmsViewSectionLink
     };
 }

@@ -1,16 +1,19 @@
 'use strict';
 
 angular.module('mms.directives')
-.directive('mmsSpec', ['Utils', 'AuthService', 'ElementService', 'UtilsService', 'ViewService', '$templateCache', 'growl', '_', mmsSpec]);
+.directive('mmsSpec', ['Utils', 'URLService', 'AuthService', 'ElementService', 'UtilsService', 'ViewService',
+    'PermissionsService', 'EventService', '$templateCache', 'growl', '_', mmsSpec]);
 
 /**
  * @ngdoc directive
  * @name mms.directives.directive:mmsSpec
  *
  * @requires mms.Utils
+ * @required mms.URLService
  * @requires mms.AuthService
  * @requires mms.ElementService
  * @requires mms.ViewService
+ * @requires mms.PermissionsService
  * @requires $compile
  * @requires $templateCache
  * @requires growl
@@ -71,7 +74,11 @@ angular.module('mms.directives')
  * @param {Object=} mmsElement An element object, if this is provided, a read only
  *      element spec for it would be shown, this will not use mms services to get the element
  */
-function mmsSpec(Utils, AuthService, ElementService, UtilsService, ViewService, $templateCache, growl, _) {
+function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, ViewService, PermissionsService,
+                 EventService, $templateCache, growl, _) {
+
+    const eventSvc = EventService;
+
     var template = $templateCache.get('mms/templates/mmsSpec.html');
 
     var mmsSpecLink = function(scope, domElement, attrs) {
@@ -84,11 +91,21 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, ViewService, 
         scope.isEnumeration = false;
         //TODO pass proper args
         scope.propertyTypeClicked = function(id) {
-            var elmentOb = {id: id, _projectId: scope.mmsProjectId, _refId: scope.mmsRefId};
-            scope.$emit('elementSelected', elmentOb);
+            var elementOb = {id: id, _projectId: scope.mmsProjectId, _refId: scope.mmsRefId};
+            eventSvc.$broadcast('elementSelected', {elementOb: elementOb});
         };
+
+        var getModifier = function(modifier) {
+            AuthService.getUserData(modifier).then(function(modifierData){
+                return modifierData.users[0];
+            }, function() {
+                return modifier;
+            });
+        };
+
         if (scope.mmsElement) {
             scope.element = scope.mmsElement;
+            scope.modifier = getModifier(scope.mmsElement._modifier);
             Utils.setupValCf(scope);
             scope.editable = false;
             return;
@@ -137,6 +154,11 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, ViewService, 
                     return;
                 }
                 scope.element = data;
+                AuthService.getUserData(data._modifier).then(function(modifierData){
+                    scope.modifier = modifierData.users[0];
+                }, function() {
+                    scope.modifier = data._modifier;
+                });
                 Utils.setupValCf(scope);
                 if (!scope.mmsCommitId || scope.mmsCommitId === 'latest') {
                     ElementService.search(reqOb, {
@@ -153,8 +175,7 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, ViewService, 
                         }
                     });
                 }
-                if (!scope.element._editable ||
-                        (scope.mmsCommitId !== 'latest' && scope.mmsCommitId)) {
+                if ((scope.mmsCommitId !== 'latest' && scope.mmsCommitId) || !PermissionsService.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId)) {
                     scope.editable = false;
                     scope.edit = null;
                     scope.editing = false;
@@ -190,7 +211,7 @@ function mmsSpec(Utils, AuthService, ElementService, UtilsService, ViewService, 
                     });
                 }
                 getTypeClass(scope.element);
-                scope.elementDataLink = '/alfresco/service/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&alf_ticket='+AuthService.getTicket();
+                scope.elementDataLink = URLService.getRoot() + '/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&token='+AuthService.getToken();
                 scope.gettingSpec = false;
             }, function(reason) {
                 scope.gettingSpec = false;

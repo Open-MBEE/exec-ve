@@ -3,12 +3,20 @@
 /* Controllers */
 
 angular.module('mmsApp')
-    .controller('ViewCtrl', ['$scope', '$rootScope', '$state', '$timeout', '$window', '$location',
-    '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService', 'ShortenUrlService', 'Utils',
-    'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
-    function($scope, $rootScope, $state, $timeout, $window, $location, $http,
+    .controller('ViewCtrl', ['$scope', '$state', '$timeout', '$window', '$location',
+        '$http', '$element', 'growl', 'hotkeys', 'MmsAppUtils', 'UxService', 'URLService', 'UtilsService',
+        'ShortenUrlService', 'Utils', 'search', 'orgOb', 'projectOb', 'refOb', 'groupOb', 'documentOb', 'viewOb',
+        'PermissionsService', 'RootScopeService', 'TreeService', 'EventService',
+    function($scope, $state, $timeout, $window, $location, $http,
              $element, growl, hotkeys, MmsAppUtils, UxService, URLService, UtilsService, ShortenUrlService, Utils,
-             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb) {
+             search, orgOb, projectOb, refOb, groupOb, documentOb, viewOb, PermissionsService, RootScopeService,
+             TreeService, EventService) {
+        
+    let rootScopeSvc = RootScopeService;
+    let tree = TreeService.getApi();
+
+    let eventSvc = EventService;
+    eventSvc.$init($scope);
 
     function isPageLoading() {
         if ($element.find('.isLoading').length > 0) {
@@ -23,12 +31,18 @@ angular.module('mmsApp')
         $scope.vidLink = true;
     }
 
-    if (!$rootScope.veCommentsOn)
-        $rootScope.veCommentsOn = false;
-    if (!$rootScope.veElementsOn)
-        $rootScope.veElementsOn = false;
-    if (!$rootScope.ve_editmode)
-        $rootScope.ve_editmode = false;
+    $scope.ve_viewContentLoading = false;
+    $scope.subs.push(eventSvc.$on(rootScopeSvc.constants.VEVIEWCONTENTLOADING, (newValue) => {
+        $scope.ve_viewContentLoading = newValue;
+    }));
+
+    rootScopeSvc.veFullDocMode(false);
+    if (!rootScopeSvc.veCommentsOn())
+        rootScopeSvc.veCommentsOn(false);
+    if (!rootScopeSvc.veElementsOn())
+        rootScopeSvc.veElementsOn(false);
+    if (!rootScopeSvc.veEditMode())
+        rootScopeSvc.veEditMode(false);
 
     $scope.search = search;
     Utils.toggleLeftPane(search);
@@ -39,13 +53,13 @@ angular.module('mmsApp')
     $scope.buttons = [];
     $scope.viewApi = {
         init: function() {
-            if ($rootScope.veCommentsOn) {
+            if (rootScopeSvc.veCommentsOn()) {
                 $scope.viewApi.toggleShowComments();
             }
-            if ($rootScope.veElementsOn) {
+            if (rootScopeSvc.veElementsOn()) {
                 $scope.viewApi.toggleShowElements();
             }
-            if ($rootScope.ve_editmode) {
+            if (rootScopeSvc.veEditMode()) {
                 $scope.viewApi.toggleShowEdits();
             }
         },
@@ -60,7 +74,11 @@ angular.module('mmsApp')
             }
         },
         elementClicked: function(elementOb) {
-            $rootScope.$broadcast('elementSelected', elementOb, 'latest');
+            let data = {
+                elementOb: elementOb,
+                commitId: 'latest'
+            };
+            eventSvc.$broadcast('elementSelected', data);
         }
     };
     $scope.comments = {
@@ -83,31 +101,31 @@ angular.module('mmsApp')
 
     $scope.bbApi = {
         init: function() {
-            if (viewOb && viewOb._editable && refOb.type === 'Branch') {
+            if (viewOb && refOb.type === 'Branch' && PermissionsService.hasBranchEditPermission(refOb)) {
                 $scope.bbApi.addButton(UxService.getButtonBarButton('show-edits'));
-                $scope.bbApi.setToggleState('show-edits', $rootScope.ve_editmode);
+                $scope.bbApi.setToggleState('show-edits', rootScopeSvc.veEditMode());
                 hotkeys.bindTo($scope)
                 .add({
                     combo: 'alt+d',
                     description: 'toggle edit mode',
-                    callback: function() {$scope.$broadcast('show-edits');}
+                    callback: function() {eventSvc.$broadcast('show-edits');}
                 });
             }
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-elements'));
-            $scope.bbApi.setToggleState('show-elements', $rootScope.veElementsOn);
+            $scope.bbApi.setToggleState('show-elements', rootScopeSvc.veElementsOn());
             $scope.bbApi.addButton(UxService.getButtonBarButton('show-comments'));
-            $scope.bbApi.setToggleState('show-comments', $rootScope.veCommentsOn);
+            $scope.bbApi.setToggleState('show-comments', rootScopeSvc.veCommentsOn());
 
             // Set hotkeys for toolbar
             hotkeys.bindTo($scope)
             .add({
                 combo: 'alt+c',
                 description: 'toggle show comments',
-                callback: function() {$scope.$broadcast('show-comments');}
+                callback: function() {eventSvc.$broadcast('show-comments');}
             }).add({
                 combo: 'alt+e',
                 description: 'toggle show elements',
-                callback: function() {$scope.$broadcast('show-elements');}
+                callback: function() {eventSvc.$broadcast('show-elements');}
             });
 
             if ($state.includes('project.ref.preview') || $state.includes('project.ref.document')) {
@@ -125,11 +143,11 @@ angular.module('mmsApp')
                     .add({
                         combo: 'alt+.',
                         description: 'next',
-                        callback: function() {$scope.$broadcast('center-next');}
+                        callback: function() {eventSvc.$broadcast('center-next');}
                     }).add({
                         combo: 'alt+,',
                         description: 'previous',
-                        callback: function() {$scope.$broadcast('center-previous');}
+                        callback: function() {eventSvc.$broadcast('center-previous');}
                     });
                 } else {
                     $scope.bbApi.addButton(UxService.getButtonBarButton('export'));
@@ -138,56 +156,56 @@ angular.module('mmsApp')
         }
     };
 
-    $scope.$on('show-comments', function() {
+   $scope.subs.push(eventSvc.$on('show-comments', function() {
         $scope.viewApi.toggleShowComments();
         $scope.bbApi.toggleButtonState('show-comments');
-        $rootScope.veCommentsOn = !$rootScope.veCommentsOn;
-    });
+        rootScopeSvc.veCommentsOn(!rootScopeSvc.veCommentsOn());
+    }));
 
-    $scope.$on('show-elements', function() {
+   $scope.subs.push(eventSvc.$on('show-elements', function() {
         $scope.viewApi.toggleShowElements();
         $scope.bbApi.toggleButtonState('show-elements');
-        $rootScope.veElementsOn = !$rootScope.veElementsOn;
-    });
+        rootScopeSvc.veElementsOn(!rootScopeSvc.veElementsOn());
+    }));
 
-    $scope.$on('show-edits', function() {
-        if( ($rootScope.veElementsOn && $rootScope.ve_editmode) || (!$rootScope.veElementsOn && !$rootScope.ve_editmode) ){
+   $scope.subs.push(eventSvc.$on('show-edits', function() {
+        if( (rootScopeSvc.veElementsOn() && rootScopeSvc.veEditMode()) || (!rootScopeSvc.veElementsOn() && !rootScopeSvc.veEditMode()) ){
             $scope.viewApi.toggleShowElements();
             $scope.bbApi.toggleButtonState('show-elements');
-            $rootScope.veElementsOn = !$rootScope.veElementsOn;
+            rootScopeSvc.veElementsOn(!rootScopeSvc.veElementsOn());
         }
         $scope.viewApi.toggleShowEdits();
         $scope.bbApi.toggleButtonState('show-edits');
-        $rootScope.ve_editmode = !$rootScope.ve_editmode;
-    });
+        rootScopeSvc.veEditMode(!rootScopeSvc.veEditMode());
+    }));
 
-    $scope.$on('center-previous', function() {
-        var prev = $rootScope.ve_treeApi.get_prev_branch($rootScope.ve_treeApi.get_selected_branch());
+   $scope.subs.push(eventSvc.$on('center-previous', function() {
+        var prev = tree.get_prev_branch(tree.get_selected_branch());
         if (!prev)
             return;
         while (prev.type !== 'view' && prev.type !== 'section') {
-            prev = $rootScope.ve_treeApi.get_prev_branch(prev);
+            prev = tree.get_prev_branch(prev);
             if (!prev)
                 return;
         }
         $scope.bbApi.toggleButtonSpinner('center-previous');
-        $rootScope.ve_treeApi.select_branch(prev);
+        tree.select_branch(prev);
         $scope.bbApi.toggleButtonSpinner('center-previous');
-    });
+    }));
 
-    $scope.$on('center-next', function() {
-        var next = $rootScope.ve_treeApi.get_next_branch($rootScope.ve_treeApi.get_selected_branch());
+   $scope.subs.push(eventSvc.$on('center-next', function() {
+        var next = tree.get_next_branch(tree.get_selected_branch());
         if (!next)
             return;
         while (next.type !== 'view' && next.type !== 'section') {
-            next = $rootScope.ve_treeApi.get_next_branch(next);
+            next = tree.get_next_branch(next);
             if (!next)
                 return;
         }
         $scope.bbApi.toggleButtonSpinner('center-next');
-        $rootScope.ve_treeApi.select_branch(next);
+        tree.select_branch(next);
         $scope.bbApi.toggleButtonSpinner('center-next');
-    });
+    }));
 
     // Share URL button settings
     $scope.dynamicPopover = ShortenUrlService.dynamicPopover;
@@ -196,7 +214,11 @@ angular.module('mmsApp')
 
     if (viewOb && $state.includes('project.ref')) {
         $timeout(function() {
-            $rootScope.$broadcast('viewSelected', viewOb, 'latest');
+            let data = {
+                elementOb: viewOb,
+                commitId: 'latest'
+            };
+            eventSvc.$broadcast('viewSelected', data);
         }, 1000);
     }
 
@@ -206,16 +228,20 @@ angular.module('mmsApp')
         getProperties: true,
         closeable: true,
         callback: function(elementOb) {
-            $rootScope.$broadcast('elementSelected', elementOb, 'latest');
-            if ($rootScope.ve_togglePane && $rootScope.ve_togglePane.closed)
-                $rootScope.ve_togglePane.toggle();
+            let data = {
+                elementOb: elementOb,
+                commitId: 'latest'
+            };
+            eventSvc.$broadcast('elementSelected', data);
+            if (typeof rootScopeSvc.mmsPaneClosed() === 'boolean' && rootScopeSvc.mmsPaneClosed())
+                eventSvc.$broadcast('mms-pane-toggle', false);
         },
         relatedCallback: function (doc, view, elem) {//siteId, documentId, viewId) {
             $state.go('project.ref.document.view', {projectId: doc._projectId, documentId: doc.id, viewId: view.id, refId: doc._refId, search: undefined});
         }
     };
 
-    $scope.$on('convert-pdf', function() {
+   $scope.subs.push(eventSvc.$on('convert-pdf', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 3)
@@ -224,15 +250,15 @@ angular.module('mmsApp')
         }, function(reason){
             growl.error("Exporting as PDF file Failed: " + reason.message);
         });
-    });
+    }));
 
-    $scope.$on('print', function() {
+   $scope.subs.push(eventSvc.$on('print', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 1);
-    });
+    }));
 
-    $scope.$on('word', function() {
+   $scope.subs.push(eventSvc.$on('word', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 2)
@@ -241,18 +267,18 @@ angular.module('mmsApp')
         }, function(reason){
             growl.error("Exporting as Word file Failed: " + reason.message);
         });
-    });
+    }));
 
-    $scope.$on('tabletocsv', function() {
+   $scope.subs.push(eventSvc.$on('tabletocsv', function() {
         if (isPageLoading())
             return;
         MmsAppUtils.tableToCsv(false);
-    });
+    }));
 
-    $scope.$on('refresh-numbering', function() {
+   $scope.subs.push(eventSvc.$on('refresh-numbering', function() {
         if (isPageLoading())
             return;
         var printElementCopy = angular.element("#print-div");
-        MmsAppUtils.refreshNumbering($rootScope.ve_treeApi.get_rows(), printElementCopy);
-    });
+        MmsAppUtils.refreshNumbering(tree.get_rows(), printElementCopy);
+    }));
 }]);

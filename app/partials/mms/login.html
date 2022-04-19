@@ -1,7 +1,7 @@
 <div id="ve-login" class="row">
     <div class="account-wall">
         <div>
-            <h2>{{ pageTitle }}</h2>
+            <img src="assets/openmbee.svg" alt="Program Logo">
         </div>
         <div>
             <form name="loginForm" ng-submit="login(credentials)">
@@ -14,5 +14,14 @@
                 </button>
             </form>
         </div>
+
+        <div class="login-banner">
+            <div class="login-box login-banner">
+                <ul>
+                    <li ng-repeat="label in loginBanner.labels">{{label}}</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
+

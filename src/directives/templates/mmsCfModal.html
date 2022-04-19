@@ -21,8 +21,10 @@
         <div class="form-group" ng-show="!showProposeLink"><br>
             <label>Link Text:</label>
             <div class="radio radio-with-label">
-                <label><input type="radio" ng-model="linkType" ng-value="1">&nbsp;Document auto-numbering
-                <a uib-tooltip="For links within current document, otherwise defaults to name" tooltip-trigger="mouseenter" tooltip-popup-delay="100"><i class="fa fa-info-circle"></i></a></label><br>
+                <label><input type="radio" ng-model="linkType" ng-value="1">&nbsp;Auto-Numbering
+                    <a uib-tooltip="For links within current document, otherwise defaults to name" tooltip-trigger="mouseenter" tooltip-popup-delay="100"><i class="fa fa-info-circle"></i></a></label><br>
+                <label><input type="radio" ng-model="linkType" ng-value="4">&nbsp;Auto-Numbering w/ Name</label><br>
+                    <a uib-tooltip="For links within current document, otherwise defaults to name" tooltip-trigger="mouseenter" tooltip-popup-delay="100"><i class="fa fa-info-circle"></i></a></label><br>
                 <label><input type="radio" ng-model="linkType" ng-value="2">&nbsp;Name</label><br>
                 <label><input type="radio" ng-model="linkType" ng-value="3">&nbsp;Custom&nbsp;
                     <input type="text" ng-model="linkText" placeholder="custom title"/></label>

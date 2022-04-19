@@ -5,10 +5,10 @@
             <h4 ng-if="!specApi.getEditing()" class="right-pane-title">Preview Element</h4>
             <form class="form-horizontal">
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">Edits ({{veEditsLength()}}):</label>
+                    <label class="col-sm-3 control-label">Edits ({{openEdits}}):</label>
                     <div class="col-sm-9">
                         <select class="form-control"
-                            ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in ve_edits"
+                            ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in edits"
                             ng-model="tracker.etrackerSelected" ng-change="etrackerChange()">
                         </select>
                     </div>
@@ -39,10 +39,5 @@
         <mms-view-reorder mms-element-id="{{viewOb.id}}" mms-project-id="{{viewOb._projectId}}"
             mms-commit-id="{{viewCommitId}}" mms-order="true" mms-ref-id="{{viewOb._refId}}"
             mms-view-reorder-api="viewContentsOrderApi"></mms-view-reorder>
-    </div>
-
-    <div class="container-fluid" ng-if="show.jobs">
-        <mms-jobs mms-doc-id="{{documentOb.id}}" mms-project-id="{{projectOb.id}}"
-            mms-ref-id="{{refOb.id}}"></mms-jobs>
     </div>
 </div>

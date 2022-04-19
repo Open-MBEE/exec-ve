@@ -179,10 +179,6 @@ function CacheService(_) {
         return keys.join('|');
     };
 
-    var getCache = function() {
-        return cache;
-    };
-
     var reset = function() {
         var keys = Object.keys(cache);
         for (var i = 0; i < keys.length; i++) {
@@ -196,7 +192,6 @@ function CacheService(_) {
         put: put,
         exists: exists,
         remove: remove,
-        getCache: getCache,
         reset: reset
     };
 }
