@@ -10,6 +10,6 @@ import "./lib/ckeditor/ckeditor.js"
 
 // import "./ve-utils/ve-utils.main"
 // import "./ve-directives/ve-directives.main"
-import "./ve-app/ve-app.main"
+import "./ve-app"
 
 

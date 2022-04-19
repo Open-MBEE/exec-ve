@@ -308,104 +308,104 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
     }
 
     function _createUpdateCommand(scope, viewName, id) {
-        var updateCommand = {
-            "command": "Group",
-            "onsuccess": "onPerspectivesCommandSuccess",
-            "data": []
+        var updateCommand: {data: object[], command: string, onsuccess: string} = {
+            command: "Group",
+            onsuccess: "onPerspectivesCommandSuccess",
+            data: [] as object[]
         };
         updateCommand.data.push({
-              "command": "Custom",
-              "data": {
-                  "serverClassName": "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
-                  "args": ["int-add-" + id, URLService.getMmsServer() + URLService.getRoot()],
-                  "modelID": 'model-' + id,
-                  "module": "SysML",
-                  "project": id,
-                  "viewID": "view-" + id,
-                  "viewName": viewName
+              command: "Custom",
+              data: {
+                  serverClassName: "gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl",
+                  args: ["int-add-" + id, URLService.getMmsServer() + URLService.getRoot()],
+                  modelID: 'model-' + id,
+                  module: "SysML",
+                  project: id,
+                  viewID: "view-" + id,
+                  viewName: viewName
               }
           },
           {
-              "command": "SetModelAttribute",
-              "data": {
-                  "attributeName": "Ticket",
-                  "attributeValue": AuthService.getToken(),
-                  "modelID": 'model-' + id,
-                  "module": "SysML",
-                  "project": id,
-                  "viewID": "view-" + id,
-                  "viewName": viewName
+              command: "SetModelAttribute",
+              data: {
+                  attributeName: "Ticket",
+                  attributeValue: AuthService.getToken(),
+                  modelID: 'model-' + id,
+                  module: "SysML",
+                  project: id,
+                  viewID: "view-" + id,
+                  viewName: viewName
               },
-              "onfailure": "onPerspectivesCommandFailure",
+              onfailure: "onPerspectivesCommandFailure",
           },
           {
-              "command": "SetModelAttribute",
-              "data": {
-                  "attributeName": "MMSRefId",
-                  "attributeValue": scope.mmsRefId,
-                  "modelID": 'model-' + id,
-                  "module": "SysML",
-                  "project": id,
-                  "viewID": "view-" + id,
-                  "viewName": viewName
+              command: "SetModelAttribute",
+              data: {
+                  attributeName: "MMSRefId",
+                  attributeValue: scope.mmsRefId,
+                  modelID: 'model-' + id,
+                  module: "SysML",
+                  project: id,
+                  viewID: "view-" + id,
+                  viewName: viewName
               },
-              "onfailure": "onPerspectivesCommandFailure",
+              onfailure: "onPerspectivesCommandFailure",
           },
           {
-              "command": "SetModelAttribute",
-              "data": {
-                  "attributeName": "MMSProjectId",
-                  "attributeValue": scope.mmsProjectId,
-                  "modelID": 'model-' + id,
-                  "module": "SysML",
-                  "project": id,
-                  "viewID": "view-" + id,
-                  "viewName": viewName
+              command: "SetModelAttribute",
+              data: {
+                  attributeName: "MMSProjectId",
+                  attributeValue: scope.mmsProjectId,
+                  modelID: 'model-' + id,
+                  module: "SysML",
+                  project: id,
+                  viewID: "view-" + id,
+                  viewName: viewName
               },
-              "onfailure": "onPerspectivesCommandFailure",
+              onfailure: "onPerspectivesCommandFailure",
           });
         if (scope.context || (scope.initElements.length > 0)) {
-            var initialIntegratorIds = [];
+            var initialIntegratorIds: string[] = [];
             if (scope.initElements.length > 0) {
                 updateCommand.data.push({
-                    "command": "SetModelAttribute",
-                    "data": {
-                        "attributeName": "AddElements",
-                        "attributeValue": _getElementsArrayString(scope.initElements),
-                        "modelID": 'model-' + id,
-                        "module": "SysML",
-                        "project": id,
-                        "viewID": "view-" + id,
-                        "viewName": viewName
+                    command: "SetModelAttribute",
+                    data: {
+                        attributeName: "AddElements",
+                        attributeValue: _getElementsArrayString(scope.initElements),
+                        modelID: 'model-' + id,
+                        module: "SysML",
+                        project: id,
+                        viewID: "view-" + id,
+                        viewName: viewName
                     },
-                    "onfailure":"onPerspectivesCommandFailure",
+                    onfailure:"onPerspectivesCommandFailure",
                 });
                 initialIntegratorIds.push('int-add-' + id);
             }
             initialIntegratorIds.push('int-fcd-' + id);
             updateCommand.data.push({
-                "command": "Update",
-                "onsuccess": "onPerspectivesCommandSuccess",
-                "onfailure": "onPerspectivesCommandFailure",
-                "data": {
-                    "project": id,
-                    "module": "SysML",
-                    "integratorIDs": initialIntegratorIds
+                command: "Update",
+                onsuccess: "onPerspectivesCommandSuccess",
+                onfailure: "onPerspectivesCommandFailure",
+                data: {
+                    project: id,
+                    module: "SysML",
+                    integratorIDs: initialIntegratorIds
                 }
             });
             if (scope.context) {
                 updateCommand.data.push({
-                    "command": "Custom",
-                            "data": {
-                                "project": id,
-                                "module": "SysML",
-                                "modelID": 'model-' + id,
-                                "serverClassName": "gov.nasa.jpl.mbee.ems.command.NewContextCommand",
-                                "viewID": "view-" + id,
-                                "viewName": viewName,
-                                "args": ["" + scope.context]
+                    command: "Custom",
+                            data: {
+                                project: id,
+                                module: "SysML",
+                                modelID: 'model-' + id,
+                                serverClassName: "gov.nasa.jpl.mbee.ems.command.NewContextCommand",
+                                viewID: "view-" + id,
+                                viewName: viewName,
+                                args: ["" + scope.context]
                             },
-                    "onfailure": "onPerspectivesCommandFailure",
+                    onfailure: "onPerspectivesCommandFailure",
                 });
             }
         }

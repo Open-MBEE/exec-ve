@@ -1,4 +1,5 @@
-import {TreeApi, TreeBranch} from "./TreeService.service";
+import {TreeApi} from "./Tree.service";
+import {TreeBranch} from "../types/tree";
 
 class LegacyTreeApiService extends TreeApi {
     /**

@@ -1,15 +1,15 @@
 import * as angular from "angular";
-var veDirectives = angular.module('veDirectives');
+var veExt = angular.module('veExt');
 
-veDirectives.directive('mmsTranscludeArt', ['ElementService','AuthService','URLService', mmsTranscludeArt]);
+veExt.directive('mmsTranscludeArt', ['ElementService','AuthService','URLService', mmsTranscludeArt]);
 
 /**
  * @ngdoc directive
- * @name veDirectives.directive:mmsTranscludeArt
+ * @name veExt.directive:mmsTranscludeArt
  *
- * @requires mms.AuthService
- * @requires mms.ElementService
- * @requires mms.URLService
+ * @requires veUtils/AuthService
+ * @requires veUtils/ElementService
+ * @requires veUtils/URLService
  * @requires growl
  *
  * @restrict E

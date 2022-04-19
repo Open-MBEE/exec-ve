@@ -1,26 +1,28 @@
+var Visualizer = window['ui-router-visualizer'].Visualizer;
+
 import * as angular from 'angular';
-import uiRouter, {Transition, StateService} from "@uirouter/angularjs";
-import {StateProvider, UIRouter, TransitionService, UrlParts} from "@uirouter/angularjs";
 import {
-    IHttpProvider, IHttpResponse,
+    IHttpResponse,
     IHttpService,
     IIntervalService,
     ILocationProvider,
-    ILocationService, IPromise, IQService,
+    ILocationService,
+    IPromise,
+    IQService,
     IRequestConfig
-} from "angular";
-import {RootScopeService} from "../ve-utils/services/RootScopeService.service";
-import {AuthService} from "../ve-utils/services/AuthorizationService.service";
-import {URLService, URLServiceProvider} from "../ve-utils/services/URLService.provider";
+} from 'angular';
+import uiRouter, {StateProvider, Transition, TransitionService, UIRouter, UrlParts} from "@uirouter/angularjs";
+import {RootScopeService} from "../ve-utils/services/RootScope.service";
+import {AuthService} from "../ve-utils/services/Authorization.service";
+import {URLService, URLServiceProvider} from "../ve-utils/services/URL.provider";
 import {ResolveService} from "./services/Resolve.service";
-import {ngStorage} from "ngstorage";
-import {ProjectService} from "../ve-utils/services/ProjectService.service";
-import {HttpService} from "../ve-utils/services/HttpService.service";
-import {EventService} from "../ve-utils/services/EventService.service";
-import {ApplicationService} from "../ve-utils/services/ApplicationService.service";
+import {ProjectService} from "../ve-utils/services/Project.service";
+import {EventService} from "../ve-utils/services/Event.service";
+import {ViewObject} from "../ve-utils/types/mms";
+import {faPane} from "../fa-pane/fa-pane.main";
 
-var veApp = angular.module('veApp', ['veUtils', 'veDirectives', 'ui.bootstrap', uiRouter, 'ui.tree', 'angular-growl', 'angular-flatpickr', 'rx', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
-//var veApp = angular.module('veApp', ['veUtils', 'veDirectives', 'fa.directive.borderLayout', 'ui.bootstrap', uiRouter.default, 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
+export let veApp = angular.module('veApp', ['veUtils', 'veCore', 'veExt', 'ui.bootstrap', uiRouter, faPane, 'ui.tree', 'angular-growl', 'angular-flatpickr', 'rx', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngAnimate', 'ngCookies', 'ngPromiseExtras', 'ngSanitize', 'ngStorage']);
+//var veApp = angular.module('veApp', ['veUtils', 'veCore', 'fa.directive.borderLayout', 'ui.bootstrap', uiRouter.default, 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
 
 veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider: StateProvider, $uiRouterProvider : UIRouter, $transitionsProvider: TransitionService, $httpProvider : angular.IHttpProvider, $provide : angular.auto.IProvideService, $urlServiceProvider: URLServiceProvider, $locationProvider : ILocationProvider) {
     // override uibTypeaheadPopup functionality
@@ -66,8 +68,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
     $stateProvider
         .state('main', {
             url: '',
-            component: 'main',
-            redirectTo: 'main.login'
+            component: 'main'
         })
         .state('main.login', {
             url: '/login?next',
@@ -182,9 +183,9 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     return null;
                 },
                 groupObs: ['ResolveService', '$transition$', (resolveSvc: ResolveService, $transition$: Transition) => {
-                    return resolveSvc.getGroups($transition$);
+                    return resolveSvc.getGroups($transition$)
                 }],
-                documentOb: ['$transition$', 'refOb', 'projectOb', 'ResolveService', ($transition$: Transition, refOb, projectOb, resolveSvc: ResolveService) => {
+                documentOb: ['$transition$', 'refOb', 'projectOb', 'ResolveService', ($transition$, refOb, projectOb, resolveSvc) => {
                     return resolveSvc.getDocument($transition$, refOb, projectOb);
                 }],
                 viewOb: ['documentOb', (documentOb) => {
@@ -239,15 +240,14 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     bindings: {
                         mmsDocument: 'documentOb',
                         mmsOrg: 'orgOb',
-                        mmsOrgs: 'orgObs',
                         mmsProject: 'projectOb',
                         mmsRef: 'refOb',
-                        mmsRefs: 'refObs',
-                        mmsGroups: 'groupObs'
+                        mmsGroups: 'groupObs',
+                        docMeta: 'docMeta'
                     },
                 },
                 'pane-center@main': {
-                    component: 'centerView'
+                    component: 'singleView'
                 },
                 'pane-right@main': {
                     component: 'rightPane'
@@ -325,7 +325,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     }
                 },
                 'pane-center@main': {
-                    component: 'centerView'
+                    component: 'singleView'
                 },
                 'pane-right@main': {
                     component: 'rightPane'
@@ -341,7 +341,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 documentOb: ['params', 'ResolveService', function (params: {[paramName: string]: any }, resolveSvc: ResolveService) {
                     return resolveSvc.getProjectDocument(params);
                 }],
-                viewOb: ['documentOb', function (documentOb: angular.mms.ViewObject) {
+                viewOb: ['documentOb', function (documentOb: ViewObject) {
                     return documentOb;
                 }],
                 groupOb: ['groupObs', 'documentOb', function (groupObs, documentOb) {
@@ -387,12 +387,12 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                         mmsOrg: 'orgOb',
                         mmsProject: 'projectOb',
                         mmsRef: 'refOb',
-                        mmsRefs: 'refObs',
-                        mmsGroups: 'groupObs'
-                    }
+                        mmsGroups: 'groupObs',
+                        docMeta: 'docMeta'
+                    },
                 },
                 'pane-center@main': {
-                    component: 'centerView'
+                    component: 'singleView'
                 },
                 'pane-right@main': {
                     component: 'rightPane'
@@ -445,7 +445,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     }
                 },
                 'pane-center@main': {
-                    component: 'centerView'
+                    component: 'singleView'
                 },
             }
         })
@@ -474,7 +474,10 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
 
             deferred.promise.state = deferred.state = 'pending';
 
-            deferred.promise.then(function() {
+            deferred.promise.then(function(result) {
+                if (result === 'cancelled') {
+                    deferred.promise.state = 'cancelled';
+                }
                 deferred.promise.state = deferred.state = 'fulfilled';
             }, function () {
                 deferred.promise.state = deferred.state = 'rejected';
@@ -497,21 +500,33 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     console.log(config.url)
                 }
                 return config
-            },
-            responseError: (rejection) => {
-                let timeout = rejection.config.timeout as IPromise<any>;
+            }
+        }
+    }]);
+
+    $httpProvider.interceptors.push(['$q', '$location', 'URLService', 'EventService', function ($q: IQService, $location: ILocationService, uRLSvc: URLService, eventSvc: EventService) {
+        return {
+            responseError: (rejection: IHttpResponse<any>): angular.IPromise<angular.IHttpResponse<any>> | IHttpResponse<any> => {
+                let timeout: angular.IPromise<string> = rejection.config.timeout as IPromise<any>;
+                if (timeout.state && timeout.state === 'cancelled') {
+                    rejection.data = 'cancelled';
+                    return $q.when(rejection);
+                }
                 if (rejection.status == 401) {
                     console.log(rejection.config.url);
-                    if (timeout.state && timeout.state === 'fulfilled') {
-                        return $q.when('cancelled');
-                    }else {
+                    if (rejection.config.url === uRLSvc.getCheckTokenURL()) {
+                        return $q.reject(rejection);
+                    } else {
                         eventSvc.$broadcast('mms.unauthorized');
-                        //return $q.when('event-triggered');
                     }
                 }
+                return $q.reject(rejection);
+            }
+        }
+    }]);
 
-                return rejection
-            },
+    $httpProvider.interceptors.push(['$q', '$location', 'URLService', 'EventService', function ($q: IQService, $location: ILocationService, uRLSvc: URLService, eventSvc: EventService) {
+        return {
             response: function (response) {
                 if (response.status === 202) {
                     eventSvc.$broadcast("mms.working", response);
@@ -538,20 +553,26 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
     var $state = $uiRouter.stateService
     rootScopeSvc.loginModalOpen(false);
     $transitions.onBefore({}, (transition: Transition) => {
-        let deferred = $q.defer();
-        console.log(transition.to().name);
         if ($globalState.current.name === 'main.login' || transition.$to().name === 'main.login' || rootScopeSvc.loginModalOpen())
             return;
-        authSvc.checkLogin().then(() => {
+        let deferred = $q.defer();
+        authSvc.checkLogin().then((result) => {
+            if (transition.$to().name === 'main') {
+                deferred.resolve($state.target('main.login.select'));
+            }
             deferred.resolve();
         }, () => {
             $http.pendingRequests.forEach(function (pendingReq) {
                 if (pendingReq.cancel) {
-                    pendingReq.cancel.resolve('Cancel!');
+                    pendingReq.cancel.resolve('cancelled');
                 }
             });
-            rootScopeSvc.veRedirect({toState: transition.to(), toParams: transition.params()})
-            deferred.resolve($state.target('main.login', {next: transition.to().name}));
+            if (transition.$to().name !== 'main') {
+                rootScopeSvc.veRedirect({toState: transition.to(), toParams: transition.params()})
+                deferred.resolve($state.target('main.login', {next: transition.to().name}));
+            }else {
+                deferred.resolve($state.target('main.login'));
+            }
         })
 
         return deferred.promise
@@ -560,10 +581,16 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
         console.log(reason);
         //console.log(reason.error());
     })
-    eventSvc.$on('mms.unauthorized', async (response) => {
+    eventSvc.$on('mms.unauthorized', (response) => {
         // add a boolean to the 'or' statement to check for modal window
-        if ($globalState.current.name === '' || $globalState.current.name === 'main.login' || rootScopeSvc.veStateChanging() || rootScopeSvc.loginModalOpen())
+        if ($globalState.current.name === '' || $globalState.current.name === 'main.login' || rootScopeSvc.veStateChanging() || rootScopeSvc.loginModalOpen()) {
+            if ($globalState.current.name === 'main.login.select' || ($globalState.transition && $globalState.transition.$to.name === 'main.login.select')) {
+                $state.target('main.login');
+            }
             return;
+        }
+
+
         authSvc.checkLogin().then(() => {},() => {
             rootScopeSvc.loginModalOpen(true)
             $uibModal.open({
@@ -600,7 +627,9 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
         });
     });
 
-    // if ($globalState.current.name == '') {
-    //     $state.go('main');
-    // }
+}])
+
+veApp.run(['$uiRouter', '$trace', function($uiRouter, $trace) {
+   var pluginInstance = $uiRouter.plugin(Visualizer);
+   $trace.enable('TRANSITION');
 }])

@@ -1,12 +1,12 @@
 import * as angular from 'angular';
 
 import {StateService} from '@uirouter/angularjs'
-import {ElementService} from "../../ve-utils/services/ElementService.service";
-import {ViewService} from "../../ve-utils/services/ViewService.service";
-import {UtilsService} from "../../ve-utils/services/UtilsService.service";
-import {EventService} from "../../ve-utils/services/EventService.service";
-import {TreeService} from "../../ve-utils/services/TreeService.service";
-import {EditService} from "../../ve-utils/services/EditService.service";
+import {ElementService} from "../../ve-utils/services/Element.service";
+import {ViewService} from "../../ve-utils/services/View.service";
+import {UtilsService} from "../../ve-utils/services/Utils.service";
+import {EventService} from "../../ve-utils/services/Event.service";
+import {TreeService} from "../../ve-utils/services/Tree.service";
+import {EditService} from "../../ve-utils/services/Edit.service";
 
 var veApp = angular.module('veApp');
 
@@ -22,7 +22,8 @@ var veApp = angular.module('veApp');
 export class AppUtilsService implements angular.Injectable<any> {
     private style: any;
 
-
+    static $inject = ['$q', '$uibModal', '$timeout', '$location', '$window', 'growl',
+        '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventService', 'TreeService']
     constructor(private $q: angular.IQService, private $uibModal: angular.ui.bootstrap.IModalService,
                 private $timeout: angular.ITimeoutService, private $location: angular.ILocationService,
                 private $window: angular.IWindowService, private growl: angular.growl.IGrowlService,
@@ -76,31 +77,35 @@ if (window.navigator.msSaveOrOpenBlob) {
             modalInstance.result.then( (data) => {
                 let choice = data.$value;
                 if (choice === 'export') {
-                    var tableCSV = [];
+                    var tableCSV: {caption: string, val: string | boolean}[] = [];
                     // Grab all tables and run export to csv fnc
-                    tables.find("table").each((index: number, elt: HTMLElement) => {
+                    tables.find("table").each((index: number, elt: HTMLTableElement) => {
                         var tableObj = {
                             caption: 'no caption',
                             val: angular.element(elt).table2CSV({delivery: 'value'})
                         };
-                        if ((<HTMLTableElement>elt).caption) {
-                            tableObj.caption = (<HTMLTableElement>elt).caption.innerHTML;
+                        if (elt.caption) {
+                            tableObj.caption = elt.caption.innerHTML;
                         }
                         tableCSV.push(tableObj);
                     });
                     let exportPopup = (data) => {
                         var generator = window.open('', 'csv', 'height=600,width=800,scrollbars=1');
-                        generator.document.write('<html><head><title>Tables to CSV</title>');
-                        generator.document.write('</head><body >');
-                        generator.document.write(data);
-                        generator.document.write('</body></html>');
-                        generator.document.close();
+                        if (generator){
+                            generator.document.write('<html><head><title>Tables to CSV</title>');
+                            generator.document.write('</head><body >');
+                            generator.document.write(data);
+                            generator.document.write('</body></html>');
+                            generator.document.close();
+                        }else {
+                            this.growl.error("Popup Window Failed to open. Allow popups and try again")
+                        }
                         return true;
                     };
                     // generate text area content for popup
-                    var genTextArea = '';
+                    var genTextArea: string = '';
                     var num = 0;
-                    angular.element(tableCSV).each((index, element) => {
+                    tableCSV.forEach((element: { caption: string; val: string | boolean }, index) => {
                         genTextArea += '<h2>' + element.caption + '</h2><div><button class="btn btn-sm btn-primary" onclick="doClick(\'textArea' + num + '\')">Save CSV</button></div><textArea cols=100 rows=15 wrap="off" id="textArea' + num + '">';
                         genTextArea += element.val + '</textArea>';
                         num++;
@@ -167,12 +172,18 @@ if (window.navigator.msSaveOrOpenBlob) {
                     result.toe = choice[2] ? '' : result.toe;
                     if (mode === 1) {
                         var popupWin = this.$window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
-                        popupWin.document.open();
-                        popupWin.document.write('<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
-                        popupWin.document.close();
-                        this.$timeout(() => {
-                            popupWin.print();
-                        }, 1000, false);
+                        if (popupWin) {
+                            let popup: Window = <Window>popupWin;
+                            popup.document.open();
+                            popup.document.write('<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">' + css + '</style></head><body style="overflow: auto">' + result.cover + result.toc + result.tot + result.tof + result.toe + result.contents + '</body></html>');
+                            popup.document.close();
+                            this.$timeout(() => {
+                                popup.print();
+                            }, 1000, false);
+                        }else {
+                            this.growl.error("Popup Window Failed to open. Allow popups and try again")
+                        }
+
                     } else {
                         result.tof = choice[1] ? result.tof + result.toe : '';
                         result.tot = choice[1] ? result.tot : '';
@@ -357,9 +368,6 @@ if (window.navigator.msSaveOrOpenBlob) {
         }
 
 }
-
-AppUtilsService.$inject = ['$q', '$uibModal', '$timeout', '$location', '$window', 'growl',
-    '$filter', '$state', 'ElementService','ViewService', 'UtilsService', 'EventService', 'TreeService', 'EditService']
 
     veApp.service('AppUtilsService',  AppUtilsService);
 

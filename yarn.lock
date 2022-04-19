@@ -92,6 +92,11 @@
   dependencies:
     "@types/d3" "^4"
 
+"@types/ckeditor4@^4.16.1":
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/@types/ckeditor4/-/ckeditor4-4.16.1.tgz#67003802784157c0ea35dc4bdd36a48ab5fd8bd7"
+  integrity sha512-2v3yiFsZVmCestsIamjYJM65KP9IDh6tpvb3chqMPEgN3q+N0NWwcv2TSJG/1jRGRsbo3dZRtDvfrNO3HT6eWg==
+
 "@types/d3-array@*", "@types/d3-array@^2.8.0":
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/@types/d3-array/-/d3-array-2.8.0.tgz#4b70ccb0c6d2ef28dac1e7e653b3ecd1f4b1d1ee"
@@ -573,6 +578,11 @@
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@types/linkify-it/-/linkify-it-3.0.2.tgz#fd2cd2edbaa7eaac7e7f3c1748b52a19143846c9"
   integrity sha512-HZQYqbiFVWufzCwexrvh694SOim8z2d+xJl5UNamcvQFejLY/2YUtzXHYi3cHdI7PMlS8ejH2slRAOJQ32aNbA==
+
+"@types/lodash@^4.14.181":
+  version "4.14.181"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.181.tgz#d1d3740c379fda17ab175165ba04e2d03389385d"
+  integrity sha512-n3tyKthHJbkiWhDZs3DkhkCzt2MexYHXlX0td5iMplyfwketaOeKboEVBqzceH7juqvEg3q5oUoBFxSLu7zFag==
 
 "@types/markdown-it@^12.2.3":
   version "12.2.3"

@@ -1,12 +1,13 @@
 import * as angular from "angular";
 import {StateService} from "@uirouter/angularjs";
 
-import {AuthService} from "../../ve-utils/services/AuthorizationService.service";
-import {RootScopeService} from "../../ve-utils/services/RootScopeService.service";
+import {AuthService} from "../../ve-utils/services/Authorization.service";
+import {RootScopeService} from "../../ve-utils/services/RootScope.service";
+import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 
 var veApp = angular.module('veApp');
 
-let LoginComponent: angular.ve.ComponentOptions = {
+let LoginComponent: VeComponentOptions = {
     selector: 'login',
     template: `
     <div id="ve-login" class="row">
@@ -75,7 +76,9 @@ let LoginComponent: angular.ve.ComponentOptions = {
                     }, (reason) => {
                         this.spin = false;
                         this.growl.error(reason.message);
-                    });
+                    }).finally(() => {
+                        this.rootScopeSvc.veRedirect(null)
+                })
             }
         }
     }

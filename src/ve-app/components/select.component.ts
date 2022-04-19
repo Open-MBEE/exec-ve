@@ -1,14 +1,16 @@
 import * as angular from "angular";
+import Rx from 'rx';
 import {StateService, TransitionService, UIRouterGlobals, UIRouter} from "@uirouter/angularjs";
-import {ProjectService} from "../../ve-utils/services/ProjectService.service";
-import {AuthService} from "../../ve-utils/services/AuthorizationService.service";
-import {RootScopeService} from "../../ve-utils/services/RootScopeService.service";
-import {EventService} from "../../ve-utils/services/EventService.service";
+import {ProjectService} from "../../ve-utils/services/Project.service";
+import {AuthService} from "../../ve-utils/services/Authorization.service";
+import {RootScopeService} from "../../ve-utils/services/RootScope.service";
+import {EventService} from "../../ve-utils/services/Event.service";
 import {ngStorage} from "ngstorage";
+import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 
 var veApp = angular.module('veApp');
 
-let SelectComponent: angular.ve.ComponentOptions = {
+let SelectComponent: VeComponentOptions = {
     selector: 'projectSelect',
     template: `
     <div id="ve-origin-select" class="row">
@@ -52,7 +54,12 @@ let SelectComponent: angular.ve.ComponentOptions = {
     </div>
     <div class="account-wall" ng-if="!$ctrl.redirect_from_old">
         <div ng-class="{'fade-in': $ctrl.fromLogin}">
-            <a class="select-logout-button" ng-click="$ctrl.logout()"><i class="fa fa-arrow-left back-to-account" aria-hidden="true"></i></a>
+            <a class="select-logout-button" ng-click="$ctrl.logout()">
+                <div>
+                    <span ng-if="$ctrl.logout_spin"><i class="fa fa-spin fa-spinner"></i></span>
+                    <span ng-if="!$ctrl.logout_spin"><i class="fa fa-arrow-left back-to-account" aria-hidden="true"></i>
+                </div>
+            </a>
             <img src="img/logo-large.svg" alt="Program Logo">
         </div>
         <div ng-class="{'animated-fade-in-slide': $ctrl.fromLogin}">
@@ -100,7 +107,7 @@ let SelectComponent: angular.ve.ComponentOptions = {
 
         //injectables
         private $globalState: UIRouterGlobals = this.$uiRouter.globals;
-        private subs: Promise<PushSubscription>[];
+        public subs: Rx.IDisposable[];
 
         //bindings
         public mmsOrgs
@@ -110,7 +117,8 @@ let SelectComponent: angular.ve.ComponentOptions = {
         public redirect_from_old
         pageTitle: string
         fromLogin
-        spin: boolean
+        spin: boolean = false
+        logout_spin: boolean = false
         orgs: object
         projects: object
         orgId: string
@@ -138,7 +146,6 @@ let SelectComponent: angular.ve.ComponentOptions = {
             this.pageTitle = 'View Editor';
             this.fromLogin = this.$globalState.params.fromLogin;
             this.$localStorage.$default({org: this.mmsOrgs[0]});
-            this.spin = false;
             this.orgs = this.mmsOrgs;
             if (this.$localStorage.org) {
                 this.selectOrg(this.$localStorage.org);
@@ -154,7 +161,7 @@ let SelectComponent: angular.ve.ComponentOptions = {
                 this.selectedProject = "$resolve.Ob"; // default here?
                 this.projectSvc.getProjects(this.orgId).then((data) =>{
                     this.projects = data;
-                    if (data.length > 0) {
+                    if (data && data.length > 0) {
                         if(this.$localStorage.project && this.checkForProject(data, this.$localStorage.project) === 1){
                             this.selectedProject = this.$localStorage.project.name;
                             this.projectId = this.$localStorage.project.id;
@@ -194,10 +201,13 @@ let SelectComponent: angular.ve.ComponentOptions = {
             }
         };
         public logout() {
+            this.logout_spin = true;
             this.authSvc.logout().then(() => {
-                this.$state.go('main.login');
+                this.$state.go('main.login',{});
             }, () => {
                 this.growl.error('You were not logged out');
+            }).finally(() => {
+                this.logout_spin = false;
             });
         };
     }

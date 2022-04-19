@@ -1,6 +1,10 @@
 import * as angular from 'angular';
 
-var veExt = angular.module('veExt',['veUtils', 'ui.bootstrap', 'angular-growl', 'angular-sanitize'])
+/**
+ *
+ * @type {angular.IModule}
+ */
+export const veExt = angular.module('veExt',['veUtils', 'veCore', 'ui.bootstrap', 'angular-growl', 'ngSanitize'])
 
 veExt.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.ISanitizeProvider) {
     $sanitizeProvider.addValidElements({

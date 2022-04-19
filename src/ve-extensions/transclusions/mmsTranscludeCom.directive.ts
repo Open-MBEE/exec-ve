@@ -1,17 +1,17 @@
 import * as angular from "angular";
-var veDirectives = angular.module('veDirectives');
+var veExt = angular.module('veExt');
 
-veDirectives.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', 'EventService', 'MathJaxService', '$templateCache', '$compile', 'growl', mmsTranscludeCom]);
+veExt.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', 'EventService', 'MathJaxService', '$templateCache', '$compile', 'growl', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive
- * @name veDirectives.directive:mmsTranscludeCom
+ * @name veExt.directive:mmsTranscludeCom
  *
- * @requires mms.ElementService
- * @requires mms.UtilsService
- * @requires mms.ViewService
- * @requires mms.UxService
- * @requires mms.Utils
+ * @requires veUtils/ElementService
+ * @requires veUtils/UtilsService
+ * @requires veUtils/ViewService
+ * @requires veUtils/UxService
+ * @requires veUtils/Utils
  * @requires $compile
  * @requires $templateCache
  * @requires growl

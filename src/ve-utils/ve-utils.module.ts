@@ -2,10 +2,11 @@ import * as angular from 'angular';
 
 /**
  * @ngdoc overview
- * @name mms
+ * @module veUtils
+ * @name veUtils
  *
  * @description
- * # mms module
+ * # View Editor Utilities Module
  * This module provides angular services that abstract the mms rest api. The only 
  * dependency it has is the LoDash js library. Most service functions return
  * a Promise that allows you to pass it success and failure handlers via the
@@ -15,7 +16,7 @@ import * as angular from 'angular';
  * ## Links
  * * [angular.js](http://angularjs.org)
  * * [mms](https://github.com/Open-MBEE/mms)
- * * {@link mms.URLService#methods_handleHttpStatus Promise rejected object}
+ * * {@link veUtils/URLService#methods_handleHttpStatus Promise rejected object}
  * * [lodash](http://lodash.com)
  *
  * ## Example app that uses this module
@@ -56,7 +57,7 @@ import * as angular from 'angular';
     ]);
     </pre>
  */
-var veUtils = angular.module('veUtils', ['rx'])
+export const veUtils = angular.module('veUtils', ['rx'])
 
 veUtils.config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);

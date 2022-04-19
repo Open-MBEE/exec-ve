@@ -1,18 +1,19 @@
 import * as angular from "angular";
-var veDirectives = angular.module('veDirectives');
 
-veDirectives.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
+var veExt = angular.module('veExt');
+
+veExt.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
     '$http', '$compile', 'growl', 'MathJax', 'ViewService', 'EventService', 'MathJaxService', mmsTranscludeVal]);
 
 /**
  * @ngdoc directive
- * @name veDirectives.directive:mmsTranscludeVal
+ * @name veExt.directive:mmsTranscludeVal
  *
- * @requires mms.ElementService
- * @requires mms.UtilsService
- * @requires mms.URLService
- * @requires mms.UxService
- * @requires mms.Utils
+ * @requires veUtils/ElementService
+ * @requires veUtils/UtilsService
+ * @requires veUtils/URLService
+ * @requires veUtils/UxService
+ * @requires veUtils/Utils
  * @requires $compile
  * @requires $http
  * @requires $templateCache
@@ -97,7 +98,7 @@ function mmsTranscludeVal(ElementService, UtilsService, UxService, Utils, URLSer
             if (scope.recompileScope) {
                 scope.recompileScope.$destroy();
             }
-            var toCompileList = [];
+            var toCompileList: any[] = [];
             var areStrings = false;
             var values = scope.values;
             if (preview) {

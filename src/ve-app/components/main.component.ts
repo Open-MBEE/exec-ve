@@ -1,22 +1,24 @@
 import * as angular from "angular";
+import Rx from 'rx';
 import "angular-growl-v2";
 import {TransitionService, Transition, StateService, UIRouter, UIRouterGlobals, UrlParts} from "@uirouter/angularjs";
 
 
-import {URLService} from "../../ve-utils/services/URLService.provider";
-import {UtilsService} from "../../ve-utils/services/UtilsService.service";
-import {HttpService} from "../../ve-utils/services/HttpService.service";
-import {AuthService} from "../../ve-utils/services/AuthorizationService.service";
-import {ElementService} from "../../ve-utils/services/ElementService.service";
-import {CacheService} from "../../ve-utils/services/CacheService.service";
-import {ApplicationService} from "../../ve-utils/services/ApplicationService.service";
-import {RootScopeService} from "../../ve-utils/services/RootScopeService.service";
-import {EditService} from "../../ve-utils/services/EditService.service";
-import {EventService} from "../../ve-utils/services/EventService.service";
+import {URLService} from "../../ve-utils/services/URL.provider";
+import {UtilsService} from "../../ve-utils/services/Utils.service";
+import {HttpService} from "../../ve-utils/services/Http.service";
+import {AuthService} from "../../ve-utils/services/Authorization.service";
+import {ElementService} from "../../ve-utils/services/Element.service";
+import {CacheService} from "../../ve-utils/services/Cache.service";
+import {ApplicationService} from "../../ve-utils/services/Application.service";
+import {RootScopeService} from "../../ve-utils/services/RootScope.service";
+import {EditService} from "../../ve-utils/services/Edit.service";
+import {EventService} from "../../ve-utils/services/Event.service";
+import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 
 var veApp = angular.module('veApp');
 
-let MainComponent: angular.ve.ComponentOptions = {
+let MainComponent: VeComponentOptions = {
   selector: "main",
   transclude: true,
   template: `
@@ -64,7 +66,7 @@ let MainComponent: angular.ve.ComponentOptions = {
             'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'EditService', 'EventService']
         
         //local
-        private subs: Promise<PushSubscription>[];
+        public subs: Rx.IDisposable[];
                 openEdits = {};
 
         private hidePanes: boolean = false;
@@ -164,27 +166,10 @@ let MainComponent: angular.ve.ComponentOptions = {
                 }
             }));
 
-            this.$transitions.onBefore({}, (transition => {
-                //Redirect unauthenticated traffic to login
-                var checkLogin = this.authSvc.checkLogin();
-                if (!checkLogin) {
-                    if (transition.to().name === '') {
-                        this.$state.go('main.login');
-                    }else {
-                        this.eventSvc.$broadcast('mms.unauthorized');
-                    }
-                } else if (transition.to().name == 'main') {
-                    this.$state.go('main.login');
-                }
-            }))
-
             this.$transitions.onStart({}, (trans) => {
                 this.rootScopeSvc.veViewContentLoading(true);
                 this.httpSvc.transformQueue();
                 this.rootScopeSvc.veStateChanging(true);
-                if (this.$globalState.current.name == 'main') {
-                    this.$state.go('main.login');
-                }
             })
 
             this.$transitions.onError({}, (trans: Transition) => {
@@ -197,8 +182,7 @@ let MainComponent: angular.ve.ComponentOptions = {
                         error.config.url.indexOf('/authentication') !== -1)) { //check if 404 if checking valid ticket
                     trans.abort();
                     this.rootScopeSvc.veRedirect({toState: trans.to().name, toParams: trans.params()});
-                    this.$state.go('main.login', {notify: false});
-                    return;
+                    this.$state.target('main.login', {notify: false});
                 }
                 this.growl.error('Error: ' + trans.error().message);
             })
@@ -208,7 +192,7 @@ let MainComponent: angular.ve.ComponentOptions = {
                 this.rootScopeSvc.veHidePanes(false);
                 this.rootScopeSvc.veShowManageRefs(false);
                 this.rootScopeSvc.veShowLogin(false);
-                if (this.$globalState.current.name === 'main.login' || this.$globalState.current.name === 'main.login.select' || this.$globalState.current.name === 'main.login.redirect') {
+                if (this.$globalState.$current.name === 'main.login' || this.$globalState.$current.name === 'main.login.select' || this.$globalState.$current.name === 'main.login.redirect') {
                     this.rootScopeSvc.veHidePanes(true);
                     this.rootScopeSvc.veShowLogin(true);
                 } else if (this.$state.includes('project') && !(this.$state.includes('main.project.ref'))) {
@@ -216,9 +200,9 @@ let MainComponent: angular.ve.ComponentOptions = {
                     this.rootScopeSvc.veShowManageRefs(true);
                     this.eventSvc.$broadcast('fromParamChange', trans.params('from'));
                 }
-                if (this.$globalState.current.name === 'main.project.ref') {
+                if (this.$globalState.$current.name === 'main.project.ref') {
                     this.rootScopeSvc.treeInitialSelection(trans.params().refId);
-                } else if (this.$globalState.current.name === 'main.project.ref.preview') {
+                } else if (this.$globalState.$current.name === 'main.project.ref.preview') {
                     var index = trans.params().documentId.indexOf('_cover');
                     if (index > 0)
                         this.rootScopeSvc.treeInitialSelection(trans.params().documentId.substring(5, index));
@@ -251,7 +235,7 @@ let MainComponent: angular.ve.ComponentOptions = {
             });
 
 
-            if (this.$globalState.current.name == 'main') {
+            if (this.$globalState.$current.name == 'main') {
                 this.$state.go('main.login');
             }
         }

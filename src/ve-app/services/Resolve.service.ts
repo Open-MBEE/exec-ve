@@ -2,19 +2,25 @@ import * as angular from 'angular';
 import {UIRouter, Transition} from "@uirouter/angularjs";
 var veApp = angular.module('veApp');
 
-import {BrandingService} from "../../ve-utils/services/BrandingService.service"
-import {URLService} from "../../ve-utils/services/URLService.provider";
-import {AuthService} from "../../ve-utils/services/AuthorizationService.service";
-import {ApplicationService} from "../../ve-utils/services/ApplicationService.service";
-import {ProjectService} from "../../ve-utils/services/ProjectService.service";
-import {ViewService} from "../../ve-utils/services/ViewService.service";
-import {ElementService} from "../../ve-utils/services/ElementService.service";
-import {PermissionsService} from "../../ve-utils/services/PermissionsService.service";
+import {BrandingService} from "../../ve-utils/services/Branding.service"
+import {URLService} from "../../ve-utils/services/URL.provider";
+import {AuthService} from "../../ve-utils/services/Authorization.service";
+import {ApplicationService} from "../../ve-utils/services/Application.service";
+import {ProjectService} from "../../ve-utils/services/Project.service";
+import {ViewService} from "../../ve-utils/services/View.service";
+import {ElementService} from "../../ve-utils/services/Element.service";
+import {PermissionsService} from "../../ve-utils/services/Permissions.service";
 import {ngStorage} from "ngstorage";
+import {ElementObject, RefObject, ViewObject} from "../../ve-utils/types/mms";
 
 export class ResolveService {
 
-    constructor(private $window: angular.IWindowService, private $q: angular.IQService, private $cookies: angular.cookies.ICookiesService, private $uiRouter : UIRouter, private brandingSvc : BrandingService,
+    static $inject = ['$window', '$q', '$cookies', '$uiRouter', 'BrandingService', 'URLService',
+        'AuthService', 'ProjectService', 'ApplicationService', 'ViewService', 'ElementService', 'PermissionsService'];
+
+    constructor(private $window: angular.IWindowService, private $q: angular.IQService,
+                private $cookies: angular.cookies.ICookiesService,
+                private $uiRouter : UIRouter, private brandingSvc : BrandingService,
                 private uRLSvc : URLService, private authSvc: AuthService, private projectSvc: ProjectService,
                 private applicationSvc: ApplicationService, private viewSvc: ViewService,
                 private elementSvc: ElementService, private permissionsSvc: PermissionsService
@@ -35,7 +41,7 @@ export class ResolveService {
             this.applicationSvc.setUserName(data);
             this.uRLSvc.setToken(this.$window.localStorage.getItem('token'));
             deferred.resolve(this.$window.localStorage.getItem('token'));
-            this.$cookies.put('com.tomsawyer.web.license.user', data, {path: '/'});
+            this.$cookies.put('com.tomsawyer.web.license.user', data.username, {path: '/'});
         }, (rejection) => {
             deferred.reject(rejection);
         });
@@ -71,9 +77,9 @@ export class ResolveService {
         return this.projectSvc.getRefs($transition$.params().projectId);
     }
 
-    private _filterRefs(refType: string, refObs: any[]) {
-        let ret = [];
-        refObs.forEach((ref) => {
+    private _filterRefs(refType: string, refObs: RefObject[]): RefObject[] {
+        let ret: RefObject[] = [];
+        refObs.forEach((ref: RefObject) => {
                 if (ref.type === refType) {
                     ret.push(ref);
                 }
@@ -125,8 +131,11 @@ export class ResolveService {
                         _refId: params.refId,
                         id: 'holding_bin_' + params.projectId
                     },{
-                        viewName: projectOb.name + ' Cover Page',
-                        viewId: eid
+                        name: projectOb.name + ' Cover Page',
+                        id: eid,
+                        _projectId: params.projectId,
+                        _refId: params.refId,
+                        type: 'Class'
                     }, 2).then((data) => {
                         deferred.resolve(data);
                     }, (reason2) => {
@@ -143,13 +152,18 @@ export class ResolveService {
                         _projectId: params.projectId,
                         _refId: params.refId,
                         id: eid,
-                        name: name
+                        name: name,
+                        type: 'Class',
+                        deleted: false
                     },
                     {
                         _projectId: params.projectId,
                         _refId: params.refId,
                         id: eid + "_asi",
-                        name: ' '
+                        name: ' ',
+                        type: 'InstanceSpecification',
+                        ownerId: eid,
+                        deleted: false
                     }
                 ]).then((data) => {
                     var resolved = false;
@@ -174,9 +188,9 @@ export class ResolveService {
         return deferred.promise;
     }
 
-    public getDocumentPreview(params: {[paramName: string]: any}, refOb: angular.mms.ElementObject): angular.IPromise<angular.mms.ElementObject> {
+    public getDocumentPreview(params: {[paramName: string]: any}, refOb: ElementObject): angular.IPromise<ElementObject> {
 
-        var deferred: angular.IDeferred<angular.mms.ElementObject> = this.$q.defer();
+        var deferred: angular.IDeferred<ElementObject> = this.$q.defer();
         var eid = params.documentId;
         var coverIndex = eid.indexOf('_cover');
         if (coverIndex > 0) {
@@ -191,7 +205,7 @@ export class ResolveService {
             }, (reason) => {
                 if (reason.status === 404) {
                     if (refOb.type === 'Tag') {
-                        deferred.resolve(null);
+                        deferred.resolve(reason);
                     } else {
                         var viewDoc = '<mms-group-docs mms-group-id="' + groupId + '">[cf:group docs]</mms-group-docs>';
                         this.elementSvc.getElement({projectId: params.projectId, refId: params.refId, elementId: groupId})
@@ -201,16 +215,19 @@ export class ResolveService {
                                     _refId: params.refId,
                                     id: groupId
                                 },{
-                                    viewName: groupElement.name + ' Cover Page',
-                                    viewId: eid
+                                    name: groupElement.name + ' Cover Page',
+                                    id: eid,
+                                    _projectId: params.projectId,
+                                    _refId: params.refId,
+                                    type: 'Class'
                                 }, viewDoc)
                                     .then((data) => {
                                         deferred.resolve(data);
                                     }, (reason3) => {
-                                        deferred.resolve(null);
+                                        deferred.resolve(reason3);
                                     });
                             }, (reason2) => {
-                                deferred.resolve(null);
+                                deferred.resolve(reason2);
                             });
                     }
                 } else {
@@ -227,7 +244,7 @@ export class ResolveService {
         return deferred.promise;
     }
 
-    public getProjectDocument(params: {[paramName: string]: any}): angular.IPromise<angular.mms.ViewObject> {
+    public getProjectDocument(params: {[paramName: string]: any}): angular.IPromise<ViewObject> {
         return this.viewSvc.getProjectDocument({
             projectId: params.projectId,
             refId: params.refId,
@@ -261,8 +278,5 @@ export class ResolveService {
     }
 
 }
-
-ResolveService.$inject = ['$window', '$q', '$cookies', '$uiRouter', 'BrandingService', 'URLService',
-    'AuthService', 'ProjectService', 'ApplicationService', 'ViewService', 'ElementService', 'PermissionsService'];
 
 veApp.service('ResolveService',ResolveService);

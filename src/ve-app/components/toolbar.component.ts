@@ -1,10 +1,12 @@
 import * as angular from 'angular';
-import {TButton, ToolbarApi, ToolbarService} from "../../ve-directives/services/toolbar.service";
+import Rx from 'rx';
+import {TButton, ToolbarApi, ToolbarService} from "../../ve-core/tools/Toolbar.service";
 import {StateService} from "@uirouter/angularjs";
-import {EditService} from "../../ve-utils/services/EditService.service";
-import {UxService} from "../../ve-utils/services/UxService.service";
-import {PermissionsService} from "../../ve-utils/services/PermissionsService.service"
-import {EventService} from "../../ve-utils/services/EventService.service";
+import {EditService} from "../../ve-utils/services/Edit.service";
+import {UxService} from "../../ve-utils/services/Ux.service";
+import {PermissionsService} from "../../ve-utils/services/Permissions.service"
+import {EventService} from "../../ve-utils/services/Event.service";
+import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 
 var veApp = angular.module('veApp');
 
@@ -13,7 +15,7 @@ var veApp = angular.module('veApp');
 
 
 /* Classes */
-const ToolbarComponent: angular.ve.ComponentOptions = {
+const ToolbarComponent: VeComponentOptions = {
     selector: "toolbar", //toolbar-component
     template: `<ve-toolbar on-click="$ctrl.onClick(button)" />`,
     bindings: {
@@ -24,7 +26,7 @@ const ToolbarComponent: angular.ve.ComponentOptions = {
         static $inject = ['$state', 'UxService', 'PermissionsService', 'EditService', 'EventService', 'ToolbarService'];
 
         //Injected Deps
-        private subs: Promise<PushSubscription>[];
+        public subs: Rx.IDisposable[];
 
         //Bindings
         public refOb

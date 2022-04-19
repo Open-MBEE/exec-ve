@@ -1,24 +1,15 @@
 import * as angular from 'angular';
+import Rx from 'rx';
 import { StateService } from '@uirouter/angularjs';
-import { ProjectService } from 'src/ve-utils/services/ProjectService.service';
-import {ElementService} from "../../ve-utils/services/ElementService.service";
-import { RootScopeService } from 'src/ve-utils/services/RootScopeService.service';
-import {EventService} from "../../ve-utils/services/EventService.service";
+import { ProjectService } from 'src/ve-utils/services/Project.service';
+import {ElementService} from "../../ve-utils/services/Element.service";
+import { RootScopeService } from 'src/ve-utils/services/RootScope.service';
+import {EventService} from "../../ve-utils/services/Event.service";
+import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {QueryObject, RequestObject} from "../../ve-utils/types/mms"
 var veApp = angular.module('veApp');
 
-
-/* Controllers */
-    // /workspaces/master/sites/{siteid}                    {siteid}_cover      /projects/{projectid}/master/document/{siteid}_cover
-    // /workspaces/master/sites/{siteid}/document/{docid}   {docid}             /projects/{projectid}/master/document/{docid}
-    // /workspaces/master/sites/{siteid}/documents/{docid}  {docid}             /projects/{projectid}/master/documents/{docid}
-    // /workspaces/master/sites/{siteid}/documents/{docid}/views/{viewid} 
-    // (view id might be the same as doc id)	            {docid},{viewid}	/projects/{projectid of doc}/master/documents/{docid}/views/{viewid}
-    // if {viewid} not found, go to doc
-    // if {docid} not found but view is found, it might be under a different doc 
-    // (see _relatedDocuments of element in search result)
-    // /workspaces/master/sites/{siteid}/documents/{docid}/full	{docid}	/projects/{projectid}/master/documents/{docid}/full
-
-let RedirectComponent: angular.ve.ComponentOptions = {
+let RedirectComponent: VeComponentOptions = {
     selector: 'veRedirect',
     template: `
     <div id="ve-origin-select" class="row">
@@ -62,21 +53,21 @@ let RedirectComponent: angular.ve.ComponentOptions = {
 `,
     controller: class RedirectController implements angular.IComponentController {
 
-        private subs: Promise<PushSubscription>[];
+        public subs: Rx.IDisposable[];
 
         public redirect_from_old: object;
         redirect_noResults: boolean = false;
-        redirect_element: object = null;
+        redirect_element: { name: string, type: string, link: string }
         spin: boolean = false;
         elem: any;
         redirect_relatedDocs: any;
-        projectList = [];
-        reqOb = {};
+        projectList: string[] = [];
+        reqOb:RequestObject;
 
-        static $inject = ['$state', '$location', '$timeout', 'growl',
+        static $inject = ['$q', '$state', '$location', '$timeout', 'growl',
             'ProjectService', 'ElementService', 'RootScopeService', 'EventService']
 
-        constructor(private $state: StateService, private $location: angular.ILocationService, 
+        constructor(private $q: angular.IQService, private $state: StateService, private $location: angular.ILocationService,
                     private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService,
                     private projectSvc: ProjectService, private elementSvc: ElementService, 
                     private rootScopeSvc: RootScopeService, private eventSvc: EventService) {
@@ -105,15 +96,20 @@ let RedirectComponent: angular.ve.ComponentOptions = {
             this.$state.go('main.login.select');
         };
 
-        public buildQuery(idList, projectList) {
-            var queryOb = { 'query': { 'bool':{ "filter": [] } } };
-            //Fitler master ref
-            queryOb.query.bool.filter.push({ 'terms' : { 'id' : idList } });
-            //Fitler project id
-            queryOb.query.bool.filter.push({ 'terms' : { '_projectId' : projectList } });
-            //Fitler master ref
-            queryOb.query.bool.filter.push({ 'term' : { '_inRefIds' : 'master' } });
-            return queryOb;
+        public buildQuery(idList: string[], projectList): QueryObject[] {
+            var queryObs: QueryObject[] = []
+            //Filter master ref
+            for (let id of idList) {
+                for (let project of projectList) {
+                    let queryOb: QueryObject = {params: {
+                            id: id,
+                            _projectId: project,
+                            _inRefIds: 'master'
+                        }}
+                    queryObs.push(queryOb);
+                }
+            }
+            return queryObs;
         };
 
         public errorHandler(reason) {
@@ -121,10 +117,10 @@ let RedirectComponent: angular.ve.ComponentOptions = {
             this.$state.go('main.login.select');
         };
 
-        public oldUrlTest(location) {
-            var segments = location.split('/');
+        public oldUrlTest(location: string) {
+            var segments: string[] = location.split('/');
             let successRedirectFnc = this.errorHandler;
-            let searchTermList = []
+            let searchTermList: string[] = []
             const noResultFnc = () => {
                 // TODO - Search for document was unsucessful. Please select from the following or contact admin to verify that document exists.
                 this.redirect_noResults = true;
@@ -269,8 +265,9 @@ let RedirectComponent: angular.ve.ComponentOptions = {
             }
             // console.log(segments);
             var queryOb = this.buildQuery(searchTermList, this.projectList);
-            this.elementSvc.search(this.reqOb, queryOb)
-            .then(successRedirectFnc, this.errorHandler);
+            let promises: angular.IPromise<any>[] = []
+            promises.push(this.elementSvc.search(this.reqOb, queryOb));
+            this.$q.all(promises).then(successRedirectFnc, this.errorHandler);
         };
     }
 };

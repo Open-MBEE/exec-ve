@@ -1,7 +1,8 @@
 import * as angular from "angular";
-var veDirectives = angular.module('veDirectives');
+import {ViewController} from "../../ve-core/view/view.component";
+var veCore = angular.module('veCore');
 
-veDirectives.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'UxService', 'Utils', 'EventService', 'growl', mmsViewSection]);
+veCore.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'UxService', 'Utils', 'EventService', 'growl', mmsViewSection]);
 
 function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils, EventService, growl) {
 
@@ -35,8 +36,8 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
 
     var mmsViewSectionLink = function(scope, domElement : angular.IAugmentedJQuery, attrs, controllers) {
         scope.element = scope.section; // This is for methods in Utils
-        var mmsViewCtrl = controllers[0];
-        var mmsViewPresentationElemCtrl = controllers[1];
+        var ViewController = controllers[0];
+        var ViewPresentationElemController = controllers[1];
         scope.setPeLineVisibility = function($event) {
             window.setTimeout(function() {
                 var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
@@ -51,8 +52,8 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
             //should not do anything if section is not an instancespec
             if (scope.startEdit)
                 scope.startEdit();
-            if (mmsViewCtrl && mmsViewPresentationElemCtrl)
-                mmsViewCtrl.transcludeClicked(scope.section); //show instance spec if clicked
+            if (ViewController && ViewPresentationElemController)
+                ViewController.transcludeClicked(scope.section); //show instance spec if clicked
             e.stopPropagation();
         });
 
@@ -81,8 +82,8 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
         var refId = scope.mmsRefId;
         var commitId = scope.mmsCommitId;
 
-        if (mmsViewCtrl) {
-            var viewVersion = mmsViewCtrl.getElementOrigin();
+        if (ViewController) {
+            var viewVersion = ViewController.getElementOrigin();
             if (!projectId)
                 projectId = viewVersion.projectId;
             if (!refId)
@@ -94,17 +95,17 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
         scope.refId = refId ? refId : 'master';
         scope.commitId = commitId ? commitId : 'latest';
 
-        if (mmsViewCtrl && mmsViewPresentationElemCtrl) {
+        if (ViewController && ViewPresentationElemController) {
 
             scope.isEditing = false;
             scope.inPreviewMode = false;
             scope.elementSaving = false;
             scope.cleanUp = false;
-            scope.instanceSpec = mmsViewPresentationElemCtrl.getInstanceSpec();
-            scope.instanceVal = mmsViewPresentationElemCtrl.getInstanceVal();
-            scope.presentationElem = mmsViewPresentationElemCtrl.getPresentationElement();
-            scope.view = mmsViewCtrl.getView();
-            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(domElement, mmsViewCtrl);
+            scope.instanceSpec = ViewPresentationElemController.getInstanceSpec();
+            scope.instanceVal = ViewPresentationElemController.getInstanceVal();
+            scope.presentationElem = ViewPresentationElemController.getPresentationElement();
+            scope.view = ViewController.getView();
+            scope.isDirectChildOfPresentationElement = Utils.isDirectChildOfPresentationElementFunc(domElement, ViewController);
             if (scope.instanceSpec.classifierIds[0] === ViewService.TYPE_TO_CLASSIFIER_ID.Section)
                 scope.isDirectChildOfPresentationElement = false;
             var type = "name";
@@ -133,11 +134,11 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
             };
 
             scope.delete = function() {
-                Utils.deleteAction(scope, scope.bbApi, mmsViewPresentationElemCtrl.getParentSection());
+                Utils.deleteAction(scope, scope.bbApi, ViewPresentationElemController.getParentSection());
             };
 
             scope.startEdit = function() {
-                Utils.startEdit(scope,mmsViewCtrl,domElement,null,scope.section);
+                Utils.startEdit(scope,ViewController,domElement,null,scope.section);
             };
 
             scope.preview = function() {
@@ -146,7 +147,7 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
         }
 
         scope.addEltAction = function(index, type, e) {
-            if (!mmsViewCtrl || !mmsViewCtrl.isEditable()) {
+            if (!ViewController || !ViewController.isEditable()) {
                 return;
             }
             e.stopPropagation();
@@ -159,9 +160,9 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
     return {
         restrict: 'E',
         scope: {
-            section: '<mmsSection' //this is json if contains, the instancespec if contents
+            section: '<viewData' //this is json if contains, the instancespec if contents
         },
-        require: ['?^view','?^mmsViewPresentationElem'],
+        require: ['?^view','?^viewPe'],
         controller: ['$scope', mmsViewSectionCtrl],
         link: mmsViewSectionLink
     };

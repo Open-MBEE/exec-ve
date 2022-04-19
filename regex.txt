@@ -1,8 +1,9 @@
 Step 1
-(var|const|let)? ?\$?scope\.?([a-zA-Z]*) = function? ?$( =>)?
+(var|const|let)? ?(\$?scope\.)?([a-zA-Z]*) (= )?function? ?(\([A-Za-z, \?]*\))( =>)?
 public $2$3
 
 function? ?([a-zA-Z]*) ?(\([A-Za-z, \?]*\))( =>)?
+^([^\S\r\n])[\s\t]*function ([_a-zA-Z]*) ?(\([A-Za-z, \?]*\))
 public $1$2
 
 Step 2
@@ -29,6 +30,14 @@ private \l$1Svc: $1Service$2
 //Angular providers in constructors
 (\$)?([a-zA-Z]{2,20})(,?)
 private $1$2: angular.I\u$2Service
+
+//Constructor to static $inject
+(public|private) (\$)?([a-zA-Z]{2,20}): [A-Za-z\.]*(,?)\n?
+'$2$3'$4
+
+//then convert back to Service formal names
+'([a-zA-Z]*)Svc'
+'\u$1Service'
 
 //Bindings
 ([A-Za-z]{2,15}),

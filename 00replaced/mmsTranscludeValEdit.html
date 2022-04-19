@@ -1,0 +1,12 @@
+<div class="panel panel-info">
+    <span ng-repeat="value in editValues" ng-switch on="value.type">
+        <span ng-switch-when="LiteralInteger">{{value.value}}</span>
+        <span ng-switch-when="LiteralBoolean">{{value.value}}</span>
+        <span ng-switch-when="LiteralReal">{{value.value | veRealNum}}</span>
+        <span ng-switch-when="LiteralUnlimitedNatural">{{value.value}}</span>
+        <span ng-switch-when="ElementValue"><mms-transclude-name no-click="true" mms-element-id="{{::value.elementId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}"></mms-transclude-name></span>
+        <span ng-switch-when="InstanceValue"><mms-transclude-name no-click="true" mms-element-id="{{::value.instanceId}}" mms-project-id="{{projectId}}" mms-ref-id="{{refId}}" mms-commit-id="{{commitId}}"></mms-transclude-name></span>
+        <span ng-switch-when="OpaqueExpression">{{value.body[0]}}</span>
+        <span ng-switch-default>{{value}}</span>
+    </span>
+</div>

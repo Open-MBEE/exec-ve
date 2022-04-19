@@ -1,13 +1,13 @@
 import * as angular from "angular";
-var veDirectives = angular.module('veDirectives');
+var veCore = angular.module('veCore');
 
-veDirectives.directive('mmsViewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', 'ApplicationService', mmsViewLink]);
+veCore.directive('viewLink', ['ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', 'ApplicationService', mmsViewLink]);
 
 /**
  * @ngdoc directive
- * @name veDirectives.directive:mmsViewLink
+ * @name veCore.directive:mmsViewLink
  *
- * @requires mms.ElementService
+ * @requires veUtils/ElementService
  * @requires $compile
  *
  * @restrict E

@@ -3,6 +3,7 @@
     "baseUrl": "",
     "allowSyntheticDefaultImports": true,
     "declaration": false,
+    "strictNullChecks": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "downlevelIteration": true,

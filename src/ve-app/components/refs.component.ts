@@ -1,17 +1,20 @@
 import * as angular from 'angular';
+import Rx from 'rx';
 import * as _ from 'lodash';
 
 import { StateService } from '@uirouter/angularjs';
 import {IWindowService} from "angular";
-import {ElementService} from "../../ve-utils/services/ElementService.service";
-import {ProjectService} from "../../ve-utils/services/ProjectService.service";
+import {ElementService} from "../../ve-utils/services/Element.service";
+import {ProjectService} from "../../ve-utils/services/Project.service";
 import {AppUtilsService} from "../services/AppUtils.service";
-import {ApplicationService} from "../../ve-utils/services/ApplicationService.service";
-import {RootScopeService} from "../../ve-utils/services/RootScopeService.service";
-import {EventService} from "../../ve-utils/services/EventService.service";
+import {ApplicationService} from "../../ve-utils/services/Application.service";
+import {RootScopeService} from "../../ve-utils/services/RootScope.service";
+import {EventService} from "../../ve-utils/services/Event.service";
+import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {RefObject} from "../../ve-utils/types/mms";
 var veApp = angular.module('veApp');
 
-let RefsComponent: angular.ve.ComponentOptions = {
+let RefsComponent: VeComponentOptions = {
     selector: 'refs',
     template: `
     <div class="container-fluid ve-no-panes">
@@ -103,7 +106,7 @@ let RefsComponent: angular.ve.ComponentOptions = {
             'ElementService', 'ProjectService', 'AppUtilsService', 'ApplicationService', 'RootScopeService',
             'EventService']
 
-        private subs: Promise<PushSubscription>[];
+        public subs: Rx.IDisposable[];
 
         //Bindings
          public mmsOrg
@@ -242,13 +245,13 @@ let RefsComponent: angular.ve.ComponentOptions = {
                     getFilter: () => {
                         return this.$filter;
                     },
-                    getPmmsRoject: () => {
+                    getProjectOb: () => {
                         return this.mmsProject;
                     },
-                    getRmmsEf: () => {
+                    getRefOb: () => {
                         return this.mmsRef;
                     },
-                    getOmmsRg: () => {
+                    getOrgOb: () => {
                         return this.mmsOrg;
                     },
                     getSeenViewIds: () => {
@@ -258,14 +261,14 @@ let RefsComponent: angular.ve.ComponentOptions = {
             });
         instance.result.then((data) => {
         //TODO add load handling once mms returns status
-        let tag = [];
+        let tag: RefObject[] = [];
         for (let i = 0; i < this.mmsRefs.length; i++) {
             if (this.mmsRefs[i].type === "Tag")
                 tag.push(this.mmsRefs[i]);
         }
         this.tags = tag;
 
-        let branches = [];
+        let branches: RefObject[] = [];
         for (let j = 0; j < this.mmsRefs.length; j++) {
             if (this.mmsRefs[j].type === "Branch")
                 branches.push(this.mmsRefs[j]);

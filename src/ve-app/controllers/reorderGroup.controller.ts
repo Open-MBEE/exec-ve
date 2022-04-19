@@ -1,4 +1,6 @@
 import * as angular from 'angular';
+import {TreeBranch} from "../../ve-utils/types/tree";
+import {ElementObject} from "../../ve-utils/types/mms";
 var veApp = angular.module('veApp');
 
 
@@ -95,13 +97,14 @@ function ($scope, $stateParams, $state, $window, growl, ElementService, CacheSer
     function saveReorder() {
         if(!$scope.isSaving) {
             $scope.isSaving = true;
-            var results = []; findNodesToUpdate(results);
-            var elementsToUpdate = results.map(function(result) {
+            var results: any[] = []; findNodesToUpdate(results);
+            var elementsToUpdate: ElementObject[] = results.map((result) => {
                return {
                    id: result.node.data.id,
                    ownerId: result.newOwnerId,
                    _projectId: projectOb.id,
-                   _refId: refOb.id
+                   _refId: refOb.id,
+                   type: result.node.data.type
                };
             });
             ElementService

@@ -12,8 +12,8 @@ export interface VeViewExtensionOptions extends angular.IComponentOptions {
     selector: string,
     style?: string[]
     bindings: {
-        mmsData: string,
-        mmsPe?: string
+        viewData: string,
+        viewPe?: string
     }
 
 }
