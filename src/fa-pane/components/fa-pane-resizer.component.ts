@@ -24,7 +24,7 @@ let FaPaneResizerComponent: VeComponentOptions = {
         static $inject = ['$window', '$scope', '$element', '$attrs'];
 
         constructor(private $window: angular.IWindowService, private $scope: angular.pane.IPaneScope,
-                    private $element: angular.IRootElementService, private $attrs: angular.IAttributes) {
+                    private $element: JQuery<HTMLElement>, private $attrs: angular.IAttributes) {
         }
 
         $onInit() {

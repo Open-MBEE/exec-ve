@@ -1,0 +1,42 @@
+{
+    "apiUrl": "https://cae-mms-lb.jpl.nasa.gov",
+    "basePath": "",
+    "enableDebug": true,
+    "customLabels": {
+        "pi": "PROPRIETARY: Proprietary Information",
+        "export_ctrl": "EXPORT WARNING: No export controlled documents allowed on this server",
+        "no_public_release": "Not for Public Release or Redistribution",
+        "unclassified": "CLASSIFICATION: This system is UNCLASSIFIED"
+    },
+    "loginBanner": {
+        "labels": [["unclassified"], ["pi", "no_public_release"]],
+        "separator": "-",
+        "background": "#0D47A1",
+        "color": "#e8e8e8"
+    },
+    "banner": {
+        "message": ["pi"]
+    },
+    "footer": {
+        "message": "OpenMBEE View Editor | Licensed under Apache 2.0"
+    },
+    "loginTimout": 600000,
+    "extensions": {
+      "content": [
+        {
+          "name": "Content Magic Test",
+          "path": "content-magic.component.ts",
+          "button": {
+            "id": "content-magic",
+            "category": "global",
+            "icon": "fa-magic",
+            "selected": true,
+            "active": true,
+            "permission": true,
+            "tooltip": "Magic!",
+            "spinner": false
+          }
+        }
+      ]
+    }
+}

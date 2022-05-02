@@ -1,6 +1,6 @@
 import angular from "angular";
 import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {Utils} from "../utilities/Utils.service";
+import {Utils} from "../utilities/CoreUtils.service";
 import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 import {ElementObject} from "../../ve-utils/types/mms";
 

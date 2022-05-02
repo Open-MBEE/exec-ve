@@ -17,7 +17,7 @@
         // API url
         apiUrl: 'http://localhost:8080',
         // Base url
-        baseUrl: '',
+        basePath: '',
         enableDebug: true,
         // Configuration for the banner below the login modal (only visible at login)
         loginBanner: {

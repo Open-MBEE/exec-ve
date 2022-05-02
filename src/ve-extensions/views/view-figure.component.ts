@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import {VeViewExtensionOptions} from "../ve-extensions";
+import {VeViewExtensionOptions} from "./view-pe";
 import {veExt} from "../ve-extensions.module";
 
 let ViewFigureComponent: VeViewExtensionOptions = {

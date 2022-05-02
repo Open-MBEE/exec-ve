@@ -3,8 +3,8 @@ import $ from "jquery";
 import JQuery from "jquery"
 import Rx from 'rx'
 
-import {VeViewExtensionOptions} from "../ve-extensions";
-import {Utils} from "../../ve-core/utilities/Utils.service";
+import {VeViewExtensionOptions} from "./view-pe";
+import {TransclusionService} from "../transclusions/Transclusion.service";
 import {EventService} from "../../ve-utils/services/Event.service";
 import {INgModelOptions} from "angular";
 import {TableCell, TableConfig, ViewHtmlService} from "./ViewHtml.service";
@@ -80,9 +80,9 @@ let ViewTableComponent: VeViewExtensionOptions = {
 
 
         constructor(private $scope: angular.IScope, private $compile: angular.ICompileService,
-                    private $timeout: angular.ITimeoutService, private $element: angular.IRootElementService,
+                    private $timeout: angular.ITimeoutService, private $element: JQuery<HTMLElement>,
                     private $document: angular.IDocumentService, private $window: angular.IWindowService,
-                    private viewHtmlSvc: ViewHtmlService, private utils: Utils, private eventSvc: EventService) {}
+                    private viewHtmlSvc: ViewHtmlService, private transclusionSvc: TransclusionService, private eventSvc: EventService) {}
 
         $onInit = () => {
 
@@ -563,7 +563,7 @@ let ViewTableComponent: VeViewExtensionOptions = {
         $postLink() {
 
             $(this.$element).find('img').each((index, element) => {
-                this.utils.fixImgSrc($(element));
+                this.transclusionSvc.fixImgSrc($(element));
             });
 
             this.nextIndex = 0;

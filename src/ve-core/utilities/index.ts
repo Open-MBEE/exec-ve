@@ -1,8 +1,5 @@
 //Services
-import "./Utils.service";
-
-import "../../ve-extensions/utilities/annotation.component";
-
+import "./CoreUtils.service";
 //Modals
 import "./modals/revert-confirm.component"
 import "./modals/save-conflict.component"

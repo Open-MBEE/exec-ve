@@ -48,10 +48,10 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
     $locationProvider.hashPrefix('');
 
 
-    if (window.__env.baseUrl) {
-        $urlServiceProvider.setBaseUrl(window.__env.baseUrl);
+    if (window.__env.basePath) {
+        $urlServiceProvider.setBasePath(window.__env.basePath);
     } else {
-        $urlServiceProvider.setBaseUrl('');
+        $urlServiceProvider.setBasePath('');
     }
 
     if (window.__env.apiUrl) {

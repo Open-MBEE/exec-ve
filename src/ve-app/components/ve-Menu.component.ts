@@ -132,7 +132,7 @@ let VeMenuComponent: VeComponentOptions = {
 
         static $inject = ['$uiRouter', '$state', '$sce', '$timeout', '$element', 'CacheService', 'UtilsService', 'RootScopeService'];
         constructor(private $uiRouter: UIRouter, private $state: StateService, private $sce: angular.ISCEService,
-                    private $timeout: angular.ITimeoutService, private $element: angular.IRootElementService,
+                    private $timeout: angular.ITimeoutService, private $element: JQuery<HTMLElement>,
                     private cacheSvc: CacheService, private utilsSvc: UtilsService, private rootScopeSvc: RootScopeService) {
 
             this.htmlTooltip = "Branch temporarily unavailable during duplication.";

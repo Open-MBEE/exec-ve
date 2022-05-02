@@ -8,8 +8,8 @@ declare interface UtilController  {
     elementSaving: boolean,
     bbApi?: ButtonBarApi
     editorApi?: any
+    values?: any[]
     isEnumeration: boolean,
-    recompileScope?: angular.IScope,
     skipBroadcast: boolean
     isEditing: boolean,
     mmsProjectId: string,

@@ -1,5 +1,4 @@
 //Services
-import "./ViewExt.service"
 import "./ViewHtml.service"
 
 //Components

@@ -56,7 +56,7 @@ export class ButtonBarApi {
     }
   };
 
-  setPermission(id, permission) {
+  setPermission(id: string, permission: boolean) {
     this.buttons.forEach((button) => {
       if (button.id === id)
         button.permission = permission;
@@ -103,7 +103,7 @@ export class ButtonBarApi {
     return (buttonTemp.toggle_state) ? (buttonTemp.toggle_state) : false;
   };
 
-  addButton(button) {
+  addButton(button: BButton) {
     //TODO: Determine if count can actually be replaced by length here
     if (this.buttons.length === 0) {
       button.placement = "bottom-left";

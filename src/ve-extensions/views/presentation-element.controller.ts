@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import {ViewHtmlService} from "./ViewHtml.service";
-import {Utils} from "../../ve-core/utilities/Utils.service";
+import {TransclusionService} from "../transclusions/Transclusion.service";
 
 export class PresentationElementController implements angular.IComponentController {
 
@@ -12,18 +12,19 @@ export class PresentationElementController implements angular.IComponentControll
     protected $transcludeEl: JQuery<HTMLElement>;
 
 
-    static $inject = ['$element', '$scope', '$compile', 'ViewHtmlService', 'Utils']
-    constructor(protected $element: angular.IRootElementService, protected $scope: angular.IScope,
-                protected $compile: angular.ICompileService, protected viewHtmlSvc: ViewHtmlService, protected utils: Utils) {
+    static $inject = ['$element', '$scope', '$compile', 'ViewHtmlService', 'TransclusionService']
+    constructor(protected $element: JQuery<HTMLElement>, protected $scope: angular.IScope,
+                protected $compile: angular.ICompileService, protected viewHtmlSvc: ViewHtmlService, protected transclusionSvc: TransclusionService) {
     }
 
     $postLink() {
-        this.$transcludeEl = $(this.$element.children()[0]);
-        this.$transcludeEl.html(this.getContent());
-        $(this.$transcludeEl[0]).find('img').each((index, element) => {
-            this.utils.fixImgSrc($(element));
+        this.$element.empty();
+        this.$transcludeEl = $(this.getContent());
+        this.$transcludeEl.find('img').each((index, element) => {
+            this.transclusionSvc.fixImgSrc($(element));
         });
-        this.$compile(this.$transcludeEl)(Object.assign(this.$scope.$new(),{$ctrl: this}));
+        this.$element.append(this.$transcludeEl);
+        this.$compile(this.$transcludeEl)(this.$scope);
     }
 
     protected getContent = (): string => {

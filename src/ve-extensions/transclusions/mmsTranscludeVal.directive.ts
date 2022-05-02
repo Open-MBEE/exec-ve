@@ -2,7 +2,7 @@ import * as angular from "angular";
 
 var veExt = angular.module('veExt');
 
-veExt.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'Utils', 'URLService', 'AuthService',
+veExt.directive('mmsTranscludeVal', ['ElementService', 'UtilsService', 'UxService', 'TransclusionService', 'URLService', 'AuthService',
     '$http', '$compile', 'growl', 'MathJax', 'ViewService', 'EventService', 'MathJaxService', mmsTranscludeVal]);
 
 /**

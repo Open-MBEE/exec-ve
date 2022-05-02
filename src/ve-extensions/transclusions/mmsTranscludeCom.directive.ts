@@ -1,7 +1,7 @@
 import * as angular from "angular";
 var veExt = angular.module('veExt');
 
-veExt.directive('mmsTranscludeCom', ['Utils', 'ElementService', 'UtilsService', 'ViewService', 'UxService', 'EventService', 'MathJaxService', '$templateCache', '$compile', 'growl', mmsTranscludeCom]);
+veExt.directive('mmsTranscludeCom', ['TransclusionService', 'ElementService', 'UtilsService', 'ViewService', 'UxService', 'EventService', 'MathJaxService', '$templateCache', '$compile', 'growl', mmsTranscludeCom]);
 
 /**
  * @ngdoc directive

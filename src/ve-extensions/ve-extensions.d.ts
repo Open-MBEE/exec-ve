@@ -1,22 +1,23 @@
 import * as angular from 'angular';
+import {TButton} from "./content-tools/content-tool";
 
 export interface PEController extends angular.IComponentController {
     foo: string
 }
-export interface VeExtensionOptions {
-    name: string,
+export interface VeExtensionConfig {
+    id: string,
     path: string,
-    type: string
 }
-export interface VeViewExtensionOptions extends angular.IComponentOptions {
-    selector: string,
-    style?: string[]
-    bindings: {
-        viewData: string,
-        viewPe?: string
-    }
 
+
+
+export interface ContentToolConfig  extends VeExtensionConfig {
+    name: string,
+    button: TButton,
+    dynamic_button: TButton[]
 }
+
+export interface ExtensionsConfig {}
 
 // <div id="{{$ctrl.instanceSpec.id}}" ng-if="!$ctrl.presentationElemLoading" ng-switch on="$ctrl.presentationElem.type">
 //     <mms-view-para class="read-width" data-mms-para="$ctrl.presentationElem" ng-switch-when="Paragraph"></mms-view-para>

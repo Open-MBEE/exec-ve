@@ -316,7 +316,7 @@ export class FaPaneController implements angular.IComponentController {
     constructor(private $window, private $scope: angular.pane.IPaneScope, private $compile: angular.ICompileService,
                 private $transitions: TransitionService,
                 private $timeout: angular.ITimeoutService, private $transclude: angular.ITranscludeFunction,
-                private $interval: angular.IIntervalService, private $element: angular.IRootElementService,
+                private $interval: angular.IIntervalService, private $element: JQuery<HTMLElement>,
                 private $attrs: angular.IAttributes, private paneSvc: PaneManagerService, private eventSvc: EventService) {
 
         this.$evalAsync = this.$scope.$root.$evalAsync;

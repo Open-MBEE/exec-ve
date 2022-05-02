@@ -10,7 +10,7 @@ import {PermissionsService} from "../../ve-utils/services/Permissions.service";
 import {RootScopeService} from "../../ve-utils/services/RootScope.service";
 import {TreeService} from "../../ve-utils/services/Tree.service";
 import {EventService} from "../../ve-utils/services/Event.service";
-import {Utils} from "../../ve-core/utilities/Utils.service";
+import {Utils} from "../../ve-core/utilities/CoreUtils.service";
 import {BButton, ButtonBarApi, ButtonBarService} from "../../ve-core/button-bar/ButtonBar.service";
 import { StateService } from '@uirouter/angularjs';
 import {ViewElement, ViewService} from "../../ve-utils/services/View.service";

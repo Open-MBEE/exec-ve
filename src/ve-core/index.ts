@@ -22,7 +22,7 @@ import "./utilities";
 
 import "./button-bar";
 import "./view";
-import "./tools";
+import "../ve-extensions/content-tools";
 import "./tree";
 import "./editor";
 import "./search";

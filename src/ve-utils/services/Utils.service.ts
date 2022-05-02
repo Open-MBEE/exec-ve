@@ -5,7 +5,7 @@ import {URLService} from "./URL.provider";
 import {ApplicationService} from "./Application.service";
 import {ElementObject, ElementsRequest, RequestObject} from "../types/mms";
 import {Class, Dependency, Generalization, InstanceSpec, Package, ValueSpec} from "../utils/emf.util";
-import {TranscludeController} from "../../ve-extensions/transclusions/transclusion";
+import {TransclusionController} from "../../ve-extensions/transclusions/transclusion";
 
 var veUtils = angular.module('veUtils');
 
@@ -38,7 +38,7 @@ export class UtilsService {
 
     constructor(private $q, private $http, private cacheSvc : CacheService, private uRLSvc : URLService, private applicationSvc : ApplicationService) {}
 
-    public hasCircularReference(ctrl: TranscludeController, curId, curType) {
+    public hasCircularReference(ctrl: TransclusionController, curId, curType) {
         var curscope = ctrl.$scope;
         while (curscope.$parent) {
             var parent = curscope.$parent;

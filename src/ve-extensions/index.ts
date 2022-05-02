@@ -1,4 +1,5 @@
-import ve, {VeExtensionOptions} from "./ve-extensions.d"
+import {VeExtensionConfig} from "./ve-extensions"
+import {VeConfig} from "../ve-utils/types/config";
 //Libraries
 // import "angular-sanitize";
 // import "angular-growl-v2";
@@ -14,12 +15,6 @@ import "./ve-extensions.module"
 import "./utilities"
 import "./transclusions"
 import "./views"
+import "./content-tools"
 
-if (window.__env.extensions) {
-    for(let extension of window.__env.extensions) {
-        let ext = extension as VeExtensionOptions;
-        if (ext.path) {
-            import(ext.path);
-        }
-    }
-}
+import "./custom"

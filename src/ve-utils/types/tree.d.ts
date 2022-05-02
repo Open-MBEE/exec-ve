@@ -98,7 +98,7 @@ declare namespace AngularUITree {
      * Internal representation of node in the UI
      */
     interface ITreeNodeScope extends angular.IScope {
-        $element: angular.IRootElementService;
+        $element: JQuery<HTMLElement>;
         $modelValue: any; // Model value for node;
         $parentNodeScope: IParentTreeNodeScope[]; // uiTreeNode Scope of parent node;
         $childNodesScope: ITreeNodeScope[]; // uiTreeNodes Scope of child nodes.

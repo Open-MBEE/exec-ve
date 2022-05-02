@@ -2,7 +2,7 @@ import * as angular from "angular";
 import {ViewController} from "../../ve-core/view/view.component";
 var veCore = angular.module('veCore');
 
-veCore.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'UxService', 'Utils', 'EventService', 'growl', mmsViewSection]);
+veCore.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'UxService', 'TransclusionService', 'EventService', 'growl', mmsViewSection]);
 
 function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils, EventService, growl) {
 

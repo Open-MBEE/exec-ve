@@ -9,11 +9,11 @@
     "downlevelIteration": true,
     "lib": ["es6", "dom", "ES2017.object", "ES2016.Array.Include", "es2018.promise"],
     "mapRoot": "./",
-    "module": "es2020",
+    "module": "esnext",
     "moduleResolution": "node",
     "outDir": "../dist/out-tsc",
     "sourceMap": true,
-    "target": "es6",
+    "target": "es2017",
     "typeRoots": [
       "./src/node_modules/@types"
     ]

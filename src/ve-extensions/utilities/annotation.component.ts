@@ -38,7 +38,7 @@ let AnnotationComponent: VeComponentOptions = {
         //Local
         public displayContent
         
-        constructor(private $element: angular.IRootElementService, private viewSvc: ViewService, private utilsSvc: UtilsService, private eventSvc: EventService) {
+        constructor(private $element: JQuery<HTMLElement>, private viewSvc: ViewService, private utilsSvc: UtilsService, private eventSvc: EventService) {
         }
 
         $onInit() {

@@ -9,9 +9,6 @@ export class CacheService {
 
     get<T>(key): T | undefined {
         var realkey = key;
-        if (key.includes('||') > 0) {
-            console.trace()
-        }
         if (angular.isArray(key)) {
             if (key[0] === 'element' && key[1] === '') {
                 console.trace()
@@ -75,11 +72,6 @@ export class CacheService {
         var realkey = key;
         if (angular.isArray(key)) {
             realkey = this.makeKey(key);
-        }
-        if (key[0].includes('group') || key.includes('group')) {
-            console.log(realkey)
-            console.trace();
-            console.log(value)
         }
         value = JSON.parse(JSON.stringify(value));
         var val: T = this.get<T>(realkey);

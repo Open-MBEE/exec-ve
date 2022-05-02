@@ -1,12 +1,15 @@
 import * as angular from 'angular';
 import Rx from 'rx';
-import {TButton, ToolbarApi, ToolbarService} from "../../ve-core/tools/Toolbar.service";
-import {StateService} from "@uirouter/angularjs";
+import {ToolbarService} from "../../ve-extensions/content-tools/services/Toolbar.service";
+import {TButton} from "../../ve-extensions/content-tools/content-tool";
+import {StateService, UIRouter, UIRouterGlobals} from "@uirouter/angularjs";
 import {EditService} from "../../ve-utils/services/Edit.service";
 import {UxService} from "../../ve-utils/services/Ux.service";
 import {PermissionsService} from "../../ve-utils/services/Permissions.service"
 import {EventService} from "../../ve-utils/services/Event.service";
 import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {ToolbarApi} from "../../ve-extensions/content-tools/services/Toolbar.api";
+import {ExtensionService} from "../../ve-extensions/utilities/Extension.service";
 
 var veApp = angular.module('veApp');
 
@@ -23,7 +26,7 @@ const ToolbarComponent: VeComponentOptions = {
         documentOb: '<'
     },
     controller: class ToolbarController implements angular.IComponentController {
-        static $inject = ['$state', 'UxService', 'PermissionsService', 'EditService', 'EventService', 'ToolbarService'];
+        static $inject = ['$state', 'ExtensionService', 'PermissionsService', 'EditService', 'EventService', 'ToolbarService'];
 
         //Injected Deps
         public subs: Rx.IDisposable[];
@@ -35,23 +38,18 @@ const ToolbarComponent: VeComponentOptions = {
         //Local
         public tbApi: ToolbarApi;
         public buttons: TButton[];
-        private tbInitFlag;
 
-        constructor(private $state: StateService, private uxSvc: UxService, private permissionsSvc: PermissionsService,
+        constructor(public $state: StateService, public extensionSvc: ExtensionService, private permissionsSvc: PermissionsService,
                     private editSvc: EditService, private eventSvc: EventService, private toolbarSvc: ToolbarService) {
-            this.tbInitFlag = false;
+
         }
 
         $onInit() {
+
             this.eventSvc.$init(this);
 
-            this.tbApi = this.toolbarSvc.getApi();
-            if (this.toolbarSvc.buttons.length > 0) {
-                this.toolbarSvc.buttons.length = 0;
-            }
-            this.tbApi.setInit(this.tbInit);
-            this.tbApi.init(this);
-            this.buttons = this.toolbarSvc.buttons;
+            this.tbApi = this.toolbarSvc.initApi('right-toolbar', this.tbInit, this);
+            this.buttons = this.tbApi.buttons;
 
             this.subs.push(this.eventSvc.$on(this.toolbarSvc.constants.SETPERMISSION, (data) => {
                 this.tbApi.setPermission(data.id, data.value);
@@ -69,30 +67,31 @@ const ToolbarComponent: VeComponentOptions = {
                 this.tbApi.select(data.id);
             }));
         };
-
-        tbInit(tbCtrl) {
-            let tbApi = tbCtrl.tbApi;
-            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("element-viewer"));
-            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("element-editor"));
-            if (tbCtrl.editSvc.openEdits() > 0) {
-                tbApi.setIcon('element-editor', 'fa-edit-asterisk');
-                tbApi.setPermission('element-editor-saveall', true);
-            }
-            let editable = false;
-            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("element-history"));
-            tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("tags"));
-            if (tbCtrl.$state.includes('main.project.ref') && !tbCtrl.$state.includes('main.project.ref.document')) {
-                editable = tbCtrl.refOb && tbCtrl.refOb.type === 'Branch' && tbCtrl.permissionsSvc.hasBranchEditPermission(tbCtrl.refOb);
-                tbApi.setPermission('element-editor', editable);
-                if (tbCtrl.$state.includes('main.project.ref.preview')) {
-                    tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("view-reorder"));
-                    tbApi.setPermission("view-reorder", editable);
+        //TODO: Need to find a more generic way to execute the init logic (beyond just getting the button);
+        tbInit(tbApi: ToolbarApi, tbCtrl: { $state: StateService, extensionSvc: ExtensionService } & angular.IComponentController) {
+            for (let tool of tbCtrl.extensionSvc.getExtensions('content')) {
+                let button = tbCtrl.toolbarSvc.getToolbarButton(tool)
+                tbApi.addButton(button);
+                if (button.enabledFor) {
+                    button.active=false;
+                    for (let enableState of button.enabledFor) {
+                        if (tbCtrl.$state.includes(enableState)) {
+                            button.active=true;
+                            break;
+                        }
+                    }
                 }
-            } else if (tbCtrl.$state.includes('main.project.ref.document')) {
-                editable = tbCtrl.refOb && tbCtrl.refOb.type === 'Branch' && tbCtrl.permissionsSvc.hasBranchEditPermission(tbCtrl.refOb);
-                tbApi.addButton(tbCtrl.uxSvc.getToolbarButton("view-reorder"));
-                tbApi.setPermission('element-editor', editable);
-                tbApi.setPermission("view-reorder", editable);
+                if (button.disabledFor) {
+                    for (let disableState of button.disabledFor) {
+                        if (tbCtrl.$state.includes(disableState)) {
+                            button.active=false;
+                            break;
+                        }
+                    }
+                }
+                if (!button.permission) {
+                    button.permission = tbCtrl.refOb && tbCtrl.refOb.type === 'Branch' && tbCtrl.permissionsSvc.hasBranchEditPermission(tbCtrl.refOb);
+                }
             }
         };
     }

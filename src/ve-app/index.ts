@@ -3,7 +3,8 @@
 // import '../styles/vendor.scss';
 
 //Shared Dependencies
-import 'jquery';
+// import 'jquery';
+
 import 'angular';
 import 'lodash';
 import 'angular-ui-bootstrap';

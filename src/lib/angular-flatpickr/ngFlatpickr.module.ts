@@ -25,7 +25,7 @@ var ngFlatpickrComponent: VeComponentOptions = {
             fpOpts
             fpOnSetup
 
-        constructor(private $element: angular.IRootElementService, private $timeout: angular.ITimeoutService,
+        constructor(private $element: JQuery<HTMLElement>, private $timeout: angular.ITimeoutService,
                     private $scope: angular.IScope) {}
 
         $onInit()

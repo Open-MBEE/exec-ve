@@ -100,7 +100,7 @@ export class ElementService {
             return this.inProgress[key];
         }
         var deferred: angular.IDeferred<ElementObject> = this.$q.defer();
-        var cached = this.cacheSvc.get<ElementObject>(requestCacheKey);
+        var cached: ElementObject = this.cacheSvc.get<ElementObject>(requestCacheKey);
         if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
             deferred.resolve(cached);
             return deferred.promise;
@@ -217,7 +217,7 @@ export class ElementService {
             result._commitId = 'latest'; //so realCacheKey is right later
             var commitCacheKey = this.utilsSvc.makeElementKey(resultCommitCopy); //save historic element
             if (!edit) {
-                this.cacheSvc.put(commitCacheKey, resultCommitCopy, true);
+                this.cacheSvc.put(commitCacheKey, result, true);
             }
         }
         let resultReqOb = this.utilsSvc.makeElementRequestObject(result);

@@ -1,6 +1,5 @@
 //Services
 import "./CKEditor.service"
-import "./MathJax.service"
 import "./Mention.service"
 
 //Components

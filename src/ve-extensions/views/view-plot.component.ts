@@ -1,7 +1,7 @@
 import * as angular from "angular";
-import {VeViewExtensionOptions} from "../ve-extensions";
+import {VeViewExtensionOptions} from "./view-pe";
 import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {Utils} from "../../ve-core/utilities/Utils.service";
+import {TransclusionService} from "../transclusions/Transclusion.service";
 import {veExt} from "../ve-extensions.module";
 
 let ViewPlotComponent: VeViewExtensionOptions = {
@@ -18,8 +18,8 @@ let ViewPlotComponent: VeViewExtensionOptions = {
         
         public plot
 
-        constructor(private $element: angular.IRootElementService, private $scope: angular.IScope,
-                    private $compile: angular.ICompileService, private utilsSvc: UtilsService, private utils: Utils) {}
+        constructor(private $element: JQuery<HTMLElement>, private $scope: angular.IScope,
+                    private $compile: angular.ICompileService, private utilsSvc: UtilsService, private transclusionSvc: TransclusionService) {}
 
         $onInit() {
             this.plot = this.viewData;

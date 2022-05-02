@@ -2,7 +2,7 @@ import * as angular from "angular";
 import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 import {ViewController} from "../../ve-core/view/view.component";
 import {handleChange} from "../../ve-utils/utils/change.util";
-import {on} from "../../lib/ckeditor/ckeditor";
+import {ExtensionService} from "../utilities/Extension.service";
 var veExt = angular.module('veExt');
 
 
@@ -48,13 +48,13 @@ export class MmsCfController implements angular.IComponentController {
     commitId: string
     clearWatch: boolean = false;
 
-    static $inject = ['$compile', '$scope', '$element']
+    static $inject = ['$compile', '$scope', '$element', 'ExtensionService']
     private templateElementHtml: any;
 
-    protected $transcludeEl: JQuery<HTMLElement>;
+    protected $transcludeEl: JQuery;
 
     constructor(private $compile: angular.ICompileService, private $scope: angular.IScope,
-                private $element: angular.IRootElementService) {
+                private $element: JQuery<HTMLElement>, private extensionSvc: ExtensionService) {
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject) {
@@ -65,7 +65,7 @@ export class MmsCfController implements angular.IComponentController {
     }
 
     $postLink() {
-        this.$transcludeEl = $(this.$element.children()[0]);
+        //this.$transcludeEl = $(this.$element.children()[0]);
         this.changeAction(this.mmsElementId,'',false);
     }
 
@@ -79,12 +79,13 @@ export class MmsCfController implements angular.IComponentController {
     };
 
     private changeAction = (newVal, oldVal, firstChange) => {
-        if (this.clearWatch || !newVal || !this.mmsProjectId || firstChange) {
+        if (this.clearWatch || !newVal || firstChange) {
             return;
         }
         if (!this.mmsWatchId && newVal) {
             this.clearWatch = true;
         }
+
         let projectId = this.mmsProjectId;
         let refId = this.mmsRefId;
         let commitId = this.mmsCommitId;
@@ -112,17 +113,25 @@ export class MmsCfController implements angular.IComponentController {
         this.projectId = projectId;
         this.refId = refId ? refId : 'master';
         this.commitId = commitId ? commitId : 'latest';
-        this.templateElementHtml = 'FixMe'//TODO: $(this.$element)[0].innerHTML;
+        this.templateElementHtml = this.$element[0].innerHTML;
         if (this.mmsCfType) {
-            this.$transcludeEl.html('<mms-transclude-' + this.mmsCfType + (this.mmsGenerateForDiff ? ' mms-generate-for-diff="mmsGenerateForDiff" ' : '') + ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable" mms-cf-label="{{$ctrl.templateElementHtml}}"></mms-transclude-' + this.mmsCfType + '>');
-            this.$compile(this.$transcludeEl)(this.$scope.$new());
+            this.$element.empty();
+            let tag = this.extensionSvc.getTagByType("mmsTransclude", this.mmsCfType)
+            if (tag === 'error') {
+                this.$transcludeEl = $('<error type="{{$ctrl.mmsCfType}}" mms-element-id="{{$ctrl.mmsElementId}}" kind="Transclusion"></error>');
+            }else {
+                this.$transcludeEl = $('<' + tag + (this.mmsGenerateForDiff ? ' mms-generate-for-diff="mmsGenerateForDiff" ' : '') + ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable" mms-cf-label="{{$ctrl.templateElementHtml}}"></' + tag + '>');
+            }
+            this.$element.append(this.$transcludeEl);
+            this.$compile(this.$transcludeEl)(this.$scope);
         }
     };
 }
 
 let MmsCfComponent: VeComponentOptions = {
     selector: 'mmsCf',
-    template: `<div></div>`,
+    template: `<div ng-transclude></div>`,
+    transclude: true,
     bindings: {
         mmsElementId: '@',
         mmsProjectId: '@',

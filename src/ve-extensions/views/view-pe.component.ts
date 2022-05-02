@@ -2,9 +2,9 @@ import * as angular from "angular";
 import {ViewService} from "../../ve-utils/services/View.service";
 import {ElementService} from "../../ve-utils/services/Element.service";
 import {ViewController} from "../../ve-core/view/view.component";
-import {ViewExtService} from "./ViewExt.service";
 import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 import {veExt} from "../ve-extensions.module";
+import {ExtensionService} from "../utilities/Extension.service";
 
 /**
  * @ngdoc component
@@ -41,12 +41,12 @@ export class ViewPresentationElemController implements angular.IComponentControl
     public presentationElem
 
     static $inject = ['$scope', '$element', '$timeout', '$location', '$anchorScroll', '$compile', 'ViewService',
-        'ElementService', 'ViewExtService']
-    constructor(private $scope: angular.IScope, private $element: angular.IRootElementService,
+        'ElementService', 'ExtensionService']
+    constructor(private $scope: angular.IScope, private $element: JQuery<HTMLElement>,
                 private $timeout: angular.ITimeoutService, private $location: angular.ILocationService,
                 private $anchorScroll: angular.IAnchorScrollService, private $compile: angular.ICompileService,
                 private viewSvc: ViewService, private elementSvc: ElementService,
-                private viewExtSvc: ViewExtService) {}
+                private extensionSvc: ExtensionService) {}
 
     $onInit() {
         this.presentationElemLoading = true;
@@ -85,7 +85,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
                         this.viewCtrl.transcludeClicked(instanceSpec);
                     e.stopPropagation();
                 }));
-                let tag = this.viewExtSvc.getTypeTag(this.presentationElem);
+                let tag = this.extensionSvc.getTagByType("view", this.presentationElem.type);
 
                 let newPe = $('<div id="' + this.instanceSpec.id + '" ng-if="!$ctrl.presentationElemLoading"></div>')
                 $(newPe).append('<' + tag + ' view-data="::presentationElem" view-pe="::instanceSpec">' + '</' + tag + '>');

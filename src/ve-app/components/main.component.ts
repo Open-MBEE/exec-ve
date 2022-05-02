@@ -93,6 +93,10 @@ let MainComponent: VeComponentOptions = {
             this.rootScopeSvc.treeInitialSelection('');
             this.rootScopeSvc.veFn(false);
 
+            this.rootScopeSvc.veCommentsOn(false);
+            this.rootScopeSvc.veElementsOn(false);
+            this.rootScopeSvc.veEditMode(false);
+
             this.subs.push(this.eventSvc.$on(this.rootScopeSvc.constants.VETITLE, (value) => {
                 this.$window.document.title = value + ' | View Editor';
             }));

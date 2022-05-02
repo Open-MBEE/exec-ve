@@ -3,7 +3,7 @@ import Rx from 'rx';
 import {RootScopeService} from "../../ve-utils/services/RootScope.service";
 import {ViewApi, ViewService} from "../../ve-utils/services/View.service";
 import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {Utils} from "../utilities/Utils.service";
+import {Utils} from "../utilities/CoreUtils.service";
 import {ElementService} from "../../ve-utils/services/Element.service";
 import {EventService} from "../../ve-utils/services/Event.service";
 import {handleChange, onChangesCallback} from "../../ve-utils/utils/change.util";
@@ -58,8 +58,6 @@ import {veCore} from "../ve-core.module";
  * @param {string} mmsProjectId The project id for the view
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
- * @param {expression=} mmsCfClicked The expression to handle transcluded elements in the
- *              view being clicked, this should be a function whose argument is 'elementId'
  */
 
 export class ViewController implements angular.IComponentController {
@@ -87,7 +85,7 @@ export class ViewController implements angular.IComponentController {
     public subs: Rx.IDisposable[];
 
 
-    constructor(private $element: angular.IRootElementService, private growl: angular.growl.IGrowlService, private utils: Utils, private authSvc: AuthService,
+    constructor(private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService, private utils: Utils, private authSvc: AuthService,
                 private viewSvc: ViewService, private elementSvc: ElementService, private eventSvc: EventService,
                 private rootScopeSvc: RootScopeService) {}
 

@@ -13,7 +13,6 @@ import {RootScopeService} from "../../ve-utils/services/RootScope.service";
 import {PermissionsService} from "../../ve-utils/services/Permissions.service";
 import {EventService} from "../../ve-utils/services/Event.service";
 import {ButtonBarApi, ButtonBarService} from "../../ve-core/button-bar/ButtonBar.service";
-import {ToolbarApi} from "../../ve-core/tools/Toolbar.service";
 import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 import {ElementObject, ViewObject} from "../../ve-utils/types/mms";
 import {ValueSpec} from "../../ve-utils/utils/emf.util";
@@ -369,7 +368,7 @@ let LeftPaneComponent: VeComponentOptions = {
         this.resetPeTreeList(branch.type);
       }));
 
-      this.subs.push(this.eventSvc.$on('view.reorder.saved', (data) => {
+      this.subs.push(this.eventSvc.$on('content-reorder-saved', (data) => {
         var node: TreeBranch = this.viewId2node[data.id];
         var viewNode: TreeBranch = node;
         var newChildren: TreeBranch[] = [];

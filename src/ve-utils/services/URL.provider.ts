@@ -4,21 +4,21 @@ var veUtils = angular.module('veUtils');
 
 
 export class URLServiceProvider {
-    private baseUrl = '/api';
+    private basePath = '/api';
     private mmsUrl = 'localhost:8080';
 
 
     constructor() {
     };
 
-   setBaseUrl(base) {
-        this.baseUrl = base;
+   setBasePath(base) {
+        this.basePath = base;
     };
    setMmsUrl(mms) {
         this.mmsUrl = mms;
     };
     $get() {
-        return new URLService(this.baseUrl,this.mmsUrl);
+        return new URLService(this.basePath,this.mmsUrl);
     }
 }
 
@@ -34,12 +34,12 @@ veUtils.provider('URLService', URLServiceProvider)
  * should rarely be used directly by applications.
  *
  * To configure the base url of the mms server, you can use the URLServiceProvider
- * in your application module's config. By default, the baseUrl is '/api', but is
+ * in your application module's config. By default, the basePath is '/api', but is
  * effectively '/' relative to the service layer due to the rewrite rule.
  *  <pre>
         angular.module('myApp', ['veUtils'])
         .config(function(URLServiceProvider) {
-            URLServiceProvider.setBaseUrl('https://url/context/path');
+            URLServiceProvider.setBasePath('https://url/context/path');
         });
  </pre>
  * (You may run into problems like cross origin security policy that prevents it from
@@ -50,8 +50,8 @@ export class URLService {
 
     private  token
 
-    constructor(private baseUrl, private mmsUrl) {
-        this.root = this.mmsUrl + this.baseUrl;
+    constructor(private basePath, private mmsUrl) {
+        this.root = this.mmsUrl + this.basePath;
         this.token = window.localStorage.getItem('token');
     }
 

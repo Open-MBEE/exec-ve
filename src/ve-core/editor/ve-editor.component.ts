@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import * as _ from "lodash";
-import CKEDITOR from "../../lib/ckeditor/ckeditor"
+import CKEDITOR from "../../lib/types/ckeditor"
 
 import {VeComponentOptions} from "../../ve-utils/types/view-editor";
 import {ElementService} from "../../ve-utils/services/Element.service";
@@ -9,7 +9,7 @@ import {UtilsService} from "../../ve-utils/services/Utils.service";
 import {ViewService} from "../../ve-utils/services/View.service";
 import {URLService} from "../../ve-utils/services/URL.provider";
 import {MentionService} from "./Mention.service";
-import {Utils} from "../utilities/Utils.service";
+import {Utils} from "../utilities/CoreUtils.service";
 
 
 
@@ -28,7 +28,6 @@ import {ElementObject} from "../../ve-utils/types/mms";
  * @requires veUtils/UtilsService
  * @requires veUtils/ViewService
  * @requires $uibModal
- * @requires $templateCache
  * @requires $window
  * @requires $timeout
  * @requires growl
@@ -47,6 +46,8 @@ import {ElementObject} from "../../ve-utils/types/mms";
  */
 export class VeEditorController implements angular.IComponentController {
 
+        private cKEditor = window.CKEDITOR;
+
         private editValue: any;
         mmsProjectId: string;
         mmsRefId: string;
@@ -55,6 +56,9 @@ export class VeEditorController implements angular.IComponentController {
         private autosaveKey: any;
         private mmsEditorApi: VeEditorApi;
 
+        private toolbar: Array<string | string[] | { name: string, items?: string[] | undefined, groups?: string[] | undefined }>;
+        protected $transcludeEl: JQuery<HTMLElement>
+        protected id: string;
         private generatedIds: number = 0;
         private instance: CKEDITOR.editor = null;
         private deb: _.DebouncedFunc<(e) => void> = _.debounce((e) => {
@@ -64,7 +68,7 @@ export class VeEditorController implements angular.IComponentController {
         static $inject = ['$window', '$uibModal', '$attrs', '$element', '$timeout', '$scope', 'growl', 'CacheService',
             'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'Utils'];
         constructor(private $window: angular.IWindowService, private $uibModal: angular.ui.bootstrap.IModalService,
-                    private $attrs: angular.IAttributes, private $element: angular.IRootElementService,
+                    private $attrs: angular.IAttributes, private $element: JQuery<HTMLElement>,
                     private $timeout: angular.ITimeoutService, private $scope: angular.IScope, private growl: angular.growl.IGrowlService,
                     private cacheSvc: CacheService, private elementSvc: ElementService, private utilsSvc: UtilsService,
                     private viewSvc: ViewService, private uRLSvc: URLService, private mentionSvc: MentionService,
@@ -73,10 +77,8 @@ export class VeEditorController implements angular.IComponentController {
 
 
         $onInit() {
-
-            if (!this.$attrs.id) {
-                this.$attrs.$set('id', 'mmsCkEditor' + this.generatedIds++);
-            }
+            this.$transcludeEl = $(this.$element.children()[0]);
+            this.id = 'mmsCkEditor' + this.generatedIds++;
 
             // Formatting editor toolbar
             var stylesToolbar = { name: 'styles', items : ['Styles',/*'Format',*/'FontSize','TextColor','BGColor'] };
@@ -110,20 +112,22 @@ export class VeEditorController implements angular.IComponentController {
                     thisToolbar = [justifyToolbar, imageToolbar, sourceToolbar];
                     break;
             }
-
+            this.toolbar = thisToolbar;
+        }
+        $postLink() {
             this.$timeout(() => {
                 // Initialize ckeditor and set event handlers
                 $(this.$element).val(this.editing());
-                this.instance = CKEDITOR.replace(this.$attrs.id, {
-                    //customConfig: '/lib/ckeditor/config.js', not needed, this is default and prevents absolute path
+                this.instance = this.cKEditor.replace(this.id, {
+                    //customConfig: '/lib/ckeditor-dev/config.js', not needed, this is default and prevents absolute path
                     mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
                     extraPlugins: 'liststyle,colordialog,autosave,autogrow,stylescombo,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,mmsdropdown,sourcedialog',
                     mmscf: {callbackModalFnc: this.transcludeCallback},
                     mmscomment: {callbackModalFnc: this.commentCallback},
                     mmsvlink: {callbackModalFnc: this.viewLinkCallback},
                     mmsreset: {callback: this.mmsResetCallback},
-                    contentsCss: CKEDITOR.basePath+'contents.css',
-                    toolbar: thisToolbar
+                    contentsCss: this.cKEditor.basePath+'contents.css',
+                    toolbar: this.toolbar
                 });
 
                 // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
@@ -269,7 +273,7 @@ export class VeEditorController implements angular.IComponentController {
 
         $onDestroy() {
             if (!this.instance) {
-                this.instance = CKEDITOR.instances[this.$attrs.id];
+                this.instance = this.cKEditor.instances[this.id];
             } else {
                 this.mentionSvc.removeAllMentionForEditor(this.instance);
                 this.instance.destroy();
@@ -298,7 +302,7 @@ export class VeEditorController implements angular.IComponentController {
             tInstance.result.then((tag) => {
                 this._addWidgetTag(ed, tag);
             }, () => {
-                var focusManager = new this.$window.CKEDITOR.focusManager( ed );
+                var focusManager: CKEDITOR.focusManager = new this.cKEditor.focusManager( ed );
                 focusManager.focus();
             });
         };
@@ -390,8 +394,8 @@ export class VeEditorController implements angular.IComponentController {
 
         private _addInlineMention = () => {
             var keyupHandler;
-            CKEDITOR.instances[this.$attrs.id].on('contentDom', () => {
-                keyupHandler = CKEDITOR.instances[this.instance.name].document.on('keyup', (e) => {
+            this.cKEditor.instances[this.id].on('contentDom', () => {
+                keyupHandler = this.cKEditor.instances[this.instance.name].document.on('keyup', (e) => {
                     if(this._isMentionKey(e.data.$)) {
                         this.mentionSvc.createMention(this.instance, this.$scope.$new(), this.mmsProjectId, this.mmsRefId);
                     } else {
@@ -400,7 +404,7 @@ export class VeEditorController implements angular.IComponentController {
                 });
             });
 
-            CKEDITOR.instances[this.$attrs.id].on('contentDomUnload', () => {
+            this.cKEditor.instances[this.id].on('contentDomUnload', () => {
                 if (keyupHandler) {
                     keyupHandler.removeListener();
                 }
@@ -453,7 +457,7 @@ export class VeEditorController implements angular.IComponentController {
             editor.addCommand('formatAsCode', {
                 exec: (editor: CKEDITOR.editor) => {
                     var selected_text = editor.getSelection().getSelectedText();
-                    var newElement = new CKEDITOR.dom.element("code");
+                    var newElement = new this.cKEditor.dom.element("code");
                     newElement.addClass('inlineCode');
                     newElement.setText(selected_text);
                     editor.insertElement(newElement);
@@ -468,15 +472,15 @@ export class VeEditorController implements angular.IComponentController {
                 icon: 'codeSnippet'
             });
             editor.contextMenu.addListener((element) => {
-                return {formatAsCode: CKEDITOR.TRISTATE_OFF};
+                return {formatAsCode: this.cKEditor.TRISTATE_OFF};
             });
-            editor.setKeystroke( CKEDITOR.CTRL + 75, 'formatAsCode' );
+            editor.setKeystroke( this.cKEditor.CTRL + 75, 'formatAsCode' );
         }
 }
 
 let veEditorComponent: VeComponentOptions = {
     selector: 'veEditor',
-    template: ``,
+    template: `<textarea id="{{$ctrl.id}}"></textarea>`,
     bindings: {
         editValue: "&",
         mmsElementId: "<",

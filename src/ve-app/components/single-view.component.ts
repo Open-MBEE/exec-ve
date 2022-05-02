@@ -10,7 +10,7 @@ import {ShortenUrlService} from "../../ve-utils/services/ShortenUrl.service";
 import {PermissionsService} from "../../ve-utils/services/Permissions.service";
 import {RootScopeService} from "../../ve-utils/services/RootScope.service";
 import {TreeApi, TreeService} from "../../ve-utils/services/Tree.service";
-import {Utils} from "../../ve-core/utilities/Utils.service";
+import {Utils} from "../../ve-core/utilities/CoreUtils.service";
 import {EventService} from "../../ve-utils/services/Event.service";
 import {BButton, ButtonBarApi, ButtonBarService} from "../../ve-core/button-bar/ButtonBar.service";
 import {handleChange} from "../../ve-utils/utils/change.util";
@@ -110,7 +110,7 @@ let SingleViewComponent: VeComponentOptions = {
 
         constructor(private $scope: angular.IScope, private $state: StateService, private $timeout: angular.ITimeoutService,
                     private $window: angular.IWindowService, private $location: angular.ILocationService,
-                    private $http: angular.IHttpService, private $element: angular.IRootElementService,
+                    private $http: angular.IHttpService, private $element: JQuery<HTMLElement>,
                     private growl: angular.growl.IGrowlService, private hotkeys: angular.hotkeys.HotkeysProvider,
                     private appUtilsSvc: AppUtilsService, private uxSvc: UxService, private uRLSvc: URLService,
                     private utilsSvc: UtilsService, private shortenUrlSvc: ShortenUrlService, private utils: Utils,

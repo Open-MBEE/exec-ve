@@ -1,4 +1,6 @@
 import * as angular from 'angular';
+import {VeConfig} from "../ve-utils/types/view-editor";
+import {VeExtensionConfig} from "./ve-extensions";
 
 /**
  *
@@ -14,4 +16,5 @@ veExt.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.
             'mms-commit-id', 'mms-watch-id', 'non-editable', 'mms-generate-for-diff'])
         .enableSvg()
 }])
-    .constant('CKEDITOR', window.CKEDITOR);
+    .constant('CKEDITOR', window.CKEDITOR)
+    .constant('veConfig', window.__env)

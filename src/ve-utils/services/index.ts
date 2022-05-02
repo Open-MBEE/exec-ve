@@ -11,6 +11,7 @@ import "./Emf.service";
 import "./Event.service";
 import "./FullDocument.service";
 import "./Http.service";
+import "./MathJax.service";
 import "./Permissions.service";
 import "./Project.service";
 import "./Session.service";

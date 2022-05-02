@@ -4,7 +4,7 @@ import {ProjectService} from "../../../ve-utils/services/Project.service";
 import {ElementService} from "../../../ve-utils/services/Element.service";
 import {ApplicationService} from "../../../ve-utils/services/Application.service";
 import {UtilsService} from "../../../ve-utils/services/Utils.service";
-import {Utils} from "../../../ve-core/utilities/Utils.service";
+import {Utils} from "../../../ve-core/utilities/CoreUtils.service";
 import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
 import {CommitObject, RefObject} from "../../../ve-utils/types/mms";
 var veApp = angular.module('veApp');
