@@ -1,4 +1,4 @@
-# angular-mms
+# View Editor (VE)
 
 ## Usage
 https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
@@ -13,7 +13,7 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 * /app - MDEV developed application, this will be separated out in the future
 
 ## Configuration
-_(View Editor 3.7.0 and newer)_
+_(View Editor 4.0.0 and newer)_
 
 You can now configure view editor to work with external sites without using Grunt. This file also allows the configuration
 of certain branding and other features that will be expanded in future versions
@@ -25,7 +25,7 @@ of certain branding and other features that will be expanded in future versions
    appended to your `grunt` command (e.g. `grunt release:docker --env=prod`).
 3. For more information regarding the available configuration options see [Config](docs/Config.md).
 
-_Versions Prior to 3.7.0_
+_Versions Prior to 4.0.0_
 5. Create a file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.
     * The _grunt_ command will build with these default and fake values, but will not be runnable.  
     * You should update "ems" key to point to the value of the **actual** hostname serving the Model Management Server (MMS).
