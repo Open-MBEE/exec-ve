@@ -1,4 +1,4 @@
-# angular-mms
+# View Editor (VE)
 
 ## Usage
 https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
@@ -12,7 +12,28 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 * /src/directives/templates - html templates for our directives plus common styling
 * /app - MDEV developed application, this will be separated out in the future
 
+## Configuration
+_(View Editor 4.0.0 and newer)_
 
+You can now configure view editor to work with external sites without using Grunt. This file also allows the configuration
+of certain branding and other features that will be expanded in future versions
+
+1. In the `app/config` directory copy `config.example.js` into a new file and rename it to `config.<your_env_here>.js`
+2. You should update the `baseUrl` and `apiUrl` fields to point to your MMS server (eg. `apiURL: 'https://localhost:8080'`
+& (`baseUrl: ''`)
+3. To deploy view editor using this custom file, use `--env <your_env_here>`
+   appended to your `grunt` command (e.g. `grunt release:docker --env=prod`).
+3. For more information regarding the available configuration options see [Config](docs/Config.md).
+
+_Versions Prior to 4.0.0_
+5. Create a file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.
+    * The _grunt_ command will build with these default and fake values, but will not be runnable.  
+    * You should update "ems" key to point to the value of the **actual** hostname serving the Model Management Server (MMS).
+```json
+{
+  "ems": "hostnameurl"
+}
+```
 ## Installation and Building
 
 1. Install the latest stable version of Node ( at the time of this writing 8.9.4 )
@@ -24,17 +45,9 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 4. to install all node module dependencies specified in package.json
 
        npm install
-       
-5. Create a file named `angular-mms-grunt-servers.json`. This is where you will add server mappings.
-    * The _grunt_ command will build with these default and fake values, but will not be runnable.  
-    * You should update "ems" key to point to the value of the **actual** hostname serving the Model Management Server (MMS).
-```json
-{
-  "ems": "hostnameurl"
-}
-```
 
-6. In the angular-mms directory, run. . .
+
+6. In the root directory, run. . .
 * . . .to build and bundle the app in development mode. The final artifact will be available in the dist folder:
   
       grunt
@@ -47,17 +60,21 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 
       grunt server
       
-* . . .to build a proxied service.  "hostnameurl" is the key from the angular-mms-grunt-servers.json. Its value is the server's base url that you would like the proxy to forward requests to:
+* . . .to build a proxied service in develop mode with default configuration:
 
-      grunt server:hostnameurl
+      grunt server:docker
       
 * . . .to build and bundle the app in production mode as well as launching a web server locally and a proxy:
 
       grunt release
       
-* . . .to builid and bundle the app in production mode as well as launching a webserver locally and a psroxy, where the server url pertains to a different url you want. Make sure that "hostnameurl" exists in the angular-mms-grunt-servers.json:
+* . . .to build and bundle the app in production mode as well as launching a webserver locally with default configuration:
 
-      grunt release:hostnameurl
+      grunt release:docker
+
+* . . .to build and bundle the app with a custom configuration in dev/production mode as well as launching a webserver locally (defaults to `example`):
+
+      grunt <server/release>:docker --env=<env_file_name>
       
 * . . .to build and bundle the app in production modes, generate documentation and publish the final artifact to Artifactory:
 
@@ -71,9 +88,23 @@ https://github.com/Open-MBEE/ve/blob/develop/Documents/ViewEditorUserGuide.pdf
 
 For more information, please consult the Gruntfile.js and the links at the bottom.
 
+
 ## Building and Running with Docker
 To build the container, run the following command: `docker build -t ve .`.
 To run the container, run `docker run -it -p 80:9000 --name ve ve`.
+
+### Using the docker container
+The docker container can be configured using a number of options
+#### Specifying Port
+To specify the port use `--env VE_ENV=<desired_port>` (default = 9000)
+
+#### Enabling HTTPS
+Use `--env VE_PROTOCOL='https'` in order for this to work you will need to mount your https certificates and key to
+`/run/secrets/cert.key` and `/run/secrets/cert.crt`
+
+#### Config file (View Editor 4.0+)
+To use a custom configuration file with the docker container you can mount the desired file using a docker config (mounted to `/opt/mbee/ve/app/config/config.<env_file_name>.js`) or volume mounted at `/opt/mbee/ve/app/config`.
+Using your custom configuration can be done by specifying `--env VE_ENV=<your_env_here>` or adding `VE_ENV` to your compose file.
 
 ## Problems?
 If you see some error after updating, try cleaning out the bower_components and bower_components_target folders under /app and do a _grunt clean_
@@ -123,6 +154,8 @@ For Protractor - place new tests within test/develop/e2e
 * _grunt docs_ - this would generate the docs and run the server at localhost:10000
 
 ## Contributing and Experimenting, Add Components
+For general contributing guidelines, please see <https://www.openmbee.org/contribute.html>
+
 Fork this repo, switch to the develop branch and use our existing build process and structure to add in services/directives/apps - in the future will have a better repo structure for pulling in dependencies and module management
 
 ### Services

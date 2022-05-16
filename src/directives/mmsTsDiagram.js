@@ -328,7 +328,7 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
                     "command": "SetModelAttribute",
                     "data": {
                         "attributeName": "Ticket",
-                        "attributeValue": AuthService.getTicket(),
+                        "attributeValue": AuthService.getToken(),
                         "modelID": 'model-' + id,
                         "module": "SysML",
                         "project": id,

@@ -4,14 +4,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ve_title}} | View Editor</title>
+    <script></script>
+    <title>View Editor</title>
     <!--build:css css/vendor.min.css-->
     <!--bower:css -->
     <!--endbower -->
     <!--endbuild-->
     <link rel="stylesheet" href="css/ve-mms.min.css" type="text/css">
     <link rel="stylesheet" href="lib/flatpickr/flatpickr.css" type="text/css">
-    <link href="/mms-ts/tsperspectives/TSWebView.css" rel="stylesheet" type="text/css">
+    <!--<link href="/mms-ts/tsperspectives/TSWebView.css" rel="stylesheet" type="text/css">-->
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="icon" type="image/png" href="assets/favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="assets/favicon-16x16.png" sizes="16x16" />
@@ -23,9 +24,13 @@
 <div growl></div>
 
 <div id="outer-wrap">
-    <div ui-view="login" ng-show="showLogin" style="height: 100vh"></div>
+    <!--<div id="login-overlay" ng-show="showLogin" style="height: 100vh">-->
+    <div id="login-overlay" ng-show="showLogin">
+        <div ui-view="login"></div>
+    </div>
 
     <div id="inner-wrap">
+        <div ui-view="banner"></div>
         <div ui-view="nav"></div>
         <div ui-view="menu"></div>
         <div ui-view="manageRefs" ng-show="showManageRefs" style="height: 100vh"></div>
@@ -49,9 +54,7 @@
             </div>
         </div>
         </div>
-        <ve-footer ng-if="ve_footer">
-            <span ng-bind-html="ve_footer"></span>
-        </ve-footer>
+        <div ui-view="footer"></div>
     </div>
 </div>
 

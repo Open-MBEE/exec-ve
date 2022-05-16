@@ -119,7 +119,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                 } else {
                     scope.href = UtilsService.PROJECT_URL_PREFIX + scope.projectId + '/' + scope.refId + '/documents/' + scope.docid + '/views/' + scope.vid;
                 }
-                scope.change = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc == scope.docid) && !scope.suppressNumbering;
+                scope.showNum = ApplicationService.getState().inDoc && (ApplicationService.getState().currentDoc === scope.docid) && !scope.suppressNumbering;
             }, function(reason) {
                 element.html('<span mms-annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></span>');
                 $compile(element.contents())(Object.assign(scope.$new(), {
@@ -146,11 +146,12 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
             linkIconClass: '@?',
             linkTarget: '@?',
             mmsExternalLink: '<?',
-            suppressNumbering: '<'
+            suppressNumbering: '<',
+            showName: '<'
         },
         require: ['?^^mmsCf', '?^^mmsView'],
-        template: '<span ng-if="!loading"><a target="{{target}}" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && change">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !change">{{name || "Unnamed View"}}</span></a>' +
-        '<a class="external-link no-print" target="_blank" ng-href="{{href}}" ng-if="mmsExternalLink"><i class="fa fa-external-link ve-secondary-text pull-right" aria-hidden="true" title="Open document in new tab"></i></a></span>',
+        template: '<span ng-if="!loading"><a target="{{target}}" ng-class="linkClass" ng-href="{{href}}"><i ng-class="linkIconClass" aria-hidden="true"></i><span ng-if="linkText">{{linkText}}</span><span ng-if="!linkText && showNum && showName">{{type}}{{element._veNumber}}{{suffix}} - {{name || "Unnamed View"}}</span><span ng-if="!linkText && showNum && !showName">{{type}}{{element._veNumber}}{{suffix}}</span><span ng-if="!linkText && !showNum">{{name || "Unnamed View"}}</span></a>' +
+        '<a class="external-link no-print" target="_blank" ng-href="{{href}}" ng-if="mmsExternalLink"><i class="fa fa-external-link" aria-hidden="true" title="Open document in new tab"></i></a></span>',
         link: mmsViewLinkLink
     };
 }

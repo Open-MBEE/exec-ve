@@ -139,6 +139,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             $scope.showProposeLink = false;
             $scope.searchExisting = true;
             $scope.suppressNumbering = false;
+            $scope.suppressName = true;
             $scope.linkType = 1;
             $scope.linkText = '';
 
@@ -154,11 +155,20 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 if (peid) {
                     tag += ' mms-pe-id="' + peid + '"';
                 }
+                if ($scope.linkType == 1) {
+                    tag += ' suppress-numbering="false"';
+                    tag += ' show-name="false"';
+                }
                 if ($scope.linkType == 2) {
                     tag += ' suppress-numbering="true"';
+                    tag += ' show-name="true"';
                 }
                 if ($scope.linkType == 3 && $scope.linkText) {
                     tag += ' link-text="' + $scope.linkText + '"';
+                }
+                if ($scope.linkType == 4) {
+                    tag += ' suppress-numbering="false"';
+                    tag += ' show-name="true"';
                 }
                 tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>';
                 return tag;
@@ -340,7 +350,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         };
         
         // Formatting editor toolbar
-        var stylesToolbar = { name: 'styles', items : ['Format','FontSize','TextColor','BGColor' ] };
+        var stylesToolbar = { name: 'styles', items : ['Styles',/*'Format',*/'FontSize','TextColor','BGColor'] };
         var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
         var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
         var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
@@ -349,7 +359,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
         var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
         var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
         var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-        var sourceToolbar = { name: 'source', items: [ 'Maximize','Source' ] };
+        var sourceToolbar = { name: 'source', items: [ 'Maximize','Sourcedialog' ] };
         var combinedToolbar = { name: 'combined', items: [{name: 'Mmscf', label: 'Cross Reference', command: 'mmscf'},
             {name: 'Mmsvlink',label: 'View/Element Link',command: 'mmsvlink'}, 'Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', {name: 'Mmscomment',label: 'Comment',   command: 'mmscomment'}, 'mmsExtraFeature' ]};
         // var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
@@ -379,7 +389,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
             // Initialize ckeditor and set event handlers
             $(element).val(ngModelCtrl.$modelValue);
             instance = CKEDITOR.replace(attrs.id, {
-                // customConfig: '/lib/ckeditor/config.js',
+                //customConfig: '/lib/ckeditor/config.js', not needed, this is default and prevents absolute path
                 mmscf: {callbackModalFnc: transcludeCallback},
                 mmscomment: {callbackModalFnc: commentCallback},
                 mmsvlink: {callbackModalFnc: viewLinkCallback},
@@ -443,6 +453,30 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                         }
                     }
                 });
+                instance.dataProcessor.dataFilter.addRules({
+                    elements: {
+                        $: function (element) {
+                            if (element.name === 'script') {
+                                element.remove();
+                                return;
+                            }
+
+                            if (element.name.startsWith('mms-')) {
+                                if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    element.replaceWithChildren();
+                                    return;
+                                }
+                            }
+
+                            var attributesToDelete = Object.keys(element.attributes).filter(function(attrKey) {
+                                return attrKey.startsWith('ng-');
+                            });
+                            attributesToDelete.forEach(function(attrToDelete) {
+                                delete element.attributes[attrToDelete];
+                            });
+                        }
+                    }
+                });
             }
 
             instance.on( 'init', function(args) {
@@ -470,12 +504,14 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 var formData = new FormData();
                 var xhr = fileLoader.xhr;
 
-                xhr.open( 'POST', URLService.getPutArtifactsURL({projectId: scope.mmsProjectId, refId: scope.mmsRefId}), true );
-                formData.append('id', UtilsService.createMmsId().replace('MMS', 'VE'));
+                xhr.open( 'POST', URLService.getPutArtifactsURL({projectId: scope.mmsProjectId, refId: scope.mmsRefId, elementId: UtilsService.createMmsId().replace('MMS', 'VE')}), true );                
+                //xhr.withCredentials = true;
+                xhr.setRequestHeader('Authorization', URLService.getAuthorizationHeaderValue());
                 formData.append('file', fileLoader.file, fileLoader.fileName );
                 if (fileLoader.fileName) {
                     formData.append('name', fileLoader.fileName);
                 }
+                
                 fileLoader.xhr.send( formData );
 
                 // Prevented the default behavior.
@@ -490,12 +526,14 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 var xhr = data.fileLoader.xhr;
                 var response = JSON.parse(xhr.response);
             
-                if ( !response.artifacts || response.artifacts.length == 0) {
+                if ( !response.elements || response.elements.length == 0 || !response.elements[0]._artifacts || response.elements[0]._artifacts.length == 0) {
                     // An error occurred during upload.
                     //data.message = response[ 1 ];
                     evt.cancel();
                 } else {
-                    data.url = '/alfresco' + response.artifacts[0].artifactLocation;
+                    //TODO does this need to be smarter?
+                    var element = response.elements[0];
+                    data.url = URLService.getArtifactEmbedURL({projectId: element._projectId, refId: element._refId, elementId: element.id, artifactExtension: element._artifacts[0].extension });
                 }
             } );
         }, 0, false);

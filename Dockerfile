@@ -1,8 +1,8 @@
 ################################################################################
 # Dockerfile
 # 
-# Josh Kaplan 
-# joshua.d.kaplan@lmco.com
+# Enquier
+# openmbee@gmail.com
 #
 # This is the Dockerfile for View Editor (VE). 
 # To build the container, run the following command: `docker build -t ve .` 
@@ -11,7 +11,9 @@
 ################################################################################
 FROM node:8
 
-MAINTAINER Josh Kaplan <joshua.d.kaplan@lmco.com>
+ENV VE_ENV 'example'
+    VE_PORT 9000
+    VE_PROTOCOL 'http'
 
 WORKDIR /opt/mbee/ve
 COPY . /opt/mbee/ve
@@ -54,8 +56,8 @@ RUN node ./node_modules/node-sass/scripts/install.js
 RUN npm rebuild node-sass
 
 # Expose ports
-EXPOSE 9000
+EXPOSE ${VE_PORT}
 
 # When the container runs, we run grunt. The second argument should reference a 
 # server defined in the angular-mms-grunt-servers.json file. 
-CMD ["grunt", "server:dev"]
+CMD ["sh", "-c", "grunt release:docker --env=${VE_ENV} --port=${VE_PORT} --protocol=${VE_PROTOCOL}"]
