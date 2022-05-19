@@ -2,22 +2,17 @@ import * as angular from "angular";
 import * as _ from "lodash";
 import CKEDITOR from "../../lib/types/ckeditor"
 
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {CacheService} from "../../ve-utils/services/Cache.service";
-import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {ViewService} from "../../ve-utils/services/View.service";
-import {URLService} from "../../ve-utils/services/URL.provider";
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {CacheService, ElementService, URLService, UtilsService, ViewService} from "@ve-utils/services";
 import {MentionService} from "./Mention.service";
-import {Utils} from "../utilities/CoreUtils.service";
-
+import {CoreUtilsService} from "@ve-core/utilities";
 
 
 import {veCore} from "../ve-core.module";
 import {VeEditorApi} from "./CKEditor.service";
-import {ElementObject} from "../../ve-utils/types/mms";
+import {ElementObject} from "@ve-types/mms";
 
-//veCore.directive('mmsCkeditor', ['$window', '$uibModal', '$templateCache', '$timeout', 'growl', 'CKEDITOR', 'CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'Utils', mmsCkeditor]);
+//veCore.directive('mmsCkeditor', ['$window', '$uibModal', '$templateCache', '$timeout', 'growl', 'CKEDITOR', 'CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'CoreUtilsService', mmsCkeditor]);
 /**
  * @ngdoc directive
  * @name veCore.directive:mmsCkeditor
@@ -66,13 +61,13 @@ export class VeEditorController implements angular.IComponentController {
         }, 1000);
 
         static $inject = ['$window', '$uibModal', '$attrs', '$element', '$timeout', '$scope', 'growl', 'CacheService',
-            'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'Utils'];
+            'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'CoreUtilsService'];
         constructor(private $window: angular.IWindowService, private $uibModal: angular.ui.bootstrap.IModalService,
                     private $attrs: angular.IAttributes, private $element: JQuery<HTMLElement>,
                     private $timeout: angular.ITimeoutService, private $scope: angular.IScope, private growl: angular.growl.IGrowlService,
                     private cacheSvc: CacheService, private elementSvc: ElementService, private utilsSvc: UtilsService,
                     private viewSvc: ViewService, private uRLSvc: URLService, private mentionSvc: MentionService,
-                    private utils: Utils) {}
+                    private utils: CoreUtilsService) {}
         //depends on angular bootstrap
 
 

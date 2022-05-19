@@ -1,12 +1,9 @@
 import * as angular from 'angular';
 import * as _ from 'lodash';
-import {VeComponentOptions, VeSearchOptions} from "../../../ve-utils/types/view-editor";
-import {UtilsService} from "../../../ve-utils/services/Utils.service";
-import {ElementService} from "../../../ve-utils/services/Element.service";
+import {VeComponentOptions, VeSearchOptions} from "@ve-types/view-editor";
+import {ApplicationService, ElementService, UtilsService, ViewService} from "@ve-utils/services";
 import {VeEditorController} from "../ve-editor.component";
-import {ViewService} from "../../../ve-utils/services/View.service";
-import {ApplicationService} from "../../../ve-utils/services/Application.service";
-import {ElementObject, ViewObject} from "../../../ve-utils/types/mms";
+import {ElementObject, ViewObject} from "@ve-types/mms";
 
 
 import {veExt} from "../../../ve-extensions/ve-extensions.module";

@@ -1,21 +1,20 @@
 import * as angular from 'angular';
-import Rx from 'rx';
-var veApp = angular.module('veApp');
-import { StateService } from '@uirouter/angularjs';
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {ProjectService} from "../../ve-utils/services/Project.service";
-import {Utils} from "../../ve-core/utilities/CoreUtils.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {PermissionsService} from "../../ve-utils/services/Permissions.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {EditService} from "../../ve-utils/services/Edit.service";
-import { ToolbarService } from 'src/ve-extensions/content-tools/services/Toolbar.service';
-import {SpecObject, SpecService} from "../../ve-extensions/content-tools/services/Spec.service";
-import {ContentReorderService} from "../../ve-extensions/content-tools/services/ContentReorder.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {ElementObject} from "../../ve-utils/types/mms";
+import Rx from 'rx-lite';
+import {
+    EditService,
+    ElementService,
+    EventService,
+    PermissionsService,
+    ProjectService,
+    RootScopeService
+} from "@ve-utils/services";
+import {CoreUtilsService} from "@ve-core/utilities";
+import {ToolbarService} from 'src/ve-extensions/spec-tools/services/Toolbar.service';
+import {SpecApi, SpecService} from "../../ve-extensions/spec-tools/services/Spec.service";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
-
+import {veApp} from "@ve-app";
+import {ElementObject, ElementsRequest} from "@ve-types/mms";
 
 
 /* Controllers */
@@ -27,7 +26,7 @@ let RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
     template: `
     <div class="pane-right">
-    <tools-pane tools-category="$ctrl.toolsCategory"></tools-pane>
+    <tools-pane tools-category="{{$ctrl.toolsCategory}}"></tools-pane>
 </div>
     `,
     bindings: {
@@ -39,7 +38,7 @@ let RightPaneComponent: VeComponentOptions = {
         viewOb: "<"
     },
     require: {
-        $pane: '^^faPane'
+        $pane: '^^ngPane'
     },
     controller: class RightPaneController implements angular.IComponentController {
 
@@ -54,7 +53,7 @@ let RightPaneComponent: VeComponentOptions = {
 
         public subs: Rx.IDisposable[];
 
-        private specInfo: SpecObject;
+        private specApi: SpecApi;
         protected toolsCategory:string = "global";
         // viewContentsOrderApi: ContentReorderApi;
         // editable: any;
@@ -66,13 +65,13 @@ let RightPaneComponent: VeComponentOptions = {
         private $pane
 
         static $inject = ['$scope', '$uibModal', '$q', '$timeout', 'hotkeys', 'growl',
-            'ElementService', 'ProjectService', 'Utils', 'PermissionsService', 'RootScopeService', 'EventService',
+            'ElementService', 'ProjectService', 'CoreUtilsService', 'PermissionsService', 'RootScopeService', 'EventService',
             'EditService', 'ToolbarService', 'SpecService']
 
         constructor(private $scope, private $uibModal: angular.ui.bootstrap.IModalService,
                     private $q: angular.IQService, private $timeout: angular.ITimeoutService,
                     private hotkeys: angular.hotkeys.HotkeysProvider, private growl: angular.growl.IGrowlService,
-                    private elementSvc: ElementService, private projectSvc: ProjectService, private utils: Utils,
+                    private elementSvc: ElementService, private projectSvc: ProjectService, private utils: CoreUtilsService,
                     private permissionsSvc: PermissionsService, private rootScopeSvc: RootScopeService,
                     private eventSvc: EventService, private editSvc: EditService, private toolbarSvc: ToolbarService,
                     private specSvc: SpecService) {
@@ -80,22 +79,21 @@ let RightPaneComponent: VeComponentOptions = {
 
         $onInit() {
             this.eventSvc.$init(this);
-            this.$pane = this.$scope.$parent.$parent.$parent.$pane;
-            this.specInfo = {
+            this.specApi = {
                 refId: this.refOb.id,
                 refType: this.refOb.type,
                 commitId: 'latest',
                 projectId: this.projectOb.id,
-                id: ""
+                elementId: ""
             }
-            this.specSvc.specInfo = this.specInfo
+            this.specSvc.specApi = this.specApi
                 this.specSvc.editable = this.documentOb && this.refOb.type === 'Branch' && this.permissionsSvc.hasBranchEditPermission(this.refOb);
 
             //Set the viewOb if found first otherwise fallback to documentOb or nothing
             if (this.viewOb) {
-                this.specInfo.id = this.viewOb.id;
+                this.specApi.elementId = this.viewOb.id;
             } else if (this.documentOb) {
-                this.specInfo.id = this.documentOb.id;
+                this.specApi.elementId = this.documentOb.id;
             }
 
             //Independent of viewOb if there is a document we want document tools enabled
@@ -103,13 +101,14 @@ let RightPaneComponent: VeComponentOptions = {
                 this.toolsCategory = "document";
             }
 
+            //Init Pane Toggle Controls
             this.rootScopeSvc.rightPaneClosed(this.$pane.closed);
 
-            this.subs.push(this.eventSvc.$on('right-pane-toggled', () => {
+            this.subs.push(this.$pane.$toggled.subscribe(() => {
                 this.rootScopeSvc.rightPaneClosed(this.$pane.closed);
             }));
 
-            this.subs.push(this.eventSvc.$on('right-pane-toggle', (paneClosed) => {
+            this.subs.push(this.eventSvc.$on('right-pane.toggle', (paneClosed) => {
                 if (paneClosed === undefined) {
                     this.$pane.toggle();
                 } else if (paneClosed && !this.$pane.closed) {
@@ -117,17 +116,18 @@ let RightPaneComponent: VeComponentOptions = {
                 } else if (!paneClosed && this.$pane.closed) {
                     this.$pane.toggle();
                 }
+                this.rootScopeSvc.rightPaneClosed(this.$pane.closed);
             }));
 
-            this.subs.push(this.eventSvc.$on('elementSelected', (data) => {
+            this.subs.push(this.eventSvc.$on('element.selected', (data: {elementOb: ElementObject, commitId: string, displayOldSpec: boolean}) => {
                 let elementOb = data.elementOb;
                 let commitId = (data.commitId) ? data.commitId : null;
-                let displayOldContent = (data.displayOldContent) ? data.displayOldContent : null;
-                this.specInfo.id = elementOb.id;
-                this.specInfo.projectId = elementOb._projectId;
-                this.specInfo.refId = elementOb._refId;
-                this.specInfo.commitId = commitId ? commitId : elementOb._commitId;
-                this.specInfo.displayOldContent = displayOldContent;
+                let displayOldSpec = (data.displayOldSpec) ? data.displayOldSpec : null;
+                this.specApi.elementId = elementOb.id;
+                this.specApi.projectId = elementOb._projectId;
+                this.specApi.refId = elementOb._refId;
+                this.specApi.commitId = commitId ? commitId : elementOb._commitId;
+                this.specApi.displayOldSpec = displayOldSpec;
 
                 if (this.specSvc.setEditing) {
                     this.specSvc.setEditing(false);
@@ -137,13 +137,26 @@ let RightPaneComponent: VeComponentOptions = {
                     id: 'element',
                     value: editable
                 });
-                this.eventSvc.$broadcast('content-changed');
+                this.specSvc.setElement().then(() => {
+                    this.eventSvc.$broadcast('spec.ready');
+                });
             }));
 
-            this.subs.push(this.eventSvc.$on('viewSelected', (data) => {
+            this.subs.push(this.eventSvc.$on('element.updated',(data: {element: ElementObject, continueEdit: boolean}) => {
+                let elementOb = data.element;
+                let continueEdit = data.continueEdit;
+                if (elementOb.id === this.specApi.elementId && elementOb._projectId === this.specApi.projectId &&
+                    elementOb._refId === this.specApi.refId && !continueEdit) {
+                    this.specSvc.setElement().then(() => {
+                        this.eventSvc.$broadcast('spec.ready');
+                    });
+                }
+            }));
+
+            this.subs.push(this.eventSvc.$on('view.selected', (data) => {
                 let elementOb = data.elementOb;
                 let commitId = (data.commitId) ? data.commitId : null;
-                this.eventSvc.$broadcast('elementSelected', {elementOb: elementOb, commitId: commitId});
+                this.eventSvc.$broadcast('element.selected', {elementOb: elementOb, commitId: commitId});
                 this.viewOb = elementOb;
                 var editable = this.refOb.type === 'Branch' && commitId === 'latest' && this.permissionsSvc.hasBranchEditPermission(this.refOb);
                 //this.viewCommitId = commitId ? commitId : elementOb._commitId;
@@ -155,13 +168,13 @@ let RightPaneComponent: VeComponentOptions = {
         }
 
         $postLink() {
-            //If there is a view pre-selected, send the viewSelected event to the spec tools system
+            //If there is a view pre-selected, send the view.selected event to the spec tools system
             if (this.viewOb || this.documentOb) {
                 let data = {
                     elementOb: (this.viewOb) ? this.viewOb : this.documentOb,
                     commitId: 'latest'
                 };
-                this.eventSvc.$broadcast("viewSelected", data)
+                this.eventSvc.$broadcast("view.selected", data)
             }
         }
     }

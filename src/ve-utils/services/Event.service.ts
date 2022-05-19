@@ -1,11 +1,9 @@
 import * as angular from 'angular'
-import Rx from 'rx'
+import Rx from 'rx-lite'
 
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
-export interface eventHandlerFn {
-    (args?: any): void
-}
+export type eventHandlerFn = (...args: any) => void
 
 export class EventService {
 
@@ -16,11 +14,10 @@ export class EventService {
     public $broadcast = (name: string, data?: any) => this.emit(name, data);
     public $listen = (name: string, handler: eventHandlerFn): Rx.IDisposable => this.listen(name, handler);
     public $on = (name: string, handler: eventHandlerFn): Rx.IDisposable => this.listen(name, handler);
-    public $destroy = (subs: PushSubscription[]): void => this.destroy(subs);
+    public $destroy = (subs: Rx.IDisposable[]): void => this.destroy(subs);
     public $init = (ctrl: { subs: Rx.IDisposable[] } & angular.IComponentController): void => this.initEventSvc(ctrl);
 
-    static $inject = ['rx'];
-    constructor(private rx: Rx) {}
+    constructor() {}
 
     createName(name) {
         return `$ ${name}`;
@@ -30,15 +27,15 @@ export class EventService {
         let fnName = this.createName(name);
         //$rootScope.$broadcast(name,data);
         if (!this.subjects[fnName]) {
-            (this.subjects[fnName] = new this.rx.Subject());
+            (this.subjects[fnName] = new Rx.Subject<any>());
         }
         this.subjects[fnName].onNext(data);
     };
 
-    listen(name, handler) {
+    listen(name: string, handler: eventHandlerFn) {
         let fnName = this.createName(name);
         if (!this.subjects[fnName]) {
-            (this.subjects[fnName] = new this.rx.Subject());
+            (this.subjects[fnName] = new Rx.Subject<any>());
         }
         return this.subjects[fnName].subscribe(handler);
     };

@@ -1,8 +1,7 @@
 import * as angular from "angular";
 
-import {UtilsService} from "../../../ve-utils/services/Utils.service";
-import {ElementService} from "../../../ve-utils/services/Element.service";
-import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
+import {ElementService, UtilsService} from "@ve-utils/services";
+import {VeComponentOptions} from "@ve-types/view-editor";
 import {VeEditorController} from "../ve-editor.component";
 
 import {veExt} from "../../../ve-extensions/ve-extensions.module";

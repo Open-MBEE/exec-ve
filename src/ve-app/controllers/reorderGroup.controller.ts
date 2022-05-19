@@ -1,7 +1,7 @@
 import * as angular from 'angular';
-import {TreeBranch} from "../../ve-utils/types/tree";
-import {ElementObject} from "../../ve-utils/types/mms";
-var veApp = angular.module('veApp');
+import {ElementObject} from "@ve-types/mms";
+
+import {veApp} from "@ve-app";
 
 
 

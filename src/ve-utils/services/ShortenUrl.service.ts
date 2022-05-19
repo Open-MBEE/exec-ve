@@ -1,8 +1,6 @@
-import * as angular from "angular";
 import {URLService} from "./URL.provider";
 import {UtilsService} from "./Utils.service";
-var veUtils = angular.module('veUtils');
-
+import {veUtils} from "@ve-utils";
 
 
 export class ShortenUrlService {

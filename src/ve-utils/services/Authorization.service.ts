@@ -7,9 +7,8 @@ import {ViewService} from "./View.service";
 import {ProjectService} from "./Project.service";
 import {SessionService} from "./Session.service";
 import {EditService} from "./Edit.service";
-import {IHttpResponse} from "angular";
 import {AuthResponse, CheckAuthResponse} from "../types/mms";
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 
 /**

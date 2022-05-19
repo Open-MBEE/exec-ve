@@ -1,5 +1,5 @@
-import {MathJaxObject} from "../types/mathjax";
-import {veUtils} from "../ve-utils.module";
+import {MathJaxObject} from "@ve-types/third-party";
+import {veUtils} from "@ve-utils";
 
 export class MathJaxService {
     private promise = Promise.resolve();  // Used to hold chain of typesetting calls

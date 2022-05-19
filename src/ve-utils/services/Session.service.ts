@@ -1,6 +1,5 @@
-import * as angular from 'angular'
 import {EventService} from "./Event.service";
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 export class SessionService {
 

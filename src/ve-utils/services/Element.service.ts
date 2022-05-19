@@ -12,9 +12,12 @@ import {
     ElementObject,
     ElementsRequest,
     ElementsResponse,
-    QueryObject, QueryParams, RequestObject, SearchResponse
+    QueryObject,
+    QueryParams,
+    RequestObject,
+    SearchResponse
 } from "../types/mms";
-import {veUtils} from "../ve-utils.module";
+import {veUtils} from "@ve-utils";
 
 /**
  * @ngdoc service
@@ -48,7 +51,7 @@ export class ElementService {
      *
      * Most of these methods return promises that will reject with a reason object
      * when a server call fails, see
-     * {@link veUtils/URLService#methods_handleHttpStatus the return object}
+     * {@link veUtils/URLService#handleHttpStatus the return object}
      *
      * ## Example Usage
      *  <pre>
@@ -89,7 +92,7 @@ export class ElementService {
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    getElement(reqOb: ElementsRequest, weight?: number, update?: boolean): angular.IPromise<ElementObject> {
+    getElement(reqOb: ElementsRequest, weight?: number, update?: boolean, allowEmpty?: boolean): angular.IPromise<ElementObject> {
         this.utilsSvc.normalize(reqOb);
         var requestCacheKey = this.getElementKey(reqOb);
         var url = this.uRLSvc.getElementURL(reqOb);
@@ -118,6 +121,8 @@ export class ElementService {
             (data, status, headers, config) => {
                 if (angular.isArray(data.elements) && data.elements.length > 0) {
                     deferred.resolve(this.cacheElement(reqOb, data.elements[0]));
+                } else if (allowEmpty) {
+                    deferred.resolve(null);
                 } else {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"}); //TODO 
                 }
@@ -430,13 +435,15 @@ export class ElementService {
      * Save element to mms and update the cache if successful, the element object
      * must have an id, and whatever property that needs to be updated.
      *
-     * {@link veUtils/ElementService#methods_getElementForEdit see also getElementForEdit}
+     * {@link veUtils/ElementService#getElementForEdit see also getElementForEdit}
      *
-     * @param {object} elementOb An object that contains _projectId, _refId, sysmlId and any property changes to be saved.
-     * @returns {Promise} The promise will be resolved with the updated cache element reference if
+     * @param {ElementObject} elementOb An object that contains _projectId, _refId, sysmlId and any property changes to be saved.
+     * @param {boolean} returnChildViews
+     * @param {boolean} allowEmpty
+     * @returns {angular.IPromise<ElementObject>} The promise will be resolved with the updated cache element reference if
      *      update is successful. If a conflict occurs, the promise will be rejected with status of 409
      */
-    updateElement(elementOb: ElementObject, returnChildViews?): angular.IPromise<ElementObject> { //elementOb should have the keys needed to make url
+    updateElement(elementOb: ElementObject, returnChildViews?:boolean, allowEmpty?:boolean): angular.IPromise<ElementObject> { //elementOb should have the keys needed to make url
 
         var deferred: angular.IDeferred<ElementObject> = this.$q.defer();
         const handleSuccess = (data: ElementsResponse) => {
@@ -492,8 +499,13 @@ export class ElementService {
                     deferred.resolve(rejected[0].element);
                     return;
                 }
+
                 if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
-                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
+                    if (allowEmpty) {
+                        deferred.resolve(null);
+                    } else {
+                        deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
+                    }
                     return;
                 }
                 handleSuccess(response.data);

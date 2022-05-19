@@ -1,22 +1,24 @@
 import * as angular from "angular";
-import Rx from 'rx';
+import Rx from 'rx-lite';
 import "angular-growl-v2";
-import {TransitionService, Transition, StateService, UIRouter, UIRouterGlobals, UrlParts} from "@uirouter/angularjs";
+import {StateService, Transition, TransitionService, UIRouter, UIRouterGlobals} from "@uirouter/angularjs";
 
 
-import {URLService} from "../../ve-utils/services/URL.provider";
-import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {HttpService} from "../../ve-utils/services/Http.service";
-import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {CacheService} from "../../ve-utils/services/Cache.service";
-import {ApplicationService} from "../../ve-utils/services/Application.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {EditService} from "../../ve-utils/services/Edit.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {
+    ApplicationService,
+    AuthService,
+    CacheService,
+    EditService,
+    ElementService,
+    EventService,
+    HttpService,
+    RootScopeService,
+    URLService,
+    UtilsService
+} from "@ve-utils/services";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 let MainComponent: VeComponentOptions = {
   selector: "main",
@@ -36,24 +38,24 @@ let MainComponent: VeComponentOptions = {
         <ui-view name="menu"></ui-view>
         <ui-view name="manageRefs" ng-show="$ctrl.showManageRefs" style="height: 100vh"></ui-view>
         <div ng-hide="$ctrl.hidePanes">
-            <fa-pane pane-anchor="center" fa-pane="main" pane-closed="false" class="fa-pane" id="main-pane">
-                <fa-pane fa-pane="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-tabs" pane-closed="false">
+            <ng-pane pane-anchor="center" pane-id="main" pane-closed="false" class="ng-pane" id="main-pane">
+                <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-tabs" pane-closed="false">
                     <ui-view name="pane-left" class="container-pane-left"></ui-view>
-                </fa-pane>
-                <fa-pane fa-pane="toolbar" pane-anchor="east" pane-size="41px" pane-closed="false" pane-no-toggle="true">
+                </ng-pane>
+                <ng-pane pane-id="toolbar" pane-anchor="east" pane-size="41px" pane-closed="false" pane-no-toggle="true">
                     <ui-view name="toolbar-right"></ui-view>
-                </fa-pane>
-                <fa-pane fa-pane="center-view" pane-anchor="center" pane-closed="false" class="center-view">
-                    <fa-pane fa-pane="right-pane" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="true" class="pane-right">
+                </ng-pane>
+                <ng-pane pane-id="center-view" pane-anchor="center" pane-closed="false" class="center-view">
+                    <ng-pane pane-id="right-pane" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="true" class="pane-right">
                         <ui-view name="pane-right"></ui-view>
-                    </fa-pane>
-                    <fa-pane fa-pane="center" pane-anchor="center" class="pane-center" pane-closed="false" pane-no-toggle="true">
+                    </ng-pane>
+                    <ng-pane pane-id="center" pane-anchor="center" class="pane-center" pane-closed="false" pane-no-toggle="true">
                         <ui-view name="pane-center">
                             <i class="pane-center-spinner fa fa-3x fa-spinner fa-spin"></i>
                         </ui-view>
-                    </fa-pane>
-                </fa-pane>
-            </fa-pane>
+                    </ng-pane>
+                </ng-pane>
+            </ng-pane>
         </div>
     <ui-view name="footer"></ui-view>
     </div>
@@ -75,7 +77,7 @@ let MainComponent: VeComponentOptions = {
         mmsWorkingTime: any;
         workingModalOpen = false;
 
-        $globalState: UIRouterGlobals = this.$uiRouter.globals;
+        $uiRouterGlobals: UIRouterGlobals = this.$uiRouter.globals;
 
         constructor(private $scope: angular.IScope, private $timeout: angular.ITimeoutService, private $location: angular.ILocationService,
                     private $window: angular.IWindowService, private $uibModal: angular.ui.bootstrap.IModalService,
@@ -196,7 +198,7 @@ let MainComponent: VeComponentOptions = {
                 this.rootScopeSvc.veHidePanes(false);
                 this.rootScopeSvc.veShowManageRefs(false);
                 this.rootScopeSvc.veShowLogin(false);
-                if (this.$globalState.$current.name === 'main.login' || this.$globalState.$current.name === 'main.login.select' || this.$globalState.$current.name === 'main.login.redirect') {
+                if (this.$uiRouterGlobals.$current.name === 'main.login' || this.$uiRouterGlobals.$current.name === 'main.login.select' || this.$uiRouterGlobals.$current.name === 'main.login.redirect') {
                     this.rootScopeSvc.veHidePanes(true);
                     this.rootScopeSvc.veShowLogin(true);
                 } else if (this.$state.includes('project') && !(this.$state.includes('main.project.ref'))) {
@@ -204,9 +206,9 @@ let MainComponent: VeComponentOptions = {
                     this.rootScopeSvc.veShowManageRefs(true);
                     this.eventSvc.$broadcast('fromParamChange', trans.params('from'));
                 }
-                if (this.$globalState.$current.name === 'main.project.ref') {
+                if (this.$uiRouterGlobals.$current.name === 'main.project.ref') {
                     this.rootScopeSvc.treeInitialSelection(trans.params().refId);
-                } else if (this.$globalState.$current.name === 'main.project.ref.preview') {
+                } else if (this.$uiRouterGlobals.$current.name === 'main.project.ref.preview') {
                     var index = trans.params().documentId.indexOf('_cover');
                     if (index > 0)
                         this.rootScopeSvc.treeInitialSelection(trans.params().documentId.substring(5, index));
@@ -230,16 +232,16 @@ let MainComponent: VeComponentOptions = {
                 this.rootScopeSvc.veViewContentLoading(false);
                 if (this.$state.includes('main.project.ref') && (trans.from().name === 'main.login' || trans.from().name === 'main.login.select' || trans.from().name === 'project' || trans.from().name === 'main.login.redirect')) {
                     this.$timeout(() => {
-                        this.eventSvc.$broadcast('left-pane-toggle');
+                        this.eventSvc.$broadcast('left-pane.toggle');
                     }, 1, false);
                     this.$timeout(() => {
-                        this.eventSvc.$broadcast('left-pane-toggle');
+                        this.eventSvc.$broadcast('left-pane.toggle');
                     }, 100, false);
                 }
             });
 
 
-            if (this.$globalState.$current.name == 'main') {
+            if (this.$uiRouterGlobals.$current.name == 'main') {
                 this.$state.go('main.login');
             }
         }

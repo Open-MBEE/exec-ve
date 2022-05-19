@@ -1,15 +1,18 @@
 import * as angular from "angular";
-import Rx from 'rx';
+import Rx from 'rx-lite';
 
-import {ApplicationService} from "../../ve-utils/services/Application.service";
-import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {TreeApi, TreeService} from "../../ve-utils/services/Tree.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {EventService} from "../../ve-utils/services/Event.service";
+import {
+    ApplicationService,
+    EventService,
+    RootScopeService,
+    TreeApi,
+    TreeService,
+    UtilsService
+} from "@ve-utils/services";
 import {handleChange} from "../../ve-utils/utils/change.util";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {VeComponentOptions} from "@ve-types/view-editor";
 import {veCore} from "../ve-core.module";
-import {TreeBranch, TreeRow} from "../../ve-utils/types/tree";
+import {TreeBranch, TreeRow} from "@ve-types/tree";
 
 /**
  * @ngdoc directive
@@ -54,7 +57,7 @@ import {TreeBranch, TreeRow} from "../../ve-utils/types/tree";
  * ## Example
  * ### controller (js)
  *  <pre>
- angular.module('app', ['veCore'])
+ angular.module('app', ['ve-core'])
  .controller('TreeCtrl', ['$scope', function($scope) {
         $scope.api = {}; //empty object to be populated by the spec api
         $public handler(branch) {

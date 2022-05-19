@@ -63,3 +63,7 @@ angular.module('veDirectives')['_invokeQueue'].forEach(function(value){
     var tag = value[2][0].replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
     console.log(value[1] + ": " + tag);
 });
+
+//Module Exports
+import ("[A-Za-z./]*";)
+export * from $1

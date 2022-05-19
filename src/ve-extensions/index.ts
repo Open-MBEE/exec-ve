@@ -1,20 +1,26 @@
-import {VeExtensionConfig} from "./ve-extensions"
-import {VeConfig} from "../ve-utils/types/config";
 //Libraries
 // import "angular-sanitize";
 // import "angular-growl-v2";
 // import "angular-ui-bootstrap";
 
 //VE Modules
-import "../ve-core"
-import "../ve-utils"
+import "@ve-utils"
 
 //Module Main
 import "./ve-extensions.module"
+import "./Extension.service";
+export * from "./Extension.service";
 
-import "./utilities"
+import "./ExtUtil.service"
+export * from "./ExtUtil.service"
+
 import "./transclusions"
-import "./views"
-import "./content-tools"
+import "./presentations"
+import "./spec-tools"
 
-import "./custom"
+export * from "./ve-extensions.module"
+
+
+
+
+export default 've-ext';

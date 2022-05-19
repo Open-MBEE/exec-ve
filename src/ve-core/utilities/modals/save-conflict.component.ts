@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
+import {VeComponentOptions} from "@ve-types/view-editor";
 import {veCore} from "../../ve-core.module";
 
 let SaveConflictComponent: VeComponentOptions = {

@@ -20,8 +20,5 @@ import "./reorder.component";
 import "./right-pane.component";
 import "./select.component";
 import "./toolbar.component";
-import "./ve-footer.component";
-import "./ve-menu.component";
-import "./ve-nav.component";
-import "./ve-system-banner.component";
+
 import "./single-view.component";

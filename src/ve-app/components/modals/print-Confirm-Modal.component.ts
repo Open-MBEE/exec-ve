@@ -1,12 +1,10 @@
 import * as angular from 'angular';
 import * as _ from "lodash";
 
-import {UtilsService} from "../../../ve-utils/services/Utils.service";
-import {DocMetadata, ViewService} from "../../../ve-utils/services/View.service";
-import {EditService} from "../../../ve-utils/services/Edit.service";
+import {DocMetadata, EditService, ElementService, UtilsService, ViewService} from "@ve-utils/services";
 import {AppUtilsService} from "../../services/AppUtils.service";
-import {ElementService} from "../../../ve-utils/services/Element.service";
-var veApp = angular.module('veApp');
+
+import {veApp} from "@ve-app";
 
 let PrintConfirmModalComponent: angular.Injectable<any> = {
     selector: 'printConfirmModal',

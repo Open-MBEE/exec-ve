@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import {ElementsRequest, QueryParams, RequestObject} from "../types/mms";
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 
 export class URLServiceProvider {
@@ -37,7 +37,7 @@ veUtils.provider('URLService', URLServiceProvider)
  * in your application module's config. By default, the basePath is '/api', but is
  * effectively '/' relative to the service layer due to the rewrite rule.
  *  <pre>
-        angular.module('myApp', ['veUtils'])
+        angular.module('myApp', ['ve-core'])
         .config(function(URLServiceProvider) {
             URLServiceProvider.setBasePath('https://url/context/path');
         });

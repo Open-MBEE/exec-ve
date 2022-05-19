@@ -1,9 +1,8 @@
 import * as angular from 'angular';
-import {ElementService} from "../../../ve-utils/services/Element.service";
-import {EventService} from "../../../ve-utils/services/Event.service";
-import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
+import {ElementService, EventService} from "@ve-utils/services";
+import {VeComponentOptions} from "@ve-types/view-editor";
 import {veCore} from "../../ve-core.module";
-import {ElementObject} from "../../../ve-utils/types/mms";
+import {ElementObject} from "@ve-types/mms";
 
 let RevertConfirmComponent: VeComponentOptions = {
     selector: 'revertConfirm',

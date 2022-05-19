@@ -1,7 +1,7 @@
 import * as angular from "angular";
-import {MentionService} from "./Mention.service";
-import {Utils} from "../utilities/CoreUtils.service";
-import {veCore} from "../ve-core.module";
+import {MentionService} from "@ve-core/editor";
+import {CoreUtilsService} from "@ve-core/utilities";
+import {veCore} from "@ve-core";
 
 
 let MMSMention = {
@@ -54,7 +54,7 @@ let MMSMention = {
         //Local
         public fastCfListing
         
-        constructor(private mentionSvc : MentionService, private utils : Utils) {
+        constructor(private mentionSvc : MentionService, private utils: CoreUtilsService) {
         }
 
         $onInit() {

@@ -1,18 +1,15 @@
 import * as angular from 'angular';
-import Rx from 'rx';
+import {IWindowService} from 'angular';
+import Rx from 'rx-lite';
 import * as _ from 'lodash';
 
-import { StateService } from '@uirouter/angularjs';
-import {IWindowService} from "angular";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {ProjectService} from "../../ve-utils/services/Project.service";
+import {StateService} from '@uirouter/angularjs';
+import {ApplicationService, ElementService, EventService, ProjectService, RootScopeService} from "@ve-utils/services";
 import {AppUtilsService} from "../services/AppUtils.service";
-import {ApplicationService} from "../../ve-utils/services/Application.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {RefObject} from "../../ve-utils/types/mms";
-var veApp = angular.module('veApp');
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {RefObject} from "@ve-types/mms";
+
+import {veApp} from "@ve-app";
 
 let RefsComponent: VeComponentOptions = {
     selector: 'refs',

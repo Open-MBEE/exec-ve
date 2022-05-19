@@ -1,13 +1,13 @@
 import * as angular from 'angular';
-import Rx from 'rx';
-import { StateService } from '@uirouter/angularjs';
-import { ProjectService } from 'src/ve-utils/services/Project.service';
-import {ElementService} from "../../ve-utils/services/Element.service";
-import { RootScopeService } from 'src/ve-utils/services/RootScope.service';
-import {EventService} from "../../ve-utils/services/Event.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {QueryObject, RequestObject} from "../../ve-utils/types/mms"
-var veApp = angular.module('veApp');
+import Rx from 'rx-lite';
+import {StateService} from '@uirouter/angularjs';
+import {ProjectService} from "@ve-utils/services";
+import {ElementService, EventService} from "@ve-utils/services";
+import {RootScopeService} from "@ve-utils/services";
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {QueryObject, RequestObject} from "@ve-types/mms"
+
+import {veApp} from "@ve-app";
 
 let RedirectComponent: VeComponentOptions = {
     selector: 'veRedirect',

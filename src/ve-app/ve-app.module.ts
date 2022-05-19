@@ -1,4 +1,4 @@
-var Visualizer = window['ui-router-visualizer'].Visualizer;
+//const Visualizer = window['ui-router-visualizer'].Visualizer;
 
 import * as angular from 'angular';
 import {
@@ -11,18 +11,28 @@ import {
     IQService,
     IRequestConfig
 } from 'angular';
-import uiRouter, {StateProvider, Transition, TransitionService, UIRouter, UrlParts} from "@uirouter/angularjs";
-import {RootScopeService} from "../ve-utils/services/RootScope.service";
-import {AuthService} from "../ve-utils/services/Authorization.service";
-import {URLService, URLServiceProvider} from "../ve-utils/services/URL.provider";
+import uiRouter, {
+    StateProvider,
+    StateService,
+    Transition,
+    TransitionService,
+    UIRouter,
+    UIRouterGlobals,
+    UrlParts
+} from "@uirouter/angularjs";
+import {
+    AuthService,
+    EventService,
+    ProjectService,
+    RootScopeService,
+    URLService,
+    URLServiceProvider
+} from "@ve-utils/services";
 import {ResolveService} from "./services/Resolve.service";
-import {ProjectService} from "../ve-utils/services/Project.service";
-import {EventService} from "../ve-utils/services/Event.service";
-import {ViewObject} from "../ve-utils/types/mms";
-import {faPane} from "../fa-pane/fa-pane.main";
+import {ViewObject} from "@ve-types/mms";
+import ngPane from 'angular-pane-layout';
 
-export let veApp = angular.module('veApp', ['veUtils', 'veCore', 'veExt', 'ui.bootstrap', uiRouter, faPane, 'ui.tree', 'angular-growl', 'angular-flatpickr', 'rx', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngAnimate', 'ngCookies', 'ngPromiseExtras', 'ngSanitize', 'ngStorage']);
-//var veApp = angular.module('veApp', ['veUtils', 'veCore', 'fa.directive.borderLayout', 'ui.bootstrap', uiRouter.default, 'ui.tree', 'angular-growl', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngStorage', 'ngAnimate', 'ngPromiseExtras', 'ngCookies']);
+export let veApp = angular.module('ve-app', ['ve-utils', 've-core', 've-ext', 'ui.bootstrap', uiRouter, ngPane, 'ui.tree', 'angular-growl', 'angular-flatpickr', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngAnimate', 'ngCookies', 'ngPromiseExtras', 'ngSanitize', 'ngStorage']);
 
 veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider: StateProvider, $uiRouterProvider : UIRouter, $transitionsProvider: TransitionService, $httpProvider : angular.IHttpProvider, $provide : angular.auto.IProvideService, $urlServiceProvider: URLServiceProvider, $locationProvider : ILocationProvider) {
     // override uibTypeaheadPopup functionality
@@ -545,15 +555,13 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
 
 }]);
 
-veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$transitions', 'RootScopeService', 'AuthService', 'EventService',
-    function($q, $http: IHttpService, $interval: IIntervalService, $location : ILocationService, $uibModal, $uiRouter : UIRouter, $transitions: TransitionService, rootScopeSvc: RootScopeService, authSvc: AuthService,
+veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$uiRouterGlobals', '$state', '$transitions', 'RootScopeService', 'AuthService', 'EventService',
+    function($q, $http: IHttpService, $interval: IIntervalService, $location : ILocationService, $uibModal, $uiRouter: UIRouter, $uiRouterGlobals : UIRouterGlobals, $state: StateService, $transitions: TransitionService, rootScopeSvc: RootScopeService, authSvc: AuthService,
              eventSvc: EventService) {
 
-    var $globalState = $uiRouter.globals;
-    var $state = $uiRouter.stateService
     rootScopeSvc.loginModalOpen(false);
     $transitions.onBefore({}, (transition: Transition) => {
-        if ($globalState.current.name === 'main.login' || transition.$to().name === 'main.login' || rootScopeSvc.loginModalOpen())
+        if ($uiRouterGlobals.current.name === 'main.login' || transition.$to().name === 'main.login' || rootScopeSvc.loginModalOpen())
             return;
         let deferred = $q.defer();
         authSvc.checkLogin().then((result) => {
@@ -583,8 +591,8 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
     })
     eventSvc.$on('mms.unauthorized', (response) => {
         // add a boolean to the 'or' statement to check for modal window
-        if ($globalState.current.name === '' || $globalState.current.name === 'main.login' || rootScopeSvc.veStateChanging() || rootScopeSvc.loginModalOpen()) {
-            if ($globalState.current.name === 'main.login.select' || ($globalState.transition && $globalState.transition.$to.name === 'main.login.select')) {
+        if ($uiRouterGlobals.current.name === '' || $uiRouterGlobals.current.name === 'main.login' || rootScopeSvc.veStateChanging() || rootScopeSvc.loginModalOpen()) {
+            if ($uiRouterGlobals.current.name === 'main.login.select' || ($uiRouterGlobals.transition && $uiRouterGlobals.transition.$to.name === 'main.login.select')) {
                 $state.target('main.login');
             }
             return;
@@ -630,6 +638,6 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
 }])
 
 veApp.run(['$uiRouter', '$trace', function($uiRouter, $trace) {
-   var pluginInstance = $uiRouter.plugin(Visualizer);
+   //var pluginInstance = $uiRouter.plugin(Visualizer);
    $trace.enable('TRANSITION');
 }])

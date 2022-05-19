@@ -1,7 +1,7 @@
 import * as angular from 'angular';
-import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 let WorkingModalComponent: VeComponentOptions = {
     selector: 'workingModal',

@@ -1,24 +1,28 @@
 import * as angular from 'angular';
-import Rx from 'rx';
-import {FullDocumentService, FullDocumentServiceFactory} from "../../ve-utils/services/FullDocument.service";
-import {ShortenUrlService} from "../../ve-utils/services/ShortenUrl.service";
+import Rx from 'rx-lite';
+import {
+    EventService,
+    FullDocumentService,
+    FullDocumentServiceFactory,
+    PermissionsService,
+    RootScopeService,
+    ShortenUrlService,
+    TreeService,
+    URLService,
+    UtilsService,
+    UxService,
+    ViewElement,
+    ViewService
+} from "@ve-utils/services";
 import {AppUtilsService} from "../services/AppUtils.service";
-import {URLService} from "../../ve-utils/services/URL.provider";
-import {UxService} from "../../ve-utils/services/Ux.service";
-import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {PermissionsService} from "../../ve-utils/services/Permissions.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {TreeService} from "../../ve-utils/services/Tree.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {Utils} from "../../ve-core/utilities/CoreUtils.service";
-import {BButton, ButtonBarApi, ButtonBarService} from "../../ve-core/button-bar/ButtonBar.service";
-import { StateService } from '@uirouter/angularjs';
-import {ViewElement, ViewService} from "../../ve-utils/services/View.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {ElementObject, ViewObject} from "../../ve-utils/types/mms";
-import {TreeBranch, View2NodeMap} from "../../ve-utils/types/tree";
+import {CoreUtilsService} from "@ve-core/utilities";
+import {IButtonBarButton, ButtonBarApi, ButtonBarService} from "@ve-utils/button-bar";
+import {StateService} from '@uirouter/angularjs';
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {ElementObject, ViewObject} from "@ve-types/mms";
+import {View2NodeMap} from "@ve-types/tree";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 
 /* Controller */
@@ -26,14 +30,14 @@ let FullDocumentComponent: VeComponentOptions = {
     selector: 'fullDocument',
     template: `
     <div ng-if="search === null">
-    <fa-pane fa-pane="center-tb" pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false">
+    <ng-pane pane-id="center-tb" pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false">
         <div class="pane-center-toolbar">
             <div class="pane-center-btn-group">
                 <button-bar bb-id="$ctrl.bbId" class="bordered-button-bar"></button-bar>
             </div>
         </div>
-    </fa-pane>
-    <fa-pane fa-pane="center" pane-anchor="center" pane-scroll-api="scrollApi" pane-closed="false">
+    </ng-pane>
+    <ng-pane pane-id="center" pane-anchor="center" pane-scroll-api="scrollApi" pane-closed="false">
         <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="viewContentLoading"></i>
         <div class="ve-notify-banner" ng-show="refOb.type === 'Tag'">
             <span><strong>Tags are read only:</strong> Switch to a branch to edit</span>
@@ -44,7 +48,7 @@ let FullDocumentComponent: VeComponentOptions = {
                 <view mms-element-id="view.id" mms-commit-id="latest" mms-project-id="$ctrl.projectOb.id" mms-ref-id="$ctrl.refOb.id" mms-number="view.number" mms-view-api="view.api"></view>
             </div>
         </div>
-    </fa-pane>
+    </ng-pane>
 </div>
 
 <div ng-if="$ctrl.search !== null">
@@ -96,14 +100,14 @@ let FullDocumentComponent: VeComponentOptions = {
         private dynamicPopover: { templateUrl: "shareUrlTemplate.html"; title: "Share" };
 
         static $inject = ['$scope', '$window', '$state', '$anchorScroll', '$location', '$timeout', '$http', 'hotkeys', 'growl',
-            'FullDocumentService', 'ShortenUrlService', 'AppUtilsService', 'Utils', 'UxService', 'URLService',
+            'FullDocumentService', 'ShortenUrlService', 'AppUtilsService', 'CoreUtilsService', 'UxService', 'URLService',
             'UtilsService', 'PermissionsService', 'RootScopeService', 'ViewService', 'TreeService', 'EventService', 'ButtonBarService']
         constructor(private $scope: angular.IScope, private $window: angular.IWindowService, private $state: StateService,
                     private $anchorScroll: angular.IAnchorScrollService, private $location: angular.ILocationService,
                     private $timeout: angular.ITimeoutService, private $http: angular.IHttpService,
                     private hotkeys: angular.hotkeys.HotkeysProvider, private growl: angular.growl.IGrowlService,
                     private fullDocumentFcty: FullDocumentServiceFactory, private shortenUrlSvc: ShortenUrlService,
-                    private appUtilsSvc: AppUtilsService, private utils: Utils, private uxSvc: UxService,
+                    private appUtilsSvc: AppUtilsService, private utils: CoreUtilsService, private uxSvc: UxService,
                     private uRLSvc: URLService, private utilsSvc: UtilsService, private permissionsSvc: PermissionsService,
                     private rootScopeSvc: RootScopeService, private viewSvc: ViewService, private treeSvc: TreeService, private eventSvc: EventService,
                     private buttonBarSvc: ButtonBarService) {
@@ -130,7 +134,7 @@ let FullDocumentComponent: VeComponentOptions = {
             this.bbApi = this.buttonBarSvc.initApi(this.bbId,
                 (api: ButtonBarApi) => {
                     if (this.documentOb && this.refOb.type === 'Branch' && this.permissionsSvc.hasBranchEditPermission(this.refOb)) {
-                        api.addButton(this.uxSvc.getButtonBarButton('show-edits'));
+                        api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'));
                         api.setToggleState('show-edits', this.rootScopeSvc.veEditMode());
                         // @ts-ignore
                         this.hotkeys.bindTo(this.$scope)
@@ -143,15 +147,15 @@ let FullDocumentComponent: VeComponentOptions = {
                             });
                     }
 
-                    api.addButton(this.uxSvc.getButtonBarButton('show-elements'));
-                    api.addButton(this.uxSvc.getButtonBarButton('show-comments'));
-                    api.addButton(this.uxSvc.getButtonBarButton('refresh-numbering'));
-                    api.addButton(this.uxSvc.getButtonBarButton('print'));
-                    var exportButtons: BButton = this.uxSvc.getButtonBarButton('export');
+                    api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'));
+                    api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'));
+                    api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'));
+                    api.addButton(this.buttonBarSvc.getButtonBarButton('print'));
+                    var exportButtons: IButtonBarButton = this.buttonBarSvc.getButtonBarButton('export');
                     if (!exportButtons.dropdown_buttons) {
-                        exportButtons.dropdown_buttons = [] as BButton[]
+                        exportButtons.dropdown_buttons = [] as IButtonBarButton[]
                     }
-                        exportButtons.dropdown_buttons.push(this.uxSvc.getButtonBarButton("convert-pdf"));
+                        exportButtons.dropdown_buttons.push(this.buttonBarSvc.getButtonBarButton("convert-pdf"));
 
                     api.addButton(exportButtons);
                     api.setToggleState('show-comments', this.rootScopeSvc.veCommentsOn());
@@ -183,9 +187,9 @@ let FullDocumentComponent: VeComponentOptions = {
                         elementOb: elementOb,
                         commitId: 'latest'
                     };
-                    this.eventSvc.$broadcast('elementSelected', data);
+                    this.eventSvc.$broadcast('element.selected', data);
                     if (typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' && this.rootScopeSvc.rightPaneClosed())
-                        this.eventSvc.$broadcast('right-pane-toggle');
+                        this.eventSvc.$broadcast('right-pane.toggle');
                 },
                 relatedCallback: (doc, view, elem) => {//siteId, documentId, viewId) {
                     this.$state.go('main.project.ref.document.view', {
@@ -219,7 +223,7 @@ let FullDocumentComponent: VeComponentOptions = {
                 // The Controller codes get executed before all the directives'
                 // code in its template ( full-doc.html ). As a result, use $timeout here
                 // to let them finish first because in this case
-                // we rely on fa-pane directive to setup isScrollVisible
+                // we rely on ng-pane directive to setup isScrollVisible
                 this.$timeout(() => {
                     this.fullDocumentSvc = this.fullDocumentFcty.get(this.views);
                     this.fullDocumentSvc.addInitialViews(this.scrollApi.isScrollVisible);
@@ -344,7 +348,7 @@ let FullDocumentComponent: VeComponentOptions = {
                 elementOb: elementOb,
                 commitId: 'latest'
             };
-            this.eventSvc.$broadcast('elementSelected', data);
+            this.eventSvc.$broadcast('element.selected', data);
         }
 
         private _buildViewElement(vId, curSec): ViewElement {

@@ -1,12 +1,11 @@
-import { StateService } from '@uirouter/angularjs';
+import {StateService} from '@uirouter/angularjs';
 import * as angular from 'angular';
-import {TreeApi, TreeService} from "../../ve-utils/services/Tree.service";
-import {AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap} from "../../ve-utils/types/tree";
-import {ViewObject} from "../../ve-utils/types/mms";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {ElementService, TreeApi, TreeService} from "@ve-utils/services";
+import {AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap} from "@ve-types/tree";
+import {ViewObject} from "@ve-types/mms";
+import {VeComponentOptions} from "@ve-types/view-editor";
 import {AppUtilsService} from "../services/AppUtils.service";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import { ViewService } from 'src/ve-utils/services/View.service';
+import {ViewService} from "@ve-utils/services";
 import {veUtils} from '../../ve-utils/ve-utils.module'
 import {veApp} from '../ve-app.module';
 

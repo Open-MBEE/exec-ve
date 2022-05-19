@@ -87,6 +87,8 @@ export interface RefObject extends Object {
     parentCommitId?: string
 }
 
+export interface PropertySpec {options?: ElementObject[], isEnumeration?: boolean, isSlot?: boolean}
+
 interface RequestObject extends Object {
     projectId: string
     refId: string

@@ -1,12 +1,12 @@
+// import "./transclusion.controller"
+export * from "./transclusion.controller"
+
+import "./transclusion.component";
+
+import "./components"
+import "./mms-transclude-compatibility.component"
+import "./charts"
 
 
-import "./mms-cf.component";
 
-import "./mmsTranscludeArt.directive";
-import "./mmsTranscludeCom.directive";
-import "./transclude-doc.component";
-import "./mms-transclude-view.component"
-import "./mmsTranscludeImg.directive";
-import "./transclude-name.component";
-import "./mmsTranscludeVal.directive";
 // import "./mmsTsDiagram.directive";

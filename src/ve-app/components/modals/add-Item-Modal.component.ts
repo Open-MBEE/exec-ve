@@ -1,13 +1,10 @@
 import * as angular from 'angular';
-import {ViewService} from "../../../ve-utils/services/View.service";
-import {ProjectService} from "../../../ve-utils/services/Project.service";
-import {ElementService} from "../../../ve-utils/services/Element.service";
-import {ApplicationService} from "../../../ve-utils/services/Application.service";
-import {UtilsService} from "../../../ve-utils/services/Utils.service";
-import {Utils} from "../../../ve-core/utilities/CoreUtils.service";
-import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
-import {CommitObject, RefObject} from "../../../ve-utils/types/mms";
-var veApp = angular.module('veApp');
+import {ApplicationService, ElementService, ProjectService, UtilsService, ViewService} from "@ve-utils/services";
+import {CoreUtilsService} from "@ve-core/utilities";
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {CommitObject, RefObject} from "@ve-types/mms";
+
+import {veApp} from "@ve-app";
 
 let AddItemModalComponent: VeComponentOptions = {
     selector: "addItemModal",
@@ -103,7 +100,7 @@ let AddItemModalComponent: VeComponentOptions = {
     },
     controller: class AddItemController implements angular.IComponentController {
 
-        static $inject = ['growl', '$timeout', 'ViewService', 'ElementService', 'ProjectService', 'ApplicationService', 'UtilsService', 'Utils'];
+        static $inject = ['growl', '$timeout', 'ViewService', 'ElementService', 'ProjectService', 'ApplicationService', 'UtilsService', 'CoreUtilsService'];
 
         //bindings
         public modalInstance
@@ -129,7 +126,7 @@ let AddItemModalComponent: VeComponentOptions = {
         constructor(private growl: angular.growl.IGrowlService, private $timeout: angular.ITimeoutService,
                     private viewSvc: ViewService, private elementSvc: ElementService,
                     private projectSvc: ProjectService, private applicationSvc: ApplicationService,
-                    private utilsSvc: UtilsService, private utils: Utils) {
+                    private utilsSvc: UtilsService, private utils: CoreUtilsService) {
 
             this.createForm = true;
             this.oking = false;

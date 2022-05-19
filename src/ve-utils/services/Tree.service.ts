@@ -2,9 +2,8 @@ import * as angular from 'angular'
 import {RootScopeService} from "./RootScope.service";
 import {EventService} from "./Event.service";
 import {ElementObject} from "../types/mms";
-import {veUtils} from "../ve-utils.module";
+import {veUtils} from "@ve-utils";
 import {TreeBranch, TreeRow} from "../types/tree";
-
 
 
 export class TreeService {

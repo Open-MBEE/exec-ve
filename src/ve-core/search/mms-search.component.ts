@@ -1,19 +1,12 @@
 import * as angular from 'angular'
 import * as _ from 'lodash'
-import { veCore } from '../ve-core.module'
-import { VeComponentOptions } from '../../ve-utils/types/view-editor'
-import { CacheService } from '../../ve-utils/services/Cache.service'
-import { ElementService } from '../../ve-utils/services/Element.service'
-import { ProjectService } from '../../ve-utils/services/Project.service'
-import { UtilsService } from '../../ve-utils/services/Utils.service'
-import { ViewService } from '../../ve-utils/services/View.service'
-import {
-    ElementObject,
-    ProjectObject,
-    QueryObject,
-    RequestObject,
-    ViewObject,
-} from '../../ve-utils/types/mms'
+import {VeComponentOptions} from '../../ve-utils/types/view-editor'
+import {CacheService} from "@ve-utils/services"
+import {ElementService} from "@ve-utils/services"
+import {ProjectService} from "@ve-utils/services"
+import {UtilsService} from "@ve-utils/services"
+import {ViewService} from "@ve-utils/services"
+import {ElementObject, ProjectObject, QueryObject, RequestObject, ViewObject,} from '../../ve-utils/types/mms'
 
 //veCore.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', 'growl', '$templateCache', '$timeout', mmsSearch]);
 

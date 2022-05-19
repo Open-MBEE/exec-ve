@@ -1,13 +1,13 @@
 import * as angular from 'angular'
 import * as _ from 'lodash';
 
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 export class CacheService {
     public cache = {};
     constructor() {}
 
-    get<T>(key): T | undefined {
+    get<T>(key, noCopy?: boolean): T | undefined {
         var realkey = key;
         if (angular.isArray(key)) {
             if (key[0] === 'element' && key[1] === '') {
@@ -16,9 +16,12 @@ export class CacheService {
             realkey = this.makeKey(key);
         }
         if (this.cache.hasOwnProperty(realkey)) {
-            var realval = this.cache[realkey];
+            const realval = this.cache[realkey];
             if (angular.isString(realval)) {
                 return this.get(realval);
+            }
+            if (noCopy) {
+                return realval;
             }
             return JSON.parse(JSON.stringify(realval));
         }
@@ -74,15 +77,15 @@ export class CacheService {
             realkey = this.makeKey(key);
         }
         value = JSON.parse(JSON.stringify(value));
-        var val: T = this.get<T>(realkey);
+        var val: T = this.get<T>(realkey, true);
         if (val && m && angular.isObject(value)) {
-            _.merge(val, value, function(a,b,id) {
+            _.mergeWith(val, value, (a,b,id) => {
                 if ((id === '_contents' || id === 'specification') && b && b.type === 'Expression') {
                     return b;
                 }
                 if (angular.isArray(a) && angular.isArray(b) && b.length < a.length) {
                     a.length = 0;
-                    Array.prototype.push.apply(a, b);
+                    a.push(...b);
                     return a;
                 }
                 if (id === '_displayedElementIds' && b) {

@@ -1,15 +1,11 @@
 import * as angular from "angular";
-import Rx from 'rx';
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {ViewApi, ViewService} from "../../ve-utils/services/View.service";
-import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {Utils} from "../utilities/CoreUtils.service";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {handleChange, onChangesCallback} from "../../ve-utils/utils/change.util";
-import {ElementObject, ElementsRequest} from "../../ve-utils/types/mms";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {veCore} from "../ve-core.module";
+import Rx from 'rx-lite';
+import {AuthService, ElementService, EventService, RootScopeService, ViewApi, ViewService} from "@ve-utils/services";
+import {CoreUtilsService} from "@ve-core/utilities";
+import {onChangesCallback} from "@ve-utils/utils";
+import {ElementObject, ElementsRequest} from "@ve-types/mms";
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {veCore} from "@ve-core";
 
 /**
  * @ngdoc directive
@@ -31,7 +27,7 @@ import {veCore} from "../ve-core.module";
  * ## Example
  * ### controller (js)
  *  <pre>
-    angular.module('app', ['veCore'])
+    angular.module('app', ['ve-core'])
     .controller('ViewCtrl', ['this', function(this) {
         this.api = {}; //empty object to be populated by the view directive
        public handler(elementId) {
@@ -70,7 +66,7 @@ export class ViewController implements angular.IComponentController {
     private mmsLink: boolean;
     private mmsViewApi: ViewApi;
 
-    static $inject = [ '$element', 'growl', 'Utils', 'AuthService', 'ViewService', 'ElementService', 'EventService', 'RootScopeService']
+    static $inject = [ '$element', 'growl', 'CoreUtilsService', 'AuthService', 'ViewService', 'ElementService', 'EventService', 'RootScopeService']
     private showEdits: boolean;
     private modified: any;
     private modifier: object;
@@ -85,7 +81,7 @@ export class ViewController implements angular.IComponentController {
     public subs: Rx.IDisposable[];
 
 
-    constructor(private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService, private utils: Utils, private authSvc: AuthService,
+    constructor(private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService, private utils: CoreUtilsService, private authSvc: AuthService,
                 private viewSvc: ViewService, private elementSvc: ElementService, private eventSvc: EventService,
                 private rootScopeSvc: RootScopeService) {}
 
@@ -326,7 +322,7 @@ let ViewComponent: VeComponentOptions = {
     </h1>
 
     <h1 ng-if="!$ctrl.mmsLink" class="view-title h{{level}}">
-        <span class="ve-view-number">{{$ctrl.view._veNumber}}</span> <mms-transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}"></mms-transclude-name>
+        <span class="ve-view-number">{{$ctrl.view._veNumber}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}"></transclude-name>
     </h1>
 
     <div class="ve-secondary-text last-modified no-print">

@@ -1,14 +1,11 @@
 import * as angular from "angular";
-import Rx from 'rx';
-import {StateService, TransitionService, UIRouterGlobals, UIRouter} from "@uirouter/angularjs";
-import {ProjectService} from "../../ve-utils/services/Project.service";
-import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {EventService} from "../../ve-utils/services/Event.service";
+import Rx from 'rx-lite';
+import {StateService, TransitionService, UIRouter, UIRouterGlobals} from "@uirouter/angularjs";
+import {AuthService, EventService, ProjectService, RootScopeService} from "@ve-utils/services";
 import {ngStorage} from "ngstorage";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 let SelectComponent: VeComponentOptions = {
     selector: 'projectSelect',
@@ -106,7 +103,7 @@ let SelectComponent: VeComponentOptions = {
             'AuthService', 'RootScopeService', 'EventService']
 
         //injectables
-        private $globalState: UIRouterGlobals = this.$uiRouter.globals;
+        private $uiRouterGlobals: UIRouterGlobals = this.$uiRouter.globals;
         public subs: Rx.IDisposable[];
 
         //bindings
@@ -144,7 +141,7 @@ let SelectComponent: VeComponentOptions = {
             }));
             this.rootScopeSvc.veTitle('Projects');
             this.pageTitle = 'View Editor';
-            this.fromLogin = this.$globalState.params.fromLogin;
+            this.fromLogin = this.$uiRouterGlobals.params.fromLogin;
             this.$localStorage.$default({org: this.mmsOrgs[0]});
             this.orgs = this.mmsOrgs;
             if (this.$localStorage.org) {

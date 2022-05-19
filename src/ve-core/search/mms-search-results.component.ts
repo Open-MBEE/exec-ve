@@ -1,7 +1,5 @@
 import * as angular from "angular";
-
-import {veCore} from "../ve-core.module";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
 export class MmsSearchResultsController implements angular.IComponentController {
 

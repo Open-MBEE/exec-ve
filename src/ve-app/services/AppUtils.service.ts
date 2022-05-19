@@ -1,14 +1,9 @@
 import * as angular from 'angular';
 
 import {StateService} from '@uirouter/angularjs'
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {ViewService} from "../../ve-utils/services/View.service";
-import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {TreeService} from "../../ve-utils/services/Tree.service";
-import {EditService} from "../../ve-utils/services/Edit.service";
+import {ElementService, EventService, TreeService, UtilsService, ViewService} from "@ve-utils/services";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 
 

@@ -1,7 +1,7 @@
 import angular from 'angular';
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 let LoginBannerComponent: VeComponentOptions = {
     selector: 'loginBanner',
@@ -9,7 +9,7 @@ let LoginBannerComponent: VeComponentOptions = {
     <div class="login-banner">
     <div class="login-box login-banner">
         <ul>
-            <li ng-repeat="label in $ctrl.labels">{{label}}</li>
+            <li ng-repeat="message in $ctrl.message">{{message}}</li>
         </ul>
     </div>
 </div>
@@ -19,11 +19,11 @@ let LoginBannerComponent: VeComponentOptions = {
     },
     controller: class LoginBannerController implements angular.IComponentController {
         private mmsLoginBanner
-        public labels
+        public message
         constructor() {
         }
         $onInit() {
-            this.labels = this.mmsLoginBanner.labels;
+            this.message = this.mmsLoginBanner.message;
         }
     }
 }

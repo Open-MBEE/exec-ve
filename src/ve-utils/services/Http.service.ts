@@ -1,5 +1,5 @@
 import * as angular from 'angular'
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 /**
  * @ngdoc service

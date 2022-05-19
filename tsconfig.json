@@ -15,7 +15,20 @@
     "sourceMap": true,
     "target": "es2017",
     "typeRoots": [
-      "./src/node_modules/@types"
-    ]
+      "../node_modules/@types"
+    ],
+    "rootDir": "./src",
+    "paths": {
+      "@ve-ext": ["src/ve-extensions"],
+      "@ve-ext/*": ["src/ve-extensions/*"],
+      "@ve-utils": ["src/ve-utils"],
+      "@ve-utils/*": ["src/ve-utils/*"],
+      "@ve-core": ["src/ve-core"],
+      "@ve-core/*": ["src/ve-core/*"],
+      "@ve-app": ["src/ve-app"],
+      "@ve-app/*": ["src/ve-app/*"],
+      "@ve-types/*": ["src/ve-utils/types/*"]
+    },
+    "skipLibCheck": true
   }
 }

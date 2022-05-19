@@ -1,36 +1,70 @@
 import * as angular from "angular";
-import Rx from "rx";
-
-import {TransclusionService} from "./Transclusion.service";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {ViewService} from "../../ve-utils/services/View.service";
-import {UxService} from "../../ve-utils/services/Ux.service";
-import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {MathJaxService} from "../../ve-utils/services/MathJax.service";
-import {BButton, ButtonBarApi, ButtonBarService} from "../../ve-core/button-bar/ButtonBar.service";
-import {ViewController} from "../../ve-core/view/view.component";
-import {ViewPresentationElemController} from "../views/view-pe.component";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {ElementObject, ViewObject} from "../../ve-utils/types/mms";
-import {VeEditorApi} from "../../ve-core/editor/CKEditor.service";
-import {handleChange, onChangesCallback} from "../../ve-utils/utils/change.util";
-import {TransclusionController, TranscludeScope} from "./transclusion";
-import {veExt} from "../ve-extensions.module";
-import {veUtils} from "../../ve-utils/ve-utils.module"
 import {Injectable} from "angular";
+import Rx from 'rx-lite';
+
+import {veExt, ExtUtilService, ExtensionController} from "@ve-ext";
+import {
+    AuthService,
+    ElementService,
+    EventService,
+    MathJaxService,
+    UtilsService,
+    UxService,
+    ViewService
+} from "@ve-utils/services";
+import {ButtonBarService} from "@ve-utils/button-bar";
+import {ViewController} from "@ve-core/view";
+import {ElementObject, ViewObject} from "@ve-types/mms";
+import {VeEditorApi} from "@ve-core/editor";
+import {handleChange, onChangesCallback} from "../../ve-utils/utils/change.util";
+import {IPaneScope} from "angular-pane-layout";
+import {ViewPresentationElemController} from "@ve-ext/presentations/view-pe.component";
+
+export interface ITransclusion extends angular.IComponentController, ExtensionController {
+    $scope: TranscludeScope
+    mmsElementId: string
+    mmsProjectId: string
+    mmsRefId: string;
+    commitId: string
+    cfType: string
+    edit: ElementObject
+    element: ElementObject
+    isEditing: boolean
+    inPreviewMode: boolean
+    skipBroadcast: boolean
+    addValueTypes?: object
+    addValueType?: string
+    recompileScope?: TranscludeScope,
+    //Functions
+    editorApi?: VeEditorApi,
+    addValue?(type: string): void,
+    removeVal?(i: number): void
+
+    save?(e?): void
+    saveC?(e?): void
+    cancel?(e?): void
+    startEdit?(e?): void
+    preview?(e?): void
+    delete?(e?): void
+
+}
+
+export interface TranscludeScope extends IPaneScope {
+    $ctrl?: ITransclusion
+    $parent: TranscludeScope
+}
+
 
 /**
  * @ngdoc component
- * @name veExt/TranscludeDocController
- * @type {TransclusionController}
+ * @name veExt/Transclusion
+ * @type {ITransclusion}
  *
  * @requires {angular.IScope} $scope
  * @requires {angular.ICompileService} $compile
  * @requires {angular.IRootElementService} $element
  * @requires {angular.growl.IGrowlService} growl
- * @requires {Utils} utils
+ * @requires {ExtUtilService} extUtilSvc
  * @requires {ElementService} elementSvc
  * @requires {UtilsService} utilsSvc
  * @requires {ViewService} viewSvc
@@ -57,7 +91,7 @@ import {Injectable} from "angular";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TransclusionControllerImpl implements TransclusionController {
+export class Transclusion implements ITransclusion {
 
     //Required Controllers
     protected mmsViewCtrl: ViewController
@@ -96,15 +130,19 @@ export class TransclusionControllerImpl implements TransclusionController {
     public skipBroadcast: boolean;
     protected clearWatch: boolean = false;
 
-    protected view: ViewObject;
+
     public edit: ElementObject;
     public editValues: any[];
     public element: ElementObject;
     protected type: string = '';
     protected editorType: string;
-    protected instanceSpec: any;
-    protected instanceVal: any;
+
+    public view: ViewObject;
+    public instanceSpec: any;
+    public instanceVal: any;
+
     protected presentationElem: any;
+
     protected panelTitle: string;
     protected panelType: string;
 
@@ -112,6 +150,12 @@ export class TransclusionControllerImpl implements TransclusionController {
 
     protected template: string | Injectable<(...args: any[]) => string>
 
+    public save?(e?): void
+    public saveC?(e?): void
+    public cancel?(e?): void
+    public startEdit?(e?): void
+    public preview?(e?): void
+    public delete?(e?): void
 
     static $inject: string[] = [
         '$q',
@@ -119,7 +163,7 @@ export class TransclusionControllerImpl implements TransclusionController {
         '$compile',
         '$element',
         'growl',
-        'TransclusionService',
+        'ExtUtilService',
         'ElementService',
         'UtilsService',
         'ViewService',
@@ -131,10 +175,17 @@ export class TransclusionControllerImpl implements TransclusionController {
 
     constructor(public $q: angular.IQService, public $scope: angular.IScope, protected $compile: angular.ICompileService,
                 protected $element: JQuery<HTMLElement>, protected growl: angular.growl.IGrowlService,
-                protected transclusionSvc: TransclusionService, protected elementSvc: ElementService, protected utilsSvc: UtilsService,
+                protected extUtilSvc: ExtUtilService, protected elementSvc: ElementService, protected utilsSvc: UtilsService,
                 protected viewSvc: ViewService, protected uxSvc: UxService, protected authSvc: AuthService,
                 protected eventSvc: EventService, protected mathJaxSvc: MathJaxService) {}
 
+    $onInit() {
+        if (this.$element.prop("tagName").includes('mms')) {
+            this.growl.warning("mmsTransclude(*) Syntax is deprecated and will be removed in a future version" +
+                "please see the release documentation for further details");
+        }
+        this.config();
+    }
 
     $onDestroy() {
         this.eventSvc.destroy(this.subs);
@@ -147,6 +198,24 @@ export class TransclusionControllerImpl implements TransclusionController {
     $postLink() {
         this.changeAction(this.mmsElementId,'',false);
     }
+
+    /**
+     * @name veExt/Transclusion#config
+     *
+     * @description
+     *
+     * @protected
+     */
+    protected config:() => void = () => {}
+
+    /**
+     * @name veExt/Transclusion#config
+     *
+     * @description
+     *
+     * @protected
+     */
+    protected destroy:() => void = () => {}
 
 
 
@@ -206,7 +275,7 @@ export class TransclusionControllerImpl implements TransclusionController {
                     this.panelType = this.cfKind;
                 }
                 this.recompile();
-                this.transclusionSvc.reopenUnsavedElts(this, this.cfTitle.toLowerCase());
+                this.extUtilSvc.reopenUnsavedElts(this, this.cfTitle.toLowerCase());
 
                 if (this.commitId === 'latest') {
                     this.subs.push(this.eventSvc.$on('element.updated', (data) => {
@@ -214,6 +283,7 @@ export class TransclusionControllerImpl implements TransclusionController {
                         let continueEdit = data.continueEdit;
                         if (elementOb.id === this.element.id && elementOb._projectId === this.element._projectId &&
                             elementOb._refId === this.element._refId && !continueEdit) {
+                            this.element = elementOb;
                             this.recompile();
                         }
                     }));

@@ -1,17 +1,11 @@
 import * as angular from 'angular';
-import Rx from 'rx';
-import {ToolbarService} from "../../ve-extensions/content-tools/services/Toolbar.service";
-import {TButton} from "../../ve-extensions/content-tools/content-tool";
-import {StateService, UIRouter, UIRouterGlobals} from "@uirouter/angularjs";
-import {EditService} from "../../ve-utils/services/Edit.service";
-import {UxService} from "../../ve-utils/services/Ux.service";
-import {PermissionsService} from "../../ve-utils/services/Permissions.service"
-import {EventService} from "../../ve-utils/services/Event.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {ToolbarApi} from "../../ve-extensions/content-tools/services/Toolbar.api";
-import {ExtensionService} from "../../ve-extensions/utilities/Extension.service";
-
-var veApp = angular.module('veApp');
+import Rx from 'rx-lite';
+import {ISpecToolButton, ToolbarApi, ToolbarService} from "@ve-ext/spec-tools";
+import {UIRouterGlobals} from "@uirouter/angularjs";
+import {EditService, EventService, PermissionsService} from "@ve-utils/services";
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {ExtensionService} from "@ve-ext";
+import {veApp} from "@ve-app";
 
 
 
@@ -20,7 +14,7 @@ var veApp = angular.module('veApp');
 /* Classes */
 const ToolbarComponent: VeComponentOptions = {
     selector: "toolbar", //toolbar-component
-    template: `<ve-toolbar on-click="$ctrl.onClick(button)" />`,
+    template: `<tools-navbar on-click="$ctrl.onClick(button)" />`,
     bindings: {
         refOb: '<',
         documentOb: '<'
@@ -37,9 +31,9 @@ const ToolbarComponent: VeComponentOptions = {
 
         //Local
         public tbApi: ToolbarApi;
-        public buttons: TButton[];
+        public buttons: ISpecToolButton[];
 
-        constructor(public $state: StateService, public extensionSvc: ExtensionService, private permissionsSvc: PermissionsService,
+        constructor(public $uiRouterGlobals: UIRouterGlobals, public extensionSvc: ExtensionService, private permissionsSvc: PermissionsService,
                     private editSvc: EditService, private eventSvc: EventService, private toolbarSvc: ToolbarService) {
 
         }
@@ -67,15 +61,15 @@ const ToolbarComponent: VeComponentOptions = {
                 this.tbApi.select(data.id);
             }));
         };
-        //TODO: Need to find a more generic way to execute the init logic (beyond just getting the button);
-        tbInit(tbApi: ToolbarApi, tbCtrl: { $state: StateService, extensionSvc: ExtensionService } & angular.IComponentController) {
-            for (let tool of tbCtrl.extensionSvc.getExtensions('content')) {
+
+        tbInit(tbApi: ToolbarApi, tbCtrl: { $uiRouterGlobals: UIRouterGlobals, extensionSvc: ExtensionService } & angular.IComponentController) {
+            for (let tool of tbCtrl.extensionSvc.getExtensions('spec')) {
                 let button = tbCtrl.toolbarSvc.getToolbarButton(tool)
                 tbApi.addButton(button);
                 if (button.enabledFor) {
                     button.active=false;
                     for (let enableState of button.enabledFor) {
-                        if (tbCtrl.$state.includes(enableState)) {
+                        if (tbCtrl.$uiRouterGlobals.current.name.indexOf(enableState) > -1) {
                             button.active=true;
                             break;
                         }
@@ -83,7 +77,7 @@ const ToolbarComponent: VeComponentOptions = {
                 }
                 if (button.disabledFor) {
                     for (let disableState of button.disabledFor) {
-                        if (tbCtrl.$state.includes(disableState)) {
+                        if (tbCtrl.$uiRouterGlobals.current.name.indexOf(disableState) > -1) {
                             button.active=false;
                             break;
                         }

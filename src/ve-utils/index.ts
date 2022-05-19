@@ -4,10 +4,15 @@
 
 import "./ve-utils.module"
 
-import "./lodash/pluck.mixin"
-import "./jquery"
+import "./third-party"
 
-import "./utils/emf.util"
+import "./utils"
 import "./services"
+import "./button-bar"
+import "./components"
+
+export * from "./ve-utils.module"
+
+export default 've-utils';
 
 

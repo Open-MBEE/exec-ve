@@ -1,17 +1,18 @@
 import * as angular from 'angular';
-import {UIRouter, Transition} from "@uirouter/angularjs";
-var veApp = angular.module('veApp');
+import {Transition, UIRouter} from "@uirouter/angularjs";
+import {
+    ApplicationService,
+    AuthService,
+    BrandingService,
+    ElementService,
+    PermissionsService,
+    ProjectService,
+    URLService,
+    ViewService
+} from "@ve-utils/services"
+import {ElementObject, RefObject, ViewObject} from "@ve-types/mms";
 
-import {BrandingService} from "../../ve-utils/services/Branding.service"
-import {URLService} from "../../ve-utils/services/URL.provider";
-import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {ApplicationService} from "../../ve-utils/services/Application.service";
-import {ProjectService} from "../../ve-utils/services/Project.service";
-import {ViewService} from "../../ve-utils/services/View.service";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {PermissionsService} from "../../ve-utils/services/Permissions.service";
-import {ngStorage} from "ngstorage";
-import {ElementObject, RefObject, ViewObject} from "../../ve-utils/types/mms";
+import {veApp} from "@ve-app";
 
 export class ResolveService {
 

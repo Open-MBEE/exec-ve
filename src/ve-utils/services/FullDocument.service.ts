@@ -1,7 +1,6 @@
-import * as angular from 'angular'
 import * as _ from 'lodash'
 import {ViewObject} from "../types/mms";
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 export class FullDocumentService {
     public viewsBuffer = [];

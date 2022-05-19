@@ -1,6 +1,6 @@
 import * as angular from 'angular'
 import {URLService} from "./URL.provider";
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 /**
  * @ngdoc service

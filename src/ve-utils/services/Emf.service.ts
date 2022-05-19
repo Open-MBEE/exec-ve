@@ -1,10 +1,7 @@
-import * as angular from "angular";
-
-import {Class, Dependency, Element, Generalization, InstanceSpec, Package, ValueSpec} from "../utils/emf.util";
-import {ElementObject} from "../types/mms";
+import {Class, Dependency, Generalization, InstanceSpec, Package, ValueSpec} from "../utils/emf.util";
 
 
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 export class EmfService {
     /**

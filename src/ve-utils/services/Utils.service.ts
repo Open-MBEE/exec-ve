@@ -1,13 +1,13 @@
-import * as angular from "angular";
+import angular from "angular";
 import * as _ from "lodash";
 import {CacheService} from "./Cache.service";
 import {URLService} from "./URL.provider";
 import {ApplicationService} from "./Application.service";
-import {ElementObject, ElementsRequest, RequestObject} from "../types/mms";
-import {Class, Dependency, Generalization, InstanceSpec, Package, ValueSpec} from "../utils/emf.util";
-import {TransclusionController} from "../../ve-extensions/transclusions/transclusion";
+import {ElementObject, ElementsRequest} from "../types/mms";
+import {Class} from "@ve-utils/utils";
+import {ITransclusion} from "@ve-ext/transclusions";
 
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 
 /**
@@ -38,7 +38,7 @@ export class UtilsService {
 
     constructor(private $q, private $http, private cacheSvc : CacheService, private uRLSvc : URLService, private applicationSvc : ApplicationService) {}
 
-    public hasCircularReference(ctrl: TransclusionController, curId, curType) {
+    public hasCircularReference(ctrl: ITransclusion, curId, curType) {
         var curscope = ctrl.$scope;
         while (curscope.$parent) {
             var parent = curscope.$parent;

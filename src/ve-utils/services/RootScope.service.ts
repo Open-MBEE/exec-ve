@@ -1,6 +1,5 @@
-import * as angular from 'angular'
 import {SessionService} from "./Session.service";
-var veUtils = angular.module('veUtils');
+import {veUtils} from "@ve-utils";
 
 export class RootScopeService {
     

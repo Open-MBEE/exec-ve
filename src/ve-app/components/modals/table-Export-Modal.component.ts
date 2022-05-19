@@ -1,6 +1,7 @@
 import * as angular from 'angular';
-import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
-var veApp = angular.module('veApp');
+import {VeComponentOptions} from "@ve-types/view-editor";
+
+import {veApp} from "@ve-app";
 
 let TableExportModalComponent: VeComponentOptions = {
     selector: 'tableExport',

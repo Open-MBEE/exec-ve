@@ -1,12 +1,9 @@
 import angular from "angular";
 import * as _ from "lodash";
-import {AuthService} from "../../../ve-utils/services/Authorization.service";
-import {EditService} from "../../../ve-utils/services/Edit.service";
-import {UtilsService} from "../../../ve-utils/services/Utils.service";
-import {CacheService} from "../../../ve-utils/services/Cache.service";
-import {VeComponentOptions} from "../../../ve-utils/types/view-editor";
+import {AuthService, CacheService, EditService, UtilsService} from "@ve-utils/services";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 let LoginModalComponent: VeComponentOptions = {
     selector: 'loginModal',

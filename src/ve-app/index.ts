@@ -8,7 +8,7 @@
 import 'angular';
 import 'lodash';
 import 'angular-ui-bootstrap';
-import 'rx-angular';
+import 'rx-lite';
 import 'flatpickr';
 
 import 'angular-animate';
@@ -17,8 +17,8 @@ import 'angular-growl-v2';
 import 'angular-hotkeys';
 import '@uirouter/angularjs';
 import 'angular-sanitize';
-import 'angular-ui-bootstrap';
 import 'angular-ui-tree';
+import 'angular-pane-layout';
 
 import 'angulartics';
 import 'angulartics-piwik';
@@ -33,12 +33,15 @@ import '../lib/angular-promise-extras/angular-promise-extras';
 import "../lib/angular-flatpickr/ngFlatpickr.main"
 
 //VE Modules
-import "../fa-pane"
-import "../ve-core"
-import "../ve-extensions"
+import "@ve-core"
+import "@ve-ext"
+import "@ve-utils"
 
 import "./ve-app.module";
-
 import "./services";
 import "./components";
+import "./navigation";
 import "./controllers";
+
+export * from "./ve-app.module"
+

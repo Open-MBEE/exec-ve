@@ -17,14 +17,13 @@ import "../ve-utils"
 
 //VE Core
 import "./ve-core.module"
-
 import "./utilities";
 
-import "./button-bar";
 import "./view";
-import "../ve-extensions/content-tools";
 import "./tree";
 import "./editor";
 import "./search";
 
-import "./directives"
+export * from "./ve-core.module"
+
+

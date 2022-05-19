@@ -1,17 +1,21 @@
-import {URLService} from "../../ve-utils/services/URL.provider";
-import {CacheService} from "../../ve-utils/services/Cache.service";
-import {ElementService} from "../../ve-utils/services/Element.service";
-import {ViewService} from "../../ve-utils/services/View.service";
-import {UtilsService} from "../../ve-utils/services/Utils.service";
-import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {PermissionsService} from "../../ve-utils/services/Permissions.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {EventService} from "../../ve-utils/services/Event.service";
-import {EditService} from "../../ve-utils/services/Edit.service";
 import * as angular from "angular";
-import {ElementObject} from "../../ve-utils/types/mms";
 
-export class Utils {
+import {
+    AuthService,
+    CacheService,
+    EditService,
+    ElementService,
+    EventService,
+    PermissionsService,
+    RootScopeService,
+    URLService,
+    UtilsService,
+    ViewService
+} from "@ve-utils/services";
+import {ElementObject} from "@ve-types/mms";
+import {veCore} from "@ve-core";
+
+export class CoreUtilsService {
 
     //locals
     private addItemData
@@ -33,11 +37,11 @@ export class Utils {
 
     public toggleLeftPane(searchTerm) {
         if ( searchTerm && !this.rootScopeSvc.leftPaneClosed() ) {
-            this.eventSvc.$broadcast('left-pane-toggle', true);
+            this.eventSvc.$broadcast('left-pane.toggle', true);
         }
 
         if ( !searchTerm && this.rootScopeSvc.leftPaneClosed() ) {
-            this.eventSvc.$broadcast('left-pane-toggle', false);
+            this.eventSvc.$broadcast('left-pane.toggle', false);
         }
     };
 
@@ -119,3 +123,5 @@ export class Utils {
         return dups;
     };
 }
+
+veCore.service('CoreUtilsService', CoreUtilsService)

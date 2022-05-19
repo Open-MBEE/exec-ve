@@ -1,9 +1,8 @@
-import * as angular from "angular";
-import { URLService } from "./URL.provider";
-import { UtilsService } from "./Utils.service";
-import { CacheService } from "./Cache.service";
-import { ElementService } from "./Element.service";
-var veUtils = angular.module('veUtils');
+import {URLService} from "./URL.provider";
+import {UtilsService} from "./Utils.service";
+import {CacheService} from "./Cache.service";
+import {ElementService} from "./Element.service";
+import {veUtils} from "@ve-utils";
 
 export class PlotService {
     constructor(private $q, private $http, private uRLSvc: URLService, private utilsSvc: UtilsService, private cacheSvc: CacheService, private elementSvc: ElementService) {

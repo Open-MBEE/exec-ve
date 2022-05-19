@@ -42,15 +42,15 @@
   height: 100vh;
 }
 
-.fa-pane-orientation-vertical,
-.fa-pane-orientation-horizontal {
-  .fa-pane-handle {
+.ng-pane-orientation-vertical,
+.ng-pane-orientation-horizontal {
+  .ng-pane-handle {
     background-color: $white;
     height: 100px;
     top: -webkit-calc(50% - 50px) !important;
     top: calc(50% - 50px) !important;
 
-    > .fa-pane-toggle {
+    > .ng-pane-toggle {
       height: 100%;
       max-height: 100%;
       cursor: pointer;
@@ -71,14 +71,14 @@
   }
 }
 
-.fa-pane-orientation-vertical {
-  > .fa-pane-handle {
+.ng-pane-orientation-vertical {
+  > .ng-pane-handle {
     cursor: row-resize;
   }
 }
 
-.fa-pane-orientation-horizontal {
-  .fa-pane-handle {
+.ng-pane-orientation-horizontal {
+  .ng-pane-handle {
     cursor: col-resize;
   }
 }

@@ -1,11 +1,10 @@
 import * as angular from "angular";
 import {StateService} from "@uirouter/angularjs";
 
-import {AuthService} from "../../ve-utils/services/Authorization.service";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
+import {AuthService, RootScopeService} from "@ve-utils/services";
+import {VeComponentOptions} from "@ve-types/view-editor";
 
-var veApp = angular.module('veApp');
+import {veApp} from "@ve-app";
 
 let LoginComponent: VeComponentOptions = {
     selector: 'login',

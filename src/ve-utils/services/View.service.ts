@@ -1,19 +1,14 @@
 import * as angular from 'angular'
 import * as _ from 'lodash'
-import { ElementService } from './Element.service'
-import { URLService } from './URL.provider'
-import { UtilsService } from './Utils.service'
-import { CacheService } from './Cache.service'
-import { EventService } from './Event.service'
-import { TreeBranch, View2NodeMap } from '../types/tree'
-import {
-    DocumentObject,
-    ElementObject,
-    ElementsRequest,
-    ViewObject,
-} from '../types/mms'
+import {ElementService} from './Element.service'
+import {URLService} from './URL.provider'
+import {UtilsService} from './Utils.service'
+import {CacheService} from './Cache.service'
+import {EventService} from './Event.service'
+import {TreeBranch, View2NodeMap} from '../types/tree'
+import {DocumentObject, ElementObject, ElementsRequest, ViewObject,} from '../types/mms'
 import {Class, InstanceSpec, Package, ValueSpec} from "../utils/emf.util";
-var veUtils = angular.module('veUtils')
+import {veUtils} from "@ve-utils";
 
 export interface ViewElement {
     id: any
@@ -679,7 +674,7 @@ export class ViewService {
      * @param {object} instanceVal to remove from the View or Section
      * @returns {Promise} The promise would be resolved with updated View or Section object
      */
-    public removeElementFromViewOrSection(reqOb, instanceVal) {
+    public removeElementFromViewOrSection(reqOb: ElementsRequest, instanceVal?: any) {
         this.utilsSvc.normalize(reqOb)
         var deferred = this.$q.defer()
 

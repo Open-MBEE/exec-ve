@@ -7,8 +7,8 @@
     @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
   }
 
-  &.fa-pane-orientation-horizontal {
-    .fa-pane-handle > .fa-pane-toggle {
+  &.ng-pane-orientation-horizontal {
+    .ng-pane-handle > .ng-pane-toggle {
       @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
       margin-left: 1px;
     }
@@ -44,8 +44,8 @@
     z-index: 1;
   }
 
-  &.fa-pane-orientation-horizontal {
-    .fa-pane-handle > .fa-pane-toggle {
+  &.ng-pane-orientation-horizontal {
+    .ng-pane-handle > .ng-pane-toggle {
       @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
       margin-left: 1px;
     }

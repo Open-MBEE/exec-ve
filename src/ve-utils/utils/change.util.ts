@@ -1,8 +1,9 @@
-import * as angular from "angular";
+import * as angular from 'angular';
+
 
 /**
  * @name onChangesCallback
- * @description This interface defines the expected format for a callback added to the {@link handleChange}
+ * @description This function type defines the expected format for a callback added to the {@link handleChange}
  * helper function.
  * @example
  *      myCallback: onChangesCallback = (newVal, oldVal, firstChange) => {
@@ -13,9 +14,7 @@ import * as angular from "angular";
  *      }
  *
  */
-export interface onChangesCallback {
-    (newVal?: any, oldVal?: any, firstChange?: boolean):any;
-}
+export type onChangesCallback = (newVal?: any, oldVal?: any, firstChange?: boolean) => any
 
 /**
  * @name change.utils#handleChange:
@@ -36,18 +35,22 @@ export interface onChangesCallback {
  * @param {angular.IOnChangesObject} changesObj
  * @param {string} watch
  * @param {onChangesCallback} callback
+ * @param {boolean} ignoreFirst -
  * @returns {any}
  */
-export function handleChange(changesObj: angular.IOnChangesObject, watch:string, callback: onChangesCallback): any {
-
-    if (!watch) {
+export function handleChange(changesObj: angular.IOnChangesObject, watch: string, callback: onChangesCallback,
+                             ignoreFirst?: boolean): any {
+    if (watch === "") {
         return callback();
     }
     else if (changesObj[watch]) {
-        let newVal = changesObj[watch].currentValue;
-        let oldVal = changesObj[watch].previousValue;
-        let firstChange = changesObj[watch].isFirstChange();
-        return callback(newVal,oldVal,firstChange);
+        if (ignoreFirst && changesObj[watch].isFirstChange()) {
+            return;
+        }
+        const newVal = changesObj[watch].currentValue;
+        const oldVal = changesObj[watch].previousValue;
+        const firstChange = changesObj[watch].isFirstChange();
+        return callback(newVal, oldVal, firstChange);
     }
     return;
 }

@@ -42,7 +42,7 @@ import * as angular from 'angular';
     </pre>
  * ### JS (app.js)
  *  <pre>
-    angular.module('exampleApp', ['veUtils'])
+    angular.module('exampleApp', ['ve-utils'])
     .controller('exampleCtrl', ['$scope', 'ElementService',
         function($scope, ElementService) { //dependency injections
             ElementService.getElement('_element_id').then(
@@ -57,7 +57,7 @@ import * as angular from 'angular';
     ]);
     </pre>
  */
-export const veUtils = angular.module('veUtils', ['rx'])
+export const veUtils = angular.module('ve-utils', [])
 
 veUtils.config(['$sceProvider', function($sceProvider) {
     $sceProvider.enabled(false);

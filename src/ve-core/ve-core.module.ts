@@ -69,11 +69,11 @@ import * as angular from "angular";
     </pre>
  * ### JS (app.js)
  *  <pre>
-    angular.module('exampleApp', ['veUtils', 'veCore']);
+    angular.module('exampleApp', ['ve-utils', 've-core']);
     </pre>
  */
 
-export const veCore = angular.module('veCore', ['veUtils', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter']);
+export const veCore = angular.module('ve-core', ['ve-utils', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter']);
 
   veCore.config(['$sceProvider', 'growlProvider', 'uiTreeFilterSettingsProvider', function($sceProvider, growlProvider, uiTreeFilterSettingsProvider) {
     $sceProvider.enabled(false);

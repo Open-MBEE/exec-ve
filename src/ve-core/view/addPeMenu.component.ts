@@ -1,8 +1,8 @@
 import angular from "angular";
-import {RootScopeService} from "../../ve-utils/services/RootScope.service";
-import {Utils} from "../utilities/CoreUtils.service";
-import {VeComponentOptions} from "../../ve-utils/types/view-editor";
-import {ElementObject} from "../../ve-utils/types/mms";
+import {RootScopeService} from "@ve-utils/services";
+import {CoreUtilsService} from "../utilities/CoreUtils.service";
+import {VeComponentOptions} from "@ve-types/view-editor";
+import {ElementObject} from "@ve-types/mms";
 
 import {veCore} from "../ve-core.module";
 
@@ -60,9 +60,9 @@ let AddPeMenuComponent: VeComponentOptions = {
 
         private addPeIndex: number;
 
-        static $inject = ['RootScopeService', 'Utils'];
+        static $inject = ['RootScopeService', 'CoreUtilsService'];
 
-        constructor(private rootScopeSvc: RootScopeService, private utils: Utils) {
+        constructor(private rootScopeSvc: RootScopeService, private utils: CoreUtilsService) {
         }
         /**
          * @ngdoc function

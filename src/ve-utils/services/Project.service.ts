@@ -8,15 +8,13 @@ import {
     CommitObject,
     CommitResponse,
     ElementObject,
-    OrgObject, OrgsResponse,
+    OrgObject,
+    OrgsResponse,
     ProjectObject,
     RefObject,
     RequestObject
 } from "../types/mms";
-import {veUtils} from "../ve-utils.module";
-
-
-
+import {veUtils} from "@ve-utils";
 
 
 /**
