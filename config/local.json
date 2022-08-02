@@ -23,8 +23,8 @@
     "loginTimout": 600000,
     "experimental": [
       {
-        "id": "Content Magic",
-        "path": "../ve-experimental/experimental-magic"
+        "id": "experimental-magic",
+        "name": "Content Magic"
       }
     ]
 }

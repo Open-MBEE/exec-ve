@@ -1,8 +1,11 @@
 import * as angular from "angular";
-import {EventService, UtilsService, ViewService} from "@ve-utils/services";
+
+import {EventService, UtilsService} from "@ve-utils/core-services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 
 import {veUtils} from "@ve-utils";
+import {ExtensionService} from "@ve-ext";
+import {SchemaService} from "@ve-utils/model-schema";
 
 /** Used for annotating an element that doesn't have any commit history at all or for an element that is deleted but has commit history **/
 let AnnotationComponent: VeComponentOptions = {
@@ -26,7 +29,7 @@ let AnnotationComponent: VeComponentOptions = {
         mmsCfLabel: '<'
     },
     controller: class AnnotationController implements angular.IComponentController {
-        static $inject = ['$element', 'ViewService', 'UtilsService', 'EventService']
+        static $inject = ['$element', 'ExtensionService', 'SchemaService', 'UtilsService', 'EventService']
 
         //Bindings
         private mmsReqOb;
@@ -36,8 +39,10 @@ let AnnotationComponent: VeComponentOptions = {
         
         //Local
         public displayContent
+        private schema: string = 'cameo';
         
-        constructor(private $element: JQuery<HTMLElement>, private viewSvc: ViewService, private utilsSvc: UtilsService, private eventSvc: EventService) {
+        constructor(private $element: JQuery<HTMLElement>, private extensionSvc: ExtensionService,
+                    private schemaSvc: SchemaService, private utilsSvc: UtilsService, private eventSvc: EventService) {
         }
 
         $onInit() {
@@ -66,21 +71,14 @@ let AnnotationComponent: VeComponentOptions = {
         };
 
         private _getContentIfElementFound(type, element) {
-            var AT = this.viewSvc.AnnotationType;
+            var AT = this.extensionSvc.AnnotationType;
             var inlineContent = '';
             var toolTipTitle;
             var toolTipContent;
-            var classifierType = this.viewSvc.getTypeFromClassifierId(element.classifierIds);
+            var classifierType = this.schemaSvc.getKeyByValue('TYPE_TO_CLASSIFIER_ID',element.classifierIds[0], this.schema);
 
-            switch (classifierType) {
-                case 'ListT':
-                case 'TableT':
-                case 'ImageT':
-                case 'ParagraphT':
-                case 'SectionT':
-                case 'FigureT':
-                    classifierType = classifierType.substring(0, classifierType.length - 1);
-                    break;
+            if (classifierType.endsWith('T')) {
+                classifierType = classifierType.substring(0, classifierType.length-1);
             }
 
             switch (type) {
@@ -125,7 +123,7 @@ let AnnotationComponent: VeComponentOptions = {
         }
 
         private _getContentIfElementNotFound(type, reqOb, cfLabel) {
-            var AT = this.viewSvc.AnnotationType;
+            var AT = this.extensionSvc.AnnotationType;
             var inlineContent = '';
             var label = cfLabel ? '(' + cfLabel + ')' : '';
             switch (type) {

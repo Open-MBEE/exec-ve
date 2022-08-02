@@ -1,9 +1,9 @@
 import * as angular from "angular";
 import {IQService} from "angular";
 import * as _ from "lodash";
-import {ElementService, ViewService} from "@ve-utils/services";
+import{ElementService, ViewService} from "@ve-utils/mms-api-client";
 import {ViewObject} from "@ve-types/mms";
-import {SpecApi, SpecService} from "./Spec.service";
+import {SpecService} from "./Spec.service";
 import {veExt} from "@ve-ext";
 
 export interface ElementReferences extends ViewObject {

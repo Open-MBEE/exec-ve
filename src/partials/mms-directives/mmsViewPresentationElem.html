@@ -10,7 +10,7 @@
     <mms-view-equation class="read-width" data-mms-para="presentationElem" ng-switch-when="Equation"></mms-view-equation>
     <mms-view-figure class="read-width" data-mms-para="presentationElem" ng-switch-when="Figure"></mms-view-figure>
     <mms-view-figure class="read-width" data-mms-para="presentationElem" ng-switch-when="ImageT"></mms-view-figure>
-    <mms-transclude-com class="read-width" mms-element-id="{{presentationElem.source}}" mms-project-id="{{instanceSpec._projectId}}" mms-ref-id="{{instanceSpec._refId}}" ng-switch-when="Comment"></mms-transclude-com>
+    <transclude-com class="read-width" mms-element-id="{{presentationElem.source}}" mms-project-id="{{instanceSpec._projectId}}" mms-ref-id="{{instanceSpec._refId}}" ng-switch-when="Comment"></transclude-com>
     <mms-view-plot data-mms-plot="presentationElem" ng-switch-when="Plot"></mms-view-plot>
     <mms-ts-diagram mms-pe-id="{{instanceSpec.id}}" mms-project-id="{{instanceSpec._projectId}}" mms-ref-id="{{instanceSpec._refId}}" mms-tsp-spec="presentationElem" ng-switch-when="TomSawyerDiagram"></mms-ts-diagram>
 </div>

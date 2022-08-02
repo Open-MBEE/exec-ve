@@ -7,7 +7,7 @@
    * @return {Array|Object} The same type as the input argument.
    */
   var mapValues = function(obj, callback) {
-    if (angular.isArray(obj))
+    if (Array.isArray(obj))
       return obj.map(callback)
 
     var ret = {}

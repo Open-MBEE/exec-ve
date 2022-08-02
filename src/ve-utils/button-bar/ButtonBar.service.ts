@@ -2,7 +2,7 @@ import * as angular from "angular";
 import {veUtils} from "@ve-utils";
 import {ButtonBarApi} from "@ve-utils/button-bar";
 import {VeEditorApi} from "@ve-core/editor";
-import {EventService} from "@ve-utils/services";
+import {EventService} from "@ve-utils/core-services";
 
 export interface IButtonBarButton {
   id: string,
@@ -69,7 +69,7 @@ export class ButtonBarService {
     if (!init) {
       return new Error("Illegal Bar initialization")
     }
-      let api = new ButtonBarApi(id);
+      let api = new ButtonBarApi(id, init);
       init(api);
       this.buttonBars[id] = api;
       return api;
@@ -91,7 +91,7 @@ export class ButtonBarService {
         case 'tree-expand':
           return {
             id: button,
-            icon: 'fa-caret-square-o-down',
+            icon: 'fa-regular fa-caret-square-down fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -106,7 +106,7 @@ export class ButtonBarService {
         case 'tree-collapse':
           return {
             id: button,
-            icon: 'fa-caret-square-o-up',
+            icon: 'fa-regular fa-caret-square-up fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -120,7 +120,7 @@ export class ButtonBarService {
         case 'tree-filter':
           return {
             id: button,
-            icon: 'fa-filter',
+            icon: 'fa-solid fa-filter fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -134,7 +134,7 @@ export class ButtonBarService {
         case 'tree-add-document-or-group':
           return {
             id: button,
-            icon: 'fa-plus',
+            icon: 'fa-solid fa-plus fa-2x',
             selected: true,
             active: true,
             permission: false,
@@ -153,7 +153,7 @@ export class ButtonBarService {
         case 'tree-delete-document':
           return {
             id: button,
-            icon: 'fa-trash',
+            icon: 'fa-solid fa-trash fa-2x',
             selected: true,
             active: true,
             permission: false,
@@ -167,7 +167,7 @@ export class ButtonBarService {
         case 'tree-add-view':
           return {
             id: button,
-            icon: 'fa-plus',
+            icon: 'fa-solid fa-plus fa-2x',
             selected: true,
             active: true,
             permission: false,
@@ -181,7 +181,7 @@ export class ButtonBarService {
         case 'tree-add-group':
           return {
             id: button,
-            icon: 'fa-folder',
+            icon: 'fa-solid fa-folder',
             selected: true,
             active: true,
             permission: true,
@@ -192,10 +192,24 @@ export class ButtonBarService {
               this.eventSvc.$broadcast(button)
             },
           }
+        case 'tree-clear-select':
+          return {
+            id: button,
+            icon: 'fa-regular fa-folder fa-2x',
+            selected: true,
+            active: true,
+            permission: true,
+            tooltip: 'Clear Selection',
+            spinner: false,
+            toggleable: false,
+            action: () => {
+              this.eventSvc.$broadcast(button)
+            }
+          }
         case 'tree-add-document':
           return {
             id: button,
-            icon: 'fa-file',
+            icon: 'fa-solid fa-file',
             selected: true,
             active: true,
             permission: true,
@@ -206,11 +220,24 @@ export class ButtonBarService {
               this.eventSvc.$broadcast(button)
             },
           }
-
+        case 'tree-refresh':
+          return {
+            id: button,
+            icon: 'fa-solid fa-refresh',
+            selected: true,
+            active: true,
+            permission: true,
+            tooltip: 'Refresh Tree Data',
+            spinner: false,
+            toggleable: false,
+            action: () => {
+              this.eventSvc.$broadcast(button)
+            },
+          }
         case 'tree-add-tag':
           return {
             id: button,
-            icon: 'fa-tag',
+            icon: 'fa-solid fa-tag fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -224,7 +251,7 @@ export class ButtonBarService {
         case 'tree-add-branch':
           return {
             id: button,
-            icon: 'fa-plus',
+            icon: 'fa-solid fa-plus fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -238,7 +265,7 @@ export class ButtonBarService {
         case 'tree-delete':
           return {
             id: button,
-            icon: 'fa-trash',
+            icon: 'fa-solid fa-trash fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -252,7 +279,7 @@ export class ButtonBarService {
         case 'tree-delete-view':
           return {
             id: button,
-            icon: 'fa-trash',
+            icon: 'fa-solid fa-trash fa-2x',
             selected: true,
             active: true,
             permission: false,
@@ -266,7 +293,7 @@ export class ButtonBarService {
         case 'tree-reorder-view':
           return {
             id: button,
-            icon: 'fa-arrows-v',
+            icon: 'fa-solid fa-arrows-v fa-2x',
             selected: true,
             active: true,
             permission: false,
@@ -280,7 +307,7 @@ export class ButtonBarService {
         case 'tree-reorder-group':
           return {
             id: button,
-            icon: 'fa-arrows-v',
+            icon: 'fa-solid fa-arrows-v fa-2x',
             selected: true,
             active: true,
             permission: false,
@@ -294,14 +321,14 @@ export class ButtonBarService {
         case 'tree-full-document':
           return {
             id: button,
-            icon: 'fa-file-text-o',
+            icon: 'fa-regular fa-file-text fa-2x',
             selected: true,
             active: true,
             permission: true,
             tooltip: 'Full Document',
             spinner: false,
             toggleable: true,
-            toggle_icon: 'fa-file-text',
+            toggle_icon: 'fa-solid fa-file-text fa-2x',
             toggle_tooltip: 'View Mode',
             action: () => {
               this.eventSvc.$broadcast(button)
@@ -310,7 +337,7 @@ export class ButtonBarService {
         case 'view-mode-dropdown':
           return {
             id: button,
-            icon: 'fa-filter',
+            icon: 'fa-solid fa-filter fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -398,14 +425,14 @@ export class ButtonBarService {
         case 'show-edits':
           return {
             id: button,
-            icon: 'fa-pencil-square-o',
+            icon: 'fa-regular fa-pen-to-square fa-2x',
             selected: true,
             active: true,
             permission: true,
             tooltip: 'Enable Edits (alt + d)',
             spinner: false,
             toggleable: true,
-            toggle_icon: 'fa-pencil-square',
+            toggle_icon: 'fa-solid fa-pen-to-square fa-2x',
             toggle_tooltip: 'Disable Edits (alt + d)',
             action: () => {
               this.eventSvc.$broadcast(button)
@@ -414,14 +441,14 @@ export class ButtonBarService {
         case 'show-elements':
           return {
             id: button,
-            icon: 'fa-codepen',
+            icon: 'fa-brands fa-codepen fa-2x',
             selected: true,
             active: true,
             permission: true,
             tooltip: 'Show Elements (alt + e)',
             spinner: false,
             toggleable: true,
-            toggle_icon: 'fa-cube',
+            toggle_icon: 'fa-solid fa-cube fa-2x',
             toggle_tooltip: 'Hide Elements (alt + e)',
             action: () => {
               this.eventSvc.$broadcast(button)
@@ -430,14 +457,14 @@ export class ButtonBarService {
         case 'show-comments':
           return {
             id: button,
-            icon: 'fa-comment-o',
+            icon: 'fa-regular fa-comment fa-2x',
             selected: true,
             active: true,
             permission: true,
             tooltip: 'Show Comments (alt + c)',
             spinner: false,
             toggleable: true,
-            toggle_icon: 'fa-comment',
+            toggle_icon: 'fa-solid fa-comment fa-2x',
             toggle_tooltip: 'Hide Comments (alt + c)',
             action: () => {
               this.eventSvc.$broadcast(button)
@@ -446,7 +473,7 @@ export class ButtonBarService {
         case 'refresh-numbering':
           return {
             id: button,
-            icon: 'fa-sort-numeric-asc',
+            icon: 'fa-solid fa-sort-numeric-asc fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -460,7 +487,7 @@ export class ButtonBarService {
         case 'share-url':
           return {
             id: button,
-            icon: 'fa-share-alt',
+            icon: 'fa-solid fa-share-alt fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -474,7 +501,7 @@ export class ButtonBarService {
         case 'center-previous':
           return {
             id: button,
-            icon: 'fa-chevron-left',
+            icon: 'fa-solid fa-chevron-left fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -488,7 +515,7 @@ export class ButtonBarService {
         case 'center-next':
           return {
             id: button,
-            icon: 'fa-chevron-right',
+            icon: 'fa-solid fa-chevron-right fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -502,7 +529,7 @@ export class ButtonBarService {
         case 'export':
           return {
             id: button,
-            icon: 'fa-download',
+            icon: 'fa-solid fa-download fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -521,7 +548,7 @@ export class ButtonBarService {
         case 'print':
           return {
             id: button,
-            icon: 'fa-print',
+            icon: 'fa-solid fa-print fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -535,7 +562,7 @@ export class ButtonBarService {
         case 'convert-pdf':
           return {
             id: button,
-            icon: 'fa-file-pdf-o',
+            icon: 'fa-regular fa-file-pdf fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -549,7 +576,7 @@ export class ButtonBarService {
         case 'word':
           return {
             id: button,
-            icon: 'fa-file-word-o',
+            icon: 'fa-regular fa-file-word fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -563,7 +590,7 @@ export class ButtonBarService {
         case 'tabletocsv':
           return {
             id: button,
-            icon: 'fa-table',
+            icon: 'fa-solid fa-table fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -580,7 +607,7 @@ export class ButtonBarService {
         case 'presentation-element-delete':
           return {
             id: button,
-            icon: 'fa-trash',
+            icon: 'fa-solid fa-trash fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -595,7 +622,7 @@ export class ButtonBarService {
         case 'presentation-element-save':
           return {
             id: button,
-            icon: 'fa-save',
+            icon: 'fa-solid fa-save fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -610,7 +637,7 @@ export class ButtonBarService {
         case 'presentation-element-saveC':
           return {
             id: button,
-            icon: 'fa-send-o',
+            icon: 'fa-regular fa-paper-plane fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -625,7 +652,7 @@ export class ButtonBarService {
         case 'presentation-element-cancel':
           return {
             id: button,
-            icon: 'fa-times',
+            icon: 'fa-solid fa-times fa-2x',
             selected: true,
             active: true,
             permission: true,
@@ -640,7 +667,7 @@ export class ButtonBarService {
         case 'presentation-element-preview':
           return {
             id: button,
-            icon: 'fa-file-powerpoint-o',
+            icon: 'fa-regular fa-file-powerpoint fa-2x',
             selected: true,
             active: true,
             permission: true,

@@ -1,9 +1,11 @@
 import angular from "angular";
 import $ from "jquery";
 import moment from "moment";
-import {CacheService, UtilsService, ViewService} from "@ve-utils/services";
-import {veExt} from "../../ve-extensions/ve-extensions.module";
+import {CacheService, ViewService} from "@ve-utils/mms-api-client";
+import {UtilsService} from "@ve-utils/core-services";
 import {ElementObject} from "@ve-types/mms";
+
+import {veCore} from "@ve-core";
 
 export interface MentionScope extends angular.IScope {
     mmsEditor?: any;
@@ -301,4 +303,4 @@ export class MentionService {
     }
 }
 
-veExt.service('MentionService', MentionService);
+veCore.service('MentionService', MentionService);

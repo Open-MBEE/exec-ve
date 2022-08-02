@@ -4,21 +4,23 @@ import {PresentationComponentOptions} from "@ve-ext/presentations";
 import {veExt} from "@ve-ext";
 
 
-let ViewTableTComponent: PresentationComponentOptions = {
+let PresentTableTComponent: PresentationComponentOptions = {
     selector: 'presentTableT',
-    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.viewData.source}}"></mms-cf>
+    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,
     bindings: {
-        viewData: '<',
-        viewPe: '<'
+       peObject: '<',
+        element: '<',
+        peNumber: '<'
     },
-    controller: class ViewTableTController implements angular.IComponentController {
+    controller: class PresentTableTController implements angular.IComponentController {
 
-        public viewData
-        public viewPe
+        public peObject
+        public element
+        public peNumber
 
         constructor() {}
     }
 }
 
-veExt.component(ViewTableTComponent.selector,ViewTableTComponent);
+veExt.component(PresentTableTComponent.selector,PresentTableTComponent);

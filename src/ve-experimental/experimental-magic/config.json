@@ -2,7 +2,7 @@
     "specTools": [
         {
             "name": "Spec Magic Test",
-            "path": "extension-magic",
+            "path": "experimental-magic",
             "button": {
                 "id": "spec-magic",
                 "category": "global",

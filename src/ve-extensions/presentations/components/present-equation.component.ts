@@ -2,21 +2,23 @@ import * as angular from "angular";
 import {PresentationComponentOptions} from "@ve-ext/presentations";
 import {veExt} from "@ve-ext";
 
-let ViewEquationComponent: PresentationComponentOptions = {
+let PresentEquationComponent: PresentationComponentOptions = {
     selector: 'presentEquation',
-    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.viewData.source}}"></mms-cf>
+    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,
     bindings: {
-        viewData: '<',
-        viewPe: '<'
+       peObject: '<',
+        element: '<',
+        peNumber: '<'
     },
-    controller: class ViewEquationController implements angular.IComponentController {
+    controller: class PresentEquationController implements angular.IComponentController {
 
-        public viewData
-        public viewPe
+        public peObject
+        public element
+        public peNumber
 
         constructor() {}
     }
 }
 
-veExt.component(ViewEquationComponent.selector,ViewEquationComponent);
+veExt.component(PresentEquationComponent.selector,PresentEquationComponent);

@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import {MentionService} from "@ve-core/editor";
-import {CoreUtilsService} from "@ve-core/utilities";
+import {CoreUtilsService} from "@ve-core/core";
 import {veCore} from "@ve-core";
 
 

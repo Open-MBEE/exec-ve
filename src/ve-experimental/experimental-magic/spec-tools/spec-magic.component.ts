@@ -6,12 +6,14 @@ import {ExtUtilService} from "@ve-ext";
 import {
     AuthService,
     ElementService,
-    EventService,
     PermissionsService,
     URLService,
-    UtilsService,
     ViewService
-} from "@ve-utils/services";
+} from "@ve-utils/mms-api-client"
+import {
+    EventService,
+    UtilsService
+} from "@ve-utils/core-services";
 
 import _ from "lodash";
 
@@ -25,8 +27,8 @@ class SpecMagicController extends SpecTool implements ISpecTool {
                 eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService) {
         super($scope,$element,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
         this.specType = _.kebabCase(SpecMagicComponent.selector)
-        this.specTitle = "Edit Element";
-        this.specKind = 'document'
+        this.specTitle = "Magic Element";
+        this.specKind = 'global'
     }
 }
 

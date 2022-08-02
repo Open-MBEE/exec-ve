@@ -85,7 +85,7 @@ view:not(.editing):not(.outline) {
   }
 }
 
-mms-view:not(.reviewing) transclude-com {
+view:not(.reviewing) transclude-com {
   display: none;
 }
 
@@ -108,6 +108,8 @@ transclude-name:hover .input-group > .input-group-addon.transclude-name-label{
   visibility: 1;
   opacity: 1;
 }
+
+add-item-modal {}
 
 /*------------------------------------------------------------------
 Element not found styling
@@ -173,7 +175,7 @@ transclude-img img {
 .pe-type-Equation,
 .pe-type-Comment{
   &::before{
-    font-family: $icon-font-name;
+    font-family: "FontAwesome", $icon-font-name !important;
     padding-right: 4px;
   }
 }

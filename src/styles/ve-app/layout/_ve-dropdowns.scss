@@ -311,7 +311,6 @@
     padding: 5px 8px;
     height: 34px;
     line-height: 18px;
-    margin-top: 6px;
   }
 
   .dropdown-menu {
@@ -321,11 +320,19 @@
 
   .label-dropdown {
     color: $ve-white-text-lighter-2;
-    font-size: 15px;
+    font-size: 16px;
     display: block;
+    margin-bottom: 5px;
   }
 
+  .select-toolbar {
+    display: flex;
+  }
+
+
+
 }
+
 
 
 /*------------------------------------------------------------------

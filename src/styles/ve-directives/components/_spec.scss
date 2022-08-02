@@ -168,7 +168,7 @@ Styles that apply to both the spec
   }
 
   /*File icon for documents and views*/
-  .elem-related-docs-wrapper mms-view-link a::before {
+  .elem-related-docs-wrapper view-link a::before {
     content: "\f15b";
     font-family: $icon-font-name;
     padding: 0 4px 0 0;

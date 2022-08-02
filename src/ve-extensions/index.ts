@@ -8,11 +8,9 @@ import "@ve-utils"
 
 //Module Main
 import "./ve-extensions.module"
-import "./Extension.service";
-export * from "./Extension.service";
 
-import "./ExtUtil.service"
-export * from "./ExtUtil.service"
+import "./core"
+export * from "./core";
 
 import "./transclusions"
 import "./presentations"
@@ -20,7 +18,7 @@ import "./spec-tools"
 
 export * from "./ve-extensions.module"
 
-
+import "../ve-experimental"
 
 
 export default 've-ext';

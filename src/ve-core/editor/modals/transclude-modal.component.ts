@@ -1,25 +1,44 @@
 import * as angular from 'angular';
 import * as _ from 'lodash';
-import {VeComponentOptions, VeSearchOptions} from "@ve-types/view-editor";
-import {ApplicationService, ElementService, UtilsService, ViewService} from "@ve-utils/services";
+import {
+    VeModalComponent,
+    VeModalController,
+    VeModalResolve,
+    VeModalResolveFn,
+    VeSearchOptions
+} from "@ve-types/view-editor";
+import {ElementService, ViewService} from "@ve-utils/mms-api-client";
+import {ApplicationService, UtilsService} from "@ve-utils/core-services";
 import {VeEditorController} from "../ve-editor.component";
-import {ElementObject, ViewObject} from "@ve-types/mms";
+import {ElementObject, QueryObject, ViewObject} from "@ve-types/mms";
+import {Class} from "@ve-utils/utils";
+
+import {veCore} from "@ve-core";
+import {SchemaService} from "@ve-utils/model-schema";
+import {VeModalControllerImpl} from "@ve-utils/modals/ve-modal.controller";
 
 
-import {veExt} from "../../../ve-extensions/ve-extensions.module";
-import {Class} from "../../../ve-utils/utils/emf.util";
+export interface TranscludeModalResolve extends VeModalResolve {
+    editor: VeEditorController
+    viewLink: boolean
+}
+
+export interface TranscludeModalResolveFn extends VeModalResolveFn {
+    editor(): VeEditorController
+    viewLink(): boolean
+}
 
 // Component for inserting cross reference
 // Defines scope variables for html template and how to handle user click
 // Also defines options for search interfaces -- see mmsSearch.js for more info
-let TranscludeModalComponent: VeComponentOptions = {
+let TranscludeModalComponent: VeModalComponent = {
     selector: 'transcludeModal',
     template: `
     <div class="modal-header">
     <h4>{{$ctrl.title}}</h4>
 </div>
 <div class="modal-body">
-    <div class="ve-light-tabs modal-top-tabs" ng-show="$ctrl.viewLink">
+    <div class="ve-light-tabs modal-top-tabs" ng-show="!$ctrl.viewLink">
         <ul class="nav nav-tabs">
             <li class="uib-tab nav-item tab-item" ng-class="{'active': !$ctrl.searchExisting}">
                 <a class="nav-link" ng-click="$ctrl.searchExisting = false"><i class="fa fa-plus"></i>Create New</a>
@@ -35,7 +54,7 @@ let TranscludeModalComponent: VeComponentOptions = {
         <div class="transclude-modal-instructions">
             {{$ctrl.description}}
         </div>
-        <div class="form-group" ng-show="!$ctrl.viewLink"><br>
+        <div class="form-group" ng-show="$ctrl.viewLink"><br>
             <label>Link Text:</label>
             <div class="radio radio-with-label">
                 <label><input type="radio" ng-model="$ctrl.linkType" ng-value="1">&nbsp;Auto-Numbering
@@ -63,7 +82,7 @@ let TranscludeModalComponent: VeComponentOptions = {
             </div>
             <div class="form-group">
                 <label class="label-documentation">Documentation</label>
-                <ve-editor editor-data="$ctrl.newE.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></ve-editor>
+                <ve-editor ng-model="$ctrl.newE.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></ve-editor>
             </div>
             <label>Property to cross-reference</label><span class="star-mandatory">*</span>
             <div class="radio radio-with-label">
@@ -81,17 +100,13 @@ let TranscludeModalComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        close: "<",
-        dismiss: "<",
         modalInstance: "<",
         resolve: "<"
     },
-    controller: class TranscludeModalController implements angular.IComponentController {
+    controller: class TranscludeModalController extends VeModalControllerImpl implements VeModalController {
 
         //bindings
-        private dismiss
-        close
-        resolve
+        public resolve: TranscludeModalResolve
 
         private editor: VeEditorController
 
@@ -109,25 +124,29 @@ let TranscludeModalComponent: VeComponentOptions = {
         protected linkText: string;
 
         // Set search result options
-        protected searchOptions: VeSearchOptions
+        protected searchOptions: VeSearchOptions = {
+            closeable: false
+        }
 
 
-        static $inject = ['growl', 'ElementService', 'ViewService', 'ApplicationService',  'UtilsService']
+        static $inject = ['growl', 'ElementService', 'SchemaService', 'ViewService', 'ApplicationService', 'UtilsService']
         private mmsProjectId: string;
         private mmsRefId: string;
+        private schema = 'cameo';
 
 
         constructor(private growl: angular.growl.IGrowlService, private elementSvc: ElementService,
-                    private viewSvc: ViewService, private applicationSvc: ApplicationService,
+                    private schemaSvc: SchemaService, private viewSvc: ViewService, private applicationSvc: ApplicationService,
                     private utilsSvc: UtilsService) {
+            super();
         }
 
         $onInit() {
-            this.editor = this.resolve.editor();
+            this.editor = this.resolve.editor;
             this.mmsProjectId = this.editor.mmsProjectId;
             this.mmsRefId = this.editor.mmsRefId;
             this.searchOptions.callback = this.choose;
-            this.viewLink = this.resolve.viewLink();
+            this.viewLink = this.resolve.viewLink;
 
             if (!this.viewLink) {
                 this.searchOptions.getProperties = true
@@ -176,11 +195,11 @@ let TranscludeModalComponent: VeComponentOptions = {
                 tag = this.createViewLink(elem, did, vid, peid);
             }
 
-            this.close({$value: tag});
+            this.modalInstance.close({$value: tag});
         };
 
         public cancel = () => {
-            this.dismiss();
+            this.modalInstance.dismiss();
         };
 
         public makeNewAndChoose = () => {
@@ -236,7 +255,7 @@ let TranscludeModalComponent: VeComponentOptions = {
         };
 
         private createViewLink = (elem, did, vid, peid) => {
-        var tag = '<mms-view-link';
+        var tag = '<view-link';
         if (did) {
             tag += ' mms-doc-id="' + did + '"';
         }
@@ -261,7 +280,7 @@ let TranscludeModalComponent: VeComponentOptions = {
             tag += ' suppress-numbering="false"';
             tag += ' show-name="true"';
         }
-        tag += '>[cf:' + elem.name + '.vlink]</mms-view-link>';
+        tag += '>[cf:' + elem.name + '.vlink]</view-link>';
         return tag;
     };
 
@@ -275,36 +294,29 @@ let TranscludeModalComponent: VeComponentOptions = {
             peid = elem.id;
         }
         var tag = this.createViewLink(elem, did, vid, peid);
-        this.close({ $value: tag });
+        this.modalInstance.close({ $value: tag });
     };
 
-    private mainSearchFilter = () => {
-            var stereoQuery = {
-                terms: {}
-            };
-            stereoQuery.terms = {"_appliedStereotypeIds": [this.utilsSvc.VIEW_SID, this.utilsSvc.DOCUMENT_SID].concat(this.utilsSvc.OTHER_VIEW_SID)};
+    private mainSearchFilter = (): {_appliedStereotypeIds?: string[], classifierIds?: string[]} => {
+        let filter: {_appliedStereotypeIds?: string[], classifierIds?: string[]} = {};
+        filter._appliedStereotypeIds = [
+            this.schemaSvc.get('VIEW_SID', this.schema),
+            this.schemaSvc.get('DOCUMENT_SID', this.schema),
+            ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema)
+        ];
+        var allClassifierIds = this.schemaSvc.get('TYPE_TO_CLASSIFIER_ID', this.schema);
+        var classifierList = [];
 
-            var classifierList = [];
-            var allClassifierIds = this.viewSvc.TYPE_TO_CLASSIFIER_ID;
-            for (var k in allClassifierIds) {
-                if (allClassifierIds.hasOwnProperty(k)) {
-                    classifierList.push(allClassifierIds[k]);
-                }
+        for (var k in allClassifierIds) {
+            if (allClassifierIds.hasOwnProperty(k)) {
+                filter.classifierIds.push(allClassifierIds[k]);
             }
-            var classifierIdQuery = {
-                terms: {}
-            };
-            classifierIdQuery.terms = {"classifierIds": classifierList};
-            return {
-                "bool": {
-                    "should": [
-                        stereoQuery,
-                        classifierIdQuery
-                    ]
-                }
-            };
-        };
+        }
+
+
+        return filter
     }
 }
+}
 
-veExt.component(TranscludeModalComponent.selector, TranscludeModalComponent);
+veCore.component(TranscludeModalComponent.selector, TranscludeModalComponent);

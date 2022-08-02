@@ -1,35 +1,59 @@
 import * as angular from 'angular';
 
-export interface ElementObject extends Object {
+export interface MmsObject extends Object {
+
+}
+
+export interface ElementObject extends MmsObject {
     id: string
     _projectId: string
     _refId: string
     _commitId?: string
     _modified?: Date
     type?: string
-    value?: any
-
     defaultValue?: any
-    specification?: ElementObject
-    operand?: ElementObject[]
     documentation?: string
     name?: string
     [key: string]: any
+}
+
+export interface InstanceObject extends ElementObject {
+    specification?: ElementObject
+    operand?: InstanceObject[]
+    value?: any
 }
 
 
 export interface ViewObject extends ElementObject {
     _relatedDocuments?: ViewObject[]
     _parentViews?: ViewObject[]
-    _contents?: any
+    _contents?: InstanceObject
     _childViews?: ViewObject[]
+}
+
+export interface PresentationInstanceObject extends MmsObject {
+    source?: string
+    sourceProperty?: string
+    sourceType?: string
+    type: string
+    nonEditable?: boolean
+    text?: string
+    excludeFromList?: boolean
+    config?: any
+    ptype?: string
+    showIfEmpty?: boolean
+    body?: any[]
+}
+
+export interface PresentationObject extends InstanceObject {
+    value: PresentationInstanceObject
 }
 
 export interface DocumentObject extends ViewObject {
     _groupId?: string
 }
 
-export interface CommitObject extends Object {
+export interface CommitObject extends MmsObject {
     deleted?: CommitChangeElement[],
     _creator? : string,
     added?: CommitChangeElement[],
@@ -43,7 +67,7 @@ export interface CommitObject extends Object {
     _projectId: string
 }
 
-export interface CommitChangeElement extends Object {
+export interface CommitChangeElement extends MmsObject {
     _previousDocId: string,
     _docId: string,
     id: string,
@@ -51,7 +75,7 @@ export interface CommitChangeElement extends Object {
 
 }
 
-export interface OrgObject extends Object {
+export interface OrgObject extends MmsObject {
     public: boolean,
     created: string,
     name: string,
@@ -59,7 +83,7 @@ export interface OrgObject extends Object {
     id: string
 }
 
-export interface ProjectObject extends Object {
+export interface ProjectObject extends MmsObject {
     mounts?: string,
     schema?: string,
     _creator?: string,
@@ -72,7 +96,7 @@ export interface ProjectObject extends Object {
     _refId?: string
 }
 
-export interface RefObject extends Object {
+export interface RefObject extends MmsObject {
     parentRefId: string,
     deleted?: boolean,
     _docId?: string,
@@ -89,7 +113,7 @@ export interface RefObject extends Object {
 
 export interface PropertySpec {options?: ElementObject[], isEnumeration?: boolean, isSlot?: boolean}
 
-interface RequestObject extends Object {
+interface RequestObject extends MmsObject {
     projectId: string
     refId: string
     orgId?: string
@@ -106,7 +130,7 @@ export interface ElementCreationRequest extends ElementsRequest {
     elements: ElementObject[]
 }
 
-export interface QueryObject extends Object {
+export interface QueryObject extends MmsObject {
     params?: {
         [key: string]: string | object
     },
@@ -117,7 +141,7 @@ export interface QueryObject extends Object {
     size?: number
 }
 
-export interface QueryParams extends Object {
+export interface QueryParams extends MmsObject {
     showDeleted?: boolean,
 }
 
@@ -131,7 +155,13 @@ export interface CheckAuthResponse {
 
 interface BasicResponse extends angular.IHttpResponse<any> {
     messages: any[]
-    rejected: any[]
+    rejected: RejectedObject[]
+}
+
+interface RejectedObject {
+    code: number,
+    message: string
+    object: ElementObject
 }
 
 export interface ElementsResponse extends BasicResponse {

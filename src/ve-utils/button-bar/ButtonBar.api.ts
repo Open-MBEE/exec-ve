@@ -1,14 +1,13 @@
-import {IButtonBarButton} from "@ve-utils/button-bar";
+import {buttonInitFn, IButtonBarButton} from "@ve-utils/button-bar";
 
 export class ButtonBarApi {
 
-    public buttons: IButtonBarButton[]
-    public id
+    public buttons: IButtonBarButton[] = []
 
-    constructor(id) {
-        this.id = id;
-        this.buttons = [];
+    constructor(public id, public init: buttonInitFn) {
     }
+
+
 
     getId() {
         return this.id;
@@ -16,6 +15,11 @@ export class ButtonBarApi {
 
     getButtons() {
         return this.buttons;
+    }
+
+    resetButtons() {
+        this.buttons = [];
+        this.init(this);
     }
 
     select(parentButton, childButton) {
@@ -107,11 +111,11 @@ export class ButtonBarApi {
         });
     };
 
-    toggleButtonState(id) {
+    toggleButtonState(id: string, state?: boolean) {
         this.buttons.forEach((button) => {
             if (button.id === id) {
                 if (button.toggleable) {
-                    button.toggle_state = !button.toggle_state;
+                    button.toggle_state = (state != null) ? state : !button.toggle_state;
                     if (button.toggle_state && button.toggle_icon && button.toggle_tooltip) {
                         button.icon = button.toggle_icon;
                         button.tooltip = button.toggle_tooltip;

@@ -1,22 +1,22 @@
 import * as angular from "angular";
 import * as _ from "lodash";
-import {SpecService} from "../services/Spec.service";
-import {ReorderService, ElementReferences} from "../services/Reorder.service";
-import {
+import {SpecService} from "@ve-ext/spec-tools";
+import {ReorderService, ElementReferences} from "../services/Reorder.service";import {
     AuthService,
-    ElementService,
-    EventService,
     PermissionsService,
     URLService,
-    UtilsService,
+    ElementService,
     ViewService
-} from "@ve-utils/services";
-import {handleChange} from "../../../ve-utils/utils/change.util";
+} from "@ve-utils/mms-api-client"
+import {
+    EventService,
+    UtilsService
+} from "@ve-utils/core-services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {ElementObject} from "@ve-types/mms";
 import {SpecTool, ISpecTool} from "@ve-ext/spec-tools";
 import {veExt, ExtUtilService} from "@ve-ext";
-import {ToolbarService} from "../services/Toolbar.service";
+import {ToolbarService} from "@ve-ext/spec-tools";
 
 //veExt.directive('mmsSpecReorder', ['ElementService', 'ViewService', 'PermissionsService', '$templateCache', 'growl', '$q', mmsSpecReorder]);
 

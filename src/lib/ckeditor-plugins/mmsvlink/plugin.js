@@ -13,7 +13,7 @@ CKEDITOR.plugins.add('mmsvlink', {
     // and insert mmsvlink tag as widget.
     editor.widgets.add('mmsvlink', {
       button: 'Insert Cross Reference as link',
-      allowedContent: 'mms-view-link[*];',
+      allowedContent: 'view-link[*];',
       inline: true,
       insert: function () {
         var defaultConfig = {
@@ -27,8 +27,8 @@ CKEDITOR.plugins.add('mmsvlink', {
       // Check the elements that need to be converted to widgets.
       upcast: function (element) {
         // Return "true" (that element needs to converted to a mmsvlink widget)
-        // for all <mms-view-link> elements.
-        return element.name == 'mms-view-link';
+        // for all <view-link> elements.
+        return element.name == 'view-link';
       },
     });
 

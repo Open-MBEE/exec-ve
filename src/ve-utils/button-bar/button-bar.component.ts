@@ -25,7 +25,7 @@ let ButtonBarComponent: VeComponentOptions = {
       <li>
           <a ng-repeat="dropdown_button in button.dropdown_buttons | filter: {permission: true}" type="button"
               class="center {{dropdown_button.id}} {{ button.id === 'view-mode-dropdown' && dropdown_button.selected ? 'checked-list-item' : ''}}" ng-click="dropdown_button.action($event); mmsBbApi.select(button, dropdown_button)"><i
-              class="fa {{dropdown_button.icon}}"> </i>&nbsp;{{dropdown_button.tooltip}}</a>
+              class="{{dropdown_button.icon}}"> </i>&nbsp;{{dropdown_button.tooltip}}</a>
       </li>
     </ul>
   </span>

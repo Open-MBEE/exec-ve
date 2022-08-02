@@ -28,7 +28,7 @@ tr {
 }
 
 /*Overriding default from ng-pane-scroller that results in double scroll bar*/
-.center-view .center-view{
+.content-pane .content-pane{
   overflow: hidden;
 }
 
@@ -43,8 +43,9 @@ tr {
 
   .pane-center-spinner {
     position: absolute;
-    top: 45%;
-    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .pane-center-toolbar {
@@ -64,6 +65,7 @@ tr {
 
   .pane-center-inner {
     margin-top: 10px;
+    padding-block-end: 40px;
   }
 }
 

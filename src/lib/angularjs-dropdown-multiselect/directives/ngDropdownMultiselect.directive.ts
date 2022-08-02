@@ -173,7 +173,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
             }
 
             if ($scope.singleSelection) {
-                if (angular.isArray($scope.selectedModel) && $scope.selectedModel.length === 0) {
+                if (Array.isArray($scope.selectedModel) && $scope.selectedModel.length === 0) {
                     clearObject($scope.selectedModel);
                 }
             }
@@ -213,7 +213,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                     if ($scope.settings.smartButtonMaxItems > 0) {
                         var itemsText: any[] = [];
 
-                        angular.forEach($scope.options, function (optionItem) {
+                        $scope.options.forEach(function (optionItem) {
                             if ($scope.isChecked($scope.getPropertyForObject(optionItem, $scope.settings.idProp))) {
                                 var displayText = $scope.getPropertyForObject(optionItem, $scope.settings.displayProp);
                                 var converterResponse = $scope.settings.smartButtonTextConverter(displayText, optionItem);
@@ -260,7 +260,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 $scope.deselectAll(false);
                 $scope.externalEvents.onSelectAll();
 
-                angular.forEach($scope.options, function (value) {
+                $scope.options.forEach(function (value) {
                     $scope.setSelectedItem(value[$scope.settings.idProp], true);
                 });
             };

@@ -162,9 +162,9 @@ $btn-default-border:             $ve-silver-base;
 // $btn-success-bg:                 $brand-success
 // $btn-success-border:             darken($btn-success-bg, 5%)
 
-// $btn-info-color:                 #fff
-// $btn-info-bg:                    $brand-info
-// $btn-info-border:                darken($btn-info-bg, 5%)
+ $btn-info-color:                 $ve-light-text;
+ $btn-info-bg:                    $ve-slate-base;
+ $btn-info-border:                darken($btn-info-bg, 5%);
 
 // $btn-warning-color:              #fff
 // $btn-warning-bg:                 $brand-warning

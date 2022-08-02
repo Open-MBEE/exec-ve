@@ -7,7 +7,9 @@ import "./ve-utils.module"
 import "./third-party"
 
 import "./utils"
-import "./services"
+import "./model-schema"
+import "./core-services"
+import "./mms-api-client"
 import "./button-bar"
 import "./components"
 

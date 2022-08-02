@@ -29,8 +29,8 @@ CKEDITOR.plugins.add('mmscf', {
       upcast: function (element) {
         // Return "true" (that element needs to converted to a mmscf widget)
         // for all <mms-transclude-doc> elements.
-        return (element.name == 'mms-transclude-doc') || (element.name == 'mms-transclude-val') ||
-          (element.name == 'mms-transclude-name') || (element.name == 'mms-cf');
+        return new RegExp(`(mms-)?transclude-[a-z]*`).test(element.name) ||
+            (element.name === 'mms-cf') || (element.name === 'transclusion')
       },
     });
 

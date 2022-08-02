@@ -5,7 +5,8 @@ import ITreeNode = AngularUITree.ITreeNode;
 export interface TreeBranch extends ITreeNode {
     label: string
     type: string
-    data: ElementObject
+    group?: ElementObject
+    data: ViewObject
     children: TreeBranch[]
     level?: number
     new?: string

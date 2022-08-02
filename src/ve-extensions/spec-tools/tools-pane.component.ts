@@ -4,17 +4,20 @@ import Rx from 'rx-lite';
 
 
 import {veExt, ExtUtilService} from "@ve-ext";
+
 import {
     AuthService,
-    EditService,
     ElementService,
-    EventService,
     ProjectService,
+    ViewService,
+    PermissionsService
+} from "@ve-utils/mms-api-client"
+import {
+    EditService,
+    EventService,
     RootScopeService
-} from "@ve-utils/services";
-import {ViewService} from "@ve-utils/services";
-import {PermissionsService} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
+} from "@ve-utils/core-services";
+import {VeComponentOptions, VeModalService} from "@ve-types/view-editor";
 import {ExtensionService} from "@ve-ext";
 import {SpecApi, SpecService} from "./services/Spec.service";
 import {ISpecToolButton, ToolbarService} from "./services/Toolbar.service";
@@ -134,7 +137,7 @@ class ToolsPaneController implements angular.IComponentController {
 
 
     constructor(private $compile: angular.ICompileService, private $scope, private $element: JQuery,
-                private $uibModal: angular.ui.bootstrap.IModalService,
+                private $uibModal: VeModalService,
                 private $q: angular.IQService, private $timeout: angular.ITimeoutService,
                 private hotkeys: angular.hotkeys.HotkeysProvider, private growl: angular.growl.IGrowlService,
                 private elementSvc: ElementService, private projectSvc: ProjectService, private extUtilSvc: ExtUtilService,
@@ -229,7 +232,7 @@ class ToolsPaneController implements angular.IComponentController {
                             continueEdit: false
                         };
                         this.eventSvc.$broadcast('element.updated', data);
-                        this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {id: 'spec-inspector'});
+                        this.eventSvc.$broadcast('spec-inspector',{id: 'spec-inspector'});
                         this.specSvc.setEditing(false);
                     });
                     this.growl.success("Save All Successful");
@@ -273,7 +276,7 @@ class ToolsPaneController implements angular.IComponentController {
                     this.specApi.commitId = 'latest';
                 } else {
                     this.specSvc.setEditing(false);
-                    this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {id: 'spec-inspector'});
+                    this.eventSvc.$broadcast('spec-inspector',{id: 'spec-inspector'});
                     this.eventSvc.$broadcast(this.toolbarSvc.constants.SETICON, {
                         id: 'spec-editor',
                         value: 'fa-edit'
@@ -304,17 +307,25 @@ class ToolsPaneController implements angular.IComponentController {
         }
     }
 
-    private changeTool = (data: {id: string, category: string, title?: string}) => {
+    private changeTool = (data: {id: string, category?: string, title?: string}) => {
         if (!this.currentTool) {
             this.currentTool = ''
         }
         if (this.currentTool !== data.id) {
+
             this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {id: data.id});
             if (this.currentTool !== "") {
                 this.show[_.camelCase(this.currentTool)] = false
             }
             this.currentTool = data.id
-            this.currentTitle = (data.title) ? data.title : data.id;
+            const inspect: ISpecToolButton = this.toolbarSvc.getToolbarButton(data.id);
+            if (!data.title ) {
+                data.title = inspect.tooltip;
+            }
+            if (!data.category) {
+                data.category = inspect.category;
+            }
+            this.currentTitle = data.title
             if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
                 this.startTool(data.id, data.category)
                 this.show[_.camelCase(data.id)] = true

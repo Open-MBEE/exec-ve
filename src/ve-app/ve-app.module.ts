@@ -22,15 +22,17 @@ import uiRouter, {
 } from "@uirouter/angularjs";
 import {
     AuthService,
-    EventService,
-    ProjectService,
-    RootScopeService,
     URLService,
-    URLServiceProvider
-} from "@ve-utils/services";
-import {ResolveService} from "./services/Resolve.service";
+    URLServiceProvider,
+    ProjectService
+} from "@ve-utils/mms-api-client"
+import {
+    EventService,
+    RootScopeService,
+} from "@ve-utils/core-services";
+import {ResolveService} from "@ve-app/main/services";
 import {ViewObject} from "@ve-types/mms";
-import ngPane from 'angular-pane-layout';
+import ngPane from '@openmbee/pane-layout';
 
 export let veApp = angular.module('ve-app', ['ve-utils', 've-core', 've-ext', 'ui.bootstrap', uiRouter, ngPane, 'ui.tree', 'angular-growl', 'angular-flatpickr', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngAnimate', 'ngCookies', 'ngPromiseExtras', 'ngSanitize', 'ngStorage']);
 
@@ -155,20 +157,27 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
         })
         .state('main.project', { //TODO this will be the ui to diff and merge and manage refs
             url: '/projects/:projectId',
+            abstract: true,
             params: {
                 projectId: {
                     type: 'path'
                 }
-            }
-        })
-        .state('main.project.ref', { // equivalent to old sites and documents page
-            url: '/:refId?search',
+            },
             resolve: {
                 params: ['$transition$', function ($transition$): {[paramName: string]: any } {
                     return $transition$.params();
                 }],
+                token: ['ResolveService', function(resolveSvc: ResolveService) {
+                    return resolveSvc.getToken();
+                }],
+                bannerOb: ['ResolveService', function(resolveSvc: ResolveService) {
+                    return resolveSvc.getBanner();
+                }],
                 projectOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params: {[paramName: string]: any }) => {
-                    return resolveSvc.getProjectMounts(params);
+                    return resolveSvc.getProject(params);
+                }],
+                projectObs: ['ProjectService', 'projectOb', (projectSvc: ProjectService, projectOb) => {
+                    return projectSvc.getProjects(projectOb.orgId);
                 }],
                 orgOb: ['ResolveService', 'projectOb', function (resolveSvc: ResolveService, projectOb) {
                     return resolveSvc.getOrg(projectOb);
@@ -176,13 +185,109 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 orgObs: ['ResolveService', function (resolveSvc: ResolveService) {
                     return resolveSvc.getOrgs();
                 }],
-                projectObs: ['ProjectService', 'projectOb', (projectSvc: ProjectService, projectOb) => {
-                    return projectSvc.getProjects(projectOb.orgId);
+                refObs: ['ResolveService', 'params', function(resolveSvc: ResolveService, params) {
+                    return resolveSvc.getRefs(params);
                 }],
-                refOb: ['ProjectService', '$transition$', (projectSvc: ProjectService, $transition$: Transition) => {
-                    let params = $transition$.params();
-                    return projectSvc.getRef(params.refId, params.projectId);
+                tagObs: ['refObs', function(refObs) {
+                    var ret = [];
+                    for (var i = 0; i < refObs.length; i++) {
+                        if (refObs[i].type === "Tag")
+                            ret.push(refObs[i]);
+                    }
+                    return ret;
                 }],
+                branchObs: ['refObs', function(refObs) {
+                    var ret = [];
+                    for (var i = 0; i < refObs.length; i++) {
+                        if (refObs[i].type === "Branch")
+                            ret.push(refObs[i]);
+                    }
+                    return ret;
+                }],
+                // refOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
+                //     return resolveSvc.getRef(params);
+                // }],
+                // tagOb: ['refOb', 'ResolveService', (refOb, resolveSvc: ResolveService) => {
+                //     return resolveSvc.getTag(refOb);
+                // }],
+                // branchOb: ['refOb', 'ResolveService', (refOb, resolveSvc: ResolveService) => {
+                //     return resolveSvc.getBranch(refOb);
+                // }],
+                documentOb: () => {
+                    return null;
+                },
+                viewOb: () => {
+                    return null;
+                }
+            },
+            views: {
+                'banner@main': {
+                    component: 'veSystemBanner'
+                },
+                'nav@main': {
+                    component: 'veNav',
+                    bindings: {
+                        mmsOrg: 'orgOb',
+                        mmsOrgs: 'orgObs',
+                        mmsProject: 'projectOb',
+                        mmsProjects: 'projectObs',
+                        mmsRef: 'refOb',
+                    }
+                },
+                'menu@main': {
+                    component: 'veMenu',
+                    bindings: {
+                        mmsProject: 'projectOb',
+                        mmsProjects: 'projectObs',
+                        mmsGroup: 'groupOb',
+                        mmsGroups: 'groupObs',
+                        mmsBranch: 'branchOb',
+                        mmsRef: 'refOb',
+                        mmsTag: 'tagOb',
+                        mmsDocument: 'documentOb',
+                        mmsView: 'viewOb'
+                    }
+                }
+            }
+        })
+        .state('main.project.refs', {
+            url: '/refs',
+            views: {
+                'pane-center@main': {
+                    component: 'refs',
+                    bindings: {
+                        mmsOrg: 'orgOb',
+                        mmsProject: 'projectOb',
+                        mmsRef: 'refOb',
+                        mmsRefs: 'refObs',
+                        mmsTags: 'tagObs',
+                        mmsBranches: 'branchObs',
+                    }
+                }
+            }
+
+        })
+        .state('main.project.ref', { // equivalent to old sites and documents page
+            url: '/:refId',
+            resolve: {
+                params: ['$transition$', function ($transition$): {[paramName: string]: any } {
+                    return $transition$.params();
+                }],
+                // projectOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params: {[paramName: string]: any }) => {
+                //     return resolveSvc.getProjectMounts(params);
+                // }],
+                // orgOb: ['ResolveService', 'projectOb', function (resolveSvc: ResolveService, projectOb) {
+                //     return resolveSvc.getOrg(projectOb);
+                // }],
+                // orgObs: ['ResolveService', function (resolveSvc: ResolveService) {
+                //     return resolveSvc.getOrgs();
+                // }],
+                // projectObs: ['ProjectService', 'projectOb', (projectSvc: ProjectService, projectOb) => {
+                //     return projectSvc.getProjects(projectOb.orgId);
+                // }],
+                refOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
+                        return resolveSvc.getRef(params);
+                    }],
                 tagOb: ['refOb', 'ResolveService', (refOb, resolveSvc: ResolveService) => {
                     return resolveSvc.getTag(refOb);
                 }],
@@ -192,17 +297,14 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 groupOb: () => {
                     return null;
                 },
-                groupObs: ['ResolveService', '$transition$', (resolveSvc: ResolveService, $transition$: Transition) => {
-                    return resolveSvc.getGroups($transition$)
+                groupObs: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
+                    return resolveSvc.getGroups(params)
                 }],
-                documentOb: ['$transition$', 'refOb', 'projectOb', 'ResolveService', ($transition$, refOb, projectOb, resolveSvc) => {
-                    return resolveSvc.getDocument($transition$, refOb, projectOb);
+                documentOb: ['params', 'refOb', 'projectOb', 'ResolveService', (params, refOb, projectOb, resolveSvc: ResolveService) => {
+                    return resolveSvc.getDocument(params, refOb, projectOb);
                 }],
                 viewOb: ['documentOb', (documentOb) => {
                     return documentOb;
-                }],
-                search: ['ResolveService', '$transition$', (resolveSvc: ResolveService, $transition$: Transition) => {
-                    return resolveSvc.getSearch($transition$)
                 }],
                 bannerOb: ['ResolveService', (resolveSvc: ResolveService) => {
                     return resolveSvc.getBanner();
@@ -256,8 +358,9 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                         docMeta: 'docMeta'
                     },
                 },
+
                 'pane-center@main': {
-                    component: 'singleView'
+                    component: 'slideshow'
                 },
                 'pane-right@main': {
                     component: 'rightPane'
@@ -270,11 +373,18 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 }
             }
         })
+        .state('main.project.ref.portal', {
+            url: '/portal',
+            views: {
+                'pane-center@main': {
+                    component: 'slideshow'
+                }
+            }
+        })
         .state('main.project.ref.groupReorder', {
             url: '/group-reorder',
             resolve: {
-                documentObs: ['ViewService', '$transition$', 'token', function (ViewService, $transition$) {
-                    let params = $transition$.params();
+                documentObs: ['ViewService', 'params', 'token', function (ViewService, params) {
                     return ViewService.getProjectDocuments({
                         projectId: params.projectId,
                         refId: params.refId
@@ -297,48 +407,20 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 params: ['$transition$', function ($transition$): {[paramName: string]: any } {
                     return $transition$.params();
                 }],
-                projectOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params: {[paramName: string]: any }) => {
-                    return resolveSvc.getProjectMounts(params);
-                }],
                 documentOb: ['ResolveService', 'params', 'refOb', (resolveSvc: ResolveService, params: {[paramName: string]: any }, refOb) => {
                     return resolveSvc.getDocumentPreview(params, refOb)
                 }],
                 viewOb: ['documentOb', (documentOb) => {
                     return documentOb;
                 }],
-                groupOb: ['groupObs', 'documentOb', (groupObs, documentOb) => {
-                    var group = null;
-                    if (documentOb) {
-                        for (var i = 0; i < groupObs.length; i++) {
-                            if (groupObs[i].id == documentOb._groupId) {
-                                group = groupObs[i];
-                                break;
-                            }
-                        }
-                    }
-                    return group;
-                }]
+                groupOb: ['groupObs', 'documentOb', 'ResolveService', function (groupObs, documentOb, resolveSvc: ResolveService) {
+                    resolveSvc.getGroup(groupObs,documentOb);
+
+                }],
             },
             views: {
-                'menu@main': {
-                    component: 'veMenu',
-                    bindings: {
-                        mmsProject: 'projectOb',
-                        mmsProjects: 'projectObs',
-                        mmsGroup: 'groupOb',
-                        mmsGroups: 'groupObs',
-                        mmsBranch: 'branchOb',
-                        mmsRef: 'refOb',
-                        mmsTag: 'tagOb',
-                        mmsDocument: 'documentOb',
-                        mmsView: 'viewOb'
-                    }
-                },
                 'pane-center@main': {
-                    component: 'singleView'
-                },
-                'pane-right@main': {
-                    component: 'rightPane'
+                    component: 'slideshow'
                 }
             }
         })
@@ -354,17 +436,9 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 viewOb: ['documentOb', function (documentOb: ViewObject) {
                     return documentOb;
                 }],
-                groupOb: ['groupObs', 'documentOb', function (groupObs, documentOb) {
-                    var group = null;
-                    if (documentOb) {
-                        for (var i = 0; i < groupObs.length; i++) {
-                            if (groupObs[i].id == documentOb._groupId) {
-                                group = groupObs[i];
-                                break;
-                            }
-                        }
-                    }
-                    return group;
+                groupOb: ['groupObs', 'documentOb', 'ResolveService', function (groupObs, documentOb, resolveSvc: ResolveService) {
+                    resolveSvc.getGroup(groupObs,documentOb);
+
                 }],
                 docMeta: ['ViewService', 'documentOb', function (ViewService, documentOb) {
                     return ViewService.getDocMetadata({
@@ -402,7 +476,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     },
                 },
                 'pane-center@main': {
-                    component: 'singleView'
+                    component: 'slideshow'
                 },
                 'pane-right@main': {
                     component: 'rightPane'
@@ -418,25 +492,16 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 params: ['$transition$', function ($transition$): {[paramName: string]: any } {
                     return $transition$.params();
                 }],
-                viewOb: ['ResolveService', '$transition$', (resolveSvc: ResolveService, $transition$) => {
-                    let params = $transition$.params();
+                viewOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
                     return resolveSvc.getView(params).then((response) => {
                         let viewOb = response;
                         return viewOb;
                     });
                 }],
-                groupOb: ['groupObs', 'documentOb', function (groupObs, documentOb) {
-                    var group = null;
-                    if (documentOb) {
-                        for (var i = 0; i < groupObs.length; i++) {
-                            if (groupObs[i].id == documentOb._groupId) {
-                                group = groupObs[i];
-                                break;
-                            }
-                        }
-                    }
-                    return group;
-                }]
+                groupOb: ['groupObs', 'documentOb', 'ResolveService', function (groupObs, documentOb, resolveSvc: ResolveService) {
+                    resolveSvc.getGroup(groupObs,documentOb);
+
+                }],
             },
             views: {
                 'menu@main': {
@@ -455,7 +520,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     }
                 },
                 'pane-center@main': {
-                    component: 'singleView'
+                    component: 'slideshow'
                 },
             }
         })
@@ -463,8 +528,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
             url: '/order',
             views: {
                 'pane-center@main': {
-                    templateUrl: 'partials/ve-utils/reorder-views.html',
-                    controller: 'ReorderCtrl'
+                    component: 'reorderDocument'
                 }
             }
         })
@@ -472,8 +536,32 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
             url: '/full',
             views: {
                 'pane-center@main': {
-                    component: 'fullDocument'
+                    component: 'document'
                 }
+            }
+        })
+        .state('main.project.ref.search', {
+            url: '/search?search&field',
+            params: {
+                search: {
+                    dynamic: true
+                },
+                field: {
+                    dynamic: true
+                }
+            },
+            resolve: {
+                field: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
+                    return resolveSvc.getField(params)
+                }],
+                search: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
+                    return resolveSvc.getSearch(params)
+                }],
+            },
+            views: {
+                'pane-center@main': {
+                    component: 'search'
+                },
             }
         });
 
@@ -568,6 +656,9 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
             if (transition.$to().name === 'main') {
                 deferred.resolve($state.target('main.login.select'));
             }
+            if (transition.$to().name === 'main.project.ref') {
+                deferred.resolve($state.target('main.project.ref.portal'));
+            }
             deferred.resolve();
         }, () => {
             $http.pendingRequests.forEach(function (pendingReq) {
@@ -577,7 +668,7 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
             });
             if (transition.$to().name !== 'main') {
                 rootScopeSvc.veRedirect({toState: transition.to(), toParams: transition.params()})
-                deferred.resolve($state.target('main.login', {next: transition.to().name}));
+                deferred.resolve($state.target('main.login', {next: transition.to().url}));
             }else {
                 deferred.resolve($state.target('main.login'));
             }
@@ -641,3 +732,5 @@ veApp.run(['$uiRouter', '$trace', function($uiRouter, $trace) {
    //var pluginInstance = $uiRouter.plugin(Visualizer);
    $trace.enable('TRANSITION');
 }])
+
+veApp.constant(' ', window.__env)

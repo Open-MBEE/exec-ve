@@ -56,6 +56,9 @@ private ([a-zA-Z]{0,20}) ?:? ?([a-zA-Z$]*)
 (   )([a-zA-Z]{2,50})(\([A-Za-z:=>\(\), \$\?]*\))(: [A-Za-z]*)? \{
 $1 public $2 = $3$4 => {
 
+For refactoring
+((import \{)(, )?(.*)(\} from "@ve-utils/mms-api-client")(;)?\n)?((import \{)(.*), ?(AuthService|CacheService|ElementService|HttpService|PermissionsService|ProjectService|URLService|ViewService)(\n)?(, )?(.*)?(, )?(\} from "@ve-utils/core-services"))
+import \{$4, $10\} from "@ve-utils/mms-api-client";\n$8$9$11$12$14
 
 
 myStr

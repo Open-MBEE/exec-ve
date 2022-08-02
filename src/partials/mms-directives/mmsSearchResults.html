@@ -19,7 +19,7 @@
             <span class="{{ getTypeClass(elem) }}"></span>
             <a class="elem-name" ng-click="userResultClick(elem, 'name')">{{elem.name}}</a>
             <a class="elem-name" ng-show="elem.type == 'Slot'" ng-click="userResultClick(elem, 'name')">
-                <mms-transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
+                <transclude-name mms-element-id="{{elem.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></transclude-name>
             </a>
         </div>
         <div class="elem-qualified-name-wrapper">
@@ -28,10 +28,10 @@
             </div>
         </div>
         <div ng-if="elem.type === 'Diagram' && elem._artifacts">
-            <mms-transclude-img ng-click="userResultClick(elem, 'img')" mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></mms-transclude-img>
+            <transclude-img ng-click="userResultClick(elem, 'img')" mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></transclude-img>
         </div>
         <div ng-if="elem.type !== 'Diagram' && elem._artifacts">
-            <mms-transclude-art mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></mms-transclude-art>
+            <transclude-art mms-element-id="{{elem.id}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}"></transclude-art>
         </div>
         <div class="elem-documentation-wrapper">
             <label>Documentation</label>
@@ -78,7 +78,7 @@
             <table>
                 <tr ng-repeat="property in elem._properties | limitTo : limitForProps">
                     <td>
-                        {{property.name}}<span ng-if="property.type === 'Slot'"><mms-transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name></span>: 
+                        {{property.name}}<span ng-if="property.type === 'Slot'"><transclude-name mms-element-id="{{property.definingFeatureId}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></transclude-name></span>:
                     </td>
                     <td>
                         <a ng-click="userResultClick(property, 'val')">{{property.defaultValue.value | limitTo:300}}
@@ -128,7 +128,7 @@
                 <span class="elem-type">{{elem.type}}</span>
                 <span ng-if="elem._appliedStereotypeIds.length">
                     <span ng-repeat="type in elem._appliedStereotypeIds">
-                        <mms-transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></mms-transclude-name>
+                        <transclude-name class="elem-type" mms-element-id="{{type}}" mms-project-id="{{elem._projectId}}" mms-ref-id="{{elem._refId}}" no-click="true"></transclude-name>
                     </span>
                 </span>
             </div>

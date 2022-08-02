@@ -48,7 +48,7 @@ tools-navbar {
 			vertical-align:middle;
 		}
 		.fa-edit-asterisk:after {
-			content:"\f069";
+			content:"\2a";
 			color: $red;
 			position:absolute;
 			left:0;
@@ -60,7 +60,7 @@ tools-navbar {
 			font-size: 12px;
 		}
 
-		.fa-save, .fa-send-o {
+		.fa-save, .fa-paper-plane {
 			color: $brand_base;
 		}
 

@@ -83,12 +83,4 @@ export const veCore = angular.module('ve-core', ['ve-utils', 'ui.bootstrap', 'an
     uiTreeFilterSettingsProvider.addresses = ['label'];
     uiTreeFilterSettingsProvider.descendantCollection = 'children';
 }])
-.filter('veRealNum', function() {
-    return function(n) {
-        if (Number.isInteger(n)) {
-            return n + '.0';
-        }
-        return n;
-    };
-})
 .constant('CKEDITOR', window.CKEDITOR)

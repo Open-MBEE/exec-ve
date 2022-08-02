@@ -4,14 +4,16 @@ import Rx from 'rx-lite';
 
 import {
     AuthService,
-    ElementService, eventHandlerFn,
-    EventService,
-    MathJaxService,
+    ElementService,
     PermissionsService,
     URLService,
-    UtilsService,
     ViewService
-} from "@ve-utils/services";
+} from "@ve-utils/mms-api-client"
+import {
+    EventService,
+    MathJaxService,
+    UtilsService
+} from "@ve-utils/core-services";
 import {ISpecToolButton, ToolbarService} from "./services/Toolbar.service";
 import {ElementObject, ElementsRequest} from "@ve-types/mms";
 import {VeEditorApi} from "@ve-core/editor";
@@ -19,7 +21,7 @@ import {onChangesCallback} from "@ve-utils/utils";
 import {veExt, ExtUtilService, ExtensionController} from "@ve-ext";
 import {SpecApi, SpecService} from "./services/Spec.service";
 import {ToolbarApi} from "./services/Toolbar.api";
-import {IPaneScope} from "angular-pane-layout";
+import {IPaneScope} from "@openmbee/pane-layout";
 
 export interface ISpecTool extends angular.IComponentController, ExtensionController {
     $scope: ISpecToolScope
@@ -48,8 +50,8 @@ export interface ISpecToolScope extends IPaneScope {
 
 /**
  * @ngdoc component
- * @name veExt/TranscludeDocController
- * @type {ITransclusion}
+ * @name veExt/SpecTool
+ * @type {ISpecTool}
  *
  * @requires {angular.IScope} $scope
  * @requires {angular.ICompileService} $compile
@@ -72,7 +74,7 @@ export interface ISpecToolScope extends IPaneScope {
  *
  * ## Example
  *  <pre>
- <mms-transclude-doc mms-element-id="element_id"></mms-transclude-doc>
+ <transclude-doc mms-element-id="element_id"></transclude-doc>
  </pre>
  *
  * @param {string} mmsElementId The id of the view
@@ -169,6 +171,8 @@ export class SpecTool implements ISpecTool {
         }));
         this.subs.push(this.eventSvc.$on('spec.ready', this.changeElement))
         this.config();
+        this.subs.push(this.eventSvc.$on(this.specType, this.initCallback));
+        this.initCallback();
     }
 
     $onDestroy() {
@@ -176,8 +180,8 @@ export class SpecTool implements ISpecTool {
         this.destroy()
     }
 
-        /**
-     * @name veExt/SpecPaneControllerImpl#config
+    /**
+     * @name veExt/SpecTool#config
      *
      * @description
      *
@@ -186,14 +190,22 @@ export class SpecTool implements ISpecTool {
     protected config:() => void = () => {}
 
     /**
-     * @name veExt/SpecPaneControllerImpl#config
+     * @name veExt/SpecTool#initCallback
+     *
+     * @description
+     *
+     * @protected
+     */
+    protected initCallback: () => void = () => {};
+
+    /**
+     * @name veExt/SpecTool#destroy
      *
      * @description
      *
      * @protected
      */
     protected destroy:() => void = () => {}
-
 
     public changeElement = () => {
         this.specApi = this.specSvc.specApi;

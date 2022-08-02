@@ -2,17 +2,18 @@ import angular from 'angular';
 import * as _flatpickr from 'flatpickr';
 import { FlatpickrFn, Instance } from 'flatpickr/dist/types/instance';
 import { VeComponentOptions } from 'src/ve-utils/types/view-editor';
-const flatpickr: FlatpickrFn = _flatpickr as any;
+const flatpickr: FlatpickrFn = _flatpickr.default;
 
 var ngFlatpickrComponent: VeComponentOptions = {
     selector: 'ngFlatpickr',
-    template: '<ng-transclude>' +
-        '<input type="text" ng-if="!$ctrl.fpOpts.inline" ng-model="$ctrl.ngModel" placeholder="{{ $ctrl.fpOpts.placeholder }}"></input>' +
-        '<div ng-if="$ctrl.fpOpts.inline"></div>' +
-        '</ng-transclude>',
+    template: `
+    <ng-transclude>
+    <input type="text" ng-show="!$ctrl.fpOpts.inline" ng-model="$ctrl.inputDate" placeholder="{{ $ctrl.fpOpts.placeholder }}">
+    <div ng-show="$ctrl.fpOpts.inline"></div>
+</ng-transclude>
+`,
     transclude: true,
     bindings: {
-        ngModel: '<',
         fpOpts: '<',
         fpOnSetup: '&'
     },
@@ -20,10 +21,10 @@ var ngFlatpickrComponent: VeComponentOptions = {
         static $inject = ['$element', '$timeout', '$scope'];
 
         //Bindings
-        private
-            ngModel
-            fpOpts
-            fpOnSetup
+        private fpOpts
+        private fpOnSetup
+
+        private inputDate
 
         constructor(private $element: JQuery<HTMLElement>, private $timeout: angular.ITimeoutService,
                     private $scope: angular.IScope) {}
@@ -31,17 +32,18 @@ var ngFlatpickrComponent: VeComponentOptions = {
         $onInit()
         {
             this.fpOpts.placeholder = this.fpOpts.placeholder || 'Select Date..';
+        }
 
+        $postLink() {
             this.grabElementAndRunFlatpickr();
         }
-        ;
 
         $onChanges() {
             this.grabElementAndRunFlatpickr();
         };
 
-        grabElementAndRunFlatpickr() {
-            this.$timeout(function () {
+        grabElementAndRunFlatpickr = () => {
+            this.$timeout(() => {
                 var transcludeEl = this.$element.find('ng-transclude')[0];
                 var element = transcludeEl.children[0];
 
@@ -49,7 +51,7 @@ var ngFlatpickrComponent: VeComponentOptions = {
             }, 0, true);
         }
 
-        setDatepicker(element) {
+        setDatepicker = (element) => {
             var fpLib = flatpickr;
 
             if (!fpLib) {
@@ -65,17 +67,17 @@ var ngFlatpickrComponent: VeComponentOptions = {
             }
 
             // If has ngModel set the date
-            if (this.ngModel) {
-                fpInstance.setDate(this.ngModel);
+            if (this.inputDate) {
+                fpInstance.setDate(this.inputDate);
             }
 
             // destroy the flatpickr instance when the dom element is removed
-            angular.element(element).on('$destroy', function () {
+            angular.element(element).on('$destroy', () => {
                 fpInstance.destroy();
             });
 
             // Refresh the scope
-            this.$scope.$applyAsync();
+            //this.$scope.$applyAsync();
         }
     }
 }

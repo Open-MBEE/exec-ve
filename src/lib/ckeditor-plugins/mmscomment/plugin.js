@@ -13,7 +13,7 @@ CKEDITOR.plugins.add('mmscomment', {
     editor.widgets.add('mmscomment', {
       button: 'Insert Comment',
       inline: true,
-      allowedContent: 'mms-transclude-com[*];',
+      allowedContent: 'mms-transclude-com[*];transclude-com[*]',
       insert: function () {
         var defaultConfig = {
           callbackModalFnc: function () {

@@ -8,11 +8,20 @@ export const veExt = angular.module('ve-ext',['ve-utils', 'ui.bootstrap', 'angul
 
 // veExt.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.ISanitizeProvider) {
 //     $sanitizeProvider.addValidElements({
-//         htmlElements: ['mms-cf', 'mms-view-link', 'mms-transclude-doc', 'mms-transclude-val', 'mms-transclude-name', 'mms-transclude-view'],
+//         htmlElements: ['mms-cf', 'view-link', 'transclude-doc', 'transclude-val', 'transclude-name', 'transclude-view'],
 //     })
 //         .addValidAttrs(['mms-data', 'mms-cf-type', 'mms-element-id', 'mms-project-id', 'mms-ref-id',
 //             'mms-commit-id', 'mms-watch-id', 'non-editable', 'mms-generate-for-diff'])
 //         .enableSvg()
 // }])
-    veExt.constant('CKEDITOR', window.CKEDITOR)
-    .constant('veConfig', window.__env)
+    veExt
+        .filter('veRealNum', function() {
+            return function(n) {
+                if (Number.isInteger(n)) {
+                    return n + '.0';
+                }
+                return n;
+            };
+        })
+        .constant('CKEDITOR', window.CKEDITOR)
+        .constant('veConfig', window.__env)

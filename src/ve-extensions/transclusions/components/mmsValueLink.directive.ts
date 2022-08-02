@@ -63,7 +63,7 @@ function mmsValueLink(ElementService, $compile, growl) {
                 if (value && value.type === 'LiteralString')
                     scope.url = value.value;
             } else if (data.type === 'Slot') {
-                if (angular.isArray(data.value) && data.value.length > 0 && data.value[0].type === 'LiteralString') {
+                if (Array.isArray(data.value) && data.value.length > 0 && data.value[0].type === 'LiteralString') {
                     scope.url = data.value[0].value;
                 }
             } else {

@@ -1,29 +1,32 @@
 import * as angular from "angular";
 import {PresentationComponentOptions} from "@ve-ext/presentations";
 import {veExt} from "@ve-ext";
+import {InstanceObject, PresentationInstanceObject} from "@ve-types/mms";
 
-let ViewImageComponent: PresentationComponentOptions = {
+let PresentImageComponent: PresentationComponentOptions = {
     selector: 'presentImage',
     template: `
     <figure>
-    <mms-cf mms-cf-type="img" mms-element-id="{{$ctrl.viewData.id}}"></mms-cf>
+    <mms-cf mms-cf-type="img" mms-element-id="{{$ctrl.peObject.id}}"></mms-cf>
     <figcaption>
-        <span ng-if="!$ctrl.viewData.excludeFromList">Figure {{$ctrl.viewPe._veNumber}}. 
-        </span>{{$ctrl.viewData.title || $ctrl.viewPe.name}}
+        <span ng-if="!$ctrl.peObject.excludeFromList">Figure {{$ctrl.peNumber}}. 
+        </span>{{$ctrl.peObject.title || $ctrl.element.name}}
     </figcaption>
 </figure>
 `,
     bindings: {
-        viewData: '<',
-        viewPe: '<'
+       peObject: '<',
+        element: '<',
+        peNumber: '<'
     },
-    controller: class ViewImageController implements angular.IComponentController {
+    controller: class PresentImageController implements angular.IComponentController {
 
-        public viewData
-        public viewPe
+        public peObject: PresentationInstanceObject
+        public element: InstanceObject
+        public peNumber: string
 
         constructor() {}
     }
 }
 
-veExt.component(ViewImageComponent.selector,ViewImageComponent);
+veExt.component(PresentImageComponent.selector,PresentImageComponent);

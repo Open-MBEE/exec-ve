@@ -2,16 +2,14 @@ import * as angular from "angular";
 import _ from "lodash";
 
 import {veExt, ExtUtilService} from "@ve-ext";
-import {URLService} from "@ve-utils/services";
-import {AuthService, ElementService, EventService, UtilsService} from "@ve-utils/services";
-import {ViewService} from "@ve-utils/services";
-import {PermissionsService} from "@ve-utils/services";
-import {SpecService} from "../services/Spec.service";
+import {URLService, ViewService} from "@ve-utils/mms-api-client";
+import{AuthService, PermissionsService, ElementService} from "@ve-utils/mms-api-client";
+import {EventService, UtilsService} from "@ve-utils/core-services";
+import {SpecService} from "@ve-ext/spec-tools";
 import {VeComponentOptions} from "@ve-types/view-editor";
-import {ElementObject, ElementsRequest} from "@ve-types/mms";
 
 import {ISpecTool, SpecTool} from "../spec-tool.controller";
-import {ToolbarService} from "../services/Toolbar.service";
+import {ToolbarService} from "@ve-ext/spec-tools";
 
 
 /**
@@ -102,13 +100,11 @@ class SpecInspectorController extends SpecTool implements ISpecTool  {
             this.specKind = "document";
         }
 
-        protected config = () => {
-            this.subs.push(this.eventSvc.$on(this.specType, () => {
-                this.specSvc.setEditing(false);
-                this.specSvc.cleanUpSaveAll();
-            }));
-
+        protected initCallback = () => {
+            this.specSvc.setEditing(false);
+            this.specSvc.cleanUpSaveAll();
         }
+
     }
 
 let SpecInspectorComponent: VeComponentOptions = {
@@ -127,62 +123,54 @@ let SpecInspectorComponent: VeComponentOptions = {
 
         <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
             <h2 class="prop-title spec-view-value-heading">Property Value</h2>
-            <div ng-repeat="value in $ctrl.values" ng-switch on="value.type">
-                <span class="prop" ng-switch-when="LiteralInteger">{{value.value}}</span>
-                <span class="prop" ng-switch-when="LiteralBoolean">{{value.value}}</span>
-                <span class="prop" ng-switch-when="LiteralReal">{{value.value | veRealNum}}</span>
-                <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{value.value}}</span>
-                <span class="prop" ng-switch-when="LiteralString" ng-bind-html="value.value"></span>
-                <span class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.elementId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
-                <span class="prop" ng-switch-when="InstanceValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{value.instanceId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
-                <span class="prop" ng-switch-when="OpaqueExpression">{{value.body[0]}}</span>
-                <span class="prop" ng-switch-default>{{value}}</span>
-            </div>
+            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}" non-editable="true"></transclude-val>
+            
             <h2 class="prop-title spec-view-value-heading">Property Type</h2>
-            <span class="prop" ng-if="$ctrl.element.type === 'Property'"><mms-transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.typeId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.typeId)"></mms-transclude-name></span>
-            <span class="prop" ng-if="$ctrl.element.type === 'Slot'"><mms-transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.definingFeatureId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.definingFeatureId)"></mms-transclude-name></span>
+            <span class="prop" ng-if="$ctrl.element.type === 'Property'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.typeId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.typeId)"></transclude-name></span>
+            <span class="prop" ng-if="$ctrl.element.type === 'Slot'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.definingFeatureId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.definingFeatureId)"></transclude-name></span>
         </div>
 
         <div ng-if="$ctrl.element.type === 'Generalization' || $ctrl.element.type === 'Dependency'">
             <h2 class="prop-title">Source</h2>
-            <span class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._sourceIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._sourceIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
             <h2 class="prop-title">Target</h2>
-            <span class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._targetIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._targetIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
         </div>
 
         <div ng-if="$ctrl.element.type === 'Connector'">
             <h2 class="prop-title">Path 1</h2>
-            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[0]"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
+            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[0]"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
             <h2 class="prop-title">Path 2</h2>
-            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[1]"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
+            <span class="prop" ng-repeat="path in $ctrl.element._propertyPathIds[1]"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
         </div>
 
         <div ng-if="$ctrl.element.type === 'Association'">
             <h2 class="prop-title">Role 1</h2>
-            <span class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
             <h2 class="prop-title">Role 2</h2>
-            <span class="prop"><mms-transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[1]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
+            <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.memberEndIds[1]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
         </div>
 
         <div ng-if="$ctrl.element.type === 'Constraint'">
             <h2 class="prop-title">Constraint Specification</h2>
-            <div ng-switch on="$ctrl.values[0].type">
-                <span class="prop" ng-switch-when="LiteralInteger">{{$ctrl.values[0].value}}</span>
-                <span class="prop" ng-switch-when="LiteralBoolean">{{$ctrl.values[0].value}}</span>
-                <span class="prop" ng-switch-when="LiteralReal">{{$ctrl.values[0].value | veRealNum}}</span>
-                <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{$ctrl.values[0].value}}</span>
-                <span class="prop" ng-switch-when="LiteralString" ng-bind-html="$ctrl.values[0].value"></span>
-                <span class="prop" ng-switch-when="ElementValue"><mms-transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.values[0].elementId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
-                <span class="prop" ng-switch-when="OpaqueExpression">{{$ctrl.values[0].body[0]}}</span>
-                <span class="prop" ng-switch-default>{{$ctrl.values}}</span>
-            </div>
+<!--            <div ng-switch on="$ctrl.values[0].type">-->
+<!--                <span class="prop" ng-switch-when="LiteralInteger">{{$ctrl.values[0].value}}</span>-->
+<!--                <span class="prop" ng-switch-when="LiteralBoolean">{{$ctrl.values[0].value}}</span>-->
+<!--                <span class="prop" ng-switch-when="LiteralReal">{{$ctrl.values[0].value | veRealNum}}</span>-->
+<!--                <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{$ctrl.values[0].value}}</span>-->
+<!--                <span class="prop" ng-switch-when="LiteralString" ng-bind-html="$ctrl.values[0].value"></span>-->
+<!--                <span class="prop" ng-switch-when="ElementValue"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.values[0].elementId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>-->
+<!--                <span class="prop" ng-switch-when="OpaqueExpression">{{$ctrl.values[0].body[0]}}</span>-->
+<!--                <span class="prop" ng-switch-default>{{$ctrl.values}}</span>-->
+<!--            </div>-->
+            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}" non-editable="true" first="true"></transclude-val>
         </div>
 
         <div ng-if="$ctrl.element.type === 'Diagram' && $ctrl.element._artifacts">
-            <mms-transclude-img mms-element-id="{{$ctrl.element.id}}" mms-ref-id="{{$ctrl.element._refId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-commit-id="{{$ctrl.element._commitId}}"></mms-transclude-img>
+            <transclude-img mms-element-id="{{$ctrl.element.id}}" mms-ref-id="{{$ctrl.element._refId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-commit-id="{{$ctrl.element._commitId}}"></transclude-img>
         </div>
         <div ng-if="$ctrl.element.type === 'Artifact' && $ctrl.element._artifacts">
-            <mms-transclude-art mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-art-ext=""></mms-transclude-art>
+            <transclude-art mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-art-ext=""></transclude-art>
         </div>
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="$ctrl.showDocHTML = !$ctrl.showDocHTML"><i class="fa fa-code"></i></a></h2>
         <p ng-show="!$ctrl.showDocHTML" class="doc-text">
@@ -195,8 +183,8 @@ let SpecInspectorComponent: VeComponentOptions = {
             <span class="elem-related-docs-wrapper prop">
                 <div ng-repeat="relatedDocument in $ctrl.relatedDocuments">
                     <span ng-repeat="relatedView in relatedDocument._parentViews">
-                        <mms-view-link suppress-numbering="true" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedDocument.id}}" link-target="_blank" rel="noopener"></mms-view-link>
-                        > <mms-view-link suppress-numbering="true" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedView.id}}" link-target="_blank" rel="noopener"></mms-view-link><br/>
+                        <view-link suppress-numbering="true" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedDocument.id}}" link-target="_blank" rel="noopener"></view-link>
+                        > <view-link suppress-numbering="true" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedView.id}}" link-target="_blank" rel="noopener"></view-link><br/>
                     </span>
                 </div>
             </span>
@@ -207,23 +195,25 @@ let SpecInspectorComponent: VeComponentOptions = {
             <h2 class="prop-title">Metatypes</h2>
             <span class="elem-type-wrapper prop">
                 <span class="elem-type">{{$ctrl.element.type}}</span>
-                <div ng-repeat="type in $ctrl.element._appliedStereotypeIds" class="elem-type"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" no-click="true"></mms-transclude-name></div>
+                <div ng-repeat="type in $ctrl.element._appliedStereotypeIds" class="elem-type">
+                    <transclude-name mms-element-id="{{type}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" no-click="true"></transclude-name>
+                </div>
             </span>
 
             <div ng-if="$ctrl.element.type === 'InstanceSpecification'">
                 <h2 class="prop-title">Classifiers</h2>
-                <span class="prop" ng-repeat="path in element.classifierIds"><mms-transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-transclude-name></span>
+                <span class="prop" ng-repeat="path in element.classifierIds"><transclude-name mms-watch-id="true" mms-element-id="{{path}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
             </div>
 
             <h2 class="prop-title">Location</h2>
-            <span class="prop">{{$ctrl.qualifiedName}}</span>
+            <span class="prop">{{$ctrl.specApi.qualifiedName}}</span>
             <h2 class="prop-title">ID&nbsp;
-                <button ng-click="copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default" uib-tooltip="Copy ID">
+                <button ng-click="$ctrl.copyToClipboard($event, '#spec-element-id')" class="btn btn-sm btn-default" uib-tooltip="Copy ID">
                     <i class="fa fa-copy"></i>
                 </button>
             </h2>
             <span class="prop id" title="Copy ID">
-                <span id="spec-element-id" ng-click="copyToClipboard($event, '#spec-element-id')">{{$ctrl.element.id}}</span>
+                <span id="spec-element-id" ng-click="$ctrl.copyToClipboard($event, '#spec-element-id')">{{$ctrl.element.id}}</span>
             </span>
             <h2 class="prop-title">Branch/Tag</h2>
             <span class="prop">{{$ctrl.element._refId}}</span>

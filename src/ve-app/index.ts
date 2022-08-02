@@ -18,13 +18,10 @@ import 'angular-hotkeys';
 import '@uirouter/angularjs';
 import 'angular-sanitize';
 import 'angular-ui-tree';
-import 'angular-pane-layout';
+import '@openmbee/pane-layout';
 
 import 'angulartics';
 import 'angulartics-piwik';
-
-import 'c3';
-import 'd3';
 
 import 'moment';
 import 'ngstorage';
@@ -38,10 +35,14 @@ import "@ve-ext"
 import "@ve-utils"
 
 import "./ve-app.module";
-import "./services";
-import "./components";
-import "./navigation";
-import "./controllers";
+
+
+import "./main";
+
+import "./login";
+import "./pane-center";
+import "./pane-left"
+import "./pane-right"
 
 export * from "./ve-app.module"
 

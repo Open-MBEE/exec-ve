@@ -97,8 +97,8 @@ function mmsTsDiagram(ElementService, $templateCache, $window, $timeout, growl, 
     $window.onPerspectivesViewLoaded = function(projectID, moduleName, modelID, viewID, viewName) {
         console.log("The Perspectives view " + viewID + " is now on the DOM.");
     };
-    $window.onPerspectivesViewUpdated = function(projectID, moduleName, modelID, viewID, viewNamem, viewData) {
-        console.log("The Perspectives view" + viewID + " was udpdated with data " + viewData);
+    $window.onPerspectivesViewUpdated = function(projectID, moduleName, modelID, viewID, viewNamem, peObject) {
+        console.log("The Perspectives view" + viewID + " was udpdated with data " + peObject);
     };
     $window.onPerspectivesViewCanvasRendered = function(projectID, moduleName, modelID, viewID, viewName) {
         console.log("The Perspectives canvas for view" + viewID + " was rendered");

@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import {veExt} from "@ve-ext"
-import {EventService} from "@ve-utils/services";
+import {EventService} from "@ve-utils/core-services";
 import {ToolbarApi} from "./Toolbar.api";
 import {UIRouterGlobals} from "@uirouter/angularjs";
 import {ExtensionService} from "@ve-ext";
@@ -72,7 +72,6 @@ export class ToolbarService {
   private toolbars: {[key: string]: ToolbarApi} = {}
   private buttons: { [key: string]: ISpecToolButton } = {}
   private dynamic_buttons: { [key: string]: ISpecToolButton } = {}
-  private buttonCount: number;
 
   static $inject = ['EventService', 'veConfig']
   constructor(private eventSvc: EventService, private veConfig: VeConfig) {
@@ -82,13 +81,13 @@ export class ToolbarService {
     for (let button of default_dynamic_buttons) {
       this.dynamic_buttons[button.id] = new ToolButton(button.id, button);
     }
-     if (this.veConfig.extConfig && this.veConfig.extConfig.spec) {
-      for (let spec of this.veConfig.extConfig.spec) {
-        if (spec.button) {
-          this.buttons[spec.button.id] = new ToolButton(spec.button.id, spec.button)
-          }
-      if (spec.dynamic_button) {
-        for (let dynButton of spec.dynamic_button) {
+     if (this.veConfig.expConfig && this.veConfig.expConfig.specTools) {
+      for (let tool of this.veConfig.expConfig.specTools) {
+        if (tool.button) {
+          this.buttons[tool.button.id] = new ToolButton(tool.button.id, tool.button)
+        }
+      if (tool.dynamic_button) {
+        for (let dynButton of tool.dynamic_button) {
           this.dynamic_buttons[dynButton.id] = new ToolButton(dynButton.id, dynButton)
         }
       }

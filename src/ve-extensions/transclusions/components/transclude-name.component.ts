@@ -1,10 +1,20 @@
 import * as angular from 'angular'
 
-import {ElementService, UtilsService, ViewService, UxService, AuthService, EventService} from "@ve-utils/services"
+import {
+    ElementService,
+    ViewService,
+    AuthService
+} from "@ve-utils/mms-api-client"
+import {
+    UtilsService,
+    EventService
+} from "@ve-utils/core-services"
 import {VeComponentOptions} from '@ve-types/view-editor'
-import {veExt, ExtUtilService} from '@ve-ext'
+import {veExt, ExtUtilService, ExtensionService} from '@ve-ext'
 import {ITransclusion, Transclusion} from "@ve-ext/transclusions";
-import {MathJaxService} from "@ve-utils/services";
+import {MathJaxService} from "@ve-utils/core-services";
+import {ButtonBarService} from "@ve-utils/button-bar";
+import {SchemaService} from "@ve-utils/model-schema";
 
 /**
  * @ngdoc component
@@ -19,7 +29,7 @@ import {MathJaxService} from "@ve-utils/services";
  * @requires {ElementService} elementSvc
  * @requires {UtilsService} utilsSvc
  * @requires {ViewService} viewSvc
- * @requires {UxService} uxSvc
+
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
  * @requires {MathJaxService} mathJaxSvc
@@ -56,14 +66,15 @@ export class TranscludeNameController extends Transclusion implements ITransclus
         extUtilSvc: ExtUtilService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
-        viewSvc: ViewService,
-        uxSvc: UxService,
+        schemaSvc: SchemaService,
         authSvc: AuthService,
         eventSvc: EventService,
         mathJaxSvc: MathJaxService,
+        extensionSvc: ExtensionService,
+        buttonBarSvc: ButtonBarService
     ) {
-        super($q,$scope,$compile,$element,growl,extUtilSvc,elementSvc,utilsSvc,viewSvc,uxSvc,authSvc,eventSvc,
-            mathJaxSvc)
+        super($q,$scope,$compile,$element,growl,extUtilSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
+            mathJaxSvc, extensionSvc, buttonBarSvc)
         this.cfType = 'name'
         this.cfTitle = ''
         this.cfKind = 'Text'
@@ -112,7 +123,7 @@ export class TranscludeNameController extends Transclusion implements ITransclus
             };
 
             this.startEdit = () => {
-                this.extUtilSvc.startEdit(this, this.mmsViewCtrl, this.$element, TranscludeNameComponent.template, false);
+                this.extUtilSvc.startEdit(this, this.mmsViewCtrl.isEditable(), this.$element, TranscludeNameComponent.template, false);
             };
 
         }

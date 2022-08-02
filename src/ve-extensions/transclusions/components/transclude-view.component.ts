@@ -3,16 +3,19 @@ import * as angular from "angular";
 import {
     AuthService,
     ElementService,
+    ViewService
+} from "@ve-utils/mms-api-client"
+import {
+
     EventService,
     MathJaxService,
-    UtilsService,
-    UxService,
-    ViewService
-} from "@ve-utils/services";
+    UtilsService
+} from "@ve-utils/core-services";
 import {ButtonBarService} from "@ve-utils/button-bar";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {ITransclusion, Transclusion} from "@ve-ext/transclusions";
-import {veExt, ExtUtilService} from "@ve-ext";
+import {veExt, ExtUtilService, ExtensionService} from "@ve-ext";
+import {SchemaService} from "@ve-utils/model-schema";
 
 /**
  * @ngdoc component
@@ -27,7 +30,7 @@ import {veExt, ExtUtilService} from "@ve-ext";
  * @requires {ElementService} elementSvc
  * @requires {UtilsService} utilsSvc
  * @requires {ViewService} viewSvc
- * @requires {UxService} uxSvc
+
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
@@ -40,7 +43,7 @@ import {veExt, ExtUtilService} from "@ve-ext";
  *
  * ## Example
  *  <pre>
- <mms-transclude-view mms-element-id="element_id"></mms-transclude-view>
+ <transclude-view mms-element-id="element_id"></transclude-view>
  </pre>
  *
  * @param {string} mmsElementId The id of the view
@@ -52,8 +55,7 @@ import {veExt, ExtUtilService} from "@ve-ext";
  */
 export class TranscludeViewController extends Transclusion implements ITransclusion {
 
-    static $inject = ['$scope', '$compile', '$element', 'growl', 'ExtUtilService','ElementService', 'UtilsService',
-        'ViewService', 'UxService', 'AuthService', 'EventService', 'ButtonBarService', 'MathJaxService'];
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: angular.IQService,
@@ -64,14 +66,15 @@ export class TranscludeViewController extends Transclusion implements ITransclus
         extUtilSvc: ExtUtilService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
-        viewSvc: ViewService,
-        uxSvc: UxService,
+        schemaSvc: SchemaService,
         authSvc: AuthService,
         eventSvc: EventService,
         mathJaxSvc: MathJaxService,
+        extensionSvc: ExtensionService,
+        buttonBarSvc: ButtonBarService
     ) {
-        super($q,$scope,$compile,$element,growl,extUtilSvc,elementSvc,utilsSvc,viewSvc,uxSvc,authSvc,eventSvc,
-            mathJaxSvc)
+        super($q,$scope,$compile,$element,growl,extUtilSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
+            mathJaxSvc, extensionSvc, buttonBarSvc)
         this.cfType = 'view'
         this.cfTitle = 'View'
         this.cfKind = 'contents'

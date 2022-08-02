@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import {veExt} from "../../ve-extensions/ve-extensions.module";
+import {veCore} from "@ve-core";
 
 // Used to sync value between input from the ckeditor and the uib-typeahead directive
 let MMSMentionIntercept = {
@@ -46,4 +46,4 @@ let MMSMentionIntercept = {
     }
 }
 
-veExt.component(MMSMentionIntercept.selector, MMSMentionIntercept);
+veCore.component(MMSMentionIntercept.selector, MMSMentionIntercept);

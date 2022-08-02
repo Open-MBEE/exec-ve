@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import {EventService, RootScopeService} from "@ve-utils/services";
+import {EventService, RootScopeService} from "@ve-utils/core-services";
 import {ToolbarService} from "./services/Toolbar.service";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {ToolbarApi} from "./services/Toolbar.api";

@@ -16,10 +16,8 @@ import "../ve-utils"
 
 
 //VE Core
-import "./ve-core.module"
-import "./utilities";
-
-import "./view";
+import "./ve-core.module";
+import "./core";
 import "./tree";
 import "./editor";
 import "./search";

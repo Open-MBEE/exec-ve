@@ -1,22 +1,25 @@
 import * as angular from "angular";
 import {PresentationComponentOptions} from "@ve-ext/presentations";
 import {veExt} from "@ve-ext";
+import {InstanceObject, PresentationInstanceObject} from "@ve-types/mms";
 
-let ViewListTComponent: PresentationComponentOptions = {
+let PresentListTComponent: PresentationComponentOptions = {
     selector: 'presentListT',
-    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.viewData.source}}"></mms-cf>
+    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,
     bindings: {
-        viewData: '<',
-        viewPe: '<'
+       peObject: '<',
+        element: '<',
+        peNumber: '<'
     },
-    controller: class ViewListTController implements angular.IComponentController {
+    controller: class PresentListTController implements angular.IComponentController {
 
-        public viewData
-        public viewPe
+        public peObject: PresentationInstanceObject
+        public element: InstanceObject
+        public peNumber: string
 
         constructor() {}
     }
 }
 
-veExt.component(ViewListTComponent.selector,ViewListTComponent);
+veExt.component(PresentListTComponent.selector,PresentListTComponent);

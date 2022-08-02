@@ -2,16 +2,20 @@ import * as angular from 'angular'
 import {Injectable} from 'angular'
 import {
     AuthService,
-    EditService,
     ElementService,
+    PermissionsService,
+    URLService,
+    ViewService
+} from "@ve-utils/mms-api-client"
+import {
+    EditService,
     EventService,
-    PermissionsService, URLService,
-    UtilsService, ViewService
-} from "@ve-utils/services";
+    UtilsService
+} from "@ve-utils/core-services";
 import {ToolbarService} from "@ve-ext/spec-tools";
-import {ElementObject, ElementsRequest, PropertySpec, RequestObject} from "@ve-types/mms";
+import {ElementObject, ElementsRequest, PropertySpec} from "@ve-types/mms";
 import {VeEditorApi} from "@ve-core/editor";
-import {veExt, ExtUtilService, ExtensionController} from "@ve-ext";
+import {veExt, ExtUtilService} from "@ve-ext";
 
 export interface SpecApi extends ElementsRequest {
     elementId: string,
@@ -37,8 +41,8 @@ export class SpecService implements Injectable<any> {
     public specApi: SpecApi
 
     public tracker: {
-        etrackerSelected: any,
-    };
+        etrackerSelected?: any,
+    } = {};
 
     public editValues: any[] = [];
 
@@ -123,7 +127,7 @@ export class SpecService implements Injectable<any> {
         return this.edit;
     };
 
-    setEdits(edit: ElementObject) {
+    public setEdits(edit: ElementObject) {
         this.edit = edit;
     }
 
@@ -216,7 +220,7 @@ export class SpecService implements Injectable<any> {
                             if (!this.getKeepMode())
                                 this.setEditing(false);
                             this.setKeepMode(false);
-                            if (this.edit.type === 'Property' || this.edit.type === 'Port' || this.edit.type === 'Slot') {// angular.isArray(this.specSvc.edit.value)) {
+                            if (this.edit.type === 'Property' || this.edit.type === 'Port' || this.edit.type === 'Slot') {// Array.isArray(this.specSvc.edit.value)) {
                                 if (this.edit.defaultValue)
                                     this.setEditValues([this.edit.defaultValue]);
                                 else if (this.edit.value)

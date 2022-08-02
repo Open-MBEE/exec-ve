@@ -1,8 +1,8 @@
 import * as angular from "angular";
 import {VeComponentOptions} from "@ve-types/view-editor";
-import {ViewController} from "@ve-core/view";
 import {handleChange} from "@ve-utils/utils/change.util";
 import {ExtensionService, veExt} from "@ve-ext";
+import {ViewController} from "@ve-ext/presentations/view.component";
 
 
 /**
@@ -26,6 +26,7 @@ import {ExtensionService, veExt} from "@ve-ext";
  */
 
 export class TransclusionController implements angular.IComponentController {
+
     //Bindings
     mmsElementId: string;
     mmsProjectId: string;

@@ -1,14 +1,42 @@
 import * as angular from 'angular'
 import * as _ from 'lodash'
-import {VeComponentOptions} from '../../ve-utils/types/view-editor'
-import {CacheService} from "@ve-utils/services"
-import {ElementService} from "@ve-utils/services"
-import {ProjectService} from "@ve-utils/services"
-import {UtilsService} from "@ve-utils/services"
-import {ViewService} from "@ve-utils/services"
-import {ElementObject, ProjectObject, QueryObject, RequestObject, ViewObject,} from '../../ve-utils/types/mms'
+import {CacheService, ElementService, ProjectService, ViewService} from "@ve-utils/mms-api-client";
+import {RootScopeService, UtilsService} from "@ve-utils/core-services";
+
+import {VeComponentOptions, VeSearchOptions} from '@ve-types/view-editor'
+import {
+    ElementObject, ElementsRequest,
+    ElementsResponse,
+    ProjectObject,
+    QueryObject,
+    RequestObject,
+    SearchResponse,
+    ViewObject,
+} from '@ve-types/mms'
+
+import {veCore} from "@ve-core";
+import {SchemaService} from "@ve-utils/model-schema";
+import {StateService} from '@uirouter/angularjs';
 
 //veCore.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', 'growl', '$templateCache', '$timeout', mmsSearch]);
+
+
+export interface SearchQuery {
+    searchText: string
+    selectedSearchMetatypes: any[]
+    searchField: SearchField
+    from?: number,
+    size?: number
+}
+
+export interface AdvancedSearchQuery extends SearchQuery{
+    operator: string
+}
+
+export interface SearchField {
+    id: string,
+    label: string
+}
 
 /**
  * @ngdoc directive
@@ -23,33 +51,21 @@ import {ElementObject, ProjectObject, QueryObject, RequestObject, ViewObject,} f
  *
  */
 class SearchController implements angular.IComponentController {
-    private mmsOptions: {
-        getProperties: any
-        emptyDocTxt?: string
-        searchResult?: ElementObject[]
-        searchInput?: string
-        itemsPerPage: number
-        hideFilterOptions?: boolean
-        callback?(elem, property): void
-        relatedCallback?(doc, view, elem): void
-        filterCallback?(elements: ElementObject[]): ElementObject[]
-    }
+    private mmsOptions: VeSearchOptions
     private mmsProjectId: string
     private mmsRefId: string
+    private embedded: boolean
 
     //Search Results
     private metatypeSearch: string
-    protected searchResults: ElementObject[]
+    protected searchResults: ElementObject[] = []
     protected baseSearchResults: ElementObject[] = []
+    protected filteredSearchResults: ElementObject[] = []
     protected showFilterOptions: boolean
     protected searchLoading: boolean = false
-    protected mainSearch: {
-        searchText: string
-        selectedSearchMetatypes: any[]
-        searchType: { id: string; label: string }
-    } = {
+    protected mainSearch: SearchQuery = {
         searchText: '',
-        searchType: {
+        searchField: {
             id: 'all',
             label: 'All Fields',
         },
@@ -60,7 +76,7 @@ class SearchController implements angular.IComponentController {
     }
     private emptyDocTxt: string
     protected refId: string
-    // Search resulte settings
+    // Search result settings
     protected activeFilter: any[] = []
 
     // Pagination settings
@@ -68,20 +84,11 @@ class SearchController implements angular.IComponentController {
     protected paginationCache: { [key: number]: ElementObject[] } = {}
     private maxPages: number
     protected currentPage: number = 0
-    protected itemsPerPage: number = 100
-
+    protected itemsPerPage: number = 10
     // Advanced search settings
     protected advanceSearch: boolean = false
     protected advancedSearchResults: boolean
-    protected advanceSearchRows: {
-        operator: any
-        searchText: string
-        selectedSearchMetatypes: any[]
-        searchType: {
-            id: string
-            label: string
-        }
-    }[] = []
+    protected advanceSearchRows: AdvancedSearchQuery[] = []
     protected stringQuery = this.mainSearch.searchText
 
     // View property settings
@@ -90,7 +97,7 @@ class SearchController implements angular.IComponentController {
     protected limitForProps = 6
 
     // Set search options
-    public fieldTypeList: { id: string; label: string }[] = [
+    public fieldTypeList: SearchField[] = [
         {
             id: 'all',
             label: 'All Fields',
@@ -112,7 +119,7 @@ class SearchController implements angular.IComponentController {
             label: 'ID',
         },
         {
-            id: 'metatype',
+            id: 'type',
             label: 'Metatype',
         },
     ]
@@ -149,8 +156,16 @@ class SearchController implements angular.IComponentController {
         { display: 'Views', icon: 'pe-type-View', type: 'View' },
         { display: 'Requirements', icon: 'pe-type-Req', type: 'Requirement' },
     ]
+    private filterList: QueryObject[] = [];
+
+    private schema = 'cameo';
+
+    static $inject = ['$q', '$state', 'growl', '$timeout', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService',
+        'UtilsService', 'ViewService', 'SchemaService', 'RootScopeService']
 
     constructor(
+        private $q: angular.IQService,
+        private $state: StateService,
         private growl: angular.growl.IGrowlService,
         private $timeout: angular.ITimeoutService,
         private $anchorScroll: angular.IAnchorScrollService,
@@ -158,7 +173,9 @@ class SearchController implements angular.IComponentController {
         private elementSvc: ElementService,
         private projectSvc: ProjectService,
         private utilsSvc: UtilsService,
-        private viewSvc: ViewService
+        private viewSvc: ViewService,
+        private schemaSvc: SchemaService,
+        private rootScopeSvc: RootScopeService
     ) {}
 
     $onInit() {
@@ -197,6 +214,14 @@ class SearchController implements angular.IComponentController {
             this.searchResults = data1
             this.paginationCache[0] = data1
         }
+        if (this.mmsOptions.searchField) {
+            for (const field of this.fieldTypeList) {
+                if (this.mmsOptions.searchField === field.label || this.mmsOptions.searchField === field.id) {
+                    this.mainSearch.searchField = field;
+                    break;
+                }
+            }
+        }
         if (this.mmsOptions.searchInput) {
             this.mainSearch.searchText = this.mmsOptions.searchInput
             this.newSearch(this.mainSearch)
@@ -234,7 +259,7 @@ class SearchController implements angular.IComponentController {
                     .then((data: ElementObject[]) => {
                         var properties: ElementObject[] = []
                         //TODO might not be elements
-                        angular.forEach(data, (elt) => {
+                        data.forEach((elt) => {
                             if (
                                 elt.type === 'Property' &&
                                 elt.ownerId == elem.id
@@ -287,13 +312,10 @@ class SearchController implements angular.IComponentController {
     }
 
     public closeSearch = () => {
-        window.history.back()
+        this.$state.go('main.project.ref.portal', {search: null, field: null}, {reload: true})
     }
 
     public advancedSearchHandler = () => {
-        this.growl.error(
-            "Search Error: Advanced Search hasn't been implemented yet"
-        )
     }
 
     // Get metatypes for dropdown options
@@ -344,9 +366,9 @@ class SearchController implements angular.IComponentController {
 
     private _applyFilters = () => {
         if (!this.activeFilter.length) {
-            this.searchResults = this.baseSearchResults
+            this.filteredSearchResults = this.baseSearchResults
         } else {
-            this.searchResults = _.filter(this.baseSearchResults, (item) => {
+            this.filteredSearchResults = _.filter(this.baseSearchResults, (item) => {
                 return _.includes(
                     this.activeFilter,
                     this.viewSvc.getElementType(item)
@@ -372,8 +394,8 @@ class SearchController implements angular.IComponentController {
     public stringQueryUpdate = () => {
         var rowLength = this.advanceSearchRows.length
         this.stringQuery = Array(rowLength + 1).join('(')
-        this.stringQuery += this.mainSearch.searchType.label + ':'
-        if (this.mainSearch.searchType.id === 'metatype') {
+        this.stringQuery += this.mainSearch.searchField.label + ':'
+        if (this.mainSearch.searchField.id === 'metatype') {
             this.stringQuery += this.getMetatypeSelection(
                 '#searchMetatypeSelectAdvance'
             )
@@ -385,9 +407,9 @@ class SearchController implements angular.IComponentController {
                 ' ' +
                 this.advanceSearchRows[i].operator.toUpperCase() +
                 ' ' +
-                this.advanceSearchRows[i].searchType.label +
+                this.advanceSearchRows[i].searchField.label +
                 ':'
-            if (this.advanceSearchRows[i].searchType.id === 'metatype') {
+            if (this.advanceSearchRows[i].searchField.id === 'metatype') {
                 this.stringQuery +=
                     this.getMetatypeSelection('#searchMetatypeSelect-' + i) +
                     ')'
@@ -408,7 +430,7 @@ class SearchController implements angular.IComponentController {
     public addAdvanceSearchRow = () => {
         this.advanceSearchRows.push({
             operator: 'And',
-            searchType: {
+            searchField: {
                 id: 'all',
                 label: 'All Fields',
             },
@@ -425,7 +447,7 @@ class SearchController implements angular.IComponentController {
      * @description
      * Removes selected row and updates advanced search main query input
      *
-     * @param {objecy} row advanced search row
+     * @param {object} row advanced search row
      */
     public removeRowAdvanceSearch = (row) => {
         this.advanceSearchRows = _.without(this.advanceSearchRows, row)
@@ -466,6 +488,20 @@ class SearchController implements angular.IComponentController {
         }
     }
 
+    public goTo = (page: number) => {
+        if (this.paginationCache[page]) {
+            this.baseSearchResults = this.paginationCache[page]
+            this.currentPage = page
+            this._applyFilters()
+        } else {
+            this.search(
+                this.mainSearch,
+                page,
+                this.itemsPerPage
+            )
+        }
+    }
+
     /**
      * @ngdoc function
      * @name veCore.directive:mmsSearch#search
@@ -479,52 +515,73 @@ class SearchController implements angular.IComponentController {
      * @param {number} page page number of search results
      * @param {number} numItems number of items to return per page
      */
-    public search = (query: {}, page: number, numItems: number) => {
+    public search = (query: SearchQuery, page: number, numItems: number) => {
         this.searchLoading = true
-        var queryOb: QueryObject = this.buildQuery(query)
-        queryOb.from = page * numItems + page
-        queryOb.size = numItems
+        if (!this.embedded) {
+            this.$state.go('.',{search: query.searchText, field: query.searchField.id});
+        }
+        var queryObs: QueryObject[] = this.buildQuery(query)
+        // for (const queryOb of queryObs) {
+        //     queryOb.from = page * numItems + page
+        //     queryOb.size = numItems
+        // }
         var reqOb: RequestObject = {
             projectId: this.mmsProjectId,
             refId: this.refId,
         }
-        this.elementSvc
-            .search(reqOb, queryOb, 2)
-            .then(
-                (data) => {
-                    let elements = data.elements
-                    if (this.mmsOptions.filterCallback) {
-                        let results = this.mmsOptions.filterCallback(elements)
-                        if (results) {
-                            this.searchResults = results
-                        } else {
-                            this.searchResults = []
-                        }
-                    } else {
-                        this.searchResults = elements
-                    }
-                    this.baseSearchResults = this.searchResults
-                    this.combineRelatedViews(this)
-                    this.totalResults = data.total
-                    this.maxPages = Math.ceil(
-                        this.totalResults / this.itemsPerPage
-                    )
-                    this.currentPage = page
-                    this.paginationCache[page] = this.searchResults
-                    if (this.advanceSearch) {
-                        // scope.advanceSearch = !scope.advanceSearch;
-                        this.advancedSearchResults = true
-                    }
-                    this._applyFilters()
-                    // scope.refineOptions = findRefineOptions(baseSearchResults);
-                },
-                (reason) => {
-                    this.growl.error('Search Error: ' + reason.message)
+        const promises: angular.IPromise<SearchResponse>[] = []
+        for (const queryOb of queryObs) {
+                promises.push(this._performSearch(reqOb, queryOb))
+        }
+
+
+        this.$q.all(promises).then(
+            (data) => {
+                let elements: ElementObject[] = []
+                this.searchResults = [];
+                this.totalResults = 0;
+                for (const d of data) {
+                    elements.push(...d.elements);
+                    this.totalResults = this.totalResults + d.total;
                 }
-            )
+                if (this.mmsOptions.filterCallback) {
+                    let results = this.mmsOptions.filterCallback(elements)
+                    if (results) {
+                        this.searchResults = results
+                    } else {
+                        this.searchResults = []
+                    }
+                } else if (elements.length > 0) {
+                    this.searchResults = elements
+                }
+                this.combineRelatedViews(this)
+                this.maxPages = Math.ceil(
+                    this.totalResults / this.itemsPerPage
+                )
+                this.currentPage = page
+                for (const pg of [...Array(this.maxPages).keys()]) {
+                    this.paginationCache[pg] = this.searchResults.slice(pg * this.itemsPerPage,(pg + 1) * this.itemsPerPage)
+                }
+                this.baseSearchResults = this.paginationCache[page];
+                if (this.advanceSearch) {
+                    // scope.advanceSearch = !scope.advanceSearch;
+                    this.advancedSearchResults = true
+                }
+                this._applyFilters()
+                // scope.refineOptions = findRefineOptions(baseSearchResults);
+            },
+            (reason) => {
+                this.growl.error('Search Error: ' + reason.message)
+            }
+        )
             .finally(() => {
                 this.searchLoading = false
             })
+    }
+
+    private _performSearch(reqOb: RequestObject, queryOb: QueryObject): angular.IPromise<SearchResponse> {
+        return this.elementSvc
+            .search(reqOb, queryOb, 2)
     }
 
     newSearch = (query) => {
@@ -588,7 +645,7 @@ class SearchController implements angular.IComponentController {
     ) => {
         projectsList.push(project)
         var mounts = project._mounts
-        if (angular.isArray(mounts) && mounts.length !== 0) {
+        if (Array.isArray(mounts) && mounts.length !== 0) {
             for (var i = 0; i < mounts.length; i++) {
                 if (mounts[i]._mounts) {
                     this.getAllMountsAsArray(mounts[i], projectsList)
@@ -599,6 +656,7 @@ class SearchController implements angular.IComponentController {
     }
 
     public buildSearchClause = (query) => {}
+
 
     /**
      * @ngdoc function
@@ -611,10 +669,74 @@ class SearchController implements angular.IComponentController {
      *
      * @return {object} {{query: {bool: {must: *[]}}}} JSON object from post data.
      */
-    public buildQuery = (query) => {
+    public buildQuery = (query: SearchQuery) => {
         // Set project and mounted projects filter
-        var projectList = this.getProjectMountsQuery()
-        return query
+        //var projectList = this.getProjectMountsQuery()
+        let filterTerms: {[key:string]: string[]} = {}
+        let queryObs: QueryObject[] = [];
+        this.filterList = [];
+
+        if (query.searchField.id === 'all') {
+            for (const type of this.fieldTypeList) {
+                if (type.id !== 'all') {
+                    let queryOb: QueryObject = {params: {}}
+                    queryOb.params[type.id] = query.searchText;
+                    queryObs.push(queryOb)
+                }
+
+            }
+        }else {
+            let queryOb: QueryObject = {params: {}}
+            queryOb.params[query.searchField.id] = query.searchText;
+            queryObs.push(queryOb)
+        }
+
+        if (this.mmsOptions.filterQueryList) {
+            for (const filterQuery of this.mmsOptions.filterQueryList) {
+                for (const [term, list] of Object.entries(filterQuery())) {
+                    if (!filterTerms[term]) {
+                        filterTerms[term] = [];
+                    }
+
+                    filterTerms[term].push(...list.filter((value) => {
+                        return filterTerms[term].includes(value);
+                    }));
+                }
+            }
+        }
+        if (this.docsviews.selected) {
+            let queryObs: QueryObject[] = [];
+            const stereoIds = [
+                this.schemaSvc.get('VIEW_SID', this.schema),
+                this.schemaSvc.get('DOCUMENT_SID', this.schema),
+                ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema)
+            ];
+            /*If the filter list already contain the view id's do not add them a second time since filtering is done
+            client side */
+            if (!filterTerms._appliedStereotypeIds) {
+                filterTerms._appliedStereotypeIds = [];
+            }
+            filterTerms._appliedStereotypeIds.push(...stereoIds.filter((value) => {
+                return !filterTerms._appliedStereotypeIds.includes(value);
+            }));
+        }
+
+        if (Object.entries(filterTerms).length > 0) {
+            let filterQueries:QueryObject[] = [];
+            for (const queryOb of queryObs) {
+                for (const [term, list] of Object.entries(filterTerms)) {
+                    for (const sid of list) {
+                        let newOb = JSON.parse(JSON.stringify(queryOb))
+                        newOb.params[term] = sid;
+                        filterQueries.push(newOb);
+                    }
+                }
+            }
+            return filterQueries;
+        }
+
+
+        return queryObs
     }
 
     private combineRelatedViews = (scope) => {
@@ -662,25 +784,25 @@ let SearchComponent: VeComponentOptions = {
             <form class="form-inline basic-search-form" ng-submit="$ctrl.newSearch($ctrl.mainSearch)">
                 <!-- search type menu -->
                 <div class="form-group fixed-content-m">
-                    <label class="sr-only" for="searchTypeSelect">Search type menu</label>
-                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchType.isopen">
-                        <button id="searchTypeSelect" class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                            {{$ctrl.mainSearch.searchType.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
+                    <label class="sr-only" for="searchFieldSelect">Search type menu</label>
+                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchField.isopen">
+                        <button id="searchFieldSelect" class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                            {{$ctrl.mainSearch.searchField.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
                         </button>
-                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchTypeSelect">
-                            <li ng-click="$ctrl.mainSearch.searchType = type;" ng-repeat="type in $ctrl.fieldTypeList"
-                                ng-class="{'checked-list-item': type.id === $ctrl.mainSearch.searchType.id}">
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchFieldSelect">
+                            <li ng-click="$ctrl.mainSearch.searchField = type;" ng-repeat="type in $ctrl.fieldTypeList"
+                                ng-class="{'checked-list-item': type.id === $ctrl.mainSearch.searchField.id}">
                                 <a>{{ type.label }}</a>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <!-- search keyword input -->
-                <div class="form-group" ng-show="$ctrl.mainSearch.searchType.id != 'metatype'">
+                <div class="form-group" ng-show="$ctrl.mainSearch.searchField.id != 'metatype'">
                     <label class="sr-only" for="searchInput">Search keyword</label>
                     <input class="search-input" type="text" id="searchInput" ng-model="$ctrl.mainSearch.searchText" autofocus/>
                 </div>
-                <div class="form-group" ng-if="$ctrl.mainSearch.searchType.id === 'metatype'">
+                <div class="form-group" ng-if="$ctrl.mainSearch.searchField.id === 'metatype'">
                     <label class="sr-only" for="searchMetatypeSelect">Search metatype menu</label>
                     <div id="searchMetatypeSelect" ng-dropdown-multiselect="" options="$ctrl.metatypeList" selected-model="$ctrl.mainSearch.selectedSearchMetatypes" extra-settings="$ctrl.metatypeSettings"></div>
                 </div>
@@ -716,92 +838,92 @@ let SearchComponent: VeComponentOptions = {
                 </div>
                 <!-- search type menu -->
                 <div class="form-group fixed-content-m">
-                    <label class="sr-only" for="searchTypeSelectAdvance">Search type menu</label>
-                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchType.isopen2">
-                        <button id="searchTypeSelectAdvance" class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                            {{$ctrl.mainSearch.searchType.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
+                    <label class="sr-only" for="searchFieldSelectAdvance">Search type menu</label>
+                    <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="mainSearchField.isopen2">
+                        <button id="searchFieldSelectAdvance" class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                            {{$ctrl.mainSearch.searchField.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
                         </button>
-                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchTypeSelectAdvance">
-                            <li ng-click="$ctrl.mainSearch.searchType = type; $ctrl.stringQueryUpdate()" ng-repeat="type in $ctrl.fieldTypeList"
-                                ng-class="{'checked-list-item': type.id === $ctrl.mainSearch.searchType.id}">
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchFieldSelectAdvance">
+                            <li ng-click="$ctrl.mainSearch.searchField = type; $ctrl.stringQueryUpdate()" ng-repeat="type in $ctrl.fieldTypeList"
+                                ng-class="{'checked-list-item': type.id === $ctrl.mainSearch.searchField.id}">
                                 <a>{{ type.label }}</a>
                             </li>
                         </ul>
                     </div>
                 </div>
                 <!-- search keyword input -->
-                <div class="form-group" ng-show="$ctrl.mainSearch.searchType.id != 'metatype'">
+                <div class="form-group" ng-show="$ctrl.mainSearch.searchField.id != 'metatype'">
                     <label class="sr-only" for="searchText">Advanced search query</label>
                     <input class="search-input" type="text" id="searchText" ng-model="$ctrl.mainSearch.searchText" ng-change="$ctrl.stringQueryUpdate()" autofocus/>
                 </div>
                 <!-- metatype multiselect -->
-                <div class="form-group" ng-if="$ctrl.mainSearch.searchType.id === 'metatype'">
+                <div class="form-group" ng-if="$ctrl.mainSearch.searchField.id === 'metatype'">
                     <label class="sr-only" for="searchMetatypeSelectAdvance">Search metatype menu</label>
                     <div id="searchMetatypeSelectAdvance" ng-dropdown-multiselect="" options="$ctrl.metatypeList" selected-model="$ctrl.mainSearch.selectedSearchMetatypes" extra-settings="$ctrl.metatypeSettings" events="$ctrl.multiselectEvent"></div>
                 </div>
             </div>
 
-            <!-- Advanced search rows -->
-            <div ng-repeat="row in $ctrl.advanceSearchRows">
-                <div class="form-inline">
-                    <!-- operator -->
-                    <div class="form-group fixed-content-s">
-                        <label class="sr-only" for="operator-{{$index}}">Search row operator</label>
-                        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="row.operatorisopen">
-                            <button id="operator-{{$index}}" class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                                {{row.operator}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
-                            </button>
-                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="operator-{{$index}}">
-                                <li ng-click="row.operator = value; stringQueryUpdate()" ng-repeat="(key, value) in $ctrl.operatorList"
-                                    ng-class="{'checked-list-item': value === row.operator}">
-                                    <a>{{ value }}</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- row search type menu -->
-                    <div class="form-group fixed-content-m">
-                        <label class="sr-only" for="searchTypeSelect-{{$index}}">Search type menu</label>
-                        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="row.isopen">
-                            <button id="searchTypeSelect-{{$index}}" class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                                {{row.searchType.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>
-                            </button>
-                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchTypeSelect-{{$index}}">
-                                <li ng-click="row.searchType = type; $ctrl.stringQueryUpdate()" ng-repeat="type in $ctrl.fieldTypeList"
-                                    ng-class="{'checked-list-item': type.id === row.searchType.id}">
-                                    <a>{{ type.label }}</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- row search keyword input -->
-                    <div class="form-group" ng-show="row.searchType.id != 'metatype'">
-                        <label class="sr-only" for="searchText-{{$index}}">Advanced search query</label>
-                        <input class="search-input" type="text" id="searchText-{{$index}}" ng-model="row.searchText" ng-change="$ctrl.stringQueryUpdate()" autofocus/>
-                    </div>
-                    <!-- row metatype multiselect -->
-                    <div class="form-group" ng-if="row.searchType.id === 'metatype'">
-                        <label class="sr-only" for="searchMetatypeSelect-{{$index}}">Search metatype menu</label>
-                        <div id="searchMetatypeSelect-{{$index}}" ng-dropdown-multiselect="" options="$ctrl.metatypeList" selected-model="row.selectedSearchMetatypes" extra-settings="$ctrl.metatypeSettings" events="multiselectEvent"></div>
-                    </div>
-                    <!-- remove row button -->
-                    <a type="button" ng-click="$ctrl.removeRowAdvanceSearch(row)" class="btn btn-secondary">
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            <!-- add row button -->
-            <a type="button" ng-click="$ctrl.addAdvanceSearchRow()" class="btn btn-secondary">
-                <i class="fa fa-plus"></i>&nbsp;Add Row
-            </a>
+<!--            &lt;!&ndash; Advanced search rows &ndash;&gt;-->
+<!--            <div ng-repeat="row in $ctrl.advanceSearchRows">-->
+<!--                <div class="form-inline">-->
+<!--                    &lt;!&ndash; operator &ndash;&gt;-->
+<!--                    <div class="form-group fixed-content-s">-->
+<!--                        <label class="sr-only" for="operator-{{$index}}">Search row operator</label>-->
+<!--                        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="row.operatorisopen">-->
+<!--                            <button id="operator-{{$index}}" class="dropdown-toggle" type="button" uib-dropdown-toggle>-->
+<!--                                {{row.operator}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>-->
+<!--                            </button>-->
+<!--                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="operator-{{$index}}">-->
+<!--                                <li ng-click="row.operator = value; stringQueryUpdate()" ng-repeat="(key, value) in $ctrl.operatorList"-->
+<!--                                    ng-class="{'checked-list-item': value === row.operator}">-->
+<!--                                    <a>{{ value }}</a>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; row search type menu &ndash;&gt;-->
+<!--                    <div class="form-group fixed-content-m">-->
+<!--                        <label class="sr-only" for="searchFieldSelect-{{$index}}">Search type menu</label>-->
+<!--                        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="row.isopen">-->
+<!--                            <button id="searchFieldSelect-{{$index}}" class="dropdown-toggle" type="button" uib-dropdown-toggle>-->
+<!--                                {{row.searchField.label}}&nbsp;<i class="fa fa-caret-down" aria-hidden="true"></i>-->
+<!--                            </button>-->
+<!--                            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="searchFieldSelect-{{$index}}">-->
+<!--                                <li ng-click="row.searchField = type; $ctrl.stringQueryUpdate()" ng-repeat="type in $ctrl.fieldTypeList"-->
+<!--                                    ng-class="{'checked-list-item': type.id === row.searchField.id}">-->
+<!--                                    <a>{{ type.label }}</a>-->
+<!--                                </li>-->
+<!--                            </ul>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; row search keyword input &ndash;&gt;-->
+<!--                    <div class="form-group" ng-show="row.searchField.id != 'metatype'">-->
+<!--                        <label class="sr-only" for="searchText-{{$index}}">Advanced search query</label>-->
+<!--                        <input class="search-input" type="text" id="searchText-{{$index}}" ng-model="row.searchText" ng-change="$ctrl.stringQueryUpdate()" autofocus/>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; row metatype multiselect &ndash;&gt;-->
+<!--                    <div class="form-group" ng-if="row.searchField.id === 'metatype'">-->
+<!--                        <label class="sr-only" for="searchMetatypeSelect-{{$index}}">Search metatype menu</label>-->
+<!--                        <div id="searchMetatypeSelect-{{$index}}" ng-dropdown-multiselect="" options="$ctrl.metatypeList" selected-model="row.selectedSearchMetatypes" extra-settings="$ctrl.metatypeSettings" events="multiselectEvent"></div>-->
+<!--                    </div>-->
+<!--                    &lt;!&ndash; remove row button &ndash;&gt;-->
+<!--                    <a type="button" ng-click="$ctrl.removeRowAdvanceSearch(row)" class="btn btn-secondary">-->
+<!--                        <i class="fa fa-times"></i>-->
+<!--                    </a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            &lt;!&ndash; add row button &ndash;&gt;-->
+<!--            <a type="button" ng-click="$ctrl.addAdvanceSearchRow()" class="btn btn-secondary">-->
+<!--                <i class="fa fa-plus"></i>&nbsp;Add Row-->
+<!--            </a>-->
             <div class="advanced-views-docs">
                 <input type="checkbox" ng-model="$ctrl.docsviews.selected"> Search for Views and Documents
             </div>
         </div>
         <span class="close-button-container">
-            <span class="close-button" ng-if="$ctrl.mmsOptions.closeable" ng-click="$ctrl.closeSearch()">
+            <a class="close-button" ng-if="$ctrl.mmsOptions.closeable" ui-sref="main.project.ref.portal({search: undefined, field: undefined})" ui-sref-opts="{ inherit: true }">
                 <i tooltip-placement="left" uib-tooltip="Close Search"  class="fa fa-times"></i>
-            </span>
+            </a>
         </span>
 
         <!-- <div ng-show="advancedSearchResults" class="mms-search-input"> -->
@@ -822,32 +944,46 @@ let SearchComponent: VeComponentOptions = {
             </div>
         </div> -->
     </div> 
-<!--    <div class="slide-animate" ng-include="'partials/mms-directives/mmsSearchResults.html'"></div> &lt;!&ndash; TODO: Need to make this a separate component &ndash;&gt;-->
-    <div id="ve-search-results" class="misc-form-field results-count" ng-hide="$ctrl.searchLoading || !$ctrl.paginationCache.length">
+    <div id="ve-search-results" class="misc-form-field results-count" ng-hide="$ctrl.searchLoading || _.isEmpty($ctrl.paginationCache)">
         <div class="ve-search-filter" ng-hide="!$ctrl.showFilterOptions">
             <span class="label-for-filter ve-secondary-text">FILTER: </span>
             <div class="btn-group btn-group-sm" role="group"  aria-label="mms-search-results-filter">
                 <button type="button" ng-repeat="item in $ctrl.filterOptions" ng-click="$ctrl.filterSearchResults(item.type)"
                 title="Filter {{item.display}}" class="btn ve-btn-group-default {{item.icon}}"
-                ng-class="{'active': getActiveFilterClass(item.type)}">{{item.display}}</button>
+                ng-class="{'active': $ctrl.getActiveFilterClass(item.type)}">{{item.display}}</button>
             </div>
         </div>
     
         <div class="ve-secondary-text">Showing <b>{{$ctrl.searchResults.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{$ctrl.currentPage + 1}})</div>
     </div>
+    <div class="container-fluid search-nav " ng-show="$ctrl.searchResults.length > 0">
+    <div class="btn-group btn-group-sm pull-right" role="navigation">
+        <button ng-show="$ctrl.currentPage > 0" class="btn btn-secondary " ng-click="$ctrl.prevPage()">&lt; Prev</button>
+        <button ng-show="$ctrl.searchResults.length > 0 && $ctrl.currentPage < $ctrl.maxPages" class="btn btn-secondary pull-right" ng-click="$ctrl.nextPage()"><span class="btn-text">Next &gt;</span></button>
+    </div>
+        
+    </div>
 
 
     <div class="search-results" ng-show="$ctrl.searchResults.length > 0">
-    <div class="elem-wrapper" ng-repeat="elem in filteredElms = (searchResults)">
-    
-    <div class="container-fluid search-nav">
-        <a ng-show="$ctrl.currentPage > 0" ng-click="$ctrl.prevPage()">&lt; Prev</a>
-        <a ng-show="$ctrl.searchResults.length > 0 && $ctrl.currentPage < $ctrl.maxPages" class="pull-right" ng-click="$ctrl.nextPage()">Next ></a>
+        <div class="elem-wrapper" ng-repeat="elem in $ctrl.filteredSearchResults">
+            <mms-search-results mms-element="::elem"></mms-search-results>
+        </div>    
     </div>
-
-    <div class="container-no-results container-fluid" ng-show="$ctrl.searchResults.length === 0 && !$ctrl.searchLoading">
+    
+    <div class="container-no-results container-fluid" ng-show="(!$ctrl.searchResults || $ctrl.searchResults.length === 0) && !$ctrl.searchLoading">
         <h3>No Results Found.</h3>
     </div>
+    
+    <div class="container-fluid search-nav text-center" ng-show="$ctrl.searchResults.length > 0">
+        <div class="btn-group btn-group-sm" role="navigation">
+            <button ng-show="$ctrl.currentPage > 0" ng-click="$ctrl.prevPage()">&lt; Prev</button>
+            <button ng-show="$ctrl.searchResults.length > 0" class="btn btn-secondary" ng-repeat="page in Object.keys($ctrl.paginationCache)" ng-click="$ctrl.goTo(page)">{{ page }}</button>
+            <button ng-show="$ctrl.searchResults.length > 0 && $ctrl.currentPage < $ctrl.maxPages" class="btn btn-secondary text-center" ng-click="$ctrl.nextPage()">Next &gt;</button>
+        </div>
+    </div>
+
+    
 </div>
 
   `,
@@ -855,6 +991,10 @@ let SearchComponent: VeComponentOptions = {
         mmsOptions: '<',
         mmsProjectId: '@',
         mmsRefId: '@',
+        embedded: '<'
     },
     controller: SearchController,
 }
+
+veCore.component(SearchComponent.selector, SearchComponent);
+

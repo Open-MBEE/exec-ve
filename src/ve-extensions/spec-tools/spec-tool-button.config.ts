@@ -80,7 +80,7 @@ export const default_dynamic_buttons: ISpecToolButton[] = [
     {
         id: 'spec-editor-saveC',
         category: 'dynamic',
-        icon: 'fa-send-o',
+        icon: 'fa-regular fa-paper-plane',
         dynamic: true,
         selected: false,
         active: false,

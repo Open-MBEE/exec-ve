@@ -1,4 +1,4 @@
-import {VeExtensionConfig, VeExtensionDescriptor} from "@ve-ext/index.d";
+import {VeExperimentConfig, VeExperimentDescriptor} from "@ve-ext/index.d";
 
 
 export interface VeConfig {
@@ -31,6 +31,6 @@ export interface VeConfig {
         disabled?: boolean
     }
     loginTimeout?: number,
-    extensions?: VeExtensionDescriptor[]
-    extConfig?: VeExtensionConfig
+    experimental?: VeExperimentDescriptor[]
+    expConfig?: VeExperimentConfig
 }

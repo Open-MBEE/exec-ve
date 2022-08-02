@@ -10,7 +10,7 @@
 @import "../ve-base/mms-typography";
 
 /* Native Font Awesome Support */
-$fa-font-path: "~font-awesome/fonts";
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 
 /* A minimal Bootstrap file */
 @import "vendors/bootstrap/styles";
@@ -38,5 +38,4 @@ $fa-font-path: "~font-awesome/fonts";
 @import "components/mms-autocomplete-modal";
 @import "components/mms-history";
 @import "components/mms-jobs";
-@import "charts/mms-d3-chart";
 @import "components/mms-mention";

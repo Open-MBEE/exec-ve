@@ -173,7 +173,7 @@ mms-transclude-img img {
 .pe-type-Equation,
 .pe-type-Comment{
   &::before{
-    font-family: $icon-font-name;
+    font-family: "FontAwesome", $icon-font-name !important;
     padding-right: 4px;
   }
 }

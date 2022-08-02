@@ -3,7 +3,7 @@ import _ from "lodash";
 
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {veUtils} from "@ve-utils";
-import {UtilsService} from "@ve-utils/services";
+import {UtilsService} from "@ve-utils/core-services";
 
 
 class ExtensionErrorController implements angular.IComponentController {

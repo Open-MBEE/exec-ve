@@ -1,21 +1,23 @@
 import * as angular from "angular";
 import * as _ from "lodash";
-import CKEDITOR from "../../lib/types/ckeditor"
 
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {CacheService, ElementService, URLService, UtilsService, ViewService} from "@ve-utils/services";
+import {VeComponentOptions, VeModalService, VeModalSettings} from "@ve-types/view-editor";
+import {CacheService, URLService, ViewService, ElementService} from "@ve-utils/mms-api-client";
+import {UtilsService} from "@ve-utils/core-services";
 import {MentionService} from "./Mention.service";
-import {CoreUtilsService} from "@ve-core/utilities";
+import {CoreUtilsService} from "@ve-core/core";
 
-
-import {veCore} from "../ve-core.module";
-import {VeEditorApi} from "./CKEditor.service";
+import {VeEditorApi} from "./VeEditor.service";
 import {ElementObject} from "@ve-types/mms";
+import {CKEDITOR} from "@ve-types/third-party"
 
-//veCore.directive('mmsCkeditor', ['$window', '$uibModal', '$templateCache', '$timeout', 'growl', 'CKEDITOR', 'CacheService', 'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'CoreUtilsService', mmsCkeditor]);
+import {veCore} from "@ve-core";
+import {TranscludeModalResolveFn} from "@ve-core/editor/modals/transclude-modal.component";
+
+
 /**
  * @ngdoc directive
- * @name veCore.directive:mmsCkeditor
+ * @name veCore.component:veEditor
  * @element textarea
  *
  * @requires veUtils/CacheService
@@ -32,21 +34,22 @@ import {ElementObject} from "@ve-types/mms";
  * @restrict A
  *
  * @description
- * Make any textarea with an ngModel attached to be a CKEditor wysiwyg editor. This
+ * Make any edit any value with a CKEditor wysiwyg editor. This
  * requires the CKEditor library. Transclusion is supported. ngModel is required.
+ * Allows the setting of an Autosave key.
  * ### Example
  * <pre>
-   <ve-editor edit-value="element.documentation"></ve-editor>
+   <ve-editor ng-model="element.documentation"></ve-editor>
    </pre>
  */
 export class VeEditorController implements angular.IComponentController {
 
         private cKEditor = window.CKEDITOR;
 
-        private editValue: any;
+        private ngModelCtrl: angular.INgModelController;
+
         mmsProjectId: string;
         mmsRefId: string;
-        private mmsElementId: string;
         private mmsEditorType: any;
         private autosaveKey: any;
         private mmsEditorApi: VeEditorApi;
@@ -60,9 +63,9 @@ export class VeEditorController implements angular.IComponentController {
             this.update();
         }, 1000);
 
-        static $inject = ['$window', '$uibModal', '$attrs', '$element', '$timeout', '$scope', 'growl', 'CacheService',
+        static $inject = ['$compile', '$window', '$uibModal', '$attrs', '$element', '$timeout', '$scope', 'growl', 'CacheService',
             'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'CoreUtilsService'];
-        constructor(private $window: angular.IWindowService, private $uibModal: angular.ui.bootstrap.IModalService,
+        constructor(private $compile: angular.ICompileService, private $window: angular.IWindowService, private $uibModal: VeModalService,
                     private $attrs: angular.IAttributes, private $element: JQuery<HTMLElement>,
                     private $timeout: angular.ITimeoutService, private $scope: angular.IScope, private growl: angular.growl.IGrowlService,
                     private cacheSvc: CacheService, private elementSvc: ElementService, private utilsSvc: UtilsService,
@@ -72,7 +75,6 @@ export class VeEditorController implements angular.IComponentController {
 
 
         $onInit() {
-            this.$transcludeEl = $(this.$element.children()[0]);
             this.id = 'mmsCkEditor' + this.generatedIds++;
 
             // Formatting editor toolbar
@@ -112,11 +114,12 @@ export class VeEditorController implements angular.IComponentController {
         $postLink() {
             this.$timeout(() => {
                 // Initialize ckeditor and set event handlers
-                $(this.$element).val(this.editing());
+                this.$element.empty();
+                this.$transcludeEl = $('<textarea id="' + this.id + '"></textarea>')
+                this.$transcludeEl.val(this.ngModelCtrl.$modelValue);
+                this.$element.append(this.$transcludeEl);
+                this.$compile(this.$transcludeEl)(this.$scope);
                 this.instance = this.cKEditor.replace(this.id, {
-                    //customConfig: '/lib/ckeditor-dev/config.js', not needed, this is default and prevents absolute path
-                    mathJaxLib: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js',
-                    extraPlugins: 'liststyle,colordialog,autosave,autogrow,stylescombo,mmscf,mmscomment,mmsvlink,mmsreset,mmssignature,mmsdropdown,sourcedialog',
                     mmscf: {callbackModalFnc: this.transcludeCallback},
                     mmscomment: {callbackModalFnc: this.commentCallback},
                     mmsvlink: {callbackModalFnc: this.viewLinkCallback},
@@ -146,12 +149,12 @@ export class VeEditorController implements angular.IComponentController {
 
                 const highlightActiveEditor = (instance) => {
                     var activeEditorClass = 'active-editor';
-                    $('mms-transclude-doc').children('div').removeClass(activeEditorClass);
-                    $(instance.element.$).closest('mms-transclude-doc').children('div').addClass(activeEditorClass);
+                    $('transclude-doc').children('div').removeClass(activeEditorClass);
+                    $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass);
 
                     instance.on('focus', () => {
-                        $('mms-transclude-doc').children('div').removeClass(activeEditorClass);
-                        $(instance.element.$).closest('mms-transclude-doc').children('div').addClass(activeEditorClass);
+                        $('transclude-doc').children('div').removeClass(activeEditorClass);
+                        $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass);
                     });
                 }
 
@@ -165,7 +168,7 @@ export class VeEditorController implements angular.IComponentController {
                                 }
 
                                 if (element.name.startsWith('mms-')) {
-                                    if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    if (element.name !== 'view-link' && element.name !== 'mms-cf' && element.name !== 'transclude-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
                                         element.replaceWithChildren();
                                         return;
                                     }
@@ -189,7 +192,7 @@ export class VeEditorController implements angular.IComponentController {
                                 }
 
                                 if (element.name.startsWith('mms-')) {
-                                    if (element.name !== 'mms-view-link' && element.name !== 'mms-cf' && element.name !== 'mms-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    if (element.name !== 'view-link' && element.name !== 'mms-cf' && element.name !== 'transclude-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
                                         element.replaceWithChildren();
                                         return;
                                     }
@@ -206,9 +209,9 @@ export class VeEditorController implements angular.IComponentController {
                     });
                 }
 
-                // this.instance.on( 'init', (args) => {
-                //     ngModelCtrl.$setPristine();
-                // });
+                this.instance.on( 'init', (args) => {
+                    this.ngModelCtrl.$setPristine();
+                });
 
                 this.instance.on( 'change', this.deb);
                 this.instance.on( 'afterCommandExec', this.deb);
@@ -276,15 +279,12 @@ export class VeEditorController implements angular.IComponentController {
             }
         };
 
-        public editing = (value?) => {
-            return (value) ?  this.editValue = value : this.editValue;
-        }
-
 
         public transcludeCallback = (ed) => {
-            var tInstance = this.$uibModal.open({
+
+            const tSettings: VeModalSettings = {
                 component: 'transcludeModal',
-                resolve: {
+                resolve: <TranscludeModalResolveFn>{
                     editor: () => {
                         return this
                     },
@@ -293,7 +293,8 @@ export class VeEditorController implements angular.IComponentController {
                     }
                 },
                 size: 'lg'
-            });
+            }
+            var tInstance = this.$uibModal.open(tSettings);
             tInstance.result.then((tag) => {
                 this._addWidgetTag(ed, tag);
             }, () => {
@@ -310,39 +311,46 @@ export class VeEditorController implements angular.IComponentController {
 
 
         public viewLinkCallback = (ed) => {
-                var vInstance = this.$uibModal.open({
-                    component: 'transcludeModal',
-                    resolve: {
-                        editor: () => {
-                            return this
-                        },
-                        viewLink: () => {
-                            return true;
-                        }
+            const vSettings: VeModalSettings = {
+                component: 'transcludeModal',
+                resolve: <TranscludeModalResolveFn>{
+                    editor: () => {
+                        return this
                     },
-                    size: 'lg'
-                });
+                    viewLink: () => {
+                        return true;
+                    }
+                },
+                size: 'lg'
+            };
+                var vInstance = this.$uibModal.open(vSettings);
+
                 vInstance.result.then((data) => {
                     this._addWidgetTag(ed, data.$value);
                 });
             };
 
         public commentCallback = (ed) => {
-            var cInstance = this.$uibModal.open({
+            const cSettings: VeModalSettings = {
                 component: 'transcludeModal',
-                resolve: {
+                resolve: <TranscludeModalResolveFn>{
                     editor: () => {
                         return this
                     },
+                    viewLink: () => {
+                        return false;
+                    }
                 }
-            });
+            };
+            var cInstance = this.$uibModal.open(cSettings);
+
             cInstance.result.then((tag) => {
                 this._addWidgetTag(ed, tag);
             });
         };
 
         public resetCrossRef = (type, typeString) => {
-            angular.forEach(type, (value, key) => {
+            type.forEach((value, key) => {
                 var transclusionObject = angular.element(value);
                 var transclusionId = transclusionObject.attr('mms-element-id');
                 var transclusionKey = this.utilsSvc.makeElementKey({elementId: transclusionId, projectId: this.mmsProjectId, refId: this.mmsRefId});
@@ -372,15 +380,15 @@ export class VeEditorController implements angular.IComponentController {
             this.resetCrossRef(body.find("mms-cf[mms-cf-type='name']").$, '.name]');
             this.resetCrossRef(body.find("mms-cf[mms-cf-type='doc']").$, '.doc]');
             this.resetCrossRef(body.find("mms-cf[mms-cf-type='val']").$, '.val]');
-            this.resetCrossRef(body.find('mms-view-link').$, '.vlink]');
+            this.resetCrossRef(body.find('view-link').$, '.vlink]');
             this.update();
         };
 
         public update = () => {
             // getData() returns CKEditor's processed/clean HTML content.
             if (angular.isDefined(this.instance) && this.instance !== null)
-                this.editing(this.instance.getData());
-        };
+                this.ngModelCtrl.$setViewValue(this.instance.getData());
+        }
 
         private _addWidgetTag = (editor, tag) => {
             editor.insertHtml( tag );
@@ -476,8 +484,10 @@ export class VeEditorController implements angular.IComponentController {
 let veEditorComponent: VeComponentOptions = {
     selector: 'veEditor',
     template: `<textarea id="{{$ctrl.id}}"></textarea>`,
+    require: {
+        ngModelCtrl: "^ngModel"
+    },
     bindings: {
-        editValue: "&",
         mmsElementId: "<",
         mmsProjectId: '@',
         mmsRefId: '@',

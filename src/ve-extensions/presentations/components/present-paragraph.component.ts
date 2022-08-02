@@ -1,30 +1,36 @@
 import * as angular from "angular";
-import {PresentationComponentOptions, ViewHtmlService, PresentationElementController} from "@ve-ext/presentations";
+import {PresentationComponentOptions, ViewHtmlService, Presentation, PresentationService} from "@ve-ext/presentations";
 
 import {veExt, ExtUtilService} from "@ve-ext";
+import {ButtonBarService} from "@ve-utils/button-bar";
+import {EventService} from "@ve-utils/core-services";
+import {SchemaService} from "@ve-utils/model-schema";
+import {PresentationInstanceObject} from "@ve-types/mms";
 
-class ViewParagraph extends PresentationElementController implements angular.IComponentController {
+class PresentParagraph extends Presentation implements angular.IComponentController {
 
-    static $inject = PresentationElementController.$inject
+    static $inject = Presentation.$inject
     constructor($element: JQuery<HTMLElement>, $scope: angular.IScope,
-                $compile: angular.ICompileService, viewHtmlSvc: ViewHtmlService, extUtilSvc: ExtUtilService) {
-        super($element, $scope, $compile, viewHtmlSvc, extUtilSvc)
+                $compile: angular.ICompileService, growl: angular.growl.IGrowlService, schemaSvc: SchemaService, viewHtmlSvc: ViewHtmlService,
+                presentationSvc: PresentationService,  extUtilSvc: ExtUtilService, eventSvc: EventService, buttonBarSvc: ButtonBarService) {
+        super($element, $scope, $compile, growl, schemaSvc, viewHtmlSvc, presentationSvc, extUtilSvc, eventSvc, buttonBarSvc)
     }
 
-    protected getContent = (): string => this.viewHtmlSvc.makeHtmlPara(this.viewData);
+    protected getContent = (): string => this.viewHtmlSvc.makeHtmlPara(this.peObject);
 
 
 }
 
-let ViewParagraphComponent: PresentationComponentOptions = {
+let PresentParagraphComponent: PresentationComponentOptions = {
     selector: 'presentParagraph',
     template: `<div></div>`,
     bindings: {
-        viewData: '<',
-        viewPe: '<'
+       peObject: '<',
+        element: '<',
+        peNumber: '<'
     },
-    controller: ViewParagraph
+    controller: PresentParagraph
 
 }
 
-veExt.component(ViewParagraphComponent.selector, ViewParagraphComponent);
+veExt.component(PresentParagraphComponent.selector, PresentParagraphComponent);

@@ -8,10 +8,10 @@ import {
     TreeApi,
     TreeService,
     UtilsService
-} from "@ve-utils/services";
-import {handleChange} from "../../ve-utils/utils/change.util";
+} from "@ve-utils/core-services";
+import {handleChange} from "@ve-utils/utils";
 import {VeComponentOptions} from "@ve-types/view-editor";
-import {veCore} from "../ve-core.module";
+import {veCore} from "@ve-core";
 import {TreeBranch, TreeRow} from "@ve-types/tree";
 
 /**
@@ -48,7 +48,7 @@ import {TreeBranch, TreeRow} from "@ve-types/tree";
  *  <pre>
  {
         types: {
-            'a type': 'fa fa-file-o',
+            'a type': 'fa-regular fa-file',
             'another type': 'fa fa-file'
         }
     }
@@ -185,7 +185,7 @@ let TreeComponent: VeComponentOptions = {
             if (!this.options.expandLevel && this.options.expandLevel !== 0)
                 this.options.expandLevel = 1;
             let expand_level = this.options.expandLevel;
-            if (!angular.isArray(this.treeData)) {
+            if (!Array.isArray(this.treeData)) {
                 this.$log.warn('treeData is not an array!');
                 return;
             }

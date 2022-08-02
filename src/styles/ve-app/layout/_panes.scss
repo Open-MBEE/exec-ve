@@ -92,8 +92,10 @@
 
 #main-pane {
   top: $navTotal;
+  bottom: $footerHeight;
 }
 
 .content-container {
   top: $navTotal;
+  bottom: $footerHeight;
 }

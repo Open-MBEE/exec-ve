@@ -1,10 +1,12 @@
 import * as angular from 'angular'
 
-import {ElementService, UtilsService, ViewService, UxService, AuthService, EventService, MathJaxService} from "@ve-utils/services"
-import {IButtonBarButton, ButtonBarApi, ButtonBarService,} from '@ve-utils/button-bar'
+import {ElementService, AuthService, ViewService, URLService} from "@ve-utils/mms-api-client";
+import {UtilsService, EventService, MathJaxService} from "@ve-utils/core-services"
+import {ButtonBarService,} from '@ve-utils/button-bar'
 import {VeComponentOptions} from '@ve-types/view-editor'
 import {Transclusion, ITransclusion} from '@ve-ext/transclusions'
-import {veExt, ExtUtilService} from '@ve-ext'
+import {veExt, ExtUtilService, ExtensionService} from '@ve-ext'
+import {SchemaService} from "@ve-utils/model-schema";
 
 /**
  * @ngdoc component
@@ -19,7 +21,7 @@ import {veExt, ExtUtilService} from '@ve-ext'
  * @requires {ElementService} elementSvc
  * @requires {UtilsService} utilsSvc
  * @requires {ViewService} viewSvc
- * @requires {UxService} uxSvc
+
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
@@ -32,7 +34,7 @@ import {veExt, ExtUtilService} from '@ve-ext'
  * 
  * ## Example
  *  <pre>
-    <mms-transclude-doc mms-element-id="element_id"></mms-transclude-doc>
+    <transclude-doc mms-element-id="element_id"></transclude-doc>
     </pre>
  *
  * @param {string} mmsElementId The id of the view
@@ -44,18 +46,6 @@ import {veExt, ExtUtilService} from '@ve-ext'
  */
 export class TranscludeDocController extends Transclusion implements ITransclusion {
 
-    //Locals
-    private fixPreSpanRegex: RegExp = /<\/span>\s*<mms-cf/g
-    private fixPostSpanRegex: RegExp = /<\/mms-cf>\s*<span[^>]*>/g
-    private emptyRegex: RegExp = /^\s*$/
-    private spacePeriod: RegExp = />(?:\s|&nbsp;)\./g
-    private spaceSpace: RegExp = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g
-    private spaceComma: RegExp = />(?:\s|&nbsp;),/g
-
-
-    public bbApi: ButtonBarApi
-    public bars: string[]
-    protected buttons: IButtonBarButton[] = []
     protected editorTemplate: string = `
     <div class="panel panel-default no-print">
     <div class="panel-heading clearfix">
@@ -72,12 +62,12 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         </div>
     </div>
     <div class="panel-body no-padding-panel">
-        <ve-editor edit-value="$ctrl.edit.documentation" mms-editor-type="{{$ctrl.editorType}}" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></ve-editor>
+        <ve-editor ng-model="$ctrl.edit.documentation" mms-editor-type="{{$ctrl.editorType}}" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></ve-editor>
     </div>
 </div>
 `
 
-    static $inject: string[] = [...Transclusion.$inject, 'ButtonBarService'];
+    static $inject: string[] = Transclusion.$inject;
 
     constructor(
         $q: angular.IQService,
@@ -88,27 +78,24 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         extUtilSvc: ExtUtilService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
-        viewSvc: ViewService,
-        uxSvc: UxService,
+        schemaSvc: SchemaService,
         authSvc: AuthService,
         eventSvc: EventService,
         mathJaxSvc: MathJaxService,
-        private buttonBarSvc: ButtonBarService,
+        extensionSvc: ExtensionService,
+        buttonBarSvc: ButtonBarService
     ) {
-        super($q, $scope,$compile,$element,growl,extUtilSvc,elementSvc,utilsSvc,viewSvc,uxSvc,authSvc,eventSvc,
-            mathJaxSvc)
+        super($q, $scope,$compile,$element,growl,extUtilSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
+            mathJaxSvc, extensionSvc, buttonBarSvc)
         this.cfType = 'doc'
         this.cfTitle = 'Documentation'
         this.cfKind = 'Text'
         this.checkCircular = true;
     }
 
-    $onInit() {
-        this.eventSvc.$init(this)
+    config = () => {
+
         this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this)
-        this.buttons = this.bbApi.buttons
-
-
 
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) this.startEdit()
@@ -151,7 +138,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             this.startEdit = () => {
                 this.extUtilSvc.startEdit(
                     this,
-                    this.mmsViewCtrl,
+                    this.mmsViewCtrl.isEditable(),
                     this.$element,
                     this.editorTemplate,
                     false
@@ -178,10 +165,10 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             this.presentationElem =
                 this.mmsViewPresentationElemCtrl.getPresentationElement()
             var auto = [
-                this.viewSvc.TYPE_TO_CLASSIFIER_ID.Image,
-                this.viewSvc.TYPE_TO_CLASSIFIER_ID.Paragraph,
-                this.viewSvc.TYPE_TO_CLASSIFIER_ID.List,
-                this.viewSvc.TYPE_TO_CLASSIFIER_ID.Table,
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Image',this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Paragraph', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','List', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Table', this.schema),
             ]
 
             if (auto.indexOf(this.instanceSpec.classifierIds[0]) >= 0)
@@ -203,29 +190,6 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
                 this.editorType = this.presentationElem.type
             }
         }
-    }
-
-
-    private bbInit = (api: ButtonBarApi) => {
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('presentation-element-preview', this)
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('presentation-element-save', this)
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('presentation-element-saveC', this)
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('presentation-element-cancel', this)
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('presentation-element-delete', this)
-        )
-        api.setPermission(
-            'presentation-element-delete',
-            this.isDirectChildOfPresentationElement
-        )
     }
 
     public getContent = (preview?) => {
@@ -251,22 +215,22 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             result = doc;
         }
         if (this.mmsViewPresentationElemCtrl) {
-            var peSpec =
+            var element =
                 this.mmsViewPresentationElemCtrl.getPresentationElement()
             var pe = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             if (
                 pe &&
                 pe._veNumber &&
-                peSpec &&
-                (peSpec.type === 'TableT' ||
-                    peSpec.type === 'Figure' ||
-                    peSpec.type === 'Equation' ||
-                    peSpec.type === 'ImageT')
+                element &&
+                (element.type === 'TableT' ||
+                    element.type === 'Figure' ||
+                    element.type === 'Equation' ||
+                    element.type === 'ImageT')
             ) {
                 this.type =
-                    peSpec.type === 'TableT'
+                    element.type === 'TableT'
                         ? 'table'
-                        : peSpec.type.toLowerCase()
+                        : element.type.toLowerCase()
                 if (this.type === 'imaget') {
                     this.type = 'figure'
                 }

@@ -1,11 +1,13 @@
 import * as angular from "angular";
 
-import {ElementService, UtilsService} from "@ve-utils/services";
+import{ElementService} from "@ve-utils/mms-api-client";
+import {UtilsService} from "@ve-utils/core-services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {VeEditorController} from "../ve-editor.component";
+import { Class } from "@ve-utils/utils";
 
-import {veExt} from "../../../ve-extensions/ve-extensions.module";
-import {Class} from "../../../ve-utils/utils/emf.util";
+import {veCore} from "@ve-core";
+
 
 let CommentModalComponent: VeComponentOptions = {
     selector: 'commentModal',
@@ -80,4 +82,4 @@ let CommentModalComponent: VeComponentOptions = {
 }
 }
 
-veExt.component(CommentModalComponent.selector, CommentModalComponent)
+veCore.component(CommentModalComponent.selector, CommentModalComponent)

@@ -5,7 +5,6 @@ import "./transclusion.component";
 
 import "./components"
 import "./mms-transclude-compatibility.component"
-import "./charts"
 
 
 

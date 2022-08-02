@@ -2,10 +2,15 @@ export * from "./view-pe"
 export * from "./presentation-element.controller"
 
 //Services
-import "./ViewHtml.service"
-export * from "./ViewHtml.service"
+import "./services/ViewHtml.service"
+import "./services/Presentation.service"
+
+export * from "./services/ViewHtml.service"
+export * from "./services/Presentation.service"
 
 //Components
+import "./view.component"
+export * from "./view.component"
 import "./view-pe.component"
 export * from "./view-pe.component"
 
@@ -18,7 +23,7 @@ import "./components/present-list-t.component"
 import "./components/present-paragraph.component"
 import "./components/present-table.component"
 import "./components/present-table-t.component"
+import "./components/present-section.component"
 
 //Directives
 import "./mmsViewLink.directive"
-import "./mmsViewSection.directive"

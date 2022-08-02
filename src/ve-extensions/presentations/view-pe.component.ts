@@ -1,8 +1,11 @@
 import * as angular from "angular";
-import {ElementService, ViewService} from "@ve-utils/services";
-import {ViewController} from "@ve-core/view";
+import {ElementService, ViewService} from "@ve-utils/mms-api-client";
+import {EventService, TreeApi, TreeService} from "@ve-utils/core-services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {ExtensionService, veExt} from "@ve-ext";
+import Rx from "rx-lite";
+import {ViewController} from "@ve-ext/presentations/view.component";
+import {ElementObject, PresentationInstanceObject} from "@ve-types/mms";
 
 /**
  * @ngdoc component
@@ -34,21 +37,34 @@ export class ViewPresentationElemController implements angular.IComponentControl
 
     private viewCtrl: ViewController
 
+    public subs: Rx.IDisposable[];
+    private treeApi: TreeApi
+
     public presentationElemLoading
     public instanceSpec
-    public presentationElem
+    public presentationElem: PresentationInstanceObject | ElementObject
+    public peNumber: string;
 
     static $inject = ['$scope', '$element', '$timeout', '$location', '$anchorScroll', '$compile', 'ViewService',
-        'ElementService', 'ExtensionService']
+        'ElementService', 'TreeService', 'ExtensionService', 'EventService']
     constructor(private $scope: angular.IScope, private $element: JQuery<HTMLElement>,
                 private $timeout: angular.ITimeoutService, private $location: angular.ILocationService,
                 private $anchorScroll: angular.IAnchorScrollService, private $compile: angular.ICompileService,
-                private viewSvc: ViewService, private elementSvc: ElementService,
-                private extensionSvc: ExtensionService) {}
+                private viewSvc: ViewService, private elementSvc: ElementService, private treeSvc: TreeService,
+                private extensionSvc: ExtensionService, private eventSvc: EventService) {}
 
     $onInit() {
         this.presentationElemLoading = true;
-        if (!this.mmsInstanceVal.instanceId) {
+        this.treeApi = this.treeSvc.getApi();
+        this.eventSvc.$init(this);
+
+        this.subs.push(this.eventSvc.$on(TreeService.events.UPDATED, () => {
+            if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
+                this.peNumber = this.treeApi.branch2viewNumber[this.instanceSpec.id];
+            }
+        }));
+
+        if (!this.mmsInstanceVal || !this.mmsInstanceVal.instanceId) {
             this.$element.html('<span class="mms-error">Reference is null</span>');
             return;
         }
@@ -66,7 +82,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
         var reqOb = {elementId: this.mmsInstanceVal.instanceId, projectId: projectId, refId: refId, commitId: commitId, includeRecentVersionElement: true};
         this.elementSvc.getElement(reqOb, 1)
             .then((instanceSpec) => {
-                this.presentationElem = this.viewSvc.getPresentationElementSpec(instanceSpec);
+                this.presentationElem = this.viewSvc.getPresentationInstanceObject(instanceSpec);
                 this.instanceSpec = instanceSpec;
                 this.presentationElemLoading = false;
                 var hash = this.$location.hash();
@@ -86,12 +102,9 @@ export class ViewPresentationElemController implements angular.IComponentControl
                 let tag = this.extensionSvc.getTagByType("present", this.presentationElem.type);
 
                 let newPe = $('<div id="' + this.instanceSpec.id + '" ng-if="!$ctrl.presentationElemLoading"></div>')
-                $(newPe).append('<' + tag + ' view-data="::presentationElem" view-pe="::instanceSpec">' + '</' + tag + '>');
+                $(newPe).append('<' + tag + ' pe-object="::$ctrl.presentationElem" element="::$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' + '</' + tag + '>');
                 $(this.$element).append(newPe);
-                this.$compile(newPe)(Object.assign(this.$scope.$new(), {
-                    presentationElem: this.presentationElem,
-                    instanceSpec: this.instanceSpec
-                }));
+                this.$compile(newPe)(this.$scope);
             }, (reason) => {
                 if (reason.status === 500) {
                     this.$element.html('<span class="mms-error">View element reference error: ' + this.mmsInstanceVal.instanceId + ' invalid specification</span>');
@@ -100,7 +113,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
                     this.$compile($(this.$element))(Object.assign(this.$scope.$new(), {
                         reqOb: reqOb,
                         recentElement: reason.data.recentVersionOfElement,
-                        type: this.viewSvc.AnnotationType.mmsPresentationElement
+                        type: this.extensionSvc.AnnotationType.mmsPresentationElement
                     }));
                 }
             }).finally(() => {

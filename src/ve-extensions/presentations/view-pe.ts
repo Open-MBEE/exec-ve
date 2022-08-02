@@ -4,8 +4,18 @@ export interface PresentationComponentOptions extends VeComponentOptions {
     selector: string,
     style?: string[]
     bindings: {
-        viewData: string,
-        viewPe?: string
+        peObject: string,
+        element: string,
+        peNumber: string,
+        mmsProjectId?: '@',
+        mmsRefId?: '@',
+        mmsCommitId?: '@',
+        [key: string]: string
+    }
+    required?: {
+        mmsViewPresentationElemCtrl: string
+        mmsViewCtrl: string
+        [key: string]: string
     }
 
 }
