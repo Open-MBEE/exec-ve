@@ -28,7 +28,7 @@ export interface AddItemResolveFn extends VeModalResolveFn {
     getOrgOb(): OrgObject;
     getSeenViewIds(): { [p: string]: TreeBranch };
     finalize?(): angular.IPromise<ElementObject>
-
+    init?(): void
 }
 
 export interface AddItemResolve extends VeModalResolve {
@@ -39,7 +39,7 @@ export interface AddItemResolve extends VeModalResolve {
     getOrgOb: OrgObject;
     getSeenViewIds: { [p: string]: TreeBranch };
     finalize?(): angular.IPromise<ElementObject>
-
+    init?(ctrl: VeModalControllerImpl): void
 }
 
 export interface AddItemData {
@@ -57,7 +57,7 @@ export interface AddItemData {
 let AddItemModalComponent: VeModalComponent = {
     selector: "addItemModal",
     template: `
-    <div ng-show="!$ctrl.noAuth">
+    <div>
     <div class="modal-header">
         <h4 class="item-type-{{$ctrl.itemType}}" ng-if="$ctrl.addType == 'item'">Create new {{$ctrl.itemType | lowercase}}</h4>
         <h4 class="pe-type-{{$ctrl.itemType}}" ng-if="$ctrl.addType == 'pe'">Add {{$ctrl.itemType | lowercase}}</h4>
@@ -100,7 +100,7 @@ let AddItemModalComponent: VeModalComponent = {
                 <br />
                 <input ng-model="$ctrl.newItem.permission" value="write" type="radio"> Write
             </div>  
-            <div class="form-group">
+            <div class="form-group" ng-if="$ctrl.itemType === 'Tag' || $ctrl.itemType === 'Branch'">
                 <label>Point in History</label>
                 <form>
                     <div class="radio radio-with-label">
@@ -173,7 +173,6 @@ let AddItemModalComponent: VeModalComponent = {
         parentData: ElementObject
 
         private $componentEl: JQuery<HTMLElement>;
-        private noAuth: boolean = false;
 
         constructor(private $scope: angular.IScope, private $compile: angular.ICompileService, private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService, private $timeout: angular.ITimeoutService,
                     private viewSvc: ViewService, private elementSvc: ElementService,
@@ -184,7 +183,7 @@ let AddItemModalComponent: VeModalComponent = {
 
         $onInit() {
             this.addItemData = this.resolve.getAddData;
-            this.parentData = this.addItemData.parentBranch.data;
+            this.parentData = (this.addItemData.parentBranch) ? null : this.addItemData.parentBranch.data;
             this.addType = (this.addItemData.addType) ? this.addItemData.addType : "item";
 
             this.searchOptions = {
@@ -203,47 +202,61 @@ let AddItemModalComponent: VeModalComponent = {
 
             this.itemType = this.addItemData.itemType;
             this.newItem = {name: ''};
-
-            if (this.itemType === 'Document') {
-                this.displayName = "Document";
-            } else if (this.itemType === 'View') {
-                this.displayName = "View";
-            } else if (this.itemType === 'Group') {
-                this.displayName = "Group";
-            } else if (this.itemType === 'Branch' || this.itemType === 'Tag') {
-                this.now = new Date();
-                this.newItem.description = "";
-                this.newItem.permission = "read";
-                this.newItem.lastCommit = true;
-                this.newItem.timestamp = this.now;
-                if (this.itemType === 'Branch') {
-                    this.displayName = "Branch";
-                }else {
-                    this.displayName = "Tag";
-                }
-                this.dateTimeOpts = {
-                    enableTime: true,
-                    enableSeconds: true,
-                    defaultDate: this.now,
-                    dateFormat: 'Y-m-dTH:i:S',
-                    time_24hr: true,
-                    maxDate: new Date(),
-                    onClose: (selectedDates) => {
-                        this.updateTimeOpt();
-                        this.newItem.timestamp = selectedDates[0];
-                    },
-                    inline: false
-                };
-            } else if (this.addType === 'pe') {
-
-            } else {
-                this.growl.error("Add " + (this.addType === 'item') ? "Item" : "PE" + " of Type " + this.itemType + " is not supported");
-                return;
-            }
-
             if (this.resolve.init && this.resolve.init instanceof Function) {
                 this.resolve.init(this);
+                return;
             }
+            switch (this.itemType) {
+                case 'Document':
+                    this.displayName = "Document";
+                    break;
+
+                case 'View':
+                    this.displayName = "View";
+                    break;
+
+                case 'Group':
+                    this.displayName = "Group";
+                    break;
+
+                case 'Branch':
+                case 'Tag':
+                    this.now = new Date();
+                    this.newItem.description = "";
+                    this.newItem.permission = "read";
+                    this.newItem.lastCommit = true;
+                    this.newItem.timestamp = this.now;
+                    if (this.itemType === 'Branch') {
+                        this.displayName = "Branch";
+                    }else {
+                        this.displayName = "Tag";
+                    }
+                    this.dateTimeOpts = {
+                        enableTime: true,
+                        enableSeconds: true,
+                        defaultDate: this.now,
+                        dateFormat: 'Y-m-dTH:i:S',
+                        time_24hr: true,
+                        maxDate: new Date(),
+                        onClose: (selectedDates) => {
+                            this.updateTimeOpt();
+                            this.newItem.timestamp = selectedDates[0];
+                        },
+                        inline: false
+                    };
+                    break;
+
+                case "Org":
+                    this.displayName = "Org";
+                    break;
+
+                default:
+                    if (this.addType !== 'pe') {
+                        this.growl.warning("Add " + (this.addType === 'item') ? "Item" : "PE" + " of Type " + this.itemType + " is not supported");
+                    }
+                    break;
+            }
+
         }
 
          public callback = (data) => {

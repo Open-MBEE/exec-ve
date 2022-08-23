@@ -14,17 +14,17 @@ import {veUtils} from "@ve-utils";
  * This utility service handles permissions inquiries
  */
 export class PermissionsService {
-    
+
     private permissions = {project: {}, ref:{}};
 
     constructor(private $q, private $http, private uRLSvc : URLService) {}
 
     public initializePermissions(projectOb, refOb) {
         var url = this.uRLSvc.getPermissionsLookupURL();
-       
-        var deferred = this.$q.defer();                
 
-        this.$http.put(url, { "lookups" : [ 
+        var deferred = this.$q.defer();
+
+        this.$http.put(url, { "lookups" : [
             {
                 "type" : "PROJECT",
                 "projectId": projectOb.id,
@@ -41,21 +41,21 @@ export class PermissionsService {
             var data = response.data.lookups;
             if (Array.isArray(data) && data.length > 0) {
                 for(var i in data) {
-                    var d = data[i];                    
+                    var d = data[i];
                     if(d.type == 'PROJECT'){
-                        this.permissions.project[d.projectId] = d.hasPrivilege;                        
+                        this.permissions.project[d.projectId] = d.hasPrivilege;
                     } else {
                         this.permissions.ref[d.projectId + '/' + d.refId] = d.hasPrivilege;
-                    }                    
-                }                
+                    }
+                }
                 deferred.resolve(this.permissions);
             } else {
                 deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
             }
         }, (response) => {
             this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
-        });   
-        
+        });
+
         return deferred.promise;
     };
 

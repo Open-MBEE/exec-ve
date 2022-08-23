@@ -418,9 +418,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openmbee/pane-layout@../pane-layout/openmbee-pane-layout-1.0.40.tgz":
-  version "1.0.40"
-  resolved "../pane-layout/openmbee-pane-layout-1.0.40.tgz#c94b1fa115340f9d7fac55765d58af09bb3d5543"
+"@openmbee/pane-layout@^1.0.40":
+  version "1.0.41"
+  resolved "https://registry.yarnpkg.com/@openmbee/pane-layout/-/pane-layout-1.0.41.tgz#5be869dd343f60c7e7b2394720cef21140b6e4c9"
+  integrity sha512-nI0i8cX0cBeKyiRZnwUQJUb1Tgd8Zm/uKNBMnLYaSKtqMaK8XHKiBk0BuDLuKEv97xrHct7grguygNL6al5BJQ==
   dependencies:
     "@uirouter/angularjs" "^1.0.30"
     angular "^1.8.2"

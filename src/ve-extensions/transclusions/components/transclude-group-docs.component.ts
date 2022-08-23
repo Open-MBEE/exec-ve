@@ -108,7 +108,7 @@ class TranscludeGroupDocsController extends Transclusion implements ITransclusio
         }
         this.docs = docs;
     }
-    
+
 };
 
 let TranscludeGroupDocsComponent: VeComponentOptions = {
