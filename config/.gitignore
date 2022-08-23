@@ -1,4 +1,3 @@
-config.*.json
-config.*.js
-!config.example.json
+*.json
+!example.json
 !config.js

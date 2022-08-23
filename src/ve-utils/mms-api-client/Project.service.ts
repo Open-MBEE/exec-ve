@@ -4,7 +4,7 @@ import {CacheService, ElementService, URLService} from "@ve-utils/mms-api-client
 import {
     CommitObject,
     CommitResponse,
-    ElementObject,
+    ElementObject, ElementsResponse,
     OrgObject,
     OrgsResponse,
     ProjectObject,
@@ -115,6 +115,21 @@ export class ProjectService {
                 delete this.inProgress[key];
             });
         }
+        return deferred.promise;
+    };
+
+    public createOrg(name: string): angular.IPromise<OrgObject> {
+        let deferred: angular.IDeferred<OrgObject> = this.$q.defer()
+        let url = this.uRLSvc.getOrgsURL();
+        this.$http.post(url, {'orgs': {'name': name}, 'source': this.applicationSvc.getSource()})
+            .then((response: angular.IHttpResponse<OrgsResponse>) => {
+                let org = response.data.orgs[0];
+                let key = ['org', org.id];
+                this.cacheSvc.put(key, response.data.orgs[0], true);
+                deferred.resolve(this.cacheSvc.get<OrgObject>(key));
+            }, (response) => {
+                this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+            });
         return deferred.promise;
     };
 

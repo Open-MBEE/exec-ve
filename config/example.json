@@ -1,0 +1,30 @@
+{
+  "apiUrl": "http://localhost:8080",
+  "basePath": "",
+  "enableDebug": true,
+  "customLabels": {
+    "pi": "PROPRIETARY: Proprietary Information",
+    "export_ctrl": "EXPORT WARNING: No export controlled documents allowed on this server",
+    "no_public_release": "Not for Public Release or Redistribution",
+    "unclassified": "CLASSIFICATION: This system is UNCLASSIFIED"
+  },
+  "loginBanner": {
+    "labels": [["unclassified"], ["pi"], ["no_public_release"]],
+    "separator": " ",
+    "background": "#0D47A1",
+    "color": "#e8e8e8"
+  },
+  "banner": {
+    "labels": ["pi"]
+  },
+  "footer": {
+    "labels": ["opensource"]
+  },
+  "loginTimout": 600000,
+  "experimental": [
+    {
+      "id": "experimental-magic",
+      "name": "Content Magic"
+    }
+  ]
+}
