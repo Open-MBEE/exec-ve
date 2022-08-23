@@ -151,7 +151,7 @@ module.exports = function(grunt) {
         files: [
 
           // Entry html files
-          {expand: true, cwd: 'app', src: ['mms.html', 'index.html'], dest: 'dist/'},
+          {expand: true, cwd: 'app', src: ['mms.html', 'index.html', 'env.ts'], dest: 'dist/'},
 
           // External deps
           {expand: true, cwd: 'app', src: ['bower.json', 'bower_components/**'], dest: 'dist/'},
@@ -360,15 +360,15 @@ module.exports = function(grunt) {
 
     watch: {
       dev: {
-        files: ['app/env.js', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
+        files: ['app/env.ts', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['dev-build']
       },
       release: {
-        files: ['app/env.js', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
+        files: ['app/env.ts', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['release-build']
       },
       docs: {
-        files: ['app/env.js', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
+        files: ['app/env.ts', 'app/**/*', '!app/bower_components/**', 'src/**/*'],
         tasks: ['ngdocs']
       },
       options: {

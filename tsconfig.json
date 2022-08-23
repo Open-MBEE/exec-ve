@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "baseUrl": "",
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "strictNullChecks": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "lib": ["es6", "dom", "ES2017.object", "ES2016.Array.Include", "es2018.promise"],
+    "mapRoot": "./",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "../dist/out-tsc",
+    "sourceMap": true,
+    "target": "es2017",
+    "typeRoots": [
+      "../node_modules/@types"
+    ],
+    "rootDir": "./src",
+    "paths": {
+      "@ve-ext": ["src/ve-extensions"],
+      "@ve-ext/*": ["src/ve-extensions/*"],
+      "@ve-utils": ["src/ve-utils"],
+      "@ve-utils/*": ["src/ve-utils/*"],
+      "@ve-core": ["src/ve-core"],
+      "@ve-core/*": ["src/ve-core/*"],
+      "@ve-app": ["src/ve-app"],
+      "@ve-app/*": ["src/ve-app/*"],
+      "@ve-types/*": ["src/ve-utils/types/*"]
+    },
+    "skipLibCheck": true
+  }
+}

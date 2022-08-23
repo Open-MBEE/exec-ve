@@ -1,0 +1,18 @@
+{
+    "specTools": [
+        {
+            "name": "Spec Magic Test",
+            "path": "experimental-magic",
+            "button": {
+                "id": "spec-magic",
+                "category": "global",
+                "icon": "fa-magic",
+                "selected": true,
+                "active": true,
+                "permission": true,
+                "tooltip": "Magic!",
+                "spinner": false
+            }
+        }
+    ]
+}

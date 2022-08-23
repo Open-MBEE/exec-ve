@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2003-2019, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2022, CKSource Holding sp. z o.o. All rights reserved.
 For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
 */
 
@@ -161,57 +161,7 @@ a > img {
 	text-align: right;
 }
 
-.image-grayscale/*
- * VE Custom CSS
- */
-
-mms-cf, mms-group-docs, mms-view-link {
-	background-color: #e7f2ff;
-	margin-top: 0;
-	margin-bottom: 0 !important;
-	padding: 2px 2px 1px !important;
-	border: 2px solid #8cbaf1 !important;
-	border-radius: 2px;
-	z-index: 0;
-	cursor: not-allowed;
-}
-
-mms-cf[mms-cf-type="com"] {
-	background-color: #fdfbdc; /*lighten($yellow, 10%);*/
-	border-color: #f8f086 !important; /*darken($yellow, 8%);*/
-}
-
-
-.signature-box {
-	padding: 8px;
-	border: 1px solid #ddd;
-}
-
-a[title='mms-br']:hover {
-	background-color: transparent;
-	cursor: default;
-}
-a[title='mms-br'] {
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
-}
-a[title='mms-br'] > hr {
-	margin: 0;
-}
-
-.cke_panel_listItem.cke_selected a, .cke_panel_listItem a:hover, .cke_panel_listItem a:focus, .cke_panel_listItem a:active {
-	background-color: #f5f5f5 !important;
-	outline: 0;
-}
-
-.cke_panel_listItem a {
-	padding-left: 20px !important;
-}
-
-.inlineCode {
-	background-color: #e8d4e8;
-	color: black;
-}
+.image-grayscale
 {
 	background-color: white;
 	color: #666;
@@ -255,56 +205,4 @@ a[title='mms-br'] > hr {
 	max-width: 1920px;
 	max-height: 1080px;
 	margin:0 auto;
-}
-
-/*
- * VE Custom CSS
- */
-
-mms-cf, mms-group-docs, mms-view-link {
-	background-color: #e7f2ff;
-	margin-top: 0;
-	margin-bottom: 0 !important;
-	padding: 2px 2px 1px !important;
-	border: 2px solid #8cbaf1 !important;
-	border-radius: 2px;
-	z-index: 0;
-	cursor: not-allowed;
-}
-
-mms-cf[mms-cf-type="com"] {
-	background-color: #fdfbdc; /*lighten($yellow, 10%);*/
-	border-color: #f8f086 !important; /*darken($yellow, 8%);*/
-}
-
-
-.signature-box {
-	padding: 8px;
-	border: 1px solid #ddd;
-}
-
-a[title='mms-br']:hover {
-	background-color: transparent;
-	cursor: default;
-}
-a[title='mms-br'] {
-	padding-top: 0 !important;
-	padding-bottom: 0 !important;
-}
-a[title='mms-br'] > hr {
-	margin: 0;
-}
-
-.cke_panel_listItem.cke_selected a, .cke_panel_listItem a:hover, .cke_panel_listItem a:focus, .cke_panel_listItem a:active {
-	background-color: #f5f5f5 !important;
-	outline: 0;
-}
-
-.cke_panel_listItem a {
-	padding-left: 20px !important;
-}
-
-.inlineCode {
-	background-color: #e8d4e8;
-	color: black;
 }

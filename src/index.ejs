@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+<!--    <script src="//unpkg.com/ui-router-visualizer@3"></script>-->
+
+    <script src="js/jquery.js"></script>
+    <script src="config/config.js"></script>
+    <script src="<%= ckPath %>/ckeditor.js" ></script>
+    <script src="<%= ckPath %>/adapters/jquery.js"></script>
+
+</head>
+
+<body ng-app="ve-app" ng-strict-di ng-cloak>
+<ui-view></ui-view>
+
+
+<!-- CKEDITOR Settings. Let the browser know where to find the rest of CKEDITOR codes -->
+<script type="text/javascript">
+    var CKEDITOR_BASEPATH = '/ckeditor-dev/';
+</script>
+
+<script>
+    window.MathJax = {
+        options: {
+            ignoreHtmlClass: 'tex2jax_ignore',
+            processHtmlClass: 'tex2jax_process'
+        },
+        tex: {
+            autoload: {
+                color: [],
+                colorv2: ['color']
+            },
+            packages: {'[+]': ['noerrors']}
+        },
+        loader: {
+            load: ['[tex]/noerrors']
+        }
+    };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+<script type="text/javascript">
+    function getHostname() {
+        var host = location.hostname.slice(0,location.hostname.indexOf('.'));
+        var idSite = -1;
+        if (host === 'opencae') {
+            idSite = '2';
+        }
+        return idSite;
+    }
+</script>
+
+</body>
+</html>

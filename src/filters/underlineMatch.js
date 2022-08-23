@@ -1,6 +1,6 @@
-'use strict';
 
-angular.module('mms').filter('underlineMatch', ['$filter', partialMatch]);
+
+angular.module('ve-utils').filter('underlineMatch', ['$filter', partialMatch]);
 function partialMatch($filter) {
     var uibTypeaheadHighlightFn = $filter('uibTypeaheadHighlight');
     return function(match, query) {
