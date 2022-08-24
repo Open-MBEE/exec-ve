@@ -1,23 +1,24 @@
-const path = require('path')
-const fs = require('fs')
-const replace = require('replace-in-file');
+import * as path from 'path';
+import * as fs from 'fs';
 
-const webpack = require('webpack')
-const CopyPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
+import * as webpack from 'webpack';
+
+import CopyPlugin from 'copy-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
+import {AutomaticPrefetchPlugin, Configuration} from "webpack";
 
 const hq = require('alias-hq');
 
-const environment = require('./environment')
+import environment from './src/lib/environment'
 
 const packageJson = require("./package.json");
 let sourceDir = './ve-custom'
 let experimentalDir = './src/ve-experimental'
 
 
-class WatchRunPlugin {
+class WatchRunPlugin implements AutomaticPrefetchPlugin {
     apply(compiler) {
         compiler.hooks.watchRun.tap('WatchRun', (comp) => {
             if (comp.modifiedFiles) {
@@ -39,6 +40,8 @@ class WatchRunPlugin {
 }
 
 class SetupPlugin {
+    private readonly mode
+    private ran
     constructor(mode) {
         this.mode = (mode === 'development') ? "-dev" : ""
         this.ran = false;
@@ -102,11 +105,8 @@ class SetupPlugin {
     }
 }
 
-module.exports = (env, argv) => {
-    let ckPath = (argv.mode === 'development') ? "ckeditor" : "ckeditor"
-
-    return {
-        stats: 'verbose',
+const config = (env: any, argv: any): Configuration =>({
+        mode: (argv.mode) ? argv.mode : "production",
         experiments: {
             topLevelAwait: true
         },
@@ -124,9 +124,8 @@ module.exports = (env, argv) => {
             //     //'@uirouter/angularjs'
             // ],
         },
-
         optimization: {
-            minimize: false,
+            minimize: (argv.mode === "production"),
         },
         output: {
             path: path.resolve(__dirname, 'dist'),
@@ -151,7 +150,7 @@ module.exports = (env, argv) => {
         },
         plugins: [
             new WatchRunPlugin(),
-            new SetupPlugin(),
+            new SetupPlugin(argv.mode),
             new webpack.EnvironmentPlugin({
                 VE_ENV: 'local',
             }),
@@ -159,7 +158,7 @@ module.exports = (env, argv) => {
                 title: 'View Editor',
                 template: path.resolve(environment.paths.source, 'index.ejs'),
                 templateParameters: {
-                    ckPath: ckPath
+                    ckPath: 'ckeditor'
                 }
             }),
             new FaviconsWebpackPlugin({
@@ -202,15 +201,15 @@ module.exports = (env, argv) => {
                     },
                     {
                         from: path.resolve(
-                            environment.paths.source, 'lib', ckPath
+                            environment.paths.source, 'lib', 'ckeditor'
                         ),
-                        to: path.resolve(environment.paths.output, ckPath)
+                        to: path.resolve(environment.paths.output, 'ckeditor')
                     },
                     {
                         from: path.resolve(
                             environment.paths.source, 'lib', 'ckeditor-plugins'
                         ),
-                        to: path.resolve(environment.paths.output, ckPath, 'plugins')
+                        to: path.resolve(environment.paths.output, 'ckeditor', 'plugins')
                     },
                     {
                         from: path.resolve(
@@ -268,6 +267,7 @@ module.exports = (env, argv) => {
                 // all files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'
                 { test: /\.tsx?$/, loader: 'ts-loader' },
             ],
-        },
-    }
-}
+        }
+});
+
+export default config;

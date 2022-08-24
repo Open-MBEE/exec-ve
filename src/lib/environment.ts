@@ -1,6 +1,4 @@
-const webpack = require("webpack");
-
-module.exports = {
+const environment = {
     paths: {
         source: "./src/",
         output: "./dist/",
@@ -9,3 +7,5 @@ module.exports = {
         },
     mode: 'local'
 }
+
+export default environment

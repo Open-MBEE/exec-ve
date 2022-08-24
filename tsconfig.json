@@ -4,20 +4,21 @@
     "allowSyntheticDefaultImports": true,
     "declaration": false,
     "strictNullChecks": false,
+    "noImplicitAny": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "downlevelIteration": true,
     "lib": ["es6", "dom", "ES2017.object", "ES2016.Array.Include", "es2018.promise"],
     "mapRoot": "./",
-    "module": "esnext",
+    "module": "ESNext",
     "moduleResolution": "node",
     "outDir": "../dist/out-tsc",
     "sourceMap": true,
     "target": "es2017",
     "typeRoots": [
-      "../node_modules/@types"
+      "node_modules/@types"
     ],
-    "rootDir": "./src",
+    "rootDir": "src",
     "paths": {
       "@ve-ext": ["src/ve-extensions"],
       "@ve-ext/*": ["src/ve-extensions/*"],
@@ -30,5 +31,14 @@
       "@ve-types/*": ["src/ve-utils/types/*"]
     },
     "skipLibCheck": true
+  },
+  "ts-node": {
+    "files": true,
+    "compilerOptions": {
+      "esModuleInterop": true,
+      "module": "CommonJS",
+      "target": "es5",
+      "rootDir": "."
+    },
   }
 }
