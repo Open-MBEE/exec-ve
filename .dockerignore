@@ -1,1 +1,8 @@
-Dockerfile
+*
+
+!yarn.lock
+!webpack.config.ts
+!package.json
+!src/
+!config/
+!tsconfig.json

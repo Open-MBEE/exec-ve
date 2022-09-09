@@ -12,7 +12,7 @@ view {
     margin-bottom: 15px;
   }
 
-  // Keep title the same size as reading 
+  // Keep title the same size as reading
   .view-title, .section-title {
     .form-control{
       height: inherit;
@@ -21,7 +21,7 @@ view {
   }
 
   &.editing {
-    mms-view-section {
+    present-section {
       display: block;
       border: 2px solid $ve-silver-darker-1;
       @include transition(border, .5s);
@@ -29,7 +29,7 @@ view {
     }
   }
   &.outline:not(.editing) {
-    mms-view-section {
+    present-section {
       display: block;
       border: 2px solid white;
     }
@@ -56,15 +56,15 @@ view {
   }
 }
 
-mms-view.editing,
-mms-view.outline {
+view.editing,
+view.outline {
   .last-modified {
     //opacity: 1;
     visibility: visible;
   }
 }
 
-mms-view.editing {
+view.editing {
   .add-pe-button-container {
     //opacity: 1;
     visibility: visible;

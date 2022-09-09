@@ -3,6 +3,7 @@ import * as angular from "angular";
 import {ElementObject} from "@ve-types/mms";
 import {ViewService} from "@ve-utils/mms-api-client";
 import {VeModalService} from "@ve-types/view-editor";
+import {AddItemResolveFn} from "@ve-app/main/modals/add-item-modal.component";
 
 export class PresentationService {
 
@@ -59,10 +60,19 @@ export class PresentationService {
         }
         let instance = this.$uibModal.open({
             component: 'addItemModal',
-            resolve: {
+            resolve: <AddItemResolveFn> {
                 getAddData: () => {
                     return this.addItemData;
-                }
+                },
+                getProjectId: () => {
+                    return viewOrSectionOb._projectId;
+                },
+                getRefId: () => {
+                    return viewOrSectionOb._refId;
+                },
+                getOrgId: () => {
+                    return '';
+                },
             }});
         instance.result.then((data) => {
             if (data.type !== 'InstanceSpecification' || this.viewSvc.isSection(data)) {

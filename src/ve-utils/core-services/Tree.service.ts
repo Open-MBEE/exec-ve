@@ -65,12 +65,12 @@ export class TreeService {
      * @param {string} type type of object
      * @param {object} parent key of parent field
      * @param {angular.IComponentController} ctrl
-     * @param {callback} level2_Func function to get childen objects
+     * @param {callback} level2_Func function to get child objects
      * @returns {void} root node
      */
-    public buildTreeHierarchy = (array: any[], id: string, type: string, parent: string, ctrl: angular.IComponentController, level2_Func) => {
-        var rootNodes = [];
-        var data2Node = {};
+    public buildTreeHierarchy = (array: ElementObject[], id: string, type: string, parent: string, ctrl: angular.IComponentController, level2_Func): TreeBranch[] => {
+        var rootNodes: TreeBranch[] = [];
+        var data2Node: { [key: string]: TreeBranch} = {};
         var i = 0;
         var data = null;
         // make first pass to create all nodes
@@ -80,12 +80,16 @@ export class TreeService {
                 label: data.name,
                 type: type,
                 data: data,
-                children: []
+                children: [],
+                loading: true
             };
         }
         // make second pass to associate data to parent nodes
         for (i = 0; i < array.length; i++) {
             data = array[i];
+            if (data2Node[data[id]].type === 'group') {
+                data2Node[data[id]].loading = false;
+            }
             // If theres an element in data2Node whose key matches the 'parent' value in the array element
             // add the array element to the children array of the matched data2Node element
             if (data[parent] && data2Node[data[parent]]) {//bad data!
@@ -93,6 +97,7 @@ export class TreeService {
             } else {
                 // If theres not an element in data2Node whose key matches the 'parent' value in the array element
                 // it's a "root node" and so it should be pushed to the root nodes array along with its children
+
                 rootNodes.push(data2Node[data[id]]);
             }
         }
@@ -202,7 +207,7 @@ export class TreeApi {
     public treeRows: TreeRow[] = []
     public selectedBranch: TreeBranch = null;
     public branch2viewNumber: {[key: string]: string} = {};
-    
+
     constructor(private $timeout: angular.ITimeoutService, private rootScopeSvc: RootScopeService,
                 private eventSvc: EventService) {}
 
@@ -605,6 +610,8 @@ export class TreeApi {
             branch.selected = true;
             this.selectedBranch = branch;
             this.expandAllParents(branch);
+            if (this.selectedBranch.data.id !== this.rootScopeSvc.treeInitialSelection())
+                this.rootScopeSvc.treeInitialSelection('');
             if (!noClick) {
                 var options = this.rootScopeSvc.treeOptions();
                 if (branch.onSelect != null) {
@@ -655,7 +662,7 @@ export class TreeApi {
         if (options.sort) {
             this.treeData.sort(this.treeSortFunction);
         }
-       const addBranchToList = (level, section, branch, visible, peNums) => {
+       const addBranchToList = (level, section, branch: TreeBranch, visible, peNums) => {
             var expand_icon = "";
             var type_icon = "";
             var aggr = branch.aggr;

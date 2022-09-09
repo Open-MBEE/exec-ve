@@ -332,7 +332,7 @@ export class ViewController implements angular.IComponentController {
 
 }
 
-let ViewComponent: VeComponentOptions = {
+export let ViewComponent: VeComponentOptions = {
     selector: 'view',
     template: `
     <div id="{{$ctrl.mmsElementId}}" ng-class="{landscape: $ctrl.view._printLandscape}">

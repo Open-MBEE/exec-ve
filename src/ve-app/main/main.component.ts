@@ -70,7 +70,7 @@ let MainComponent: VeComponentOptions = {
         static $inject = ['$scope', '$timeout', '$location', '$window', '$uibModal', '$interval', '$http', 'veConfig',
             'growl', 'hotkeys', 'growlMessages','$uiRouter', '$transitions', '$state', 'URLService', 'UtilsService', 'HttpService', 'AuthService',
             'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'EditService', 'EventService']
-        
+
         //local
         public subs: Rx.IDisposable[];
                 openEdits = {};
@@ -91,9 +91,9 @@ let MainComponent: VeComponentOptions = {
                     private veConfig: VeConfig, private growl: angular.growl.IGrowlService, private hotkeys, private growlMessages,
                     private $uiRouter: UIRouter, private $transitions: TransitionService, private $state: StateService, private uRLSvc: URLService, private utilsSvc: UtilsService, private httpSvc: HttpService,
                     private authSvc: AuthService, private elementSvc: ElementService, private cacheSvc: CacheService,
-                    private applicationSvc: ApplicationService, private rootScopeSvc: RootScopeService, 
+                    private applicationSvc: ApplicationService, private rootScopeSvc: RootScopeService,
                     private editSvc: EditService, private eventSvc: EventService) {}
-        
+
         $onInit() {
             this.eventSvc.$init(this);
 
@@ -252,6 +252,8 @@ let MainComponent: VeComponentOptions = {
                 } else if (this.$state.includes('main.project.ref.document') && (this.$state.current.name !== 'main.project.ref.document.order')) {
                     if (trans.params().viewId !== undefined)
                         this.rootScopeSvc.treeInitialSelection(trans.params().viewId);
+                    else if (trans.params()['#'] !== undefined)
+                        this.rootScopeSvc.treeInitialSelection(trans.params()['#'])
                     else
                         this.rootScopeSvc.treeInitialSelection(trans.params().documentId);
                 }

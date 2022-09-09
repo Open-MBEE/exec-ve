@@ -36,7 +36,7 @@ export class ElementService {
     private inProgress: { [key: string]: angular.IPromise<any>} = {};
 
     static $inject = ['$q', '$http', 'growl', 'URLService', 'UtilsService', 'CacheService', 'HttpService', 'ApplicationService'];
-    
+
     constructor(private $q: angular.IQService, private $http: angular.IHttpService, private growl: angular.growl.IGrowlService, private uRLSvc : URLService,
                 private utilsSvc : UtilsService, private cacheSvc : CacheService, private httpSvc : HttpService,
                 private applicationSvc : ApplicationService) {}
@@ -62,7 +62,7 @@ export class ElementService {
                 alert('got ' + element.name);
             },
      (reason) => {
-                alert('get element failed: ' + reason.message); 
+                alert('get element failed: ' + reason.message);
                 //see mms.URLService#handleHttpStatus for the reason object
             }
      );
@@ -70,8 +70,8 @@ export class ElementService {
      * ## Example with commitId
      *  <pre>
      this.elementSvc.this.getElement({
-            projectId: 'projectId', 
-            elementId: 'elementId', 
+            projectId: 'projectId',
+            elementId: 'elementId',
             refId: 'refId',         //default 'master'
             commitId: 'commitId',   //default 'latest'
             extended: true          //default false (extended includes _qualifiedName, _qualifiedId, _childViews)
@@ -80,7 +80,7 @@ export class ElementService {
                 alert('got ' + element.name);
             },
      (reason) => {
-                alert('get element failed: ' + reason.message); 
+                alert('get element failed: ' + reason.message);
                 //see mms.URLService#handleHttpStatus for the reason object
             }
      );
@@ -94,7 +94,7 @@ export class ElementService {
      *      multiple calls to this method with the same parameters would give the
      *      same object
      */
-    getElement(reqOb: ElementsRequest, weight?: number, update?: boolean, allowEmpty?: boolean): angular.IPromise<ElementObject> {
+    getElement(reqOb: ElementsRequest, weight?: number, refresh?: boolean, allowEmpty?: boolean): angular.IPromise<ElementObject> {
         this.utilsSvc.normalize(reqOb);
         var requestCacheKey = this.getElementKey(reqOb);
         var url = this.uRLSvc.getElementURL(reqOb);
@@ -106,7 +106,7 @@ export class ElementService {
         }
         var deferred: angular.IDeferred<ElementObject> = this.$q.defer();
         var cached: ElementObject = this.cacheSvc.get<ElementObject>(requestCacheKey);
-        if (cached && !update && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
+        if (cached && !refresh && (!reqOb.extended || (reqOb.extended && cached._qualifiedId))) {
             deferred.resolve(cached);
             return deferred.promise;
         }
@@ -126,7 +126,7 @@ export class ElementService {
                 } else if (allowEmpty) {
                     deferred.resolve(null);
                 } else {
-                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"}); //TODO 
+                    deferred.reject({status: 500, data: '', message: "Server Error: empty response"}); //TODO
                 }
                 delete this.inProgress[key];
             },
@@ -153,13 +153,13 @@ export class ElementService {
      *
      * @param {object} reqOb keys - {projectId, refId, elementIds (array of ids), commitId, extended}
      * @param {integer} [weight=1] priority of request (2 is immediate, 1 is normal, 0 is low)
-     * @param {boolean} [update=false] (optional) whether to always get the latest
-     *      from server, even if it's already in cache (this will update the cache if exists)
+     * @param {boolean} [refresh=false] (optional) whether to always get the latest
+     *      from server, even if it's already in cache (this will refresh the cache if exists)
      * @returns {Promise} The promise will be resolved with an array of element objects,
      *      multiple calls to this method with the same parameters would give the
      *      same objects
      */
-    getElements(reqOb: ElementsRequest, weight, update?): angular.IPromise<ElementObject[]> {
+    getElements(reqOb: ElementsRequest, weight, refresh?): angular.IPromise<ElementObject[]> {
         var deferred: angular.IDeferred<ElementObject[]> = this.$q.defer();
         var request: {elements: {id:string}[]} = {elements: []};
         var existing: ElementObject[] = [];
@@ -168,7 +168,7 @@ export class ElementService {
             var id = reqOb.elementId[i];
             var requestCacheKey = this.getElementKey(reqOb, id);
             var exist = this.cacheSvc.get<ElementObject>(requestCacheKey);
-            if (exist && !update && (!reqOb.extended || (reqOb.extended && exist._qualifiedId))) {
+            if (exist && !refresh && (!reqOb.extended || (reqOb.extended && exist._qualifiedId))) {
                 existing.push(exist);
                 continue;
             }
@@ -280,13 +280,13 @@ export class ElementService {
      *
      * @param {object} reqOb see description of getElement.
      * @param {integer} [weight=1] priority
-     * @param {boolean} [update=false] update from server
+     * @param {boolean} [refresh=false] update from server
      * @returns {Promise} The promise will be resolved with the element object,
      *      multiple calls to this method with the same id would result in
      *      references to the same object. This object can be edited without
      *      affecting the same element object that's used for displays
      */
-    getElementForEdit(reqOb: ElementsRequest, weight?: number, update?: boolean): angular.IPromise<ElementObject> {
+    getElementForEdit(reqOb: ElementsRequest, weight?: number, refresh?: boolean): angular.IPromise<ElementObject> {
         this.utilsSvc.normalize(reqOb);
         let id = Array.isArray(reqOb.elementId) ? reqOb.elementId[0] : reqOb.elementId;
         var requestCacheKey = this.getElementKey(reqOb, id, true);
@@ -296,12 +296,12 @@ export class ElementService {
         }
         var deferred: angular.IDeferred<ElementObject> = this.$q.defer();
         var cached = this.cacheSvc.get<ElementObject>(requestCacheKey);
-        if (cached && !update) {
+        if (cached && !refresh) {
             deferred.resolve(cached);
             return deferred.promise;
         }
         this.inProgress[key] = deferred.promise;
-        this.getElement(reqOb, weight, update)
+        this.getElement(reqOb, weight, refresh)
             .then((result) => {
                 var copy = JSON.parse(JSON.stringify(result));
                 deferred.resolve(this.cacheElement(reqOb, copy, true));
@@ -323,16 +323,16 @@ export class ElementService {
      *
      * @param {object} reqOb see description of getElement, add 'depth' key.
      * @param {integer} [weight=1] priority
-     * @param {boolean} [update=false] update from server
+     * @param {boolean} [refresh=false] update from server
      * @returns {Promise} The promise will be resolved with an array of
      * element objects
      */
-    getOwnedElements(reqOb: ElementsRequest, weight?, update?) {
+    getOwnedElements(reqOb: ElementsRequest, weight?, refresh?) {
         this.utilsSvc.normalize(reqOb);
         if (!reqOb.depth) {
             reqOb.depth = -1;
         }
-        return this.getGenericElements(this.uRLSvc.getOwnedElementURL(reqOb), reqOb, 'elements', weight, update);
+        return this.getGenericElements(this.uRLSvc.getOwnedElementURL(reqOb), reqOb, 'elements', weight, refresh);
     };
 
     /**
@@ -348,9 +348,9 @@ export class ElementService {
      * @param {ElementsRequest} reqOb see description of getElement.
      * @param {string} jsonKey json key that has the element array value
      * @param {integer} [weight=1] priority
-     * @param {boolean} [update=false] update from server
+     * @param {boolean} [refresh=false] update from server
      */
-    getGenericElements(url: string, reqOb: ElementsRequest, jsonKey, weight, update?): angular.IPromise<ElementObject[]> {
+    getGenericElements(url: string, reqOb: ElementsRequest, jsonKey, weight, refresh?): angular.IPromise<ElementObject[]> {
         this.utilsSvc.normalize(reqOb);
         if (this.inProgress.hasOwnProperty(url)) {
             this.httpSvc.ping(url, weight);

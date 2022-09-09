@@ -2,7 +2,7 @@ import * as angular from "angular";
 import * as _ from "lodash";
 
 import {VeComponentOptions, VeModalService, VeModalSettings} from "@ve-types/view-editor";
-import {CacheService, URLService, ViewService, ElementService} from "@ve-utils/mms-api-client";
+import {CacheService, URLService, ViewService, ElementService, AuthService} from "@ve-utils/mms-api-client";
 import {UtilsService} from "@ve-utils/core-services";
 import {MentionService} from "./Mention.service";
 import {CoreUtilsService} from "@ve-core/core";
@@ -13,6 +13,8 @@ import {CKEDITOR} from "@ve-types/third-party"
 
 import {veCore} from "@ve-core";
 import {TranscludeModalResolveFn} from "@ve-core/editor/modals/transclude-modal.component";
+import $ from "jquery";
+import {VeConfig} from "@ve-types/config";
 
 
 /**
@@ -44,6 +46,7 @@ import {TranscludeModalResolveFn} from "@ve-core/editor/modals/transclude-modal.
  */
 export class VeEditorController implements angular.IComponentController {
 
+        private veConfig: VeConfig = window.__env
         private cKEditor = window.CKEDITOR;
 
         private ngModelCtrl: angular.INgModelController;
@@ -63,14 +66,16 @@ export class VeEditorController implements angular.IComponentController {
             this.update();
         }, 1000);
 
+        private tokenStr: RegExp = new RegExp('([\?&]token=[a-zA-Z0-9\.]*)');
+
         static $inject = ['$compile', '$window', '$uibModal', '$attrs', '$element', '$timeout', '$scope', 'growl', 'CacheService',
-            'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'CoreUtilsService'];
+            'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'AuthService', 'CoreUtilsService'];
         constructor(private $compile: angular.ICompileService, private $window: angular.IWindowService, private $uibModal: VeModalService,
                     private $attrs: angular.IAttributes, private $element: JQuery<HTMLElement>,
                     private $timeout: angular.ITimeoutService, private $scope: angular.IScope, private growl: angular.growl.IGrowlService,
                     private cacheSvc: CacheService, private elementSvc: ElementService, private utilsSvc: UtilsService,
                     private viewSvc: ViewService, private uRLSvc: URLService, private mentionSvc: MentionService,
-                    private utils: CoreUtilsService) {}
+                    private authSvc: AuthService, private utils: CoreUtilsService) {}
         //depends on angular bootstrap
 
 
@@ -117,6 +122,7 @@ export class VeEditorController implements angular.IComponentController {
                 this.$element.empty();
                 this.$transcludeEl = $('<textarea id="' + this.id + '"></textarea>')
                 this.$transcludeEl.val(this.ngModelCtrl.$modelValue);
+
                 this.$element.append(this.$transcludeEl);
                 this.$compile(this.$transcludeEl)(this.$scope);
                 this.instance = this.cKEditor.replace(this.id, {
@@ -127,7 +133,6 @@ export class VeEditorController implements angular.IComponentController {
                     contentsCss: this.cKEditor.basePath+'contents.css',
                     toolbar: this.toolbar
                 });
-
                 // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
                 if ( this.$attrs.autosaveKey ) {
                     // Configuration for autosave plugin
@@ -147,6 +152,42 @@ export class VeEditorController implements angular.IComponentController {
                     highlightActiveEditor(this.instance);
                 } );
 
+                this.instance.on('toHtml', () => {
+                    this.instance.dataProcessor.dataFilter.addRules({
+                        elements: {
+                            // Adds the token to img's in the editor environment to allow images to be displayed while editing
+                            $: (element) => {
+                                element.find((el: CKEDITOR.htmlParser.element) => {
+                                    return el.name == "img" && el.attributes['data-cke-saved-src']
+                                        && el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
+                                }, true).forEach((el: CKEDITOR.htmlParser.element) => {
+                                    el.attributes['src'] = this._fixImgUrl(el.attributes['data-cke-saved-src'], true);
+                                   // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                                })
+                            }
+                        }
+                    })
+                }, null, null, 9);
+
+
+                this.instance.on('getData', () => {
+                    this.instance.dataProcessor.htmlFilter.addRules({
+                        elements: {
+                            // Removes the token from the export src to prevent saving of token to server
+                            $: (element) => {
+                                element.find((el: CKEDITOR.htmlParser.element) => {
+                                    return el.name == "img" && el.attributes['data-cke-saved-src']
+                                        && el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
+                                }, true).forEach((el: CKEDITOR.htmlParser.element) => {
+                                    el.attributes['data-cke-saved-src'] = this._fixImgUrl(el.attributes['data-cke-saved-src'], false);
+                                    // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                                })
+                            }
+                        }
+                    })
+
+                });
+
                 const highlightActiveEditor = (instance) => {
                     var activeEditorClass = 'active-editor';
                     $('transclude-doc').children('div').removeClass(activeEditorClass);
@@ -158,10 +199,11 @@ export class VeEditorController implements angular.IComponentController {
                     });
                 }
 
-                const addCkeditorHtmlFilterRule = (instance) => {
+                const addCkeditorHtmlFilterRule = (instance: CKEDITOR.editor) => {
                     instance.dataProcessor.htmlFilter.addRules({
                         elements: {
                             $: (element) => {
+
                                 if (element.name === 'script') {
                                     element.remove();
                                     return;
@@ -228,6 +270,9 @@ export class VeEditorController implements angular.IComponentController {
                     this.mmsEditorApi.save = () => {
                         this.update();
                     };
+                    this.mmsEditorApi.cancel = () => {
+                        this.update();
+                    }
                 }
                 this.instance.on('fileUploadRequest', (evt) => {
                     var fileLoader = evt.data.fileLoader;
@@ -263,7 +308,7 @@ export class VeEditorController implements angular.IComponentController {
                     } else {
                         //TODO does this need to be smarter?
                         var element = response.elements[0];
-                        data.url = this.uRLSvc.getArtifactEmbedURL({projectId: element._projectId, refId: element._refId, elementId: element.id}, element._artifacts[0].extension);
+                        data.url = this.uRLSvc.getArtifactURL({projectId: element._projectId, refId: element._refId, elementId: element.id}, element._artifacts[0].extension);
                     }
                 } );
             }, 0, false);
@@ -388,6 +433,28 @@ export class VeEditorController implements angular.IComponentController {
             // getData() returns CKEditor's processed/clean HTML content.
             if (angular.isDefined(this.instance) && this.instance !== null)
                 this.ngModelCtrl.$setViewValue(this.instance.getData());
+        }
+
+        private _fixImgSrc = (imgDom: JQuery<HTMLElement>, addToken?: boolean) => {
+
+            var src = imgDom.attr('src');
+            if (src) {
+                return this._fixImgUrl(src, addToken);
+            }
+            return null;
+        }
+
+        private _fixImgUrl = (src: string, addToken?: boolean): string => {
+            let url = new window.URL(src);
+            let params = new window.URLSearchParams(url.search);
+            if (params.has('token')) {
+                params.delete('token')
+            }
+            if (addToken) {
+                params.append('token', this.authSvc.getToken());
+            }
+            url.search = params.toString();
+            return url.toString();
         }
 
         private _addWidgetTag = (editor, tag) => {

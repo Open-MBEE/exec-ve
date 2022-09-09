@@ -9,20 +9,20 @@ export class ButtonBarApi {
 
 
 
-    getId() {
+     public getId = () => {
         return this.id;
     }
 
-    getButtons() {
+     public getButtons = () => {
         return this.buttons;
     }
 
-    resetButtons() {
+     public resetButtons = () => {
         this.buttons = [];
         this.init(this);
     }
 
-    select(parentButton, childButton) {
+     public select = (parentButton, childButton) => {
         if(parentButton && childButton) {
             parentButton.dropdown_buttons.forEach((dropdownButton) => {
                 dropdownButton.selected = dropdownButton.id === childButton.id;
@@ -30,28 +30,28 @@ export class ButtonBarApi {
         }
     };
 
-    setPermission(id: string, permission: boolean) {
+     public setPermission = (id: string, permission: boolean) => {
         this.buttons.forEach((button) => {
             if (button.id === id)
                 button.permission = permission;
         });
     };
 
-    setTooltip(id, tooltip) {
+     public setTooltip = (id, tooltip) => {
         this.buttons.forEach((button) => {
             if (button.id === id)
                 button.tooltip = tooltip;
         });
     };
 
-    setIcon(id, icon) {
+     public setIcon = (id, icon) => {
         this.buttons.forEach((button) => {
             if (button.id === id)
                 button.icon = icon;
         });
     };
 
-    setToggleState(id, state) {
+     public setToggleState = (id, state) => {
         this.buttons.forEach((button) => {
             if (button.id === id) {
                 if (button.toggleable) {
@@ -63,7 +63,7 @@ export class ButtonBarApi {
         });
     };
 
-    getToggleState(id): boolean  {
+    public getToggleState = (id): boolean =>  {
         var buttonTemp: IButtonBarButton = {} as IButtonBarButton;
 
         this.buttons.forEach((button: IButtonBarButton) => {
@@ -77,7 +77,7 @@ export class ButtonBarApi {
         return (buttonTemp.toggle_state) ? (buttonTemp.toggle_state) : false;
     };
 
-    addButton(button: IButtonBarButton) {
+     public addButton = (button: IButtonBarButton) => {
         //TODO: Determine if count can actually be replaced by length here
         if (this.buttons.length === 0) {
             button.placement = "bottom-left";
@@ -96,7 +96,7 @@ export class ButtonBarApi {
         this.buttons.push(button);
     };
 
-    toggleButtonSpinner(id) {
+    public toggleButtonSpinner = (id) => {
         this.buttons.forEach((button) => {
             if (button.id === id) {
                 if (button.spinner) {
@@ -111,7 +111,7 @@ export class ButtonBarApi {
         });
     };
 
-    toggleButtonState(id: string, state?: boolean) {
+     public toggleButtonState = (id: string, state?: boolean) => {
         this.buttons.forEach((button) => {
             if (button.id === id) {
                 if (button.toggleable) {

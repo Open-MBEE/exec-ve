@@ -1108,7 +1108,7 @@ export declare namespace CKEDITOR {
         readonly container: dom.element;
         readonly contextMenu: plugins.contextMenu;
         copyFormatting: plugins.copyformatting.state;
-        dataProcessor: dataProcessor;
+        dataProcessor: htmlDataProcessor;
         readonly document: dom.document;
         readonly element: dom.element;
         readonly elementMode: number;

@@ -118,7 +118,7 @@ class LeftPaneController implements angular.IComponentController {
     this.toggle('showTree');
     this.eventSvc.$init(this);
 
-    if (this.$state.includes('main.project.ref.document.full')) {
+    if (this.$state.includes('main.project.ref.document.full') && !this.rootScopeSvc.veFullDocMode()) {
       this.rootScopeSvc.veFullDocMode(true);
     }
 
@@ -237,12 +237,7 @@ class LeftPaneController implements angular.IComponentController {
     }));
 
     this.subs.push(this.eventSvc.$on('tree-refresh', () => {
-      this.tbApi.toggleButtonSpinner('tree-refresh');
-      this.treeApi.refresh();
-      let dispose = this.eventSvc.$on(TreeService.events.UPDATED, () => {
-        this.tbApi.toggleButtonSpinner('tree-refresh');
-        dispose.dispose()
-      })
+      this.reloadData();
     }));
 
     if (this.$state.includes('main.project.ref') && !this.$state.includes('main.project.ref.document')) {
@@ -433,7 +428,7 @@ class LeftPaneController implements angular.IComponentController {
     }
   }
 
-  groupLevel2Func(ctrl: { mmsProject: ProjectObject, mmsRef: RefObject, treeApi: TreeApi, viewSvc: ViewService }, groupOb: ElementObject, groupNode: TreeBranch) {
+  groupLevel2Func = (ctrl: { mmsProject: ProjectObject, mmsRef: RefObject, treeApi: TreeApi, viewSvc: ViewService }, groupOb: ElementObject, groupNode: TreeBranch) => {
     groupNode.loading = true;
     ctrl.viewSvc.getProjectDocuments({
       projectId: ctrl.mmsProject.id,
@@ -627,7 +622,7 @@ class LeftPaneController implements angular.IComponentController {
     }
   };
 
-  fullDocMode() {
+  public fullDocMode = () => {
     if (this.rootScopeSvc.veFullDocMode()) {
       this.rootScopeSvc.veFullDocMode(false);
       this.bbApi.setToggleState("tree-full-document", false);
@@ -651,6 +646,17 @@ class LeftPaneController implements angular.IComponentController {
       this.$state.go('main.project.ref.document.full', {search: undefined});
     }
   };
+
+  reloadData() {
+    this.bbApi.toggleButtonSpinner('tree-refresh');
+    this.$state.reload().then(() => {
+      this.treeApi.refresh();
+      let dispose = this.eventSvc.$on(TreeService.events.UPDATED, () => {
+        this.tbApi.toggleButtonSpinner('tree-refresh');
+        dispose.dispose()
+      })
+    });
+  }
 
   addItem(itemType: string) {
     const deferred = this.$q.defer();
@@ -688,14 +694,14 @@ class LeftPaneController implements angular.IComponentController {
         getFilter: () => {
           return this.$filter;
         },
-        getProjectOb: () => {
-          return this.mmsProject;
+        getProjectId: () => {
+          return this.mmsProject.id;
         },
-        getRefOb: () => {
-          return this.mmsRef;
+        getRefId: () => {
+          return this.mmsRef.id;
         },
-        getOrgOb: () => {
-          return this.mmsOrg;
+        getOrgId: () => {
+          return this.mmsOrg.id;
         },
         getSeenViewIds: () => {
           return this.seenViewIds;
@@ -718,6 +724,7 @@ class LeftPaneController implements angular.IComponentController {
         aggr: '',
       };
       var top = this.addItemData.itemType === 'Group';
+      this.reloadData();
       this.treeApi.addBranch(this.addItemData.parentBranch, newbranch, top);
 
       const addToFullDocView = (node, curSection, prevSysml) => {

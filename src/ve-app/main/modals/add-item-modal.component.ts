@@ -12,7 +12,7 @@ import {
     VeModalController,
     VeSearchOptions, VeModalResolveFn
 } from "@ve-types/view-editor";
-import {CommitObject, ElementObject, MmsObject, OrgObject, ProjectObject, RefObject, ViewObject} from "@ve-types/mms";
+import {CommitObject, ElementObject, MmsObject, RefObject, ViewObject} from "@ve-types/mms";
 import {TreeBranch} from "@ve-types/tree";
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
 
@@ -22,22 +22,22 @@ import {veApp} from "@ve-app";
 
 export interface AddItemResolveFn extends VeModalResolveFn {
     getAddData(): any;
-    getFilter(): angular.IFilterService;
-    getProjectOb(): ProjectObject;
-    getRefOb(): RefObject;
-    getOrgOb(): OrgObject;
-    getSeenViewIds(): { [p: string]: TreeBranch };
+    getProjectId(): string;
+    getRefId(): string;
+    getOrgId(): string;
+    getFilter?(): angular.IFilterService;
+    getSeenViewIds?(): { [p: string]: TreeBranch };
     finalize?(): angular.IPromise<ElementObject>
     init?(): void
 }
 
 export interface AddItemResolve extends VeModalResolve {
     getAddData: AddItemData;
-    getFilter: angular.IFilterService;
-    getProjectOb: ProjectObject;
-    getRefOb: RefObject;
-    getOrgOb: OrgObject;
-    getSeenViewIds: { [p: string]: TreeBranch };
+    getFilter?: angular.IFilterService;
+    getProjectId: string;
+    getRefId: string;
+    getOrgId: string;
+    getSeenViewIds?: { [p: string]: TreeBranch };
     finalize?(): angular.IPromise<ElementObject>
     init?(ctrl: VeModalControllerImpl): void
 }
@@ -128,7 +128,7 @@ let AddItemModalComponent: VeModalComponent = {
                 <label><input type="radio" ng-model="$ctrl.newViewAggr.type" value="shared">Add view and its children</label><br>
                 <label><input type="radio" ng-model="$ctrl.newViewAggr.type" value="none">Add view only</label>
             </div>
-            <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.projectOb.id}}" mms-ref-id="{{$ctrl.refOb.id}}" embedded="true"></mms-search>
+            <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" embedded="true"></mms-search>
         </div>
         
     
@@ -157,17 +157,18 @@ let AddItemModalComponent: VeModalComponent = {
 
         //local
         private addItemData: AddItemData
+
         public searchOptions: VeSearchOptions = null;
-        itemType
-        createForm = true;
-        oking = false;
-        projectOb
-        refOb
-        orgOb
-        displayName = "";
-        addType
-        newItem
-        now
+        itemType: string
+        createForm: boolean = true;
+        oking: boolean = false;
+        projectId: string
+        refId: string
+        orgId: string
+        displayName: string = "";
+        addType: string
+        newItem: { description?: any; permission?: any; lastCommit?: any; timestamp?: any; name: any; }
+        now: Date
         dateTimeOpts: Options.Options
 
         parentData: ElementObject
@@ -183,8 +184,11 @@ let AddItemModalComponent: VeModalComponent = {
 
         $onInit() {
             this.addItemData = this.resolve.getAddData;
-            this.parentData = (this.addItemData.parentBranch) ? null : this.addItemData.parentBranch.data;
+            this.parentData = (!this.addItemData.parentBranch) ? null : this.addItemData.parentBranch.data;
             this.addType = (this.addItemData.addType) ? this.addItemData.addType : "item";
+            this.projectId = this.resolve.getProjectId;
+            this.refId = this.resolve.getRefId;
+            this.orgId = this.resolve.getOrgId;
 
             this.searchOptions = {
                 callback: this.callback,
@@ -193,12 +197,6 @@ let AddItemModalComponent: VeModalComponent = {
                 hideFilterOptions: true,
                 closeable: false
             };
-
-            if (this.addType === 'item') {
-                this.projectOb = this.resolve.getProjectOb;
-                this.refOb = this.resolve.getRefOb;
-                this.orgOb = this.resolve.getOrgOb;
-            }
 
             this.itemType = this.addItemData.itemType;
             this.newItem = {name: ''};
@@ -417,22 +415,22 @@ let AddItemModalComponent: VeModalComponent = {
             let last = () => {
                 this.oking = false;
             };
-            const ownerId = (this.parentData) ? this.parentData.id : "holding_bin_" + this.projectOb.id
+            const ownerId = (this.parentData) ? this.parentData.id : "holding_bin_" + this.projectId
             if (this.resolve.finalize) {
                 this.resolve.finalize().then(resolve,reject,last);
             }
             // Item specific promises:
             else if (this.itemType === 'Document') {
                 this.viewSvc.createDocument({
-                    _projectId: this.projectOb.id,
-                    _refId: this.refOb.id,
+                    _projectId: this.projectId,
+                    _refId: this.refId,
                     id: ownerId
                 }, {
                     name: this.newItem.name,
                     id: this.utilsSvc.createMmsId(),
                     isDoc: true,
-                    _projectId: this.projectOb.id,
-                    _refId: this.refOb.id,
+                    _projectId: this.projectId,
+                    _refId: this.refId,
                     type: "Class"
                 }).then(resolve,reject,last);
             } else if (this.itemType === 'View') {
@@ -440,23 +438,23 @@ let AddItemModalComponent: VeModalComponent = {
                 this.viewSvc.createView(this.parentData, {
                     id: this.utilsSvc.createMmsId(),
                     name: this.newItem.name,
-                    _projectId: this.projectOb.id,
-                    _refId: this.refOb.id,
+                    _projectId: this.projectId,
+                    _refId: this.refId,
                     type: "Class"
                 }).then(resolve,reject,last);
             } else if (this.itemType === 'Group') {
                 this.viewSvc.createGroup(this.newItem.name,
                     {
-                        _projectId: this.projectOb.id,
-                        _refId: this.refOb.id,
+                        _projectId: this.projectId,
+                        _refId: this.refId,
                         id: ownerId
-                    }, this.orgOb.id
+                    }, this.orgId
                 ).then(resolve,reject,last);
             } else if ((this.itemType === 'Branch' || this.itemType === 'Tag') && this.newItem.name !== '') {
                     let refObj: RefObject = {
                         name: this.newItem.name,
                         type: this.itemType,
-                        _projectId: this.projectOb.id,
+                        _projectId: this.projectId,
                         description: this.newItem.description,
                         parentRefId: this.addItemData.createParentRefId,
                         permission: this.newItem.permission,
@@ -466,13 +464,13 @@ let AddItemModalComponent: VeModalComponent = {
                     if (!this.newItem.lastCommit) {
                         // Make call to history?maxTimestamp to get closest commit id to branch off
                         let ts = this.resolve.getFilter('date')(this.newItem.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
-                        this.projectSvc.getRefHistory(refObj.parentRefId, this.projectOb.id, ts)
+                        this.projectSvc.getRefHistory(refObj.parentRefId, this.projectId, ts)
                             .then((commits:CommitObject[]) => {
                                 refObj.parentCommitId = commits[0].id;
-                                this.projectSvc.createRef( refObj, this.projectOb.id ).then(resolve,reject,last);
+                                this.projectSvc.createRef( refObj, this.projectId ).then(resolve,reject,last);
                             });
                     } else {
-                        this.projectSvc.createRef( refObj, this.projectOb.id ).then(resolve,reject,last);
+                        this.projectSvc.createRef( refObj, this.projectId ).then(resolve,reject,last);
                     }
             } else if (this.addType === 'pe') {
                 this.viewSvc.createInstanceSpecification(this.addItemData.viewOrSectionOb, this.itemType, this.newItem.name, this.addItemData.addPeIndex).then(resolve,reject,last);

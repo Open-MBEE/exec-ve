@@ -30,15 +30,15 @@ import {ApplicationService} from "@ve-utils/core-services";
  * This is a utility service for getting project, ref, commit information
  */
 export class ProjectService {
-    
+
     private inProgress = {};
 
     static $inject = ['$q','$http','ApplicationService','CacheService','ElementService','URLService'];
     constructor(private $q, private $http, private applicationSvc : ApplicationService, private cacheSvc : CacheService,
                 private elementSvc : ElementService, private uRLSvc : URLService) {
-        
+
     }
-     
+
 
     /**
      * @ngdoc method
@@ -83,7 +83,7 @@ export class ProjectService {
      * @ngdoc method
      * @name ProjectService#getOrgs
      * @methodOf ProjectService
-     * 
+     *
      * @description
      * Gets orgs information
      *
@@ -380,7 +380,7 @@ export class ProjectService {
         return deferred.promise;
     };
 
-    public getGroups(projectId: string, refId: string): angular.IPromise<ElementObject[]> {
+    public getGroups(projectId: string, refId: string, ignoreCache?: boolean): angular.IPromise<ElementObject[]> {
         refId = refId ? refId : 'master';
         var cacheKey = ['groups', projectId, refId];
         var url = this.uRLSvc.getGroupsURL(projectId, refId);
@@ -388,7 +388,7 @@ export class ProjectService {
             return this.inProgress[url];
         }
         var deferred: angular.IDeferred<ElementObject[]> = this.$q.defer();
-        if (this.cacheSvc.exists(cacheKey)) {
+        if (this.cacheSvc.exists(cacheKey) && !ignoreCache) {
             deferred.resolve(this.cacheSvc.get<ElementObject[]>(cacheKey));
         } else {
             this.inProgress[url] = deferred.promise;

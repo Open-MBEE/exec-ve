@@ -183,22 +183,26 @@ class FullDocumentController implements angular.IComponentController {
                 this.rootScopeSvc.veElementsOn((data != null) ? data :
                     !this.rootScopeSvc.veElementsOn()
                 )
+                if ((!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode())) {
+                    this.eventSvc.$broadcast('show-edits', false);
+                }
             })
         )
 
         this.subs.push(
             this.eventSvc.$on('show-edits', (data?:boolean) => {
-                if ((this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) || (!this.rootScopeSvc.veElementsOn() && !this.rootScopeSvc.veEditMode())) {
-                    this.eventSvc.$broadcast('show-elements', (data != null) ? data : null);
-                }
                 this.bbApi.toggleButtonState('show-edits', (data != null) ? data : null)
                 this.rootScopeSvc.veEditMode((data != null) ? data :
                     !this.rootScopeSvc.veEditMode()
                 )
+                if ((this.rootScopeSvc.veElementsOn() && !this.rootScopeSvc.veEditMode()) || (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode())) {
+                    this.eventSvc.$broadcast('show-elements', this.rootScopeSvc.veEditMode());
+                }
             })
         )
 
-        this.rootScopeSvc.veFullDocMode(false)
+        if (!this.rootScopeSvc.veFullDocMode())
+            this.rootScopeSvc.veFullDocMode(true)
         if (this.rootScopeSvc.veCommentsOn())
             this.eventSvc.$broadcast('show-comments', false)
         if (this.rootScopeSvc.veElementsOn())
@@ -377,7 +381,7 @@ let DocumentComponent: VeComponentOptions = {
     bindings: {
         projectOb: "<",
         refOb: "<",
-        documentOb: "<" 
+        documentOb: "<"
     },
     controller: FullDocumentController
 }

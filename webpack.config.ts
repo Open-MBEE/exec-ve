@@ -7,7 +7,7 @@ import CopyPlugin from 'copy-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
-import {AutomaticPrefetchPlugin, Configuration} from "webpack";
+import {AutomaticPrefetchPlugin, Compiler, Configuration} from "webpack";
 
 const hq = require('alias-hq');
 
@@ -18,8 +18,9 @@ let sourceDir = './ve-custom'
 let experimentalDir = './src/ve-experimental'
 
 
+
 class WatchRunPlugin implements AutomaticPrefetchPlugin {
-    apply(compiler) {
+    apply(compiler: Compiler) {
         compiler.hooks.watchRun.tap('WatchRun', (comp) => {
             if (comp.modifiedFiles) {
                 const changedFiles = Array.from(comp.modifiedFiles, (file) => `\n  ${file}`).join('');
@@ -110,7 +111,7 @@ const config = (env: any, argv: any): Configuration =>({
         experiments: {
             topLevelAwait: true
         },
-        devtool: 'eval',
+        devtool: 'source-map',
         entry: {
             veApp: {
                 import: path.resolve(environment.paths.source, 'main.ts'),
@@ -138,10 +139,7 @@ const config = (env: any, argv: any): Configuration =>({
             modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
             // Add '.ts' and '.tsx' as a resolvable extension.
             extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
-            alias: hq.get('webpack'),
-            // alias: {
-            //     buffer: 'buffer',
-            // },
+            alias: hq.get('webpack')
         },
         watchOptions: {
             aggregateTimeout: 300,

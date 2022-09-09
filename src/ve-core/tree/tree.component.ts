@@ -115,7 +115,7 @@ let TreeComponent: VeComponentOptions = {
     <ul class="nav nav-list nav-pills nav-stacked abn-tree">
     <li ng-repeat="row in $ctrl.treeRows | filter:{visible:true} track by row.branch.uid" ng-hide="!$ctrl.treeFilter(row, options.search)"
         ng-class="'level-' + {{row.level}}" class="abn-tree-row">
-        <div class="arrow" ng-click="$ctrl.userClicksBranch(row.branch)" ng-dblclick="$ctrl.user_dblclicks_branch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
+        <div class="arrow" ng-click="$ctrl.userClicksBranch(row.branch)" ng-dblclick="$ctrl.userDblClicksBranch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
             <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
                 <a ng-href="{{$ctrl.getHref(row);}}" class="tree-item">
                     <i ng-class="{'active-text': row.branch.selected}" ng-click="$ctrl.expandCallback(row, $event)" class="indented tree-icon {{row.expand_icon}}" ></i>
@@ -245,10 +245,10 @@ let TreeComponent: VeComponentOptions = {
         };
 
         public userClicksBranch(branch) {
-            this.treeApi.selectBranch(branch);
+            this.treeApi.userClicksBranch(branch);
         };
 
-        public user_dblclicks_branch(branch) {
+        public userDblClicksBranch(branch) {
             if (branch.onDblclick) {
                 this.eventSvc.$broadcast(branch.onDblclick,{ branch: branch });
             } else if (this.options.onDblclick) {

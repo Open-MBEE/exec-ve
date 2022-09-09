@@ -23,6 +23,7 @@ import { VeEditorApi } from '@ve-core/editor'
 import {VeModalService, VeModalSettings} from "@ve-types/view-editor";
 import {ConfirmDeleteModalResolveFn} from "@ve-app/main/modals/confirm-delete-modal.component";
 import {settings} from "alias-hq";
+import $ from "jquery";
 
 export interface ExtensionController {
     element: ElementObject
@@ -33,7 +34,7 @@ export interface ExtensionController {
     instanceVal?: any
     elementSaving: boolean
     bbApi?: ButtonBarApi
-    editorApi?: any
+    editorApi?: VeEditorApi
 
     // isEnumeration: boolean,
     skipBroadcast: boolean
@@ -360,6 +361,11 @@ export class ExtUtilService {
      */
     public hasEdits(editOb: ElementObject): boolean {
         editOb._commitId = 'latest'
+        // const element = $(editOb.documentation)
+        // element.find('img').each((index, el) => {
+        //     $(el).attr('src', this._fixImgSrc($(el)));
+        // })
+        // editOb.documentation = element.prop('outerHTML');
         var cachedKey = this.utilsSvc.makeElementKey(
             this.utilsSvc.makeElementRequestObject(editOb)
         )
@@ -388,6 +394,28 @@ export class ExtUtilService {
             return true
         }
         return false
+    }
+
+    private _fixImgSrc = (imgDom: JQuery<HTMLElement>, addToken?: boolean) => {
+
+        var src = imgDom.attr('src');
+        if (src) {
+            return this._fixImgUrl(src, addToken);
+        }
+        return null;
+    }
+
+    private _fixImgUrl = (src: string, addToken?: boolean): string => {
+        let url = new window.URL(src);
+        let params = new window.URLSearchParams(url.search);
+        if (params.has('token')) {
+            params.delete('token')
+        }
+        if (addToken) {
+            params.append('token', this.authSvc.getToken());
+        }
+        url.search = params.toString();
+        return url.toString();
     }
 
     /**
@@ -823,6 +851,9 @@ export class ExtUtilService {
         }
         if (ctrl.bbApi) {
             ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
+        }
+        if (ctrl.editorApi && ctrl.editorApi.cancel) {
+            ctrl.editorApi.cancel();
         }
         // Only need to confirm the cancellation if edits have been made:
         if (this.hasEdits(ctrl.edit)) {

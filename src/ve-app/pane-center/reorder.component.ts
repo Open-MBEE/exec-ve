@@ -1,7 +1,7 @@
 import {StateService} from '@uirouter/angularjs';
 import * as angular from 'angular';
 import {ViewService, ElementService} from "@ve-utils/mms-api-client";
-import {TreeApi, TreeService} from "@ve-utils/core-services";
+import {EventService, TreeApi, TreeService} from "@ve-utils/core-services";
 import {AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap} from "@ve-types/tree";
 import {ViewObject} from "@ve-types/mms";
 import {VeComponentOptions} from "@ve-types/view-editor";
@@ -42,16 +42,19 @@ class ReorderController implements angular.IComponentController {
 
     //injectables
     private treeApi: TreeApi
+    public subs: Rx.IDisposable[];
 
-    static $inject = ['$state', 'growl', '$scope', 'ElementService', 'ViewService', 'AppUtilsService', 'TreeService'];
+    static $inject = ['$state', '$timeout', 'growl', '$scope', 'ElementService', 'ViewService', 'AppUtilsService', 'TreeService', 'EventService'];
 
-    constructor(private $state: StateService, private growl: angular.growl.IGrowlService,
-                private $scope: angular.IScope, private elementSvc: ElementService, private viewSvc: ViewService, 
-                private appUtilsSvc: AppUtilsService, private treeSvc: TreeService) {}
+    constructor(private $state: StateService, private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService,
+                private $scope: angular.IScope, private elementSvc: ElementService, private viewSvc: ViewService,
+                private appUtilsSvc: AppUtilsService, private treeSvc: TreeService, private eventSvc: EventService) {}
 
     $onInit() {
         this.doc = this.documentOb;
         this.treeApi = this.treeSvc.getApi();
+        this.eventSvc.$init(this);
+
         let name = (this.documentOb.name) ? this.documentOb.name : this.documentOb.id
         this.viewIds2node[this.documentOb.id] = {
             label: name,
@@ -72,19 +75,35 @@ class ReorderController implements angular.IComponentController {
                 });
                 this.tree = [docNode];
             });
-
+        this.subs.push(this.eventSvc.$on('foobar', () => {
+            let root = this.tree;
+            console.log(root);
+        }))
         this.treeOptions = {
-            dropped : () => {
-                for (var i = 0; i < this.tree.length; i++) {
-                    var root = this.tree[i];
-                    root.new = '';
-                    var num = 1;
-                    for (var j = 0; j < root.children.length; j++) {
-                        this.updateNumber(root.children[j], num + '', 'new');
-                        num++;
+            dropped : (e) => {
+                this.$timeout(() => {
+                    for (var i = 0; i < this.tree.length; i++) {
+                        var root = this.tree[i];
+                        root.new = '';
+                        var num = 1;
+                        for (var j = 0; j < root.children.length; j++) {
+                            this.updateNumber(root.children[j], num + '', 'new');
+                            num++;
+                        }
                     }
-                }
+                }, 1)
             },
+            // dragStop: (e) => {
+            //     for (var i = 0; i < this.tree.length; i++) {
+            //         var root = this.tree[i];
+            //         root.new = '';
+            //         var num = 1;
+            //         for (var j = 0; j < root.children.length; j++) {
+            //             this.updateNumber(root.children[j], num + '', 'new');
+            //             num++;
+            //         }
+            //     }
+            // },
             dragStart: () => {},
             accept: function(sourceNodeScope: VeTreeNodeScope, destNodeScope: VeTreeNodeScope, destIndex) {
                 if (destNodeScope.$element.hasClass('root'))
@@ -203,7 +222,7 @@ class ReorderController implements angular.IComponentController {
             this.saving = false;
         });
     };
-    
+
    public cancel = () => {
         this.navigate(false);
     };

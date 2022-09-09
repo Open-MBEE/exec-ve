@@ -14,7 +14,7 @@ import {
 import uiRouter, {
     StateProvider,
     StateService,
-    Transition,
+    Transition, TransitionOptions,
     TransitionService,
     UIRouter,
     UIRouterGlobals,
@@ -270,8 +270,12 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
         .state('main.project.ref', { // equivalent to old sites and documents page
             url: '/:refId',
             resolve: {
-                params: ['$transition$', function ($transition$): {[paramName: string]: any } {
+                params: ['$transition$', function ($transition$: Transition): {[paramName: string]: any } {
                     return $transition$.params();
+                }],
+                refresh: ['$transition$', function ($transition$: Transition): boolean {
+                    const options = $transition$.options();
+                    return (options.reload === true || options.reload === 'true')
                 }],
                 // projectOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params: {[paramName: string]: any }) => {
                 //     return resolveSvc.getProjectMounts(params);
@@ -297,11 +301,11 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 groupOb: () => {
                     return null;
                 },
-                groupObs: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
-                    return resolveSvc.getGroups(params)
+                groupObs: ['ResolveService', 'params', 'refresh', (resolveSvc: ResolveService, params, refresh: boolean) => {
+                    return resolveSvc.getGroups(params, refresh)
                 }],
-                documentOb: ['params', 'refOb', 'projectOb', 'ResolveService', (params, refOb, projectOb, resolveSvc: ResolveService) => {
-                    return resolveSvc.getDocument(params, refOb, projectOb);
+                documentOb: ['params', 'refresh', 'refOb', 'projectOb', 'ResolveService', (params, refresh: boolean, refOb, projectOb, resolveSvc: ResolveService) => {
+                    return resolveSvc.getDocument(params, refOb, projectOb, refresh);
                 }],
                 viewOb: ['documentOb', (documentOb) => {
                     return documentOb;
@@ -407,8 +411,8 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 params: ['$transition$', function ($transition$): {[paramName: string]: any } {
                     return $transition$.params();
                 }],
-                documentOb: ['ResolveService', 'params', 'refOb', (resolveSvc: ResolveService, params: {[paramName: string]: any }, refOb) => {
-                    return resolveSvc.getDocumentPreview(params, refOb)
+                documentOb: ['ResolveService', 'params', 'refresh', 'refOb', (resolveSvc: ResolveService, params: {[paramName: string]: any }, refresh: boolean, refOb) => {
+                    return resolveSvc.getDocumentPreview(params, refOb, refresh)
                 }],
                 viewOb: ['documentOb', (documentOb) => {
                     return documentOb;
@@ -430,8 +434,8 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 params: ['$transition$', function ($transition$): {[paramName: string]: any } {
                     return $transition$.params();
                 }],
-                documentOb: ['params', 'ResolveService', function (params: {[paramName: string]: any }, resolveSvc: ResolveService) {
-                    return resolveSvc.getProjectDocument(params);
+                documentOb: ['params', 'refresh', 'ResolveService', function (params: {[paramName: string]: any }, refresh: boolean, resolveSvc: ResolveService) {
+                    return resolveSvc.getProjectDocument(params, refresh);
                 }],
                 viewOb: ['documentOb', function (documentOb: ViewObject) {
                     return documentOb;
@@ -492,11 +496,8 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                 params: ['$transition$', function ($transition$): {[paramName: string]: any } {
                     return $transition$.params();
                 }],
-                viewOb: ['ResolveService', 'params', (resolveSvc: ResolveService, params) => {
-                    return resolveSvc.getView(params).then((response) => {
-                        let viewOb = response;
-                        return viewOb;
-                    });
+                viewOb: ['ResolveService', 'params', 'refresh', (resolveSvc: ResolveService, params, refresh) => {
+                    return resolveSvc.getView(params, refresh);
                 }],
                 groupOb: ['groupObs', 'documentOb', 'ResolveService', function (groupObs, documentOb, resolveSvc: ResolveService) {
                     resolveSvc.getGroup(groupObs,documentOb);
@@ -526,6 +527,11 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
         })
         .state('main.project.ref.document.order', {
             url: '/order',
+            resolve: {
+                documentOb: ['params', 'ResolveService', function (params: {[paramName: string]: any }, resolveSvc: ResolveService) {
+                    return resolveSvc.getProjectDocument(params, true);
+                }],
+            },
             views: {
                 'pane-center@main': {
                     component: 'reorderDocument'

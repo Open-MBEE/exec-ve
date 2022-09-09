@@ -160,14 +160,14 @@ class RefsController{
                 getFilter: () => {
                     return this.$filter;
                 },
-                getProjectOb: () => {
-                    return this.mmsProject;
+                getProjectId: () => {
+                    return this.mmsProject.id;
                 },
-                getRefOb: () => {
-                    return this.mmsRef;
+                getRefId: () => {
+                    return this.mmsRef.id;
                 },
-                getOrgOb: () => {
-                    return this.mmsOrg;
+                getOrgId: () => {
+                    return this.mmsOrg.id;
                 },
                 getSeenViewIds: () => {
                     return null;

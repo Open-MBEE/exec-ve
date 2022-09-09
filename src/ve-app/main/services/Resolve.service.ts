@@ -1,5 +1,5 @@
 import * as angular from 'angular';
-import {Transition, UIRouter} from "@uirouter/angularjs";
+import {Transition, TransitionOptions, UIRouter} from "@uirouter/angularjs";
 import {
     AuthService,
     ElementService,
@@ -108,11 +108,11 @@ export class ResolveService {
         return this._filterRefs("Branch", refObs);
     }
 
-    public getGroups(params): angular.IPromise<ElementObject[]> {
-        return this.projectSvc.getGroups(params.projectId, params.refId)
+    public getGroups(params, refresh?: boolean): angular.IPromise<ElementObject[]> {
+        return this.projectSvc.getGroups(params.projectId, params.refId, refresh)
     }
 
-    public getGroup(groupObs,documentOb): ElementObject {
+    public getGroup(groupObs, documentOb): ElementObject {
         var group = null;
         if (documentOb) {
             for (var i = 0; i < groupObs.length; i++) {
@@ -125,7 +125,7 @@ export class ResolveService {
         return group;
     }
 
-    public getDocument(params, refOb, projectOb): angular.IPromise<ViewObject> {
+    public getDocument(params, refOb: RefObject, projectOb: ProjectObject, refresh?: boolean): angular.IPromise<ViewObject> {
         var deferred: angular.IDeferred<ViewObject> = this.$q.defer();
         var eid = params.projectId + '_cover';
         this.elementSvc.getElement({
@@ -133,7 +133,7 @@ export class ResolveService {
             refId: params.refId,
             extended: true,
             elementId: eid
-        }, 2).then((data) => {
+        }, 2, refresh).then((data) => {
             deferred.resolve(data);
         }, (reason) => {
             if (reason.status === 404) {
@@ -202,7 +202,7 @@ export class ResolveService {
         return deferred.promise;
     }
 
-    public getDocumentPreview(params: {[paramName: string]: any}, refOb: ElementObject): angular.IPromise<ElementObject> {
+    public getDocumentPreview(params: {[paramName: string]: any}, refOb: RefObject, refresh?: boolean): angular.IPromise<ElementObject> {
 
         var deferred: angular.IDeferred<ElementObject> = this.$q.defer();
         var eid = params.documentId;
@@ -214,7 +214,7 @@ export class ResolveService {
                 refId: params.refId,
                 extended: true,
                 elementId: eid
-            }, 2).then((data) => {
+            }, 2, refresh).then((data) => {
                 deferred.resolve(data);
             }, (reason) => {
                 if (reason.status === 404) {
@@ -222,7 +222,7 @@ export class ResolveService {
                         deferred.resolve(reason);
                     } else {
                         var viewDoc = '<transclude-group-docs mms-group-id="' + groupId + '">[cf:group docs]</transclude-group-docs>';
-                        this.elementSvc.getElement({projectId: params.projectId, refId: params.refId, elementId: groupId})
+                        this.elementSvc.getElement({projectId: params.projectId, refId: params.refId, elementId: groupId}, 2, refresh)
                             .then((groupElement) => {
                                 this.viewSvc.createView({
                                     _projectId: params.projectId,
@@ -249,7 +249,7 @@ export class ResolveService {
                 }
             });
         } else {
-            this.getProjectDocument(params).then((data) =>{
+            this.getProjectDocument(params, refresh).then((data) =>{
                 deferred.resolve(data);
             }, (reason) => {
                 deferred.reject(reason);
@@ -258,21 +258,21 @@ export class ResolveService {
         return deferred.promise;
     }
 
-    public getProjectDocument(params: {[paramName: string]: any}): angular.IPromise<ViewObject> {
+    public getProjectDocument(params: {[paramName: string]: any}, refresh?: boolean): angular.IPromise<ViewObject> {
         return this.viewSvc.getProjectDocument({
             projectId: params.projectId,
             refId: params.refId,
             extended: false,
             documentId: params.documentId
-        }, 2);
+        }, 2, refresh);
     }
 
-    public getView(params) {
+    public getView(params, refresh?: boolean) {
         return this.elementSvc.getElement({
             projectId: params.projectId,
             refId: params.refId,
             elementId: params.viewId
-        }, 2);
+        }, 2, refresh);
     }
 
     public getSearch(params) {

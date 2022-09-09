@@ -9,10 +9,12 @@ export * from "./services/ViewHtml.service"
 export * from "./services/Presentation.service"
 
 //Components
+import "./add-pe-menu.component"
 import "./view.component"
 export * from "./view.component"
 import "./view-pe.component"
 export * from "./view-pe.component"
+import "./view-link.component"
 
 //Presentations
 import "./components/present-equation.component"
@@ -25,5 +27,6 @@ import "./components/present-table.component"
 import "./components/present-table-t.component"
 import "./components/present-section.component"
 
-//Directives
-import "./mmsViewLink.directive"
+//Compatibility
+import "./mms-view-compatibility.component";
+

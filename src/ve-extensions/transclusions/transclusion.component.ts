@@ -12,7 +12,7 @@ import {ViewController} from "@ve-ext/presentations/view.component";
  * @requires $compile
  *
  * @description
- * Given an element id, puts in the element's name binding, if there's a parent 
+ * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -70,7 +70,7 @@ export class TransclusionController implements angular.IComponentController {
     }
 
     //INFO this was this.getWsAndVersion
-    private getElementOrigin = () => {
+    public getElementOrigin = () => {
         return {
             projectId: this.projectId,
             refId: this.refId,

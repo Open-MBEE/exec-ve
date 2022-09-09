@@ -8,6 +8,7 @@ export interface TreeBranch extends ITreeNode {
     group?: ElementObject
     data: ViewObject
     children: TreeBranch[]
+    hide?: boolean
     level?: number
     new?: string
     loading?: boolean
@@ -85,14 +86,15 @@ declare namespace AngularUITree {
         (source: ITreeNodeScope, destination: ITreeNodeScope, destinationIndex: number): boolean;
     }
 
-    interface IDroppedCallback {
+    interface IDragCallback {
         (eventInfo: IEventInfo): void;
     }
 
     interface ICallbacks {
         accept?: IAcceptCallback;
-        dragStart?: IDroppedCallback;
-        dropped?: IDroppedCallback;
+        dragStart?: IDragCallback;
+        dropped?: IDragCallback;
+        dragStop?: IDragCallback;
     }
 
     /**

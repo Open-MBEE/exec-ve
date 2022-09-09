@@ -374,7 +374,7 @@ export class ViewService {
                         childrenFunc(curItem, childNodes)
                     }
                     this.$q.all(childPromises).then(
-                        (childNodes) => {
+                        () => {
                             deferred.resolve(curItem)
                         },
                         (reason) => {
@@ -1237,27 +1237,27 @@ export class ViewService {
      * Gets all the documents in a site
      *
      * @param {Object} reqOb object containing project and ref ids needed to resolve request
-     * @param {boolean} [update=false] Update latest
+     * @param {boolean} [refresh=false] Update latest
      * @param {int} weight the priority of the request
      * @returns {Promise} The promise will be resolved with array of document objects
      */
     public getProjectDocuments(
         reqOb,
         weight,
-        update?
+        refresh?
     ): angular.IPromise<ViewObject[]> {
         this.utilsSvc.normalize(reqOb)
         var deferred: angular.IDeferred<ViewObject[]> = this.$q.defer()
         var url = this.uRLSvc.getProjectDocumentsURL(reqOb)
         var cacheKey = ['documents', reqOb.projectId, reqOb.refId]
-        if (this.cacheSvc.exists(cacheKey) && !update) {
+        if (this.cacheSvc.exists(cacheKey) && !refresh) {
             deferred.resolve(this.cacheSvc.get(cacheKey))
         } else {
-            if (update === undefined) {
-                update = false
+            if (refresh === undefined) {
+                refresh = false
             }
             this.elementSvc
-                .getGenericElements(url, reqOb, 'documents', weight, update)
+                .getGenericElements(url, reqOb, 'documents', weight, refresh)
                 .then(
                     (data) => {
                         this.cacheSvc.put(cacheKey, data, false)
@@ -1283,30 +1283,30 @@ export class ViewService {
      *
      * @param {object} reqOb object containing project, ref, document ids needed to resolve request
      * @param {int} weight the priority of the request
-     * @param {boolean} update [default=false] Update latest
+     * @param {boolean} refresh [default=false] refresh latest
      * @returns {Promise} The promise will be resolved with array of document objects
      */
     public getProjectDocument(
         reqOb,
         weight,
-        update?
+        refresh?
     ): angular.IPromise<ViewObject> {
         reqOb.elementId = reqOb.documentId
         var cacheKey = this.elementSvc.getElementKey(reqOb)
         var deferred: angular.IDeferred<ViewObject> = this.$q.defer()
         var cached = this.cacheSvc.get<ViewObject>(cacheKey)
-        if (update === undefined) {
-            update = false
+        if (refresh === undefined) {
+            refresh = false
         }
         if (
             cached &&
-            !update &&
+            !refresh &&
             (!reqOb.extended || (reqOb.extended && cached._qualifiedId))
         ) {
             deferred.resolve(cached)
             return deferred.promise
         }
-        this.getProjectDocuments(reqOb, weight, update).then(
+        this.getProjectDocuments(reqOb, weight, refresh).then(
             (result) => {
                 var documentOb = result.filter((resultOb) => {
                     return resultOb.id === reqOb.documentId
