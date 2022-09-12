@@ -325,7 +325,7 @@ export class VeEditorController implements angular.IComponentController {
         };
 
 
-        public transcludeCallback = (ed) => {
+        public transcludeCallback = (ed: CKEDITOR.editor) => {
 
             const tSettings: VeModalSettings = {
                 component: 'transcludeModal',
@@ -340,7 +340,8 @@ export class VeEditorController implements angular.IComponentController {
                 size: 'lg'
             }
             var tInstance = this.$uibModal.open(tSettings);
-            tInstance.result.then((tag) => {
+            tInstance.result.then((result) => {
+                const tag = result.$value;
                 this._addWidgetTag(ed, tag);
             }, () => {
                 var focusManager: CKEDITOR.focusManager = new this.cKEditor.focusManager( ed );
@@ -355,7 +356,7 @@ export class VeEditorController implements angular.IComponentController {
 
 
 
-        public viewLinkCallback = (ed) => {
+        public viewLinkCallback = (ed: CKEDITOR.editor) => {
             const vSettings: VeModalSettings = {
                 component: 'transcludeModal',
                 resolve: <TranscludeModalResolveFn>{
@@ -370,12 +371,13 @@ export class VeEditorController implements angular.IComponentController {
             };
                 var vInstance = this.$uibModal.open(vSettings);
 
-                vInstance.result.then((data) => {
-                    this._addWidgetTag(ed, data.$value);
+                vInstance.result.then((result) => {
+                    const tag = result.$value;
+                    this._addWidgetTag(ed, tag);
                 });
             };
 
-        public commentCallback = (ed) => {
+        public commentCallback = (ed: CKEDITOR.editor) => {
             const cSettings: VeModalSettings = {
                 component: 'transcludeModal',
                 resolve: <TranscludeModalResolveFn>{
@@ -389,17 +391,19 @@ export class VeEditorController implements angular.IComponentController {
             };
             var cInstance = this.$uibModal.open(cSettings);
 
-            cInstance.result.then((tag) => {
+            cInstance.result.then((result) => {
+                const tag = result.$value;
                 this._addWidgetTag(ed, tag);
             });
         };
 
-        public resetCrossRef = (type, typeString) => {
-            type.forEach((value, key) => {
-                var transclusionObject = angular.element(value);
-                var transclusionId = transclusionObject.attr('mms-element-id');
-                var transclusionKey = this.utilsSvc.makeElementKey({elementId: transclusionId, projectId: this.mmsProjectId, refId: this.mmsRefId});
-                var inCache: ElementObject = this.cacheSvc.get<ElementObject>(transclusionKey);
+        public resetCrossRef = (type: CKEDITOR.dom.node[], typeString) => {
+            type.forEach((node, key) => {
+                let value = node.$;
+                let transclusionObject = angular.element(value);
+                const transclusionId = transclusionObject.attr('mms-element-id');
+                const transclusionKey = this.utilsSvc.makeElementKey({elementId: transclusionId, projectId: this.mmsProjectId, refId: this.mmsRefId});
+                const inCache: ElementObject = this.cacheSvc.get<ElementObject>(transclusionKey);
                 if (inCache) {
                     transclusionObject.html('[cf:' + inCache.name + typeString);
                 } else {
@@ -420,12 +424,12 @@ export class VeEditorController implements angular.IComponentController {
             });
         };
 
-        public mmsResetCallback = (ed) => {
+        public mmsResetCallback = (ed: CKEDITOR.editor) => {
             var body = ed.document.getBody();
-            this.resetCrossRef(body.find("mms-cf[mms-cf-type='name']").$, '.name]');
-            this.resetCrossRef(body.find("mms-cf[mms-cf-type='doc']").$, '.doc]');
-            this.resetCrossRef(body.find("mms-cf[mms-cf-type='val']").$, '.val]');
-            this.resetCrossRef(body.find('view-link').$, '.vlink]');
+            this.resetCrossRef(body.find("mms-cf[mms-cf-type='name']").toArray(), '.name]');
+            this.resetCrossRef(body.find("mms-cf[mms-cf-type='doc']").toArray(), '.doc]');
+            this.resetCrossRef(body.find("mms-cf[mms-cf-type='val']").toArray(), '.val]');
+            this.resetCrossRef(body.find('view-link').toArray(), '.vlink]');
             this.update();
         };
 
@@ -457,7 +461,7 @@ export class VeEditorController implements angular.IComponentController {
             return url.toString();
         }
 
-        private _addWidgetTag = (editor, tag) => {
+        private _addWidgetTag = (editor: CKEDITOR.editor, tag: string) => {
             editor.insertHtml( tag );
             this.utils.focusOnEditorAfterAddingWidgetTag(editor);
         }
@@ -519,7 +523,7 @@ export class VeEditorController implements angular.IComponentController {
             return keyboardEvent.shiftKey;
         }
 
-         private _addContextMenuItems = (editor) => {
+         private _addContextMenuItems = (editor: CKEDITOR.editor) => {
              this._addFormatAsCodeMenuItem(editor);
         }
 

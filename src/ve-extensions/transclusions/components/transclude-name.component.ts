@@ -37,7 +37,7 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's name binding, if there's a parent 
+ * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -82,9 +82,6 @@ export class TranscludeNameController extends Transclusion implements ITransclus
     }
 
     protected config = () => {
-        this.eventSvc.$init(this)
-
-
         this.$element.on('click', (e) => {
             if (this.noClick)
                 return;

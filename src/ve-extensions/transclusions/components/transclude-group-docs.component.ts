@@ -28,7 +28,7 @@ class TranscludeGroupDocsController extends Transclusion implements ITransclusio
     template = `<table class="table table-condensed">
     <tr><th>Document(s)</th><!--<th>Last Modified</th><th>Last Modified By</th><th>Created</th>--></tr>
     <tr ng-repeat="doc in $ctrl.docs | orderBy: 'name'">
-        <td><mms-view-link mms-document-id="{{doc.id}}" mms-element-id="{{doc.id}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}"></mms-view-link></td>
+        <td><view-link mms-document-id="{{doc.id}}" mms-element-id="{{doc.id}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}"></view-link></td>
     </tr>
 </table>
 `
@@ -111,7 +111,7 @@ class TranscludeGroupDocsController extends Transclusion implements ITransclusio
 
 };
 
-let TranscludeGroupDocsComponent: VeComponentOptions = {
+export let TranscludeGroupDocsComponent: VeComponentOptions = {
         selector: 'transcludeGroupDocs',
         template: `<div></div>`,
         bindings: {

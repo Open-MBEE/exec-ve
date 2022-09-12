@@ -33,7 +33,7 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @restrict E
  *
  * @description
- * Given an element id, puts in the element's name binding, if there's a parent 
+ * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -44,7 +44,7 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeValController extends Transclusion implements ITransclusion{
+export class TranscludeValController extends Transclusion implements ITransclusion {
 
     //Custom Bindings
     first: boolean

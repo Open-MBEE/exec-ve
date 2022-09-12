@@ -5,7 +5,7 @@ import {StateService} from '@uirouter/angularjs'
 import {AppUtilsService} from '@ve-app/main/services'
 import {
     PermissionsService,
-    URLService
+    URLService, ViewApi
 } from "@ve-utils/mms-api-client"
 import {
     EventService,
@@ -24,6 +24,7 @@ import {VeComponentOptions} from '@ve-types/view-editor'
 
 import {veApp} from "@ve-app";
 import {ContentWindowService} from "@ve-app/pane-center/services/ContentWindow.service";
+import {ElementObject} from "@ve-types/mms";
 
 class SlideshowController implements angular.IComponentController {
     public orgOb
@@ -41,9 +42,14 @@ class SlideshowController implements angular.IComponentController {
     public bbApi
     bbId = 'view-ctrl'
     bars: string[] = []
-    comments = {
+    comments: {
+        count: number,
+        lastCommented: Date,
+        lastCommentedBy: string,
+        map: object
+    } = {
         count: 0,
-        lastCommented: '',
+        lastCommented: null,
         lastCommentedBy: '',
         map: {},
     }
@@ -51,6 +57,7 @@ class SlideshowController implements angular.IComponentController {
     dynamicPopover: { templateUrl: 'shareUrlTemplate.html'; title: 'Share' }
     copyToClipboard: ($event: any) => void
     handleShareURL: any
+    viewApi: ViewApi;
 
     static $inject = [
         '$scope',
@@ -125,7 +132,97 @@ class SlideshowController implements angular.IComponentController {
             )
         )
 
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, this)
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, (api: ButtonBarApi) => {
+            if (
+                this.viewOb &&
+                this.refOb.type === 'Branch' &&
+                this.permissionsSvc.hasBranchEditPermission(this.refOb)
+            ) {
+                api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
+                api.setToggleState('show-edits', this.rootScopeSvc.veEditMode())
+                // @ts-ignore
+                this.hotkeys.bindTo(this.$scope).add({
+                    combo: 'alt+d',
+                    description: 'toggle edit mode',
+                    callback: () => {
+                        this.eventSvc.$broadcast('show-edits')
+                    },
+                })
+            }
+            api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
+            api.setToggleState(
+                'show-elements',
+                this.rootScopeSvc.veElementsOn()
+            )
+            api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
+            api.setToggleState(
+                'show-comments',
+                this.rootScopeSvc.veCommentsOn()
+            )
+
+            // Set hotkeys for toolbar
+            this.hotkeys
+                .bindTo(this.$scope)
+                .add({
+                    combo: 'alt+c',
+                    description: 'toggle show comments',
+                    callback: () => {
+                        this.eventSvc.$broadcast('show-comments')
+                    },
+                })
+                .add({
+                    combo: 'alt+e',
+                    description: 'toggle show elements',
+                    callback: () => {
+                        this.eventSvc.$broadcast('show-elements')
+                    },
+                })
+
+            if (
+                this.$state.includes('main.project.ref.preview') ||
+                this.$state.includes('main.project.ref.document')
+            ) {
+                api.addButton(
+                    this.buttonBarSvc.getButtonBarButton('refresh-numbering')
+                )
+                // api.addButton(this.buttonBarSvc.getButtonBarButton('share-url'));
+                api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
+                if (this.$state.includes('main.project.ref.document')) {
+                    var exportButtons: IButtonBarButton =
+                        this.buttonBarSvc.getButtonBarButton('export')
+                    if (!exportButtons.dropdown_buttons)
+                        exportButtons.dropdown_buttons = []
+                    exportButtons.dropdown_buttons.push(
+                        this.buttonBarSvc.getButtonBarButton('convert-pdf')
+                    )
+                    api.addButton(exportButtons)
+                    api.addButton(
+                        this.buttonBarSvc.getButtonBarButton('center-previous')
+                    )
+                    api.addButton(this.buttonBarSvc.getButtonBarButton('center-next'))
+                    // Set hotkeys for toolbar
+                    // @ts-ignore
+                    this.hotkeys
+                        .bindTo(this.$scope)
+                        .add({
+                            combo: 'alt+.',
+                            description: 'next',
+                            callback: () => {
+                                this.eventSvc.$broadcast('center-next')
+                            },
+                        })
+                        .add({
+                            combo: 'alt+,',
+                            description: 'previous',
+                            callback: () => {
+                                this.eventSvc.$broadcast('center-previous')
+                            },
+                        })
+                } else {
+                    api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
+                }
+            }
+        }, this)
         //Set BB ID after initalization to prevent bar from starting too soon
 
         this.buttons = this.bbApi.buttons
@@ -312,6 +409,11 @@ class SlideshowController implements angular.IComponentController {
                 )
             })
         )
+
+        this.viewApi = {
+            elementClicked: this.elementClicked,
+            elementTranscluded: this.elementTranscluded
+        }
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject) {
@@ -325,15 +427,7 @@ class SlideshowController implements angular.IComponentController {
         this.buttonBarSvc.destroy(this.bars)
     }
 
-    isPageLoading() {
-        if (this.$element.find('.isLoading').length > 0) {
-            this.growl.warning('Still loading!')
-            return true
-        }
-        return false
-    }
-
-    elementTranscluded(elementOb, type) {
+    public elementTranscluded = (elementOb: ElementObject, type) => {
         if (
             type === 'Comment' &&
             !this.comments.map.hasOwnProperty(elementOb.id)
@@ -347,7 +441,7 @@ class SlideshowController implements angular.IComponentController {
         }
     }
 
-    elementClicked(elementOb) {
+    public elementClicked = (elementOb: ElementObject) => {
         let data = {
             elementOb: elementOb,
             commitId: 'latest',
@@ -355,96 +449,12 @@ class SlideshowController implements angular.IComponentController {
         this.eventSvc.$broadcast('element.selected', data)
     }
 
-    bbInit = (api: ButtonBarApi) => {
-        if (
-            this.viewOb &&
-            this.refOb.type === 'Branch' &&
-            this.permissionsSvc.hasBranchEditPermission(this.refOb)
-        ) {
-            api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
-            api.setToggleState('show-edits', this.rootScopeSvc.veEditMode())
-            // @ts-ignore
-            this.hotkeys.bindTo(this.$scope).add({
-                combo: 'alt+d',
-                description: 'toggle edit mode',
-                callback: () => {
-                    this.eventSvc.$broadcast('show-edits')
-                },
-            })
+    isPageLoading() {
+        if (this.$element.find('.isLoading').length > 0) {
+            this.growl.warning('Still loading!')
+            return true
         }
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
-        api.setToggleState(
-            'show-elements',
-            this.rootScopeSvc.veElementsOn()
-        )
-        api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
-        api.setToggleState(
-            'show-comments',
-            this.rootScopeSvc.veCommentsOn()
-        )
-
-        // Set hotkeys for toolbar
-        this.hotkeys
-            .bindTo(this.$scope)
-            .add({
-                combo: 'alt+c',
-                description: 'toggle show comments',
-                callback: () => {
-                    this.eventSvc.$broadcast('show-comments')
-                },
-            })
-            .add({
-                combo: 'alt+e',
-                description: 'toggle show elements',
-                callback: () => {
-                    this.eventSvc.$broadcast('show-elements')
-                },
-            })
-
-        if (
-            this.$state.includes('main.project.ref.preview') ||
-            this.$state.includes('main.project.ref.document')
-        ) {
-            api.addButton(
-                this.buttonBarSvc.getButtonBarButton('refresh-numbering')
-            )
-            // api.addButton(this.buttonBarSvc.getButtonBarButton('share-url'));
-            api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
-            if (this.$state.includes('main.project.ref.document')) {
-                var exportButtons: IButtonBarButton =
-                    this.buttonBarSvc.getButtonBarButton('export')
-                if (!exportButtons.dropdown_buttons)
-                    exportButtons.dropdown_buttons = []
-                exportButtons.dropdown_buttons.push(
-                    this.buttonBarSvc.getButtonBarButton('convert-pdf')
-                )
-                api.addButton(exportButtons)
-                api.addButton(
-                    this.buttonBarSvc.getButtonBarButton('center-previous')
-                )
-                api.addButton(this.buttonBarSvc.getButtonBarButton('center-next'))
-                // Set hotkeys for toolbar
-                // @ts-ignore
-                this.hotkeys
-                    .bindTo(this.$scope)
-                    .add({
-                        combo: 'alt+.',
-                        description: 'next',
-                        callback: () => {
-                            this.eventSvc.$broadcast('center-next')
-                        },
-                    })
-                    .add({
-                        combo: 'alt+,',
-                        description: 'previous',
-                        callback: () => {
-                            this.eventSvc.$broadcast('center-previous')
-                        },
-                    })
-            } else {
-                api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
-            }
-        }
+        return false
     }
 }
 
@@ -474,7 +484,7 @@ let SlideshowComponent: VeComponentOptions = {
                 <div id="print-div" ng-if="$ctrl.viewOb">
                     <view mms-element-id="{{$ctrl.viewOb.id}}" mms-commit-id="latest"
                               mms-project-id="{{$ctrl.projectOb.id}}" mms-ref-id="{{$ctrl.refOb.id}}"
-                                mms-link="$ctrl.vidLink"></view>
+                                mms-link="$ctrl.vidLink" mms-view-api="$ctrl.viewApi"></view>
                 </div>
             </div>
         </div>

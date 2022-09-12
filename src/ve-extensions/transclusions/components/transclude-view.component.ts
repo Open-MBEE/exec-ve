@@ -2,7 +2,7 @@ import * as angular from "angular";
 
 import {
     AuthService,
-    ElementService,
+    ElementService, ViewApi,
     ViewService
 } from "@ve-utils/mms-api-client"
 import {
@@ -16,6 +16,7 @@ import {VeComponentOptions} from "@ve-types/view-editor";
 import {ITransclusion, Transclusion} from "@ve-ext/transclusions";
 import {veExt, ExtUtilService, ExtensionService} from "@ve-ext";
 import {SchemaService} from "@ve-utils/model-schema";
+import {ViewController} from "@ve-ext/presentations";
 
 /**
  * @ngdoc component
@@ -55,6 +56,11 @@ import {SchemaService} from "@ve-utils/model-schema";
  */
 export class TranscludeViewController extends Transclusion implements ITransclusion {
 
+    //Custom Bindings
+    public noTitle: boolean
+
+    public viewApi: ViewApi
+
     static $inject = Transclusion.$inject
 
     constructor(
@@ -81,8 +87,19 @@ export class TranscludeViewController extends Transclusion implements ITransclus
         this.checkCircular = true;
     }
 
-    protected getContents = () => {
-        return this.$q.resolve('<view mms-element-id="$ctrl.elementId" mms-project-id="$ctrl.projectId" mms-ref-id="$ctrl.refId" mms-commit-id="$ctrl.commitId"></view>')
+    protected config = () => {
+
+        if (typeof this.noTitle === 'undefined') {
+            this.noTitle = true;
+        }
+
+        if (this.mmsViewCtrl) {
+            this.viewApi = this.mmsViewCtrl.mmsViewApi
+        }
+    }
+
+    public getContent = () => {
+        return this.$q.resolve('<view mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" no-title="{{$ctrl.noTitle}}" mms-view-api="$ctrl.viewApi"></view>')
     }
 
 
@@ -90,7 +107,7 @@ export class TranscludeViewController extends Transclusion implements ITransclus
 
 
 const TranscludeViewComponent: VeComponentOptions = {
-    selector: "mmsTranscludeView",
+    selector: "transcludeView",
     template: `<div></div>`,
     bindings: {
         mmsElementId: '@',
@@ -100,7 +117,8 @@ const TranscludeViewComponent: VeComponentOptions = {
         mmsWatchId: '@',
         nonEditable: '<',
         mmsCfLabel: '@',
-        mmsGenerateForDiff: '<'
+        mmsGenerateForDiff: '<',
+        noTitle: '@'
     },
     require: {
         mmsViewCtrl: '?^^view',

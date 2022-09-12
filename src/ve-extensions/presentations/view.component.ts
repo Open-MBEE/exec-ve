@@ -76,7 +76,9 @@ export class ViewController implements angular.IComponentController {
     private mmsRefId: string;
     private mmsCommitId: string;
     private mmsLink: boolean;
-    private mmsViewApi: ViewApi;
+    public mmsViewApi: ViewApi;
+    private mmsNumber: number
+    public noTitle: boolean;
 
     static $inject = [ '$element', 'growl', 'CoreUtilsService', 'AuthService', 'PresentationService', 'ViewService',
         'ElementService', 'EventService', 'TreeService', 'RootScopeService']
@@ -96,6 +98,7 @@ export class ViewController implements angular.IComponentController {
     private treeApi: TreeApi
 
 
+
     constructor(private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService,
                 private utils: CoreUtilsService, private authSvc: AuthService, private presentationSvc: PresentationService,
                 private viewSvc: ViewService, private elementSvc: ElementService, private eventSvc: EventService,
@@ -107,6 +110,8 @@ export class ViewController implements angular.IComponentController {
 
         this.reqOb = {elementId: this.mmsElementId, projectId: this.mmsProjectId, refId: this.mmsRefId, commitId: this.mmsCommitId};
         this.processed = false;
+
+        this.number = (this.mmsNumber) ? this.mmsNumber.toString(10) : '';
 
         this.isSection = false;
         this.showElements = false;
@@ -336,21 +341,21 @@ export let ViewComponent: VeComponentOptions = {
     selector: 'view',
     template: `
     <div id="{{$ctrl.mmsElementId}}" ng-class="{landscape: $ctrl.view._printLandscape}">
-
-    <h1 ng-if="$ctrl.mmsLink" class="view-title">
-      <span class="ve-view-number">{{$ctrl.number}}</span> <view-link ng-class="{'docTitle-underlined': isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
-      <view-link class="open-document" ng-mouseover="hoverIn()" ng-mouseleave="hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
-        link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
-    </h1>
-
-    <h1 ng-if="!$ctrl.mmsLink" class="view-title h{{level}}">
-        <span class="ve-view-number">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}"></transclude-name>
-    </h1>
-
-    <div class="ve-secondary-text last-modified no-print">
-      Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email !== undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b>
+    <div ng-if="!$ctrl.noTitle">
+        <h1 ng-if="$ctrl.mmsLink" class="view-title">
+          <span class="ve-view-number">{{$ctrl.number}}</span> <view-link ng-class="{'docTitle-underlined': isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
+          <view-link class="open-document" ng-mouseover="hoverIn()" ng-mouseleave="hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
+            link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
+        </h1>
+    
+        <h1 ng-if="!$ctrl.mmsLink" class="view-title h{{level}}">
+            <span class="ve-view-number">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}"></transclude-name>
+        </h1>
+    
+        <div class="ve-secondary-text last-modified no-print">
+          Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email !== undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b>
+        </div>
     </div>
-
     <i ng-hide="$ctrl.view" class="fa fa-2x fa-spinner fa-spin"></i>
 
     <add-pe-menu mms-view="$ctrl.view" index="-1" class="add-pe-button-container no-print"></add-pe-menu>
@@ -377,7 +382,9 @@ export let ViewComponent: VeComponentOptions = {
         mmsRefId: '@',
         mmsCommitId: '@',
         mmsLink: '<',
-        mmsViewApi: '<'
+        mmsViewApi: '<',
+        mmsNumber: '<',
+        noTitle: '@'
     },
     controller: ViewController
 }
