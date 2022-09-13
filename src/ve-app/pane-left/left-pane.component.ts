@@ -507,7 +507,6 @@ class LeftPaneController implements angular.IComponentController {
     }
   };
 
-
   addSectionElements(element, viewNode, parentNode, initial?) {
     var contents:ValueSpec | null = null
 

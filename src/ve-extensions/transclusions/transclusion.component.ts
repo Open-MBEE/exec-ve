@@ -38,7 +38,7 @@ export class TransclusionController implements angular.IComponentController {
     mmsGenerateForDiff: boolean;
 
     //Deps
-    mmsCfCtrl: TransclusionController
+    transclusionCtrl: TransclusionController
     mmsViewCtrl: ViewController
 
     //Local
@@ -89,8 +89,8 @@ export class TransclusionController implements angular.IComponentController {
         let projectId = this.mmsProjectId;
         let refId = this.mmsRefId;
         let commitId = this.mmsCommitId;
-        if (this.mmsCfCtrl) {
-            let cfVersion = this.mmsCfCtrl.getElementOrigin();
+        if (this.transclusionCtrl) {
+            let cfVersion = this.transclusionCtrl.getElementOrigin();
             if (!projectId)
                 projectId = cfVersion.projectId;
             if (!refId)
@@ -113,12 +113,12 @@ export class TransclusionController implements angular.IComponentController {
         this.projectId = projectId;
         this.refId = refId ? refId : 'master';
         this.commitId = commitId ? commitId : 'latest';
-        this.templateElementHtml = this.$element[0].innerHTML;
+        //this.templateElementHtml = this.$element[0].innerHTML;
         if (this.mmsCfType) {
             this.$element.empty();
             let tag = this.extensionSvc.getTagByType("transclude", this.mmsCfType)
             if (tag === 'extension-error') {
-                this.$transcludeEl = $('<extension-error ext-kind="$ctrl.extType" ext-type="$ctrl.mmsCfType" mms-element-id="$ctrl.mmsElementId"></extension-error>');
+                this.$transcludeEl = $('<error ext-kind="$ctrl.extType" ext-type="$ctrl.mmsCfType" mms-element-id="$ctrl.mmsElementId"></error>');
             }else {
                 this.$transcludeEl = $('<' + tag + (this.mmsGenerateForDiff ? ' mms-generate-for-diff="mmsGenerateForDiff" ' : '') + ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable" mms-cf-label="{{$ctrl.templateElementHtml}}"></' + tag + '>');
             }
@@ -143,7 +143,7 @@ let TransclusionComponent: VeComponentOptions = {
         mmsGenerateForDiff: '<'
     },
     require: {
-        mmsCfCtrl: '?^^transclusion',
+        transclusionCtrl: '?^^transclusion',
         mmsViewCtrl: '?^^view'
     },
     controller: TransclusionController

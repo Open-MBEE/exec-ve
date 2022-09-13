@@ -17,9 +17,9 @@ export interface ElementObject extends MmsObject {
     [key: string]: any
 }
 
-export interface InstanceObject extends ElementObject {
+export interface ExpressionObject extends ElementObject {
     specification?: ElementObject
-    operand?: InstanceObject[]
+    operand?: ExpressionObject[]
     value?: any
 }
 
@@ -27,7 +27,7 @@ export interface InstanceObject extends ElementObject {
 export interface ViewObject extends ElementObject {
     _relatedDocuments?: ViewObject[]
     _parentViews?: ViewObject[]
-    _contents?: InstanceObject
+    _contents?: ExpressionObject
     _childViews?: ViewObject[]
 }
 
@@ -45,9 +45,9 @@ export interface PresentationInstanceObject extends MmsObject {
     body?: any[]
 }
 
-export interface PresentationObject extends InstanceObject {
-    value: PresentationInstanceObject
-}
+// export interface PresentationObject extends ExpressionObject {
+//     value: PresentationInstanceObject
+// }
 
 export interface DocumentObject extends ViewObject {
     _groupId?: string

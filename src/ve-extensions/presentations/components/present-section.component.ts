@@ -55,7 +55,7 @@ class PresentSectionController extends Presentation implements IPresentation, Ve
     }
 
     protected config = () => {
-        this.section = this.element = this.element;
+        this.section = this.element;
 
 
         this.$element.on("click", (e) => {

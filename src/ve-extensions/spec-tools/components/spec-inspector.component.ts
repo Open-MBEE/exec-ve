@@ -8,7 +8,7 @@ import {EventService, UtilsService} from "@ve-utils/core-services";
 import {SpecService} from "@ve-ext/spec-tools";
 import {VeComponentOptions} from "@ve-types/view-editor";
 
-import {ISpecTool, SpecTool} from "../spec-tool.controller";
+import {ISpecTool, SpecTool} from "@ve-ext/spec-tools";
 import {ToolbarService} from "@ve-ext/spec-tools";
 
 
@@ -16,8 +16,8 @@ import {ToolbarService} from "@ve-ext/spec-tools";
  * @ngdoc directive
  * @name veExt.directive:mmsSpec
  *
- * @requires veUtils/Utils
- * @required veUtils/URLService
+ * @requires veExt/ExtUtilService
+ * @requires veUtils/URLService
  * @requires veUtils/AuthService
  * @requires veUtils/ElementService
  * @requires veUtils/ViewService
@@ -153,16 +153,6 @@ let SpecInspectorComponent: VeComponentOptions = {
 
         <div ng-if="$ctrl.element.type === 'Constraint'">
             <h2 class="prop-title">Constraint Specification</h2>
-<!--            <div ng-switch on="$ctrl.values[0].type">-->
-<!--                <span class="prop" ng-switch-when="LiteralInteger">{{$ctrl.values[0].value}}</span>-->
-<!--                <span class="prop" ng-switch-when="LiteralBoolean">{{$ctrl.values[0].value}}</span>-->
-<!--                <span class="prop" ng-switch-when="LiteralReal">{{$ctrl.values[0].value | veRealNum}}</span>-->
-<!--                <span class="prop" ng-switch-when="LiteralUnlimitedNatural">{{$ctrl.values[0].value}}</span>-->
-<!--                <span class="prop" ng-switch-when="LiteralString" ng-bind-html="$ctrl.values[0].value"></span>-->
-<!--                <span class="prop" ng-switch-when="ElementValue"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.values[0].elementId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>-->
-<!--                <span class="prop" ng-switch-when="OpaqueExpression">{{$ctrl.values[0].body[0]}}</span>-->
-<!--                <span class="prop" ng-switch-default>{{$ctrl.values}}</span>-->
-<!--            </div>-->
             <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}" non-editable="true" first="true"></transclude-val>
         </div>
 

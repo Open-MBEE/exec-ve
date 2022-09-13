@@ -210,7 +210,7 @@ export class VeEditorController implements angular.IComponentController {
                                 }
 
                                 if (element.name.startsWith('mms-')) {
-                                    if (element.name !== 'view-link' && element.name !== 'mms-cf' && element.name !== 'transclude-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                    if (element.name !== 'view-link' && element.name !== 'transclusion' && element.name !== 'transclude-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
                                         element.replaceWithChildren();
                                         return;
                                     }
@@ -233,8 +233,8 @@ export class VeEditorController implements angular.IComponentController {
                                     return;
                                 }
 
-                                if (element.name.startsWith('mms-')) {
-                                    if (element.name !== 'view-link' && element.name !== 'mms-cf' && element.name !== 'transclude-group-docs' && element.name !== 'mms-diff-attr' && element.name !== 'mms-value-link') {
+                                if (element.name.startsWith('transclude-') || element.name.startsWith('present-') || element.name.startsWith('view')) {
+                                    if (element.name !== 'view-link' && element.name !== 'transclude-group-docs' && element.name !== 'transclude-diff-attr' && element.name !== 'mms-value-link') {
                                         element.replaceWithChildren();
                                         return;
                                     }

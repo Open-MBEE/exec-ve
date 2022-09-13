@@ -12,18 +12,13 @@ import {
 } from "@ve-utils/core-services";
 import {CoreUtilsService} from "@ve-core/core";
 import {ToolbarService} from 'src/ve-extensions/spec-tools/services/Toolbar.service';
-import {SpecApi, SpecService} from "../../ve-extensions/spec-tools/services/Spec.service";
+import {SpecApi, SpecService} from "@ve-ext/spec-tools";
 import {VeComponentOptions, VeModalService} from "@ve-types/view-editor";
 
 import {veApp} from "@ve-app";
 import {ElementObject, ElementsRequest} from "@ve-types/mms";
 
 
-/* Controllers */
-
-//veApp.controller('ToolCtrl', ['this', ]);
-//TODO: Make this more flexible and based on a more extensible pattern?
-// Example:https://kamranicus.com/dynamic-angularjs-components/
 let RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
     template: `
@@ -51,7 +46,7 @@ let RightPaneComponent: VeComponentOptions = {
         documentOb;
         viewOb;
 
-        
+
 
         public subs: Rx.IDisposable[];
 

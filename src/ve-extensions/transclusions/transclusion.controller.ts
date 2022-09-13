@@ -246,11 +246,11 @@ export class Transclusion implements ITransclusion {
      */
     protected destroy:() => void = () => {}
 
-    public getContent = (preview?): angular.IPromise<string | HTMLElement[]> => {
+    public getContent = (preview?: boolean): angular.IPromise<string | HTMLElement[]> => {
         return this.$q.resolve('Not Yet Implemented');
     }
 
-    protected recompile = (preview?): void =>  {
+    protected recompile = (preview?: boolean): void =>  {
         this.getContent(preview).then((result) => {
             this.$element.empty();
             this.$transcludeEl = $(result);
@@ -320,6 +320,7 @@ export class Transclusion implements ITransclusion {
                 }
             }, (reason) => {
                 this.$element.empty()
+                //TODO: Add reason/errorMessage handling here.
                 this.$transcludeEl = $('<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></annotation>');
                 this.$element.append(this.$transcludeEl);
                 this.$compile(this.$transcludeEl)(Object.assign(this.$scope.$new(), {

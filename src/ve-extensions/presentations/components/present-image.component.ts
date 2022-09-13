@@ -1,7 +1,7 @@
 import * as angular from "angular";
 import {PresentationComponentOptions} from "@ve-ext/presentations";
 import {veExt} from "@ve-ext";
-import {InstanceObject, PresentationInstanceObject} from "@ve-types/mms";
+import {ExpressionObject, PresentationInstanceObject} from "@ve-types/mms";
 
 let PresentImageComponent: PresentationComponentOptions = {
     selector: 'presentImage',
@@ -22,7 +22,7 @@ let PresentImageComponent: PresentationComponentOptions = {
     controller: class PresentImageController implements angular.IComponentController {
 
         public peObject: PresentationInstanceObject
-        public element: InstanceObject
+        public element: ExpressionObject
         public peNumber: string
 
         constructor() {}

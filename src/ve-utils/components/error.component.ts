@@ -11,6 +11,7 @@ class ExtensionErrorController implements angular.IComponentController {
     //Bindings
     extType
     extKind
+    errorMsg: string
     mmsElementId
 
     //Local Structure
@@ -24,10 +25,15 @@ class ExtensionErrorController implements angular.IComponentController {
     }
 
     $onInit() {
+        this.id = this.mmsElementId;
+        if (!this.extKind && !this.extType) {
+            this.title = "Error"
+            this.content = (this.errorMsg) ? this.errorMsg : "There was a problem displaying your content."
+            return;
+        }
         let localKind = (this.extKind) ? _.capitalize(this.extKind) : "Element"
         let localExtType = _.capitalize(this.extType);
 
-        this.id = this.mmsElementId
         this.title = "Unsupported " + localKind + " Type: " + localExtType;
         this.content = "This " + localKind + " has a rendering type: " + localExtType + " that is not supported by View Editor"
     }
@@ -38,14 +44,14 @@ class ExtensionErrorController implements angular.IComponentController {
 }
 
 let ExtensionErrorComponent: VeComponentOptions = {
-    selector: 'extensionError',
+    selector: 'error',
     template: `
     <span class="mms-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{$ctrl.title}}"></span>
 <script type="text/ng-template" id="annotationTemplate">
     <p>
         {{$ctrl.content}}
     </p>
-    <a href="https://github.com/open-mbee/ve">Contribute Your Idea</a>
+    <a href="https://github.com/open-mbee/ve/issues">Report Issues/Contribute Your Idea</a>
     <p id="tooltipElementId" style="position: absolute; left: -1000px; top: -1000px; ">
         {{$ctrl.mmsElementId}}
     </p>
@@ -55,6 +61,7 @@ let ExtensionErrorComponent: VeComponentOptions = {
     bindings: {
         extType: "<",
         extKind: "<",
+        errorMsg: "<",
         mmsElementId: "<"
     },
     controller: ExtensionErrorController

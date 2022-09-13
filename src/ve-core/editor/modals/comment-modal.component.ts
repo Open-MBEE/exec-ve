@@ -67,7 +67,7 @@ let CommentModalComponent: VeComponentOptions = {
         var reqOb = {elements: this.comment, elementId: this.comment.id, projectId: this.mmsProjectId, refId: this.mmsRefId};
         this.elementSvc.createElement(reqOb)
             .then((data) => {
-                let tag = '<mms-cf mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</mms-cf>';
+                let tag = '<transclusion mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</transclusion>';
                 this.close({ $value: tag });
             }, (reason) => {
                 this.growl.error("Comment Error: " + reason.message);

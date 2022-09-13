@@ -1,7 +1,7 @@
 import * as angular from "angular";
 import {PresentationComponentOptions, ViewHtmlService} from "@ve-ext/presentations";
 import {veExt, ExtUtilService} from "@ve-ext";
-import {InstanceObject, PresentationInstanceObject} from "@ve-types/mms";
+import {ExpressionObject, PresentationInstanceObject} from "@ve-types/mms";
 
 let PresentListComponent: PresentationComponentOptions = {
     selector: 'presentList',
@@ -14,7 +14,7 @@ let PresentListComponent: PresentationComponentOptions = {
     controller: class PresentListController implements angular.IComponentController {
 
         public peObject: PresentationInstanceObject
-        public element: InstanceObject
+        public element: ExpressionObject
         public peNumber: string
 
         constructor(private $element: JQuery<HTMLElement>, private $scope: angular.IScope,

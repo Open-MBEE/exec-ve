@@ -162,7 +162,7 @@ let TranscludeModalComponent: VeModalComponent = {
         public choose = (elem: ElementObject, property: string) => {
             let tag = '';
             if (!this.viewLink) {
-                tag = '<mms-cf mms-cf-type="' + property + '" mms-element-id="' + elem.id + '" non-editable="' + this.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</mms-cf>';
+                tag = '<transclusion mms-cf-type="' + property + '" mms-element-id="' + elem.id + '" non-editable="' + this.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</transclusion>';
             }
             else {
                 var did = null;

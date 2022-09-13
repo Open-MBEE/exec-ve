@@ -2,7 +2,7 @@ import * as angular from "angular";
 import {ViewHtmlService} from "@ve-ext/presentations";
 import {ExtensionController, ExtUtilService} from "@ve-ext";
 import {ViewPresentationElemController} from "@ve-ext/presentations";
-import {ElementObject, InstanceObject, PresentationInstanceObject, ViewObject} from "@ve-types/mms";
+import {ElementObject, ExpressionObject, PresentationInstanceObject, ViewObject} from "@ve-types/mms";
 import {PresentationService} from "@ve-ext/presentations";
 import {ButtonBarApi, ButtonBarService} from "@ve-utils/button-bar";
 import {EventService} from "@ve-utils/core-services";
@@ -20,7 +20,7 @@ export class Presentation implements IPresentation {
 
     //Bindings
     public peObject: PresentationInstanceObject
-    public element: InstanceObject
+    public element: ExpressionObject
     public peNumber: string
     protected mmsProjectId: string;
     protected mmsRefId: string;

@@ -50,10 +50,10 @@ let MMSMention = {
                 mmsMentionId
                 mmsProjectId
                 mmsRefId
-        
+
         //Local
         public fastCfListing
-        
+
         constructor(private mentionSvc : MentionService, private utils: CoreUtilsService) {
         }
 
@@ -68,7 +68,7 @@ let MMSMention = {
         }
 
         private _createCf($item) {
-            var tag = '<mms-cf mms-cf-type="' + $item.type + '" mms-element-id="' + $item.id + '">[cf:' + $item.name + '.' + $item.type + ']</mms-cf>';
+            var tag = '<transclusion mms-cf-type="' + $item.type + '" mms-element-id="' + $item.id + '">[cf:' + $item.name + '.' + $item.type + ']</transclusion>';
             this.mmsEditor.insertHtml(tag);
             this.utils.focusOnEditorAfterAddingWidgetTag(this.mmsEditor);
         }
