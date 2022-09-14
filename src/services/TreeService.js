@@ -666,5 +666,6 @@ function TreeApi($timeout, RootScopeService, EventService, TreeService) {
     this.on_treeData_change = on_treeData_change;
     this.on_initialSelection_change = on_initialSelection_change;
     this.expandPathToSelectedBranch = expandPathToSelectedBranch;
+    this.get_parent_branch = get_parent;
 
 }
