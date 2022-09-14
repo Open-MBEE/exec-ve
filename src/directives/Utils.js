@@ -973,6 +973,9 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     var fixImgSrc = function(imgDom) {
         var src = imgDom.attr('src');
         if (src) {
+            if (src.indexOf('http') < 0) {
+                src = URLService.getRoot() + src;
+            }
             imgDom.attr('src', src + '?token=' + AuthService.getToken());
         }
         if (imgDom.width() < 860) { //keep image relative centered with text if less than 9 in

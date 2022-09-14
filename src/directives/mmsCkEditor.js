@@ -504,7 +504,7 @@ function mmsCkeditor($uibModal, $templateCache, $timeout, growl, CKEDITOR, _, Ca
                 var formData = new FormData();
                 var xhr = fileLoader.xhr;
 
-                xhr.open( 'POST', URLService.getPutArtifactsURL({projectId: scope.mmsProjectId, refId: scope.mmsRefId, elementId: UtilsService.createMmsId().replace('MMS', 'VE')}), true );                
+                xhr.open( 'POST', URLService.getPutArtifactsURL({projectId: scope.mmsProjectId, refId: scope.mmsRefId, elementId: UtilsService.createMmsId().replace('MMS', '_hidden_image')}), true );                
                 //xhr.withCredentials = true;
                 xhr.setRequestHeader('Authorization', URLService.getAuthorizationHeaderValue());
                 formData.append('file', fileLoader.file, fileLoader.fileName );

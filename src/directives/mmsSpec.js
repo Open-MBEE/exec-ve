@@ -96,11 +96,12 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
         };
 
         var getModifier = function(modifier) {
-            AuthService.getUserData(modifier).then(function(modifierData){
+            return modifier;
+            /*AuthService.getUserData(modifier).then(function(modifierData){
                 return modifierData.users[0];
             }, function() {
                 return modifier;
-            });
+            });*/
         };
 
         if (scope.mmsElement) {
@@ -154,11 +155,12 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                     return;
                 }
                 scope.element = data;
-                AuthService.getUserData(data._modifier).then(function(modifierData){
+                scope.modifier = data._modifier;
+                /*AuthService.getUserData(data._modifier).then(function(modifierData){
                     scope.modifier = modifierData.users[0];
                 }, function() {
                     scope.modifier = data._modifier;
-                });
+                });*/
                 Utils.setupValCf(scope);
                 if (!scope.mmsCommitId || scope.mmsCommitId === 'latest') {
                     ElementService.search(reqOb, {

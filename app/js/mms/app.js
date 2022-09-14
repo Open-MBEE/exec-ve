@@ -422,7 +422,7 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
                             },{
                                 viewName: projectOb.name + ' Cover Page',
                                 viewId: eid
-                            }, 2).then(function(data) {
+                            }).then(function(data) {
                                 deferred.resolve(data);
                             }, function(reason2) {
                                 deferred.resolve(null);

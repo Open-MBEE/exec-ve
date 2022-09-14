@@ -106,11 +106,12 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
                 if (elem._modified > $scope.modified && type !== 'Comment') {
                     $scope.modified = elem._modified;
                     if (elem._modifier) {
-                        AuthService.getUserData(elem._modifier).then(function(modifierData){
+                        $scope.modifier = elem._modifier;
+                        /*AuthService.getUserData(elem._modifier).then(function(modifierData){
                                 $scope.modifier = modifierData.users[0];
                         }, function() {
                             $scope.modifier = elem._modifier;
-                        });
+                        });*/
                     }
                 }
                 if ($scope.mmsViewApi && $scope.mmsViewApi.elementTranscluded)
@@ -187,22 +188,24 @@ function mmsView(Utils, AuthService, ViewService, ElementService, $templateCache
                     //getting cached individual elements should be faster
                     scope.view = data;
                     scope.modified = data._modified;
-                    AuthService.getUserData(data._modifier).then(function(modifierData){
+                    scope.modifier = data._modifier;
+                    /*AuthService.getUserData(data._modifier).then(function(modifierData){
                         scope.modifier = modifierData.users[0];
                     }, function() {
                         scope.modifier = data._modifier;
-                    });
+                    });*/
                     return;
                 }
                 ViewService.getViewElements(reqOb, 1)
                 .finally(function() {
                     scope.view = data;
                     scope.modified = data._modified;
-                    AuthService.getUserData(data._modifier).then(function(modifierData){
+                    scope.modifier = data._modifier;
+                    /*AuthService.getUserData(data._modifier).then(function(modifierData){
                         scope.modifier = modifierData.users[0];
                     }, function() {
                         scope.modifier = data._modifier;
-                    });
+                    });*/
                     element.removeClass('isLoading');
                 });
             }, function(reason) {
