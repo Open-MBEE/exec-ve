@@ -17,7 +17,8 @@ import "./tools-navbar.component";
 import "./components/spec-inspector.component"
 import "./components/spec-editor.component"
 import "./components/spec-reorder.component";
-import "./components/mmsHistory.directive.ts"
+import "./components/spec-history.component";
+import "./components/spec-ref-list.component";
 
 
 

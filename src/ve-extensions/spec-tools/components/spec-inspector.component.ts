@@ -2,7 +2,7 @@ import * as angular from "angular";
 import _ from "lodash";
 
 import {veExt, ExtUtilService} from "@ve-ext";
-import {URLService, ViewService} from "@ve-utils/mms-api-client";
+import {ProjectService, URLService, ViewService} from "@ve-utils/mms-api-client";
 import{AuthService, PermissionsService, ElementService} from "@ve-utils/mms-api-client";
 import {EventService, UtilsService} from "@ve-utils/core-services";
 import {SpecService} from "@ve-ext/spec-tools";
@@ -14,7 +14,7 @@ import {ToolbarService} from "@ve-ext/spec-tools";
 
 /**
  * @ngdoc directive
- * @name veExt.directive:mmsSpec
+ * @name veExt.component:mmsSpec
  *
  * @requires veExt/ExtUtilService
  * @requires veUtils/URLService
@@ -27,7 +27,6 @@ import {ToolbarService} from "@ve-ext/spec-tools";
  * @requires growl
  * @requires _
  *
- * @restrict E
  *
  * @description
  * Outputs a "spec window" of the element whose id is specified. Spec includes name,
@@ -88,16 +87,15 @@ class SpecInspectorController extends SpecTool implements ISpecTool  {
 
         static $inject = SpecTool.$inject;
 
-        constructor($scope: angular.IScope, $element: JQuery<HTMLElement>,
+        constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
                     growl: angular.growl.IGrowlService, extUtilSvc: ExtUtilService, uRLSvc: URLService,
-                    authSvc: AuthService, elementSvc: ElementService, utilsSvc: UtilsService,
-                    viewSvc: ViewService, permissionsSvc: PermissionsService,
+                    authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
+                    utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
                     eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService) {
-            super($scope,$element,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
+            super($scope,$element,$q,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
 
             this.specType = _.kebabCase(SpecInspectorComponent.selector)
             this.specTitle = "Preview Element";
-            this.specKind = "document";
         }
 
         protected initCallback = () => {

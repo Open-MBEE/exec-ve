@@ -11,12 +11,11 @@ import {ElementObject, ElementsRequest} from "@ve-types/mms";
 
 /**
  * @ngdoc directive
- * @name veExt.directive:mmsViewLink
+ * @name veExt.component:mmsViewLink
  *
  * @requires veUtils/ElementService
  * @requires $compile
  *
- * @restrict E
  *
  * @description
  * Given a view id and optional document id, creates a html link

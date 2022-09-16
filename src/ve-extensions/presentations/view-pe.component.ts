@@ -21,7 +21,6 @@ import {ElementObject, PresentationInstanceObject} from "@ve-types/mms";
  * @requires growl
  *
  *
- * @restrict E
  *
  * @description
  * Given a InstanceVal, parses the element reference tree to get the corresponding

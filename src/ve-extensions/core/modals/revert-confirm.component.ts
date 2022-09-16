@@ -68,6 +68,8 @@ let RevertConfirmComponent: VeComponentOptions = {
                 compareCommit
                 element
 
+        static $inject = ['growl', 'ElementService', 'EventService'];
+
         constructor(private growl, private elementSvc : ElementService, private eventSvc : EventService) {
         }
 

@@ -23,7 +23,7 @@ let RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
     template: `
     <div class="pane-right">
-    <tools-pane tools-category="{{$ctrl.toolsCategory}}"></tools-pane>
+    <tools-pane tools-category="{{$ctrl.toolsCategory}}" mms-branches="$ctrl.branchObs" mms-tags="$ctrl.tagObs"></tools-pane>
 </div>
     `,
     bindings: {
@@ -83,14 +83,19 @@ let RightPaneComponent: VeComponentOptions = {
                 projectId: this.projectOb.id,
                 elementId: ""
             }
+            if (this.documentOb) {
+                this.specApi.docId = (this.documentOb) ? this.documentOb.id : ""
+            }
             this.specSvc.specApi = this.specApi
                 this.specSvc.editable = this.documentOb && this.refOb.type === 'Branch' && this.permissionsSvc.hasBranchEditPermission(this.refOb);
 
             //Set the viewOb if found first otherwise fallback to documentOb or nothing
             if (this.viewOb) {
                 this.specApi.elementId = this.viewOb.id;
+                this.specApi.docId = this.documentOb.id;
             } else if (this.documentOb) {
                 this.specApi.elementId = this.documentOb.id;
+                this.specApi.docId = this.documentOb.id;
             }
 
             //Independent of viewOb if there is a document we want document tools enabled
@@ -134,9 +139,7 @@ let RightPaneComponent: VeComponentOptions = {
                     id: 'element',
                     value: editable
                 });
-                this.specSvc.setElement().then(() => {
-                    this.eventSvc.$broadcast('spec.ready');
-                });
+                this.specSvc.setElement();
             }));
 
             this.subs.push(this.eventSvc.$on('element.updated',(data: {element: ElementObject, continueEdit: boolean}) => {
@@ -144,9 +147,7 @@ let RightPaneComponent: VeComponentOptions = {
                 let continueEdit = data.continueEdit;
                 if (elementOb.id === this.specApi.elementId && elementOb._projectId === this.specApi.projectId &&
                     elementOb._refId === this.specApi.refId && !continueEdit) {
-                    this.specSvc.setElement().then(() => {
-                        this.eventSvc.$broadcast('spec.ready');
-                    });
+                    this.specSvc.setElement();
                 }
             }));
 

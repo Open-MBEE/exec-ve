@@ -5,7 +5,7 @@ import Rx from 'rx-lite';
 import {
     AuthService,
     ElementService,
-    PermissionsService,
+    PermissionsService, ProjectService,
     URLService,
     ViewService
 } from "@ve-utils/mms-api-client"
@@ -15,7 +15,7 @@ import {
     UtilsService
 } from "@ve-utils/core-services";
 import {ISpecToolButton, ToolbarService} from "./services/Toolbar.service";
-import {ElementObject, ElementsRequest} from "@ve-types/mms";
+import {ElementObject, ElementsRequest, RefObject, ViewObject} from "@ve-types/mms";
 import {VeEditorApi} from "@ve-core/editor";
 import {onChangesCallback} from "@ve-utils/utils";
 import {veExt, ExtUtilService, ExtensionController} from "@ve-ext";
@@ -87,6 +87,8 @@ export interface ISpecToolScope extends IPaneScope {
 export class SpecTool implements ISpecTool {
 
     //Bindings
+    // mmsBranches
+    // mmsTags
     // mmsElementId;
     // mmsProjectId;
     // mmsRefId;
@@ -94,13 +96,11 @@ export class SpecTool implements ISpecTool {
     // mmsElement;
 
     //
-    protected specApi: SpecApi
+    public specApi: SpecApi
 
     //Customizers
     public specType: string
     public specTitle: string
-    protected specKind: string
-    public specButton: ISpecToolButton
 
 
     public subs: Rx.IDisposable[];
@@ -125,6 +125,8 @@ export class SpecTool implements ISpecTool {
     protected gettingSpec = false;
     protected isSlot: boolean = false;
     public element: ElementObject;
+    public document: ViewObject;
+    public ref: RefObject;
     public values: any[];
     public edit: ElementObject;
     protected modifier;
@@ -141,13 +143,13 @@ export class SpecTool implements ISpecTool {
     protected template: string | Injectable<(...args: any[]) => string>
 
 
-    static $inject = ['$scope', '$element', 'growl', 'ExtUtilService', 'URLService', 'AuthService', 'ElementService',
-        'UtilsService', 'ViewService', 'PermissionsService', 'EventService', 'SpecService', 'ToolbarService'];
+    static $inject = ['$scope', '$element', '$q', 'growl', 'ExtUtilService', 'URLService', 'AuthService', 'ElementService',
+        'ProjectService', 'UtilsService', 'ViewService', 'PermissionsService', 'EventService', 'SpecService', 'ToolbarService'];
 
-    constructor(public $scope: angular.IScope, protected $element: JQuery<HTMLElement>,
+    constructor(public $scope: angular.IScope, protected $element: JQuery<HTMLElement>, protected $q: angular.IQService,
                 protected growl: angular.growl.IGrowlService, protected extUtilSvc: ExtUtilService, protected uRLSvc: URLService,
-                protected authSvc: AuthService, protected elementSvc: ElementService, protected utilsSvc: UtilsService,
-                protected viewSvc: ViewService, protected permissionsSvc: PermissionsService,
+                protected authSvc: AuthService, protected elementSvc: ElementService, protected projectSvc: ProjectService,
+                protected utilsSvc: UtilsService, protected viewSvc: ViewService, protected permissionsSvc: PermissionsService,
                 protected eventSvc: EventService, protected specSvc: SpecService, protected toolbarSvc: ToolbarService) {
 
     }
@@ -209,10 +211,17 @@ export class SpecTool implements ISpecTool {
 
     public changeElement = () => {
         this.specApi = this.specSvc.specApi;
-        this.element = this.specSvc.getElement();
-        this.values = this.specSvc.getValues();
-        this.modifier = this.specApi.modifier;
+        this.refId = this.specApi.refId;
+        this.projectId = this.specApi.projectId;
+        this.commitId = this.specApi.commitId;
+        this.modifier = this.specSvc.getModifier();
         this.qualifiedName = this.specApi.qualifiedName
+        this.element = this.specSvc.getElement();
+        this.document = this.specSvc.getDocument();
+        this.values = this.specSvc.getValues();
+        this.ref = this.specSvc.getRef();
+
+        this.initCallback();
     }
 
 
@@ -237,8 +246,8 @@ export class SpecTool implements ISpecTool {
 
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsSpec#save
-     * @methodOf veExt.directive:mmsSpec
+     * @name veExt.component:mmsSpec#save
+     * @methodOf veExt.component:mmsSpec
      *
      * @description
      * save edited element

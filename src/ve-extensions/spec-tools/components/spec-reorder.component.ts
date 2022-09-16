@@ -1,12 +1,13 @@
 import * as angular from "angular";
 import * as _ from "lodash";
 import {SpecService} from "@ve-ext/spec-tools";
-import {ReorderService, ElementReferences} from "../services/Reorder.service";import {
+import {ReorderService, ElementReferences} from "@ve-ext/spec-tools";
+import {
     AuthService,
     PermissionsService,
     URLService,
     ElementService,
-    ViewService
+    ViewService, ProjectService
 } from "@ve-utils/mms-api-client"
 import {
     EventService,
@@ -18,19 +19,16 @@ import {SpecTool, ISpecTool} from "@ve-ext/spec-tools";
 import {veExt, ExtUtilService} from "@ve-ext";
 import {ToolbarService} from "@ve-ext/spec-tools";
 
-//veExt.directive('mmsSpecReorder', ['ElementService', 'ViewService', 'PermissionsService', '$templateCache', 'growl', '$q', mmsSpecReorder]);
-
 /**
  * @ngdoc directive
- * @name veExt.directive:mmsSpecReorder
+ * @name veExt.component:mmsSpecReorder
  *
  * @requires veUtils/ViewService
  * @requires $templateCache
  *
- * @restrict E
  *
  * @description
- * Visualize and edit the structure of a view 
+ * Visualize and edit the structure of a view
  *
  * @param {string} mmsElementId The id of the view
  * @param {string} mmsProjectId The project id for the view
@@ -47,12 +45,13 @@ class SpecReorderController extends SpecTool implements ISpecTool {
 
     static $inject = [...SpecTool.$inject, 'ReorderService'];
 
-    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>,
+    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
                 growl: angular.growl.IGrowlService, extUtilSvc: ExtUtilService, uRLSvc: URLService,
-                authSvc: AuthService, elementSvc: ElementService, utilsSvc: UtilsService,
-                viewSvc: ViewService, permissionsSvc: PermissionsService,
-                eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService, private specReorderSvc: ReorderService) {
-        super($scope, $element, growl, extUtilSvc, uRLSvc, authSvc, elementSvc, utilsSvc, viewSvc, permissionsSvc, eventSvc, specSvc, toolbarSvc)
+                authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
+                utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
+                eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService,
+                private specReorderSvc: ReorderService) {
+        super($scope,$element,$q,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
         this.specType = _.kebabCase(SpecReorderComponent.selector)
         this.specTitle = "Reorder Spec";
     }

@@ -792,7 +792,7 @@ export class ElementService {
      * @param {boolean} [update=false] update from server
      * @returns {Promise} The promise will be resolved with an array of commit objects.
      */
-    getElementHistory(reqOb: ElementsRequest, weight: number, update: boolean): angular.IPromise<CommitObject[]> {
+    getElementHistory(reqOb: ElementsRequest, weight: number, update?: boolean): angular.IPromise<CommitObject[]> {
         this.utilsSvc.normalize(reqOb);
 
         var key = this.uRLSvc.getElementHistoryURL(reqOb);

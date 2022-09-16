@@ -7,7 +7,7 @@ import {ElementService} from "@ve-utils/mms-api-client/Element.service";
 import {ViewService} from "@ve-utils/mms-api-client/View.service";
 import {ProjectService} from "@ve-utils/mms-api-client/Project.service";
 import {EditService, SessionService} from "@ve-utils/core-services";
-import {AuthResponse, CheckAuthResponse} from "@ve-types/mms";
+import {AuthResponse, CheckAuthResponse, OrgObject, OrgsResponse, UserObject, UsersResponse} from "@ve-types/mms";
 
 
 /**
@@ -25,14 +25,16 @@ import {AuthResponse, CheckAuthResponse} from "@ve-types/mms";
  * Provide general authorization functions. I.e. login, logout, etc...
  */
 export class AuthService {
-    
+
+    private inProgress: { [p: string]: angular.IPromise<any>} = {}
+
     private token = this.$window.localStorage.getItem('token');
     static injector = ['$q', '$http', '$window', '$analytics', 'CacheService', 'URLService', 'HttpService', 'ElementService', 'ViewService', 'ProjectService', 'SessionService', 'EditService'];
     constructor(private $q, private $http: angular.IHttpService, private $window, private $analytics,
                 private cacheSvc : CacheService, private uRLSvc : URLService, private httpSvc : HttpService,
                 private elementSvc : ElementService, private viewSvc : ViewService, private projectSvc : ProjectService,
                 private sessionSvc : SessionService, private editSvc : EditService) {
-    
+
     }
 
     getAuthorized(credentialsJSON) {
@@ -107,22 +109,25 @@ export class AuthService {
     //     })
     // }
 
-    getUserData(username){
-        var deferred = this.$q.defer();
-        if (!this.token) {
-            deferred.reject(false);
-            return deferred.promise;
+    getUserData(username: string): angular.IPromise<UserObject> {
+        let deferred: angular.IDeferred<UserObject> = this.$q.defer();
+        var key = ['user', username];
+        var urlkey = this.uRLSvc.getPersonURL(username);
+        if (this.cacheSvc.exists(key)) {
+            deferred.resolve(this.cacheSvc.get<UserObject>(key));
+        } else {
+            this.$http.get(urlkey).then((response: angular.IHttpResponse<UsersResponse>) => {
+                if (!response.data.users || response.data.users.length < 1) {
+                    deferred.reject({status: 404, data: '', message: 'User not found'});
+                } else {
+                    this.cacheSvc.put(key, response.data.users[0], false);
+                    deferred.resolve(this.cacheSvc.get<UserObject>(key));
+                }
+            }, (response) => {
+                this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
+            })
+
         }
-
-        this.$http.get(this.uRLSvc.getPersonURL(username)).then((success) => {
-            deferred.resolve(success.data);
-        }, (fail) =>{
-            deferred.reject(fail);
-            if (fail.status === '401') {
-                this.removeToken();
-            }
-
-        });
         return deferred.promise;
     };
 

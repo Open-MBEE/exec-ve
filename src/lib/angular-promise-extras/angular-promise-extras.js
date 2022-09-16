@@ -24,7 +24,7 @@
       $q.allSettled = function(promises) {
         return $q.all(mapValues(promises, function(promiseOrValue) {
           if (! promiseOrValue.then)
-            return { state: 'fulfilled', value: promiseOrValue }
+            return { state: 'pending', value: promiseOrValue }
 
           return promiseOrValue.then(function(value) {
             return { state: 'fulfilled', value: value }

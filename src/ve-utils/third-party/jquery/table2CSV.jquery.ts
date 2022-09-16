@@ -1,6 +1,6 @@
 import * as jQuery from 'jquery';
 
-jQuery.fn.table2CSV = function(inputOptions) {
+jQuery.fn.table2CSV = (inputOptions) => {
     var options = jQuery.extend({
         separator: ',',
         header: [],
@@ -8,22 +8,22 @@ jQuery.fn.table2CSV = function(inputOptions) {
     },
     inputOptions);
 
-    var csvData = [];
-    var el = this;
-    
-    function handleMatrix(bodyTag, cellTag) {
-        var spanData = {}; //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
-        var curRow = 0;
-        $(el).children(bodyTag).children('tr').each(function() {
+    let csvData = [];
+    const el = this;
+
+    const handleMatrix = (bodyTag: string, cellTag: string) => {
+        const spanData = {}; //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
+        let curRow: number = 0;
+        $(el).children(bodyTag).children('tr').each((index, element) => {
             tmpRow = [];
             var curCol = 0;
-            $(this).children(cellTag).each(function() {
+            $(element).children(cellTag).each((index, element) => {
                 while(spanData[curRow] && spanData[curRow][curCol]) {
                     tmpRow.push('""');
                     curCol++;
                 }
-                tmpRow.push(formatData($(this).text()));
-                var rowstring = $(this).attr('rowspan');
+                tmpRow.push(formatData($(element).text()));
+                var rowstring = $(element).attr('rowspan');
                 if (rowspan) {
                     var rowspan = parseInt(rowstring);
                     if (rowspan > 1) {
@@ -35,7 +35,7 @@ jQuery.fn.table2CSV = function(inputOptions) {
                         }
                     }
                 }
-                var colstring = $(this).attr('colspan');
+                var colstring = $(element).attr('colspan');
                 if (!colstring){
                     curCol++;
                     return;
@@ -60,7 +60,7 @@ jQuery.fn.table2CSV = function(inputOptions) {
 
     //header
     var numCols = options.header.length;
-    var tmpRow = []; 
+    var tmpRow = [];
     if (numCols > 0) {
         for (var i = 0; i < numCols; i++) {
             tmpRow[tmpRow.length] = formatData(options.header[i]);

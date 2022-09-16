@@ -32,8 +32,8 @@ private \l$1Svc: $1Service$2
 private $1$2: angular.I\u$2Service
 
 //Constructor to static $inject
-(public|private) (\$)?([a-zA-Z]{2,20}): [A-Za-z\.]*(,?)\n?
-'$2$3'$4
+\s*(public|private) (\$)?([a-zA-Z]{2,20}|\$q): [A-Z<>a-z\.]*(,?)\n?
+ '$2$3'$4
 
 //then convert back to Service formal names
 '([a-zA-Z]*)Svc'
@@ -53,8 +53,8 @@ private ([a-zA-Z]{0,20}) ?:? ?([a-zA-Z$]*)
 
 
 //Change existing prototypes to instances for callback
-(   )([a-zA-Z]{2,50})(\([A-Za-z:=>\(\), \$\?]*\))(: [A-Za-z]*)? \{
-$1 public $2 = $3$4 => {
+(   )(public|private)? ([_a-zA-Z]{2,50})(\([A-Za-z:=>\(\), \$\?]*\))(: [A-Za-z]*)? \{
+$1 $2 $3 = $4 => {
 
 For refactoring
 ((import \{)(, )?(.*)(\} from "@ve-utils/mms-api-client")(;)?\n)?((import \{)(.*), ?(AuthService|CacheService|ElementService|HttpService|PermissionsService|ProjectService|URLService|ViewService)(\n)?(, )?(.*)?(, )?(\} from "@ve-utils/core-services"))

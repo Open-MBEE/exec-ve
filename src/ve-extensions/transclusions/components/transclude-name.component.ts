@@ -34,7 +34,6 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @requires {EventService} eventSvc
  * @requires {MathJaxService} mathJaxSvc
  *
- * @restrict E
  *
  * @description
  * Given an element id, puts in the element's name binding, if there's a parent

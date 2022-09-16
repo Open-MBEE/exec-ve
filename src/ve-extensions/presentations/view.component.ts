@@ -16,19 +16,18 @@ import {CoreUtilsService} from "@ve-core/core";
 import {onChangesCallback} from "@ve-utils/utils";
 import {ElementObject, ElementsRequest} from "@ve-types/mms";
 import {VeComponentOptions} from "@ve-types/view-editor";
-import {veExt} from "@ve-ext";
+import {ExtUtilService, veExt} from "@ve-ext";
 import {PresentationService} from "@ve-ext/presentations/services/Presentation.service";
 
 /**
  * @ngdoc directive
- * @name veExt.directive:View
+ * @name veExt.component:View
  *
  * @requires ViewService
  * @requires ElementService
  * @requires $element
  * @requires growl
  *
- * @restrict E
  *
  * @description
  * Given a view id, renders the view according to the json given by veUtils/ViewService
@@ -80,7 +79,7 @@ export class ViewController implements angular.IComponentController {
     private mmsNumber: number
     public noTitle: boolean;
 
-    static $inject = [ '$element', 'growl', 'CoreUtilsService', 'AuthService', 'PresentationService', 'ViewService',
+    static $inject = [ '$element', 'growl', 'ExtUtilService', 'AuthService', 'PresentationService', 'ViewService',
         'ElementService', 'EventService', 'TreeService', 'RootScopeService']
     private showEdits: boolean;
     private modified: any;
@@ -100,7 +99,8 @@ export class ViewController implements angular.IComponentController {
 
 
     constructor(private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService,
-                private utils: CoreUtilsService, private authSvc: AuthService, private presentationSvc: PresentationService,
+                private extUtilSvc: ExtUtilService,
+                private authSvc: AuthService, private presentationSvc: PresentationService,
                 private viewSvc: ViewService, private elementSvc: ElementService, private eventSvc: EventService,
                 private treeSvc: TreeService, private rootScopeSvc: RootScopeService) {}
 
@@ -187,11 +187,7 @@ export class ViewController implements angular.IComponentController {
             if (elem._modified > this.modified && type !== 'Comment') {
                 this.modified = elem._modified;
                 if (elem._modifier) {
-                    this.authSvc.getUserData(elem._modifier).then((modifierData) =>{
-                            this.modifier = modifierData.users[0];
-                    }, () => {
-                        this.modifier = elem._modifier;
-                    });
+                    this.modifier = this.extUtilSvc.getModifier(elem._modifier);
                 }
             }
             if (this.mmsViewApi && this.mmsViewApi.elementTranscluded)
@@ -262,22 +258,14 @@ export class ViewController implements angular.IComponentController {
                 //getting cached individual elements should be faster
                 this.view = data;
                 this.modified = data._modified;
-                this.authSvc.getUserData(data._modifier).then((modifierData) =>{
-                    this.modifier = modifierData.users[0];
-                }, () => {
-                    this.modifier = data._modifier;
-                });
+                this.modifier = this.extUtilSvc.getModifier(data._modifier);
                 return;
             }
             this.viewSvc.getViewElements(this.reqOb, 1)
             .finally(() => {
                 this.view = data;
                 this.modified = data._modified;
-                this.authSvc.getUserData(data._modifier).then((modifierData) =>{
-                    this.modifier = modifierData.users[0];
-                }, () => {
-                    this.modifier = data._modifier;
-                });
+                this.modifier = this.extUtilSvc.getModifier(data._modifier);
                 this.$element.removeClass('isLoading');
             });
         }, (reason) => {
@@ -292,8 +280,8 @@ export class ViewController implements angular.IComponentController {
 
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsView#toggleShowElements
-     * @methodOf veExt.directive:mmsView
+     * @name veExt.component:mmsView#toggleShowElements
+     * @methodOf veExt.component:mmsView
      *
      * @description
      * toggle elements highlighting
@@ -305,8 +293,8 @@ export class ViewController implements angular.IComponentController {
 
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsView#toggleShowComments
-     * @methodOf veExt.directive:mmsView
+     * @name veExt.component:mmsView#toggleShowComments
+     * @methodOf veExt.component:mmsView
      *
      * @description
      * toggle comments visibility
@@ -318,8 +306,8 @@ export class ViewController implements angular.IComponentController {
 
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsView#toggleShowEdits
-     * @methodOf veExt.directive:mmsView
+     * @name veExt.component:mmsView#toggleShowEdits
+     * @methodOf veExt.component:mmsView
      *
      * @description
      * toggle elements editing panel

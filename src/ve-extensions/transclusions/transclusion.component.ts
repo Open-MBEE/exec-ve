@@ -7,7 +7,7 @@ import {ViewController} from "@ve-ext/presentations/view.component";
 
 /**
  * @ngdoc component
- * @name veExt.directive:mmsCf
+ * @name veExt.component:mmsCf
  *
  * @requires $compile
  *

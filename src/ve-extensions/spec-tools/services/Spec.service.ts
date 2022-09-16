@@ -3,7 +3,7 @@ import {Injectable} from 'angular'
 import {
     AuthService,
     ElementService,
-    PermissionsService,
+    PermissionsService, ProjectService,
     URLService,
     ViewService
 } from "@ve-utils/mms-api-client"
@@ -13,16 +13,16 @@ import {
     UtilsService
 } from "@ve-utils/core-services";
 import {ToolbarService} from "@ve-ext/spec-tools";
-import {ElementObject, ElementsRequest, PropertySpec} from "@ve-types/mms";
+import {ElementObject, ElementsRequest, PropertySpec, RefObject, UserObject, ViewObject} from "@ve-types/mms";
 import {VeEditorApi} from "@ve-core/editor";
 import {veExt, ExtUtilService} from "@ve-ext";
 
 export interface SpecApi extends ElementsRequest {
     elementId: string,
+    docId?: string,
     refType: "Branch"| "Tag",
     displayOldSpec?: boolean | null
     relatedDocuments?: any
-    modifier?: any;
     propSpec?: PropertySpec;
     typeClass?: string
     dataLink?: string
@@ -31,6 +31,9 @@ export interface SpecApi extends ElementsRequest {
 
 export class SpecService implements Injectable<any> {
     private element: ElementObject;
+    private document: ViewObject;
+    private modifier: UserObject;
+    private ref: RefObject;
     private values: any[];
     private edit: ElementObject;
     private editing: boolean = false;
@@ -46,21 +49,21 @@ export class SpecService implements Injectable<any> {
 
     public editValues: any[] = [];
 
-    static $inject = ['$q', '$timeout', 'growl', 'ElementService', 'ViewService', 'EventService', 'ToolbarService', 'EditService',
+    static $inject = ['$q', '$timeout', 'growl', 'ElementService', 'ProjectService', 'ViewService', 'EventService', 'ToolbarService', 'EditService',
         'ExtUtilService', 'URLService', 'AuthService', 'PermissionsService', 'UtilsService']
     private ran: boolean;
     private lastid: string;
     private gettingSpec: boolean;
     constructor(private $q: angular.IQService, private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService,
-                private elementSvc: ElementService, private viewSvc: ViewService, private eventSvc: EventService, private toolbarSvc: ToolbarService,
+                private elementSvc: ElementService, private projectSvc: ProjectService, private viewSvc: ViewService, private eventSvc: EventService, private toolbarSvc: ToolbarService,
                 private editSvc: EditService, private extUtilSvc: ExtUtilService, private uRLSvc: URLService, private authSvc: AuthService,
                 private permissionsSvc: PermissionsService, private utilsSvc: UtilsService) {
     }
 
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsSpec#toggleEditing
-     * @methodOf veExt.directive:mmsSpec
+     * @name veExt.component:mmsSpec#toggleEditing
+     * @methodOf veExt.component:mmsSpec
      *
      * @description
      * toggles editing
@@ -80,8 +83,8 @@ export class SpecService implements Injectable<any> {
     };
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsSpec#setEditing
-     * @methodOf veExt.directive:mmsSpec
+     * @name veExt.component:mmsSpec#setEditing
+     * @methodOf veExt.component:mmsSpec
      *
      * @description
      * sets editing state
@@ -101,8 +104,8 @@ export class SpecService implements Injectable<any> {
     };
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsSpec#getEditing
-     * @methodOf veExt.directive:mmsSpec
+     * @name veExt.component:mmsSpec#getEditing
+     * @methodOf veExt.component:mmsSpec
      *
      * @description
      * get editing state
@@ -114,8 +117,8 @@ export class SpecService implements Injectable<any> {
     };
     /**
      * @ngdoc function
-     * @name veExt.directive:mmsSpec#getEdits
-     * @methodOf veExt.directive:mmsSpec
+     * @name veExt.component:mmsSpec#getEdits
+     * @methodOf veExt.component:mmsSpec
      *
      * @description
      * get current edit object
@@ -135,17 +138,21 @@ export class SpecService implements Injectable<any> {
         return this.element
     }
 
+    public getDocument() {
+        return this.document;
+    }
+
+    public getModifier() {
+        return this.modifier;
+    }
+
     public getValues() {
         return this.values;
     }
 
-    public getModifier(modifier) {
-        this.authSvc.getUserData(modifier).then((modifierData) =>{
-            return modifierData.users[0];
-        }, () => {
-            return modifier;
-        });
-    };
+    public getRef() {
+        return this.ref;
+    }
 
     public getTypeClass(element: ElementObject) {
         // Get Type
@@ -153,6 +160,7 @@ export class SpecService implements Injectable<any> {
     };
 
     public getQualifiedName() {
+        const deferred: angular.IDeferred<boolean> = this.$q.defer();
         let elementOb = this.element
         if (this.edit !== undefined)
             elementOb = this.edit
@@ -164,10 +172,12 @@ export class SpecService implements Injectable<any> {
         }
         this.elementSvc.getElementQualifiedName(reqOb).then((result: string) => {
             this.specApi.qualifiedName = result;
+            deferred.resolve(true);
         })
+        return deferred.promise;
     }
 
-    public setElement(): angular.IPromise<boolean> {
+    public setElement(): void {
 
         this.specApi.relatedDocuments = null;
         this.specApi.propSpec = {}
@@ -179,21 +189,23 @@ export class SpecService implements Injectable<any> {
 
         this.specApi.extended = !(this.specApi.commitId && this.specApi.commitId !== 'latest');
 
-        return this._updateElement()
+        this._updateElement()
     }
 
-    private _updateElement(): angular.IPromise<boolean> {
-        const deferred: angular.IDeferred<boolean> = this.$q.defer()
+    private _updateElement(): void {
         const reqOb: ElementsRequest = Object.assign({}, this.specApi);
             this.elementSvc.getElement(reqOb, 2, false).then((data) => {
+                const promises: angular.IPromise<any>[] = [];
                 if (data.id !== this.lastid) {
                     return;
                 }
                 this.element = data;
                 this.values = this.extUtilSvc.setupValCf(data);
-                this.specApi.modifier = this.getModifier(data._modifier);
+                promises.push(this.authSvc.getUserData(data._modifier).then((result) => {
+                    this.modifier = result;
+                }));
                 if (!this.specApi.commitId || this.specApi.commitId === 'latest') {
-                    this.elementSvc.search(reqOb, {
+                    promises.push(this.elementSvc.search(reqOb, {
                         size: 1,
                         params: {id: data.id, _projectId: data._projectId}
                     }, 2).then((searchResultOb) => {
@@ -204,14 +216,27 @@ export class SpecService implements Injectable<any> {
                         if (searchResult && searchResult.length == 1 && searchResult[0].id === data.id && searchResult[0]._relatedDocuments && searchResult[0]._relatedDocuments.length > 0) {
                             this.specApi.relatedDocuments = searchResult[0]._relatedDocuments;
                         }
-                    });
+                    }));
                 }
-                if ((this.specApi.commitId && this.specApi.commitId !== 'latest') || !this.permissionsSvc.hasProjectIdBranchIdEditPermission(this.specApi.projectId, this.specApi.refId)) {
+                if (this.specApi.docId) {
+                    const docReq: ElementsRequest = {
+                        elementId: this.specApi.docId,
+                        projectId: this.specApi.projectId,
+                        refId: this.specApi.refId,
+                        commitId: (this.specApi.commitId) ? this.specApi.commitId : "latest"
+                    }
+                    promises.push(this.viewSvc.getProjectDocument(docReq,1).then((result) => {
+                        this.document = result;
+                    }));
+                }
+                if ((this.specApi.commitId && this.specApi.commitId !== 'latest')
+                    || !this.permissionsSvc.hasProjectIdBranchIdEditPermission(this.specApi.projectId, this.specApi.refId)
+                    || this.specApi.refType === 'Tag') {
                     this.editable = false;
                     this.edit = null;
                     this.setEditing(false);
                 } else {
-                    this.elementSvc.getElementForEdit(reqOb)
+                    promises.push(this.elementSvc.getElementForEdit(reqOb)
                         .then((data) => {
                             if (data.id !== this.lastid)
                                 return;
@@ -239,19 +264,26 @@ export class SpecService implements Injectable<any> {
                             if (this.edit.type === 'Constraint' && this.edit.specification) {
                                 this.setEditValues([this.edit.specification]);
                             }
-                        });
+                        }));
                 }
+                promises.push(this.projectSvc.getRef(this.specApi.refId, this.specApi.projectId).then((result) => {
+                    this.ref = result;
+                }));
                 this.getTypeClass(this.element);
-                this.getQualifiedName()
+                promises.push(this.getQualifiedName());
                 this.specApi.dataLink = this.uRLSvc.getRoot() + '/projects/' + this.element._projectId + '/refs/' + this.element._refId + '/elements/' + this.element.id + '?commitId=' + this.element._commitId + '&token=' + this.authSvc.getToken();
-                this.gettingSpec = false;
-                deferred.resolve(true)
+
+                this.$q.allSettled(promises).then(() =>
+                    this.eventSvc.$broadcast('spec.ready')
+                ,(reason) => {
+                    this.growl.error("Getting Element Error: " + reason.message);
+                })
             }, (reason) => {
-                deferred.reject(reason);
+
+                this.growl.error("Getting Element Error: " + reason.message);
+            }).finally(() => {
                 this.gettingSpec = false;
-                //this.growl.error("Getting Element Error: " + reason.message);
-            });
-        return deferred.promise;
+            })
     }
 
 

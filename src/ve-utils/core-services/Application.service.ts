@@ -14,10 +14,9 @@ import {veUtils} from "@ve-utils";
  */
 export class ApplicationService {
     private state: { inDoc: boolean, fullDoc: boolean, currentDoc: string } = {inDoc: false, fullDoc: false, currentDoc: null}
-            username: any = null;
-    
+
     constructor(private $q, private $http, private urlSvc : URLService) {}
-    
+
     source = this.createUniqueId();
 
     createUniqueId() {
@@ -46,14 +45,6 @@ export class ApplicationService {
                 this.urlSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
             });
         return deferred.promise;
-    };
-
-    setUserName(user) {
-        this.username = user;
-    };
-
-    getUserName() {
-        return this.username;
     };
 
     getState() {

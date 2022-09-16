@@ -42,7 +42,6 @@ export interface SearchField {
  * @ngdoc directive
  * @name veCore.directive:mmsSearch
  *
- * @restrict E
  *
  * @description
  * TBA

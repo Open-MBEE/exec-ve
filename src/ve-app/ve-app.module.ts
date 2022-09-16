@@ -571,26 +571,26 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
             }
         });
 
-    $provide.decorator('$q', ['$delegate', function ($delegate) {
-        var defer = $delegate.defer;
-        $delegate.defer = function() {
-            var deferred = defer();
-
-            deferred.promise.state = deferred.state = 'pending';
-
-            deferred.promise.then(function(result) {
-                if (result === 'cancelled') {
-                    deferred.promise.state = 'cancelled';
-                }
-                deferred.promise.state = deferred.state = 'fulfilled';
-            }, function () {
-                deferred.promise.state = deferred.state = 'rejected';
-            });
-
-            return deferred;
-        };
-        return $delegate;
-    }]);
+    // $provide.decorator('$q', ['$delegate', function ($delegate) {
+    //     var defer = $delegate.defer;
+    //     $delegate.defer = function() {
+    //         var deferred = defer();
+    //
+    //         deferred.promise.state = deferred.state = 'pending';
+    //
+    //         deferred.promise.then(function(result) {
+    //             if (result === 'cancelled') {
+    //                 deferred.promise.state = 'cancelled';
+    //             }
+    //             deferred.promise.state = deferred.state = 'fulfilled';
+    //         }, function () {
+    //             deferred.promise.state = deferred.state = 'rejected';
+    //         });
+    //
+    //         return deferred;
+    //     };
+    //     return $delegate;
+    // }]);
 
     // anonymous factory intercepts requests
     $httpProvider.interceptors.push(['$q', '$location', 'URLService', 'EventService', function ($q: IQService, $location: ILocationService, uRLSvc: URLService, eventSvc: EventService) {

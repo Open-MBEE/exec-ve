@@ -42,7 +42,6 @@ export class ResolveService {
     public getToken(): angular.IPromise<string> {
         var deferred: angular.IDeferred<string> = this.$q.defer();
         this.authSvc.checkLogin().then((data) => {
-            this.applicationSvc.setUserName(data);
             this.uRLSvc.setToken(this.$window.localStorage.getItem('token'));
             deferred.resolve(this.$window.localStorage.getItem('token'));
             this.$cookies.put('com.tomsawyer.web.license.user', data.username, {path: '/'});

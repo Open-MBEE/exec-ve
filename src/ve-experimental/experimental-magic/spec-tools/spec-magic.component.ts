@@ -6,7 +6,7 @@ import {ExtUtilService} from "@ve-ext";
 import {
     AuthService,
     ElementService,
-    PermissionsService,
+    PermissionsService, ProjectService,
     URLService,
     ViewService
 } from "@ve-utils/mms-api-client"
@@ -20,15 +20,14 @@ import _ from "lodash";
 class SpecMagicController extends SpecTool implements ISpecTool {
     static $inject = [...SpecTool.$inject];
 
-    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>,
+    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
                 growl: angular.growl.IGrowlService, extUtilSvc: ExtUtilService, uRLSvc: URLService,
-                authSvc: AuthService, elementSvc: ElementService, utilsSvc: UtilsService,
-                viewSvc: ViewService, permissionsSvc: PermissionsService,
+                authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
+                utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
                 eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService) {
-        super($scope,$element,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
+        super($scope,$element,$q,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
         this.specType = _.kebabCase(SpecMagicComponent.selector)
         this.specTitle = "Magic Element";
-        this.specKind = 'global'
     }
 }
 

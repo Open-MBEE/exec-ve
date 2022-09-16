@@ -9,7 +9,7 @@ import {VeComponentOptions} from "@ve-types/view-editor";
 
 /**
  * @ngdoc directive
- * @name veExt.directive:mmsTranscludeCom
+ * @name veExt.component:mmsTranscludeCom
  *
  * @requires veUtils/ElementService
  * @requires veUtils/UtilsService
@@ -21,7 +21,6 @@ import {VeComponentOptions} from "@ve-types/view-editor";
  * @requires growl
  * @requires MathJax
  *
- * @restrict E
  *
  * @description
  * Given an element id, puts in the element's documentation binding, if there's a parent

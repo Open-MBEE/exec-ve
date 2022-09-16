@@ -131,7 +131,7 @@ let VeNavComponent: VeComponentOptions = {
             this.authSvc.checkLogin().then((data) => {
                 this.username = data.username;
                 this.authSvc.getUserData(data.username).then((userData) => {
-                    this.user = userData.users[0];
+                    this.user = userData;
                     if (this.user.firstName) {
                         this.userBadge = this.user.firstName.substring(0,1).toUpperCase();
                         this.userBadge+= this.user.lastName.substring(0,1).toUpperCase();

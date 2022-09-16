@@ -2,6 +2,7 @@
 // import "angular-sanitize";
 // import "angular-growl-v2";
 // import "angular-ui-bootstrap";
+// import "./html-rendered-diff";
 
 //VE Modules
 import "@ve-utils"

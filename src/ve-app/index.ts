@@ -28,6 +28,7 @@ import 'ngstorage';
 
 import '../lib/angular-promise-extras/angular-promise-extras';
 import "../lib/angular-flatpickr/ngFlatpickr.main"
+import '../lib/html-rendered-diff/index';
 
 //VE Modules
 import "@ve-core"

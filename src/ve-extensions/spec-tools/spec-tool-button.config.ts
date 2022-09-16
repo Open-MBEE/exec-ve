@@ -54,7 +54,7 @@ export const default_toolbar_buttons: ISpecToolButton[] = [
         enabledFor: ['main.project.ref.preview', 'main.project.ref.document'],
     },
     {
-        id: 'spec-tags',
+        id: 'spec-ref-list',
         category: 'document',
         icon: 'fa-code-fork',
         selected: false,

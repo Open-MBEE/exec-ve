@@ -1,7 +1,14 @@
 import * as angular from "angular";
 import _ from "lodash";
 
-import {URLService, ElementService, AuthService, ViewService, PermissionsService} from "@ve-utils/mms-api-client";
+import {
+    URLService,
+    ElementService,
+    AuthService,
+    ViewService,
+    PermissionsService,
+    ProjectService
+} from "@ve-utils/mms-api-client";
 import {EditService, EventService, UtilsService} from "@ve-utils/core-services";
 import {SpecService} from "@ve-ext/spec-tools";
 import {VeComponentOptions} from "@ve-types/view-editor";
@@ -10,7 +17,7 @@ import {SpecTool, ISpecTool, ToolbarService} from "@ve-ext/spec-tools";
 
 /**
  * @ngdoc directive
- * @name veExt.directive:mmsSpec
+ * @name veExt.component:mmsSpec
  *
  * @requires veUtils/Utils
  * @required veUtils/URLService
@@ -23,7 +30,6 @@ import {SpecTool, ISpecTool, ToolbarService} from "@ve-ext/spec-tools";
  * @requires growl
  * @requires _
  *
- * @restrict E
  *
  * @description
  * Outputs a "spec window" of the element whose id is specified. Spec includes name,
@@ -84,15 +90,14 @@ class SpecEditorController extends SpecTool implements ISpecTool {
 
     static $inject = [...SpecTool.$inject, 'EditService'];
 
-    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>,
+    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
                 growl: angular.growl.IGrowlService, extUtilSvc: ExtUtilService, uRLSvc: URLService,
-                authSvc: AuthService, elementSvc: ElementService, utilsSvc: UtilsService,
-                viewSvc: ViewService, permissionsSvc: PermissionsService,
+                authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
+                utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
                 eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService, private editSvc: EditService) {
-        super($scope,$element,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
+        super($scope,$element,$q,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
         this.specType = _.kebabCase(SpecEditorComponent.selector)
         this.specTitle = "Edit Element";
-        this.specKind = 'document'
     }
 
     config = () => {

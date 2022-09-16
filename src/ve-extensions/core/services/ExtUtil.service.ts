@@ -14,7 +14,7 @@ import {
     RootScopeService,
     UtilsService,
 } from '@ve-utils/core-services'
-import { ElementObject, PropertySpec, ViewObject } from '@ve-types/mms'
+import {CommitObject, ElementObject, PropertySpec, RefObject, UserObject, ViewObject} from '@ve-types/mms'
 import { ITransclusion } from '@ve-ext/transclusions'
 import { ValueSpec } from '@ve-utils/utils'
 import { veExt } from '@ve-ext'
@@ -24,6 +24,7 @@ import {VeModalService, VeModalSettings} from "@ve-types/view-editor";
 import {ConfirmDeleteModalResolveFn} from "@ve-app/main/modals/confirm-delete-modal.component";
 import {settings} from "alias-hq";
 import $ from "jquery";
+import {ISpecTool, SpecApi} from "@ve-ext/spec-tools";
 
 export interface ExtensionController {
     element: ElementObject
@@ -35,7 +36,7 @@ export interface ExtensionController {
     elementSaving: boolean
     bbApi?: ButtonBarApi
     editorApi?: VeEditorApi
-
+    specApi?: SpecApi
     // isEnumeration: boolean,
     skipBroadcast: boolean
     isEditing: boolean
@@ -43,6 +44,16 @@ export interface ExtensionController {
     editValues: any[]
     $scope: angular.IScope
 }
+
+export interface Commit {
+    ref: { id: string, type?: "Branch" | "Tag", _projectId?: string },
+    isOpen: boolean
+    refIsOpen?: boolean
+    history: CommitObject[]
+    commitSelected: CommitObject | string
+}
+
+
 
 /**
  * @internal
@@ -1151,7 +1162,7 @@ export class ExtUtilService {
      * @param {JQLite} domElement dom of the directive, jquery wrapped
      */
     public revertAction(
-        $ctrl: angular.IComponentController,
+        $ctrl: { mmsElementId: string, mmsProjectId: string, mmsRefId: string, baseCommit: Commit, compareCommit: Commit, element: ElementObject },
         domElement: JQLite
     ) {
         this.revertData = {
@@ -1197,6 +1208,10 @@ export class ExtUtilService {
             imgDom.unwrap() //note this removes parent p and puts img and any of its siblings in its place
         }
     }
+
+    public getModifier(modifier: string): angular.IPromise<UserObject> {
+        return this.authSvc.getUserData(modifier);
+    };
 }
 
 veExt.service('ExtUtilService', ExtUtilService)

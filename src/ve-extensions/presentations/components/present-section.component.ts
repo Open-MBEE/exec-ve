@@ -10,8 +10,6 @@ import {ElementObject} from "@ve-types/mms";
 import {EventService} from "@ve-utils/core-services";
 import {SchemaService} from "@ve-utils/model-schema";
 
-//veExt.directive('mmsViewSection', ['$compile', '$templateCache', 'ViewService', 'ButtonBarService', 'ExtUtilService', 'EventService', 'growl', mmsViewSection]);
-
 class PresentSectionController extends Presentation implements IPresentation, VeEditorApi {
 
     //Local

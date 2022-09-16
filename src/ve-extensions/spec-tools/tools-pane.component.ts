@@ -26,7 +26,7 @@ import {ReorderService} from "./services/Reorder.service";
 
 /**
  * @ngdoc directive
- * @name veExt.directive:mmsSpec
+ * @name veExt.component:mmsSpec
  *
  * @requires veUtils/Utils
  * @required veUtils/URLService
@@ -39,7 +39,6 @@ import {ReorderService} from "./services/Reorder.service";
  * @requires growl
  * @requires _
  *
- * @restrict E
  *
  * @description
  * Outputs a "spec window" of the element whose id is specified. Spec includes name,
@@ -123,7 +122,7 @@ class ToolsPaneController implements angular.IComponentController {
     openEdits: number;
     edits: {};
     protected errorType: string
-    
+
     private templateElementHtml: any;
 
     //protected $toolEl: JQuery;
@@ -155,7 +154,7 @@ class ToolsPaneController implements angular.IComponentController {
 
         this.specApi = this.specSvc.specApi;
         this.elementSaving = false;
-        
+
         this.tools = this.extensionSvc.getExtensions('spec');
         this.tools.forEach((tool:string) =>{
             this.subs.push(this.eventSvc.$on(tool,this.changeTool))
@@ -343,7 +342,7 @@ class ToolsPaneController implements angular.IComponentController {
                 this.errorType = this.currentTool.replace("spec-", "")
                 newTool.append('<extension-error type="$ctrl.errorType" mms-element-id="$ctrl.mmsElementId" kind="Spec"></extension-error>');
             }else {
-                newTool.append('<' + tag + ' ></' + tag + '>');
+                newTool.append('<' + tag + ' mms-branches="$ctrl.mmsBranches" mms-tags="$ctrl.mmsTags"></' + tag + '>');
             }
 
             if (category === 'document') {
@@ -427,6 +426,8 @@ class ToolsPaneController implements angular.IComponentController {
 </div>
     `,
     bindings: {
+        mmsBranches: "@",
+        mmsTags: "@",
         toolsCategory: "@"
     },
     controller: ToolsPaneController

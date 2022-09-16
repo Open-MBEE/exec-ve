@@ -4,12 +4,29 @@ export interface MmsObject extends Object {
 
 }
 
+export interface UserObject extends MmsObject {
+    username: string
+    id?: string
+    created?: Date
+    modified?: Date
+    email?: string
+    firstName?: string
+    lastName?: string
+    admin?: boolean
+    enabled?: boolean
+    fullName?: string
+}
+
 export interface ElementObject extends MmsObject {
     id: string
     _projectId: string
     _refId: string
     _commitId?: string
     _modified?: Date
+    _modifier?: string
+    _creator?: string
+    _created?: Date
+    _inRefIds?: string[]
     type?: string
     defaultValue?: any
     documentation?: string
@@ -97,7 +114,7 @@ export interface ProjectObject extends MmsObject {
 }
 
 export interface RefObject extends MmsObject {
-    parentRefId: string,
+    parentRefId?: string,
     deleted?: boolean,
     _docId?: string,
     _creator?: string,
@@ -192,5 +209,9 @@ export interface CommitResponse extends BasicResponse {
 
 export interface GroupsResponse extends BasicResponse {
     groups: ElementObject[]
+}
+
+export interface UsersResponse extends BasicResponse {
+    users: UserObject[]
 }
 

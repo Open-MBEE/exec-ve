@@ -11,11 +11,10 @@ import {handleChange} from "@ve-utils/utils";
 
 /**
  * @ngdoc directive
- * @name veExt.directive:mmsGroupDocs
+ * @name veExt.component:mmsGroupDocs
  *
  * @requires veUtils/ElementService
  *
- * @restrict E
  *
  * @description
  *

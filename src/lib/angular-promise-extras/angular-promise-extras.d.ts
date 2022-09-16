@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 
 declare module 'angular' {
-    type PromiseState = 'fulfilled' | 'rejected';
+    type PromiseState = 'pending' | 'fulfilled' | 'rejected';
 
     interface PromiseValue<T> {
         state: PromiseState;

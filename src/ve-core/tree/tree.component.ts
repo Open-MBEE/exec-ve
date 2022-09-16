@@ -21,7 +21,6 @@ import {TreeBranch, TreeRow} from "@ve-types/tree";
  * @requires $timeout
  * @requires $templateCache
  *
- * @restrict E
  *
  * @description
  * Outputs a tree with customizable icons for different types of nodes and callback
