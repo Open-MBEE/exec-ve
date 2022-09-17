@@ -159,16 +159,15 @@ export class SpecService implements Injectable<any> {
         this.specApi.typeClass = this.utilsSvc.getElementTypeClass(element, this.viewSvc.getElementType(element));
     };
 
-    public getQualifiedName() {
+    public getQualifiedName(element: ElementObject) {
         const deferred: angular.IDeferred<boolean> = this.$q.defer();
-        let elementOb = this.element
-        if (this.edit !== undefined)
-            elementOb = this.edit
+        if (this.edit)
+            element = this.edit
         const reqOb: ElementsRequest = {
-            commitId: (elementOb._commitId) ? elementOb._commitId : "latest",
-            projectId: elementOb._projectId,
-            refId: elementOb._refId,
-            elementId: elementOb.id
+            commitId: (element._commitId) ? element._commitId : "latest",
+            projectId: element._projectId,
+            refId: element._refId,
+            elementId: element.id
         }
         this.elementSvc.getElementQualifiedName(reqOb).then((result: string) => {
             this.specApi.qualifiedName = result;
@@ -270,7 +269,7 @@ export class SpecService implements Injectable<any> {
                     this.ref = result;
                 }));
                 this.getTypeClass(this.element);
-                promises.push(this.getQualifiedName());
+                promises.push(this.getQualifiedName(this.element));
                 this.specApi.dataLink = this.uRLSvc.getRoot() + '/projects/' + this.element._projectId + '/refs/' + this.element._refId + '/elements/' + this.element.id + '?commitId=' + this.element._commitId + '&token=' + this.authSvc.getToken();
 
                 this.$q.allSettled(promises).then(() =>

@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import {ButtonBarApi} from "@ve-utils/button-bar";
+import {ButtonBarApi, IButtonBarButton} from "@ve-utils/button-bar";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {veUtils} from "@ve-utils";
 
@@ -24,7 +24,7 @@ let ButtonBarComponent: VeComponentOptions = {
     <ul class="dropdown-menu" role="menu">
       <li>
           <a ng-repeat="dropdown_button in button.dropdown_buttons | filter: {permission: true}" type="button"
-              class="center {{dropdown_button.id}} {{ button.id === 'view-mode-dropdown' && dropdown_button.selected ? 'checked-list-item' : ''}}" ng-click="dropdown_button.action($event); mmsBbApi.select(button, dropdown_button)"><i
+              class="center {{dropdown_button.id}} {{ button.id === 'view-mode-dropdown' && dropdown_button.selected ? 'checked-list-item' : ''}}" ng-click="dropdown_button.action($event); $ctrl.bbApi.select(button, dropdown_button)"><i
               class="{{dropdown_button.icon}}"> </i>&nbsp;{{dropdown_button.tooltip}}</a>
       </li>
     </ul>
@@ -38,8 +38,8 @@ let ButtonBarComponent: VeComponentOptions = {
     },
     controller: class ButtonBarController implements angular.IComponentController {
 
-        public buttons
-        private bbApi
+        public buttons: IButtonBarButton[]
+        private bbApi: ButtonBarApi
 
         static $inject = []
 

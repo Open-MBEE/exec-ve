@@ -61,7 +61,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 
     //Templates
     valTemplate = `
-    <span ng-repeat="value in ::$ctrl.values | limitTo: ($ctrl.first ? 1 : $ctrl.values.length)" ng-switch on="value.type">
+    <span ng-repeat="value in $ctrl.values | limitTo: ($ctrl.first ? 1 : $ctrl.values.length)" ng-switch on="value.type">
     <span ng-switch-when="LiteralInteger">{{::value.value}}</span>
     <span ng-switch-when="LiteralBoolean">{{::value.value}}</span>
     <span ng-switch-when="LiteralReal">{{::value.value | veRealNum}}</span>
@@ -243,7 +243,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 
     }
 
-    public getContent = (preview?) => {
+    public getContent = (preview?): angular.IPromise<string | HTMLElement[]> => {
         let deferred = this.$q.defer<string |HTMLElement[]>();
         var toCompileList: any[] = [];
         var areStrings = false;
@@ -270,11 +270,12 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 
         if (values.length === 0 || Object.keys(values[0]).length < 2) {
             result = '<span class="no-print placeholder">(no value)</span>';
+            deferred.resolve(result);
         } else if (areStrings) {
             var toCompile = toCompileList.join(' ');
             if (toCompile === '' || this.emptyRegex.test(toCompile)) {
                 result = '<span class="no-print placeholder">(no value)</span>';
-                return this.$q.resolve(result);
+                deferred.resolve(result);
             }
             toCompile = toCompile.replace(this.spacePeriod, '>.');
             toCompile = toCompile.replace(this.spaceSpace, '> ');
@@ -284,7 +285,6 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             } else {
                 result = toCompile;
             }
-
 
             if (!this.mmsGenerateForDiff) {
                 let resultHtml = $('<p></p>').html(result).toArray()
@@ -296,19 +296,15 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             } else {
                 deferred.resolve(result);
             }
-            return deferred.promise;
-
         } else {
             if (preview) {
-                return this.$q.resolve(this.editTemplate);
+                deferred.resolve(this.editTemplate);
             } else {
                 if (this.first) {
                     this.values = this.values[0]
                 }
-                this.$q.resolve(this.valTemplate);
+                deferred.resolve(this.valTemplate);
             }
-
-
         }
         return deferred.promise;
     }

@@ -1,4 +1,5 @@
 (function () {
+    const TextDiff = require('diff/lib/diff/word');
     const VirtualDomDiff = require('virtual-dom/diff');
     const VirtualText = require('virtual-dom/vnode/vtext');
     const VirtualNode = require('virtual-dom/vnode/vnode');
@@ -109,7 +110,7 @@
                 found.foundIn.splice(found.at, 0, wrapNodeToRemove);
             } else if (IsVText(nodeToRemove)) {
                 // text-diff
-                let diffResults = diffWords(nodeToRemove.text, nodeToAdd.text);
+                let diffResults = TextDiff.diffWords(nodeToRemove.text, nodeToAdd.text);
                 if (diffResults.length > 0) {
                     let childNodes = [];
                     diffResults.forEach(function (result) {

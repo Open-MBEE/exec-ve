@@ -187,7 +187,7 @@ let AddItemModalComponent: VeModalComponent = {
             this.parentData = (!this.addItemData.parentBranch) ? null : this.addItemData.parentBranch.data;
             this.addType = (this.addItemData.addType) ? this.addItemData.addType : "item";
             this.projectId = this.resolve.getProjectId;
-            this.refId = this.resolve.getRefId;
+            this.refId = (this.resolve.getRefId) ? this.resolve.getRefId : '';
             this.orgId = this.resolve.getOrgId;
 
             this.searchOptions = {
@@ -459,7 +459,7 @@ let AddItemModalComponent: VeModalComponent = {
                         parentRefId: this.addItemData.createParentRefId,
                         permission: this.newItem.permission,
                         id: this.applicationSvc.createUniqueId(),
-                        parentCommitId: ''
+                        parentCommitId: null
                     };
                     if (!this.newItem.lastCommit) {
                         // Make call to history?maxTimestamp to get closest commit id to branch off

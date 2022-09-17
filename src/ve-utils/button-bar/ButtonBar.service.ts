@@ -21,6 +21,7 @@ export interface IButtonBarButton {
   toggle_tooltip?: string,
   placement?: string,
   action: buttonActionFn,
+  dropdown_toggle?: boolean,
   dropdown_buttons?: IButtonBarButton[]
 }
 
@@ -348,6 +349,7 @@ export class ButtonBarService {
             action: () => {
               this.eventSvc.$broadcast(button)
             },
+            dropdown_toggle: true,
             dropdown_buttons: [
               this.getButtonBarButton('tree-show-pe'),
               this.getButtonBarButton('tree-show-views'),
@@ -388,7 +390,7 @@ export class ButtonBarService {
             selected: false,
             active: true,
             permission: true,
-            tooltip: 'Show Only Tables',
+            tooltip: 'Show List of Tables',
             spinner: false,
             toggleable: false,
             action: () => {
@@ -401,7 +403,7 @@ export class ButtonBarService {
             selected: false,
             active: true,
             permission: true,
-            tooltip: 'Show Only Figures',
+            tooltip: 'Show List of Figures',
             spinner: false,
             toggleable: false,
             action: () => {
@@ -414,7 +416,7 @@ export class ButtonBarService {
             selected: false,
             active: true,
             permission: true,
-            tooltip: 'Show Only Equations',
+            tooltip: 'Show List of Equations',
             spinner: false,
             toggleable: false,
             action: () => {

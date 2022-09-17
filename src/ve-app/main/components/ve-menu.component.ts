@@ -32,7 +32,7 @@ let VeMenuComponent: VeComponentOptions = {
                     <i class="fa fa-home" aria-hidden="true"></i>
                 </a>
             </li>
-            <li ng-style="truncateStyle" ng-show="!$ctrl.isRefsView()" ng-repeat="breadcrumb in $ctrl.breadcrumbs track by $index">
+            <li ng-style="truncateStyle" ng-show="!$ctrl.isRefsView" ng-repeat="breadcrumb in $ctrl.breadcrumbs track by $index">
                 <span> &#8250;</span>
                 <a ui-sref="{{ breadcrumb.link }}" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i ng-class="{'fa fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true"></i>{{ breadcrumb.name }}
@@ -41,7 +41,7 @@ let VeMenuComponent: VeComponentOptions = {
         </ul>
     </div>
 
-    <div ng-show="!$ctrl.isRefsView()" class="nav navbar-nav navbar-right" style="padding-right: 15px">
+    <div ng-show="!$ctrl.isRefsView" class="nav navbar-nav navbar-right" style="padding-right: 15px">
         <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
             <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>
                 <span class="label-dropdown">{{ $ctrl.currentRef.type }}:</span>
@@ -129,6 +129,7 @@ let VeMenuComponent: VeComponentOptions = {
         crumbs: { name: string, id: string, type: string, link: string }[] = [];
         groups;
         groupsMap: { [id: string]: { id: string, name: string, parentId: string } } = {};
+        isRefsView: boolean = false;
 
         static $inject = ['$uiRouter', '$state', '$sce', '$timeout', '$element', 'CacheService', 'UtilsService', 'RootScopeService'];
         constructor(private $uiRouter: UIRouter, private $state: StateService, private $sce: angular.ISCEService,
@@ -164,14 +165,18 @@ let VeMenuComponent: VeComponentOptions = {
                 this.rootScopeSvc.veTitle(this.currentProject);
             }
 
+            // Check for Refs View, Skip the rest if it is
+            if (this.$state.includes('main.project.refs')) {
+                this.isRefsView = true;
+                return;
+            }
+
             if (this.mmsGroup !== undefined) {
                 for (var i = 0; i < this.groups.length; i++) {
                     this.groupsMap[this.groups[i].id] = {id: this.groups[i].id, name: this.groups[i].name, parentId: this.groups[i]._parentId};
                 }
                 this.child = this.mmsGroup;
-
             }
-
             if (this.child && this.child != oldChild) {
                 if (this.child.type === 'Package') {//child.hasOwnProperty('_id')) {
                     this.crumbs.push({name: this.child.name, id: this.child.id, type: "group", link: "main.project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})"});
@@ -235,8 +240,8 @@ let VeMenuComponent: VeComponentOptions = {
             this.$state.go('main.project.refs', {projectId: this.mmsProject.id}, {reload: true});
         };
 
-        isRefsView() {
-            return this.$state.includes('project') && !(this.$state.includes('main.project.ref'));
+        checkRefsView() {
+            return this.$state.includes('refs');
         };
 
 

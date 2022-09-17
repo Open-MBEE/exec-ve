@@ -12,6 +12,8 @@ import {
 } from "@ve-utils/mms-api-client";
 import { EventService, UtilsService} from "@ve-utils/core-services";
 import {VeComponentOptions} from "@ve-types/view-editor";
+import {RefObject} from "@ve-types/mms";
+import {MergeConfirmResolveFn} from "@ve-ext/core/modals/merge-confirm-modal.component";
 
 /**
  * @ngdoc component
@@ -48,14 +50,15 @@ class SpecRefListController extends SpecTool implements ISpecTool {
     docEditable: boolean
     docName: string
     private isDoc: boolean;
+    srcRefOb: RefObject;
 
-    static $inject = SpecTool.$inject;
+    static $inject = [...SpecTool.$inject, '$uibModal'];
 
     constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
                 growl: angular.growl.IGrowlService, extUtilSvc: ExtUtilService, uRLSvc: URLService,
                 authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
                 utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
-                eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService) {
+                eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService, private $uibModal: angular.ui.bootstrap.IModalService) {
         super($scope,$element,$q,growl,extUtilSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
         this.specType = _.kebabCase(SpecRefListComponent.selector)
         this.specTitle = "Branch/Tag List";
@@ -68,7 +71,8 @@ class SpecRefListController extends SpecTool implements ISpecTool {
     }
     //Callback function for document change
     public initCallback = () => {
-        this.docName = this.document.name;
+        if (this.document)
+            this.docName = this.document.name;
         if (!this.utilsSvc.isDocument(this.element)) {
             this.isDoc = false;
             return;
@@ -80,13 +84,20 @@ class SpecRefListController extends SpecTool implements ISpecTool {
     }
 
 
-    public docMergeAction = function (srcRef) {
-        var templateUrlStr = 'partials/mms-directives/mergeConfirm.html';
+    public docMergeAction = (srcRef) => {
         this.srcRefOb = srcRef;
 
         var instance = this.$uibModal.open({
-            templateUrl: templateUrlStr,
-            scope: this,
+            resolve: <MergeConfirmResolveFn> {
+                getDocName: (): string => {
+                    if (this.document)
+                        return this.document.name
+                    return '(Not Found)'
+                },
+                getSrcRefOb: (): RefObject => {
+                    return this.srcRefOb;
+                }
+            },
             component: 'mergeConfirmModal',
         });
         instance.result.then(function (data) {
@@ -98,7 +109,79 @@ class SpecRefListController extends SpecTool implements ISpecTool {
 
 let SpecRefListComponent: VeComponentOptions = {
     selector: 'specRefList',
-    template: ``,
+    template: `
+    
+<input class="form-control" ng-model="refFilter" type="text" placeholder="Filter branches/tags">
+
+<table class="tags-table table table-condensed">
+    <thead>
+        <tr>
+            <td><h3 class="Tag-icon">Tag</h3></td>
+            <td><h3>Created</h3></td>
+            <td ng-if="$ctrl.isDoc && $ctrl.docEditable && $ctrl.showMerge"></td>
+        </tr>
+    </thead>
+    <tbody ng-show="filteredTags.length">
+        <tr ng-repeat="tag in filteredTags = (mmsTags | orderBy:'-_created' | filter: {name : refFilter})">
+            <td>
+                <a ui-sref="{refId: tag.id}"><b>{{tag.name}}</b></a>
+                <div>{{tag.description}}</div>
+            </td>
+            <td class="ve-secondary-text">{{tag._created | date:'M/d/yy h:mm a'}}</td>
+            <td ng-if="isDoc && docEditable && showMerge">
+                <div class="btn-group" uib-dropdown is-open="status.isopen">
+                    <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Tag actions">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                        <li role="menuitem" style="padding:10px;">
+                            <button class="btn btn-default btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(tag)">
+                                Pull In<i ng-show="!$ctrl.runCleared" class="fa fa-spin fa-spinner"></i>
+                            </button> to this document on current branch
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+
+    <tbody ng-show="$ctrl.mmsTags.length && !$ctrl.filteredTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags found</td></tr></tbody>
+
+    <tbody ng-hide="$ctrl.mmsTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags in current project.</td></tr></tbody>
+
+    <thead>
+        <tr>
+            <td><h3 class="Branch-icon">Branch</h3></td>
+            <td><h3>Created</h3></td>
+            <td ng-if="$ctrl.isDoc && $ctrl.docEditable && $ctrl.showMerge"></td>
+        </tr>
+    </thead>
+    <tbody ng-show="filteredBranches.length">
+        <tr ng-repeat="branch in filteredBranches = ($ctrl.mmsBranches | orderBy:'-_created' | filter: {name : refFilter})">
+            <td>
+                <a ui-sref="{refId: branch.id}"><b>{{branch.name}}</b></a>
+                <div>{{branch.description}}</div>
+            </td>
+            <td class="ve-secondary-text">{{branch._created | date:'M/d/yy h:mm a'}}</td>
+            <td ng-if="isDoc && docEditable && showMerge">
+                <div class="btn-group" uib-dropdown is-open="status.isopen">
+                    <button type="button" class="btn btn-default" uib-dropdown-toggle ng-disabled="disabled" title="Branch actions">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu pull-right" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                        <li role="menuitem" style="padding:10px;">
+                            <button class="btn btn-default btn-sm" ng-class="{'disabled': !$ctrl.docEditable || !$ctrl.runCleared}" ng-click="$ctrl.docMergeAction(branch)">
+                                Pull In<i ng-show="!runCleared" class="fa fa-spin fa-spinner"></i>
+                            </button> to this document on current branch
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+    <tbody><tr ng-hide="filteredBranches.length"><td colspan="3" class="ve-secondary-text">No branches found</td></tr></tbody>
+</table>    
+`,
     bindings: {
         mmsBranches: '<',
         mmsTags: '<'

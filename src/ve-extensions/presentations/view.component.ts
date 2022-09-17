@@ -187,7 +187,9 @@ export class ViewController implements angular.IComponentController {
             if (elem._modified > this.modified && type !== 'Comment') {
                 this.modified = elem._modified;
                 if (elem._modifier) {
-                    this.modifier = this.extUtilSvc.getModifier(elem._modifier);
+                    this.extUtilSvc.getModifier(elem._modifier).then((result) => {
+                        this.modifier = result;
+                    })
                 }
             }
             if (this.mmsViewApi && this.mmsViewApi.elementTranscluded)
@@ -258,14 +260,18 @@ export class ViewController implements angular.IComponentController {
                 //getting cached individual elements should be faster
                 this.view = data;
                 this.modified = data._modified;
-                this.modifier = this.extUtilSvc.getModifier(data._modifier);
+                this.extUtilSvc.getModifier(data._modifier).then((result) => {
+                    this.modifier = result;
+                })
                 return;
             }
             this.viewSvc.getViewElements(this.reqOb, 1)
             .finally(() => {
                 this.view = data;
                 this.modified = data._modified;
-                this.modifier = this.extUtilSvc.getModifier(data._modifier);
+                this.extUtilSvc.getModifier(data._modifier).then((result) => {
+                    this.modifier = result;
+                })
                 this.$element.removeClass('isLoading');
             });
         }, (reason) => {
@@ -341,7 +347,7 @@ export let ViewComponent: VeComponentOptions = {
         </h1>
     
         <div class="ve-secondary-text last-modified no-print">
-          Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email !== undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b>
+          Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email">{{ $ctrl.modifier.email }}</b><b ng-if="!$ctrl.modifier.email">{{ $ctrl.modifier }}</b>
         </div>
     </div>
     <i ng-hide="$ctrl.view" class="fa fa-2x fa-spinner fa-spin"></i>
@@ -371,7 +377,7 @@ export let ViewComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsLink: '<',
         mmsViewApi: '<',
-        mmsNumber: '<',
+        mmsNumber: '@',
         noTitle: '@'
     },
     controller: ViewController

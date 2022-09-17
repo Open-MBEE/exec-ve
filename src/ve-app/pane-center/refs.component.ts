@@ -164,7 +164,7 @@ class RefsController{
                     return this.mmsProject.id;
                 },
                 getRefId: () => {
-                    return this.mmsRef.id;
+                    return null;
                 },
                 getOrgId: () => {
                     return this.mmsOrg.id;

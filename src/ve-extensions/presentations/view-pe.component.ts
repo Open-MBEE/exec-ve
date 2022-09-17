@@ -25,8 +25,8 @@ import {ElementObject, PresentationInstanceObject} from "@ve-types/mms";
  * @description
  * Given a InstanceVal, parses the element reference tree to get the corresponding
  * presentation element, and renders it in the view
- * 
- * @param {Object} mmsInstanceVal A InstanceValue json object 
+ *
+ * @param {Object} mmsInstanceVal A InstanceValue json object
  * @param {Object} mmsParentSection the parent section if available
  */
 export class ViewPresentationElemController implements angular.IComponentController {
@@ -57,6 +57,10 @@ export class ViewPresentationElemController implements angular.IComponentControl
         this.treeApi = this.treeSvc.getApi();
         this.eventSvc.$init(this);
 
+        //Init PeNumber
+        if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
+            this.peNumber = this.treeApi.branch2viewNumber[this.instanceSpec.id];
+        }
         this.subs.push(this.eventSvc.$on(TreeService.events.UPDATED, () => {
             if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
                 this.peNumber = this.treeApi.branch2viewNumber[this.instanceSpec.id];

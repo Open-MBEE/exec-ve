@@ -4,7 +4,7 @@ import $ from "jquery";
 import JQuery from "jquery";
 import Rx from 'rx-lite'
 
-import {Presentation, PresentationComponentOptions, PresentationService} from "@ve-ext/presentations";
+import {IPresentation, Presentation, PresentationComponentOptions, PresentationService} from "@ve-ext/presentations";
 import {EventService} from "@ve-utils/core-services";
 import {TableCell, TableConfig, ViewHtmlService} from "@ve-ext/presentations";
 
@@ -12,13 +12,11 @@ import {veExt, ExtUtilService} from "@ve-ext";
 import {SchemaService} from "@ve-utils/model-schema";
 import {ButtonBarService} from "@ve-utils/button-bar";
 
-class PresentTableController extends Presentation implements angular.IComponentController {
+class PresentTableController extends Presentation implements IPresentation {
 
     public $searchEl: JQuery<HTMLElement>;
     public $tHeadEl: JQuery<HTMLElement>;
     public $captionEl: JQuery<HTMLTableCaptionElement>;
-
-    private ngModelCtrl: angular.INgModelController;
 
     public table
     public tableConfig: TableConfig
@@ -37,7 +35,7 @@ class PresentTableController extends Presentation implements angular.IComponentC
 
     /** Full Table Filter **/
     public _fullTableFilterSub: Rx.IDisposable
-    protected searchTerm: string;
+
     private _searchTerm: string = '';
     private numFiltered: number;
 
@@ -119,8 +117,6 @@ class PresentTableController extends Presentation implements angular.IComponentC
             debounce: this.tableConfig.filterDebounceRate,
             getterSetter: true
         }
-
-        this.ngModelCtrl.$viewChangeListeners.push(this.searchListener)
     }
 
     getContent = () => {
@@ -128,13 +124,16 @@ class PresentTableController extends Presentation implements angular.IComponentC
         return '<div class="table-wrapper">' + html + '</div>'
     }
 
-    /** Filter Utilities **/
-    public searchListener = () => {
-        this.eventSvc.$broadcast('update-search',{newInputVal: this.searchTerm, oldInputVal: this._searchTerm});
-    }
-
     /** Full Table Filter **/
-
+    public searchTerm = (newTerm: string): string => {
+        this.eventSvc.$broadcast('update-search',{newInputVal: newTerm, oldInputVal: this._searchTerm});
+        if (newTerm != this._searchTerm) {
+            return this._searchTerm = newTerm;
+        }
+        else {
+            return this._searchTerm;
+        }
+    };
 
     /** Add Full Table Filter ability **/
     public addFullTableFilter = (trs: JQuery<HTMLElement>): void => {
@@ -144,11 +143,10 @@ class PresentTableController extends Presentation implements angular.IComponentC
     }
 
     /** Add a watcher to the Full Table Filter Input **/
-    private _addWatcherToFullTableFilterInput = (performFilter) => {
+    private _addWatcherToFullTableFilterInput = (performFilter: () => void): Rx.IDisposable => {
         return this.eventSvc.$on('update-search',(data) => {
             if (data.newInputVal !== data.oldInputVal) {
                 performFilter();
-                this._searchTerm = this.searchTerm;
             }
         })
     }
@@ -156,7 +154,7 @@ class PresentTableController extends Presentation implements angular.IComponentC
     /** Filter rows by search term **/
     private _fullTableFilter = (trs: JQuery<HTMLElement>) => {
         this._resetColumnWiseFilterInputs();
-        if ( this.searchTerm === '' ) {
+        if ( this._searchTerm === '' ) {
             this.numFiltered = trs.length;
             trs.show();
         } else {
@@ -167,7 +165,7 @@ class PresentTableController extends Presentation implements angular.IComponentC
 
     /** Display rows that match the filter term **/
     private _displaySomeRows = (trs, increaseNumOfRowToShow) => {
-        var regExp = new RegExp(this.searchTerm, 'i');
+        var regExp = new RegExp(this._searchTerm, 'i');
         for (var i = 0, numRows = trs.length; i < numRows; i++) {
             var string = $(trs[i]).text();
             if (regExp.test(string)) {
@@ -235,9 +233,9 @@ class PresentTableController extends Presentation implements angular.IComponentC
 
     /** Clear out the filter term from the Full Table Filter input **/
     private _resetFullTableFilterInput = (trs: JQuery<HTMLElement>) => {
-        if (this.searchTerm !== '') {
+        if (this._searchTerm !== '') {
             this._fullTableFilterSub.dispose();
-            this.searchTerm = '';
+            this.searchTerm('');
             this._fullTableFilterSub = this._addWatcherToFullTableFilterInput(() =>{this._fullTableFilter(trs);});
         }
     }
@@ -582,11 +580,6 @@ class PresentTableController extends Presentation implements angular.IComponentC
         return data;
     };
 
-    $postLink() {
-
-
-    }
-
     private compileTable() {
         this.$timeout(() => {
             var first = this.nextIndex;
@@ -630,11 +623,8 @@ let PresentTableComponent: PresentationComponentOptions = {
     </span>
 </div>          
 `,
-    require: {
-        ngModelCtrl: "^ngModel"
-    },
     bindings: {
-       peObject: '<',
+        peObject: '<',
         element: '<',
         peNumber: '<'
     },

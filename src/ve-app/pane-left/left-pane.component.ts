@@ -115,7 +115,7 @@ class LeftPaneController implements angular.IComponentController {
   $onInit() {
 
     this.paneClosed = false;
-    this.toggle('showTree');
+    this.toggle('tree');
     this.eventSvc.$init(this);
 
     if (this.$state.includes('main.project.ref.document.full') && !this.rootScopeSvc.veFullDocMode()) {
@@ -209,14 +209,14 @@ class LeftPaneController implements angular.IComponentController {
     }));
 
     this.subs.push(this.eventSvc.$on('tree-show-pe', () => {
-      this.toggle('showTree');
+      //this.toggle('tree');
       this.rootScopeSvc.treeShowPe(true);
       this.setPeVisibility(this.viewId2node[this.mmsDocument.id]);
       this.treeApi.refresh();
     }));
 
     this.subs.push(this.eventSvc.$on('tree-show-views', () => {
-      this.toggle('showTree');
+      //this.toggle('tree');
       this.rootScopeSvc.treeShowPe(false);
       this.setPeVisibility(this.viewId2node[this.mmsDocument.id]);
       this.treeApi.refresh();
@@ -399,6 +399,8 @@ class LeftPaneController implements angular.IComponentController {
   };
 
   toggle = (id:string) => {
+    //TODO: Make into an array with remove and add for toggling Views
+    if (this.activeMenu)
     this.activeMenu = id;
   };
 

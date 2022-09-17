@@ -202,8 +202,31 @@ const MmsHistoryComponent: VeComponentOptions = {
 </div>
 
 <div style="position:relative;">
+    <div class="inline-diff-buttons">
+        <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype">Compare:</span>
+        <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink':ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="$ctrl.compareCommit.isOpen" auto-close="outsideClick" style="flex:2">
+            <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
+                <span>{{$ctrl.compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.compareCommit.commitSelected._creator}}</b></span>
+                <span ng-if="$ctrl.compareCommit.commitSelected.id === $ctrl.compareCommit.history[0].id"> (Latest)</span>
+                <i class="fa fa-caret-down" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
+                <li class="dropdown-input">
+                    <input class="ve-plain-input" type="text" placeholder="Filter history on {{compareCommit.ref.type}}: {{compareCommit.ref.name}}" ng-model="historyFilter">
+                </li>
+                <li ng-click="$ctrl.commitClicked(version)" ng-repeat="version in $ctrl.compareCommit.history | filter:historyFilter"
+                    ng-class="{'checked-list-item': version === $ctrl.compareCommit.commitSelected,'secondary-checked-list-item': version === $ctrl.baseCommit.commitSelected && ModelData.ShowDiffPrototype}"
+                    tooltip-placement="left" uib-tooltip="Selected before version"
+                    tooltip-append-to-body="version === $ctrl.baseCommit.commitSelected" tooltip-enable="ModelData.ShowDiffPrototype && version === $ctrl.baseCommit.commitSelected">
+                    <a>{{version._created | date:'M/d/yy h:mm a'}} by <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
+                </li>
+            </ul>
+        </div>
+        <span class="inline-btn-label" ng-show="ModelData.ShowDiffPrototype">on</span>
+        <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype" style="flex:1">{{$ctrl.compareCommit.ref.type}}: <b>{{$ctrl.compareCommit.ref.name}}</b></span>
+    </div>
     <div ng-if="ModelData.ShowDiffPrototype" class="inline-diff-buttons fade-in-out">
-        <span class="inline-btn-label">Before:</span>
+        <span class="inline-btn-label">To:</span>
         <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="$ctrl.baseCommit.isOpen" auto-close="outsideClick" style="flex:2" ng-hide="$ctrl.disableRevert">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 {{$ctrl.baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.baseCommit.commitSelected._creator}}</b><span ng-if="$ctrl.baseCommit.commitSelected.id === $ctrl.baseCommit.history[0].id"> (Latest)</span>
@@ -213,7 +236,7 @@ const MmsHistoryComponent: VeComponentOptions = {
                 <li class="dropdown-input">
                     <input class="ve-plain-input" ng-model="historyFilter" type="text" placeholder="Filter history on {{$ctrl.baseCommit.ref.type}}: {{$ctrl.baseCommit.ref.name}}">
                 </li>
-                <li ng-click="baseCommitClicked(version)" ng-repeat="version in $ctrl.baseCommit.history | filter:historyFilter"
+                <li ng-click="$ctrl.baseCommitClicked(version)" ng-repeat="version in $ctrl.baseCommit.history | filter:historyFilter"
                     ng-class="{'checked-list-item': version === $ctrl.baseCommit.commitSelected,'secondary-checked-list-item': version === $ctrl.compareCommit.commitSelected}"
                     ng-disabled="$index === 0" tooltip-placement="left" uib-tooltip="Selected after version"
                     tooltip-append-to-body="version === $ctrl.compareCommit.commitSelected" tooltip-enable="version === $ctrl.compareCommit.commitSelected">
@@ -244,29 +267,7 @@ const MmsHistoryComponent: VeComponentOptions = {
     </div>
 
     <div class="diff-dotted-connection fade-in-out" ng-show="ModelData.ShowDiffPrototype"></div>
-    <div class="inline-diff-buttons">
-        <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype">After:</span>
-        <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink':ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="$ctrl.compareCommit.isOpen" auto-close="outsideClick" style="flex:2">
-            <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                <span>{{$ctrl.compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.compareCommit.commitSelected._creator}}</b></span>
-                <span ng-if="$ctrl.compareCommit.commitSelected.id === $ctrl.compareCommit.history[0].id"> (Latest)</span>
-                <i class="fa fa-caret-down" aria-hidden="true"></i>
-            </button>
-            <ul class="dropdown-menu menu-with-input" uib-dropdown-menu role="menu">
-                <li class="dropdown-input">
-                    <input class="ve-plain-input" type="text" placeholder="Filter history on {{compareCommit.ref.type}}: {{compareCommit.ref.name}}" ng-model="historyFilter">
-                </li>
-                <li ng-click="$ctrl.commitClicked(version)" ng-repeat="version in $ctrl.compareCommit.history | filter:historyFilter"
-                    ng-class="{'checked-list-item': version === $ctrl.compareCommit.commitSelected,'secondary-checked-list-item': version === $ctrl.baseCommit.commitSelected && ModelData.ShowDiffPrototype}"
-                    tooltip-placement="left" uib-tooltip="Selected before version"
-                    tooltip-append-to-body="version === $ctrl.baseCommit.commitSelected" tooltip-enable="ModelData.ShowDiffPrototype && version === $ctrl.baseCommit.commitSelected">
-                    <a>{{version._created | date:'M/d/yy h:mm a'}} by <b>{{ version._creator }}</b><span ng-if="$index == 0"> (Latest)</span></a>
-                </li>
-            </ul>
-        </div>
-        <span class="inline-btn-label" ng-show="ModelData.ShowDiffPrototype">on</span>
-        <span class="inline-btn-label fade-in-out" ng-show="ModelData.ShowDiffPrototype" style="flex:1">{{$ctrl.compareCommit.ref.type}}: <b>{{$ctrl.compareCommit.ref.name}}</b></span>
-    </div>
+    
 </div>
 
 <hr class="spec-title-divider">

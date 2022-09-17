@@ -25,7 +25,14 @@ export class ButtonBarApi {
      public select = (parentButton, childButton) => {
         if(parentButton && childButton) {
             parentButton.dropdown_buttons.forEach((dropdownButton) => {
-                dropdownButton.selected = dropdownButton.id === childButton.id;
+                if (parentButton.dropdown_toggle) {
+                    if (dropdownButton.id === childButton.id) {
+                        dropdownButton.selected = !dropdownButton.selected;
+                    }
+                }
+                else {
+                        dropdownButton.selected = dropdownButton.id === childButton.id;
+                }
             });
         }
     };
