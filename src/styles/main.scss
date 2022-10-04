@@ -1,10 +1,14 @@
+/* Import Third-Party CSS/SASS */
+@import "~angular-hotkeys/src/hotkeys.css";
+@import "~angular-growl-v2/src/growl.css";
+@import "~@fortawesome/fontawesome-free/css/all.css";
+@import "~@openmbee/pane-layout/styles/styles.css";
 
+/* Local Bootstrap */
+@import "third-party/bootstrap-main";
 
 /* Import VE Directive Styles */
-@import 've-directives/ve-directives-main';
+@import "ve-components/ve-components-main";
 
 /* Import VE APP Styles */
-@import 've-app/ve-app-main';
-
-/* Import Vendor CSS/SASS */
-@import './vendor';
+@import "ve-app/ve-app-main";

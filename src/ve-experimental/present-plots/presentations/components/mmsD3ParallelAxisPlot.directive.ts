@@ -39,7 +39,7 @@ function mmsD3ParallelAxisPlot(PlotService,  $window) {
       //redefine top and right margin based on TB string length
       maxSize = 0;
       size = 0;
-      for (var i = 0; i < outputs.variables.length; i++)
+      for (let i = 0; i < outputs.variables.length; i++)
       {
         size = outputs.variables[i].length; //length of the string
         if (maxSize < size)

@@ -52,7 +52,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       lineHeight = 10;
 
       var columnHeaderLabels = []; //IP, IPR, Mag...
-      for (var i = 0; i < zData.dataseries.length; i++) {
+      for (let i = 0; i < zData.dataseries.length; i++) {
           var opt = zData.dataseries[i];
           for (var j = 0; j < opt.value.length; j++) {
               var inst = opt.value[j];
@@ -92,7 +92,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       var xIndex = [];
       xIndex.push(0);
       var xtotal = 0;
-      for (i = 0; i < zData.axisZoneLength.length; i++) {
+      for (let i = 0; i < zData.axisZoneLength.length; i++) {
          xtotal += zData.axisZoneLength[i];
          xIndex.push(xtotal);
       }
@@ -334,7 +334,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       for ( var k = 0; k < scope.datavalues.length; k++){
         dataValuesPerTable = scope.datavalues[k];
         states = [];
-        for ( var i = 0; i < dataValuesPerTable.length; i++){
+        for ( let i = 0; i < dataValuesPerTable.length; i++){
             var tvalues = []; //table value for each row
             for ( var j = 0; j < dataValuesPerTable[i].length; j++){
               var datavalue = null;

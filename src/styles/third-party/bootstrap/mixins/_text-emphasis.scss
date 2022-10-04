@@ -1,0 +1,15 @@
+@use "sass:color";
+@use "../../bootstrap-variables" as bootstrap;
+
+// Typography
+
+// [converter] bootstrap.$parent hack
+@mixin text-emphasis-variant($parent, $color) {
+  #{$parent} {
+    color: $color;
+  }
+  a#{$parent}:hover,
+  a#{$parent}:focus {
+    color: color.scale($color, $lightness: -10%);
+  }
+}

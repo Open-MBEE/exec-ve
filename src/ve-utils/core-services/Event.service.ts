@@ -10,9 +10,7 @@ export class EventService {
     private subjects: {[key:string]: Rx.ISubject<any>} = {};
 
     //API
-    public $emit = (name: string, data?: any): void => this.emit(name, data);
     public $broadcast = (name: string, data?: any) => this.emit(name, data);
-    public $listen = (name: string, handler: eventHandlerFn): Rx.IDisposable => this.listen(name, handler);
     public $on = (name: string, handler: eventHandlerFn): Rx.IDisposable => this.listen(name, handler);
     public $destroy = (subs: Rx.IDisposable[]): void => this.destroy(subs);
     public $init = (ctrl: { subs: Rx.IDisposable[] } & angular.IComponentController): void => this.initEventSvc(ctrl);
@@ -42,7 +40,7 @@ export class EventService {
 
     destroy(subs: Rx.IDisposable[]) {
         if (subs.length > 0) {
-            for (var i = 0; i < subs.length; i++) {
+            for (let i = 0; i < subs.length; i++) {
                 if (typeof subs[i].dispose === 'function'){
                     subs[i].dispose();
                 }

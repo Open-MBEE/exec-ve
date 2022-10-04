@@ -110,7 +110,7 @@ veExt.directive('mmsD3NormalizedStackedBarPlot', ['PlotService','$window', mmsD3
   function total(all) {
     all.forEach(function(a){ 
       a.total = 0;
-      for ( var i = 0; i < scope.tablecolumnheader.length; i++){
+      for ( let i = 0; i < scope.tablecolumnheader.length; i++){
         a.total += Number(a[scope.tablecolumnheader[i]]);
       }
     });

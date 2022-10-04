@@ -1,24 +1,29 @@
+/* VE base styles */
+@use "src/styles/globals";
+@use "sass:color";
+
 /*************************
   Styles for the View Editor left pane
 *************************/
 
-$pane_left_btn_group_width: 244px;
+$pane-left-btn-group-width: 244px;
 
 #main-pane {
   > .west-tabs {
     &.ng-pane-orientation-horizontal {
       .ng-pane-handle > .ng-pane-toggle {
-        @include box-shadow(2px 0 2px 0px rgba(100, 100, 100, 0.2));
+        @include globals.box-shadow(2px 0 2px 0 rgba(100, 100, 100, 0.2));
+
         margin-right: 1px;
 
         &::before {
-          left: -1
+          left: -1;
         }
       }
     }
 
     .west-tabs {
-      @include box-shadow(1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+      @include globals.box-shadow(1px 0 1px 0 rgba(0, 0, 0, 0.2));
     }
   }
 }
@@ -26,42 +31,39 @@ $pane_left_btn_group_width: 244px;
 .container-pane-left {
   height: 100%;
   width: 100%;
-  background: $ve-silver-lighter-1;
+  background: globals.$ve-silver-lighter-1;
 
   .pane-left {
     width: 100%;
     height: 100%;
-    min-width: $pane_left_btn_group_width;
+    min-width: $pane-left-btn-group-width;
     padding-block-end: 40px;
 
     .pane-left-toolbar {
       padding: 5px 4px;
-      background: $white;
+      background: globals.$white;
     }
 
     .tree-options {
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
       display: flex;
       padding: 4px 5px;
-      background: $white;
-      border-top: 1px solid $ve-silver-darker-1;
-      border-bottom: 1px solid $ve-silver-darker-1;
+      background: globals.$white;
+      border-top: 1px solid globals.$ve-silver-darker-1;
+      border-bottom: 1px solid globals.$ve-silver-darker-1;
 
-      .ve-plain-input{
+      .ve-plain-input {
         margin: 0 2px;
-        border-color: $ve-silver-darker-1;
+        border-color: globals.$ve-silver-darker-1;
       }
 
-      .btn-tools{
+      .btn-tools {
         padding: 4px 6px;
         background: transparent;
       }
     }
-    .fa-folder{
-      color: lighten($ve-accent, 12%);
+
+    .fa-folder {
+      color: color.scale(globals.$ve-accent, $lightness: 12%);
     }
   }
 }

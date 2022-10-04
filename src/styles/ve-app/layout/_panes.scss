@@ -1,3 +1,7 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+
 /*************************
   Includes ng Border Layout mods that
   follow the MMS app design guide
@@ -10,12 +14,12 @@
 .pane-center,
 .pane-right {
   p {
-    font-family: $font-family-sans-serif;
-    font-size: $font-size-base;
+    font-family: globals.$font-family-sans-serif;
+    font-size: globals.$font-size-base;
   }
 
   blockquote {
-    font-weight: $light_font_weight;
+    font-weight: globals.$light-font-weight;
     font-style: italic;
   }
 
@@ -25,7 +29,7 @@
   h4,
   h5,
   h6 {
-    font-family: $light-font-family-sans-serif;
+    font-family: globals.$light-font-family-sans-serif;
   }
 }
 
@@ -45,7 +49,7 @@
 .ng-pane-orientation-vertical,
 .ng-pane-orientation-horizontal {
   .ng-pane-handle {
-    background-color: $white;
+    background-color: globals.$white;
     height: 100px;
     top: -webkit-calc(50% - 50px) !important;
     top: calc(50% - 50px) !important;
@@ -54,18 +58,18 @@
       height: 100%;
       max-height: 100%;
       cursor: pointer;
-      background-color: $white;
+      background-color: globals.$white;
       z-index: 10;
 
       &::before {
-        font-family: "FontAwesome";
+        font-family: globals.$font-family-icon;
         font-size: 8px;
         content: "";
-        color: $tertiary_grey;
+        color: globals.$tertiary-grey;
         position: relative;
         top: 39%;
         display: inline-block;
-        @include transform(rotate(90deg));
+        @include globals.transform(rotate(90deg));
       }
     }
   }
@@ -91,11 +95,11 @@
 }
 
 #main-pane {
-  top: $navTotal;
-  bottom: $footerHeight;
+  top: globals.$nav-total;
+  bottom: globals.$footer-height;
 }
 
 .content-container {
-  top: $navTotal;
-  bottom: $footerHeight;
+  top: globals.$nav-total;
+  bottom: globals.$footer-height;
 }

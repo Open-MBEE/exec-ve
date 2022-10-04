@@ -9,22 +9,19 @@ import {
 } from "@ve-utils/mms-api-client"
 import {
     EventService,
-
     RootScopeService,
     ShortenUrlService,
-    TreeApi,
-    TreeService,
-
-    UtilsService,
-    UxService
+    UtilsService
 } from '@ve-utils/core-services'
 import {IButtonBarButton, ButtonBarApi, ButtonBarService,} from '@ve-utils/button-bar'
 import {handleChange} from '@ve-utils/utils'
 import {VeComponentOptions} from '@ve-types/view-editor'
-
-import {veApp} from "@ve-app";
 import {ContentWindowService} from "@ve-app/pane-center/services/ContentWindow.service";
 import {ElementObject} from "@ve-types/mms";
+import {TreeApi, TreeService} from "@ve-core/tree";
+
+import {veApp} from "@ve-app";
+
 
 class SlideshowController implements angular.IComponentController {
     public orgOb
@@ -58,6 +55,7 @@ class SlideshowController implements angular.IComponentController {
     copyToClipboard: ($event: any) => void
     handleShareURL: any
     viewApi: ViewApi;
+    number: string;
 
     static $inject = [
         '$scope',
@@ -119,7 +117,7 @@ class SlideshowController implements angular.IComponentController {
         }
 
         this.viewContentLoading = false
-
+        this.rootScopeSvc.veNumberingOn(true);
         if (this.rootScopeSvc.veFullDocMode())
             this.rootScopeSvc.veFullDocMode(false);
 
@@ -158,6 +156,11 @@ class SlideshowController implements angular.IComponentController {
             api.setToggleState(
                 'show-comments',
                 this.rootScopeSvc.veCommentsOn()
+            )
+            api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
+            api.setToggleState(
+                'show-numbering',
+                this.rootScopeSvc.veNumberingOn()
             )
 
             // Set hotkeys for toolbar
@@ -227,6 +230,12 @@ class SlideshowController implements angular.IComponentController {
 
         this.buttons = this.bbApi.buttons
 
+        this.subs.push(this.eventSvc.$on(TreeService.events.UPDATED, () => {
+            if (this.treeApi.branch2viewNumber[this.viewOb.id]) {
+                this.number = (this.rootScopeSvc.veNumberingOn()) ? this.treeApi.branch2viewNumber[this.viewOb.id] : '';
+            }
+        }));
+
         this.subs.push(
             this.eventSvc.$on('show-comments', (data?:boolean) => {
 
@@ -234,6 +243,16 @@ class SlideshowController implements angular.IComponentController {
                 this.rootScopeSvc.veCommentsOn((data != null) ? data :
                     !this.rootScopeSvc.veCommentsOn()
                 )
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.$on('show-numbering', (data?:boolean) => {
+                this.bbApi.toggleButtonState('show-numbering', (data != null) ? data : null);
+                this.rootScopeSvc.veNumberingOn((data != null) ? data :
+                    !this.rootScopeSvc.veNumberingOn()
+                )
+                this.number = (this.rootScopeSvc.veNumberingOn()) ? this.treeApi.branch2viewNumber[this.viewOb.id] : ''
             })
         )
 
@@ -402,11 +421,10 @@ class SlideshowController implements angular.IComponentController {
         this.subs.push(
             this.eventSvc.$on('refresh-numbering', () => {
                 if (this.isPageLoading()) return
-                var printElementCopy = angular.element('#print-div')
-                this.appUtilsSvc.refreshNumbering(
-                    this.treeApi.getRows(),
-                    printElementCopy
-                )
+                this.treeApi.refresh().then(() => {
+                    this.treeSvc.refreshPeTrees()
+                    this.number = this.treeApi.branch2viewNumber[this.viewOb.id];
+                })
             })
         )
 
@@ -414,6 +432,8 @@ class SlideshowController implements angular.IComponentController {
             elementClicked: this.elementClicked,
             elementTranscluded: this.elementTranscluded
         }
+
+        this.number = this.treeApi.branch2viewNumber[this.viewOb.id]
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject) {
@@ -484,7 +504,7 @@ let SlideshowComponent: VeComponentOptions = {
                 <div id="print-div" ng-if="$ctrl.viewOb">
                     <view mms-element-id="{{$ctrl.viewOb.id}}" mms-commit-id="latest"
                               mms-project-id="{{$ctrl.projectOb.id}}" mms-ref-id="{{$ctrl.refOb.id}}"
-                                mms-link="$ctrl.vidLink" mms-view-api="$ctrl.viewApi"></view>
+                                mms-link="$ctrl.vidLink" mms-view-api="$ctrl.viewApi" mms-number="{{$ctrl.number}}"></view>
                 </div>
             </div>
         </div>

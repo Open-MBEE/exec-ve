@@ -1,0 +1,145 @@
+@use "sass:color";
+@use "../bootstrap-variables" as bootstrap;
+@use "./mixins/vendor-prefixes" as vendor;
+@use "./mixins/reset-text";
+
+// --------------------------------------------------
+// Popovers
+// --------------------------------------------------
+
+.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: bootstrap.$zindex-popover;
+  display: none;
+  max-width: bootstrap.$popover-max-width;
+  padding: 1px;
+
+  // Our parent element can be arbitrary since popovers are by default inserted as a sibling of their target element.
+  // So reset our font and text properties to avoid inheriting weird values.
+  @include reset-text.reset-text;
+
+  font-size: bootstrap.$font-size-base;
+  background-color: bootstrap.$popover-bg;
+  background-clip: padding-box;
+  border: 1px solid bootstrap.$popover-fallback-border-color;
+  border: 1px solid bootstrap.$popover-border-color;
+  border-radius: bootstrap.$border-radius-large;
+
+  @include vendor.box-shadow(0 5px 10px rgba(0,0,0,0.2));
+
+  // Offset the popover to account for the popover arrow
+  &.top { margin-top: - bootstrap.$popover-arrow-width; }
+  &.right { margin-left: bootstrap.$popover-arrow-width; }
+  &.bottom { margin-top: bootstrap.$popover-arrow-width; }
+  &.left { margin-left: - bootstrap.$popover-arrow-width; }
+}
+
+.popover-title {
+  margin: 0; // reset heading margin
+  padding: 8px 14px;
+  font-size: bootstrap.$font-size-base;
+  background-color: bootstrap.$popover-title-bg;
+  border-bottom: 1px solid color.scale(bootstrap.$popover-title-bg, $lightness: -5%);
+  border-radius: (bootstrap.$border-radius-large - 1) (bootstrap.$border-radius-large - 1) 0 0;
+}
+
+.popover-content {
+  padding: 9px 14px;
+}
+
+// Arrows
+
+// .arrow is outer, .arrow:after is inner
+
+.popover > .arrow {
+  &,
+  &::after {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+  }
+}
+
+.popover > .arrow {
+  border-width: bootstrap.$popover-arrow-outer-width;
+}
+
+.popover > .arrow::after {
+  border-width: bootstrap.$popover-arrow-width;
+  content: "";
+}
+
+.popover {
+  &.top > .arrow {
+    left: 50%;
+    margin-left: - bootstrap.$popover-arrow-outer-width;
+    border-bottom-width: 0;
+    border-top-color: bootstrap.$popover-arrow-outer-fallback-color; // IE8 fallback
+    border-top-color: bootstrap.$popover-arrow-outer-color;
+    bottom: - bootstrap.$popover-arrow-outer-width;
+
+    &::after {
+      content: " ";
+      bottom: 1px;
+      margin-left: - bootstrap.$popover-arrow-width;
+      border-bottom-width: 0;
+      border-top-color: bootstrap.$popover-arrow-color;
+    }
+  }
+
+  &.right > .arrow {
+    top: 50%;
+    left: - bootstrap.$popover-arrow-outer-width;
+    margin-top: - bootstrap.$popover-arrow-outer-width;
+    border-left-width: 0;
+    border-right-color: bootstrap.$popover-arrow-outer-fallback-color; // IE8 fallback
+    border-right-color: bootstrap.$popover-arrow-outer-color;
+
+    &::after {
+      content: " ";
+      left: 1px;
+      bottom: - bootstrap.$popover-arrow-width;
+      border-left-width: 0;
+      border-right-color: bootstrap.$popover-arrow-color;
+    }
+  }
+
+  &.bottom > .arrow {
+    left: 50%;
+    margin-left: - bootstrap.$popover-arrow-outer-width;
+    border-top-width: 0;
+    border-bottom-color: bootstrap.$popover-arrow-outer-fallback-color; // IE8 fallback
+    border-bottom-color: bootstrap.$popover-arrow-outer-color;
+    top: - bootstrap.$popover-arrow-outer-width;
+
+    &::after {
+      content: " ";
+      top: 1px;
+      margin-left: - bootstrap.$popover-arrow-width;
+      border-top-width: 0;
+      border-bottom-color: bootstrap.$popover-arrow-color;
+    }
+  }
+
+  &.left > .arrow {
+    top: 50%;
+    right: - bootstrap.$popover-arrow-outer-width;
+    margin-top: - bootstrap.$popover-arrow-outer-width;
+    border-right-width: 0;
+    border-left-color: bootstrap.$popover-arrow-outer-fallback-color; // IE8 fallback
+    border-left-color: bootstrap.$popover-arrow-outer-color;
+
+    &::after {
+      content: " ";
+      right: 1px;
+      border-right-width: 0;
+      border-left-color: bootstrap.$popover-arrow-color;
+      bottom: - bootstrap.$popover-arrow-width;
+    }
+  }
+}

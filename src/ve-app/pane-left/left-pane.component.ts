@@ -4,8 +4,7 @@ import Rx from 'rx-lite';
 import {StateService, Transition, TransitionService, UIRouterGlobals} from "@uirouter/angularjs";
 import {
   EventService,
-  RootScopeService, TreeApi,
-  TreeService,
+  RootScopeService,
   UtilsService,
 } from "@ve-utils/core-services";
 import {
@@ -15,11 +14,11 @@ import {
   ViewService
 } from "@ve-utils/mms-api-client";
 import {AppUtilsService} from "@ve-app/main/services";
-import {IButtonBarButton, ButtonBarApi, ButtonBarService} from "@ve-utils/button-bar";
+import {IButtonBarButton, ButtonBarApi, ButtonBarService, ButtonWrapEvent} from "@ve-utils/button-bar";
 import {VeComponentOptions, VeModalService, VeModalSettings} from "@ve-types/view-editor";
-import {ElementObject, ProjectObject, RefObject, ViewObject} from "@ve-types/mms";
+import {DocumentObject, ElementObject, OrgObject, ProjectObject, RefObject, ViewObject} from "@ve-types/mms";
 import {ValueSpec} from "@ve-utils/utils";
-import {TreeBranch} from "@ve-types/tree";
+import {TreeBranch, TreeConfig, TreeOptions} from "@ve-types/tree";
 import {IPaneManagerService} from "@openmbee/pane-layout/lib/PaneManagerService";
 import {IPane} from "@openmbee/pane-layout";
 
@@ -27,6 +26,8 @@ import {IPane} from "@openmbee/pane-layout";
 import {veApp} from "@ve-app";
 import {AddItemData, AddItemResolveFn} from "@ve-app/main/modals/add-item-modal.component";
 import {ConfirmDeleteModalResolveFn} from "@ve-app/main/modals/confirm-delete-modal.component";
+import {TreeApi} from "@ve-core/tree/Tree.api";
+import {TreeService} from "@ve-core/tree/Tree.service";
 
 
 class LeftPaneController implements angular.IComponentController {
@@ -38,36 +39,41 @@ class LeftPaneController implements angular.IComponentController {
   private $pane: IPane
   private paneClosed: boolean
 
-  private treeApi: TreeApi
   public treeData: TreeBranch[]
 
   public bbApi: ButtonBarApi
+  public bbSize: string;
   public tbApi: ButtonBarApi
   public bars: string[]
-  public buttons: IButtonBarButton[]
-  public treeButtons: IButtonBarButton[]
 
-  public treeOptions
+  public treeOptions: TreeOptions
   public tableList
   public figureList
   public equationList
-  public treeViewModes
-  public activeMenu
+  public mainTree: TreeConfig;
+  public peTrees: TreeConfig[];
+
+  private mainTreeApi: TreeApi;
+  private peTreeApis: {[treeId: string]: TreeApi } = {};
+
+  public activeMenu: { [id: string]: boolean } = {};
   public viewId2node: {[key: string]: TreeBranch} = {};
   public seenViewIds: {[key: string]: TreeBranch} = {};
   public initialSelection
 
   //Bindings
-  private mmsDocument
-  private mmsOrg
-  private mmsProject
-  private mmsRef
+  private mmsDocument: DocumentObject
+  private mmsOrg: OrgObject
+  private mmsProject: ProjectObject
+  private mmsRef: RefObject
   private mmsGroups: ElementObject[]
   private docMeta
 
   //Local Variables
   public docEditable;
-  public addItemData: AddItemData
+  public addItemData: AddItemData;
+  protected squishSize: number = 250;
+  public filterInputPlaceholder: string;
 
   static $inject = ['$anchorScroll', '$q', '$filter', '$location',
     '$uibModal', '$scope', '$state', '$transitions', '$uiRouterGlobals', '$paneManager',
@@ -86,25 +92,38 @@ class LeftPaneController implements angular.IComponentController {
               private treeSvc: TreeService, private permissionsSvc: PermissionsService,
               private rootScopeSvc: RootScopeService, private eventSvc: EventService, private buttonBarSvc: ButtonBarService) {
 
-
     this.tableList = [];
     this.figureList = [];
     this.equationList = [];
-    this.treeViewModes = [{
+
+    //TODO: Make main tree more configurable; Add Toolbar?
+    this.mainTree = {
+      id: 'contents',
+      types: []
+    }
+    this.peTrees = [
+    {
       id: 'table',
-      title: 'Tables',
+      title: 'Table of Tables',
       icon: 'fa-table',
-      branchList: this.tableList
+      types: [
+          'table'
+      ]
     }, {
       id: 'figure',
-      title: 'Figures',
+      title: 'Table of Figures',
       icon: 'fa-image',
-      branchList: this.figureList
+      types: [
+          'figure',
+          'image'
+      ]
     }, {
       id: 'equation',
-      title: 'Equations',
+      title: 'Table of Equations',
       icon: 'fa-superscript',
-      branchList: this.equationList
+      types: [
+          'equation'
+      ]
     }];
 
 
@@ -115,8 +134,10 @@ class LeftPaneController implements angular.IComponentController {
   $onInit() {
 
     this.paneClosed = false;
-    this.toggle('tree');
+
     this.eventSvc.$init(this);
+    this.bbSize = "78px";
+
 
     if (this.$state.includes('main.project.ref.document.full') && !this.rootScopeSvc.veFullDocMode()) {
       this.rootScopeSvc.veFullDocMode(true);
@@ -130,11 +151,54 @@ class LeftPaneController implements angular.IComponentController {
       this.rootScopeSvc.treeShowPe(false);
     }
 
-    this.treeApi = this.treeSvc.getApi();
-    this.treeData = this.treeApi.treeData;
+    this.treeOptions = {
+      typeIcons: this.treeSvc.getTreeTypes(),
+      sectionNumbering: !!this.$state.includes('main.project.ref.document'),
+      numberingDepth: 0,
+      numberingSeparator: '.',
+      expandLevel: this.$state.includes('main.project.ref.document') ? 3 : (this.$state.includes('main.project.ref') ? 0 : 1),
+      search: '',
+      onSelect: this.treeClickCallback,
+      onDblClick: this.treeDblClickCallback,
+      sort: !this.$state.includes('main.project.ref.document')
+    };
+    if (this.mmsDocument && this.docMeta) {
+      this.treeOptions.numberingDepth = this.docMeta.numberingDepth;
+      this.treeOptions.numberingSeparator = this.docMeta.numberingSeparator;
+      this.treeOptions.startChapter = this.mmsDocument._startChapter;
+    }
+
+    this.mainTreeApi = this.treeSvc.getApi(this.mainTree);
+
+    if (this.mainTreeApi.treeData.length > 0)
+      this.mainTreeApi.treeData.length = 0;
+    this.treeData = this.mainTreeApi.treeData
+
+    this.mainTreeApi.treeOptions = this.treeOptions;
+    if (this.rootScopeSvc.treeInitialSelection()) {
+      this.mainTreeApi.initialSelection = this.rootScopeSvc.treeInitialSelection()
+    }
+
+    for (let i = 0; i < this.peTrees.length; i++) {
+      let api = this.treeSvc.getPeApi(this.peTrees[i])
+      if (api.treeData.length > 0)
+          api.treeData.length = 0
+      api.treeOptions = this.treeOptions;
+    }
+
+    this.peTreeApis = this.treeSvc.getAllPeApi();
+
 
     this.bbApi = this.buttonBarSvc.initApi("tree-button-bar",this.bbInit,this);
     this.tbApi = this.buttonBarSvc.initApi("tree-tool-bar",this.tbInit,this);
+
+    this.subs.push(this.eventSvc.$on(this.bbApi.WRAP_EVENT, (data: ButtonWrapEvent) => {
+      if (data.oldSize != data.newSize) {
+        const calcSize = Math.round(data.newSize + 47.5);
+        this.bbSize = calcSize.toString(10) + "px";
+        this.$scope.$apply();
+      }
+    }))
 
     this.$transitions.onSuccess({}, (trans: Transition) => {
       this.bbApi.resetButtons();
@@ -143,7 +207,6 @@ class LeftPaneController implements angular.IComponentController {
 
     if (this.treeData.length > 0) {
       this.treeData.length = 0;
-      this.treeApi.treeRows.length = 0;
     }
 
     //Init Pane Toggle Controls
@@ -163,13 +226,22 @@ class LeftPaneController implements angular.IComponentController {
       }
     }));
 
+    this.subs.push(this.eventSvc.$on('tree-branch-selected', (branch) => {
+      this.mainTreeApi.selectBranch(branch, true)
+      Object.values(this.peTreeApis).forEach((api) => {
+        api.selectBranch(branch, true);
+      })
+    }));
+
 
     this.subs.push(this.eventSvc.$on('tree-expand', () => {
-      this.treeApi.expandAll();
+      this.mainTreeApi.expandAll()
+      Object.values(this.peTreeApis).forEach((api) => api.expandAll())
     }));
 
     this.subs.push(this.eventSvc.$on('tree-collapse', () => {
-      this.treeApi.collapseAll();
+      this.mainTreeApi.collapseAll();
+      Object.values(this.peTreeApis).forEach((api) => api.collapseAll())
     }));
 
     this.subs.push(this.eventSvc.$on('tree-add-document', () => {
@@ -209,17 +281,10 @@ class LeftPaneController implements angular.IComponentController {
     }));
 
     this.subs.push(this.eventSvc.$on('tree-show-pe', () => {
-      //this.toggle('tree');
-      this.rootScopeSvc.treeShowPe(true);
+      this.rootScopeSvc.treeShowPe(!this.rootScopeSvc.treeShowPe());
+      this.bbApi.setToggleState("tree-show-pe",this.rootScopeSvc.treeShowPe());
       this.setPeVisibility(this.viewId2node[this.mmsDocument.id]);
-      this.treeApi.refresh();
-    }));
-
-    this.subs.push(this.eventSvc.$on('tree-show-views', () => {
-      //this.toggle('tree');
-      this.rootScopeSvc.treeShowPe(false);
-      this.setPeVisibility(this.viewId2node[this.mmsDocument.id]);
-      this.treeApi.refresh();
+      this.mainTreeApi.refresh();
     }));
 
     this.subs.push(this.eventSvc.$on('tree-show-tables', () => {
@@ -232,6 +297,10 @@ class LeftPaneController implements angular.IComponentController {
       this.toggle('equation');
     }));
 
+    this.subs.push(this.eventSvc.$on('tree-close-all', () => {
+      this.closeAll();
+    }));
+
     this.subs.push(this.eventSvc.$on('tree-full-document', () => {
       this.fullDocMode();
     }));
@@ -241,12 +310,18 @@ class LeftPaneController implements angular.IComponentController {
     }));
 
     if (this.$state.includes('main.project.ref') && !this.$state.includes('main.project.ref.document')) {
+      this.mainTree.types = ['group'];
+      if (this.mmsRef.type === 'Branch') {
+        this.mainTree.types.push('view')
+      } else {
+        this.mainTree.types.push('snapshot')
+      }
       this.treeData.push(...this.treeSvc.buildTreeHierarchy(this.mmsGroups, "id", "group", "_parentId",this, this.groupLevel2Func));
       this.viewSvc.getProjectDocuments({
         projectId: this.mmsProject.id,
         refId: this.mmsRef.id
       }, 2).then((documentObs) => {
-        for (var i = 0; i < documentObs.length; i++) {
+        for (let i = 0; i < documentObs.length; i++) {
           if (!documentObs[i]._groupId || documentObs[i]._groupId == this.mmsProject.id) {
             this.treeData.push({
               label: documentObs[i].name,
@@ -256,11 +331,13 @@ class LeftPaneController implements angular.IComponentController {
             });
           }
         }
-        if (this.treeApi.initialSelect) {
-          this.treeApi.initialSelect();
-        }
+        this.mainTreeApi.initialSelect().then(() => {
+          this.treeSvc.refreshPeTrees()
+        })
+
       });
     } else {
+      this.mainTree.types = ['view', 'section'];
       if (!this.mmsDocument._childViews) {
         this.mmsDocument._childViews = [];
       }
@@ -283,7 +360,9 @@ class LeftPaneController implements angular.IComponentController {
               for (var i in this.viewId2node) {
                 this.addSectionElements(this.viewId2node[i].data, this.viewId2node[i], this.viewId2node[i], true);
               }
-              this.treeApi.refresh();
+              this.mainTreeApi.initialSelect().then(() => {
+                this.treeSvc.refreshPeTrees()
+              })
             });
           }, (reason) => {
             console.log(reason);
@@ -291,47 +370,29 @@ class LeftPaneController implements angular.IComponentController {
       this.treeData.push(this.viewId2node[this.mmsDocument.id]);
     }
 
-    this.treeOptions = {
-      types: this.treeSvc.getTreeTypes(),
-      sectionNumbering: !!this.$state.includes('main.project.ref.document'),
-      numberingDepth: 0,
-      numberingSeparator: '.',
-      expandLevel: this.$state.includes('main.project.ref.document') ? 3 : (this.$state.includes('main.project.ref') ? 0 : 1),
-      search: '',
-      onSelect: 'tree-click',
-      onDblclick: 'tree-double-click',
-      sort: !this.$state.includes('main.project.ref.document')
-    };
-    if (this.mmsDocument && this.docMeta) {
-      this.treeOptions.numberingDepth = this.docMeta.numberingDepth;
-      this.treeOptions.numberingSeparator = this.docMeta.numberingSeparator;
-      this.treeOptions.startChapter = this.mmsDocument._startChapter;
+
+    if (this.$state.includes('project.ref.document')) {
+      this.filterInputPlaceholder = 'Filter table of contents';
+    } else {
+      this.filterInputPlaceholder = 'Filter groups/docs';
     }
-
-    this.rootScopeSvc.treeOptions(this.treeOptions);
-
-    this.subs.push(this.eventSvc.$on(this.treeOptions.onDblclick, (args) => {
-      this.treeDblclickHandler(args.branch);
-    }));
-
-    this.subs.push(this.eventSvc.$on(this.treeOptions.onSelect, (args) => {
-      this.treeClickHandler(args.branch);
-    }));
 
     // Utils creates this event when deleting instances from the view
     this.subs.push(this.eventSvc.$on('viewctrl.delete.element', (elementData) => {
-      var branch = this.treeApi.getBranch(elementData);
+      var branch = this.mainTreeApi.getBranch(elementData);
       if (branch) {
-        this.treeApi.removeSingleBranch(branch);
+        this.mainTreeApi.removeSingleBranch(branch).then(() => {
+          this.treeSvc.refreshPeTree(branch.type);
+        })
       }
-      this.resetPeTreeList(branch.type);
+
     }));
 
     this.subs.push(this.eventSvc.$on('spec-reorder-saved', (data) => {
       var node: TreeBranch = this.viewId2node[data.id];
       var viewNode: TreeBranch = node;
       var newChildren: TreeBranch[] = [];
-      for (var i = 0; i < node.children.length; i++) {
+      for (let i = 0; i < node.children.length; i++) {
         var child = node.children[i];
         if (child.type === 'view') {
           newChildren.push(child);
@@ -365,9 +426,8 @@ class LeftPaneController implements angular.IComponentController {
 
   tbInit = (api: ButtonBarApi) => {
     if (this.$state.includes('main.project.ref.document')) {
-      const viewModeButton = this.buttonBarSvc.getButtonBarButton("view-mode-dropdown");
-      api.addButton(viewModeButton);
-      api.select(viewModeButton, this.rootScopeSvc.treeShowPe() ? this.buttonBarSvc.getButtonBarButton('tree-show-pe') : this.buttonBarSvc.getButtonBarButton('tree-show-views'));
+      api.addButton(this.buttonBarSvc.getButtonBarButton("tree-mode-dropdown"));
+      //api.select(viewModeButton, this.rootScopeSvc.treeShowPe() ? this.buttonBarSvc.getButtonBarButton('tree-show-pe') : this.buttonBarSvc.getButtonBarButton('tree-show-views'));
     }
   };
 
@@ -387,6 +447,7 @@ class LeftPaneController implements angular.IComponentController {
       api.addButton(this.buttonBarSvc.getButtonBarButton("tree-full-document"));
       api.addButton(this.buttonBarSvc.getButtonBarButton("tree-add-view"));
       api.addButton(this.buttonBarSvc.getButtonBarButton("tree-delete-view"));
+      api.addButton(this.buttonBarSvc.getButtonBarButton("tree-show-pe"));
       api.setPermission("tree-add-view", this.docEditable);
       api.setPermission("tree-reorder-view", this.docEditable);
       api.setPermission("tree-delete-view", this.docEditable);
@@ -399,35 +460,25 @@ class LeftPaneController implements angular.IComponentController {
   };
 
   toggle = (id:string) => {
-    //TODO: Make into an array with remove and add for toggling Views
-    if (this.activeMenu)
-    this.activeMenu = id;
+    if (typeof this.activeMenu[id] === 'undefined')
+      this.activeMenu[id] = false;
+    this.activeMenu[id] = !this.activeMenu[id];
+    if (this.tbApi instanceof ButtonBarApi) {
+      if (Object.keys(this.activeMenu).some(k => this.activeMenu[k])) {
+        this.tbApi.setActive("tree-close-all", true, 'tree-mode-dropdown');
+      }else {
+        this.tbApi.setActive("tree-close-all", false, 'tree-mode-dropdown');
+      }
+    }
+
   };
 
-  // Get a list of specific PE type from branch
-  getPeTreeList(branch, type, list) {
-    if (branch.type === type) {
-      list.push(branch);
-    }
-    for (var i = 0; i < branch.children.length; i++) {
-      this.getPeTreeList(branch.children[i], type, list);
-    }
-  }
-
-  // Function to refresh table and figure list when new item added, deleted or reordered
-  resetPeTreeList(elemType) {
-    if (elemType == 'table' || elemType == 'all') {
-      this.tableList.length = 0;
-      this.getPeTreeList(this.viewId2node[this.mmsDocument.id], 'table', this.tableList);
-    }
-    if (elemType == 'figure' || elemType == 'image' || elemType == 'all') {
-      this.figureList.length = 0;
-      this.getPeTreeList(this.viewId2node[this.mmsDocument.id], 'figure', this.figureList);
-    }
-    if (elemType == 'equation' || elemType == 'all') {
-      this.equationList.length = 0;
-      this.getPeTreeList(this.viewId2node[this.mmsDocument.id], 'equation', this.equationList);
-    }
+  closeAll = () => {
+    Object.keys(this.activeMenu).forEach(k => {
+      this.activeMenu[k] = false;
+    })
+    this.tbApi.deselectAll('tree-mode-dropdown')
+    this.tbApi.setActive("tree-close-all", false, 'tree-mode-dropdown');
   }
 
   groupLevel2Func = (ctrl: { mmsProject: ProjectObject, mmsRef: RefObject, treeApi: TreeApi, viewSvc: ViewService }, groupOb: ElementObject, groupNode: TreeBranch) => {
@@ -438,13 +489,13 @@ class LeftPaneController implements angular.IComponentController {
     }, 2).then((documentObs: ViewObject[]) => {
       let docs: ViewObject[] = [];
       let docOb: ViewObject, i;
-      for (i = 0; i < documentObs.length; i++) {
+      for (let i = 0; i < documentObs.length; i++) {
         docOb = documentObs[i];
         if (docOb._groupId === groupOb.id) {
           docs.push(docOb);
         }
       }
-      for (i = 0; i < docs.length; i++) {
+      for (let i = 0; i < docs.length; i++) {
         docOb = docs[i];
         groupNode.children.unshift({
           label: docOb.name,
@@ -455,9 +506,9 @@ class LeftPaneController implements angular.IComponentController {
         });
       }
       groupNode.loading = false;
-      if (ctrl.treeApi.initialSelect) {
-        ctrl.treeApi.initialSelect();
-      }
+      this.mainTreeApi.initialSelect().then(() => {
+        this.treeSvc.refreshPeTrees()
+      })
     });
   };
 
@@ -480,7 +531,7 @@ class LeftPaneController implements angular.IComponentController {
   public handleChildren = (curNode: TreeBranch, childNodes: TreeBranch[]) => {
     let newChildNodes: TreeBranch[] = [];
     let node: TreeBranch;
-    for (var i = 0; i < childNodes.length; i++) {
+    for (let i = 0; i < childNodes.length; i++) {
       node = childNodes[i];
       if (this.seenViewIds[node.data.id]) {
         this.growl.error("Warning: View " + node.data.name + " have multiple parents! Duplicates not shown.");
@@ -491,9 +542,9 @@ class LeftPaneController implements angular.IComponentController {
     }
     curNode.children.push.apply(curNode.children, newChildNodes);
     curNode.loading = false;
-    if (this.treeApi.refresh) {
-      this.treeApi.refresh();
-    }
+    this.mainTreeApi.refresh().then(() => {
+      this.treeSvc.refreshPeTrees()
+    })
   };
 
   processDeletedViewBranch(branch) {
@@ -504,18 +555,18 @@ class LeftPaneController implements angular.IComponentController {
     if (this.viewId2node[id]) {
       delete this.viewId2node[id];
     }
-    for (var i = 0; i < branch.children.length; i++) {
+    for (let i = 0; i < branch.children.length; i++) {
       this.processDeletedViewBranch(branch.children[i]);
     }
   };
 
-  addSectionElements(element, viewNode, parentNode, initial?) {
+  addSectionElements(element: ElementObject, viewNode: TreeBranch, parentNode: TreeBranch, initial?: boolean) {
     var contents:ValueSpec | null = null
 
     var addContentsSectionTreeNode = (operand: ElementObject[]) => {
       var bulkGet:string[] = [];
-      var i = 0;
-      for (i = 0; i < operand.length; i++) {
+      let i = 0;
+      for (let i = 0; i < operand.length; i++) {
         bulkGet.push(operand[i].instanceId);
       }
       this.elementSvc.getElements({
@@ -524,7 +575,7 @@ class LeftPaneController implements angular.IComponentController {
         refId: this.mmsRef.id,
       }, 0).then((ignore) => {
         var instances: angular.IPromise<ElementObject>[] = [];
-        for (var i = 0; i < operand.length; i++) {
+        for (let i = 0; i < operand.length; i++) {
           instances.push(this.elementSvc.getElement({
             projectId: this.mmsProject.id,
             refId: this.mmsRef.id,
@@ -559,11 +610,15 @@ class LeftPaneController implements angular.IComponentController {
               parentNode.children.unshift(otherTreeNode);
             }
           }
-          this.treeApi.refresh();
+          let promise: Promise<boolean>;
           if (initial) {
-            this.treeApi.initialSelect();
+            promise = this.mainTreeApi.initialSelect();
+          } else {
+            promise = this.mainTreeApi.refresh();
           }
-          this.resetPeTreeList('all');
+          promise.then(() => {
+            this.treeSvc.refreshPeTrees()
+          })
         }, (reason) => {
           //view is bad
         });
@@ -583,7 +638,7 @@ class LeftPaneController implements angular.IComponentController {
     }
   }
 
-  treeClickHandler(branch) {
+  treeClickCallback = (branch: TreeBranch) => {
     if (this.$state.includes('main.project.ref') && !this.$state.includes('main.project.ref.document')) {
       if (branch.type === 'group') {
         this.$state.go('main.project.ref.preview', {
@@ -611,15 +666,16 @@ class LeftPaneController implements angular.IComponentController {
     }
   };
 
-  treeDblclickHandler(branch) {
+  treeDblClickCallback = (branch) => {
     if (this.$state.includes('main.project.ref') && !this.$state.includes('main.project.ref.document')) {
-      if (branch.type === 'group')
-        this.treeApi.expand_branch(branch);
-      else if (branch.type === 'view' || branch.type === 'snapshot') {
+      if (branch.type === 'view' || branch.type === 'snapshot') {
         this.$state.go('main.project.ref.document', {documentId: branch.data.id, search: undefined});
       }
     } else if (this.$state.includes('main.project.ref.document')) {
-      this.treeApi.expand_branch(branch);
+      this.mainTreeApi.expandBranch(branch).then(() => {
+        this.treeSvc.refreshPeTree(branch.type);
+      })
+
     }
   };
 
@@ -627,7 +683,7 @@ class LeftPaneController implements angular.IComponentController {
     if (this.rootScopeSvc.veFullDocMode()) {
       this.rootScopeSvc.veFullDocMode(false);
       this.bbApi.setToggleState("tree-full-document", false);
-      var curBranch = this.treeApi.getSelectedBranch();
+      var curBranch = this.mainTreeApi.getSelectedBranch();
       if (curBranch) {
         var viewId;
         if (curBranch.type !== 'view') {
@@ -651,10 +707,8 @@ class LeftPaneController implements angular.IComponentController {
   reloadData() {
     this.bbApi.toggleButtonSpinner('tree-refresh');
     this.$state.reload().then(() => {
-      this.treeApi.refresh();
-      let dispose = this.eventSvc.$on(TreeService.events.UPDATED, () => {
+      this.mainTreeApi.refresh().then(() => {
         this.tbApi.toggleButtonSpinner('tree-refresh');
-        dispose.dispose()
       })
     });
   }
@@ -667,7 +721,7 @@ class LeftPaneController implements angular.IComponentController {
       parentBranch: null,
       branchType: ""
     }
-    var branch = this.treeApi.getSelectedBranch();
+    var branch = this.mainTreeApi.getSelectedBranch();
     if (itemType === 'Document') {
       deferred.promise = this.addDocument(branch);
     } else if (itemType === 'Group') {
@@ -725,14 +779,11 @@ class LeftPaneController implements angular.IComponentController {
         aggr: '',
       };
       var top = this.addItemData.itemType === 'Group';
-      this.reloadData();
-      this.treeApi.addBranch(this.addItemData.parentBranch, newbranch, top);
-
       const addToFullDocView = (node, curSection, prevSysml) => {
         var lastChild = prevSysml;
         if (node.children) {
           var num = 1;
-          for (var i = 0; i < node.children.length; i++) {
+          for (let i = 0; i < node.children.length; i++) {
             var cNode = node.children[i];
             var data = {
               vId: cNode.data.id,
@@ -746,38 +797,39 @@ class LeftPaneController implements angular.IComponentController {
         }
         return lastChild;
       };
-
-      if (this.addItemData.itemType === 'View') {
-        this.viewId2node[data.id] = newbranch;
-        this.seenViewIds[data.id] = newbranch;
-        newbranch.aggr = this.addItemData.newViewAggr.type;
-        var curNum = this.addItemData.parentBranch.children[this.addItemData.parentBranch.children.length - 1].data._veNumber;
-        var prevBranch = this.treeApi.getPrevBranch(newbranch);
-        while (prevBranch.type !== 'view') {
-          prevBranch = this.treeApi.getPrevBranch(prevBranch);
-        }
-        this.viewSvc.handleChildViews(data, this.addItemData.newViewAggr.type, undefined, this.mmsProject.id, this.mmsRef.id, this.viewId2node, this.handleSingleView, this.handleChildren)
-            .then((node) => {
-              // handle full doc mode
-              if (this.rootScopeSvc.veFullDocMode()) {
-                addToFullDocView(node, curNum, newbranch.data.id);
-              }
-              this.addViewSectionsRecursivelyForNode(node);
-            });
-        if (!this.rootScopeSvc.veFullDocMode()) {
-          this.$state.go('main.project.ref.document.view', {viewId: data.id, search: undefined});
-        } else {
-          if (prevBranch) {
-            this.eventSvc.$broadcast('mms-new-view-added', {
-              vId: data.id,
-              curSec: curNum,
-              prevSibId: prevBranch.data.id
-            });
+      this.mainTreeApi.addBranch(this.addItemData.parentBranch, newbranch, top).then(() => {
+        if (this.addItemData.itemType === 'View') {
+          this.viewId2node[data.id] = newbranch;
+          this.seenViewIds[data.id] = newbranch;
+          newbranch.aggr = this.addItemData.newViewAggr.type;
+          var curNum = this.addItemData.parentBranch.children[this.addItemData.parentBranch.children.length - 1].data._veNumber;
+          var prevBranch = this.mainTreeApi.getPrevBranch(newbranch);
+          while (prevBranch.type !== 'view') {
+            prevBranch = this.mainTreeApi.getPrevBranch(prevBranch);
+          }
+          this.viewSvc.handleChildViews(data, this.addItemData.newViewAggr.type, undefined, this.mmsProject.id, this.mmsRef.id, this.viewId2node, this.handleSingleView, this.handleChildren)
+              .then((node) => {
+                // handle full doc mode
+                if (this.rootScopeSvc.veFullDocMode()) {
+                  addToFullDocView(node, curNum, newbranch.data.id);
+                }
+                this.addViewSectionsRecursivelyForNode(node);
+              });
+          if (!this.rootScopeSvc.veFullDocMode()) {
+            this.$state.go('main.project.ref.document.view', {viewId: data.id, search: undefined});
           } else {
-            this.eventSvc.$broadcast('mms-new-view-added', {vId: data.id, curSec: curNum, prevSibId: this.addItemData.parentBranch.data.id});
+            if (prevBranch) {
+              this.eventSvc.$broadcast('mms-new-view-added', {
+                vId: data.id,
+                curSec: curNum,
+                prevSibId: prevBranch.data.id
+              });
+            } else {
+              this.eventSvc.$broadcast('mms-new-view-added', {vId: data.id, curSec: curNum, prevSibId: this.addItemData.parentBranch.data.id});
+            }
           }
         }
-      }
+      })
     });
   }
 
@@ -825,7 +877,7 @@ class LeftPaneController implements angular.IComponentController {
   }
 
   deleteItem(cb?) {
-    var branch = this.treeApi.getSelectedBranch();
+    var branch = this.mainTreeApi.getSelectedBranch();
     if (!branch) {
       this.growl.warning("Select item to remove.");
       return;
@@ -871,7 +923,7 @@ class LeftPaneController implements angular.IComponentController {
             deferred.reject(reason);
           }
           if (branch.type === 'view') {
-            var parentBranch = this.treeApi.getParent(branch);
+            var parentBranch = this.mainTreeApi.getParent(branch);
             if (!this.$state.includes('main.project.ref.document')) {
               this.viewSvc.downgradeDocument(branch.data).then(resolve,reject)
             } else {
@@ -892,18 +944,18 @@ class LeftPaneController implements angular.IComponentController {
       }
     });
     instance.result.then((data) => {
-      this.treeApi.removeBranch(branch);
-      if (this.$state.includes('main.project.ref.document') && branch.type === 'view') {
-        this.processDeletedViewBranch(branch);
-      }
-
-      if (this.rootScopeSvc.veFullDocMode()) {
-        cb(branch);
-      } else {
-        this.treeApi.selectBranch();
-        this.$state.go('^', {search: undefined});
-      }
-    });
+      this.mainTreeApi.removeBranch(branch).then(() => {
+        if (this.$state.includes('main.project.ref.document') && branch.type === 'view') {
+          this.processDeletedViewBranch(branch);
+        }
+        if (this.rootScopeSvc.veFullDocMode()) {
+          cb(branch);
+        } else {
+          this.mainTreeApi.selectBranch();
+          this.$state.go('^', {search: undefined});
+        }
+      });
+    })
   };
 
   addViewSections(view) {
@@ -913,7 +965,7 @@ class LeftPaneController implements angular.IComponentController {
 
   addViewSectionsRecursivelyForNode(node) {
     this.addViewSections(node.data);
-    for (var i = 0; i < node.children.length; i++) {
+    for (let i = 0; i < node.children.length; i++) {
       if (node.children[i].type === 'view') {
         this.addViewSectionsRecursivelyForNode(node.children[i]);
       }
@@ -921,30 +973,31 @@ class LeftPaneController implements angular.IComponentController {
   }
 
   setPeVisibility(branch) {
-    if (branch.type === 'figure' || branch.type === 'table' || branch.type === 'equation') {
+    if (!this.mainTree.types.includes(branch.type)) {
       branch.hide = !this.rootScopeSvc.treeShowPe();
     }
-    for (var i = 0; i < branch.children.length; i++) {
+    for (let i = 0; i < branch.children.length; i++) {
       this.setPeVisibility(branch.children[i]);
     }
   }
 
-  //TODO refresh table and fig list when new item added, deleted or reordered
-  userClicksBranch(branch) {
-    this.treeApi.userClicksBranch(branch);
-  };
-
   userClicksPane() {
-    this.treeApi.selectBranch();
+    this.mainTreeApi.selectBranch();
   }
 
   searchInputChangeHandler() {
     if (this.treeOptions.search === '') {
-      this.treeApi.collapseAll();
-      this.treeApi.expandPathToSelectedBranch();
+      this.mainTreeApi.collapseAll().then(() => {
+        this.mainTreeApi.expandPathToSelectedBranch();
+      })
+      Object.values(this.peTreeApis).forEach((api) => {
+        api.collapseAll().then(() => {
+          api.expandPathToSelectedBranch();
+        })
+      })
     } else {
       // expand all branches so that the filter works correctly
-      this.treeApi.expandAll();
+      this.mainTreeApi.expandAll();
     }
   }
 
@@ -955,14 +1008,24 @@ let LeftPaneComponent: VeComponentOptions = {
   selector: "leftPane",
   transclude: true,
   template: `
-  <ng-pane pane-anchor="north" pane-size="78px" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
+  <ng-pane pane-anchor="north" pane-size="{{ $ctrl.bbSize }}" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
     <div class="pane-left">
         <div class="pane-left-toolbar" role="toolbar">
             <button-bar button-api="$ctrl.bbApi"></button-bar>
         </div>
         <div class="tree-options">
             <button-bar button-api="$ctrl.tbApi"></button-bar>
-            <input class="ve-plain-input" ng-model-options="{debounce: 1000}"
+            <button ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" uib-popover-template="'filterTemplate.html'" 
+              popover-title="Filter Tree" popover-placement="right-bottom" popover-append-to-body="true" 
+              popover-trigger="'outsideClick'" type="button" class="btn btn-tools btn-sm">
+                <i class="fa-solid fa-filter fa-2x"></i>
+            </button>
+            <script type="text/ng-template" id="filterTemplate.html">
+                  <input ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
+                    ng-model="$ctrl.treeOptions.search" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
+                    ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
+            </script>
+            <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
                 ng-model="$ctrl.treeOptions.search" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
                 ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
         </div>
@@ -970,28 +1033,12 @@ let LeftPaneComponent: VeComponentOptions = {
 </ng-pane>
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
     <div class="pane-left" style="display:table;">
-        <tree options="$ctrl.treeOptions"></tree>
-
-        <div data-ng-repeat="view in $ctrl.treeViewModes" ng-if="view.id == $ctrl.activeMenu">
-            <h4 style="margin: 3px 0px 3px 10px;">List of {{view.title}}</h4>
-            <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-                <li ng-repeat="row in view.branchList | filter:$ctrl.treeOptions.search track by $index"
-                    class="abn-tree-row">
-                    <div class="arrow" ng-click="userClicksBranch(row)"
-                        ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{view.id}}-{{row.data.id}}">
-                        <a class="tree-item" style="padding-left: 20px; position:relative;">
-                            <i ng-class="{'active-text': row.branch.selected}"
-                            class="indented tree-icon fa {{view.icon}}"></i>
-                            <!-- TODO active branch -->
-                            <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.data._veNumber}} {{row.data.name}}</span>
-                        </a>
-                    </div>
-                </li>
-            </ul>
+        <tree tree-api="$ctrl.mainTreeApi" tree-options="$ctrl.treeOptions"></tree>
+        <div data-ng-repeat="view in $ctrl.peTrees" ng-if="$ctrl.activeMenu[view.id]">
+            <tree tree-api="$ctrl.peTreeApis[view.id]" tree-options="$ctrl.treeOptions"></tree>
         </div>
-    <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>
+        <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>
     </div>
-    
 </ng-pane>
 `,
   bindings: {

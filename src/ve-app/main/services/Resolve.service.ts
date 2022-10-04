@@ -12,7 +12,7 @@ import {
     ApplicationService,
     BrandingService, BrandingStyle
 } from "@ve-utils/core-services"
-import {ElementObject, OrgObject, ProjectObject, RefObject, ViewObject} from "@ve-types/mms";
+import {DocumentObject, ElementObject, OrgObject, ProjectObject, RefObject, ViewObject} from "@ve-types/mms";
 
 import {veApp} from "@ve-app";
 
@@ -114,7 +114,7 @@ export class ResolveService {
     public getGroup(groupObs, documentOb): ElementObject {
         var group = null;
         if (documentOb) {
-            for (var i = 0; i < groupObs.length; i++) {
+            for (let i = 0; i < groupObs.length; i++) {
                 if (groupObs[i].id == documentOb._groupId) {
                     group = groupObs[i];
                     break;
@@ -266,7 +266,14 @@ export class ResolveService {
         }, 2, refresh);
     }
 
-    public getView(params, refresh?: boolean) {
+    public getProjectDocuments(params: {[paramName: string]: any}, refresh?: boolean): angular.IPromise<DocumentObject[]> {
+        return this.viewSvc.getProjectDocuments({
+            projectId: params.projectId,
+            refId: params.refId
+        }, 2, refresh);
+    }
+
+    public getView(params: {[paramName: string]: any}, refresh?: boolean): angular.IPromise<ViewObject> {
         return this.elementSvc.getElement({
             projectId: params.projectId,
             refId: params.refId,

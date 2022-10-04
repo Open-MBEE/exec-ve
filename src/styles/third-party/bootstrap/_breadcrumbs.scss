@@ -1,0 +1,30 @@
+@use "../bootstrap-variables" as bootstrap;
+
+// Breadcrumbs
+// --------------------------------------------------
+
+.breadcrumb {
+  padding: bootstrap.$breadcrumb-padding-vertical bootstrap.$breadcrumb-padding-horizontal;
+  margin-bottom: bootstrap.$line-height-computed;
+  list-style: none;
+  background-color: bootstrap.$breadcrumb-bg;
+  border-radius: bootstrap.$border-radius-base;
+
+  > li {
+    display: inline-block;
+
+    + li::before {
+      // [converter] Workaround for https://github.com/sass/libsass/issues/1115
+      $nbsp: "\00a0";
+
+      // Unicode space added since inline-block means non-collapsing white-space
+      content: "#{bootstrap.$breadcrumb-separator}#{$nbsp}";
+      padding: 0 5px;
+      color: bootstrap.$breadcrumb-color;
+    }
+  }
+
+  > .active {
+    color: bootstrap.$breadcrumb-active-color;
+  }
+}

@@ -34,7 +34,7 @@ let MMSMention = {
     </a>
 </script>
 
-<mms-mention-intercept mms-mention-intercept-value="$ctrl.mmsMentionValue" mms-fast-cf="$ctrl.fastCfListing" mms-mention-id="$ctrl.mmsMentionId"></mms-mention-intercept>
+<mention-intercept mms-mention-intercept-value="$ctrl.mmsMentionValue" mms-fast-cf="$ctrl.fastCfListing" mms-mention-id="$ctrl.mmsMentionId"></mention-intercept>
 `,
     bindings: {
         mmsEditor: '<',

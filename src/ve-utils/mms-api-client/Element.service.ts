@@ -164,7 +164,7 @@ export class ElementService {
         var request: {elements: {id:string}[]} = {elements: []};
         var existing: ElementObject[] = [];
         this.utilsSvc.normalize(reqOb);
-        for (var i = 0; i < reqOb.elementId.length; i++) {
+        for (let i = 0; i < reqOb.elementId.length; i++) {
             var id = reqOb.elementId[i];
             var requestCacheKey = this.getElementKey(reqOb, id);
             var exist = this.cacheSvc.get<ElementObject>(requestCacheKey);
@@ -183,13 +183,13 @@ export class ElementService {
                 var data = response.data.elements;
                 var i;
                 if (data && data.length > 0) {
-                    for (i = 0; i < data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         existing.push(this.cacheElement(reqOb, data[i]));
                     }
                 }
                 var deleted = response.data.deleted;
                 if (deleted && deleted.length > 0) {
-                    for (i = 0; i < deleted.length; i++) {
+                    for (let i = 0; i < deleted.length; i++) {
                         this.cacheDeletedElement(reqOb, deleted[i]);
                     }
                 }
@@ -363,7 +363,7 @@ export class ElementService {
             (data, status, headers, config) => {
                 var results: ElementObject[] = [];
                 var elements = data[jsonKey];
-                for (var i = 0; i < elements.length; i++) {
+                for (let i = 0; i < elements.length; i++) {
                     var element = elements[i];
                     if (!element) {//check for possible null
                         continue;
@@ -452,7 +452,7 @@ export class ElementService {
             var e: ElementObject = data.elements[0];
 
             if (data.elements.length > 1 && elementOb.id) {
-                for (var i = 0; i < data.elements.length; i++) {
+                for (let i = 0; i < data.elements.length; i++) {
                     if (data.elements[i].id === elementOb.id) {
                         e = data.elements[i];
                     }
@@ -644,7 +644,7 @@ export class ElementService {
                 }
                 var resp: ElementObject = response.data.elements[0];
                 if (response.data.elements.length > 1 && reqOb.elements[0].id) {
-                    for (var i = 0; i < response.data.elements.length; i++) {
+                    for (let i = 0; i < response.data.elements.length; i++) {
                         if (response.data.elements[i].id === reqOb.elements[0].id) {
                             resp = response.data.elements[i];
                         }
@@ -681,7 +681,7 @@ export class ElementService {
                     return;
                 }
                 var results: ElementObject[] = [];
-                for (var i = 0; i < response.data.elements.length; i++) {
+                for (let i = 0; i < response.data.elements.length; i++) {
                     results.push(this.cacheElement(reqOb, response.data.elements[i]));
                     var editCopy = JSON.parse(JSON.stringify(response.data.elements[i]));
                     this.cacheElement(reqOb, editCopy, true);
@@ -764,7 +764,7 @@ export class ElementService {
         this.$http.post(url, query)
             .then((response: angular.IHttpResponse<SearchResponse>) => {
                 //var result = [];
-                //for (var i = 0; i < data.data.elements.length; i++) {
+                //for (let i = 0; i < data.data.elements.length; i++) {
                 //    var element = data.data.elements[i];
                 //    var cacheE = this.cacheElement(reqOb, element);
                 //    var toAdd = JSON.parse(JSON.stringify(element)); //make clone

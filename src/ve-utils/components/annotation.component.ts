@@ -11,7 +11,7 @@ import {SchemaService} from "@ve-utils/model-schema";
 let AnnotationComponent: VeComponentOptions = {
     selector: 'annotation',
     template: `
-    <span class="mms-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{$ctrl.displayContent.toolTipTitle}}"></span>
+    <span class="ve-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{$ctrl.displayContent.toolTipTitle}}"></span>
 <script type="text/ng-template" id="annotationTemplate">
     <p>
         {{$ctrl.displayContent.toolTipContent}}

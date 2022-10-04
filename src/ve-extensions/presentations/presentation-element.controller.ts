@@ -81,10 +81,8 @@ export class Presentation implements IPresentation {
     $onInit() {
         this.eventSvc.$init(this);
 
-        if (this.peNumber) {
-            this.level = this.peNumber.split('.').length;
-            this.number = this.peNumber;
-        }
+        this.setNumber();
+
         this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this);
 
         var projectId = this.mmsProjectId;
@@ -142,10 +140,7 @@ export class Presentation implements IPresentation {
         this.isEditing = false;
         this.inPreviewMode = false;
 
-        if (this.peNumber) {
-            this.level = this.peNumber.split('.').length;
-            this.number = this.peNumber;
-        }
+        this.setNumber();
 
         this.$element.empty();
         this.$transcludeEl = $(this.getContent());
@@ -170,5 +165,25 @@ export class Presentation implements IPresentation {
         api.addButton(this.buttonBarSvc.getButtonBarButton("presentation-element-delete", this));
         api.setPermission("presentation-element-delete", this.isDirectChildOfPresentationElement);
     };
+
+
+    // Presentation Api
+
+    /**
+     * @name Presentation/setNumber
+     * @type function
+     *
+     * @description Helper function which will set the level and number of the PE. Contains logic that
+     * will handle cases where the {string} peNumber is parsed as an integer that will be treated as level 1
+     */
+    public setNumber = () => {
+        if (this.peNumber) {
+            if (Number.isInteger(this.peNumber))
+                this.level = 1;
+            else
+                this.level = this.peNumber.split('.').length;
+            this.number = this.peNumber;
+        }
+    }
 
 }

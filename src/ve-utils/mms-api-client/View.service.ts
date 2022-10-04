@@ -113,7 +113,7 @@ export class ViewService {
                 var index = -1
                 var projectDocs: ViewObject[] = this.cacheSvc.get<ViewObject[]>(cacheKey)
                 if (projectDocs) {
-                    for (var i = 0; i < projectDocs.length; i++) {
+                    for (let i = 0; i < projectDocs.length; i++) {
                         if (projectDocs[i].id === elementOb.id) {
                             index = i
                             break
@@ -196,7 +196,7 @@ export class ViewService {
                 }
                 if (view._contents && view._contents.operand) {
                     var contents = view._contents.operand
-                    for (var i = 0; i < contents.length; i++) {
+                    for (let i = 0; i < contents.length; i++) {
                         if (contents[i] && contents[i].instanceId) {
                             toGet.push(contents[i].instanceId)
                         }
@@ -246,7 +246,7 @@ export class ViewService {
 
     public collectTableSources(sources, body) {
         var i, j, k
-        for (i = 0; i < body.length; i++) {
+        for (let i = 0; i < body.length; i++) {
             var row = body[i]
             for (j = 0; j < row.length; j++) {
                 var cell = row[j]
@@ -313,7 +313,7 @@ export class ViewService {
             return deferred.promise
         } else {
         }
-        for (var i = 0; i < v._childViews.length; i++) {
+        for (let i = 0; i < v._childViews.length; i++) {
 
             if (seenViews[v._childViews[i].id]) continue
             childIds.push(v._childViews[i].id)
@@ -332,13 +332,13 @@ export class ViewService {
             .then(
                 (childViews: ViewObject[]) => {
                     var mapping = {}
-                    for (var i = 0; i < childViews.length; i++) {
+                    for (let i = 0; i < childViews.length; i++) {
                         mapping[childViews[i].id] = childViews[i]
                     }
                     var childPromises: angular.IPromise<string[] | TreeBranch>[] = []
                     var childNodes: any[] = []
                     var processedChildViews: any[] = []
-                    for (i = 0; i < childIds.length; i++) {
+                    for (let i = 0; i < childIds.length; i++) {
                         var child = mapping[childIds[i]]
                         if (child && this.utilsSvc.isView(child)) {
                             //what if not found??
@@ -490,7 +490,7 @@ export class ViewService {
                                 JSON.stringify(data._childViews)
                             ),
                         }
-                        for (var i = 0; i < clone._childViews.length; i++) {
+                        for (let i = 0; i < clone._childViews.length; i++) {
                             if (clone._childViews[i].id === reqOb.viewId) {
                                 clone._childViews.splice(i, 1)
                                 break
@@ -666,7 +666,7 @@ export class ViewService {
                     }
                     if (clone[key] && clone[key].operand) {
                         var operands = data[key].operand
-                        for (var i = 0; i < operands.length; i++) {
+                        for (let i = 0; i < operands.length; i++) {
                             if (
                                 instanceVal.instanceId ===
                                 operands[i].instanceId
@@ -847,7 +847,7 @@ export class ViewService {
         }
         this.elementSvc.createElements(reqOb).then(
             (data) => {
-                for (var i = 0; i < data.length; i++) {
+                for (let i = 0; i < data.length; i++) {
                     var elem = data[i]
                     if (elem.id === newInstanceId) {
                         if (type === 'Section') {
@@ -1243,11 +1243,11 @@ export class ViewService {
      */
     public getProjectDocuments(
         reqOb,
-        weight,
+        weight?,
         refresh?
-    ): angular.IPromise<ViewObject[]> {
+    ): angular.IPromise<DocumentObject[]> {
         this.utilsSvc.normalize(reqOb)
-        var deferred: angular.IDeferred<ViewObject[]> = this.$q.defer()
+        var deferred: angular.IDeferred<DocumentObject[]> = this.$q.defer()
         var url = this.uRLSvc.getProjectDocumentsURL(reqOb)
         var cacheKey = ['documents', reqOb.projectId, reqOb.refId]
         if (this.cacheSvc.exists(cacheKey) && !refresh) {
@@ -1262,7 +1262,7 @@ export class ViewService {
                     (data) => {
                         this.cacheSvc.put(cacheKey, data, false)
                         deferred.resolve(
-                            this.cacheSvc.get<ViewObject[]>(cacheKey)
+                            this.cacheSvc.get<DocumentObject[]>(cacheKey)
                         )
                     },
                     (reason) => {
@@ -1381,7 +1381,7 @@ export class ViewService {
      */
     public getElementReferenceTree(reqOb: ElementsRequest, contents: ElementObject, weight?: number) : angular.IPromise<ElementObject[]> {
         var promises: angular.IPromise<ElementObject>[] = []
-        for (var i = 0; i < contents.operand.length; i++) {
+        for (let i = 0; i < contents.operand.length; i++) {
             promises.push(
                 this.getElementReference(reqOb, contents.operand[i], weight)
             )
@@ -1584,7 +1584,7 @@ export class ViewService {
                     if (data.length === 0) {
                         return
                     }
-                    for (var i = 0; i < data.length; i++) {
+                    for (let i = 0; i < data.length; i++) {
                         var prop = data[i]
                         var feature = prop.definingFeatureId
                             ? prop.definingFeatureId

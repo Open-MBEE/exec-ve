@@ -1,4 +1,7 @@
-/*------------------------------------------------------------------
+/* VE base styles */
+@use "src/styles/globals";
+
+/* ------------------------------------------------------------------
 [Login Table of contents]
 
 1. Layout
@@ -8,19 +11,17 @@
 4. Animation
 5. Branding
 
--------------------------------------------------------------------*/
+------------------------------------------------------------------- */
 
-
-/*------------------------------------------------------------------
+/* ------------------------------------------------------------------
 1. Layout
--------------------------------------------------------------------*/
+------------------------------------------------------------------- */
 
 #ve-origin-select,
 #ve-login {
-
-  background-color: $ve-slate-darker-2;
+  background-color: globals.$ve-slate-darker-2;
   margin: 0;
-  height:100vh;
+  height: 100vh;
 
   .account-wall {
     min-width: 320px;
@@ -40,15 +41,15 @@
     position: relative;
   }
 
-  @media (max-height:500px){
-    .account-wall{
+  @media (max-height: 500px) {
+    .account-wall {
       margin: 40px auto;
     }
   }
 
-/*------------------------------------------------------------------
+  /* ------------------------------------------------------------------
 2. Typography
--------------------------------------------------------------------*/
+------------------------------------------------------------------- */
 
   .account-wall h2 {
     margin-bottom: 32px;
@@ -58,10 +59,10 @@
   }
 
   .module-disabled {
-    opacity: .3;
+    opacity: 0.3;
   }
 
-  .back-to-account{
+  .back-to-account {
     float: left;
     position: absolute;
     top: 18px;
@@ -69,74 +70,76 @@
   }
 
   .label-text {
-    color: $ve-white-text-lighter-2;
+    color: globals.$ve-white-text-lighter-2;
     font-size: 14px;
   }
 
-/*------------------------------------------------------------------
+  /* ------------------------------------------------------------------
 3. Input
--------------------------------------------------------------------*/
+------------------------------------------------------------------- */
 
   .login-input {
-    background-color: $ve-slate-base;
-    border: 1px solid $ve-slate-base;
+    background-color: globals.$ve-slate-base;
+    border: 1px solid globals.$ve-slate-base;
     border-radius: 2px !important;
     box-shadow: none;
-    color:white;
+    color: white;
     line-height: 18px;
     margin: 6px 0 18px;
-    letter-spacing:.05em;
+    letter-spacing: 0.05em;
     height: 36px;
 
     &:focus {
       box-shadow: none;
-      border: 1px solid $ve-teal-base;
+      border: 1px solid globals.$ve-teal-base;
     }
   }
-
 }
 
-/*------------------------------------------------------------------
+/* ------------------------------------------------------------------
 4. Animation - slide in selection options when no project provided
--------------------------------------------------------------------*/
+------------------------------------------------------------------- */
 
-@keyframes slideInFromLeft {
+@keyframes slide-in-from-left {
   0% {
     transform: translateX(16%);
     opacity: 0;
   }
+
   100% {
     transform: translateX(0);
     opacity: 1;
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
 }
 
 .animated-fade-in-slide {
-  animation: .3s ease-out 0s 1 slideInFromLeft;
+  animation: 0.3s ease-out 0s 1 slide-in-from-left;
 }
 
-.fade-in{
-  animation: .7s ease-out 0s 1 fadeIn;
+.fade-in {
+  animation: 0.7s ease-out 0s 1 fade-in;
 }
 
-/*------------------------------------------------------------------
+/* ------------------------------------------------------------------
 5. Branding
--------------------------------------------------------------------*/
+------------------------------------------------------------------- */
 #ve-origin-select,
 #ve-login {
   .login-banner {
     width: 100%;
     text-align: center;
   }
+
   .login-box {
     margin: auto;
     padding: 20px 5px;
@@ -148,5 +151,4 @@
     list-style-type: none;
     padding: 0;
   }
-
 }

@@ -12,5 +12,6 @@ declare global {
     CKEDITOR: CKEDITOR;
     __env: VeConfig;
     HtmlRenderedDiff: HtmlRenderedDiff;
+    Promise: Promise
   }
 }

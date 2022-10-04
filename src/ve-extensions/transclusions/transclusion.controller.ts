@@ -281,7 +281,7 @@ export class Transclusion implements ITransclusion {
         }
         if (this.checkCircular) {
             if (this.extUtilSvc.hasCircularReference(this, this.mmsElementId, 'doc')) {
-                this.$element.html('<span class="mms-error">Circular Reference!</span>');
+                this.$element.html('<span class="ve-error">Circular Reference!</span>');
                 return;
             }
         }

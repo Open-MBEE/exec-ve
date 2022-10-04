@@ -20,19 +20,50 @@ export interface TreeBranch extends ITreeNode {
     selected?: boolean
     expanded?: boolean;
     expandable?: boolean;
-    onSelect?: string
+    onSelect?(branch: TreeBranch): void
+    onDblClick?(branch: TreeBranch): void
 }
 
 export interface TreeRow {
     branch: TreeBranch
     children: TreeBranch[]
-    expand_icon: string
+    visibleChild: boolean,
     label: string
     level: number
     section: string
     type_icon: string
     visible: boolean
 }
+
+export interface TreeOptions {
+    typeIcons?: {[key: string]: string}
+    sectionNumbering?: boolean
+    numberingDepth?: number
+    numberingSeparator?: string
+    expandLevel?: number
+    search: string
+    sort?: boolean
+    startChapter?: number
+    expandCallback?(elementId: string, branch: TreeBranch, recurse: boolean)
+    onSelect?(branch: TreeBranch): void
+    onDblClick?(branch: TreeBranch): void
+}
+
+export interface TreeConfig {
+    id: string
+    title?: string
+    icon?: string
+    types?: string[]
+}
+
+export interface TreeIcons {
+    iconExpand: string,
+    iconCollapse: string,
+    iconDefault: string
+}
+
+
+
 
 export interface VeTreeNodeScope extends AngularUITree.ITreeNodeScope {
     node: TreeBranch

@@ -426,9 +426,9 @@ export class VeEditorController implements angular.IComponentController {
 
         public mmsResetCallback = (ed: CKEDITOR.editor) => {
             var body = ed.document.getBody();
-            this.resetCrossRef(body.find("mms-cf[mms-cf-type='name']").toArray(), '.name]');
-            this.resetCrossRef(body.find("mms-cf[mms-cf-type='doc']").toArray(), '.doc]');
-            this.resetCrossRef(body.find("mms-cf[mms-cf-type='val']").toArray(), '.val]');
+            this.resetCrossRef(body.find("transclude[mms-cf-type='name']").toArray(), '.name]');
+            this.resetCrossRef(body.find("transclude[mms-cf-type='doc']").toArray(), '.doc]');
+            this.resetCrossRef(body.find("transclude[mms-cf-type='val']").toArray(), '.val]');
             this.resetCrossRef(body.find('view-link').toArray(), '.vlink]');
             this.update();
         };

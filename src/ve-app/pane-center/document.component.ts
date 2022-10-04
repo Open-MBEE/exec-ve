@@ -12,7 +12,6 @@ import {
     FullDocumentServiceFactory,
     RootScopeService,
     ShortenUrlService,
-    TreeService,
     UtilsService,
 } from "@ve-utils/core-services";
 import {AppUtilsService} from "@ve-app/main/services";
@@ -24,6 +23,7 @@ import {View2NodeMap} from "@ve-types/tree";
 
 import {veApp} from "@ve-app";
 import {ContentWindowService} from "@ve-app/pane-center/services/ContentWindow.service";
+import {TreeService} from "@ve-core/tree";
 
 class FullDocumentController implements angular.IComponentController {
 
@@ -244,9 +244,24 @@ class FullDocumentController implements angular.IComponentController {
             });
         }));
 
-        this.subs.push(this.eventSvc.$on('refresh-numbering', () => {
+        this.subs.push(this.eventSvc.$on('refresh-numbering', (reNumOnly: boolean) => {
             this.fullDocumentSvc.loadRemainingViews(() => {
-                this.appUtilsSvc.refreshNumbering(this.treeApi.getRows(), angular.element("#print-div"));
+                if (!reNumOnly) {
+                    this.treeSvc.getApi().refresh().then(() => {
+                        this.treeSvc.refreshPeTrees()
+                        this.views.forEach((view) => {
+                            if (this.treeApi.branch2viewNumber[view.id]) {
+                                view.number = this.treeApi.branch2viewNumber[view.id];
+                            }
+                        })
+                    })
+                } else {
+                    this.views.forEach((view) => {
+                        if (this.treeApi.branch2viewNumber[view.id]) {
+                            view.number = this.treeApi.branch2viewNumber[view.id];
+                        }
+                    })
+                }
             });
         }));
 
@@ -273,7 +288,7 @@ class FullDocumentController implements angular.IComponentController {
         return this.viewSvc.handleChildViews(this.documentOb, 'composite', undefined, this.projectOb.id,
             this.refOb.id, this.view2Node, this._handleSingleView)
             .then((childIds: string[]) => {
-                for (var i = 0; i < childIds.length; i++) {
+                for (let i = 0; i < childIds.length; i++) {
                     this._constructViews(childIds[i], this.num);
                     this.num = this.num + 1;
                 }
@@ -314,7 +329,7 @@ class FullDocumentController implements angular.IComponentController {
         if (this.view2Children[viewId] && Array.isArray(this.view2Children[viewId])) {
             var num = 1;
             let childIds = this.view2Children[viewId] as string[];
-            for (var i = 0; i < childIds.length; i++) {
+            for (let i = 0; i < childIds.length; i++) {
                 this._constructViews(this.view2Children[viewId][i], curSection + '.' + num);
                 num = num + 1;
             }
@@ -330,7 +345,7 @@ class FullDocumentController implements angular.IComponentController {
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
             return childIds;
         }
-        for (var i = 0; i < v._childViews.length; i++) {
+        for (let i = 0; i < v._childViews.length; i++) {
             if (this.seenViewIds[v._childViews[i].id]) {
                 continue;
             }

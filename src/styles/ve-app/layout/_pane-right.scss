@@ -1,15 +1,18 @@
+/* VE base styles */
+@use "src/styles/globals";
+
 /*************************
   Styles for the View Editor right pane
 *************************/
 
 .pane-right {
   > .pane-right {
-    @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+    @include globals.box-shadow(-1px 0 1px 0 rgba(0, 0, 0, 0.2));
   }
 
   &.ng-pane-orientation-horizontal {
     .ng-pane-handle > .ng-pane-toggle {
-      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
+      @include globals.box-shadow(-2px 0 2px 0 rgba(100, 100, 100, 0.2));
       margin-left: 1px;
     }
   }
@@ -34,19 +37,19 @@
   hr.spec-title-divider{
     margin-left:-18px;
     margin-right:-18px;
-    border-color: $ve-silver-darker-2;
+    border-color: globals.$ve-silver-darker-2;
   }
 }
 
 .diff-pane-right {
   > .pane-right {
-    @include box-shadow(-1px 0px 1px 0px rgba(0, 0, 0, 0.2));
+    @include globals.box-shadow(-1px 0 1px 0 rgba(0, 0, 0, 0.2));
     z-index: 1;
   }
 
   &.ng-pane-orientation-horizontal {
     .ng-pane-handle > .ng-pane-toggle {
-      @include box-shadow(-2px 0 2px 0px rgba(100, 100, 100, 0.2));
+      @include globals.box-shadow(-2px 0 2px 0 rgba(100, 100, 100, 0.2));
       margin-left: 1px;
     }
   }

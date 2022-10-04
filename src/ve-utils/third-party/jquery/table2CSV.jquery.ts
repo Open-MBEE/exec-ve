@@ -62,7 +62,7 @@ jQuery.fn.table2CSV = (inputOptions) => {
     var numCols = options.header.length;
     var tmpRow = [];
     if (numCols > 0) {
-        for (var i = 0; i < numCols; i++) {
+        for (let i = 0; i < numCols; i++) {
             tmpRow[tmpRow.length] = formatData(options.header[i]);
         }
     } else {

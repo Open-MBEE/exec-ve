@@ -46,7 +46,7 @@ export class ViewHtmlService {
         var result = ['<table class="table-bordered table-condensed ' + (table.style ? table.style : '') + '">'];
         if (table.colwidths && table.colwidths.length > 0) {
             result.push('<colgroup>');
-            for (var i = 0; i < table.colwidths.length; i++) {
+            for (let i = 0; i < table.colwidths.length; i++) {
                 if (table.colwidths[i]) {
                     result.push('<col style="width: ' + table.colwidths[i] + '">');
                 } else {
@@ -122,7 +122,7 @@ export class ViewHtmlService {
         }
         var result = [], i, j, k, row, cell, thing;
         var dtag = (isHeader ? 'th' : 'td');
-        for (i = 0; i < body.length; i++) {
+        for (let i = 0; i < body.length; i++) {
             result.push('<tr>');
             row = body[i];
             for (j = 0; j < row.length; j++) {
@@ -185,7 +185,7 @@ export class ViewHtmlService {
             result.push('<ol>');
         else
             result.push('<ul>');
-        for (i = 0; i < list.list.length; i++) {
+        for (let i = 0; i < list.list.length; i++) {
             item = list.list[i];
             result.push('<li>');
             for (j = 0; j < item.length; j++) {

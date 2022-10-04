@@ -4,7 +4,7 @@ import {StateDeclaration} from "@uirouter/core/lib/state/interface";
 import {StateParams} from "@uirouter/core/lib/params/stateParams";
 
 export class RootScopeService {
-    
+
     public constants = {
         LOGINMODALOPEN: 'login-modal-open',
         MMSREFOB: 'mms-ref-ob',
@@ -26,7 +26,6 @@ export class RootScopeService {
         VESHOWLOGIN: 've-show-login',
         VESHOWSEARCH: 've-show-search',
         TREESHOWPE: 'tree-show-pe',
-        TREEOPTIONS: 'tree-options',
         TREEINITIALSELECTION: 'tree-initialSelection',
         TREEICONS: 'tree-icons',
         LEFTPANECLOSED: 'tree-pane-closed',
@@ -89,6 +88,10 @@ export class RootScopeService {
         return this.sessionSvc.accessor(this.constants.VECOMMENTSON, value, false);
     };
 
+    veNumberingOn(value?:any | undefined) {
+        return this.sessionSvc.accessor(this.constants.VECOMMENTSON, value, true);
+    };
+
     veElementsOn(value?:any | undefined) {
         return this.sessionSvc.accessor(this.constants.VEELEMENTSON, value, false);
     };
@@ -117,16 +120,8 @@ export class RootScopeService {
         return this.sessionSvc.accessor(this.constants.TREESHOWPE, value, false);
     };
 
-    treeOptions(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.TREEOPTIONS, value, {});
-    };
-
     treeInitialSelection(value?:any | undefined) {
         return this.sessionSvc.accessor(this.constants.TREEINITIALSELECTION, value, null, true);
-    };
-
-    treeIcons(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.TREEICONS, value, {});
     };
 
     leftPaneClosed(value?:any | undefined) {

@@ -1,11 +1,12 @@
 import * as angular from "angular";
 import {ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {EventService, TreeApi, TreeService} from "@ve-utils/core-services";
+import {EventService} from "@ve-utils/core-services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {ExtensionService, veExt} from "@ve-ext";
 import Rx from "rx-lite";
 import {ViewController} from "@ve-ext/presentations/view.component";
 import {ElementObject, PresentationInstanceObject} from "@ve-types/mms";
+import {TreeApi, TreeService} from "@ve-core/tree";
 
 /**
  * @ngdoc component
@@ -57,10 +58,6 @@ export class ViewPresentationElemController implements angular.IComponentControl
         this.treeApi = this.treeSvc.getApi();
         this.eventSvc.$init(this);
 
-        //Init PeNumber
-        if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
-            this.peNumber = this.treeApi.branch2viewNumber[this.instanceSpec.id];
-        }
         this.subs.push(this.eventSvc.$on(TreeService.events.UPDATED, () => {
             if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
                 this.peNumber = this.treeApi.branch2viewNumber[this.instanceSpec.id];
@@ -68,7 +65,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
         }));
 
         if (!this.mmsInstanceVal || !this.mmsInstanceVal.instanceId) {
-            this.$element.html('<span class="mms-error">Reference is null</span>');
+            this.$element.html('<span class="ve-error">Reference is null</span>');
             return;
         }
         var projectId = null;
@@ -88,6 +85,10 @@ export class ViewPresentationElemController implements angular.IComponentControl
                 this.presentationElem = this.viewSvc.getPresentationInstanceObject(instanceSpec);
                 this.instanceSpec = instanceSpec;
                 this.presentationElemLoading = false;
+                //Init PeNumber
+                if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
+                    this.peNumber = this.treeApi.branch2viewNumber[this.instanceSpec.id];
+                }
                 var hash = this.$location.hash();
                 if (hash === instanceSpec.id) {
                     this.$timeout(() => {
@@ -110,7 +111,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
                 this.$compile(newPe)(this.$scope);
             }, (reason) => {
                 if (reason.status === 500) {
-                    this.$element.html('<span class="mms-error">View element reference error: ' + this.mmsInstanceVal.instanceId + ' invalid specification</span>');
+                    this.$element.html('<span class="ve-error">View element reference error: ' + this.mmsInstanceVal.instanceId + ' invalid specification</span>');
                 } else {
                     this.$element.html('<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>');
                     this.$compile($(this.$element))(Object.assign(this.$scope.$new(), {

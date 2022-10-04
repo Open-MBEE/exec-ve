@@ -71,10 +71,7 @@ class PresentTableController extends Presentation implements IPresentation {
         this.isEditing = false;
         this.inPreviewMode = false;
 
-        if (this.peNumber) {
-            this.level = this.peNumber.split('.').length;
-            this.number = this.peNumber;
-        }
+        this.setNumber();
 
 
         this.$transcludeEl = $(this.getContent());
@@ -166,7 +163,7 @@ class PresentTableController extends Presentation implements IPresentation {
     /** Display rows that match the filter term **/
     private _displaySomeRows = (trs, increaseNumOfRowToShow) => {
         var regExp = new RegExp(this._searchTerm, 'i');
-        for (var i = 0, numRows = trs.length; i < numRows; i++) {
+        for (let i = 0, numRows = trs.length; i < numRows; i++) {
             var string = $(trs[i]).text();
             if (regExp.test(string)) {
                 $(trs[i]).show();

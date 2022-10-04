@@ -8,6 +8,7 @@ import {ITransclusion} from "@ve-ext/transclusions";
 
 import {veUtils} from "@ve-utils";
 import {SchemaService} from "@ve-utils/model-schema";
+import {TreeBranch} from "@ve-types/tree";
 
 
 /**
@@ -49,7 +50,7 @@ export class UtilsService {
         if (vs.hasOwnProperty('valueExpression'))
             delete vs.valueExpression;
         if (vs.operand) {
-            for (var i = 0; i < vs.operand.length; i++) {
+            for (let i = 0; i < vs.operand.length; i++) {
                 this.cleanValueSpec(vs.operand[i]);
             }
         }
@@ -68,7 +69,7 @@ export class UtilsService {
      * @returns {ElementObject} clean elem
      */
     public cleanElement(elem: ElementObject, forEdit?: boolean): ElementObject {
-        var i = 0;
+        let i = 0;
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
                 elem.defaultValue = null;
@@ -79,7 +80,7 @@ export class UtilsService {
                 elem.value = [];
         }
         if (elem.value) {
-            for (i = 0; i < elem.value.length; i++) {
+            for (let i = 0; i < elem.value.length; i++) {
                 this.cleanValueSpec(elem.value[i]);
             }
         }
@@ -305,13 +306,12 @@ export class UtilsService {
      * @description
      * Generates table of contents for the document/views.
      *
-     * @param {string} tree the root element (document or view)
+     * @param {TreeBranch} rootBranch the root element (document or view) of the main tree
      * @returns {string} toc string
      */
-    public makeHtmlTOC(tree) {
+    public makeHtmlTOC(rootBranch: TreeBranch) {
         var result = '<div class="toc"><h1 class="header">Table of Contents</h1>';
-        var root_branch = tree[0].branch;
-        result += this.makeHtmlTOCChild(root_branch, true);
+        result += this.makeHtmlTOCChild(rootBranch, true);
         result += '</div>';
         return result;
     };
@@ -324,19 +324,19 @@ export class UtilsService {
      * @description
      * Generates table of contents for the document/views.
      *
-     * @param {string} child the view to be referenced in the table of content
+     * @param {string} branch the branch to be referenced in the table of content
      * @param {boolean} skip skip adding li for this branch
      * @returns {string} toc string
      */
-    public makeHtmlTOCChild(branch, skip?) {
-        var result = '';
-        var child;
+    public makeHtmlTOCChild(branch: TreeBranch, skip?) {
+        let result = '';
+        let child;
         if (!skip) {
-            var anchor = '<a href=#' + branch.data.id + '>';
+            let anchor = '<a href=#' + branch.data.id + '>';
             result += '  <li>' + anchor + branch.data._veNumber + ' ' + branch.data.name + '</a>';
         }
-        var ulAdded = false;
-        for (var i = 0; i < branch.children.length; i++) {
+        let ulAdded = false;
+        for (let i = 0; i < branch.children.length; i++) {
             child = branch.children[i];
             if (child.type !== 'view' && child.type !== 'section') {
                 continue;
@@ -366,13 +366,13 @@ export class UtilsService {
      * `html` param provides option to use html content to generate list. It also appends the
      * captions to the figures and tables.
      *
-     * @param {string} tree the document/view to be printed (what is on the left pane)
+     * @param {TreeBranch} rootBranch the root of the document/view to be printed (what is on the left pane)
      * @param {string} printElement contents to be printed (what is displayed in the center pane)
      * @param {boolean} live true only if a specific sorting is required
      * @param {boolean} html whether to generated list of tables and figures using html content, outside of the corresponding PE or not
      * @returns {object} results
      */
-    public makeTablesAndFiguresTOC(tree, printElement, live, html) {
+    public makeTablesAndFiguresTOC(rootBranch: TreeBranch, printElement: JQuery<HTMLElement>, live: boolean, html: boolean) {
         var ob = {
             tables: '',
             figures: '',
@@ -381,15 +381,14 @@ export class UtilsService {
             figureCount: 0,
             equationCount: 0
         };
-        var root_branch = tree[0].branch;
 
         // If both "Generate List of Tables and Figures" && "Use HTML for List of Tables and Figures " options are checked...
         if (html) {
-            ob = this.generateTOCHtmlOption(ob, tree, printElement);
+            ob = this.generateTOCHtmlOption(ob, rootBranch, printElement);
             // return obHTML;
         } else {
-            for (var i = 0; i < root_branch.children.length; i++) {
-                this.makeTablesAndFiguresTOCChild(root_branch.children[i], printElement, ob, live, false);
+            for (let i = 0; i < rootBranch.children.length; i++) {
+                this.makeTablesAndFiguresTOCChild(rootBranch.children[i], printElement, ob, live, false);
             }
         }
         ob.tables    = ob.tables.length    ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>'    + ob.tables    + '</ul></div>': '';
@@ -479,18 +478,18 @@ export class UtilsService {
             cap = veNumber + '. ' + pe.name;
             ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>';
             var equationCap = '(' + veNumber + ')';
-            var capEq = el.find('.mms-equation-caption');
+            var capEq = el.find('.caption-type-equation');
             capEq.html(equationCap);
             // If caption does not exist, add to html
             if (capEq.length === 0) {
-                el.find('mms-view-equation > mms-cf > transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
+                el.find('present-equation > transclude > transclude-doc > p').last().append('<span class="caption-type-equation pull-right">' + equationCap + '</span>');
             }
             if (!live) {
                 refs.find('a').attr('href', '#' + sysmlId);
             }
             refs.filter('[suppress-numbering!="true"]').filter(':not([link-text])').find('a').html('Eq. ' + equationCap);
         }
-        for (var i = 0; i < child.children.length; i++) {
+        for (let i = 0; i < child.children.length; i++) {
             this.makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName);
         }
     };
@@ -537,11 +536,11 @@ export class UtilsService {
         }
         if (type === 'equation') {
             var equationCap = '(' + veNumber + ')';
-            var capEq = el.find('.mms-equation-caption');
+            var capEq = el.find('.caption-type-equation');
             capEq.html(equationCap);
             // If caption does not exist, add to html
             if (capEq.length === 0) {
-                el.find('mms-view-equation > mms-cf > transclude-doc > p').last().append('<span class="mms-equation-caption pull-right">' + equationCap + '</span>');
+                el.find('mms-view-equation > mms-cf > transclude-doc > p').last().append('<span class="caption-type-equation pull-right">' + equationCap + '</span>');
             }
         }
     };
@@ -737,7 +736,7 @@ export class UtilsService {
             "table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n" +
             "table transclude-doc p {margin: 0 0 5px;}\n" +
             "th {background-color: #f2f3f2;}\n" +
-            //"table p {word-break: break-all;}\n" + 
+            //"table p {word-break: break-all;}\n" +
             "\n" +
             "/*------------------------------------------------------------------\n" +
             "3. Typography\n" +
@@ -765,14 +764,14 @@ export class UtilsService {
             "/*------------------------------------------------------------------\n" +
             "   3.2 Errors\n" +
             "------------------------------------------------------------------*/\n" +
-            ".mms-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
+            ".ve-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n" +
             "\n" +
             "/*------------------------------------------------------------------\n" +
             "4. Figure Captions\n" +
             "------------------------------------------------------------------*/\n" +
-            "caption, figcaption, .mms-equation-caption {text-align: center; font-weight: bold;}\n" +
+            "caption, figcaption, .caption-type-equation {text-align: center; font-weight: bold;}\n" +
             "table, figure {margin-bottom: 10px;}\n" +
-            ".mms-equation-caption {float: right;}\n" +
+            ".caption-type-equation {float: right;}\n" +
             "mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}\n" +
             "\n" +
             "/*------------------------------------------------------------------\n" +
@@ -961,12 +960,12 @@ export class UtilsService {
         window.getSelection().removeAllRanges();
     };
 
-    public getElementTypeClass(element: ElementObject, elementType) {
+    public getElementTypeClass(element: ElementObject, elementType: string) {
         var elementTypeClass = '';
         if (element.type === 'InstanceSpecification') {
-            elementTypeClass = 'pe-type-' + elementType;
+            elementTypeClass = 'pe-type-' + _.kebabCase(elementType);
         } else {
-            elementTypeClass = 'item-type-' + elementType;
+            elementTypeClass = 'item-type-' + _.kebabCase(elementType);
         }
         return elementTypeClass;
     };

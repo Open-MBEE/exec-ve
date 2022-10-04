@@ -1,34 +1,39 @@
+/* VE base styles */
+@use "src/styles/globals";
+@use "sass:color";
+
 /*************************
   Styles for the View Editor center pane
 *************************/
 
-$pane_center_btn_group_width: 340px;
-$pane_center_toolbar: $pane_center_btn_group_width + 150px;
+$pane-center-btn-group-width: 340px;
+$pane-center-toolbar: $pane-center-btn-group-width + 150px;
 
 /* start of fullDoc page styles */
-body.fullDoc {
-  text-rendering: optimizeLegibility;
+body.document {
+  text-rendering: optimizelegibility;
   overflow: scroll;
-  font-family: "Times New Roman", Serif;
+  font-family: "Times New Roman", serif;
 }
 
 tr {
   page-break-inside: avoid !important;
 }
 
-.pane-center .container-fluid{
+.pane-center .container-fluid {
   padding-left: 31px;
-  padding-right:25px;
+  padding-right: 25px;
 }
+
 /* end of fullDoc page styles */
 
 .clickable:hover {
   cursor: pointer;
-  background-color: $light_blue;
+  background-color: globals.$light-blue;
 }
 
-/*Overriding default from ng-pane-scroller that results in double scroll bar*/
-.content-pane .content-pane{
+/* Overriding default from ng-pane-scroller that results in double scroll bar */
+.content-pane .content-pane {
   overflow: hidden;
 }
 
@@ -50,13 +55,14 @@ tr {
 
   .pane-center-toolbar {
     padding: 5px 10px;
-    min-width: $pane_center_toolbar;
+    min-width: $pane-center-toolbar;
   }
 
   .pane-center-btn-group {
     float: right;
+
     // padding: 5px 10px;
-    min-width: $pane_center_btn_group_width;
+    min-width: $pane-center-btn-group-width;
 
     .bordered-button-bar {
       float: right;
@@ -69,11 +75,10 @@ tr {
   }
 }
 
-
 .container-tree-reorder {
   margin-bottom: 24px;
 
-  /*Float reorder buttons to the right */
+  /* Float reorder buttons to the right */
   .btn-tree-reorder-save {
     float: right;
     margin-top: 24px;
@@ -81,42 +86,42 @@ tr {
   }
 
   .angular-ui-tree-handle {
-    font-family: $font-family-sans-serif;
-    color: $ve-slate-base;
+    font-family: globals.$font-family-sans-serif;
+    color: globals.$ve-slate-base;
     padding: 4px 6px;
     border-radius: 2px;
     font-weight: bold;
-    @include transition($background_easeout_transition);
-  
+
+    @include globals.transition(globals.$background-easeout-transition);
+
     &.grab {
       cursor: move;
-      cursor: -moz-move;
-      cursor: -webkit-move;
     }
 
     &.no-grab {
       font-weight: initial;
-      color: $ve-light-text;
+      color: globals.$ve-light-text;
       cursor: default;
+
       &:hover {
-        background-color:transparent;
+        background-color: transparent;
       }
     }
 
-    &:hover{
-      background-color: $ve-silver-lighter-0;
+    &:hover {
+      background-color: globals.$ve-silver-lighter-0;
     }
   }
 
   .angular-ui-tree-placeholder {
-    margin:0;
-    min-height:0;
+    margin: 0;
+    min-height: 0;
   }
 
-  /*Add blue dotted line to visual feedback of where the item will be placed*/
-  .angular-ui-tree-placeholder:before{
-    background-image: url('../../../assets/location-feedback.svg');
-    content: ' ';
+  /* Add blue dotted line to visual feedback of where the item will be placed */
+  .angular-ui-tree-placeholder::before {
+    background-image: url("../../../assets/location-feedback.svg");
+    content: " ";
     background-size: 70px 30px;
     height: 30px;
     width: 70px;
@@ -126,40 +131,39 @@ tr {
   }
 }
 
-
-/* styling for doclib link to the right of the button bar*/
+/* styling for doclib link to the right of the button bar */
 
 .doclib-link {
   margin: 0 4px;
   float: left;
-  .btn-tools{
-    color: $ve-light-text;
+
+  .btn-tools {
+    color: globals.$ve-light-text;
   }
 
-  img{
-    padding-right:5px;
+  img {
+    padding-right: 5px;
     top: -1px;
     position: relative;
   }
 }
 
 .fa-folder {
-  color: lighten($ve-accent, 12%);
+  color: color.scale(globals.$ve-accent, $lightness: 12%);
 }
 
 .group-reorder-container .highlighted {
-  background-color: darken($ve-active, 4%);
+  background-color: color.scale(globals.$ve-active, $lightness: -4%);
   color: white;
 
-  /*lighten folder against dark blue background*/
-  .fa-folder{
-    color: lighten($ve-accent, 24%);
+  /* lighten folder against dark blue background */
+  .fa-folder {
+    color: color.scale(globals.$ve-accent, $lightness: 24%);
   }
 }
 
-
 .active-editor {
-  box-shadow: 0 0 0 3px rgba(101, 182,255,0.47);
+  box-shadow: 0 0 0 3px rgb(101 182 255 / 47%);
 }
 
 /* Overwrite angularjs bootstrap's popuover so that the popover's container expands with its content */

@@ -102,7 +102,7 @@ export class ProjectService {
             this.$http.get(this.uRLSvc.getOrgsURL())
             .then((response: angular.IHttpResponse<OrgsResponse>) => {
                 var orgs: OrgObject[] = [];
-                for (var i = 0; i < response.data.orgs.length; i++) {
+                for (let i = 0; i < response.data.orgs.length; i++) {
                     var org = response.data.orgs[i];
                     this.cacheSvc.put(['org', org.id], org, true);
                     orgs.push(<OrgObject>this.cacheSvc.get<OrgObject>(['org', org.id]));
@@ -150,7 +150,7 @@ export class ProjectService {
                     return;
                 }
                 var orgProjects = {};
-                for (var i = 0; i < response.data.projects.length; i++) {
+                for (let i = 0; i < response.data.projects.length; i++) {
                     var project = response.data.projects[i];
                     var porg = project.orgId;
                     this.cacheSvc.put(['project', project.id], project, true);
@@ -365,7 +365,7 @@ export class ProjectService {
                 this.cacheSvc.remove(key);
                 var list = this.cacheSvc.get<RefObject[]>(['refs', projectId]);
                 if (list) {
-                    for (var i = 0; i < list.length; i++) {
+                    for (let i = 0; i < list.length; i++) {
                         if (list[i].id === refOb.id) {
                             list.splice(i, 1);
                             break;
@@ -399,7 +399,7 @@ export class ProjectService {
                 }
                 var groups: ElementObject[] = [];
                 var reqOb = {projectId: projectId, refId: refId, commitId: 'latest', elementId: ''};
-                for (var i = 0; i < response.data.groups.length; i++) {
+                for (let i = 0; i < response.data.groups.length; i++) {
                     var group: ElementObject = response.data.groups[i];
                     reqOb.elementId = group.id;
                     group = this.elementSvc.cacheElement(reqOb, group, false);

@@ -182,7 +182,7 @@ class ViewLinkController implements angular.IComponentController {
                         this.docid = docid;
                         this.vid = data.id;
                     } else {
-                        this.$element.html("<span class=\"mms-error\">view link doesn't refer to a view</span>");
+                        this.$element.html("<span class=\"ve-error\">view link doesn't refer to a view</span>");
                     }
                     this.loading = false;
                     if (this.applicationSvc.getState().fullDoc) {

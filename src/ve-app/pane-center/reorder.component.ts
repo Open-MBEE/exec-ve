@@ -1,13 +1,15 @@
 import {StateService} from '@uirouter/angularjs';
 import * as angular from 'angular';
 import {ViewService, ElementService} from "@ve-utils/mms-api-client";
-import {EventService, TreeApi, TreeService} from "@ve-utils/core-services";
+import {EventService} from "@ve-utils/core-services";
 import {AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap} from "@ve-types/tree";
 import {ViewObject} from "@ve-types/mms";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {AppUtilsService} from "@ve-app/main/services";
-import {veUtils} from '../../ve-utils/ve-utils.module'
-import {veApp} from '../ve-app.module';
+
+import {veApp} from '@ve-app';
+import {TreeService} from "@ve-core/tree";
+import {TreeApi} from "@ve-core/tree/Tree.api";
 
 
 /* Controllers */
@@ -82,7 +84,7 @@ class ReorderController implements angular.IComponentController {
         this.treeOptions = {
             dropped : (e) => {
                 this.$timeout(() => {
-                    for (var i = 0; i < this.tree.length; i++) {
+                    for (let i = 0; i < this.tree.length; i++) {
                         var root = this.tree[i];
                         root.new = '';
                         var num = 1;
@@ -94,7 +96,7 @@ class ReorderController implements angular.IComponentController {
                 }, 1)
             },
             // dragStop: (e) => {
-            //     for (var i = 0; i < this.tree.length; i++) {
+            //     for (let i = 0; i < this.tree.length; i++) {
             //         var root = this.tree[i];
             //         root.new = '';
             //         var num = 1;
@@ -119,7 +121,7 @@ class ReorderController implements angular.IComponentController {
     public updateNumber = (node, curSection, key) => {
         node[key] = curSection;
         var num = 1;
-        for (var i = 0; i < node.children.length; i++) {
+        for (let i = 0; i < node.children.length; i++) {
             this.updateNumber(node.children[i], curSection + '.' + num, key);
             num++;
         }
@@ -144,7 +146,7 @@ class ReorderController implements angular.IComponentController {
 
     public handleChildren = (curNode: TreeBranch, childNodes: TreeBranch[]) => {
         var newChildNodes: TreeBranch[] = [];
-        for (var i = 0; i < childNodes.length; i++) {
+        for (let i = 0; i < childNodes.length; i++) {
             let node: TreeBranch = childNodes[i];
             if (this.seenViewIds[node.data.id]) {
                 return;
@@ -175,7 +177,7 @@ class ReorderController implements angular.IComponentController {
                 return;
             }
             var childViews: ViewObject[] = [];
-            for (var i = 0; i < node.children.length; i++) {
+            for (let i = 0; i < node.children.length; i++) {
                 childViews.push({
                     id: node.children[i].data.id,
                     aggregation: node.children[i].aggr,

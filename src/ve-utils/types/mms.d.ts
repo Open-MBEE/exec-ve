@@ -68,6 +68,7 @@ export interface PresentationInstanceObject extends MmsObject {
 
 export interface DocumentObject extends ViewObject {
     _groupId?: string
+    _startChapter?: number
 }
 
 export interface CommitObject extends MmsObject {

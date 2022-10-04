@@ -116,7 +116,7 @@ let SpecInspectorComponent: VeComponentOptions = {
         <div class="text-warning" ng-if="$ctrl.mmsDisplayOldSpec">
             <b> Element not found:</b> displaying last found spec
         </div>
-        <h1 class="prop element-title" ng-class="{'mms-error': $ctrl.mmsDisplayOldSpec}"><span class="{{ $ctrl.elementTypeClass }}"></span>{{$ctrl.element.name}}</h1>
+        <h1 class="prop element-title" ng-class="{'ve-error': $ctrl.mmsDisplayOldSpec}"><span class="{{ $ctrl.elementTypeClass }}"></span>{{$ctrl.element.name}}</h1>
         <span class="elem-updated-wrapper">Last modified {{$ctrl.element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email != undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b></span>
 
         <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">

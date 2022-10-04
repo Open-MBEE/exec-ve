@@ -1,5 +1,4 @@
 import "./RootScope.service";
-import "./Tree.service";
 import "./Application.service";
 import "./Branding.service";
 import "./Edit.service";
@@ -12,7 +11,6 @@ import "./Utils.service";
 import "./Ux.service";
 
 export * from "./RootScope.service";
-export * from "./Tree.service";
 export * from "./Application.service";
 export * from "./Branding.service";
 export * from "./Edit.service";

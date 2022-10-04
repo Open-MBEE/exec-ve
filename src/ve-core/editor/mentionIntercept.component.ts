@@ -5,7 +5,7 @@ import {veCore} from "@ve-core";
 let MMSMentionIntercept = {
     selector: 'mentionIntercept',
     template:`
-    <div class="mmsMention" id="{{$ctrl.mmsMentionId}}">
+    <div class="mention" id="{{$ctrl.mmsMentionId}}">
     <input style="display:none;"
            uib-typeahead="mentionItem as mentionItem.name for mentionItem in $ctrl.mmsFastCf | filter:{name: $viewValue} | limitTo:10"
            typeahead-template-url="customTemplate.html" typeahead-on-select='$ctrl.selectMentionItem($item, $model)'

@@ -70,3 +70,6 @@ angular.module('veDirectives')['_invokeQueue'].forEach(function(value){
 //Module Exports
 import ("[A-Za-z./]*";)
 export * from $1
+
+
+(\(|: |, )bootstrap.(?!box|gradient|reset|\$link-|\$breadcrumb-|\$popover-|\$padding-|\$cursor-|\$jumbotron-|\$carousel-|\$badge-|\$close-|\$label-|\$line-|\$input-|\$thumbnail-|\$screen-|\$dropdown-|\$navbar-|\$grid-|\$panel|-\$well|\$alert-|\$progress-|\$list|\$border-|\$zindex|\$icon|\$bootstrap|\$caret|\$font|\$line|\$tooltip|\$btn)(\$)?

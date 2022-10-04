@@ -14,7 +14,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
         var ownedElementsMap = {};
 
-        for (var i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           ownedElementsMap[data[i].id] = data[i];
         }
 
@@ -23,7 +23,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
 
         var elem;
 
-        for (i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           elem = data[i];
 
           if (elem.type === 'Element') {
@@ -60,7 +60,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
         // create a list of all the edges / relationships
         var edges: {from: string, to: string}[] = [];
 
-        for (i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           elem = data[i];
 
           if (elem.type === 'Dependency') {
@@ -79,7 +79,7 @@ function mmsDiagramBlock(go, growl, ElementService) {
         // create a list of components to diagram from the graph
         var components: any[] = [];
 
-        for (i = 0; i < graph.nodes.length; i++) {
+        for (let i = 0; i < graph.nodes.length; i++) {
           elem = graph.nodes[i];
 
           var diagramNode = { 

@@ -146,14 +146,14 @@ class SearchController implements angular.IComponentController {
     protected filterOptions = [
         { display: 'Documents', icon: null, type: 'Document' },
         // { display: "Sections/Views", icon: null, type: "View", "Section" },
-        { display: 'Text', icon: 'pe-type-Paragraph', type: 'Paragraph' },
-        { display: 'Tables', icon: 'pe-type-Table', type: 'Table' },
-        { display: 'Images', icon: 'pe-type-Image', type: 'Image' },
-        { display: 'Equations', icon: 'pe-type-Equation', type: 'Equation' },
-        { display: 'Comments', icon: 'pe-type-Comment', type: 'Comment' },
-        { display: 'Sections', icon: 'pe-type-Section', type: 'Section' },
-        { display: 'Views', icon: 'pe-type-View', type: 'View' },
-        { display: 'Requirements', icon: 'pe-type-Req', type: 'Requirement' },
+        { display: 'Text', icon: 'pe-type-paragraph', type: 'Paragraph' },
+        { display: 'Tables', icon: 'pe-type-table', type: 'Table' },
+        { display: 'Images', icon: 'pe-type-image', type: 'Image' },
+        { display: 'Equations', icon: 'pe-type-equation', type: 'Equation' },
+        { display: 'Comments', icon: 'pe-type-comment', type: 'Comment' },
+        { display: 'Sections', icon: 'pe-type-section', type: 'Section' },
+        { display: 'Views', icon: 'pe-type-view', type: 'View' },
+        { display: 'Requirements', icon: 'pe-type-req', type: 'Requirement' },
     ]
     private filterList: QueryObject[] = [];
 
@@ -272,7 +272,7 @@ class SearchController implements angular.IComponentController {
                         // OLD CODE - splits into 3cols
                         // if (elem._properties && elem._properties[0]) {
                         //     var properties2 = [];
-                        //     for (var i = 0; i < elem._properties.length; i++) {
+                        //     for (let i = 0; i < elem._properties.length; i++) {
                         //         if (i % 3 === 0) {
                         //             properties2.push([]);
                         //         }
@@ -401,7 +401,7 @@ class SearchController implements angular.IComponentController {
         } else {
             this.stringQuery += this.mainSearch.searchText
         }
-        for (var i = 0; i < rowLength; i++) {
+        for (let i = 0; i < rowLength; i++) {
             this.stringQuery +=
                 ' ' +
                 this.advanceSearchRows[i].operator.toUpperCase() +
@@ -645,7 +645,7 @@ class SearchController implements angular.IComponentController {
         projectsList.push(project)
         var mounts = project._mounts
         if (Array.isArray(mounts) && mounts.length !== 0) {
-            for (var i = 0; i < mounts.length; i++) {
+            for (let i = 0; i < mounts.length; i++) {
                 if (mounts[i]._mounts) {
                     this.getAllMountsAsArray(mounts[i], projectsList)
                 }

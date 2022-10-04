@@ -1,0 +1,97 @@
+@use "../bootstrap-variables" as bootstrap;
+@use "./mixins/vendor-prefixes" as vendor;
+@use "./mixins/border-radius";
+@use "./mixins/pagination";
+
+// --------------------------------------------------
+// Pagination (multiple pages)
+// --------------------------------------------------
+.pagination {
+  display: inline-block;
+  padding-left: 0;
+  margin: bootstrap.$line-height-computed 0;
+  border-radius: bootstrap.$border-radius-base;
+
+  > li {
+    display: inline; // Remove list-style and block-level defaults
+    > a,
+    > span {
+      position: relative;
+      float: left; // Collapse white-space
+      padding: bootstrap.$padding-base-vertical bootstrap.$padding-base-horizontal;
+      line-height: bootstrap.$line-height-base;
+      text-decoration: none;
+      color: bootstrap.$pagination-color;
+      background-color: bootstrap.$pagination-bg;
+      border: 1px solid bootstrap.$pagination-border;
+      margin-left: -1px;
+    }
+
+    &:first-child {
+      > a,
+      > span {
+        margin-left: 0;
+
+        @include border-radius.border-left-radius(bootstrap.$border-radius-base);
+      }
+    }
+
+    &:last-child {
+      > a,
+      > span {
+        @include border-radius.border-right-radius(bootstrap.$border-radius-base);
+      }
+    }
+  }
+
+  > li > a,
+  > li > span {
+    &:hover,
+    &:focus {
+      z-index: 2;
+      color: bootstrap.$pagination-hover-color;
+      background-color: bootstrap.$pagination-hover-bg;
+      border-color: bootstrap.$pagination-hover-border;
+    }
+  }
+
+  > .active > a,
+  > .active > span {
+    &,
+    &:hover,
+    &:focus {
+      z-index: 3;
+      color: bootstrap.$pagination-active-color;
+      background-color: bootstrap.$pagination-active-bg;
+      border-color: bootstrap.$pagination-active-border;
+      cursor: default;
+    }
+  }
+
+  > .disabled {
+    > span,
+    > span:hover,
+    > span:focus,
+    > a,
+    > a:hover,
+    > a:focus {
+      color: bootstrap.$pagination-disabled-color;
+      background-color: bootstrap.$pagination-disabled-bg;
+      border-color: bootstrap.$pagination-disabled-border;
+      cursor: bootstrap.$cursor-disabled;
+    }
+  }
+}
+
+// Sizing
+// --------------------------------------------------
+
+// Large
+.pagination-lg {
+  @include pagination.pagination-size(bootstrap.$padding-large-vertical, bootstrap.$padding-large-horizontal, bootstrap.$font-size-large, bootstrap.$line-height-large, bootstrap.$border-radius-large);
+}
+
+// Small
+.pagination-sm {
+  @include pagination.pagination-size(bootstrap.$padding-small-vertical, bootstrap.$padding-small-horizontal, bootstrap.$font-size-small, bootstrap.$line-height-small, bootstrap.$border-radius-small);
+}

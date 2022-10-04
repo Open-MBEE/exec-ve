@@ -147,7 +147,7 @@ export class HttpService {
      */
     transformQueue(){
         if(this.queue[1].length > 0) {//will the queue ever be defined?
-            for(var i = 0; i < this.queue[1].length; i++){
+            for(let i = 0; i < this.queue[1].length; i++){
                 this.queue[1][i].weight = 0;
                 // if(cache.hasOwnProperty(queue[1][i].request.url))
                 //     cache[queue[1][i].request.url].weight = 0;

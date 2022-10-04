@@ -151,7 +151,7 @@ let SpecRefListComponent: VeComponentOptions = {
 
     <thead>
         <tr>
-            <td><h3 class="Branch-icon">Branch</h3></td>
+            <td><h3 class="branch-icon">Branch</h3></td>
             <td><h3>Created</h3></td>
             <td ng-if="$ctrl.isDoc && $ctrl.docEditable && $ctrl.showMerge"></td>
         </tr>

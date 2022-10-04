@@ -515,7 +515,7 @@ export class ExtUtilService {
                 (val) => {
                     var newArray = []
                     // Filter for enumeration type
-                    for (var i = 0; i < val.length; i++) {
+                    for (let i = 0; i < val.length; i++) {
                         if (val[i].type === 'EnumerationLiteral') {
                             newArray.push(val[i])
                         }

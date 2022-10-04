@@ -27,7 +27,7 @@ CKEDITOR.plugins.add('mmscomment', {
       upcast: function (element) {
         // Return "true" (that element needs to converted to a mmscomment widget)
         // for all <mms-transclude-com> elements.
-        return (element.name == 'mms-transclude-com');
+        return (element.name === 'transclude-com' || element.name === 'mms-transclude-com');
       },
     });
 

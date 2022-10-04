@@ -9,15 +9,15 @@ import {
 } from "@ve-utils/mms-api-client"
 import {
     EventService,
-    RootScopeService, TreeApi,
-    TreeService,
+    RootScopeService
 } from "@ve-utils/core-services";
 import {CoreUtilsService} from "@ve-core/core";
-import {onChangesCallback} from "@ve-utils/utils";
+import {handleChange, onChangesCallback} from "@ve-utils/utils";
 import {ElementObject, ElementsRequest} from "@ve-types/mms";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {ExtUtilService, veExt} from "@ve-ext";
 import {PresentationService} from "@ve-ext/presentations/services/Presentation.service";
+import {TreeApi, TreeService} from "@ve-core/tree";
 
 /**
  * @ngdoc directive
@@ -136,7 +136,6 @@ export class ViewController implements angular.IComponentController {
         this.subs.push(this.eventSvc.$on(TreeService.events.UPDATED, () => {
             if (this.treeApi.branch2viewNumber[this.mmsElementId]) {
                 this.level = this.treeApi.branch2viewNumber[this.mmsElementId].split('.').length;
-                this.number = this.treeApi.branch2viewNumber[this.mmsElementId];
             }
         }));
 
@@ -144,9 +143,12 @@ export class ViewController implements angular.IComponentController {
 
     }
 
-    // $onChanges(onChangesObj:angular.IOnChangesObject) {
-    //     handleChange(onChangesObj,'mmsElementId', this._changeView)
-    // }
+    $onChanges(onChangesObj:angular.IOnChangesObject) {
+        handleChange(onChangesObj, 'mmsNumber', (newVal) => {
+            this.number = newVal
+        });
+        handleChange(onChangesObj,'mmsElementId', this._changeView)
+    }
 
    public isTranscludedElement(elementName) {
         return elementName === 'MMS-TRANSCLUDE-COM' ||
@@ -323,7 +325,7 @@ export class ViewController implements angular.IComponentController {
         this.$element.toggleClass('editing');
         // Call the callback functions to clean up frames, show edits, and
         // re-open frames when needed:
-        // for (var i = 0; i < this.presentationElemCleanUpFncs.length; i++) {
+        // for (let i = 0; i < this.presentationElemCleanUpFncs.length; i++) {
         //     this.presentationElemCleanUpFncs[i]();
         // }
     };

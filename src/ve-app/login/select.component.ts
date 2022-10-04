@@ -194,7 +194,7 @@ let SelectComponent: VeComponentOptions = {
         }
 
         public checkForProject(projectArray, project) {
-            for (var i = 0; i < projectArray.length; i++) {
+            for (let i = 0; i < projectArray.length; i++) {
                 if(projectArray[i].id === project.id){
                     return 1;
                 }

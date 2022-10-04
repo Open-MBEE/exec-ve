@@ -14,10 +14,10 @@ let PrintConfirmModalComponent: angular.Injectable<any> = {
 </div>
 
 <div class="modal-body">
-    <p ng-if="$ctrl.hasError" class="mms-error-icon">
+    <p ng-if="$ctrl.hasError" class="ve-error-icon">
         WARNING: There are cross reference errors in this document that will be reflected in the export.
     </p>
-    <p ng-if="$ctrl.unsaved" class="mms-error-icon">
+    <p ng-if="$ctrl.unsaved" class="ve-error-icon">
         WARNING: Unsaved changes may not be reflected (alt + a to save all)
     </p>
     <p ng-if="$ctrl.mode === 1">
@@ -177,7 +177,7 @@ let PrintConfirmModalComponent: angular.Injectable<any> = {
             this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : '';
             this.customizeDoc.useCustomStyle = false;
 
-            if (this.printElement.find('.mms-error').length > 0) {
+            if (this.printElement.find('.ve-error').length > 0) {
                 this.hasError = true;
             }
 

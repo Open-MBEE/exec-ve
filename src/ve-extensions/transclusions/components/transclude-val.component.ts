@@ -107,14 +107,14 @@ export class TranscludeValController extends Transclusion implements ITransclusi
                     <input class="form-control ve-plain-input" type="number" ng-model="value.value" ng-pattern="/^-?\\d+$/" ng-blur="$ctrl.cleanupVal(value)">&nbsp;
                     <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
                     </div>
-                    <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid integer</label>
+                    <label class="control-label ve-error-icon" ng-show="valForm.$error.pattern">Not a valid integer</label>
                 </div>
                 <div ng-switch-when="LiteralUnlimitedNatural" ng-class="{'has-error': valForm.$error.pattern}">
                     <div class="form-inline">
                     <input class="form-control ve-plain-input" type="number" name="natVal" ng-model="value.value" ng-pattern="/^\\d+$/" ng-blur="$ctrl.cleanupVal(value)">&nbsp;
                     <a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
                     </div>
-                    <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid natural number</label>
+                    <label class="control-label ve-error-icon" ng-show="valForm.$error.pattern">Not a valid natural number</label>
                 </div>
                 <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value">&nbsp;{{value.value}}&nbsp;<a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a></div>
                 <div ng-switch-when="LiteralReal">
@@ -255,7 +255,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         } else {
             this.isEditing = false;
         }
-        for (var i = 0; i < values.length; i++) {
+        for (let i = 0; i < values.length; i++) {
             if (values[i].type === 'LiteralString') {
                 areStrings = true;
                 var s = values[i].value;

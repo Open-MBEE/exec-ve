@@ -49,7 +49,7 @@ export class ReorderService {
             //sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
             var operand = sectionEdit.specification.operand = [];
             var origOperand = elementReference.instanceSpecification.specification.operand;
-            for (var i = 0; i < elementReference.sectionElements.length; i++) {
+            for (let i = 0; i < elementReference.sectionElements.length; i++) {
                 operand.push(elementReference.sectionElements[i].instanceVal);
                 if (elementReference.sectionElements[i].sectionElements.length > 0)
                     updateSectionElementOrder(elementReference.sectionElements[i]);
@@ -88,7 +88,7 @@ export class ReorderService {
         // Update the View edit object on Save
         if (specs) {
             specs.operand = [];
-            for (var i = 0; i < this.elementReferenceTree.length; i++) {
+            for (let i = 0; i < this.elementReferenceTree.length; i++) {
                 specs.operand.push(this.elementReferenceTree[i].instanceVal);
             }
         }

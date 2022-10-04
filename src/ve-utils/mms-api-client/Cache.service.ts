@@ -175,7 +175,7 @@ export class CacheService {
 
     reset() {
         var keys = Object.keys(this.cache);
-        for (var i = 0; i < keys.length; i++) {
+        for (let i = 0; i < keys.length; i++) {
             delete this.cache[keys[i]];
         }
     };

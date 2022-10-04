@@ -1,0 +1,89 @@
+/* VE base styles */
+@use "src/styles/globals";
+
+view {
+  .ve-view-number {
+    float: left;
+    margin-right: 10px;
+  }
+
+  .view-title,
+  .section-title {
+    font-family: globals.$light-font-family-sans-serif;
+    font-weight: globals.$light-font-weight;
+    font-size: 35px;
+    margin-top: 20px;
+    margin-bottom: 15px;
+  }
+
+  // Keep title the same size as reading
+  .view-title,
+  .section-title {
+    .form-control {
+      height: inherit;
+      font-size: inherit;
+    }
+  }
+
+  &.editing {
+    present-section {
+      display: block;
+      border: 2px solid globals.$ve-silver-darker-1;
+
+      @include globals.transition(border, 0.5s);
+      @include globals.border-radius(5px);
+    }
+  }
+
+  &.outline:not(.editing) {
+    present-section {
+      display: block;
+      border: 2px solid white;
+    }
+  }
+
+  table {
+    @extend .table-condensed !optional;
+    @extend .table-bordered !optional;
+
+    p {
+      margin: 0 0 5px;
+    }
+  }
+
+  .add-pe-button-container,
+  .last-modified {
+    // opacity: 0;
+    display: block;
+    visibility: hidden;
+  }
+
+  .read-width {
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    ol,
+    ul { // figure, img, table, div
+      max-width: globals.$pane-center-text-width;
+    }
+  }
+}
+
+view.editing,
+view.outline {
+  .last-modified {
+    // opacity: 1;
+    visibility: visible;
+  }
+}
+
+view.editing {
+  .add-pe-button-container {
+    // opacity: 1;
+    visibility: visible;
+  }
+}

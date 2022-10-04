@@ -46,7 +46,7 @@ class ExtensionErrorController implements angular.IComponentController {
 let ExtensionErrorComponent: VeComponentOptions = {
     selector: 'error',
     template: `
-    <span class="mms-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{$ctrl.title}}"></span>
+    <span class="ve-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{$ctrl.title}}"></span>
 <script type="text/ng-template" id="annotationTemplate">
     <p>
         {{$ctrl.content}}

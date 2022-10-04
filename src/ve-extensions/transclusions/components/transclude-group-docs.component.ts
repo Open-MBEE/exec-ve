@@ -98,7 +98,7 @@ class TranscludeGroupDocsController extends Transclusion implements ITransclusio
     public update = () => {
         var docs: ViewObject[] = [];
         var groupId = this.mmsGroupId === '' ? undefined : this.mmsGroupId;
-        for (var i = 0; i < this.documents.length; i++) {
+        for (let i = 0; i < this.documents.length; i++) {
             if ( (groupId === undefined || groupId === this.projectId) && !this.documents[i]._groupId ) {
                 docs.push(this.documents[i]);
             } else if (this.documents[i]._groupId == this.mmsGroupId) {

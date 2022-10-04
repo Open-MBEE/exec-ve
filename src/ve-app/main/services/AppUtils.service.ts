@@ -2,10 +2,11 @@ import * as angular from 'angular';
 
 import {StateService} from '@uirouter/angularjs'
 import {ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {EventService, TreeService, UtilsService} from "@ve-utils/core-services";
+import {EventService, UtilsService} from "@ve-utils/core-services";
 
 import {veApp} from "@ve-app";
 import {VeModalService} from "@ve-types/view-editor";
+import {TreeService} from "@ve-core/tree/Tree.service";
 
 
 
@@ -25,9 +26,9 @@ export class AppUtilsService implements angular.Injectable<any> {
                 private $timeout: angular.ITimeoutService, private $location: angular.ILocationService,
                 private $window: angular.IWindowService, private growl: angular.growl.IGrowlService,
                 private $filter: angular.IFilterService, private $state: StateService, private elementSvc: ElementService,
-                private viewSvc: ViewService, private utilsSvc: UtilsService, private eventSvc: EventService, 
+                private viewSvc: ViewService, private utilsSvc: UtilsService, private eventSvc: EventService,
                 private treeSvc: TreeService) {
-        
+
     }
 
         public tableToCsv(tables: JQLite, isDoc: boolean) { //Export to CSV button Pop-up Generated Here
@@ -254,13 +255,13 @@ if (window.navigator.msSaveOrOpenBlob) {
             var absurl = this.$location.absUrl();
             var prefix = protocol + ':// hostname' + ((port == 80 || port == 443) ? '' : (':' + port));
             var mmsIndex = absurl.indexOf('index.html');
-            var toc = this.utilsSvc.makeHtmlTOC(this.treeSvc.getApi().treeRows);
+            var toc = this.utilsSvc.makeHtmlTOC(this.treeSvc.getApi().getRows()[0].branch);
 
             // Conver to proper links for word/pdf
             this.utilsSvc.convertViewLinks(printElementCopy);
 
             // Get correct table/image numbering based on doc hierarchy
-            var tableAndFigTOC = this.utilsSvc.makeTablesAndFiguresTOC(this.treeSvc.getApi().treeRows, printElementCopy, false, htmlTotf);
+            var tableAndFigTOC = this.utilsSvc.makeTablesAndFiguresTOC(this.treeSvc.getApi().getRows()[0].branch, printElementCopy, false, htmlTotf);
             var tof = tableAndFigTOC.figures;
             var tot = tableAndFigTOC.tables;
             var toe = tableAndFigTOC.equations;
@@ -286,11 +287,11 @@ if (window.navigator.msSaveOrOpenBlob) {
                 return old;
             });
 
-            // Remove comments, table features, and all elements with classes: mms-error, no-print, ng-hide
+            // Remove comments, table features, and all elements with classes: ve-error, no-print, ng-hide
             printElementCopy.find('transclude-com').remove();
             printElementCopy.find('style').remove(); //prevent user inserted styles from interfering
             printElementCopy.find('div.tableSearch').remove();
-            //printElementCopy.find('.mms-error').html('error');
+            //printElementCopy.find('.ve-error').html('error');
             printElementCopy.find('.no-print').remove();
             printElementCopy.find('.ng-hide').remove();
 
@@ -325,7 +326,7 @@ if (window.navigator.msSaveOrOpenBlob) {
             // Get doc cover page by doc ID
             var coverHtml = '';
             if (isDoc) {
-                let cover = printElementCopy.find("mms-view[mms-element-id='" + viewOrDocOb.id + "']");
+                let cover = printElementCopy.find("view[mms-element-id='" + viewOrDocOb.id + "']");
                 cover.remove();
                 // Add class to style cover page
                 cover.addClass('ve-cover-page');
@@ -337,9 +338,7 @@ if (window.navigator.msSaveOrOpenBlob) {
         };
 
 
-        public refreshNumbering(tree, centerElement) {
-            this.utilsSvc.makeTablesAndFiguresTOC(tree, centerElement, true, false);
-        };
+
 
         /** Store all tomsawyer diagram(canvas) as an img element **/
         private _storeTomsawyerDiagramAsImg(originalDom) {

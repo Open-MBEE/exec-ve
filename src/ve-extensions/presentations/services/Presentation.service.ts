@@ -20,7 +20,7 @@ export class PresentationService {
 
     public checkForDuplicateInstances(operand) {
         var seen = {}, dups = [], curr;
-        for (var i = 0; i < operand.length; i++) {
+        for (let i = 0; i < operand.length; i++) {
             curr = operand[i].instanceId;
             if (curr) {
                 if (seen[curr]) {

@@ -1,0 +1,83 @@
+@use "../bootstrap-variables" as bootstrap;
+@use "./mixins/vendor-prefixes" as vendor;
+@use "./mixins/grid";
+@use "./mixins/grid-framework";
+
+// --------------------------------------------------
+// Grid system
+// --------------------------------------------------
+
+// Container widths
+
+// Set the container width, and override it for fixed navbars in media queries.
+
+.container {
+  @include grid.container-fixed;
+
+  @media (min-width: bootstrap.$screen-sm-min) {
+    width: bootstrap.$container-sm;
+  }
+
+  @media (min-width: bootstrap.$screen-md-min) {
+    width: bootstrap.$container-md;
+  }
+
+  @media (min-width: bootstrap.$screen-lg-min) {
+    width: bootstrap.$container-lg;
+  }
+}
+
+// Fluid container
+
+// Utilizes the mixin meant for fixed width containers, but without any defined
+// width for fluid, full width layouts.
+
+.container-fluid {
+  @include grid.container-fixed;
+}
+
+// Row
+
+// Rows contain and clear the floats of your columns.
+
+.row {
+  @include grid.make-row;
+}
+
+// Columns
+
+// Common styles for small and large grid columns
+
+@include grid-framework.make-grid-columns;
+
+// Extra small grid
+
+// Columns, offsets, pushes, and pulls for extra small devices like
+// smartphones.
+
+@include grid-framework.make-grid(xs);
+
+// Small grid
+
+// Columns, offsets, pushes, and pulls for the small device range, from phones
+// to tablets.
+
+@media (min-width: bootstrap.$screen-sm-min) {
+  @include grid-framework.make-grid(sm);
+}
+
+// Medium grid
+
+// Columns, offsets, pushes, and pulls for the desktop device range.
+
+@media (min-width: bootstrap.$screen-md-min) {
+  @include grid-framework.make-grid(md);
+}
+
+// Large grid
+
+// Columns, offsets, pushes, and pulls for the large desktop device range.
+
+@media (min-width: bootstrap.$screen-lg-min) {
+  @include grid-framework.make-grid(lg);
+}

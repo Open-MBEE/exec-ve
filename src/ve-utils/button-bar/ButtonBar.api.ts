@@ -1,13 +1,20 @@
 import {buttonInitFn, IButtonBarButton} from "@ve-utils/button-bar";
 
+export interface ButtonWrapEvent {
+    oldSize: number
+    newSize: number
+}
+
+
 export class ButtonBarApi {
 
     public buttons: IButtonBarButton[] = []
+    public WRAP_EVENT: string;
+
 
     constructor(public id, public init: buttonInitFn) {
+        this.WRAP_EVENT = id + '-wrap'
     }
-
-
 
      public getId = () => {
         return this.id;
@@ -23,11 +30,11 @@ export class ButtonBarApi {
     }
 
      public select = (parentButton, childButton) => {
-        if(parentButton && childButton) {
+        if(parentButton && childButton && childButton.selectable) {
             parentButton.dropdown_buttons.forEach((dropdownButton) => {
-                if (parentButton.dropdown_toggle) {
+                if (parentButton.dropdown_toggleable) {
                     if (dropdownButton.id === childButton.id) {
-                        dropdownButton.selected = !dropdownButton.selected;
+                        dropdownButton.selected = (dropdownButton.selected) ? !dropdownButton.selected : true;
                     }
                 }
                 else {
@@ -37,12 +44,49 @@ export class ButtonBarApi {
         }
     };
 
+    public deselect = (parentButton, childButton) => {
+        if(parentButton && childButton) {
+            parentButton.dropdown_buttons.forEach((dropdownButton) => {
+                if (parentButton.dropdown_toggleable) {
+                    if (dropdownButton.id === childButton.id) {
+                        dropdownButton.selected = false
+                    }
+                }
+            })
+        }
+    }
+
+    public deselectAll = (id: string) => {
+        this.buttons.forEach((button) => {
+            if (button.id === id && button.dropdown_buttons) {
+                button.dropdown_buttons.forEach((dropdownButton) => {
+                    if (button.dropdown_toggleable) {
+                        dropdownButton.selected = false
+                    }
+                })
+            }
+        });
+    };
+
      public setPermission = (id: string, permission: boolean) => {
         this.buttons.forEach((button) => {
             if (button.id === id)
                 button.permission = permission;
         });
     };
+
+     public setActive = (id: string, state: boolean, parent?: string) => {
+         this.buttons.forEach((button) => {
+             if (parent && button.id === parent && button.dropdown_buttons) {
+                 button.dropdown_buttons.forEach((child) => {
+                     if (child.id === id)
+                         child.active = state;
+                 })
+             }
+             if (button.id === id)
+                 button.active = state;
+         });
+     };
 
      public setTooltip = (id, tooltip) => {
         this.buttons.forEach((button) => {
@@ -86,6 +130,11 @@ export class ButtonBarApi {
 
      public addButton = (button: IButtonBarButton) => {
         //TODO: Determine if count can actually be replaced by length here
+        this._initButton(button);
+        this.buttons.push(button);
+    };
+
+    private _initButton = (button:IButtonBarButton) => {
         if (this.buttons.length === 0) {
             button.placement = "bottom-left";
         }
@@ -99,9 +148,18 @@ export class ButtonBarApi {
             button.tooltip_orginal = button.tooltip;
         }
         button.icon_original = button.icon;
-
-        this.buttons.push(button);
-    };
+        if (button.dropdown_toggleable) {
+            button.dropdown_toggle_state = false;
+        }
+        if (button.dropdown_icon) {
+            button.dropdown_icon_original = button.dropdown_icon;
+        }
+        if (typeof button.active === 'undefined') {
+            button.active = true;
+        }
+        if (button.dropdown_buttons && button.dropdown_buttons.length > 0)
+            button.dropdown_buttons.forEach((b) => this._initButton(b));
+    }
 
     public toggleButtonSpinner = (id) => {
         this.buttons.forEach((button) => {
@@ -135,7 +193,19 @@ export class ButtonBarApi {
 
                     }
                 }
+                if (button.dropdown_toggleable && button.dropdown_icon) {
+                    button.dropdown_toggle_state = (state != null) ? state : !button.dropdown_toggle_state;
+                    if (button.dropdown_toggle_state && button.dropdown_toggle_icon) {
+                        button.dropdown_icon = button.dropdown_toggle_icon;
+                        button.tooltip = button.toggle_tooltip;
+                    }
+                    else {
+                        button.dropdown_icon = button.dropdown_icon_original;
+                    }
+                }
             }
         });
     };
+
+
 }
