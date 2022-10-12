@@ -1,6 +1,6 @@
-import {veExt} from "@ve-ext";
+import {veComponents} from "@ve-components";
 
-veExt.directive('mmsD3RadarPlot', ['PlotService','$window', mmsD3RadarPlot]);
+veComponents.directive('mmsD3RadarPlot', ['PlotService','$window', mmsD3RadarPlot]);
   function mmsD3RadarPlot(PlotService, $window) {
       
     var mmsRadarChartLink = function(scope, element, attrs, mmsViewCtrl) {

@@ -14,7 +14,7 @@ import {
 import uiRouter, {
     StateProvider,
     StateService,
-    Transition, TransitionOptions,
+    Transition,
     TransitionService,
     UIRouter,
     UIRouterGlobals,
@@ -29,21 +29,22 @@ import {
 import {
     EventService,
     RootScopeService,
-} from "@ve-utils/core-services";
+} from "@ve-utils/services";
 import {ResolveService} from "@ve-app/main/services";
 import {ViewObject} from "@ve-types/mms";
 import ngPane from '@openmbee/pane-layout';
 
-export let veApp = angular.module('ve-app', ['ve-utils', 've-core', 've-ext', 'ui.bootstrap', uiRouter, ngPane, 'ui.tree', 'angular-growl', 'angular-flatpickr', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngAnimate', 'ngCookies', 'ngPromiseExtras', 'ngSanitize', 'ngStorage']);
+export const veApp = angular.module('ve-app', ['ve-utils', 've-components', 'ui.bootstrap', uiRouter, ngPane, 'ui.tree', 'angular-growl', 'angular-flatpickr', 'cfp.hotkeys', 'angulartics', 'angulartics.piwik', 'ngAnimate', 'ngCookies', 'ngPromiseExtras', 'ngSanitize', 'ngStorage']);
 
 veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$httpProvider', '$provide', 'URLServiceProvider', '$locationProvider', function($stateProvider: StateProvider, $uiRouterProvider : UIRouter, $transitionsProvider: TransitionService, $httpProvider : angular.IHttpProvider, $provide : angular.auto.IProvideService, $urlServiceProvider: URLServiceProvider, $locationProvider : ILocationProvider) {
     // override uibTypeaheadPopup functionality
-    $provide.decorator('uibTypeaheadPopupDirective', ['$delegate', function ($delegate) {
-        var originalLinkFn = $delegate[0].link;
-        $delegate[0].compile = function (tElem, tAttr) {
-            return function newLinkFn(scope, elem, attr) {
+    $provide.decorator('uibTypeaheadPopupDirective', ['$delegate', function ($delegate: ({link?(scope: angular.IScope, element: JQLite, attr: angular.IAttributes): void} & angular.IDirective)[]) {
+        const originalLinkFn = $delegate[0].link;
+        $delegate[0].compile = function (): angular.IDirectiveLinkFn {
+            return function newLinkFn(scope: {selectActive(matchId: string): void, active: string } & angular.IScope, elem, attr) {
                 // fire the originalLinkFn
-                originalLinkFn.apply($delegate[0], arguments);
+                // eslint-disable-next-line prefer-rest-params
+                originalLinkFn.apply($delegate[0], [scope, elem, attr]);
                 scope.selectActive = function (matchIdx) {
                     // added behavior
                     elem.children().removeClass('active');
@@ -58,20 +59,6 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
     }]);
 
     $locationProvider.hashPrefix('');
-
-
-    if (window.__env.basePath) {
-        $urlServiceProvider.setBasePath(window.__env.basePath);
-    } else {
-        $urlServiceProvider.setBasePath('');
-    }
-
-    if (window.__env.apiUrl) {
-        $urlServiceProvider.setMmsUrl(window.__env.apiUrl);
-    } else {
-        var mmsHost = window.location.protocol + '//' + window.location.host;
-        $urlServiceProvider.setMmsUrl(mmsHost);
-    }
 
 
     $httpProvider.defaults.withCredentials = true;
@@ -189,7 +176,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     return resolveSvc.getRefs(params);
                 }],
                 tagObs: ['refObs', function(refObs) {
-                    var ret = [];
+                    const ret = [];
                     for (let i = 0; i < refObs.length; i++) {
                         if (refObs[i].type === "Tag")
                             ret.push(refObs[i]);
@@ -197,7 +184,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     return ret;
                 }],
                 branchObs: ['refObs', function(refObs) {
-                    var ret = [];
+                    const ret = [];
                     for (let i = 0; i < refObs.length; i++) {
                         if (refObs[i].type === "Branch")
                             ret.push(refObs[i]);
@@ -233,8 +220,10 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                         mmsGroup: 'groupOb',
                         mmsGroups: 'groupObs',
                         mmsBranch: 'branchOb',
+                        mmsBranches: 'branchObs',
                         mmsRef: 'refOb',
                         mmsTag: 'tagOb',
+                        mmsTags: 'tagObs',
                         mmsDocument: 'documentOb',
                         mmsView: 'viewOb'
                     }
@@ -324,8 +313,10 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                         mmsGroup: 'groupOb',
                         mmsGroups: 'groupObs',
                         mmsBranch: 'branchOb',
+                        mmsBranches: 'branchObs',
                         mmsRef: 'refOb',
                         mmsTag: 'tagOb',
+                        mmsTags: 'tagObs',
                         mmsDocument: 'documentOb',
                         mmsView: 'viewOb'
                     }
@@ -349,7 +340,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                     component: 'rightPane'
                 },
                 'toolbar-right@main': {
-                    component: 'toolbar'
+                    component: 'rightToolbar'
                 },
                 'footer@main': {
                     component: 'veFooter'
@@ -407,8 +398,10 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                         mmsGroup: 'groupOb',
                         mmsGroups: 'groupObs',
                         mmsBranch: 'branchOb',
+                        mmsBranches: 'branchObs',
                         mmsRef: 'refOb',
                         mmsTag: 'tagOb',
+                        mmsTags: 'tagObs',
                         mmsDocument: 'documentOb',
                         mmsView: 'viewOb'
                     }
@@ -451,6 +444,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                         mmsGroup: 'groupOb',
                         mmsGroups: 'groupObs',
                         mmsBranch: 'branchOb',
+                        mmsBranches: 'branchObs',
                         mmsRef: 'refOb',
                         mmsTag: 'tagOb',
                         mmsTags: 'tagObs',
@@ -503,6 +497,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
                         mmsGroup: 'groupOb',
                         mmsGroups: 'groupObs',
                         mmsBranch: 'branchOb',
+                        mmsBranches: 'branchObs',
                         mmsRef: 'refOb',
                         mmsTag: 'tagOb',
                         mmsTags: 'tagObs',
@@ -580,7 +575,7 @@ veApp.config(['$stateProvider', '$uiRouterProvider', '$transitionsProvider', '$h
     $httpProvider.interceptors.push(['$q', '$location', 'URLService', 'EventService', function ($q: IQService, $location: ILocationService, uRLSvc: URLService, eventSvc: EventService) {
         return {
             responseError: (rejection: IHttpResponse<any>): angular.IPromise<angular.IHttpResponse<any>> | IHttpResponse<any> => {
-                let timeout: angular.IPromise<string> = rejection.config.timeout as IPromise<any>;
+                const timeout: angular.IPromise<string> = rejection.config.timeout as IPromise<any>;
                 if (timeout.state && timeout.state === 'cancelled') {
                     rejection.data = 'cancelled';
                     return $q.when(rejection);
@@ -626,7 +621,7 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
     $transitions.onBefore({}, (transition: Transition) => {
         if ($uiRouterGlobals.current.name === 'main.login' || transition.$to().name === 'main.login' || rootScopeSvc.loginModalOpen())
             return;
-        let deferred = $q.defer();
+        const deferred = $q.defer();
         authSvc.checkLogin().then((result) => {
             if (transition.$to().name === 'main') {
                 deferred.resolve($state.target('main.login.select'));
@@ -665,7 +660,7 @@ veApp.run(['$q', '$http', '$interval', '$location', '$uibModal', '$uiRouter', '$
         }
 
 
-        authSvc.checkLogin().then(() => {},() => {
+        authSvc.checkLogin().then(() => {/* do nothing if success */},() => {
             rootScopeSvc.loginModalOpen(true)
             $uibModal.open({
                 component: 'loginModal',

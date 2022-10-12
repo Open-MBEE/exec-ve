@@ -1,6 +1,6 @@
 import {CacheService, ElementService, URLService} from "@ve-utils/mms-api-client";
 import {veUtils} from "@ve-utils";
-import {UtilsService} from "@ve-utils/core-services/Utils.service";
+import {UtilsService} from "@ve-utils/services/Utils.service";
 
 export class PlotService {
     constructor(private $q, private $http, private uRLSvc: URLService, private utilsSvc: UtilsService, private cacheSvc: CacheService, private elementSvc: ElementService) {

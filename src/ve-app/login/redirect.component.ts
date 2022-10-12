@@ -3,8 +3,8 @@ import Rx from 'rx-lite';
 import {StateService} from '@uirouter/angularjs';
 import {ProjectService} from "@ve-utils/mms-api-client";
 import{ElementService} from "@ve-utils/mms-api-client";
-import {EventService} from "@ve-utils/core-services";
-import {RootScopeService} from "@ve-utils/core-services";
+import {EventService} from "@ve-utils/services";
+import {RootScopeService} from "@ve-utils/services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {QueryObject, RequestObject} from "@ve-types/mms"
 

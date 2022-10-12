@@ -1,33 +1,42 @@
-import * as angular from 'angular'
-import * as _ from 'lodash';
+import angular from 'angular'
+import _ from 'lodash'
 
-import {veUtils} from "@ve-utils";
+import { veUtils } from '@ve-utils'
+
+import { MmsObject } from '@ve-types/mms'
 
 export class CacheService {
-    public cache = {};
-    constructor() {}
+    public cache: { [key: string]: string | MmsObject } = {}
 
-    get<T>(key, noCopy?: boolean): T | undefined {
-        var realkey = key;
+    get<T extends MmsObject>(
+        key: string | string[],
+        noCopy?: boolean
+    ): T | undefined {
+        let realKey: string
         if (Array.isArray(key)) {
             if (key[0] === 'element' && key[1] === '') {
                 console.trace()
             }
-            realkey = this.makeKey(key);
+            realKey = this._makeKey(key)
+        } else {
+            realKey = key
         }
-        if (this.cache.hasOwnProperty(realkey)) {
-            let realval = this.cache[realkey];
-            if (angular.isString(realval)) {
-                return this.get(realval);
+
+        const result: T = this._get<T>(realKey)
+        if (noCopy) return result
+        else return _.cloneDeep(result)
+    }
+
+    private _get<T extends MmsObject>(realKey: string): T {
+        if (this.cache.hasOwnProperty(realKey)) {
+            let cached: string | MmsObject = this.cache[realKey]
+            if (typeof cached === 'string') {
+                cached = this._get<T>(cached)
             }
-            if (noCopy) {
-                return realval;
-            }
-            realval = (realval === undefined) ? realval : JSON.parse(JSON.stringify(realval))
-            return realval
+            return cached as T
         }
-        return;
-    };
+        return
+    }
 
     /**
      * @ngdoc method
@@ -41,22 +50,31 @@ export class CacheService {
      * @param {string} refId The branch/tag id
      * @returns {Object} Value if found, empty array if not found
      */
-    getLatestElements<T>(projectId, refId): T[] {
-        var latestElements: T[] = [];
-        for (var key in this.cache) {
+    getLatestElements<T extends MmsObject>(
+        projectId: string,
+        refId: string
+    ): T[] {
+        const latestElements: T[] = []
+        for (const key in this.cache) {
             if (!this.cache.hasOwnProperty(key)) {
-                continue;
+                continue
             }
-            if (key.indexOf('|latest') >= 0 && key.indexOf('element|') >= 0 && key.indexOf('|edit') < 0 &&
-                key.indexOf('deleted') < 0 && key.indexOf(refId) >= 0 && key.indexOf(projectId) >= 0) {
-                var val: T | undefined = this.get<T>(key);
+            if (
+                key.indexOf('|latest') >= 0 &&
+                key.indexOf('element|') >= 0 &&
+                key.indexOf('|edit') < 0 &&
+                key.indexOf('deleted') < 0 &&
+                key.indexOf(refId) >= 0 &&
+                key.indexOf(projectId) >= 0
+            ) {
+                const val: T = this._get<T>(key)
                 if (val) {
-                    latestElements.push(val);
+                    latestElements.push(val)
                 }
             }
         }
-        return latestElements;
-    };
+        return latestElements
+    }
 
     /**
      * @ngdoc method
@@ -71,45 +89,59 @@ export class CacheService {
      * @param {boolean} [merge=false] Whether to replace the value or do a merge if value already exists
      * @returns {Object} the original value
      */
-    put<T>(key, value: T, merge?): T {
-        var m = !merge ? false : merge;
-        var realkey = key;
+    put<T extends MmsObject>(
+        key: string | string[],
+        value: string | T,
+        merge?: boolean
+    ): string | T {
+        const m = typeof merge === 'undefined' ? false : merge
+        let realKey: string
         if (Array.isArray(key)) {
-            realkey = this.makeKey(key);
+            realKey = this._makeKey(key)
+        } else {
+            realKey = key
         }
         if (value !== undefined) {
-            value = JSON.parse(JSON.stringify(value));
+            value = _.cloneDeep(value)
         }
-        var val: T = this.get<T>(realkey, true);
-        if (val && m && angular.isObject(value)) {
-            _.mergeWith(val, value, (a,b,id) => {
-                if ((id === '_contents' || id === 'specification') && b && b.type === 'Expression') {
-                    return b;
+        const currentValue: T = this.get<T>(realKey, true)
+        if (currentValue && m && typeof value !== 'string') {
+            _.mergeWith(
+                currentValue,
+                value,
+                (a: T | T[], b: T | T[], id: string) => {
+                    if (
+                        (id === '_contents' || id === 'specification') &&
+                        b &&
+                        !Array.isArray(b) &&
+                        b.type === 'Expression'
+                    ) {
+                        return b
+                    }
+                    if (
+                        Array.isArray(a) &&
+                        Array.isArray(b) &&
+                        b.length < a.length
+                    ) {
+                        a.length = 0
+                        a.push(...b)
+                        return a
+                    }
+                    if (id === '_displayedElementIds' && b) {
+                        return b
+                    }
+                    return undefined
                 }
-                if (Array.isArray(a) && Array.isArray(b) && b.length < a.length) {
-                    a.length = 0;
-                    a.push(...b);
-                    return a;
-                }
-                if (id === '_displayedElementIds' && b) {
-                    return b;
-                }
-                return undefined;
-            });
+            )
         } else {
-            if (!angular.isString(val) || angular.isString(value)) {
-                this.cache[realkey] = value;
+            if (!currentValue || typeof value === 'string') {
+                this.cache[realKey] = value
             } else {
-                realkey = val;
-                while (angular.isString(this.cache[realkey])) {
-                    realkey = this.cache[realkey];
-                }
-                this.cache[realkey] = value;
+                this.cache[realKey] = value
             }
-            val = value;
         }
-        return val;
-    };
+        return value
+    }
 
     /**
      * @ngdoc method
@@ -122,21 +154,23 @@ export class CacheService {
      * @param {Array.<string>|string} key String key or Array of hierarchical keys
      * @returns {Object} value that was removed or undefined
      */
-    remove(key) {
-        var realkey = key;
+    remove<T>(key: string | string[]): T {
+        let realKey: string
         if (Array.isArray(key)) {
-            realkey = this.makeKey(key);
+            realKey = this._makeKey(key)
+        } else {
+            realKey = key
         }
-        if (!this.cache.hasOwnProperty(realkey)) {
-            return null;
+        if (!this.cache.hasOwnProperty(realKey)) {
+            return null
         }
-        var result = this.cache[realkey];
-        delete this.cache[realkey];
-        if (angular.isString(result)) {
-            return this.remove(result);
+        const removed = this.cache[realKey]
+        delete this.cache[realKey]
+        if (angular.isString(removed)) {
+            return this.remove(removed)
         }
-        return result;
-    };
+        return removed as T
+    }
 
     /**
      * @ngdoc method
@@ -150,38 +184,37 @@ export class CacheService {
      * @returns {boolean} whether value exists for key
      */
     exists(key: string | string[]): boolean {
-        let realkey = ''
+        let realKey = ''
         if (Array.isArray(key)) {
-            realkey = this.makeKey(key);
-        }else {
-            realkey = key;
+            realKey = this._makeKey(key)
+        } else {
+            realKey = key
         }
-        if (!this.cache.hasOwnProperty(realkey)) {
-            return false;
+        if (!this.cache.hasOwnProperty(realKey)) {
+            return false
         }
-        var val = this.cache[realkey];
+        const val = this.cache[realKey]
         if (angular.isObject(val)) {
-            return true;
+            return true
         }
         if (angular.isString(val)) {
-            return this.exists(val);
+            return this.exists(val)
         }
-        return false;
-    };
+        return false
+    }
 
-    makeKey(keys) {
-        return keys.join('|');
-    };
+    private _makeKey(keys: string[]) {
+        return keys.join('|')
+    }
 
     reset() {
-        var keys = Object.keys(this.cache);
+        const keys = Object.keys(this.cache)
         for (let i = 0; i < keys.length; i++) {
-            delete this.cache[keys[i]];
+            delete this.cache[keys[i]]
         }
-    };
-
+    }
 }
 
-CacheService.$inject = [];
+CacheService.$inject = []
 
-veUtils.service('CacheService', CacheService);
+veUtils.service('CacheService', CacheService)

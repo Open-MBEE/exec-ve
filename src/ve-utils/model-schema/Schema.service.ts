@@ -48,7 +48,7 @@ export class SchemaService {
     getValues(name, keys: string[], schema?:string, sourceId?: string): any[] | null {
         const lookup = this.get(name,schema,sourceId)
         if (lookup && typeof lookup === 'object') {
-            let response = [];
+            const response = [];
             for (const key in keys) {
                 if (lookup.hasOwnProperty(key)) {
                     response.push(lookup[key]);

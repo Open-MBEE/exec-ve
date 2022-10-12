@@ -2,19 +2,15 @@
 //import "angular"
 //import 'rx-angular';
 
-import "./ve-utils.module"
+import './ve-utils.module'
 
-import "./third-party"
+import './third-party'
 
-import "./utils"
-import "./model-schema"
-import "./core-services"
-import "./mms-api-client"
-import "./button-bar"
-import "./components"
+import './utils'
+import './model-schema'
+import './services'
+import './mms-api-client'
 
-export * from "./ve-utils.module"
+export * from './ve-utils.module'
 
-export default 've-utils';
-
-
+export default 've-utils'

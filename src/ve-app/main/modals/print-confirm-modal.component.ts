@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 import * as _ from "lodash";
 import {ElementService, ViewService, DocMetadata} from "@ve-utils/mms-api-client";
-import {UtilsService, EditService} from "@ve-utils/core-services";
+import {UtilsService, AutosaveService} from "@ve-utils/services";
 import {AppUtilsService} from "@ve-app/main/services";
 
 import {veApp} from "@ve-app";
@@ -128,7 +128,7 @@ let PrintConfirmModalComponent: angular.Injectable<any> = {
         resolve: "<"
     },
     controller: class PrintConfirmModalController implements angular.IComponentController {
-        static $inject = ['$filter', '$window', 'growl', 'UtilsService', 'ViewService', 'EditService', 'ElementService',
+        static $inject = ['$filter', '$window', 'growl', 'UtilsService', 'ViewService', 'AutosaveService', 'ElementService',
             'AppUtilsService'];
 
         //bindings
@@ -162,7 +162,7 @@ let PrintConfirmModalComponent: angular.Injectable<any> = {
         customization: any;
 
         constructor(private $filter: angular.IFilterService, private $window: angular.IWindowService, private growl: angular.growl.IGrowlService,
-                    private utilsSvc: UtilsService, private viewSvc: ViewService, private editSvc: EditService,
+                    private utilsSvc: UtilsService, private viewSvc: ViewService, private autosaveSvc: AutosaveService,
                     private elementSvc: ElementService, private appUtilsSvc: AppUtilsService) {
         }
 
@@ -222,7 +222,7 @@ let PrintConfirmModalComponent: angular.Injectable<any> = {
                     this.meta['bottom-right'] = 'counter(page)';
                 });
             }
-            this.unsaved = (this.editSvc.getAll() && !_.isEmpty(this.editSvc.getAll()));
+            this.unsaved = (this.autosaveSvc.getAll() && !_.isEmpty(this.autosaveSvc.getAll()));
             this.docOption = (!this.isDoc && (this.mode === 3 || this.mode === 2));
             this.model = { genTotf: false, landscape: false, htmlTotf: false };
 

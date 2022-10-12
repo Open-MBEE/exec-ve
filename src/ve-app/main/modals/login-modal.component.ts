@@ -1,7 +1,7 @@
 import angular from "angular";
 import * as _ from "lodash";
 import {AuthService, CacheService} from "@ve-utils/mms-api-client"
-import {EditService, UtilsService} from "@ve-utils/core-services";
+import {AutosaveService, UtilsService} from "@ve-utils/services";
 import {VeModalComponent, VeModalController} from "@ve-types/view-editor";
 
 import {veApp} from "@ve-app";
@@ -32,7 +32,7 @@ let LoginModalComponent: VeModalComponent = {
     },
     controller: class LoginModalController extends VeModalControllerImpl implements VeModalController {
 
-        static $inject = ['$state', 'growl', 'AuthService', 'EditService', 'UtilsService', 'CacheService'];
+        static $inject = ['$state', 'growl', 'AuthService', 'AutosaveService', 'UtilsService', 'CacheService'];
 
         public credentials = {
                     username: '',
@@ -40,7 +40,7 @@ let LoginModalComponent: VeModalComponent = {
                 };
                 spin = false;
 
-        constructor(private $state, private growl, private authSvc: AuthService, private editSvc: EditService,
+        constructor(private $state, private growl, private authSvc: AuthService, private autosaveSvc: AutosaveService,
                     private utilsSvc: UtilsService, private cacheSvc: CacheService) {
             super();
         }
@@ -52,7 +52,7 @@ let LoginModalComponent: VeModalComponent = {
                     this.growl.success("Logged in");
                     // Check if user had changes queued before refreshing page data
                     // add edits to cache
-                    var edits = this.editSvc.getAll();
+                    var edits = this.autosaveSvc.getAll();
                     _.map(edits, (element, key) => {
                         var cacheKey = this.utilsSvc.makeElementKey(element, true);
                         this.cacheSvc.put(cacheKey, element);

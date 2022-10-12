@@ -1,22 +1,24 @@
-import * as angular from 'angular';
-import * as _ from 'lodash';
+import * as angular from 'angular'
+import _ from 'lodash'
+
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { SchemaService } from '@ve-utils/model-schema'
+import { ApplicationService, UtilsService } from '@ve-utils/services'
+import { Class } from '@ve-utils/utils'
+
+import { veCore } from '@ve-core'
+
+import { VeEditorController } from '../ve-editor.component'
+
+import { ElementObject, QueryObject, ViewObject } from '@ve-types/mms'
 import {
     VeModalComponent,
     VeModalController,
     VeModalResolve,
     VeModalResolveFn,
-    VeSearchOptions
-} from "@ve-types/view-editor";
-import {ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {ApplicationService, UtilsService} from "@ve-utils/core-services";
-import {VeEditorController} from "../ve-editor.component";
-import {ElementObject, QueryObject, ViewObject} from "@ve-types/mms";
-import {Class} from "@ve-utils/utils";
-
-import {veCore} from "@ve-core";
-import {SchemaService} from "@ve-utils/model-schema";
-import {VeModalControllerImpl} from "@ve-utils/modals/ve-modal.controller";
-
+    VeSearchOptions,
+} from '@ve-types/view-editor'
 
 export interface TranscludeModalResolve extends VeModalResolve {
     editor: VeEditorController
@@ -31,7 +33,7 @@ export interface TranscludeModalResolveFn extends VeModalResolveFn {
 // Component for inserting cross reference
 // Defines scope variables for html template and how to handle user click
 // Also defines options for search interfaces -- see mmsSearch.js for more info
-let TranscludeModalComponent: VeModalComponent = {
+const TranscludeModalComponent: VeModalComponent = {
     selector: 'transcludeModal',
     template: `
     <div class="modal-header">
@@ -100,59 +102,75 @@ let TranscludeModalComponent: VeModalComponent = {
 </div>
 `,
     bindings: {
-        modalInstance: "<",
-        resolve: "<"
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class TranscludeModalController extends VeModalControllerImpl implements VeModalController {
-
+    controller: class TranscludeModalController
+        extends VeModalControllerImpl
+        implements VeModalController
+    {
         //bindings
         public resolve: TranscludeModalResolve
 
         private editor: VeEditorController
 
-        protected title: string = 'Insert cross reference';
-        protected description: string = 'Begin by searching for an element, then click a field to cross-reference.';
-        protected searchExisting: boolean = true;
-        protected newE: { name: string, documentation: string } = {name: '', documentation: ''};
-        protected requestName: boolean = false;
-        protected requestDocumentation: boolean = false;
-        protected viewLink: boolean;
-        protected nonEditableCheckbox: boolean = false;
-        protected showEditableOp: boolean = true;
-        protected proposeClass: string;
-        protected linkType: number = null;
-        protected linkText: string;
+        protected title: string = 'Insert cross reference'
+        protected description: string =
+            'Begin by search for an element, then click a field to cross-reference.'
+        protected searchExisting: boolean = true
+        protected newE: { name: string; documentation: string } = {
+            name: '',
+            documentation: '',
+        }
+        protected requestName: boolean = false
+        protected requestDocumentation: boolean = false
+        protected viewLink: boolean
+        protected nonEditableCheckbox: boolean = false
+        protected showEditableOp: boolean = true
+        protected proposeClass: string
+        protected linkType: number = null
+        protected linkText: string
 
         // Set search result options
         protected searchOptions: VeSearchOptions = {
-            closeable: false
+            closeable: false,
         }
 
+        static $inject = [
+            'growl',
+            'ElementService',
+            'SchemaService',
+            'ViewService',
+            'ApplicationService',
+            'UtilsService',
+        ]
+        private mmsProjectId: string
+        private mmsRefId: string
+        private schema = 'cameo'
 
-        static $inject = ['growl', 'ElementService', 'SchemaService', 'ViewService', 'ApplicationService', 'UtilsService']
-        private mmsProjectId: string;
-        private mmsRefId: string;
-        private schema = 'cameo';
-
-
-        constructor(private growl: angular.growl.IGrowlService, private elementSvc: ElementService,
-                    private schemaSvc: SchemaService, private viewSvc: ViewService, private applicationSvc: ApplicationService,
-                    private utilsSvc: UtilsService) {
-            super();
+        constructor(
+            private growl: angular.growl.IGrowlService,
+            private elementSvc: ElementService,
+            private schemaSvc: SchemaService,
+            private viewSvc: ViewService,
+            private applicationSvc: ApplicationService,
+            private utilsSvc: UtilsService
+        ) {
+            super()
         }
 
         $onInit() {
-            this.editor = this.resolve.editor;
-            this.mmsProjectId = this.editor.mmsProjectId;
-            this.mmsRefId = this.editor.mmsRefId;
-            this.searchOptions.callback = this.choose;
-            this.viewLink = this.resolve.viewLink;
+            this.editor = this.resolve.editor
+            this.mmsProjectId = this.editor.mmsProjectId
+            this.mmsRefId = this.editor.mmsRefId
+            this.searchOptions.callback = this.choose
+            this.viewLink = this.resolve.viewLink
 
             if (!this.viewLink) {
                 this.searchOptions.getProperties = true
-                this.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to cross-reference a placeholder.'
-            }
-            else {
+                this.searchOptions.emptyDocTxt =
+                    'This field is empty, but you can still click here to cross-reference a placeholder.'
+            } else {
                 this.searchOptions.relatedCallback = this.chooseDoc
                 this.searchOptions.filterQueryList = [this.mainSearchFilter]
                 this.searchOptions.itemsPerPage = 200
@@ -160,163 +178,196 @@ let TranscludeModalComponent: VeModalComponent = {
         }
 
         public choose = (elem: ElementObject, property: string) => {
-            let tag = '';
+            let tag = ''
             if (!this.viewLink) {
-                tag = '<transclusion mms-cf-type="' + property + '" mms-element-id="' + elem.id + '" non-editable="' + this.nonEditableCheckbox + '">[cf:' + elem.name + '.' + property + ']</transclusion>';
-            }
-            else {
-                var did = null;
-                var vid = null;
-                var peid = null;
-                var currentDoc = this.applicationSvc.getState().currentDoc;
-                if (elem._relatedDocuments && elem._relatedDocuments.length > 0) {
-                    var cur = _.find(elem._relatedDocuments, {id: currentDoc});
+                tag =
+                    '<transclusion mms-cf-type="' +
+                    property +
+                    '" mms-element-id="' +
+                    elem.id +
+                    '" non-editable="' +
+                    this.nonEditableCheckbox +
+                    '">[cf:' +
+                    elem.name +
+                    '.' +
+                    property +
+                    ']</transclusion>'
+            } else {
+                let did = null
+                let vid = null
+                let peid = null
+                const currentDoc = this.applicationSvc.getState().currentDoc
+                if (
+                    elem._relatedDocuments &&
+                    elem._relatedDocuments.length > 0
+                ) {
+                    const cur = _.find(elem._relatedDocuments, {
+                        id: currentDoc,
+                    })
                     if (cur) {
-                        did = currentDoc;
+                        did = currentDoc
                         if (cur._parentViews.length > 0) {
-                            vid = cur._parentViews[0].id;
+                            vid = cur._parentViews[0].id
                         }
                     } else {
-                        did = elem._relatedDocuments[0].id;
+                        did = elem._relatedDocuments[0].id
                         if (elem._relatedDocuments[0]._parentViews.length > 0) {
-                            vid = elem._relatedDocuments[0]._parentViews[0].id;
+                            vid = elem._relatedDocuments[0]._parentViews[0].id
                         }
                     }
                 }
                 if (elem.type === 'InstanceSpecification') {
                     if (this.viewSvc.isSection(elem)) {
-                        vid = elem.id;
+                        vid = elem.id
                     } else {
-                        peid = elem.id;
+                        peid = elem.id
                     }
                 } else {
-                    vid = elem.id;
+                    vid = elem.id
                 }
-                tag = this.createViewLink(elem, did, vid, peid);
+                tag = this.createViewLink(elem, did, vid, peid)
             }
 
-            this.modalInstance.close({$value: tag});
-        };
+            this.modalInstance.close({ $value: tag })
+        }
 
         public cancel = () => {
-            this.modalInstance.dismiss();
-        };
+            this.modalInstance.dismiss()
+        }
 
         public makeNewAndChoose = () => {
             if (!this.newE.name) {
-                this.growl.error('Error: A name for your new element is required.');
-                return;
+                this.growl.error(
+                    'Error: A name for your new element is required.'
+                )
+                return
             } else if (!this.requestName && !this.requestDocumentation) {
-                this.growl.error('Error: Selection of a property to cross-reference is required.');
-                return;
+                this.growl.error(
+                    'Error: Selection of a property to cross-reference is required.'
+                )
+                return
             }
-            this.proposeClass = "fa fa-spin fa-spinner";
-            let id = this.utilsSvc.createMmsId();
-            let createObj: ElementObject = {
+            this.proposeClass = 'fa fa-spin fa-spinner'
+            const id = this.utilsSvc.createMmsId()
+            const createObj: ElementObject = {
                 id: id,
                 _projectId: this.mmsProjectId,
                 _refId: this.mmsRefId,
-                ownerId: "holding_bin_" + this.mmsProjectId,
+                ownerId: 'holding_bin_' + this.mmsProjectId,
                 name: this.newE.name,
                 documentation: this.newE.documentation,
                 type: 'Class',
-                _appliedStereotypeIds: []
+                _appliedStereotypeIds: [],
             }
-            let toCreate: ElementObject = new Class(createObj);
-            var reqOb = {
+            const toCreate: ElementObject = new Class(createObj)
+            const reqOb = {
                 elements: [toCreate],
                 elementId: toCreate.id,
                 projectId: this.mmsProjectId,
-                refId: this.mmsRefId
-            };
+                refId: this.mmsRefId,
+            }
 
-            this.elementSvc.createElement(reqOb)
-                .then((data) => {
+            this.elementSvc.createElement(reqOb).then(
+                (data) => {
                     if (this.requestName) {
-                        this.choose(data, 'name');
+                        this.choose(data, 'name')
                     } else if (this.requestDocumentation) {
-                        this.choose(data, 'doc');
+                        this.choose(data, 'doc')
                     }
-                    this.proposeClass = "";
-                }, (reason) => {
-                    this.growl.error("Propose Error: " + reason.message);
-                    this.proposeClass = "";
-                });
-        };
+                    this.proposeClass = ''
+                },
+                (reason) => {
+                    this.growl.error('Propose Error: ' + reason.message)
+                    this.proposeClass = ''
+                }
+            )
+        }
 
         public toggleRadio = (field) => {
-            if (field === "name") {
-                this.requestName = true;
-                this.requestDocumentation = false;
-            } else if (field === "documentation") {
-                this.requestName = false;
-                this.requestDocumentation = true;
+            if (field === 'name') {
+                this.requestName = true
+                this.requestDocumentation = false
+            } else if (field === 'documentation') {
+                this.requestName = false
+                this.requestDocumentation = true
             }
-        };
+        }
 
         private createViewLink = (elem, did, vid, peid) => {
-        var tag = '<view-link';
-        if (did) {
-            tag += ' mms-doc-id="' + did + '"';
-        }
-        if (vid) {
-            tag += ' mms-element-id="' + vid + '"';
-        }
-        if (peid) {
-            tag += ' mms-pe-id="' + peid + '"';
-        }
-        if (this.linkType == 1) {
-            tag += ' suppress-numbering="false"';
-            tag += ' show-name="false"';
-        }
-        if (this.linkType == 2) {
-            tag += ' suppress-numbering="true"';
-            tag += ' show-name="true"';
-        }
-        if (this.linkType == 3 && this.linkText) {
-            tag += ' link-text="' + this.linkText + '"';
-        }
-        if (this.linkType == 4) {
-            tag += ' suppress-numbering="false"';
-            tag += ' show-name="true"';
-        }
-        tag += '>[cf:' + elem.name + '.vlink]</view-link>';
-        return tag;
-    };
-
-    public chooseDoc = (doc: ViewObject, view: ViewObject, elem: ElementObject) => {
-        var did = doc.id;
-        var vid = view.id;
-        var peid = null;
-        if (this.viewSvc.isSection(elem)) {
-            vid = elem.id;
-        } else if (this.viewSvc.getPresentationElementType(elem)) {
-            peid = elem.id;
-        }
-        var tag = this.createViewLink(elem, did, vid, peid);
-        this.modalInstance.close({ $value: tag });
-    };
-
-    private mainSearchFilter = (): {_appliedStereotypeIds?: string[], classifierIds?: string[]} => {
-        let filter: {_appliedStereotypeIds?: string[], classifierIds?: string[]} = {};
-        filter._appliedStereotypeIds = [
-            this.schemaSvc.get('VIEW_SID', this.schema),
-            this.schemaSvc.get('DOCUMENT_SID', this.schema),
-            ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema)
-        ];
-        var allClassifierIds = this.schemaSvc.get('TYPE_TO_CLASSIFIER_ID', this.schema);
-        var classifierList = [];
-
-        for (var k in allClassifierIds) {
-            if (allClassifierIds.hasOwnProperty(k)) {
-                filter.classifierIds.push(allClassifierIds[k]);
+            let tag = '<view-link'
+            if (did) {
+                tag += ' mms-doc-id="' + did + '"'
             }
+            if (vid) {
+                tag += ' mms-element-id="' + vid + '"'
+            }
+            if (peid) {
+                tag += ' mms-pe-id="' + peid + '"'
+            }
+            if (this.linkType == 1) {
+                tag += ' suppress-numbering="false"'
+                tag += ' show-name="false"'
+            }
+            if (this.linkType == 2) {
+                tag += ' suppress-numbering="true"'
+                tag += ' show-name="true"'
+            }
+            if (this.linkType == 3 && this.linkText) {
+                tag += ' link-text="' + this.linkText + '"'
+            }
+            if (this.linkType == 4) {
+                tag += ' suppress-numbering="false"'
+                tag += ' show-name="true"'
+            }
+            tag += '>[cf:' + elem.name + '.vlink]</view-link>'
+            return tag
         }
 
+        public chooseDoc = (
+            doc: ViewObject,
+            view: ViewObject,
+            elem: ElementObject
+        ) => {
+            const did = doc.id
+            let vid = view.id
+            let peid = null
+            if (this.viewSvc.isSection(elem)) {
+                vid = elem.id
+            } else if (this.viewSvc.getPresentationElementType(elem)) {
+                peid = elem.id
+            }
+            const tag = this.createViewLink(elem, did, vid, peid)
+            this.modalInstance.close({ $value: tag })
+        }
 
-        return filter
-    }
-}
+        private mainSearchFilter = (): {
+            _appliedStereotypeIds?: string[]
+            classifierIds?: string[]
+        } => {
+            const filter: {
+                _appliedStereotypeIds?: string[]
+                classifierIds?: string[]
+            } = {}
+            filter._appliedStereotypeIds = [
+                this.schemaSvc.get('VIEW_SID', this.schema),
+                this.schemaSvc.get('DOCUMENT_SID', this.schema),
+                ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema),
+            ]
+            const allClassifierIds = this.schemaSvc.get(
+                'TYPE_TO_CLASSIFIER_ID',
+                this.schema
+            )
+            const classifierList = []
+
+            for (const k in allClassifierIds) {
+                if (allClassifierIds.hasOwnProperty(k)) {
+                    filter.classifierIds.push(allClassifierIds[k])
+                }
+            }
+
+            return filter
+        }
+    },
 }
 
-veCore.component(TranscludeModalComponent.selector, TranscludeModalComponent);
+veCore.component(TranscludeModalComponent.selector, TranscludeModalComponent)

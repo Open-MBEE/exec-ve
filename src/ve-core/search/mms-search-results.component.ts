@@ -5,7 +5,7 @@ import {veCore} from "@ve-core";
 export class MmsSearchResultsController implements angular.IComponentController {
 
 }
-let MmsSearchResultsComponent: VeComponentOptions = {
+const MmsSearchResultsComponent: VeComponentOptions = {
     selector: "mmsSearchResults",
     require: {
       $search: "^^mmsSearch"

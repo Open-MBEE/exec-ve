@@ -1,6 +1,6 @@
-import {veExt} from "@ve-ext";
+import {veComponents} from "@ve-components";
 
-veExt.directive('mmsD3ParallelAxisPlot', ['PlotService', '$window', mmsD3ParallelAxisPlot]);
+veComponents.directive('mmsD3ParallelAxisPlot', ['PlotService', '$window', mmsD3ParallelAxisPlot]);
 function mmsD3ParallelAxisPlot(PlotService,  $window) {
       
   var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {

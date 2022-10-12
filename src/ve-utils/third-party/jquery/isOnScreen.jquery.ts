@@ -5,34 +5,34 @@
         if(x == null || typeof x == 'undefined') x = 1;
         if(y == null || typeof y == 'undefined') y = 1;
 
-        var win = $(window);
+        const win = $(window);
 
-        var viewport = {
+        const viewport = {
             top : win.scrollTop(),
             left : win.scrollLeft(),
             right: win.scrollLeft() + win.width(),
             bottom: win.scrollTop() + win.height()
         };
-        
 
-        var height = this.outerHeight();
-        var width = this.outerWidth();
+
+        const height = this.outerHeight();
+        const width = this.outerWidth();
 
         if(!width || !height){
             return false;
         }
 
-        var bounds = this.offset();
+        const bounds = this.offset();
         bounds.right = bounds.left + width;
         bounds.bottom = bounds.top + height;
 
-        var visible = (!(viewport.right < bounds.left || viewport.left > bounds.right || viewport.bottom < bounds.top || viewport.top > bounds.bottom));
+        const visible = (!(viewport.right < bounds.left || viewport.left > bounds.right || viewport.bottom < bounds.top || viewport.top > bounds.bottom));
 
         if(!visible){
             return false;
         }
 
-        var deltas = {
+        const deltas = {
             top : Math.min( 1, ( bounds.bottom - viewport.top ) / height),
             bottom : Math.min(1, ( viewport.bottom - bounds.top ) / height),
             left : Math.min(1, ( bounds.right - viewport.left ) / width),

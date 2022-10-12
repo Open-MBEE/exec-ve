@@ -12,11 +12,11 @@ import {
 } from "@ve-utils/mms-api-client"
 import {
     ApplicationService,
-    EditService,
+    AutosaveService,
     EventService,
     RootScopeService,
     UtilsService
-} from "@ve-utils/core-services";
+} from "@ve-utils/services";
 import {VeComponentOptions, VeModalService} from "@ve-types/view-editor";
 
 import {veApp} from "@ve-app";
@@ -69,7 +69,7 @@ let MainComponent: VeComponentOptions = {
 
         static $inject = ['$scope', '$timeout', '$location', '$window', '$uibModal', '$interval', '$http', 'veConfig',
             'growl', 'hotkeys', 'growlMessages','$uiRouter', '$transitions', '$state', 'URLService', 'UtilsService', 'HttpService', 'AuthService',
-            'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'EditService', 'EventService']
+            'ElementService', 'CacheService', 'ApplicationService', 'RootScopeService', 'AutosaveService', 'EventService']
 
         //local
         public subs: Rx.IDisposable[];
@@ -92,7 +92,7 @@ let MainComponent: VeComponentOptions = {
                     private $uiRouter: UIRouter, private $transitions: TransitionService, private $state: StateService, private uRLSvc: URLService, private utilsSvc: UtilsService, private httpSvc: HttpService,
                     private authSvc: AuthService, private elementSvc: ElementService, private cacheSvc: CacheService,
                     private applicationSvc: ApplicationService, private rootScopeSvc: RootScopeService,
-                    private editSvc: EditService, private eventSvc: EventService) {}
+                    private autosaveSvc: AutosaveService, private eventSvc: EventService) {}
 
         $onInit() {
             this.eventSvc.$init(this);
@@ -121,8 +121,8 @@ let MainComponent: VeComponentOptions = {
                 this.hidePanes = value;
             }));
 
-            this.subs.push(this.eventSvc.$on(this.editSvc.EVENT, () => {
-                this.openEdits = this.editSvc.getAll();
+            this.subs.push(this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
+                this.openEdits = this.autosaveSvc.getAll();
             }));
 
 
@@ -173,7 +173,7 @@ let MainComponent: VeComponentOptions = {
                 //so next time edit forms will show updated data (mainly for stomp updates)
                 var editKey = this.utilsSvc.makeElementKey(this.utilsSvc.makeElementRequestObject(element), true);
                 var veEditsKey = element.id + '|' + element._projectId + '|' + element._refId;
-                if (this.editSvc.getAll() && !this.editSvc.get(veEditsKey) && this.cacheSvc.exists(editKey)) {
+                if (this.autosaveSvc.getAll() && !this.autosaveSvc.get(veEditsKey) && this.cacheSvc.exists(editKey)) {
                     this.elementSvc.cacheElement({projectId: element._projectId, refId: element._refId, elementId: element.id, commitId: 'latest'}, JSON.parse(JSON.stringify(element)), true);
                 }
             }));

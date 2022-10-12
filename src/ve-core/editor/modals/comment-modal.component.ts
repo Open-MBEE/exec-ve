@@ -1,7 +1,7 @@
 import * as angular from "angular";
 
 import{ElementService} from "@ve-utils/mms-api-client";
-import {UtilsService} from "@ve-utils/core-services";
+import {UtilsService} from "@ve-utils/services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {VeEditorController} from "../ve-editor.component";
 import { Class } from "@ve-utils/utils";
@@ -9,7 +9,7 @@ import { Class } from "@ve-utils/utils";
 import {veCore} from "@ve-core";
 
 
-let CommentModalComponent: VeComponentOptions = {
+const CommentModalComponent: VeComponentOptions = {
     selector: 'commentModal',
     template: `
     
@@ -43,7 +43,7 @@ let CommentModalComponent: VeComponentOptions = {
             this.mmsProjectId = this.editor.mmsProjectId;
             this.mmsRefId = this.editor.mmsRefId;
 
-            var id = this.utilsSvc.createMmsId();
+            const id = this.utilsSvc.createMmsId();
             this.comment = new Class({
                 id: id,
                 _projectId: this.mmsProjectId,
@@ -64,10 +64,10 @@ let CommentModalComponent: VeComponentOptions = {
             return;
         }
         this.oking = true;
-        var reqOb = {elements: this.comment, elementId: this.comment.id, projectId: this.mmsProjectId, refId: this.mmsRefId};
+        const reqOb = {elements: this.comment, elementId: this.comment.id, projectId: this.mmsProjectId, refId: this.mmsRefId};
         this.elementSvc.createElement(reqOb)
             .then((data) => {
-                let tag = '<transclusion mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</transclusion>';
+                const tag = '<transclusion mms-cf-type="com" mms-element-id="' + data.id + '">comment:' + data._creator + '</transclusion>';
                 this.close({ $value: tag });
             }, (reason) => {
                 this.growl.error("Comment Error: " + reason.message);

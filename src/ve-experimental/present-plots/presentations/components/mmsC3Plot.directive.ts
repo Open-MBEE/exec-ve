@@ -1,6 +1,6 @@
-import {veExt} from "@ve-ext";
+import {veComponents} from "@ve-components";
 
-veExt.directive('mmsC3Plot', ['PlotService', '$window', mmsC3Plot]);
+veComponents.directive('mmsC3Plot', ['PlotService', '$window', mmsC3Plot]);
 function mmsC3Plot(PlotService, $window, _) {
       
   var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {

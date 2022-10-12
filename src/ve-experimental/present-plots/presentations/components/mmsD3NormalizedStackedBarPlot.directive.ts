@@ -1,6 +1,6 @@
-import {veExt} from "@ve-ext";
+import {veComponents} from "@ve-components";
 
-veExt.directive('mmsD3NormalizedStackedBarPlot', ['PlotService','$window', mmsD3NormalizedStackedBarPlot]);
+veComponents.directive('mmsD3NormalizedStackedBarPlot', ['PlotService','$window', mmsD3NormalizedStackedBarPlot]);
   
   /**
   /* reference https://bl.ocks.org/mbostock/3886394

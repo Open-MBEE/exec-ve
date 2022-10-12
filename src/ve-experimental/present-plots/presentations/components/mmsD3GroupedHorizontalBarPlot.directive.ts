@@ -1,8 +1,8 @@
-import {veExt} from "@ve-ext";
+import {veComponents} from "@ve-components";
 //d3js grouped horizontal bar chart is created by referencing
 //http://bl.ocks.org/erikvullings/51cc5332439939f1f292
 
-veExt.directive('mmsD3GroupedHorizontalBarPlot', ['PlotService','$window', mmsD3GroupedHorizontalBarPlot]);
+veComponents.directive('mmsD3GroupedHorizontalBarPlot', ['PlotService','$window', mmsD3GroupedHorizontalBarPlot]);
 function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
 
     var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {

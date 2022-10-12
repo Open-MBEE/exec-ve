@@ -24,7 +24,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 		var testElements = {
 			elements: [
 				{
-					_modifier: "merp", 
+					_modifier: "merp",
 					id: "firstelementid",
 					_modified: "2017-05-19T13:22:31.614-0700",
 					_refId: "master",
@@ -33,7 +33,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-05-09T17:12:17.165-0700",
 					name: "First Element",
-					_projectId: "someprojectid"	
+					_projectId: "someprojectid"
 				},
 				{
 					_modifier: "merp", //same as element above, but added text in documentation
@@ -45,7 +45,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-05-09T17:12:17.165-0700",
 					name: "First Element",
-					_projectId: "someprojectid"	
+					_projectId: "someprojectid"
 				},
 				{
 					_modifier: "merp", //same as element above, but deleted text in documentation
@@ -57,7 +57,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-05-09T17:12:17.165-0700",
 					name: "First Element",
-					_projectId: "someprojectid"	
+					_projectId: "someprojectid"
 				},
 				{
 					_modifier: "someperson",
@@ -69,7 +69,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-05-01T17:12:17.165-0700",
 					name: "Second Element",
-					_projectId: "someprojectid"	
+					_projectId: "someprojectid"
 				},
 				{
 					_modifier: "someperson", //same as above, but different refs
@@ -81,7 +81,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-05-01T17:12:17.165-0700",
 					name: "Second Element",
-					_projectId: "someprojectid"	
+					_projectId: "someprojectid"
 				},
 				{
 					_modifier: "anotherperson",
@@ -93,7 +93,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Third Element",
-					_projectId: "someprojectid"	
+					_projectId: "someprojectid"
 				},
 				{
 					_modifier: "anotherperson", //same as above, different commits
@@ -105,7 +105,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Third Element",
-					_projectId: "someprojectid"	
+					_projectId: "someprojectid"
 				},
 				{
 					_modifier: "anotherperson",
@@ -117,7 +117,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-05-20T17:12:17.165-0700",
 					name: "Fourth Element",
-					_projectId: "anotherprojectid"	
+					_projectId: "anotherprojectid"
 				},
 				{
 					_modifier: "anotherperson",
@@ -129,7 +129,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Fifth Element",
-					_projectId: "yetanotherprojectid"	
+					_projectId: "yetanotherprojectid"
 				},
 				{
 					_modifier: "anotherperson",
@@ -141,7 +141,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Sixth Element",
-					_projectId: "yetanotherprojectid"	
+					_projectId: "yetanotherprojectid"
 				},
 				{
 					_modifier: "anotherperson",
@@ -153,7 +153,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Seventh Element",
-					_projectId: "nthprojectid"	
+					_projectId: "nthprojectid"
 				},
 				{
 					_modifier: "anotherperson",
@@ -165,7 +165,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Eighth Element",
-					_projectId: "nthprojectid"	
+					_projectId: "nthprojectid"
 				},
 				{
 					_modifier: "anotherperson",
@@ -177,7 +177,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 					_creator: "merp",
 					_created: "2017-03-01T17:12:17.165-0700",
 					name: "Eighth Element",
-					_projectId: "nthprojectid"	
+					_projectId: "nthprojectid"
 				}
 			]
 		};
@@ -207,7 +207,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "fifthelementid",
 			mmsRefOneId: "branchfive",
 			mmsCommitOneId: "latest",
-			mmsProjectOneId: "yetanotherprojectid"		 
+			mmsProjectOneId: "yetanotherprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "sixthelementid",
@@ -216,7 +216,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "yetanotherprojectid"
 		};
 
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -227,16 +227,16 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "fifthelementid",
 			mmsRefOneId: "branchfive",
 			mmsCommitOneId: "latest",
-			mmsProjectOneId: "yetanotherprojectid"		 
+			mmsProjectOneId: "yetanotherprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "fifthelementid",
 			mmsRefTwoId: "branchfive",
 			mmsCommitTwoId: "latest",
-			mmsProjectTwoId: "yetanotherprojectid"		 
+			mmsProjectTwoId: "yetanotherprojectid"
 		};
 
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -248,7 +248,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "fifthelementid",
 			mmsRefOneId: "branchfive",
 			mmsCommitOneId: "latest",
-			mmsProjectOneId: "yetanotherprojectid"		 
+			mmsProjectOneId: "yetanotherprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "fifthelementid",
@@ -257,7 +257,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "yetanotherprojectid"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -274,10 +274,10 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidTwo: "fifthelementid",
 			mmsRefTwoId: "branchfive",
 			mmsCommitTwoId: "latest",
-			mmsProjectTwoId: "yetanotherprojectid"		 
+			mmsProjectTwoId: "yetanotherprojectid"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -288,7 +288,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "thirdelementid",
 			mmsRefOneId: "branchthree",
 			mmsCommitOneId: "3902839085",
-			mmsProjectOneId: "someprojectid"	 
+			mmsProjectOneId: "someprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "thirdelementid",
@@ -297,7 +297,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "someprojectid"
 		};
 
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -308,7 +308,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "thirdelementid",
 			mmsRefOneId: "branchthree",
 			mmsCommitOneId: "thiscommitdoesntexist",
-			mmsProjectOneId: "someprojectid"	 
+			mmsProjectOneId: "someprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "thirdelementid",
@@ -317,7 +317,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "someprojectid"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne + '?commitId=' + scope.elementOne.mmsCommitOneId).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -328,7 +328,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "thirdelementid",
 			mmsRefOneId: "branchthree",
 			mmsCommitOneId: "thiscommitdoesntexist",
-			mmsProjectOneId: "someprojectid"	 
+			mmsProjectOneId: "someprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "thirdelementid",
@@ -338,7 +338,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne + '?commitId=' + scope.elementOne.mmsCommitOneId).respond({status: 404, message: "" });
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo + '?commitId=' + scope.elementTwo.mmsCommitTwoId).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -349,7 +349,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "sixthelementid",
 			mmsRefOneId: "master",
 			mmsCommitOneId: "latest",
-			mmsProjectOneId: "yetanotherprojectid"	 
+			mmsProjectOneId: "yetanotherprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "seventhelementid",
@@ -358,7 +358,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "nthprojectid"
 		};
 
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -369,7 +369,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "sixthelementid",
 			mmsRefOneId: "master",
 			mmsCommitOneId: "latest",
-			mmsProjectOneId: "thisprojectdoesntexist"	 
+			mmsProjectOneId: "thisprojectdoesntexist"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "seventhelementid",
@@ -378,7 +378,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "nthprojectid"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -389,7 +389,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "sixthelementid",
 			mmsRefOneId: "master",
 			mmsCommitOneId: "latest",
-			mmsProjectOneId: "yetanotherprojectid"	 
+			mmsProjectOneId: "yetanotherprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "seventhelementid",
@@ -398,7 +398,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "thisprojectdoesntexist"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -409,7 +409,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "sixthelementid",
 			mmsRefOneId: "master",
 			mmsCommitOneId: "latest",
-			mmsProjectOneId: "thisprojectdoesntexist"	 
+			mmsProjectOneId: "thisprojectdoesntexist"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "seventhelementid",
@@ -419,7 +419,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne).respond({status: 404, message: "" });
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -430,7 +430,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "firstelementid",
 			mmsRefOneId: "master",
 			mmsCommitOneId: "9028490394",
-			mmsProjectOneId: "someprojectid"	 
+			mmsProjectOneId: "someprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "firstelementid",
@@ -439,7 +439,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "someprojectid"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementOne.mmsProjectOneId + '/refs/' + scope.elementOne.mmsRefOneId + '/elements/' + scope.elementOne.mmsEidOne + '?commitId=' + scope.elementOne.mmsCommitOneId).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -450,7 +450,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "eighthelementid",
 			mmsRefOneId: "master",
 			mmsCommitOneId: "89798989897",
-			mmsProjectOneId: "nthprojectid"	 
+			mmsProjectOneId: "nthprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "eighthelementid",
@@ -459,7 +459,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "nthprojectid"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo).respond({status: 200, message: "[ERROR]: Element MMS_1493917957356_969a3e36-f1e0-461d-9a24-c6b6f815cc84 is deleted"});
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();
@@ -470,7 +470,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsEidOne: "firstelementid",
 			mmsRefOneId: "master",
 			mmsCommitOneId: "3042934",
-			mmsProjectOneId: "someprojectid"	 
+			mmsProjectOneId: "someprojectid"
 		};
 		scope.elementTwo = {
 			mmsEidTwo: "thiselementdoesnotexist",
@@ -479,7 +479,7 @@ xdescribe('Directive: mmsDiffAttr', function() {
 			mmsProjectTwoId: "someprojectid"
 		};
 		$httpBackend.expect('GET', '/alfresco/service/projects/' + scope.elementTwo.mmsProjectTwoId + '/refs/' + scope.elementTwo.mmsRefTwoId + '/elements/' + scope.elementTwo.mmsEidTwo + '?commitId=' + scope.elementTwo.mmsCommitTwoId).respond({status: 404, message: "" });
-		element = angular.element('<mms-diff-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-attr>');
+		element = angular.element('<mms-diff-merge-attr mms-project-one-id="{{elementOne.mmsProjectOneId}}" mms-project-two-id="{{elementTwo.mmsProjectTwoId}}" mms-eid-one="{{elementOne.mmsEidOne}}" mms-eid-two="{{elementTwo.mmsEidTwo}}" mms-ref-one-id="{{elementOne.mmsRefOneId}}" mms-ref-two-id="{{elementTwo.mmsRefTwoId}}" mms-commit-one-id="{{elementOne.mmsCommitOneId}}" mms-commit-two-id="{{elementTwo.mmsCommitTwoId}}"></mms-diff-merge-attr>');
 		$compile(element)(scope);
 		scope.$apply();
 		$httpBackend.flush();

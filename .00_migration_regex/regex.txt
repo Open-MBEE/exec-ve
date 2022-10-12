@@ -10,7 +10,7 @@ Step 2
 ([a-zA-Z]*)Service\.(?!provider|factory|service)
 this.\l$1Svc.
 
-(this\.)?((\$interval|\$http|\$window|\$q|\$timeout|\$uibModal|\$state|\$localStorage|editSvc|growl|hotkeys|rootScopeSvc|eventSvc|edit)(\.|\())
+(this\.)?((\$interval|\$http|\$window|\$q|\$timeout|\$uibModal|\$state|\$localStorage|autosaveSvc|growl|hotkeys|rootScopeSvc|eventSvc|edit)(\.|\())
 this.$2
 
 function ?(\([0-9a-zA-Z_ ,:]*\))
@@ -57,7 +57,7 @@ private ([a-zA-Z]{0,20}) ?:? ?([a-zA-Z$]*)
 $1 $2 $3 = $4 => {
 
 For refactoring
-((import \{)(, )?(.*)(\} from "@ve-utils/mms-api-client")(;)?\n)?((import \{)(.*), ?(AuthService|CacheService|ElementService|HttpService|PermissionsService|ProjectService|URLService|ViewService)(\n)?(, )?(.*)?(, )?(\} from "@ve-utils/core-services"))
+((import \{)(, )?(.*)(\} from "@ve-utils/mms-api-client")(;)?\n)?((import \{)(.*), ?(AuthService|CacheService|ElementService|HttpService|PermissionsService|ProjectService|URLService|ViewService)(\n)?(, )?(.*)?(, )?(\} from "@ve-utils/services"))
 import \{$4, $10\} from "@ve-utils/mms-api-client";\n$8$9$11$12$14
 
 

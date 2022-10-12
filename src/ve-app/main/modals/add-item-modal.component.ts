@@ -1,61 +1,71 @@
-import * as angular from 'angular';
-import flatpickr from "flatpickr";
-import Options = flatpickr.Options;
+import * as angular from 'angular'
+import flatpickr from 'flatpickr'
 
-import {ElementService, ProjectService, ViewService} from "@ve-utils/mms-api-client"
-import {ApplicationService, UtilsService} from "@ve-utils/core-services";
-import {SchemaService} from "@ve-utils/model-schema";
-import {CoreUtilsService} from "@ve-core/core";
+import { CoreUtilsService } from '@ve-core/services'
+import {
+    ElementService,
+    ProjectService,
+    ViewService,
+} from '@ve-utils/mms-api-client'
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { SchemaService } from '@ve-utils/model-schema'
+import { ApplicationService, UtilsService } from '@ve-utils/services'
+
+import { veApp } from '@ve-app'
+
+import Options = flatpickr.Options
+
+import {
+    CommitObject,
+    ElementObject,
+    MmsObject,
+    RefObject,
+    ViewObject,
+} from '@ve-types/mms'
+import { TreeBranch } from '@ve-types/tree'
 import {
     VeModalComponent,
     VeModalResolve,
     VeModalController,
-    VeSearchOptions, VeModalResolveFn
-} from "@ve-types/view-editor";
-import {CommitObject, ElementObject, MmsObject, RefObject, ViewObject} from "@ve-types/mms";
-import {TreeBranch} from "@ve-types/tree";
-import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller';
-
-import {veApp} from "@ve-app";
-
-
+    VeSearchOptions,
+    VeModalResolveFn,
+} from '@ve-types/view-editor'
 
 export interface AddItemResolveFn extends VeModalResolveFn {
-    getAddData(): any;
-    getProjectId(): string;
-    getRefId(): string;
-    getOrgId(): string;
-    getFilter?(): angular.IFilterService;
-    getSeenViewIds?(): { [p: string]: TreeBranch };
+    getAddData(): AddItemData
+    getProjectId(): string
+    getRefId(): string
+    getOrgId(): string
+    getFilter?(): angular.IFilterService
+    getSeenViewIds?(): { [p: string]: TreeBranch }
     finalize?(): angular.IPromise<ElementObject>
     init?(): void
 }
 
 export interface AddItemResolve extends VeModalResolve {
-    getAddData: AddItemData;
-    getFilter?: angular.IFilterService;
-    getProjectId: string;
-    getRefId: string;
-    getOrgId: string;
-    getSeenViewIds?: { [p: string]: TreeBranch };
+    getAddData: AddItemData
+    getFilter?: angular.IFilterService
+    getProjectId: string
+    getRefId: string
+    getOrgId: string
+    getSeenViewIds?: { [p: string]: TreeBranch }
     finalize?(): angular.IPromise<ElementObject>
     init?(ctrl: VeModalControllerImpl): void
 }
 
 export interface AddItemData {
     itemType: string
-    newViewAggr: { type: string };
-    parentBranch: TreeBranch;
-    branchType: string;
-    addType?: 'item' | 'pe';
+    newViewAggr: { type: string }
+    parentBranch: TreeBranch
+    branchType: string
+    addType?: 'item' | 'pe'
     viewOrSectionOb?: ViewObject
     addPeIndex?: number
     createParentRefId?: string
 }
 
-
-let AddItemModalComponent: VeModalComponent = {
-    selector: "addItemModal",
+const AddItemModalComponent: VeModalComponent = {
+    selector: 'addItemModal',
     template: `
     <div>
     <div class="modal-header">
@@ -143,91 +153,126 @@ let AddItemModalComponent: VeModalComponent = {
 </div>
 `,
     bindings: {
-        modalInstance: "<",
-        resolve: "<"
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class AddItemController extends VeModalControllerImpl implements VeModalController {
-
-        static $inject = ['$scope', '$compile', '$element', 'growl', '$timeout', 'ViewService', 'ElementService', 'ProjectService', 'SchemaService',
-            'ApplicationService', 'UtilsService', 'CoreUtilsService'];
+    controller: class AddItemController
+        extends VeModalControllerImpl
+        implements VeModalController
+    {
+        static $inject = [
+            '$scope',
+            '$compile',
+            '$element',
+            'growl',
+            '$timeout',
+            'ViewService',
+            'ElementService',
+            'ProjectService',
+            'SchemaService',
+            'ApplicationService',
+            'UtilsService',
+            'CoreUtilsService',
+        ]
 
         private schema = 'cameo'
 
-        protected resolve: AddItemResolve;
+        protected resolve: AddItemResolve
 
         //local
         private addItemData: AddItemData
 
-        public searchOptions: VeSearchOptions = null;
+        public searchOptions: VeSearchOptions = null
         itemType: string
-        createForm: boolean = true;
-        oking: boolean = false;
+        createForm: boolean = true
+        oking: boolean = false
         projectId: string
         refId: string
         orgId: string
-        displayName: string = "";
+        displayName: string = ''
         addType: string
-        newItem: { description?: any; permission?: any; lastCommit?: any; timestamp?: any; name: any; }
+        newItem: {
+            description?: any
+            permission?: any
+            lastCommit?: any
+            timestamp?: any
+            name: any
+        }
         now: Date
         dateTimeOpts: Options.Options
 
-        parentData: ElementObject
+        private $componentEl: JQuery<HTMLElement>
 
-        private $componentEl: JQuery<HTMLElement>;
+        constructor(
+            private $scope: angular.IScope,
+            private $compile: angular.ICompileService,
+            private $element: JQuery<HTMLElement>,
+            private growl: angular.growl.IGrowlService,
+            private $timeout: angular.ITimeoutService,
+            private viewSvc: ViewService,
+            private elementSvc: ElementService,
+            private projectSvc: ProjectService,
+            private schemaSvc: SchemaService,
+            private applicationSvc: ApplicationService,
+            private utilsSvc: UtilsService,
+            private utils: CoreUtilsService
+        ) {
+            super()
+        }
 
-        constructor(private $scope: angular.IScope, private $compile: angular.ICompileService, private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService, private $timeout: angular.ITimeoutService,
-                    private viewSvc: ViewService, private elementSvc: ElementService,
-                    private projectSvc: ProjectService, private schemaSvc: SchemaService, private applicationSvc: ApplicationService,
-                    private utilsSvc: UtilsService, private utils: CoreUtilsService) {
-                    super();
-        };
+        public parentData: ElementObject = {} as ElementObject
 
         $onInit() {
-            this.addItemData = this.resolve.getAddData;
-            this.parentData = (!this.addItemData.parentBranch) ? null : this.addItemData.parentBranch.data;
-            this.addType = (this.addItemData.addType) ? this.addItemData.addType : "item";
-            this.projectId = this.resolve.getProjectId;
-            this.refId = (this.resolve.getRefId) ? this.resolve.getRefId : '';
-            this.orgId = this.resolve.getOrgId;
+            this.addItemData = this.resolve.getAddData
+            if (this.addItemData.parentBranch) {
+                this.parentData = this.addItemData.parentBranch.data
+            }
+
+            this.addType = this.addItemData.addType
+                ? this.addItemData.addType
+                : 'item'
+            this.projectId = this.resolve.getProjectId
+            this.refId = this.resolve.getRefId ? this.resolve.getRefId : ''
+            this.orgId = this.resolve.getOrgId
 
             this.searchOptions = {
                 callback: this.callback,
                 itemsPerPage: 200,
                 filterQueryList: [this.queryFilter],
                 hideFilterOptions: true,
-                closeable: false
-            };
+                closeable: false,
+            }
 
-            this.itemType = this.addItemData.itemType;
-            this.newItem = {name: ''};
+            this.itemType = this.addItemData.itemType
+            this.newItem = { name: '' }
             if (this.resolve.init && this.resolve.init instanceof Function) {
-                this.resolve.init(this);
-                return;
+                this.resolve.init(this)
+                return
             }
             switch (this.itemType) {
                 case 'Document':
-                    this.displayName = "Document";
-                    break;
+                    this.displayName = 'Document'
+                    break
 
                 case 'View':
-                    this.displayName = "View";
-                    break;
+                    this.displayName = 'View'
+                    break
 
                 case 'Group':
-                    this.displayName = "Group";
-                    break;
+                    this.displayName = 'Group'
+                    break
 
                 case 'Branch':
                 case 'Tag':
-                    this.now = new Date();
-                    this.newItem.description = "";
-                    this.newItem.permission = "read";
-                    this.newItem.lastCommit = true;
-                    this.newItem.timestamp = this.now;
+                    this.now = new Date()
+                    this.newItem.description = ''
+                    this.newItem.permission = 'read'
+                    this.newItem.lastCommit = true
+                    this.newItem.timestamp = this.now
                     if (this.itemType === 'Branch') {
-                        this.displayName = "Branch";
-                    }else {
-                        this.displayName = "Tag";
+                        this.displayName = 'Branch'
+                    } else {
+                        this.displayName = 'Tag'
                     }
                     this.dateTimeOpts = {
                         enableTime: true,
@@ -237,257 +282,412 @@ let AddItemModalComponent: VeModalComponent = {
                         time_24hr: true,
                         maxDate: new Date(),
                         onClose: (selectedDates) => {
-                            this.updateTimeOpt();
-                            this.newItem.timestamp = selectedDates[0];
+                            this.updateTimeOpt()
+                            this.newItem.timestamp = selectedDates[0]
                         },
-                        inline: false
-                    };
-                    break;
+                        inline: false,
+                    }
+                    break
 
-                case "Org":
-                    this.displayName = "Org";
-                    break;
+                case 'Org':
+                    this.displayName = 'Org'
+                    break
 
                 default:
                     if (this.addType !== 'pe') {
-                        this.growl.warning("Add " + (this.addType === 'item') ? "Item" : "PE" + " of Type " + this.itemType + " is not supported");
+                        this.growl.warning(
+                            `Add ${
+                                this.addType === 'item'
+                                    ? 'Item'
+                                    : 'PE' +
+                                      ' of Type ' +
+                                      this.itemType +
+                                      ' is not supported'
+                            }`
+                        )
                     }
-                    break;
+                    break
             }
-
         }
 
-         public callback = (data) => {
+        public callback = (data: ElementObject) => {
             if (this.itemType === 'View') {
-                return this.addExistingView(data);
+                return this.addExistingView(data)
             } else if (this.addType === 'pe') {
-                return this.addExistingPe(data);
+                return this.addExistingPe(data)
             }
         }
 
-         public addExistingView = (view) => {
-            var viewId = view.id;
+        public addExistingView = (view: ViewObject) => {
+            const viewId = view.id
             if (this.resolve.getSeenViewIds[viewId]) {
-                this.growl.error("Error: View " + view.name + " is already in this document.");
-                return;
+                this.growl.error(
+                    'Error: View ' + view.name + ' is already in this document.'
+                )
+                return
             }
             if (this.oking) {
-                this.growl.info("Please wait...");
-                return;
+                this.growl.info('Please wait...')
+                return
             }
-            this.oking = true;
-            this.viewSvc.addViewToParentView({
-                parentViewId: this.parentData.id,
-                viewId: viewId,
-                projectId: this.parentData._projectId,
-                refId: this.parentData._refId,
-                aggr: this.addItemData.newViewAggr.type
-            }).then((data) => {
-                this.elementSvc.getElement({
-                    elementId: viewId,
-                    projectId: view._projectId,
-                    refId: view._refId
-                }, 2, false)
-                    .then((realView) => {
-                        this.modalInstance.close({$value: realView});
-                    },() => {
-                        this.modalInstance.close({$value: view});
-                    }).finally(() => {
-                    this.growl.success("View Added");
-                });
-            },(reason) => {
-                this.growl.error("View Add Error: " + reason.message);
-            }).finally(() => {
-                this.oking = false;
-            });
-        };
+            this.oking = true
+            this.viewSvc
+                .addViewToParentView({
+                    parentViewId: this.parentData.id,
+                    viewId: viewId,
+                    projectId: this.parentData._projectId,
+                    refId: this.parentData._refId,
+                    aggr: this.addItemData.newViewAggr.type,
+                })
+                .then(
+                    (data) => {
+                        this.elementSvc
+                            .getElement(
+                                {
+                                    elementId: viewId,
+                                    projectId: view._projectId,
+                                    refId: view._refId,
+                                },
+                                2,
+                                false
+                            )
+                            .then(
+                                (realView) => {
+                                    this.modalInstance.close({
+                                        $value: realView,
+                                    })
+                                },
+                                () => {
+                                    this.modalInstance.close({ $value: view })
+                                }
+                            )
+                            .finally(() => {
+                                this.growl.success('View Added')
+                            })
+                    },
+                    (reason) => {
+                        this.growl.error(`View Add Error: ${reason.message}`)
+                    }
+                )
+                .finally(() => {
+                    this.oking = false
+                })
+        }
 
-         public addExistingPe = (elementOb) => {
+        public addExistingPe = (elementOb) => {
             if (this.oking) {
-                this.growl.info("Please wait...");
-                return;
+                this.growl.info('Please wait...')
+                return
             }
-            this.oking = true;
-            var instanceVal = {
+            this.oking = true
+            const instanceVal = {
                 instanceId: elementOb.id,
-                type: "InstanceValue"
-            };
-            this.viewSvc.addElementToViewOrSection(this.addItemData.viewOrSectionOb, instanceVal, this.addItemData.addPeIndex)
-                .then((data) => {
-                    var elemType = this.itemType;
-                    this.utils.successUpdates(elemType, this.addItemData.viewOrSectionOb.id);
-                    this.modalInstance.close({$value: data});
-                }, (reason) => {
-                    this.growl.error(this.itemType +" Add Error: " + reason.message);
-                }).finally(() => {
-                this.oking = false;
-            });
-        };
+                type: 'InstanceValue',
+            }
+            this.viewSvc
+                .addElementToViewOrSection(
+                    this.addItemData.viewOrSectionOb,
+                    instanceVal,
+                    this.addItemData.addPeIndex
+                )
+                .then(
+                    (data) => {
+                        const elemType = this.itemType
+                        this.utils.successUpdates(
+                            elemType,
+                            this.addItemData.viewOrSectionOb.id
+                        )
+                        this.modalInstance.close({ $value: data })
+                    },
+                    (reason) => {
+                        this.growl.error(
+                            this.itemType + ' Add Error: ' + reason.message
+                        )
+                    }
+                )
+                .finally(() => {
+                    this.oking = false
+                })
+        }
 
-         public updateTimeOpt = () => {
-            this.newItem.lastCommit = false;
-        };
+        public updateTimeOpt = () => {
+            this.newItem.lastCommit = false
+        }
 
-
-        public queryFilter = (): {_appliedStereotypeIds?: string[], classifierIds?: string[]} => {
-            let filters: {_appliedStereotypeIds?: string[], classifierIds?: string[]} = {};
+        public queryFilter = (): {
+            _appliedStereotypeIds?: string[]
+            classifierIds?: string[]
+        } => {
+            const filters: {
+                _appliedStereotypeIds?: string[]
+                classifierIds?: string[]
+            } = {}
             if (this.addType === 'item') {
                 if (this.itemType === 'View') {
                     filters._appliedStereotypeIds = [
-                                this.schemaSvc.get('VIEW_SID', this.schema),
-                                this.schemaSvc.get('DOCUMENT_SID', this.schema),
-                                ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema)
-                            ]
-                }else {
+                        this.schemaSvc.get('VIEW_SID', this.schema),
+                        this.schemaSvc.get('DOCUMENT_SID', this.schema),
+                        ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema),
+                    ]
+                } else {
                     return filters
                 }
             } else if (this.addType === 'pe') {
                 if (this.itemType === 'Table') {
-                    filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','TableT',this.schema), this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Table',this.schema)];
+                    filters.classifierIds = [
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'TableT',
+                            this.schema
+                        ),
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'Table',
+                            this.schema
+                        ),
+                    ]
                 } else if (this.itemType === 'List') {
-                    filters.classifierIds  = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','ListT',this.schema), this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','List',this.schema)];
+                    filters.classifierIds = [
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'ListT',
+                            this.schema
+                        ),
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'List',
+                            this.schema
+                        ),
+                    ]
                 } else if (this.itemType === 'Image') {
-                    filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','ImageT',this.schema), this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Image',this.schema)];
+                    filters.classifierIds = [
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'ImageT',
+                            this.schema
+                        ),
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'Image',
+                            this.schema
+                        ),
+                    ]
                 } else if (this.itemType === 'Paragraph') {
-                    filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','ParagraphT',this.schema), this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Paragraph',this.schema)];
+                    filters.classifierIds = [
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'ParagraphT',
+                            this.schema
+                        ),
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'Paragraph',
+                            this.schema
+                        ),
+                    ]
                 } else if (this.itemType === 'Section') {
-                    filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','SectionT',this.schema), this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Section',this.schema)];
+                    filters.classifierIds = [
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'SectionT',
+                            this.schema
+                        ),
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            'Section',
+                            this.schema
+                        ),
+                    ]
                 } else {
-                    filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID',this.itemType,this.schema)];
+                    filters.classifierIds = [
+                        this.schemaSvc.getValue(
+                            'TYPE_TO_CLASSIFIER_ID',
+                            this.itemType,
+                            this.schema
+                        ),
+                    ]
                 }
             }
             return filters
         }
 
-         public ok = (): void => {
+        public ok = (): void => {
             if (this.oking) {
-                this.growl.info("Please wait...");
-                return;
+                this.growl.info('Please wait...')
+                return
             }
-            this.oking = true;
-            let loginCb = (result?: any) => {
+            this.oking = true
+            const loginCb = (result?: any) => {
                 if (result) {
-                    this.$element.empty();
-                    this.$element.append(this.$componentEl);
-                    this.$compile(this.$componentEl)(this.$scope.$new());
-                    this.ok();
-                }else {
-                    reject({code: 666, message: "User not Authenticated"})
-                }
-            }
-            let reLogin = () => {
-                let tempInstance: angular.ui.bootstrap.IModalInstanceService = {
-                    closed: undefined,
-                    opened: undefined,
-                    rendered: undefined,
-                    result: undefined,
-                    close: loginCb,
-                    dismiss: loginCb
-                }
-                this.$componentEl = this.$element.children();
-                this.$element.empty();
-                let modalResolve: VeModalResolve = {
-                    continue: true
-                }
-                const $loginEl = $('<login-modal modal-instance="modalInstance" resolve="resolve"></login-modal>')
-                this.$element.append($loginEl);
-                this.$compile($loginEl)(Object.apply(this.$scope.$new(true),{ modalInstance: tempInstance, resolve: modalResolve}));
-            }
-            let resolve = (data: MmsObject): void => {
-                if (this.addType === 'pe') {
-                    var elemType = this.itemType;
-                    this.utils.successUpdates(elemType, this.addItemData.viewOrSectionOb.id);
+                    this.$element.empty()
+                    this.$element.append(this.$componentEl)
+                    this.$compile(this.$componentEl)(this.$scope.$new())
+                    this.ok()
                 } else {
-                    this.growl.success(this.displayName + " is being created");
+                    reject({ code: 666, message: 'User not Authenticated' })
+                }
+            }
+            const reLogin = () => {
+                const tempInstance: angular.ui.bootstrap.IModalInstanceService =
+                    {
+                        closed: undefined,
+                        opened: undefined,
+                        rendered: undefined,
+                        result: undefined,
+                        close: loginCb,
+                        dismiss: loginCb,
+                    }
+                this.$componentEl = this.$element.children()
+                this.$element.empty()
+                const modalResolve: VeModalResolve = {
+                    continue: true,
+                }
+                const $loginEl = $(
+                    '<login-modal modal-instance="modalInstance" resolve="resolve"></login-modal>'
+                )
+                this.$element.append($loginEl)
+                this.$compile($loginEl)(
+                    Object.apply(this.$scope.$new(true), {
+                        modalInstance: tempInstance,
+                        resolve: modalResolve,
+                    })
+                )
+            }
+            const resolve = (data: MmsObject): void => {
+                if (this.addType === 'pe') {
+                    const elemType = this.itemType
+                    this.utils.successUpdates(
+                        elemType,
+                        this.addItemData.viewOrSectionOb.id
+                    )
+                } else {
+                    this.growl.success(this.displayName + ' is being created')
                 }
                 if (this.itemType === 'Tag') {
-                    this.growl.info('Please wait for a completion email prior to viewing of the tag.');
+                    this.growl.info(
+                        'Please wait for a completion email prior to viewing of the tag.'
+                    )
                 }
-                this.modalInstance.close({$value: data});
+                this.modalInstance.close({ $value: data })
             }
-            let reject = (reason) => {
+            const reject = (reason) => {
                 if (reason.code === 401) {
-                    reLogin();
-                }else {
-                    this.growl.error("Create " + this.displayName + " Error: " + reason.message);
+                    reLogin()
+                } else {
+                    this.growl.error(
+                        'Create ' +
+                            this.displayName +
+                            ' Error: ' +
+                            reason.message
+                    )
                 }
             }
-            let last = () => {
-                this.oking = false;
-            };
-            const ownerId = (this.parentData) ? this.parentData.id : "holding_bin_" + this.projectId
+            const last = () => {
+                this.oking = false
+            }
+            const ownerId = this.parentData
+                ? this.parentData.id
+                : 'holding_bin_' + this.projectId
             if (this.resolve.finalize) {
-                this.resolve.finalize().then(resolve,reject,last);
+                this.resolve.finalize().then(resolve, reject, last)
             }
             // Item specific promises:
             else if (this.itemType === 'Document') {
-                this.viewSvc.createDocument({
-                    _projectId: this.projectId,
-                    _refId: this.refId,
-                    id: ownerId
-                }, {
-                    name: this.newItem.name,
-                    id: this.utilsSvc.createMmsId(),
-                    isDoc: true,
-                    _projectId: this.projectId,
-                    _refId: this.refId,
-                    type: "Class"
-                }).then(resolve,reject,last);
+                this.viewSvc
+                    .createDocument(
+                        {
+                            _projectId: this.projectId,
+                            _refId: this.refId,
+                            id: ownerId,
+                        },
+                        {
+                            name: this.newItem.name,
+                            id: this.utilsSvc.createMmsId(),
+                            isDoc: true,
+                            _projectId: this.projectId,
+                            _refId: this.refId,
+                            type: 'Class',
+                        }
+                    )
+                    .then(resolve, reject, last)
             } else if (this.itemType === 'View') {
-                this.addItemData.newViewAggr.type = "composite";
-                this.viewSvc.createView(this.parentData, {
-                    id: this.utilsSvc.createMmsId(),
-                    name: this.newItem.name,
-                    _projectId: this.projectId,
-                    _refId: this.refId,
-                    type: "Class"
-                }).then(resolve,reject,last);
-            } else if (this.itemType === 'Group') {
-                this.viewSvc.createGroup(this.newItem.name,
-                    {
+                this.addItemData.newViewAggr.type = 'composite'
+                this.viewSvc
+                    .createView(this.parentData, {
+                        id: this.utilsSvc.createMmsId(),
+                        name: this.newItem.name,
                         _projectId: this.projectId,
                         _refId: this.refId,
-                        id: ownerId
-                    }, this.orgId
-                ).then(resolve,reject,last);
-            } else if ((this.itemType === 'Branch' || this.itemType === 'Tag') && this.newItem.name !== '') {
-                    let refObj: RefObject = {
-                        name: this.newItem.name,
-                        type: this.itemType,
-                        _projectId: this.projectId,
-                        description: this.newItem.description,
-                        parentRefId: this.addItemData.createParentRefId,
-                        permission: this.newItem.permission,
-                        id: this.applicationSvc.createUniqueId(),
-                        parentCommitId: null
-                    };
-                    if (!this.newItem.lastCommit) {
-                        // Make call to history?maxTimestamp to get closest commit id to branch off
-                        let ts = this.resolve.getFilter('date')(this.newItem.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ');
-                        this.projectSvc.getRefHistory(refObj.parentRefId, this.projectId, ts)
-                            .then((commits:CommitObject[]) => {
-                                refObj.parentCommitId = commits[0].id;
-                                this.projectSvc.createRef( refObj, this.projectId ).then(resolve,reject,last);
-                            });
-                    } else {
-                        this.projectSvc.createRef( refObj, this.projectId ).then(resolve,reject,last);
-                    }
+                        type: 'Class',
+                    })
+                    .then(resolve, reject, last)
+            } else if (this.itemType === 'Group') {
+                this.viewSvc
+                    .createGroup(
+                        this.newItem.name,
+                        {
+                            _projectId: this.projectId,
+                            _refId: this.refId,
+                            id: ownerId,
+                        },
+                        this.orgId
+                    )
+                    .then(resolve, reject, last)
+            } else if (
+                (this.itemType === 'Branch' || this.itemType === 'Tag') &&
+                this.newItem.name !== ''
+            ) {
+                const refObj: RefObject = {
+                    name: this.newItem.name,
+                    type: this.itemType,
+                    _projectId: this.projectId,
+                    description: this.newItem.description,
+                    parentRefId: this.addItemData.createParentRefId,
+                    permission: this.newItem.permission,
+                    id: this.applicationSvc.createUniqueId(),
+                    parentCommitId: null,
+                }
+                if (!this.newItem.lastCommit) {
+                    // Make call to history?maxTimestamp to get closest commit id to branch off
+                    const ts = this.resolve.getFilter('date')(
+                        this.newItem.timestamp,
+                        'yyyy-MM-ddTHH:mm:ss.sssZ'
+                    )
+                    this.projectSvc
+                        .getRefHistory(refObj.parentRefId, this.projectId, ts)
+                        .then((commits: CommitObject[]) => {
+                            refObj.parentCommitId = commits[0].id
+                            this.projectSvc
+                                .createRef(refObj, this.projectId)
+                                .then(resolve, reject, last)
+                        })
+                } else {
+                    this.projectSvc
+                        .createRef(refObj, this.projectId)
+                        .then(resolve, reject, last)
+                }
             } else if (this.addType === 'pe') {
-                this.viewSvc.createInstanceSpecification(this.addItemData.viewOrSectionOb, this.itemType, this.newItem.name, this.addItemData.addPeIndex).then(resolve,reject,last);
-            }
-            else {
-                this.growl.error("Add Item of Type " + this.itemType + " is not supported");
-                this.oking = false;
-                return;
+                this.viewSvc
+                    .createInstanceSpecification(
+                        this.addItemData.viewOrSectionOb,
+                        this.itemType,
+                        this.newItem.name,
+                        this.addItemData.addPeIndex
+                    )
+                    .then(resolve, reject, last)
+            } else {
+                this.growl.error(
+                    'Add Item of Type ' + this.itemType + ' is not supported'
+                )
+                this.oking = false
+                return
             }
         }
 
         public cancel() {
-            this.modalInstance.dismiss();
+            this.modalInstance.dismiss()
         }
-
-
-    }
+    },
 }
 
-veApp.component(AddItemModalComponent.selector, AddItemModalComponent);
+veApp.component(AddItemModalComponent.selector, AddItemModalComponent)

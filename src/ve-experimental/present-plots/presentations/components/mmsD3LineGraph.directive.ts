@@ -2,11 +2,11 @@
 /*
 (function() {
 
- veExt.directive('mmsLineGraph', ['PlotService', '$window', '$q', '$log', mmsLineGraph]);
+ veComponents.directive('mmsLineGraph', ['PlotService', '$window', '$q', '$log', mmsLineGraph]);
 
   /**
    * @ngdoc directive
-   * @name veExt.directive:mmsLineGraph
+   * @name veComponents.directive:mmsLineGraph
    * @restrict EA
    * @scope
    * @param {string} eid Element ID or comma separated IDs to table elements
@@ -128,12 +128,12 @@
       xData, yData,                     // column data
       xColHeads, yColHeads;             // column headers
 
-  
+
     //Generate C3 configurations for the table
     function generateGraphSettings(scope, projectId, refId, commitId) {
       var deferred = $q.defer();
 
-    
+
       var promises = [];
       var eids = scope.eid.split(',').map(function (val) {
         return val.trim();
@@ -150,7 +150,7 @@
         var reqOb = {elementId: eid, projectId: projectId, refId: refId, commitId: commitId};
         promises.push(PlotService.readTableCols(reqOb));
       });
-  
+
       // Collect column settings
       if (scope.xCols) {
         xCols = scope.xCols;
@@ -546,13 +546,13 @@
 
         function logGridSect(logFn, powFn, num, powStart, powEnd) {
           var grids = [], grid;
-          var diff, gridInt, gridPos, startTick, endTick;
+          var diff-merge, gridInt, gridPos, startTick, endTick;
           startTick = powFn(powStart);
           endTick = powFn(powEnd);
-          diff = endTick - startTick;
-          gridInt = diff / num;
+          diff-merge = endTick - startTick;
+          gridInt = diff-merge / num;
           // $log.log("Draw lines from pow("+powStart+")/"+startTick+" to pow("+powEnd+")/"+endTick);
-          // $log.log("diff: " + diff);
+          // $log.log("diff-merge: " + diff-merge);
           // $log.log("tickInt: " + tickInt);
           for (gridPos = startTick; gridPos < endTick; gridPos += gridInt) {
             grids.push(logGridLine(gridPos, className, gridLabel));
@@ -585,7 +585,7 @@
       var projectId;
       var refId;
       var commitId;
-          
+
       if (mmsViewCtrl) {
         var viewVersion = mmsViewCtrl.getElementOrigin();
         if (!projectId)

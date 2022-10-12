@@ -2,7 +2,7 @@ import * as angular from "angular";
 import Rx from 'rx-lite';
 import {StateService, TransitionService, UIRouter, UIRouterGlobals} from "@uirouter/angularjs";
 import {ProjectService, AuthService} from "@ve-utils/mms-api-client";
-import {EventService, RootScopeService} from "@ve-utils/core-services";
+import {EventService, RootScopeService} from "@ve-utils/services";
 import {ngStorage} from "ngstorage";
 import {VeComponentOptions} from "@ve-types/view-editor";
 

@@ -31,8 +31,8 @@ import "../lib/angular-flatpickr/ngFlatpickr.main"
 import '../lib/html-rendered-diff/index';
 
 //VE Modules
-import "@ve-core"
-import "@ve-ext"
+import "@ve-components"
+import "@ve-components"
 import "@ve-utils"
 
 import "./ve-app.module";

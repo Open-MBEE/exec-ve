@@ -1,29 +1,29 @@
 import * as jQuery from 'jquery';
 
 jQuery.fn.table2CSV = (inputOptions) => {
-    var options = jQuery.extend({
+    const options = jQuery.extend({
         separator: ',',
         header: [],
         delivery: 'popup' // popup, value
     },
     inputOptions);
 
-    let csvData = [];
+    const csvData = [];
     const el = this;
 
     const handleMatrix = (bodyTag: string, cellTag: string) => {
         const spanData = {}; //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
-        let curRow: number = 0;
+        let curRow = 0;
         $(el).children(bodyTag).children('tr').each((index, element) => {
             tmpRow = [];
-            var curCol = 0;
+            let curCol = 0;
             $(element).children(cellTag).each((index, element) => {
                 while(spanData[curRow] && spanData[curRow][curCol]) {
                     tmpRow.push('""');
                     curCol++;
                 }
                 tmpRow.push(formatData($(element).text()));
-                var rowstring = $(element).attr('rowspan');
+                const rowstring = $(element).attr('rowspan');
                 if (rowspan) {
                     var rowspan = parseInt(rowstring);
                     if (rowspan > 1) {
@@ -35,12 +35,12 @@ jQuery.fn.table2CSV = (inputOptions) => {
                         }
                     }
                 }
-                var colstring = $(element).attr('colspan');
+                const colstring = $(element).attr('colspan');
                 if (!colstring){
                     curCol++;
                     return;
                 }
-                var colspan = parseInt(colstring);
+                let colspan = parseInt(colstring);
                 while (colspan > 1) {
                     curCol++;
                     tmpRow.push('""');
@@ -59,7 +59,7 @@ jQuery.fn.table2CSV = (inputOptions) => {
     }
 
     //header
-    var numCols = options.header.length;
+    const numCols = options.header.length;
     var tmpRow = [];
     if (numCols > 0) {
         for (let i = 0; i < numCols; i++) {
@@ -70,7 +70,7 @@ jQuery.fn.table2CSV = (inputOptions) => {
     }
     // actual data
     handleMatrix('tbody', 'td');
-    var mydata = csvData.join('\n');
+    const mydata = csvData.join('\n');
     if (options.delivery == 'popup') {
         return popup(mydata);
     } else {
@@ -78,20 +78,20 @@ jQuery.fn.table2CSV = (inputOptions) => {
     }
 
     function row2CSV(tmpRow) {
-        var tmp = tmpRow.join(''); // to remove any blank rows
+        const tmp = tmpRow.join(''); // to remove any blank rows
         if (tmpRow.length > 0 && tmp != '') {
-            var mystr = tmpRow.join(options.separator);
+            const mystr = tmpRow.join(options.separator);
             csvData[csvData.length] = mystr;
         }
     }
     function formatData(input) {
         // replace " with “
-        var regexp = new RegExp(/["]/g);
-        var output = input.replace(regexp, "“");
+        const regexp = new RegExp(/["]/g);
+        let output = input.replace(regexp, "“");
         //HTML
         // var regexp = new RegExp(/\<[^\<]+\>/g);
         // var output = output.replace(regexp, "");
-        var i = output.search(/\S/); //index of first non whitespace char
+        const i = output.search(/\S/); //index of first non whitespace char
         if (i > 0) {
             output = '_'.repeat(i) + $.trim(output);
         }
@@ -103,7 +103,7 @@ jQuery.fn.table2CSV = (inputOptions) => {
         return '"' + output + '"';
     }
     function popup(data) {
-        var generator = window.open('', 'csv', 'height=400,width=600');
+        const generator = window.open('', 'csv', 'height=400,width=600');
         generator.document.write('<html><head><title>CSV</title>');
         generator.document.write('</head><body >');
         generator.document.write('<textArea cols=70 rows=15 wrap="off" >');

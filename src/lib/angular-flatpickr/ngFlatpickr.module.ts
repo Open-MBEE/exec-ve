@@ -1,10 +1,10 @@
 import angular from 'angular';
 import * as _flatpickr from 'flatpickr';
 import { FlatpickrFn, Instance } from 'flatpickr/dist/types/instance';
-import { VeComponentOptions } from 'src/ve-utils/types/view-editor';
+import { VeComponentOptions } from '@ve-types/view-editor';
 const flatpickr: FlatpickrFn = _flatpickr.default;
 
-var ngFlatpickrComponent: VeComponentOptions = {
+const ngFlatpickrComponent: VeComponentOptions = {
     selector: 'ngFlatpickr',
     template: `
     <ng-transclude>

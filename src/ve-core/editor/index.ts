@@ -1,15 +1,15 @@
 //Services
-import "./VeEditor.service"
-import "./Mention.service"
+import "./services"
+export * from "./services"
+
 //Components
-import "./mention.component"
-import "./mentionIntercept.component"
+import "./components/mention.component"
+import "./components/mentionIntercept.component"
 import "./ve-editor.component"
 
 //Modals
-import "./modals/transclude-modal.component"
-import "./modals/comment-modal.component"
+import "./modals"
+export * from "./modals";
 
-export * from "./VeEditor.service";
-export * from "./Mention.service";
+
 

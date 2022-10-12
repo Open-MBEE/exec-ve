@@ -12,8 +12,8 @@ import {
     RootScopeService,
     ShortenUrlService,
     UtilsService
-} from '@ve-utils/core-services'
-import {IButtonBarButton, ButtonBarApi, ButtonBarService,} from '@ve-utils/button-bar'
+} from '@ve-utils/services'
+import {IButtonBarButton, ButtonBarApi, ButtonBarService,} from '@ve-core/button-bar'
 import {handleChange} from '@ve-utils/utils'
 import {VeComponentOptions} from '@ve-types/view-editor'
 import {ContentWindowService} from "@ve-app/pane-center/services/ContentWindow.service";

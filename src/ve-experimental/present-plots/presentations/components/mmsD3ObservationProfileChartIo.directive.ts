@@ -1,10 +1,10 @@
 //not usable using stereotype <<Plot>> in mdk so commented out for now.
 /*
-veExt.directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService', 'PlotService', '$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
+veComponents.directive('mmsD3ObservationProfileChartIo', ['ElementService', 'UtilsService', 'PlotService', '$compile', 'growl','$window', mmsD3ObservationProfileChartIo]);
 function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotService, $compile, growl, $window) {
-      
+
   var mmsChartLink = function(scope, element, attrs, mmsViewCtrl) {
-      
+
     var reversed = false;
     if (scope.reversed !== undefined)
       reversed = Boolean(scope.reversed);
@@ -12,19 +12,19 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
     var userdefinedColor = [];
     if (scope.color !== undefined)
       userdefinedColor = scope.color.split(",");
-   
-    scope.rowHeaders=[]; //not null when render is called 1st time.      
-    var d3 = $window.d3;  
+
+    scope.rowHeaders=[]; //not null when render is called 1st time.
+    var d3 = $window.d3;
     var svg = d3.select(element[0])
       .append('div')
       .append("svg:svg")
       .attr("class", "obpchart");
-        
+
     var processed = false;
     var projectId;
     var refId;
     var commitId;
-          
+
     if (mmsViewCtrl) {
         var viewVersion = mmsViewCtrl.getElementOrigin();
         if (!projectId)
@@ -61,7 +61,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
               }
           }
       }
- 
+
       var gap = 15; //10/15 is width of line = actual gap is 5
       var gapG =15; //gap between Group
       //var height = (lineHeight + gap + (columnHeaderLabels.length * gapG)) * zData.dataseries.length;
@@ -70,7 +70,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
 
       //based on right or left labels
       var bottomLabelHeight = (lineHeight + gap )*Math.max(zData.dataseries.length, 3);
-      
+
       var d3colorR = d3.scale.category10().range();
 
       function getColor(d, i){
@@ -79,12 +79,12 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       //for 4 On and 4 StandBy colors
       //var colorS = ["#67001f", "#d6604d", "#4393c3", "#053061"];
       //var colorO = ["#f4a582", "#fddbc7", "#d1e5f0", "#92c5de"];
-      
+
       //Support 8 On colors and 2 Standby Colors
       //var colorS = ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#053061", "#2166ac", "#4393c3", "#92c5de"];
       //var colorO = ["#fddbc7", "#fddbc7", "#fddbc7", "#fddbc7", "#d1e5f0", "#d1e5f0", "#d1e5f0", "#d1e5f0"];
       //var colorW = "#f7f7f7";
- 
+
       var svg = d3.select(".obpchart")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + bottomLabelHeight + 1 * gapG + margin.bottom); //gapG for label
@@ -110,7 +110,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       })
       .each(function(d, i) {
           this.setAttribute("class", d);
-          
+
           d3.select(this).append("text")
               .attr("class", "leftLabel")
               .attr("x", -10)
@@ -127,9 +127,9 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
               this.setAttribute("class",d.name);
               //linecolorOn=d3color(i % zData.dataseries.length);
               linecolorOn=getColor(d,i);
-             
+
               //for (dict of d.value) {
-              for ( var k = 0; k < d.value.length; k++){    
+              for ( var k = 0; k < d.value.length; k++){
                   var dict = d.value[k];
                   if (dict.name === this.parentNode.getAttribute("class")) {
                       for (var j = 0; j < dict.states.length; j++) {
@@ -144,11 +144,11 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
                             lineopacity = 0.3;
                             //linecolor = colorO[i];
                             //lineopacity = 1;
-                            
+
                           }
                           else { //on
                             lineopacity = 1;
-                            linecolor = linecolorOn;  
+                            linecolor = linecolorOn;
                             //linecolor = colorS[i];
                           }
                           d3.select(this).append("line")
@@ -166,7 +166,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
                   }
               });
           });
-   
+
       var y = d3.scale.linear().range([height + gapG, 0]); //length of y-axis
       var yAxis = d3.svg.axis()
         .scale(y)
@@ -194,11 +194,11 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       .attr("stroke-dasharray", "10,5")
       .call(yAxis);
 
-      //label on top of axis for each zone = 1,2,3,4,5... 
+      //label on top of axis for each zone = 1,2,3,4,5...
       svg.selectAll(".label")
       .data(zData.axisTopLabels.values)
       .enter().append("g")
-      .attr("transform", function(d,i){ 
+      .attr("transform", function(d,i){
         return  "translate(" + (margin.left +xticks[i]) + "," + (margin.axisTop-5) + ")"; //top
         //return  "translate(" + (margin.left + xticks[i]) + "," + ((zData.rowValue.length + 1.5)* gap  + margin.top)   + ")";
       })
@@ -207,12 +207,12 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       .text(function(d,i) {
           return d;
       });
-   
-       //label on bottom of axis for each zone = 66k, 40k, ... AltitudeMax values 
+
+       //label on bottom of axis for each zone = 66k, 40k, ... AltitudeMax values
        svg.selectAll(".label2")
       .data(zData.axisBottomLabels.values)
       .enter().append("g")
-      .attr("transform", function(d,i){ 
+      .attr("transform", function(d,i){
         return  "translate(" + (margin.left +xticks[i]-5) + "," + (margin.axisTop+15) + ")"; //top
         //return  "translate(" + (margin.left + xticks[i]) + "," + ((zData.rowValue.length + 1.5)* gap  + margin.top)   + ")";
       })
@@ -227,7 +227,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
         .call(xAxis)
         //.attr("transform", "translate(" + margin.left + "," + (zData.rowValue.length * gap  + margin.top)  + ")"); //bottom
         .attr("transform", "translate(" + margin.left + "," + margin.axisTop + ")");//top
-  
+
       //label to top axis
      svg.append("g").append("text")
      .attr("transform", "translate(" + margin.left + "," + (margin.axisTop +10) +")")//top
@@ -235,7 +235,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
      .text(zData.axisBottomLabels.name)
      .attr("x", -10)
      .attr("dy", ".35em");
-   
+
       //label to top axis
       svg.append("g")
       .append("text")
@@ -245,12 +245,12 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       .attr("x", -10)
       .attr("dy", ".35em");
 
-        
+
       //label for bottom label = tablename
       svg.selectAll(".bottomLabelText")
         .data(zData.dataseries)
         .enter().append("g")
-        .attr("transform", function(d,i){ 
+        .attr("transform", function(d,i){
           return   "translate(" + (margin.left/3*7+5) + "," + (margin.top + height + 2* gapG + 2*lineHeight + i*gap) + ")";
         })
       .attr("class", "bottomLabel")
@@ -263,10 +263,10 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       svg.selectAll(".bottomShadingLabelText")
       .data(["On(3)", "Standby(2)", "Off(1)"])
       .enter().append("g")
-      .attr("transform", function(d,i){ 
+      .attr("transform", function(d,i){
         if ( i === 2)
           return "translate(" + (margin.left + margin.left/3*3) + "," + (margin.top + height + 2* gapG + lineHeight/2) + ")";
-        else  
+        else
           return "translate(" + (margin.left + margin.left/3*i) + "," + (margin.top + height + 2* gapG + lineHeight/2) + ")";
       })
       //.attr("class", "bottomLabel")
@@ -274,11 +274,11 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       .attr("class", "bottomShadingLabelText")
       .text(function(d){return d;});
 
-        //bottom label left 
+        //bottom label left
         svg.selectAll(".bottomLabelColoredLine")
           .data(zData.dataseries)
           .enter().append("g")
-          .attr("transform", function(d,i){ 
+          .attr("transform", function(d,i){
            return   "translate(" + margin.left + "," + (margin.top + height + 2* gapG + (i *gap) + lineHeight) + ")";
           })
           .append("rect")
@@ -291,7 +291,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
            svg.selectAll(".bottomLabelColoredLine")
           .data(zData.dataseries)
           .enter().append("g")
-          .attr("transform", function(d,i){ 
+          .attr("transform", function(d,i){
            return   "translate(" + (margin.left + margin.left/3)+ "," + (margin.top + height + 2* gapG + (i *gap) + lineHeight) + ")";
           })
           .append("rect")
@@ -307,7 +307,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
           svg.selectAll(".bottomLabelColoredLine")
           .data(zData.dataseries)
           .enter().append("g")
-          .attr("transform", function(d,i){ 
+          .attr("transform", function(d,i){
            return   "translate(" + (margin.left + margin.left/3*3 )+ "," + (margin.top + height + 2* gapG + (i *gap) + lineHeight) + ")";
           })
           .append("rect")
@@ -330,7 +330,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       var axisTopLabels = [];
       var axisZoneLength =[];
 
-      
+
       for ( var k = 0; k < scope.datavalues.length; k++){
         dataValuesPerTable = scope.datavalues[k];
         states = [];
@@ -353,9 +353,9 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
             }
             states.push(eachStates);
         }//end of for loop i
-        
+
         dataseries= [];
-        if ( reversed){     
+        if ( reversed){
           states = transpose(states);
           for (i = 1; i < scopetableColumnHeadersLabel[k].length; i++){
             dataseries.push({name: scopetableColumnHeadersLabel[k][i], states: states[i]});
@@ -368,7 +368,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
             }
           }
         }
-        else { 
+        else {
           for (i = 1; i < dataValuesPerTable.length; i++){
             dataseries.push({name: scope.tableRowHeaders[k][i].name, states: states[i]});
           }
@@ -383,32 +383,32 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
         }
         if (userdefinedColor.length !== 0 && userdefinedColor[k] !== undefined)
           groupedDataSeries.push({name: scopeTableTitles[k], color: userdefinedColor[k].trim(), value: dataseries});
-        else  
+        else
           groupedDataSeries.push({name: scopeTableTitles[k], value: dataseries});
 
         //axisBottomLabels must be Number
         if ( k === 0 ){
           var xmin = Math.min.apply(Math, axisBottomLabels);
 
-          var diff = [];
+          var diff-merge = [];
           var middleIndex = Math.floor(axisBottomLabels.length/2);
-          
+
           for( i = 0; i < axisBottomLabels.length; i++){
             if ( i < middleIndex){
-               diff.push(Number(axisBottomLabels[i]) - Number(axisBottomLabels[i+1]));
+               diff-merge.push(Number(axisBottomLabels[i]) - Number(axisBottomLabels[i+1]));
             }
             else if ( i == middleIndex){
-              diff.push( Number(axisBottomLabels[middleIndex]));
+              diff-merge.push( Number(axisBottomLabels[middleIndex]));
             }
-            else {//i > middleIndex  
-              diff.push(Number(axisBottomLabels[i]) - Number(axisBottomLabels[i-1]));
+            else {//i > middleIndex
+              diff-merge.push(Number(axisBottomLabels[i]) - Number(axisBottomLabels[i-1]));
             }
           }
-          
-          var diffMin = Math.min.apply(Math, diff);
-          for ( i = 0; i < diff.length; i++){
-              //temp.push(Math.log(diff[i]/diffMin) + 0.5);
-              axisZoneLength.push(Math.log(diff[i]/diffMin) + 0.5);
+
+          var diffMin = Math.min.apply(Math, diff-merge);
+          for ( i = 0; i < diff-merge.length; i++){
+              //temp.push(Math.log(diff-merge[i]/diffMin) + 0.5);
+              axisZoneLength.push(Math.log(diff-merge[i]/diffMin) + 0.5);
           }
           //use fommat("s") for axisBottomLabel
           for( i = 0; i < axisBottomLabels.length; i++){
@@ -417,7 +417,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
         }
 
       } //end of for loop k
-      
+
       var modelData = {
          "axisTopLabels": {"name": "Zone", "values":axisTopLabels},
          "axisBottomLabels": {"name": axisBottomLabelTitle, "values": axisBottomLabels},
@@ -425,7 +425,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
          "dataseries" : groupedDataSeries
       };
       /*var dummyData = {
-        
+
         "axisTopLabels":{ "name": "zZones", "values":[
                     "1a",
                     "2",
@@ -498,7 +498,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
       };*//*
       obpchartPlot(modelData);
     };//end of render
- 
+
     scope.$watch('datavalues', function(newVals, oldVals) {
         return scope.render();
     }, true);

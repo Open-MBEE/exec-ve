@@ -6,20 +6,20 @@ import {
     ProjectService
 } from "@ve-utils/mms-api-client"
 import {
-    EditService,
+    AutosaveService,
     EventService,
     RootScopeService
-} from "@ve-utils/core-services";
-import {CoreUtilsService} from "@ve-core/core";
-import {ToolbarService} from 'src/ve-extensions/spec-tools/services/Toolbar.service';
-import {SpecApi, SpecService} from "@ve-ext/spec-tools";
+} from "@ve-utils/services";
+import {CoreUtilsService} from "@ve-core/services";
+import {ToolbarService} from '@ve-core/tool-bar';
+import {SpecApi, SpecService} from "@ve-components/spec-tools";
 import {VeComponentOptions, VeModalService} from "@ve-types/view-editor";
 
 import {veApp} from "@ve-app";
-import {ElementObject, ElementsRequest} from "@ve-types/mms";
+import {ElementObject} from "@ve-types/mms";
 
 
-let RightPaneComponent: VeComponentOptions = {
+const RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
     template: `
     <div class="pane-right">
@@ -63,14 +63,14 @@ let RightPaneComponent: VeComponentOptions = {
 
         static $inject = ['$scope', '$uibModal', '$q', '$timeout', 'hotkeys', 'growl',
             'ElementService', 'ProjectService', 'CoreUtilsService', 'PermissionsService', 'RootScopeService', 'EventService',
-            'EditService', 'ToolbarService', 'SpecService']
+            'AutosaveService', 'ToolbarService', 'SpecService']
 
         constructor(private $scope, private $uibModal: VeModalService,
                     private $q: angular.IQService, private $timeout: angular.ITimeoutService,
                     private hotkeys: angular.hotkeys.HotkeysProvider, private growl: angular.growl.IGrowlService,
                     private elementSvc: ElementService, private projectSvc: ProjectService, private utils: CoreUtilsService,
                     private permissionsSvc: PermissionsService, private rootScopeSvc: RootScopeService,
-                    private eventSvc: EventService, private editSvc: EditService, private toolbarSvc: ToolbarService,
+                    private eventSvc: EventService, private autosaveSvc: AutosaveService, private toolbarSvc: ToolbarService,
                     private specSvc: SpecService) {
         }
 

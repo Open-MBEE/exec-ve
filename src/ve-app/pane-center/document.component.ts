@@ -13,9 +13,9 @@ import {
     RootScopeService,
     ShortenUrlService,
     UtilsService,
-} from "@ve-utils/core-services";
+} from "@ve-utils/services";
 import {AppUtilsService} from "@ve-app/main/services";
-import {IButtonBarButton, ButtonBarApi, ButtonBarService} from "@ve-utils/button-bar";
+import {IButtonBarButton, ButtonBarApi, ButtonBarService} from "@ve-core/button-bar";
 import {StateService} from '@uirouter/angularjs';
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {ElementObject, ViewObject} from "@ve-types/mms";

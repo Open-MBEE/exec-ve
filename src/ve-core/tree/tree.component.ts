@@ -6,11 +6,10 @@ import {
     EventService,
     RootScopeService,
     UtilsService
-} from "@ve-utils/core-services";
+} from "@ve-utils/services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {TreeBranch, TreeIcons, TreeOptions, TreeRow} from "@ve-types/tree";
-import {TreeApi} from "@ve-core/tree/Tree.api";
-import {TreeService} from "@ve-core/tree";
+import {TreeApi, TreeService} from "@ve-core/tree";
 
 import {veCore} from "@ve-core";
 /**
@@ -154,12 +153,12 @@ class TreeController implements angular.IComponentController {
 
         if (!this.options.expandLevel && this.options.expandLevel !== 0)
             this.options.expandLevel = 1;
-        let expand_level = this.options.expandLevel;
+        const expand_level = this.options.expandLevel;
 
         this.subs.push(this.eventSvc.$on('tree-get-branch-element', (data: {id: string, treeId: string}) => {
             if (data.treeId === this.treeApi.treeConfig.id) {
                 this.$timeout(() => {
-                    var el = $('#tree-branch-' + data.id);
+                    const el = $('#tree-branch-' + data.id);
                     if (!el.isOnScreen() && el.get(0) !== undefined) {
                         el.get(0).scrollIntoView();
                     }
@@ -176,7 +175,7 @@ class TreeController implements angular.IComponentController {
             b.expanded = b.level <= expand_level;
         });
 
-    };
+    }
 
     $onDestroy() {
             this.eventSvc.destroy(this.subs);
@@ -190,13 +189,13 @@ class TreeController implements angular.IComponentController {
         if (e) {
             e.stopPropagation();
         }
-        let promise = (branch.expanded) ? this.treeApi.closeBranch(branch) : this.treeApi.expandBranch(branch)
+        const promise = (branch.expanded) ? this.treeApi.closeBranch(branch) : this.treeApi.expandBranch(branch)
         promise.then(() => {
 
             branch.loading = false;
             //this.$scope.$apply();
         })
-    };
+    }
 
     public userClicksBranch(branch: TreeBranch) {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
@@ -205,7 +204,7 @@ class TreeController implements angular.IComponentController {
         } else if (this.options.onSelect) {
             this.options.onSelect(branch);
         }
-    };
+    }
 
     public userDblClicksBranch(branch: TreeBranch) {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
@@ -214,7 +213,7 @@ class TreeController implements angular.IComponentController {
         } else if (this.options.onDblClick) {
             this.options.onDblClick(branch);
         }
-    };
+    }
 
     public getHref(row) {
         //var data = row.branch.data;
@@ -225,7 +224,7 @@ class TreeController implements angular.IComponentController {
     }
 }
 
-let TreeComponent: VeComponentOptions = {
+const TreeComponent: VeComponentOptions = {
     selector: 'tree',
     transclude: true,
     template: `

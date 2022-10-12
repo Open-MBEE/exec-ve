@@ -1,3 +1,3 @@
 
 import "./right-pane.component"
-import "./toolbar.component"
+import "./right-toolbar.component"

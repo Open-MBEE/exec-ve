@@ -12,7 +12,7 @@ import {
     RequestObject
 } from "@ve-types/mms";
 import {veUtils} from "@ve-utils";
-import {ApplicationService} from "@ve-utils/core-services";
+import {ApplicationService} from "@ve-utils/services";
 
 
 /**
@@ -52,9 +52,9 @@ export class ProjectService {
      * @returns {Promise} Resolves to the org object.
      */
     public getOrg(orgId: string): angular.IPromise<OrgObject> {
-        var deferred: angular.IDeferred<OrgObject> = this.$q.defer();
-        var key = ['org', orgId];
-        var urlkey = this.uRLSvc.getOrgURL(orgId);
+        const deferred: angular.IDeferred<OrgObject> = this.$q.defer();
+        const key = ['org', orgId];
+        const urlkey = this.uRLSvc.getOrgURL(orgId);
         if (this.inProgress.hasOwnProperty(urlkey)) {
             return this.inProgress[urlkey];
         }
@@ -77,7 +77,7 @@ export class ProjectService {
             });
         }
         return deferred.promise;
-    };
+    }
 
     /**
      * @ngdoc method
@@ -90,20 +90,20 @@ export class ProjectService {
      * @returns {Promise} Resolves into array of org objects.
      */
     public getOrgs(ignoreCache?: boolean): angular.IPromise<OrgObject[]> {
-        var key = 'orgs';
+        const key = 'orgs';
         if (this.inProgress.hasOwnProperty(key)) {
             return this.inProgress[key];
         }
-        var deferred = this.$q.defer();
+        const deferred = this.$q.defer();
         if (this.cacheSvc.exists(key) && !ignoreCache) {
             deferred.resolve(this.cacheSvc.get<OrgObject[]>(key));
         } else {
             this.inProgress[key] = deferred.promise;
             this.$http.get(this.uRLSvc.getOrgsURL())
             .then((response: angular.IHttpResponse<OrgsResponse>) => {
-                var orgs: OrgObject[] = [];
+                const orgs: OrgObject[] = [];
                 for (let i = 0; i < response.data.orgs.length; i++) {
-                    var org = response.data.orgs[i];
+                    const org = response.data.orgs[i];
                     this.cacheSvc.put(['org', org.id], org, true);
                     orgs.push(<OrgObject>this.cacheSvc.get<OrgObject>(['org', org.id]));
                 }
@@ -116,30 +116,30 @@ export class ProjectService {
             });
         }
         return deferred.promise;
-    };
+    }
 
     public createOrg(name: string): angular.IPromise<OrgObject> {
-        let deferred: angular.IDeferred<OrgObject> = this.$q.defer()
-        let url = this.uRLSvc.getOrgsURL();
+        const deferred: angular.IDeferred<OrgObject> = this.$q.defer()
+        const url = this.uRLSvc.getOrgsURL();
         this.$http.post(url, {'orgs': {'name': name}, 'source': this.applicationSvc.getSource()})
             .then((response: angular.IHttpResponse<OrgsResponse>) => {
-                let org = response.data.orgs[0];
-                let key = ['org', org.id];
+                const org = response.data.orgs[0];
+                const key = ['org', org.id];
                 this.cacheSvc.put(key, response.data.orgs[0], true);
                 deferred.resolve(this.cacheSvc.get<OrgObject>(key));
             }, (response) => {
                 this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
             });
         return deferred.promise;
-    };
+    }
 
     public getProjects(orgId?: string, ignoreCache?: boolean): angular.IPromise<ProjectObject[]> {
-        var deferred: angular.IDeferred<ProjectObject[]> = this.$q.defer();
-        var url = this.uRLSvc.getProjectsURL(orgId);
+        const deferred: angular.IDeferred<ProjectObject[]> = this.$q.defer();
+        const url = this.uRLSvc.getProjectsURL(orgId);
         if (this.inProgress.hasOwnProperty(url)) {
             return this.inProgress[url];
         }
-        var cacheKey = !orgId ? 'projects' : ['projects', orgId];
+        const cacheKey = !orgId ? 'projects' : ['projects', orgId];
         if (this.cacheSvc.exists(cacheKey) && !ignoreCache) {
             deferred.resolve(this.cacheSvc.get<ProjectObject[]>(cacheKey));
         } else {
@@ -149,10 +149,10 @@ export class ProjectService {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
-                var orgProjects = {};
+                const orgProjects = {};
                 for (let i = 0; i < response.data.projects.length; i++) {
-                    var project = response.data.projects[i];
-                    var porg = project.orgId;
+                    const project = response.data.projects[i];
+                    const porg = project.orgId;
                     this.cacheSvc.put(['project', project.id], project, true);
                     if(orgProjects[porg] === undefined) {
                         orgProjects[porg] = [];
@@ -160,7 +160,7 @@ export class ProjectService {
                     orgProjects[porg].push(this.cacheSvc.get<ProjectObject>(['project', project.id]));
                 }
                 $.each(orgProjects, (i, val) => {
-                    var orgCacheKey = ['projects', i];
+                    const orgCacheKey = ['projects', i];
                     this.cacheSvc.put(orgCacheKey, val, false);
                 });
                 deferred.resolve(this.cacheSvc.get<ProjectObject[]>(cacheKey));
@@ -171,15 +171,15 @@ export class ProjectService {
             });
         }
         return deferred.promise;
-    };
+    }
 
     public getProject(projectId): angular.IPromise<ProjectObject> {
-        var deferred: angular.IDeferred<ProjectObject> = this.$q.defer();
-        var url = this.uRLSvc.getProjectURL(projectId);
+        const deferred: angular.IDeferred<ProjectObject> = this.$q.defer();
+        const url = this.uRLSvc.getProjectURL(projectId);
         if (this.inProgress.hasOwnProperty(url)) {
             return this.inProgress[url];
         }
-        var cacheKey = ['project', projectId];
+        const cacheKey = ['project', projectId];
         if (this.cacheSvc.exists(cacheKey))
             deferred.resolve(this.cacheSvc.get<ProjectObject>(cacheKey));
         else {
@@ -198,18 +198,18 @@ export class ProjectService {
             });
         }
         return deferred.promise;
-    };
+    }
 
     public getProjectMounts(projectId: string, refId: string, resolve?: boolean): angular.IPromise<ProjectObject> {
-        var deferred: angular.IDeferred<ProjectObject> = this.$q.defer();
+        const deferred: angular.IDeferred<ProjectObject> = this.$q.defer();
         if (resolve) {
             var projPromise: angular.IPromise<ProjectObject> = this.getProject(projectId);
         }
-        var url = this.uRLSvc.getProjectMountsURL(projectId, refId);
+        const url = this.uRLSvc.getProjectMountsURL(projectId, refId);
         if (this.inProgress.hasOwnProperty(url)) {
             return this.inProgress[url];
         }
-        var cacheKey = ['project', projectId, refId];
+        const cacheKey = ['project', projectId, refId];
         if (this.cacheSvc.exists(cacheKey)) {
             deferred.resolve(this.cacheSvc.get<ProjectObject>(cacheKey));
         } else {
@@ -239,15 +239,15 @@ export class ProjectService {
             });
         }
         return deferred.promise;
-    };
+    }
 
     public getRefs(projectId: string): angular.IPromise<RefObject[]> {
-        var cacheKey = ['refs', projectId];
-        var url = this.uRLSvc.getRefsURL(projectId);
+        const cacheKey = ['refs', projectId];
+        const url = this.uRLSvc.getRefsURL(projectId);
         if (this.inProgress.hasOwnProperty(url)) {
             return this.inProgress[url];
         }
-        var deferred: angular.IDeferred<RefObject[]> = this.$q.defer();
+        const deferred: angular.IDeferred<RefObject[]> = this.$q.defer();
         if (this.cacheSvc.exists(cacheKey)) {
             deferred.resolve(this.cacheSvc.get<RefObject[]>(cacheKey));
         } else {
@@ -257,9 +257,9 @@ export class ProjectService {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
-                var refs: RefObject[] = [];
-                for (var index = 0; index < response.data.refs.length; index++) {
-                    var ref: RefObject = response.data.refs[index];
+                const refs: RefObject[] = [];
+                for (let index = 0; index < response.data.refs.length; index++) {
+                    const ref: RefObject = response.data.refs[index];
                     if (ref.id === 'master') {
                         ref.type = 'Branch';
                     }
@@ -275,12 +275,12 @@ export class ProjectService {
             });
         }
         return deferred.promise;
-    };
+    }
 
     public getRef(refId: string, projectId: string): angular.IPromise<RefObject> {
-        var deferred: angular.IDeferred<RefObject> = this.$q.defer();
+        const deferred: angular.IDeferred<RefObject> = this.$q.defer();
         this.getRefs(projectId).then((data) => {
-            var result = this.cacheSvc.get<RefObject>(['ref', projectId, refId]);
+            const result = this.cacheSvc.get<RefObject>(['ref', projectId, refId]);
             if (result) {
                 deferred.resolve(result);
             } else {
@@ -290,11 +290,11 @@ export class ProjectService {
             deferred.reject(reason);
         });
         return deferred.promise;
-    };
+    }
 
     public getRefHistory(refId: string, projectId: string, timestamp: string): angular.IPromise<CommitObject[]> {
-        var deferred: angular.IDeferred<CommitObject[]> = this.$q.defer();
-        var url;
+        const deferred: angular.IDeferred<CommitObject[]> = this.$q.defer();
+        let url;
         if (timestamp !== null) {
             url = this.uRLSvc.getRefHistoryURL(projectId, refId, timestamp);
         } else {
@@ -313,19 +313,19 @@ export class ProjectService {
             delete this.inProgress[url];
         });
         return deferred.promise;
-    };
+    }
 
     public createRef(refOb: RefObject, projectId: string): angular.IPromise<RefObject> {
-        var deferred: angular.IDeferred<RefObject> = this.$q.defer();
-        var url = this.uRLSvc.getRefsURL(projectId);
+        const deferred: angular.IDeferred<RefObject> = this.$q.defer();
+        const url = this.uRLSvc.getRefsURL(projectId);
         this.$http.post(url, {'refs': [refOb], 'source': this.applicationSvc.getSource()})
         .then((response) => {
             if (!Array.isArray(response.data.refs) || response.data.refs.length === 0) {
                 deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                 return;
             }
-            var createdRef = response.data.refs[0];
-            var list = this.cacheSvc.get<RefObject[]>(['refs', projectId]);
+            const createdRef = response.data.refs[0];
+            const list = this.cacheSvc.get<RefObject[]>(['refs', projectId]);
             if (list) {
                 list.push(createdRef);
             }
@@ -335,35 +335,35 @@ export class ProjectService {
             this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
         return deferred.promise;
-    };
+    }
 
     public updateRef(refOb:RequestObject, projectId: string): angular.IPromise<RefObject> {
-        var deferred: angular.IDeferred<RefObject> = this.$q.defer();
-        var url = this.uRLSvc.getRefsURL(projectId);
+        const deferred: angular.IDeferred<RefObject> = this.$q.defer();
+        const url = this.uRLSvc.getRefsURL(projectId);
         this.$http.post(url, {'refs': [refOb], 'source': this.applicationSvc.getSource()})
         .then((response) => {
             if (!Array.isArray(response.data.refs) || response.data.refs.length === 0) {
                 deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                 return;
             }
-            var resp = response.data.refs[0];
+            const resp = response.data.refs[0];
             this.cacheSvc.put(['ref', projectId, resp.id], resp, true)
             deferred.resolve(this.cacheSvc.get<RefObject>(['ref', projectId, resp.id]));
         }, (response) => {
             this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
         return deferred.promise;
-    };
+    }
 
     public deleteRef(refId: string, projectId: string): angular.IPromise<boolean> {
-        var deferred: angular.IDeferred<boolean> = this.$q.defer();
-        var url = this.uRLSvc.getRefURL(projectId, refId);
+        const deferred: angular.IDeferred<boolean> = this.$q.defer();
+        const url = this.uRLSvc.getRefURL(projectId, refId);
         this.$http.delete(url).then((response) => {
-            var key = ['ref', projectId, refId];
-            var refOb = this.cacheSvc.get<RefObject>(key);
+            const key = ['ref', projectId, refId];
+            const refOb = this.cacheSvc.get<RefObject>(key);
             if (refOb) {
                 this.cacheSvc.remove(key);
-                var list = this.cacheSvc.get<RefObject[]>(['refs', projectId]);
+                const list = this.cacheSvc.get<RefObject[]>(['refs', projectId]);
                 if (list) {
                     for (let i = 0; i < list.length; i++) {
                         if (list[i].id === refOb.id) {
@@ -378,16 +378,16 @@ export class ProjectService {
             this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
         });
         return deferred.promise;
-    };
+    }
 
     public getGroups(projectId: string, refId: string, ignoreCache?: boolean): angular.IPromise<ElementObject[]> {
         refId = refId ? refId : 'master';
-        var cacheKey = ['groups', projectId, refId];
-        var url = this.uRLSvc.getGroupsURL(projectId, refId);
+        const cacheKey = ['groups', projectId, refId];
+        const url = this.uRLSvc.getGroupsURL(projectId, refId);
         if (this.inProgress.hasOwnProperty(url)) {
             return this.inProgress[url];
         }
-        var deferred: angular.IDeferred<ElementObject[]> = this.$q.defer();
+        const deferred: angular.IDeferred<ElementObject[]> = this.$q.defer();
         if (this.cacheSvc.exists(cacheKey) && !ignoreCache) {
             deferred.resolve(this.cacheSvc.get<ElementObject[]>(cacheKey));
         } else {
@@ -397,16 +397,16 @@ export class ProjectService {
                     deferred.reject({status: 500, data: '', message: "Server Error: empty response"});
                     return;
                 }
-                var groups: ElementObject[] = [];
-                var reqOb = {projectId: projectId, refId: refId, commitId: 'latest', elementId: ''};
+                const groups: ElementObject[] = [];
+                const reqOb = {projectId: projectId, refId: refId, commitId: 'latest', elementId: ''};
                 for (let i = 0; i < response.data.groups.length; i++) {
-                    var group: ElementObject = response.data.groups[i];
+                    let group: ElementObject = response.data.groups[i];
                     reqOb.elementId = group.id;
                     group = this.elementSvc.cacheElement(reqOb, group, false);
                     this.cacheSvc.put(['group', projectId, refId, group.id], group, true);
                     groups.push(<ElementObject>this.cacheSvc.get<ElementObject>(['group', projectId, refId, group.id]));
                 }
-                let cachedGroups = this.cacheSvc.put(cacheKey, groups, false);
+                const cachedGroups = this.cacheSvc.put(cacheKey, groups, false);
                 deferred.resolve(this.cacheSvc.get<ElementObject[]>(cacheKey));
             }, (response) => {
                 this.uRLSvc.handleHttpStatus(response.data, response.status, response.headers, response.config, deferred);
@@ -415,12 +415,12 @@ export class ProjectService {
             });
         }
         return deferred.promise;
-    };
+    }
 
     public getGroup(id: string, projectId: string, refId: string): angular.IPromise<ElementObject> {
-        var deferred: angular.IDeferred<ElementObject> = this.$q.defer();
+        const deferred: angular.IDeferred<ElementObject> = this.$q.defer();
         this.getGroups(projectId, refId).then((data) => {
-            var result = this.cacheSvc.get<ElementObject>(['group', projectId, refId, id]);
+            const result = this.cacheSvc.get<ElementObject>(['group', projectId, refId, id]);
             if (result) {
                 deferred.resolve(result);
             } else {
@@ -430,11 +430,11 @@ export class ProjectService {
             deferred.reject(reason);
         });
         return deferred.promise;
-    };
+    }
 
     public reset() {
         this.inProgress = {};
-    };
+    }
 
 }
 

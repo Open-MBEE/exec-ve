@@ -2,11 +2,11 @@ import * as angular from 'angular';
 
 import {StateService} from '@uirouter/angularjs'
 import {ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {EventService, UtilsService} from "@ve-utils/core-services";
+import {EventService, UtilsService} from "@ve-utils/services";
 
 import {veApp} from "@ve-app";
 import {VeModalService} from "@ve-types/view-editor";
-import {TreeService} from "@ve-core/tree/Tree.service";
+import {TreeService} from "@ve-core/tree";
 
 
 

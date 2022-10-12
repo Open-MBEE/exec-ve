@@ -1,9 +1,9 @@
-import "./Tree.service"
-import "./Tree.api"
+import "./services/Tree.service";
+import "./services/Tree.api";
 
 //Components
 import "./tree.component"
 
-export * from "./Tree.service"
-export * from "./Tree.api"
+export * from "./services/Tree.service";
+export * from "./services/Tree.api";
 

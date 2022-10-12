@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 import {StateService, UIRouter, UIRouterGlobals} from '@uirouter/angularjs';
 import {CacheService, ProjectService} from "@ve-utils/mms-api-client";
-import{RootScopeService, UtilsService} from "@ve-utils/core-services";
+import{RootScopeService, UtilsService} from "@ve-utils/services";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {handleChange, onChangesCallback} from "@ve-utils/utils";
 
@@ -157,21 +157,26 @@ let VeMenuComponent: VeComponentOptions = {
         }
 
         // $onChanges(onChangesObj: angular.IOnChangesObject) {
-        //     handleChange(onChangesObj, 'mmsDocument', this.updateBreadrumbs)
+        //     handleChange(onChangesObj, 'mmsDocument', this.updateBreadcrumbs)
         //     handleChange(onChangesObj, 'mmsGroups', this.updateGroups)
         // }
 
         updateGroups: onChangesCallback = () => {
             this.groupsMap = {};
-            this.groups = this.mmsGroups
-            for (let i = 0; i < this.groups.length; i++) {
-                this.groupsMap[this.groups[i].id] = {id: this.groups[i].id, name: this.groups[i].name, parentId: this.groups[i]._parentId};
+            if (this.mmsGroups) {
+                this.groups = this.mmsGroups
+                for (let i = 0; i < this.groups.length; i++) {
+                    this.groupsMap[this.groups[i].id] = {
+                        id: this.groups[i].id,
+                        name: this.groups[i].name,
+                        parentId: this.groups[i]._parentId
+                    };
+                }
             }
-
-            this.updateBreadrumbs();
+            this.updateBreadcrumbs();
         }
 
-        public updateBreadrumbs: onChangesCallback = () => {
+        public updateBreadcrumbs: onChangesCallback = () => {
             let parentId = ""
             let oldChild = null;
             if (this.child)

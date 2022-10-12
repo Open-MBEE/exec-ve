@@ -1,6 +1,6 @@
 import * as angular from 'angular';
 import {VeComponentOptions} from "@ve-types/view-editor";
-import {BrandingStyle} from "@ve-utils/core-services";
+import {BrandingStyle} from "@ve-utils/services";
 
 import {veApp} from "@ve-app";
 

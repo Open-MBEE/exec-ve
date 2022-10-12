@@ -1,4 +1,4 @@
-import {EventService, RootScopeService} from "@ve-utils/core-services";
+import {EventService, RootScopeService} from "@ve-utils/services";
 import {veApp} from "@ve-app";
 
 export class ContentWindowService {

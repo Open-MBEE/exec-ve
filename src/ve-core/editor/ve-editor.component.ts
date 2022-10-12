@@ -2,12 +2,10 @@ import * as angular from "angular";
 import * as _ from "lodash";
 
 import {VeComponentOptions, VeModalService, VeModalSettings} from "@ve-types/view-editor";
-import {CacheService, URLService, ViewService, ElementService, AuthService} from "@ve-utils/mms-api-client";
-import {UtilsService} from "@ve-utils/core-services";
-import {MentionService} from "./Mention.service";
-import {CoreUtilsService} from "@ve-core/core";
+import {CacheService, URLService, ViewService, ElementService} from "@ve-utils/mms-api-client";
+import {ImageService, UtilsService} from "@ve-utils/services";
+import {MentionService, VeEditorApi} from "@ve-core/editor";
 
-import {VeEditorApi} from "./VeEditor.service";
 import {ElementObject} from "@ve-types/mms";
 import {CKEDITOR} from "@ve-types/third-party"
 
@@ -15,6 +13,7 @@ import {veCore} from "@ve-core";
 import {TranscludeModalResolveFn} from "@ve-core/editor/modals/transclude-modal.component";
 import $ from "jquery";
 import {VeConfig} from "@ve-types/config";
+import {EditorService} from "@ve-core/editor/services/Editor.service";
 
 
 /**
@@ -53,7 +52,7 @@ export class VeEditorController implements angular.IComponentController {
 
         mmsProjectId: string;
         mmsRefId: string;
-        private mmsEditorType: any;
+        private mmsEditorType: string;
         private autosaveKey: any;
         private mmsEditorApi: VeEditorApi;
 
@@ -69,13 +68,33 @@ export class VeEditorController implements angular.IComponentController {
         private tokenStr: RegExp = new RegExp('([\?&]token=[a-zA-Z0-9\.]*)');
 
         static $inject = ['$compile', '$window', '$uibModal', '$attrs', '$element', '$timeout', '$scope', 'growl', 'CacheService',
-            'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'AuthService', 'CoreUtilsService'];
+            'ElementService', 'UtilsService', 'ViewService', 'URLService', 'MentionService', 'EditorService', 'ImageService'];
+
+    /**
+     *
+     * @param {angular.ICompileService} $compile
+     * @param {angular.IWindowService} $window
+     * @param {VeModalService} $uibModal
+     * @param {angular.IAttributes} $attrs
+     * @param {JQuery<HTMLElement>} $element
+     * @param {angular.ITimeoutService} $timeout
+     * @param {angular.IScope} $scope
+     * @param {angular.growl.IGrowlService} growl
+     * @param {CacheService} cacheSvc
+     * @param {ElementService} elementSvc
+     * @param {UtilsService} utilsSvc
+     * @param {ViewService} viewSvc
+     * @param {URLService} uRLSvc
+     * @param {MentionService} mentionSvc
+     * @param {EditorService} editorSvc
+     * @param {ImageService} imageSvc
+     */
         constructor(private $compile: angular.ICompileService, private $window: angular.IWindowService, private $uibModal: VeModalService,
                     private $attrs: angular.IAttributes, private $element: JQuery<HTMLElement>,
                     private $timeout: angular.ITimeoutService, private $scope: angular.IScope, private growl: angular.growl.IGrowlService,
                     private cacheSvc: CacheService, private elementSvc: ElementService, private utilsSvc: UtilsService,
                     private viewSvc: ViewService, private uRLSvc: URLService, private mentionSvc: MentionService,
-                    private authSvc: AuthService, private utils: CoreUtilsService) {}
+                    private editorSvc: EditorService, private imageSvc: ImageService) {}
         //depends on angular bootstrap
 
 
@@ -83,21 +102,21 @@ export class VeEditorController implements angular.IComponentController {
             this.id = 'mmsCkEditor' + this.generatedIds++;
 
             // Formatting editor toolbar
-            var stylesToolbar = { name: 'styles', items : ['Styles',/*'Format',*/'FontSize','TextColor','BGColor'] };
-            var basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
-            var clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
-            var justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
-            var editingToolbar = { name: 'editing', items : [ 'Find','Replace' ] };
-            var linksToolbar = { name: 'links', items : [ 'Link','Unlink','-' ] };
-            var imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
-            var listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
-            var equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
-            var sourceToolbar = { name: 'source', items: [ 'Maximize','Sourcedialog' ] };
-            var combinedToolbar = { name: 'combined', items: ['Mmscf', 'Mmsvlink', 'Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', 'Mmscomment', 'mmsExtraFeature' ]};
-            var extrasToolbar = { name: 'extras', items: ['mmsExtraFeature']}
+            const stylesToolbar = { name: 'styles', items : ['Styles',/*'Format',*/'FontSize','TextColor','BGColor'] };
+            const basicStylesToolbar = { name: 'basicstyles', items : [ 'Bold','Italic','Underline', 'mmsExtraFormat'] };
+            const clipboardToolbar = { name: 'clipboard', items : [ 'Undo','Redo' ] };
+            const justifyToolbar = { name: 'paragraph', items : [ 'JustifyLeft','JustifyCenter','JustifyRight' ] };
+            const editingToolbar = { name: 'editing', items : [ 'Find','Replace' ] };
+            const linksToolbar = { name: 'links', items : [ 'Link','Unlink','-' ] };
+            const imageToolbar = { name: 'image', items: [ 'Image','Iframe' ] };
+            const listToolbar =  { name: 'list', items: [ 'NumberedList','BulletedList','Outdent','Indent' ] };
+            const equationToolbar = { name: 'equation', items: [ 'Mathjax','SpecialChar' ]};
+            const sourceToolbar = { name: 'source', items: [ 'Maximize','Sourcedialog' ] };
+            const combinedToolbar = { name: 'combined', items: ['Mmscf', 'Mmsvlink', 'Table', 'Image', 'Iframe', 'Mathjax', 'SpecialChar', 'Mmscomment', 'mmsExtraFeature' ]};
+            const extrasToolbar = { name: 'extras', items: ['mmsExtraFeature']}
             // var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
 
-            var thisToolbar: Array<string | string[] | { name: string, items?: string[] | undefined, groups?: string[] | undefined }> = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, combinedToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
+            let thisToolbar: Array<string | string[] | { name: string, items?: string[] | undefined, groups?: string[] | undefined }> = [stylesToolbar, basicStylesToolbar, justifyToolbar, listToolbar, linksToolbar, combinedToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
             switch(this.mmsEditorType) {
                 case 'TableT':
                     //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
@@ -134,10 +153,10 @@ export class VeEditorController implements angular.IComponentController {
                     toolbar: this.toolbar
                 });
                 // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
-                if ( this.$attrs.autosaveKey ) {
+                if ( this.autosaveKey ) {
                     // Configuration for autosave plugin
                     this.instance.config.autosave = {
-                        SaveKey: this.$attrs.autosaveKey,
+                        SaveKey: this.autosaveKey,
                         delay: 5,
                         NotOlderThen: 7200, // 5 days in minutes
                         enableAutosave: true
@@ -155,13 +174,13 @@ export class VeEditorController implements angular.IComponentController {
                 this.instance.on('toHtml', () => {
                     this.instance.dataProcessor.dataFilter.addRules({
                         elements: {
-                            // Adds the token to img's in the editor environment to allow images to be displayed while editing
+                            // Adds the token to img's in the editor environment to allow images to be displayed while editor
                             $: (element) => {
                                 element.find((el: CKEDITOR.htmlParser.element) => {
                                     return el.name == "img" && el.attributes['data-cke-saved-src']
-                                        && el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
+                                        && (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1 || el.attributes['data-cke-saved-src'].indexOf('http') < 0)
                                 }, true).forEach((el: CKEDITOR.htmlParser.element) => {
-                                    el.attributes['src'] = this._fixImgUrl(el.attributes['data-cke-saved-src'], true);
+                                    el.attributes['src'] = this.imageSvc.fixImgUrl(el.attributes['data-cke-saved-src'], true);
                                    // el.attributes['src'] = el.attributes['data-cke-saved-src'];
                                 })
                             }
@@ -179,7 +198,7 @@ export class VeEditorController implements angular.IComponentController {
                                     return el.name == "img" && el.attributes['data-cke-saved-src']
                                         && el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
                                 }, true).forEach((el: CKEDITOR.htmlParser.element) => {
-                                    el.attributes['data-cke-saved-src'] = this._fixImgUrl(el.attributes['data-cke-saved-src'], false);
+                                    el.attributes['data-cke-saved-src'] = this.imageSvc.fixImgUrl(el.attributes['data-cke-saved-src'], false);
                                     // el.attributes['src'] = el.attributes['data-cke-saved-src'];
                                 })
                             }
@@ -189,7 +208,7 @@ export class VeEditorController implements angular.IComponentController {
                 });
 
                 const highlightActiveEditor = (instance) => {
-                    var activeEditorClass = 'active-editor';
+                    const activeEditorClass = 'active-editor';
                     $('transclude-doc').children('div').removeClass(activeEditorClass);
                     $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass);
 
@@ -216,7 +235,7 @@ export class VeEditorController implements angular.IComponentController {
                                     }
                                 }
 
-                                var attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
+                                const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
                                     return attrKey.startsWith('ng-');
                                 });
                                 attributesToDelete.forEach((attrToDelete) => {
@@ -234,13 +253,13 @@ export class VeEditorController implements angular.IComponentController {
                                 }
 
                                 if (element.name.startsWith('transclude-') || element.name.startsWith('present-') || element.name.startsWith('view')) {
-                                    if (element.name !== 'view-link' && element.name !== 'transclude-group-docs' && element.name !== 'transclude-diff-attr' && element.name !== 'mms-value-link') {
+                                    if (element.name !== 'view-link' && element.name !== 'transclude-group-docs' && element.name !== 'transclude-diff-merge-attr' && element.name !== 'mms-value-link') {
                                         element.replaceWithChildren();
                                         return;
                                     }
                                 }
 
-                                var attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
+                                const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
                                     return attrKey.startsWith('ng-');
                                 });
                                 attributesToDelete.forEach((attrToDelete) => {
@@ -275,9 +294,9 @@ export class VeEditorController implements angular.IComponentController {
                     }
                 }
                 this.instance.on('fileUploadRequest', (evt) => {
-                    var fileLoader = evt.data.fileLoader;
-                    var formData = new FormData();
-                    var xhr = fileLoader.xhr;
+                    const fileLoader = evt.data.fileLoader;
+                    const formData = new FormData();
+                    const xhr = fileLoader.xhr;
 
                     xhr.open( 'POST', this.uRLSvc.getPutArtifactsURL({projectId: this.mmsProjectId, refId: this.mmsRefId, elementId: this.utilsSvc.createMmsId().replace('MMS', 'VE')}), true );
                     //xhr.withCredentials = true;
@@ -297,9 +316,9 @@ export class VeEditorController implements angular.IComponentController {
                     evt.stop();
 
                     // Get XHR and response.
-                    var data = evt.data;
-                    var xhr = data.fileLoader.xhr;
-                    var response = JSON.parse(xhr.response);
+                    const data = evt.data;
+                    const xhr = data.fileLoader.xhr;
+                    const response = JSON.parse(xhr.response);
 
                     if ( !response.elements || response.elements.length == 0 || !response.elements[0]._artifacts || response.elements[0]._artifacts.length == 0) {
                         // An error occurred during upload.
@@ -307,7 +326,7 @@ export class VeEditorController implements angular.IComponentController {
                         evt.cancel();
                     } else {
                         //TODO does this need to be smarter?
-                        var element = response.elements[0];
+                        const element = response.elements[0];
                         data.url = this.uRLSvc.getArtifactURL({projectId: element._projectId, refId: element._refId, elementId: element.id}, element._artifacts[0].extension);
                     }
                 } );
@@ -322,7 +341,7 @@ export class VeEditorController implements angular.IComponentController {
                 this.instance.destroy();
                 this.instance = null;
             }
-        };
+        }
 
 
         public transcludeCallback = (ed: CKEDITOR.editor) => {
@@ -339,12 +358,12 @@ export class VeEditorController implements angular.IComponentController {
                 },
                 size: 'lg'
             }
-            var tInstance = this.$uibModal.open(tSettings);
+            const tInstance = this.$uibModal.open(tSettings);
             tInstance.result.then((result) => {
                 const tag = result.$value;
                 this._addWidgetTag(ed, tag);
             }, () => {
-                var focusManager: CKEDITOR.focusManager = new this.cKEditor.focusManager( ed );
+                const focusManager: CKEDITOR.focusManager = new this.cKEditor.focusManager( ed );
                 focusManager.focus();
             });
         };
@@ -369,7 +388,7 @@ export class VeEditorController implements angular.IComponentController {
                 },
                 size: 'lg'
             };
-                var vInstance = this.$uibModal.open(vSettings);
+                const vInstance = this.$uibModal.open(vSettings);
 
                 vInstance.result.then((result) => {
                     const tag = result.$value;
@@ -389,7 +408,7 @@ export class VeEditorController implements angular.IComponentController {
                     }
                 }
             };
-            var cInstance = this.$uibModal.open(cSettings);
+            const cInstance = this.$uibModal.open(cSettings);
 
             cInstance.result.then((result) => {
                 const tag = result.$value;
@@ -399,8 +418,8 @@ export class VeEditorController implements angular.IComponentController {
 
         public resetCrossRef = (type: CKEDITOR.dom.node[], typeString) => {
             type.forEach((node, key) => {
-                let value = node.$;
-                let transclusionObject = angular.element(value);
+                const value = node.$;
+                const transclusionObject = angular.element(value);
                 const transclusionId = transclusionObject.attr('mms-element-id');
                 const transclusionKey = this.utilsSvc.makeElementKey({elementId: transclusionId, projectId: this.mmsProjectId, refId: this.mmsRefId});
                 const inCache: ElementObject = this.cacheSvc.get<ElementObject>(transclusionKey);
@@ -408,12 +427,12 @@ export class VeEditorController implements angular.IComponentController {
                     transclusionObject.html('[cf:' + inCache.name + typeString);
                 } else {
                     //TODO create Utils function to handle request objects
-                    var reqOb = {elementId: transclusionId, projectId: this.mmsProjectId, refId: this.mmsRefId};
+                    const reqOb = {elementId: transclusionId, projectId: this.mmsProjectId, refId: this.mmsRefId};
                     this.elementSvc.getElement(reqOb, 2)
                     .then((data) => {
                         transclusionObject.html('[cf:' + data.name + typeString);
                     }, (reason) => {
-                        var error;
+                        let error;
                         if (reason.status === 410)
                             error = 'deleted';
                         if (reason.status === 404)
@@ -425,7 +444,7 @@ export class VeEditorController implements angular.IComponentController {
         };
 
         public mmsResetCallback = (ed: CKEDITOR.editor) => {
-            var body = ed.document.getBody();
+            const body = ed.document.getBody();
             this.resetCrossRef(body.find("transclude[mms-cf-type='name']").toArray(), '.name]');
             this.resetCrossRef(body.find("transclude[mms-cf-type='doc']").toArray(), '.doc]');
             this.resetCrossRef(body.find("transclude[mms-cf-type='val']").toArray(), '.val]');
@@ -439,35 +458,13 @@ export class VeEditorController implements angular.IComponentController {
                 this.ngModelCtrl.$setViewValue(this.instance.getData());
         }
 
-        private _fixImgSrc = (imgDom: JQuery<HTMLElement>, addToken?: boolean) => {
-
-            var src = imgDom.attr('src');
-            if (src) {
-                return this._fixImgUrl(src, addToken);
-            }
-            return null;
-        }
-
-        private _fixImgUrl = (src: string, addToken?: boolean): string => {
-            let url = new window.URL(src);
-            let params = new window.URLSearchParams(url.search);
-            if (params.has('token')) {
-                params.delete('token')
-            }
-            if (addToken) {
-                params.append('token', this.authSvc.getToken());
-            }
-            url.search = params.toString();
-            return url.toString();
-        }
-
         private _addWidgetTag = (editor: CKEDITOR.editor, tag: string) => {
             editor.insertHtml( tag );
-            this.utils.focusOnEditorAfterAddingWidgetTag(editor);
+            this.editorSvc.focusOnEditorAfterAddingWidgetTag(editor);
         }
 
         private _addInlineMention = () => {
-            var keyupHandler;
+            let keyupHandler;
             this.cKEditor.instances[this.id].on('contentDom', () => {
                 keyupHandler = this.cKEditor.instances[this.instance.name].document.on('keyup', (e) => {
                     if(this._isMentionKey(e.data.$)) {
@@ -491,7 +488,7 @@ export class VeEditorController implements angular.IComponentController {
             }
 
             // when tab is pressed or any of these special keys is pressed while the mention results show up, ignore default ckeditor's behaviour
-            var ignoreDefaultBehaviour = this._isTabKey(e) || (this._isSpecialKey(e) && this.mentionSvc.hasMentionResults(this.instance) );
+            const ignoreDefaultBehaviour = this._isTabKey(e) || (this._isSpecialKey(e) && this.mentionSvc.hasMentionResults(this.instance) );
             if ( ignoreDefaultBehaviour ) {
                 e.cancel(); e.stop();
             }
@@ -507,7 +504,7 @@ export class VeEditorController implements angular.IComponentController {
 
             // 13 = enter, 38 = up arrow, 40 = down arrow
          private _isSpecialKey = (event) => {
-            var key = event.data.domEvent.$.which;
+            const key = event.data.domEvent.$.which;
             return key === 13 || key === 38 || key === 40;
         }
 
@@ -530,8 +527,8 @@ export class VeEditorController implements angular.IComponentController {
          private _addFormatAsCodeMenuItem = (editor: CKEDITOR.editor) => {
             editor.addCommand('formatAsCode', {
                 exec: (editor: CKEDITOR.editor) => {
-                    var selected_text = editor.getSelection().getSelectedText();
-                    var newElement = new this.cKEditor.dom.element("code");
+                    const selected_text = editor.getSelection().getSelectedText();
+                    const newElement = new this.cKEditor.dom.element("code");
                     newElement.addClass('inlineCode');
                     newElement.setText(selected_text);
                     editor.insertElement(newElement);
@@ -552,7 +549,7 @@ export class VeEditorController implements angular.IComponentController {
         }
 }
 
-let veEditorComponent: VeComponentOptions = {
+const veEditorComponent: VeComponentOptions = {
     selector: 'veEditor',
     template: `<textarea id="{{$ctrl.id}}"></textarea>`,
     require: {

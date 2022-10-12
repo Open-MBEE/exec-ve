@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 import {StateService, UIRouter, UIRouterGlobals} from '@uirouter/angularjs';
 import {AuthService} from "@ve-utils/mms-api-client";
-import {ApplicationService, EventService, RootScopeService} from "@ve-utils/core-services";
+import {ApplicationService, EventService, RootScopeService} from "@ve-utils/services";
 import {VeComponentOptions, VeModalService} from "@ve-types/view-editor";
 
 import {veApp} from "@ve-app";

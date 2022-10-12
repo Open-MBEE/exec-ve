@@ -1,15 +1,14 @@
 import {StateService} from '@uirouter/angularjs';
 import * as angular from 'angular';
 import {ViewService, ElementService} from "@ve-utils/mms-api-client";
-import {EventService} from "@ve-utils/core-services";
+import {EventService} from "@ve-utils/services";
 import {AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap} from "@ve-types/tree";
 import {ViewObject} from "@ve-types/mms";
 import {VeComponentOptions} from "@ve-types/view-editor";
 import {AppUtilsService} from "@ve-app/main/services";
 
 import {veApp} from '@ve-app';
-import {TreeService} from "@ve-core/tree";
-import {TreeApi} from "@ve-core/tree/Tree.api";
+import {TreeService, TreeApi} from "@ve-core/tree";
 
 
 /* Controllers */

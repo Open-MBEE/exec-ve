@@ -6,7 +6,7 @@ import {
   EventService,
   RootScopeService,
   UtilsService,
-} from "@ve-utils/core-services";
+} from "@ve-utils/services";
 import {
   ElementService,
   PermissionsService,
@@ -14,7 +14,7 @@ import {
   ViewService
 } from "@ve-utils/mms-api-client";
 import {AppUtilsService} from "@ve-app/main/services";
-import {IButtonBarButton, ButtonBarApi, ButtonBarService, ButtonWrapEvent} from "@ve-utils/button-bar";
+import {IButtonBarButton, ButtonBarApi, ButtonBarService, ButtonWrapEvent} from "@ve-core/button-bar";
 import {VeComponentOptions, VeModalService, VeModalSettings} from "@ve-types/view-editor";
 import {DocumentObject, ElementObject, OrgObject, ProjectObject, RefObject, ViewObject} from "@ve-types/mms";
 import {ValueSpec} from "@ve-utils/utils";
@@ -26,8 +26,8 @@ import {IPane} from "@openmbee/pane-layout";
 import {veApp} from "@ve-app";
 import {AddItemData, AddItemResolveFn} from "@ve-app/main/modals/add-item-modal.component";
 import {ConfirmDeleteModalResolveFn} from "@ve-app/main/modals/confirm-delete-modal.component";
-import {TreeApi} from "@ve-core/tree/Tree.api";
-import {TreeService} from "@ve-core/tree/Tree.service";
+import {TreeApi} from "@ve-core/tree";
+import {TreeService} from "@ve-core/tree";
 
 
 class LeftPaneController implements angular.IComponentController {

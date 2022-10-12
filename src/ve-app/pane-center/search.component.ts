@@ -2,7 +2,7 @@ import {VeComponentOptions, VeSearchOptions} from "@ve-types/view-editor";
 import {veApp} from "@ve-app";
 import {OrgObject, ProjectObject} from "@ve-types/mms";
 import {ContentWindowService} from "@ve-app/pane-center/services/ContentWindow.service";
-import {EventService, RootScopeService} from "@ve-utils/core-services";
+import {EventService, RootScopeService} from "@ve-utils/services";
 import { StateService } from "@uirouter/angularjs";
 
 
