@@ -135,7 +135,6 @@ interface RequestObject extends MmsObject {
     refId: string
     orgId?: string
     commitId?: string
-    extended?: boolean
     depth?: number
 }
 
@@ -143,7 +142,7 @@ export interface ElementsRequest extends RequestObject {
     elementId: string | string[]
 }
 
-export interface ViewsRequest extends ElementsRequest {
+export interface ViewsRequest extends RequestObject {
     returnChildViews: boolean
 }
 

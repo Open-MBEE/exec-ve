@@ -6,34 +6,31 @@ import { veUtils } from '@ve-utils'
 import { MmsObject } from '@ve-types/mms'
 
 export class CacheService {
-    public cache: { [key: string]: string | MmsObject } = {}
+    public cache: { [key: string]: string | unknown | unknown[] } = {}
 
-    get<T extends MmsObject>(
-        key: string | string[],
-        noCopy?: boolean
-    ): T | undefined {
-        let realKey: string
-        if (Array.isArray(key)) {
-            if (key[0] === 'element' && key[1] === '') {
-                console.trace()
-            }
-            realKey = this._makeKey(key)
-        } else {
-            realKey = key
-        }
-
+    get<T>(key: string | string[], noCopy?: boolean): T | undefined {
+        const realKey: string = this._makeKey(key)
         const result: T = this._get<T>(realKey)
+
         if (noCopy) return result
         else return _.cloneDeep(result)
     }
 
-    private _get<T extends MmsObject>(realKey: string): T {
-        if (this.cache.hasOwnProperty(realKey)) {
-            let cached: string | MmsObject = this.cache[realKey]
-            if (typeof cached === 'string') {
-                cached = this._get<T>(cached)
+    private _get<T>(realKey: string): T {
+        const recurse = (key: string): string | T => {
+            if (typeof this.cache[key] === 'string') {
+                return recurse(this.cache[key] as string)
             }
-            return cached as T
+            return this.cache[key] as T
+        }
+        if (this.cache.hasOwnProperty(realKey)) {
+            let result: T
+            if (typeof this.cache[realKey] === 'string') {
+                result = recurse(this.cache[realKey] as string) as T
+            } else {
+                result = this.cache[realKey] as T
+            }
+            return result
         }
         return
     }
@@ -67,15 +64,18 @@ export class CacheService {
                 key.indexOf(refId) >= 0 &&
                 key.indexOf(projectId) >= 0
             ) {
-                const val: T = this._get<T>(key)
+                const val: T | T[] = this._get<T>(key)
                 if (val) {
-                    latestElements.push(val)
+                    Array.isArray(val)
+                        ? latestElements.push(...val)
+                        : latestElements.push(val)
                 }
             }
         }
         return latestElements
     }
 
+    type
     /**
      * @ngdoc method
      * @name CacheService#put
@@ -89,58 +89,68 @@ export class CacheService {
      * @param {boolean} [merge=false] Whether to replace the value or do a merge if value already exists
      * @returns {Object} the original value
      */
-    put<T extends MmsObject>(
+    put<T extends MmsObject | MmsObject[]>(
         key: string | string[],
-        value: string | T,
+        value: T,
         merge?: boolean
-    ): string | T {
+    ): T {
         const m = typeof merge === 'undefined' ? false : merge
-        let realKey: string
-        if (Array.isArray(key)) {
-            realKey = this._makeKey(key)
-        } else {
-            realKey = key
-        }
-        if (value !== undefined) {
-            value = _.cloneDeep(value)
-        }
+        const realKey = this._makeKey(key)
         const currentValue: T = this.get<T>(realKey, true)
-        if (currentValue && m && typeof value !== 'string') {
-            _.mergeWith(
-                currentValue,
-                value,
-                (a: T | T[], b: T | T[], id: string) => {
-                    if (
-                        (id === '_contents' || id === 'specification') &&
-                        b &&
-                        !Array.isArray(b) &&
-                        b.type === 'Expression'
-                    ) {
-                        return b
-                    }
-                    if (
-                        Array.isArray(a) &&
-                        Array.isArray(b) &&
-                        b.length < a.length
-                    ) {
-                        a.length = 0
-                        a.push(...b)
-                        return a
-                    }
-                    if (id === '_displayedElementIds' && b) {
-                        return b
-                    }
-                    return undefined
+        if (currentValue && m) {
+            _.mergeWith(currentValue, value, (a: T, b: T, id: string) => {
+                if (
+                    (id === '_contents' || id === 'specification') &&
+                    b &&
+                    !Array.isArray(b) &&
+                    b.type === 'Expression'
+                ) {
+                    return b
                 }
-            )
+                if (
+                    Array.isArray(a) &&
+                    Array.isArray(b) &&
+                    b.length < a.length
+                ) {
+                    a.length = 0
+                    a.push(...b)
+                    return a
+                }
+                if (id === '_displayedElementIds' && b) {
+                    return b
+                }
+                return undefined
+            })
         } else {
-            if (!currentValue || typeof value === 'string') {
-                this.cache[realKey] = value
-            } else {
-                this.cache[realKey] = value
-            }
+            this.cache[realKey] = value
         }
         return value
+    }
+
+    /**
+     * @ngdoc method
+     * @name CacheService#link
+     * @methodOf CacheService
+     *
+     * @description
+     * Create a link to another cached items. This link will be automatically followed/resolved by cache service
+     *
+     * @param {string | string[]} sourceKey
+     * @param {string | string[]} targetKey
+     */
+    public link(
+        sourceKey: string | string[],
+        targetKey: string | string[]
+    ): void {
+        const realSourceKey: string = this._makeKey(sourceKey)
+        if (
+            this.cache.hasOwnProperty(realSourceKey) &&
+            typeof this.cache[realSourceKey] !== 'string'
+        ) {
+            delete this.cache[realSourceKey]
+        }
+
+        this.cache[realSourceKey] = this._makeKey(targetKey)
     }
 
     /**
@@ -203,8 +213,12 @@ export class CacheService {
         return false
     }
 
-    private _makeKey(keys: string[]) {
-        return keys.join('|')
+    private _makeKey(keys: string | string[]): string {
+        if (Array.isArray(keys)) {
+            return keys.join('|')
+        } else {
+            return keys
+        }
     }
 
     reset() {

@@ -103,7 +103,7 @@ export class ViewService {
         elementOb: ViewObject
     ): angular.IPromise<ViewObject> {
         const deferred: angular.IDeferred<ViewObject> = this.$q.defer()
-        const clone = JSON.parse(JSON.stringify(elementOb))
+        const clone = _.cloneDeep(elementOb)
         clone._appliedStereotypeIds = [
             this.schemaSvc.get('VIEW_SID', this.schema),
         ]

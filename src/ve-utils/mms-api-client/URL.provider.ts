@@ -9,6 +9,7 @@ import {
     ArtifactsRequest,
     AuthResponse,
     BasicResponse,
+    ElementCreationRequest,
     ElementsRequest,
     QueryParams,
     RequestObject,
@@ -246,10 +247,7 @@ export class URLService {
      */
     getProjectDocumentsURL(reqOb: RequestObject): string {
         const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/documents`
-        return this.addExtended(
-            this.addVersion(r, reqOb.commitId),
-            reqOb.extended
-        )
+        return this.addVersion(r, reqOb.commitId)
     }
 
     /**
@@ -287,10 +285,7 @@ export class URLService {
             ? reqOb.elementId[0]
             : reqOb.elementId
         const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${elementId}`
-        return this.addExtended(
-            this.addVersion(r, reqOb.commitId),
-            reqOb.extended
-        )
+        return this.addVersion(r, reqOb.commitId)
     }
 
     // getViewElementIdsURL (reqOb: RequestObject): string {
@@ -331,7 +326,7 @@ export class URLService {
         } else {
             r += '?' + recurseString
         }
-        return this.addExtended(r, reqOb.extended)
+        return r
     }
 
     /**
@@ -354,6 +349,24 @@ export class URLService {
 
     /**
      * @ngdoc method
+     * @name veUtils/URLService#getPostViewsURL
+     * @methodOf veUtils/URLService
+     *
+     * @description
+     * Gets the path for posting view changes.
+     *
+     * @param {object} reqOb object with keys as described in ElementService.
+     * @returns {string} The post elements url.
+     */
+    getPostViewsURL(reqOb: ViewsRequest): string {
+        return this.addChildViews(
+            `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views`,
+            reqOb.returnChildViews
+        )
+    }
+
+    /**
+     * @ngdoc method
      * @name veUtils/URLService#getPostElementsURL
      * @methodOf veUtils/URLService
      *
@@ -363,14 +376,8 @@ export class URLService {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
-    getPostElementsURL(reqOb: ViewsRequest): string {
-        return this.addExtended(
-            this.addChildViews(
-                `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views`,
-                reqOb.returnChildViews
-            ),
-            reqOb.extended
-        )
+    getPostElementsURL(reqOb: ElementCreationRequest): string {
+        return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements`
     }
 
     /**
@@ -386,10 +393,7 @@ export class URLService {
      */
     getPutElementsURL(reqOb: RequestObject): string {
         const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views`
-        return this.addExtended(
-            this.addVersion(r, reqOb.commitId),
-            reqOb.extended
-        )
+        return this.addVersion(r, reqOb.commitId)
     }
 
     /**
@@ -415,7 +419,7 @@ export class URLService {
         } else {
             r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/search`
         }
-        return this.addExtended(r, true)
+        return r
     }
 
     /**
@@ -594,14 +598,6 @@ export class URLService {
             else return url + '?commitId=' + version
         }
         return url
-    }
-
-    private addExtended(url: string, extended: boolean): string {
-        let r = url
-        if (!extended) return r
-        if (r.indexOf('?') > 0) r += '&extended=true'
-        else r += '?extended=true'
-        return r
     }
 
     private addChildViews(url: string, add: boolean): string {
