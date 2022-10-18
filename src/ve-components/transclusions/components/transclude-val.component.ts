@@ -1,17 +1,31 @@
-import * as angular from 'angular'
+import angular from 'angular'
+import $ from 'jquery'
 
-import {AuthService, ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {MathJaxService, UtilsService, EventService, ImageService} from "@ve-utils/services";
-import {VeComponentOptions} from '@ve-types/view-editor'
-import {veComponents} from "@ve-components";
-import {ExtensionService, ComponentService} from "@ve-components/services"
-import {ITransclusion, Transclusion} from "@ve-components/transclusions";
+import { ExtensionService, ComponentService } from '@ve-components/services'
+import { ISpecTool } from '@ve-components/spec-tools'
+import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import {
+    ButtonBarApi,
+    ButtonBarService,
+    IButtonBarButton,
+} from '@ve-core/button-bar'
+import {
+    AuthService,
+    ElementService,
+    ViewService,
+} from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
+import {
+    MathJaxService,
+    UtilsService,
+    EventService,
+    ImageService,
+} from '@ve-utils/services'
 
-import $ from "jquery";
-import {PropertySpec} from "@ve-types/mms";
-import {ButtonBarApi, ButtonBarService, IButtonBarButton} from "@ve-core/button-bar";
-import {ISpecTool} from "@ve-components/spec-tools";
-import {SchemaService} from "@ve-utils/model-schema";
+import { veComponents } from '@ve-components'
+
+import { PropertySpec } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 /**
  * @ngdoc component
@@ -44,8 +58,10 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeValController extends Transclusion implements ITransclusion {
-
+export class TranscludeValController
+    extends Transclusion
+    implements ITransclusion
+{
     //Custom Bindings
     first: boolean
 
@@ -53,8 +69,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     mmsSpecEditorCtrl: ISpecTool
 
     //Locals
-    values: any[] = [];
-    editValues: any[] = [];
+    values: any[] = []
+    editValues: any[] = []
     propertySpec: PropertySpec
     public bbApi: ButtonBarApi
     public bars: string[]
@@ -170,8 +186,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 </div>
 `
 
-
-    static $inject = Transclusion.$inject;
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: angular.IQService,
@@ -190,44 +205,61 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
     ) {
-        super($q, $scope,$compile,$element,growl,componentSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
-            mathJaxSvc, extensionSvc, buttonBarSvc, imageSvc)
+        super(
+            $q,
+            $scope,
+            $compile,
+            $element,
+            growl,
+            componentSvc,
+            elementSvc,
+            utilsSvc,
+            schemaSvc,
+            authSvc,
+            eventSvc,
+            mathJaxSvc,
+            extensionSvc,
+            buttonBarSvc,
+            imageSvc
+        )
         this.cfType = 'val'
         this.cfTitle = 'values'
         this.cfKind = 'Value'
-        this.checkCircular = false;
+        this.checkCircular = false
     }
 
     protected config = () => {
+        this.componentSvc.setupValEditFunctions(this)
 
-        this.componentSvc.setupValEditFunctions(this);
-
-        this.isEditing = false;
-        this.elementSaving = false;
+        this.isEditing = false
+        this.elementSaving = false
 
         if (this.mmsSpecEditorCtrl) {
             this._startEdit(this.mmsSpecEditorCtrl.specSvc.editable)
             this.changeAction = () => {
                 this.config()
-            };
-            return;
-
+            }
+            return
         }
 
         this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this)
 
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) {
-                this.startEdit();
+                this.startEdit()
             }
             if (this.mmsViewCtrl) {
-                this.mmsViewCtrl.transcludeClicked(this.element);
+                this.mmsViewCtrl.transcludeClicked(this.element)
             }
-            if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
-                this.growl.warning("Cross Reference is not editable.");
+            if (
+                this.nonEditable &&
+                this.mmsViewCtrl &&
+                this.mmsViewCtrl.isEditable()
+            ) {
+                this.growl.warning('Cross Reference is not editable.')
             }
-            e.stopPropagation();
-        });
+            e.stopPropagation()
+        })
 
         if (this.mmsViewCtrl) {
             this.isDirectChildOfPresentationElement =
@@ -235,117 +267,141 @@ export class TranscludeValController extends Transclusion implements ITransclusi
                     this.$element,
                     this.mmsViewCtrl
                 )
-            this.view = this.mmsViewCtrl.getView();
+            this.view = this.mmsViewCtrl.getView()
 
             this.startEdit = () => {
-                this._startEdit(this.mmsViewCtrl.isEditable());
+                this._startEdit(this.mmsViewCtrl.isEditable())
             }
         }
-
-
     }
 
-    public getContent = (preview?): angular.IPromise<string | HTMLElement[]> => {
-        let deferred = this.$q.defer<string |HTMLElement[]>();
-        var toCompileList: any[] = [];
-        var areStrings = false;
+    public getContent = (
+        preview?
+    ): angular.IPromise<string | HTMLElement[]> => {
+        const deferred = this.$q.defer<string | HTMLElement[]>()
+        const toCompileList: any[] = []
+        let areStrings = false
         this.values = this.componentSvc.setupValCf(this.element)
-        let values = this.values;
-        let result = '';
+        let values = this.values
+        let result = ''
         if (preview) {
-            values = this.editValues;
+            values = this.editValues
         } else {
-            this.isEditing = false;
+            this.isEditing = false
         }
         for (let i = 0; i < values.length; i++) {
             if (values[i].type === 'LiteralString') {
-                areStrings = true;
-                var s = values[i].value;
+                areStrings = true
+                let s = values[i].value
                 if (s.indexOf('<p>') === -1) {
-                    s = s.replace('<', '&lt;');
+                    s = s.replace('<', '&lt;')
                 }
-                toCompileList.push(s);
+                toCompileList.push(s)
             } else {
-                break;
+                break
             }
         }
 
         if (values.length === 0 || Object.keys(values[0]).length < 2) {
-            result = '<span class="no-print placeholder">(no value)</span>';
-            deferred.resolve(result);
+            result = '<span class="no-print placeholder">(no value)</span>'
+            deferred.resolve(result)
         } else if (areStrings) {
-            var toCompile = toCompileList.join(' ');
+            let toCompile = toCompileList.join(' ')
             if (toCompile === '' || this.emptyRegex.test(toCompile)) {
-                result = '<span class="no-print placeholder">(no value)</span>';
-                deferred.resolve(result);
+                result = '<span class="no-print placeholder">(no value)</span>'
+                deferred.resolve(result)
             }
-            toCompile = toCompile.replace(this.spacePeriod, '>.');
-            toCompile = toCompile.replace(this.spaceSpace, '> ');
-            toCompile = toCompile.replace(this.spaceComma, '>,');
+            toCompile = toCompile.replace(this.spacePeriod, '>.')
+            toCompile = toCompile.replace(this.spaceSpace, '> ')
+            toCompile = toCompile.replace(this.spaceComma, '>,')
             if (preview) {
-                result = '<div class="panel panel-info">'+toCompile+'</div>';
+                result = '<div class="panel panel-info">' + toCompile + '</div>'
             } else {
-                result = toCompile;
+                result = toCompile
             }
 
             if (!this.mmsGenerateForDiff) {
-                let resultHtml = $('<p></p>').html(result).toArray()
-                this.mathJaxSvc
-                    .typeset(resultHtml)
-                    .then(() => deferred.resolve(resultHtml), (reason) => {
-                        deferred.reject(reason);
-                    })
+                const resultHtml = $('<p></p>').html(result).toArray()
+                this.mathJaxSvc.typeset(resultHtml).then(
+                    () => deferred.resolve(resultHtml),
+                    (reason) => {
+                        deferred.reject(reason)
+                    }
+                )
             } else {
-                deferred.resolve(result);
+                deferred.resolve(result)
             }
         } else {
             if (preview) {
-                deferred.resolve(this.editTemplate);
+                deferred.resolve(this.editTemplate)
             } else {
                 if (this.first) {
                     this.values = this.values[0]
                 }
-                deferred.resolve(this.valTemplate);
+                deferred.resolve(this.valTemplate)
             }
         }
-        return deferred.promise;
+        return deferred.promise
     }
 
     private _startEdit = (isEditable: boolean) => {
-        var id = this.element.typeId;
-        if (this.element.type === 'Slot')
-            id = this.element.definingFeatureId;
-        if (!id || (this.propertySpec.isEnumeration && this.propertySpec.options)) {
-            this.componentSvc.startEdit(this, isEditable, this.$element, this.frameTemplate, false);
-            return;
+        let id = this.element.typeId
+        if (this.element.type === 'Slot') id = this.element.definingFeatureId
+        if (
+            !id ||
+            (this.propertySpec.isEnumeration && this.propertySpec.options)
+        ) {
+            this.componentSvc.startEdit(
+                this,
+                isEditable,
+                this.$element,
+                this.frameTemplate,
+                false
+            )
+            return
         }
-        this.componentSvc.getPropertySpec(this.element)
-            .then( (value) => {
-                this.propertySpec = value;
-                this.componentSvc.startEdit(this, isEditable, this.$element, this.frameTemplate, false);
-            }, (reason) => {
-                this.componentSvc.startEdit(this, isEditable, this.$element, this.frameTemplate, false);
-                this.growl.error('Failed to get property spec: ' + reason.message);
-            });
-    };
+        this.componentSvc.getPropertySpec(this.element).then(
+            (value) => {
+                this.propertySpec = value
+                this.componentSvc.startEdit(
+                    this,
+                    isEditable,
+                    this.$element,
+                    this.frameTemplate,
+                    false
+                )
+            },
+            (reason) => {
+                this.componentSvc.startEdit(
+                    this,
+                    isEditable,
+                    this.$element,
+                    this.frameTemplate,
+                    false
+                )
+                this.growl.error(
+                    'Failed to get property spec: ' + reason.message
+                )
+            }
+        )
+    }
 
     public save = (e) => {
-        e.stopPropagation();
-        this.componentSvc.saveAction(this, this.$element, false);
-    };
+        e.stopPropagation()
+        this.componentSvc.saveAction(this, this.$element, false)
+    }
 
     public saveC = () => {
-        this.componentSvc.saveAction(this, this.$element, true);
-    };
+        this.componentSvc.saveAction(this, this.$element, true)
+    }
 
     public cancel = (e) => {
-        e.stopPropagation();
-        this.componentSvc.cancelAction(this, this.recompile, this.$element);
-    };
-
+        e.stopPropagation()
+        this.componentSvc.cancelAction(this, this.recompile, this.$element)
+    }
 }
 
-export let TranscludeValComponent: VeComponentOptions = {
+export const TranscludeValComponent: VeComponentOptions = {
     selector: 'transcludeVal',
     template: `<div></div>`,
     bindings: {
@@ -356,15 +412,15 @@ export let TranscludeValComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
-        first: '<'
+        first: '<',
     },
-        transclude: true,
-        require: {
-            mmsViewCtrl: '?^view',
-            mmsViewPresentationElemCtrl: '?^viewPe',
-            mmsSpecEditorCtrl: '?^specEditor'
+    transclude: true,
+    require: {
+        mmsViewCtrl: '?^view',
+        mmsViewPresentationElemCtrl: '?^viewPe',
+        mmsSpecEditorCtrl: '?^specEditor',
     },
-        controller: TranscludeValController
-    };
+    controller: TranscludeValController,
+}
 
-veComponents.component(TranscludeValComponent.selector, TranscludeValComponent);
+veComponents.component(TranscludeValComponent.selector, TranscludeValComponent)

@@ -1,11 +1,12 @@
-import * as angular from 'angular';
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {BrandingStyle} from "@ve-utils/services";
+import angular from 'angular'
 
-import {veApp} from "@ve-app";
+import { BrandingStyle } from '@ve-utils/services'
 
+import { veApp } from '@ve-app'
 
-let VeSystemBannerComponent: VeComponentOptions = {
+import { VeComponentOptions } from '@ve-types/view-editor'
+
+const VeSystemBannerComponent: VeComponentOptions = {
     selector: 'veSystemBanner',
     template: `
     <nav class="nav-level-banner navbar-fixed-top" role="navigation">
@@ -19,20 +20,21 @@ let VeSystemBannerComponent: VeComponentOptions = {
 </nav>    
 `,
     bindings: {
-        bannerOb: '<'
+        bannerOb: '<',
     },
-    controller: class VeSystemBannerController implements angular.IComponentController {
-        public bannerOb: BrandingStyle;
+    controller: class VeSystemBannerController
+        implements angular.IComponentController
+    {
+        public bannerOb: BrandingStyle
 
-        public bannerMessage: string[] = ['Loading...'];
+        public bannerMessage: string[] = ['Loading...']
 
         $onInit() {
             if (Array.isArray(this.bannerOb.message))
-                this.bannerMessage = this.bannerOb.message;
-            else
-                this.bannerMessage = [this.bannerOb.message];
+                this.bannerMessage = this.bannerOb.message
+            else this.bannerMessage = [this.bannerOb.message]
         }
-    }
-};
+    },
+}
 
-veApp.component(VeSystemBannerComponent.selector,VeSystemBannerComponent);
+veApp.component(VeSystemBannerComponent.selector, VeSystemBannerComponent)

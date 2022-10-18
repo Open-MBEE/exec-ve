@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 import _ from 'lodash'
 
 import { ComponentService } from '@ve-components/services'

@@ -1,5 +1,5 @@
 import { StateService } from '@uirouter/angularjs'
-import * as angular from 'angular'
+import angular from 'angular'
 import _ from 'lodash'
 
 import {
@@ -736,9 +736,9 @@ class SearchController implements angular.IComponentController {
         if (this.docsviews.selected) {
             const queryObs: QueryObject[] = []
             const stereoIds = [
-                this.schemaSvc.get('VIEW_SID', this.schema),
-                this.schemaSvc.get('DOCUMENT_SID', this.schema),
-                ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema),
+                this.schemaSvc.getSchema('VIEW_SID', this.schema),
+                this.schemaSvc.getSchema('DOCUMENT_SID', this.schema),
+                ...this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema),
             ]
             /*If the filter list already contain the view id's do not add them a second time since filtering is done
             client side */

@@ -1,15 +1,15 @@
-import angular from "angular";
-import * as _ from "lodash";
-import {AuthService, CacheService} from "@ve-utils/mms-api-client"
-import {AutosaveService, UtilsService} from "@ve-utils/services";
-import {VeModalComponent, VeModalController} from "@ve-types/view-editor";
+import angular from 'angular'
+import * as _ from 'lodash'
 
-import {veApp} from "@ve-app";
-import {VeModalControllerImpl} from "@ve-utils/modals/ve-modal.controller";
+import { AuthService, CacheService } from '@ve-utils/mms-api-client'
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+import { AutosaveService, UtilsService } from '@ve-utils/services'
 
+import { veApp } from '@ve-app'
 
+import { VeModalComponent, VeModalController } from '@ve-types/view-editor'
 
-let LoginModalComponent: VeModalComponent = {
+const LoginModalComponent: VeModalComponent = {
     selector: 'loginModal',
     template: `
     <div class="modal-header">
@@ -27,51 +27,76 @@ let LoginModalComponent: VeModalComponent = {
 </div>
 `,
     bindings: {
-        modalInstance: "<",
-        resolve: "<"
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class LoginModalController extends VeModalControllerImpl implements VeModalController {
-
-        static $inject = ['$state', 'growl', 'AuthService', 'AutosaveService', 'UtilsService', 'CacheService'];
+    controller: class LoginModalController
+        extends VeModalControllerImpl
+        implements VeModalController
+    {
+        static $inject = [
+            '$state',
+            'growl',
+            'AuthService',
+            'AutosaveService',
+            'UtilsService',
+            'CacheService',
+        ]
 
         public credentials = {
-                    username: '',
-                    password: ''
-                };
-                spin = false;
+            username: '',
+            password: '',
+        }
+        spin = false
 
-        constructor(private $state, private growl, private authSvc: AuthService, private autosaveSvc: AutosaveService,
-                    private utilsSvc: UtilsService, private cacheSvc: CacheService) {
-            super();
+        constructor(
+            private $state,
+            private growl,
+            private authSvc: AuthService,
+            private autosaveSvc: AutosaveService,
+            private utilsSvc: UtilsService,
+            private cacheSvc: CacheService
+        ) {
+            super()
         }
 
         login(credentials) {
-                this.spin = true;
-                var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                this.authSvc.getAuthorized(credentialsJSON).then((user) => {
-                    this.growl.success("Logged in");
+            this.spin = true
+            const credentialsJSON = {
+                username: credentials.username,
+                password: credentials.password,
+            }
+            this.authSvc.getAuthorized(credentialsJSON).then(
+                (user) => {
+                    this.growl.success('Logged in')
                     // Check if user had changes queued before refreshing page data
                     // add edits to cache
-                    var edits = this.autosaveSvc.getAll();
+                    const edits = this.autosaveSvc.getAll()
                     _.map(edits, (element, key) => {
-                        var cacheKey = this.utilsSvc.makeElementKey(element, true);
-                        this.cacheSvc.put(cacheKey, element);
-                    });
+                        const cacheKey = this.apiSvc.makeCacheKey(element, true)
+                        this.cacheSvc.put(cacheKey, element)
+                    })
                     if (this.resolve.continue) {
-                        this.$state.go(this.$state.current, {}, {reload: true});
+                        this.$state.go(
+                            this.$state.current,
+                            {},
+                            { reload: true }
+                        )
                     }
-                    this.modalInstance.dismiss(true);
-                }, (reason) => {
-                    this.spin = false;
-                    this.credentials.password = '';
-                    this.growl.error(reason.message);
-                });
-            };
+                    this.modalInstance.dismiss(true)
+                },
+                (reason) => {
+                    this.spin = false
+                    this.credentials.password = ''
+                    this.growl.error(reason.message)
+                }
+            )
+        }
 
         cancel = () => {
             this.modalInstance.dismiss(false)
-        };
-    }
+        }
+    },
 }
 
-veApp.component(LoginModalComponent.selector,LoginModalComponent);
+veApp.component(LoginModalComponent.selector, LoginModalComponent)

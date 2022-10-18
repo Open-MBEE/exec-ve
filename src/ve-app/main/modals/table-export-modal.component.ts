@@ -1,9 +1,10 @@
-import * as angular from 'angular';
-import {VeComponentOptions} from "@ve-types/view-editor";
+import angular from 'angular'
 
-import {veApp} from "@ve-app";
+import { veApp } from '@ve-app'
 
-let TableExportModalComponent: VeComponentOptions = {
+import { VeComponentOptions } from '@ve-types/view-editor'
+
+const TableExportModalComponent: VeComponentOptions = {
     selector: 'tableExport',
     template: `
     <div class="modal-header">
@@ -34,12 +35,14 @@ let TableExportModalComponent: VeComponentOptions = {
     
 `,
     bindings: {
-        close: "<",
-        dismiss: "<",
-        modalInstance: "<",
-        resolve: "<"
+        close: '<',
+        dismiss: '<',
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class TableExportModalController implements angular.IComponentController {
+    controller: class TableExportModalController
+        implements angular.IComponentController
+    {
         //bindings
         public modalInstance
         dismiss
@@ -52,17 +55,17 @@ let TableExportModalComponent: VeComponentOptions = {
         constructor() {}
 
         $onInit() {
-            this.type = this.resolve.type;
+            this.type = this.resolve.type
         }
 
         public export() {
-            this.close({$value:'export'});
-        };
+            this.close({ $value: 'export' })
+        }
 
         public cancel() {
-            this.dismiss();
-        };
-    }
+            this.dismiss()
+        }
+    },
 }
 
-veApp.component(TableExportModalComponent.selector,TableExportModalComponent)
+veApp.component(TableExportModalComponent.selector, TableExportModalComponent)

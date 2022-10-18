@@ -1,13 +1,13 @@
-import * as angular from 'angular'
+import angular from 'angular'
 import _ from 'lodash'
 
-import { CacheService } from '@ve-utils/mms-api-client/Cache.service'
 import {
+    ApiService,
+    CacheService,
     httpCallback,
     HttpService,
-} from '@ve-utils/mms-api-client/Http.service'
-import { URLService } from '@ve-utils/mms-api-client/URL.provider'
-import { ApplicationService, UtilsService } from '@ve-utils/services'
+    URLService,
+} from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -18,6 +18,7 @@ import {
     ElementObject,
     ElementsRequest,
     ElementsResponse,
+    GenericResponse,
     QueryObject,
     QueryParams,
     RequestObject,
@@ -51,10 +52,9 @@ export class ElementService {
         '$http',
         'growl',
         'URLService',
-        'UtilsService',
+        'ApiService',
         'CacheService',
         'HttpService',
-        'ApplicationService',
     ]
 
     constructor(
@@ -62,10 +62,9 @@ export class ElementService {
         private $http: angular.IHttpService,
         private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
-        private utilsSvc: UtilsService,
+        private apiSvc: ApiService,
         private cacheSvc: CacheService,
-        private httpSvc: HttpService,
-        private applicationSvc: ApplicationService
+        private httpSvc: HttpService
     ) {}
 
     /**
@@ -122,13 +121,13 @@ export class ElementService {
      *      same object
      */
     getElement(
-        reqOb: ElementsRequest,
+        reqOb: ElementsRequest<string>,
         weight?: number,
         refresh?: boolean,
         allowEmpty?: boolean
     ): angular.IPromise<ElementObject> {
-        this.utilsSvc.normalize(reqOb)
-        const requestCacheKey = this.getElementKey(reqOb)
+        this.apiSvc.normalize(reqOb)
+        const requestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
         if (!reqOb.projectId) {
             console.log('foo')
         }
@@ -154,7 +153,10 @@ export class ElementService {
             deferred.resolve(cached)
             return deferred.promise
         }
-        const deletedRequestCacheKey = this.getElementKey(reqOb)
+        const deletedRequestCacheKey = this.getElementKey(
+            reqOb,
+            reqOb.elementId
+        )
         deletedRequestCacheKey.push('deleted')
         const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey)
         if (deleted) {
@@ -166,9 +168,8 @@ export class ElementService {
             return deferred.promise
         }
         this.inProgressElements[key] = deferred.promise
-        const successCallback: httpCallback<ElementsResponse> = (
-            data: ElementsResponse
-        ) => {
+        const successCallback: httpCallback<ElementsResponse> = (response) => {
+            const data = response.data
             if (Array.isArray(data.elements) && data.elements.length > 0) {
                 deferred.resolve(this.cacheElement(reqOb, data.elements[0]))
             } else if (allowEmpty) {
@@ -185,14 +186,10 @@ export class ElementService {
         this.httpSvc.get<ElementsResponse>(
             url,
             successCallback,
-            (data, status, headers, config) => {
+            (response) => {
+                const data = response.data
                 const reason: VePromiseReason<ElementsResponse> =
-                    this.uRLSvc.handleHttpStatus<ElementsResponse>(
-                        data,
-                        status,
-                        headers,
-                        config
-                    )
+                    this.uRLSvc.handleHttpStatus<ElementsResponse>(response)
                 if (
                     data.deleted &&
                     data.deleted.length > 0 &&
@@ -226,14 +223,14 @@ export class ElementService {
      *      same objects
      */
     getElements(
-        reqOb: ElementsRequest,
+        reqOb: ElementsRequest<string[]>,
         weight: number,
         refresh?: boolean
     ): angular.IPromise<ElementObject[]> {
         const deferred: angular.IDeferred<ElementObject[]> = this.$q.defer()
         const request: { elements: { id: string }[] } = { elements: [] }
         const existing: ElementObject[] = []
-        this.utilsSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb)
         for (let i = 0; i < reqOb.elementId.length; i++) {
             const id = reqOb.elementId[i]
             const requestCacheKey = this.getElementKey(reqOb, id)
@@ -270,7 +267,7 @@ export class ElementService {
                 deferred.resolve(existing)
             },
             (response: angular.IHttpResponse<ElementObject[]>) =>
-                deferred.reject(this._handleResponse<ElementObject[]>(response))
+                this.apiSvc.handleErrorCallback(response, deferred)
         )
 
         return deferred.promise
@@ -292,30 +289,31 @@ export class ElementService {
      * @returns {object} cached object
      */
     cacheElement(
-        reqOb: ElementsRequest,
+        reqOb: RequestObject,
         elementOb: ElementObject,
         edit?: boolean
     ): ElementObject {
-        let result: ElementObject | string = this.utilsSvc.cleanElement(
-            elementOb,
-            edit
-        )
+        let result: ElementObject = this.apiSvc.cleanElement(elementOb, edit)
         const requestCacheKey = this.getElementKey(reqOb, result.id, edit)
         const origResultCommit = result._commitId
         if (reqOb.commitId === 'latest') {
-            const resultCommitCopy: ElementsRequest =
-                this.utilsSvc.makeElementRequestObject(
-                    _.clone<ElementObject>(result)
-                )
+            const resultCommitCopy: RequestObject =
+                this.apiSvc.makeRequestObject(_.clone<ElementObject>(result))
             result._commitId = 'latest' //so realCacheKey is right later
-            const commitCacheKey =
-                this.utilsSvc.makeElementKey(resultCommitCopy) //save historic element
+            const commitCacheKey = this.apiSvc.makeCacheKey(
+                resultCommitCopy,
+                result.id
+            ) //save historic element
             if (!edit) {
                 this.cacheSvc.put(commitCacheKey, result, true)
             }
         }
-        const resultReqOb = this.utilsSvc.makeElementRequestObject(result)
-        const realCacheKey = this.utilsSvc.makeElementKey(resultReqOb, edit)
+        const resultReqOb = this.apiSvc.makeRequestObject(result)
+        const realCacheKey = this.apiSvc.makeCacheKey(
+            resultReqOb,
+            result.id,
+            edit
+        )
         result._commitId = origResultCommit //restore actual commitId
         if (!_.isEqual(realCacheKey, requestCacheKey)) {
             this.cacheSvc.link(requestCacheKey, realCacheKey)
@@ -324,16 +322,18 @@ export class ElementService {
         return result
     }
 
-    cacheDeletedElement(reqOb: ElementsRequest, deletedOb: ElementObject) {
+    cacheDeletedElement(reqOb: RequestObject, deletedOb: ElementObject) {
         const requestCacheKey = this.getElementKey(reqOb, deletedOb.id)
         requestCacheKey.push('deleted')
-        const deletedReqOb: ElementsRequest = {
-            elementId: deletedOb.id,
+        const deletedReqOb: RequestObject = {
             projectId: deletedOb._projectId,
             refId: deletedOb._refId,
             commitId: deletedOb._commitId,
         }
-        const commitCacheKey = this.utilsSvc.makeElementKey(deletedReqOb)
+        const commitCacheKey = this.apiSvc.makeCacheKey(
+            deletedReqOb,
+            deletedOb.id
+        )
         this.cacheSvc.link(requestCacheKey, commitCacheKey)
         this.cacheSvc.put(commitCacheKey, deletedOb, true)
     }
@@ -378,15 +378,12 @@ export class ElementService {
      *      affecting the same element object that's used for displays
      */
     getElementForEdit(
-        reqOb: ElementsRequest,
+        reqOb: ElementsRequest<string>,
         weight?: number,
         refresh?: boolean
     ): angular.IPromise<ElementObject> {
-        this.utilsSvc.normalize(reqOb)
-        const id = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        const requestCacheKey = this.getElementKey(reqOb, id, true)
+        this.apiSvc.normalize(reqOb)
+        const requestCacheKey = this.getElementKey(reqOb, reqOb.elementId, true)
         const key = this.uRLSvc.getElementURL(reqOb) + 'edit'
         if (this.inProgressElements.hasOwnProperty(key)) {
             return this.inProgressElements[key]
@@ -429,11 +426,11 @@ export class ElementService {
      * element objects
      */
     getOwnedElements(
-        reqOb: ElementsRequest,
+        reqOb: ElementsRequest<string>,
         weight?: number,
         refresh?: boolean
     ) {
-        this.utilsSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb)
         if (!reqOb.depth) {
             reqOb.depth = -1
         }
@@ -463,17 +460,17 @@ export class ElementService {
      */
     getGenericElements(
         url: string,
-        reqOb: ElementsRequest,
+        reqOb: RequestObject,
         jsonKey: string,
         weight: number,
         refresh?: boolean
     ): angular.IPromise<ElementObject[]> {
-        this.utilsSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb)
         if (this.inProgressElements.hasOwnProperty(url)) {
             this.httpSvc.ping(url, weight)
             return this.inProgressArrays[url]
         }
-        const requestCacheKey = this.getElementKey(reqOb)
+        const requestCacheKey = this.getElementKey(reqOb, jsonKey)
         const deferred: angular.IDeferred<ElementObject[]> = this.$q.defer()
         this.inProgressArrays[url] = deferred.promise
         const cached = this.cacheSvc.get<ElementObject[]>(requestCacheKey)
@@ -481,11 +478,11 @@ export class ElementService {
             deferred.resolve(cached)
             return deferred.promise
         }
-        this.httpSvc.get<{ [jsonKey: string]: ElementObject[] }>(
+        this.httpSvc.get<GenericResponse>(
             url,
-            (data) => {
+            (response) => {
                 const results: ElementObject[] = []
-                const elements = data[jsonKey]
+                const elements: ElementObject[] = response.data[jsonKey]
                 for (let i = 0; i < elements.length; i++) {
                     const element = elements[i]
                     if (!element) {
@@ -497,10 +494,8 @@ export class ElementService {
                 delete this.inProgressArrays[url]
                 deferred.resolve(results)
             },
-            (data, status, headers, config) => {
-                deferred.reject(
-                    this.uRLSvc.handleHttpStatus(data, status, headers, config)
-                )
+            (response: angular.IHttpResponse<GenericResponse>) => {
+                deferred.reject(this.uRLSvc.handleHttpStatus(response))
                 delete this.inProgressArrays[url]
             },
             weight
@@ -524,8 +519,9 @@ export class ElementService {
         const ob = _.cloneDeep(elementOb) //make a copy
         ob._commitId = 'latest'
         const editOb = this.cacheSvc.get<ElementObject>(
-            this.utilsSvc.makeElementKey(
-                this.utilsSvc.makeElementRequestObject(ob),
+            this.apiSvc.makeCacheKey(
+                this.apiSvc.makeRequestObject(ob),
+                ob.id,
                 true
             )
         )
@@ -603,12 +599,14 @@ export class ElementService {
             const resp: ElementObject = this.cacheElement(metaOb, e)
             const editCopy = _.cloneDeep(e)
             this.cacheElement(metaOb, editCopy, true)
-            const history = this.cacheSvc.get<CommitObject[]>([
-                'history',
-                metaOb.projectId,
-                metaOb.refId,
-                metaOb.elementId,
-            ])
+            const history = this.cacheSvc.get<CommitObject[]>(
+                this.apiSvc.makeCacheKey(
+                    metaOb,
+                    metaOb.elementId,
+                    false,
+                    'history'
+                )
+            )
             if (history) {
                 const id = e._commitId ? e._commitId : 'latest'
                 history.unshift({
@@ -641,7 +639,7 @@ export class ElementService {
                 }),
                 {
                     elements: [postElem],
-                    source: this.applicationSvc.getSource(),
+                    source: 'view-editor',
                 },
                 { timeout: 60000 }
             )
@@ -679,35 +677,28 @@ export class ElementService {
                 (response: angular.IHttpResponse<ElementsResponse>) => {
                     if (response.status === 409) {
                         const serverOb = response.data.elements[0]
-                        this.utilsSvc.cleanElement(serverOb)
+                        this.apiSvc.cleanElement(serverOb)
                         const origCommit = elementOb._commitId
                         elementOb._commitId = 'latest'
-                        const origOb = this.cacheSvc.get(
-                            this.utilsSvc.makeElementKey({
-                                elementId: elementOb.id,
-                                projectId: elementOb._projectId,
-                                refId: elementOb._refId,
-                                commitId: elementOb._commitId,
-                            })
+                        const origOb = this.cacheSvc.get<ElementObject>(
+                            this.apiSvc.makeCacheKey(
+                                {
+                                    projectId: elementOb._projectId,
+                                    refId: elementOb._refId,
+                                    commitId: elementOb._commitId,
+                                },
+                                elementOb.id
+                            )
                         )
                         elementOb._commitId = origCommit
                         if (!origOb) {
                             deferred.reject(
-                                this.uRLSvc.handleHttpStatus(
-                                    response.data,
-                                    response.status,
-                                    response.headers,
-                                    response.config
-                                )
+                                this.uRLSvc.handleHttpStatus(response)
                             )
                             return
                         }
                         if (
-                            !this.utilsSvc.hasConflict(
-                                postElem,
-                                origOb,
-                                serverOb
-                            )
+                            !this.apiSvc.hasConflict(postElem, origOb, serverOb)
                         ) {
                             elementOb._read = serverOb._read
                             elementOb._modified = serverOb._modified
@@ -724,23 +715,11 @@ export class ElementService {
                             )
                         } else {
                             deferred.reject(
-                                this.uRLSvc.handleHttpStatus(
-                                    response.data,
-                                    response.status,
-                                    response.headers,
-                                    response.config
-                                )
+                                this.uRLSvc.handleHttpStatus(response)
                             )
                         }
                     } else
-                        deferred.reject(
-                            this.uRLSvc.handleHttpStatus(
-                                response.data,
-                                response.status,
-                                response.headers,
-                                response.config
-                            )
-                        )
+                        deferred.reject(this.uRLSvc.handleHttpStatus(response))
                 }
             )
         //});
@@ -856,14 +835,14 @@ export class ElementService {
     createElement(
         reqOb: ElementCreationRequest
     ): angular.IPromise<ElementObject> {
-        this.utilsSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb)
         const deferred: angular.IDeferred<ElementObject> = this.$q.defer()
 
         const url = this.uRLSvc.getPostElementsURL(reqOb)
         this.$http
             .post(url, {
                 elements: reqOb.elements,
-                source: this.applicationSvc.getSource(),
+                source: 'view-editor',
             })
             .then(
                 (response: angular.IHttpResponse<ElementsResponse>) => {
@@ -899,9 +878,7 @@ export class ElementService {
                     deferred.resolve(this.cacheElement(reqOb, resp))
                 },
                 (response: angular.IHttpResponse<ElementsResponse>) =>
-                    deferred.reject(
-                        this._handleResponse<ElementsResponse>(response)
-                    )
+                    this.apiSvc.handleErrorCallback(response, deferred)
             )
         return deferred.promise
     }
@@ -922,13 +899,13 @@ export class ElementService {
     createElements(
         reqOb: ElementCreationRequest
     ): angular.IPromise<ElementObject[]> {
-        this.utilsSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb)
         const deferred: angular.IDeferred<ElementObject[]> = this.$q.defer()
         const url = this.uRLSvc.getPostElementsURL(reqOb)
         this.$http
             .post(url, {
                 elements: reqOb.elements,
-                source: this.applicationSvc.getSource(),
+                source: 'view-editor',
             })
             .then(
                 (response: angular.IHttpResponse<ElementsResponse>) => {
@@ -954,7 +931,7 @@ export class ElementService {
                     deferred.resolve(results)
                 },
                 (response: angular.IHttpResponse<ElementsResponse>) => {
-                    deferred.reject(this._handleResponse(response))
+                    this.apiSvc.handleErrorCallback(response, deferred)
                 }
             )
         return deferred.promise
@@ -978,7 +955,7 @@ export class ElementService {
         server?: ElementObject
         cache?: ElementObject
     }> {
-        const reqOb: ElementsRequest = {
+        const reqOb: RequestObject = {
             projectId: elementOb._projectId,
             refId: elementOb._refId,
             elementId: elementOb.id,
@@ -990,7 +967,7 @@ export class ElementService {
         }> = this.$q.defer()
         deferred.resolve({ status: false })
         const orig = this.cacheSvc.get<ElementObject>(
-            this.utilsSvc.makeElementKey(reqOb, false)
+            this.apiSvc.makeCacheKey(reqOb, elementOb.id, false)
         )
         if (!orig) {
             deferred.resolve({ status: false })
@@ -1002,12 +979,12 @@ export class ElementService {
                 delete server._modified
                 delete server._read
                 delete server._creator
-                server = this.utilsSvc.cleanElement(server)
+                server = this.apiSvc.cleanElement(server)
                 let current: ElementObject = _.cloneDeep(orig)
                 delete current._modified
                 delete current._read
                 delete current._creator
-                current = this.utilsSvc.cleanElement(current)
+                current = this.apiSvc.cleanElement(current)
                 if (_.isEqual(server, current)) {
                     deferred.resolve({ status: false })
                 } else {
@@ -1019,7 +996,7 @@ export class ElementService {
                 }
             },
             (response: angular.IHttpResponse<ElementsResponse>) => {
-                deferred.reject(this._handleResponse(response))
+                this.apiSvc.handleErrorCallback(response, deferred)
             }
         )
         return deferred.promise
@@ -1046,7 +1023,7 @@ export class ElementService {
         queryParams?: QueryParams,
         weight?
     ): angular.IPromise<SearchResponse> {
-        this.utilsSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb)
         const url = this.uRLSvc.getElementSearchURL(reqOb, queryParams)
         const deferred: angular.IDeferred<SearchResponse> = this.$q.defer()
         this.$http.post(url, query).then(
@@ -1063,7 +1040,7 @@ export class ElementService {
                 deferred.resolve(response.data)
             },
             (response: angular.IHttpResponse<SearchResponse>) =>
-                deferred.reject(this._handleResponse(response))
+                this.apiSvc.handleErrorCallback(response, deferred)
         )
         return deferred.promise
     }
@@ -1082,25 +1059,22 @@ export class ElementService {
      * @returns {Promise} The promise will be resolved with an array of commit objects.
      */
     getElementHistory(
-        reqOb: ElementsRequest,
+        reqOb: ElementsRequest<string>,
         weight: number,
         update?: boolean
     ): angular.IPromise<CommitObject[]> {
-        this.utilsSvc.normalize(reqOb)
+        this.apiSvc.normalize(reqOb)
 
         const key = this.uRLSvc.getElementHistoryURL(reqOb)
         if (this.inProgressArrays.hasOwnProperty(key)) {
             return this.inProgressArrays[key]
         }
-        const id = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        const requestCacheKey: string[] = [
-            'history',
-            reqOb.projectId,
-            reqOb.refId,
-            id,
-        ]
+        const requestCacheKey: string[] = this.apiSvc.makeCacheKey(
+            reqOb,
+            reqOb.elementId,
+            false,
+            'history'
+        )
         const deferred: angular.IDeferred<CommitObject[]> = this.$q.defer()
         if (this.cacheSvc.exists(requestCacheKey) && !update) {
             deferred.resolve(this.cacheSvc.get(requestCacheKey))
@@ -1117,45 +1091,26 @@ export class ElementService {
                 deferred.resolve(
                     this.cacheSvc.get<CommitObject[]>(requestCacheKey)
                 )
-                delete this.inProgress[key]
+                delete this.inProgressArrays[key]
             },
-            (response) => {
-                this.uRLSvc.handleHttpStatus(
-                    response.data,
-                    response.status,
-                    response.headers,
-                    response.config,
-                    deferred
-                )
-                delete this.inProgress[key]
+            (response: angular.IHttpResponse<CommitObject[]>) => {
+                this.apiSvc.handleErrorCallback(response, deferred)
+                delete this.inProgressArrays[key]
             }
         )
         return deferred.promise
     }
 
     public getElementKey(
-        reqOb: ElementsRequest,
-        id?: string,
+        reqOb: RequestObject,
+        id: string,
         edit?: boolean
     ): string[] {
-        if (!id) {
-            id = Array.isArray(reqOb.elementId)
-                ? reqOb.elementId[0]
-                : reqOb.elementId
-        }
-        return this.utilsSvc.makeElementKey(
-            {
-                projectId: reqOb.projectId,
-                elementId: id,
-                commitId: reqOb.commitId,
-                refId: reqOb.refId,
-            },
-            edit
-        )
+        return this.apiSvc.makeCacheKey(reqOb, id, edit)
     }
 
     public getElementQualifiedName(
-        reqOb: ElementsRequest
+        reqOb: ElementsRequest<string>
     ): angular.IPromise<string> {
         const queryOb = {
             params: {
@@ -1182,7 +1137,8 @@ export class ElementService {
     }
 
     reset() {
-        this.inProgress = {}
+        this.inProgressArrays = {}
+        this.inProgressElements = {}
     }
 
     private _groupElementsByProjectIdAndRefId(elementObs: ElementObject[]) {
@@ -1191,7 +1147,7 @@ export class ElementService {
         })
     }
 
-    private _createMetaOb(element: ElementObject): ElementsRequest {
+    private _createMetaOb(element: ElementObject): ElementsRequest<string> {
         return {
             projectId: element._projectId,
             refId: element._refId,
@@ -1215,18 +1171,22 @@ export class ElementService {
         returnChildViews?: boolean
     ): angular.IPromise<ElementObject[]> {
         const deferred: angular.IDeferred<ElementObject[]> = this.$q.defer()
+        const url = returnChildViews
+            ? this.uRLSvc.getPostViewsURL({
+                  projectId: elements[0]._projectId,
+                  refId: elements[0]._refId,
+                  returnChildViews: returnChildViews ? returnChildViews : null,
+              })
+            : this.uRLSvc.getPostElementsURL({
+                  projectId: elements[0]._projectId,
+                  refId: elements[0]._refId,
+              })
         this.$http
             .post(
-                this.uRLSvc.getPostElementsURL({
-                    projectId: elements[0]._projectId,
-                    refId: elements[0]._refId,
-                    returnChildViews: returnChildViews
-                        ? returnChildViews
-                        : null,
-                }),
+                url,
                 {
                     elements: elements,
-                    source: this.applicationSvc.getSource(),
+                    source: 'view-editor',
                 },
                 { timeout: 60000 }
             )
@@ -1234,7 +1194,7 @@ export class ElementService {
                 (response: angular.IHttpResponse<ElementsResponse>) => {
                     this._bulkUpdateSuccessHandler(response, deferred)
                 },
-                (response) => {
+                (response: angular.IHttpResponse<ElementsResponse>) => {
                     this._bulkUpdateFailHandler(response, deferred, elements)
                 }
             )
@@ -1250,17 +1210,19 @@ export class ElementService {
         if (elements && elements.length > 0) {
             elements.forEach((e) => {
                 const metaOb = this._createMetaOb(e)
-                const editCopy = JSON.parse(JSON.stringify(e))
+                const editCopy = _.cloneDeep(e)
                 results.push(this.cacheElement(metaOb, e))
 
                 this.cacheElement(metaOb, editCopy, true)
 
-                const history = this.cacheSvc.get<CommitObject[]>([
-                    'history',
-                    metaOb.projectId,
-                    metaOb.refId,
-                    metaOb.elementId,
-                ])
+                const history = this.cacheSvc.get<CommitObject[]>(
+                    this.apiSvc.makeCacheKey(
+                        metaOb,
+                        metaOb.elementId,
+                        false,
+                        'history'
+                    )
+                )
                 if (history) {
                     history.unshift({
                         _creator: e._modifier,
@@ -1281,10 +1243,7 @@ export class ElementService {
                         'Bulk Update Partially Rejected. Check logs for more details.'
                     )
                     console.log(
-                        '[BULK UPDATE ELEMENT REJECTED]: ' +
-                            e.code +
-                            ': ' +
-                            e.message
+                        `[BULK UPDATE ELEMENT REJECTED]: ${e.code}: ${e.message}`
                     )
                     console.log(e.object.id)
                 }
@@ -1299,27 +1258,10 @@ export class ElementService {
         response: angular.IHttpResponse<ElementsResponse>,
         deferred: angular.IDeferred<ElementObject[]>,
         elementObs?: ElementObject[]
-    ) {
+    ): void {
         // for now the server doesn't return anything for the data properties, so override with the input
 
-        this.uRLSvc.handleHttpStatus(
-            response.data,
-            response.status,
-            response.headers,
-            response.config,
-            deferred
-        )
-    }
-
-    private _handleResponse<T>(
-        response: angular.IHttpResponse<T>
-    ): VePromiseReason<T> {
-        return this.uRLSvc.handleHttpStatus<T>(
-            response.data,
-            response.status,
-            response.headers,
-            response.config
-        )
+        this.apiSvc.handleErrorCallback(response, deferred)
     }
 }
 

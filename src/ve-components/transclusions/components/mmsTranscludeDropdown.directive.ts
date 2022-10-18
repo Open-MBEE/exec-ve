@@ -5,24 +5,27 @@
  * responsible person for that particular item which gets saved as the Type/Value? of the property You could additionally add a
  * binding which specifies the template for the creation of new objects as types to be placed in the holding bin.
  */
-import * as angular from 'angular'
+import angular from 'angular'
 
+import { ComponentService, ExtensionService } from '@ve-components/services'
+import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import { ButtonBarService } from '@ve-core/button-bar'
 import {
     ElementService,
     ViewService,
-    AuthService
-} from "@ve-utils/mms-api-client"
+    AuthService,
+} from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
 import {
+    MathJaxService,
     UtilsService,
-    EventService, ImageService
-} from "@ve-utils/services"
-import {VeComponentOptions} from '@ve-types/view-editor'
-import {veComponents} from '@ve-components'
-import {ComponentService, ExtensionService} from "@ve-components/services"
-import {ITransclusion, Transclusion} from "@ve-components/transclusions";
-import {MathJaxService} from "@ve-utils/services";
-import {ButtonBarService} from "@ve-core/button-bar";
-import {SchemaService} from "@ve-utils/model-schema";
+    EventService,
+    ImageService,
+} from '@ve-utils/services'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 /**
  * @ngdoc component
@@ -56,14 +59,15 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeEnumController extends Transclusion implements ITransclusion{
-
+export class TranscludeEnumController
+    extends Transclusion
+    implements ITransclusion
+{
     //Locals
     noClick: any | undefined
     clickHandler: any | undefined
 
-
-    static $inject = Transclusion.$inject;
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: angular.IQService,
@@ -82,12 +86,27 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
     ) {
-        super($q,$scope,$compile,$element,growl,componentSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
-            mathJaxSvc, extensionSvc, buttonBarSvc, imageSvc)
+        super(
+            $q,
+            $scope,
+            $compile,
+            $element,
+            growl,
+            componentSvc,
+            elementSvc,
+            utilsSvc,
+            schemaSvc,
+            authSvc,
+            eventSvc,
+            mathJaxSvc,
+            extensionSvc,
+            buttonBarSvc,
+            imageSvc
+        )
         this.cfType = 'name'
         this.cfTitle = ''
         this.cfKind = 'Text'
-        this.checkCircular = false;
+        this.checkCircular = false
     }
 
     protected config = () => {
@@ -95,61 +114,74 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
         // Value to save the resulting pointer
         // Transclusion for new options
         this.$element.on('click', (e) => {
-            if (this.noClick)
-                return;
+            if (this.noClick) return
 
             if (this.clickHandler) {
-                this.clickHandler();
-                return;
+                this.clickHandler()
+                return
             }
-            if (this.startEdit && !this.nonEditable)
-                this.startEdit();
+            if (this.startEdit && !this.nonEditable) this.startEdit()
 
-            if (!this.mmsViewCtrl)
-                return false;
+            if (!this.mmsViewCtrl) return false
 
-            if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
-                this.growl.warning("Cross Reference is not editable.");
+            if (
+                this.nonEditable &&
+                this.mmsViewCtrl &&
+                this.mmsViewCtrl.isEditable()
+            ) {
+                this.growl.warning('Cross Reference is not editable.')
             }
-            this.mmsViewCtrl.transcludeClicked(this.element);
-            e.stopPropagation();
-        });
+            this.mmsViewCtrl.transcludeClicked(this.element)
+            e.stopPropagation()
+        })
 
         if (this.mmsViewCtrl) {
-
-            this.isEditing = false;
-            this.elementSaving = false;
-            this.view = this.mmsViewCtrl.getView();
+            this.isEditing = false
+            this.elementSaving = false
+            this.view = this.mmsViewCtrl.getView()
 
             this.save = (e) => {
-                e.stopPropagation();
-                this.componentSvc.saveAction(this, this.$element, false);
-            };
+                e.stopPropagation()
+                this.componentSvc.saveAction(this, this.$element, false)
+            }
 
             this.cancel = (e) => {
-                e.stopPropagation();
-                this.componentSvc.cancelAction(this, this.recompile, this.$element);
-            };
+                e.stopPropagation()
+                this.componentSvc.cancelAction(
+                    this,
+                    this.recompile,
+                    this.$element
+                )
+            }
 
             this.startEdit = () => {
-                this.componentSvc.startEdit(this, this.mmsViewCtrl.isEditable(), this.$element, TranscludeEnumComponent.template, false);
-            };
-
+                this.componentSvc.startEdit(
+                    this,
+                    this.mmsViewCtrl.isEditable(),
+                    this.$element,
+                    TranscludeEnumComponent.template,
+                    false
+                )
+            }
         }
     }
 
     public getContent = (preview?) => {
-        let deferred = this.$q.defer<string>();
-        var defaultTemplate = '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">(no name)</span>';
-        var editTemplate = '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">(no name)</span>';
+        const deferred = this.$q.defer<string>()
+        const defaultTemplate =
+            '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">(no name)</span>'
+        const editTemplate =
+            '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">(no name)</span>'
         if (preview) {
-            deferred.resolve('<div class="panel panel-info">'+ editTemplate +'</div>');
+            deferred.resolve(
+                '<div class="panel panel-info">' + editTemplate + '</div>'
+            )
         } else {
-            this.isEditing = false;
-            deferred.resolve(defaultTemplate);
+            this.isEditing = false
+            deferred.resolve(defaultTemplate)
         }
-        return deferred.promise;
-    };
+        return deferred.promise
+    }
 
     // private _startEdit(
     //     ctrl: ExtensionController,
@@ -235,7 +267,6 @@ export class TranscludeEnumController extends Transclusion implements ITransclus
     //         })
     //     }
     // }
-
 }
 
 export const TranscludeEnumComponent: VeComponentOptions = {
@@ -271,14 +302,16 @@ export const TranscludeEnumComponent: VeComponentOptions = {
         noClick: '@',
         nonEditable: '<',
         clickHandler: '&?',
-        mmsCfLabel: '@'
+        mmsCfLabel: '@',
     },
     transclude: true,
     require: {
-        mmsViewCtrl: '?^^view'
+        mmsViewCtrl: '?^^view',
     },
-    controller: TranscludeEnumController
-};
+    controller: TranscludeEnumController,
+}
 
-veComponents.component(TranscludeEnumComponent.selector, TranscludeEnumComponent);
-
+veComponents.component(
+    TranscludeEnumComponent.selector,
+    TranscludeEnumComponent
+)

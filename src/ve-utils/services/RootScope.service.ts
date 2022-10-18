@@ -1,10 +1,11 @@
-import {SessionService} from "./Session.service";
-import {veUtils} from "@ve-utils";
-import {StateDeclaration} from "@uirouter/core/lib/state/interface";
-import {StateParams} from "@uirouter/core/lib/params/stateParams";
+import { StateParams } from '@uirouter/core/lib/params/stateParams'
+import { StateDeclaration } from '@uirouter/core/lib/state/interface'
+
+import { veUtils } from '@ve-utils'
+
+import { SessionService } from './Session.service'
 
 export class RootScopeService {
-
     public constants = {
         LOGINMODALOPEN: 'login-modal-open',
         MMSREFOB: 'mms-ref-ob',
@@ -29,107 +30,184 @@ export class RootScopeService {
         TREEINITIALSELECTION: 'tree-initialSelection',
         TREEICONS: 'tree-icons',
         LEFTPANECLOSED: 'tree-pane-closed',
-        DELETEKEY: this.sessionSvc.constants.DELETEKEY
-    };
-
-    constructor(private sessionSvc: SessionService) {
+        DELETEKEY: this.sessionSvc.constants.DELETEKEY,
     }
 
-    loginModalOpen(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.LOGINMODALOPEN, value, false);
+    constructor(private sessionSvc: SessionService) {}
+
+    loginModalOpen(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.LOGINMODALOPEN,
+            value,
+            false
+        )
     }
 
-    mmsRefOb(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.MMSREFOB, value);
+    mmsRefOb(value?: any | undefined) {
+        return this.sessionSvc.accessor(this.constants.MMSREFOB, value)
     }
 
-    rightPaneToggleable(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.RIGHTPANETOGGLEABLE, value, true);
+    rightPaneToggleable(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.RIGHTPANETOGGLEABLE,
+            value,
+            true
+        )
     }
 
-    rightPaneClosed(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.RIGHTPANECLOSED, value, false);
+    rightPaneClosed(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.RIGHTPANECLOSED,
+            value,
+            false
+        )
     }
 
-    veTitle(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VETITLE, value, 'View Editor', true);
+    veTitle(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VETITLE,
+            value,
+            'View Editor',
+            true
+        )
     }
 
-    veFn(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEFN, value, false);
+    veFn(value?: any | undefined) {
+        return this.sessionSvc.accessor(this.constants.VEFN, value, false)
     }
 
-    veStateChanging(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VESTATECHANGING, value, false);
+    veStateChanging(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VESTATECHANGING,
+            value,
+            false
+        )
     }
 
-    veViewContentLoading(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEVIEWCONTENTLOADING, value, false, true);
+    veViewContentLoading(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VEVIEWCONTENTLOADING,
+            value,
+            false,
+            true
+        )
     }
 
-    veRedirect(value?: { toState: StateDeclaration, toParams: { [paramName: string]: any } } | undefined):
-        { toState: StateDeclaration, toParams: { [paramName: string]: any } } | undefined {
-        return this.sessionSvc.accessor(this.constants.VEREDIRECT, value, null);
+    veRedirect(
+        value?:
+            | { toState: StateDeclaration; toParams: ParamsObject }
+            | undefined
+    ): { toState: StateDeclaration; toParams: ParamsObject } | undefined {
+        return this.sessionSvc.accessor(this.constants.VEREDIRECT, value, null)
     }
 
-    veRedirectFromOld(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEREDIRECTFROMOLD, value, null, true);
+    veRedirectFromOld(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VEREDIRECTFROMOLD,
+            value,
+            null,
+            true
+        )
     }
 
-    veCrushUrl(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VECRUSHURL, value, null);
+    veCrushUrl(value?: any | undefined) {
+        return this.sessionSvc.accessor(this.constants.VECRUSHURL, value, null)
     }
 
-    veFullDocMode(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEFULLDOCMODE, value, false);
+    veFullDocMode(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VEFULLDOCMODE,
+            value,
+            false
+        )
     }
 
-    veCommentsOn(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VECOMMENTSON, value, false);
+    veCommentsOn(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VECOMMENTSON,
+            value,
+            false
+        )
     }
 
-    veNumberingOn(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VECOMMENTSON, value, true);
+    veNumberingOn(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VECOMMENTSON,
+            value,
+            true
+        )
     }
 
-    veElementsOn(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEELEMENTSON, value, false);
+    veElementsOn(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VEELEMENTSON,
+            value,
+            false
+        )
     }
 
-    veEditMode(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEEDITMODE, value, false);
+    veEditMode(value?: any | undefined) {
+        return this.sessionSvc.accessor(this.constants.VEEDITMODE, value, false)
     }
 
-    veHidePanes(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEHIDEPANES, value, false, true)
+    veHidePanes(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VEHIDEPANES,
+            value,
+            false,
+            true
+        )
     }
 
-    veShowManageRefs(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VESHOWMANAGEREFS, value, false, true);
+    veShowManageRefs(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VESHOWMANAGEREFS,
+            value,
+            false,
+            true
+        )
     }
 
-    veShowLogin(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VESHOWLOGIN, value, false, true);
+    veShowLogin(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.VESHOWLOGIN,
+            value,
+            false,
+            true
+        )
     }
 
     veShowSearch(value?: boolean | undefined): boolean | undefined {
-        return this.sessionSvc.accessor(this.constants.VESHOWSEARCH, value, false, true);
+        return this.sessionSvc.accessor(
+            this.constants.VESHOWSEARCH,
+            value,
+            false,
+            true
+        )
     }
 
-    treeShowPe(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.TREESHOWPE, value, false);
+    treeShowPe(value?: any | undefined) {
+        return this.sessionSvc.accessor(this.constants.TREESHOWPE, value, false)
     }
 
-    treeInitialSelection(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.TREEINITIALSELECTION, value, null, true);
+    treeInitialSelection(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.TREEINITIALSELECTION,
+            value,
+            null,
+            true
+        )
     }
 
-    leftPaneClosed(value?:any | undefined) {
-        return this.sessionSvc.accessor(this.constants.LEFTPANECLOSED, value, false);
+    leftPaneClosed(value?: any | undefined) {
+        return this.sessionSvc.accessor(
+            this.constants.LEFTPANECLOSED,
+            value,
+            false
+        )
     }
-
 }
 
-RootScopeService.$inject = ['SessionService'];
+RootScopeService.$inject = ['SessionService']
 
-veUtils.service('RootScopeService', RootScopeService);
+veUtils.service('RootScopeService', RootScopeService)

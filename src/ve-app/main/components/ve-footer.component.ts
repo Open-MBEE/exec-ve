@@ -1,11 +1,13 @@
-import * as angular from 'angular';
-import {handleChange} from "@ve-utils/utils/change.util";
-import {VeComponentOptions} from "@ve-types/view-editor";
+import angular from 'angular'
 
-import {veApp} from "@ve-app";
+import { handleChange } from '@ve-utils/utils/change.util'
 
-let VeFooterComponent: VeComponentOptions = {
-    selector: "veFooter",
+import { veApp } from '@ve-app'
+
+import { VeComponentOptions } from '@ve-types/view-editor'
+
+const VeFooterComponent: VeComponentOptions = {
+    selector: 'veFooter',
     template: `
     <footer ng-show="!$ctrl.footerOb.disabled" class="footer">
     <div class="block">
@@ -16,7 +18,7 @@ let VeFooterComponent: VeComponentOptions = {
 </footer>
 `,
     bindings: {
-        footerOb: "<"
+        footerOb: '<',
     },
     controller: class FooterController implements angular.IComponentController {
         private footerOb
@@ -25,19 +27,16 @@ let VeFooterComponent: VeComponentOptions = {
 
         $onInit() {
             if (Array.isArray(this.footerOb.message))
-                this.footerMessage = this.footerOb.message;
-            else
-                this.footerMessage = [this.footerOb.message];
+                this.footerMessage = this.footerOb.message
+            else this.footerMessage = [this.footerOb.message]
         }
 
         $onChanges(onChangesObj: angular.IOnChangesObject) {
-            handleChange(onChangesObj, 'footerOb',() => {
-                this.footerMessage = this.footerOb.message;
+            handleChange(onChangesObj, 'footerOb', () => {
+                this.footerMessage = this.footerOb.message
             })
         }
-    }
-
+    },
 }
 
-
-veApp.component(VeFooterComponent.selector,VeFooterComponent);
+veApp.component(VeFooterComponent.selector, VeFooterComponent)

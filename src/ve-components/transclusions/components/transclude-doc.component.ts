@@ -1,13 +1,25 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
-import {ElementService, AuthService, ViewService, URLService} from "@ve-utils/mms-api-client";
-import {UtilsService, EventService, MathJaxService, ImageService} from "@ve-utils/services"
-import {ButtonBarService,} from '@ve-core/button-bar'
-import {VeComponentOptions} from '@ve-types/view-editor'
-import {Transclusion, ITransclusion} from '@ve-components/transclusions'
-import {veComponents} from "@ve-components";
-import {ExtensionService, ComponentService} from "@ve-components/services"
-import {SchemaService} from "@ve-utils/model-schema";
+import { ExtensionService, ComponentService } from '@ve-components/services'
+import { Transclusion, ITransclusion } from '@ve-components/transclusions'
+import { ButtonBarService } from '@ve-core/button-bar'
+import {
+    ElementService,
+    AuthService,
+    ViewService,
+    URLService,
+} from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
+import {
+    UtilsService,
+    EventService,
+    MathJaxService,
+    ImageService,
+} from '@ve-utils/services'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 /**
  * @ngdoc component
@@ -45,8 +57,10 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeDocController extends Transclusion implements ITransclusion {
-
+export class TranscludeDocController
+    extends Transclusion
+    implements ITransclusion
+{
     protected editorTemplate: string = `
     <div class="panel panel-default no-print">
     <div class="panel-heading clearfix">
@@ -68,7 +82,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
 </div>
 `
 
-    static $inject = Transclusion.$inject;
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: angular.IQService,
@@ -87,16 +101,30 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
     ) {
-        super($q, $scope,$compile,$element,growl,componentSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
-            mathJaxSvc, extensionSvc, buttonBarSvc, imageSvc)
+        super(
+            $q,
+            $scope,
+            $compile,
+            $element,
+            growl,
+            componentSvc,
+            elementSvc,
+            utilsSvc,
+            schemaSvc,
+            authSvc,
+            eventSvc,
+            mathJaxSvc,
+            extensionSvc,
+            buttonBarSvc,
+            imageSvc
+        )
         this.cfType = 'doc'
         this.cfTitle = 'Documentation'
         this.cfKind = 'Text'
-        this.checkCircular = true;
+        this.checkCircular = true
     }
 
     config = () => {
-
         this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this)
 
         this.$element.on('click', (e) => {
@@ -134,7 +162,11 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             }
 
             this.cancel = () => {
-                this.componentSvc.cancelAction(this, this.recompile, this.$element)
+                this.componentSvc.cancelAction(
+                    this,
+                    this.recompile,
+                    this.$element
+                )
             }
 
             this.startEdit = () => {
@@ -148,7 +180,11 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             }
 
             this.preview = () => {
-                this.componentSvc.previewAction(this, this.recompile, this.$element)
+                this.componentSvc.previewAction(
+                    this,
+                    this.recompile,
+                    this.$element
+                )
             }
         }
 
@@ -166,11 +202,27 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
             this.presentationElem =
                 this.mmsViewPresentationElemCtrl.getPresentationElement()
-            var auto = [
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Image',this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Paragraph', this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','List', this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Table', this.schema),
+            const auto = [
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'Image',
+                    this.schema
+                ),
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'Paragraph',
+                    this.schema
+                ),
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'List',
+                    this.schema
+                ),
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'Table',
+                    this.schema
+                ),
             ]
 
             if (auto.indexOf(this.instanceSpec.classifierIds[0]) >= 0)
@@ -195,9 +247,9 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
     }
 
     public getContent = (preview?) => {
-        let deferred = this.$q.defer<string | HTMLElement[]>();
+        const deferred = this.$q.defer<string | HTMLElement[]>()
 
-        var doc = preview ? this.edit.documentation : this.element.documentation
+        let doc = preview ? this.edit.documentation : this.element.documentation
         if (!doc || this.emptyRegex.test(doc)) {
             doc =
                 '<p class="no-print placeholder">(no ' +
@@ -209,17 +261,17 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         doc = doc.replace(this.spacePeriod, '>.')
         doc = doc.replace(this.spaceSpace, '> ')
         doc = doc.replace(this.spaceComma, '>,')
-        let result: string = '';
+        let result = ''
         if (preview) {
-            result = '<div class="panel panel-info">' + doc + '</div>';
+            result = '<div class="panel panel-info">' + doc + '</div>'
         } else {
             this.isEditing = false
-            result = doc;
+            result = doc
         }
         if (this.mmsViewPresentationElemCtrl) {
-            var element =
+            const element =
                 this.mmsViewPresentationElemCtrl.getPresentationElement()
-            var pe = this.mmsViewPresentationElemCtrl.getInstanceSpec()
+            const pe = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             if (
                 pe &&
                 pe._veNumber &&
@@ -240,21 +292,21 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
             }
         }
         if (!this.mmsGenerateForDiff) {
-            let resultHtml = $('<p></p>').html(result).toArray()
-            this.mathJaxSvc
-                .typeset(resultHtml)
-                .then(() => deferred.resolve(resultHtml), (reason) => {
-                    deferred.reject(reason);
-                })
+            const resultHtml = $('<p></p>').html(result).toArray()
+            this.mathJaxSvc.typeset(resultHtml).then(
+                () => deferred.resolve(resultHtml),
+                (reason) => {
+                    deferred.reject(reason)
+                }
+            )
         } else {
-            deferred.resolve(result);
+            deferred.resolve(result)
         }
-        return deferred.promise;
+        return deferred.promise
     }
-
 }
 
-export let TranscludeDocComponent: VeComponentOptions = {
+export const TranscludeDocComponent: VeComponentOptions = {
     selector: 'transcludeDoc',
     template: `<div></div>`,
     bindings: {
@@ -275,4 +327,3 @@ export let TranscludeDocComponent: VeComponentOptions = {
 }
 
 veComponents.component(TranscludeDocComponent.selector, TranscludeDocComponent)
-

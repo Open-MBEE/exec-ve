@@ -1,22 +1,20 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
+import { ExtensionService, ComponentService } from '@ve-components/services'
+import { Transclusion, ITransclusion } from '@ve-components/transclusions'
+import { ButtonBarService } from '@ve-core/button-bar'
 import {
     ElementService,
     ViewService,
     AuthService,
-    URLService
-} from "@ve-utils/mms-api-client"
-import {
-    UtilsService,
-    EventService,
-    MathJaxService
-} from "@ve-utils/services"
-import { ButtonBarService } from '@ve-core/button-bar'
-import {VeComponentOptions} from '@ve-types/view-editor'
-import {Transclusion, ITransclusion} from '@ve-components/transclusions'
-import {veComponents} from "@ve-components";
-import {ExtensionService, ComponentService} from "@ve-components/services"
-import {SchemaService} from "@ve-utils/model-schema";
+    URLService,
+} from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
+import { UtilsService, EventService, MathJaxService } from '@ve-utils/services'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 /**
  * @ngdoc component
@@ -54,17 +52,17 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeImgController extends Transclusion implements ITransclusion {
-
+export class TranscludeImgController
+    extends Transclusion
+    implements ITransclusion
+{
     //Locals
-    includeExt = [
-        'svg', 'png'
-    ];
-    svg: { url: string, image: boolean, ext: string }[]
-    png: { url: string, image: boolean, ext: string }[]
-    artifacts: { url: string, image: boolean, ext: string }[]
+    includeExt = ['svg', 'png']
+    svg: { url: string; image: boolean; ext: string }[]
+    png: { url: string; image: boolean; ext: string }[]
+    artifacts: { url: string; image: boolean; ext: string }[]
 
-    static $inject: string[] = [...Transclusion.$inject, 'URLService'];
+    static $inject: string[] = [...Transclusion.$inject, 'URLService']
 
     constructor(
         $q: angular.IQService,
@@ -81,19 +79,32 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
         extensionSvc: ExtensionService,
         mathJaxSvc: MathJaxService,
         buttonBarSvc: ButtonBarService,
-        private urlSvc: URLService,
+        private urlSvc: URLService
     ) {
-        super($q, $scope,$compile,$element,growl,componentSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
-            mathJaxSvc, extensionSvc, buttonBarSvc)
+        super(
+            $q,
+            $scope,
+            $compile,
+            $element,
+            growl,
+            componentSvc,
+            elementSvc,
+            utilsSvc,
+            schemaSvc,
+            authSvc,
+            eventSvc,
+            mathJaxSvc,
+            extensionSvc,
+            buttonBarSvc
+        )
         this.cfType = 'doc'
         this.cfTitle = 'Documentation'
         this.cfKind = 'Text'
-        this.checkCircular = true;
+        this.checkCircular = true
     }
 
     config = () => {
         this.$element.on('click', (e) => {
-
             if (this.mmsViewCtrl)
                 this.mmsViewCtrl.transcludeClicked(this.element)
 
@@ -101,36 +112,35 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
         })
     }
 
-
-
     public getContent = (preview?) => {
-        var artifacts = this.element._artifacts;
+        const artifacts = this.element._artifacts
         if (artifacts !== undefined) {
-            var reqOb = {
+            const reqOb = {
                 elementId: this.mmsElementId,
                 projectId: this.projectId,
                 refId: this.refId,
                 commitId: this.commitId,
                 includeRecentVersionElement: true,
             }
-            this.artifacts = artifacts.filter(a => this.includeExt.includes(a.extension))
-                .map(a => {
+            this.artifacts = artifacts
+                .filter((a) => this.includeExt.includes(a.extension))
+                .map((a) => {
                     return {
                         url: this.urlSvc.getArtifactURL(reqOb, a.extension),
-                        image: (a.mimetype.indexOf('image') > -1),
-                        ext: a.extension
-                    };
-                });
-            this.svg = this.artifacts.filter(a => a.ext === 'svg');
-            this.png = this.artifacts.filter(a => a.ext === 'png');
+                        image: a.mimetype.indexOf('image') > -1,
+                        ext: a.extension,
+                    }
+                })
+            this.svg = this.artifacts.filter((a) => a.ext === 'svg')
+            this.png = this.artifacts.filter((a) => a.ext === 'png')
         }
-        let result = '<img class="mms-svg" ng-src="{{$ctrl.svg[0].url}}" alt="{{$ctrl.element.name}}"><img class="mms-png" ng-src="{{$ctrl.png[0].url}}"  alt="{{$ctrl.element.name}}"/>'
-        return this.$q.resolve(result);
+        const result =
+            '<img class="mms-svg" ng-src="{{$ctrl.svg[0].url}}" alt="{{$ctrl.element.name}}"><img class="mms-png" ng-src="{{$ctrl.png[0].url}}"  alt="{{$ctrl.element.name}}"/>'
+        return this.$q.resolve(result)
     }
-
 }
 
-export let TranscludeImgComponent: VeComponentOptions = {
+export const TranscludeImgComponent: VeComponentOptions = {
     selector: 'transcludeImg',
     template: `<div></div>`,
     bindings: {
@@ -141,7 +151,7 @@ export let TranscludeImgComponent: VeComponentOptions = {
         mmsWatchId: '@',
         nonEditable: '<',
         mmsCfLabel: '@',
-        mmsGenerateForDiff: '<'
+        mmsGenerateForDiff: '<',
     },
     require: {
         mmsViewCtrl: '?^view',
@@ -151,4 +161,3 @@ export let TranscludeImgComponent: VeComponentOptions = {
 }
 
 veComponents.component(TranscludeImgComponent.selector, TranscludeImgComponent)
-

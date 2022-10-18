@@ -1,5 +1,11 @@
-import * as angular from 'angular'
-import { Injectable } from 'angular'
+import angular, { Injectable } from 'angular'
+import $ from 'jquery'
+
+import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
+import { SpecApi } from '@ve-components/spec-tools'
+import { ITransclusion } from '@ve-components/transclusions'
+import { ButtonBarApi } from '@ve-core/button-bar'
+import { VeEditorApi } from '@ve-core/editor'
 import {
     AuthService,
     CacheService,
@@ -14,17 +20,17 @@ import {
     RootScopeService,
     UtilsService,
 } from '@ve-utils/services'
-import {ElementObject, PropertySpec, UserObject, ViewObject} from '@ve-types/mms'
-import { ITransclusion } from '@ve-components/transclusions'
 import { ValueSpec } from '@ve-utils/utils'
-import { veComponents } from '@ve-components'
-import { ButtonBarApi } from '@ve-core/button-bar'
-import { VeEditorApi } from '@ve-core/editor'
-import {VeModalService, VeModalSettings} from "@ve-types/view-editor";
-import {ConfirmDeleteModalResolveFn} from "@ve-app/main/modals/confirm-delete-modal.component";
 
-import $ from "jquery";
-import {SpecApi} from "@ve-components/spec-tools";
+import { veComponents } from '@ve-components'
+
+import {
+    ElementObject,
+    PropertySpec,
+    UserObject,
+    ViewObject,
+} from '@ve-types/mms'
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 export interface ExtensionController {
     element: ElementObject
@@ -44,8 +50,6 @@ export interface ExtensionController {
     editValues: any[]
     $scope: angular.IScope
 }
-
-
 
 /**
  * @internal
@@ -69,8 +73,6 @@ export interface ExtensionController {
 export class ComponentService {
     //locals
     private addItemData
-
-
 
     static $inject = [
         '$q',
@@ -110,19 +112,24 @@ export class ComponentService {
         private autosaveSvc: AutosaveService
     ) {}
 
-    public hasCircularReference(ctrl: ITransclusion, curId: string, curType: string) {
-        let curscope = ctrl.$scope;
+    public hasCircularReference(
+        ctrl: ITransclusion,
+        curId: string,
+        curType: string
+    ) {
+        let curscope = ctrl.$scope
         while (curscope.$parent) {
-            const parent = curscope.$parent;
+            const parent = curscope.$parent
             if (curscope.$parent.$ctrl) {
-
-                if (parent.$ctrl.mmsElementId === curId && parent.$ctrl.cfType === curType)
-                    return true;
-
+                if (
+                    parent.$ctrl.mmsElementId === curId &&
+                    parent.$ctrl.cfType === curType
+                )
+                    return true
             }
-            curscope = parent;
+            curscope = parent
         }
-        return false;
+        return false
     }
 
     public clearAutosave(autosaveKey: string, elementType: string) {
@@ -357,8 +364,8 @@ export class ComponentService {
      */
     public hasEdits(editOb: ElementObject): boolean {
         editOb._commitId = 'latest'
-        const cachedKey = this.utilsSvc.makeElementKey(
-            this.utilsSvc.makeElementRequestObject(editOb)
+        const cachedKey = this.apiSvc.makeCacheKey(
+            this.utilsSvc.makeRequestObject(editOb)
         )
         const elementOb: ElementObject =
             this.cacheSvc.get<ElementObject>(cachedKey)
@@ -408,8 +415,8 @@ export class ComponentService {
         //     editorApi.destroy();
         // }
         editOb._commitId = 'latest'
-        const cachedKey = this.utilsSvc.makeElementKey(
-            this.utilsSvc.makeElementRequestObject(editOb)
+        const cachedKey = this.apiSvc.makeCacheKey(
+            this.utilsSvc.makeRequestObject(editOb)
         )
         const elementOb: ElementObject =
             this.cacheSvc.get<ElementObject>(cachedKey)
@@ -822,7 +829,7 @@ export class ComponentService {
             ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
         }
         if (ctrl.editorApi && ctrl.editorApi.cancel) {
-            ctrl.editorApi.cancel();
+            ctrl.editorApi.cancel()
         }
         // Only need to confirm the cancellation if edits have been made:
         if (this.hasEdits(ctrl.edit)) {
@@ -860,15 +867,17 @@ export class ComponentService {
                 getType: () => {
                     return 'edit'
                 },
-                finalize: () => { return () => {
-                    this.clearAutosave(
-                        deleteOb.element._projectId +
-                        deleteOb.element._refId +
-                        deleteOb.element.id,
-                        deleteOb.type
-                    )
-                    return this.$q.resolve(true);
-                }},
+                finalize: () => {
+                    return () => {
+                        this.clearAutosave(
+                            deleteOb.element._projectId +
+                                deleteOb.element._refId +
+                                deleteOb.element.id,
+                            deleteOb.type
+                        )
+                        return this.$q.resolve(true)
+                    }
+                },
             },
         }
         return this.$uibModal.open(settings)
@@ -887,22 +896,24 @@ export class ComponentService {
         bbApi.toggleButtonSpinner('presentation-element-delete')
         const settings: VeModalSettings = {
             component: 'confirmDeleteModal',
-            resolve: <ConfirmDeleteModalResolveFn> {
+            resolve: <ConfirmDeleteModalResolveFn>{
                 getType: () => {
                     return ctrl.edit.type ? ctrl.edit.type : 'element'
                 },
                 getName: () => {
                     return ctrl.edit.name ? ctrl.edit.name : 'Element'
                 },
-                finalize: () => { return () => {
-                    this.clearAutosave(
-                        ctrl.element._projectId +
-                        ctrl.element._refId +
-                        ctrl.element.id,
-                        ctrl.edit.type
-                    )
-                    return this.$q.resolve(true);
-                }},
+                finalize: () => {
+                    return () => {
+                        this.clearAutosave(
+                            ctrl.element._projectId +
+                                ctrl.element._refId +
+                                ctrl.element.id,
+                            ctrl.edit.type
+                        )
+                        return this.$q.resolve(true)
+                    }
+                },
             },
         }
         const instance = this.$uibModal.open(settings)
@@ -1102,10 +1113,8 @@ export class ComponentService {
         }
     }
 
-
-
     public getModifier(modifier: string): angular.IPromise<UserObject> {
-        return this.authSvc.getUserData(modifier);
+        return this.authSvc.getUserData(modifier)
     }
 }
 

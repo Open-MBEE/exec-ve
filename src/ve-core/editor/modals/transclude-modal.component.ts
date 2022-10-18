@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 import _ from 'lodash'
 
 import { ElementService, ViewService } from '@ve-utils/mms-api-client'
@@ -349,11 +349,11 @@ const TranscludeModalComponent: VeModalComponent = {
                 classifierIds?: string[]
             } = {}
             filter._appliedStereotypeIds = [
-                this.schemaSvc.get('VIEW_SID', this.schema),
-                this.schemaSvc.get('DOCUMENT_SID', this.schema),
-                ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema),
+                this.schemaSvc.getSchema('VIEW_SID', this.schema),
+                this.schemaSvc.getSchema('DOCUMENT_SID', this.schema),
+                ...this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema),
             ]
-            const allClassifierIds = this.schemaSvc.get(
+            const allClassifierIds = this.schemaSvc.getSchema
                 'TYPE_TO_CLASSIFIER_ID',
                 this.schema
             )

@@ -1,15 +1,21 @@
-import {StateService} from '@uirouter/angularjs';
-import * as angular from 'angular';
-import {ViewService, ElementService} from "@ve-utils/mms-api-client";
-import {EventService} from "@ve-utils/services";
-import {AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap} from "@ve-types/tree";
-import {ViewObject} from "@ve-types/mms";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {AppUtilsService} from "@ve-app/main/services";
+import { StateService } from '@uirouter/angularjs'
+import angular from 'angular'
 
-import {veApp} from '@ve-app';
-import {TreeService, TreeApi} from "@ve-core/tree";
+import { AppUtilsService } from '@ve-app/main/services'
+import { TreeService, TreeApi } from '@ve-core/tree'
+import { ViewService, ElementService } from '@ve-utils/mms-api-client'
+import { EventService } from '@ve-utils/services'
 
+import { veApp } from '@ve-app'
+
+import { ViewObject } from '@ve-types/mms'
+import {
+    AngularUITree,
+    TreeBranch,
+    VeTreeNodeScope,
+    View2NodeMap,
+} from '@ve-types/tree'
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 /* Controllers */
 /**
@@ -27,69 +33,99 @@ import {TreeService, TreeApi} from "@ve-core/tree";
  * @requires veUtils/TreeService
  */
 class ReorderController implements angular.IComponentController {
-
     //bindings
     private documentOb: ViewObject
 
     //local
     protected doc: ViewObject
-    private viewIds2node: View2NodeMap = {};
-    private origViews: {[key:string]: ViewObject} = {};
+    private viewIds2node: View2NodeMap = {}
+    private origViews: { [key: string]: ViewObject } = {}
     public tree: TreeBranch[]
     public treeOptions: AngularUITree.ICallbacks
-    private seenViewIds: View2NodeMap = {};
-    public saveClass: string = "";
-    private saving: boolean = false;
+    private seenViewIds: View2NodeMap = {}
+    public saveClass: string = ''
+    private saving: boolean = false
 
     //injectables
     private treeApi: TreeApi
-    public subs: Rx.IDisposable[];
+    public subs: Rx.IDisposable[]
 
-    static $inject = ['$state', '$timeout', 'growl', '$scope', 'ElementService', 'ViewService', 'AppUtilsService', 'TreeService', 'EventService'];
+    static $inject = [
+        '$state',
+        '$timeout',
+        'growl',
+        '$scope',
+        'ElementService',
+        'ViewService',
+        'AppUtilsService',
+        'TreeService',
+        'EventService',
+    ]
 
-    constructor(private $state: StateService, private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService,
-                private $scope: angular.IScope, private elementSvc: ElementService, private viewSvc: ViewService,
-                private appUtilsSvc: AppUtilsService, private treeSvc: TreeService, private eventSvc: EventService) {}
+    constructor(
+        private $state: StateService,
+        private $timeout: angular.ITimeoutService,
+        private growl: angular.growl.IGrowlService,
+        private $scope: angular.IScope,
+        private elementSvc: ElementService,
+        private viewSvc: ViewService,
+        private appUtilsSvc: AppUtilsService,
+        private treeSvc: TreeService,
+        private eventSvc: EventService
+    ) {}
 
     $onInit() {
-        this.doc = this.documentOb;
-        this.treeApi = this.treeSvc.getApi();
-        this.eventSvc.$init(this);
+        this.doc = this.documentOb
+        this.treeApi = this.treeSvc.getApi()
+        this.eventSvc.$init(this)
 
-        let name = (this.documentOb.name) ? this.documentOb.name : this.documentOb.id
+        const name = this.documentOb.name
+            ? this.documentOb.name
+            : this.documentOb.id
         this.viewIds2node[this.documentOb.id] = {
             label: name,
             type: 'view',
             data: this.documentOb,
             aggr: 'composite',
-            children: []
-        };
+            children: [],
+        }
 
-        this.viewSvc.handleChildViews(this.documentOb, 'composite', undefined, this.documentOb._projectId,
-            this.documentOb._refId, this.viewIds2node, this.handleSingleView, this.handleChildren)
-            .then((docNode:TreeBranch) => {
-                var num = 1;
+        this.viewSvc
+            .handleChildViews(
+                this.documentOb,
+                'composite',
+                undefined,
+                this.documentOb._projectId,
+                this.documentOb._refId,
+                this.viewIds2node,
+                this.handleSingleView,
+                this.handleChildren
+            )
+            .then((docNode: TreeBranch) => {
+                let num = 1
                 docNode.children.forEach((node) => {
-                    this.updateNumber(node, num + '', 'old');
-                    this.updateNumber(node, num + '', 'new');
-                    num++;
-                });
-                this.tree = [docNode];
-            });
-        this.subs.push(this.eventSvc.$on('foobar', () => {
-            let root = this.tree;
-            console.log(root);
-        }))
+                    this.updateNumber(node, num + '', 'old')
+                    this.updateNumber(node, num + '', 'new')
+                    num++
+                })
+                this.tree = [docNode]
+            })
+        this.subs.push(
+            this.eventSvc.$on('foobar', () => {
+                const root = this.tree
+                console.log(root)
+            })
+        )
         this.treeOptions = {
-            dropped : (e) => {
+            dropped: (e) => {
                 this.$timeout(() => {
                     for (let i = 0; i < this.tree.length; i++) {
-                        var root = this.tree[i];
-                        root.new = '';
-                        var num = 1;
-                        for (var j = 0; j < root.children.length; j++) {
-                            this.updateNumber(root.children[j], num + '', 'new');
-                            num++;
+                        const root = this.tree[i]
+                        root.new = ''
+                        let num = 1
+                        for (let j = 0; j < root.children.length; j++) {
+                            this.updateNumber(root.children[j], num + '', 'new')
+                            num++
                         }
                     }
                 }, 1)
@@ -106,76 +142,83 @@ class ReorderController implements angular.IComponentController {
             //     }
             // },
             dragStart: () => {},
-            accept: function(sourceNodeScope: VeTreeNodeScope, destNodeScope: VeTreeNodeScope, destIndex) {
-                if (destNodeScope.$element.hasClass('root'))
-                    return false; //don't allow moving to outside doc
-                return destNodeScope.node.aggr != 'none';
-
-            }
-        };
-
-
+            accept: function (
+                sourceNodeScope: VeTreeNodeScope,
+                destNodeScope: VeTreeNodeScope,
+                destIndex
+            ) {
+                if (destNodeScope.$element.hasClass('root')) return false //don't allow moving to outside doc
+                return destNodeScope.node.aggr != 'none'
+            },
+        }
     }
 
     public updateNumber = (node, curSection, key) => {
-        node[key] = curSection;
-        var num = 1;
+        node[key] = curSection
+        let num = 1
         for (let i = 0; i < node.children.length; i++) {
-            this.updateNumber(node.children[i], curSection + '.' + num, key);
-            num++;
+            this.updateNumber(node.children[i], curSection + '.' + num, key)
+            num++
         }
-    };
+    }
 
-    public handleSingleView = (v: ViewObject, aggr: string, propId: string): TreeBranch => {
-        var curNode: TreeBranch = this.viewIds2node[v.id];
+    public handleSingleView = (
+        v: ViewObject,
+        aggr: string,
+        propId: string
+    ): TreeBranch => {
+        let curNode: TreeBranch = this.viewIds2node[v.id]
         if (!curNode) {
             curNode = {
-                label: (v.name) ? v.name : v.id,
+                label: v.name ? v.name : v.id,
                 data: v,
                 aggr: aggr,
                 propertyId: propId,
                 type: v.type,
-                children: []
-            };
-            this.viewIds2node[v.id] = curNode;
+                children: [],
+            }
+            this.viewIds2node[v.id] = curNode
         }
-        this.origViews[v.id] = v;
-        return curNode;
+        this.origViews[v.id] = v
+        return curNode
     }
 
     public handleChildren = (curNode: TreeBranch, childNodes: TreeBranch[]) => {
-        var newChildNodes: TreeBranch[] = [];
+        const newChildNodes: TreeBranch[] = []
         for (let i = 0; i < childNodes.length; i++) {
-            let node: TreeBranch = childNodes[i];
+            const node: TreeBranch = childNodes[i]
             if (this.seenViewIds[node.data.id]) {
-                return;
+                return
             }
-            this.seenViewIds[node.data.id] = node;
-            newChildNodes.push(node);
+            this.seenViewIds[node.data.id] = node
+            newChildNodes.push(node)
         }
-        curNode.children.push.apply(curNode.children, newChildNodes);
+        curNode.children.push.apply(curNode.children, newChildNodes)
     }
 
-
-
-
-   public save = () => {
+    public save = () => {
         if (this.saving) {
-            this.growl.info("please wait");
-            return;
+            this.growl.info('please wait')
+            return
         }
-        if (this.tree.length > 1 || this.tree[0].data.id !== this.documentOb.id) {
-            this.growl.error('Views cannot be re-ordered outside the context of the current document.');
-            return;
+        if (
+            this.tree.length > 1 ||
+            this.tree[0].data.id !== this.documentOb.id
+        ) {
+            this.growl.error(
+                'Views cannot be re-ordered outside the context of the current document.'
+            )
+            return
         }
-       this.saving = true;
-        this.saveClass = "fa fa-spin fa-spinner";
-        var toSave: ViewObject[] = [];
-        for (let [id, node] of Object.entries(this.viewIds2node)) {
-            if (node.aggr == 'none') {//cannot process views whose aggr is none since their children are not shown
-                return;
+        this.saving = true
+        this.saveClass = 'fa fa-spin fa-spinner'
+        const toSave: ViewObject[] = []
+        for (const [id, node] of Object.entries(this.viewIds2node)) {
+            if (node.aggr == 'none') {
+                //cannot process views whose aggr is none since their children are not shown
+                return
             }
-            var childViews: ViewObject[] = [];
+            const childViews: ViewObject[] = []
             for (let i = 0; i < node.children.length; i++) {
                 childViews.push({
                     id: node.children[i].data.id,
@@ -183,66 +226,81 @@ class ReorderController implements angular.IComponentController {
                     propertyId: node.children[i].propertyId,
                     _projectId: node.data._projectId,
                     _refId: node.data._refId,
-                    type: node.data.type
-                });
+                    type: node.data.type,
+                })
             }
-            var orig = this.origViews[id];
-            if (((!orig._childViews || orig._childViews.length === 0) && childViews.length > 0) ||
-                (orig._childViews && !angular.equals(orig._childViews, childViews))) {
+            const orig = this.origViews[id]
+            if (
+                ((!orig._childViews || orig._childViews.length === 0) &&
+                    childViews.length > 0) ||
+                (orig._childViews &&
+                    !angular.equals(orig._childViews, childViews))
+            ) {
                 toSave.push({
                     id: id,
                     name: orig.name,
                     _childViews: childViews,
                     _projectId: orig._projectId,
                     _refId: orig._refId,
-                    type: orig.type
-                });
+                    type: orig.type,
+                })
             }
         }
 
         if (toSave.length === 0) {
-            this.growl.info("No changes to save!");
-            this.saving = false;
-            this.saveClass = "";
-            return;
+            this.growl.info('No changes to save!')
+            this.saving = false
+            this.saveClass = ''
+            return
         }
-        this.elementSvc.updateElements(toSave, true)
-        .then(() => {
-            this.growl.success('Reorder Successful');
-            this.navigate(true);
-        }, (response) => {
-            var reason = response.failedRequests[0];
-            var errorMessage = reason.message;
-            if (reason.status === 409) {
-                this.growl.error("There's a conflict in the views you're trying to change!");
-            } else {
-                this.growl.error(errorMessage);
-            }
-        }).finally(() => {
-            this.saveClass = "";
-            this.saving = false;
-        });
-    };
+        this.elementSvc
+            .updateElements(toSave, true)
+            .then(
+                () => {
+                    this.growl.success('Reorder Successful')
+                    this.navigate(true)
+                },
+                (response) => {
+                    const reason = response.failedRequests[0]
+                    const errorMessage = reason.message
+                    if (reason.status === 409) {
+                        this.growl.error(
+                            "There's a conflict in the views you're trying to change!"
+                        )
+                    } else {
+                        this.growl.error(errorMessage)
+                    }
+                }
+            )
+            .finally(() => {
+                this.saveClass = ''
+                this.saving = false
+            })
+    }
 
-   public cancel = () => {
-        this.navigate(false);
-    };
+    public cancel = () => {
+        this.navigate(false)
+    }
 
     public navigate = (reload) => {
-        var curBranch = this.treeApi.getSelectedBranch();
+        const curBranch = this.treeApi.getSelectedBranch()
         if (!curBranch) {
-            this.$state.go('main.project.ref.document', {}, {reload:true});
+            this.$state.go('main.project.ref.document', {}, { reload: true })
         } else {
-            var goToId: string = curBranch.data.id;
+            let goToId: string = curBranch.data.id
             if (curBranch.type !== 'section' && curBranch.type !== 'view') {
-                goToId = (curBranch.viewId) ? curBranch.viewId : '';
+                goToId = curBranch.viewId ? curBranch.viewId : ''
             }
-            this.$state.go('main.project.ref.document.view', {viewId: goToId}, {reload: reload});
+            this.$state.go(
+                'main.project.ref.document.view',
+                { viewId: goToId },
+                { reload: reload }
+            )
         }
     }
 }
 
-let ReorderComponent: VeComponentOptions = {
+const ReorderComponent: VeComponentOptions = {
     selector: 'reorderDocument',
     template: `
     <script type="text/ng-template" id="nodes_renderer.html">
@@ -269,9 +327,9 @@ let ReorderComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        documentOb: "<"
+        documentOb: '<',
     },
-    controller: ReorderController
+    controller: ReorderController,
 }
 
-veApp.component(ReorderComponent.selector, ReorderComponent);
+veApp.component(ReorderComponent.selector, ReorderComponent)

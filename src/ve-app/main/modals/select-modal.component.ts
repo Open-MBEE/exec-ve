@@ -1,10 +1,16 @@
-import * as angular from 'angular';
-import {VeModalComponent, VeModalResolve, VeModalController} from "@ve-types/view-editor";
+import { StateService } from '@uirouter/angularjs'
+import angular from 'angular'
 
-import {veApp} from "@ve-app";
-import { StateService } from '@uirouter/angularjs';
-import {ProjectService} from "@ve-utils/mms-api-client";
-import {OrgObject, ProjectObject} from "@ve-types/mms";
+import { ProjectService } from '@ve-utils/mms-api-client'
+
+import { veApp } from '@ve-app'
+
+import { OrgObject, ProjectObject } from '@ve-types/mms'
+import {
+    VeModalComponent,
+    VeModalResolve,
+    VeModalController,
+} from '@ve-types/view-editor'
 
 interface SelectModalResolve extends VeModalResolve {
     mmsOrgs: OrgObject[]
@@ -15,116 +21,131 @@ interface SelectModalResolve extends VeModalResolve {
 }
 
 class SelectModalController implements VeModalController {
-
-    static $inject = ['$scope', '$state', 'ProjectService'];
+    static $inject = ['$scope', '$state', 'ProjectService']
 
     //bindings
-    public modalInstance: angular.ui.bootstrap.IModalInstanceService;
-    private resolve: SelectModalResolve;
+    public modalInstance: angular.ui.bootstrap.IModalInstanceService
+    private resolve: SelectModalResolve
 
     //local
-    public spin = false;
-    public orgId: string;
-    public projectId: string = "";
-    public selectedOrg: string;
-    public selectedProject: string;
-    public orgs: OrgObject[];
-    public projects: ProjectObject[];
-    protected orgSpin: boolean;
-    protected projSpin: boolean;
+    public spin = false
+    public orgId: string
+    public projectId: string = ''
+    public selectedOrg: string
+    public selectedProject: string
+    public orgs: OrgObject[]
+    public projects: ProjectObject[]
+    protected orgSpin: boolean
+    protected projSpin: boolean
 
-
-
-    constructor(private $scope: angular.IScope, private $state: StateService, private projectSvc: ProjectService) {
-    }
+    constructor(
+        private $scope: angular.IScope,
+        private $state: StateService,
+        private projectSvc: ProjectService
+    ) {}
 
     $onInit() {
-        this.orgs = this.resolve.mmsOrgs;
-        this.projects = this.resolve.mmsProjects;
+        this.orgs = this.resolve.mmsOrgs
+        this.projects = this.resolve.mmsProjects
 
-        this.orgId = this.resolve.mmsOrg.id;
-        this.projectId = this.resolve.mmsProject.id;
+        this.orgId = this.resolve.mmsOrg.id
+        this.projectId = this.resolve.mmsProject.id
 
-        this.selectedOrg = this.resolve.mmsOrg.name;
+        this.selectedOrg = this.resolve.mmsOrg.name
         this.selectedProject = this.projects.filter((e) => {
-            return e.id === this.projectId;
-        })[0].name;
-
-
-
+            return e.id === this.projectId
+        })[0].name
     }
 
     public selectOrg = (org) => {
-        if(org) {
-            this.orgId = org.id;
-            this.selectedOrg = org.name;
-            this.selectedProject = "";
-            this.projSpin = true;
-            this.refreshProjects();
+        if (org) {
+            this.orgId = org.id
+            this.selectedOrg = org.name
+            this.selectedProject = ''
+            this.projSpin = true
+            this.refreshProjects()
         }
-    };
+    }
 
     public selectProject = (project) => {
-        if(project) {
-            this.projectId = project.id;
-            this.selectedProject = project.name;
+        if (project) {
+            this.projectId = project.id
+            this.selectedProject = project.name
         }
-    };
+    }
 
     public continue = () => {
-        if(this.orgId && this.projectId) {
+        if (this.orgId && this.projectId) {
             // was the same project selected? cancel...
-            if (this.resolve.mmsProject.orgId === this.orgId &&
-                this.resolve.mmsProject.id === this.projectId) {
-                this.cancel();
-            }
-            else {
-                this.spin = true;
-                this.$state.go('main.project.ref.portal', {orgId: this.orgId, projectId: this.projectId, refId: 'master', search: undefined}).then((data) => {
-                    this.modalInstance.dismiss();
-                }, (reject) => {
-                    this.spin = false;
-                });
+            if (
+                this.resolve.mmsProject.orgId === this.orgId &&
+                this.resolve.mmsProject.id === this.projectId
+            ) {
+                this.cancel()
+            } else {
+                this.spin = true
+                this.$state
+                    .go('main.project.ref.portal', {
+                        orgId: this.orgId,
+                        projectId: this.projectId,
+                        refId: 'master',
+                        search: undefined,
+                    })
+                    .then(
+                        (data) => {
+                            this.modalInstance.dismiss()
+                        },
+                        (reject) => {
+                            this.spin = false
+                        }
+                    )
             }
         }
-    };
+    }
 
     public refreshOrgs = () => {
-        this.orgSpin = true;
-        this.orgs.length = 0;
-        this.projectSvc.getOrgs(true).then((data) => {
-            this.orgs.push(...data);
-        }).finally(
-            () => {
-                this.orgSpin = false;
-            }
-        );
+        this.orgSpin = true
+        this.orgs.length = 0
+        this.projectSvc
+            .getOrgs(true)
+            .then((data) => {
+                this.orgs.push(...data)
+            })
+            .finally(() => {
+                this.orgSpin = false
+            })
     }
 
     public refreshProjects = () => {
-        this.projSpin = true;
-        this.projects.length = 0;
-        this.projectSvc.getProjects(this.orgId, true).then((data) => {
-            this.projects.push(...data);
-            if (data && data.length > 0 && this.projects.filter((p)=>{ return p.id === this.projectId }).length === 0) {
-                this.selectProject(data[0]);
-            } else {
-                //no projects
-            }
-        }).finally(
-            () => {
-                this.projSpin = false;
-            }
-        );
+        this.projSpin = true
+        this.projects.length = 0
+        this.projectSvc
+            .getProjects(this.orgId, true)
+            .then((data) => {
+                this.projects.push(...data)
+                if (
+                    data &&
+                    data.length > 0 &&
+                    this.projects.filter((p) => {
+                        return p.id === this.projectId
+                    }).length === 0
+                ) {
+                    this.selectProject(data[0])
+                } else {
+                    //no projects
+                }
+            })
+            .finally(() => {
+                this.projSpin = false
+            })
     }
 
     public cancel = () => {
-        this.modalInstance.dismiss();
-    };
-
+        this.modalInstance.dismiss()
+    }
 }
 
-let SelectModalComponent: VeModalComponent = {
+const SelectModalComponent: VeModalComponent = {
     selector: 'selectModal',
     template: `
     <div id="modal-window" class="ve-dark-modal">
@@ -184,10 +205,10 @@ let SelectModalComponent: VeModalComponent = {
 </div>
 `,
     bindings: {
-        modalInstance: "<",
-        resolve: "<"
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: SelectModalController
-};
+    controller: SelectModalController,
+}
 
-veApp.component(SelectModalComponent.selector,SelectModalComponent);
+veApp.component(SelectModalComponent.selector, SelectModalComponent)

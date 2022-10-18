@@ -1,10 +1,11 @@
-import * as angular from 'angular'
+import angular from 'angular'
 import _ from 'lodash'
 
 import {
     ElementService,
     CacheService,
     URLService,
+    ApiService,
 } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import { UtilsService, EventService } from '@ve-utils/services'
@@ -16,22 +17,26 @@ import {
     DocumentObject,
     ElementObject,
     ElementsRequest,
+    MmsObject,
     PresentationInstanceObject,
+    TableBodyObject,
+    TableInstanceObject,
+    ValueObject,
     ViewObject,
 } from '@ve-types/mms'
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
 
 export interface ViewElement {
-    id: any
+    id: string
     api: ViewApi
-    number?: any
+    number?: string
     topLevel?: boolean
     first?: boolean
 }
 
 export interface ViewApi {
-    elementClicked(elementOb: ElementObject): any
-    elementTranscluded(elementOb: ElementObject, type: string): any
+    elementClicked(elementOb: ElementObject): void
+    elementTranscluded(elementOb: ElementObject, type: string): void
 }
 
 export interface DocMetadata {
@@ -62,7 +67,9 @@ export interface DocMetadata {
  *
  */
 export class ViewService {
-    public inProgress = {}
+    private inProgress: {
+        [url: string]: angular.IPromise<MmsObject | MmsObject[]>
+    } = {}
     private schema: string = 'cameo'
 
     static $inject = [
@@ -71,7 +78,7 @@ export class ViewService {
         'growl',
         'URLService',
         'ElementService',
-        'UtilsService',
+        'ApiService',
         'CacheService',
         'EventService',
         'SchemaService',
@@ -82,7 +89,7 @@ export class ViewService {
         private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
         private elementSvc: ElementService,
-        private utilsSvc: UtilsService,
+        private apiSvc: ApiService,
         private cacheSvc: CacheService,
         private eventSvc: EventService,
         private schemaSvc: SchemaService
@@ -105,12 +112,12 @@ export class ViewService {
         const deferred: angular.IDeferred<ViewObject> = this.$q.defer()
         const clone = _.cloneDeep(elementOb)
         clone._appliedStereotypeIds = [
-            this.schemaSvc.get('VIEW_SID', this.schema),
+            this.schemaSvc.getSchema('VIEW_SID', this.schema) as string,
         ]
         const asi = {
             id: elementOb.id + '_asi',
             ownerId: elementOb.id,
-            classifierIds: [this.schemaSvc.get('VIEW_SID', this.schema)],
+            classifierIds: [this.schemaSvc.getSchema('VIEW_SID', this.schema)],
             type: 'InstanceSpecification',
             _projectId: elementOb._projectId,
             _refId: elementOb._refId,
@@ -167,45 +174,36 @@ export class ViewService {
      * @returns {Promise} The promise will be resolved with array of element objects.
      */
     public getViewElements(
-        reqOb: ElementsRequest,
+        reqOb: ElementsRequest<string>,
         weight: number,
         update?: boolean
-    ) {
-        this.utilsSvc.normalize(reqOb)
-        const deferred = this.$q.defer()
+    ): angular.IPromise<ViewObject[]> {
+        this.apiSvc.normalize(reqOb)
+        const deferred: angular.IDeferred<ViewObject[]> = this.$q.defer()
         const key =
             'viewElements' +
             reqOb.projectId +
             reqOb.refId +
             reqOb.elementId +
             reqOb.commitId
-        if (this.inProgress[key]) {
-            return this.inProgress[key]
+        if (this.inProgress.hasOwnProperty(key)) {
+            return this.inProgress[key] as angular.IPromise<ViewObject[]>
         }
-        const requestCacheKey = [
-            'elements',
-            reqOb.projectId,
-            reqOb.refId,
-            reqOb.elementId,
-            reqOb.commitId,
-        ]
-        const cached = this.cacheSvc.get(requestCacheKey)
+        const requestCacheKey = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId)
+        const cached = this.cacheSvc.get<ViewObject[]>(requestCacheKey)
         if (cached && !update) {
             deferred.resolve(cached)
             return deferred.promise
         }
         this.inProgress[key] = deferred.promise
         this.elementSvc.getElement(reqOb, weight, update).then(
-            (view) => {
-                let toGet: any[] = []
+            (view: ViewObject) => {
+                const toGet: string[] = []
                 let results: ElementObject[] = []
                 if (view._displayedElementIds) {
-                    let displayed = view._displayedElementIds
-                    if (!Array.isArray(displayed)) {
-                        displayed = JSON.parse(displayed)
-                    }
+                    const displayed: string[] = view._displayedElementIds
                     if (Array.isArray(displayed) && displayed.length > 0) {
-                        toGet = displayed
+                        toGet.push(...displayed)
                     }
                 }
                 if (view._contents && view._contents.operand) {
@@ -217,7 +215,8 @@ export class ViewService {
                     }
                 }
                 if (view.specification && view.specification.operand) {
-                    const specContents = view.specification.operand
+                    const specContents: ValueObject[] = view.specification
+                        .operand as ValueObject[]
                     for (let j = 0; j < specContents.length; j++) {
                         if (specContents[j] && specContents[j].instanceId) {
                             toGet.push(specContents[j].instanceId)
@@ -227,20 +226,22 @@ export class ViewService {
                 if (
                     this.isTable(view) &&
                     view.specification &&
-                    view.specification.value
+                    view.specification.value &&
+                    typeof view.specification.value === 'string'
                 ) {
-                    try {
-                        const tableJson = JSON.parse(view.specification.value)
-                        if (tableJson.body) {
-                            this.collectTableSources(toGet, tableJson.body)
-                        }
-                    } catch (e) {}
+                    const tableJson: TableInstanceObject = JSON.parse(
+                        view.specification.value
+                    ) as TableInstanceObject
+                    if (tableJson.body) {
+                        toGet.push(...this.collectTableSources(tableJson))
+                    }
                 }
-
-                const toGetSet = new Set(toGet)
-                reqOb.elementId = Array.from(toGetSet)
+                const toGetReqOb: ElementsRequest<string[]> = Object.assign(
+                    reqOb,
+                    { elementId: toGet }
+                )
                 this.elementSvc
-                    .getElements(reqOb, weight, update)
+                    .getElements(toGetReqOb, weight, update)
                     .then((data) => {
                         results = data
                     })
@@ -258,22 +259,21 @@ export class ViewService {
         return deferred.promise
     }
 
-    public collectTableSources(sources, body) {
-        let i, j, k
-        for (let i = 0; i < body.length; i++) {
-            const row = body[i]
-            for (j = 0; j < row.length; j++) {
-                const cell = row[j]
-                for (k = 0; k < cell.content.length; k++) {
-                    const thing = cell.content[k]
+    public collectTableSources(table: TableInstanceObject): string[] {
+        const sources: string[] = []
+        const body = table.body
+        body.forEach((row) => {
+            row.forEach((cell) => {
+                cell.content.forEach((thing: TableInstanceObject) => {
                     if (thing.type === 'Table' && thing.body) {
-                        this.collectTableSources(sources, thing.body)
+                        sources.push(...this.collectTableSources(thing))
                     } else if (thing.type === 'Paragraph' && thing.source) {
                         sources.push(thing.source)
                     }
-                }
-            }
-        }
+                })
+            })
+        })
+        return sources
     }
 
     /**
@@ -967,8 +967,8 @@ export class ViewService {
             documentation: viewOb.viewDoc ? viewOb.viewDoc : '',
             _appliedStereotypeIds: [
                 viewOb.isDoc
-                    ? this.schemaSvc.get('DOCUMENT_SID', this.schema)
-                    : this.schemaSvc.get('VIEW_SID', this.schema),
+                    ? this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)
+                    : this.schemaSvc.getSchema('VIEW_SID', this.schema),
             ],
             appliedStereotypeInstanceId: newViewId + '_asi',
         })
@@ -1039,8 +1039,8 @@ export class ViewService {
             name: '',
             classifierIds: [
                 viewOb.isDoc
-                    ? this.schemaSvc.get('DOCUMENT_SID', this.schema)
-                    : this.schemaSvc.get('VIEW_SID', this.schema),
+                    ? this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)
+                    : this.schemaSvc.getSchema('VIEW_SID', this.schema),
             ],
             _appliedStereotypeIds: [],
             stereotypedElementId: newViewId,
@@ -1150,12 +1150,14 @@ export class ViewService {
             ownerId: ownerOb.id,
             _isGroup: true,
             _appliedStereotypeIds: [
-                this.schemaSvc.get('GROUP_ST_ID', this.schema),
+                this.schemaSvc.getSchema('GROUP_ST_ID', this.schema),
             ],
             appliedStereotypeInstanceId: PACKAGE_ASI_ID,
         })
         const groupAsi = new InstanceSpec({
-            classifierIds: [this.schemaSvc.get('GROUP_ST_ID', this.schema)],
+            classifierIds: [
+                this.schemaSvc.getSchema('GROUP_ST_ID', this.schema),
+            ],
             id: PACKAGE_ASI_ID,
             _projectId: ownerOb._projectId,
             _refId: ownerOb._refId,
@@ -1228,7 +1230,7 @@ export class ViewService {
     public removeGroup(elementOb) {
         elementOb._isGroup = false
         _.remove(elementOb._appliedStereotypeIds, (id) => {
-            return id === this.schemaSvc.get('GROUP_ST_ID', this.schema)
+            return id === this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)
         })
         elementOb.appliedStereotypeInstanceId =
             elementOb._appliedStereotypeIds.length > 0
@@ -1803,7 +1805,7 @@ export class ViewService {
             instanceSpec._appliedStereotypeIds !== undefined &&
             instanceSpec._appliedStereotypeIds.length > 0 &&
             instanceSpec._appliedStereotypeIds[0] ===
-                this.schemaSvc.get('GROUP_ST_ID', this.schema)
+                this.schemaSvc.getSchema('GROUP_ST_ID', this.schema)
         )
     }
 

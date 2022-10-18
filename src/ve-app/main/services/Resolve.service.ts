@@ -1,5 +1,5 @@
 import { UIRouter } from '@uirouter/angularjs'
-import * as angular from 'angular'
+import angular from 'angular'
 
 import {
     AuthService,
@@ -22,6 +22,7 @@ import {
     DocumentObject,
     ElementObject,
     ElementsResponse,
+    MountObject,
     OrgObject,
     ParamsObject,
     ProjectObject,
@@ -107,7 +108,7 @@ export class ResolveService {
 
     public getProjectMounts(
         params: ParamsObject
-    ): angular.IPromise<ProjectObject> {
+    ): angular.IPromise<MountObject[]> {
         return this.projectSvc.getProjectMounts(
             params.projectId,
             params.refId,

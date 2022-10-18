@@ -1,9 +1,10 @@
-import * as angular from 'angular';
-import {VeComponentOptions} from "@ve-types/view-editor";
+import angular from 'angular'
 
-import {veApp} from "@ve-app";
+import { veApp } from '@ve-app'
 
-let WorkingModalComponent: VeComponentOptions = {
+import { VeComponentOptions } from '@ve-types/view-editor'
+
+const WorkingModalComponent: VeComponentOptions = {
     selector: 'workingModal',
     template: `
     <div class="modal-header">Please come back later</div>
@@ -12,28 +13,27 @@ let WorkingModalComponent: VeComponentOptions = {
 </div> 
 `,
     bindings: {
-        close: "<",
-        dismiss: "<",
-        modalInstance: "<",
-        resolve: "<"
+        close: '<',
+        dismiss: '<',
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class WorkingModalController implements angular.IComponentController {
-
+    controller: class WorkingModalController
+        implements angular.IComponentController
+    {
         //bindings
         private dismiss
-                close
-                resolve
+        close
+        resolve
 
         public workingTime
 
-        constructor() {
-        }
+        constructor() {}
 
         $onInit() {
-            this.workingTime = this.resolve.getWorkingTime();
-
+            this.workingTime = this.resolve.getWorkingTime()
         }
-    }
+    },
 }
 
-veApp.component(WorkingModalComponent.selector, WorkingModalComponent);
+veApp.component(WorkingModalComponent.selector, WorkingModalComponent)

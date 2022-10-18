@@ -1,10 +1,12 @@
-import * as angular from 'angular';
-import{ElementService} from "@ve-utils/mms-api-client";
-import {EventService} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ElementObject} from "@ve-types/mms";
+import angular from 'angular'
 
-import {veCore} from "@ve-core";
+import { ElementService } from '@ve-utils/mms-api-client'
+import { EventService } from '@ve-utils/services'
+
+import { veCore } from '@ve-core'
+
+import { ElementObject } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 const RevertConfirmComponent: VeComponentOptions = {
     selector: 'revertConfirm',
@@ -46,91 +48,112 @@ const RevertConfirmComponent: VeComponentOptions = {
   
 `,
     bindings: {
-        close: "<",
-        dismiss: "<",
-        modalInstance: "<",
-        resolve: "<"
+        close: '<',
+        dismiss: '<',
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class RevertConfirmController implements angular.IComponentController {
-
+    controller: class RevertConfirmController
+        implements angular.IComponentController
+    {
         //bindings
         public modalInstance
-                dismiss
-                close
-                resolve
+        dismiss
+        close
+        resolve
 
         public oking
-                revertData
-                elementId
-                projectId
-                refId
-                baseCommit
-                compareCommit
-                element
+        revertData
+        elementId
+        projectId
+        refId
+        baseCommit
+        compareCommit
+        element
 
-        static $inject = ['growl', 'ElementService', 'EventService'];
+        static $inject = ['growl', 'ElementService', 'EventService']
 
-        constructor(private growl, private elementSvc : ElementService, private eventSvc : EventService) {
-        }
+        constructor(
+            private growl,
+            private elementSvc: ElementService,
+            private eventSvc: EventService
+        ) {}
 
         $onInit() {
-            this.revertData = this.resolve.getRevertData();
-            this.elementId = this.revertData.elementId;
-            this.projectId = this.revertData.projectId;
-            this.refId = this.revertData.refId;
-            this.baseCommit = this.revertData.baseCommit;
-            this.compareCommit = this.revertData.compareCommit;
-            this.element = this.revertData.element;
+            this.revertData = this.resolve.getRevertData()
+            this.elementId = this.revertData.elementId
+            this.projectId = this.revertData.projectId
+            this.refId = this.revertData.refId
+            this.baseCommit = this.revertData.baseCommit
+            this.compareCommit = this.revertData.compareCommit
+            this.element = this.revertData.element
         }
 
         ok() {
             if (this.oking) {
-                this.growl.info("Please wait...");
-                return;
+                this.growl.info('Please wait...')
+                return
             }
-            this.oking = true;
+            this.oking = true
 
             const reqOb = {
                 elementId: this.elementId,
                 projectId: this.projectId,
                 refId: this.baseCommit.refSelected.id,
-                commitId: this.baseCommit.commitSelected.id
-            };
-            this.elementSvc.getElement(reqOb, 2, false)
-                .then((data) => {
-                    const revertEltInfo: ElementObject = {
-                        id: this.elementId,
-                        name: (data.name) ? data.name : "",
-                        type: data.type,
-                        documentation: data.documentation,
-                        _projectId: this.projectId,
-                        _refId: this.refId,
-                        defaultValue: (data.defaultValue) ? data.defaultValue : undefined,
-                        value: (data.value) ? data.value : undefined
-                    };
+                commitId: this.baseCommit.commitSelected.id,
+            }
+            this.elementSvc
+                .getElement(reqOb, 2, false)
+                .then(
+                    (data) => {
+                        const revertEltInfo: ElementObject = {
+                            id: this.elementId,
+                            name: data.name ? data.name : '',
+                            type: data.type,
+                            documentation: data.documentation,
+                            _projectId: this.projectId,
+                            _refId: this.refId,
+                            defaultValue: data.defaultValue
+                                ? data.defaultValue
+                                : undefined,
+                            value: data.value ? data.value : undefined,
+                        }
 
-                    this.elementSvc.updateElement(revertEltInfo)
-                        .then((element) => {
-                            const data = {
-                                element: element,
-                                continueEdit: false
+                        this.elementSvc.updateElement(revertEltInfo).then(
+                            (element) => {
+                                const data = {
+                                    element: element,
+                                    continueEdit: false,
+                                }
+                                this.eventSvc.$broadcast(
+                                    'element.updated',
+                                    data
+                                )
+                                this.close()
+                                this.growl.success('Element reverted')
+                            },
+                            (reason) => {
+                                this.growl.error(
+                                    'Revert not completed - Error: ' +
+                                        reason.message
+                                )
                             }
-                            this.eventSvc.$broadcast('element.updated', data);
-                            this.close();
-                            this.growl.success("Element reverted");
-                        }, (reason) => {
-                            this.growl.error("Revert not completed - Error: " + reason.message);
-                        })
-                }, (reason) => {
-                    this.growl.error("Revert not completed - Error: " + reason.message);
-                }).finally(() => {
-                    this.oking = false;
-            });
+                        )
+                    },
+                    (reason) => {
+                        this.growl.error(
+                            'Revert not completed - Error: ' + reason.message
+                        )
+                    }
+                )
+                .finally(() => {
+                    this.oking = false
+                })
         }
         cancel() {
-            this.dismiss();
+            this.dismiss()
         }
-    }
+    },
 }
 
-veCore.component(RevertConfirmComponent.selector,RevertConfirmComponent);
+veCore.component(RevertConfirmComponent.selector, RevertConfirmComponent)

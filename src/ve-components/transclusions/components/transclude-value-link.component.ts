@@ -1,21 +1,24 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
+import { ExtensionService, ComponentService } from '@ve-components/services'
+import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import { ButtonBarService } from '@ve-core/button-bar'
 import {
     ElementService,
     ViewService,
-    AuthService
-} from "@ve-utils/mms-api-client"
+    AuthService,
+} from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
 import {
+    MathJaxService,
     UtilsService,
-    EventService, ImageService
-} from "@ve-utils/services"
-import {VeComponentOptions} from '@ve-types/view-editor'
-import {veComponents} from "@ve-components";
-import {ExtensionService, ComponentService} from "@ve-components/services"
-import {ITransclusion, Transclusion} from "@ve-components/transclusions";
-import {MathJaxService} from "@ve-utils/services";
-import {ButtonBarService} from "@ve-core/button-bar";
-import {SchemaService} from "@ve-utils/model-schema";
+    EventService,
+    ImageService,
+} from '@ve-utils/services'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 /**
  * @ngdoc component
@@ -48,12 +51,14 @@ import {SchemaService} from "@ve-utils/model-schema";
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeNameController extends Transclusion implements ITransclusion{
-
+export class TranscludeNameController
+    extends Transclusion
+    implements ITransclusion
+{
     //Custom Bindings
     mmsLinkText: string
 
-    static $inject = Transclusion.$inject;
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: angular.IQService,
@@ -72,44 +77,61 @@ export class TranscludeNameController extends Transclusion implements ITransclus
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
     ) {
-        super($q, $scope,$compile,$element,growl,componentSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
-            mathJaxSvc, extensionSvc, buttonBarSvc, imageSvc)
+        super(
+            $q,
+            $scope,
+            $compile,
+            $element,
+            growl,
+            componentSvc,
+            elementSvc,
+            utilsSvc,
+            schemaSvc,
+            authSvc,
+            eventSvc,
+            mathJaxSvc,
+            extensionSvc,
+            buttonBarSvc,
+            imageSvc
+        )
         this.cfType = 'name'
         this.cfTitle = ''
         this.cfKind = 'Text'
-        this.checkCircular = false;
-        this.nonEditable = true;
+        this.checkCircular = false
+        this.nonEditable = true
     }
 
     protected config = () => {
         if (typeof this.mmsLinkText === 'undefined')
-            this.mmsLinkText = (this.mmsCfLabel) ? this.mmsCfLabel : 'Link'
-
+            this.mmsLinkText = this.mmsCfLabel ? this.mmsCfLabel : 'Link'
     }
 
     public getContent = () => {
-        let url = '';
+        let url = ''
         if (this.element.type === 'Property') {
-            var value = this.element.defaultValue;
-            if (value && value.type === 'LiteralString')
-                url = value.value;
+            const value = this.element.defaultValue
+            if (value && value.type === 'LiteralString') url = value.value
         } else if (this.element.type === 'Slot') {
-            if (angular.isArray(this.element.value) && this.element.value.length > 0 && this.element.value[0].type === 'LiteralString') {
-                url = this.element.value[0].value;
+            if (
+                angular.isArray(this.element.value) &&
+                this.element.value.length > 0 &&
+                this.element.value[0].type === 'LiteralString'
+            ) {
+                url = this.element.value[0].value
             }
         }
 
         if (url !== '') {
-            return this.$q.resolve('<a ng-href="'+ url + '">' + this.mmsLinkText + '</a>')
+            return this.$q.resolve(
+                '<a ng-href="' + url + '">' + this.mmsLinkText + '</a>'
+            )
+        } else {
+            return this.$q.reject('Element does not provide link value.')
         }
-        else {
-            return this.$q.reject('Element does not provide link value.');
-        }
-
     }
 }
 
-export let TranscludeValueLinkComponent: VeComponentOptions = {
+export const TranscludeValueLinkComponent: VeComponentOptions = {
     selector: 'transcludeValueLink',
     template: `
     <div></div>
@@ -121,14 +143,17 @@ export let TranscludeValueLinkComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsWatchId: '@',
         mmsCfLabel: '@',
-        mmsLinkText: '@'
+        mmsLinkText: '@',
     },
     transclude: true,
     require: {
         transclusionCtrl: '?^^transclusion',
-        mmsViewCtrl: '?^^view'
+        mmsViewCtrl: '?^^view',
     },
-    controller: TranscludeNameController
-};
+    controller: TranscludeNameController,
+}
 
-veComponents.component(TranscludeValueLinkComponent.selector, TranscludeValueLinkComponent);
+veComponents.component(
+    TranscludeValueLinkComponent.selector,
+    TranscludeValueLinkComponent
+)

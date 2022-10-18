@@ -1,11 +1,9 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
 import { ViewController } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import { ElementObject } from '@ve-types/mms'
-import { VeComponentOptions } from '@ve-types/view-editor'
 import { AuthService, ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
@@ -17,6 +15,9 @@ import {
 import { handleChange } from '@ve-utils/utils'
 
 import { veCore } from '@ve-core'
+
+import { ElementObject } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/view-editor'
 
 /**
  * @ngdoc directive

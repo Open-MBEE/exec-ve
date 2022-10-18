@@ -1,15 +1,10 @@
-import * as angular from 'angular'
-
-import { PermissionCache } from '@ve-utils/mms-api-client/Permissions.service'
+import angular, { IServiceProvider } from 'angular'
 
 import { veUtils } from '@ve-utils'
 
 import { VeConfig } from '@ve-types/config'
 import {
     ArtifactsRequest,
-    AuthResponse,
-    BasicResponse,
-    ElementCreationRequest,
     ElementsRequest,
     QueryParams,
     RequestObject,
@@ -17,7 +12,7 @@ import {
 } from '@ve-types/mms'
 import { VePromiseReason } from '@ve-types/view-editor'
 
-export class URLServiceProvider implements angular.IServiceProvider {
+export class URLServiceProvider implements IServiceProvider {
     readonly basePath: string = '/api'
     readonly apiUrl: string = 'localhost:8080'
     private veConfig: VeConfig = window.__env
@@ -261,11 +256,8 @@ export class URLService {
      *
      * @returns {string} The path for image url queries.
      */
-    getImageURL(reqOb: ElementsRequest): string {
-        const id = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${id}`
+    getImageURL(reqOb: ElementsRequest<string>): string {
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
         return this.addVersion(r, reqOb.commitId)
     }
 
@@ -280,11 +272,8 @@ export class URLService {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
-    getElementURL(reqOb: ElementsRequest): string {
-        const elementId = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${elementId}`
+    getElementURL(reqOb: ElementsRequest<string>): string {
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
         return this.addVersion(r, reqOb.commitId)
     }
 
@@ -313,13 +302,10 @@ export class URLService {
     //     return r
     // }
 
-    getOwnedElementURL(reqOb: ElementsRequest): string {
+    getOwnedElementURL(reqOb: ElementsRequest<string>): string {
         let recurseString = 'recurse=true'
         if (reqOb.depth) recurseString = `depth=${reqOb.depth}`
-        const elementId = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        let r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${elementId}`
+        let r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
         r = this.addVersion(r, reqOb.commitId)
         if (r.indexOf('?') > 0) {
             r += '&' + recurseString
@@ -340,11 +326,8 @@ export class URLService {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The url.
      */
-    getElementHistoryURL(reqOb: ElementsRequest): string {
-        const elementId = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${elementId}/commits`
+    getElementHistoryURL(reqOb: ElementsRequest<string>): string {
+        return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/commits`
     }
 
     /**
@@ -376,7 +359,7 @@ export class URLService {
      * @param {object} reqOb object with keys as described in ElementService.
      * @returns {string} The post elements url.
      */
-    getPostElementsURL(reqOb: ElementCreationRequest): string {
+    getPostElementsURL(reqOb: RequestObject): string {
         return `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements`
     }
 
@@ -434,15 +417,12 @@ export class URLService {
      * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    getArtifactURL(reqOb: ArtifactsRequest, artifactExtension: string) {
+    getArtifactURL(reqOb: ArtifactsRequest<string>, artifactExtension: string) {
         const ext =
             artifactExtension !== undefined
                 ? artifactExtension
                 : reqOb.artifactExtension
-        const elementId = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${elementId}/${ext}`
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
         return this.addToken(this.addVersion(r, reqOb.commitId))
     }
 
@@ -458,13 +438,13 @@ export class URLService {
      * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    getArtifactEmbedURL(reqOb: ArtifactsRequest, artifactExtension: string) {
+    getArtifactEmbedURL(
+        reqOb: ArtifactsRequest<string>,
+        artifactExtension: string
+    ) {
         const ext =
             artifactExtension !== undefined ? artifactExtension : 'undefined'
-        const elementId = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${elementId}/${ext}`
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
         return this.addVersion(r, reqOb.commitId)
     }
 
@@ -479,11 +459,8 @@ export class URLService {
      * @param {object} reqOb object with keys
      * @returns {string} url
      */
-    getPutArtifactsURL(reqOb: ElementsRequest): string {
-        const elementId = Array.isArray(reqOb.elementId)
-            ? reqOb.elementId[0]
-            : reqOb.elementId
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${elementId}`
+    getPutArtifactsURL(reqOb: ElementsRequest<string>): string {
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
         return this.addVersion(r, reqOb.commitId)
     }
 
@@ -498,7 +475,7 @@ export class URLService {
      * @param {object} reqOb object with keys
      * @returns {string} url
      */
-    getArtifactHistoryURL(reqOb: ElementsRequest): string {
+    getArtifactHistoryURL(reqOb: ElementsRequest<string>): string {
         return this.getElementHistoryURL(reqOb)
     }
 
@@ -535,28 +512,22 @@ export class URLService {
      *      ```
      */
     handleHttpStatus<T>(
-        data: T,
-        status: number,
-        header: angular.IHttpHeadersGetter,
-        config: angular.IRequestConfig
+        response: angular.IHttpResponse<T>
     ): VePromiseReason<T> {
-        const result: VePromiseReason<T> = {
-            status: status,
-            data: data,
-            message: '',
-        }
-        if (status === 404) result.message = 'Not Found'
-        else if (status === 500) {
+        const result: VePromiseReason<T> = response
+        const data: T = result.data
+        if (result.status === 404) result.message = 'Not Found'
+        else if (result.status === 500) {
             if (typeof data === 'string' && data.indexOf('ENOTFOUND') >= 0)
                 result.message = 'Network Error (Please check network)'
             else result.message = 'Server Error'
-        } else if (status === 401 || status === 403)
+        } else if (result.status === 401 || result.status === 403)
             result.message = 'Permission Error'
-        else if (status === 409) result.message = 'Conflict'
-        else if (status === 400) result.message = 'BadRequestObject'
-        else if (status === 410) result.message = 'Deleted'
-        else if (status === 408) result.message = 'Timed Out'
-        else if (status === 501) {
+        else if (result.status === 409) result.message = 'Conflict'
+        else if (result.status === 400) result.message = 'BadRequestObject'
+        else if (result.status === 410) result.message = 'Deleted'
+        else if (result.status === 408) result.message = 'Timed Out'
+        else if (result.status === 501) {
             result.message = 'Caching'
         } else result.message = 'Timed Out (Please check network)'
         return result

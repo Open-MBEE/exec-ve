@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 import flatpickr from 'flatpickr'
 
 import { CoreUtilsService } from '@ve-core/services'
@@ -425,9 +425,12 @@ const AddItemModalComponent: VeModalComponent = {
             if (this.addType === 'item') {
                 if (this.itemType === 'View') {
                     filters._appliedStereotypeIds = [
-                        this.schemaSvc.get('VIEW_SID', this.schema),
-                        this.schemaSvc.get('DOCUMENT_SID', this.schema),
-                        ...this.schemaSvc.get('OTHER_VIEW_SID', this.schema),
+                        this.schemaSvc.getSchema('VIEW_SID', this.schema),
+                        this.schemaSvc.getSchema('DOCUMENT_SID', this.schema),
+                        ...this.schemaSvc.getSchema(
+                            'OTHER_VIEW_SID',
+                            this.schema
+                        ),
                     ]
                 } else {
                     return filters

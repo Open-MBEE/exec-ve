@@ -1,14 +1,19 @@
-import * as angular from 'angular';
-import {StateService, UIRouter, UIRouterGlobals} from '@uirouter/angularjs';
-import {AuthService} from "@ve-utils/mms-api-client";
-import {ApplicationService, EventService, RootScopeService} from "@ve-utils/services";
-import {VeComponentOptions, VeModalService} from "@ve-types/view-editor";
+import { StateService, UIRouter, UIRouterGlobals } from '@uirouter/angularjs'
+import angular from 'angular'
 
-import {veApp} from "@ve-app";
+import { AuthService } from '@ve-utils/mms-api-client'
+import {
+    ApplicationService,
+    EventService,
+    RootScopeService,
+} from '@ve-utils/services'
 
+import { veApp } from '@ve-app'
 
-let VeNavComponent: VeComponentOptions = {
-    selector: "veNav",
+import { VeComponentOptions, VeModalService } from '@ve-types/view-editor'
+
+const VeNavComponent: VeComponentOptions = {
+    selector: 'veNav',
     bindings: {
         mmsOrg: '<',
         mmsOrgs: '<',
@@ -88,119 +93,158 @@ let VeNavComponent: VeComponentOptions = {
 </nav>
 `,
     controller: class VeNavController implements angular.IComponentController {
-        static $inject = ['$uiRouter', '$state', '$location', '$uibModal', '$window', 'hotkeys', 'growl', 'ApplicationService',
-            'AuthService', 'EventService', 'RootScopeService'];
+        static $inject = [
+            '$uiRouter',
+            '$state',
+            '$location',
+            '$uibModal',
+            '$window',
+            'hotkeys',
+            'growl',
+            'ApplicationService',
+            'AuthService',
+            'EventService',
+            'RootScopeService',
+        ]
 
         //bindings
-        public mmsOrg;
-        public mmsProject;
-        public mmsProjects;
-        public mmsRef;
-        public mmsOrgs;
+        public mmsOrg
+        public mmsProject
+        public mmsProjects
+        public mmsRef
+        public mmsOrgs
 
         //injectables
-        public subs: Rx.IDisposable[];
+        public subs: Rx.IDisposable[]
 
         //local
-        public isNavCollapsed;
-        public about;
-        public searchClass;
-        public username;
-        public user;
-        public userBadge: string;
+        public isNavCollapsed
+        public about
+        public searchClass
+        public username
+        public user
+        public userBadge: string
 
-        protected showSearch: boolean = true;
+        protected showSearch: boolean = true
 
-        constructor(private $uiRouter: UIRouter, private $state: StateService, private $location: angular.ILocationService,
-                    private $uibModal: VeModalService, private $window: angular.IWindowService,
-                    private hotkeys: angular.hotkeys.HotkeysProvider, private growl: angular.growl.IGrowlService,
-                    private applicationSvc: ApplicationService, private authSvc: AuthService,
-                    private eventSvc: EventService, private rootScopeSvc: RootScopeService) {
-            this.isNavCollapsed = true;
+        constructor(
+            private $uiRouter: UIRouter,
+            private $state: StateService,
+            private $location: angular.ILocationService,
+            private $uibModal: VeModalService,
+            private $window: angular.IWindowService,
+            private hotkeys: angular.hotkeys.HotkeysProvider,
+            private growl: angular.growl.IGrowlService,
+            private applicationSvc: ApplicationService,
+            private authSvc: AuthService,
+            private eventSvc: EventService,
+            private rootScopeSvc: RootScopeService
+        ) {
+            this.isNavCollapsed = true
 
-            this.searchClass = "";
+            this.searchClass = ''
         }
 
         $onInit() {
-            this.eventSvc.$init(this);
+            this.eventSvc.$init(this)
 
-            this.subs.push(this.eventSvc.$on(this.rootScopeSvc.constants.VESHOWSEARCH, (data: boolean) => {
-               this.showSearch = data;
-            }));
+            this.subs.push(
+                this.eventSvc.$on(
+                    this.rootScopeSvc.constants.VESHOWSEARCH,
+                    (data: boolean) => {
+                        this.showSearch = data
+                    }
+                )
+            )
 
             this.authSvc.checkLogin().then((data) => {
-                this.username = data.username;
-                this.authSvc.getUserData(data.username).then((userData) => {
-                    this.user = userData;
-                    if (this.user.firstName) {
-                        this.userBadge = this.user.firstName.substring(0,1).toUpperCase();
-                        this.userBadge+= this.user.lastName.substring(0,1).toUpperCase();
-                    }else {
-                        this.userBadge = (this.user.username) ? this.user.username.substring(0,2).toUpperCase() : "VE";
+                this.username = data.username
+                this.authSvc.getUserData(data.username).then(
+                    (userData) => {
+                        this.user = userData
+                        if (this.user.firstName) {
+                            this.userBadge = this.user.firstName
+                                .substring(0, 1)
+                                .toUpperCase()
+                            this.userBadge += this.user.lastName
+                                .substring(0, 1)
+                                .toUpperCase()
+                        } else {
+                            this.userBadge = this.user.username
+                                ? this.user.username
+                                      .substring(0, 2)
+                                      .toUpperCase()
+                                : 'VE'
+                        }
+                    },
+                    () => {
+                        this.user = data.username
+                        this.userBadge = this.username
+                            .substring(0, 1)
+                            .toUpperCase()
                     }
-                },() => {
-                    this.user = data.username;
-                    this.userBadge = this.username.substring(0,1).toUpperCase()
-                });
-            });
-
-
+                )
+            })
         }
 
         updateOrg() {
             this.$uibModal.open({
-                    component: 'selectModal',
-                    windowClass: 've-dropdown-short-modal',
-                    resolve: {
-                        mmsOrgs: () => {
-                            return this.mmsOrgs;
-                        },
-                        mmsOrg: () => {
-                            return this.mmsOrg;
-                        },
-                        mmsProjects: () => {
-                            return this.mmsProjects;
-                        },
-                        mmsProject: () => {
-                            return this.mmsProject;
-                        }
+                component: 'selectModal',
+                windowClass: 've-dropdown-short-modal',
+                resolve: {
+                    mmsOrgs: () => {
+                        return this.mmsOrgs
                     },
-            });
-
-        };
+                    mmsOrg: () => {
+                        return this.mmsOrg
+                    },
+                    mmsProjects: () => {
+                        return this.mmsProjects
+                    },
+                    mmsProject: () => {
+                        return this.mmsProject
+                    },
+                },
+            })
+        }
 
         toggleHelp() {
-            this.hotkeys.toggleCheatSheet();
-        };
+            this.hotkeys.toggleCheatSheet()
+        }
 
         toggleAbout() {
             this.$uibModal.open({
-                component: 'aboutModal'
-            });
-        };
+                component: 'aboutModal',
+            })
+        }
 
         logout() {
-            this.authSvc.logout().then(() => {
-                this.$state.go('main.login');
-            },() => {
-                this.growl.error('You were not logged out');
-            });
-        };
+            this.authSvc.logout().then(
+                () => {
+                    this.$state.go('main.login')
+                },
+                () => {
+                    this.growl.error('You were not logged out')
+                }
+            )
+        }
 
         search(searchText) {
             if (this.$state.includes('main.project.ref.document.order')) {
-                this.growl.warning("Please finish reorder action first.");
-                return;
+                this.growl.warning('Please finish reorder action first.')
+                return
                 // } else if ($state.includes('main.project.diff')) {
                 //     growl.warning("Please finish diff action first.");
                 //     return;
             } else {
-                this.searchClass = "fa fa-spin fa-spinner";
-                this.$state.go('main.project.ref.search', {search: searchText, field: 'all'});
+                this.searchClass = 'fa fa-spin fa-spinner'
+                this.$state.go('main.project.ref.search', {
+                    search: searchText,
+                    field: 'all',
+                })
             }
-        };
+        }
+    },
+}
 
-    }
-};
-
-veApp.component(VeNavComponent.selector,VeNavComponent);
+veApp.component(VeNavComponent.selector, VeNavComponent)

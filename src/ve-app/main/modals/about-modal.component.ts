@@ -1,10 +1,11 @@
-import * as angular from 'angular';
-import {VeComponentOptions} from "@ve-types/view-editor";
+import angular from 'angular'
 
-import {veApp} from "@ve-app";
+import { veApp } from '@ve-app'
 
-let AboutModalComponent: VeComponentOptions = {
-    selector: "aboutModal",
+import { VeComponentOptions } from '@ve-types/view-editor'
+
+const AboutModalComponent: VeComponentOptions = {
+    selector: 'aboutModal',
     template: `
     <div class="modal-header">
     <h4>About</h4>
@@ -20,12 +21,13 @@ let AboutModalComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        modalInstance: "<",
-        resolve: "@"
+        modalInstance: '<',
+        resolve: '@',
     },
-    controller: class AboutModalController implements angular.IComponentController {
-
-        static $inject = ['$window', 'ApplicationService'];
+    controller: class AboutModalController
+        implements angular.IComponentController
+    {
+        static $inject = ['$window', 'ApplicationService']
 
         private $window
         private applicationSvc
@@ -39,26 +41,31 @@ let AboutModalComponent: VeComponentOptions = {
         public mmsV
 
         constructor($window, ApplicationService) {
-            this.$window = $window;
-            this.applicationSvc = ApplicationService;
-        };
+            this.$window = $window
+            this.applicationSvc = ApplicationService
+        }
 
         $onInit() {
-            this.veV = (this.$window.__env.version) ? this.$window.__env.version : '3.6.1'
+            this.veV = this.$window.__env.version
+                ? this.$window.__env.version
+                : '3.6.1'
             this.mmsV = 'Loading...'
 
-            this.applicationSvc.getMmsVersion().then((data) => {
-                this.mmsV = data;
-            }, (reason) => {
-                this.mmsV = "Could not retrieve due to failure: " + reason.message;
-            });
-
+            this.applicationSvc.getMmsVersion().then(
+                (data) => {
+                    this.mmsV = data
+                },
+                (reason) => {
+                    this.mmsV =
+                        'Could not retrieve due to failure: ' + reason.message
+                }
+            )
         }
 
         cancel() {
-            this.modalInstance.dismiss();
+            this.modalInstance.dismiss()
         }
-    }
-};
+    },
+}
 
-veApp.component(AboutModalComponent.selector, AboutModalComponent);
+veApp.component(AboutModalComponent.selector, AboutModalComponent)

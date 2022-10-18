@@ -1,5 +1,4 @@
-import * as angular from 'angular';
-
+import angular from 'angular'
 
 /**
  * @name onChangesCallback
@@ -14,7 +13,11 @@ import * as angular from 'angular';
  *      }
  *
  */
-export type onChangesCallback = (newVal?: any, oldVal?: any, firstChange?: boolean) => any
+export type onChangesCallback = (
+    newVal?: any,
+    oldVal?: any,
+    firstChange?: boolean
+) => any
 
 /**
  * @name change.utils#handleChange:
@@ -38,19 +41,22 @@ export type onChangesCallback = (newVal?: any, oldVal?: any, firstChange?: boole
  * @param {boolean} ignoreFirst -
  * @returns {any}
  */
-export function handleChange(changesObj: angular.IOnChangesObject, watch: string, callback: onChangesCallback,
-                             ignoreFirst?: boolean): any {
-    if (watch === "") {
-        return callback();
-    }
-    else if (changesObj[watch]) {
+export function handleChange(
+    changesObj: angular.IOnChangesObject,
+    watch: string,
+    callback: onChangesCallback,
+    ignoreFirst?: boolean
+): any {
+    if (watch === '') {
+        return callback()
+    } else if (changesObj[watch]) {
         if (ignoreFirst && changesObj[watch].isFirstChange()) {
-            return;
+            return
         }
-        const newVal = changesObj[watch].currentValue;
-        const oldVal = changesObj[watch].previousValue;
-        const firstChange = changesObj[watch].isFirstChange();
-        return callback(newVal, oldVal, firstChange);
+        const newVal = changesObj[watch].currentValue
+        const oldVal = changesObj[watch].previousValue
+        const firstChange = changesObj[watch].isFirstChange()
+        return callback(newVal, oldVal, firstChange)
     }
-    return;
+    return
 }

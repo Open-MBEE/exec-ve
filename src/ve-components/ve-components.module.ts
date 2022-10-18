@@ -1,10 +1,15 @@
-import * as angular from 'angular';
+import angular from 'angular'
 
 /**
  *
  * @type {angular.IModule}
  */
-export const veComponents = angular.module('ve-components',['ve-utils', 'ui.bootstrap', 'angular-growl', 'ngSanitize'])
+export const veComponents = angular.module('ve-components', [
+    've-utils',
+    'ui.bootstrap',
+    'angular-growl',
+    'ngSanitize',
+])
 
 // veComponents.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.ISanitizeProvider) {
 //     $sanitizeProvider.addValidElements({
@@ -14,14 +19,14 @@ export const veComponents = angular.module('ve-components',['ve-utils', 'ui.boot
 //             'mms-commit-id', 'mms-watch-id', 'non-editable', 'mms-generate-for-diff'])
 //         .enableSvg()
 // }])
-    veComponents
-        .filter('veRealNum', function() {
-            return function(n) {
-                if (Number.isInteger(n)) {
-                    return n + '.0';
-                }
-                return n;
-            };
-        })
-        .constant('CKEDITOR', window.CKEDITOR)
-        .constant('veConfig', window.__env)
+veComponents
+    .filter('veRealNum', function () {
+        return function (n) {
+            if (Number.isInteger(n)) {
+                return n + '.0'
+            }
+            return n
+        }
+    })
+    .constant('CKEDITOR', window.CKEDITOR)
+    .constant('veConfig', window.__env)

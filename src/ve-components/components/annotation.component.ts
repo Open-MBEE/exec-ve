@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
 import { ExtensionService } from '@ve-components/services'
 import { SchemaService } from '@ve-utils/model-schema'

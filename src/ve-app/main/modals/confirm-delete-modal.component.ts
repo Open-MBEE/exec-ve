@@ -1,23 +1,30 @@
-import * as angular from 'angular';
-import {VeComponentOptions, VeModalController, VeModalResolve, VeModalResolveFn} from "@ve-types/view-editor";
+import angular from 'angular'
+import _ from 'lodash'
 
-import {veApp} from "@ve-app";
-import {VeModalControllerImpl} from "@ve-utils/modals/ve-modal.controller";
-import _ from "lodash";
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
+
+import { veApp } from '@ve-app'
+
+import {
+    VeComponentOptions,
+    VeModalController,
+    VeModalResolve,
+    VeModalResolveFn,
+} from '@ve-types/view-editor'
 
 export interface ConfirmDeleteModalResolve extends VeModalResolve {
-    getType: string,
-    getName: string,
+    getType: string
+    getName: string
     finalize(): angular.IPromise<boolean>
 }
 
 export interface ConfirmDeleteModalResolveFn extends VeModalResolveFn {
-    getType(): string,
-    getName(): string,
+    getType(): string
+    getName(): string
     finalize(): () => angular.IPromise<boolean>
 }
 
-let ConfirmDeleteModalComponent: VeComponentOptions = {
+const ConfirmDeleteModalComponent: VeComponentOptions = {
     selector: 'confirmDeleteModal',
     template: `
     <div class="modal-header">
@@ -40,14 +47,16 @@ let ConfirmDeleteModalComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        modalInstance: "<",
-        resolve: "<"
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class ConfirmDeleteModalController extends VeModalControllerImpl implements VeModalController {
+    controller: class ConfirmDeleteModalController
+        extends VeModalControllerImpl
+        implements VeModalController
+    {
+        static $inject = ['growl']
 
-        static $inject = ['growl'];
-
-        protected resolve: ConfirmDeleteModalResolve;
+        protected resolve: ConfirmDeleteModalResolve
 
         //local
         public oking
@@ -56,43 +65,49 @@ let ConfirmDeleteModalComponent: VeComponentOptions = {
 
         private treeApi
 
-
         constructor(private growl: angular.growl.IGrowlService) {
             super()
         }
 
         $onInit() {
-            this.oking = false;
-            this.type = this.resolve.getType;
-            this.name = this.resolve.getName;
+            this.oking = false
+            this.type = this.resolve.getType
+            this.name = this.resolve.getName
         }
 
         ok = () => {
             if (this.oking) {
-                this.growl.info("Please wait...");
-                return;
+                this.growl.info('Please wait...')
+                return
             }
-            this.oking = true;
+            this.oking = true
             if (this.resolve.finalize) {
-                this.resolve.finalize().then(() => {
-                        this.growl.success(_.upperFirst(this.type) + " Removed");
-                        this.oking = false;
-                        this.modalInstance.close({ $value: 'ok'});
-                }, (reason) => {
-                    if (reason.message) {
-                        this.growl.error(this.type + ' Removal Error: ' + reason.message);
+                this.resolve.finalize().then(
+                    () => {
+                        this.growl.success(_.upperFirst(this.type) + ' Removed')
+                        this.oking = false
+                        this.modalInstance.close({ $value: 'ok' })
+                    },
+                    (reason) => {
+                        if (reason.message) {
+                            this.growl.error(
+                                this.type + ' Removal Error: ' + reason.message
+                            )
+                        }
+                        this.oking = false
+                        this.modalInstance.dismiss(reason)
                     }
-                    this.oking = false;
-                    this.modalInstance.dismiss(reason);
-                });
+                )
             }
-        };
+        }
 
-        cancel()
-        {
-            this.modalInstance.dismiss();
-        };
-    }
-};
+        cancel() {
+            this.modalInstance.dismiss()
+        }
+    },
+}
 
-veApp.component(ConfirmDeleteModalComponent.selector,ConfirmDeleteModalComponent);
+veApp.component(
+    ConfirmDeleteModalComponent.selector,
+    ConfirmDeleteModalComponent
+)

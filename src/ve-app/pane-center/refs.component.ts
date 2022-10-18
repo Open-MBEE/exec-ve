@@ -1,6 +1,5 @@
 import { StateService } from '@uirouter/angularjs'
-import * as angular from 'angular'
-import { IWindowService } from 'angular'
+import angular, { IWindowService } from 'angular'
 import _ from 'lodash'
 import Rx from 'rx-lite'
 

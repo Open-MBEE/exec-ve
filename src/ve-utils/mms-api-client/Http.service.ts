@@ -1,13 +1,8 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
 import { veUtils } from '@ve-utils'
 
-export type httpCallback<T> = (
-    data: T,
-    status: number,
-    headers: angular.IHttpHeadersGetter,
-    config: angular.IRequestConfig
-) => void
+export type httpCallback<T> = (response: angular.IHttpResponse<T>) => void
 
 export interface HttpServiceRequest {
     url: string
@@ -77,20 +72,10 @@ export class HttpService {
                     .get(url)
                     .then(
                         (response: angular.IHttpResponse<T>) => {
-                            successCallback(
-                                response.data,
-                                response.status,
-                                response.headers,
-                                response.config
-                            )
+                            successCallback(response)
                         },
                         (response: angular.IHttpResponse<T>) => {
-                            errorCallback(
-                                response.data,
-                                response.status,
-                                response.headers,
-                                response.config
-                            )
+                            errorCallback(response)
                         }
                     )
                     .finally(() => {
@@ -116,20 +101,10 @@ export class HttpService {
                 .get(url)
                 .then(
                     (response: angular.IHttpResponse<T>) => {
-                        successCallback(
-                            response.data,
-                            response.status,
-                            response.headers,
-                            response.config
-                        )
+                        successCallback(response)
                     },
                     (response: angular.IHttpResponse<T>) => {
-                        errorCallback(
-                            response.data,
-                            response.status,
-                            response.headers,
-                            response.config
-                        )
+                        errorCallback(response)
                     }
                 )
                 .finally(() => {

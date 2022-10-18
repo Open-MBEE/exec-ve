@@ -1,16 +1,16 @@
-import * as angular from 'angular';
-import Rx from 'rx-lite';
-import {StateService} from '@uirouter/angularjs';
-import {ProjectService} from "@ve-utils/mms-api-client";
-import{ElementService} from "@ve-utils/mms-api-client";
-import {EventService} from "@ve-utils/services";
-import {RootScopeService} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {QueryObject, RequestObject} from "@ve-types/mms"
+import { StateService } from '@uirouter/angularjs'
+import angular from 'angular'
+import Rx from 'rx-lite'
 
-import {veApp} from "@ve-app";
+import { ProjectService, ElementService } from '@ve-utils/mms-api-client'
+import { EventService, RootScopeService } from '@ve-utils/services'
 
-let RedirectComponent: VeComponentOptions = {
+import { veApp } from '@ve-app'
+
+import { QueryObject, RequestObject } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/view-editor'
+
+const RedirectComponent: VeComponentOptions = {
     selector: 'veRedirect',
     template: `
     <div id="ve-origin-select" class="row">
@@ -52,227 +52,368 @@ let RedirectComponent: VeComponentOptions = {
     </div>
 </div>
 `,
-    controller: class RedirectController implements angular.IComponentController {
+    controller: class RedirectController
+        implements angular.IComponentController
+    {
+        public subs: Rx.IDisposable[]
 
-        public subs: Rx.IDisposable[];
+        public redirect_from_old: object
+        redirect_noResults: boolean = false
+        redirect_element: { name: string; type: string; link: string }
+        spin: boolean = false
+        elem: any
+        redirect_relatedDocs: any
+        projectList: string[] = []
+        reqOb: RequestObject
 
-        public redirect_from_old: object;
-        redirect_noResults: boolean = false;
-        redirect_element: { name: string, type: string, link: string }
-        spin: boolean = false;
-        elem: any;
-        redirect_relatedDocs: any;
-        projectList: string[] = [];
-        reqOb:RequestObject;
+        static $inject = [
+            '$q',
+            '$state',
+            '$location',
+            '$timeout',
+            'growl',
+            'ProjectService',
+            'ElementService',
+            'RootScopeService',
+            'EventService',
+        ]
 
-        static $inject = ['$q', '$state', '$location', '$timeout', 'growl',
-            'ProjectService', 'ElementService', 'RootScopeService', 'EventService']
+        constructor(
+            private $q: angular.IQService,
+            private $state: StateService,
+            private $location: angular.ILocationService,
+            private $timeout: angular.ITimeoutService,
+            private growl: angular.growl.IGrowlService,
+            private projectSvc: ProjectService,
+            private elementSvc: ElementService,
+            private rootScopeSvc: RootScopeService,
+            private eventSvc: EventService
+        ) {}
 
-        constructor(private $q: angular.IQService, private $state: StateService, private $location: angular.ILocationService,
-                    private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService,
-                    private projectSvc: ProjectService, private elementSvc: ElementService, 
-                    private rootScopeSvc: RootScopeService, private eventSvc: EventService) {
-        }
-        
         $onInit() {
-            this.eventSvc.$init(this);
+            this.eventSvc.$init(this)
 
-            this.rootScopeSvc.veTitle('Redirecting... | View Editor'); //what to name this?
+            this.rootScopeSvc.veTitle('Redirecting... | View Editor') //what to name this?
 
-            this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld();
-            this.subs.push(this.eventSvc.$on(this.rootScopeSvc.constants.VEREDIRECTFROMOLD, (data) => {
-                this.redirect_from_old = data;
-            }));
-
+            this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld()
+            this.subs.push(
+                this.eventSvc.$on(
+                    this.rootScopeSvc.constants.VEREDIRECTFROMOLD,
+                    (data) => {
+                        this.redirect_from_old = data
+                    }
+                )
+            )
 
             this.projectSvc.getProjects().then((projectObs) => {
-                this.projectList = projectObs.map((a) => {return a.id;});
-                this.reqOb = {projectId: this.projectList[0], refId: 'master'};
-                this.oldUrlTest(this.rootScopeSvc.veCrushUrl());
-            });
-
+                this.projectList = projectObs.map((a) => {
+                    return a.id
+                })
+                this.reqOb = { projectId: this.projectList[0], refId: 'master' }
+                this.oldUrlTest(this.rootScopeSvc.veCrushUrl())
+            })
         }
 
         public resetSelectPage() {
-            this.$state.go('main.login.select');
-        };
+            this.$state.go('main.login.select')
+        }
 
         public buildQuery(idList: string[], projectList): QueryObject[] {
-            var queryObs: QueryObject[] = []
+            const queryObs: QueryObject[] = []
             //Filter master ref
-            for (let id of idList) {
-                for (let project of projectList) {
-                    let queryOb: QueryObject = {params: {
+            for (const id of idList) {
+                for (const project of projectList) {
+                    const queryOb: QueryObject = {
+                        params: {
                             id: id,
                             _projectId: project,
-                            _inRefIds: 'master'
-                        }}
-                    queryObs.push(queryOb);
+                            _inRefIds: 'master',
+                        },
+                    }
+                    queryObs.push(queryOb)
                 }
             }
-            return queryObs;
-        };
+            return queryObs
+        }
 
         public errorHandler(reason) {
-            this.growl.error(reason.message);
-            this.$state.go('main.login.select');
-        };
+            this.growl.error(reason.message)
+            this.$state.go('main.login.select')
+        }
 
         public oldUrlTest(location: string) {
-            var segments: string[] = location.split('/');
-            let successRedirectFnc = this.errorHandler;
-            let searchTermList: string[] = []
+            const segments: string[] = location.split('/')
+            let successRedirectFnc = this.errorHandler
+            const searchTermList: string[] = []
             const noResultFnc = () => {
                 // TODO - Search for document was unsucessful. Please select from the following or contact admin to verify that document exists.
-                this.redirect_noResults = true;
-            };
+                this.redirect_noResults = true
+            }
 
             if (segments.length === 5) {
-                if (location.includes('sites')) { //Search for site
-                    searchTermList.push(segments[4]+'_cover');
+                if (location.includes('sites')) {
+                    //Search for site
+                    searchTermList.push(segments[4] + '_cover')
                     successRedirectFnc = (data) => {
-                        if ( data.length > 0 ) {
-                            this.redirect_element = {name: data[0].name,
+                        if (data.length > 0) {
+                            this.redirect_element = {
+                                name: data[0].name,
                                 type: 'group',
-                                link: "main.project.ref.preview({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[0].id+ "'})"
-                            };
+                                link:
+                                    "main.project.ref.preview({projectId:'" +
+                                    data[0]._projectId +
+                                    "',refId:'master',documentId:'" +
+                                    data[0].id +
+                                    "'})",
+                            }
                             const redirectFnc = () => {
-                                this.$state.go('main.project.ref.preview', {projectId: data[0]._projectId, refId: 'master', documentId: data[0].id});
-                            };
-                            this.$timeout(redirectFnc, 10000);
+                                this.$state.go('main.project.ref.preview', {
+                                    projectId: data[0]._projectId,
+                                    refId: 'master',
+                                    documentId: data[0].id,
+                                })
+                            }
+                            this.$timeout(redirectFnc, 10000)
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 }
-            } else if (segments.length === 7) { //Search for document
+            } else if (segments.length === 7) {
+                //Search for document
                 if (location.includes('documents')) {
                     // ["", "workspaces", "master", "sites", "site__18_0_6_eda034b_1489006578377_52061_121780", "document", "_18_0_6_bec02f9_1489697812908_180368_252005"]
-                    searchTermList.push(segments[6]);
+                    searchTermList.push(segments[6])
                     successRedirectFnc = (data) => {
-                        if ( data.length > 0 ) {
-                            this.redirect_element = {name: data[0].name,
+                        if (data.length > 0) {
+                            this.redirect_element = {
+                                name: data[0].name,
                                 type: 'doc',
-                                link: "main.project.ref.document({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[0].id+ "'})"
-                            };
+                                link:
+                                    "main.project.ref.document({projectId:'" +
+                                    data[0]._projectId +
+                                    "',refId:'master',documentId:'" +
+                                    data[0].id +
+                                    "'})",
+                            }
                             const redirectFnc = () => {
-                                this.$state.go('main.project.ref.document', {projectId: data[0]._projectId, refId: 'master', documentId: data[0].id});
-                            };
-                            this.$timeout(redirectFnc, 10000);
+                                this.$state.go('main.project.ref.document', {
+                                    projectId: data[0]._projectId,
+                                    refId: 'master',
+                                    documentId: data[0].id,
+                                })
+                            }
+                            this.$timeout(redirectFnc, 10000)
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 } else if (location.includes('document')) {
-                    searchTermList.push(segments[6]);
+                    searchTermList.push(segments[6])
                     successRedirectFnc = (data) => {
-                        if ( data.length > 0 ) {
-                            this.redirect_element = {name: data[0].name,
+                        if (data.length > 0) {
+                            this.redirect_element = {
+                                name: data[0].name,
                                 type: 'doc',
-                                link: "main.project.ref.preview({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[0].id+ "'})"
-                            };
+                                link:
+                                    "main.project.ref.preview({projectId:'" +
+                                    data[0]._projectId +
+                                    "',refId:'master',documentId:'" +
+                                    data[0].id +
+                                    "'})",
+                            }
                             const redirectFnc = () => {
-                                this.$state.go('main.project.ref.preview', {projectId: data[0]._projectId, refId: 'master', documentId: data[0].id});
-                            };
-                            this.$timeout(redirectFnc, 10000);
+                                this.$state.go('main.project.ref.preview', {
+                                    projectId: data[0]._projectId,
+                                    refId: 'master',
+                                    documentId: data[0].id,
+                                })
+                            }
+                            this.$timeout(redirectFnc, 10000)
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 }
-            } else if (segments.length === 9) { //Search for view
+            } else if (segments.length === 9) {
+                //Search for view
                 if (location.includes('views')) {
                     // ["", "workspaces", "master", "sites", "site__18_0_6_eda034b_1489006578377_52061_121780", "documents", "_18_0_6_bec02f9_1489697812908_180368_252005", "views", "MMS_1474405796233_0887698d-1fc7-47ac-87ac-b0f6e7b69d35"]
                     if (segments[6] == segments[8]) {
-                        searchTermList.push(segments[6]);
+                        searchTermList.push(segments[6])
                         successRedirectFnc = (data) => {
-                            if ( data.length > 0 ) {
-                                this.redirect_element = {name: data[0].name,
+                            if (data.length > 0) {
+                                this.redirect_element = {
+                                    name: data[0].name,
                                     type: 'doc',
-                                    link: "main.project.ref.document.view({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[0].id+ "',viewId:'" +data[0].id+ "'})"
-                                };
+                                    link:
+                                        "main.project.ref.document.view({projectId:'" +
+                                        data[0]._projectId +
+                                        "',refId:'master',documentId:'" +
+                                        data[0].id +
+                                        "',viewId:'" +
+                                        data[0].id +
+                                        "'})",
+                                }
                                 const redirectFnc = () => {
-                                    this.$state.go('main.project.ref.document.view', {projectId: data[0]._projectId, refId: 'master', documentId: data[0].id, viewId: data[0].id});
-                                };
-                                this.$timeout(redirectFnc, 10000);
+                                    this.$state.go(
+                                        'main.project.ref.document.view',
+                                        {
+                                            projectId: data[0]._projectId,
+                                            refId: 'master',
+                                            documentId: data[0].id,
+                                            viewId: data[0].id,
+                                        }
+                                    )
+                                }
+                                this.$timeout(redirectFnc, 10000)
                             } else {
-                                noResultFnc();
+                                noResultFnc()
                             }
-                        };
+                        }
                     } else {
-                        searchTermList.push(segments[6]);
-                        searchTermList.push(segments[8]);
+                        searchTermList.push(segments[6])
+                        searchTermList.push(segments[8])
                         successRedirectFnc = (data) => {
-                            let redirectFnc;
+                            let redirectFnc
                             if (data.length > 1) {
-                                if ( data[0].id === segments[6] && data[1].id === segments[8] ) {
+                                if (
+                                    data[0].id === segments[6] &&
+                                    data[1].id === segments[8]
+                                ) {
                                     //should check case if data[1] is segent[6] also
-                                    this.redirect_element = {name: data[0].name,
+                                    this.redirect_element = {
+                                        name: data[0].name,
                                         type: 'doc',
-                                        link: "main.project.ref.document.view({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[0].id+ "',viewId:'" +data[1].id+ "'})"
-                                    };
+                                        link:
+                                            "main.project.ref.document.view({projectId:'" +
+                                            data[0]._projectId +
+                                            "',refId:'master',documentId:'" +
+                                            data[0].id +
+                                            "',viewId:'" +
+                                            data[1].id +
+                                            "'})",
+                                    }
                                     redirectFnc = () => {
-                                        this.$state.go('main.project.ref.document.view', {projectId: data[0]._projectId, refId: 'master', documentId: data[0].id, viewId: data[1].id});
-                                    };
-                                } else if ( data[0].id === segments[8] && data[1].id === segments[6] ) {
+                                        this.$state.go(
+                                            'main.project.ref.document.view',
+                                            {
+                                                projectId: data[0]._projectId,
+                                                refId: 'master',
+                                                documentId: data[0].id,
+                                                viewId: data[1].id,
+                                            }
+                                        )
+                                    }
+                                } else if (
+                                    data[0].id === segments[8] &&
+                                    data[1].id === segments[6]
+                                ) {
                                     //should check case if data[1] is segent[6] also
-                                    this.redirect_element = {name: data[0].name,
+                                    this.redirect_element = {
+                                        name: data[0].name,
                                         type: 'doc',
-                                        link: "main.project.ref.document.view({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[1].id+ "',viewId:'" +data[0].id+ "'})"
-                                    };
+                                        link:
+                                            "main.project.ref.document.view({projectId:'" +
+                                            data[0]._projectId +
+                                            "',refId:'master',documentId:'" +
+                                            data[1].id +
+                                            "',viewId:'" +
+                                            data[0].id +
+                                            "'})",
+                                    }
                                     redirectFnc = () => {
-                                        this.$state.go('main.project.ref.document.view', {projectId: data[0]._projectId, refId: 'master', documentId: data[1].id, viewId: data[0].id});
-                                    };
+                                        this.$state.go(
+                                            'main.project.ref.document.view',
+                                            {
+                                                projectId: data[0]._projectId,
+                                                refId: 'master',
+                                                documentId: data[1].id,
+                                                viewId: data[0].id,
+                                            }
+                                        )
+                                    }
                                 }
-                                this.$timeout(redirectFnc, 10000);
+                                this.$timeout(redirectFnc, 10000)
                             } else if (data.length > 0) {
-                                if ( data[0].id === segments[8] ) {
-                                    this.elem = data[0];
-                                    this.redirect_relatedDocs = data[0]._relatedDocuments;
-                                } else if ( data[0].id === segments[6] ) {
-                                    this.redirect_element = {name: data[0].name,
+                                if (data[0].id === segments[8]) {
+                                    this.elem = data[0]
+                                    this.redirect_relatedDocs =
+                                        data[0]._relatedDocuments
+                                } else if (data[0].id === segments[6]) {
+                                    this.redirect_element = {
+                                        name: data[0].name,
                                         type: 'doc',
-                                        link: "main.project.ref.document({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[0].id+ "'})"
-                                    };
+                                        link:
+                                            "main.project.ref.document({projectId:'" +
+                                            data[0]._projectId +
+                                            "',refId:'master',documentId:'" +
+                                            data[0].id +
+                                            "'})",
+                                    }
                                     redirectFnc = () => {
-                                        this.$state.go('main.project.ref.document', {projectId: data[0]._projectId, refId: 'master', documentId: data[0].id});
-                                    };
-                                    this.$timeout(redirectFnc, 10000);
+                                        this.$state.go(
+                                            'main.project.ref.document',
+                                            {
+                                                projectId: data[0]._projectId,
+                                                refId: 'master',
+                                                documentId: data[0].id,
+                                            }
+                                        )
+                                    }
+                                    this.$timeout(redirectFnc, 10000)
                                 }
                             } else {
-                                noResultFnc();
+                                noResultFnc()
                             }
-                        };
+                        }
                     }
                 }
-            } else if (segments.length === 8) { //Search for full doc
+            } else if (segments.length === 8) {
+                //Search for full doc
                 if (location.includes('full')) {
-                    searchTermList.push(segments[6]);
+                    searchTermList.push(segments[6])
                     successRedirectFnc = (data) => {
-                        if ( data.length > 0 ) {
-                            this.redirect_element = {name: data[0].name,
+                        if (data.length > 0) {
+                            this.redirect_element = {
+                                name: data[0].name,
                                 type: 'doc',
-                                link: "main.project.ref.document.full({projectId:'" +data[0]._projectId+ "',refId:'master',documentId:'" +data[0].id+ "'})"
-                            };
+                                link:
+                                    "main.project.ref.document.full({projectId:'" +
+                                    data[0]._projectId +
+                                    "',refId:'master',documentId:'" +
+                                    data[0].id +
+                                    "'})",
+                            }
                             const redirectFnc = () => {
-                                this.$state.go('main.project.ref.document.full', {projectId: data[0]._projectId, refId: 'master', documentId: data[0].id});
-                            };
-                            this.$timeout(redirectFnc, 10000);
+                                this.$state.go(
+                                    'main.project.ref.document.full',
+                                    {
+                                        projectId: data[0]._projectId,
+                                        refId: 'master',
+                                        documentId: data[0].id,
+                                    }
+                                )
+                            }
+                            this.$timeout(redirectFnc, 10000)
                         } else {
-                            noResultFnc();
+                            noResultFnc()
                         }
-                    };
+                    }
                 }
             }
             // console.log(segments);
-            var queryObs: QueryObject[] = this.buildQuery(searchTermList, this.projectList);
-            let promises: angular.IPromise<any>[] = []
-            for (let queryOb of queryObs) {
-                promises.push(this.elementSvc.search(this.reqOb, queryOb));
+            const queryObs: QueryObject[] = this.buildQuery(
+                searchTermList,
+                this.projectList
+            )
+            const promises: angular.IPromise<any>[] = []
+            for (const queryOb of queryObs) {
+                promises.push(this.elementSvc.search(this.reqOb, queryOb))
             }
-            this.$q.all(promises).then(successRedirectFnc, this.errorHandler);
-        };
-    }
-};
+            this.$q.all(promises).then(successRedirectFnc, this.errorHandler)
+        }
+    },
+}
 
-veApp.component(RedirectComponent.selector, RedirectComponent);
+veApp.component(RedirectComponent.selector, RedirectComponent)

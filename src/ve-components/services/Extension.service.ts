@@ -1,28 +1,29 @@
-import * as angular from 'angular';
-import _ from 'lodash';
-import {veComponents} from "@ve-components";
-import {IToolBarButton} from "@ve-core/tool-bar";
+import angular from 'angular'
+import _ from 'lodash'
+
+import { IToolBarButton } from '@ve-core/tool-bar'
+
+import { veComponents } from '@ve-components'
 
 export interface VeExperimentDescriptor {
-    id: string,
-    path?: string,
+    id: string
+    path?: string
     config?: string
 }
 
 export interface VeExperimentConfig {
-    specTools?: SpecToolConfig[],
+    specTools?: SpecToolConfig[]
     transclusions?: VeExperimentConfig[]
     presentations?: VeExperimentConfig[]
 }
 
-export interface SpecToolConfig  extends VeExperimentConfig {
-    name: string,
-    button: IToolBarButton,
+export interface SpecToolConfig extends VeExperimentConfig {
+    name: string
+    button: IToolBarButton
     dynamic_button: IToolBarButton[]
 }
 
 export class ExtensionService {
-
     extensionTags: string[] = []
     extensionData: any[] = []
     allowedExtensions: string[] = ['present', 'transclude', 'spec']
@@ -41,11 +42,10 @@ export class ExtensionService {
     constructor(private growl: angular.growl.IGrowlService) {
         angular.module('ve-components')['_invokeQueue'].forEach((value) => {
             if (value[1] === 'component') {
-                this.extensionTags.push(_.kebabCase(value[2][0]));
-                this.extensionData.push(value[2]);
+                this.extensionTags.push(_.kebabCase(value[2][0]))
+                this.extensionData.push(value[2])
             }
-
-        });
+        })
 
         // for (const tag of this.extensionTags) {
         //
@@ -57,7 +57,9 @@ export class ExtensionService {
             this.growl.error('Unknown Extension Prefix: ' + extPrefix)
             return 'extension-error'
         }
-        let tag = _.kebabCase((type.startsWith(extPrefix)) ? type : extPrefix + _.capitalize(type));
+        const tag = _.kebabCase(
+            type.startsWith(extPrefix) ? type : extPrefix + _.capitalize(type)
+        )
         if (!this.extensionTags.includes(tag)) {
             this.growl.error('Unknown Extension type: ' + type)
             return 'extension-error'
@@ -69,10 +71,12 @@ export class ExtensionService {
 
     public getExtensions(extPrefix: string, exclude?: string[]): string[] {
         return this.extensionTags.filter((value) => {
-            return (value.startsWith(extPrefix) && ((exclude) ? !exclude.includes(value) : true))
+            return (
+                value.startsWith(extPrefix) &&
+                (exclude ? !exclude.includes(value) : true)
+            )
         })
     }
-
 }
 
 veComponents.service('ExtensionService', ExtensionService)

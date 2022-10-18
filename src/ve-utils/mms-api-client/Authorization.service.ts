@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
 import {
     CacheService,
@@ -73,14 +73,14 @@ export class AuthService {
                 deferred.resolve(this.token)
             },
             (fail: angular.IHttpResponse<AuthResponse>) => {
-                this.uRLSvc.handleHttpStatus(
-                    fail.data,
-                    fail.status,
-                    fail.headers,
-                    fail.config,
-                    deferred
+                deferred.reject(
+                    this.uRLSvc.handleHttpStatus(
+                        fail.data,
+                        fail.status,
+                        fail.headers,
+                        fail.config
+                    )
                 )
-                deferred.reject(fail)
             }
         )
         return deferred.promise

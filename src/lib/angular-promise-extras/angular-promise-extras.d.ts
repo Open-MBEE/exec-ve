@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
 declare module 'angular' {
     type PromiseState = 'pending' | 'fulfilled' | 'rejected'

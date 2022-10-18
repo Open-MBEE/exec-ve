@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
 export type MmsObject = Record<string, unknown>
 
@@ -25,23 +25,32 @@ export interface ElementObject extends MmsObject {
     _creator?: string
     _created?: Date
     _inRefIds?: string[]
+    _appliedStereotypeIds?: string[]
     type?: string
     defaultValue?: ExpressionObject
     documentation?: string
     name?: string
 }
 
-export interface ExpressionObject extends ElementObject {
-    specification?: ElementObject
-    operand?: ExpressionObject[]
-    value?: unknown
+export interface ValueObject extends ElementObject {
+    value?: unknown | unknown[]
+    instanceId?: string
+}
+export interface ExpressionObject extends ValueObject {
+    specification?: ExpressionObject
+    operand?: ValueObject[]
+    value?: ElementObject[]
 }
 
 export interface ViewObject extends ElementObject {
+    aggregation?: string
+    propertyId?: string
+    specification?: ValueObject
     _relatedDocuments?: ViewObject[]
     _parentViews?: ViewObject[]
     _contents?: ExpressionObject
     _childViews?: ViewObject[]
+    _displayedElementIds?: string[]
 }
 
 export interface PresentationInstanceObject extends MmsObject {
@@ -56,6 +65,14 @@ export interface PresentationInstanceObject extends MmsObject {
     ptype?: string
     showIfEmpty?: boolean
     body?: unknown[]
+}
+
+export interface TableInstanceObject extends PresentationInstanceObject {
+    body?: TableBodyObject[][]
+}
+
+export interface TableBodyObject {
+    content: PresentationInstanceObject[]
 }
 
 // export interface PresentationObject extends ExpressionObject {
@@ -97,16 +114,19 @@ export interface OrgObject extends MmsObject {
 }
 
 export interface ProjectObject extends MmsObject {
-    mounts?: string
     schema?: string
     _creator?: string
     _docId?: string
     _created?: string
-    _mounts?: ProjectObject[]
     name?: string
     id: string
     orgId?: string
-    _refId?: string
+}
+
+export interface MountObject extends ProjectObject {
+    _mounts: MountObject[]
+    _refId: string
+    _projectId: string
 }
 
 export interface RefObject extends MmsObject {
@@ -138,15 +158,15 @@ interface RequestObject extends MmsObject {
     depth?: number
 }
 
-export interface ElementsRequest extends RequestObject {
-    elementId: string | string[]
+export interface ElementsRequest<T> extends RequestObject {
+    elementId: T
 }
 
 export interface ViewsRequest extends RequestObject {
     returnChildViews: boolean
 }
 
-export interface ArtifactsRequest extends ElementsRequest {
+export interface ArtifactsRequest<T> extends ElementsRequest<T> {
     artifactExtension: string
 }
 
@@ -157,7 +177,7 @@ export interface ParamsObject extends RequestObject {
     field?: string
 }
 
-export interface ElementCreationRequest extends ElementsRequest {
+export interface ElementCreationRequest extends RequestObject {
     elements: ElementObject[]
 }
 
@@ -185,9 +205,13 @@ export interface CheckAuthResponse {
     username: string
 }
 
-interface BasicResponse extends angular.IHttpResponse<unknown> {
+interface BasicResponse {
     messages: string[]
     rejected: RejectedObject[]
+}
+
+interface GenericResponse extends BasicResponse {
+    [p: string]: ElementObject[]
 }
 
 interface RejectedObject {

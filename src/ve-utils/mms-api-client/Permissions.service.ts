@@ -1,4 +1,4 @@
-import * as angular from 'angular'
+import angular from 'angular'
 
 import { URLService } from '@ve-utils/mms-api-client'
 
@@ -81,12 +81,13 @@ export class PermissionsService {
                     }
                 },
                 (response: angular.IHttpResponse<PermissionsResponse>) => {
-                    this.uRLSvc.handleHttpStatus(
-                        response.data,
-                        response.status,
-                        response.headers,
-                        response.config,
-                        deferred
+                    deferred.reject(
+                        this.uRLSvc.handleHttpStatus(
+                            response.data,
+                            response.status,
+                            response.headers,
+                            response.config
+                        )
                     )
                 }
             )

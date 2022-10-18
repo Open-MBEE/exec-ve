@@ -1,10 +1,18 @@
-import angular, { IComponentController, IComponentOptions } from 'angular'
+import angular, {
+    IComponentController,
+    IComponentOptions,
+    IHttpResponse,
+} from 'angular'
 
 import IModalService = angular.ui.bootstrap.IModalService
 import IModalSettings = angular.ui.bootstrap.IModalSettings
 import IModalInstanceService = angular.ui.bootstrap.IModalInstanceService
 
-import { ElementObject, ViewObject } from '@ve-types/mms'
+import {
+    ElementObject,
+    PresentationInstanceObject,
+    ViewObject,
+} from '@ve-types/mms'
 
 export interface VeComponentOptions extends IComponentOptions {
     selector: string
@@ -65,10 +73,8 @@ export interface VeModalResolveFn {
     [key: string]: () => unknown
 }
 
-export interface VePromiseReason<T> {
+export interface VePromiseReason<T> extends IHttpResponse<T> {
     state?: angular.PromiseState
-    status?: number
-    data?: T
     message?: string
     recentVersionOfElement?: ElementObject
 }

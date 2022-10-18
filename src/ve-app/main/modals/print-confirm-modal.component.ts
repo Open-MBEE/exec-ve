@@ -1,12 +1,17 @@
-import * as angular from 'angular';
-import * as _ from "lodash";
-import {ElementService, ViewService, DocMetadata} from "@ve-utils/mms-api-client";
-import {UtilsService, AutosaveService} from "@ve-utils/services";
-import {AppUtilsService} from "@ve-app/main/services";
+import angular from 'angular'
+import * as _ from 'lodash'
 
-import {veApp} from "@ve-app";
+import { AppUtilsService } from '@ve-app/main/services'
+import {
+    ElementService,
+    ViewService,
+    DocMetadata,
+} from '@ve-utils/mms-api-client'
+import { UtilsService, AutosaveService } from '@ve-utils/services'
 
-let PrintConfirmModalComponent: angular.Injectable<any> = {
+import { veApp } from '@ve-app'
+
+const PrintConfirmModalComponent: angular.Injectable<any> = {
     selector: 'printConfirmModal',
     template: `
     <div class="modal-header">
@@ -122,14 +127,24 @@ let PrintConfirmModalComponent: angular.Injectable<any> = {
 </div>
 `,
     bindings: {
-        close: "<",
-        dismiss: "<",
-        modalInstance: "<",
-        resolve: "<"
+        close: '<',
+        dismiss: '<',
+        modalInstance: '<',
+        resolve: '<',
     },
-    controller: class PrintConfirmModalController implements angular.IComponentController {
-        static $inject = ['$filter', '$window', 'growl', 'UtilsService', 'ViewService', 'AutosaveService', 'ElementService',
-            'AppUtilsService'];
+    controller: class PrintConfirmModalController
+        implements angular.IComponentController
+    {
+        static $inject = [
+            '$filter',
+            '$window',
+            'growl',
+            'UtilsService',
+            'ViewService',
+            'AutosaveService',
+            'ElementService',
+            'AppUtilsService',
+        ]
 
         //bindings
         public modalInstance
@@ -137,148 +152,239 @@ let PrintConfirmModalComponent: angular.Injectable<any> = {
         close
         resolve
 
-        private refOb: any;
-        type: string;
-        mode: any;
-        action: string;
-        viewOrDocOb: any;
-        printElement: any;
-        label: string;
+        private refOb: any
+        type: string
+        mode: any
+        action: string
+        viewOrDocOb: any
+        printElement: any
+        label: string
         meta: {
-            'top-left': string, top: string, 'top-right': string,
-            'bottom-left': string, bottom: string, 'bottom-right': string
-        };
-        customizeDoc: {
-            useCustomStyle: boolean,
-            customCSS: any
-        };
-        hasError: boolean;
-        isDoc: boolean;
-        elementSaving: boolean;
-        unsaved: boolean;
-        docOption: boolean;
-        model: { genTotf: boolean; landscape: boolean; htmlTotf: boolean; };
-        previewResult: any;
-        customization: any;
-
-        constructor(private $filter: angular.IFilterService, private $window: angular.IWindowService, private growl: angular.growl.IGrowlService,
-                    private utilsSvc: UtilsService, private viewSvc: ViewService, private autosaveSvc: AutosaveService,
-                    private elementSvc: ElementService, private appUtilsSvc: AppUtilsService) {
+            'top-left': string
+            top: string
+            'top-right': string
+            'bottom-left': string
+            bottom: string
+            'bottom-right': string
         }
+        customizeDoc: {
+            useCustomStyle: boolean
+            customCSS: any
+        }
+        hasError: boolean
+        isDoc: boolean
+        elementSaving: boolean
+        unsaved: boolean
+        docOption: boolean
+        model: { genTotf: boolean; landscape: boolean; htmlTotf: boolean }
+        previewResult: any
+        customization: any
+
+        constructor(
+            private $filter: angular.IFilterService,
+            private $window: angular.IWindowService,
+            private growl: angular.growl.IGrowlService,
+            private utilsSvc: UtilsService,
+            private viewSvc: ViewService,
+            private autosaveSvc: AutosaveService,
+            private elementSvc: ElementService,
+            private appUtilsSvc: AppUtilsService
+        ) {}
 
         $onInit() {
             this.refOb = this.resolve.refOb()
             this.isDoc = this.resolve.isDoc()
-            this.type = this.isDoc ? 'DOCUMENT' : 'VIEW';
-            this.mode = this.resolve.mode();
-            this.viewOrDocOb = this.resolve.viewOrDocOb();
-            this.printElement = this.resolve.print();
-            this.action = this.mode === 1 ? 'print' : this.mode === 3 ? 'Generate PDF' : 'Generate word';
-            this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : '';
-            this.customizeDoc.useCustomStyle = false;
+            this.type = this.isDoc ? 'DOCUMENT' : 'VIEW'
+            this.mode = this.resolve.mode()
+            this.viewOrDocOb = this.resolve.viewOrDocOb()
+            this.printElement = this.resolve.print()
+            this.action =
+                this.mode === 1
+                    ? 'print'
+                    : this.mode === 3
+                    ? 'Generate PDF'
+                    : 'Generate word'
+            this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : ''
+            this.customizeDoc.useCustomStyle = false
 
             if (this.printElement.find('.ve-error').length > 0) {
-                this.hasError = true;
+                this.hasError = true
             }
 
             if (this.isDoc) {
                 // If _printCss, use to set doc css for export/print
-                this.customizeDoc.useCustomStyle = false;
+                this.customizeDoc.useCustomStyle = false
                 if (this.viewOrDocOb._printCss) {
                     // If _printCss, show tab for custom css
-                    this.customizeDoc.useCustomStyle = true;
-                    this.customizeDoc.customCSS = this.viewOrDocOb._printCss;
+                    this.customizeDoc.useCustomStyle = true
+                    this.customizeDoc.customCSS = this.viewOrDocOb._printCss
                 } else {
-                    this.customizeDoc.customCSS = this.utilsSvc.getPrintCss(false, false, {});
+                    this.customizeDoc.customCSS = this.utilsSvc.getPrintCss(
+                        false,
+                        false,
+                        {}
+                    )
                 }
 
                 // Get/Set document header/footer for PDF generation
                 this.meta = {
-                    'top-left': 'loading...', top: 'loading...', 'top-right': 'loading...',
-                    'bottom-left': 'loading...', bottom: 'loading...', 'bottom-right': 'loading...'
-                };
-                this.viewSvc.getDocMetadata({
-                    elementId: this.viewOrDocOb.id,
-                    projectId: this.viewOrDocOb._projectId,
-                    refId: this.viewOrDocOb._refId
-                }, 2).then((metadata: DocMetadata) => {
-                    this.meta.top = metadata.top ? metadata.top : '';
-                    this.meta.bottom = metadata.bottom ? metadata.bottom : '';
-                    this.meta['top-left'] = metadata.topl ? metadata.topl : '';
-                    this.meta['top-right'] = metadata.topr ? metadata.topr : '';
-                    if (this.refOb && this.refOb.type === 'Tag') {
-                        this.meta['top-right'] = this.meta['top-right'] + ' ' + this.refOb.name;
-                    }
-                    var displayTime = this.refOb.type === 'Tag' ? this.refOb._timestamp : 'latest';
-                    if (displayTime === 'latest') {
-                        displayTime = new Date();
-                        displayTime = this.$filter('date')(displayTime, 'M/d/yy h:mm a');
-                    }
-                    this.meta['top-right'] = this.meta['top-right'] + ' ' + displayTime;
-                    this.meta['bottom-left'] = metadata.bottoml ? metadata.bottoml : '';
-                    this.meta['bottom-right'] = metadata.bottomr ? metadata.bottomr : 'counter(page)';
-                }, (reason) => {
-                    this.meta['top-left'] = this.meta.top = this.meta['top-right'] = this.meta['bottom-left'] = this.meta.bottom = '';
-                    this.meta['bottom-right'] = 'counter(page)';
-                });
+                    'top-left': 'loading...',
+                    top: 'loading...',
+                    'top-right': 'loading...',
+                    'bottom-left': 'loading...',
+                    bottom: 'loading...',
+                    'bottom-right': 'loading...',
+                }
+                this.viewSvc
+                    .getDocMetadata(
+                        {
+                            elementId: this.viewOrDocOb.id,
+                            projectId: this.viewOrDocOb._projectId,
+                            refId: this.viewOrDocOb._refId,
+                        },
+                        2
+                    )
+                    .then(
+                        (metadata: DocMetadata) => {
+                            this.meta.top = metadata.top ? metadata.top : ''
+                            this.meta.bottom = metadata.bottom
+                                ? metadata.bottom
+                                : ''
+                            this.meta['top-left'] = metadata.topl
+                                ? metadata.topl
+                                : ''
+                            this.meta['top-right'] = metadata.topr
+                                ? metadata.topr
+                                : ''
+                            if (this.refOb && this.refOb.type === 'Tag') {
+                                this.meta['top-right'] =
+                                    this.meta['top-right'] +
+                                    ' ' +
+                                    this.refOb.name
+                            }
+                            let displayTime =
+                                this.refOb.type === 'Tag'
+                                    ? this.refOb._timestamp
+                                    : 'latest'
+                            if (displayTime === 'latest') {
+                                displayTime = new Date()
+                                displayTime = this.$filter('date')(
+                                    displayTime,
+                                    'M/d/yy h:mm a'
+                                )
+                            }
+                            this.meta['top-right'] =
+                                this.meta['top-right'] + ' ' + displayTime
+                            this.meta['bottom-left'] = metadata.bottoml
+                                ? metadata.bottoml
+                                : ''
+                            this.meta['bottom-right'] = metadata.bottomr
+                                ? metadata.bottomr
+                                : 'counter(page)'
+                        },
+                        (reason) => {
+                            this.meta['top-left'] =
+                                this.meta.top =
+                                this.meta['top-right'] =
+                                this.meta['bottom-left'] =
+                                this.meta.bottom =
+                                    ''
+                            this.meta['bottom-right'] = 'counter(page)'
+                        }
+                    )
             }
-            this.unsaved = (this.autosaveSvc.getAll() && !_.isEmpty(this.autosaveSvc.getAll()));
-            this.docOption = (!this.isDoc && (this.mode === 3 || this.mode === 2));
-            this.model = { genTotf: false, landscape: false, htmlTotf: false };
-
+            this.unsaved =
+                this.autosaveSvc.getAll() &&
+                !_.isEmpty(this.autosaveSvc.getAll())
+            this.docOption = !this.isDoc && (this.mode === 3 || this.mode === 2)
+            this.model = { genTotf: false, landscape: false, htmlTotf: false }
         }
-
-
 
         public saveStyleUpdate() {
             // To only update _printCss, create new ob with doc info
-            this.elementSaving = true;
-            var docOb = {
+            this.elementSaving = true
+            const docOb = {
                 id: this.viewOrDocOb.id,
                 _projectId: this.viewOrDocOb._projectId,
                 _refId: this.viewOrDocOb._refId,
-                _printCss: this.customizeDoc.customCSS
-            };
-            this.elementSvc.updateElement(docOb).then(() => {
-                this.elementSaving = false;
-                this.growl.success('Save Successful');
-            }, () => {
-                this.elementSaving = false;
-                this.growl.warning('Save was not complete. Please try again.');
-            });
-        };
+                _printCss: this.customizeDoc.customCSS,
+            }
+            this.elementSvc.updateElement(docOb).then(
+                () => {
+                    this.elementSaving = false
+                    this.growl.success('Save Successful')
+                },
+                () => {
+                    this.elementSaving = false
+                    this.growl.warning(
+                        'Save was not complete. Please try again.'
+                    )
+                }
+            )
+        }
         public preview() {
             if (!this.previewResult) {
-                this.previewResult = this.appUtilsSvc.printOrGenerate(this.viewOrDocOb, 3, true, true, false);
-                this.previewResult.tof = this.previewResult.tof + this.previewResult.toe;
+                this.previewResult = this.appUtilsSvc.printOrGenerate(
+                    this.viewOrDocOb,
+                    3,
+                    true,
+                    true,
+                    false
+                )
+                this.previewResult.tof =
+                    this.previewResult.tof + this.previewResult.toe
             }
-            var result = this.previewResult;
-            var htmlArr = ['<html><head><title>' + this.viewOrDocOb.name + '</title><style type="text/css">', this.customizeDoc.customCSS, '</style></head><body style="overflow: auto">', result.cover];
-            if (result.toc != '') htmlArr.push(result.toc);
-            if (result.tot != '' && this.model.genTotf) htmlArr.push(result.tot);
-            if (result.tof != '' && this.model.genTotf) htmlArr.push(result.tof);
-            htmlArr.push(result.contents, '</body></html>');
-            var htmlString = htmlArr.join('');
-            var popupWin: Window | null = this.$window.open('about:blank', '_blank', 'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1');
+            const result = this.previewResult
+            const htmlArr = [
+                '<html><head><title>' +
+                    this.viewOrDocOb.name +
+                    '</title><style type="text/css">',
+                this.customizeDoc.customCSS,
+                '</style></head><body style="overflow: auto">',
+                result.cover,
+            ]
+            if (result.toc != '') htmlArr.push(result.toc)
+            if (result.tot != '' && this.model.genTotf) htmlArr.push(result.tot)
+            if (result.tof != '' && this.model.genTotf) htmlArr.push(result.tof)
+            htmlArr.push(result.contents, '</body></html>')
+            const htmlString = htmlArr.join('')
+            const popupWin: Window | null = this.$window.open(
+                'about:blank',
+                '_blank',
+                'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1'
+            )
             if (popupWin) {
-                popupWin.document.open();
-                popupWin.document.write(htmlString);
-                popupWin.document.close();
-            }else {
-                this.growl.error("Popup Window Failed to open. Allow popups and try again")
+                popupWin.document.open()
+                popupWin.document.write(htmlString)
+                popupWin.document.close()
+            } else {
+                this.growl.error(
+                    'Popup Window Failed to open. Allow popups and try again'
+                )
             }
-        };
+        }
         public print() {
-            this.customization = this.customizeDoc.useCustomStyle ? this.customizeDoc.customCSS : false;
-            this.close({$value: ['ok', this.model.genTotf, this.model.htmlTotf, this.model.landscape, this.meta, this.customization]});
-        };
+            this.customization = this.customizeDoc.useCustomStyle
+                ? this.customizeDoc.customCSS
+                : false
+            this.close({
+                $value: [
+                    'ok',
+                    this.model.genTotf,
+                    this.model.htmlTotf,
+                    this.model.landscape,
+                    this.meta,
+                    this.customization,
+                ],
+            })
+        }
         public fulldoc() {
-            this.close({$value: ['fulldoc']});
-        };
+            this.close({ $value: ['fulldoc'] })
+        }
         public cancel() {
-            this.dismiss();
-        };
-    }
-};
+            this.dismiss()
+        }
+    },
+}
 
-veApp.component(PrintConfirmModalComponent.selector,PrintConfirmModalComponent);
+veApp.component(PrintConfirmModalComponent.selector, PrintConfirmModalComponent)
