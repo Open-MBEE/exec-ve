@@ -83,20 +83,20 @@ function($anchorScroll, $q, $filter, $location, $uibModal, $scope, $state, $time
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-expand"));
         $scope.bbApi.addButton(UxService.getButtonBarButton("tree-collapse"));
         if ($state.includes('project.ref') && !$state.includes('project.ref.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-group"));
-            $scope.bbApi.setPermission("tree-reorder-group", projectOb && PermissionsService.hasProjectEditPermission(projectOb));
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
-            $scope.bbApi.setPermission( "tree-add-document-or-group", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );
-            $scope.bbApi.setPermission( "tree-delete-document", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );
+            //$scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-group"));
+            //$scope.bbApi.setPermission("tree-reorder-group", projectOb && PermissionsService.hasProjectEditPermission(projectOb));
+            //$scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-document-or-group"));
+            //$scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-document"));
+            //$scope.bbApi.setPermission( "tree-add-document-or-group", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );
+            //$scope.bbApi.setPermission( "tree-delete-document", (refOb.type === 'Tag' ? false : true) && PermissionsService.hasBranchEditPermission(refOb) );
         } else if ($state.includes('project.ref.document')) {
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
+            //$scope.bbApi.addButton(UxService.getButtonBarButton("tree-reorder-view"));
             $scope.bbApi.addButton(UxService.getButtonBarButton("tree-full-document"));
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-view"));
-            $scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-view"));
-            $scope.bbApi.setPermission("tree-add-view", docEditable);
-            $scope.bbApi.setPermission("tree-reorder-view", docEditable);
-            $scope.bbApi.setPermission("tree-delete-view", docEditable);
+            //$scope.bbApi.addButton(UxService.getButtonBarButton("tree-add-view"));
+            //$scope.bbApi.addButton(UxService.getButtonBarButton("tree-delete-view"));
+            //$scope.bbApi.setPermission("tree-add-view", docEditable);
+            //$scope.bbApi.setPermission("tree-reorder-view", docEditable);
+            //$scope.bbApi.setPermission("tree-delete-view", docEditable);
             if (rootScopeSvc.veFullDocMode()) {
                 $scope.bbApi.setToggleState('tree-full-document', true);
             }

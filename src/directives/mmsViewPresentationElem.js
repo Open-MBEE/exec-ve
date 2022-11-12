@@ -72,6 +72,8 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $t
             .then(function(instanceSpec) {
                 scope.presentationElem = ViewService.getPresentationElementSpec(instanceSpec);
                 scope.instanceSpec = instanceSpec;
+                ViewService.getViewElements(reqOb, 0) // bulk get and cache elements incase of table instead of 1 by 1
+                .finally(function() {
                 scope.presentationElemLoading = false;
                 var hash = $location.hash();
                 if (hash === instanceSpec.id) {
@@ -86,6 +88,7 @@ function mmsViewPresentationElem(ViewService, ElementService, $templateCache, $t
                     if (mmsViewCtrl)
                         mmsViewCtrl.transcludeClicked(instanceSpec);
                     e.stopPropagation();
+                });
                 });
             }, function(reason) {
                 if (reason.status === 500) {

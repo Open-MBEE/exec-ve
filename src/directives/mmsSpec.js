@@ -163,7 +163,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                 });*/
                 Utils.setupValCf(scope);
                 if (!scope.mmsCommitId || scope.mmsCommitId === 'latest') {
-                    ElementService.search(reqOb, {
+                    /*ElementService.search(reqOb, {
                         size: 1,
                         sort : [{ _modified : {order : "desc"}}],
                         query: {bool: {filter: [{term: {id: data.id}}, {term: {'_projectId': data._projectId}}]}}
@@ -175,7 +175,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                         if (searchResult && searchResult.length == 1 && searchResult[0].id === data.id && searchResult[0]._relatedDocuments.length > 0) {
                             scope.relatedDocuments = searchResult[0]._relatedDocuments;
                         }
-                    });
+                    });*/
                 }
                 if ((scope.mmsCommitId !== 'latest' && scope.mmsCommitId) || !PermissionsService.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId)) {
                     scope.editable = false;

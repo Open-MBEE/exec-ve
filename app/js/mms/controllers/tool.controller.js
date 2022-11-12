@@ -15,7 +15,7 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
     const editSvc = EditService;
 
     const toolbar = ToolbarService;
-
+    eventSvc.$init($scope);
     $scope.specInfo = {
         refId: refOb.id,
         commitId: 'latest',
@@ -45,8 +45,8 @@ function($scope, $state, $uibModal, $q, $timeout, hotkeys,
     $scope.$watch('$pane.closed',() => {
         rootScopeSvc.mmsPaneClosed($scope.$pane.closed);
     });
-
-   $scope.subs.push(eventSvc.$on(editSvc.EVENT, function() {
+    $scope.openEdits = editSvc.openEdits();
+    $scope.subs.push(eventSvc.$on(editSvc.EVENT, function() {
         $scope.openEdits = editSvc.openEdits();
     }));
     $scope.edits = editSvc.getAll();
