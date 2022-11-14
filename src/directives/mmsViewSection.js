@@ -12,7 +12,7 @@ function mmsViewSection($compile, $templateCache, ViewService, UxService, Utils,
     var mmsViewSectionCtrl = function($scope) {
 
 
-
+        eventSvc.$init($scope);
         $scope.sectionInstanceVals = [];
         $scope.bbApi = {};
         $scope.buttons = [];

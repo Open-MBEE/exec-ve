@@ -37,7 +37,7 @@ function mmsTranscludeCom(Utils, ElementService, UtilsService, ViewService, UxSe
     var template = $templateCache.get('mms/templates/mmsTranscludeDoc.html');
     
     var mmsTranscludeComCtrl = function ($scope) {
-
+        eventSvc.$init($scope);
         $scope.bbApi = {};
         $scope.buttons = [];
         $scope.buttonsInit = false;
