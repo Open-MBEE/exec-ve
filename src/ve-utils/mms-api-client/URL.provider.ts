@@ -2,6 +2,7 @@ import angular, { IServiceProvider } from 'angular'
 
 import { veUtils } from '@ve-utils'
 
+import { VePromiseReason } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
 import {
     ArtifactsRequest,
@@ -10,7 +11,6 @@ import {
     RequestObject,
     ViewsRequest,
 } from '@ve-types/mms'
-import { VePromiseReason } from '@ve-types/view-editor'
 
 export class URLServiceProvider implements IServiceProvider {
     readonly basePath: string = '/api'
@@ -26,7 +26,7 @@ export class URLServiceProvider implements IServiceProvider {
         }
     }
 
-    $get() {
+    $get(): URLService {
         return new URLService(this.basePath, this.apiUrl)
     }
 }
@@ -35,9 +35,7 @@ veUtils.provider('URLService', URLServiceProvider)
 /**
  * @ngdoc service
  * @name veUtils/URLService
- *
- * @description
- * This utility service gives back url paths for use in other services in communicating
+ * * This utility service gives back url paths for use in other services in communicating
  * with the server, arguments like projectId, refId, commitId are expected to be strings and
  * not null or undefined. This service is usually called by higher level services and
  * should rarely be used directly by applications.
@@ -73,7 +71,7 @@ export class URLService {
         return Object.assign({}, this.url)
     }
 
-    setToken(t: string) {
+    setToken(t: string): void {
         this.token = t
     }
 
@@ -81,9 +79,9 @@ export class URLService {
         return 'Bearer ' + this.token
     }
 
-    getAuthorizationHeader(headers: { [name: string]: string }): {
-        [name: string]: string
-    } {
+    getAuthorizationHeader(
+        headers: angular.HttpHeaderType
+    ): angular.HttpHeaderType {
         if (!this.token) {
             return headers
         }
@@ -94,21 +92,17 @@ export class URLService {
         return headers
     }
 
-    getMmsServer() {
+    getMmsServer(): string {
         return this.apiUrl
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#setHeader
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Adds generates Default Headers using this.token
      *
      * @returns {object} The HTTP header format
      */
-    getHeaders() {
+    getHeaders(): angular.HttpHeaderType {
         return {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + this.token,
@@ -116,11 +110,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#isTimestamp
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * self explanatory
      *
      * @param {string} version A version string or timestamp
@@ -138,25 +128,17 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getMmsVersionURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * self explanatory
      *
      * @returns {object} Returns object with mmsversion
      */
-    getMmsVersionURL() {
+    getMmsVersionURL(): string {
         return `${this.root}/mmsversion`
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getSiteDashboardURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the path for a site dashboard.
      *
      * @param {string} site Site name (not title!).
@@ -167,11 +149,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getExportHtmlUrl
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets url that to convert HTML to PDF or Word
      * @param {string} projectId id of the project
      * @param {string} refId id of the ref
@@ -218,7 +196,11 @@ export class URLService {
         return `${this.root}/projects/${projectId}/refs/${refId}`
     }
 
-    getRefHistoryURL(projectId: string, refId: string, timestamp?: string) {
+    getRefHistoryURL(
+        projectId: string,
+        refId: string,
+        timestamp?: string
+    ): string {
         if (timestamp !== '' && this.isTimestamp(timestamp)) {
             return `${this.root}/projects/${projectId}/refs/${refId}/commits&maxTimestamp=${timestamp}&limit=1`
         }
@@ -230,11 +212,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getProjectDocumentsURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url for all documents in a ref
      *
      * @param {object} reqOb object with keys as described in ElementService.
@@ -246,11 +224,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getImageURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url for querying an image url
      * (this is not the actual image path)
      *
@@ -262,11 +236,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getElementURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the path for an element
      *
      * @param {object} reqOb object with keys as described in ElementService.
@@ -316,11 +286,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getElementHistoryURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url to query for element history
      *
      * @param {object} reqOb object with keys as described in ElementService.
@@ -331,15 +297,10 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
-     * @name veUtils/URLService#getPostViewsURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
+     *  @name veUtils/URLService#getPostViewsURL
      * Gets the path for posting view changes.
-     *
-     * @param {object} reqOb object with keys as described in ElementService.
-     * @returns {string} The post elements url.
+     * @param {RequestObject} reqOb
+     * @return {string}
      */
     getPostViewsURL(reqOb: ViewsRequest): string {
         return this.addChildViews(
@@ -349,11 +310,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getPostElementsURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the path for posting element changes.
      *
      * @param {object} reqOb object with keys as described in ElementService.
@@ -364,11 +321,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getPutElementsURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the path for getting multiple elements (using put with body).
      *
      * @param {object} reqOb object with keys as described in ElementService.
@@ -380,18 +333,17 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#getElementSearchURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url for element keyword search.
      *
      * @param {RequestObject} reqOb object with keys as described in ElementService.
      * @param {QueryParams} queryParams provide optional query parameters
      * @returns {string} The post elements url.
      */
-    getElementSearchURL(reqOb: RequestObject, queryParams?: QueryParams) {
+    getElementSearchURL(
+        reqOb: RequestObject,
+        queryParams?: QueryParams
+    ): string {
         let r: string
         let urlParams = ''
         if (queryParams) {
@@ -408,20 +360,20 @@ export class URLService {
     /**
      * @ngdocs method
      * @name veUtils/URLService#getArtifactURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url for an artifact
      *
      * @param {object} reqOb object with keys
      * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    getArtifactURL(reqOb: ArtifactsRequest<string>, artifactExtension: string) {
+    getArtifactURL(
+        reqOb: ElementsRequest<string> | ArtifactsRequest<string>,
+        artifactExtension?: string
+    ): string {
         const ext =
             artifactExtension !== undefined
                 ? artifactExtension
-                : reqOb.artifactExtension
+                : (reqOb as ArtifactsRequest<string>).artifactExtension
         const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
         return this.addToken(this.addVersion(r, reqOb.commitId))
     }
@@ -429,9 +381,6 @@ export class URLService {
     /**
      * @ngdocs method
      * @name veUtils/URLService#getArtifactEmbedURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url without added this.token for an artifact
      *
      * @param {object} reqOb object with keys
@@ -441,7 +390,7 @@ export class URLService {
     getArtifactEmbedURL(
         reqOb: ArtifactsRequest<string>,
         artifactExtension: string
-    ) {
+    ): string {
         const ext =
             artifactExtension !== undefined ? artifactExtension : 'undefined'
         const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
@@ -451,9 +400,6 @@ export class URLService {
     /**
      * @ngdocs method
      * @name veUtils/URLService#getPutArtifactsURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url for an artifact
      *
      * @param {object} reqOb object with keys
@@ -467,9 +413,6 @@ export class URLService {
     /**
      * @ngdocs method
      * @name veUtils/URLService#getArtifactHistoryURL
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Gets the url for an artifact commit history
      *
      * @param {object} reqOb object with keys
@@ -479,7 +422,7 @@ export class URLService {
         return this.getElementHistoryURL(reqOb)
     }
 
-    getCheckTokenURL() {
+    getCheckTokenURL(): string {
         return `${this.root}/checkAuth` //TODO remove when server returns 404
     }
 
@@ -488,11 +431,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#handleHttpStatus
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Utility for setting the state of a deferred object based on the status
      * of http error. The arguments are the same as angular's $http error
      * callback
@@ -534,28 +473,20 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#addServer
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Adds mmsServer parameter to URL string, mainly used for PMA jobs
      *
      * @param {String} url The url string for which to add mmsServer parameter argument.
      * @param {String} server The mms server url for where elements are stored
      * @returns {string} The url with server parameter added.
      */
-    private addServer(url: string, server: string) {
+    private addServer(url: string, server: string): string {
         if (url.indexOf('?') > 0) return `${url}&mmsServer=${server}`
         else return `${url}?mmsServer=${server}`
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#addVersion
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Adds commitId parameter to URL string
      *
      * @param {String} url The url string for which to add version parameter argument.
@@ -597,11 +528,7 @@ export class URLService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/URLService#addToken
-     * @methodOf veUtils/URLService
-     *
-     * @description
      * Adds token parameter to URL string
      *
      * @param {String} url The url string for which to add token parameter argument.

@@ -36,69 +36,70 @@ export class SchemaService {
         }
     }
 
-    getSchema(name: string, schemaName?: string, sourceId?: string): unknown {
+    getSchema<T>(name: string, schemaName?: string, sourceId?: string): T {
         const schema: Schema = this._getSchema(schemaName, sourceId)
         if (schema.schema[name]) {
-            return schema.schema[name]
+            return schema.schema[name] as T
         } else {
             this._schemaError(name, schemaName)
         }
     }
 
-    getValue(
+    getValue<T>(
         name: string,
         key: string,
         schemaName?: string,
         sourceId?: string
-    ): unknown {
+    ): T {
         const lookup = this.getSchema(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
-            return lookup[key]
+            return lookup[key] as T
         }
     }
 
-    getValues(
+    getValues<T>(
         name: string,
         keys: string[],
         schemaName?: string,
         sourceId?: string
-    ): unknown[] | null {
+    ): T[] | null {
         const lookup = this.getSchema(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
-            const response = []
+            const response: T[] = []
             keys.forEach((key) => {
                 if (lookup.hasOwnProperty(key)) {
-                    response.push(lookup[key])
+                    response.push(lookup[key] as T)
                 }
             })
             return response
         }
     }
 
-    getMap(name: string, schemaName?: string, sourceId?: string): unknown {
+    getMap<T>(name: string, schemaName?: string, sourceId?: string): T {
         const schema: Schema = this._getSchema(schemaName, sourceId)
         if (schema.map && schema.map[name]) {
-            return schema.schema[name]
+            return schema.schema[name] as T
         } else {
             this._schemaError(name, schemaName)
+            return null
         }
     }
 
-    getMappedValue(
+    getMappedValue<T>(
         name: string,
         key: string,
         schemaName?: string,
         sourceId?: string
-    ): unknown {
+    ): T {
         const lookup = this.getMap(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
-            return lookup[key]
+            return lookup[key] as T
         }
     }
 
-    getKeyByValue(
+    getKeyByValue<T>(
         name: string,
-        value: unknown,
+        value: T,
         schemaName?: string,
         sourceId?: string
     ): string {

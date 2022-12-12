@@ -1,25 +1,33 @@
-import * as angular from "angular";
-import * as _ from "lodash";
-import {SpecService} from "@ve-components/spec-tools";
-import {ReorderService, ElementReferences} from "@ve-components/spec-tools";
+import angular from 'angular'
+import _ from 'lodash'
+
+import { ComponentService } from '@ve-components/services'
+import {
+    SpecService,
+    SpecTool,
+    ISpecTool,
+    ReorderService,
+} from '@ve-components/spec-tools'
+import { ToolbarService } from '@ve-core/tool-bar'
 import {
     AuthService,
     PermissionsService,
     URLService,
     ElementService,
-    ViewService, ProjectService
-} from "@ve-utils/mms-api-client"
-import {
-    EventService,
-    UtilsService
-} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ElementObject} from "@ve-types/mms";
-import {SpecTool, ISpecTool} from "@ve-components/spec-tools";
-import {ComponentService} from "@ve-components/services";
-import {ToolbarService} from "@ve-core/tool-bar"
+    ViewService,
+    ProjectService,
+    ApiService,
+} from '@ve-utils/mms-api-client'
+import { EventService, UtilsService } from '@ve-utils/services'
 
-import {veComponents} from "@ve-components";
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/angular'
+import {
+    PresentationReference,
+    ViewInstanceSpec,
+    ViewObject,
+} from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -28,9 +36,7 @@ import {veComponents} from "@ve-components";
  * @requires veUtils/ViewService
  * @requires $templateCache
  *
- *
- * @description
- * Visualize and edit the structure of a view
+ * * Visualize and edit the structure of a view
  *
  * @param {string} mmsElementId The id of the view
  * @param {string} mmsProjectId The project id for the view
@@ -38,140 +44,156 @@ import {veComponents} from "@ve-components";
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 class SpecReorderController extends SpecTool implements ISpecTool {
+    private treeOptions: object
 
-        private treeOptions: object;
+    private elementReferenceTree: PresentationReference[]
+    private originalElementReferenceTree: PresentationReference[]
+    public view: ViewObject | ViewInstanceSpec
 
-        private elementReferenceTree: ElementReferences[];
-        private originalElementReferenceTree: ElementReferences[];
-        public view: ElementObject;
+    static $inject = [...SpecTool.$inject, 'ReorderService']
+    reorderable: boolean
 
-    static $inject = [...SpecTool.$inject, 'ReorderService'];
-
-    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
-                growl: angular.growl.IGrowlService, componentSvc: ComponentService, uRLSvc: URLService,
-                authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
-                utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
-                eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService,
-                private specReorderSvc: ReorderService) {
-        super($scope,$element,$q,growl,componentSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
+    constructor(
+        $scope: angular.IScope,
+        $element: JQuery<HTMLElement>,
+        $q: angular.IQService,
+        growl: angular.growl.IGrowlService,
+        componentSvc: ComponentService,
+        uRLSvc: URLService,
+        authSvc: AuthService,
+        elementSvc: ElementService,
+        projectSvc: ProjectService,
+        utilsSvc: UtilsService,
+        apiSvc: ApiService,
+        viewSvc: ViewService,
+        permissionsSvc: PermissionsService,
+        eventSvc: EventService,
+        specSvc: SpecService,
+        toolbarSvc: ToolbarService,
+        private reorderSvc: ReorderService
+    ) {
+        super(
+            $scope,
+            $element,
+            $q,
+            growl,
+            componentSvc,
+            uRLSvc,
+            authSvc,
+            elementSvc,
+            projectSvc,
+            utilsSvc,
+            apiSvc,
+            viewSvc,
+            permissionsSvc,
+            eventSvc,
+            specSvc,
+            toolbarSvc
+        )
         this.specType = _.kebabCase(SpecReorderComponent.selector)
-        this.specTitle = "Reorder Spec";
+        this.specTitle = 'Reorder Spec'
     }
 
-    config = () => {
-        this.view = this.specReorderSvc.view;
-        this.elementReferenceTree = this.specReorderSvc.elementReferenceTree;
-        this.originalElementReferenceTree = this.specReorderSvc.originalElementReferenceTree;
+    config = (): void => {
+        this.reorderSvc.view = this.view = this.element
+        this.reorderSvc.refresh()
+        this.elementReferenceTree = this.reorderSvc.elementReferenceTree
+        this.originalElementReferenceTree =
+            this.reorderSvc.originalElementReferenceTree
         this.treeOptions = {
-            accept: (sourceNodeScope, destNodeScope, destIndex) => {
-                if (sourceNodeScope.element.isOpaque)
-                    return false;
-                if (destNodeScope.$element.hasClass('root'))
-                    return true;
-                return !!this.viewSvc.isSection(destNodeScope.element.presentationElement);
+            accept: (
+                sourceNodeScope: SpecTool,
+                destNodeScope: SpecTool,
+                destIndex: number
+            ): boolean => {
+                if (sourceNodeScope.element.isOpaque) return false
+                if (destNodeScope.$element.hasClass('root')) return true
+                return !!this.viewSvc.isSection(
+                    destNodeScope.element as ViewInstanceSpec
+                )
+            },
+        }
 
-            }
-        };
+        this.subs.push(
+            this.eventSvc.$on('spec-reorder', () => {
+                this.specSvc.setEditing(true)
+            })
+        )
 
-        this.subs.push(this.eventSvc.$on('spec-reorder', () => {
-            this.specReorderSvc.setEditing(true);
-        }));
-
-        let viewSaving = false;
-        this.subs.push(this.eventSvc.$on('spec-reorder.refresh', () => {
-            this.specReorderSvc.refresh();
-        }));
-        this.subs.push(this.eventSvc.$on('spec-reorder-save', () => {
-            if (viewSaving) {
-                this.growl.info('Please Wait...');
-                return;
-            }
-            viewSaving = true;
-            this.eventSvc.$broadcast(this.toolbarSvc.constants.TOGGLEICONSPINNER, {id: 'spec-reorder-save'});
-            this.specReorderSvc.save().then((data) => {
-                viewSaving = false;
-                this.specReorderSvc.refresh();
-                this.growl.success('Save Successful');
-                this.eventSvc.$broadcast(this.toolbarSvc.constants.TOGGLEICONSPINNER, {id: 'spec-reorder-save'});
-                this.eventSvc.$broadcast('spec-reorder-saved', {id: this.specApi.elementId});
-            }, (response) => {
-                this.specReorderSvc.refresh();
-                viewSaving = false;
-                var reason = response.failedRequests[0];
-                this.growl.error(reason.message);
-                this.eventSvc.$broadcast(this.toolbarSvc.constants.TOGGLEICONSPINNER, {id: 'spec-reorder-save'});
-            });
-            this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {id: 'spec-reorder'});
-        }));
-        this.subs.push(this.eventSvc.$on('spec-reorder-cancel', () => {
-            this.specSvc.setEditing(false);
-            this.specReorderSvc.refresh();
-            this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {id: 'spec-inspector'});
-            //this.('element');
-        }));
+        let viewSaving = false
+        this.subs.push(
+            this.eventSvc.$on('spec-reorder.refresh', () => {
+                this.reorderSvc.refresh()
+            })
+        )
+        this.subs.push(
+            this.eventSvc.$on('spec-reorder-save', () => {
+                if (viewSaving) {
+                    this.growl.info('Please Wait...')
+                    return
+                }
+                viewSaving = true
+                this.eventSvc.$broadcast(
+                    this.toolbarSvc.constants.TOGGLEICONSPINNER,
+                    { id: 'spec-reorder-save' }
+                )
+                this.reorderSvc.save().then(
+                    () => {
+                        viewSaving = false
+                        this.reorderSvc.refresh()
+                        this.growl.success('Save Successful')
+                        this.eventSvc.$broadcast(
+                            this.toolbarSvc.constants.TOGGLEICONSPINNER,
+                            { id: 'spec-reorder-save' }
+                        )
+                        this.eventSvc.$broadcast('spec-reorder-saved', {
+                            id: this.specApi.elementId,
+                        })
+                    },
+                    (response) => {
+                        this.reorderSvc.refresh()
+                        viewSaving = false
+                        const reason = response.data.failedRequests[0]
+                        this.growl.error(reason.message)
+                        this.eventSvc.$broadcast(
+                            this.toolbarSvc.constants.TOGGLEICONSPINNER,
+                            { id: 'spec-reorder-save' }
+                        )
+                    }
+                )
+                this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {
+                    id: 'spec-reorder',
+                })
+            })
+        )
+        this.subs.push(
+            this.eventSvc.$on('spec-reorder-cancel', () => {
+                this.specSvc.setEditing(false)
+                this.reorderSvc.refresh()
+                this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {
+                    id: 'spec-inspector',
+                })
+                //this.('element');
+            })
+        )
     }
 
-    // $onChanges(onChangesObj: angular.IOnChangesObject) {
-    //     handleChange(onChangesObj, 'mmsElementId', (newVal, oldVal) => {
-    //         if (!(!newVal || newVal == oldVal && this.ran)) {
-    //             this.ran = true;
-    //             this.lastid = newVal;
-    //             var commitId = this.mmsCommitId;
-    //             commitId = commitId ? commitId : 'latest';
-    //             var reqOb = {elementId: this.mmsElementId, projectId: this.mmsProjectId, refId: this.mmsRefId, commitId: commitId};
-    //             this.elementReferenceTree.length = 0;
-    //             this.originalElementReferenceTree.length = 0;
-    //             this.elementSvc.getElement(reqOb)
-    //                 .then((data) => {
-    //                     if (newVal !== this.lastid)
-    //                         return;
-    //                     this.specReorderSvc.view = this.view = data;
-    //                     this.specReorderSvc.editable = commitId === 'latest' && this.permissionsSvc.hasProjectIdBranchIdEditPermission(this.mmsProjectId, this.mmsRefId);
-    //
-    //                     var specs = data._specs || data.specification;
-    //                     if (specs) {
-    //                         this.viewSvc.getElementReferenceTree(reqOb, specs)
-    //                             .then((elementReferenceTree) => {
-    //                                 if (newVal !== this.lastid)
-    //                                     return;
-    //                                 this.elementReferenceTree.push(...elementReferenceTree);
-    //                                 this.originalElementReferenceTree.push(..._.cloneDeepWith(elementReferenceTree, (value, key) => {
-    //                                     if (key === 'instanceId' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
-    //                                         return value;
-    //                                     return undefined;
-    //                                 }));
-    //                             },(reason) => {
-    //                                 if (newVal !== this.lastid)
-    //                                     return;
-    //                             });
-    //                     }
-    //
-    //                 }, (reason) => {
-    //                     if (newVal !== this.lastid)
-    //                         return;
-    //                     this.growl.error('View Error: ' + reason.message);
-    //                 });
-    //             }
-    //         });
-    //     // handleChange(onChangesObj,"mmsProjectId", (newVal) => {
-    //     //     this.s.mmsProjectId = newVal;
-    //     // })
-    //     // handleChange(onChangesObj,"mmsCommitId", (newVal) => {
-    //     //     this.specReorderApi.mmsCommitId = newVal;
-    //     // })
-    //     // handleChange(onChangesObj,"mmsRefId", (newVal) => {
-    //     //     this.specReorderApi.mmsRefId = newVal;
-    //     // })
-    //
-    // }
-
-    public getEditing() {
-        return this.specReorderSvc.editing;
+    initCallback = (): void => {
+        this.reorderSvc.view = this.view = this.element
+        if (this.view.type === 'View' || this.viewSvc.isSection(this.view)) {
+            this.reorderable = true
+            this.reorderSvc.refresh()
+        } else {
+            this.reorderable = false
+        }
     }
 
+    public getEditing(): boolean {
+        return this.specSvc.getEditing()
+    }
 }
 
-let SpecReorderComponent: VeComponentOptions = {
+const SpecReorderComponent: VeComponentOptions = {
     selector: 'specReorder',
     template: `
     <!-- Nested node template -->
@@ -207,7 +229,7 @@ let SpecReorderComponent: VeComponentOptions = {
         mmsRefId: '@',
         mmsCommitId: '@',
     },
-    controller: SpecReorderController
+    controller: SpecReorderController,
 }
 
-        veComponents.component(SpecReorderComponent.selector,SpecReorderComponent);
+veComponents.component(SpecReorderComponent.selector, SpecReorderComponent)

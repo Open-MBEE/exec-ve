@@ -24,7 +24,7 @@ class SelectModalController implements VeModalController {
     static $inject = ['$scope', '$state', 'ProjectService']
 
     //bindings
-    public modalInstance: angular.ui.bootstrap.IModalInstanceService
+    public modalInstance: VeModalInstanceService<unknown>
     private resolve: SelectModalResolve
 
     //local
@@ -44,7 +44,7 @@ class SelectModalController implements VeModalController {
         private projectSvc: ProjectService
     ) {}
 
-    $onInit() {
+    $onInit(): void {
         this.orgs = this.resolve.mmsOrgs
         this.projects = this.resolve.mmsProjects
 

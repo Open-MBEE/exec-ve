@@ -1,40 +1,53 @@
-import angular from 'angular'
+import angular, { IScope } from 'angular'
 import $ from 'jquery'
 import moment from 'moment'
 
-import { CacheService, ViewService } from '@ve-utils/mms-api-client'
+import { MMSMentionController } from '@ve-core/editor/components/mention.component'
+import { ApiService, CacheService, ViewService } from '@ve-utils/mms-api-client'
 import { UtilsService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
 import { ElementObject } from '@ve-types/mms'
 
-export interface MentionScope extends angular.IScope {
-    mmsEditor?: any
+export interface MentionScope extends IScope {
+    mmsEditor?: CKEDITOR.editor
     mmsMentionValue?: string
     mmsMentionId?: string
     mmsProjectId?: string
     mmsRefId?: string
 }
 
+export interface MentionState {
+    mentionScope: MentionScope
+    mentionController: MMSMentionController
+    mentionElement: JQLite
+    mentionId: string
+    mentionPlaceHolderId: string
+}
+
 export class MentionService {
-    mentions = {}
+    mentions: { [id: string]: MentionState } = {}
     mentionPlacerHolderPrefix = 'mentionPlaceHolder'
 
     static $inject = [
         '$compile',
         '$timeout',
+        'growl',
         'CacheService',
         'ViewService',
         'UtilsService',
+        'ApiService',
     ]
 
     constructor(
         private $compile: angular.ICompileService,
         private $timeout: angular.ITimeoutService,
+        private growl: angular.growl.IGrowlService,
         private cacheSvc: CacheService,
         private viewSvc: ViewService,
-        private utilsSvc: UtilsService
+        private utilsSvc: UtilsService,
+        private apiSvc: ApiService
     ) {}
     /** Used to maintain all mention in all ckeditors **/
 
@@ -115,15 +128,18 @@ export class MentionService {
     }
 
     public createMention(
-        editor,
-        mentionScope: angular.IScope,
-        projectId,
-        refId,
-        existingMentionPlaceHolder?
-    ) {
+        editor: CKEDITOR.editor,
+        mentionScope: MentionScope,
+        projectId: string,
+        refId: string,
+        existingMentionPlaceHolder?: {
+            mentionId: string
+            mentionPlaceHolderId: string
+        }
+    ): void {
         const mentionId = existingMentionPlaceHolder
             ? existingMentionPlaceHolder.mentionId
-            : this._getNewMentionId()
+            : MentionService._getNewMentionId()
         const mentionPlaceHolderId = existingMentionPlaceHolder
             ? existingMentionPlaceHolder.mentionPlaceHolderId
             : this._createMentionPlaceHolder(editor, mentionId)
@@ -147,40 +163,65 @@ export class MentionService {
         )
     }
 
-    public handleInput(event, editor, projectId, refId) {
-        const currentEditingElement = editor._.elementsPath.list[0].$
-        const currentEditingElementId = currentEditingElement.getAttribute('id')
-        const mentionId = this._getMentionIdFromMentionPlaceHolder(
-            currentEditingElementId
-        )
-        if (mentionId) {
-            let mentionState = this._retrieveMentionState(editor.id, mentionId)
-            // logic to reactivate existing "@" when reloading ckeditor
-            if (!mentionState) {
-                this.createMention(editor, projectId, refId, {
-                    mentionId: mentionId,
-                    mentionPlaceHolderId: currentEditingElementId,
+    public handleInput(
+        event: CKEDITOR.eventInfo<CKEDITOR.dom.event<KeyboardEvent>>,
+        newScope: MentionScope,
+        editor: CKEDITOR.editor,
+        projectId: string,
+        refId: string
+    ): void {
+        if (editor._ && editor._.elementsPath) {
+            const elementsPath = editor._.elementsPath
+            const currentEditingElement = elementsPath.list[0].$
+            const currentEditingElementId =
+                currentEditingElement.getAttribute('id')
+            const mentionId = this._getMentionIdFromMentionPlaceHolder(
+                currentEditingElementId
+            )
+            if (mentionId) {
+                let mentionState = this._retrieveMentionState(
+                    editor.id,
+                    mentionId
+                )
+                // logic to reactivate existing "@" when reloading ckeditor
+                if (!mentionState) {
+                    this.createMention(editor, newScope, projectId, refId, {
+                        mentionId: mentionId,
+                        mentionPlaceHolderId: currentEditingElementId,
+                    })
+                    mentionState = this._retrieveMentionState(
+                        editor.id,
+                        mentionId
+                    )
+                }
+
+                const mentionScope = mentionState.mentionScope
+                mentionScope.$apply(() => {
+                    let text = currentEditingElement.innerText
+                    text = text.substring(1) // ignore @
+                    mentionScope.mmsMentionValue = text
+                    this._repositionDropdownIfOffScreen(editor, mentionState)
                 })
-                mentionState = this._retrieveMentionState(editor.id, mentionId)
+
+                this._handleSpecialKeys(
+                    event,
+                    mentionId,
+                    editor,
+                    projectId,
+                    refId
+                )
             }
-
-            const mentionScope = mentionState.mentionScope
-            mentionScope.$apply(() => {
-                let text = currentEditingElement.innerText
-                text = text.substring(1) // ignore @
-                mentionScope.mmsMentionValue = text
-                this._repositionDropdownIfOffScreen(editor, mentionState)
-            })
-
-            this._handleSpecialKeys(event, mentionId, editor, projectId, refId)
         }
     }
 
-    public handleMentionSelection(editor, mentionId) {
+    public handleMentionSelection(
+        editor: CKEDITOR.editor,
+        mentionId: string
+    ): void {
         this._cleanup(editor, mentionId)
     }
 
-    public removeAllMentionForEditor(editor) {
+    public removeAllMentionForEditor(editor: CKEDITOR.editor): void {
         Object.keys(this.mentions)
             .filter((key) => {
                 const splits = key.split('-')
@@ -191,7 +232,7 @@ export class MentionService {
             })
     }
 
-    public hasMentionResults(editor) {
+    public hasMentionResults(editor: CKEDITOR.editor): boolean {
         const currentEditingElement = editor._.elementsPath.list[0].$
         const currentEditingElementId = currentEditingElement.getAttribute('id')
         const mentionId = this._getMentionIdFromMentionPlaceHolder(
@@ -203,7 +244,7 @@ export class MentionService {
         return false
     }
 
-    private static _hasMentionResults(mentionId) {
+    private static _hasMentionResults(mentionId: string): boolean {
         return (
             $('#' + mentionId)
                 .find('ul')
@@ -212,12 +253,12 @@ export class MentionService {
     }
 
     private _createMentionDirective(
-        editor,
+        editor: CKEDITOR.editor,
         mentionScope: MentionScope,
-        mentionId,
-        projectId,
-        refId
-    ) {
+        mentionId: string,
+        projectId: string,
+        refId: string
+    ): JQLite {
         mentionScope.mmsEditor = editor
         mentionScope.mmsMentionValue = ''
         mentionScope.mmsMentionId = mentionId
@@ -228,15 +269,17 @@ export class MentionService {
         )(mentionScope)
     }
 
-    private static _getCkeditorFrame(editor) {
+    private static _getCkeditorFrame(
+        editor: CKEDITOR.editor
+    ): HTMLIFrameElement {
         return editor.container.$.getElementsByTagName('iframe')[0]
     }
 
     private static _positionMentionElement(
-        editor,
-        mentionElement,
-        mentionPlaceHolderId
-    ) {
+        editor: CKEDITOR.editor,
+        mentionElement: JQLite,
+        mentionPlaceHolderId: string
+    ): void {
         const ckeditorFrame = MentionService._getCkeditorFrame(editor)
         const ckeditorBox = ckeditorFrame.getBoundingClientRect()
         const mentionPlaceHolder =
@@ -252,16 +295,16 @@ export class MentionService {
     }
 
     private _createNewMentionState(
-        editor,
-        mention,
-        mentionPlaceHolderId,
-        mentionId
-    ) {
+        editor: CKEDITOR.editor,
+        mention: JQLite,
+        mentionPlaceHolderId: string,
+        mentionId: string
+    ): MentionState {
         const key = MentionService._getMentionStateId(editor.id, mentionId)
-        const value = {
-            mentionScope: mention.scope,
-            mentionController: mention.controller,
-            mentionElement: mention.element,
+        const value: MentionState = {
+            mentionScope: mention.scope<MentionScope>(),
+            mentionController: mention.controller() as MMSMentionController,
+            mentionElement: mention,
             mentionId: mentionId,
             mentionPlaceHolderId: mentionPlaceHolderId,
         }
@@ -269,17 +312,26 @@ export class MentionService {
         return value
     }
 
-    private _retrieveMentionState(editorId, mentionId) {
+    private _retrieveMentionState(
+        editorId: string,
+        mentionId: string
+    ): MentionState {
         return this.mentions[
             MentionService._getMentionStateId(editorId, mentionId)
         ]
     }
 
-    private static _getMentionStateId(editorId, mentionId) {
+    private static _getMentionStateId(
+        editorId: string,
+        mentionId: string
+    ): string {
         return editorId + '-' + mentionId
     }
 
-    private _createMentionPlaceHolder(editor, mentionId) {
+    private _createMentionPlaceHolder(
+        editor: CKEDITOR.editor,
+        mentionId: string
+    ): string {
         const id =
             this.mentionPlacerHolderPrefix + '-' + editor.id + '-' + mentionId
         const mentionPlaceHolder = '<span id="' + id + '">@</span>'
@@ -288,35 +340,24 @@ export class MentionService {
     }
 
     // Generate unique id
-    private _getNewMentionId() {
-        function chr4() {
-            return Math.random().toString(16).slice(-4)
-        }
-        return (
-            chr4() +
-            chr4() +
-            chr4() +
-            chr4() +
-            chr4() +
-            chr4() +
-            chr4() +
-            chr4()
-        )
+    private static _getNewMentionId(): string {
+        return this.apiSvc.createUUID()
     }
 
-    private _getMentionIdFromMentionPlaceHolder(currentEditingElementId) {
+    private _getMentionIdFromMentionPlaceHolder(
+        currentEditingElementId: string
+    ): string {
         if (
             currentEditingElementId &&
             currentEditingElementId.indexOf(this.mentionPlacerHolderPrefix) > -1
         ) {
             const splits = currentEditingElementId.split('-')
-            const mentionId = splits[2]
-            return mentionId
+            return splits[2]
         }
         return null
     }
 
-    private _cleanup(editor, mentionId, unwrapOnly?) {
+    private _cleanup(editor: CKEDITOR.editor, mentionId: string, unwrapOnly?) {
         const mentionState = this._retrieveMentionState(editor.id, mentionId)
         const mentionPlaceHolderId = mentionState.mentionPlaceHolderId
         const mentionPlaceHolderDom =

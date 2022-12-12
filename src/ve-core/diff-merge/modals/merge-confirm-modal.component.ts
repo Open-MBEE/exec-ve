@@ -22,7 +22,7 @@ export interface MergeConfirmResolveFn extends VeModalResolveFn {
 }
 
 class MergeConfirmModalController
-    extends VeModalControllerImpl
+    extends VeModalControllerImpl<void>
     implements VeModalController
 {
     //Bindings
@@ -40,7 +40,7 @@ class MergeConfirmModalController
         super()
     }
 
-    $onInit() {
+    $onInit(): void {
         this.srcRefOb = this.resolve.getSrcRefOb
         this.docName = this.resolve.getDocName
         this.oking = false
@@ -48,7 +48,7 @@ class MergeConfirmModalController
         this.createForm = true
     }
 
-    public ok = () => {
+    public ok = (): void => {
         if (this.oking) {
             this.growl.info('Please wait...')
             return
@@ -56,7 +56,7 @@ class MergeConfirmModalController
         this.oking = false
     }
 
-    public cancel = () => {
+    public cancel = (): void => {
         this.modalInstance.dismiss()
     }
 }

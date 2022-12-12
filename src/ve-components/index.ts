@@ -5,23 +5,30 @@
 // import "./html-rendered-diff-merge";
 
 //VE Modules
-import "@ve-utils"
+import '@ve-utils'
 
 //Module Main
-import "./ve-components.module"
+import './ve-components.module'
 
-import "./services"
+import './services'
 
-import "./components"
+import './components'
 
 // Extensions
-import "./presentations"
-import "./transclusions"
-import "./spec-tools"
+import './presentations'
+import './transclusions'
+import './spec-tools'
+import './add-elements'
 
-export * from "./ve-components.module"
+export * from './ve-components.module'
 
-import "../ve-experimental"
+import '../ve-experimental'
+import { ElementObject } from '@ve-types/mms'
 
+export default 've-components'
 
-export default 've-components';
+export interface PropertySpec {
+    options?: ElementObject[]
+    isEnumeration?: boolean
+    isSlot?: boolean
+}

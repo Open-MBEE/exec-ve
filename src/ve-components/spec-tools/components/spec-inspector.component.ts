@@ -1,17 +1,23 @@
-import * as angular from "angular";
-import _ from "lodash";
+import angular from 'angular'
+import _ from 'lodash'
 
-import {ComponentService} from "@ve-components/services";
-import {veComponents} from "@ve-components";
-import {ProjectService, URLService, ViewService} from "@ve-utils/mms-api-client";
-import{AuthService, PermissionsService, ElementService} from "@ve-utils/mms-api-client";
-import {EventService, UtilsService} from "@ve-utils/services";
-import {SpecService} from "@ve-components/spec-tools";
-import {VeComponentOptions} from "@ve-types/view-editor";
+import { ComponentService } from '@ve-components/services'
+import { SpecService, ISpecTool, SpecTool } from '@ve-components/spec-tools'
+import { ToolbarService } from '@ve-core/tool-bar'
+import {
+    ProjectService,
+    URLService,
+    ViewService,
+    AuthService,
+    PermissionsService,
+    ElementService,
+    ApiService,
+} from '@ve-utils/mms-api-client'
+import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
 
-import {ISpecTool, SpecTool} from "@ve-components/spec-tools";
-import {ToolbarService} from "@ve-core/tool-bar"
+import { veComponents } from '@ve-components'
 
+import { VeComponentOptions } from '@ve-types/angular'
 
 /**
  * @ngdoc directive
@@ -28,9 +34,7 @@ import {ToolbarService} from "@ve-core/tool-bar"
  * @requires growl
  * @requires _
  *
- *
- * @description
- * Outputs a "spec window" of the element whose id is specified. Spec includes name,
+ * * Outputs a "spec window" of the element whose id is specified. Spec includes name,
  * documentation, and value if the element is a property. Also last modified time,
  * last user, element id. Editability is determined by a param and also element
  * editability. Documentation and string values can have html and can transclude other
@@ -83,30 +87,58 @@ import {ToolbarService} from "@ve-core/tool-bar"
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 
+class SpecInspectorController extends SpecTool implements ISpecTool {
+    static $inject = SpecTool.$inject
 
-class SpecInspectorController extends SpecTool implements ISpecTool  {
+    constructor(
+        $scope: angular.IScope,
+        $element: JQuery<HTMLElement>,
+        $q: angular.IQService,
+        growl: angular.growl.IGrowlService,
+        componentSvc: ComponentService,
+        uRLSvc: URLService,
+        authSvc: AuthService,
+        elementSvc: ElementService,
+        projectSvc: ProjectService,
+        utilsSvc: UtilsService,
+        apiSvc: ApiService,
+        viewSvc: ViewService,
+        permissionsSvc: PermissionsService,
+        eventSvc: EventService,
+        specSvc: SpecService,
+        toolbarSvc: ToolbarService,
+        private autosaveSvc: AutosaveService
+    ) {
+        super(
+            $scope,
+            $element,
+            $q,
+            growl,
+            componentSvc,
+            uRLSvc,
+            authSvc,
+            elementSvc,
+            projectSvc,
+            utilsSvc,
+            apiSvc,
+            viewSvc,
+            permissionsSvc,
+            eventSvc,
+            specSvc,
+            toolbarSvc
+        )
 
-        static $inject = SpecTool.$inject;
-
-        constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
-                    growl: angular.growl.IGrowlService, componentSvc: ComponentService, uRLSvc: URLService,
-                    authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
-                    utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
-                    eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService) {
-            super($scope,$element,$q,growl,componentSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
-
-            this.specType = _.kebabCase(SpecInspectorComponent.selector)
-            this.specTitle = "Preview Element";
-        }
-
-        protected initCallback = () => {
-            this.specSvc.setEditing(false);
-            this.specSvc.cleanUpSaveAll();
-        }
-
+        this.specType = _.kebabCase(SpecInspectorComponent.selector)
+        this.specTitle = 'Preview Element'
     }
 
-let SpecInspectorComponent: VeComponentOptions = {
+    protected initCallback = (): void => {
+        this.specSvc.setEditing(false)
+        this.specSvc.cleanUpSaveAll()
+    }
+}
+
+const SpecInspectorComponent: VeComponentOptions = {
     selector: 'specInspector',
     template: `
 <!-- HTML for view mode -->
@@ -227,9 +259,9 @@ let SpecInspectorComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsElement: '<?',
         noEdit: '@',
-        mmsDisplayOldSpec: '<?'
+        mmsDisplayOldSpec: '<?',
     },
-    controller: SpecInspectorController
+    controller: SpecInspectorController,
 }
 
-veComponents.component(SpecInspectorComponent.selector,SpecInspectorComponent);
+veComponents.component(SpecInspectorComponent.selector, SpecInspectorComponent)

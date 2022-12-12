@@ -1,16 +1,19 @@
-import * as angular from "angular";
-import _ from "lodash";
+import angular, { IComponentController } from 'angular'
 
+import { Commit, CompareData, DiffMergeService } from '@ve-core/diff-merge'
+import { ElementService, ProjectService } from '@ve-utils/mms-api-client'
+import { handleChange } from '@ve-utils/utils'
+
+import { veCore } from '@ve-core'
+
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 import {
-    ElementService,
-    ProjectService,
-    } from "@ve-utils/mms-api-client";
-import {CommitObject, ElementObject, ElementsRequest, RefObject} from "@ve-types/mms";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {handleChange} from "@ve-utils/utils";
+    CommitObject,
+    ElementObject,
+    ElementsRequest,
+    RefObject,
+} from '@ve-types/mms'
 
-import {veCore} from "@ve-core";
-import {Commit, DiffMergeService} from "@ve-core/diff-merge";
 /**
  * @ngdoc component
  * @name veCore.component:MmsHistory
@@ -21,9 +24,7 @@ import {Commit, DiffMergeService} from "@ve-core/diff-merge";
  * @requires $q
  * @requires _
  *
- *
- * @description
- * Outputs a history window of the element whose id is specified. History includes
+ * * Outputs a history window of the element whose id is specified. History includes
  * name of modifier and date of change. Also modified date links to spec output below.
  *
  * ### template (html)
@@ -37,154 +38,202 @@ import {Commit, DiffMergeService} from "@ve-core/diff-merge";
  * @param {string} mmsProjectId The project id for the element
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
-class MmsHistoryController implements angular.IComponentController {
-
+class MmsHistoryController implements IComponentController {
     // Bindings
     mmsRefId: string
     mmsElementId: string
     mmsProjectId: string
 
     // Locals
-    element: ElementObject;
-    gettingHistory: boolean;
-    refList: RefObject[];
-    baseCommit: Commit
-    historyVer: string;
-    compareCommit: Commit
-    disableRevert: boolean;
-
-    static $inject = ['$element', 'ElementService', 'ProjectService', 'DiffMergeService'];
-
-    constructor(private $element: JQuery<HTMLElement>, private elementSvc: ElementService,
-                private projectSvc: ProjectService, private diffMergeSvc: DiffMergeService) {
+    element: ElementObject
+    gettingHistory: boolean = false
+    refList: RefObject[] = []
+    baseCommit: Commit = {
+        ref: null,
+        history: null,
+        commitSelected: null,
+        isOpen: false,
+        refIsOpen: false,
     }
-
-    $onInit() {
-        this.historyVer = 'latest';
-        this.compareCommit = {
-            ref: {id: this.mmsRefId },
-            history: null,
-            commitSelected: null,
-            isOpen: false
-        };
-
-
-        // base data
-        this.refList = [];
-        this.baseCommit = {
-            ref: {id: this.mmsRefId },
-            history: null,
-            commitSelected: null,
-            isOpen: false,
-            refIsOpen: false
-        };
+    historyVer: string = 'latest'
+    compareCommit: Commit = {
+        ref: null,
+        history: null,
+        commitSelected: null,
+        isOpen: false,
     }
+    disableRevert: boolean = true
 
-    $onChanges(onChangesObj: angular.IOnChangesObject) {
+    static $inject = [
+        '$q',
+        '$element',
+        'growl',
+        'ElementService',
+        'ProjectService',
+        'DiffMergeService',
+    ]
+
+    constructor(
+        private $q: angular.IQService,
+        private $element: JQuery<HTMLElement>,
+        private growl: angular.growl.IGrowlService,
+        private elementSvc: ElementService,
+        private projectSvc: ProjectService,
+        private diffMergeSvc: DiffMergeService
+    ) {}
+
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
         handleChange(onChangesObj, 'mmsElementId', this.initCallback)
         handleChange(onChangesObj, 'mmsProjectId', this.initCallback)
         handleChange(onChangesObj, 'mmsRefId', this.initCallback)
     }
 
-    $postLink() {
-        this.initCallback();
+    $postLink(): void {
+        this.initCallback()
     }
 
     /**
-     * @ngdoc function
      * @name veCore.component:MmsHistory#initCallback
-     * @methodOf veCore.component:MmsHistory
-     *
-     * @description
      * Change scope history when another element is selected
      */
-    initCallback = () => {
-        if (!this.mmsProjectId || !this.mmsRefId)
-            return;
-        this.gettingHistory = true;
-        const reqOb: ElementsRequest = {
+    initCallback = (): void => {
+        if (!this.mmsProjectId || !this.mmsRefId) return
+        this.gettingHistory = true
+        const reqOb: ElementsRequest<string> = {
             elementId: this.mmsElementId,
             projectId: this.mmsProjectId,
-            refId: this.mmsRefId
+            refId: this.mmsRefId,
         }
         // this.elementSvc.getElement(reqOb, 2, false).then((data) => {
         //     this.element = data;
         // })
-        this.elementSvc.getElementHistory(reqOb, 2, true)
-            .then((data) => {
-                this.historyVer = 'latest';
-                this.compareCommit.history = data;
-                this.compareCommit.commitSelected = this.compareCommit.history[0];
-                this.getRefs();
-                this.baseCommit.history = data;
-                if (data.length > 1) {
-                    this.baseCommit.commitSelected = this.compareCommit.history[1];
-                } else if (data.length > 0) {
-                    this.baseCommit.commitSelected = this.compareCommit.history[0];
-                } else {
-                    this.baseCommit.commitSelected = '--- none ---';
-                }
-            }).finally(() => {
-            this.gettingHistory = false;
-        });
-    };
+        this.elementSvc.getElementHistory(reqOb, 2, true).then(
+            (data) => {
+                this.historyVer = 'latest'
+                this.compareCommit.history = data
+                this.compareCommit.commitSelected =
+                    this.compareCommit.history[0]
+                this.baseCommit.history = data
+                this.getRefs()
+                    .then(() => {
+                        if (data.length > 1) {
+                            this.baseCommit.commitSelected =
+                                this.compareCommit.history[1]
+                        } else if (data.length > 0) {
+                            this.baseCommit.commitSelected =
+                                this.compareCommit.history[0]
+                        } else {
+                            this.baseCommit.commitSelected = '--- none ---'
+                        }
+                    })
+                    .finally(() => {
+                        this.gettingHistory = false
+                        this.disableRevert = this._isSame()
+                    })
+            },
+            (reason) => {
+                this.growl.error(
+                    `Unable to get Element History - ${reason.message}`
+                )
+            }
+        )
+    }
 
     // Get ref list for project and details on
-    getRefs = () => {
-        this.projectSvc.getRefs(this.mmsProjectId)
-            .then((data) => {
-                this.refList = data;
-                this.compareCommit.ref = _.find(data, (item) => {
-                    return item.id == this.mmsRefId;
-                });
-                this.baseCommit.ref = this.compareCommit.ref;
-            });
-    };
+    getRefs = (): VePromise<void, void> => {
+        const deferred = this.$q.defer<void>()
+        this.projectSvc.getRefs(this.mmsProjectId).then(
+            (data) => {
+                this.refList = data
+                this.compareCommit.ref = this.refList.filter((ref) => {
+                    return ref.id === this.mmsRefId
+                })[0]
+                this.baseCommit.ref = this.compareCommit.ref
+                deferred.resolve()
+            },
+            (reason) => {
+                this.growl.error(`Unable to get Refs - ${reason.message}`)
+                deferred.reject()
+            }
+        )
+        return deferred.promise
+    }
 
-    commitClicked = (version: CommitObject) => {
-        this.compareCommit.commitSelected = version;
-        this.historyVer = this.compareCommit.commitSelected.id;
-        this.compareCommit.isOpen = !this.compareCommit.isOpen;
-    };
+    commitClicked = (version: CommitObject): void => {
+        this.compareCommit.commitSelected = version
+        this.historyVer = this.compareCommit.commitSelected.id
+        this.compareCommit.isOpen = !this.compareCommit.isOpen
+    }
 
-    getElementHistoryByRef = (ref) => {
+    getElementHistoryByRef = (ref?: RefObject): void => {
         if (ref) {
-            this.disableRevert = false;
+            this.disableRevert = false
             // scope.gettingCompareHistory = true;
-            this.baseCommit.ref = ref;
-            const reqOb = {elementId: this.mmsElementId, projectId: this.mmsProjectId, refId: ref.id};
-            this.elementSvc.getElementHistory(reqOb, 2)
-                .then((data) => {
-                    this.baseCommit.history = data;
-                    if (data.length > 0) {
-                        this.baseCommit.commitSelected = this.baseCommit.history[0];
+            this.baseCommit.ref = ref
+            const reqOb = {
+                elementId: this.mmsElementId,
+                projectId: this.mmsProjectId,
+                refId: ref.id,
+            }
+            this.elementSvc
+                .getElementHistory(reqOb, 2)
+                .then(
+                    (data) => {
+                        this.baseCommit.history = data
+                        if (data.length > 0) {
+                            this.baseCommit.commitSelected =
+                                this.baseCommit.history[0]
+                        }
+                        this.disableRevert = this._isSame()
+                    },
+                    (error) => {
+                        this.baseCommit.history = []
+                        this.baseCommit.commitSelected = ''
+                        this.disableRevert = true
                     }
-                }, (error) => {
-                    this.baseCommit.history = [];
-                    this.baseCommit.commitSelected = '';
-                    this.disableRevert = true;
-                }).finally(() => {
-                // scope.gettingCompareHistory = false;
-                this.baseCommit.refIsOpen = !this.baseCommit.refIsOpen;
-            })
+                )
+                .finally(() => {
+                    // scope.gettingCompareHistory = false;
+                    this.baseCommit.refIsOpen = !this.baseCommit.refIsOpen
+                })
         }
-    };
+    }
 
-    baseCommitClicked = (version: CommitObject) => {
-        this.baseCommit.commitSelected = version;
-        this.baseCommit.isOpen = !this.baseCommit.isOpen;
-    };
-
+    baseCommitClicked = (version: CommitObject): void => {
+        this.baseCommit.commitSelected = version
+        this.baseCommit.isOpen = !this.baseCommit.isOpen
+    }
 
     //TODO
     // check if commit ids are the same - display to user that they are comparing same or disable the commit that matches
-    revert = () => {
-        this.diffMergeSvc.revertAction(this, this.$element);
-    };
+    revert = (): void => {
+        if (!this._isSame()) {
+            const reqOb: ElementsRequest<string> = {
+                elementId: this.mmsElementId,
+                projectId: this.mmsProjectId,
+                refId: this.mmsRefId,
+            }
+            const compareData: CompareData = {
+                compareCommit: this.compareCommit,
+                baseCommit: this.baseCommit,
+                element: this.element,
+            }
+            this.diffMergeSvc.revertAction(reqOb, compareData, this.$element)
+        } else this.growl.warning('Nothing to revert!')
+    }
 
+    private _isSame = (): boolean => {
+        const compareId =
+            typeof this.compareCommit.commitSelected === 'string'
+                ? this.compareCommit.commitSelected
+                : this.compareCommit.commitSelected.id
+        const baseId =
+            typeof this.baseCommit.commitSelected === 'string'
+                ? this.baseCommit.commitSelected
+                : this.baseCommit.commitSelected.id
+        return baseId == compareId
+    }
 }
-
-
 
 const MmsHistoryComponent: VeComponentOptions = {
     selector: 'mmsHistory',
@@ -337,7 +386,7 @@ const MmsHistoryComponent: VeComponentOptions = {
         mmsProjectId: '@',
         mmsRefId: '@',
     },
-    controller: MmsHistoryController
+    controller: MmsHistoryController,
 }
 
 veCore.component(MmsHistoryComponent.selector, MmsHistoryComponent)

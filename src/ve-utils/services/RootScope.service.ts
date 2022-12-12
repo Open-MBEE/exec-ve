@@ -5,6 +5,8 @@ import { veUtils } from '@ve-utils'
 
 import { SessionService } from './Session.service'
 
+import { ParamsObject, RefObject } from '@ve-types/mms'
+
 export class RootScopeService {
     public constants = {
         LOGINMODALOPEN: 'login-modal-open',
@@ -12,7 +14,6 @@ export class RootScopeService {
         RIGHTPANETOGGLEABLE: 'mms-pane-toggleable',
         RIGHTPANECLOSED: 'mms-pane-closed',
         VETITLE: 've-title',
-        VEFN: 've-fn',
         VESTATECHANGING: 've-state-changing',
         VEVIEWCONTENTLOADING: 've-view-content-loading',
         VEREDIRECT: 've-redirect',
@@ -33,9 +34,11 @@ export class RootScopeService {
         DELETEKEY: this.sessionSvc.constants.DELETEKEY,
     }
 
+    static $inject = ['SessionService']
+
     constructor(private sessionSvc: SessionService) {}
 
-    loginModalOpen(value?: any | undefined) {
+    loginModalOpen(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.LOGINMODALOPEN,
             value,
@@ -43,11 +46,11 @@ export class RootScopeService {
         )
     }
 
-    mmsRefOb(value?: any | undefined) {
-        return this.sessionSvc.accessor(this.constants.MMSREFOB, value)
+    mmsRefOb(value?: RefObject | undefined): RefObject {
+        return this.sessionSvc.accessor(this.constants.MMSREFOB, value, null)
     }
 
-    rightPaneToggleable(value?: any | undefined) {
+    rightPaneToggleable(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.RIGHTPANETOGGLEABLE,
             value,
@@ -55,7 +58,7 @@ export class RootScopeService {
         )
     }
 
-    rightPaneClosed(value?: any | undefined) {
+    rightPaneClosed(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.RIGHTPANECLOSED,
             value,
@@ -63,7 +66,7 @@ export class RootScopeService {
         )
     }
 
-    veTitle(value?: any | undefined) {
+    veTitle(value?: string | undefined): string {
         return this.sessionSvc.accessor(
             this.constants.VETITLE,
             value,
@@ -72,11 +75,7 @@ export class RootScopeService {
         )
     }
 
-    veFn(value?: any | undefined) {
-        return this.sessionSvc.accessor(this.constants.VEFN, value, false)
-    }
-
-    veStateChanging(value?: any | undefined) {
+    veStateChanging(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VESTATECHANGING,
             value,
@@ -84,7 +83,7 @@ export class RootScopeService {
         )
     }
 
-    veViewContentLoading(value?: any | undefined) {
+    veViewContentLoading(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VEVIEWCONTENTLOADING,
             value,
@@ -101,20 +100,20 @@ export class RootScopeService {
         return this.sessionSvc.accessor(this.constants.VEREDIRECT, value, null)
     }
 
-    veRedirectFromOld(value?: any | undefined) {
+    veRedirectFromOld(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VEREDIRECTFROMOLD,
             value,
-            null,
+            false,
             true
         )
     }
 
-    veCrushUrl(value?: any | undefined) {
+    veCrushUrl(value?: string | undefined): string {
         return this.sessionSvc.accessor(this.constants.VECRUSHURL, value, null)
     }
 
-    veFullDocMode(value?: any | undefined) {
+    veFullDocMode(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VEFULLDOCMODE,
             value,
@@ -122,7 +121,7 @@ export class RootScopeService {
         )
     }
 
-    veCommentsOn(value?: any | undefined) {
+    veCommentsOn(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VECOMMENTSON,
             value,
@@ -130,7 +129,7 @@ export class RootScopeService {
         )
     }
 
-    veNumberingOn(value?: any | undefined) {
+    veNumberingOn(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VECOMMENTSON,
             value,
@@ -138,7 +137,7 @@ export class RootScopeService {
         )
     }
 
-    veElementsOn(value?: any | undefined) {
+    veElementsOn(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VEELEMENTSON,
             value,
@@ -146,11 +145,11 @@ export class RootScopeService {
         )
     }
 
-    veEditMode(value?: any | undefined) {
+    veEditMode(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(this.constants.VEEDITMODE, value, false)
     }
 
-    veHidePanes(value?: any | undefined) {
+    veHidePanes(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VEHIDEPANES,
             value,
@@ -159,7 +158,7 @@ export class RootScopeService {
         )
     }
 
-    veShowManageRefs(value?: any | undefined) {
+    veShowManageRefs(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VESHOWMANAGEREFS,
             value,
@@ -168,7 +167,7 @@ export class RootScopeService {
         )
     }
 
-    veShowLogin(value?: any | undefined) {
+    veShowLogin(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VESHOWLOGIN,
             value,
@@ -186,11 +185,11 @@ export class RootScopeService {
         )
     }
 
-    treeShowPe(value?: any | undefined) {
+    treeShowPe(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(this.constants.TREESHOWPE, value, false)
     }
 
-    treeInitialSelection(value?: any | undefined) {
+    treeInitialSelection(value?: string | undefined): string {
         return this.sessionSvc.accessor(
             this.constants.TREEINITIALSELECTION,
             value,
@@ -199,7 +198,7 @@ export class RootScopeService {
         )
     }
 
-    leftPaneClosed(value?: any | undefined) {
+    leftPaneClosed(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.LEFTPANECLOSED,
             value,
@@ -207,7 +206,5 @@ export class RootScopeService {
         )
     }
 }
-
-RootScopeService.$inject = ['SessionService']
 
 veUtils.service('RootScopeService', RootScopeService)

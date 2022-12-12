@@ -14,7 +14,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -34,9 +34,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {EventService} eventSvc
  * @requires {MathJaxService} mathJaxSvc
  *
- *
- * @description
- * Given an element id, puts in the element's name binding, if there's a parent
+ * * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -52,8 +50,8 @@ export class TranscludeNameController
     implements ITransclusion
 {
     //Locals
-    noClick: any | undefined
-    clickHandler: any | undefined
+    noClick: unknown | undefined
+    clickHandler: () => void
 
     static $inject = Transclusion.$inject
 
@@ -97,7 +95,7 @@ export class TranscludeNameController
         this.checkCircular = false
     }
 
-    protected config = () => {
+    protected config = (): void => {
         this.$element.on('click', (e) => {
             if (this.noClick) return
 
@@ -125,12 +123,12 @@ export class TranscludeNameController
             this.elementSaving = false
             this.view = this.mmsViewCtrl.getView()
 
-            this.save = (e) => {
+            this.save = (e: JQuery.ClickEvent): void => {
                 e.stopPropagation()
                 this.componentSvc.saveAction(this, this.$element, false)
             }
 
-            this.cancel = (e) => {
+            this.cancel = (e: JQuery.ClickEvent): void => {
                 e.stopPropagation()
                 this.componentSvc.cancelAction(
                     this,
@@ -139,7 +137,7 @@ export class TranscludeNameController
                 )
             }
 
-            this.startEdit = () => {
+            this.startEdit = (): void => {
                 this.componentSvc.startEdit(
                     this,
                     this.mmsViewCtrl.isEditable(),
@@ -151,7 +149,9 @@ export class TranscludeNameController
         }
     }
 
-    public getContent = (preview?) => {
+    public getContent = (
+        preview?
+    ): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string>()
         const defaultTemplate =
             '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">(no name)</span>'

@@ -2,18 +2,14 @@ import angular from 'angular'
 import $ from 'jquery'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { ISpecTool } from '@ve-components/spec-tools'
+import { SpecService, SpecTool } from '@ve-components/spec-tools'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import {
     ButtonBarApi,
     ButtonBarService,
     IButtonBarButton,
 } from '@ve-core/button-bar'
-import {
-    AuthService,
-    ElementService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { AuthService, ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
     MathJaxService,
@@ -22,10 +18,10 @@ import {
     ImageService,
 } from '@ve-utils/services'
 
-import { veComponents } from '@ve-components'
+import { PropertySpec, veComponents } from '@ve-components'
 
-import { PropertySpec } from '@ve-types/mms'
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
+import { SlotObject, ValueObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
@@ -45,9 +41,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {EventService} eventSvc
  * @requires {MathJaxService} mathJaxSvc
  *
- *
- * @description
- * Given an element id, puts in the element's name binding, if there's a parent
+ * * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -66,11 +60,11 @@ export class TranscludeValController
     first: boolean
 
     //Custom Require
-    mmsSpecEditorCtrl: ISpecTool
+    mmsSpecEditorCtrl: SpecTool
 
     //Locals
-    values: any[] = []
-    editValues: any[] = []
+    values: ValueObject[] = []
+    editValues: ValueObject[] = []
     propertySpec: PropertySpec
     public bbApi: ButtonBarApi
     public bars: string[]
@@ -186,7 +180,7 @@ export class TranscludeValController
 </div>
 `
 
-    static $inject = Transclusion.$inject
+    static $inject = [...Transclusion.$inject, 'SpecService']
 
     constructor(
         $q: angular.IQService,
@@ -203,7 +197,8 @@ export class TranscludeValController
         mathJaxSvc: MathJaxService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
-        imageSvc: ImageService
+        imageSvc: ImageService,
+        private specSvc: SpecService
     ) {
         super(
             $q,
@@ -228,21 +223,29 @@ export class TranscludeValController
         this.checkCircular = false
     }
 
-    protected config = () => {
+    protected config = (): void => {
+        this.componentSvc.getPropertySpec(this.element).then(
+            (value) => {
+                this.propertySpec = value
+            },
+            (reason) => {
+                this.growl.error(
+                    'Failed to get property spec: ' + reason.message
+                )
+            }
+        )
         this.componentSvc.setupValEditFunctions(this)
 
         this.isEditing = false
         this.elementSaving = false
 
         if (this.mmsSpecEditorCtrl) {
-            this._startEdit(this.mmsSpecEditorCtrl.specSvc.editable)
-            this.changeAction = () => {
+            this._startEdit(this.specSvc.editable)
+            this.changeAction = (): void => {
                 this.config()
             }
             return
         }
-
-        this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this)
 
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) {
@@ -269,7 +272,7 @@ export class TranscludeValController
                 )
             this.view = this.mmsViewCtrl.getView()
 
-            this.startEdit = () => {
+            this.startEdit = (): void => {
                 this._startEdit(this.mmsViewCtrl.isEditable())
             }
         }
@@ -292,7 +295,7 @@ export class TranscludeValController
         for (let i = 0; i < values.length; i++) {
             if (values[i].type === 'LiteralString') {
                 areStrings = true
-                let s = values[i].value
+                let s = values[i].value as string
                 if (s.indexOf('<p>') === -1) {
                     s = s.replace('<', '&lt;')
                 }
@@ -336,7 +339,7 @@ export class TranscludeValController
                 deferred.resolve(this.editTemplate)
             } else {
                 if (this.first) {
-                    this.values = this.values[0]
+                    this.values = [this.values[0]]
                 }
                 deferred.resolve(this.valTemplate)
             }
@@ -344,9 +347,11 @@ export class TranscludeValController
         return deferred.promise
     }
 
-    private _startEdit = (isEditable: boolean) => {
+    private _startEdit = (isEditable: boolean): void => {
         let id = this.element.typeId
-        if (this.element.type === 'Slot') id = this.element.definingFeatureId
+        if (this.element.type === 'Slot') {
+            id = (this.element as SlotObject).definingFeatureId
+        }
         if (
             !id ||
             (this.propertySpec.isEnumeration && this.propertySpec.options)
@@ -386,16 +391,16 @@ export class TranscludeValController
         )
     }
 
-    public save = (e) => {
+    public save = (e: JQuery.ClickEvent): void => {
         e.stopPropagation()
         this.componentSvc.saveAction(this, this.$element, false)
     }
 
-    public saveC = () => {
+    public saveC = (): void => {
         this.componentSvc.saveAction(this, this.$element, true)
     }
 
-    public cancel = (e) => {
+    public cancel = (e: JQuery.ClickEvent): void => {
         e.stopPropagation()
         this.componentSvc.cancelAction(this, this.recompile, this.$element)
     }
@@ -412,6 +417,7 @@ export const TranscludeValComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
+        mmsCallback: '&',,
         first: '<',
     },
     transclude: true,

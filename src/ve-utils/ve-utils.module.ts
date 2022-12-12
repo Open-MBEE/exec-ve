@@ -4,15 +4,13 @@ import angular from 'angular'
  * @ngdoc overview
  * @module veUtils
  * @name veUtils
- *
- * @description
- * # View Editor Utilities Module
- * This module provides angular services that abstract the mms rest api. The only 
+ * * # View Editor Utilities Module
+ * This module provides angular services that abstract the mms rest api. The only
  * dependency it has is the LoDash js library. Most service functions return
  * a Promise that allows you to pass it success and failure handlers via the
- * then() method. The format of the objects that are resolved when successful 
+ * then() method. The format of the objects that are resolved when successful
  * are defined by json schemas that're linked to below.
- * 
+ *
  * ## Links
  * * [angular.js](http://angularjs.org)
  * * [mms](https://github.com/Open-MBEE/mms)
@@ -48,7 +46,7 @@ import angular from 'angular'
             ElementService.getElement('_element_id').then(
                 function(element) { //success handler
                     $scope.element = element;
-                }, 
+                },
                 function(reason) { //failed handler
                     alert('get element failed: ' + reason.message);
                 }
@@ -62,7 +60,7 @@ export const veUtils = angular.module('ve-utils', [])
 veUtils
     .config([
         '$sceProvider',
-        function ($sceProvider) {
+        ($sceProvider: angular.ISCEProvider): void => {
             $sceProvider.enabled(false)
         },
     ])

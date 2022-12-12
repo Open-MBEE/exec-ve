@@ -1,13 +1,18 @@
-import * as angular from "angular";
-import {StateService, UIRouterGlobals} from "@uirouter/angularjs";
-import {AuthService} from "@ve-utils/mms-api-client";
-import {RootScopeService} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
+import {
+    StateService,
+    TransitionPromise,
+    UIRouterGlobals,
+} from '@uirouter/angularjs'
+import angular, { IQService } from 'angular'
 
-import {veApp} from "@ve-app";
-import {ILocationService, IQService} from "angular";
+import { AuthService } from '@ve-utils/mms-api-client'
+import { BrandingStyle, RootScopeService } from '@ve-utils/services'
 
-let LoginComponent: VeComponentOptions = {
+import { veApp } from '@ve-app'
+
+import { VeComponentOptions, VePromiseReason } from '@ve-types/angular'
+
+const LoginComponent: VeComponentOptions = {
     selector: 'login',
     template: `
     <div id="ve-login" class="row">
@@ -33,57 +38,92 @@ let LoginComponent: VeComponentOptions = {
 `,
     bindings: {
         mmsLoginBanner: '<',
-        paramsOb: '<'
+        paramsOb: '<',
     },
     controller: class LoginController implements angular.IComponentController {
-        static $inject = ['$q', '$state', '$uiRouterGlobals', 'growl', 'AuthService', 'RootScopeService'];
-        
-        public spin = false;
-                pageTitle = 'View Editor';
-                loginBanner;
+        static $inject = [
+            '$q',
+            '$state',
+            '$uiRouterGlobals',
+            'growl',
+            'AuthService',
+            'RootScopeService',
+        ]
 
-        private mmsLoginBanner;
+        public spin: boolean = false
+        loginBanner: BrandingStyle
 
-        
-        constructor(private $q: IQService, private $state: StateService, private $uiRouterGlobals: UIRouterGlobals, private growl: angular.growl.IGrowlService, private authSvc: AuthService, private rootScopeSvc: RootScopeService) {}
-            
-        $onInit() {
-            this.rootScopeSvc.veTitle('Login');
-            this.loginBanner = this.mmsLoginBanner;
+        private mmsLoginBanner: BrandingStyle
+
+        constructor(
+            private $q: IQService,
+            private $state: StateService,
+            private $uiRouterGlobals: UIRouterGlobals,
+            private growl: angular.growl.IGrowlService,
+            private authSvc: AuthService,
+            private rootScopeSvc: RootScopeService
+        ) {}
+
+        $onInit(): void {
+            this.rootScopeSvc.veTitle('Login')
+            this.loginBanner = this.mmsLoginBanner
         }
-        
-        login(credentials) {
-            const deferred = this.$q.defer();
-            this.spin = true;
-            if (!credentials || !credentials.password || !credentials.username) {
+
+        login(credentials: {
+            password: string
+            username: string
+        }): angular.IPromise<TransitionPromise> {
+            const deferred = this.$q.defer<TransitionPromise>()
+            this.spin = true
+            if (
+                !credentials ||
+                !credentials.password ||
+                !credentials.username
+            ) {
                 let message = 'Missing: '
-                message+= (!credentials || !credentials.username) ? 'Username' : '';
-                message+= (!credentials) ? ' and ' : '';
-                message+= (!credentials || !credentials.password) ? 'Password' : '';
-                this.growl.error(message);
-            }
-            else {
-                var credentialsJSON = {"username":credentials.username, "password":credentials.password};
-                this.authSvc.getAuthorized(credentialsJSON)
-                    .then((user) => {
+                message +=
+                    !credentials || !credentials.username ? 'Username' : ''
+                message += !credentials ? ' and ' : ''
+                message +=
+                    !credentials || !credentials.password ? 'Password' : ''
+                this.growl.error(message)
+            } else {
+                const credentialsJSON = {
+                    username: credentials.username,
+                    password: credentials.password,
+                }
+                this.authSvc.getAuthorized(credentialsJSON).then(
+                    (user) => {
                         if (this.rootScopeSvc.veRedirect()) {
-                            let veRedirect = this.rootScopeSvc.veRedirect();
-                            var toState = veRedirect.toState;
-                            var toParams = veRedirect.toParams;
+                            const veRedirect = this.rootScopeSvc.veRedirect()
+                            const toState = veRedirect.toState
+                            const toParams = veRedirect.toParams
                             toParams.next = undefined
-                            deferred.resolve(this.$state.go(toState.name, toParams, {reload: true}));
+                            deferred.resolve(
+                                this.$state.go(toState.name, toParams, {
+                                    reload: true,
+                                })
+                            )
                         } else {
-                            this.$state.go('main.login.select', {fromLogin: true});
+                            this.$state
+                                .go('main.login.select', {
+                                    fromLogin: true,
+                                })
+                                .catch(() => {
+                                    /* Handled by UIRouter */
+                                })
                         }
-                    }, (reason) => {
-                        this.spin = false;
-                        deferred.resolve(this.growl.error(reason.message));
-                    })
+                    },
+                    (reason: VePromiseReason<unknown>) => {
+                        this.spin = false
+                        this.growl.error(reason.message)
+                        deferred.reject(reason)
+                    }
+                )
             }
             return deferred.promise
         }
-    }
-
+    },
 }
 
-veApp.component(LoginComponent.selector,LoginComponent);
+veApp.component(LoginComponent.selector, LoginComponent)

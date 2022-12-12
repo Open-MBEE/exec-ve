@@ -15,12 +15,9 @@ import {
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import { RefObject } from '@ve-types/mms'
-import {
-    VeComponentOptions,
-    VeModalService,
-    VeModalSettings,
-} from '@ve-types/view-editor'
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class RefsController {
     static $inject = [
@@ -65,7 +62,7 @@ class RefsController {
     view
     fromParams
     htmlTooltip
-    addItemData
+    addElementData
 
     constructor(
         private $sce: angular.ISCEService,
@@ -86,7 +83,7 @@ class RefsController {
         private eventSvc: EventService
     ) {}
 
-    $onInit() {
+    $onInit(): void {
         this.eventSvc.$init(this)
 
         this.contentWindowSvc.toggleLeftPane(true)
@@ -136,11 +133,11 @@ class RefsController {
     }
 
     addBranch(e) {
-        this.addItem('Branch')
+        this.addElement('Branch')
     }
 
     addTag(e) {
-        this.addItem('Tag')
+        this.addElement('Tag')
     }
 
     deleteRef(e) {
@@ -159,8 +156,8 @@ class RefsController {
         )
     }
 
-    addItem(itemType) {
-        this.addItemData = {
+    addElement(itemType) {
+        this.addElementData = {
             itemType: itemType,
             createParentRefId: {},
             from: '',
@@ -175,11 +172,11 @@ class RefsController {
                 return
             }
             if (branch.type === 'Tag') {
-                this.addItemData.from = 'Tag ' + branch.name
+                this.addElementData.from = 'Tag ' + branch.name
             } else {
-                this.addItemData.from = 'Branch ' + branch.name
+                this.addElementData.from = 'Branch ' + branch.name
             }
-            this.addItemData.createParentRefId = branch.id
+            this.addElementData.createParentRefId = branch.id
         } else if (itemType === 'Tag') {
             if (!branch) {
                 this.growl.warning(
@@ -187,7 +184,7 @@ class RefsController {
                 )
                 return
             }
-            this.addItemData.createParentRefId = branch.id
+            this.addElementData.createParentRefId = branch.id
         } else {
             this.growl.error(
                 'Add Item of Type ' + itemType + ' is not supported'
@@ -195,10 +192,10 @@ class RefsController {
             return
         }
         const instance = this.$uibModal.open({
-            component: 'addItemModal',
+            component: 'addElementModal',
             resolve: {
                 getAddData: () => {
-                    return this.addItemData
+                    return this.addElementData
                 },
                 getFilter: () => {
                     return this.$filter

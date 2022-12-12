@@ -1,3 +1,1 @@
-
-import "./lodash/pluck.mixin"
-import "./jquery"
+import './jquery'

@@ -25,9 +25,7 @@
    * @param {boolean=true} logScaleLabel Whether to render labels for log grid
    * @param {string=} tickFit  Whether to fit tick marks to data. Accepted values: '', 'xy', 'yx', 'x', 'y'
    * @param {string="line"} type Type of graph to render (line, spline, step, step-before, step-after, area, area-spline, area-step, ...).
-   * @param {object=} padding Set the top/right/bottom/left margin.
-   * @description
-   * A directive for generating a D3 line graph from opaque tables.
+   * @param {object=} padding Set the top/right/bottom/left margin.   * A directive for generating a D3 line graph from opaque tables.
    * Element text is used as caption. If element text is "$title", the table title
    * will be used instead. Use "{''}" to generate an empty caption.
    *
@@ -64,7 +62,7 @@
    * @TODO: Add data types support (spline, area-spline, area-line, etc.)
    * @TODO: Find way to avoid using onrendered callback for log scale
    */
-   /*
+/*
   function mmsLineGraph(PlotService, $window, $q, $log, mmsViewCtrl) {
 
     var graphCount = 0;
@@ -135,7 +133,7 @@
 
 
       var promises = [];
-      var eids = scope.eid.split(',').map(function (val) {
+      var eids = scope.eid.split(',').map((val) => {
         return val.trim();
       });
       var xCols = [], yCols = [];
@@ -183,7 +181,7 @@
               label : {},
               tick : {
                 fit: false,
-                format: function (val) {
+                format: (val) => {
                   val = Math.round(val * 100) / 100;
                   return val;
                 }
@@ -206,7 +204,6 @@
                         console.log('i\'m right here---render table' );
           _chart.data.xs = {};
         }
-
 
 
         if (typeof scope.tickFit === 'string') {
@@ -432,7 +429,7 @@
         console.warn('Unknown log base: "' + base + '"');
       }
 
-      safeLogFn = function (val) {
+      safeLogFn = (val) => {
         val = (val < DEFAULT.LOGSCALE_MIN ? DEFAULT.LOGSCALE_MIN : val);
         return logFn(val);
       };
@@ -505,11 +502,11 @@
       };
       _chart._onrendered.push(gridDrawFn);
       _chart._postrender.push(tickModFn);
-      _chart.legend.item.onclick = function (id) {
+      _chart.legend.item.onclick = (id) => {
         scope.chart.toggle(id);
         tickModded = false;
       };
-      _chart._onresized.push(function () {
+      _chart._onresized.push(() => {
         tickModded = false;
       });
 
@@ -564,7 +561,7 @@
          * Generate a config object for a log gridline
          * @param {number} @pos Position/value of gridline
          */
-        /*function logGridLine(pos, className, text) {
+/*function logGridLine(pos, className, text) {
           var posLog = logFn(pos);
           return {
             value: posLog,
@@ -628,7 +625,7 @@
             width: element.offsetWidth - DEFAULT.RESIZE_MARGIN_W,
             height: element.offsetHeight - DEFAULT.RESIZE_MARGIN_H
           });
-          _chart._onresized.map(function (cb) {
+          _chart._onresized.map((cb) => {
             cb();
           });
         };

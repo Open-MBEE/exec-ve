@@ -12,7 +12,9 @@ import { AutosaveService, SessionService } from '@ve-utils/services'
 
 import { veUtils } from '@ve-utils'
 
+import { VePromise } from '@ve-types/angular'
 import {
+    AuthRequest,
     AuthResponse,
     CheckAuthResponse,
     UserObject,
@@ -29,13 +31,11 @@ import {
  * @requires ElementService
  * @requires ViewService
  * @requires ProjectService
- *
- * @description
- * Provide general authorization functions. I.e. login, logout, etc...
+ * * Provide general authorization functions. I.e. login, logout, etc...
  */
 export class AuthService {
     private token: string | null
-    static injector = [
+    static $inject = [
         '$q',
         '$http',
         'CacheService',
@@ -62,31 +62,26 @@ export class AuthService {
         this.token = localStorage.getItem('token')
     }
 
-    getAuthorized(credentialsJSON): angular.IPromise<string> {
-        const deferred: angular.IDeferred<string> = this.$q.defer()
+    getAuthorized(
+        credentialsJSON: AuthRequest
+    ): VePromise<string, AuthResponse> {
+        const deferred = this.$q.defer<string>()
         const loginURL = this.uRLSvc.getAuthenticationUrl()
-        this.$http.post(loginURL, credentialsJSON).then(
-            (success: angular.IHttpResponse<AuthResponse>) => {
+        this.$http.post<AuthResponse>(loginURL, credentialsJSON).then(
+            (success) => {
                 this.uRLSvc.setToken(success.data.token)
                 this.token = success.data.token
                 localStorage.setItem('token', this.token)
                 deferred.resolve(this.token)
             },
             (fail: angular.IHttpResponse<AuthResponse>) => {
-                deferred.reject(
-                    this.uRLSvc.handleHttpStatus(
-                        fail.data,
-                        fail.status,
-                        fail.headers,
-                        fail.config
-                    )
-                )
+                deferred.reject(this.uRLSvc.handleHttpStatus(fail))
             }
         )
         return deferred.promise
     }
 
-    removeToken() {
+    removeToken(): void {
         localStorage.removeItem('token')
         this.token = undefined
         this.uRLSvc.setToken(null)
@@ -99,12 +94,12 @@ export class AuthService {
         this.sessionSvc.clear()
     }
 
-    getToken() {
+    getToken(): string {
         return this.token
     }
 
-    checkLogin(): angular.IPromise<CheckAuthResponse> {
-        const deferred: angular.IDeferred<CheckAuthResponse> = this.$q.defer()
+    checkLogin(): VePromise<CheckAuthResponse> {
+        const deferred = this.$q.defer<CheckAuthResponse>()
         if (!this.token) {
             deferred.reject(false)
             return deferred.promise
@@ -146,15 +141,15 @@ export class AuthService {
     //     })
     // }
 
-    getUserData(username: string): angular.IPromise<UserObject> {
-        const deferred: angular.IDeferred<UserObject> = this.$q.defer()
+    getUserData(username: string): VePromise<UserObject> {
+        const deferred = this.$q.defer<UserObject>()
         const key = ['user', username]
         const urlkey = this.uRLSvc.getPersonURL(username)
         if (this.cacheSvc.exists(key)) {
             deferred.resolve(this.cacheSvc.get<UserObject>(key))
         } else {
-            this.$http.get(urlkey).then(
-                (response: angular.IHttpResponse<UsersResponse>) => {
+            this.$http.get<UsersResponse>(urlkey).then(
+                (response) => {
                     if (
                         !response.data.users ||
                         response.data.users.length < 1
@@ -170,12 +165,7 @@ export class AuthService {
                     }
                 },
                 (response: angular.IHttpResponse<UsersResponse>) => {
-                    this.uRLSvc.handleHttpStatus(
-                        response.data,
-                        response.status,
-                        response.headers,
-                        response.config
-                    )
+                    this.uRLSvc.handleHttpStatus(response)
                     deferred.reject(response)
                 }
             )
@@ -183,8 +173,8 @@ export class AuthService {
         return deferred.promise
     }
 
-    logout() {
-        const deferred = this.$q.defer()
+    logout(): VePromise<boolean> {
+        const deferred = this.$q.defer<boolean>()
         this.checkLogin()
             .then(
                 () => {
@@ -201,7 +191,5 @@ export class AuthService {
         return deferred.promise
     }
 }
-
-AuthService.$inject = AuthService.injector
 
 veUtils.service('AuthService', AuthService)

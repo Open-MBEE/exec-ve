@@ -1,7 +1,7 @@
 import angular, { Injectable } from 'angular'
 
 import { ComponentService } from '@ve-components/services'
-import { VeEditorApi } from '@ve-core/editor'
+import { EditingApi } from '@ve-core/editor'
 import { ToolbarService } from '@ve-core/tool-bar'
 import {
     AuthService,
@@ -13,19 +13,21 @@ import {
 } from '@ve-utils/mms-api-client'
 import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
 
-import { veComponents } from '@ve-components'
+import { PropertySpec, veComponents } from '@ve-components'
 
+import { VePromise, VePromiseReason } from '@ve-types/angular'
 import {
+    DocumentObject,
     ElementObject,
     ElementsRequest,
-    PropertySpec,
+    LiteralObject,
     RefObject,
     UserObject,
+    ValueObject,
     ViewObject,
 } from '@ve-types/mms'
 
-export interface SpecApi extends ElementsRequest {
-    elementId: string
+export interface SpecApi extends ElementsRequest<string> {
     docId?: string
     refType: 'Branch' | 'Tag'
     displayOldSpec?: boolean | null
@@ -38,23 +40,23 @@ export interface SpecApi extends ElementsRequest {
 
 export class SpecService implements Injectable<any> {
     private element: ElementObject
-    private document: ViewObject
+    private document: DocumentObject
     private modifier: UserObject
     private ref: RefObject
-    private values: any[]
+    private values: ValueObject[]
     private edit: ElementObject
     private editing: boolean = false
     public editable: boolean
-    private keeping: boolean
-    private editorApi: VeEditorApi
+    private keeping: boolean = false
+    private editorApi: EditingApi
 
     public specApi: SpecApi
 
     public tracker: {
-        etrackerSelected?: any
+        etrackerSelected?: string
     } = {}
 
-    public editValues: any[] = []
+    public editValues: ValueObject[] = []
 
     static $inject = [
         '$q',
@@ -93,16 +95,12 @@ export class SpecService implements Injectable<any> {
     ) {}
 
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsSpec#toggleEditing
-     * @methodOf veComponents.component:mmsSpec
-     *
-     * @description
      * toggles editor
      *
      * @return {boolean} toggle successful
      */
-    public toggleEditing() {
+    public toggleEditing(): boolean {
         if (!this.editing) {
             if (this.editable) this.editing = true
             else return false
@@ -112,17 +110,13 @@ export class SpecService implements Injectable<any> {
         return true
     }
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsSpec#setEditing
-     * @methodOf veComponents.component:mmsSpec
-     *
-     * @description
      * sets editor state
      *
      * @param {boolean} mode true or false
      * @return {boolean} set successful
      */
-    public setEditing(mode) {
+    public setEditing(mode): boolean {
         if (mode) {
             if (this.editable) this.editing = true
             else return false
@@ -130,58 +124,50 @@ export class SpecService implements Injectable<any> {
         return true
     }
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsSpec#getEditing
-     * @methodOf veComponents.component:mmsSpec
-     *
-     * @description
      * get editor state
      *
      * @return {boolean} editor or not
      */
-    public getEditing() {
+    public getEditing(): boolean {
         return this.editing
     }
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsSpec#getEdits
-     * @methodOf veComponents.component:mmsSpec
-     *
-     * @description
      * get current edit object
      *
      * @return {Object} may be null or undefined, if not, is
      *  current element object that can be edited (may include changes)
      */
-    public getEdits() {
+    public getEdits(): ElementObject {
         return this.edit
     }
 
-    public setEdits(edit: ElementObject) {
+    public setEdits(edit: ElementObject): void {
         this.edit = edit
     }
 
-    public getElement() {
+    public getElement(): ElementObject {
         return this.element
     }
 
-    public getDocument() {
+    public getDocument(): DocumentObject {
         return this.document
     }
 
-    public getModifier() {
+    public getModifier(): UserObject {
         return this.modifier
     }
 
-    public getValues() {
+    public getValues(): ValueObject[] {
         return this.values
     }
 
-    public getRef() {
+    public getRef(): RefObject {
         return this.ref
     }
 
-    public getTypeClass(element: ElementObject) {
+    public getTypeClass(element: ElementObject): void {
         // Get Type
         this.specApi.typeClass = this.utilsSvc.getElementTypeClass(
             element,
@@ -189,21 +175,24 @@ export class SpecService implements Injectable<any> {
         )
     }
 
-    public getQualifiedName(element: ElementObject) {
-        const deferred: angular.IDeferred<boolean> = this.$q.defer()
+    public getQualifiedName(element: ElementObject): VePromise<boolean> {
+        const deferred = this.$q.defer<boolean>()
         if (this.edit) element = this.edit
-        const reqOb: ElementsRequest = {
+        const reqOb: ElementsRequest<string> = {
             commitId: element._commitId ? element._commitId : 'latest',
             projectId: element._projectId,
             refId: element._refId,
             elementId: element.id,
         }
-        this.elementSvc
-            .getElementQualifiedName(reqOb)
-            .then((result: string) => {
+        this.elementSvc.getElementQualifiedName(reqOb).then(
+            (result) => {
                 this.specApi.qualifiedName = result
                 deferred.resolve(true)
-            })
+            },
+            (reason) => {
+                deferred.reject(reason)
+            }
+        )
         return deferred.promise
     }
 
@@ -222,7 +211,7 @@ export class SpecService implements Injectable<any> {
     }
 
     private _updateElement(): void {
-        const reqOb: ElementsRequest = Object.assign({}, this.specApi)
+        const reqOb = Object.assign({}, this.specApi)
         this.elementSvc
             .getElement(reqOb, 2, false)
             .then(
@@ -246,17 +235,13 @@ export class SpecService implements Injectable<any> {
                     ) {
                         promises.push(
                             this.elementSvc
-                                .search(
-                                    reqOb,
-                                    {
-                                        size: 1,
-                                        params: {
-                                            id: data.id,
-                                            _projectId: data._projectId,
-                                        },
+                                .search<ViewObject>(reqOb, {
+                                    size: 1,
+                                    params: {
+                                        id: data.id,
+                                        _projectId: data._projectId,
                                     },
-                                    2
-                                )
+                                })
                                 .then((searchResultOb) => {
                                     if (data.id !== this.lastid) {
                                         return
@@ -277,7 +262,7 @@ export class SpecService implements Injectable<any> {
                         )
                     }
                     if (this.specApi.docId) {
-                        const docReq: ElementsRequest = {
+                        const docReq: ElementsRequest<string> = {
                             elementId: this.specApi.docId,
                             projectId: this.specApi.projectId,
                             refId: this.specApi.refId,
@@ -322,13 +307,22 @@ export class SpecService implements Injectable<any> {
                                         this.edit.type === 'Slot'
                                     ) {
                                         // Array.isArray(this.specSvc.edit.value)) {
-                                        if (this.edit.defaultValue)
+                                        if (this.edit.defaultValue) {
                                             this.setEditValues([
                                                 this.edit.defaultValue,
                                             ])
-                                        else if (this.edit.value)
-                                            this.setEditValues(this.edit.value)
-                                        else this.setEditValues([])
+                                        } else if (this.edit.value) {
+                                            let values:
+                                                | ValueObject
+                                                | ValueObject[] = (
+                                                this
+                                                    .edit as LiteralObject<ValueObject>
+                                            ).value
+                                            if (!Array.isArray(values)) {
+                                                values = [values]
+                                            }
+                                            this.setEditValues(values)
+                                        } else this.setEditValues([])
                                         this.componentSvc
                                             .getPropertySpec(this.element)
                                             .then(
@@ -383,7 +377,7 @@ export class SpecService implements Injectable<any> {
 
                     this.$q.allSettled(promises).then(
                         () => this.eventSvc.$broadcast('spec.ready'),
-                        (reason) => {
+                        (reason: VePromiseReason<unknown>) => {
                             this.growl.error(
                                 'Getting Element Error: ' + reason.message
                             )
@@ -400,54 +394,52 @@ export class SpecService implements Injectable<any> {
     }
 
     /**
-     * @ngdoc function
      * @name Spec.service:SpecApi#hasEdits
-     * @methodOf Spec.service:SpecApi
-     *
-     * @description
      * whether editor object has changes compared to base element,
      * currently compares name, doc, property values, if element is not
      * editable, returns false
      *
      * @return {boolean} has changes or not
      */
-    public hasEdits() {
+    public hasEdits(): boolean {
         return this.componentSvc.hasEdits(this.edit)
     }
 
-    public setEditValues(values: any[]) {
+    public setEditValues<T extends ValueObject>(values: T[]): void {
         this.editValues.length = 0
         this.editValues.push(...values)
     }
 
-    public setKeepMode(value?: boolean) {
+    public setKeepMode(value?: boolean): void {
         if (value === undefined) {
             this.keepMode()
         }
         this.keeping = value
     }
 
-    public getKeepMode() {
+    public getKeepMode(): boolean {
         return this.keeping
     }
 
-    public keepMode() {
+    public keepMode(): void {
         this.keeping = true
     }
 
-    public editorSave() {
-        if (this.edit && this.editorApi.save) this.editorApi.save()
+    public editorSave(): VePromise<boolean> {
+        if (this.edit && this.editorApi.save) {
+            return this.editorApi.save()
+        }
+        return this.$q.resolve(false)
     }
 
-    revertEdits() {
+    revertEdits(): void {
         this.editValues = this.componentSvc.revertEdits(
             this.editValues,
-            this.edit,
-            this.editorApi
+            this.edit
         )
     }
 
-    public save(continueEdit) {
+    public save(continueEdit: boolean): void {
         this.eventSvc.$broadcast('element-saving', true)
         const saveEdit = this.edit
         this.componentSvc.clearAutosave(
@@ -464,78 +456,69 @@ export class SpecService implements Injectable<any> {
                 this.toolbarSvc.constants.TOGGLEICONSPINNER,
                 { id: 'spec-editor-saveC' }
             )
-        this.$timeout(
-            () => {
-                this._save()
-                    .then(
-                        (data) => {
-                            this.eventSvc.$broadcast('element-saving', false)
-                            if (!data) {
-                                this.growl.info('Save Skipped (No Changes)')
-                            } else {
-                                this.growl.success('Save Successful')
-                            }
-                            if (continueEdit) return
-                            const saveEdit = this.getEdits()
-                            const key =
-                                saveEdit.id +
-                                '|' +
-                                saveEdit._projectId +
-                                '|' +
-                                saveEdit._refId
-                            this.autosaveSvc.remove(key)
-                            if (this.autosaveSvc.openEdits() > 0) {
-                                const next = Object.keys(
-                                    this.autosaveSvc.getAll()
-                                )[0]
-                                const id = next.split('|')
-                                this.tracker.etrackerSelected = next
-                                this.keepMode()
-                                this.specApi.elementId = id[0]
-                                this.specApi.projectId = id[1]
-                                this.specApi.refId = id[2]
-                                this.specApi.commitId = 'latest'
-                            } else {
-                                this.setEditing(false)
-                                this.eventSvc.$broadcast(
-                                    this.toolbarSvc.constants.SELECT,
-                                    { id: 'spec-inspector' }
-                                )
-                                this.cleanUpSaveAll()
-                            }
-                        },
-                        (reason) => {
-                            this.eventSvc.$broadcast('element-saving', false)
-                            if (reason.type === 'info')
-                                this.growl.info(reason.message)
-                            else if (reason.type === 'warning')
-                                this.growl.warning(reason.message)
-                            else if (reason.type === 'error')
-                                this.growl.error(reason.message)
-                        }
+        this._save()
+            .then(
+                (data) => {
+                    this.eventSvc.$broadcast('element-saving', false)
+                    if (!data) {
+                        this.growl.info('Save Skipped (No Changes)')
+                    } else {
+                        this.growl.success('Save Successful')
+                    }
+                    if (continueEdit) return
+                    const saveEdit = this.getEdits()
+                    const key =
+                        saveEdit.id +
+                        '|' +
+                        saveEdit._projectId +
+                        '|' +
+                        saveEdit._refId
+                    this.autosaveSvc.remove(key)
+                    if (this.autosaveSvc.openEdits() > 0) {
+                        const next = Object.keys(this.autosaveSvc.getAll())[0]
+                        const id = next.split('|')
+                        this.tracker.etrackerSelected = next
+                        this.keepMode()
+                        this.specApi.elementId = id[0]
+                        this.specApi.projectId = id[1]
+                        this.specApi.refId = id[2]
+                        this.specApi.commitId = 'latest'
+                    } else {
+                        this.setEditing(false)
+                        this.eventSvc.$broadcast(
+                            this.toolbarSvc.constants.SELECT,
+                            { id: 'spec-inspector' }
+                        )
+                        this.cleanUpSaveAll()
+                    }
+                },
+                (reason) => {
+                    this.eventSvc.$broadcast('element-saving', false)
+                    if (reason.type === 'info') this.growl.info(reason.message)
+                    else if (reason.type === 'warning')
+                        this.growl.warning(reason.message)
+                    else if (reason.type === 'error')
+                        this.growl.error(reason.message)
+                }
+            )
+            .finally(() => {
+                if (!continueEdit)
+                    this.eventSvc.$broadcast(
+                        this.toolbarSvc.constants.TOGGLEICONSPINNER,
+                        { id: 'spec-editor-save' }
                     )
-                    .finally(() => {
-                        if (!continueEdit)
-                            this.eventSvc.$broadcast(
-                                this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                                { id: 'spec-editor-save' }
-                            )
-                        else
-                            this.eventSvc.$broadcast(
-                                this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                                { id: 'spec-editor-saveC' }
-                            )
-                    })
-            },
-            1000,
-            false
-        )
+                else
+                    this.eventSvc.$broadcast(
+                        this.toolbarSvc.constants.TOGGLEICONSPINNER,
+                        { id: 'spec-editor-saveC' }
+                    )
+            })
         this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {
             id: 'spec-editor',
         })
     }
 
-    private _save() {
+    private _save(): VePromise<ElementObject> {
         return this.componentSvc.save(
             this.edit,
             this.editorApi,

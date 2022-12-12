@@ -1,16 +1,21 @@
 import angular from 'angular'
 import _ from 'lodash'
 
-import { ITransclusion } from '@ve-components/transclusions'
-import { CacheService, URLService } from '@ve-utils/mms-api-client'
-import { SchemaService } from '@ve-utils/model-schema'
-import { ApplicationService } from '@ve-utils/services'
-import { Class } from '@ve-utils/utils'
+import { ApiService, URLService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
-import { ElementObject, ElementsRequest, RequestObject } from '@ve-types/mms'
+import { ElementObject, ViewObject } from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
+
+export interface TOCHtmlObject {
+    equations: string
+    tables: string
+    figures: string
+    tableCount: number
+    equationCount: number
+    figureCount: number
+}
 
 /**
  * @ngdoc service
@@ -19,49 +24,31 @@ import { TreeBranch } from '@ve-types/tree'
  * @requires $http
  * @requires CacheService
  * @requires URLService
- * @requires ApplicationService
+ * @requires ApiService
  * @requires _
- *
- * @description
- * Utilities
+ * * Utilities
  */
 export class UtilsService {
     public PROJECT_URL_PREFIX = 'index.html#/projects/'
 
-    private schema = 'cameo'
-
-    static $inject = [
-        '$q',
-        '$http',
-        'growl',
-        'CacheService',
-        'URLService',
-        'ApplicationService',
-        'SchemaService',
-    ]
+    static $inject = ['$q', '$http', 'growl', 'URLService', 'ApiService']
 
     constructor(
         private $q: angular.IQService,
         private $http: angular.IHttpService,
         private growl: angular.growl.IGrowlService,
-        private cacheSvc: CacheService,
         private uRLSvc: URLService,
-        private applicationSvc: ApplicationService,
-        private schemaSvc: SchemaService
+        private apiSvc: ApiService
     ) {}
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#makeHtmlTOCChild
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Generates table of contents for the document/views.
      *
      * @param {TreeBranch} rootBranch the root element (document or view) of the main tree
      * @returns {string} toc string
      */
-    public makeHtmlTOC(rootBranch: TreeBranch) {
+    public makeHtmlTOC(rootBranch: TreeBranch): string {
         let result =
             '<div class="toc"><h1 class="header">Table of Contents</h1>'
         result += this.makeHtmlTOCChild(rootBranch, true)
@@ -70,33 +57,20 @@ export class UtilsService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#makeHtmlTOCChild
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Generates table of contents for the document/views.
-     *
-     * @param {string} branch the branch to be referenced in the table of content
-     * @param {boolean} skip skip adding li for this branch
-     * @returns {string} toc string
+     * @param {TreeBranch} branch
+     * @param skip
+     * @return {string}
      */
-    public makeHtmlTOCChild(branch: TreeBranch, skip?) {
+    public makeHtmlTOCChild(branch: TreeBranch, skip?): string {
         let result = ''
-        let child
         if (!skip) {
-            const anchor = '<a href=#' + branch.data.id + '>'
-            result +=
-                '  <li>' +
-                anchor +
-                branch.data._veNumber +
-                ' ' +
-                branch.data.name +
-                '</a>'
+            const anchor: string = '<a href=#' + branch.data.id + '>'
+            result += `  <li>${anchor}${branch.data._veNumber} ${branch.data.name}</a>`
         }
         let ulAdded = false
-        for (let i = 0; i < branch.children.length; i++) {
-            child = branch.children[i]
+        for (const child of branch.children) {
             if (child.type !== 'view' && child.type !== 'section') {
                 continue
             }
@@ -116,11 +90,7 @@ export class UtilsService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#makeTablesAndFiguresTOC
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Generates a list of tables, figures, and equations. Default uses presentation elements.
      * `html` param provides option to use html content to generate list. It also appends the
      * captions to the figures and tables.
@@ -136,7 +106,7 @@ export class UtilsService {
         printElement: JQuery<HTMLElement>,
         live: boolean,
         html: boolean
-    ) {
+    ): TOCHtmlObject {
         let ob = {
             tables: '',
             figures: '',
@@ -180,27 +150,23 @@ export class UtilsService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#makeTablesAndFiguresTOCChild
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Generates a list of tables, figures, and equations of the none root node of he tree (containment tree on the left pane). It also appends the captions to the figures and tables.
      *
-     * @param {string} child presentation element
-     * @param {string} printElement contents to be printed (what is displayed in the center pane)
-     * @param {string} ob an object that stores the html list of tables, figures, and equations as well as the counts of those
+     * @param {TreeBranch} child presentation element
+     * @param {JQuery<HTMLElement>} printElement contents to be printed (what is displayed in the center pane)
+     * @param {TOCHtmlObject} ob an object that stores the html list of tables, figures, and equations as well as the counts of those
      * @param {boolean} live true when user would like to preview numbering in the app
      * @param {boolean} showRefName the tree hierarchy of the document or view (what is displayed in the left pane)
      * @returns {void} nothing
      */
     public makeTablesAndFiguresTOCChild(
-        child,
-        printElement,
-        ob,
-        live,
-        showRefName
-    ) {
+        child: TreeBranch,
+        printElement: JQuery<HTMLElement>,
+        ob: TOCHtmlObject,
+        live: boolean,
+        showRefName: boolean
+    ): void {
         const pe = child.data
         const sysmlId = pe.id
         const veNumber = pe._veNumber
@@ -320,7 +286,11 @@ export class UtilsService {
         }
     }
 
-    public addLiveNumbering(pe, el, type) {
+    public addLiveNumbering(
+        pe: ViewObject,
+        el: JQuery<HTMLElement>,
+        type: string
+    ): void {
         const veNumber = pe._veNumber
         if (!veNumber) {
             return
@@ -388,50 +358,45 @@ export class UtilsService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#this.generateAnchorId
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Generates a unique ID to be used in TOC anchor tags (e.g. <a name='tbl_xxxxx...x'>, <a href='#tbl_xxxxx...x'>)
      *
      * @param {string} prefix "tbl_" when creating an id for a table, "fig_" when creating an id for a figuer
      * @returns {string} unique ID wit prefix, tbl_ or fig_
      */
-    public generateAnchorId(prefix) {
-        return prefix + this.applicationSvc.createUniqueId()
+    public generateAnchorId(prefix: string): string {
+        return `${prefix}${this.apiSvc.createUniqueId()}`
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#generateTOCHtmlOption
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Generates a list of tables, figures, and equations. It also appends the captions to the figures and tables.
      *
      * @param {string} ob an object that stores the html list of tables, figures, and equations as well as the counts of those
-     * @param {string} tree the tree hierarchy of the document or view (what is displayed in the left pane)
+     * @param {string} treeBranch the tree hierarchy of the document or view (what is displayed in the left pane)
      * @param {string} printElement contents to be printed (what is displayed in the center pane)
      * @returns {string} populates the object fed to the function (the first argument) and return
      */
-    public generateTOCHtmlOption(ob, tree, printElement) {
+    public generateTOCHtmlOption(
+        ob: TOCHtmlObject,
+        treeBranch: TreeBranch,
+        printElement: JQuery<HTMLElement>
+    ): TOCHtmlObject {
         // Grab all existing tables and figures inside the center pane, and assign them to tables and figures
         const tables = printElement.find('table'),
             figures = printElement.find('figure')
         // equations = printElement.find('.math-tex');
         let anchorId = '',
             thisCap = '',
-            tblCap,
-            tbl,
-            fig,
-            j
+            tblCap: JQuery<HTMLElement>,
+            tbl: JQuery<HTMLTableElement>,
+            fig: JQuery<HTMLElement>
 
         ob.tableCount = tables.length
         ob.figureCount = figures.length
 
         // Tables
-        for (j = 0; j < tables.length; j++) {
+        for (let j = 0; j < tables.length; j++) {
             tbl = $(tables[j])
             tblCap = $('caption', tbl)
 
@@ -442,8 +407,8 @@ export class UtilsService {
             // Append li to the List of Tables
             thisCap =
                 tblCap && tblCap.text() !== ''
-                    ? j + 1 + '. ' + tblCap.text()
-                    : j + 1 + '. '
+                    ? `${j + 1}. ${tblCap.text()}`
+                    : `${j + 1}. `
             ob.tables +=
                 '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
 
@@ -454,7 +419,7 @@ export class UtilsService {
         }
 
         // Figures
-        for (j = 0; j < figures.length; j++) {
+        for (let j = 0; j < figures.length; j++) {
             fig = $(figures[j])
             const figcap = $('figcaption', fig)
 
@@ -465,8 +430,8 @@ export class UtilsService {
             // Append li to the List of Figures
             thisCap =
                 figcap && figcap.text() !== ''
-                    ? j + 1 + '. ' + figcap.text()
-                    : j + 1
+                    ? `${j + 1}. ${figcap.text()}`
+                    : `${j + 1}`
             ob.figures +=
                 '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
 
@@ -495,17 +460,13 @@ export class UtilsService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#convertViewLinks
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Link the element to the document/view in VE (add an anchor tag)
      *
      * @param {string} printElement the content of the view/document currently selected on the center pane
      * @returns {void} nothing
      */
-    public convertViewLinks(printElement) {
+    public convertViewLinks(printElement: JQuery<HTMLElement>): void {
         printElement.find('view-link').each((index) => {
             const $this = $(this)
             let elementId =
@@ -523,11 +484,7 @@ export class UtilsService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#getPrintCss
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Typeset HTML to PDF (resource: https://www.princexml.com/)
      *
      * @param {string} htmlFlag user input taken from the printConfirm modal: whether to include docGen generated tables and rapid tables, outside of the corresponding PE or not(<-- this comment needs to be approved by Shakeh)
@@ -538,7 +495,11 @@ export class UtilsService {
                 };
      * @returns {string} document/view content string to be passed to the server for conversion
      */
-    public getPrintCss(htmlFlag, landscape, meta): string {
+    public getPrintCss(
+        htmlFlag: boolean,
+        landscape: boolean,
+        meta: { [x: string]: string }
+    ): string {
         let ret =
             '/*------------------------------------------------------------------\n' +
             'Custom CSS Table of Contents\n' +
@@ -652,7 +613,8 @@ export class UtilsService {
             '9. Bookmark Level\n' +
             '------------------------------------------------------------------*/\n'
         for (let i = 1; i < 10; i++) {
-            ret += '.h' + i + ' {bookmark-level: ' + i + ';}\n'
+            ret += `.h${i} {bookmark-level: ${i};}
+`
         }
         if (htmlFlag) {
             ret +=
@@ -664,18 +626,14 @@ export class UtilsService {
         }
         Object.keys(meta).forEach((key) => {
             if (meta[key]) {
-                let content
+                let content: string
                 if (meta[key] === 'this.counter(page)') {
                     content = meta[key]
                 } else {
                     content = '"' + meta[key] + '"'
                 }
-                ret +=
-                    '@page {@' +
-                    key +
-                    ' {font-size: 9px; content: ' +
-                    content +
-                    ';}}\n'
+                ret += `@page {@${key} {font-size: 9px; content: ${content};}}
+`
             }
         })
         if (landscape) {
@@ -685,19 +643,24 @@ export class UtilsService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#exportHtmlAs
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Converts HTML to PDF
      *
-     * @param {string} exportType The export type (3 for pdf | 2 for word)
+     * @param {number} exportType The export type (3 for pdf | 2 for word)
      * @param {Object} data contains htmlString, name, projectId, refId
      * @returns {Promise} Promise would be resolved with 'ok', the server will send an email to user when done
      */
-    public exportHtmlAs(exportType, data) {
-        let accept
+    public exportHtmlAs(
+        exportType: number,
+        data: {
+            htmlString: string
+            name: string
+            projectId: string
+            refId: string
+            css: string
+        }
+    ): angular.IPromise<string> {
+        let accept: string
         switch (exportType) {
             case 2:
                 accept =
@@ -709,33 +672,33 @@ export class UtilsService {
             default:
                 accept = 'application/pdf'
         }
-        const deferred = this.$q.defer()
+        const deferred = this.$q.defer<string>()
         this.$http
-            .post(this.uRLSvc.getExportHtmlUrl(data.projectId, data.refId), {
-                'Content-Type': 'text/html',
-                Accepts: accept,
-                body: data.htmlString,
-                name: data.name,
-                css: data.css,
-            })
+            .post<string>(
+                this.uRLSvc.getExportHtmlUrl(data.projectId, data.refId),
+                {
+                    'Content-Type': 'text/html',
+                    Accepts: accept,
+                    body: data.htmlString,
+                    name: data.name,
+                    css: data.css,
+                }
+            )
             .then(
                 () => {
                     deferred.resolve('ok')
                 },
-                (error) => {
-                    this.uRLSvc.handleHttpStatus(
-                        error.data,
-                        error.status,
-                        error.headers,
-                        error.config,
-                        deferred
-                    )
+                (error: angular.IHttpResponse<unknown>) => {
+                    deferred.reject(this.uRLSvc.handleHttpStatus(error))
                 }
             )
         return deferred.promise
     }
 
-    public copyToClipboard(target: JQuery<HTMLElement>, $event) {
+    public copyToClipboard(
+        target: JQuery<HTMLElement>,
+        $event: JQuery.ClickEvent
+    ): void {
         $event.stopPropagation()
         const range = window.document.createRange()
         range.selectNodeContents(target[0].childNodes[0])
@@ -748,7 +711,10 @@ export class UtilsService {
         window.getSelection().removeAllRanges()
     }
 
-    public getElementTypeClass(element: ElementObject, elementType: string) {
+    public getElementTypeClass(
+        element: ElementObject,
+        elementType: string
+    ): string {
         let elementTypeClass = ''
         if (element.type === 'InstanceSpecification') {
             elementTypeClass = 'pe-type-' + _.kebabCase(elementType)

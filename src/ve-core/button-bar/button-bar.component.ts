@@ -1,12 +1,18 @@
-import * as angular from "angular";
-import {ButtonBarApi, ButtonBarService, IButtonBarButton} from "@ve-core/button-bar";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {veUtils} from "@ve-utils";
-import {EventService} from "@ve-utils/services";
+import angular from 'angular'
 
+import {
+    ButtonBarApi,
+    ButtonBarService,
+    IButtonBarButton,
+} from '@ve-core/button-bar'
+import { EventService } from '@ve-utils/services'
+
+import { veUtils } from '@ve-utils'
+
+import { VeComponentOptions } from '@ve-types/angular'
 
 const ButtonBarComponent: VeComponentOptions = {
-    selector: "buttonBar",
+    selector: 'buttonBar',
     template: `
     <div class="button-bar">
     <span ng-repeat="button in $ctrl.buttons | filter: {permission: true}" >
@@ -44,55 +50,65 @@ const ButtonBarComponent: VeComponentOptions = {
 
 `,
     bindings: {
-        bbApi: "<buttonApi",
-        minSize: "<"
+        bbApi: '<buttonApi',
+        minSize: '<',
     },
-    controller: class ButtonBarController implements angular.IComponentController {
-
+    controller: class ButtonBarController
+        implements angular.IComponentController
+    {
         // Bindings
         private bbApi: ButtonBarApi
-        private minSize: number = 100;
+        private minSize: number = 100
 
         public buttons: IButtonBarButton[]
-        public dropdownIcon: { [id: string]: string };
-        private squished: boolean = false;
-        private squishButton: IButtonBarButton;
-        private currentHeight: number;
+        public dropdownIcon: { [id: string]: string }
+        private squished: boolean = false
+        private squishButton: IButtonBarButton
+        private currentHeight: number
         static $inject = ['$element', 'EventService', 'ButtonBarService']
 
-        constructor(private $element: JQuery<HTMLElement>, private eventSvc: EventService, private buttonBarSvc: ButtonBarService) {
-        }
+        constructor(
+            private $element: JQuery<HTMLElement>,
+            private eventSvc: EventService,
+            private buttonBarSvc: ButtonBarService
+        ) {}
 
-        $onInit() {
-            this.squishButton = this.buttonBarSvc.getButtonBarButton('button-bar-menu')
-            this.squishButton.dropdown_buttons = this.buttons;
-            const observed = this.$element.children().get(0);
-            const observer = new ResizeObserver(mutations =>
+        $onInit(): void {
+            this.squishButton =
+                this.buttonBarSvc.getButtonBarButton('button-bar-menu')
+            this.squishButton.dropdown_buttons = this.buttons
+            const observed = this.$element.children().get(0)
+            const observer = new ResizeObserver((mutations) =>
                 mutations.forEach((mutationRecord) => {
-                    const size = mutationRecord.borderBoxSize;
-                    const oldHeight = this.currentHeight;
-                    this.eventSvc.$broadcast(this.bbApi.WRAP_EVENT, { oldSize: oldHeight, newSize: size[0].blockSize });
-                    this.currentHeight = size[0].blockSize;
+                    const size = mutationRecord.borderBoxSize
+                    const oldHeight = this.currentHeight
+                    this.eventSvc.$broadcast(this.bbApi.WRAP_EVENT, {
+                        oldSize: oldHeight,
+                        newSize: size[0].blockSize,
+                    })
+                    this.currentHeight = size[0].blockSize
                     if (size[0].inlineSize <= this.minSize && !this.squished) {
-                        this.squished = true;
-                        this.buttons = [this.squishButton];
-                    } else if (size[0].inlineSize > this.minSize && this.squished) {
-                        this.squished = false;
-                        this.buttons = this.squishButton.dropdown_buttons;
+                        this.squished = true
+                        this.buttons = [this.squishButton]
+                    } else if (
+                        size[0].inlineSize > this.minSize &&
+                        this.squished
+                    ) {
+                        this.squished = false
+                        this.buttons = this.squishButton.dropdown_buttons
                     }
                 })
-            );
+            )
 
-            observer.observe(observed);
+            observer.observe(observed)
         }
 
-        $doCheck() {
+        $doCheck(): void {
             if (this.bbApi instanceof ButtonBarApi) {
-                this.buttons = this.bbApi.buttons;
+                this.buttons = this.bbApi.buttons
             }
         }
-
-    }
+    },
 }
 
-veUtils.component(ButtonBarComponent.selector, ButtonBarComponent);
+veUtils.component(ButtonBarComponent.selector, ButtonBarComponent)

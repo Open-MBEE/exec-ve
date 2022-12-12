@@ -1,145 +1,193 @@
-import * as angular from "angular";
-import {IQService} from "angular";
-import * as _ from "lodash";
-import{ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {ViewObject} from "@ve-types/mms";
-import {SpecService} from "./Spec.service";
-import {veComponents} from "@ve-components";
+import angular from 'angular'
+import _ from 'lodash'
 
-export interface ElementReferences extends ViewObject {
-    sectionElements?: any
-    instanceVal?: any
-}
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
+
+import { veComponents } from '@ve-components'
+
+import { SpecService } from './Spec.service'
+
+import { VePromise } from '@ve-types/angular'
+import {
+    BulkResponse,
+    ElementObject,
+    ElementsRequest,
+    ExpressionObject,
+    InstanceValueObject,
+    PresentationReference,
+    ViewInstanceSpec,
+    ViewObject,
+} from '@ve-types/mms'
 
 export class ReorderService {
+    static $inject = ['$q', 'growl', 'ElementService', 'ViewService']
 
-    static $inject = ['$q', 'ElementService', 'ViewService'];
+    public editing = false
+    elementReferenceTree: PresentationReference[] = []
+    originalElementReferenceTree: PresentationReference[] = []
+    view: ViewObject | ViewInstanceSpec
 
-    public editing = false;
-    editable: boolean;
-    elementReferenceTree: ElementReferences[] = [];
-    originalElementReferenceTree: ElementReferences[] = [];
-    view: ViewObject = {_projectId: "", _refId: "", id: "", type: "Class"}
+    constructor(
+        private $q: angular.IQService,
+        private growl: angular.growl.IGrowlService,
+        private elementSvc: ElementService,
+        private viewSvc: ViewService,
+        private specSvc: SpecService
+    ) {}
 
-    constructor(private $q: IQService, private elementSvc: ElementService, private viewSvc: ViewService, private specSvc: SpecService) {
-    }
-
-
-    public toggleEditing() {
-        if (!this.editable)
-            return false;
-        this.editing = !this.editing;
-        return true;
-    };
-    
-    public save() {
-        var elementObsToUpdate = [];
-        var updateSectionElementOrder = (elementReference) => {
-            var sectionEdit = {
+    public save(): VePromise<ElementObject[], BulkResponse<ElementObject>> {
+        const elementObsToUpdate: ElementObject[] = []
+        const updateSectionElementOrder = (
+            elementReference: PresentationReference
+        ): void => {
+            const sectionEdit: ViewInstanceSpec = {
                 id: elementReference.instanceId,
                 //_modified: elementReference.instanceSpecification._modified,
                 _projectId: elementReference.instanceSpecification._projectId,
                 _refId: elementReference.instanceSpecification._refId,
                 type: elementReference.instanceSpecification.type,
-                specification: {
-                    type: "Expression",
-                    operand: null
-                }
-            };
+                specification: _.cloneDeep(
+                    elementReference.instanceSpecification.specification
+                ),
+            }
             //sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
-            var operand = sectionEdit.specification.operand = [];
-            var origOperand = elementReference.instanceSpecification.specification.operand;
-            for (let i = 0; i < elementReference.sectionElements.length; i++) {
-                operand.push(elementReference.sectionElements[i].instanceVal);
-                if (elementReference.sectionElements[i].sectionElements.length > 0)
-                    updateSectionElementOrder(elementReference.sectionElements[i]);
+            const operand: InstanceValueObject[] =
+                (sectionEdit.specification.operand = [])
+
+            if (!elementReference.instanceSpecification.specification) {
+                this.growl.error('Malformed Reference Tree; Aborting')
             }
-            if (!angular.equals(operand, origOperand)) {
-                elementObsToUpdate.push(sectionEdit);
+            const origOperand = (
+                elementReference.instanceSpecification
+                    .specification as ExpressionObject<InstanceValueObject>
+            ).operand
+            elementReference.sectionElements.forEach(
+                (sectionElement, index) => {
+                    operand.push(sectionElement.instanceVal)
+                    if (sectionElement.sectionElements.length > 0)
+                        updateSectionElementOrder(sectionElement)
+                }
+            )
+
+            if (!_.isEqual(operand, origOperand)) {
+                elementObsToUpdate.push(sectionEdit)
             }
-        };
-    
-        var deferred = this.$q.defer();
-        if (!this.editable || !this.editing) {
-            deferred.reject({type: 'error', message: "View isn't editable and can't be saved."});
-            return deferred.promise;
+        }
+
+        const deferred = this.$q.defer<ElementObject[]>()
+        if (!this.specSvc.editable || !this.specSvc.getEditing()) {
+            deferred.reject({
+                type: 'error',
+                message: "View isn't editable and can't be saved.",
+            })
+            return deferred.promise
         }
         if (this.elementReferenceTree.length === 0) {
-            deferred.reject({type: 'error', message: 'View specs were not initialized properly or is empty.'});
-            return deferred.promise;
+            deferred.reject({
+                type: 'error',
+                message:
+                    'View specs were not initialized properly or is empty.',
+            })
+            return deferred.promise
         }
-        var viewEdit = {
+        const viewEdit: ViewInstanceSpec | ViewObject = {
             id: this.view.id,
             //_modified: this.view._modified,
             _projectId: this.view._projectId,
             _refId: this.view._refId,
             type: this.view.type,
-            _specs: null,
             specification: null,
-            view2view: null
-        };
-        //viewEdit.specialization = _.cloneDeep(this.view.specialization);
-        if (this.view._specs)
-            viewEdit._specs = JSON.parse(JSON.stringify(this.view._specs));
-        if (this.view.specification)
-            viewEdit.specification = JSON.parse(JSON.stringify(this.view.specification));
-        var specs = viewEdit._specs || viewEdit.specification;
-        var origSpecs = this.view._specs || this.view.specification;
-        // Update the View edit object on Save
-        if (specs) {
-            specs.operand = [];
-            for (let i = 0; i < this.elementReferenceTree.length; i++) {
-                specs.operand.push(this.elementReferenceTree[i].instanceVal);
+        }
+        if (this.view.specification) {
+            viewEdit.specification = _.cloneDeep(
+                (this.view as ViewInstanceSpec).specification
+            )
+            const specs = (viewEdit as ViewInstanceSpec).specification
+            const origSpecs = (this.view as ViewInstanceSpec).specification
+            // Update the View edit object on Save
+            if (specs.operand) {
+                specs.operand = []
+                this.elementReferenceTree.forEach((elementRef) => {
+                    ;(specs as ExpressionObject).operand.push(
+                        elementRef.instanceVal
+                    )
+                })
+                if (specs && !_.isEqual(specs.operand, origSpecs.operand)) {
+                    elementObsToUpdate.push(viewEdit)
+                }
             }
+            // Recurse
+            this.elementReferenceTree.forEach((elementReference) => {
+                if (
+                    elementReference.sectionElements &&
+                    elementReference.sectionElements.length > 0
+                ) {
+                    updateSectionElementOrder(elementReference)
+                }
+            })
         }
-        if (viewEdit.view2view)
-            delete viewEdit.view2view;
-        if (specs && !angular.equals(specs.operand, origSpecs.operand)) {
-            elementObsToUpdate.push(viewEdit);
+
+        return this.elementSvc.updateElements(elementObsToUpdate, false)
+    }
+
+    public revert(): void {
+        this.elementReferenceTree = _.cloneDeepWith(
+            this.originalElementReferenceTree,
+            (value: unknown, key) => {
+                if (
+                    key === 'instanceId' ||
+                    key === 'instanceSpecification' ||
+                    key === 'presentationElement' ||
+                    key === 'instanceVal'
+                )
+                    return value
+                return undefined
+            }
+        ) as PresentationReference[]
+    }
+
+    public refresh(): void {
+        let contents: ExpressionObject<InstanceValueObject> = null
+        if (this.view._contents) {
+            contents = (this.view as ViewObject)._contents
         }
-        for (var j = 0; j < this.elementReferenceTree.length; j++) {
-            if (this.elementReferenceTree[j].sectionElements.length > 0)
-                updateSectionElementOrder(this.elementReferenceTree[j]);
+        if (this.view.specification) {
+            contents = (this.view as ViewInstanceSpec).specification
         }
-    
-        return this.elementSvc.updateElements(elementObsToUpdate, false);
-    };
-    
-    public revert() {
-        this.elementReferenceTree = _.cloneDeepWith(this.originalElementReferenceTree, (value, key) => {
-            if (key === 'instanceId' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
-                return value;
-            return undefined;
-        });
-    };
-    
-    public refresh() {
-        var specs = this.view._specs || this.view.specification;
-        var reqOb = {elementId: this.specSvc.specApi.elementId, projectId: this.specSvc.specApi.projectId, refId: this.specSvc.specApi.refId, commitId: this.specSvc.specApi.commitId};
-        if (specs) {
-            this.viewSvc.getElementReferenceTree(reqOb, specs)
-                .then((elementReferenceTree) => {
-                    this.elementReferenceTree = elementReferenceTree;
-                    this.originalElementReferenceTree = _.cloneDeepWith(elementReferenceTree, (value, key) => {
-                        if (key === 'instanceId' || key === 'instanceSpecification' || key === 'presentationElement' || key === 'instanceVal')
-                            return value;
-                        return undefined;
-                    });
-                }, (reason) => {
-                    this.elementReferenceTree = [];
-                    this.originalElementReferenceTree = [];
-                });
+        const reqOb: ElementsRequest<string> = {
+            elementId: this.specSvc.specApi.elementId,
+            projectId: this.specSvc.specApi.projectId,
+            refId: this.specSvc.specApi.refId,
+            commitId: this.specSvc.specApi.commitId,
+        }
+        if (contents) {
+            this.viewSvc.getElementReferenceTree(reqOb, contents).then(
+                (elementReferenceTree) => {
+                    this.elementReferenceTree = elementReferenceTree
+                    this.originalElementReferenceTree = _.cloneDeepWith(
+                        elementReferenceTree,
+                        (value: unknown, key) => {
+                            if (
+                                key === 'instanceId' ||
+                                key === 'instanceSpecification' ||
+                                key === 'presentationElement' ||
+                                key === 'instanceVal'
+                            )
+                                return value
+                            return undefined
+                        }
+                    ) as PresentationReference[]
+                },
+                (reason) => {
+                    this.elementReferenceTree = []
+                    this.originalElementReferenceTree = []
+                }
+            )
         } else {
-            this.elementReferenceTree = [];
-            this.originalElementReferenceTree = [];
+            this.elementReferenceTree = []
+            this.originalElementReferenceTree = []
         }
-    };
-    
-    public setEditing(mode) {
-        if (!this.editable && mode)
-            return false;
-        this.editing = mode;
-    };
+    }
 }
 
-veComponents.service('ReorderService', ReorderService);
+veComponents.service('ReorderService', ReorderService)

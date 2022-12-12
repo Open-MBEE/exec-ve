@@ -1,16 +1,18 @@
-import * as angular from "angular";
-import {EventService, RootScopeService} from "@ve-utils/services";
-import {ToolbarService} from "./services/Toolbar.service";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ToolbarApi} from "./services/Toolbar.api";
-import {buttonOnClickFn, IToolBarButton} from "@ve-core/tool-bar";
+import angular from 'angular'
 
-import {veCore} from "@ve-core";
+import { buttonOnClickFn, IToolBarButton } from '@ve-core/tool-bar'
+import { EventService, RootScopeService } from '@ve-utils/services'
 
+import { veCore } from '@ve-core'
+
+import { ToolbarApi } from './services/Toolbar.api'
+import { ToolbarService } from './services/Toolbar.service'
+
+import { VeComponentOptions } from '@ve-types/angular'
 
 const ToolBarComponent: VeComponentOptions = {
-	selector: 'toolBar',
-	template: `
+    selector: 'toolBar',
+    template: `
 	<div class="right-toolbar">
     <div class="toolbox">
         <div ng-repeat="button in $ctrl.buttons | filter: {active: true, permission: true} | orderBy:'priority'">
@@ -23,60 +25,73 @@ const ToolBarComponent: VeComponentOptions = {
     </div>
 </div>
 `,
-	controller: class VeToolbarController implements angular.IComponentController {
+    controller: class VeToolbarController
+        implements angular.IComponentController
+    {
+        private tbApi: ToolbarApi
+        public buttons: IToolBarButton[]
 
-		private tbApi: ToolbarApi
-		public buttons: IToolBarButton[]
+        static $inject = [
+            'growl',
+            'RootScopeService',
+            'EventService',
+            'ToolbarService',
+        ]
 
-		static $inject = ['growl', 'RootScopeService', 'EventService', 'ToolbarService'];
+        constructor(
+            private growl: angular.growl.IGrowlService,
+            private rootScopeSvc: RootScopeService,
+            private eventSvc: EventService,
+            private toolbarSvc: ToolbarService
+        ) {}
 
-		constructor(private growl: angular.growl.IGrowlService, private rootScopeSvc: RootScopeService,
-					private eventSvc: EventService, private toolbarSvc: ToolbarService) {}
+        $onInit(): void {
+            this.tbApi = this.toolbarSvc.getApi('right-toolbar')
+            this.buttons = this.tbApi.buttons
+        }
+        public clicked(button) {
+            if (!button.permission) {
+                return
+            }
+            if (!button.active) {
+                return
+            }
 
-		$onInit() {
-			this.tbApi = this.toolbarSvc.getApi('right-toolbar');
-			this.buttons = this.tbApi.buttons;
-		}
-		public clicked(button) {
+            let toggleDeactivateFlag = false
+            if (
+                typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' &&
+                this.rootScopeSvc.rightPaneToggleable() !== false
+            ) {
+                if (button.selected || this.rootScopeSvc.rightPaneClosed()) {
+                    if (button.selected && !this.rootScopeSvc.rightPaneClosed())
+                        toggleDeactivateFlag = true
+                    this.eventSvc.$broadcast('right-pane.toggle')
+                }
+            }
 
-			if (!button.permission) {
-				return;
-			}
-			if (!button.active) {
-				return;
-			}
+            if (this.tbApi) this.tbApi.select(button.id)
 
-			let toggleDeactivateFlag = false;
-			if (typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' && this.rootScopeSvc.rightPaneToggleable() !== false)
-			{
-				if (button.selected || this.rootScopeSvc.rightPaneClosed())
-				{
-					if (button.selected && !this.rootScopeSvc.rightPaneClosed()) toggleDeactivateFlag = true;
-					this.eventSvc.$broadcast('right-pane.toggle');
-				}
-			}
+            if (button.onClick) {
+                button.onClick()
+            } else if (this.onClick) {
+                this.onClick(button)
+            } else {
+                this.growl.error('Button' + button.id + 'has no click function')
+            }
 
-			if (this.tbApi) this.tbApi.select(button.id);
+            if (toggleDeactivateFlag && this.tbApi) {
+                this.tbApi.deactivate(button.id)
+            }
+        }
 
-			if (button.onClick) {
-				button.onClick();
-			} else if (this.onClick){
-				this.onClick(button);
-			}
-			else {
-				this.growl.error("Button" + button.id + "has no click function");
-			}
-
-			if (toggleDeactivateFlag && this.tbApi) {
-				this.tbApi.deactivate(button.id);
-			}
-
-		}
-
-		protected onClick: buttonOnClickFn = (button) => {
-			this.eventSvc.$broadcast(button.id, {id: button.id, category: button.category, title: button.tooltip})
-		}
-	}
+        protected onClick: buttonOnClickFn = (button) => {
+            this.eventSvc.$broadcast(button.id, {
+                id: button.id,
+                category: button.category,
+                title: button.tooltip,
+            })
+        }
+    },
 }
 
-veCore.component(ToolBarComponent.selector,ToolBarComponent);
+veCore.component(ToolBarComponent.selector, ToolBarComponent)

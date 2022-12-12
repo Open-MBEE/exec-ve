@@ -1,15 +1,22 @@
-import * as angular from "angular";
-import Rx from 'rx-lite';
-import {StateService, TransitionService, UIRouter, UIRouterGlobals} from "@uirouter/angularjs";
-import {ProjectService, AuthService} from "@ve-utils/mms-api-client";
-import {EventService, RootScopeService} from "@ve-utils/services";
-import {ngStorage} from "ngstorage";
-import {VeComponentOptions} from "@ve-types/view-editor";
+import {
+    StateService,
+    TransitionService,
+    UIRouter,
+    UIRouterGlobals,
+} from '@uirouter/angularjs'
+import angular from 'angular'
+import { ngStorage } from 'ngstorage'
+import Rx from 'rx-lite'
 
-import {veApp} from "@ve-app";
-import {OrgObject, ProjectObject} from "@ve-types/mms";
+import { ProjectService, AuthService } from '@ve-utils/mms-api-client'
+import { EventService, RootScopeService } from '@ve-utils/services'
 
-let SelectComponent: VeComponentOptions = {
+import { veApp } from '@ve-app'
+
+import { VeComponentOptions } from '@ve-types/angular'
+import { OrgObject, ProjectObject } from '@ve-types/mms'
+
+const SelectComponent: VeComponentOptions = {
     selector: 'projectSelect',
     template: `
     <div id="ve-origin-select" class="row">
@@ -80,15 +87,24 @@ let SelectComponent: VeComponentOptions = {
 `,
     bindings: {
         mmsOrgs: '<',
-        mmsLoginBanner: '<'
+        mmsLoginBanner: '<',
     },
     controller: class SelectController implements angular.IComponentController {
-        static $inject = ['$uiRouter', '$transitions', '$state', '$localStorage', 'growl', 'ProjectService',
-            'AuthService', 'RootScopeService', 'EventService']
+        static $inject = [
+            '$uiRouter',
+            '$transitions',
+            '$state',
+            '$localStorage',
+            'growl',
+            'ProjectService',
+            'AuthService',
+            'RootScopeService',
+            'EventService',
+        ]
 
         //injectables
-        private $uiRouterGlobals: UIRouterGlobals = this.$uiRouter.globals;
-        public subs: Rx.IDisposable[];
+        private $uiRouterGlobals: UIRouterGlobals = this.$uiRouter.globals
+        public subs: Rx.IDisposable[]
 
         //bindings
         public mmsOrgs
@@ -107,122 +123,162 @@ let SelectComponent: VeComponentOptions = {
         selectedOrg: string
         selectedProject: string
         loginBanner: object
-        protected orgSpin: boolean;
-        protected projSpin: boolean;
+        protected orgSpin: boolean
+        protected projSpin: boolean
 
-        constructor(private $uiRouter : UIRouter, private $transitions: TransitionService, private $state: StateService,
-                    private $localStorage: ngStorage.StorageService, private growl, private projectSvc: ProjectService, private authSvc: AuthService,
-                    private rootScopeSvc: RootScopeService, private eventSvc: EventService) {
+        constructor(
+            private $uiRouter: UIRouter,
+            private $transitions: TransitionService,
+            private $state: StateService,
+            private $localStorage: ngStorage.StorageService,
+            private growl,
+            private projectSvc: ProjectService,
+            private authSvc: AuthService,
+            private rootScopeSvc: RootScopeService,
+            private eventSvc: EventService
+        ) {}
 
-        }
+        $onInit(): void {
+            this.loginBanner = this.mmsLoginBanner
+            this.eventSvc.$init(this)
+            this.rootScopeSvc.veTitle('View Editor') //what to name this?
+            this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld()
 
-        $onInit() {
-            this.loginBanner = this.mmsLoginBanner;
-            this.eventSvc.$init(this);
-            this.rootScopeSvc.veTitle('View Editor'); //what to name this?
-            this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld();
-
-            this.subs.push(this.eventSvc.$on(this.rootScopeSvc.constants.VEREDIRECTFROMOLD, (data) => {
-                this.redirect_from_old = data;
-            }));
-            this.rootScopeSvc.veTitle('Projects');
-            this.pageTitle = 'View Editor';
-            this.fromLogin = this.$uiRouterGlobals.params.fromLogin;
-            this.$localStorage.$default({org: this.mmsOrgs[0]});
-            this.orgs = this.mmsOrgs;
+            this.subs.push(
+                this.eventSvc.$on(
+                    this.rootScopeSvc.constants.VEREDIRECTFROMOLD,
+                    (data) => {
+                        this.redirect_from_old = data
+                    }
+                )
+            )
+            this.rootScopeSvc.veTitle('Projects')
+            this.pageTitle = 'View Editor'
+            this.fromLogin = this.$uiRouterGlobals.params.fromLogin
+            this.$localStorage.$default({ org: this.mmsOrgs[0] })
+            this.orgs = this.mmsOrgs
             if (this.$localStorage.org) {
-                this.selectOrg(this.$localStorage.org);
+                this.selectOrg(this.$localStorage.org)
             }
         }
 
         public selectOrg(org) {
             if (org) {
-                this.$localStorage.org = org;
-                this.orgId = org.id;
-                this.$localStorage.org.orgName = org.name;
-                this.selectedOrg = this.$localStorage.org.name;
-                this.selectedProject = "$resolve.Ob"; // default here?
-                this.projectSvc.getProjects(this.orgId).then((data) =>{
-                    this.projects = data;
+                this.$localStorage.org = org
+                this.orgId = org.id
+                this.$localStorage.org.orgName = org.name
+                this.selectedOrg = this.$localStorage.org.name
+                this.selectedProject = '$resolve.Ob' // default here?
+                this.projectSvc.getProjects(this.orgId).then((data) => {
+                    this.projects = data
                     if (data && data.length > 0) {
-                        if(this.$localStorage.project && this.checkForProject(data, this.$localStorage.project) === 1){
-                            this.selectedProject = this.$localStorage.project.name;
-                            this.projectId = this.$localStorage.project.id;
-                        }else{
-                            this.selectProject(data[0]);
+                        if (
+                            this.$localStorage.project &&
+                            this.checkForProject(
+                                data,
+                                this.$localStorage.project
+                            ) === 1
+                        ) {
+                            this.selectedProject =
+                                this.$localStorage.project.name
+                            this.projectId = this.$localStorage.project.id
+                        } else {
+                            this.selectProject(data[0])
                         }
                     }
-                });
+                })
             }
-        };
+        }
 
         public selectProject(project) {
             if (project) {
-                this.$localStorage.project = project;
-                this.selectedProject = this.$localStorage.project.name;
-                this.projectId = this.$localStorage.project.id;
+                this.$localStorage.project = project
+                this.selectedProject = this.$localStorage.project.name
+                this.projectId = this.$localStorage.project.id
             }
-        };
+        }
 
         public refreshOrgs = () => {
-            this.orgSpin = true;
-            this.orgs.length = 0;
-            this.projectSvc.getOrgs(true).then((data) => {
-                this.orgs.push(...data);
-            }).finally(
-                () => {
-                    this.orgSpin = false;
-                }
-            );
+            this.orgSpin = true
+            this.orgs.length = 0
+            this.projectSvc
+                .getOrgs(true)
+                .then((data) => {
+                    this.orgs.push(...data)
+                })
+                .finally(() => {
+                    this.orgSpin = false
+                })
         }
 
         public refreshProjects = () => {
-            this.projSpin = true;
-            this.projects.length = 0;
-            this.projectSvc.getProjects(this.orgId, true).then((data) => {
-                this.projects.push(...data);
-                if (data && data.length > 0 && this.projects.filter((p)=>{ return p.id === this.projectId }).length === 0) {
-                    this.selectProject(data[0]);
-                } else {
-                    //no projects
-                }
-            }).finally(
-                () => {
-                    this.projSpin = false;
-                }
-            );
+            this.projSpin = true
+            this.projects.length = 0
+            this.projectSvc
+                .getProjects(this.orgId, true)
+                .then((data) => {
+                    this.projects.push(...data)
+                    if (
+                        data &&
+                        data.length > 0 &&
+                        this.projects.filter((p) => {
+                            return p.id === this.projectId
+                        }).length === 0
+                    ) {
+                        this.selectProject(data[0])
+                    } else {
+                        //no projects
+                    }
+                })
+                .finally(() => {
+                    this.projSpin = false
+                })
         }
 
         public checkForProject(projectArray, project) {
             for (let i = 0; i < projectArray.length; i++) {
-                if(projectArray[i].id === project.id){
-                    return 1;
+                if (projectArray[i].id === project.id) {
+                    return 1
                 }
             }
-            return 0;
-        };
+            return 0
+        }
 
         public continue() {
             if (this.orgId && this.projectId) {
-                this.spin = true;
-                this.rootScopeSvc.veRedirectFromOld(false);
-                this.$state.go('main.project.ref.portal', {orgId: this.orgId, projectId: this.projectId, refId: 'master'}).then((data) => {
-                }, (reject) => {
-                    this.spin = false;
-                });
+                this.spin = true
+                this.rootScopeSvc.veRedirectFromOld(false)
+                this.$state
+                    .go('main.project.ref.portal', {
+                        orgId: this.orgId,
+                        projectId: this.projectId,
+                        refId: 'master',
+                    })
+                    .then(
+                        (data) => {},
+                        (reject) => {
+                            this.spin = false
+                        }
+                    )
             }
-        };
+        }
         public logout() {
-            this.logout_spin = true;
-            this.authSvc.logout().then(() => {
-                this.$state.go('main.login',{});
-            }, () => {
-                this.growl.error('You were not logged out');
-            }).finally(() => {
-                this.logout_spin = false;
-            });
-        };
-    }
+            this.logout_spin = true
+            this.authSvc
+                .logout()
+                .then(
+                    () => {
+                        this.$state.go('main.login', {})
+                    },
+                    () => {
+                        this.growl.error('You were not logged out')
+                    }
+                )
+                .finally(() => {
+                    this.logout_spin = false
+                })
+        }
+    },
 }
 
-veApp.component(SelectComponent.selector, SelectComponent);
+veApp.component(SelectComponent.selector, SelectComponent)

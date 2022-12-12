@@ -5,8 +5,8 @@ import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 import {
-    VeComponentOptions,
     VeModalController,
     VeModalResolve,
     VeModalResolveFn,
@@ -15,13 +15,13 @@ import {
 export interface ConfirmDeleteModalResolve extends VeModalResolve {
     getType: string
     getName: string
-    finalize(): angular.IPromise<boolean>
+    finalize(): VePromise<boolean>
 }
 
 export interface ConfirmDeleteModalResolveFn extends VeModalResolveFn {
     getType(): string
     getName(): string
-    finalize(): () => angular.IPromise<boolean>
+    finalize(): () => VePromise<boolean>
 }
 
 const ConfirmDeleteModalComponent: VeComponentOptions = {
@@ -51,7 +51,7 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
         resolve: '<',
     },
     controller: class ConfirmDeleteModalController
-        extends VeModalControllerImpl
+        extends VeModalControllerImpl<string>
         implements VeModalController
     {
         static $inject = ['growl']
@@ -59,23 +59,21 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
         protected resolve: ConfirmDeleteModalResolve
 
         //local
-        public oking
-        public type
-        public name
-
-        private treeApi
+        public oking: boolean
+        public type: string
+        public name: string
 
         constructor(private growl: angular.growl.IGrowlService) {
             super()
         }
 
-        $onInit() {
+        $onInit(): void {
             this.oking = false
             this.type = this.resolve.getType
             this.name = this.resolve.getName
         }
 
-        ok = () => {
+        ok = (): void => {
             if (this.oking) {
                 this.growl.info('Please wait...')
                 return
@@ -86,7 +84,7 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
                     () => {
                         this.growl.success(_.upperFirst(this.type) + ' Removed')
                         this.oking = false
-                        this.modalInstance.close({ $value: 'ok' })
+                        this.modalInstance.close('ok')
                     },
                     (reason) => {
                         if (reason.message) {
@@ -95,13 +93,13 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
                             )
                         }
                         this.oking = false
-                        this.modalInstance.dismiss(reason)
+                        this.modalInstance.dismiss(reason.message)
                     }
                 )
             }
         }
 
-        cancel() {
+        cancel(): void {
             this.modalInstance.dismiss()
         }
     },

@@ -8,13 +8,12 @@ CKEDITOR.plugins.add('mmssignature', {
     // Register the icons.
     icons: 'mmssignature',
 
-    init: function (editor) {
-
+    init: (editor) => {
         editor.widgets.add('mmssignature', {
-
             button: 'Insert Signature Template',
             command: 'mmssignature',
-            template: //have to make the styling in-line else it won't work
+            //have to make the styling in-line else it won't work
+            template:
                 '<div class="signature-box">' +
                 '<table border="0" style="border: 0px; border-collapse: collapse; table-layout: fixed; max-width: 702px; word-wrap: break-word;">' +
                 '<tbody><tr>' +
@@ -30,21 +29,23 @@ CKEDITOR.plugins.add('mmssignature', {
                 '</table>' +
                 '</div>',
 
-            allowedContent: 'div(!signature-box){*}; table[*]{*}; tbody; tr; td(!signature-name-styling); td(!signature-space-styling); td(!signature-date-styling); div{width, padding}; div(!cell-styling); div(!signature-name){*};',
+            allowedContent:
+                'div(!signature-box){*}; table[*]{*}; tbody; tr; td(!signature-name-styling); td(!signature-space-styling); td(!signature-date-styling); div{width, padding}; div(!cell-styling); div(!signature-name){*};',
 
             requiredContent: 'div(signature-box)',
 
             editables: {
                 name: {
                     selector: '.signature-name',
-                    allowedContent: 'br strong em'
-                }
+                    allowedContent: 'br strong em',
+                },
             },
 
-            upcast: function (element) {
-                return element.name == 'div' && element.hasClass('signature-box');
-            }
-
-        });
-    }
-});
+            upcast: (element) => {
+                return (
+                    element.name == 'div' && element.hasClass('signature-box')
+                )
+            },
+        })
+    },
+})

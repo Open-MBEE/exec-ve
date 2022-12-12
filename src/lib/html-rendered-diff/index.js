@@ -1,4 +1,4 @@
-(function () {
+(() => {
     const TextDiff = require('diff/lib/diff/word');
     const VirtualDomDiff = require('virtual-dom/diff');
     const VirtualText = require('virtual-dom/vnode/vtext');
@@ -60,7 +60,7 @@
         let listOfPatches = getAllPatches(patches);
         allNodesRequiredToPatch = getNodesNeedPatching(listOfPatches);
         let originalTree = patches['a'];
-        listOfPatches.forEach(function (virtualPatch) {
+        listOfPatches.forEach((virtualPatch) => {
             switch (virtualPatch.type) {
                 case VPATCH.VNODE:
                     applyVNodePatch(virtualPatch, originalTree);
@@ -113,7 +113,7 @@
                 let diffResults = TextDiff.diffWords(nodeToRemove.text, nodeToAdd.text);
                 if (diffResults.length > 0) {
                     let childNodes = [];
-                    diffResults.forEach(function (result) {
+                    diffResults.forEach((result) => {
                         let className = result.added ? 'patcher-text-insertion' : result.removed ? 'patcher-text-deletion' : 'patcher-text-same';
                         childNodes.push(createWrapper('SPAN', className, [new VirtualText(result.value)]));
                     });
@@ -245,7 +245,7 @@
         if (typeof fromHere !== 'object' || typeof toHere !== 'object' || fromHere === null || toHere === null) {
             return false;
         }
-        Object.entries(fromHere).forEach(function (entry) {
+        Object.entries(fromHere).forEach((entry) => {
             let key = entry[0];
             let value = entry[1];
             if (typeof value === 'string') {
@@ -268,7 +268,7 @@
         if (properties === null || typeof properties !== 'object') {
             return false;
         }
-        return Object.entries(properties).some(function (property) {
+        return Object.entries(properties).some((property) => {
             let key = property[0];
             let value = property[1];
             if (typeof value === 'string') {
@@ -294,8 +294,8 @@
                 return false;
             }
             // check at child level
-            let isAffected = nodeToPatch.children.some(function (childNode) {
-                let isAffected = allNodesRequiredToPatch.some(function (nodeNeedPatching) {
+            let isAffected = nodeToPatch.children.some((childNode) => {
+                let isAffected = allNodesRequiredToPatch.some((nodeNeedPatching) => {
                     return nodeNeedPatching === childNode;
                 });
                 if (isAffected) {
@@ -307,7 +307,7 @@
                 return true;
             }
             // check at next level
-            isAffected = nodeToPatch.children.some(function (childNode) {
+            isAffected = nodeToPatch.children.some((childNode) => {
                 let isAffected = helper(childNode);
                 if (isAffected) {
                     return true;
@@ -326,13 +326,13 @@
         }
         let results = [];
         Object.entries(patches)
-            .filter(function (entry) {
+            .filter((entry) => {
                 return entry[0] !== 'a'
             })
-            .forEach(function (entry) {
+            .forEach((entry) => {
                 let virtualPatch = entry[1]; // this could be an array (case where propPatch follow by multiple insertion patches
                 if (virtualPatch.constructor === Array) {
-                    virtualPatch.forEach(function (patch) {
+                    virtualPatch.forEach((patch) => {
                         results.push(patch);
                     });
                 } else {
@@ -346,7 +346,7 @@
      *      patches: an object containing all the patches {index: []/{}}
      * **/
     function getNodesNeedPatching(patches) {
-        return patches.map(function (patch) {
+        return patches.map((patch) => {
             return patch.vNode;
         });
     }

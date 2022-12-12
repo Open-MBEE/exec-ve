@@ -1,24 +1,33 @@
-import * as angular from "angular";
-import Rx from 'rx-lite';
+import angular, { IComponentController } from 'angular'
+import Rx from 'rx-lite'
 
+import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
+import { ComponentService } from '@ve-components/services'
+import { TreeApi, TreeService } from '@ve-core/tree'
 import {
     AuthService,
     ElementService,
     ViewApi,
-    ViewService
-} from "@ve-utils/mms-api-client"
+    ViewService,
+} from '@ve-utils/mms-api-client'
+import { EventService, RootScopeService } from '@ve-utils/services'
+import { handleChange, onChangesCallback } from '@ve-utils/utils'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/angular'
 import {
-    EventService,
-    RootScopeService
-} from "@ve-utils/services";
-import {CoreUtilsService} from "@ve-core/services";
-import {handleChange, onChangesCallback} from "@ve-utils/utils";
-import {ElementObject, ElementsRequest} from "@ve-types/mms";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ComponentService} from "@ve-components/services";
-import {veComponents} from "@ve-components";
-import {PresentationService} from "@ve-components/presentations/services/Presentation.service";
-import {TreeApi, TreeService} from "@ve-core/tree";
+    ElementObject,
+    ElementsRequest,
+    ExpressionObject,
+    InstanceSpecObject,
+    InstanceValueObject,
+    RequestObject,
+    UserObject,
+    ValueObject,
+    ViewInstanceSpec,
+    ViewObject,
+} from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -29,9 +38,7 @@ import {TreeApi, TreeService} from "@ve-core/tree";
  * @requires $element
  * @requires growl
  *
- *
- * @description
- * Given a view id, renders the view according to the json given by veUtils/ViewService
+ * * Given a view id, renders the view according to the json given by veUtils/ViewService
  * The view has a text edit mode, where transclusions can be clicked. The view's last
  * modified time and author is the latest of any transcluded element modified time.
  * For available api methods, see methods section.
@@ -68,273 +75,339 @@ import {TreeApi, TreeService} from "@ve-core/tree";
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 
-export class ViewController implements angular.IComponentController {
-
+export class ViewController implements IComponentController {
     // private presentationElemCleanUpFncs: {(): any}[] = [];
-    private mmsElementId: string;
-    private mmsProjectId: string;
-    private mmsRefId: string;
-    private mmsCommitId: string;
-    private mmsLink: boolean;
-    public mmsViewApi: ViewApi;
+    private mmsElementId: string
+    private mmsProjectId: string
+    private mmsRefId: string
+    private mmsCommitId: string
+    private mmsLink: boolean
+    public mmsViewApi: ViewApi
     private mmsNumber: number
-    public noTitle: boolean;
+    public noTitle: boolean
 
-    static $inject = [ '$element', 'growl', 'ComponentService', 'AuthService', 'PresentationService', 'ViewService',
-        'ElementService', 'EventService', 'TreeService', 'RootScopeService']
-    private showEdits: boolean;
-    private modified: any;
-    private modifier: object;
-    private view: ElementObject;
-    private reqOb: ElementsRequest = {elementId: '', projectId: '', refId: '', commitId: ''};
-    private processed: boolean;
-    private isHover: boolean;
-    private isSection: boolean;
-    private level: number;
-    private number: string;
-    private showComments: boolean;
-    private showElements: boolean;
-    public subs: Rx.IDisposable[];
+    static $inject = [
+        '$element',
+        'growl',
+        'ComponentService',
+        'AuthService',
+        'PresentationService',
+        'ViewService',
+        'ElementService',
+        'EventService',
+        'TreeService',
+        'RootScopeService',
+    ]
+    private showEdits: boolean
+    private modified: Date
+    private modifier: UserObject
+    private view: ViewObject
+    private reqOb: ElementsRequest<string> = {
+        elementId: '',
+        projectId: '',
+        refId: '',
+        commitId: '',
+    }
+    private processed: boolean
+    private isHover: boolean
+    private isSection: boolean
+    private level: number
+    private number: string
+    private showComments: boolean
+    private showElements: boolean
+    public subs: Rx.IDisposable[]
     private treeApi: TreeApi
 
+    constructor(
+        private $element: JQuery<HTMLElement>,
+        private growl: angular.growl.IGrowlService,
+        private componentSvc: ComponentService,
+        private authSvc: AuthService,
+        private presentationSvc: PresentationService,
+        private viewSvc: ViewService,
+        private elementSvc: ElementService,
+        private eventSvc: EventService,
+        private treeSvc: TreeService,
+        private rootScopeSvc: RootScopeService
+    ) {}
 
+    $onInit(): void {
+        this.eventSvc.$init(this)
+        this.treeApi = this.treeSvc.getApi()
 
-    constructor(private $element: JQuery<HTMLElement>, private growl: angular.growl.IGrowlService,
-                private componentSvc: ComponentService,
-                private authSvc: AuthService, private presentationSvc: PresentationService,
-                private viewSvc: ViewService, private elementSvc: ElementService, private eventSvc: EventService,
-                private treeSvc: TreeService, private rootScopeSvc: RootScopeService) {}
+        this.reqOb = {
+            elementId: this.mmsElementId,
+            projectId: this.mmsProjectId,
+            refId: this.mmsRefId,
+            commitId: this.mmsCommitId,
+        }
+        this.processed = false
 
-    $onInit() {
-        this.eventSvc.$init(this);
-        this.treeApi = this.treeSvc.getApi();
+        this.number = this.mmsNumber ? this.mmsNumber.toString(10) : ''
 
-        this.reqOb = {elementId: this.mmsElementId, projectId: this.mmsProjectId, refId: this.mmsRefId, commitId: this.mmsCommitId};
-        this.processed = false;
+        this.isSection = false
+        this.showElements = false
+        this.showComments = false
+        this.showEdits = false
 
-        this.number = (this.mmsNumber) ? this.mmsNumber.toString(10) : '';
+        this.subs.push(
+            this.eventSvc.$on('show-comments', () => {
+                this.toggleShowComments()
+            })
+        )
 
-        this.isSection = false;
-        this.showElements = false;
-        this.showComments = false;
-        this.showEdits = false;
+        this.subs.push(
+            this.eventSvc.$on('show-elements', () => {
+                this.toggleShowElements()
+            })
+        )
 
-        this.subs.push(this.eventSvc.$on('show-comments', () => {
-            this.toggleShowComments();
-        }));
+        this.subs.push(
+            this.eventSvc.$on('show-edits', () => {
+                if (
+                    (this.rootScopeSvc.veElementsOn() &&
+                        this.rootScopeSvc.veEditMode()) ||
+                    (!this.rootScopeSvc.veElementsOn() &&
+                        !this.rootScopeSvc.veEditMode())
+                ) {
+                    this.toggleShowElements()
+                }
+                this.toggleShowEdits()
+            })
+        )
 
-        this.subs.push(this.eventSvc.$on('show-elements', () => {
-            this.toggleShowElements();
-        }));
+        this.subs.push(
+            this.eventSvc.$on(TreeService.events.UPDATED, () => {
+                if (this.treeApi.branch2viewNumber[this.mmsElementId]) {
+                    this.level =
+                        this.treeApi.branch2viewNumber[this.mmsElementId].split(
+                            '.'
+                        ).length
+                }
+            })
+        )
 
-        this.subs.push(this.eventSvc.$on('show-edits', () => {
-            if( (this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) || (!this.rootScopeSvc.veElementsOn() && !this.rootScopeSvc.veEditMode()) ){
-                this.toggleShowElements();
-            }
-            this.toggleShowEdits();
-        }));
-
-        this.subs.push(this.eventSvc.$on(TreeService.events.UPDATED, () => {
-            if (this.treeApi.branch2viewNumber[this.mmsElementId]) {
-                this.level = this.treeApi.branch2viewNumber[this.mmsElementId].split('.').length;
-            }
-        }));
-
-        this._changeView(this.mmsElementId, '');
-
+        this._changeView(this.mmsElementId, '')
     }
 
-    $onChanges(onChangesObj:angular.IOnChangesObject) {
-        handleChange(onChangesObj, 'mmsNumber', (newVal) => {
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
+        handleChange(onChangesObj, 'mmsNumber', (newVal: string) => {
             this.number = newVal
-        });
-        handleChange(onChangesObj,'mmsElementId', this._changeView, true);
+        })
+        handleChange(onChangesObj, 'mmsElementId', this._changeView, true)
     }
 
-   public isTranscludedElement(elementName) {
-        return elementName === 'MMS-TRANSCLUDE-COM' ||
+    public isTranscludedElement(elementName): boolean {
+        return (
+            elementName === 'MMS-TRANSCLUDE-COM' ||
             elementName === 'MMS-TRANSCLUDE-DOC' ||
             elementName === 'MMS-TRANSCLUDE-ART' ||
             elementName === 'MMS-TRANSCLUDE-IMG' ||
             elementName === 'MMS-TRANSCLUDE-NAME' ||
-            elementName === 'MMS-TRANSCLUDE-VAL';
+            elementName === 'MMS-TRANSCLUDE-VAL'
+        )
+    }
 
-    };
+    public isEditable(): boolean {
+        return this.showEdits
+    }
 
-   public isViewElement(elementName) {
-        return elementName === 'MMS-VIEW-IMG' ||
-            elementName === 'MMS-VIEW-LIST' ||
-            elementName === 'MMS-VIEW-PARA' ||
-            elementName === 'MMS-VIEW-TABLE' ||
-            elementName === 'MMS-VIEW-TABLE-T' ||
-            elementName === 'MMS-VIEW-LIST-T' ||
-            elementName === 'MMS-VIEW-EQUATION';
-
-    };
-
-   public isPresentationElement(elementName) {
-        return elementName === 'MMS-VIEW-PRESENTATION-ELEM';
-    };
-
-   public isEditable() {
-        return this.showEdits;
-    };
-
-   public transcludeClicked(elementOb) {
+    public transcludeClicked(elementOb: ElementObject): void {
         if (this.mmsViewApi && this.mmsViewApi.elementClicked && elementOb)
-            this.mmsViewApi.elementClicked(elementOb);
-    };
+            this.mmsViewApi.elementClicked(elementOb)
+    }
 
-   public elementTranscluded(elem: ElementObject, type: string) {
+    public elementTranscluded(elem: ElementObject, type: string): void {
         if (elem) {
             if (elem._modified > this.modified && type !== 'Comment') {
-                this.modified = elem._modified;
+                this.modified = elem._modified
                 if (elem._modifier) {
-                    this.componentSvc.getModifier(elem._modifier).then((result) => {
-                        this.modifier = result;
-                    })
+                    this.componentSvc.getModifier(elem._modifier).then(
+                        (result) => {
+                            this.modifier = result
+                        },
+                        () => {
+                            this.modifier = { username: elem._modifier }
+                        }
+                    )
                 }
             }
             if (this.mmsViewApi && this.mmsViewApi.elementTranscluded)
-                this.mmsViewApi.elementTranscluded(elem, type);
+                this.mmsViewApi.elementTranscluded(elem, type)
         }
-    };
+    }
 
     //INFO this was getWsAndVersion
-   public getElementOrigin() {
+    public getElementOrigin(): RequestObject {
         return {
             projectId: this.mmsProjectId,
             refId: this.mmsRefId,
-            commitId: this.mmsCommitId
-        };
-    };
+            commitId: this.mmsCommitId,
+        }
+    }
 
-   public getView() {
+    public getView(): ViewObject {
         // this view gets set in the viewlink fnc
-        return this.view;
-    };
+        return this.view
+    }
 
-   public hoverIn() {
-        this.isHover = true;
-    };
-   public hoverOut() {
-        this.isHover = false;
-    };
+    public hoverIn(): void {
+        this.isHover = true
+    }
+    public hoverOut(): void {
+        this.isHover = false
+    }
 
-   // public setPeLineVisibility($event) {
-   //      window.setTimeout(() => {
-   //          var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
-   //          if (peContainer.find('.dropdown-menu').css('display') == 'none') {
-   //              peContainer.find('hr').css('visibility', 'hidden');
-   //          } else {
-   //              peContainer.find('hr').css('visibility', 'visible');
-   //          }
-   //      });
-   //  };
+    // public setPeLineVisibility($event) {
+    //      window.setTimeout(() => {
+    //          var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
+    //          if (peContainer.find('.dropdown-menu').css('display') == 'none') {
+    //              peContainer.find('hr').css('visibility', 'hidden');
+    //          } else {
+    //              peContainer.find('hr').css('visibility', 'visible');
+    //          }
+    //      });
+    //  };
 
     private _changeView: onChangesCallback = (newVal, oldVal) => {
-        if (!newVal || (newVal === oldVal && this.processed))
-            return;
+        if (!newVal || (newVal === oldVal && this.processed)) return
 
-        this.processed = true;
-        this.$element.addClass('isLoading');
-        this.reqOb.elementId = this.mmsElementId;
-        this.elementSvc.getElement(this.reqOb, 1)
-        .then((data) => {
-            //view accepts a section element
-            if (data.type === 'InstanceSpecification') {
-                this.isSection = true;
-            }
-            var operand = [];
-            if (data._contents && data._contents.operand) {
-                operand = data._contents.operand;
-            }
-            if (data.specification && data.specification.operand) {
-                operand = data.specification.operand;
-            }
-            var dups = this.presentationSvc.checkForDuplicateInstances(operand);
-            if (dups.length > 0) {
-                this.growl.warning("There are duplicates in this view, duplicates ignored!");
-            }
+        this.processed = true
+        this.$element.addClass('isLoading')
+        this.reqOb.elementId = this.mmsElementId
+        this.elementSvc
+            .getElement<ElementObject>(this.reqOb, 1)
+            .then(
+                (data) => {
+                    //view accepts a section element
+                    if (data.type === 'InstanceSpecification') {
+                        this.isSection = true
+                    }
+                    let operand: ValueObject[] = []
+                    if (
+                        data._contents &&
+                        (data as ViewObject)._contents.operand
+                    ) {
+                        operand = (data as ViewObject)._contents.operand
+                    }
+                    if (
+                        data.specification &&
+                        (data as ViewInstanceSpec).specification.operand
+                    ) {
+                        operand = (
+                            data.specification as ExpressionObject<InstanceValueObject>
+                        ).operand
+                    }
+                    const dups =
+                        this.presentationSvc.checkForDuplicateInstances(operand)
+                    if (dups.length > 0) {
+                        this.growl.warning(
+                            'There are duplicates in this view, duplicates ignored!'
+                        )
+                    }
 
-            if (//data._numElements && data._numElements > 5000 &&
-                    this.mmsCommitId && this.mmsCommitId !== 'latest') {
-                //threshold where getting view elements in bulk takes too long and it's not latest
-                //getting cached individual elements should be faster
-                this.view = data;
-                this.modified = data._modified;
-                this.componentSvc.getModifier(data._modifier).then((result) => {
-                    this.modifier = result;
-                })
-                return;
-            }
-            this.viewSvc.getViewElements(this.reqOb, 1)
+                    if (
+                        //data._numElements && data._numElements > 5000 &&
+                        this.mmsCommitId &&
+                        this.mmsCommitId !== 'latest'
+                    ) {
+                        //threshold where getting view elements in bulk takes too long and it's not latest
+                        //getting cached individual elements should be faster
+                        this.view = data
+                        this.modified = data._modified
+                        this.componentSvc.getModifier(data._modifier).then(
+                            (result) => {
+                                this.modifier = result
+                            },
+                            () => {
+                                this.modifier = { username: data._modifier }
+                            }
+                        )
+                        return
+                    }
+                    this.viewSvc.getViewElements(this.reqOb, 1).finally(() => {
+                        this.view = data
+                        this.modified = data._modified
+                        this.componentSvc.getModifier(data._modifier).then(
+                            (result) => {
+                                this.modifier = result
+                            },
+                            () => {
+                                this.modifier = { username: data._modifier }
+                            }
+                        )
+                        this.$element.removeClass('isLoading')
+                    })
+                },
+                (reason) => {
+                    this.growl.error(
+                        `Getting View Error: ${reason.message}: ${this.mmsElementId}`
+                    )
+                }
+            )
             .finally(() => {
-                this.view = data;
-                this.modified = data._modified;
-                this.componentSvc.getModifier(data._modifier).then((result) => {
-                    this.modifier = result;
-                })
-                this.$element.removeClass('isLoading');
-            });
-        }, (reason) => {
-            this.growl.error('Getting View Error: ' + reason.message + ': ' + this.mmsElementId);
-        }).finally(() => {
-            if (this.view)
-                this.$element.removeClass('isLoading');
-        });
-    };
-
-
+                if (this.view) this.$element.removeClass('isLoading')
+            })
+    }
 
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsView#toggleShowElements
-     * @methodOf veComponents.component:mmsView
-     *
-     * @description
      * toggle elements highlighting
      */
-   public toggleShowElements() {
-        this.showElements = !this.showElements;
-        this.$element.toggleClass('outline');
-    };
+    public toggleShowElements(value?: boolean): void {
+        if (typeof value !== 'undefined') {
+            this.showElements = value
+        } else {
+            this.showElements = !this.showElements
+        }
+        if (this.showElements) {
+            this.$element.addClass('outline')
+        } else if (this.$element.hasClass('outline')) {
+            this.$element.removeClass('outline')
+        }
+    }
 
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsView#toggleShowComments
-     * @methodOf veComponents.component:mmsView
-     *
-     * @description
      * toggle comments visibility
      */
-   public toggleShowComments(value?: boolean) {
-        this.showComments = !this.showComments;
-        this.$element.toggleClass('reviewing');
-    };
+    public toggleShowComments(value?: boolean): void {
+        if (typeof value !== 'undefined') {
+            this.showComments = value
+        } else {
+            this.showComments = !this.showComments
+        }
+        if (this.showComments) {
+            this.$element.addClass('reviewing')
+        } else if (this.$element.hasClass('reviewing')) {
+            this.$element.removeClass('reviewing')
+        }
+    }
 
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsView#toggleShowEdits
-     * @methodOf veComponents.component:mmsView
-     *
-     * @description
      * toggle elements editor panel
      */
-   public toggleShowEdits(value?: boolean) {
-        this.showEdits = !this.showEdits;
-        this.$element.toggleClass('editing');
+    public toggleShowEdits(value?: boolean): void {
+        if (typeof value !== 'undefined') {
+            this.showEdits = value
+        } else {
+            this.showEdits = !this.showEdits
+        }
+        if (this.showEdits) {
+            this.$element.addClass('editing')
+        } else if (this.$element.hasClass('editing')) {
+            this.$element.removeClass('editing')
+        }
         // Call the callback functions to clean up frames, show edits, and
         // re-open frames when needed:
         // for (let i = 0; i < this.presentationElemCleanUpFncs.length; i++) {
         //     this.presentationElemCleanUpFncs[i]();
         // }
-    };
-
-
+    }
 }
 
-export let ViewComponent: VeComponentOptions = {
+export const ViewComponent: VeComponentOptions = {
     selector: 'view',
     template: `
     <div id="{{$ctrl.mmsElementId}}" ng-class="{landscape: $ctrl.view._printLandscape}">
@@ -381,9 +454,9 @@ export let ViewComponent: VeComponentOptions = {
         mmsLink: '<',
         mmsViewApi: '<',
         mmsNumber: '@',
-        noTitle: '@'
+        noTitle: '@',
     },
-    controller: ViewController
+    controller: ViewController,
 }
 
-veComponents.component(ViewComponent.selector,ViewComponent)
+veComponents.component(ViewComponent.selector, ViewComponent)

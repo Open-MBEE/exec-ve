@@ -1,7 +1,11 @@
 import angular from 'angular'
 import _ from 'lodash'
 
-import { ElementService, ViewService } from '@ve-utils/mms-api-client'
+import {
+    ApiService,
+    ElementService,
+    ViewService,
+} from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 import { SchemaService } from '@ve-utils/model-schema'
 import { ApplicationService, UtilsService } from '@ve-utils/services'
@@ -11,7 +15,13 @@ import { veCore } from '@ve-core'
 
 import { VeEditorController } from '../ve-editor.component'
 
-import { ElementObject, QueryObject, ViewObject } from '@ve-types/mms'
+import { VePromiseReason } from '@ve-types/angular'
+import {
+    ElementObject,
+    ElementsResponse,
+    QueryObject,
+    ViewObject,
+} from '@ve-types/mms'
 import {
     VeModalComponent,
     VeModalController,
@@ -28,6 +38,271 @@ export interface TranscludeModalResolve extends VeModalResolve {
 export interface TranscludeModalResolveFn extends VeModalResolveFn {
     editor(): VeEditorController
     viewLink(): boolean
+}
+
+class TranscludeModalController
+    extends VeModalControllerImpl<string>
+    implements VeModalController
+{
+    //bindings
+    public resolve: TranscludeModalResolve
+
+    private editor: VeEditorController
+
+    protected title: string = 'Insert cross reference'
+    protected description: string =
+        'Begin by search for an element, then click a field to cross-reference.'
+    protected searchExisting: boolean = true
+    protected newE: { name: string; documentation: string } = {
+        name: '',
+        documentation: '',
+    }
+    protected requestName: boolean = false
+    protected requestDocumentation: boolean = false
+    protected viewLink: boolean
+    protected nonEditableCheckbox: boolean = false
+    protected showEditableOp: boolean = true
+    protected proposeClass: string
+    protected linkType: number = null
+    protected linkText: string
+
+    // Set search result options
+    protected searchOptions: VeSearchOptions = {
+        closeable: false,
+    }
+
+    static $inject = [
+        'growl',
+        'ElementService',
+        'SchemaService',
+        'ViewService',
+        'ApplicationService',
+        'ApiService',
+    ]
+    private mmsProjectId: string
+    private mmsRefId: string
+    private schema = 'cameo'
+
+    constructor(
+        private growl: angular.growl.IGrowlService,
+        private elementSvc: ElementService,
+        private schemaSvc: SchemaService,
+        private viewSvc: ViewService,
+        private applicationSvc: ApplicationService,
+        private apiSvc: ApiService
+    ) {
+        super()
+    }
+
+    $onInit(): void {
+        this.editor = this.resolve.editor
+        this.mmsProjectId = this.editor.mmsProjectId
+        this.mmsRefId = this.editor.mmsRefId
+        this.searchOptions.callback = this.choose
+        this.viewLink = this.resolve.viewLink
+
+        if (!this.viewLink) {
+            this.searchOptions.getProperties = true
+            this.searchOptions.emptyDocTxt =
+                'This field is empty, but you can still click here to cross-reference a placeholder.'
+        } else {
+            this.searchOptions.relatedCallback = this.chooseDoc
+            this.searchOptions.filterQueryList = [this.mainSearchFilter]
+            this.searchOptions.itemsPerPage = 200
+        }
+    }
+
+    public choose = (elem: ElementObject, property: string): void => {
+        let tag = ''
+        if (!this.viewLink) {
+            tag = `<transclusion mms-cf-type="${property}" mms-element-id="${
+                elem.id
+            }" non-editable="${this.nonEditableCheckbox.toString()}">[cf:${
+                elem.name
+            }.${property}]</transclusion>`
+        } else {
+            let did: string
+            let vid: string
+            let peid: string
+            const currentDoc = this.applicationSvc.getState().currentDoc
+            if (
+                elem._relatedDocuments &&
+                (elem as ViewObject)._relatedDocuments.length > 0
+            ) {
+                const cur = _.find((elem as ViewObject)._relatedDocuments, {
+                    id: currentDoc,
+                })
+                if (cur) {
+                    did = currentDoc
+                    if (cur._parentViews.length > 0) {
+                        vid = cur._parentViews[0].id
+                    }
+                } else {
+                    did = (elem as ViewObject)._relatedDocuments[0].id
+                    if (
+                        (elem as ViewObject)._relatedDocuments[0]._parentViews
+                            .length > 0
+                    ) {
+                        vid = (elem as ViewObject)._relatedDocuments[0]
+                            ._parentViews[0].id
+                    }
+                }
+            }
+            if (elem.type === 'InstanceSpecification') {
+                if (this.viewSvc.isSection(elem)) {
+                    vid = elem.id
+                } else {
+                    peid = elem.id
+                }
+            } else {
+                vid = elem.id
+            }
+            tag = this.createViewLink(elem, did, vid, peid)
+        }
+
+        this.modalInstance.close(tag)
+    }
+
+    public cancel = (): void => {
+        this.modalInstance.dismiss()
+    }
+
+    public makeNewAndChoose = (): void => {
+        if (!this.newE.name) {
+            this.growl.error('Error: A name for your new element is required.')
+            return
+        } else if (!this.requestName && !this.requestDocumentation) {
+            this.growl.error(
+                'Error: Selection of a property to cross-reference is required.'
+            )
+            return
+        }
+        this.proposeClass = 'fa fa-spin fa-spinner'
+        const id = this.apiSvc.createUniqueId()
+        const createObj: ElementObject = {
+            id: id,
+            _projectId: this.mmsProjectId,
+            _refId: this.mmsRefId,
+            ownerId: 'holding_bin_' + this.mmsProjectId,
+            name: this.newE.name,
+            documentation: this.newE.documentation,
+            type: 'Class',
+            _appliedStereotypeIds: [],
+        }
+        const toCreate: ElementObject = new Class(createObj)
+        const reqOb = {
+            elements: [toCreate],
+            elementId: toCreate.id,
+            projectId: this.mmsProjectId,
+            refId: this.mmsRefId,
+        }
+
+        this.elementSvc.createElement(reqOb).then(
+            (data) => {
+                if (this.requestName) {
+                    this.choose(data, 'name')
+                } else if (this.requestDocumentation) {
+                    this.choose(data, 'doc')
+                }
+                this.proposeClass = ''
+            },
+            (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+                this.growl.error(`Propose Error: ${reason.message}`)
+                this.proposeClass = ''
+            }
+        )
+    }
+
+    public toggleRadio = (field: string): void => {
+        if (field === 'name') {
+            this.requestName = true
+            this.requestDocumentation = false
+        } else if (field === 'documentation') {
+            this.requestName = false
+            this.requestDocumentation = true
+        }
+    }
+
+    private createViewLink = (
+        elem: ViewObject,
+        did: string,
+        vid: string,
+        peid: string
+    ): string => {
+        let tag = '<view-link'
+        if (did) {
+            tag += ' mms-doc-id="' + did + '"'
+        }
+        if (vid) {
+            tag += ' mms-element-id="' + vid + '"'
+        }
+        if (peid) {
+            tag += ' mms-pe-id="' + peid + '"'
+        }
+        if (this.linkType == 1) {
+            tag += ' suppress-numbering="false"'
+            tag += ' show-name="false"'
+        }
+        if (this.linkType == 2) {
+            tag += ' suppress-numbering="true"'
+            tag += ' show-name="true"'
+        }
+        if (this.linkType == 3 && this.linkText) {
+            tag += ' link-text="' + this.linkText + '"'
+        }
+        if (this.linkType == 4) {
+            tag += ' suppress-numbering="false"'
+            tag += ' show-name="true"'
+        }
+        tag += '>[cf:' + elem.name + '.vlink]</view-link>'
+        return tag
+    }
+
+    public chooseDoc = (
+        doc: ViewObject,
+        view: ViewObject,
+        elem: ElementObject
+    ): void => {
+        const did = doc.id
+        let vid = view.id
+        let peid: string = null
+        if (this.viewSvc.isSection(elem)) {
+            vid = elem.id
+        } else if (this.viewSvc.getPresentationElementType(elem)) {
+            peid = elem.id
+        }
+        const tag = this.createViewLink(elem, did, vid, peid)
+        this.modalInstance.close(tag)
+    }
+
+    private mainSearchFilter = (): {
+        _appliedStereotypeIds?: string[]
+        classifierIds?: string[]
+    } => {
+        const filter: {
+            _appliedStereotypeIds?: string[]
+            classifierIds?: string[]
+        } = {}
+        filter._appliedStereotypeIds = [
+            this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
+            this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
+            ...this.schemaSvc.getSchema<string[]>(
+                'OTHER_VIEW_SID',
+                this.schema
+            ),
+        ]
+        const allClassifierIds = this.schemaSvc.getSchema<{
+            [type: string]: string
+        }>('TYPE_TO_CLASSIFIER_ID', this.schema)
+
+        for (const k in allClassifierIds) {
+            if (allClassifierIds.hasOwnProperty(k)) {
+                filter.classifierIds.push(allClassifierIds[k])
+            }
+        }
+
+        return filter
+    }
 }
 
 // Component for inserting cross reference
@@ -105,269 +380,7 @@ const TranscludeModalComponent: VeModalComponent = {
         modalInstance: '<',
         resolve: '<',
     },
-    controller: class TranscludeModalController
-        extends VeModalControllerImpl
-        implements VeModalController
-    {
-        //bindings
-        public resolve: TranscludeModalResolve
-
-        private editor: VeEditorController
-
-        protected title: string = 'Insert cross reference'
-        protected description: string =
-            'Begin by search for an element, then click a field to cross-reference.'
-        protected searchExisting: boolean = true
-        protected newE: { name: string; documentation: string } = {
-            name: '',
-            documentation: '',
-        }
-        protected requestName: boolean = false
-        protected requestDocumentation: boolean = false
-        protected viewLink: boolean
-        protected nonEditableCheckbox: boolean = false
-        protected showEditableOp: boolean = true
-        protected proposeClass: string
-        protected linkType: number = null
-        protected linkText: string
-
-        // Set search result options
-        protected searchOptions: VeSearchOptions = {
-            closeable: false,
-        }
-
-        static $inject = [
-            'growl',
-            'ElementService',
-            'SchemaService',
-            'ViewService',
-            'ApplicationService',
-            'UtilsService',
-        ]
-        private mmsProjectId: string
-        private mmsRefId: string
-        private schema = 'cameo'
-
-        constructor(
-            private growl: angular.growl.IGrowlService,
-            private elementSvc: ElementService,
-            private schemaSvc: SchemaService,
-            private viewSvc: ViewService,
-            private applicationSvc: ApplicationService,
-            private utilsSvc: UtilsService
-        ) {
-            super()
-        }
-
-        $onInit() {
-            this.editor = this.resolve.editor
-            this.mmsProjectId = this.editor.mmsProjectId
-            this.mmsRefId = this.editor.mmsRefId
-            this.searchOptions.callback = this.choose
-            this.viewLink = this.resolve.viewLink
-
-            if (!this.viewLink) {
-                this.searchOptions.getProperties = true
-                this.searchOptions.emptyDocTxt =
-                    'This field is empty, but you can still click here to cross-reference a placeholder.'
-            } else {
-                this.searchOptions.relatedCallback = this.chooseDoc
-                this.searchOptions.filterQueryList = [this.mainSearchFilter]
-                this.searchOptions.itemsPerPage = 200
-            }
-        }
-
-        public choose = (elem: ElementObject, property: string) => {
-            let tag = ''
-            if (!this.viewLink) {
-                tag =
-                    '<transclusion mms-cf-type="' +
-                    property +
-                    '" mms-element-id="' +
-                    elem.id +
-                    '" non-editable="' +
-                    this.nonEditableCheckbox +
-                    '">[cf:' +
-                    elem.name +
-                    '.' +
-                    property +
-                    ']</transclusion>'
-            } else {
-                let did = null
-                let vid = null
-                let peid = null
-                const currentDoc = this.applicationSvc.getState().currentDoc
-                if (
-                    elem._relatedDocuments &&
-                    elem._relatedDocuments.length > 0
-                ) {
-                    const cur = _.find(elem._relatedDocuments, {
-                        id: currentDoc,
-                    })
-                    if (cur) {
-                        did = currentDoc
-                        if (cur._parentViews.length > 0) {
-                            vid = cur._parentViews[0].id
-                        }
-                    } else {
-                        did = elem._relatedDocuments[0].id
-                        if (elem._relatedDocuments[0]._parentViews.length > 0) {
-                            vid = elem._relatedDocuments[0]._parentViews[0].id
-                        }
-                    }
-                }
-                if (elem.type === 'InstanceSpecification') {
-                    if (this.viewSvc.isSection(elem)) {
-                        vid = elem.id
-                    } else {
-                        peid = elem.id
-                    }
-                } else {
-                    vid = elem.id
-                }
-                tag = this.createViewLink(elem, did, vid, peid)
-            }
-
-            this.modalInstance.close({ $value: tag })
-        }
-
-        public cancel = () => {
-            this.modalInstance.dismiss()
-        }
-
-        public makeNewAndChoose = () => {
-            if (!this.newE.name) {
-                this.growl.error(
-                    'Error: A name for your new element is required.'
-                )
-                return
-            } else if (!this.requestName && !this.requestDocumentation) {
-                this.growl.error(
-                    'Error: Selection of a property to cross-reference is required.'
-                )
-                return
-            }
-            this.proposeClass = 'fa fa-spin fa-spinner'
-            const id = this.utilsSvc.createMmsId()
-            const createObj: ElementObject = {
-                id: id,
-                _projectId: this.mmsProjectId,
-                _refId: this.mmsRefId,
-                ownerId: 'holding_bin_' + this.mmsProjectId,
-                name: this.newE.name,
-                documentation: this.newE.documentation,
-                type: 'Class',
-                _appliedStereotypeIds: [],
-            }
-            const toCreate: ElementObject = new Class(createObj)
-            const reqOb = {
-                elements: [toCreate],
-                elementId: toCreate.id,
-                projectId: this.mmsProjectId,
-                refId: this.mmsRefId,
-            }
-
-            this.elementSvc.createElement(reqOb).then(
-                (data) => {
-                    if (this.requestName) {
-                        this.choose(data, 'name')
-                    } else if (this.requestDocumentation) {
-                        this.choose(data, 'doc')
-                    }
-                    this.proposeClass = ''
-                },
-                (reason) => {
-                    this.growl.error('Propose Error: ' + reason.message)
-                    this.proposeClass = ''
-                }
-            )
-        }
-
-        public toggleRadio = (field) => {
-            if (field === 'name') {
-                this.requestName = true
-                this.requestDocumentation = false
-            } else if (field === 'documentation') {
-                this.requestName = false
-                this.requestDocumentation = true
-            }
-        }
-
-        private createViewLink = (elem, did, vid, peid) => {
-            let tag = '<view-link'
-            if (did) {
-                tag += ' mms-doc-id="' + did + '"'
-            }
-            if (vid) {
-                tag += ' mms-element-id="' + vid + '"'
-            }
-            if (peid) {
-                tag += ' mms-pe-id="' + peid + '"'
-            }
-            if (this.linkType == 1) {
-                tag += ' suppress-numbering="false"'
-                tag += ' show-name="false"'
-            }
-            if (this.linkType == 2) {
-                tag += ' suppress-numbering="true"'
-                tag += ' show-name="true"'
-            }
-            if (this.linkType == 3 && this.linkText) {
-                tag += ' link-text="' + this.linkText + '"'
-            }
-            if (this.linkType == 4) {
-                tag += ' suppress-numbering="false"'
-                tag += ' show-name="true"'
-            }
-            tag += '>[cf:' + elem.name + '.vlink]</view-link>'
-            return tag
-        }
-
-        public chooseDoc = (
-            doc: ViewObject,
-            view: ViewObject,
-            elem: ElementObject
-        ) => {
-            const did = doc.id
-            let vid = view.id
-            let peid = null
-            if (this.viewSvc.isSection(elem)) {
-                vid = elem.id
-            } else if (this.viewSvc.getPresentationElementType(elem)) {
-                peid = elem.id
-            }
-            const tag = this.createViewLink(elem, did, vid, peid)
-            this.modalInstance.close({ $value: tag })
-        }
-
-        private mainSearchFilter = (): {
-            _appliedStereotypeIds?: string[]
-            classifierIds?: string[]
-        } => {
-            const filter: {
-                _appliedStereotypeIds?: string[]
-                classifierIds?: string[]
-            } = {}
-            filter._appliedStereotypeIds = [
-                this.schemaSvc.getSchema('VIEW_SID', this.schema),
-                this.schemaSvc.getSchema('DOCUMENT_SID', this.schema),
-                ...this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema),
-            ]
-            const allClassifierIds = this.schemaSvc.getSchema
-                'TYPE_TO_CLASSIFIER_ID',
-                this.schema
-            )
-            const classifierList = []
-
-            for (const k in allClassifierIds) {
-                if (allClassifierIds.hasOwnProperty(k)) {
-                    filter.classifierIds.push(allClassifierIds[k])
-                }
-            }
-
-            return filter
-        }
-    },
+    controller: TranscludeModalController,
 }
 
 veCore.component(TranscludeModalComponent.selector, TranscludeModalComponent)

@@ -1,21 +1,24 @@
-import * as angular from "angular";
-import _ from "lodash";
+import angular from 'angular'
+import _ from 'lodash'
 
-import {veComponents} from "@ve-components";
-import {ComponentService} from "@ve-components/services"
-import {ISpecTool, SpecService, SpecTool} from "@ve-components/spec-tools";
-import {Commit} from "@ve-core/diff-merge";
+import { ComponentService } from '@ve-components/services'
+import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
+import { Commit } from '@ve-core/diff-merge'
+import { ToolbarService } from '@ve-core/tool-bar'
 import {
+    ApiService,
     AuthService,
     ElementService,
     PermissionsService,
     ProjectService,
     URLService,
-    ViewService
-} from "@ve-utils/mms-api-client";
-import {EventService, UtilsService} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ToolbarService} from "@ve-core/tool-bar";
+    ViewService,
+} from '@ve-utils/mms-api-client'
+import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -27,9 +30,7 @@ import {ToolbarService} from "@ve-core/tool-bar";
  * @requires $q
  * @requires _
  *
- *
- * @description
- * Outputs a history window of the element whose id is specified. History includes
+ * * Outputs a history window of the element whose id is specified. History includes
  * name of modifier and date of change. Also modified date links to spec output below.
  *
  * ### template (html)
@@ -44,29 +45,57 @@ import {ToolbarService} from "@ve-core/tool-bar";
  * @param {string=master} mmsRefId Reference to use, defaults to master
  */
 class SpecHistoryController extends SpecTool implements ISpecTool {
-
     // Locals
-    gettingHistory: boolean;
-    refList: any[];
+    gettingHistory: boolean
+    refList: any[]
     baseCommit: Commit
-    historyVer: string;
+    historyVer: string
     compareCommit: Commit
-    disableRevert: boolean;
+    disableRevert: boolean
 
-    static $inject = [...SpecTool.$inject];
+    static $inject = [...SpecTool.$inject]
 
-    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
-                growl: angular.growl.IGrowlService, componentSvc: ComponentService, uRLSvc: URLService,
-                authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
-                utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
-                eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService) {
-        super($scope,$element,$q,growl,componentSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
+    constructor(
+        $scope: angular.IScope,
+        $element: JQuery<HTMLElement>,
+        $q: angular.IQService,
+        growl: angular.growl.IGrowlService,
+        componentSvc: ComponentService,
+        uRLSvc: URLService,
+        authSvc: AuthService,
+        elementSvc: ElementService,
+        projectSvc: ProjectService,
+        utilsSvc: UtilsService,
+        apiSvc: ApiService,
+        viewSvc: ViewService,
+        permissionsSvc: PermissionsService,
+        eventSvc: EventService,
+        specSvc: SpecService,
+        toolbarSvc: ToolbarService,
+        private autosaveSvc: AutosaveService
+    ) {
+        super(
+            $scope,
+            $element,
+            $q,
+            growl,
+            componentSvc,
+            uRLSvc,
+            authSvc,
+            elementSvc,
+            projectSvc,
+            utilsSvc,
+            apiSvc,
+            viewSvc,
+            permissionsSvc,
+            eventSvc,
+            specSvc,
+            toolbarSvc
+        )
         this.specType = _.kebabCase(SpecHistoryComponent.selector)
-        this.specTitle = "Element History";
+        this.specTitle = 'Element History'
     }
 }
-
-
 
 const SpecHistoryComponent: VeComponentOptions = {
     selector: 'specHistory',
@@ -78,7 +107,7 @@ const SpecHistoryComponent: VeComponentOptions = {
         mmsProjectId: '@',
         mmsRefId: '@',
     },
-    controller: SpecHistoryController
+    controller: SpecHistoryController,
 }
 
 veComponents.component(SpecHistoryComponent.selector, SpecHistoryComponent)

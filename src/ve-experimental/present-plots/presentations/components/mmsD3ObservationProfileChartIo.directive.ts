@@ -36,7 +36,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
     }
     function transpose(a) {
       return Object.keys(a[0]).map(
-          function (c) { return a.map(function (r) { return r[c]; }); }
+          (c) { return a.map(function (r) => { return r[c]; }); }
           );
       }
     function obpchartPlot(zData) {
@@ -123,7 +123,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
           .attr("transform", function(d, i) {
               return "translate(0," + i*gap + ")";
           })
-          .each(function (d, i) {
+          .each((d, i) => {
               this.setAttribute("class",d.name);
               //linecolorOn=d3color(i % zData.dataseries.length);
               linecolorOn=getColor(d,i);
@@ -301,7 +301,6 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
           //.attr("fill", function(d,i){ return d3color(i % zData.dataseries.length);})
           .attr("opacity", 0.3);
           //.attr("fill", function(d,i){ return colorO[i];});
-
 
 
           svg.selectAll(".bottomLabelColoredLine")
@@ -495,7 +494,7 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
             ]
         }
         ]
-      };*//*
+      };*/ /*
       obpchartPlot(modelData);
     };//end of render
 
@@ -531,5 +530,3 @@ function mmsD3ObservationProfileChartIo(ElementService, UtilsService, PlotServic
     }; //return
 }
 */
-
-

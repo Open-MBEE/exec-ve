@@ -10,11 +10,7 @@ import angular from 'angular'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import {
-    ElementService,
-    ViewService,
-    AuthService,
-} from '@ve-utils/mms-api-client'
+import { ElementService, AuthService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
     MathJaxService,
@@ -25,7 +21,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -46,9 +42,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {MathJaxService} mathJaxSvc
  *
  * @restrict E
- *
- * @description
- * Given an element id, puts in the element's name binding, if there's a parent
+ * * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -109,7 +103,7 @@ export class TranscludeEnumController
         this.checkCircular = false
     }
 
-    protected config = () => {
+    protected config = (): void => {
         // Need a way to put in a query for allowed options.
         // Value to save the resulting pointer
         // Transclusion for new options
@@ -184,7 +178,7 @@ export class TranscludeEnumController
     }
 
     // private _startEdit(
-    //     ctrl: ExtensionController,
+    //     ctrl: ComponentController,
     //     isEditable: boolean,
     //     domElement: JQuery<HTMLElement>,
     //     template: string | Injectable<(...args: any[]) => string>,

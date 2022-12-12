@@ -35,11 +35,11 @@ veApp.controller('ReorderGroupCtrl', [
         $scope.isSaving = false
         $scope.targetId = ''
         $scope.treeOptions = {
-            dropped: function (change) {
+            dropped: (change) => {
                 sortRecursively(children)
                 $scope.targetId = ''
             },
-            accept: function (sourceNodeScope, destNodeScope, destIndex) {
+            accept: (sourceNodeScope, destNodeScope, destIndex) => {
                 // allow moving to the root or to a group
                 const accept =
                     destNodeScope.node &&
@@ -57,7 +57,7 @@ veApp.controller('ReorderGroupCtrl', [
                 }
                 return accept
             },
-            dragStart: function (data) {
+            dragStart: (data) => {
                 $scope.targetId = data.dest.nodesScope.$nodeScope.$modelValue.id
             },
         }
@@ -71,17 +71,17 @@ veApp.controller('ReorderGroupCtrl', [
 
         function generateTree() {
             // create a node for each groupOb
-            let tree = groupObs.map(function (groupOb) {
+            let tree = groupObs.map((groupOb) => {
                 return createNode(groupOb.name, 'group', [], groupOb)
             })
 
             // add document to its group
             documentObs
-                .filter(function (documentOb) {
+                .filter((documentOb) => {
                     return documentOb._groupId
                 })
-                .forEach(function (documentOb) {
-                    const parent = _.find(tree, function (node) {
+                .forEach((documentOb) => {
+                    const parent = _.find(tree, (node) => {
                         return node.data.id === documentOb._groupId
                     })
                     if (parent) {
@@ -92,8 +92,8 @@ veApp.controller('ReorderGroupCtrl', [
                 })
 
             // for any group that has a parent group, establish that connection
-            tree.forEach(function (groupNode) {
-                const foundParent = _.find(tree, function (node) {
+            tree.forEach((groupNode) => {
+                const foundParent = _.find(tree, (node) => {
                     return node.data.id === groupNode.data._parentId
                 })
                 if (foundParent) {
@@ -104,16 +104,16 @@ veApp.controller('ReorderGroupCtrl', [
             })
 
             // only groups that don't have parents show up at root level
-            tree = tree.filter(function (groupNode) {
+            tree = tree.filter((groupNode) => {
                 return !groupNode.isChild
             })
 
             // add all the documents that don't belong to any group
             documentObs
-                .filter(function (documentOb) {
+                .filter((documentOb) => {
                     return !documentOb._groupId
                 })
-                .forEach(function (documentOb) {
+                .forEach((documentOb) => {
                     tree.push(
                         createNode(documentOb.name, 'view', [], documentOb)
                     )
@@ -152,14 +152,14 @@ veApp.controller('ReorderGroupCtrl', [
                     }
                 )
                 ElementService.updateElements(elementsToUpdate, false)
-                    .then(function () {
+                    .then(() => {
                         cleanupCache(results)
                         navigateAway(true)
                     })
-                    .catch(function () {
+                    .catch(() => {
                         growl.error('Failed to save the grouping!')
                     })
-                    .finally(function () {
+                    .finally(() => {
                         $scope.isSaving = false
                     })
             } else {
@@ -170,7 +170,7 @@ veApp.controller('ReorderGroupCtrl', [
         function findNodesToUpdate(result) {
             // ignore root
             const root = $scope.tree[0]
-            root.children.forEach(function (node) {
+            root.children.forEach((node) => {
                 // handle node change at the root level
                 if (
                     (node.type === 'group' && node.data._parentId) ||
@@ -187,7 +187,7 @@ veApp.controller('ReorderGroupCtrl', [
             })
 
             function helper(node, result) {
-                node.children.forEach(function (childNode) {
+                node.children.forEach((childNode) => {
                     if (
                         (childNode.type === 'group' &&
                             childNode.data._parentId !== node.data.id) ||
@@ -216,7 +216,7 @@ veApp.controller('ReorderGroupCtrl', [
                 projectOb.id,
                 refOb.id,
             ])
-            results.forEach(function (result) {
+            results.forEach((result) => {
                 // for group or document that is moved to the root, _parentId for "group" and _groupId for "document" need to be set to undefined
                 const newOwnerId =
                     result.newOwnerId.indexOf(projectOb.id) !== -1
@@ -226,7 +226,7 @@ veApp.controller('ReorderGroupCtrl', [
                 if (result.node.type === 'group') {
                     const cacheGroupOb = _.find(
                         listOfGroupInCache,
-                        function (groupOb) {
+                        (groupOb) => {
                             return groupOb.id === result.node.data.id
                         }
                     )
@@ -236,7 +236,7 @@ veApp.controller('ReorderGroupCtrl', [
                 } else if (result.node.type === 'view') {
                     const cacheDocument = _.find(
                         listOfDocInCache,
-                        function (documentOb) {
+                        (documentOb) => {
                             return documentOb.id === result.node.data.id
                         }
                     )
@@ -261,7 +261,7 @@ veApp.controller('ReorderGroupCtrl', [
 
         function sortRecursively(nodes) {
             nodes.sort(comparator)
-            nodes.forEach(function (node) {
+            nodes.forEach((node) => {
                 sortRecursively(node.children)
             })
         }

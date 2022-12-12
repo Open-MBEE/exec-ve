@@ -6,6 +6,7 @@ import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
 import { MergeConfirmResolveFn } from '@ve-core/diff-merge/modals/merge-confirm-modal.component'
 import { ToolbarService } from '@ve-core/tool-bar'
 import {
+    ApiService,
     AuthService,
     ElementService,
     PermissionsService,
@@ -17,8 +18,9 @@ import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import { RefObject } from '@ve-types/mms'
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeModalService } from '@ve-types/view-editor'
 
 /**
  * @ngdoc component
@@ -40,9 +42,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {SpecService} specSvc
  * @requires {ToolbarService} toolbarSvc
  *
- *
- * @description
- * Displays a list of branches/tags with details. Provides options for taking action on ref.
+ * * Displays a list of branches/tags with details. Provides options for taking action on ref.
  * For the time being it only allows for running a doc merge job on current document.
  *
  * @param {RefObject[]} mmsBranches List of current project branches
@@ -70,12 +70,13 @@ class SpecRefListController extends SpecTool implements ISpecTool {
         elementSvc: ElementService,
         projectSvc: ProjectService,
         utilsSvc: UtilsService,
+        apiSvc: ApiService,
         viewSvc: ViewService,
         permissionsSvc: PermissionsService,
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
-        private $uibModal: angular.ui.bootstrap.IModalService
+        private $uibModal: VeModalService
     ) {
         super(
             $scope,
@@ -88,6 +89,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
             elementSvc,
             projectSvc,
             utilsSvc,
+            apiSvc,
             viewSvc,
             permissionsSvc,
             eventSvc,
@@ -98,16 +100,16 @@ class SpecRefListController extends SpecTool implements ISpecTool {
         this.specTitle = 'Branch/Tag List'
     }
 
-    public config = () => {
+    public config = (): void => {
         this.showMerge =
             this.uRLSvc.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1
         this.runCleared = true
         this.docEditable = false
     }
     //Callback function for document change
-    public initCallback = () => {
+    public initCallback = (): void => {
         if (this.document) this.docName = this.document.name
-        if (!this.utilsSvc.isDocument(this.element)) {
+        if (!this.apiSvc.isDocument(this.element)) {
             this.isDoc = false
             return
         } else {
@@ -122,11 +124,11 @@ class SpecRefListController extends SpecTool implements ISpecTool {
             )
     }
 
-    public docMergeAction = (srcRef) => {
+    public docMergeAction = (srcRef: RefObject): void => {
         this.srcRefOb = srcRef
 
-        const instance = this.$uibModal.open({
-            resolve: <MergeConfirmResolveFn>{
+        const instance = this.$uibModal.open<MergeConfirmResolveFn, void>({
+            resolve: {
                 getDocName: (): string => {
                     if (this.document) return this.document.name
                     return '(Not Found)'
@@ -137,9 +139,14 @@ class SpecRefListController extends SpecTool implements ISpecTool {
             },
             component: 'mergeConfirmModal',
         })
-        instance.result.then(function (data) {
-            // TODO: do anything here?
-        })
+        instance.result.then(
+            () => {
+                // TODO: do anything here?
+            },
+            () => {
+                this.growl.error('Unable to Merge')
+            }
+        )
     }
 }
 

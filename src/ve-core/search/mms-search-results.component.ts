@@ -1,17 +1,18 @@
-import * as angular from "angular";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {veCore} from "@ve-core";
+import angular from 'angular'
 
-export class MmsSearchResultsController implements angular.IComponentController {
+import { veCore } from '@ve-core'
 
-}
+import { VeComponentOptions } from '@ve-types/angular'
+
+export class MmsSearchResultsController
+    implements angular.IComponentController {}
 const MmsSearchResultsComponent: VeComponentOptions = {
-    selector: "mmsSearchResults",
+    selector: 'mmsSearchResults',
     require: {
-      $search: "^^mmsSearch"
+        $search: '^^mmsSearch',
     },
     bindings: {
-        elem: "<mmsElement"
+        elem: '<mmsElement',
     },
     template: `
     <div class="elem-name-wrapper">
@@ -136,7 +137,7 @@ const MmsSearchResultsComponent: VeComponentOptions = {
     <div>Last modified {{$ctrl.elem._modified | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.elem._modifier}}</b></div>
 </div>
     `,
-    controller: MmsSearchResultsController
+    controller: MmsSearchResultsController,
 }
 
-veCore.component(MmsSearchResultsComponent.selector,MmsSearchResultsComponent)
+veCore.component(MmsSearchResultsComponent.selector, MmsSearchResultsComponent)

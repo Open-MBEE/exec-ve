@@ -26,9 +26,10 @@ import {
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
 import { ElementObject, ElementsRequest } from '@ve-types/mms'
-import { VeComponentOptions, VeModalService } from '@ve-types/view-editor'
+import { VeModalService } from '@ve-types/view-editor'
 
 const MainComponent: VeComponentOptions = {
     selector: 'main',
@@ -141,12 +142,11 @@ const MainComponent: VeComponentOptions = {
             private eventSvc: EventService
         ) {}
 
-        $onInit() {
+        $onInit(): void {
             this.eventSvc.$init(this)
 
             this.rootScopeSvc.veViewContentLoading(false)
             this.rootScopeSvc.treeInitialSelection('')
-            this.rootScopeSvc.veFn(false)
 
             this.rootScopeSvc.veCommentsOn(false)
             this.rootScopeSvc.veElementsOn(false)
@@ -275,7 +275,7 @@ const MainComponent: VeComponentOptions = {
                                     elementId: element.id,
                                     commitId: 'latest',
                                 },
-                                JSON.parse(JSON.stringify(element)),
+                                _.cloneDeep(element),
                                 true
                             )
                         }

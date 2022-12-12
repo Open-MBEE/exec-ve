@@ -2,8 +2,11 @@ import angular from 'angular'
 
 import ITreeNode = AngularUITree.ITreeNode
 
-import { ElementObject } from '@ve-types/mms'
+import { ElementObject, ViewObject } from '@ve-types/mms'
 
+/**
+ * @typedef TreeBranch
+ */
 export interface TreeBranch extends ITreeNode {
     label: string
     type: string

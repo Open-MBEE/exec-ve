@@ -3,12 +3,7 @@ import angular from 'angular'
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { Transclusion, ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import {
-    ElementService,
-    AuthService,
-    ViewService,
-    URLService,
-} from '@ve-utils/mms-api-client'
+import { ElementService, AuthService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
     UtilsService,
@@ -19,7 +14,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -39,9 +34,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
  * @requires {MathJaxService} mathJaxSvc
- *
- * @description
- * Given an element id, puts in the element's documentation binding, if there's a parent
+ * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
  *
@@ -124,7 +117,7 @@ export class TranscludeDocController
         this.checkCircular = true
     }
 
-    config = () => {
+    config = (): void => {
         this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this)
 
         this.$element.on('click', (e) => {
@@ -153,15 +146,15 @@ export class TranscludeDocController
                     this.mmsViewCtrl
                 )
 
-            this.save = () => {
+            this.save = (): void => {
                 this.componentSvc.saveAction(this, this.$element, false)
             }
 
-            this.saveC = () => {
+            this.saveC = (): void => {
                 this.componentSvc.saveAction(this, this.$element, true)
             }
 
-            this.cancel = () => {
+            this.cancel = (): void => {
                 this.componentSvc.cancelAction(
                     this,
                     this.recompile,
@@ -169,7 +162,7 @@ export class TranscludeDocController
                 )
             }
 
-            this.startEdit = () => {
+            this.startEdit = (): void => {
                 this.componentSvc.startEdit(
                     this,
                     this.mmsViewCtrl.isEditable(),
@@ -179,7 +172,7 @@ export class TranscludeDocController
                 )
             }
 
-            this.preview = () => {
+            this.preview = (): void => {
                 this.componentSvc.previewAction(
                     this,
                     this.recompile,
@@ -189,7 +182,7 @@ export class TranscludeDocController
         }
 
         if (this.mmsViewPresentationElemCtrl) {
-            this.delete = () => {
+            this.delete = (): void => {
                 this.componentSvc.deleteAction(
                     this,
                     this.bbApi,
@@ -246,7 +239,9 @@ export class TranscludeDocController
         }
     }
 
-    public getContent = (preview?) => {
+    public getContent = (
+        preview?: boolean
+    ): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
 
         let doc = preview ? this.edit.documentation : this.element.documentation
@@ -261,7 +256,7 @@ export class TranscludeDocController
         doc = doc.replace(this.spacePeriod, '>.')
         doc = doc.replace(this.spaceSpace, '> ')
         doc = doc.replace(this.spaceComma, '>,')
-        let result = ''
+        let result: string
         if (preview) {
             result = '<div class="panel panel-info">' + doc + '</div>'
         } else {
@@ -318,6 +313,7 @@ export const TranscludeDocComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
+        mmsCallback: '&',,
     },
     require: {
         mmsViewCtrl: '?^view',

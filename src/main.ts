@@ -8,8 +8,7 @@ import './assets/images/arrow-change.svg'
 
 // import "./ve-utils/ve-utils.main"
 // import "./ve-directives/ve-directives.main"
-import "@ve-app"
-
+import '@ve-app'
 
 /**
  * Feature ideas:

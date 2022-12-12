@@ -13,8 +13,9 @@ export interface VeExperimentDescriptor {
 
 export interface VeExperimentConfig {
     specTools?: SpecToolConfig[]
-    transclusions?: VeExperimentConfig[]
-    presentations?: VeExperimentConfig[]
+    transclusions?: VeExperimentDescriptor[]
+    presentations?: VeExperimentDescriptor[]
+    addElements?: VeExperimentDescriptor[]
 }
 
 export interface SpecToolConfig extends VeExperimentConfig {
@@ -25,8 +26,8 @@ export interface SpecToolConfig extends VeExperimentConfig {
 
 export class ExtensionService {
     extensionTags: string[] = []
-    extensionData: any[] = []
-    allowedExtensions: string[] = ['present', 'transclude', 'spec']
+    extensionData: unknown[] = []
+    allowedExtensions: string[] = ['present', 'transclude', 'spec', 'add']
 
     public AnnotationType = {
         mmsTranscludeName: 1,
@@ -40,7 +41,12 @@ export class ExtensionService {
 
     static $inject = ['growl']
     constructor(private growl: angular.growl.IGrowlService) {
-        angular.module('ve-components')['_invokeQueue'].forEach((value) => {
+        ;(
+            angular.module('ve-components')['_invokeQueue'] as {
+                1: string
+                2: string[]
+            }[]
+        ).forEach((value) => {
             if (value[1] === 'component') {
                 this.extensionTags.push(_.kebabCase(value[2][0]))
                 this.extensionData.push(value[2])
@@ -66,8 +72,6 @@ export class ExtensionService {
         }
         return tag
     }
-
-    public getExtensionData() {}
 
     public getExtensions(extPrefix: string, exclude?: string[]): string[] {
         return this.extensionTags.filter((value) => {

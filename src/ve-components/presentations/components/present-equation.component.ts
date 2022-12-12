@@ -1,24 +1,22 @@
-import * as angular from "angular";
-import {PresentationComponentOptions} from "@ve-components/presentations";
-import {veComponents} from "@ve-components";
+import { PresentationLite } from '@ve-components/presentations'
 
-let PresentEquationComponent: PresentationComponentOptions = {
+import { veComponents } from '@ve-components'
+
+import { PresentationComponentOptions } from '@ve-types/components'
+
+const PresentEquationComponent: PresentationComponentOptions = {
     selector: 'presentEquation',
     template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,
     bindings: {
-       peObject: '<',
+        peObject: '<',
         element: '<',
-        peNumber: '<'
+        peNumber: '<',
     },
-    controller: class PresentEquationController implements angular.IComponentController {
-
-        public peObject
-        public element
-        public peNumber
-
-        constructor() {}
-    }
+    controller: PresentationLite,
 }
 
-veComponents.component(PresentEquationComponent.selector,PresentEquationComponent);
+veComponents.component(
+    PresentEquationComponent.selector,
+    PresentEquationComponent
+)

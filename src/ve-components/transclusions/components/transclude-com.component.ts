@@ -1,12 +1,20 @@
-import * as angular from "angular";
-import {veComponents} from "@ve-components";
-import {ExtensionService, ComponentService} from "@ve-components/services"
-import {ButtonBarService} from "@ve-core/button-bar";
-import {ITransclusion, Transclusion} from "@ve-components/transclusions";
-import {AuthService, ElementService} from "@ve-utils/mms-api-client";
-import {EventService, ImageService, MathJaxService, UtilsService} from "@ve-utils/services";
-import {SchemaService} from "@ve-utils/model-schema";
-import {VeComponentOptions} from "@ve-types/view-editor";
+import angular from 'angular'
+
+import { ExtensionService, ComponentService } from '@ve-components/services'
+import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import { ButtonBarService } from '@ve-core/button-bar'
+import { AuthService, ElementService } from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
+import {
+    EventService,
+    ImageService,
+    MathJaxService,
+    UtilsService,
+} from '@ve-utils/services'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 
 /**
  * @ngdoc directive
@@ -22,9 +30,7 @@ import {VeComponentOptions} from "@ve-types/view-editor";
  * @requires growl
  * @requires MathJax
  *
- *
- * @description
- * Given an element id, puts in the element's documentation binding, if there's a parent
+ * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
  * (This is different from mmsTranscludeDoc because of special styles applied to comments)
@@ -34,7 +40,10 @@ import {VeComponentOptions} from "@ve-types/view-editor";
  * @param {string=master} mmsRefId Reference to use, defaults to master
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
-export class TranscludeComController extends Transclusion implements ITransclusion {
+export class TranscludeComController
+    extends Transclusion
+    implements ITransclusion
+{
     protected editorTemplate: string = `
     <div class="panel panel-default no-print">
     <div class="panel-heading clearfix">
@@ -56,8 +65,7 @@ export class TranscludeComController extends Transclusion implements ITransclusi
 </div>
 `
 
-
-    static $inject = Transclusion.$inject;
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: angular.IQService,
@@ -76,51 +84,72 @@ export class TranscludeComController extends Transclusion implements ITransclusi
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
     ) {
-        super($q, $scope,$compile,$element,growl,componentSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
-            mathJaxSvc, extensionSvc, buttonBarSvc, imageSvc)
+        super(
+            $q,
+            $scope,
+            $compile,
+            $element,
+            growl,
+            componentSvc,
+            elementSvc,
+            utilsSvc,
+            schemaSvc,
+            authSvc,
+            eventSvc,
+            mathJaxSvc,
+            extensionSvc,
+            buttonBarSvc,
+            imageSvc
+        )
         this.cfType = 'doc'
         this.cfTitle = 'comment'
         this.cfKind = 'Comment'
-        this.checkCircular = true;
+        this.checkCircular = true
     }
 
-    protected config = () => {
-        this.$element.on('click',(e) => {
-            if (this.startEdit && !this.nonEditable)
-                this.startEdit();
+    protected config = (): void => {
+        this.$element.on('click', (e) => {
+            if (this.startEdit && !this.nonEditable) this.startEdit()
 
             if (this.mmsViewCtrl)
-                this.mmsViewCtrl.transcludeClicked(this.element);
-            if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
-                this.growl.warning("Comment is not editable.");
+                this.mmsViewCtrl.transcludeClicked(this.element)
+            if (
+                this.nonEditable &&
+                this.mmsViewCtrl &&
+                this.mmsViewCtrl.isEditable()
+            ) {
+                this.growl.warning('Comment is not editable.')
             }
-            e.stopPropagation();
-        });
+            e.stopPropagation()
+        })
 
         if (this.mmsViewCtrl) {
-
-            this.isEditing = false;
-            this.elementSaving = false;
-            this.view = this.mmsViewCtrl.getView();
+            this.isEditing = false
+            this.elementSaving = false
+            this.view = this.mmsViewCtrl.getView()
             this.isDirectChildOfPresentationElement =
                 this.componentSvc.isDirectChildOfPresentationElementFunc(
                     this.$element,
                     this.mmsViewCtrl
                 )
 
-            this.save = () => {
+            this.save = (): void => {
                 this.componentSvc.saveAction(this, this.$element, false)
             }
 
-            this.saveC = () => {
+            this.saveC = (): void => {
                 this.componentSvc.saveAction(this, this.$element, true)
             }
 
-            this.cancel = () => {
-                this.componentSvc.cancelAction(this, this.recompile, this.$element)
+            this.cancel = (): void => {
+                this.componentSvc.cancelAction(
+                    this,
+                    this.recompile,
+                    this.$element
+                )
             }
 
-            this.startEdit = () => {
+            this.startEdit = (): void => {
                 this.componentSvc.startEdit(
                     this,
                     this.mmsViewCtrl.isEditable(),
@@ -130,14 +159,17 @@ export class TranscludeComController extends Transclusion implements ITransclusi
                 )
             }
 
-            this.preview = () => {
-                this.componentSvc.previewAction(this, this.recompile, this.$element)
+            this.preview = (): void => {
+                this.componentSvc.previewAction(
+                    this,
+                    this.recompile,
+                    this.$element
+                )
             }
         }
 
         if (this.mmsViewPresentationElemCtrl) {
-
-            this.delete = () => {
+            this.delete = (): void => {
                 this.componentSvc.deleteAction(
                     this,
                     this.bbApi,
@@ -150,50 +182,74 @@ export class TranscludeComController extends Transclusion implements ITransclusi
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
             this.presentationElem =
                 this.mmsViewPresentationElemCtrl.getPresentationElement()
-            var auto = [
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Image',this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Paragraph', this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','List', this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID','Table', this.schema),
+            const auto = [
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'Image',
+                    this.schema
+                ),
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'Paragraph',
+                    this.schema
+                ),
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'List',
+                    this.schema
+                ),
+                this.schemaSvc.getValue(
+                    'TYPE_TO_CLASSIFIER_ID',
+                    'Table',
+                    this.schema
+                ),
             ]
 
             if (auto.indexOf(this.instanceSpec.classifierIds[0]) >= 0)
                 //do not allow model generated to be deleted
-                this.isDirectChildOfPresentationElement = false;
+                this.isDirectChildOfPresentationElement = false
             if (this.isDirectChildOfPresentationElement)
-                this.panelTitle = this.instanceSpec.name;
-                this.panelType = 'Comment';
+                this.panelTitle = this.instanceSpec.name
+            this.panelType = 'Comment'
         }
     }
 
-    public getContent = (preview?) => {
-        let deferred = this.$q.defer<string | HTMLElement[]>();
+    public getContent = (
+        preview?: boolean
+    ): VePromise<string | HTMLElement[], string> => {
+        const deferred = this.$q.defer<string | HTMLElement[]>()
 
-        let doc = (preview ? this.edit.documentation : this.element.documentation) || '(No comment)';
-        doc += ' - <span class="mms-commenter"> Comment by <b>' + this.element._creator + '</b></span>';
+        let doc =
+            (preview ? this.edit.documentation : this.element.documentation) ||
+            '(No comment)'
+        doc +=
+            ' - <span class="mms-commenter"> Comment by <b>' +
+            this.element._creator +
+            '</b></span>'
 
-        let result: string = '';
+        let result = ''
         if (preview) {
-            result = '<div class="panel panel-info">' + doc + '</div>';
+            result = '<div class="panel panel-info">' + doc + '</div>'
         } else {
             this.isEditing = false
-            result = doc;
+            result = doc
         }
         if (!this.mmsGenerateForDiff) {
-            let resultHtml = $('<p></p>').html(result).toArray()
-            this.mathJaxSvc
-                .typeset(resultHtml)
-                .then(() => deferred.resolve(resultHtml), (reason) => {
-                    deferred.reject(reason);
-                })
+            const resultHtml = $('<p></p>').html(result).toArray()
+            this.mathJaxSvc.typeset(resultHtml).then(
+                () => deferred.resolve(resultHtml),
+                (reason) => {
+                    deferred.reject(reason)
+                }
+            )
         } else {
-            deferred.resolve(result);
+            deferred.resolve(result)
         }
-        return deferred.promise;
-    };
+        return deferred.promise
+    }
 }
 
-export let TranscludeComComponent: VeComponentOptions = {
+export const TranscludeComComponent: VeComponentOptions = {
     selector: 'transcludeCom',
     template: `<div></div>`,
     bindings: {
@@ -205,6 +261,7 @@ export let TranscludeComComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
+        mmsCallback: '&',,
     },
     require: {
         mmsViewCtrl: '?^view',
@@ -214,4 +271,3 @@ export let TranscludeComComponent: VeComponentOptions = {
 }
 
 veComponents.component(TranscludeComComponent.selector, TranscludeComComponent)
-

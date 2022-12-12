@@ -67,7 +67,7 @@ veApp.config([
         $provide: angular.auto.IProvideService,
         $urlServiceProvider: URLServiceProvider,
         $locationProvider: ILocationProvider
-    ) {
+    ): void {
         // override uibTypeaheadPopup functionality
         $provide.decorator('uibTypeaheadPopupDirective', [
             '$delegate',
@@ -79,9 +79,15 @@ veApp.config([
                         attr: angular.IAttributes
                     ): void
                 } & angular.IDirective)[]
-            ) {
+            ): {
+                link?(
+                    scope: angular.IScope,
+                    element: JQLite,
+                    attr: angular.IAttributes
+                ): void
+            } & angular.IDirective[] {
                 const originalLinkFn = $delegate[0].link
-                $delegate[0].compile = function (): angular.IDirectiveLinkFn {
+                $delegate[0].compile = (): angular.IDirectiveLinkFn => {
                     return function newLinkFn(
                         scope: {
                             selectActive(matchId: string): void
@@ -93,7 +99,7 @@ veApp.config([
                         // fire the originalLinkFn
                         // eslint-disable-next-line prefer-rest-params
                         originalLinkFn.apply($delegate[0], [scope, elem, attr])
-                        scope.selectActive = function (matchIdx) {
+                        scope.selectActive = (matchIdx): void => {
                             // added behavior
                             elem.children().removeClass('active')
                             // default behavior
@@ -127,19 +133,19 @@ veApp.config([
                 resolve: {
                     bannerOb: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     loginBannerOb: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getLoginBanner()
                         },
                     ],
                     paramsOb: [
                         '$transition$',
-                        function ($transition$) {
+                        ($transition$) => {
                             return $transition$.params()
                         },
                     ],
@@ -161,7 +167,7 @@ veApp.config([
                 resolve: {
                     token: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getToken()
                         },
                     ],
@@ -177,25 +183,25 @@ veApp.config([
                 resolve: {
                     token: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getToken()
                         },
                     ],
                     bannerOb: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     loginBannerOb: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getLoginBanner()
                         },
                     ],
                     orgObs: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getOrgs()
                         },
                     ],
@@ -225,21 +231,19 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        function ($transition$: Transition): {
-                            [paramName: string]: any
-                        } {
+                        ($transition$: Transition): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
                     token: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getToken()
                         },
                     ],
                     bannerOb: [
                         'ResolveService',
-                        function (resolveSvc: ResolveService) {
+                        (resolveSvc: ResolveService) => {
                             return resolveSvc.getBanner()
                         },
                     ],
@@ -282,7 +286,7 @@ veApp.config([
                     ],
                     tagObs: [
                         'refObs',
-                        function (refObs) {
+                        (refObs) => {
                             const ret = []
                             for (let i = 0; i < refObs.length; i++) {
                                 if (refObs[i].type === 'Tag')
@@ -293,7 +297,7 @@ veApp.config([
                     ],
                     branchObs: [
                         'refObs',
-                        function (refObs) {
+                        (refObs) => {
                             const ret = []
                             for (let i = 0; i < refObs.length; i++) {
                                 if (refObs[i].type === 'Branch')
@@ -363,15 +367,13 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        function ($transition$: Transition): {
-                            [paramName: string]: any
-                        } {
+                        ($transition$: Transition): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
                     refresh: [
                         '$transition$',
-                        function ($transition$: Transition): boolean {
+                        ($transition$: Transition): boolean => {
                             const options = $transition$.options()
                             return (
                                 options.reload === true ||
@@ -570,7 +572,7 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        function ($transition$): ParamsObject {
+                        ($transition$): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
@@ -638,7 +640,7 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        function ($transition$): ParamsObject {
+                        ($transition$): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
@@ -659,7 +661,7 @@ veApp.config([
                     ],
                     viewOb: [
                         'documentOb',
-                        function (documentOb: ViewObject) {
+                        (documentOb: ViewObject) => {
                             return documentOb
                         },
                     ],
@@ -678,7 +680,7 @@ veApp.config([
                     docMeta: [
                         'ViewService',
                         'documentOb',
-                        function (ViewService, documentOb) {
+                        (ViewService, documentOb) => {
                             return ViewService.getDocMetadata({
                                 projectId: documentOb._projectId,
                                 refId: documentOb._refId,
@@ -731,7 +733,7 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        function ($transition$): ParamsObject {
+                        ($transition$): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
@@ -920,7 +922,7 @@ veApp.config([
                 eventSvc: EventService
             ) {
                 return {
-                    response: function (response) {
+                    response: (response) => {
                         if (response.status === 202) {
                             eventSvc.$broadcast('mms.working', response)
                         }
@@ -988,7 +990,7 @@ veApp.run([
                     deferred.resolve()
                 },
                 () => {
-                    $http.pendingRequests.forEach(function (pendingReq) {
+                    $http.pendingRequests.forEach((pendingReq) => {
                         if (pendingReq.cancel) {
                             pendingReq.cancel.resolve('cancelled')
                         }
@@ -1088,7 +1090,7 @@ veApp.run([
 veApp.run([
     '$uiRouter',
     '$trace',
-    function ($uiRouter, $trace) {
+    ($uiRouter, $trace) => {
         //var pluginInstance = $uiRouter.plugin(Visualizer);
         $trace.enable('TRANSITION')
     },

@@ -1,37 +1,58 @@
+import angular from 'angular'
+import _ from 'lodash'
 
-import {CommitObject, ElementObject} from "@ve-types/mms";
-import angular from "angular";
-import {veCore} from "@ve-core";
+import { RevertConfirmResolveFn } from '@ve-core/diff-merge'
+import { ApiService, ElementService } from '@ve-utils/mms-api-client'
+
+import { veCore } from '@ve-core'
+
+import { VePromise } from '@ve-types/angular'
+import {
+    CommitObject,
+    ElementObject,
+    ElementsRequest,
+    RefObject,
+} from '@ve-types/mms'
+import { VeModalService } from '@ve-types/view-editor'
 
 export interface Commit {
-    ref: { id: string, type?: "Branch" | "Tag", _projectId?: string },
+    ref: RefObject
     isOpen: boolean
     refIsOpen?: boolean
     history: CommitObject[]
     commitSelected: CommitObject | string
 }
 
+export interface CompareData {
+    baseCommit: Commit
+    compareCommit: Commit
+    element: ElementObject
+}
+
+export interface DiffResponse {
+    status?: 'new' | 'deleted' | 'changed'
+    diff?: DiffDetail
+}
+
+export interface DiffDetail {
+    name: boolean
+    documentation: boolean
+    value: boolean
+    [key: string]: boolean
+}
+
 export class DiffMergeService {
-
-    private revertData: {
-        elementId: string
-        baseCommit: object
-        refId: string
-        compareCommit: object
-        projectId: string
-        element: object
-    }
-
-    constructor(private $uibModal: angular.ui.bootstrap.IModalService) {
-    }
-
+    static $inject = ['growl', '$uibModal', 'ApiService']
+    constructor(
+        private $q: angular.IQService,
+        private growl: angular.growl.IGrowlService,
+        private $uibModal: VeModalService,
+        private apiSvc: ApiService,
+        private elementSvc: ElementService
+    ) {}
 
     /**
-     * @ngdoc method
-     * @name DiffMergeService#revertAction
-     * @methodOf veCore.ExtUtilsService
-     * @description
-     * called by transcludes and section, cancels edited element
+     * @name DiffMergeService#revertAction     * called by transcludes and section, cancels edited element
      * uses these in the scope:
      *   element - element object for the element to edit (for sections it's the instance spec)
      *   edit - edit object
@@ -45,31 +66,106 @@ export class DiffMergeService {
      * @param {JQLite} domElement dom of the directive, jquery wrapped
      */
     public revertAction(
-        $ctrl: { mmsElementId: string, mmsProjectId: string, mmsRefId: string, baseCommit: Commit, compareCommit: Commit, element: ElementObject },
-    domElement: JQLite
-    ) {
-        this.revertData = {
-            elementId: $ctrl.mmsElementId,
-            projectId: $ctrl.mmsProjectId,
-            refId: $ctrl.mmsRefId,
-            baseCommit: $ctrl.baseCommit,
-            compareCommit: $ctrl.compareCommit,
-            element: $ctrl.element,
-        }
-        const instance = this.$uibModal.open({
+        reqOb: ElementsRequest<string>,
+        revertData: CompareData,
+        domElement: JQLite
+    ): void {
+        const instance = this.$uibModal.open<RevertConfirmResolveFn, void>({
             size: 'lg',
             windowClass: 'revert-spec',
             component: 'revertConfirm',
             resolve: {
-                getRevertData: () => {
-                    return this.revertData
+                reqOb: () => {
+                    return reqOb
+                },
+                revertData: () => {
+                    return revertData
                 },
             },
         })
-        instance.result.then((data) => {
-            // TODO: do anything here?
-        })
+        instance.result.then(
+            () => {
+                this.growl.success('Element reverted')
+            },
+            () => {
+                this.growl.error('Revert Cancelled')
+            }
+        )
+    }
+
+    public checkDiff(sourceOb: ElementObject): VePromise<DiffResponse> {
+        const deferred = this.$q.defer<DiffResponse>()
+        const diff: DiffDetail = {
+            name: false,
+            documentation: false,
+            value: false,
+        }
+        let response: DiffResponse
+        this.elementSvc
+            .getElement<ElementObject>(
+                this.apiSvc.makeElementRequestObject(sourceOb),
+                1,
+                true,
+                true
+            )
+            .then(
+                (targetOb) => {
+                    if (!targetOb) {
+                        response.status = 'new'
+                        deferred.resolve(response)
+                    }
+                    if (sourceOb.name !== targetOb.name) {
+                        diff.name = true
+                    }
+                    if (sourceOb.documentation !== targetOb.documentation) {
+                        diff.documentation = true
+                    }
+                    if (
+                        (sourceOb.type === 'Property' ||
+                            sourceOb.type === 'Port') &&
+                        !_.isEqual(sourceOb.defaultValue, targetOb.defaultValue)
+                    ) {
+                        diff.value = true
+                    } else if (
+                        sourceOb.type === 'Slot' &&
+                        !_.isEqual(sourceOb.value, targetOb.value)
+                    ) {
+                        diff.value = true
+                    } else if (
+                        sourceOb.type === 'Constraint' &&
+                        !_.isEqual(
+                            sourceOb.specification,
+                            targetOb.specification
+                        )
+                    ) {
+                        diff.value = true
+                    }
+                    let changed = false
+                    Object.keys(diff).forEach((value) => {
+                        changed = changed || diff[value]
+                    })
+                    if (changed) {
+                        response = {
+                            status: 'changed',
+                            diff,
+                        }
+                    }
+                    deferred.resolve(response)
+                },
+                (reason) => {
+                    if (reason.status === 410) {
+                        response.status = 'deleted'
+                        deferred.resolve(response)
+                    } else {
+                        this.growl.error(
+                            `Diff Check not completed - ${reason.message}`
+                        )
+                        deferred.reject(null)
+                    }
+                }
+            )
+        return deferred.promise
     }
 }
 
-veCore.service("DiffMergeService", DiffMergeService)
+veCore.service('DiffMergeService', DiffMergeService)

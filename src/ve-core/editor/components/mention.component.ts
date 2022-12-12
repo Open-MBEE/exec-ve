@@ -1,9 +1,58 @@
-import * as angular from "angular";
-import {EditorService, MentionService} from "@ve-core/editor";
-import {CoreUtilsService} from "@ve-core/services";
-import {veCore} from "@ve-core";
-import {ImageService} from "@ve-utils/services";
+import angular from 'angular'
 
+import { EditorService, MentionService } from '@ve-core/editor'
+
+import { veCore } from '@ve-core'
+
+export class MMSMentionController implements angular.IComponentController {
+    //Bindings
+    public mmsEditor
+    mmsMentionValue
+    mmsMentionId
+    mmsProjectId
+    mmsRefId
+
+    //Local
+    public fastCfListing
+
+    static $inject = ['MentionService', 'EditorService']
+
+    constructor(
+        private mentionSvc: MentionService,
+        private editorSvc: EditorService
+    ) {}
+
+    $onInit(): void {
+        this.fastCfListing = this.mentionSvc.getFastCfListing(
+            this.mmsProjectId,
+            this.mmsRefId
+        )
+        // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
+    }
+
+    public selectMentionItem($item) {
+        this._createCf($item)
+        this.mentionSvc.handleMentionSelection(
+            this.mmsEditor,
+            this.mmsMentionId
+        )
+    }
+
+    private _createCf($item) {
+        const tag =
+            '<transclusion mms-cf-type="' +
+            $item.type +
+            '" mms-element-id="' +
+            $item.id +
+            '">[cf:' +
+            $item.name +
+            '.' +
+            $item.type +
+            ']</transclusion>'
+        this.mmsEditor.insertHtml(tag)
+        this.editorSvc.focusOnEditorAfterAddingWidgetTag(this.mmsEditor)
+    }
+}
 
 const MMSMention = {
     selector: 'mention',
@@ -42,40 +91,9 @@ const MMSMention = {
         mmsMentionValue: '<',
         mmsMentionId: '<',
         mmsProjectId: '<',
-        mmsRefId: '<'
+        mmsRefId: '<',
     },
-    controller: class MMSMentionController implements angular.IComponentController {
-        //Bindings
-        public mmsEditor
-                mmsMentionValue
-                mmsMentionId
-                mmsProjectId
-                mmsRefId
-
-        //Local
-        public fastCfListing
-
-        static $inject = ["MentionService", "EditorService"];
-
-        constructor(private mentionSvc : MentionService, private editorSvc: EditorService) {
-        }
-
-        $onInit() {
-            this.fastCfListing = this.mentionSvc.getFastCfListing(this.mmsProjectId, this.mmsRefId);
-            // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
-        }
-
-        public selectMentionItem($item) {
-            this._createCf($item);
-            this.mentionSvc.handleMentionSelection(this.mmsEditor, this.mmsMentionId);
-        }
-
-        private _createCf($item) {
-            const tag = '<transclusion mms-cf-type="' + $item.type + '" mms-element-id="' + $item.id + '">[cf:' + $item.name + '.' + $item.type + ']</transclusion>';
-            this.mmsEditor.insertHtml(tag);
-            this.editorSvc.focusOnEditorAfterAddingWidgetTag(this.mmsEditor);
-        }
-    }
+    controller: MMSMentionController,
 }
 
-veCore.component(MMSMention.selector, MMSMention);
+veCore.component(MMSMention.selector, MMSMention)

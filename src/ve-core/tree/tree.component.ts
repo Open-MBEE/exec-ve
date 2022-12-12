@@ -1,17 +1,19 @@
-import * as angular from "angular";
-import Rx from 'rx-lite';
+import angular from 'angular'
+import Rx from 'rx-lite'
 
+import { TreeApi, TreeService } from '@ve-core/tree'
 import {
     ApplicationService,
     EventService,
     RootScopeService,
-    UtilsService
-} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {TreeBranch, TreeIcons, TreeOptions, TreeRow} from "@ve-types/tree";
-import {TreeApi, TreeService} from "@ve-core/tree";
+    UtilsService,
+} from '@ve-utils/services'
 
-import {veCore} from "@ve-core";
+import { veCore } from '@ve-core'
+
+import { VeComponentOptions } from '@ve-types/angular'
+import { TreeBranch, TreeIcons, TreeOptions, TreeRow } from '@ve-types/tree'
+
 /**
  * @ngdoc directive
  * @name veCore.directive:mmsTree
@@ -19,9 +21,7 @@ import {veCore} from "@ve-core";
  * @requires $timeout
  * @requires $templateCache
  *
- *
- * @description
- * Outputs a tree with customizable icons for different types of nodes and callback
+ * * Outputs a tree with customizable icons for different types of nodes and callback
  * for node branch clicked. Includes api, see methods section. (the name display is
  * angular data binded)
  * Object for tree model require (can have multiple roots):
@@ -108,91 +108,118 @@ class TreeController implements angular.IComponentController {
     private treeIcons: TreeIcons
     private treeApi: TreeApi
 
-    public treeRows: TreeRow[];
+    public treeRows: TreeRow[]
     public title
-    private selectedBranch: any;
-    public treeSpin: boolean = true;
+    private selectedBranch: any
+    public treeSpin: boolean = true
 
-    public subs: Rx.IDisposable[];
-    private treeFilter: any;
+    public subs: Rx.IDisposable[]
+    private treeFilter: any
 
     //Locals
-    public icons: TreeIcons;
-    public options: TreeOptions;
+    public icons: TreeIcons
+    public options: TreeOptions
 
-    static $inject = ['$scope', '$timeout', '$filter', 'ApplicationService',
-        'UtilsService', 'TreeService', 'RootScopeService', 'EventService'];
+    static $inject = [
+        '$scope',
+        '$timeout',
+        '$filter',
+        'ApplicationService',
+        'UtilsService',
+        'TreeService',
+        'RootScopeService',
+        'EventService',
+    ]
 
-    constructor(private $scope: angular.IScope, private $timeout: angular.ITimeoutService, private $filter: angular.IFilterService,
-                private applicationSvc: ApplicationService, private utilsSvc: UtilsService,
-                private treeSvc: TreeService, private rootScopeSvc: RootScopeService, private eventSvc: EventService) {}
+    constructor(
+        private $scope: angular.IScope,
+        private $timeout: angular.ITimeoutService,
+        private $filter: angular.IFilterService,
+        private applicationSvc: ApplicationService,
+        private utilsSvc: UtilsService,
+        private treeSvc: TreeService,
+        private rootScopeSvc: RootScopeService,
+        private eventSvc: EventService
+    ) {}
 
-    $onInit() {
+    $onInit(): void {
         this.treeSpin = this.treeApi.loading
-        this.eventSvc.$init(this);
-        this.treeRows = this.treeApi.getRows();
-        this.title = (this.treeApi.treeConfig.title) ? this.treeApi.treeConfig.title : "";
-        this.selectedBranch = this.treeApi.getSelectedBranch();
+        this.eventSvc.$init(this)
+        this.treeRows = this.treeApi.getRows()
+        this.title = this.treeApi.treeConfig.title
+            ? this.treeApi.treeConfig.title
+            : ''
+        this.selectedBranch = this.treeApi.getSelectedBranch()
 
         if (!this.treeOptions) {
             this.options = {
                 expandLevel: 1,
-                search: ''
-            };
+                search: '',
+            }
         } else {
             this.options = this.treeOptions
         }
         const iconsDefault: TreeIcons = {
             iconExpand: 'fa-solid fa-caret-down fa-lg fa-fw',
             iconCollapse: 'fa-solid fa-caret-right fa-lg fa-fw',
-            iconDefault: 'fa-solid fa-file fa-fw'
+            iconDefault: 'fa-solid fa-file fa-fw',
         }
-        this.icons = (this.treeIcons) ? this.treeIcons : iconsDefault;
+        this.icons = this.treeIcons ? this.treeIcons : iconsDefault
 
-        this.treeApi.defaultIcon = this.icons.iconDefault;
+        this.treeApi.defaultIcon = this.icons.iconDefault
 
         if (!this.options.expandLevel && this.options.expandLevel !== 0)
-            this.options.expandLevel = 1;
-        const expand_level = this.options.expandLevel;
+            this.options.expandLevel = 1
+        const expand_level = this.options.expandLevel
 
-        this.subs.push(this.eventSvc.$on('tree-get-branch-element', (data: {id: string, treeId: string}) => {
-            if (data.treeId === this.treeApi.treeConfig.id) {
-                this.$timeout(() => {
-                    const el = $('#tree-branch-' + data.id);
-                    if (!el.isOnScreen() && el.get(0) !== undefined) {
-                        el.get(0).scrollIntoView();
+        this.subs.push(
+            this.eventSvc.$on(
+                'tree-get-branch-element',
+                (data: { id: string; treeId: string }) => {
+                    if (data.treeId === this.treeApi.treeConfig.id) {
+                        this.$timeout(
+                            () => {
+                                const el = $('#tree-branch-' + data.id)
+                                if (
+                                    !el.isOnScreen() &&
+                                    el.get(0) !== undefined
+                                ) {
+                                    el.get(0).scrollIntoView()
+                                }
+                            },
+                            500,
+                            false
+                        )
                     }
-                }, 500, false);
-            }
-        }));
+                }
+            )
+        )
 
+        this.treeFilter = this.$filter('uiTreeFilter')
 
-
-        this.treeFilter = this.$filter('uiTreeFilter');
-
-        this.treeApi.forEachBranch(function(b, level) {
-            b.level = level;
-            b.expanded = b.level <= expand_level;
-        });
-
+        this.treeApi.forEachBranch((b, level) => {
+            b.level = level
+            b.expanded = b.level <= expand_level
+        })
     }
 
-    $onDestroy() {
-            this.eventSvc.destroy(this.subs);
+    $onDestroy(): void {
+        this.eventSvc.destroy(this.subs)
     }
 
-    public expandCallback(branch: TreeBranch, e){
-        branch.loading = true;
-        if(!branch.expanded && this.options.expandCallback) {
-            this.options.expandCallback(branch.data.id, branch, false);
+    public expandCallback(branch: TreeBranch, e) {
+        branch.loading = true
+        if (!branch.expanded && this.options.expandCallback) {
+            this.options.expandCallback(branch.data.id, branch, false)
         }
         if (e) {
-            e.stopPropagation();
+            e.stopPropagation()
         }
-        const promise = (branch.expanded) ? this.treeApi.closeBranch(branch) : this.treeApi.expandBranch(branch)
+        const promise = branch.expanded
+            ? this.treeApi.closeBranch(branch)
+            : this.treeApi.expandBranch(branch)
         promise.then(() => {
-
-            branch.loading = false;
+            branch.loading = false
             //this.$scope.$apply();
         })
     }
@@ -200,18 +227,18 @@ class TreeController implements angular.IComponentController {
     public userClicksBranch(branch: TreeBranch) {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
         if (branch.onSelect) {
-            branch.onSelect(branch);
+            branch.onSelect(branch)
         } else if (this.options.onSelect) {
-            this.options.onSelect(branch);
+            this.options.onSelect(branch)
         }
     }
 
     public userDblClicksBranch(branch: TreeBranch) {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
         if (branch.onDblClick) {
-            branch.onDblClick(branch);
+            branch.onDblClick(branch)
         } else if (this.options.onDblClick) {
-            this.options.onDblClick(branch);
+            this.options.onDblClick(branch)
         }
     }
 
@@ -252,11 +279,11 @@ const TreeComponent: VeComponentOptions = {
 <i ng-show="$ctrl.treeSpin" class="fa fa-spin fa-spinner"></i>
 `,
     bindings: {
-        treeApi: "<",
-        treeIcons: "<",
-        treeOptions: "<"
+        treeApi: '<',
+        treeIcons: '<',
+        treeOptions: '<',
     },
-    controller: TreeController
+    controller: TreeController,
 }
 
-veCore.component(TreeComponent.selector, TreeComponent);
+veCore.component(TreeComponent.selector, TreeComponent)

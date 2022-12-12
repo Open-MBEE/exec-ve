@@ -13,6 +13,7 @@ import { RootScopeService, UtilsService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import {
     ElementObject,
     ElementsRequest,
@@ -23,7 +24,7 @@ import {
     SearchResponse,
     ViewObject,
 } from '@ve-types/mms'
-import { VeComponentOptions, VeSearchOptions } from '@ve-types/view-editor'
+import { VeSearchOptions } from '@ve-types/view-editor'
 
 //veCore.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
@@ -44,13 +45,16 @@ export interface SearchField {
     label: string
 }
 
+export interface SearchFilter {
+    _appliedStereotypeIds?: string[]
+    classifierIds?: string[]
+}
+
 /**
  * @ngdoc directive
  * @name veCore.directive:mmsSearch
  *
- *
- * @description
- * TBA
+ * * TBA
  *
  * @scope
  *
@@ -195,7 +199,7 @@ class SearchController implements angular.IComponentController {
         private rootScopeSvc: RootScopeService
     ) {}
 
-    $onInit() {
+    $onInit(): void {
         this.showFilterOptions = !this.mmsOptions.hideFilterOptions
         this.refId = this.mmsRefId ? this.mmsRefId : 'master'
 
@@ -410,11 +414,7 @@ class SearchController implements angular.IComponentController {
     // };
 
     /**
-     * @ngdoc function
      * @name veCore.directive:mmsSearch#stringQueryUpdate
-     * @methodOf veCore.directive:mmsSearch
-     *
-     * @description
      * Updates advanced search main query input
      */
     public stringQueryUpdate = () => {
@@ -446,11 +446,7 @@ class SearchController implements angular.IComponentController {
     }
 
     /**
-     * @ngdoc function
      * @name veCore.directive:mmsSearch#addAdvanceSearchRow
-     * @methodOf veCore.directive:mmsSearch
-     *
-     * @description
      * Adds new row with empty fields and updates advanced search main query input
      */
     public addAdvanceSearchRow = () => {
@@ -466,11 +462,7 @@ class SearchController implements angular.IComponentController {
         this.stringQueryUpdate()
     }
     /**
-     * @ngdoc function
      * @name veCore.directive:mmsSearch#removeRowAdvanceSearch
-     * @methodOf veCore.directive:mmsSearch
-     *
-     * @description
      * Removes selected row and updates advanced search main query input
      *
      * @param {object} row advanced search row
@@ -525,11 +517,7 @@ class SearchController implements angular.IComponentController {
     }
 
     /**
-     * @ngdoc function
      * @name veCore.directive:mmsSearch#search
-     * @methodOf veCore.directive:mmsSearch
-     *
-     * @description
      * Call ElementService to make search post and get search results. Check for filterCallback
      * to further filter search results. Reassign pagination variables.
      *
@@ -621,11 +609,7 @@ class SearchController implements angular.IComponentController {
     }
 
     /**
-     * @ngdoc function
      * @name veCore.directive:mmsSearch#getProjectMountsQuery
-     * @methodOf veCore.directive:mmsSearch
-     *
-     * @description
      * Create a JSON object that returns a term key with a list of all mounted
      * project ids within the current project.
      *
@@ -659,11 +643,7 @@ class SearchController implements angular.IComponentController {
     }
 
     /**
-     * @ngdoc function
      * @name veCore.directive:mmsSearch#getAllMountsAsArray
-     * @methodOf veCore.directive:mmsSearch
-     *
-     * @description
      * Use projectsList to populate list with all the mounted project ids for
      * specified project.
      *
@@ -687,11 +667,7 @@ class SearchController implements angular.IComponentController {
     public buildSearchClause = (query) => {}
 
     /**
-     * @ngdoc function
      * @name veCore.directive:mmsSearch#buildQuery
-     * @methodOf veCore.directive:mmsSearch
-     *
-     * @description
      * Build JSON object for Elastic query.
      *
      *
@@ -757,7 +733,7 @@ class SearchController implements angular.IComponentController {
             for (const queryOb of queryObs) {
                 for (const [term, list] of Object.entries(filterTerms)) {
                     for (const sid of list) {
-                        const newOb = JSON.parse(JSON.stringify(queryOb))
+                        const newOb = _.cloneDeep(queryOb)
                         newOb.params[term] = sid
                         filterQueries.push(newOb)
                     }

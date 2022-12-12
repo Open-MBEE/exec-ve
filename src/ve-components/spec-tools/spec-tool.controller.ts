@@ -1,27 +1,33 @@
-import * as angular from "angular";
-import {Injectable} from "angular";
-import Rx from 'rx-lite';
+import { IPaneScope } from '@openmbee/pane-layout'
+import angular, { IComponentController, Injectable } from 'angular'
+import Rx from 'rx-lite'
 
+import { ComponentService } from '@ve-components/services'
+import { EditingApi } from '@ve-core/editor'
+import { ToolbarService, ToolbarApi } from '@ve-core/tool-bar'
 import {
+    ApiService,
     AuthService,
     ElementService,
-    PermissionsService, ProjectService,
+    PermissionsService,
+    ProjectService,
     URLService,
-    ViewService
-} from "@ve-utils/mms-api-client"
-import {
-    EventService,
-    MathJaxService,
-    UtilsService
-} from "@ve-utils/services";
-import {ToolbarService, ToolbarApi} from "@ve-core/tool-bar";
-import {ElementObject, RefObject, ViewObject} from "@ve-types/mms";
-import {VeEditorApi} from "@ve-core/editor";
-import {SpecApi, SpecService} from "./services/Spec.service";
-import {IPaneScope} from "@openmbee/pane-layout";
-import {ComponentService, ExtensionController} from "@ve-components/services";
+    ViewService,
+} from '@ve-utils/mms-api-client'
+import { EventService, UtilsService } from '@ve-utils/services'
 
-export interface ISpecTool extends angular.IComponentController, ExtensionController {
+import { SpecApi, SpecService } from './services/Spec.service'
+
+import { VePromise } from '@ve-types/angular'
+import { ComponentController } from '@ve-types/components'
+import {
+    ElementObject,
+    RefObject,
+    ValueObject,
+    ViewObject,
+} from '@ve-types/mms'
+
+export interface ISpecTool extends IComponentController, ComponentController {
     $scope: ISpecToolScope
     commitId: string
     specType: string
@@ -30,15 +36,14 @@ export interface ISpecTool extends angular.IComponentController, ExtensionContro
     isEditing: boolean
     inPreviewMode: boolean
     skipBroadcast: boolean
-    editValues: any[]
+    editValues: ValueObject[]
     values?: any[]
     addValueTypes?: object
     addValueType?: string
     //Functions
-    editorApi?: VeEditorApi,
-    addValue?(type: string): void,
+    editorApi?: EditingApi
+    addValue?(type: string): void
     removeVal?(i: number): void
-
 }
 
 export interface ISpecToolScope extends IPaneScope {
@@ -64,9 +69,7 @@ export interface ISpecToolScope extends IPaneScope {
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
  * @requires {MathJaxService} mathJaxSvc
- *
- * @description
- * Given an element id, puts in the element's documentation binding, if there's a parent
+ * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
  *
@@ -83,7 +86,6 @@ export interface ISpecToolScope extends IPaneScope {
  * @param {boolean=false} nonEditable can edit inline or not
  */
 export class SpecTool implements ISpecTool {
-
     //Bindings
     // mmsBranches
     // mmsTags
@@ -100,154 +102,203 @@ export class SpecTool implements ISpecTool {
     public specType: string
     public specTitle: string
 
-
-    public subs: Rx.IDisposable[];
+    public subs: Rx.IDisposable[]
     protected tbApi: ToolbarApi
 
-    public commitId: string;
-    protected projectId: string;
-    protected refId: string;
+    public commitId: string
+    protected projectId: string
+    protected refId: string
 
-    public editorApi: VeEditorApi = {};
-    public isEditing: boolean;
-    public isEnumeration: boolean;
-    public inPreviewMode: boolean;
-    public elementSaving: boolean;
-    public skipBroadcast: boolean;
+    public editorApi: EditingApi = {}
+    public isEditing: boolean
+    public isEnumeration: boolean
+    public inPreviewMode: boolean
+    public elementSaving: boolean
+    public skipBroadcast: boolean
 
-    protected noEdit;
-    protected mmsDisplayOldSpec;
+    protected noEdit
+    protected mmsDisplayOldSpec
 
-    protected ran = false;
-    protected lastid = null; //race condition check
-    protected gettingSpec = false;
-    protected isSlot: boolean = false;
-    public element: ElementObject;
-    public document: ViewObject;
-    public ref: RefObject;
-    public values: any[];
-    public edit: ElementObject;
-    protected modifier;
-    protected relatedDocuments: null;
-    protected elementTypeClass: string;
-    protected options: any;
-    protected elementDataLink: string;
-    protected qualifiedName: string;
+    protected ran = false
+    protected lastid = null //race condition check
+    protected gettingSpec = false
+    protected isSlot: boolean = false
+    public element: ElementObject
+    public document: ViewObject
+    public ref: RefObject
+    public values: any[]
+    public edit: ElementObject
+    protected modifier
+    protected relatedDocuments: null
+    protected elementTypeClass: string
+    protected options: any
+    protected elementDataLink: string
+    protected qualifiedName: string
 
     public editValues: any[]
 
-    protected $transcludeEl: JQuery<HTMLElement>;
+    protected $transcludeEl: JQuery<HTMLElement>
 
     protected template: string | Injectable<(...args: any[]) => string>
 
+    static $inject = [
+        '$scope',
+        '$element',
+        '$q',
+        'growl',
+        'ComponentService',
+        'URLService',
+        'AuthService',
+        'ElementService',
+        'ProjectService',
+        'UtilsService',
+        'ApiService',
+        'ViewService',
+        'PermissionsService',
+        'EventService',
+        'SpecService',
+        'ToolbarService',
+    ]
 
-    static $inject = ['$scope', '$element', '$q', 'growl', 'ComponentService', 'URLService', 'AuthService', 'ElementService',
-        'ProjectService', 'UtilsService', 'ViewService', 'PermissionsService', 'EventService', 'SpecService', 'ToolbarService'];
+    constructor(
+        public $scope: angular.IScope,
+        public $element: JQuery<HTMLElement>,
+        protected $q: angular.IQService,
+        protected growl: angular.growl.IGrowlService,
+        protected componentSvc: ComponentService,
+        protected uRLSvc: URLService,
+        protected authSvc: AuthService,
+        protected elementSvc: ElementService,
+        protected projectSvc: ProjectService,
+        protected utilsSvc: UtilsService,
+        protected apiSvc: ApiService,
+        protected viewSvc: ViewService,
+        protected permissionsSvc: PermissionsService,
+        protected eventSvc: EventService,
+        protected specSvc: SpecService,
+        protected toolbarSvc: ToolbarService
+    ) {}
 
-    constructor(public $scope: angular.IScope, protected $element: JQuery<HTMLElement>, protected $q: angular.IQService,
-                protected growl: angular.growl.IGrowlService, protected componentSvc: ComponentService, protected uRLSvc: URLService,
-                protected authSvc: AuthService, protected elementSvc: ElementService, protected projectSvc: ProjectService,
-                protected utilsSvc: UtilsService, protected viewSvc: ViewService, protected permissionsSvc: PermissionsService,
-                protected eventSvc: EventService, protected specSvc: SpecService, protected toolbarSvc: ToolbarService) {
+    $onInit(): void {
+        this.eventSvc.$init(this)
+        this.tbApi = this.toolbarSvc.getApi('right-toolbar')
+        this.editValues = this.specSvc.editValues
 
-    }
+        this.changeElement()
 
-    $onInit() {
-        this.eventSvc.$init(this);
-        this.tbApi = this.toolbarSvc.getApi('right-toolbar');
-        this.editValues = this.specSvc.editValues;
-
-        this.changeElement();
-
-        if (this.tbApi.buttons.map((value) => value.id).filter((value) => value === this.specType).length < 1
-                && window.__env && window.__env.enableDebug) {
-            console.log("Spec View: " + this.specType + "is missing a button definition")
+        if (
+            this.tbApi.buttons
+                .map((value) => value.id)
+                .filter((value) => value === this.specType).length < 1 &&
+            window.__env &&
+            window.__env.enableDebug
+        ) {
+            console.log(
+                'Spec View: ' + this.specType + 'is missing a button definition'
+            )
         }
 
-        this.subs.push(this.eventSvc.$on('element.selected', () => {
-            if (this.edit && this.editorApi.save) {
-                this.editorApi.save();
-            }
-        }));
+        this.subs.push(
+            this.eventSvc.$on('element.selected', () => {
+                if (this.edit && this.editorApi.save) {
+                    this.editorApi.save().then(
+                        () => {
+                            /* Do Nothing */
+                        },
+                        () => {
+                            /* Do Nothing */
+                        }
+                    )
+                }
+            })
+        )
         this.subs.push(this.eventSvc.$on('spec.ready', this.changeElement))
-        this.config();
-        this.subs.push(this.eventSvc.$on(this.specType, this.initCallback));
-        this.initCallback();
+        this.config()
+        this.subs.push(this.eventSvc.$on(this.specType, this.initCallback))
+        this.initCallback()
     }
 
-    $onDestroy() {
-        this.eventSvc.destroy(this.subs);
+    $onDestroy(): void {
+        this.eventSvc.destroy(this.subs)
         this.destroy()
     }
 
     /**
      * @name veComponents/SpecTool#config
      *
-     * @description
+     * Use this API to implement any tool-specific initialization steps that would normally be called in the $onInit callback
      *
      * @protected
      */
-    protected config:() => void = () => {}
+    protected config = (): void => {
+        /* Implement any initialization Logic Here */
+    }
 
     /**
      * @name veComponents/SpecTool#initCallback
      *
-     * @description
+     * This API is called whenever the element of focus for the Spec Tool window is changed
      *
      * @protected
      */
-    protected initCallback: () => void = () => {};
+    protected initCallback: () => void = () => {
+        /* Implement any post initialization steps here */
+    }
 
     /**
      * @name veComponents/SpecTool#destroy
      *
-     * @description
-     *
+     * This API is for whenever custom logic is required during the $onDestroy lifecycle stage
+     * (To reset Services, unregister listeners, etc).
      * @protected
      */
-    protected destroy:() => void = () => {}
-
-    public changeElement = () => {
-        this.specApi = this.specSvc.specApi;
-        this.refId = this.specApi.refId;
-        this.projectId = this.specApi.projectId;
-        this.commitId = this.specApi.commitId;
-        this.modifier = this.specSvc.getModifier();
-        this.qualifiedName = this.specApi.qualifiedName
-        this.element = this.specSvc.getElement();
-        this.document = this.specSvc.getDocument();
-        this.values = this.specSvc.getValues();
-        this.ref = this.specSvc.getRef();
-
-        this.initCallback();
+    protected destroy: () => void = () => {
+        /* Implement any custom on destroy logic to unregister listeners etc */
     }
 
+    public changeElement = (): void => {
+        this.specApi = this.specSvc.specApi
+        this.refId = this.specApi.refId
+        this.projectId = this.specApi.projectId
+        this.commitId = this.specApi.commitId
+        this.modifier = this.specSvc.getModifier()
+        this.qualifiedName = this.specApi.qualifiedName
+        this.element = this.specSvc.getElement()
+        this.document = this.specSvc.getDocument()
+        this.values = this.specSvc.getValues()
+        this.ref = this.specSvc.getRef()
+
+        this.initCallback()
+    }
 
     //Spec Tool Common API
 
-    public copyToClipboard($event, selector) {
-        this.utilsSvc.copyToClipboard(this.$element.find(selector), $event);
-    };
+    public copyToClipboard($event: JQuery.ClickEvent, selector: string): void {
+        this.utilsSvc.copyToClipboard(
+            this.$element.find<HTMLElement>(selector),
+            $event
+        )
+    }
 
-    public cleanupVal(obj) {
-        obj.value = parseInt(obj.value);
-    };
+    public cleanupVal(obj: { value: unknown }): void {
+        obj.value = parseInt(obj.value as string)
+    }
 
-    public propertyTypeClicked(id) {
-        var elementOb = {id: id, _projectId: this.element._projectId, _refId: this.element._refId};
-        this.eventSvc.$broadcast('element.selected', {elementOb: elementOb});
-    };
+    public propertyTypeClicked(id: string): void {
+        const elementOb = {
+            id: id,
+            _projectId: this.element._projectId,
+            _refId: this.element._refId,
+        }
+        this.eventSvc.$broadcast('element.selected', { elementOb: elementOb })
+    }
 
-    public addHtml(value) {
-        value.value = "<p>" + value.value + "</p>";
-    };
+    public addHtml(value: { value: string }): void {
+        value.value = '<p>' + value.value + '</p>'
+    }
 
     /**
-     * @ngdoc function
      * @name veComponents.component:mmsSpec#save
-     * @methodOf veComponents.component:mmsSpec
-     *
-     * @description
      * save edited element
      *
      * @return {Promise} promise would be resolved with updated element if save is successful.
@@ -256,12 +307,11 @@ export class SpecTool implements ISpecTool {
      *      or force save. If the user decides to discord or merge, type will be info even though
      *      the original save failed. Error means an actual error occured.
      */
-    public save() {
-        return this.componentSvc.save(this.edit, this.editorApi, this, false);
-    };
+    public save(): VePromise<ElementObject> {
+        return this.componentSvc.save(this.edit, this.editorApi, this, false)
+    }
 
-    public hasHtml(s) {
-        return this.componentSvc.hasHtml(s);
-    };
-
+    public hasHtml(s: string): boolean {
+        return this.componentSvc.hasHtml(s)
+    }
 }

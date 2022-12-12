@@ -1,9 +1,55 @@
-import * as angular from "angular";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {veCore} from "@ve-core";
+import { IComponentController } from 'angular'
+
+import { veCore } from '@ve-core'
+
+import { VeComponentOptions } from '@ve-types/angular'
+import { ElementObject } from '@ve-types/mms'
+import {
+    VeModalInstanceService,
+    VeModalResolve,
+    VeModalResolveFn,
+} from '@ve-types/view-editor'
+
+export interface SaveConflictResolve<T extends ElementObject>
+    extends VeModalResolve {
+    latest: T
+}
+export interface SaveConflictResolveFn<T extends ElementObject>
+    extends VeModalResolveFn {
+    latest(): T
+}
+
+class SaveConflictController implements IComponentController {
+    //bindings
+    private modalInstance: VeModalInstanceService<string>
+    resolve: SaveConflictResolve<ElementObject>
+
+    //local
+    public latest: ElementObject
+
+    $onInit(): void {
+        this.latest = this.resolve.latest
+    }
+
+    ok(): void {
+        this.modalInstance.close('ok')
+    }
+
+    cancel(): void {
+        this.modalInstance.close('cancel')
+    }
+
+    force(): void {
+        this.modalInstance.close('force')
+    }
+
+    merge(): void {
+        this.modalInstance.close('merge')
+    }
+}
 
 const SaveConflictComponent: VeComponentOptions = {
-    selector: 'save-conflict',
+    selector: 'saveConflict',
     template: `
     <div class="modal-header"><h4>Conflict!</h4></div>
 <div class="modal-body">
@@ -23,40 +69,10 @@ const SaveConflictComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        resolve: "<",
-        close: "<"
+        resolve: '@',
+        modalInstance: '<',
     },
-    controller: class SaveConflictController implements angular.IComponentController {
-        //bindings
-        private close
-                resolve
-
-        //local
-        public latest
-
-        constructor() {}
-
-        $onInit() {
-            this.latest = this.resolve.latest();
-        }
-
-        ok() {
-            this.close({$value: 'ok'});
-        }
-
-        cancel() {
-            this.close({$value: 'cancel'});
-        }
-
-        force() {
-            this.close({$value: 'force'});
-        }
-
-        merge() {
-            this.close({$value: 'merge'});
-        }
-    }
-
+    controller: SaveConflictController,
 }
 
-veCore.component(SaveConflictComponent.selector,SaveConflictComponent);
+veCore.component(SaveConflictComponent.selector, SaveConflictComponent)

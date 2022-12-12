@@ -1,29 +1,39 @@
-import {VeComponentOptions, VeSearchOptions} from "@ve-types/view-editor";
-import {veApp} from "@ve-app";
-import {OrgObject, ProjectObject} from "@ve-types/mms";
-import {ContentWindowService} from "@ve-app/pane-center/services/ContentWindow.service";
-import {EventService, RootScopeService} from "@ve-utils/services";
-import { StateService } from "@uirouter/angularjs";
+import { StateService } from '@uirouter/angularjs'
 
+import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
+import { EventService, RootScopeService } from '@ve-utils/services'
+
+import { veApp } from '@ve-app'
+
+import { VeComponentOptions } from '@ve-types/angular'
+import { OrgObject, ProjectObject } from '@ve-types/mms'
+import { VeSearchOptions } from '@ve-types/view-editor'
 
 class SearchController {
-
     projectOb: ProjectObject
     orgOb: OrgObject
     search: string
     field: string
 
-    searchContentLoading: boolean = true;
+    searchContentLoading: boolean = true
     searchOptions: VeSearchOptions
 
-    static $inject = ['$state', 'ContentWindowService', 'RootScopeService', 'EventService']
+    static $inject = [
+        '$state',
+        'ContentWindowService',
+        'RootScopeService',
+        'EventService',
+    ]
 
-    constructor(private $state: StateService, private contentWindowSvc: ContentWindowService, private rootScopeSvc: RootScopeService, private eventSvc: EventService) {
+    constructor(
+        private $state: StateService,
+        private contentWindowSvc: ContentWindowService,
+        private rootScopeSvc: RootScopeService,
+        private eventSvc: EventService
+    ) {}
 
-    }
-
-    $onInit() {
-        this.searchContentLoading = false;
+    $onInit(): void {
+        this.searchContentLoading = false
 
         this.contentWindowSvc.toggleLeftPane(true)
 
@@ -34,14 +44,13 @@ class SearchController {
             getProperties: true,
             closeable: true,
             callback: (elementOb) => {
-                let data = {
+                const data = {
                     elementOb: elementOb,
                     commitId: 'latest',
                 }
                 this.eventSvc.$broadcast('element.selected', data)
                 if (
-                    typeof this.rootScopeSvc.rightPaneClosed() ===
-                    'boolean' &&
+                    typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' &&
                     this.rootScopeSvc.rightPaneClosed()
                 )
                     this.eventSvc.$broadcast('right-pane.toggle', false)
@@ -58,11 +67,10 @@ class SearchController {
             },
         }
     }
-
 }
 
-let SearchComponent: VeComponentOptions = {
-    selector: "search",
+const SearchComponent: VeComponentOptions = {
+    selector: 'search',
     template: `
     <div>   
     <ng-pane pane-id="center-view" pane-closed="false" pane-anchor="center" pane-no-toggle="true" parent-ctrl="$ctrl">
@@ -74,13 +82,13 @@ let SearchComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        search: "<",
-        field: "<",
-        projectOb: "<",
-        refOb: "<",
-        documentOb: "<"
+        search: '<',
+        field: '<',
+        projectOb: '<',
+        refOb: '<',
+        documentOb: '<',
     },
-    controller: SearchController
+    controller: SearchController,
 }
 
-veApp.component(SearchComponent.selector,SearchComponent)
+veApp.component(SearchComponent.selector, SearchComponent)

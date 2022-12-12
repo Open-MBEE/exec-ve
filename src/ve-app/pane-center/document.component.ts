@@ -1,3 +1,4 @@
+import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane'
 import { StateService } from '@uirouter/angularjs'
 import angular from 'angular'
 import Rx from 'rx-lite'
@@ -27,9 +28,15 @@ import {
 
 import { veApp } from '@ve-app'
 
-import { ElementObject, ViewObject } from '@ve-types/mms'
+import { VeComponentOptions } from '@ve-types/angular'
+import {
+    DocumentObject,
+    ElementObject,
+    ProjectObject,
+    RefObject,
+    ViewObject,
+} from '@ve-types/mms'
 import { View2NodeMap } from '@ve-types/tree'
-import { VeComponentOptions } from '@ve-types/view-editor'
 
 class FullDocumentController implements angular.IComponentController {
     public subs: Rx.IDisposable[]
@@ -38,20 +45,21 @@ class FullDocumentController implements angular.IComponentController {
     bbId = 'full-doc'
     fullDocumentSvc: FullDocumentService
 
-    private projectOb
-    private refOb
-    private documentOb
+    private projectOb: ProjectObject
+    private refOb: RefObject
+    private documentOb: DocumentObject
 
     public viewContentLoading
     treeApi
     buttons = []
     latestElement: Date
-    scrollApi
+    scrollApi: IPaneScrollApi
     views: ViewElement[] = [] as ViewElement[]
     view2Children: { [key: string]: string[] } = {}
     view2Node: View2NodeMap = {}
     num = 1
     seenViewIds = {}
+    shortUrl: string = ''
 
     private handleShareURL: any
     private copyToClipboard: ($event) => void
@@ -109,7 +117,7 @@ class FullDocumentController implements angular.IComponentController {
         this.treeApi = this.treeSvc.getApi()
     }
 
-    $onInit() {
+    $onInit(): void {
         this.eventSvc.$init(this)
         this.viewContentLoading = false
 
@@ -146,7 +154,7 @@ class FullDocumentController implements angular.IComponentController {
                         },
                     })
                 }
-
+                api.addButton(this.buttonBarSvc.getButtonBarButton('share-url'))
                 api.addButton(
                     this.buttonBarSvc.getButtonBarButton('show-elements')
                 )
@@ -199,7 +207,9 @@ class FullDocumentController implements angular.IComponentController {
         // api to communicate with borderlayout library
         this.scrollApi = {
             notifyOnScroll: this.notifyOnScroll,
-            isScrollVisible: () => {}, // pane's directive (in borderlayout) resets this to the right function
+            isScrollVisible: (): boolean => {
+                return false
+            }, // pane's directive (in borderlayout) resets this to the right function
             throttleRate: 500, // how often should the wheel event triggered
             threshold: 3000, // how far from the bottom of the page before adding more views
             frequency: 100, // how fast to add more views
@@ -250,6 +260,12 @@ class FullDocumentController implements angular.IComponentController {
                     this._buildViewElement(data.vId, data.curSec),
                     data.prevSibId
                 )
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.$on('share-url', ($event?: JQuery.ClickEvent) => {
+                this.shortenUrlSvc.copyToClipboard($event)
             })
         )
 
@@ -431,13 +447,18 @@ class FullDocumentController implements angular.IComponentController {
         )
 
         // Share URL button settings
-        this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
-        this.copyToClipboard = this.shortenUrlSvc.copyToClipboard
-        this.handleShareURL = this.shortenUrlSvc.getShortUrl.bind(
-            null,
-            this.$location.absUrl(),
-            this
-        )
+        // this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
+
+        this.shortUrl = this.shortenUrlSvc.getShortUrl({
+            projectId: this.projectOb.id,
+            refId: this.refOb.id,
+            documentId: this.documentOb.id,
+        })
+        // this.handleShareURL = this.shortenUrlSvc.getShortUrl.bind(
+        //     null,
+        //     this.$location.absUrl(),
+        //     this
+        // )
     }
 
     private _createViews = () => {

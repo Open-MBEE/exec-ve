@@ -1,21 +1,19 @@
 import angular from 'angular'
-
 ;('use strict')
 
 angular
     .module('ui.tree-filter', [])
     /**
-     * @ngdoc object
      * @name ui.tree-filter.provider:uiTreeFilterSettings
      */
-    .provider('uiTreeFilterSettings', function () {
+    .provider('uiTreeFilterSettings', () => {
         var uiTreeFilterSettings = this
 
         this.addresses = ['title']
         this.regexFlags = 'gi'
         this.descendantCollection = 'items'
 
-        this.$get = function () {
+        this.$get = () => {
             return {
                 addresses: uiTreeFilterSettings.addresses,
                 regexFlags: uiTreeFilterSettings.regexFlags,
@@ -24,12 +22,11 @@ angular
         }
     })
     /**
-     * @ngdoc function
      * @name ui.tree-filter.factory:uiTreeFilter
      */
     .filter('uiTreeFilter', [
         'uiTreeFilterSettings',
-        function (uiTreeFilterSettings) {
+        (uiTreeFilterSettings) => {
             /**
              * Iterates through given collection if flag is not true and sets a flag to true on first match.
              *
@@ -43,7 +40,7 @@ angular
                 collection = collection || []
                 var foundSoFar = false
 
-                collection.forEach(function (collectionItem) {
+                collection.forEach((collectionItem) => {
                     foundSoFar =
                         foundSoFar ||
                         testForField(collectionItem, pattern, address)
@@ -114,11 +111,11 @@ angular
              *
              * @returns {boolean}
              */
-            return function (item, pattern, addresses) {
+            return (item, pattern, addresses) => {
                 addresses = addresses || uiTreeFilterSettings.addresses
                 return (
                     pattern === undefined ||
-                    addresses.reduce(function (foundSoFar, fieldName) {
+                    addresses.reduce((foundSoFar, fieldName) => {
                         return (
                             foundSoFar || testForField(item, pattern, fieldName)
                         )

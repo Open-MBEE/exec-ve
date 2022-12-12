@@ -16,7 +16,11 @@
     "sourceMap": true,
     "target": "es2017",
     "typeRoots": [
-      "node_modules/@types"
+      "node_modules/@types",
+      "types"
+    ],
+    "exclude": [
+      "src/lib/ckeditor/ckeditor4.js"
     ],
     "rootDir": "src",
     "paths": {

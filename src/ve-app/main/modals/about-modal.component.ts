@@ -1,8 +1,11 @@
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
+
+import { ApplicationService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
+import { VeModalInstanceService } from '@ve-types/view-editor'
 
 const AboutModalComponent: VeComponentOptions = {
     selector: 'aboutModal',
@@ -24,31 +27,21 @@ const AboutModalComponent: VeComponentOptions = {
         modalInstance: '<',
         resolve: '@',
     },
-    controller: class AboutModalController
-        implements angular.IComponentController
-    {
-        static $inject = ['$window', 'ApplicationService']
-
-        private $window
-        private applicationSvc
+    controller: class AboutModalController implements IComponentController {
+        static $inject = ['ApplicationService']
 
         //bindings
-        public modalInstance
+        public modalInstance: VeModalInstanceService<void>
         public resolve
 
         //local
         public veV
         public mmsV
 
-        constructor($window, ApplicationService) {
-            this.$window = $window
-            this.applicationSvc = ApplicationService
-        }
+        constructor(private applicationSvc: ApplicationService) {}
 
-        $onInit() {
-            this.veV = this.$window.__env.version
-                ? this.$window.__env.version
-                : '3.6.1'
+        $onInit(): void {
+            this.veV = window.__env.version ? window.__env.version : '3.6.1'
             this.mmsV = 'Loading...'
 
             this.applicationSvc.getMmsVersion().then(
@@ -62,7 +55,7 @@ const AboutModalComponent: VeComponentOptions = {
             )
         }
 
-        cancel() {
+        cancel(): void {
             this.modalInstance.dismiss()
         }
     },

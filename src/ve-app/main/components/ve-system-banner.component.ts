@@ -4,7 +4,7 @@ import { BrandingStyle } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
 
 const VeSystemBannerComponent: VeComponentOptions = {
     selector: 'veSystemBanner',
@@ -29,7 +29,7 @@ const VeSystemBannerComponent: VeComponentOptions = {
 
         public bannerMessage: string[] = ['Loading...']
 
-        $onInit() {
+        $onInit(): void {
             if (Array.isArray(this.bannerOb.message))
                 this.bannerMessage = this.bannerOb.message
             else this.bannerMessage = [this.bannerOb.message]

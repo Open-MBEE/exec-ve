@@ -117,11 +117,7 @@ export class TreeService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/TreeService#buildTreeHierarchy
-     * @methodOf veUtils/TreeService
-     *
-     * @description
      * builds hierarchy of tree branch objects
      *
      * @param {array} array array of objects

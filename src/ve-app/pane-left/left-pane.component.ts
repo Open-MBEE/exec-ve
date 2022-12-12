@@ -1,6 +1,5 @@
-import { TreeBranch, TreeConfig, TreeOptions } from '@ve-types/tree'
-import { IPaneManagerService } from '@openmbee/pane-layout/lib/PaneManagerService'
 import { IPane } from '@openmbee/pane-layout'
+import { IPaneManagerService } from '@openmbee/pane-layout/lib/PaneManagerService'
 import {
     StateService,
     Transition,
@@ -11,13 +10,12 @@ import angular from 'angular'
 import Rx from 'rx-lite'
 
 import {
-    AddItemData,
-    AddItemResolveFn,
+    AddElementData,
+    AddElementResolveFn,
 } from '@ve-app/main/modals/add-item-modal.component'
 import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
 import { AppUtilsService } from '@ve-app/main/services'
 import {
-    IButtonBarButton,
     ButtonBarApi,
     ButtonBarService,
     ButtonWrapEvent,
@@ -38,19 +36,18 @@ import { ValueSpec } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
     OrgObject,
     ProjectObject,
     RefObject,
+    ValueObject,
     ViewObject,
 } from '@ve-types/mms'
-import {
-    VeComponentOptions,
-    VeModalService,
-    VeModalSettings,
-} from '@ve-types/view-editor'
+import { TreeBranch, TreeConfig, TreeOptions } from '@ve-types/tree'
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class LeftPaneController implements angular.IComponentController {
     //Scope
@@ -91,7 +88,7 @@ class LeftPaneController implements angular.IComponentController {
 
     //Local Variables
     public docEditable
-    public addItemData: AddItemData
+    public addElementData: AddElementData
     protected squishSize: number = 250
     public filterInputPlaceholder: string
 
@@ -175,7 +172,7 @@ class LeftPaneController implements angular.IComponentController {
         ]
     }
 
-    $onInit() {
+    $onInit(): void {
         this.paneClosed = false
 
         this.eventSvc.$init(this)
@@ -324,7 +321,7 @@ class LeftPaneController implements angular.IComponentController {
 
         this.subs.push(
             this.eventSvc.$on('tree-add-document', () => {
-                this.addItem('Document')
+                this.addElement('Document')
             })
         )
 
@@ -336,7 +333,7 @@ class LeftPaneController implements angular.IComponentController {
 
         this.subs.push(
             this.eventSvc.$on('tree-add-view', () => {
-                this.addItem('View')
+                this.addElement('View')
             })
         )
 
@@ -375,7 +372,7 @@ class LeftPaneController implements angular.IComponentController {
 
         this.subs.push(
             this.eventSvc.$on('tree-add-group', () => {
-                this.addItem('Group')
+                this.addElement('Group')
             })
         )
 
@@ -588,7 +585,7 @@ class LeftPaneController implements angular.IComponentController {
         }
     }
 
-    $onDestroy() {
+    $onDestroy(): void {
         this.buttonBarSvc.destroy(this.bars)
         this.eventSvc.destroy(this.subs)
     }
@@ -795,7 +792,7 @@ class LeftPaneController implements angular.IComponentController {
     ) {
         let contents: ValueSpec | null = null
 
-        const addContentsSectionTreeNode = (operand: ElementObject[]) => {
+        const addContentsSectionTreeNode = (operand: ValueObject[]) => {
             const bulkGet: string[] = []
             const i = 0
             for (let i = 0; i < operand.length; i++) {
@@ -812,7 +809,7 @@ class LeftPaneController implements angular.IComponentController {
                 )
                 .then(
                     (ignore) => {
-                        const instances: angular.IPromise<ElementObject>[] = []
+                        const instances: VePromise<ElementObject>[] = []
                         for (let i = 0; i < operand.length; i++) {
                             instances.push(
                                 this.elementSvc.getElement(
@@ -1007,9 +1004,9 @@ class LeftPaneController implements angular.IComponentController {
         })
     }
 
-    addItem(itemType: string) {
+    addElement(itemType: string) {
         const deferred = this.$q.defer()
-        this.addItemData = {
+        this.addElementData = {
             itemType: itemType,
             newViewAggr: { type: 'shared' },
             parentBranch: null,
@@ -1029,7 +1026,7 @@ class LeftPaneController implements angular.IComponentController {
         }
         deferred.promise.then(
             () => {
-                this.addItemModal()
+                this.addElementModal()
             },
             (reason) => {
                 this.growl.info(reason.message, { ttl: 2000 })
@@ -1038,12 +1035,12 @@ class LeftPaneController implements angular.IComponentController {
         return deferred.promise
     }
 
-    addItemModal() {
+    addElementModal() {
         const settings: VeModalSettings = {
-            component: 'addItemModal',
-            resolve: <AddItemResolveFn>{
+            component: 'addElementModal',
+            resolve: <AddElementResolveFn>{
                 getAddData: () => {
-                    return this.addItemData
+                    return this.addElementData
                 },
                 getFilter: () => {
                     return this.$filter
@@ -1076,12 +1073,12 @@ class LeftPaneController implements angular.IComponentController {
             }
             const newbranch: TreeBranch = {
                 label: data.name,
-                type: this.addItemData.branchType,
+                type: this.addElementData.branchType,
                 data: data,
                 children: [],
                 aggr: '',
             }
-            const top = this.addItemData.itemType === 'Group'
+            const top = this.addElementData.itemType === 'Group'
             const addToFullDocView = (node, curSection, prevSysml) => {
                 let lastChild = prevSysml
                 if (node.children) {
@@ -1105,16 +1102,16 @@ class LeftPaneController implements angular.IComponentController {
                 return lastChild
             }
             this.mainTreeApi
-                .addBranch(this.addItemData.parentBranch, newbranch, top)
+                .addBranch(this.addElementData.parentBranch, newbranch, top)
                 .then(() => {
-                    if (this.addItemData.itemType === 'View') {
+                    if (this.addElementData.itemType === 'View') {
                         this.viewId2node[data.id] = newbranch
                         this.seenViewIds[data.id] = newbranch
-                        newbranch.aggr = this.addItemData.newViewAggr.type
+                        newbranch.aggr = this.addElementData.newViewAggr.type
                         const curNum =
-                            this.addItemData.parentBranch.children[
-                                this.addItemData.parentBranch.children.length -
-                                    1
+                            this.addElementData.parentBranch.children[
+                                this.addElementData.parentBranch.children
+                                    .length - 1
                             ].data._veNumber
                         let prevBranch =
                             this.mainTreeApi.getPrevBranch(newbranch)
@@ -1125,7 +1122,7 @@ class LeftPaneController implements angular.IComponentController {
                         this.viewSvc
                             .handleChildViews(
                                 data,
-                                this.addItemData.newViewAggr.type,
+                                this.addElementData.newViewAggr.type,
                                 undefined,
                                 this.mmsProject.id,
                                 this.mmsRef.id,
@@ -1161,7 +1158,8 @@ class LeftPaneController implements angular.IComponentController {
                                     vId: data.id,
                                     curSec: curNum,
                                     prevSibId:
-                                        this.addItemData.parentBranch.data.id,
+                                        this.addElementData.parentBranch.data
+                                            .id,
                                 })
                             }
                         }
@@ -1172,32 +1170,32 @@ class LeftPaneController implements angular.IComponentController {
 
     addDocument(branch: TreeBranch) {
         if (!branch) {
-            this.addItemData.parentBranch = null
+            this.addElementData.parentBranch = null
             branch = null
         } else if (branch.type !== 'group') {
             return this.$q.reject({
                 message: 'Select a group to add document under',
             })
         } else {
-            this.addItemData.parentBranch = branch
+            this.addElementData.parentBranch = branch
         }
-        this.addItemData.branchType = 'view'
+        this.addElementData.branchType = 'view'
         return this.$q.resolve()
     }
 
     addGroup(branch: TreeBranch) {
         if (branch && branch.type === 'group') {
-            this.addItemData.parentBranch = branch
+            this.addElementData.parentBranch = branch
         } else if (branch && branch.type !== 'group') {
             return this.$q.reject({
                 message: 'Select a group to add group under',
             })
         } else {
-            this.addItemData.parentBranch = null
+            this.addElementData.parentBranch = null
             // Always create group at root level if the selected branch is not a group branch
             branch = null
         }
-        this.addItemData.branchType = 'group'
+        this.addElementData.branchType = 'group'
         return this.$q.resolve()
     }
 
@@ -1216,8 +1214,8 @@ class LeftPaneController implements angular.IComponentController {
                     'Add View Error: Cannot add a child view to a non-owned and non-shared view.',
             })
         }
-        this.addItemData.parentBranch = branch
-        this.addItemData.branchType = 'view'
+        this.addElementData.parentBranch = branch
+        this.addElementData.branchType = 'view'
         return this.$q.resolve()
     }
 
@@ -1264,7 +1262,7 @@ class LeftPaneController implements angular.IComponentController {
             resolve: <ConfirmDeleteModalResolveFn>{
                 getType: () => {
                     let type = branch.type
-                    if (this.utilsSvc.isDocument(branch.data)) {
+                    if (this.apiSvc.isDocument(branch.data)) {
                         type = 'Document'
                     }
                     return type
@@ -1273,13 +1271,13 @@ class LeftPaneController implements angular.IComponentController {
                     return branch.data.name
                 },
                 finalize: () => {
-                    return () => {
+                    return (): VePromise<boolean> => {
                         const deferred: angular.IDeferred<boolean> =
                             this.$q.defer()
-                        const resolve = () => {
+                        const resolve = (): void => {
                             deferred.resolve(true)
                         }
-                        const reject = (reason) => {
+                        const reject = (reason): void => {
                             deferred.reject(reason)
                         }
                         if (branch.type === 'view') {

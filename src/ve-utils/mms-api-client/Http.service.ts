@@ -14,15 +14,15 @@ export interface HttpServiceRequest {
 /**
  * @ngdoc service
  * @name veUtils/HttpService
- *
- * @description
- * Provides prioritization and caching for $http service calls
+ * * Provides prioritization and caching for $http service calls
  */
 export class HttpService {
     private queue: HttpServiceRequest[][] = []
     cache: { [key: string]: HttpServiceRequest } = {}
     inProgress = 0
     getLimit = 20
+
+    static $inject = ['$http']
 
     constructor(private $http: angular.IHttpService) {
         this.queue[0] = [] //high proirity
@@ -33,16 +33,12 @@ export class HttpService {
         this.getLimit = limit
     }
 
-    getQueue() {
+    getQueue(): HttpServiceRequest[][] {
         return this.queue
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/HttpService#get
-     * @methodOf veUtils/HttpService
-     *
-     * @description
      * Put a new get request in the queue, the queue is FIFO
      *
      * @param {string} url url to get
@@ -56,7 +52,7 @@ export class HttpService {
         successCallback: httpCallback<T>,
         errorCallback: httpCallback<T>,
         weight: number
-    ) {
+    ): void {
         if (weight === undefined) {
             weight = 1
         }
@@ -135,17 +131,13 @@ export class HttpService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/HttpService#ping
-     * @methodOf veUtils/HttpService
-     *
-     * @description
      * If the current queue has an ongoing request, put it in front
      *
      * @param {string} url url to get
      * @param {number} weight (optional)
      */
-    ping(url: string, weight?: number) {
+    ping(url: string, weight?: number): void {
         // ping should simply change the weight
         if (weight === undefined) {
             weight = 1
@@ -178,13 +170,11 @@ export class HttpService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/HttpService#ping
-     * @methodOf veUtils/HttpService
      *
      * @description Changes all requests in the Queue 1 to Queue 0
      */
-    transformQueue() {
+    transformQueue(): void {
         if (this.queue[1].length > 0) {
             //will the queue ever be defined?
             for (let i = 0; i < this.queue[1].length; i++) {
@@ -199,14 +189,12 @@ export class HttpService {
         }
     }
 
-    dropAll() {
+    dropAll(): void {
         this.queue[1].length = 0
         this.queue[0].length = 0
         this.cache = {}
         this.inProgress = 0
     }
 }
-
-HttpService.$inject = ['$http']
 
 veUtils.service('HttpService', HttpService)

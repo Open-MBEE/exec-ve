@@ -1,12 +1,15 @@
 import angular, { Injectable } from 'angular'
 import $ from 'jquery'
+import _ from 'lodash'
 
 import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
-import { SpecApi } from '@ve-components/spec-tools'
+import { ViewController } from '@ve-components/presentations'
 import { ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarApi } from '@ve-core/button-bar'
-import { VeEditorApi } from '@ve-core/editor'
+import { SaveConflictResolveFn } from '@ve-core/diff-merge'
+import { EditingApi } from '@ve-core/editor'
 import {
+    ApiService,
     AuthService,
     CacheService,
     ElementService,
@@ -22,34 +25,28 @@ import {
 } from '@ve-utils/services'
 import { ValueSpec } from '@ve-utils/utils'
 
-import { veComponents } from '@ve-components'
+import { PropertySpec, veComponents } from '@ve-components'
 
+import { VePromise, VePromiseReason } from '@ve-types/angular'
+import { ComponentController } from '@ve-types/components'
 import {
+    ConstraintObject,
     ElementObject,
-    PropertySpec,
+    ElementsRequest,
+    ElementsResponse,
+    ExpressionObject,
+    InstanceValueObject,
+    LiteralObject,
+    SlotObject,
     UserObject,
+    ValueObject,
     ViewObject,
 } from '@ve-types/mms'
-import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
-
-export interface ExtensionController {
-    element: ElementObject
-    commitId: string
-    edit: ElementObject
-    view?: ViewObject
-    instanceSpec?: ElementObject
-    instanceVal?: any
-    elementSaving: boolean
-    bbApi?: ButtonBarApi
-    editorApi?: VeEditorApi
-    specApi?: SpecApi
-    // isEnumeration: boolean,
-    skipBroadcast: boolean
-    isEditing: boolean
-    inPreviewMode: boolean
-    editValues: any[]
-    $scope: angular.IScope
-}
+import {
+    VeModalInstanceService,
+    VeModalService,
+    VeModalSettings,
+} from '@ve-types/view-editor'
 
 /**
  * @internal
@@ -64,15 +61,13 @@ export interface ExtensionController {
  * @requires ElementService
  * @requires AutosaveService
  * @requires _
- *
- * @description
- * Utility methods for performing edit like behavior to a transclude element
+ * * Utility methods for performing edit like behavior to a transclude element
  * WARNING These are intended to be internal utility functions and not designed to be used as api
  *
  */
 export class ComponentService {
     //locals
-    private addItemData
+    private addElementData
 
     static $inject = [
         '$q',
@@ -91,6 +86,7 @@ export class ComponentService {
         'RootScopeService',
         'EventService',
         'AutosaveService',
+        'ApiService',
     ]
 
     constructor(
@@ -109,14 +105,15 @@ export class ComponentService {
         private permissionsSvc: PermissionsService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
-        private autosaveSvc: AutosaveService
+        private autosaveSvc: AutosaveService,
+        private apiSvc: ApiService
     ) {}
 
     public hasCircularReference(
         ctrl: ITransclusion,
         curId: string,
         curType: string
-    ) {
+    ): boolean {
         let curscope = ctrl.$scope
         while (curscope.$parent) {
             const parent = curscope.$parent
@@ -132,7 +129,7 @@ export class ComponentService {
         return false
     }
 
-    public clearAutosave(autosaveKey: string, elementType: string) {
+    public clearAutosave(autosaveKey: string, elementType: string): void {
         if (elementType === 'Slot') {
             Object.keys(this.$window.localStorage).forEach((key) => {
                 if (key.indexOf(autosaveKey) !== -1) {
@@ -147,16 +144,18 @@ export class ComponentService {
     // var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     // var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
 
-    public setupValEditFunctions(ctrl: ITransclusion) {
+    public setupValEditFunctions(
+        ctrl: { propertySpec: PropertySpec } & ITransclusion
+    ): void {
         ctrl.addValueTypes = {
             string: 'LiteralString',
             boolean: 'LiteralBoolean',
             integer: 'LiteralInteger',
             real: 'LiteralReal',
         }
-        ctrl.addValue = (type) => {
+        ctrl.addValue = (type: string): void => {
             let newValueSpec: ValueSpec
-            let elementOb: ElementObject = {
+            let elementOb: LiteralObject<unknown> = {
                 id: '',
                 _projectId: ctrl.mmsProjectId,
                 _refId: ctrl.mmsRefId,
@@ -167,7 +166,7 @@ export class ComponentService {
                     elementOb = Object.assign(elementOb, {
                         type: type,
                         value: false,
-                        id: this.utilsSvc.createMmsId(),
+                        id: this.apiSvc.createUniqueId(),
                         ownerId: ctrl.element.id,
                     })
                     newValueSpec = new ValueSpec(elementOb)
@@ -177,7 +176,7 @@ export class ComponentService {
                     elementOb = Object.assign(elementOb, {
                         type: type,
                         value: 0,
-                        id: this.utilsSvc.createMmsId(),
+                        id: this.apiSvc.createUniqueId(),
                         ownerId: ctrl.element.id,
                     })
                     newValueSpec = new ValueSpec(elementOb)
@@ -187,7 +186,7 @@ export class ComponentService {
                     elementOb = Object.assign(elementOb, {
                         type: type,
                         value: '',
-                        id: this.utilsSvc.createMmsId(),
+                        id: this.apiSvc.createUniqueId(),
                         ownerId: ctrl.element.id,
                     })
                     newValueSpec = new ValueSpec(elementOb)
@@ -197,7 +196,7 @@ export class ComponentService {
                     elementOb = Object.assign(elementOb, {
                         type: type,
                         value: 0.0,
-                        id: this.utilsSvc.createMmsId(),
+                        id: this.apiSvc.createUniqueId(),
                         ownerId: ctrl.element.id,
                     })
                     newValueSpec = new ValueSpec(elementOb)
@@ -207,7 +206,7 @@ export class ComponentService {
                     elementOb = Object.assign(elementOb, {
                         type: type,
                         value: {},
-                        id: this.utilsSvc.createMmsId(),
+                        id: this.apiSvc.createUniqueId(),
                         ownerId: ctrl.element.id,
                     })
                 }
@@ -223,13 +222,13 @@ export class ComponentService {
         }
         ctrl.addValueType = 'LiteralString'
 
-        ctrl.addEnumerationValue = () => {
-            const newValueSpec: ValueSpec = new ValueSpec({
+        ctrl.addEnumerationValue = (): void => {
+            const newValueSpec: InstanceValueObject = new ValueSpec({
                 type: 'InstanceValue',
-                instanceId: ctrl.options[0],
+                instanceId: ctrl.propertySpec.options[0],
                 _projectId: ctrl.mmsProjectId,
                 _refId: ctrl.mmsRefId,
-                id: this.utilsSvc.createMmsId(),
+                id: this.apiSvc.createUniqueId(),
                 ownerId: ctrl.element.id,
             })
             ctrl.editValues.push(newValueSpec)
@@ -241,41 +240,37 @@ export class ComponentService {
             }
         }
 
-        ctrl.removeVal = (i) => {
+        ctrl.removeVal = (i): void => {
             ctrl.editValues.splice(i, 1)
         }
     }
 
-    public setupValCf(elementOb: ElementObject): any[] {
+    public setupValCf(elementOb: ElementObject): ValueObject[] {
         if (elementOb.type === 'Property' || elementOb.type === 'Port') {
             if (elementOb.defaultValue) {
-                return [elementOb.defaultValue]
+                return [elementOb.defaultValue] as ValueObject[]
             } else {
                 return []
             }
         }
         if (elementOb.type === 'Slot') {
-            return elementOb.value
+            return (elementOb as SlotObject).value
         }
         if (elementOb.type === 'Constraint' && elementOb.specification) {
-            return [elementOb.specification]
+            return [(elementOb as ConstraintObject).specification]
         }
         if (elementOb.type === 'Expression') {
-            return elementOb.operand
+            return (elementOb as ExpressionObject<ValueObject>).operand
         }
     }
 
     /**
-     * @ngdoc function
      * @name Utils#save
-     * @methodOf veComponents.ExtUtilsService
-     *
-     * @description
      * save edited element
      *
      * @param {ElementObject} edit the edit object to save
-     * @param {VeEditorApi} [editorApi=null] optional editor api
-     * @param {ExtensionController} ctrl angular scope that has common functions
+     * @param {EditingApi} [editorApi=null] optional editor api
+     * @param {ComponentController} ctrl angular scope that has common functions
      * @param continueEdit
      * @return {Promise} promise would be resolved with updated element if save is successful.
      *      For unsuccessful saves, it will be rejected with an object with type and message.
@@ -283,78 +278,118 @@ export class ComponentService {
      *      or force save. If the user decides to discord or merge, type will be info even though
      *      the original save failed. Error means an actual error occurred.
      */
-    public save(
-        edit: ElementObject,
-        editorApi: VeEditorApi,
-        ctrl: { element: ElementObject; values?: any[] },
+    public save<T extends ElementObject>(
+        edit: T,
+        editorApi: EditingApi,
+        ctrl: { element: T; values?: ValueObject[] },
         continueEdit: boolean
-    ) {
-        const deferred = this.$q.defer()
-        if (editorApi && editorApi.save) {
-            editorApi.save()
+    ): VePromise<T> {
+        const deferred = this.$q.defer<T>()
+        const saveFn: () => VePromise<boolean> = (): VePromise<boolean> => {
+            if (editorApi && editorApi.save) {
+                return editorApi.save()
+            }
+            return this.$q.resolve<boolean>(true)
         }
-        this.elementSvc.updateElement(edit, false, true).then(
-            (element) => {
-                deferred.resolve(element)
-                ctrl.values = this.setupValCf(ctrl.element)
-                const data = {
-                    element: element,
-                    continueEdit: continueEdit ? continueEdit : false,
-                }
-                this.eventSvc.$broadcast('element.updated', data)
-            },
-            (reason) => {
-                if (reason.status === 409) {
-                    const latest = reason.data.elements[0]
-                    const instance = this.$uibModal.open({
-                        component: 'saveConflict',
-                        size: 'lg',
-                        resolve: {
-                            latest: () => {
-                                return latest
-                            },
-                        },
+        saveFn().then(
+            (success) => {
+                if (!success) {
+                    this.handleError({
+                        message: 'Problem Saving from Editor',
+                        type: 'warning',
                     })
-                    instance.result.then((data) => {
-                        const choice = data.$value
-                        if (choice === 'ok') {
-                            const reqOb = {
-                                elementId: latest.id,
-                                projectId: latest._projectId,
-                                refId: latest._refId,
-                                commitId: 'latest',
-                            }
-                            this.elementSvc.cacheElement(reqOb, latest, true)
-                            this.elementSvc.cacheElement(reqOb, latest, false)
-                        } else if (choice === 'force') {
-                            edit._read = latest._read
-                            edit._modified = latest._modified
-                            this.save(edit, editorApi, ctrl, continueEdit).then(
-                                (resolved) => {
-                                    deferred.resolve(resolved)
+                }
+                this.elementSvc.updateElement(edit, false, true).then(
+                    (element: T) => {
+                        deferred.resolve(element)
+                        ctrl.values = this.setupValCf(ctrl.element)
+                        const data = {
+                            element: element,
+                            continueEdit: continueEdit ? continueEdit : false,
+                        }
+                        this.eventSvc.$broadcast('element.updated', data)
+                    },
+                    (reason: VePromiseReason<ElementsResponse<T>>) => {
+                        if (reason.status === 409) {
+                            const latest = reason.data.elements[0]
+                            const instance = this.$uibModal.open<
+                                SaveConflictResolveFn<T>,
+                                string
+                            >({
+                                component: 'saveConflict',
+                                size: 'lg',
+                                resolve: {
+                                    latest: () => {
+                                        return latest
+                                    },
                                 },
-                                (error) => {
-                                    deferred.reject(error)
+                            })
+                            instance.result.then(
+                                (data) => {
+                                    const choice = data
+                                    if (choice === 'ok') {
+                                        const reqOb = {
+                                            elementId: latest.id,
+                                            projectId: latest._projectId,
+                                            refId: latest._refId,
+                                            commitId: 'latest',
+                                        }
+                                        this.elementSvc.cacheElement(
+                                            reqOb,
+                                            latest,
+                                            true
+                                        )
+                                        this.elementSvc.cacheElement(
+                                            reqOb,
+                                            latest,
+                                            false
+                                        )
+                                    } else if (choice === 'force') {
+                                        edit._modified = latest._modified
+                                        this.save(
+                                            edit,
+                                            editorApi,
+                                            ctrl,
+                                            continueEdit
+                                        ).then(
+                                            (resolved) => {
+                                                deferred.resolve(resolved)
+                                            },
+                                            (error) => {
+                                                deferred.reject(error)
+                                            }
+                                        )
+                                    } else {
+                                        deferred.reject({ type: 'cancel' })
+                                    }
+                                },
+                                () => {
+                                    this.handleError({
+                                        message:
+                                            'An error occurred. Please try your request again',
+                                        type: 'error',
+                                    })
                                 }
                             )
                         } else {
-                            deferred.reject({ type: 'cancel' })
+                            reason.type = 'error'
+                            deferred.reject(reason)
                         }
-                    })
-                } else {
-                    deferred.reject({ type: 'error', message: reason.message })
-                }
+                    }
+                )
+            },
+            () => {
+                this.handleError({
+                    message: 'Error Saving from Editor; Please Retry',
+                    type: 'error',
+                })
             }
         )
+
         return deferred.promise
     }
-
     /**
-     * @ngdoc function
      * @name Utils#hasEdits
-     * @methodOf  veComponents.ExtUtilsService
-     *
-     * @description
      * whether editor object has changes compared to base element,
      * currently compares name, doc, property values, if element is not
      * editable, returns false
@@ -365,7 +400,9 @@ export class ComponentService {
     public hasEdits(editOb: ElementObject): boolean {
         editOb._commitId = 'latest'
         const cachedKey = this.apiSvc.makeCacheKey(
-            this.utilsSvc.makeRequestObject(editOb)
+            this.apiSvc.makeRequestObject(editOb),
+            editOb.id,
+            false
         )
         const elementOb: ElementObject =
             this.cacheSvc.get<ElementObject>(cachedKey)
@@ -377,17 +414,17 @@ export class ComponentService {
         }
         if (
             (editOb.type === 'Property' || editOb.type === 'Port') &&
-            !angular.equals(editOb.defaultValue, elementOb.defaultValue)
+            !_.isEqual(editOb.defaultValue, elementOb.defaultValue)
         ) {
             return true
         } else if (
             editOb.type === 'Slot' &&
-            !angular.equals(editOb.value, elementOb.value)
+            !_.isEqual(editOb.value, elementOb.value)
         ) {
             return true
         } else if (
             editOb.type === 'Constraint' &&
-            !angular.equals(editOb.specification, elementOb.specification)
+            !_.isEqual(editOb.specification, elementOb.specification)
         ) {
             return true
         }
@@ -395,11 +432,7 @@ export class ComponentService {
     }
 
     /**
-     * @ngdoc function
      * @name Utils#revertEdits
-     * @methodOf veComponents.ExtUtilsService
-     *
-     * @description
      * reset editor object back to base element values for name, doc, values
      *
      * @param editValues
@@ -407,16 +440,14 @@ export class ComponentService {
      * @param {object} editorApi editor api to kill editor if reverting changes
      */
     public revertEdits(
-        editValues: any[],
-        editOb: ElementObject,
-        editorApi?: VeEditorApi
-    ) {
-        // if (editorApi && editorApi.destroy) {
-        //     editorApi.destroy();
-        // }
+        editValues: ValueObject[],
+        editOb: ElementObject
+    ): ValueObject[] {
         editOb._commitId = 'latest'
         const cachedKey = this.apiSvc.makeCacheKey(
-            this.utilsSvc.makeRequestObject(editOb)
+            this.apiSvc.makeRequestObject(editOb),
+            editOb.id,
+            false
         )
         const elementOb: ElementObject =
             this.cacheSvc.get<ElementObject>(cachedKey)
@@ -426,59 +457,56 @@ export class ComponentService {
         }
         editOb.documentation = elementOb.documentation
         if (editOb.type === 'Property' || editOb.type === 'Port') {
-            editOb.defaultValue = JSON.parse(
-                JSON.stringify(elementOb.defaultValue)
-            )
+            editOb.defaultValue = _.cloneDeep(elementOb.defaultValue)
             if (editOb.defaultValue) {
                 editValues = [editOb.defaultValue]
             } else {
                 editValues = []
             }
         } else if (editOb.type === 'Slot') {
-            editOb.value = JSON.parse(JSON.stringify(elementOb.value))
-            editValues = editOb.value
-        } else if (editOb.type === 'Constraint' && editOb.specification) {
-            editOb.specification = JSON.parse(
-                JSON.stringify(elementOb.specification)
+            ;(editOb as SlotObject).value = _.cloneDeep(
+                (elementOb as SlotObject).value
             )
-            editValues = [editOb.specification]
+            editValues = (editOb as SlotObject).value
+        } else if (editOb.type === 'Constraint' && editOb.specification) {
+            ;(editOb as ConstraintObject).specification = _.cloneDeep(
+                (elementOb as ConstraintObject).specification
+            )
+            editValues = [(editOb as ConstraintObject).specification]
         }
         return editValues
     }
 
-    public handleError(reason: { type: string; message: any }) {
+    public handleError<T>(
+        reason:
+            | { message: string; type: 'error' | 'warning' | 'info' }
+            | VePromiseReason<T>
+    ): void {
         if (reason.type === 'info') this.growl.info(reason.message)
         else if (reason.type === 'warning') this.growl.warning(reason.message)
         else if (reason.type === 'error') this.growl.error(reason.message)
     }
 
     /**
-     * @ngdoc function
      * @name Utils#isEnumeration
-     * @methodOf veComponents.ExtUtilsService
-     *
-     * @description
      * Check if element is enumeration and if true get enumerable options
      *
      * @param {object} elementOb element object
      * @return {Promise} promise would be resolved with options and if object is enumerable.
      *      For unsuccessful saves, it will be rejected with an object with reason.
      */
-    public isEnumeration(
-        elementOb: ElementObject
-    ): angular.IPromise<PropertySpec> {
-        const deferred: angular.IDeferred<PropertySpec> = this.$q.defer()
+    public isEnumeration(elementOb: ElementObject): VePromise<PropertySpec> {
+        const deferred = this.$q.defer<PropertySpec>()
         if (elementOb.type === 'Enumeration') {
             const isEnumeration = true
-            const reqOb = {
+            const reqOb: ElementsRequest<string> = {
                 elementId: elementOb.id,
                 projectId: elementOb._projectId,
                 refId: elementOb._refId,
-                depth: 1,
             }
             this.elementSvc.getOwnedElements(reqOb).then(
                 (val) => {
-                    const newArray = []
+                    const newArray: ElementObject[] = []
                     // Filter for enumeration type
                     for (let i = 0; i < val.length; i++) {
                         if (val[i].type === 'EnumerationLiteral') {
@@ -503,17 +531,15 @@ export class ComponentService {
         return deferred.promise
     }
 
-    public getPropertySpec(
-        elementOb: ElementObject
-    ): angular.IPromise<PropertySpec> {
-        const deferred: angular.IDeferred<PropertySpec> = this.$q.defer()
-        let id = elementOb.typeId
+    public getPropertySpec(elementOb: ElementObject): VePromise<PropertySpec> {
+        const deferred = this.$q.defer<PropertySpec>()
+        let id: string = elementOb.typeId
         let isSlot = false
         let isEnum = false
-        let options = []
+        let options: ElementObject[] = []
         if (elementOb.type === 'Slot') {
             isSlot = true
-            id = elementOb.definingFeatureId
+            id = (elementOb as SlotObject).definingFeatureId
         }
         if (!id) {
             //no property type, will not be enum
@@ -545,28 +571,37 @@ export class ComponentService {
                     reqOb.elementId = value.typeId
                     this.elementSvc
                         .getElement(reqOb) //this gets tyep of defining feature
-                        .then((val) => {
-                            this.isEnumeration(val).then(
-                                (enumValue) => {
-                                    if (enumValue.isEnumeration) {
-                                        isEnum = enumValue.isEnumeration
-                                        options = enumValue.options
+                        .then(
+                            (val) => {
+                                this.isEnumeration(val).then(
+                                    (enumValue: PropertySpec) => {
+                                        if (enumValue.isEnumeration) {
+                                            isEnum = enumValue.isEnumeration
+                                            options = enumValue.options
+                                        }
+                                        deferred.resolve({
+                                            options: options,
+                                            isEnumeration: isEnum,
+                                            isSlot: isSlot,
+                                        })
+                                    },
+                                    () => {
+                                        deferred.resolve({
+                                            options: options,
+                                            isEnumeration: isEnum,
+                                            isSlot: isSlot,
+                                        })
                                     }
-                                    deferred.resolve({
-                                        options: options,
-                                        isEnumeration: isEnum,
-                                        isSlot: isSlot,
-                                    })
-                                },
-                                (reason) => {
-                                    deferred.resolve({
-                                        options: options,
-                                        isEnumeration: isEnum,
-                                        isSlot: isSlot,
-                                    })
-                                }
-                            )
-                        })
+                                )
+                            },
+                            () => {
+                                deferred.resolve({
+                                    options: options,
+                                    isEnumeration: isEnum,
+                                    isSlot: isSlot,
+                                })
+                            }
+                        )
                 } else {
                     this.isEnumeration(value).then(
                         (enumValue) => {
@@ -598,11 +633,7 @@ export class ComponentService {
     }
 
     /**
-     * @ngdoc function
-     * @name Utils#startEdit
-     * @methodOf veComponents.ExtUtilsService
-     * @description
-     * called by transcludes and section, adds the editor frame
+     * @name Utils#startEdit     * called by transcludes and section, adds the editor frame
      * uses these in the scope:
      *   element - element object for the element to edit (for sections it's the instance spec)
      *   isEditing - boolean
@@ -616,14 +647,14 @@ export class ComponentService {
      *   inPreviewMode - false
      *   editValues - array of editable values (for element that are of type Property, Slot, Port, Constraint)
      *
-     * @param {ExtensionController} ctrl scope of the transclude directives or view section directive
+     * @param {ComponentController} ctrl scope of the transclude directives or view section directive
      * @param editCtrl
      * @param {object} domElement dom of the directive, jquery wrapped
      * @param {string} template template to compile
      * @param {boolean} doNotScroll whether to scroll to element
      */
     public startEdit(
-        ctrl: ExtensionController,
+        ctrl: ComponentController,
         isEditable: boolean,
         domElement: JQuery<HTMLElement>,
         template: string | Injectable<(...args: any[]) => string>,
@@ -645,74 +676,91 @@ export class ComponentService {
                 projectId: elementOb._projectId,
                 refId: elementOb._refId,
             }
-            this.elementSvc.getElementForEdit(reqOb).then((data) => {
-                ctrl.isEditing = true
-                ctrl.inPreviewMode = false
-                ctrl.edit = data
+            this.elementSvc.getElementForEdit(reqOb).then(
+                (data) => {
+                    ctrl.isEditing = true
+                    ctrl.inPreviewMode = false
+                    ctrl.edit = data
 
-                if (data.type === 'Property' || data.type === 'Port') {
-                    if (ctrl.edit.defaultValue) {
-                        ctrl.editValues = [ctrl.edit.defaultValue]
+                    if (data.type === 'Property' || data.type === 'Port') {
+                        if (ctrl.edit.defaultValue) {
+                            ctrl.editValues = [ctrl.edit.defaultValue]
+                        }
+                    } else if (data.type === 'Slot') {
+                        if (Array.isArray(data.value)) {
+                            ctrl.editValues = (data as SlotObject).value
+                        }
+                    } else if (
+                        data.type === 'Constraint' &&
+                        data.specification
+                    ) {
+                        ctrl.editValues = [
+                            (data as ConstraintObject).specification,
+                        ]
                     }
-                } else if (data.type === 'Slot') {
-                    if (Array.isArray(data.value)) {
-                        ctrl.editValues = data.value
+                    if (!ctrl.editValues) {
+                        ctrl.editValues = []
                     }
-                } else if (data.type === 'Constraint' && data.specification) {
-                    ctrl.editValues = [data.specification]
-                }
-                if (!ctrl.editValues) {
-                    ctrl.editValues = []
-                }
-                /*
+                    /*
                 if (ctrl.isEnumeration && ctrl.editValues.length === 0) {
                     ctrl.editValues.push({type: 'InstanceValue', instanceId: null});
                 }
                 */
-                if (template) {
-                    domElement.empty()
-                    let transcludeEl: JQuery<HTMLElement>
-                    if (typeof template === 'string') {
-                        transcludeEl = $(template)
-                    } else {
-                        this.growl.error(
-                            'Editing is not supported for Injected Templates!'
-                        )
-                        return
+                    if (template) {
+                        domElement.empty()
+                        let transcludeEl: JQuery<HTMLElement>
+                        if (typeof template === 'string') {
+                            transcludeEl = $(template)
+                        } else {
+                            this.growl.error(
+                                'Editing is not supported for Injected Templates!'
+                            )
+                            return
+                        }
+                        domElement.append(transcludeEl)
+                        this.$compile(transcludeEl)(ctrl.$scope)
                     }
-                    domElement.append(transcludeEl)
-                    this.$compile(transcludeEl)(ctrl.$scope)
+                    if (!ctrl.skipBroadcast) {
+                        // Broadcast message for the toolCtrl:
+                        this.eventSvc.$broadcast(
+                            'presentationElem.edit',
+                            ctrl.edit
+                        )
+                    } else {
+                        ctrl.skipBroadcast = false
+                    }
+                    if (!doNotScroll) {
+                        this._scrollToElement(domElement)
+                    }
+                },
+                (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+                    reason.type = 'error'
+                    this.handleError(reason)
                 }
-                if (!ctrl.skipBroadcast) {
-                    // Broadcast message for the toolCtrl:
-                    this.eventSvc.$broadcast('presentationElem.edit', ctrl.edit)
-                } else {
-                    ctrl.skipBroadcast = false
-                }
-                if (!doNotScroll) {
-                    this._scrollToElement(domElement)
-                }
-            }, this.handleError)
+            )
 
-            this.elementSvc.isCacheOutdated(ctrl.element).then((data) => {
-                if (
-                    data.status &&
-                    data.server._modified > data.cache._modified
-                ) {
-                    this.growl.warning(
-                        'This element has been updated on the server'
-                    )
+            this.elementSvc.isCacheOutdated(ctrl.element).then(
+                (data) => {
+                    if (
+                        data.status &&
+                        data.server._modified > data.cache._modified
+                    ) {
+                        this.handleError({
+                            message:
+                                'This element has been updated on the server',
+                            type: 'warning',
+                        })
+                    }
+                },
+                (reason) => {
+                    this.handleError(reason)
                 }
-            })
+            )
         }
     }
 
     /**
-     * @ngdoc function
-     * @name Utils#saveAction
-     * @methodOf veComponents.ExtUtilsService
-     * @description
-     * called by transcludes and section, saves edited element
+     * @name Utils#saveAction     * called by transcludes and section, saves edited element
      * uses these in the scope:
      *   element - element object for the element to edit (for sections it's the instance spec)
      *   elementSaving - boolean
@@ -721,15 +769,15 @@ export class ComponentService {
      * sets these in the scope:
      *   elementSaving - boolean
      *
-     * @param {ExtensionController} ctrl
+     * @param {ComponentController} ctrl
      * @param {object} domElement dom of the directive, jquery wrapped
      * @param {boolean} continueEdit save and continue
      */
     public saveAction(
-        ctrl: ExtensionController,
+        ctrl: ComponentController,
         domElement: JQuery,
-        continueEdit
-    ) {
+        continueEdit: boolean
+    ): void {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
@@ -747,54 +795,46 @@ export class ComponentService {
         }
 
         ctrl.elementSaving = true
-
-        const work = () => {
-            this.save(ctrl.edit, ctrl.editorApi, ctrl, continueEdit)
-                .then(
-                    (data) => {
-                        ctrl.elementSaving = false
-                        if (!continueEdit) {
-                            ctrl.isEditing = false
-                            this.eventSvc.$broadcast(
-                                'presentationElem.save',
-                                ctrl.edit
-                            )
-                        }
-                        if (!data) {
-                            this.growl.info('Save Skipped (No Changes)')
-                        } else {
-                            this.growl.success('Save Successful')
-                        }
-                        //scrollToElement(domElement);
-                    },
-                    (reason) => {
-                        ctrl.elementSaving = false
-                        this.handleError(reason)
+        this.save(ctrl.edit, ctrl.editorApi, ctrl, continueEdit)
+            .then(
+                (data) => {
+                    ctrl.elementSaving = false
+                    if (!continueEdit) {
+                        ctrl.isEditing = false
+                        this.eventSvc.$broadcast(
+                            'presentationElem.save',
+                            ctrl.edit
+                        )
                     }
-                )
-                .finally(() => {
-                    if (ctrl.bbApi) {
-                        if (!continueEdit) {
-                            ctrl.bbApi.toggleButtonSpinner(
-                                'presentation-element-save'
-                            )
-                        } else {
-                            ctrl.bbApi.toggleButtonSpinner(
-                                'presentation-element-saveC'
-                            )
-                        }
+                    if (!data) {
+                        this.growl.info('Save Skipped (No Changes)')
+                    } else {
+                        this.growl.success('Save Successful')
                     }
-                })
-        }
-        this.$timeout(work, 1000, false) //to give ckeditor time to save any changes
+                    //scrollToElement(domElement);
+                },
+                (reason) => {
+                    ctrl.elementSaving = false
+                    this.handleError(reason)
+                }
+            )
+            .finally(() => {
+                if (ctrl.bbApi) {
+                    if (!continueEdit) {
+                        ctrl.bbApi.toggleButtonSpinner(
+                            'presentation-element-save'
+                        )
+                    } else {
+                        ctrl.bbApi.toggleButtonSpinner(
+                            'presentation-element-saveC'
+                        )
+                    }
+                }
+            })
     }
 
     /**
-     * @ngdoc function
-     * @name veUtils/directives.Utils#cancelAction
-     * @methodOf veUtils/directives.Utils
-     * @description
-     * called by transcludes and section, cancels edited element
+     * @name veUtils/directives.Utils#cancelAction     * called by transcludes and section, cancels edited element
      * uses these in the scope:
      *   element - element object for the element to edit (for sections it's the instance spec)
      *   edit - edit object
@@ -809,15 +849,15 @@ export class ComponentService {
      * @param {object} domElement dom of the directive, jquery wrapped
      */
     public cancelAction(
-        ctrl: ExtensionController,
+        ctrl: ComponentController,
         recompile: (preview?) => void,
         domElement: JQuery<HTMLElement>
-    ) {
+    ): void {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
         }
-        const cancelCleanUp = () => {
+        const cancelCleanUp = (): void => {
             ctrl.isEditing = false
             this.revertEdits(ctrl.editValues, ctrl.edit)
             // Broadcast message for the ToolCtrl:
@@ -828,41 +868,65 @@ export class ComponentService {
         if (ctrl.bbApi) {
             ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
         }
-        if (ctrl.editorApi && ctrl.editorApi.cancel) {
-            ctrl.editorApi.cancel()
-        }
-        // Only need to confirm the cancellation if edits have been made:
-        if (this.hasEdits(ctrl.edit)) {
-            const deleteOb = {
-                type: ctrl.edit.type,
-                element: ctrl.element,
+        const cancelFn: () => VePromise<boolean> = (): VePromise<boolean> => {
+            if (ctrl.editorApi && ctrl.editorApi.cancel) {
+                return ctrl.editorApi.cancel()
             }
-            const instance = this.deleteEditModal(deleteOb)
-            instance.result
-                .then(() => {
+            return this.$q.resolve<boolean>(true)
+        }
+        cancelFn().then(
+            (success) => {
+                // Only need to confirm the cancellation if edits have been made:
+                if (!success) {
+                    this.handleError({
+                        message: 'Problem Saving from Editor',
+                        type: 'warning',
+                    })
+                }
+                if (this.hasEdits(ctrl.edit)) {
+                    const deleteOb: { type: string; element: ElementObject } = {
+                        type: ctrl.edit.type,
+                        element: ctrl.element,
+                    }
+                    const instance = this.deleteEditModal(deleteOb)
+                    instance.result
+                        .then(() => {
+                            cancelCleanUp()
+                        })
+                        .finally(() => {
+                            if (ctrl.bbApi) {
+                                ctrl.bbApi.toggleButtonSpinner(
+                                    'presentation-element-cancel'
+                                )
+                            }
+                        })
+                } else {
                     cancelCleanUp()
-                })
-                .finally(() => {
                     if (ctrl.bbApi) {
                         ctrl.bbApi.toggleButtonSpinner(
                             'presentation-element-cancel'
                         )
                     }
+                }
+            },
+            () => {
+                this.handleError({
+                    message: 'Error Saving from Editor; Please Retry',
+                    type: 'error',
                 })
-        } else {
-            cancelCleanUp()
-            if (ctrl.bbApi) {
-                ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
             }
-        }
+        )
     }
 
-    public deleteEditModal(deleteOb) {
-        const settings: VeModalSettings = {
+    public deleteEditModal(deleteOb: {
+        type: string
+        element: ElementObject
+    }): VeModalInstanceService<string> {
+        const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
             component: 'confirmDeleteModal',
-            resolve: <ConfirmDeleteModalResolveFn>{
+            resolve: {
                 getName: () => {
-                    return deleteOb.type + ' ' + deleteOb.element.id
+                    return `${deleteOb.type} ${deleteOb.element.id}`
                 },
                 getType: () => {
                     return 'edit'
@@ -880,23 +944,25 @@ export class ComponentService {
                 },
             },
         }
-        return this.$uibModal.open(settings)
+        return this.$uibModal.open<ConfirmDeleteModalResolveFn, string>(
+            settings
+        )
     }
 
     public deleteAction(
-        ctrl: ExtensionController,
+        ctrl: ComponentController,
         bbApi: ButtonBarApi,
         section: ViewObject
-    ) {
+    ): void {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
         }
 
         bbApi.toggleButtonSpinner('presentation-element-delete')
-        const settings: VeModalSettings = {
+        const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
             component: 'confirmDeleteModal',
-            resolve: <ConfirmDeleteModalResolveFn>{
+            resolve: {
                 getType: () => {
                     return ctrl.edit.type ? ctrl.edit.type : 'element'
                 },
@@ -928,30 +994,33 @@ export class ComponentService {
                 }
                 this.viewSvc
                     .removeElementFromViewOrSection(reqOb, ctrl.instanceVal)
-                    .then((data) => {
-                        if (
-                            this.viewSvc.isSection(ctrl.instanceSpec) ||
-                            this.viewSvc.isTable(ctrl.instanceSpec) ||
-                            this.viewSvc.isFigure(ctrl.instanceSpec) ||
-                            this.viewSvc.isEquation(ctrl.instanceSpec)
-                        ) {
-                            // Broadcast message to TreeCtrl:
+                    .then(
+                        (data) => {
+                            if (
+                                this.viewSvc.isSection(ctrl.instanceSpec) ||
+                                this.viewSvc.isTable(ctrl.instanceSpec) ||
+                                this.viewSvc.isFigure(ctrl.instanceSpec) ||
+                                this.viewSvc.isEquation(ctrl.instanceSpec)
+                            ) {
+                                // Broadcast message to TreeCtrl:
+                                this.eventSvc.$broadcast(
+                                    'viewctrl.delete.element',
+                                    ctrl.instanceSpec
+                                )
+                            }
+
+                            this.eventSvc.$broadcast('content-reorder.refresh')
+
+                            // Broadcast message for the ToolCtrl:
                             this.eventSvc.$broadcast(
-                                'viewctrl.delete.element',
-                                ctrl.instanceSpec
+                                'presentationElem.cancel',
+                                ctrl.edit
                             )
-                        }
 
-                        this.eventSvc.$broadcast('content-reorder.refresh')
-
-                        // Broadcast message for the ToolCtrl:
-                        this.eventSvc.$broadcast(
-                            'presentationElem.cancel',
-                            ctrl.edit
-                        )
-
-                        this.growl.success('Remove Successful')
-                    }, this.handleError)
+                            this.growl.success('Remove Successful')
+                        },
+                        (reason) => this.handleError(reason)
+                    )
             })
             .finally(() => {
                 ctrl.bbApi.toggleButtonSpinner('presentation-element-delete')
@@ -959,11 +1028,7 @@ export class ComponentService {
     }
 
     /**
-     * @ngdoc function
-     * @name Utils#previewAction
-     * @methodOf veComponents.ExtUtilsService
-     * @description
-     * called by transcludes and section, previews edited element
+     * @name Utils#previewAction     * called by transcludes and section, previews edited element
      * uses these in the scope:
      *   element - element object for the element to edit (for sections it's the instance spec)
      *   edit - edit object
@@ -982,10 +1047,10 @@ export class ComponentService {
      * @param {object} domElement dom of the directive, jquery wrapped
      */
     public previewAction(
-        ctrl: ExtensionController,
+        ctrl: ComponentController,
         recompile: () => void,
         domElement: JQuery<HTMLElement>
-    ) {
+    ): void {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
@@ -1009,7 +1074,10 @@ export class ComponentService {
         this._scrollToElement(domElement)
     }
 
-    public isDirectChildOfPresentationElementFunc(element, mmsViewCtrl) {
+    public isDirectChildOfPresentationElementFunc(
+        element: JQuery<HTMLElement>,
+        mmsViewCtrl: ViewController
+    ): boolean {
         let parent = element[0].parentElement
         while (
             parent &&
@@ -1030,11 +1098,11 @@ export class ComponentService {
         return parent && parent.nodeName !== 'MMS-VIEW'
     }
 
-    public hasHtml(s) {
+    public hasHtml(s: string): boolean {
         return s.indexOf('<p>') !== -1
     }
 
-    private _scrollToElement(domElement: JQuery) {
+    private _scrollToElement(domElement: JQuery): void {
         this.$timeout(
             () => {
                 const el = domElement[0]
@@ -1043,26 +1111,32 @@ export class ComponentService {
             },
             500,
             false
+        ).then(
+            () => {
+                /**/
+            },
+            () => {
+                /**/
+            }
         )
     }
 
     /**
-     * @ngdoc method
-     * @name Utils#reopenUnsavedElts
-     * @methodOf veComponents.ExtUtilsService
-     * @description
-     * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
+     * @name Utils#reopenUnsavedElts     * called by transcludes when users have unsaved edits, leaves that view, and comes back to that view.
      * the editor will reopen if there are unsaved edits.
      * assumes no reload.
      * uses these in the scope:
      *   element - element object for the element to edit (for sections it's the instance spec)
      *   ve_edits - unsaved edits object
      *   startEdit - pop open the editor window
-     * @param {object} scope scope of the transclude directives or view section directive
+     * @param {ITransclusion} ctrl scope of the transclude directives or view section directive
      * @param {String} transcludeType name, documentation, or value
      */
-    public reopenUnsavedElts(ctrl: ITransclusion, transcludeType) {
-        let unsavedEdits = {}
+    public reopenUnsavedElts(
+        ctrl: ITransclusion,
+        transcludeType: string
+    ): void {
+        let unsavedEdits: { [p: string]: ElementObject } = {}
         if (this.autosaveSvc.openEdits() > 0) {
             unsavedEdits = this.autosaveSvc.getAll()
         }
@@ -1090,8 +1164,8 @@ export class ComponentService {
                     ctrl.startEdit()
                 }
             } else if (ctrl.element.type === 'Slot') {
-                const valList1 = thisEdits.value
-                const valList2 = ctrl.element.value
+                const valList1 = (thisEdits as SlotObject).value
+                const valList2 = (ctrl.element as SlotObject).value
 
                 // Check if the lists' lengths are the same
                 if (valList1.length !== valList2.length) {
@@ -1113,7 +1187,7 @@ export class ComponentService {
         }
     }
 
-    public getModifier(modifier: string): angular.IPromise<UserObject> {
+    public getModifier(modifier: string): VePromise<UserObject> {
         return this.authSvc.getUserData(modifier)
     }
 }

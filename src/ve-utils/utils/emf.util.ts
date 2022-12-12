@@ -1,14 +1,19 @@
-import {ElementObject} from "@ve-types/mms";
+import {
+    ElementObject,
+    ExpressionObject,
+    PackageObject,
+    ValueObject,
+} from '@ve-types/mms'
 
 export class Element implements ElementObject {
     id: string = ''
     _projectId: string = ''
     _refId: string = ''
-    _appliedStereotypeIds?: string[] = []
-    appliedStereotypeInstanceId?: string = null
-    documentation?: string = ''
-    mdExtensionsIds?: string[] = []
-    syncElementId?: string = null
+    _appliedStereotypeIds: string[] = []
+    appliedStereotypeInstanceId: string = null
+    documentation: string = ''
+    mdExtensionsIds: string[] = []
+    syncElementId: string = null
     type: string = 'Element'
 
     constructor(elementOb?: ElementObject) {
@@ -32,7 +37,7 @@ export class NamedElement extends Element {
 
 class PackageableElement extends NamedElement {
     ownerId: string = null
-    visibility: string = "public"
+    visibility: string = 'public'
     templateParameterId: string = null
     constructor(elementOb?: ElementObject) {
         super(elementOb)
@@ -40,7 +45,6 @@ class PackageableElement extends NamedElement {
             Object.assign(this, elementOb)
         }
     }
-
 }
 
 class TypedElement extends PackageableElement {
@@ -63,10 +67,8 @@ class TemplateableElement extends PackageableElement {
     }
 }
 
-
-
 export class Property extends TypedElement {
-    type = "Property"
+    type = 'Property'
     defaultValue: any[] = []
     constructor(elementOb?: ElementObject) {
         super(elementOb)
@@ -78,13 +80,13 @@ export class Property extends TypedElement {
 
 export class Class extends TemplateableElement {
     classifierBehaviorId: string = null
-    collaborationUseIds:string[] = []
-    elementImportIds:string[] = []
-    generalizationIds:string[] = []
-    classRealizationIds:string[] = []
-    isAbstract:boolean = false
-    isActive:boolean = false
-    isFinalSpecialization:boolean = false
+    collaborationUseIds: string[] = []
+    elementImportIds: string[] = []
+    generalizationIds: string[] = []
+    classRealizationIds: string[] = []
+    isAbstract: boolean = false
+    isActive: boolean = false
+    isFinalSpecialization: boolean = false
     isLeaf: boolean = false
     ownedAttributeIds: string[] = []
     ownedOperationIds: string[] = []
@@ -92,7 +94,7 @@ export class Class extends TemplateableElement {
     powertypeExtentIds: string[] = []
     redefinedClassifierIds: string[] = []
     representationI: string[] = []
-    type = "Class"
+    type = 'Class'
     useCaseIds: string[] = []
     constructor(elementOb?: ElementObject) {
         super(elementOb)
@@ -102,12 +104,12 @@ export class Class extends TemplateableElement {
     }
 }
 export class InstanceSpec extends PackageableElement {
-    classifierIds:string[] = []
-    deploymentIds:string[] = []
-    slotIds:string[] = []
+    classifierIds: string[] = []
+    deploymentIds: string[] = []
+    slotIds: string[] = []
     specification: Element = null
     stereotypedElementId: string = null
-    type = "InstanceSpecification"
+    type = 'InstanceSpecification'
     constructor(elementOb?: ElementObject) {
         super(elementOb)
         if (elementOb) {
@@ -116,10 +118,9 @@ export class InstanceSpec extends PackageableElement {
     }
 }
 
-export class ValueSpec extends TypedElement {
-    valueExpression:string = ""
-    operand: any[] = []
-    type = "ValueSpecification"
+export class ValueSpec extends TypedElement implements ValueObject {
+    valueExpression: string = ''
+    type = 'ValueSpecification'
     constructor(elementOb?: ElementObject) {
         super(elementOb)
         if (elementOb) {
@@ -128,14 +129,28 @@ export class ValueSpec extends TypedElement {
     }
 }
 
-export class Package extends TemplateableElement {
-    type = "Package"
-    visibility =  null
-    elementImportIds:string[] = []
-    packageImportIds:string[] = []
-    URI: string = ""
-    packageMergeIds:string[] = []
-    profileApplicationIds:string[] = []
+export class Expression<T extends ElementObject>
+    extends ValueSpec
+    implements ExpressionObject<T>
+{
+    operand: T[] = []
+    type = 'Expression'
+    constructor(elementOb?: ElementObject) {
+        super(elementOb)
+        if (elementOb) {
+            Object.assign(this, elementOb)
+        }
+    }
+}
+
+export class Package extends TemplateableElement implements PackageObject {
+    type = 'Package'
+    visibility = null
+    elementImportIds: string[] = []
+    packageImportIds: string[] = []
+    URI: string = ''
+    packageMergeIds: string[] = []
+    profileApplicationIds: string[] = []
     constructor(elementOb?: ElementObject) {
         super(elementOb)
         if (elementOb) {
@@ -144,9 +159,9 @@ export class Package extends TemplateableElement {
     }
 }
 export class Generalization extends Element {
-    generalizationSetIds:string[] = []
-    isSubstitutable:boolean = true
-    type = "Generalization"
+    generalizationSetIds: string[] = []
+    isSubstitutable: boolean = true
+    type = 'Generalization'
     constructor(elementOb?: ElementObject) {
         super(elementOb)
         if (elementOb) {
@@ -155,7 +170,7 @@ export class Generalization extends Element {
     }
 }
 export class Dependency extends PackageableElement {
-    type = "Dependency"
+    type = 'Dependency'
     visibility = null
     constructor(elementOb?: ElementObject) {
         super(elementOb)

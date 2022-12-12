@@ -8,6 +8,8 @@ import { MmsObject } from '@ve-types/mms'
 export class CacheService {
     public cache: { [key: string]: string | unknown | unknown[] } = {}
 
+    static $inject = []
+
     get<T>(key: string | string[], noCopy?: boolean): T | undefined {
         const realKey: string = this._makeKey(key)
         const result: T = this._get<T>(realKey)
@@ -36,11 +38,7 @@ export class CacheService {
     }
 
     /**
-     * @ngdoc method
      * @name CacheService#getElements
-     * @methodOf CacheService
-     *
-     * @description
      * Get the latest elements in the cache with the parameter workspace ID
      *
      * @param {string} projectId The mms project id
@@ -77,11 +75,7 @@ export class CacheService {
 
     type
     /**
-     * @ngdoc method
      * @name CacheService#put
-     * @methodOf CacheService
-     *
-     * @description
      * Put value into cache
      *
      * @param {Array.<string>|string} key String key or Array of hierarchical keys
@@ -128,11 +122,7 @@ export class CacheService {
     }
 
     /**
-     * @ngdoc method
      * @name CacheService#link
-     * @methodOf CacheService
-     *
-     * @description
      * Create a link to another cached items. This link will be automatically followed/resolved by cache service
      *
      * @param {string | string[]} sourceKey
@@ -154,11 +144,7 @@ export class CacheService {
     }
 
     /**
-     * @ngdoc method
      * @name CacheService#remove
-     * @methodOf CacheService
-     *
-     * @description
      * Remove value from cache and return it
      *
      * @param {Array.<string>|string} key String key or Array of hierarchical keys
@@ -183,11 +169,7 @@ export class CacheService {
     }
 
     /**
-     * @ngdoc method
      * @name CacheService#exists
-     * @methodOf CacheService
-     *
-     * @description
      * Check if value exists with a specific key
      *
      * @param {Array.<string>|string} key String key or Array of hierarchical keys
@@ -221,14 +203,12 @@ export class CacheService {
         }
     }
 
-    reset() {
+    reset(): void {
         const keys = Object.keys(this.cache)
         for (let i = 0; i < keys.length; i++) {
             delete this.cache[keys[i]]
         }
     }
 }
-
-CacheService.$inject = []
 
 veUtils.service('CacheService', CacheService)

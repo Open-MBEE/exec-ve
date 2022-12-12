@@ -4,7 +4,7 @@ import { handleChange } from '@ve-utils/utils/change.util'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
 
 const VeFooterComponent: VeComponentOptions = {
     selector: 'veFooter',
@@ -25,13 +25,13 @@ const VeFooterComponent: VeComponentOptions = {
 
         public footerMessage
 
-        $onInit() {
+        $onInit(): void {
             if (Array.isArray(this.footerOb.message))
                 this.footerMessage = this.footerOb.message
             else this.footerMessage = [this.footerOb.message]
         }
 
-        $onChanges(onChangesObj: angular.IOnChangesObject) {
+        $onChanges(onChangesObj: angular.IOnChangesObject): void {
             handleChange(onChangesObj, 'footerOb', () => {
                 this.footerMessage = this.footerOb.message
             })

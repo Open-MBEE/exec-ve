@@ -1,13 +1,105 @@
+import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
 import angular from 'angular'
-import * as _ from 'lodash'
+import _ from 'lodash'
 
-import { AuthService, CacheService } from '@ve-utils/mms-api-client'
+import { ApiService, AuthService, CacheService } from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
-import { AutosaveService, UtilsService } from '@ve-utils/services'
+import { AutosaveService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
-import { VeModalComponent, VeModalController } from '@ve-types/view-editor'
+import { AuthRequest } from '@ve-types/mms'
+import {
+    VeModalComponent,
+    VeModalController,
+    VeModalResolve,
+    VeModalResolveFn,
+} from '@ve-types/view-editor'
+
+export interface LoginModalResolveFn extends VeModalResolveFn {
+    continue(): boolean
+}
+
+export interface LoginModalResolve extends VeModalResolve {
+    continue: boolean
+}
+
+class LoginModalController
+    extends VeModalControllerImpl<boolean>
+    implements VeModalController
+{
+    static $inject = [
+        '$state',
+        '$uiRouterGlobals',
+        'growl',
+        'AuthService',
+        'AutosaveService',
+        'ApiService',
+        'CacheService',
+    ]
+
+    public credentials = {
+        username: '',
+        password: '',
+    }
+    spin = false
+
+    constructor(
+        private $state: StateService,
+        private $uiRouterGlobals: UIRouterGlobals,
+        private growl: angular.growl.IGrowlService,
+        private authSvc: AuthService,
+        private autosaveSvc: AutosaveService,
+        private apiSvc: ApiService,
+        private cacheSvc: CacheService
+    ) {
+        super()
+    }
+
+    login(credentials: AuthRequest): void {
+        this.spin = true
+        this.authSvc.getAuthorized(credentials).then(
+            (user) => {
+                this.growl.success('Logged in')
+                // Check if user had changes queued before refreshing page data
+                // add edits to cache
+                const edits = this.autosaveSvc.getAll()
+                _.map(edits, (element, key) => {
+                    const reqOb = this.apiSvc.makeRequestObject(element)
+                    const cacheKey = this.apiSvc.makeCacheKey(
+                        reqOb,
+                        element.id,
+                        true
+                    )
+                    this.cacheSvc.put(cacheKey, element)
+                })
+                if (this.resolve.continue) {
+                    this.$state
+                        .go(this.$uiRouterGlobals.current, {}, { reload: true })
+                        .then(
+                            () => {
+                                this.modalInstance.close(true)
+                            },
+                            () => {
+                                this.growl.error(
+                                    'Redirect error; Please reload the page'
+                                )
+                            }
+                        )
+                }
+            },
+            (reason) => {
+                this.spin = false
+                this.credentials.password = ''
+                this.growl.error(reason.message)
+            }
+        )
+    }
+
+    cancel = (): void => {
+        this.modalInstance.dismiss(false)
+    }
+}
 
 const LoginModalComponent: VeModalComponent = {
     selector: 'loginModal',
@@ -30,73 +122,7 @@ const LoginModalComponent: VeModalComponent = {
         modalInstance: '<',
         resolve: '<',
     },
-    controller: class LoginModalController
-        extends VeModalControllerImpl
-        implements VeModalController
-    {
-        static $inject = [
-            '$state',
-            'growl',
-            'AuthService',
-            'AutosaveService',
-            'UtilsService',
-            'CacheService',
-        ]
-
-        public credentials = {
-            username: '',
-            password: '',
-        }
-        spin = false
-
-        constructor(
-            private $state,
-            private growl,
-            private authSvc: AuthService,
-            private autosaveSvc: AutosaveService,
-            private utilsSvc: UtilsService,
-            private cacheSvc: CacheService
-        ) {
-            super()
-        }
-
-        login(credentials) {
-            this.spin = true
-            const credentialsJSON = {
-                username: credentials.username,
-                password: credentials.password,
-            }
-            this.authSvc.getAuthorized(credentialsJSON).then(
-                (user) => {
-                    this.growl.success('Logged in')
-                    // Check if user had changes queued before refreshing page data
-                    // add edits to cache
-                    const edits = this.autosaveSvc.getAll()
-                    _.map(edits, (element, key) => {
-                        const cacheKey = this.apiSvc.makeCacheKey(element, true)
-                        this.cacheSvc.put(cacheKey, element)
-                    })
-                    if (this.resolve.continue) {
-                        this.$state.go(
-                            this.$state.current,
-                            {},
-                            { reload: true }
-                        )
-                    }
-                    this.modalInstance.dismiss(true)
-                },
-                (reason) => {
-                    this.spin = false
-                    this.credentials.password = ''
-                    this.growl.error(reason.message)
-                }
-            )
-        }
-
-        cancel = () => {
-            this.modalInstance.dismiss(false)
-        }
-    },
+    controller: LoginModalController,
 }
 
 veApp.component(LoginModalComponent.selector, LoginModalComponent)

@@ -1,13 +1,19 @@
-export {};
+export {}
 
 declare global {
-  interface JQuery {
-    isOnScreen(x?: any, y?: any): boolean;
+    interface JQuery {
+        isOnScreen(x?: number, y?: number): boolean
 
-    table2CSV(inputOptions: {
-      delivery: string,
-      separator?: string,
-      header?: any[],
-    }): string | boolean;
-  }
+        table2CSV(inputOptions: table2CSV.inputOptions): string | boolean
+    }
+
+    namespace JQuery {
+        namespace table2CSV {
+            interface inputOptions {
+                delivery: string
+                separator?: string
+                header?: string[]
+            }
+        }
+    }
 }

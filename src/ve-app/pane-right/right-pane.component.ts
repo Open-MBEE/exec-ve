@@ -17,8 +17,9 @@ import {
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
-import { VeComponentOptions, VeModalService } from '@ve-types/view-editor'
+import { VeModalService } from '@ve-types/view-editor'
 
 const RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
@@ -97,7 +98,7 @@ const RightPaneComponent: VeComponentOptions = {
             private specSvc: SpecService
         ) {}
 
-        $onInit() {
+        $onInit(): void {
             this.eventSvc.$init(this)
             this.specApi = {
                 refId: this.refOb.id,
@@ -239,7 +240,7 @@ const RightPaneComponent: VeComponentOptions = {
             )
         }
 
-        $postLink() {
+        $postLink(): void {
             //If there is a view pre-selected, send the view.selected event to the spec tools system
             if (this.viewOb || this.documentOb) {
                 const data = {

@@ -1,28 +1,26 @@
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
+import * as CKEDITOR from 'ckeditor4'
 import $ from 'jquery'
-import * as _ from 'lodash'
+import _ from 'lodash'
 
-import { MentionService, VeEditorApi } from '@ve-core/editor'
+import { MentionService, EditingApi } from '@ve-core/editor'
 import { TranscludeModalResolveFn } from '@ve-core/editor/modals/transclude-modal.component'
 import { EditorService } from '@ve-core/editor/services/Editor.service'
 import {
+    ApiService,
     CacheService,
+    ElementService,
     URLService,
     ViewService,
-    ElementService,
 } from '@ve-utils/mms-api-client'
-import { ImageService, UtilsService } from '@ve-utils/services'
+import { ImageService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
+import { VeComponentOptions, VeNgModelController } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
-import { ElementObject } from '@ve-types/mms'
-import { CKEDITOR } from '@ve-types/third-party'
-import {
-    VeComponentOptions,
-    VeModalService,
-    VeModalSettings,
-} from '@ve-types/view-editor'
+import { ElementObject, ElementsResponse } from '@ve-types/mms'
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 /**
  * @ngdoc directive
@@ -34,16 +32,14 @@ import {
  * @requires veUtils/UtilsService
  * @requires veUtils/ViewService
  * @requires $uibModal
- * @requires $window
+ * @requires $q
  * @requires $timeout
  * @requires growl
  * @requires CKEDITOR
  * @requires _
  *
  * @restrict A
- *
- * @description
- * Make any edit any value with a CKEditor wysiwyg editor. This
+ * * Make any edit any value with a CKEditor wysiwyg editor. This
  * requires the CKEditor library. Transclusion is supported. ngModel is required.
  * Allows the setting of an Autosave key.
  * ### Example
@@ -51,17 +47,17 @@ import {
    <ve-editor ng-model="element.documentation"></ve-editor>
    </pre>
  */
-export class VeEditorController implements angular.IComponentController {
+export class VeEditorController implements IComponentController {
     private veConfig: VeConfig = window.__env
-    private cKEditor = window.CKEDITOR
+    private ckEditor: CKEDITOR.CKEditorStatic = window.CKEDITOR
 
-    private ngModelCtrl: angular.INgModelController
+    private ngModelCtrl: VeNgModelController<string>
 
     mmsProjectId: string
     mmsRefId: string
     private mmsEditorType: string
-    private autosaveKey: any
-    private mmsEditorApi: VeEditorApi
+    private autosaveKey: string
+    private mmsEditorApi: EditingApi
 
     private toolbar: Array<
         | string
@@ -77,14 +73,21 @@ export class VeEditorController implements angular.IComponentController {
     private generatedIds: number = 0
     private instance: CKEDITOR.editor = null
     private deb: _.DebouncedFunc<(e) => void> = _.debounce((e) => {
-        this.update()
+        this.update().then(
+            () => {
+                /**/
+            },
+            () => {
+                this.growl.error('Error saving editor content')
+            }
+        )
     }, 1000)
 
     private tokenStr: RegExp = new RegExp('([?&]token=[a-zA-Z0-9.]*)')
 
     static $inject = [
         '$compile',
-        '$window',
+        '$q',
         '$uibModal',
         '$attrs',
         '$element',
@@ -104,7 +107,7 @@ export class VeEditorController implements angular.IComponentController {
     /**
      *
      * @param {angular.ICompileService} $compile
-     * @param {angular.IWindowService} $window
+     * @param {angular.IQService} $q
      * @param {VeModalService} $uibModal
      * @param {angular.IAttributes} $attrs
      * @param {JQuery<HTMLElement>} $element
@@ -113,7 +116,7 @@ export class VeEditorController implements angular.IComponentController {
      * @param {angular.growl.IGrowlService} growl
      * @param {CacheService} cacheSvc
      * @param {ElementService} elementSvc
-     * @param {UtilsService} utilsSvc
+     * @param {ApiService} apiSvc
      * @param {ViewService} viewSvc
      * @param {URLService} uRLSvc
      * @param {MentionService} mentionSvc
@@ -122,7 +125,7 @@ export class VeEditorController implements angular.IComponentController {
      */
     constructor(
         private $compile: angular.ICompileService,
-        private $window: angular.IWindowService,
+        private $q: angular.IQService,
         private $uibModal: VeModalService,
         private $attrs: angular.IAttributes,
         private $element: JQuery<HTMLElement>,
@@ -131,7 +134,7 @@ export class VeEditorController implements angular.IComponentController {
         private growl: angular.growl.IGrowlService,
         private cacheSvc: CacheService,
         private elementSvc: ElementService,
-        private utilsSvc: UtilsService,
+        private apiSvc: ApiService,
         private viewSvc: ViewService,
         private uRLSvc: URLService,
         private mentionSvc: MentionService,
@@ -140,8 +143,8 @@ export class VeEditorController implements angular.IComponentController {
     ) {}
     //depends on angular bootstrap
 
-    $onInit() {
-        this.id = 'mmsCkEditor' + this.generatedIds++
+    $onInit(): void {
+        this.id = `mmsCkEditor${this.generatedIds++}`
 
         // Formatting editor toolbar
         const stylesToolbar = {
@@ -237,7 +240,7 @@ export class VeEditorController implements angular.IComponentController {
         }
         this.toolbar = thisToolbar
     }
-    $postLink() {
+    $postLink(): void {
         this.$timeout(
             () => {
                 // Initialize ckeditor and set event handlers
@@ -249,12 +252,12 @@ export class VeEditorController implements angular.IComponentController {
 
                 this.$element.append(this.$transcludeEl)
                 this.$compile(this.$transcludeEl)(this.$scope)
-                this.instance = this.cKEditor.replace(this.id, {
+                this.instance = this.ckEditor.replace(this.id, {
                     mmscf: { callbackModalFnc: this.transcludeCallback },
                     mmscomment: { callbackModalFnc: this.commentCallback },
                     mmsvlink: { callbackModalFnc: this.viewLinkCallback },
                     mmsreset: { callback: this.mmsResetCallback },
-                    contentsCss: this.cKEditor.basePath + 'contents.css',
+                    contentsCss: `${this.ckEditor.basePath}contents.css`,
                     toolbar: this.toolbar,
                 })
                 // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
@@ -282,7 +285,7 @@ export class VeEditorController implements angular.IComponentController {
                         this.instance.dataProcessor.dataFilter.addRules({
                             elements: {
                                 // Adds the token to img's in the editor environment to allow images to be displayed while editor
-                                $: (element) => {
+                                $: (element: CKEDITOR.htmlParser.element) => {
                                     element
                                         .find(
                                             (
@@ -332,7 +335,7 @@ export class VeEditorController implements angular.IComponentController {
                     this.instance.dataProcessor.htmlFilter.addRules({
                         elements: {
                             // Removes the token from the export src to prevent saving of token to server
-                            $: (element) => {
+                            $: (element: CKEDITOR.htmlParser.element) => {
                                 element
                                     .find((el: CKEDITOR.htmlParser.element) => {
                                         return (
@@ -363,7 +366,9 @@ export class VeEditorController implements angular.IComponentController {
                     })
                 })
 
-                const highlightActiveEditor = (instance) => {
+                const highlightActiveEditor = (
+                    instance: CKEDITOR.editor
+                ): void => {
                     const activeEditorClass = 'active-editor'
                     $('transclude-doc')
                         .children('div')
@@ -386,10 +391,10 @@ export class VeEditorController implements angular.IComponentController {
 
                 const addCkeditorHtmlFilterRule = (
                     instance: CKEDITOR.editor
-                ) => {
+                ): void => {
                     instance.dataProcessor.htmlFilter.addRules({
                         elements: {
-                            $: (element) => {
+                            $: (element: CKEDITOR.htmlParser.element) => {
                                 if (element.name === 'script') {
                                     element.remove()
                                     return
@@ -422,7 +427,7 @@ export class VeEditorController implements angular.IComponentController {
                     })
                     instance.dataProcessor.dataFilter.addRules({
                         elements: {
-                            $: (element) => {
+                            $: (element: CKEDITOR.htmlParser.element) => {
                                 if (element.name === 'script') {
                                     element.remove()
                                     return
@@ -475,88 +480,108 @@ export class VeEditorController implements angular.IComponentController {
                 this._addInlineMention()
 
                 if (this.mmsEditorApi) {
-                    this.mmsEditorApi.save = () => {
-                        this.update()
+                    this.mmsEditorApi.save = (): angular.IPromise<boolean> => {
+                        return this.update()
                     }
-                    this.mmsEditorApi.cancel = () => {
-                        this.update()
-                    }
+                    this.mmsEditorApi.cancel =
+                        (): angular.IPromise<boolean> => {
+                            return this.update()
+                        }
                 }
-                this.instance.on('fileUploadRequest', (evt) => {
-                    const fileLoader = evt.data.fileLoader
-                    const formData = new FormData()
-                    const xhr = fileLoader.xhr
+                this.instance.on(
+                    'fileUploadRequest',
+                    (
+                        evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>
+                    ) => {
+                        const fileLoader = evt.data.fileLoader
+                        const formData = new FormData()
+                        const xhr = fileLoader.xhr
 
-                    xhr.open(
-                        'POST',
-                        this.uRLSvc.getPutArtifactsURL({
-                            projectId: this.mmsProjectId,
-                            refId: this.mmsRefId,
-                            elementId: this.utilsSvc
-                                .createMmsId()
-                                .replace('MMS', 'VE'),
-                        }),
-                        true
-                    )
-                    //xhr.withCredentials = true;
-                    xhr.setRequestHeader(
-                        'Authorization',
-                        this.uRLSvc.getAuthorizationHeaderValue()
-                    )
-                    formData.append(
-                        'file',
-                        fileLoader.file,
-                        fileLoader.fileName
-                    )
-                    if (fileLoader.fileName) {
-                        formData.append('name', fileLoader.fileName)
+                        xhr.open(
+                            'POST',
+                            this.uRLSvc.getPutArtifactsURL({
+                                projectId: this.mmsProjectId,
+                                refId: this.mmsRefId,
+                                elementId: this.apiSvc
+                                    .createUniqueId()
+                                    .replace('MMS', 'VE'),
+                            }),
+                            true
+                        )
+                        //xhr.withCredentials = true;
+                        xhr.setRequestHeader(
+                            'Authorization',
+                            this.uRLSvc.getAuthorizationHeaderValue()
+                        )
+                        formData.append(
+                            'file',
+                            fileLoader.file,
+                            fileLoader.fileName
+                        )
+                        if (fileLoader.fileName) {
+                            formData.append('name', fileLoader.fileName)
+                        }
+
+                        fileLoader.xhr.send(formData)
+
+                        // Prevented the default behavior.
+                        evt.stop()
                     }
+                )
+                this.instance.on(
+                    'fileUploadResponse',
+                    (
+                        evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>
+                    ) => {
+                        // Prevent the default response handler.
+                        evt.stop()
 
-                    fileLoader.xhr.send(formData)
+                        // Get XHR and response.
+                        const data = evt.data
+                        const xhr = data.fileLoader.xhr
+                        const response: ElementsResponse<ElementObject> =
+                            JSON.parse(
+                                xhr.response as string
+                            ) as ElementsResponse<ElementObject>
 
-                    // Prevented the default behavior.
-                    evt.stop()
-                })
-                this.instance.on('fileUploadResponse', (evt) => {
-                    // Prevent the default response handler.
-                    evt.stop()
-
-                    // Get XHR and response.
-                    const data = evt.data
-                    const xhr = data.fileLoader.xhr
-                    const response = JSON.parse(xhr.response)
-
-                    if (
-                        !response.elements ||
-                        response.elements.length == 0 ||
-                        !response.elements[0]._artifacts ||
-                        response.elements[0]._artifacts.length == 0
-                    ) {
-                        // An error occurred during upload.
-                        //data.message = response[ 1 ];
-                        evt.cancel()
-                    } else {
-                        //TODO does this need to be smarter?
-                        const element = response.elements[0]
-                        data.url = this.uRLSvc.getArtifactURL(
-                            {
+                        if (
+                            !response.elements ||
+                            response.elements.length == 0 ||
+                            !response.elements[0]._artifacts ||
+                            response.elements[0]._artifacts.length == 0
+                        ) {
+                            // An error occurred during upload.
+                            //data.message = response[ 1 ];
+                            evt.cancel()
+                        } else {
+                            //TODO does this need to be smarter?
+                            const element = response.elements[0]
+                            data.url = this.uRLSvc.getArtifactURL({
                                 projectId: element._projectId,
                                 refId: element._refId,
                                 elementId: element.id,
-                            },
-                            element._artifacts[0].extension
-                        )
+                                artifactExtension:
+                                    element._artifacts[0].extension,
+                            })
+                        }
                     }
-                })
+                )
             },
             0,
             false
+        ).then(
+            () => {
+                /* Do Nothing */
+            },
+            () => {
+                /* Do Nothing */
+            }
         )
     }
 
-    $onDestroy() {
+    $onDestroy(): void {
         if (!this.instance) {
-            this.instance = this.cKEditor.instances[this.id]
+            this.instance = this.ckEditor.instances[this.id]
         } else {
             this.mentionSvc.removeAllMentionForEditor(this.instance)
             this.instance.destroy()
@@ -564,10 +589,10 @@ export class VeEditorController implements angular.IComponentController {
         }
     }
 
-    public transcludeCallback = (ed: CKEDITOR.editor) => {
-        const tSettings: VeModalSettings = {
+    public transcludeCallback = (ed: CKEDITOR.editor): void => {
+        const tSettings: VeModalSettings<TranscludeModalResolveFn> = {
             component: 'transcludeModal',
-            resolve: <TranscludeModalResolveFn>{
+            resolve: {
                 editor: () => {
                     return this
                 },
@@ -577,15 +602,16 @@ export class VeEditorController implements angular.IComponentController {
             },
             size: 'lg',
         }
-        const tInstance = this.$uibModal.open(tSettings)
+        const tInstance = this.$uibModal.open<TranscludeModalResolveFn, string>(
+            tSettings
+        )
         tInstance.result.then(
             (result) => {
-                const tag = result.$value
-                this._addWidgetTag(ed, tag)
+                this._addWidgetTag(ed, result)
             },
             () => {
                 const focusManager: CKEDITOR.focusManager =
-                    new this.cKEditor.focusManager(ed)
+                    new this.ckEditor.focusManager(ed)
                 focusManager.focus()
             }
         )
@@ -596,10 +622,10 @@ export class VeEditorController implements angular.IComponentController {
     // If user selects name or doc, link will be to first related doc
     // Also defines options for search interfaces -- see mmsSearch.js for more info
 
-    public viewLinkCallback = (ed: CKEDITOR.editor) => {
-        const vSettings: VeModalSettings = {
+    public viewLinkCallback = (ed: CKEDITOR.editor): void => {
+        const vSettings: VeModalSettings<TranscludeModalResolveFn> = {
             component: 'transcludeModal',
-            resolve: <TranscludeModalResolveFn>{
+            resolve: {
                 editor: () => {
                     return this
                 },
@@ -609,18 +635,24 @@ export class VeEditorController implements angular.IComponentController {
             },
             size: 'lg',
         }
-        const vInstance = this.$uibModal.open(vSettings)
+        const vInstance = this.$uibModal.open<TranscludeModalResolveFn, string>(
+            vSettings
+        )
 
-        vInstance.result.then((result) => {
-            const tag = result.$value
-            this._addWidgetTag(ed, tag)
-        })
+        vInstance.result.then(
+            (tag) => {
+                this._addWidgetTag(ed, tag)
+            },
+            () => {
+                /* Do Nothing */
+            }
+        )
     }
 
-    public commentCallback = (ed: CKEDITOR.editor) => {
-        const cSettings: VeModalSettings = {
+    public commentCallback = (ed: CKEDITOR.editor): void => {
+        const cSettings: VeModalSettings<TranscludeModalResolveFn> = {
             component: 'transcludeModal',
-            resolve: <TranscludeModalResolveFn>{
+            resolve: {
                 editor: () => {
                     return this
                 },
@@ -629,28 +661,40 @@ export class VeEditorController implements angular.IComponentController {
                 },
             },
         }
-        const cInstance = this.$uibModal.open(cSettings)
+        const cInstance = this.$uibModal.open<TranscludeModalResolveFn, string>(
+            cSettings
+        )
 
-        cInstance.result.then((result) => {
-            const tag = result.$value
-            this._addWidgetTag(ed, tag)
-        })
+        cInstance.result.then(
+            (tag) => {
+                this._addWidgetTag(ed, tag)
+            },
+            () => {
+                /* Do Nothing */
+            }
+        )
     }
 
-    public resetCrossRef = (type: CKEDITOR.dom.node[], typeString) => {
+    public resetCrossRef = (
+        type: CKEDITOR.dom.node<Node>[],
+        typeString: string
+    ): void => {
         type.forEach((node, key) => {
             const value = node.$
             const transclusionObject = angular.element(value)
             const transclusionId = transclusionObject.attr('mms-element-id')
-            const transclusionKey = this.apiSvc.makeCacheKey({
-                elementId: transclusionId,
-                projectId: this.mmsProjectId,
-                refId: this.mmsRefId,
-            })
+            const transclusionKey = this.apiSvc.makeCacheKey(
+                {
+                    projectId: this.mmsProjectId,
+                    refId: this.mmsRefId,
+                },
+                transclusionId,
+                false
+            )
             const inCache: ElementObject =
                 this.cacheSvc.get<ElementObject>(transclusionKey)
             if (inCache) {
-                transclusionObject.html('[cf:' + inCache.name + typeString)
+                transclusionObject.html(`[cf:${inCache.name}${typeString}`)
             } else {
                 //TODO create Utils function to handle request objects
                 const reqOb = {
@@ -663,7 +707,7 @@ export class VeEditorController implements angular.IComponentController {
                         transclusionObject.html('[cf:' + data.name + typeString)
                     },
                     (reason) => {
-                        let error
+                        let error: string
                         if (reason.status === 410) error = 'deleted'
                         if (reason.status === 404) error = 'not found'
                         transclusionObject.html('[cf:' + error + typeString)
@@ -673,8 +717,8 @@ export class VeEditorController implements angular.IComponentController {
         })
     }
 
-    public mmsResetCallback = (ed: CKEDITOR.editor) => {
-        const body = ed.document.getBody()
+    public mmsResetCallback = (ed: CKEDITOR.editor): void => {
+        const body: CKEDITOR.dom.element = ed.document.getBody()
         this.resetCrossRef(
             body.find("transclude[mms-cf-type='name']").toArray(),
             '.name]'
@@ -688,26 +732,34 @@ export class VeEditorController implements angular.IComponentController {
             '.val]'
         )
         this.resetCrossRef(body.find('view-link').toArray(), '.vlink]')
-        this.update()
+        this.update().then(
+            () => {
+                /**/
+            },
+            () => {
+                this.growl.error('Error saving editor content')
+            }
+        )
     }
 
-    public update = () => {
+    public update = (): angular.IPromise<boolean> => {
         // getData() returns CKEditor's processed/clean HTML content.
-        if (angular.isDefined(this.instance) && this.instance !== null)
+        if (this.instance)
             this.ngModelCtrl.$setViewValue(this.instance.getData())
+        return this.$q.resolve<boolean>(true)
     }
 
-    private _addWidgetTag = (editor: CKEDITOR.editor, tag: string) => {
+    private _addWidgetTag = (editor: CKEDITOR.editor, tag: string): void => {
         editor.insertHtml(tag)
         this.editorSvc.focusOnEditorAfterAddingWidgetTag(editor)
     }
 
-    private _addInlineMention = () => {
-        let keyupHandler
-        this.cKEditor.instances[this.id].on('contentDom', () => {
-            keyupHandler = this.cKEditor.instances[
+    private _addInlineMention = (): void => {
+        let keyupHandler: CKEDITOR.listenerRegistration
+        this.ckEditor.instances[this.id].on('contentDom', () => {
+            keyupHandler = this.ckEditor.instances[
                 this.instance.name
-            ].document.on('keyup', (e) => {
+            ].document.on<CKEDITOR.dom.node<KeyboardEvent>>('keyup', (e) => {
                 if (this._isMentionKey(e.data.$)) {
                     this.mentionSvc.createMention(
                         this.instance,
@@ -718,6 +770,7 @@ export class VeEditorController implements angular.IComponentController {
                 } else {
                     this.mentionSvc.handleInput(
                         e,
+                        this.$scope.$new(),
                         this.instance,
                         this.mmsProjectId,
                         this.mmsRefId
@@ -726,14 +779,16 @@ export class VeEditorController implements angular.IComponentController {
             })
         })
 
-        this.cKEditor.instances[this.id].on('contentDomUnload', () => {
+        this.ckEditor.instances[this.id].on('contentDomUnload', () => {
             if (keyupHandler) {
                 keyupHandler.removeListener()
             }
         })
     }
 
-    private _keyHandler = (e) => {
+    private _keyHandler = (
+        e: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>
+    ): boolean => {
         if (this._isMentionKey(e.data.domEvent.$)) {
             return false // to prevent "@" from getting written to the editor
         }
@@ -755,35 +810,40 @@ export class VeEditorController implements angular.IComponentController {
         if (!ignoreDefaultBehaviour) {
             this.deb(e)
         }
+        return true
     }
 
     // 13 = enter, 38 = up arrow, 40 = down arrow
-    private _isSpecialKey = (event) => {
+    private _isSpecialKey = (
+        event: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>
+    ): boolean => {
         const key = event.data.domEvent.$.which
         return key === 13 || key === 38 || key === 40
     }
 
-    private _isTabKey = (event) => {
+    private _isTabKey = (
+        event: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>
+    ): boolean => {
         return event.data.domEvent.$.which === 9
     }
 
-    private _isMentionKey = (keyboardEvent) => {
+    private _isMentionKey = (keyboardEvent: KeyboardEvent): boolean => {
         return this._isShiftKeyOn(keyboardEvent) && keyboardEvent.key === '@'
     }
 
-    private _isShiftKeyOn = (keyboardEvent) => {
+    private _isShiftKeyOn = (keyboardEvent: KeyboardEvent): boolean => {
         return keyboardEvent.shiftKey
     }
 
-    private _addContextMenuItems = (editor: CKEDITOR.editor) => {
+    private _addContextMenuItems = (editor: CKEDITOR.editor): void => {
         this._addFormatAsCodeMenuItem(editor)
     }
 
-    private _addFormatAsCodeMenuItem = (editor: CKEDITOR.editor) => {
+    private _addFormatAsCodeMenuItem = (editor: CKEDITOR.editor): void => {
         editor.addCommand('formatAsCode', {
             exec: (editor: CKEDITOR.editor) => {
                 const selected_text = editor.getSelection().getSelectedText()
-                const newElement = new this.cKEditor.dom.element('code')
+                const newElement = new this.ckEditor.dom.element('code')
                 newElement.addClass('inlineCode')
                 newElement.setText(selected_text)
                 editor.insertElement(newElement)
@@ -798,9 +858,9 @@ export class VeEditorController implements angular.IComponentController {
             icon: 'codeSnippet',
         })
         editor.contextMenu.addListener((element) => {
-            return { formatAsCode: this.cKEditor.TRISTATE_OFF }
+            return { formatAsCode: this.ckEditor.TRISTATE_OFF }
         })
-        editor.setKeystroke(this.cKEditor.CTRL + 75, 'formatAsCode')
+        editor.setKeystroke(this.ckEditor.CTRL + 75, 'formatAsCode')
     }
 }
 

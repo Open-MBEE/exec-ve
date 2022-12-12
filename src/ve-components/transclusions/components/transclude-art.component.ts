@@ -7,7 +7,6 @@ import {
     ElementService,
     AuthService,
     URLService,
-    ViewService,
 } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
@@ -19,7 +18,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -39,9 +38,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
  * @requires {MathJaxService} mathJaxSvc
- *
- * @description
- * Given an element id, puts in the element's documentation binding, if there's a parent
+ * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
  *
@@ -111,7 +108,7 @@ export class TranscludeArtController
         this.checkCircular = true
     }
 
-    config = () => {
+    config = (): void => {
         this.artExt = this.mmsArtExt
 
         this.$element.on('click', (e) => {
@@ -122,7 +119,9 @@ export class TranscludeArtController
         })
     }
 
-    public getContent = (preview?) => {
+    public getContent = (
+        preview?: boolean
+    ): VePromise<string | HTMLElement[], string> => {
         const artifacts = this.element._artifacts
         if (artifacts !== undefined) {
             const allExt = artifacts.map((a) => a.extension)
@@ -137,7 +136,7 @@ export class TranscludeArtController
                 projectId: this.projectId,
                 refId: this.refId,
                 commitId: this.commitId,
-                includeRecentVersionElement: true,
+                //includeRecentVersionElement: true,
             }
             this.artifacts = artifacts
                 .filter((a) => includeExt.includes(a.extension))
@@ -167,6 +166,7 @@ export const TranscludeArtComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
+        mmsCallback: '&',,
         mmsArtExt: '@',
     },
     require: {

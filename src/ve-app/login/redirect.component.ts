@@ -7,8 +7,8 @@ import { EventService, RootScopeService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import { QueryObject, RequestObject } from '@ve-types/mms'
-import { VeComponentOptions } from '@ve-types/view-editor'
 
 const RedirectComponent: VeComponentOptions = {
     selector: 'veRedirect',
@@ -90,7 +90,7 @@ const RedirectComponent: VeComponentOptions = {
             private eventSvc: EventService
         ) {}
 
-        $onInit() {
+        $onInit(): void {
             this.eventSvc.$init(this)
 
             this.rootScopeSvc.veTitle('Redirecting... | View Editor') //what to name this?

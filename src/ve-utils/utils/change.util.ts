@@ -14,10 +14,10 @@ import angular from 'angular'
  *
  */
 export type onChangesCallback = (
-    newVal?: any,
-    oldVal?: any,
+    newVal?: unknown,
+    oldVal?: unknown,
     firstChange?: boolean
-) => any
+) => void
 
 /**
  * @name change.utils#handleChange:
@@ -26,7 +26,7 @@ export type onChangesCallback = (
  * @example
  *  class ComponentController {
  *      constructor() {...}
- *      $onChanges(onChangesObj) {
+ *      $onChanges(onChangesObj: angular.IOnChangesObject): void {
  *          handleChange(onChangesObj,'watchedBinding',myCallback)
  *      }
  *

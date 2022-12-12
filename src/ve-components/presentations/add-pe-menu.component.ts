@@ -1,54 +1,53 @@
-import angular from "angular";
-import {RootScopeService} from "@ve-utils/services";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ViewObject} from "@ve-types/mms";
+import angular, { IComponentController } from 'angular'
 
-import {veComponents} from "@ve-components";
-import {PresentationService} from "@ve-components/presentations/services/Presentation.service";
+import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
+import { RootScopeService } from '@ve-utils/services'
 
-class AddPeMenuController implements angular.IComponentController {
+import { veComponents } from '@ve-components'
 
+import { VeComponentOptions } from '@ve-types/angular'
+import { ViewObject } from '@ve-types/mms'
+
+class AddPeMenuController implements IComponentController {
     // Bindings
     private mmsView: ViewObject
-    private index: number;
+    private index: number
 
-    private addPeIndex: number;
+    private addPeIndex: number
 
-    static $inject = ['PresentationService', 'RootScopeService'];
+    static $inject = ['PresentationService', 'RootScopeService']
 
-    constructor(private presentationSvc: PresentationService, private rootScopeSvc: RootScopeService) {
-    }
+    constructor(
+        private presentationSvc: PresentationService,
+        private rootScopeSvc: RootScopeService
+    ) {}
     /**
-     * @ngdoc function
      * @name veComponents.directive:mmsView#addEltAction
-     * @methodOf veComponents.directive:mmsView
-     *
-     * @description
      * Add specified element at the defined 'index'
      */
-    public addEltAction(index: number, type: string) {
+    public addEltAction(index: number, type: string): void {
         if (!this.rootScopeSvc.veEditMode()) {
-            return;
+            return
         }
-        this.addPeIndex = index;
-        this.presentationSvc.addPresentationElement(this, type, this.mmsView);
-    };
+        this.addPeIndex = index
+        this.presentationSvc.addPresentationElement(this, type, this.mmsView)
+    }
 
-    public setPeLineVisibility = ($event) => {
+    public setPeLineVisibility = ($event: JQuery.ClickEvent): void => {
         window.setTimeout(() => {
-            var peContainer = $($event.currentTarget).closest('.add-pe-button-container');
+            const peContainer = $($event.currentTarget).closest(
+                '.add-pe-button-container'
+            )
             if (peContainer.find('.dropdown-menu').css('display') == 'none') {
-                peContainer.find('hr').css('visibility', 'hidden');
+                peContainer.find('hr').css('visibility', 'hidden')
             } else {
-                peContainer.find('hr').css('visibility', 'visible');
+                peContainer.find('hr').css('visibility', 'visible')
             }
-        });
-    };
-
+        })
+    }
 }
 
-
-let AddPeMenuComponent: VeComponentOptions = {
+const AddPeMenuComponent: VeComponentOptions = {
     selector: 'addPeMenu',
     template: `
     <div class="mms-add-pe-button" ng-mouseover="$ctrl.setPeLineVisibility($event);" ng-mouseleave="$ctrl.setPeLineVisibility($event);">
@@ -94,9 +93,9 @@ let AddPeMenuComponent: VeComponentOptions = {
 `,
     bindings: {
         mmsView: '<',
-        index: '<'
+        index: '<',
     },
-    controller: AddPeMenuController
+    controller: AddPeMenuController,
 }
 
-veComponents.component(AddPeMenuComponent.selector,AddPeMenuComponent)
+veComponents.component(AddPeMenuComponent.selector, AddPeMenuComponent)

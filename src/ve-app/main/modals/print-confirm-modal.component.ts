@@ -1,5 +1,5 @@
 import angular from 'angular'
-import * as _ from 'lodash'
+import _ from 'lodash'
 
 import { AppUtilsService } from '@ve-app/main/services'
 import {
@@ -191,7 +191,7 @@ const PrintConfirmModalComponent: angular.Injectable<any> = {
             private appUtilsSvc: AppUtilsService
         ) {}
 
-        $onInit() {
+        $onInit(): void {
             this.refOb = this.resolve.refOb()
             this.isDoc = this.resolve.isDoc()
             this.type = this.isDoc ? 'DOCUMENT' : 'VIEW'

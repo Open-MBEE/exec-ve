@@ -1,45 +1,49 @@
-import {EventService} from "./Event.service";
-import {veUtils} from "@ve-utils";
+import { veUtils } from '@ve-utils'
+
+import { EventService } from './Event.service'
+
+import { ElementObject } from '@ve-types/mms'
 
 export class AutosaveService {
-    private edits = {};
-    public EVENT = 've-edits';
-    constructor ( private eventSvc : EventService) {}
+    private edits: { [key: string]: ElementObject } = {}
+    public EVENT = 've-edits'
 
-    trigger() {
-        this.eventSvc.$broadcast(this.EVENT);
+    static $inject = ['EventService']
+
+    constructor(private eventSvc: EventService) {}
+
+    trigger(): void {
+        this.eventSvc.$broadcast(this.EVENT)
     }
 
-    get(key) {
-        return this.edits[key];
+    get<T extends ElementObject>(key: string): T {
+        return this.edits[key] as T
     }
 
-    getAll() {
-        return this.edits;
+    getAll(): { [key: string]: ElementObject } {
+        return this.edits
     }
 
-    openEdits() {
-        return Object.keys(this.edits).length;
+    openEdits(): number {
+        return Object.keys(this.edits).length
     }
 
-    addOrUpdate(key, value) {
-        this.edits[key] = value;
-        this.trigger();
+    addOrUpdate(key: string, value: ElementObject): void {
+        this.edits[key] = value
+        this.trigger()
     }
 
-    remove(key) {
-        delete this.edits[key];
-        this.trigger();
+    remove(key: string): void {
+        delete this.edits[key]
+        this.trigger()
     }
 
-    reset() {
-        const keys = Object.keys(this.edits);
+    reset(): void {
+        const keys = Object.keys(this.edits)
         for (let i = 0; i < keys.length; i++) {
-            delete this.edits[keys[i]];
+            delete this.edits[keys[i]]
         }
     }
 }
 
-AutosaveService.$inject = ['EventService'];
-
-veUtils.service('AutosaveService', AutosaveService);
+veUtils.service('AutosaveService', AutosaveService)

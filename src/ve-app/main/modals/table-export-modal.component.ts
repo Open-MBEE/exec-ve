@@ -2,7 +2,7 @@ import angular from 'angular'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
 
 const TableExportModalComponent: VeComponentOptions = {
     selector: 'tableExport',
@@ -54,7 +54,7 @@ const TableExportModalComponent: VeComponentOptions = {
 
         constructor() {}
 
-        $onInit() {
+        $onInit(): void {
             this.type = this.resolve.type
         }
 

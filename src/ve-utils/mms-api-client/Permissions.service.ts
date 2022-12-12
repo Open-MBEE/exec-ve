@@ -23,12 +23,12 @@ export interface PermissionCache {
  * @requires $q
  * @requires $http
  * @requires URLService
- *
- * @description
- * This utility service handles permissions inquiries
+ * * This utility service handles permissions inquiries
  */
 export class PermissionsService {
     private permissions: PermissionCache = { project: {}, ref: {} }
+
+    static $inject = ['$q', '$http', 'URLService']
 
     constructor(
         private $q: angular.IQService,
@@ -36,13 +36,16 @@ export class PermissionsService {
         private uRLSvc: URLService
     ) {}
 
-    public initializePermissions(projectOb: ProjectObject, refOb: RefObject) {
+    public initializePermissions(
+        projectOb: ProjectObject,
+        refOb: RefObject
+    ): angular.IPromise<PermissionCache> {
         const url = this.uRLSvc.getPermissionsLookupURL()
 
-        const deferred: angular.IDeferred<PermissionCache> = this.$q.defer()
+        const deferred = this.$q.defer<PermissionCache>()
 
         this.$http
-            .put(url, {
+            .put<PermissionsResponse>(url, {
                 lookups: [
                     {
                         type: 'PROJECT',
@@ -58,7 +61,7 @@ export class PermissionsService {
                 ],
             })
             .then(
-                (response: angular.IHttpResponse<PermissionsResponse>) => {
+                (response) => {
                     const data: PermissionsObject[] = response.data.lookups
                     if (Array.isArray(data) && data.length > 0) {
                         data.forEach((d) => {
@@ -81,14 +84,7 @@ export class PermissionsService {
                     }
                 },
                 (response: angular.IHttpResponse<PermissionsResponse>) => {
-                    deferred.reject(
-                        this.uRLSvc.handleHttpStatus(
-                            response.data,
-                            response.status,
-                            response.headers,
-                            response.config
-                        )
-                    )
+                    deferred.reject(this.uRLSvc.handleHttpStatus(response))
                 }
             )
 
@@ -113,7 +109,5 @@ export class PermissionsService {
         return this.permissions.ref[projectId + '/' + refId]
     }
 }
-
-PermissionsService.$inject = ['$q', '$http', 'URLService']
 
 veUtils.service('PermissionsService', PermissionsService)

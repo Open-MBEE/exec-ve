@@ -1,9 +1,10 @@
-import * as angular from "angular";
-import {PresentationComponentOptions} from "@ve-components/presentations";
-import {veComponents} from "@ve-components";
-import {ExpressionObject, PresentationInstanceObject} from "@ve-types/mms";
+import { PresentationLite } from '@ve-components/presentations'
 
-let PresentImageComponent: PresentationComponentOptions = {
+import { veComponents } from '@ve-components'
+
+import { PresentationComponentOptions } from '@ve-types/components'
+
+const PresentImageComponent: PresentationComponentOptions = {
     selector: 'presentImage',
     template: `
     <figure>
@@ -15,18 +16,11 @@ let PresentImageComponent: PresentationComponentOptions = {
 </figure>
 `,
     bindings: {
-       peObject: '<',
+        peObject: '<',
         element: '<',
-        peNumber: '<'
+        peNumber: '<',
     },
-    controller: class PresentImageController implements angular.IComponentController {
-
-        public peObject: PresentationInstanceObject
-        public element: ExpressionObject
-        public peNumber: string
-
-        constructor() {}
-    }
+    controller: PresentationLite,
 }
 
-veComponents.component(PresentImageComponent.selector,PresentImageComponent);
+veComponents.component(PresentImageComponent.selector, PresentImageComponent)

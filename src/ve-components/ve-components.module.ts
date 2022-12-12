@@ -20,8 +20,8 @@ export const veComponents = angular.module('ve-components', [
 //         .enableSvg()
 // }])
 veComponents
-    .filter('veRealNum', function () {
-        return function (n) {
+    .filter('veRealNum', () => {
+        return (n) => {
             if (Number.isInteger(n)) {
                 return n + '.0'
             }

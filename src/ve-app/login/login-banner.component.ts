@@ -1,9 +1,12 @@
-import angular from 'angular';
-import {VeComponentOptions} from "@ve-types/view-editor";
+import angular, { IComponentController } from 'angular'
 
-import {veApp} from "@ve-app";
+import { BrandingStyle } from '@ve-utils/services'
 
-let LoginBannerComponent: VeComponentOptions = {
+import { veApp } from '@ve-app'
+
+import { VeComponentOptions } from '@ve-types/angular'
+
+const LoginBannerComponent: VeComponentOptions = {
     selector: 'loginBanner',
     template: `
     <div class="login-banner">
@@ -15,17 +18,19 @@ let LoginBannerComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        mmsLoginBanner: "<"
+        mmsLoginBanner: '<',
     },
-    controller: class LoginBannerController implements angular.IComponentController {
-        private mmsLoginBanner
-        public message
-        constructor() {
+    controller: class LoginBannerController implements IComponentController {
+        private mmsLoginBanner: BrandingStyle
+        public message: string[] | string
+
+        $onInit(): void {
+            this.message = this.mmsLoginBanner.message
+            if (!Array.isArray(this.message)) {
+                this.message = [this.message]
+            }
         }
-        $onInit() {
-            this.message = this.mmsLoginBanner.message;
-        }
-    }
+    },
 }
 
-veApp.component(LoginBannerComponent.selector, LoginBannerComponent);
+veApp.component(LoginBannerComponent.selector, LoginBannerComponent)

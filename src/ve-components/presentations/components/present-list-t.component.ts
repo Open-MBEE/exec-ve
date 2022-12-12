@@ -1,25 +1,26 @@
-import * as angular from "angular";
-import {PresentationComponentOptions} from "@ve-components/presentations";
-import {veComponents} from "@ve-components";
-import {ExpressionObject, PresentationInstanceObject} from "@ve-types/mms";
+import angular, { IComponentController } from 'angular'
 
-let PresentListTComponent: PresentationComponentOptions = {
+import { veComponents } from '@ve-components'
+
+import { PresentationComponentOptions } from '@ve-types/components'
+import { InstanceSpecObject, PresentationInstanceObject } from '@ve-types/mms'
+
+const PresentListTComponent: PresentationComponentOptions = {
     selector: 'presentListT',
     template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,
     bindings: {
-       peObject: '<',
+        peObject: '<',
         element: '<',
-        peNumber: '<'
+        peNumber: '<',
     },
-    controller: class PresentListTController implements angular.IComponentController {
-
+    controller: class PresentListTController implements IComponentController {
         public peObject: PresentationInstanceObject
-        public element: ExpressionObject
+        public element: InstanceSpecObject
         public peNumber: string
 
         constructor() {}
-    }
+    },
 }
 
-veComponents.component(PresentListTComponent.selector,PresentListTComponent);
+veComponents.component(PresentListTComponent.selector, PresentListTComponent)

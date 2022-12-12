@@ -1,5 +1,4 @@
-import * as angular from "angular";
-
+import angular from 'angular'
 
 /**
  * @ngdoc overview
@@ -9,9 +8,7 @@ import * as angular from "angular";
  * @requires ui.bootstrap
  * @requires ui.sortable
  * @requires angular-growl
- *
- * @description
- * # veCore module
+ * * # veCore module
  * This module provides prebuilt components that are commonly used by the mms
  * client applications, for example, cross referencing and element "spec window".
  * Since this module contains directives with ui elements, there's more dependencies
@@ -73,14 +70,31 @@ import * as angular from "angular";
  </pre>
  */
 
-export const veCore = angular.module('ve-core', ['ve-utils', 'ui.bootstrap', 'angular-growl', 'angularjs-dropdown-multiselect', 'ui.tree-filter']);
+export const veCore = angular.module('ve-core', [
+    've-utils',
+    'ui.bootstrap',
+    'angular-growl',
+    'angularjs-dropdown-multiselect',
+    'ui.tree-filter',
+])
 
-veCore.config(['$sceProvider', 'growlProvider', 'uiTreeFilterSettingsProvider', function($sceProvider, growlProvider, uiTreeFilterSettingsProvider) {
-    $sceProvider.enabled(false);
-    growlProvider.onlyUniqueMessages(false);
-    growlProvider.globalTimeToLive({success: 5000, error: -1, warning: 5000, info: 5000});
-    growlProvider.globalPosition('bottom-right');
-    uiTreeFilterSettingsProvider.addresses = ['label'];
-    uiTreeFilterSettingsProvider.descendantCollection = 'children';
-}])
+veCore
+    .config([
+        '$sceProvider',
+        'growlProvider',
+        'uiTreeFilterSettingsProvider',
+        ($sceProvider, growlProvider, uiTreeFilterSettingsProvider) => {
+            $sceProvider.enabled(false)
+            growlProvider.onlyUniqueMessages(false)
+            growlProvider.globalTimeToLive({
+                success: 5000,
+                error: -1,
+                warning: 5000,
+                info: 5000,
+            })
+            growlProvider.globalPosition('bottom-right')
+            uiTreeFilterSettingsProvider.addresses = ['label']
+            uiTreeFilterSettingsProvider.descendantCollection = 'children'
+        },
+    ])
     .constant('CKEDITOR', window.CKEDITOR)

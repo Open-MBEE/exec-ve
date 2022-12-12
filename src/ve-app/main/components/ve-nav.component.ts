@@ -10,7 +10,8 @@ import {
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VeModalService } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
+import { VeModalService } from '@ve-types/view-editor'
 
 const VeNavComponent: VeComponentOptions = {
     selector: 'veNav',
@@ -145,7 +146,7 @@ const VeNavComponent: VeComponentOptions = {
             this.searchClass = ''
         }
 
-        $onInit() {
+        $onInit(): void {
             this.eventSvc.$init(this)
 
             this.subs.push(

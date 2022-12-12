@@ -1,16 +1,26 @@
-import * as angular from "angular";
+import angular from 'angular'
 
-import {ExtensionService, ComponentService} from "@ve-components/services"
-import {ViewObject} from "@ve-types/mms";
-import {SchemaService} from "@ve-utils/model-schema";
-import {EventService, MathJaxService, UtilsService} from "@ve-utils/services";
-import {ButtonBarService} from "@ve-core/button-bar";
-import {ITransclusion, Transclusion} from "@ve-components/transclusions";
-import {AuthService, ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {handleChange} from "@ve-utils/utils";
+import { ExtensionService, ComponentService } from '@ve-components/services'
+import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import { ButtonBarService } from '@ve-core/button-bar'
+import {
+    AuthService,
+    ElementService,
+    ViewService,
+} from '@ve-utils/mms-api-client'
+import { SchemaService } from '@ve-utils/model-schema'
+import {
+    EventService,
+    ImageService,
+    MathJaxService,
+    UtilsService,
+} from '@ve-utils/services'
+import { handleChange } from '@ve-utils/utils'
 
-import {veComponents} from "@ve-components";
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { ViewObject } from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -18,15 +28,15 @@ import {veComponents} from "@ve-components";
  *
  * @requires veUtils/ElementService
  *
- *
- * @description
- *
+ * *
  * @param {string} mmsGroupId The id of the group to show documents for
  * @param {string=master} mmsRefId Ref, defaults to master
  * @param {string} mmsProjectId Project Id, if not stated will get from surrounding view
  */
-class TranscludeGroupDocsController extends Transclusion implements ITransclusion {
-
+class TranscludeGroupDocsController
+    extends Transclusion
+    implements ITransclusion
+{
     template = `<table class="table table-condensed">
     <tr><th>Document(s)</th><!--<th>Last Modified</th><th>Last Modified By</th><th>Created</th>--></tr>
     <tr ng-repeat="doc in $ctrl.docs | orderBy: 'name'">
@@ -35,12 +45,12 @@ class TranscludeGroupDocsController extends Transclusion implements ITransclusio
 </table>
 `
 
-    mmsGroupId: string;
+    mmsGroupId: string
 
-    documents: ViewObject[];
-    docs: ViewObject[];
+    documents: ViewObject[]
+    docs: ViewObject[]
 
-    static $inject = [...Transclusion.$inject, 'ViewService'];
+    static $inject = [...Transclusion.$inject, 'ViewService']
 
     constructor(
         $q: angular.IQService,
@@ -57,81 +67,110 @@ class TranscludeGroupDocsController extends Transclusion implements ITransclusio
         mathJaxSvc: MathJaxService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
+        imageSvc: ImageService,
         private viewSvc: ViewService
     ) {
-        super($q,$scope,$compile,$element,growl,componentSvc,elementSvc,utilsSvc,schemaSvc,authSvc,eventSvc,
-            mathJaxSvc, extensionSvc, buttonBarSvc)
+        super(
+            $q,
+            $scope,
+            $compile,
+            $element,
+            growl,
+            componentSvc,
+            elementSvc,
+            utilsSvc,
+            schemaSvc,
+            authSvc,
+            eventSvc,
+            mathJaxSvc,
+            extensionSvc,
+            buttonBarSvc,
+            imageSvc
+        )
         this.cfType = 'groupDocs'
         this.cfTitle = ''
         this.cfKind = 'Table'
-        this.checkCircular = false;
+        this.checkCircular = false
     }
 
-    $postLink() {
-        this.changeAction(this.mmsGroupId,'',false);
+    $postLink(): void {
+        this.changeAction(this.mmsGroupId, '', false)
     }
 
-    protected config = () => {
-        this.mmsGroupId = this.mmsElementId;
+    protected config = (): void => {
+        this.mmsGroupId = this.mmsElementId
     }
 
-    protected watch = (onChangesObj: angular.IOnChangesObject) => {
+    protected watch = (onChangesObj: angular.IOnChangesObject): void => {
         if (onChangesObj.mmsGroupId) {
-            this.mmsElementId = this.mmsGroupId;
+            this.mmsElementId = this.mmsGroupId
         }
-        handleChange(onChangesObj, 'mmsGroupId', this.changeAction);
+        handleChange(onChangesObj, 'mmsGroupId', this.changeAction)
     }
 
-    public getContent = () => {
-        const deferred: angular.IDeferred<string> = this.$q.defer();
-        this.mmsGroupId = this.mmsElementId;
-        this.viewSvc.getProjectDocuments({
-            projectId: this.projectId,
-            refId: this.refId
-        }, 2).then((documents) => {
-            this.documents = documents;
-            this.update();
-            deferred.resolve(this.template)
-        },(reason) => {
-            deferred.reject(reason);
-        });
-        return deferred.promise;
+    public getContent = (): VePromise<string | HTMLElement[], string> => {
+        const deferred = this.$q.defer<string>()
+        this.mmsGroupId = this.mmsElementId
+        this.viewSvc
+            .getProjectDocuments(
+                {
+                    projectId: this.projectId,
+                    refId: this.refId,
+                },
+                2
+            )
+            .then(
+                (documents) => {
+                    this.documents = documents
+                    this.update()
+                    deferred.resolve(this.template)
+                },
+                (reason) => {
+                    deferred.reject(reason)
+                }
+            )
+        return deferred.promise
     }
 
     public update = () => {
-        var docs: ViewObject[] = [];
-        var groupId = this.mmsGroupId === '' ? undefined : this.mmsGroupId;
+        const docs: ViewObject[] = []
+        const groupId = this.mmsGroupId === '' ? undefined : this.mmsGroupId
         for (let i = 0; i < this.documents.length; i++) {
-            if ( (groupId === undefined || groupId === this.projectId) && !this.documents[i]._groupId ) {
-                docs.push(this.documents[i]);
+            if (
+                (groupId === undefined || groupId === this.projectId) &&
+                !this.documents[i]._groupId
+            ) {
+                docs.push(this.documents[i])
             } else if (this.documents[i]._groupId == this.mmsGroupId) {
-                docs.push(this.documents[i]);
+                docs.push(this.documents[i])
             }
         }
-        this.docs = docs;
+        this.docs = docs
     }
-
-};
-
-export let TranscludeGroupDocsComponent: VeComponentOptions = {
-        selector: 'transcludeGroupDocs',
-        template: `<div></div>`,
-        bindings: {
-            mmsGroupId: '@',
-            mmsProjectId: '@',
-            mmsRefId: '@',
-            mmsCommitId: '@',
-            mmsWatchId: '@',
-            noClick: '@',
-            nonEditable: '<',
-            clickHandler: '&?',
-            mmsCfLabel: '@'
-        },
-        require: {
-            mmsCfCrl: '?^^mmsCf',
-            mmsViewCtrl: '?^^view'
-        },
-        controller: TranscludeGroupDocsController
 }
 
-veComponents.component(TranscludeGroupDocsComponent.selector,TranscludeGroupDocsComponent)
+export const TranscludeGroupDocsComponent: VeComponentOptions = {
+    selector: 'transcludeGroupDocs',
+    template: `<div></div>`,
+    bindings: {
+        mmsGroupId: '@',
+        mmsProjectId: '@',
+        mmsRefId: '@',
+        mmsCommitId: '@',
+        mmsWatchId: '@',
+        noClick: '@',
+        nonEditable: '<',
+        clickHandler: '&?',
+        mmsCfLabel: '@',
+    },
+    require: {
+        mmsCfCrl: '?^^mmsCf',
+        mmsViewCtrl: '?^^view',
+    },
+    controller: TranscludeGroupDocsController,
+}
+
+veComponents.component(
+    TranscludeGroupDocsComponent.selector,
+    TranscludeGroupDocsComponent
+)

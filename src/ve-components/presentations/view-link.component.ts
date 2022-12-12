@@ -1,13 +1,20 @@
-import * as angular from "angular";
+import angular, { IComponentController } from 'angular'
 
-import {ExtensionService, veComponents} from "@ve-components";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ElementService, ViewService} from "@ve-utils/mms-api-client";
-import {ApplicationService, UtilsService} from "@ve-utils/services";
-import {ViewController} from "@ve-components/presentations/view.component";
-import {TransclusionController} from "@ve-components/transclusions/transclusion.component";
-import {handleChange, onChangesCallback} from "@ve-utils/utils";
-import {ElementObject, ElementsRequest} from "@ve-types/mms";
+import { ViewController } from '@ve-components/presentations/view.component'
+import { ExtensionService } from '@ve-components/services'
+import { TransclusionController } from '@ve-components/transclusions/transclusion.component'
+import {
+    ApiService,
+    ElementService,
+    ViewService,
+} from '@ve-utils/mms-api-client'
+import { ApplicationService, UtilsService } from '@ve-utils/services'
+import { handleChange, onChangesCallback } from '@ve-utils/utils'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/angular'
+import { ElementObject, ElementsRequest } from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -16,9 +23,7 @@ import {ElementObject, ElementsRequest} from "@ve-types/mms";
  * @requires veUtils/ElementService
  * @requires $compile
  *
- *
- * @description
- * Given a view id and optional document id, creates a html link
+ * * Given a view id and optional document id, creates a html link
  *
  * @param {string} mmsElementId The id of the view
  * @param {string} mmsProjectId The project id for the view
@@ -27,22 +32,21 @@ import {ElementObject, ElementsRequest} from "@ve-types/mms";
  * @param {string} mmsDocId Document context of view
  * @param {string} mmsPeId Document context of view
  */
-class ViewLinkController implements angular.IComponentController {
-
+class ViewLinkController implements IComponentController {
     //Bindings
-    public mmsElementId
-        mmsProjectId
-        mmsRefId
-        mmsCommitId
-        mmsDocId
-        mmsPeId
-        linkText
-        linkClass
-        linkIconClass
-        linkTarget
-        mmsExternalLink
-        suppressNumbering
-        showName
+    public mmsElementId: string
+    mmsProjectId: string
+    mmsRefId: string
+    mmsCommitId: string
+    mmsDocId: string
+    mmsPeId: string
+    linkText: string
+    linkClass: string
+    linkIconClass: string
+    linkTarget: string
+    mmsExternalLink: boolean
+    suppressNumbering: boolean
+    showName: boolean
 
     // Controllers
     private mmsCfCtrl: TransclusionController
@@ -50,40 +54,57 @@ class ViewLinkController implements angular.IComponentController {
 
     // Locals
     loading: boolean = true
-    target: string;
+    target: string
     private processed: boolean = false
     projectId: string
     refId: string
     commitId: string
-    element: ElementObject;
-    elementName: string;
-    type: string;
+    element: ElementObject
+    elementName: string
+    type: string
 
-    static $inject = ['$scope', '$element', 'ElementService', 'UtilsService', '$compile', 'growl', 'ViewService', 'ApplicationService', 'ExtensionService']
-    suffix: string;
-    hash: string;
-    href: string;
-    private docid: string;
-    showNum: boolean;
-    vid: string;
+    static $inject = [
+        '$scope',
+        '$element',
+        'ElementService',
+        'ApiService',
+        'UtilsService',
+        '$compile',
+        'growl',
+        'ViewService',
+        'ApplicationService',
+        'ExtensionService',
+    ]
+    suffix: string
+    hash: string
+    href: string
+    private docid: string
+    showNum: boolean
+    vid: string
 
+    constructor(
+        private $scope: angular.IScope,
+        private $element: JQuery<HTMLElement>,
+        private elementSvc: ElementService,
+        private apiSvc: ApiService,
+        private utilsSvc: UtilsService,
+        private $compile: angular.ICompileService,
+        private growl: angular.growl.IGrowlService,
+        private viewSvc: ViewService,
+        private applicationSvc: ApplicationService,
+        private extensionSvc: ExtensionService
+    ) {}
 
-    constructor(private $scope: angular.IScope, private $element: JQuery<HTMLElement>,
-                private elementSvc: ElementService, private utilsSvc: UtilsService,
-                private $compile: angular.ICompileService, private growl: angular.growl.IGrowlService,
-                private viewSvc: ViewService, private applicationSvc: ApplicationService, private extensionSvc: ExtensionService) {
+    $onInit(): void {
+        this.target = this.linkTarget ? this.linkTarget : '_self'
     }
 
-    $onInit() {
-        this.target = this.linkTarget ? this.linkTarget : '_self';
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
+        handleChange(onChangesObj, 'mmsElementId', this.changeAction)
     }
 
-    $onChanges(onChangesObj: angular.IOnChangesObject) {
-        handleChange(onChangesObj,'mmsElementId',this.changeAction)
-    }
-
-    $postLink() {
-        this.changeAction(this.mmsElementId, '', false);
+    $postLink(): void {
+        this.changeAction(this.mmsElementId, '', false)
     }
 
     protected changeAction: onChangesCallback = (
@@ -91,120 +112,167 @@ class ViewLinkController implements angular.IComponentController {
         oldVal,
         firstChange
     ) => {
-        if (!newVal || (newVal === oldVal && this.processed))
-            return;
+        if (!newVal || (newVal === oldVal && this.processed)) return
 
-        this.processed = true;
+        this.processed = true
 
-        let projectId = this.mmsProjectId;
-        let refId = this.mmsRefId;
-        let commitId = this.mmsCommitId;
-        let docid = this.mmsDocId;
+        let projectId = this.mmsProjectId
+        let refId = this.mmsRefId
+        let commitId = this.mmsCommitId
+        let docid = this.mmsDocId
         if (this.mmsCfCtrl) {
-            const cfVersion = this.mmsCfCtrl.getElementOrigin();
-            if (!projectId)
-                projectId = cfVersion.projectId;
-            if (!refId)
-                refId = cfVersion.refId;
-            if (!commitId)
-                commitId = cfVersion.commitId;
+            const cfVersion = this.mmsCfCtrl.getElementOrigin()
+            if (!projectId) projectId = cfVersion.projectId
+            if (!refId) refId = cfVersion.refId
+            if (!commitId) commitId = cfVersion.commitId
         }
         if (this.mmsViewCtrl) {
-            const viewVersion = this.mmsViewCtrl.getElementOrigin();
-            if (!projectId)
-                projectId = viewVersion.projectId;
-            if (!refId)
-                refId = viewVersion.refId;
-            if (!commitId)
-                commitId = viewVersion.commitId;
+            const viewVersion = this.mmsViewCtrl.getElementOrigin()
+            if (!projectId) projectId = viewVersion.projectId
+            if (!refId) refId = viewVersion.refId
+            if (!commitId) commitId = viewVersion.commitId
         }
         if (!projectId) {
-            return;
+            return
         }
-            this.projectId = projectId;
-            this.refId = refId ? refId : 'master';
-            this.commitId = commitId ? commitId : 'latest';
-            let elementId = this.mmsElementId;
-            if (elementId) {
-                elementId = elementId.replace(/[^\w\-]/gi, '');
-            } else if (this.mmsPeId && !this.mmsDocId) {
-                elementId = this.applicationSvc.getState().currentDoc;
-            }
+        this.projectId = projectId
+        this.refId = refId ? refId : 'master'
+        this.commitId = commitId ? commitId : 'latest'
+        let elementId = this.mmsElementId
+        if (elementId) {
+            elementId = elementId.replace(/[^\w\-]/gi, '')
+        } else if (this.mmsPeId && !this.mmsDocId) {
+            elementId = this.applicationSvc.getState().currentDoc
+        }
 
-            const reqOb: ElementsRequest = {
-                elementId,
-                projectId,
-                refId,
-                commitId
-            };
-            this.elementSvc.getElement(reqOb, 1)
-                .then((data: ElementObject) => {
-                    this.element = data;
-                    this.elementName = data.name;
-                    this.type = 'Section ';
-                    this.suffix = '';
-                    this.hash = '#' + data.id;
-                    if (this.mmsPeId && this.mmsPeId !== '') {
-                        const reqPEOb: ElementsRequest = {
-                            elementId: this.mmsPeId,
-                            projectId,
-                            refId,
-                            commitId
-                        };
-                        this.elementSvc.getElement(reqPEOb)
-                            .then((pe) => {
-                                this.hash = '#' + pe.id;
-                                this.element = pe;
-                                this.elementName = pe.name;
-                                if (this.viewSvc.isTable(pe)) {
-                                    this.type = 'Table ';
-                                } else if (this.viewSvc.isFigure(pe)) {
-                                    this.type = "Fig. ";
-                                } else if (this.viewSvc.isEquation(pe)) {
-                                    this.type = "Eq. (";
-                                    this.suffix = ')';
-                                }
-                                if (this.applicationSvc.getState().fullDoc) {
-                                    this.href = this.utilsSvc.PROJECT_URL_PREFIX + this.projectId + '/' + this.refId + '/documents/' + this.docid + "/full" + this.hash;
-                                } else {
-                                    this.href = this.utilsSvc.PROJECT_URL_PREFIX + this.projectId + '/' + this.refId + '/documents/' + this.docid + '/views/' + this.vid + this.hash;
-                                }
-                            });
+        const reqOb: ElementsRequest<string> = {
+            elementId,
+            projectId,
+            refId,
+            commitId,
+        }
+        this.elementSvc.getElement(reqOb, 1).then(
+            (data: ElementObject) => {
+                this.element = data
+                this.elementName = data.name
+                this.type = 'Section '
+                this.suffix = ''
+                this.hash = '#' + data.id
+                if (this.mmsPeId && this.mmsPeId !== '') {
+                    const reqPEOb: ElementsRequest<string> = {
+                        elementId: this.mmsPeId,
+                        projectId,
+                        refId,
+                        commitId,
                     }
-                    if (this.utilsSvc.isDocument(data)) {
-                        docid = data.id;
-                        this.docid = docid;
-                        this.vid = data.id;
-                    } else if (this.utilsSvc.isView(data) || data.type === 'InstanceSpecification') {
-                        if (!docid || docid === '') {
-                            docid = data.id;
+                    this.elementSvc.getElement(reqPEOb).then(
+                        (pe) => {
+                            this.hash = '#' + pe.id
+                            this.element = pe
+                            this.elementName = pe.name
+                            if (this.viewSvc.isTable(pe)) {
+                                this.type = 'Table '
+                            } else if (this.viewSvc.isFigure(pe)) {
+                                this.type = 'Fig. '
+                            } else if (this.viewSvc.isEquation(pe)) {
+                                this.type = 'Eq. ('
+                                this.suffix = ')'
+                            }
+                            if (this.applicationSvc.getState().fullDoc) {
+                                this.href =
+                                    this.utilsSvc.PROJECT_URL_PREFIX +
+                                    this.projectId +
+                                    '/' +
+                                    this.refId +
+                                    '/documents/' +
+                                    this.docid +
+                                    '/full' +
+                                    this.hash
+                            } else {
+                                this.href =
+                                    this.utilsSvc.PROJECT_URL_PREFIX +
+                                    this.projectId +
+                                    '/' +
+                                    this.refId +
+                                    '/documents/' +
+                                    this.docid +
+                                    '/views/' +
+                                    this.vid +
+                                    this.hash
+                            }
+                        },
+                        (reason) => {
+                            this.growl.warning(
+                                `Unable to retrieve element: ${reason.message}`
+                            )
                         }
-                        this.docid = docid;
-                        this.vid = data.id;
-                    } else {
-                        this.$element.html("<span class=\"ve-error\">view link doesn't refer to a view</span>");
+                    )
+                }
+                if (this.apiSvc.isDocument(data)) {
+                    docid = data.id
+                    this.docid = docid
+                    this.vid = data.id
+                } else if (
+                    this.apiSvc.isView(data) ||
+                    data.type === 'InstanceSpecification'
+                ) {
+                    if (!docid || docid === '') {
+                        docid = data.id
                     }
-                    this.loading = false;
-                    if (this.applicationSvc.getState().fullDoc) {
-                        this.href = this.utilsSvc.PROJECT_URL_PREFIX + this.projectId + '/' + this.refId + '/documents/' + this.docid + '/full' + this.hash;
-                    } else {
-                        this.href = this.utilsSvc.PROJECT_URL_PREFIX + this.projectId + '/' + this.refId + '/documents/' + this.docid + '/views/' + this.vid;
-                    }
-                    this.showNum = this.applicationSvc.getState().inDoc && (this.applicationSvc.getState().currentDoc === this.docid) && !this.suppressNumbering;
-                }, (reason) => {
-                    this.$element.html('<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>');
-                    this.$compile($(this.$element))(Object.assign(this.$scope.$new(), {
+                    this.docid = docid
+                    this.vid = data.id
+                } else {
+                    this.$element.html(
+                        '<span class="ve-error">view link doesn\'t refer to a view</span>'
+                    )
+                }
+                this.loading = false
+                if (this.applicationSvc.getState().fullDoc) {
+                    this.href =
+                        this.utilsSvc.PROJECT_URL_PREFIX +
+                        this.projectId +
+                        '/' +
+                        this.refId +
+                        '/documents/' +
+                        this.docid +
+                        '/full' +
+                        this.hash
+                } else {
+                    this.href =
+                        this.utilsSvc.PROJECT_URL_PREFIX +
+                        this.projectId +
+                        '/' +
+                        this.refId +
+                        '/documents/' +
+                        this.docid +
+                        '/views/' +
+                        this.vid
+                }
+                this.showNum =
+                    this.applicationSvc.getState().inDoc &&
+                    this.applicationSvc.getState().currentDoc === this.docid &&
+                    !this.suppressNumbering
+            },
+            (reason) => {
+                this.$element.html(
+                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                )
+                this.$compile($(this.$element))(
+                    Object.assign(this.$scope.$new(), {
                         reqOb: reqOb,
-                        recentElement: reason.data.recentVersionOfElement,
-                        type: this.extensionSvc.AnnotationType.mmsPresentationElement
-                    }));
-                    this.loading = false;
-                });
-        };
+                        recentElement: reason.recentVersionOfElement,
+                        type: this.extensionSvc.AnnotationType
+                            .mmsPresentationElement,
+                    })
+                )
+                this.loading = false
+            }
+        )
     }
+}
 
-export let ViewLinkComponent: VeComponentOptions = {
-    selector: "viewLink",
+export const ViewLinkComponent: VeComponentOptions = {
+    selector: 'viewLink',
     template: `
     <span ng-if="!$ctrl.loading">
     <a target="{{$ctrl.target}}" ng-class="$ctrl.linkClass" ng-href="{{$ctrl.href}}">
@@ -221,7 +289,7 @@ export let ViewLinkComponent: VeComponentOptions = {
 `,
     require: {
         mmsCfCtrl: '?^^transclusion',
-        mmsViewCtrl: '?^^view'
+        mmsViewCtrl: '?^^view',
     },
     bindings: {
         mmsElementId: '@',
@@ -236,9 +304,9 @@ export let ViewLinkComponent: VeComponentOptions = {
         linkTarget: '@?',
         mmsExternalLink: '<?',
         suppressNumbering: '<',
-        showName: '<'
+        showName: '<',
     },
-    controller: ViewLinkController
+    controller: ViewLinkController,
 }
 
-veComponents.component(ViewLinkComponent.selector,ViewLinkComponent);
+veComponents.component(ViewLinkComponent.selector, ViewLinkComponent)

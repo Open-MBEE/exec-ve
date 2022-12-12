@@ -1,21 +1,23 @@
-import * as angular from "angular";
-import _ from "lodash";
+import angular from 'angular'
+import _ from 'lodash'
 
+import { ComponentService } from '@ve-components/services'
+import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
+import { ToolbarService } from '@ve-core/tool-bar'
 import {
     URLService,
     ElementService,
     AuthService,
     ViewService,
     PermissionsService,
-    ProjectService
-} from "@ve-utils/mms-api-client";
-import {AutosaveService, EventService, UtilsService} from "@ve-utils/services";
-import {SpecService} from "@ve-components/spec-tools";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {ComponentService} from "@ve-components/services";
-import {veComponents} from "@ve-components";
-import {SpecTool, ISpecTool, } from "@ve-components/spec-tools";
-import {ToolbarService} from "@ve-core/tool-bar";
+    ProjectService,
+    ApiService,
+} from '@ve-utils/mms-api-client'
+import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/angular'
 
 /**
  * @ngdoc directive
@@ -31,9 +33,7 @@ import {ToolbarService} from "@ve-core/tool-bar";
  * @requires growl
  * @requires _
  *
- *
- * @description
- * Outputs a "spec window" of the element whose id is specified. Spec includes name,
+ * * Outputs a "spec window" of the element whose id is specified. Spec includes name,
  * documentation, and value if the element is a property. Also last modified time,
  * last user, element id. Editability is determined by a param and also element
  * editability. Documentation and string values can have html and can transclude other
@@ -86,44 +86,82 @@ import {ToolbarService} from "@ve-core/tool-bar";
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 
-
 class SpecEditorController extends SpecTool implements ISpecTool {
+    static $inject = [...SpecTool.$inject, 'AutosaveService']
 
-    static $inject = [...SpecTool.$inject, 'AutosaveService'];
-
-    constructor($scope: angular.IScope, $element: JQuery<HTMLElement>, $q: angular.IQService,
-                growl: angular.growl.IGrowlService, componentSvc: ComponentService, uRLSvc: URLService,
-                authSvc: AuthService, elementSvc: ElementService, projectSvc: ProjectService,
-                utilsSvc: UtilsService, viewSvc: ViewService, permissionsSvc: PermissionsService,
-                eventSvc: EventService, specSvc: SpecService, toolbarSvc: ToolbarService, private autosaveSvc: AutosaveService) {
-        super($scope,$element,$q,growl,componentSvc,uRLSvc,authSvc,elementSvc,projectSvc,utilsSvc,viewSvc,permissionsSvc,eventSvc,specSvc,toolbarSvc)
+    constructor(
+        $scope: angular.IScope,
+        $element: JQuery<HTMLElement>,
+        $q: angular.IQService,
+        growl: angular.growl.IGrowlService,
+        componentSvc: ComponentService,
+        uRLSvc: URLService,
+        authSvc: AuthService,
+        elementSvc: ElementService,
+        projectSvc: ProjectService,
+        utilsSvc: UtilsService,
+        apiSvc: ApiService,
+        viewSvc: ViewService,
+        permissionsSvc: PermissionsService,
+        eventSvc: EventService,
+        specSvc: SpecService,
+        toolbarSvc: ToolbarService,
+        private autosaveSvc: AutosaveService
+    ) {
+        super(
+            $scope,
+            $element,
+            $q,
+            growl,
+            componentSvc,
+            uRLSvc,
+            authSvc,
+            elementSvc,
+            projectSvc,
+            utilsSvc,
+            apiSvc,
+            viewSvc,
+            permissionsSvc,
+            eventSvc,
+            specSvc,
+            toolbarSvc
+        )
         this.specType = _.kebabCase(SpecEditorComponent.selector)
-        this.specTitle = "Edit Element";
+        this.specTitle = 'Edit Element'
     }
 
-    config = () => {
+    config = (): void => {
         if (this.autosaveSvc.openEdits() > 0) {
-            this.tbApi.setIcon('spec-editor', 'fa-edit-asterisk');
-            this.tbApi.setPermission('spec-editor-saveall', true);
+            this.tbApi.setIcon('spec-editor', 'fa-edit-asterisk')
+            this.tbApi.setPermission('spec-editor-saveall', true)
         }
     }
 
-    initCallback = () => {
-        this.specSvc.setEditing(true);
-        const editOb = this.specSvc.getEdits();
+    initCallback = (): void => {
+        this.specSvc.setEditing(true)
+        const editOb = this.specSvc.getEdits()
         if (editOb) {
-            const key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId;
-            this.specSvc.tracker.etrackerSelected = key;
-            this.autosaveSvc.addOrUpdate(key, editOb);
-            this.specSvc.cleanUpSaveAll();
-            this.elementSvc.isCacheOutdated(editOb)
-                .then((data) => {
-                    const server = (data.server) ? <Date>data.server._modified : new Date();
-                    const cache = (data.cache) ? <Date>data.cache._modified : new Date()
+            const key =
+                editOb.id + '|' + editOb._projectId + '|' + editOb._refId
+            this.specSvc.tracker.etrackerSelected = key
+            this.autosaveSvc.addOrUpdate(key, editOb)
+            this.specSvc.cleanUpSaveAll()
+            this.elementSvc.isCacheOutdated(editOb).then(
+                (data) => {
+                    const server = data.server
+                        ? data.server._modified
+                        : new Date()
+                    const cache = data.cache ? data.cache._modified : new Date()
                     if (data.status && server > cache)
-                        this.growl.error('This element has been updated on the server. Please refresh the page to get the latest version.');
-                });
-            this.edit = editOb;
+                        this.growl.error(
+                            'This element has been updated on the server. Please refresh the page to get the latest version.'
+                        )
+                },
+                (reason) => {
+                    this.growl.error(reason.message)
+                }
+            )
+            this.edit = editOb
         }
     }
 }
@@ -167,9 +205,9 @@ const SpecEditorComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsElement: '<?',
         noEdit: '@',
-        mmsDisplayOldSpec: '<?'
+        mmsDisplayOldSpec: '<?',
     },
-    controller: SpecEditorController
+    controller: SpecEditorController,
 }
 
-veComponents.component(SpecEditorComponent.selector,SpecEditorComponent);
+veComponents.component(SpecEditorComponent.selector, SpecEditorComponent)

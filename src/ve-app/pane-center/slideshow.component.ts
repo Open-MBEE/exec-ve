@@ -25,8 +25,8 @@ import { handleChange } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
-import { VeComponentOptions } from '@ve-types/view-editor'
 
 class SlideshowController implements angular.IComponentController {
     public orgOb
@@ -106,7 +106,7 @@ class SlideshowController implements angular.IComponentController {
         private buttonBarSvc: ButtonBarService
     ) {}
 
-    $onInit() {
+    $onInit(): void {
         this.treeApi = this.treeSvc.getApi()
         this.eventSvc.$init(this)
         if (this.$state.includes('main.project.ref.portal')) {
@@ -208,7 +208,9 @@ class SlideshowController implements angular.IComponentController {
                             'refresh-numbering'
                         )
                     )
-                    // api.addButton(this.buttonBarSvc.getButtonBarButton('share-url'));
+                    api.addButton(
+                        this.buttonBarSvc.getButtonBarButton('share-url')
+                    )
                     api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
                     if (this.$state.includes('main.project.ref.document')) {
                         const exportButtons: IButtonBarButton =
@@ -492,13 +494,13 @@ class SlideshowController implements angular.IComponentController {
         this.number = this.treeApi.branch2viewNumber[this.viewOb.id]
     }
 
-    $onChanges(onChangesObj: angular.IOnChangesObject) {
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
         handleChange(onChangesObj, 'viewOb', (newVal) => {
             if (newVal) console.log('View Change:' + newVal.id)
         })
     }
 
-    $onDestroy() {
+    $onDestroy(): void {
         this.eventSvc.$destroy(this.subs)
         this.buttonBarSvc.destroy(this.bars)
     }

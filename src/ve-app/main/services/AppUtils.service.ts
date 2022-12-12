@@ -12,9 +12,7 @@ import { VeModalService } from '@ve-types/view-editor'
 /**
  * @ngdoc service
  * @name AppUtilsService
- *
- * @description
- * Utilities
+ * * Utilities
  */
 export class AppUtilsService implements angular.Injectable<any> {
     private style: any
@@ -160,11 +158,7 @@ if (window.navigator.msSaveOrOpenBlob) {
     }
 
     /**
-     * @ngdoc method
      * @name veApp.AppUtilsService#printModal
-     * @methodOf veApp.AppUtilsService
-     *
-     * @description
      * Click handler for print and export buttons. Opens modal or print
      * confirmation and options to select from
      *
@@ -300,11 +294,7 @@ if (window.navigator.msSaveOrOpenBlob) {
     }
 
     /**
-     * @ngdoc method
      * @name veApp.AppUtilsService#printOrGenerate
-     * @methodOf veApp.AppUtilsService
-     *
-     * @description
      * Called by printModal to handle cleanup and building content needed for
      * print, PDF or word export.
      * Cleansup html i.e. removes no-print, ng-hide

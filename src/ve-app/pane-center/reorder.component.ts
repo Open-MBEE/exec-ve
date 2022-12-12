@@ -8,6 +8,7 @@ import { EventService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import { ViewObject } from '@ve-types/mms'
 import {
     AngularUITree,
@@ -15,13 +16,10 @@ import {
     VeTreeNodeScope,
     View2NodeMap,
 } from '@ve-types/tree'
-import { VeComponentOptions } from '@ve-types/view-editor'
 
 /* Controllers */
 /**
- * @name veApp/ReorderController
- * @description
- * Controller for reordering view's in the tree
+ * @name veApp/ReorderController * Controller for reordering view's in the tree
  *
  *
  * @requires StateService
@@ -74,7 +72,7 @@ class ReorderController implements angular.IComponentController {
         private eventSvc: EventService
     ) {}
 
-    $onInit() {
+    $onInit(): void {
         this.doc = this.documentOb
         this.treeApi = this.treeSvc.getApi()
         this.eventSvc.$init(this)
@@ -233,8 +231,7 @@ class ReorderController implements angular.IComponentController {
             if (
                 ((!orig._childViews || orig._childViews.length === 0) &&
                     childViews.length > 0) ||
-                (orig._childViews &&
-                    !angular.equals(orig._childViews, childViews))
+                (orig._childViews && !_.isEqual(orig._childViews, childViews))
             ) {
                 toSave.push({
                     id: id,

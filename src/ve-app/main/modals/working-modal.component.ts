@@ -2,7 +2,7 @@ import angular from 'angular'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
 
 const WorkingModalComponent: VeComponentOptions = {
     selector: 'workingModal',
@@ -30,7 +30,7 @@ const WorkingModalComponent: VeComponentOptions = {
 
         constructor() {}
 
-        $onInit() {
+        $onInit(): void {
             this.workingTime = this.resolve.getWorkingTime()
         }
     },

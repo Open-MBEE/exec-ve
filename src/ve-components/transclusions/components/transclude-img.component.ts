@@ -5,16 +5,20 @@ import { Transclusion, ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import {
     ElementService,
-    ViewService,
     AuthService,
     URLService,
 } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import { UtilsService, EventService, MathJaxService } from '@ve-utils/services'
+import {
+    UtilsService,
+    EventService,
+    MathJaxService,
+    ImageService,
+} from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -34,9 +38,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
  * @requires {MathJaxService} mathJaxSvc
- *
- * @description
- * Given an element id, puts in the element's documentation binding, if there's a parent
+ * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
  *
@@ -76,9 +78,10 @@ export class TranscludeImgController
         schemaSvc: SchemaService,
         authSvc: AuthService,
         eventSvc: EventService,
-        extensionSvc: ExtensionService,
         mathJaxSvc: MathJaxService,
+        extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
+        imageSvc: ImageService,
         private urlSvc: URLService
     ) {
         super(
@@ -95,7 +98,8 @@ export class TranscludeImgController
             eventSvc,
             mathJaxSvc,
             extensionSvc,
-            buttonBarSvc
+            buttonBarSvc,
+            imageSvc
         )
         this.cfType = 'doc'
         this.cfTitle = 'Documentation'
@@ -103,7 +107,7 @@ export class TranscludeImgController
         this.checkCircular = true
     }
 
-    config = () => {
+    config = (): void => {
         this.$element.on('click', (e) => {
             if (this.mmsViewCtrl)
                 this.mmsViewCtrl.transcludeClicked(this.element)
@@ -112,7 +116,9 @@ export class TranscludeImgController
         })
     }
 
-    public getContent = (preview?) => {
+    public getContent = (
+        preview?
+    ): VePromise<string | HTMLElement[], string> => {
         const artifacts = this.element._artifacts
         if (artifacts !== undefined) {
             const reqOb = {
@@ -120,7 +126,7 @@ export class TranscludeImgController
                 projectId: this.projectId,
                 refId: this.refId,
                 commitId: this.commitId,
-                includeRecentVersionElement: true,
+                //includeRecentVersionElement: true,
             }
             this.artifacts = artifacts
                 .filter((a) => this.includeExt.includes(a.extension))
@@ -152,6 +158,7 @@ export const TranscludeImgComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
+        mmsCallback: '&',,
     },
     require: {
         mmsViewCtrl: '?^view',

@@ -1,18 +1,20 @@
-import * as angular from "angular";
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {handleChange} from "@ve-utils/utils/change.util";
-import {ExtensionService, veComponents} from "@ve-components";
-import {ViewController} from "@ve-components/presentations/view.component";
+import angular from 'angular'
 
+import { ViewController } from '@ve-components/presentations/view.component'
+import { ExtensionService } from '@ve-components/services'
+import { handleChange } from '@ve-utils/utils/change.util'
+
+import { veComponents } from '@ve-components'
+
+import { VeComponentOptions } from '@ve-types/angular'
+import { RequestObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
  * @name veComponents.component:mmsCf
  *
  * @requires $compile
- *
- * @description
- * Given an element id, puts in the element's name binding, if there's a parent
+ * * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -26,16 +28,15 @@ import {ViewController} from "@ve-components/presentations/view.component";
  */
 
 export class TransclusionController implements angular.IComponentController {
-
     //Bindings
-    mmsElementId: string;
-    mmsProjectId: string;
-    mmsRefId: string;
-    mmsCommitId: string;
-    mmsCfType: string;
-    mmsWatchId: string;
-    nonEditable: boolean;
-    mmsGenerateForDiff: boolean;
+    mmsElementId: string
+    mmsProjectId: string
+    mmsRefId: string
+    mmsCommitId: string
+    mmsCfType: string
+    mmsWatchId: string
+    nonEditable: boolean
+    mmsGenerateForDiff: boolean
 
     //Deps
     transclusionCtrl: TransclusionController
@@ -45,90 +46,101 @@ export class TransclusionController implements angular.IComponentController {
     projectId: string
     refId: string
     commitId: string
-    clearWatch: boolean = false;
-    extType: string = 'transclusion';
+    clearWatch: boolean = false
+    extType: string = 'transclusion'
 
     static $inject = ['$compile', '$scope', '$element', 'ExtensionService']
-    private templateElementHtml: any;
+    private templateElementHtml: any
 
-    protected $transcludeEl: JQuery;
+    protected $transcludeEl: JQuery
 
-    constructor(private $compile: angular.ICompileService, private $scope: angular.IScope,
-                private $element: JQuery<HTMLElement>, private extensionSvc: ExtensionService) {
-    }
+    constructor(
+        private $compile: angular.ICompileService,
+        private $scope: angular.IScope,
+        private $element: JQuery<HTMLElement>,
+        private extensionSvc: ExtensionService
+    ) {}
 
-    $onChanges(onChangesObj: angular.IOnChangesObject) {
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
         if (!this.clearWatch) {
             handleChange(onChangesObj, 'mmsElementId', this.changeAction)
             handleChange(onChangesObj, 'mmsCommitId', this.changeAction)
         }
     }
 
-    $postLink() {
+    $postLink(): void {
         //this.$transcludeEl = $(this.$element.children()[0]);
-        this.changeAction(this.mmsElementId,'',false);
+        this.changeAction(this.mmsElementId, '', false)
     }
 
     //INFO this was this.getWsAndVersion
-    public getElementOrigin = () => {
+    public getElementOrigin = (): RequestObject => {
         return {
             projectId: this.projectId,
             refId: this.refId,
-            commitId: this.commitId
-        };
-    };
+            commitId: this.commitId,
+        }
+    }
 
-    private changeAction = (newVal, oldVal, firstChange) => {
+    private changeAction = (newVal, oldVal, firstChange): void => {
         if (this.clearWatch || !newVal || firstChange) {
-            return;
+            return
         }
         if (!this.mmsWatchId && newVal) {
-            this.clearWatch = true;
+            this.clearWatch = true
         }
 
-        let projectId = this.mmsProjectId;
-        let refId = this.mmsRefId;
-        let commitId = this.mmsCommitId;
+        let projectId = this.mmsProjectId
+        let refId = this.mmsRefId
+        let commitId = this.mmsCommitId
         if (this.transclusionCtrl) {
-            let cfVersion = this.transclusionCtrl.getElementOrigin();
-            if (!projectId)
-                projectId = cfVersion.projectId;
-            if (!refId)
-                refId = cfVersion.refId;
-            if (!commitId)
-                commitId = cfVersion.commitId;
+            const cfVersion = this.transclusionCtrl.getElementOrigin()
+            if (!projectId) projectId = cfVersion.projectId
+            if (!refId) refId = cfVersion.refId
+            if (!commitId) commitId = cfVersion.commitId
         }
         if (this.mmsViewCtrl) {
-            var viewVersion = this.mmsViewCtrl.getElementOrigin();
-            if (!projectId)
-                projectId = viewVersion.projectId;
-            if (!refId)
-                refId = viewVersion.refId;
-            if (!commitId)
-                commitId = viewVersion.commitId;
+            const viewVersion = this.mmsViewCtrl.getElementOrigin()
+            if (!projectId) projectId = viewVersion.projectId
+            if (!refId) refId = viewVersion.refId
+            if (!commitId) commitId = viewVersion.commitId
         }
         if (!projectId) {
-            return;
+            return
         }
-        this.projectId = projectId;
-        this.refId = refId ? refId : 'master';
-        this.commitId = commitId ? commitId : 'latest';
+        this.projectId = projectId
+        this.refId = refId ? refId : 'master'
+        this.commitId = commitId ? commitId : 'latest'
         //this.templateElementHtml = this.$element[0].innerHTML;
         if (this.mmsCfType) {
-            this.$element.empty();
-            let tag = this.extensionSvc.getTagByType("transclude", this.mmsCfType)
+            this.$element.empty()
+            const tag = this.extensionSvc.getTagByType(
+                'transclude',
+                this.mmsCfType
+            )
             if (tag === 'extension-error') {
-                this.$transcludeEl = $('<error ext-kind="$ctrl.extType" ext-type="$ctrl.mmsCfType" mms-element-id="$ctrl.mmsElementId"></error>');
-            }else {
-                this.$transcludeEl = $('<' + tag + (this.mmsGenerateForDiff ? ' mms-generate-for-diff-merge="mmsGenerateForDiff" ' : '') + ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable" mms-cf-label="{{$ctrl.templateElementHtml}}"></' + tag + '>');
+                this.$transcludeEl = $(
+                    '<error ext-kind="$ctrl.extType" ext-type="$ctrl.mmsCfType" mms-element-id="$ctrl.mmsElementId"></error>'
+                )
+            } else {
+                this.$transcludeEl = $(
+                    '<' +
+                        tag +
+                        (this.mmsGenerateForDiff
+                            ? ' mms-generate-for-diff-merge="mmsGenerateForDiff" '
+                            : '') +
+                        ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable" mms-cf-label="{{$ctrl.templateElementHtml}}"></' +
+                        tag +
+                        '>'
+                )
             }
-            this.$element.append(this.$transcludeEl);
-            this.$compile(this.$transcludeEl)(this.$scope);
+            this.$element.append(this.$transcludeEl)
+            this.$compile(this.$transcludeEl)(this.$scope)
         }
-    };
+    }
 }
 
-let TransclusionComponent: VeComponentOptions = {
+const TransclusionComponent: VeComponentOptions = {
     selector: 'transclusion',
     template: `<div></div>`,
     transclude: true,
@@ -140,15 +152,15 @@ let TransclusionComponent: VeComponentOptions = {
         mmsCfType: '@',
         mmsWatchId: '@',
         nonEditable: '<',
-        mmsGenerateForDiff: '<'
+        mmsGenerateForDiff: '<',
     },
     require: {
         transclusionCtrl: '?^^transclusion',
-        mmsViewCtrl: '?^^view'
+        mmsViewCtrl: '?^^view',
     },
-    controller: TransclusionController
+    controller: TransclusionController,
 }
 
-
-veComponents.component(TransclusionComponent.selector,TransclusionComponent)
-.component('mmsCf',TransclusionComponent);
+veComponents
+    .component(TransclusionComponent.selector, TransclusionComponent)
+    .component('mmsCf', TransclusionComponent)

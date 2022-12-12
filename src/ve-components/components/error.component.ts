@@ -1,18 +1,18 @@
-import angular from "angular";
-import _ from "lodash";
+import angular from 'angular'
+import _ from 'lodash'
 
-import {VeComponentOptions} from "@ve-types/view-editor";
-import {veUtils} from "@ve-utils";
-import {UtilsService} from "@ve-utils/services";
+import { UtilsService } from '@ve-utils/services'
 
+import { veUtils } from '@ve-utils'
+
+import { VeComponentOptions } from '@ve-types/angular'
 
 class ExtensionErrorController implements angular.IComponentController {
-
     //Bindings
-    extType
-    extKind
+    extType: string
+    extKind: string
     errorMsg: string
-    mmsElementId
+    mmsElementId: string
 
     //Local Structure
     protected content: string
@@ -21,29 +21,35 @@ class ExtensionErrorController implements angular.IComponentController {
 
     static $inject = ['UtilsService']
 
-    constructor(private utilsSvc: UtilsService) {
-    }
+    constructor(private utilsSvc: UtilsService) {}
 
-    $onInit() {
-        this.id = this.mmsElementId;
+    $onInit(): void {
+        this.id = this.mmsElementId
         if (!this.extKind && !this.extType) {
-            this.title = "Error"
-            this.content = (this.errorMsg) ? this.errorMsg : "There was a problem displaying your content."
-            return;
+            this.title = 'Error'
+            this.content = this.errorMsg
+                ? this.errorMsg
+                : 'There was a problem displaying your content.'
+            return
         }
-        let localKind = (this.extKind) ? _.capitalize(this.extKind) : "Element"
-        let localExtType = _.capitalize(this.extType);
+        const localKind = this.extKind ? _.capitalize(this.extKind) : 'Element'
+        const localExtType = _.capitalize(this.extType)
 
-        this.title = "Unsupported " + localKind + " Type: " + localExtType;
-        this.content = "This " + localKind + " has a rendering type: " + localExtType + " that is not supported by View Editor"
+        this.title = 'Unsupported ' + localKind + ' Type: ' + localExtType
+        this.content =
+            'This ' +
+            localKind +
+            ' has a rendering type: ' +
+            localExtType +
+            ' that is not supported by View Editor'
     }
 
-    public copyToClipboard($event) {
-        this.utilsSvc.copyToClipboard($('#tooltipElementId'), $event);
-    };
+    public copyToClipboard($event: JQuery.ClickEvent): void {
+        this.utilsSvc.copyToClipboard($('#tooltipElementId'), $event)
+    }
 }
 
-let ExtensionErrorComponent: VeComponentOptions = {
+const ExtensionErrorComponent: VeComponentOptions = {
     selector: 'error',
     template: `
     <span class="ve-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{$ctrl.title}}"></span>
@@ -59,12 +65,12 @@ let ExtensionErrorComponent: VeComponentOptions = {
 </script>
 `,
     bindings: {
-        extType: "<",
-        extKind: "<",
-        errorMsg: "<",
-        mmsElementId: "<"
+        extType: '<',
+        extKind: '<',
+        errorMsg: '<',
+        mmsElementId: '<',
     },
-    controller: ExtensionErrorController
+    controller: ExtensionErrorController,
 }
 
-veUtils.component(ExtensionErrorComponent.selector, ExtensionErrorComponent);
+veUtils.component(ExtensionErrorComponent.selector, ExtensionErrorComponent)

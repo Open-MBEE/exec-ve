@@ -7,6 +7,7 @@ import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
+import { VeComponentOptions } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
@@ -14,7 +15,6 @@ import {
     RefObject,
     ViewObject,
 } from '@ve-types/mms'
-import { VeComponentOptions } from '@ve-types/view-editor'
 
 const VeMenuComponent: VeComponentOptions = {
     selector: 'veMenu',
@@ -162,7 +162,7 @@ const VeMenuComponent: VeComponentOptions = {
                 'Branch temporarily unavailable during duplication.'
         }
 
-        $onInit() {
+        $onInit(): void {
             this.projects = this.mmsProjects
             this.groups = this.mmsGroups
             if (this.mmsProject && !this.currentProject) {
@@ -184,7 +184,7 @@ const VeMenuComponent: VeComponentOptions = {
             this.updateGroups()
         }
 
-        // $onChanges(onChangesObj: angular.IOnChangesObject) {
+        // $onChanges(onChangesObj: angular.IOnChangesObject): void {
         //     handleChange(onChangesObj, 'mmsDocument', this.updateBreadcrumbs)
         //     handleChange(onChangesObj, 'mmsGroups', this.updateGroups)
         // }

@@ -3,11 +3,7 @@ import angular from 'angular'
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import {
-    ElementService,
-    ViewService,
-    AuthService,
-} from '@ve-utils/mms-api-client'
+import { ElementService, AuthService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
     MathJaxService,
@@ -18,7 +14,8 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { ElementObject, LiteralObject, SlotObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
@@ -38,9 +35,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires {EventService} eventSvc
  * @requires {MathJaxService} mathJaxSvc
  *
- *
- * @description
- * Given an element id, puts in the element's name binding, if there's a parent
+ * * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
  * and on click
  *
@@ -101,23 +96,29 @@ export class TranscludeNameController
         this.nonEditable = true
     }
 
-    protected config = () => {
+    protected config = (): void => {
         if (typeof this.mmsLinkText === 'undefined')
             this.mmsLinkText = this.mmsCfLabel ? this.mmsCfLabel : 'Link'
     }
 
-    public getContent = () => {
+    public getContent = (): VePromise<string | HTMLElement[], string> => {
         let url = ''
         if (this.element.type === 'Property') {
             const value = this.element.defaultValue
-            if (value && value.type === 'LiteralString') url = value.value
+            if (value && value.type === 'LiteralString') {
+                url = value.value as string
+            }
         } else if (this.element.type === 'Slot') {
             if (
                 angular.isArray(this.element.value) &&
                 this.element.value.length > 0 &&
-                this.element.value[0].type === 'LiteralString'
+                (this.element.value[0] as ElementObject).type ===
+                    'LiteralString'
             ) {
-                url = this.element.value[0].value
+                url = (
+                    (this.element as SlotObject)
+                        .value[0] as LiteralObject<string>
+                ).value
             }
         }
 

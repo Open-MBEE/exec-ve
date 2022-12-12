@@ -1,55 +1,39 @@
-import angular, {
-    IComponentController,
-    IComponentOptions,
-    IHttpResponse,
-} from 'angular'
+import angular, { IComponentController } from 'angular'
+
+import { ElementObject, MmsObject, ViewObject } from '@ve-types/mms'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 
 import IModalService = angular.ui.bootstrap.IModalService
 import IModalSettings = angular.ui.bootstrap.IModalSettings
 import IModalInstanceService = angular.ui.bootstrap.IModalInstanceService
 
-import {
-    ElementObject,
-    PresentationInstanceObject,
-    ViewObject,
-} from '@ve-types/mms'
-
-export interface VeComponentOptions extends IComponentOptions {
-    selector: string
-}
-
-export interface VeSearchOptions {
+export interface VeSearchOptions<T extends MmsObject> {
     getProperties?: boolean
-    searchResult?: ElementObject[]
+    searchResult?: T[]
     searchField?: string
     closeable: boolean
     searchInput?: string
     hideFilterOptions?: boolean
-    callback?: (elem: ElementObject, property: string) => any
-    relatedCallback?(
-        doc: ViewObject,
-        view: ViewObject,
-        elem: ElementObject
-    ): any
-    filterCallback?(elements: ElementObject[]): ElementObject[]
+    callback?(elem: T, property: string): void
+    relatedCallback?(doc: ViewObject, view: ViewObject, elem: T): void
+    filterCallback?(elements: T[]): T[]
     filterQueryList?: [(...any) => { [key: string]: string[] }]
     emptyDocTxt?: string
     itemsPerPage?: number
 }
 
 export interface VeModalService extends IModalService {
-    open?(settings: VeModalSettings): IModalInstanceService
+    open?<U, V>(settings: VeModalSettings<U>): VeModalInstanceService<V>
 }
 
-export interface VeModalSettings extends IModalSettings {
+export interface VeModalSettings<U extends VeModalResolveFn>
+    extends IModalSettings {
     component: string
-    resolve?: VeModalResolveFn
-    bindings?: {
-        close: ($value?: any) => void
-        dismiss: ($value?: any) => void
-        modalInstance: IModalInstanceService
-        resolve?: any
-    }
+    resolve?: U
+    // bindings?: {
+    //     modalInstance: VeModalInstanceService<V>
+    //     resolve?: U
+    // }
 }
 
 export interface VeModalComponent extends VeComponentOptions {
@@ -57,6 +41,12 @@ export interface VeModalComponent extends VeComponentOptions {
         modalInstance: string
         resolve?: string
     }
+}
+
+export interface VeModalInstanceService<T> extends IModalInstanceService {
+    close(result?: T): void
+    dismiss(reason?: T): void
+    result: VePromise<T, T>
 }
 
 export interface VeModalController extends IComponentController {
@@ -71,12 +61,6 @@ export interface VeModalResolve {
 
 export interface VeModalResolveFn {
     [key: string]: () => unknown
-}
-
-export interface VePromiseReason<T> extends IHttpResponse<T> {
-    state?: angular.PromiseState
-    message?: string
-    recentVersionOfElement?: ElementObject
 }
 
 // {

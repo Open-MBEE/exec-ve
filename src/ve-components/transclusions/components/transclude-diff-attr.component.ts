@@ -1,4 +1,5 @@
 import angular from 'angular'
+import _ from 'lodash'
 
 import { ViewController } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
@@ -16,8 +17,12 @@ import { handleChange } from '@ve-utils/utils'
 
 import { veCore } from '@ve-core'
 
-import { ElementObject } from '@ve-types/mms'
-import { VeComponentOptions } from '@ve-types/view-editor'
+import {
+    VeComponentOptions,
+    VePromise,
+    VePromiseReason,
+} from '@ve-types/angular'
+import { ElementObject, ElementsRequest, RequestObject } from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -27,9 +32,7 @@ import { VeComponentOptions } from '@ve-types/view-editor'
  * @requires $compile
  * @requires ElementService
  *
- *
- * @description
- *  Compares a element at two different refs/commits and generates a pretty diff-merge.
+ * *  Compares a element at two different refs/commits and generates a pretty diff-merge.
  * ## Example
  * <mms-diff-merge-attr mms-base-element-id="" mms-attr="name|doc|val"
  * (mms-base-project-id="" mms-base-ref-id="" mms-compare-ref-id=""
@@ -49,19 +52,19 @@ import { VeComponentOptions } from '@ve-types/view-editor'
 
 class MmsDiffAttrController extends Transclusion implements ITransclusion {
     //Bindings
-    mmsAttr
+    mmsAttr: string
 
-    mmsBaseProjectId
-    mmsCompareProjectId
+    mmsBaseProjectId: string
+    mmsCompareProjectId: string
 
-    mmsBaseRefId
-    mmsCompareRefId
+    mmsBaseRefId: string
+    mmsCompareRefId: string
 
-    mmsBaseCommitId
-    mmsCompareCommitId
+    mmsBaseCommitId: string
+    mmsCompareCommitId: string
 
-    mmsBaseElementId
-    mmsCompareElementId
+    mmsBaseElementId: string
+    mmsCompareElementId: string
 
     //Controllers
     mmsViewCtrl: ViewController
@@ -72,7 +75,7 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
     compNotFound: boolean = false
     baseDeleted: boolean = false
     compDeleted: boolean = false
-    private viewOrigin: { refId: string; commitId: string; projectId: string }
+    private viewOrigin: RequestObject
     baseElementHtml: string
     comparedElementHtml: string
     message: string
@@ -120,29 +123,29 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
         this.checkCircular = false
     }
 
-    config = () => {
+    config = (): void => {
         this.viewOrigin = this.mmsViewCtrl
             ? this.mmsViewCtrl.getElementOrigin()
             : null
     }
 
-    $postLink() {
+    $postLink(): void {
         this.changeAction(this.mmsBaseElementId, '', false)
     }
 
-    $onChanges(onChangesObj: angular.IOnChangesObject) {
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
         handleChange(onChangesObj, 'mmsBaseCommitId', this.changeAction)
         handleChange(onChangesObj, 'mmsCompareCommitId', this.changeAction)
         handleChange(onChangesObj, 'mmsBaseElementId', this.changeAction)
         handleChange(onChangesObj, 'mmsCompareElementId', this.changeAction)
     }
 
-    public diffFinish = () => {
+    public diffFinish = (): void => {
         this.diffLoading = false
     }
 
-    public recompile = () => {
-        this.getContent().then(
+    public recompile = (): void => {
+        this.getDiff().then(
             (responses: angular.PromiseValue<ElementObject>[]) => {
                 let message
 
@@ -150,14 +153,28 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
                 if (respForBaseElement.state === 'fulfilled') {
                     this._fullyRender(respForBaseElement.value).then(
                         (baseElementHtml) => {
-                            this.baseElementHtml = baseElementHtml
+                            this.baseElementHtml = $(baseElementHtml)
                                 .children()
                                 .html()
+                        },
+                        (reason) => {
+                            this.growl.error(
+                                `Error getting Diff: ${reason.message}`
+                            )
                         }
                     )
                 } else {
-                    message = respForBaseElement.reason.message
-                    if (message && message.toLowerCase().includes('deleted')) {
+                    if (
+                        respForBaseElement.reason &&
+                        (
+                            respForBaseElement.reason as VePromiseReason<ElementObject>
+                        ).message &&
+                        (
+                            respForBaseElement.reason as VePromiseReason<ElementObject>
+                        ).message
+                            .toLowerCase()
+                            .includes('deleted')
+                    ) {
                         this.baseDeleted = true
                     } else {
                         this.baseNotFound = true
@@ -169,14 +186,26 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
                 if (respForComparedElement.state === 'fulfilled') {
                     this._fullyRender(respForComparedElement.value).then(
                         (comparedElementHtml) => {
-                            this.comparedElementHtml = comparedElementHtml
+                            this.comparedElementHtml = $(comparedElementHtml)
                                 .children()
                                 .html()
+                        },
+                        () => {
+                            this.growl.error('Problem Rendering Diff')
                         }
                     )
                 } else {
-                    message = respForComparedElement.reason.message
-                    if (message && message.toLowerCase().includes('deleted')) {
+                    if (
+                        respForComparedElement.reason &&
+                        (
+                            respForComparedElement.reason as VePromiseReason<ElementObject>
+                        ).message &&
+                        (
+                            respForComparedElement.reason as VePromiseReason<ElementObject>
+                        ).message
+                            .toLowerCase()
+                            .includes('deleted')
+                    ) {
                         this.compDeleted = true
                     } else {
                         this.compNotFound = true
@@ -185,15 +214,13 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
                 }
                 this.message = this._checkElementExistence()
             },
-            (reason: string) => {
-                console.log(reason)
+            (reason) => {
+                this.growl.error(`Error getting Diff: ${reason.message}`)
             }
         )
     }
 
-    public getContent = (): angular.IPromise<
-        angular.PromiseValue<ElementObject>[]
-    > => {
+    public getDiff = (): VePromise<angular.PromiseValue<ElementObject>[]> => {
         this.diffLoading = true
 
         const baseProjectId =
@@ -211,40 +238,29 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
 
         const baseElementId = this.mmsBaseElementId
         const compareElementId = this.mmsCompareElementId || baseElementId
-
-        const isSame = this._checkSameElement({
-            baseElementId: baseElementId,
-            compareElementId: compareElementId,
-
-            baseCommitId: baseCommitId,
-            compareCommitId: compareCommitId,
-
-            baseRefId: baseRefId,
-            compareRefId: compareRefId,
-
-            baseProjectId: baseProjectId,
-            compareProjectId: compareProjectId,
-        })
+        const baseReqOb: ElementsRequest<string> = {
+            elementId: baseElementId,
+            projectId: baseProjectId,
+            refId: baseRefId,
+            commitId: baseCommitId,
+        }
+        const compareReqOb: ElementsRequest<string> = {
+            elementId: compareElementId,
+            projectId: compareProjectId,
+            refId: compareRefId,
+            commitId: compareCommitId,
+        }
+        const isSame = _.isEqual(baseReqOb, compareReqOb)
         if (isSame) {
             return
         }
 
-        const baseElementPromise = this._getElementData(
-            baseProjectId,
-            baseRefId,
-            baseCommitId,
-            baseElementId
-        )
-        const comparedElementPromise = this._getElementData(
-            compareProjectId,
-            compareRefId,
-            compareCommitId,
-            compareElementId
-        )
+        const baseElementPromise = this.elementSvc.getElement(baseReqOb)
+        const comparedElementPromise = this.elementSvc.getElement(compareReqOb)
         return this.$q.allSettled([baseElementPromise, comparedElementPromise])
     }
 
-    protected changeAction = (newVal, oldVal, firstChange) => {
+    protected changeAction = (newVal, oldVal, firstChange): void => {
         if (!newVal || firstChange) {
             return
         }
@@ -253,27 +269,11 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
         }
     }
 
-    protected _getElementData(
-        projectId: string,
-        refId: string,
-        commitId: string,
-        elementId: string
-    ): angular.IPromise<ElementObject> {
-        return this.elementSvc.getElement({
-            projectId: projectId,
-            elementId: elementId,
-            refId: refId,
-            commitId: commitId,
-        })
-    }
-
     protected _createElement = (
-        type,
-        mmsElementId,
-        mmsProjectId,
-        mmsRefId,
-        mmsCommitId
-    ) => {
+        type: string,
+        reqOb: ElementsRequest<string>,
+        callback: () => void
+    ): JQuery<HTMLElement> => {
         const ignoreMathjaxAutoFormatting =
             type === 'doc' || type === 'val' || type === 'com'
         const html =
@@ -281,38 +281,40 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
             (ignoreMathjaxAutoFormatting
                 ? 'mms-generate-for-diff-merge="mmsGenerateForDiff" '
                 : '') +
-            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}"></mms-cf>'
+            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{mmsCommitId}}" mms-callback="mmsCallback()"></mms-cf>'
         const newScope = Object.assign(this.$scope.$new(), {
             type: type,
-            mmsElementId: mmsElementId,
-            mmsProjectId: mmsProjectId,
-            mmsRefId: mmsRefId,
-            mmsCommitId: mmsCommitId,
+            mmsElementId: reqOb.elementId,
+            mmsProjectId: reqOb.projectId,
+            mmsRefId: reqOb.refId,
+            mmsCommitId: reqOb.commitId,
             mmsGenerateForDiff: true,
+            mmsCallback: callback,
         })
         return this.$compile(html)(newScope)
     }
 
-    protected _fullyRender = (data: ElementObject): Promise<JQLite> => {
+    protected _fullyRender = (data: ElementObject): VePromise<string> => {
+        const deferred = this.$q.defer<string>()
+        const renderCallback = (): void => {
+            const baseHtml = element.html()
+            deferred.resolve(baseHtml)
+        }
         const element = this._createElement(
             this.mmsAttr,
-            data.id,
-            data._projectId,
-            data._refId,
-            data._commitId
+            {
+                elementId: data.id,
+                projectId: data._projectId,
+                refId: data._refId,
+                commitId: data._commitId,
+            },
+            renderCallback
         )
-        return new Promise<JQLite>((resolve) => {
-            ;(function waitForCf() {
-                const baseHtml = element.html()
-                if (!baseHtml.includes('(loading...)')) {
-                    return resolve(element)
-                }
-                setTimeout(waitForCf, 100)
-            })()
-        })
+
+        return deferred.promise
     }
 
-    protected _checkElementExistence = () => {
+    protected _checkElementExistence = (): string => {
         let message = ''
         if (this.baseNotFound && this.compNotFound) {
             message = ' Both base and compare elements do not exist.'
@@ -329,22 +331,6 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
             message = ' Comparison element has been deleted.'
         }
         return message
-    }
-
-    protected _checkSameElement = (data) => {
-        if (
-            (data.baseCommitId !== 'latest' &&
-                data.baseCommitId === data.compareCommitId) ||
-            (data.baseCommitId === 'latest' &&
-                data.baseCommitId === data.compareCommitId &&
-                data.baseElementId === data.compareElementId &&
-                data.baseProjectId === data.compareProjectId &&
-                data.baseRefId === data.compareRefId)
-        ) {
-            this.message = ' Comparing same version.'
-            this.diffFinish()
-            return true
-        }
     }
 }
 

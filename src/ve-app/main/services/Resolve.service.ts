@@ -70,7 +70,7 @@ export class ResolveService {
         return this.brandingSvc.getLoginBanner()
     }
     public getToken(): angular.IPromise<string> {
-        const deferred: angular.IDeferred<string> = this.$q.defer()
+        const deferred = this.$q.defer<string>()
         this.authSvc.checkLogin().then(
             (data) => {
                 this.uRLSvc.setToken(this.$window.localStorage.getItem('token'))
@@ -108,7 +108,7 @@ export class ResolveService {
 
     public getProjectMounts(
         params: ParamsObject
-    ): angular.IPromise<MountObject[]> {
+    ): angular.IPromise<MountObject> {
         return this.projectSvc.getProjectMounts(
             params.projectId,
             params.refId,
@@ -182,15 +182,14 @@ export class ResolveService {
         refOb: RefObject,
         projectOb: ProjectObject,
         refresh?: boolean
-    ): angular.IPromise<ViewObject> {
-        const deferred: angular.IDeferred<ViewObject> = this.$q.defer()
+    ): angular.IPromise<DocumentObject> {
+        const deferred = this.$q.defer<DocumentObject>()
         const eid = params.projectId + '_cover'
         this.elementSvc
-            .getElement(
+            .getElement<DocumentObject>(
                 {
                     projectId: params.projectId,
                     refId: params.refId,
-                    extended: true,
                     elementId: eid,
                 },
                 2,
@@ -200,7 +199,11 @@ export class ResolveService {
                 (data) => {
                     deferred.resolve(data)
                 },
-                (reason: angular.IHttpResponse<ElementsResponse>) => {
+                (
+                    reason: angular.IHttpResponse<
+                        ElementsResponse<DocumentObject>
+                    >
+                ) => {
                     if (reason.status === 404) {
                         if (refOb.type === 'Tag') {
                             deferred.resolve(null)
@@ -217,9 +220,8 @@ export class ResolveService {
                                         id: eid,
                                         _projectId: params.projectId,
                                         _refId: params.refId,
-                                        type: 'Class',
-                                    },
-                                    ''
+                                        documentation: '',
+                                    }
                                 )
                                 .then(
                                     (data) => {
@@ -286,7 +288,7 @@ export class ResolveService {
         refOb: RefObject,
         refresh?: boolean
     ): angular.IPromise<ElementObject> {
-        const deferred: angular.IDeferred<ElementObject> = this.$q.defer()
+        const deferred = this.$q.defer<ElementObject>()
         const eid: string = params.documentId
         const coverIndex = eid.indexOf('_cover')
         if (coverIndex > 0) {
@@ -344,8 +346,8 @@ export class ResolveService {
                                                             params.projectId,
                                                         _refId: params.refId,
                                                         type: 'Class',
-                                                    },
-                                                    viewDoc
+                                                        documentation: viewDoc,
+                                                    }
                                                 )
                                                 .then(
                                                     (data) => {
@@ -391,8 +393,7 @@ export class ResolveService {
             {
                 projectId: params.projectId,
                 refId: params.refId,
-                extended: false,
-                documentId: params.documentId,
+                elementId: params.documentId,
             },
             2,
             refresh

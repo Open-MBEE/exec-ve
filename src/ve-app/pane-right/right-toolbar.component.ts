@@ -9,7 +9,7 @@ import { AutosaveService, EventService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/view-editor'
+import { VeComponentOptions } from '@ve-types/angular'
 
 /* Classes */
 const RightToolbarComponent: VeComponentOptions = {
@@ -49,7 +49,7 @@ const RightToolbarComponent: VeComponentOptions = {
             private toolbarSvc: ToolbarService
         ) {}
 
-        $onInit() {
+        $onInit(): void {
             this.eventSvc.$init(this)
 
             this.tbApi = this.toolbarSvc.initApi(

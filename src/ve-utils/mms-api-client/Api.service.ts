@@ -1,15 +1,22 @@
 import angular from 'angular'
+import _ from 'lodash'
+import uuid from 'uuid'
 
 import { URLService } from '@ve-utils/mms-api-client/URL.provider'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veUtils } from '@ve-utils'
 
+import { VeConfig } from '@ve-types/config'
 import {
     ElementObject,
+    ElementsRequest,
     ExpressionObject,
+    InstanceSpecObject,
+    LiteralObject,
     RequestObject,
     ValueObject,
+    ViewObject,
 } from '@ve-types/mms'
 
 export class ApiService {
@@ -27,36 +34,64 @@ export class ApiService {
 
     schema: string = 'cameo'
 
-    static $inject = ['SchemaService']
+    public veConfig: VeConfig = window.__env
 
-    constructor(private schemaSvc: SchemaService, private uRLSvc: URLService) {}
+    static $inject = ['$q', '$http', 'URLService', 'SchemaService']
+
+    constructor(
+        private $q: angular.IQService,
+        private $http: angular.IHttpService,
+        private uRLSvc: URLService,
+        private schemaSvc: SchemaService
+    ) {}
+
+    public getMmsVersion(): angular.IPromise<string> {
+        const deferred = this.$q.defer<string>()
+        this.$http
+            .get<{ mmsVersion: string }>(this.uRLSvc.getMmsVersionURL())
+            .then(
+                (response) => {
+                    deferred.resolve(response.data.mmsVersion)
+                },
+                (response: angular.IHttpResponse<unknown>) => {
+                    deferred.reject(this.uRLSvc.handleHttpStatus(response))
+                }
+            )
+        return deferred.promise
+    }
+
+    public getVeVersion(): string {
+        return this.veConfig.version
+    }
 
     /**
      * @name veUtils/ApiService#handleErrorCallback
      *
      * @param {angular.IHttpResponse<T>} response
      * @param {angular.IDeferred<U>} deferred
+     * @param {} type
      */
     public handleErrorCallback<T, U>(
         response: angular.IHttpResponse<T>,
-        deferred: angular.IDeferred<U>
-    ) {
-        deferred.reject(this.uRLSvc.handleHttpStatus(response))
+        deferred: angular.IDeferred<U>,
+        type?: 'error' | 'warning' | 'info'
+    ): void {
+        const res = this.uRLSvc.handleHttpStatus(response)
+        if (type) {
+            res.type = type
+        }
+        deferred.reject(res)
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#_cleanValueSpec
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Cleans value specification
      *
      * @param {Object} vs value spec object
      * @returns {void} nothing
      */
 
-    private _cleanValueSpec(vs: ValueObject) {
+    private _cleanValueSpec(vs: ValueObject): void {
         if (vs.hasOwnProperty('valueExpression')) delete vs.valueExpression
         if (vs.operand && Array.isArray(vs.operand)) {
             for (let i = 0; i < vs.operand.length; i++) {
@@ -66,46 +101,45 @@ export class ApiService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#cleanElement
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Cleans
      *
      * @param {ElementObject} elem the element object to be cleaned
      * @param {boolean} [forEdit=false] (optional) forEdit.
      * @returns {ElementObject} clean elem
      */
-    public cleanElement(elem: ElementObject, forEdit?: boolean): ElementObject {
+    public cleanElement<T extends ElementObject>(
+        elem: T,
+        forEdit?: boolean
+    ): T {
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
                 elem.defaultValue = null
             }
         }
         if (elem.type === 'Slot') {
-            if (!Array.isArray(elem.value)) elem.value = []
+            if (!Array.isArray(elem.value))
+                (elem as LiteralObject<unknown[]>).value = []
         }
         if (elem.value && Array.isArray(elem.value)) {
-            elem.value.forEach((value) => {
-                if (typeof value === 'object' && value !== null)
-                    this._cleanValueSpec(value as ExpressionObject)
-            })
+            ;(elem as LiteralObject<unknown[]>).value.forEach(
+                (value: unknown) => {
+                    if (typeof value === 'object' && value !== null)
+                        this._cleanValueSpec(
+                            value as ExpressionObject<ValueObject>
+                        )
+                }
+            )
         }
         if (elem._contents) {
-            this._cleanValueSpec(elem._contents as ExpressionObject)
+            this._cleanValueSpec((elem as ViewObject)._contents)
         }
         if (elem.specification) {
-            this._cleanValueSpec(elem.specification as ExpressionObject)
+            this._cleanValueSpec((elem as InstanceSpecObject).specification)
         }
         if (elem.type === 'Class') {
             if (elem._contents && elem.contains) {
                 delete elem.contains
-            }
-            if (Array.isArray(elem._displayedElementIds)) {
-                elem._displayedElementIds = JSON.stringify(
-                    elem._displayedElementIds
-                )
             }
             if (elem._allowedElementIds) {
                 delete elem._allowedElementIds
@@ -129,17 +163,13 @@ export class ApiService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#normalize
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Normalize common arguments
      *
      * @param {RequestObject} reqOb
      * @returns {RequestObject} with default values for ref and commit
      */
-    public normalize(reqOb: RequestObject) {
+    public normalize(reqOb: RequestObject): RequestObject {
         reqOb.refId = !reqOb.refId ? 'master' : reqOb.refId
         reqOb.commitId = !reqOb.commitId ? 'latest' : reqOb.commitId
         return reqOb
@@ -147,13 +177,10 @@ export class ApiService {
 
     /**
      * @name veUtils/UtilsService#makeRequestObject
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
-     * Make a single element request object out of an ElementObject
+     * Make a request object out of an ElementObject
      *
      * @param {ElementObject} elementOb
-     * @returns {ElementsRequest}
+     * @returns {RequestObject}
      */
     public makeRequestObject(elementOb: ElementObject): RequestObject {
         return {
@@ -164,11 +191,25 @@ export class ApiService {
     }
 
     /**
-     * @ngdoc method
-     * @name veUtils/UtilsService#makeCacheKey
-     * @methodOf veUtils/UtilsService
+     * @name veUtils/UtilsService#makeElementRequestObject
+     * Make a single element request object out of an ElementObject
      *
-     * @description
+     * @param {ElementObject} elementOb
+     * @returns {ElementsRequest}
+     */
+    public makeElementRequestObject(
+        elementOb: ElementObject
+    ): ElementsRequest<string> {
+        return {
+            elementId: elementOb.id,
+            projectId: elementOb._projectId,
+            refId: elementOb._refId,
+            commitId: elementOb._commitId,
+        }
+    }
+
+    /**
+     * @name veUtils/UtilsService#makeCacheKey
      * Make key for element for use in CacheService
      *
      * @param {RequestObject | null} reqOb request object
@@ -199,11 +240,7 @@ export class ApiService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#filterProperties
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * given element object a and element object b,
      * returns new object with b data minus keys not in a
      * (set notation A intersect B)
@@ -212,22 +249,18 @@ export class ApiService {
      * @param {Object} b Element Object
      * @returns {Object} new object
      */
-    public filterProperties(a: ElementObject, b: ElementObject): ElementObject {
-        const res: ElementObject = null
-        for (const key in a) {
-            if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
-                res[key] = b[key]
-            }
-        }
-        return res
-    }
+    // public filterProperties(a: ElementObject, b: ElementObject): ElementObject {
+    //     const res: ElementObject = null
+    //     for (const key in a) {
+    //         if (a.hasOwnProperty(key) && b.hasOwnProperty(key)) {
+    //             res[key] = b[key]
+    //         }
+    //     }
+    //     return res
+    // }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#hasConflict
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      *  Checks if sever and cache version of the element are
      *  the same so that the user is aware that they are overriding
      *  changes to the element that they have not seen in the cache element.
@@ -262,7 +295,7 @@ export class ApiService {
                 orig.hasOwnProperty(i) &&
                 server.hasOwnProperty(i)
             ) {
-                if (!angular.equals(orig[i], server[i])) {
+                if (!_.isEqual(orig[i], server[i])) {
                     return true
                 }
             }
@@ -271,79 +304,68 @@ export class ApiService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#isRestrictedValue
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * deprecated
      *
      * @param {string} table table content
      * @returns {boolean} boolean
      */
-    public isRestrictedValue(values: ExpressionObject[]) {
-        if (
-            values.length > 0 &&
-            values[0].type === 'Expression' &&
-            values[0].operand &&
-            values[0].operand.length === 3 &&
-            values[0].operand[0].value === 'RestrictedValue' &&
-            values[0].operand[2].type === 'Expression' &&
-            values[0].operand[2].operand &&
-            Array.isArray(values[0].operand[2].operand) &&
-            values[0].operand[2].operand.length > 0 &&
-            values[0].operand[1].type === 'ElementValue'
-        ) {
-            return true
-        }
-        return false
+    // public isRestrictedValue(values: ExpressionObject[]) {
+    //     if (
+    //         values.length > 0 &&
+    //         values[0].type === 'Expression' &&
+    //         values[0].operand &&
+    //         values[0].operand.length === 3 &&
+    //         values[0].operand[0].value === 'RestrictedValue' &&
+    //         values[0].operand[2].type === 'Expression' &&
+    //         values[0].operand[2].operand &&
+    //         Array.isArray(values[0].operand[2].operand) &&
+    //         values[0].operand[2].operand.length > 0 &&
+    //         values[0].operand[1].type === 'ElementValue'
+    //     ) {
+    //         return true
+    //     }
+    //     return false
+    // }
+
+    /**
+     * @name veUtils/ApiService#createUUID
+     *
+     * Alias for the currently adopted UUID standard for View Editor/MMS
+     *
+     */
+    public createUUID(): string {
+        return uuid.v4()
     }
 
     /**
-     * @ngdoc method
-     * @name veUtils/UtilsService#createMmsId
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
+     * @name veUtils/UtilsService#createUniqueId
      * Generate unique SysML element ID
      *
      * @returns {string} unique SysML element ID
      */
-    public createMmsId() {
-        let d = Date.now()
-        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-            /[xy]/g,
-            (c) => {
-                const r = (d + Math.random() * 16) % 16 | 0
-                d = Math.floor(d / 16)
-                return (c == 'x' ? r : (r & 0x3) | 0x8).toString(16)
-            }
-        )
-        return `MMS_${Date.now()}_${uuid}`
+    public createUniqueId(): string {
+        return `ve-${this.getVeVersion().replace(
+            '.',
+            '-'
+        )}-${this.createUUID()}`
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#isView
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Evaluates if an given element is a view or not
      *
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    public isView(e: ElementObject) {
+    public isView(e: ElementObject): boolean {
         if (e._appliedStereotypeIds) {
             if (
                 e._appliedStereotypeIds.indexOf(
-                    this.schemaSvc.getSchema('VIEW_SID', this.schema) as string
+                    this.schemaSvc.getSchema('VIEW_SID', this.schema)
                 ) >= 0 ||
                 e._appliedStereotypeIds.indexOf(
-                    this.schemaSvc.getSchema(
-                        'DOCUMENT_SID',
-                        this.schema
-                    ) as string
+                    this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)
                 ) >= 0
             ) {
                 return true
@@ -351,7 +373,7 @@ export class ApiService {
             const otherViewSids: string[] = this.schemaSvc.getSchema(
                 'OTHER_VIEW_SID',
                 this.schema
-            ) as string[]
+            )
             for (const otherViewSid of otherViewSids) {
                 if (e._appliedStereotypeIds.indexOf(otherViewSid) >= 0) {
                     return true
@@ -362,42 +384,34 @@ export class ApiService {
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#isDocument
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Evaluates if an given element is a document or not
      *
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    public isDocument(e: ElementObject) {
+    public isDocument(e: ElementObject): boolean {
         return (
             e._appliedStereotypeIds &&
             e._appliedStereotypeIds.indexOf(
-                this.schemaSvc.getSchema('DOCUMENT_SID', this.schema) as string
+                this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)
             ) >= 0
         )
     }
 
     /**
-     * @ngdoc method
      * @name veUtils/UtilsService#isRequirement
-     * @methodOf veUtils/UtilsService
-     *
-     * @description
      * Evaluates if an given element is a requirement from list given above: this.REQUIREMENT_SID
      *
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    public isRequirement(e: ElementObject) {
+    public isRequirement(e: ElementObject): boolean {
         if (e._appliedStereotypeIds) {
-            const reqSids = this.schemaSvc.getSchema(
+            const reqSids = this.schemaSvc.getSchema<string[]>(
                 'REQUIREMENT_SID',
                 this.schema
-            ) as string[]
+            )
             for (const reqSid of reqSids) {
                 if (e._appliedStereotypeIds.indexOf(reqSid) >= 0) {
                     return true
