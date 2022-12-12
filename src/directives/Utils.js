@@ -273,13 +273,17 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
         if (elementOb.type === 'Enumeration') {
             var isEnumeration = true;
             var reqOb = {
-                elementId: elementOb.id,
                 projectId: elementOb._projectId,
-                refId: elementOb._refId,
-                depth: 1
+                refId: elementOb._refId
             };
-            ElementService.getOwnedElements(reqOb).then(
-                function(val) {
+            var query = {
+                params: {
+                    "ownerId": elementOb.id
+                }
+            };
+            ElementService.search(reqOb, query).then(
+                function(data) {
+                    var val = data.elements;
                     var newArray = [];
                      // Filter for enumeration type
                     for (var i = 0; i < val.length; i++) {

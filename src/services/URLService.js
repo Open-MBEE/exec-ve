@@ -251,7 +251,7 @@ function urlService(baseUrl, mmsUrl) {
      * @returns {string} The url.
      */
     var getElementURL = function(reqOb) {
-        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/elements/' + reqOb.elementId;
+        var r = root + '/projects/' + reqOb.projectId + '/refs/' + reqOb.refId + '/views/' + reqOb.elementId;
         return addExtended(addVersion(r, reqOb.commitId), reqOb.extended);
     };
 
