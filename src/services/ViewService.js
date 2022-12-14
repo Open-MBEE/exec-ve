@@ -913,8 +913,14 @@ function ViewService($q, $http, URLService, ElementService, UtilsService, CacheS
                 var documentOb = result.filter(
                     (resultOb) => {
                         return resultOb.id === reqOb.documentId;
-                    })[0];
-                deferred.resolve(CacheService.put(cacheKey, documentOb, true));
+                    });
+                if (documentOb.length == 0) { // could be just a view, pretend it's a doc
+                    ElementService.getElement(reqOb, weight, update).then((result) => {
+                        deferred.resolve(result);
+                    }, (reason) => deferred.reject(reason));
+                } else {
+                    deferred.resolve(CacheService.put(cacheKey, documentOb[0], true));
+                }
             }, (reason) => {
                     deferred.reject(reason);
             });

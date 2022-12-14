@@ -106,7 +106,7 @@ function mmsViewLink(ElementService, UtilsService, $compile, growl, ViewService,
                     scope.vid = data.id;
                 } else if (UtilsService.isView(data) || data.type === 'InstanceSpecification') {
                     if (!docid || docid === '') {
-                        docid = data.id;
+                        docid = ApplicationService.getState().currentDoc;
                     }
                     scope.docid = docid;
                     scope.vid = data.id;
