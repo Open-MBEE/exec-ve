@@ -183,7 +183,8 @@ function UxService(EventService) {
       case "export":
         return {id: button, icon: 'fa-download', selected: true, active: true, permission: true, tooltip: 'Export', button_content: 'Export',
               spinner: false, toggleable: false, action: function() {eventSvc.$broadcast(button);},
-              dropdown_buttons: [ getButtonBarButton("word"), getButtonBarButton("tabletocsv")]};
+              dropdown_buttons: [ //getButtonBarButton("word"), 
+                getButtonBarButton("tabletocsv")]};
       case "print":
         return {id: button, icon: 'fa-print', selected: true, active: true, permission: true, tooltip: 'Print',
                 spinner: false, toggleable: false, action: function() {eventSvc.$broadcast(button);}};
