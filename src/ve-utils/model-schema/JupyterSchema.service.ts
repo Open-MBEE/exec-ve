@@ -1,14 +1,12 @@
-import {veUtils} from "@ve-utils";
-import {SchemaMapping} from "@ve-utils/model-schema/Schema.service";
+import { Schema, SchemaMapping } from '@ve-utils/model-schema/Schema.service'
 
-export class JupyterSchemaService implements SchemaMapping {
+import { veUtils } from '@ve-utils'
 
+export class JupyterSchema implements Schema {
     static $inject = []
 
-    constructor() {}
-
-    jsonName: string = 'jupyter';
-
+    jsonName: string = 'jupyter'
+    schema: SchemaMapping = {}
 }
 
-veUtils.service('JupyterSchemaService', JupyterSchemaService)
+veUtils.service('JupyterSchema', JupyterSchema)

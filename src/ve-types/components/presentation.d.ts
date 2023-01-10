@@ -1,6 +1,6 @@
 import { VeComponentOptions } from '@ve-types/angular'
 
-export interface PresentationComponentOptions extends VeComponentOptions {
+export interface IPresentationComponentOptions extends VeComponentOptions {
     selector: string
     style?: string[]
     bindings: {
@@ -19,7 +19,7 @@ export interface PresentationComponentOptions extends VeComponentOptions {
     }
 }
 
-export interface TableConfig {
+export interface ITableConfig {
     sortByColumnFn(sortCol?: number): void
 
     showBindingForSortIcon: number

@@ -1,8 +1,9 @@
 import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane'
 import { StateService } from '@uirouter/angularjs'
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
+import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService } from '@ve-app/main/services'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
 import {
@@ -10,10 +11,10 @@ import {
     ButtonBarApi,
     ButtonBarService,
 } from '@ve-core/button-bar'
-import { TreeService } from '@ve-core/tree'
+import { TreeApi, TreeService } from '@ve-core/tree'
 import {
     PermissionsService,
-    ViewElement,
+    ViewData,
     ViewService,
     URLService,
 } from '@ve-utils/mms-api-client'
@@ -28,7 +29,7 @@ import {
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
@@ -36,9 +37,9 @@ import {
     RefObject,
     ViewObject,
 } from '@ve-types/mms'
-import { View2NodeMap } from '@ve-types/tree'
+import { TreeBranch, View2NodeMap } from '@ve-types/tree'
 
-class FullDocumentController implements angular.IComponentController {
+class FullDocumentController implements IComponentController {
     public subs: Rx.IDisposable[]
     bars: string[]
     bbApi: ButtonBarApi
@@ -49,12 +50,12 @@ class FullDocumentController implements angular.IComponentController {
     private refOb: RefObject
     private documentOb: DocumentObject
 
-    public viewContentLoading
-    treeApi
-    buttons = []
+    public viewContentLoading: boolean
+    treeApi: TreeApi
+    buttons: IButtonBarButton[] = []
     latestElement: Date
     scrollApi: IPaneScrollApi
-    views: ViewElement[] = [] as ViewElement[]
+    views: ViewData[] = []
     view2Children: { [key: string]: string[] } = {}
     view2Node: View2NodeMap = {}
     num = 1
@@ -122,7 +123,7 @@ class FullDocumentController implements angular.IComponentController {
         this.viewContentLoading = false
 
         this.subs.push(
-            this.eventSvc.$on(
+            this.eventSvc.$on<boolean>(
                 this.rootScopeSvc.constants.VEVIEWCONTENTLOADING,
                 (data) => {
                     this.viewContentLoading = data
@@ -145,7 +146,7 @@ class FullDocumentController implements angular.IComponentController {
                         'show-edits',
                         this.rootScopeSvc.veEditMode()
                     )
-                    // @ts-ignore
+
                     this.hotkeys.bindTo(this.$scope).add({
                         combo: 'alt+d',
                         description: 'toggle edit mode',
@@ -183,7 +184,7 @@ class FullDocumentController implements angular.IComponentController {
                     'show-elements',
                     this.rootScopeSvc.veElementsOn()
                 )
-                // @ts-ignore
+
                 this.hotkeys
                     .bindTo(this.$scope)
                     .add({
@@ -219,28 +220,12 @@ class FullDocumentController implements angular.IComponentController {
             label: this.documentOb.name,
             data: this.documentOb,
             type: 'view',
-            children: this.documentOb._childViews
-                ? this.documentOb._childViews
-                : [],
+            children: [],
         }
         this.view2Children[this.documentOb.id] = []
 
-        this._createViews().then(() => {
-            // The Controller codes get executed before all the directives'
-            // code in its template ( full-doc.html ). As a result, use $timeout here
-            // to let them finish first because in this case
-            // we rely on ng-pane directive to setup isScrollVisible
-            this.$timeout(() => {
-                this.fullDocumentSvc = this.fullDocumentFcty.get(this.views)
-                this.fullDocumentSvc.addInitialViews(
-                    this.scrollApi.isScrollVisible
-                )
-                this.views = this.fullDocumentSvc.viewsBuffer
-            })
-        })
-
         this.subs.push(
-            this.eventSvc.$on('mms-tree-click', (branch) => {
+            this.eventSvc.$on<TreeBranch>('mms-tree-click', (branch) => {
                 this.fullDocumentSvc.handleClickOnBranch(branch, () => {
                     this.$location.hash(branch.data.id)
                     this.$anchorScroll()
@@ -249,18 +234,21 @@ class FullDocumentController implements angular.IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on('mms-full-doc-view-deleted', (deletedBranch) => {
+            this.eventSvc.$on('view.deleted', (deletedBranch: TreeBranch) => {
                 this.fullDocumentSvc.handleViewDelete(deletedBranch)
             })
         )
 
         this.subs.push(
-            this.eventSvc.$on('mms-new-view-added', (data) => {
-                this.fullDocumentSvc.handleViewAdd(
-                    this._buildViewElement(data.vId, data.curSec),
-                    data.prevSibId
-                )
-            })
+            this.eventSvc.$on(
+                'view.added',
+                (data: veAppEvents.viewAddedData) => {
+                    this.fullDocumentSvc.handleViewAdd(
+                        this._buildViewData(data.vId, data.curSec),
+                        data.prevSibId
+                    )
+                }
+            )
         )
 
         this.subs.push(
@@ -363,7 +351,7 @@ class FullDocumentController implements angular.IComponentController {
         this.subs.push(
             this.eventSvc.$on('print', () => {
                 this.fullDocumentSvc.loadRemainingViews(() => {
-                    this.appUtilsSvc.printModal(
+                    void this.appUtilsSvc.printModal(
                         angular.element('#print-div'),
                         this.documentOb,
                         this.refOb,
@@ -418,7 +406,7 @@ class FullDocumentController implements angular.IComponentController {
             this.eventSvc.$on('refresh-numbering', (reNumOnly: boolean) => {
                 this.fullDocumentSvc.loadRemainingViews(() => {
                     if (!reNumOnly) {
-                        this.treeSvc
+                        void this.treeSvc
                             .getApi()
                             .refresh()
                             .then(() => {
@@ -454,18 +442,25 @@ class FullDocumentController implements angular.IComponentController {
             refId: this.refOb.id,
             documentId: this.documentOb.id,
         })
-        // this.handleShareURL = this.shortenUrlSvc.getShortUrl.bind(
-        //     null,
-        //     this.$location.absUrl(),
-        //     this
-        // )
     }
 
-    private _createViews = () => {
-        const loadingViewsFromServer = this.growl.info(
-            'Loading data from server!',
-            { ttl: -1 }
-        )
+    $postLink(): void {
+        void this._createViews().then(() => {
+            // The Controller codes get executed before all the directives'
+            // code in its template ( full-doc.html ). As a result, use $timeout here
+            // to let them finish first because in this case
+            // we rely on ng-pane directive to setup isScrollVisible
+            this.fullDocumentSvc = this.fullDocumentFcty.get(this.views)
+            const scrollVisible = (): boolean => {
+                return this.scrollApi.isScrollVisible()
+            }
+            this.fullDocumentSvc.addInitialViews(scrollVisible)
+            this.views = this.fullDocumentSvc.viewsBuffer
+        })
+    }
+
+    private _createViews = (): VePromise<void, void> => {
+        const message = this._loadingViewsFromServer()
         this.views.push({
             id: this.documentOb.id,
             api: {
@@ -488,21 +483,30 @@ class FullDocumentController implements angular.IComponentController {
             )
             .then((childIds: string[]) => {
                 for (let i = 0; i < childIds.length; i++) {
-                    this._constructViews(childIds[i], this.num)
+                    this._constructViews(childIds[i], this.num.toString(10))
                     this.num = this.num + 1
                 }
             })
-            .finally(loadingViewsFromServer.destroy)
+            .finally(() => {
+                message.destroy()
+            })
     }
 
-    private _elementTranscluded = (elementOb: ElementObject, type: string) => {
+    private _loadingViewsFromServer = (): angular.growl.IGrowlMessage => {
+        return this.growl.info('Loading data from server!', { ttl: -1 })
+    }
+
+    private _elementTranscluded = (
+        elementOb: ElementObject,
+        type: string
+    ): void => {
         if (elementOb && type !== 'Comment') {
             if (elementOb._modified && elementOb._modified > this.latestElement)
                 this.latestElement = elementOb._modified
         }
     }
 
-    private _elementClicked = (elementOb) => {
+    private _elementClicked = (elementOb: ElementObject): void => {
         const data = {
             elementOb: elementOb,
             commitId: 'latest',
@@ -510,7 +514,7 @@ class FullDocumentController implements angular.IComponentController {
         this.eventSvc.$broadcast('element.selected', data)
     }
 
-    private _buildViewElement = (vId, curSec): ViewElement => {
+    private _buildViewData = (vId: string, curSec: string): ViewData => {
         return {
             id: vId,
             api: {
@@ -519,12 +523,12 @@ class FullDocumentController implements angular.IComponentController {
             },
             number: curSec,
             topLevel: curSec ? curSec.toString().indexOf('.') === -1 : false,
-            first: curSec == 1,
+            first: curSec == '1',
         }
     }
 
-    private _constructViews = (viewId, curSection) => {
-        this.views.push(this._buildViewElement(viewId, curSection))
+    private _constructViews = (viewId: string, curSection: string): void => {
+        this.views.push(this._buildViewData(viewId, curSection))
 
         if (
             this.view2Children[viewId] &&
@@ -535,7 +539,7 @@ class FullDocumentController implements angular.IComponentController {
             for (let i = 0; i < childIds.length; i++) {
                 this._constructViews(
                     this.view2Children[viewId][i],
-                    curSection + '.' + num
+                    `${curSection}.${num}`
                 )
                 num = num + 1
             }
@@ -561,7 +565,7 @@ class FullDocumentController implements angular.IComponentController {
         return childIds
     }
 
-    public notifyOnScroll = () => {
+    public notifyOnScroll = (): boolean => {
         return this.fullDocumentSvc.handleDocumentScrolling()
     }
 }

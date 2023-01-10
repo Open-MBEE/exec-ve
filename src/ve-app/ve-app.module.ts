@@ -11,6 +11,7 @@ import uiRouter, {
     UrlParts,
 } from '@uirouter/angularjs'
 import angular, {
+    IHttpInterceptor,
     IHttpResponse,
     IHttpService,
     IIntervalService,
@@ -25,15 +26,39 @@ import { ResolveService } from '@ve-app/main/services'
 import {
     AuthService,
     URLService,
-    URLServiceProvider,
     ProjectService,
+    PermissionCache,
+    ViewService,
+    DocumentMetadata,
 } from '@ve-utils/mms-api-client'
-import { EventService, RootScopeService } from '@ve-utils/services'
+import {
+    BrandingStyle,
+    EventService,
+    RootScopeService,
+} from '@ve-utils/services'
 
-import { ParamsObject, ViewObject } from '@ve-types/mms'
+import { VePromise } from '@ve-types/angular'
+import {
+    CheckAuthResponse,
+    DocumentObject,
+    GroupObject,
+    GroupsResponse,
+    MountObject,
+    OrgObject,
+    OrgsResponse,
+    ParamsObject,
+    PermissionsResponse,
+    ProjectObject,
+    ProjectsResponse,
+    RefObject,
+    RefsResponse,
+    ViewObject,
+} from '@ve-types/mms'
+import { VeModalService } from '@ve-types/view-editor'
 
 export const veApp = angular.module('ve-app', [
     've-utils',
+    've-core',
     've-components',
     'ui.bootstrap',
     uiRouter,
@@ -57,7 +82,6 @@ veApp.config([
     '$transitionsProvider',
     '$httpProvider',
     '$provide',
-    'URLServiceProvider',
     '$locationProvider',
     function (
         $stateProvider: StateProvider,
@@ -65,7 +89,6 @@ veApp.config([
         $transitionsProvider: TransitionService,
         $httpProvider: angular.IHttpProvider,
         $provide: angular.auto.IProvideService,
-        $urlServiceProvider: URLServiceProvider,
         $locationProvider: ILocationProvider
     ): void {
         // override uibTypeaheadPopup functionality
@@ -133,26 +156,30 @@ veApp.config([
                 resolve: {
                     bannerOb: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     loginBannerOb: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getLoginBanner()
                         },
                     ],
                     paramsOb: [
                         '$transition$',
-                        ($transition$) => {
+                        ($transition$: Transition): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
                 },
                 views: {
-                    'banner@main': {
-                        component: 'veSystemBanner',
+                    'banner-top@main': {
+                        component: 'systemBanner',
                     },
                     'login@main': {
                         component: 'login',
@@ -167,48 +194,63 @@ veApp.config([
                 resolve: {
                     token: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
                         },
                     ],
                 },
                 views: {
                     'login@main': {
-                        component: 'veRedirect',
+                        component: 'redirect',
                     },
                 },
             })
             .state('main.login.select', {
                 url: '/select?fromLogin',
+                params: {
+                    fromLogin: {
+                        type: 'query',
+                    },
+                },
                 resolve: {
                     token: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
                         },
                     ],
                     bannerOb: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     loginBannerOb: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getLoginBanner()
                         },
                     ],
                     orgObs: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<OrgObject[], OrgsResponse> => {
                             return resolveSvc.getOrgs()
                         },
                     ],
                 },
                 views: {
-                    'banner@main': {
-                        component: 'veSystemBanner',
+                    'banner-top@main': {
+                        component: 'systemBanner',
                     },
                     'login@main': {
                         component: 'projectSelect',
@@ -237,73 +279,86 @@ veApp.config([
                     ],
                     token: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
                         },
                     ],
                     bannerOb: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     projectOb: [
                         'ResolveService',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject) => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): VePromise<ProjectObject, ProjectsResponse> => {
                             return resolveSvc.getProject(params)
                         },
                     ],
                     projectObs: [
                         'ProjectService',
                         'projectOb',
-                        (projectSvc: ProjectService, projectOb) => {
+                        (
+                            projectSvc: ProjectService,
+                            projectOb: ProjectObject
+                        ): VePromise<ProjectObject[], ProjectsResponse> => {
                             return projectSvc.getProjects(projectOb.orgId)
                         },
                     ],
                     orgOb: [
                         'ResolveService',
                         'projectOb',
-                        (resolveSvc: ResolveService, projectOb) => {
+                        (
+                            resolveSvc: ResolveService,
+                            projectOb: ProjectObject
+                        ): VePromise<OrgObject, OrgsResponse> => {
                             return resolveSvc.getOrg(projectOb)
                         },
                     ],
                     orgObs: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<OrgObject[], OrgsResponse> => {
                             return resolveSvc.getOrgs()
                         },
                     ],
                     refObs: [
                         'ResolveService',
                         'params',
-                        function (
+                        (
                             resolveSvc: ResolveService,
                             params: ParamsObject
-                        ) {
+                        ): VePromise<RefObject[], RefsResponse> => {
                             return resolveSvc.getRefs(params)
                         },
                     ],
                     tagObs: [
+                        'ResolveService',
                         'refObs',
-                        (refObs) => {
-                            const ret = []
-                            for (let i = 0; i < refObs.length; i++) {
-                                if (refObs[i].type === 'Tag')
-                                    ret.push(refObs[i])
-                            }
-                            return ret
+                        (
+                            resolveSvc: ResolveService,
+                            refObs: RefObject[]
+                        ): RefObject[] => {
+                            return resolveSvc.getTags(refObs)
                         },
                     ],
                     branchObs: [
+                        'ResolveService',
                         'refObs',
-                        (refObs) => {
-                            const ret = []
-                            for (let i = 0; i < refObs.length; i++) {
-                                if (refObs[i].type === 'Branch')
-                                    ret.push(refObs[i])
-                            }
-                            return ret
+                        (
+                            resolveSvc: ResolveService,
+                            refObs: RefObject[]
+                        ): RefObject[] => {
+                            return resolveSvc.getBranches(refObs)
                         },
                     ],
                     documentOb: () => {
@@ -314,11 +369,11 @@ veApp.config([
                     },
                 },
                 views: {
-                    'banner@main': {
-                        component: 'veSystemBanner',
+                    'banner-top@main': {
+                        component: 'systemBanner',
                     },
                     'nav@main': {
-                        component: 'veNav',
+                        component: 'navBar',
                         bindings: {
                             mmsOrg: 'orgOb',
                             mmsOrgs: 'orgObs',
@@ -328,7 +383,7 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'veMenu',
+                        component: 'mainMenu',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
@@ -384,28 +439,40 @@ veApp.config([
                     projectOb: [
                         'ResolveService',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject) => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): VePromise<MountObject, ProjectsResponse> => {
                             return resolveSvc.getProjectMounts(params)
                         },
                     ],
                     refOb: [
                         'ResolveService',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject) => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): VePromise<RefObject, RefsResponse> => {
                             return resolveSvc.getRef(params)
                         },
                     ],
                     tagOb: [
                         'refOb',
                         'ResolveService',
-                        (refOb, resolveSvc: ResolveService) => {
+                        (
+                            refOb: RefObject,
+                            resolveSvc: ResolveService
+                        ): RefObject => {
                             return resolveSvc.getTag(refOb)
                         },
                     ],
                     branchOb: [
                         'refOb',
                         'ResolveService',
-                        (refOb, resolveSvc: ResolveService) => {
+                        (
+                            refOb: RefObject,
+                            resolveSvc: ResolveService
+                        ): RefObject => {
                             return resolveSvc.getBranch(refOb)
                         },
                     ],
@@ -420,7 +487,7 @@ veApp.config([
                             resolveSvc: ResolveService,
                             params: ParamsObject,
                             refresh: boolean
-                        ) => {
+                        ): VePromise<GroupObject[], GroupsResponse> => {
                             return resolveSvc.getGroups(params, refresh)
                         },
                     ],
@@ -431,12 +498,12 @@ veApp.config([
                         'projectOb',
                         'ResolveService',
                         (
-                            params,
+                            params: ParamsObject,
                             refresh: boolean,
-                            refOb,
-                            projectOb,
+                            refOb: RefObject,
+                            projectOb: ProjectObject,
                             resolveSvc: ResolveService
-                        ) => {
+                        ): VePromise<DocumentObject> => {
                             return resolveSvc.getDocument(
                                 params,
                                 refOb,
@@ -447,19 +514,23 @@ veApp.config([
                     ],
                     viewOb: [
                         'documentOb',
-                        (documentOb) => {
+                        (documentOb: DocumentObject): ViewObject => {
                             return documentOb
                         },
                     ],
                     bannerOb: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     footerOb: [
                         'ResolveService',
-                        (resolveSvc: ResolveService) => {
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getFooter()
                         },
                     ],
@@ -470,7 +541,11 @@ veApp.config([
                         'refOb',
                         'projectOb',
                         'ResolveService',
-                        (refOb, projectOb, resolveSvc: ResolveService) => {
+                        (
+                            refOb: RefObject,
+                            projectOb: ProjectObject,
+                            resolveSvc: ResolveService
+                        ): VePromise<PermissionCache, PermissionsResponse> => {
                             return resolveSvc.initializePermissions(
                                 projectOb,
                                 refOb
@@ -479,11 +554,11 @@ veApp.config([
                     ],
                 },
                 views: {
-                    'banner@main': {
-                        component: 'veSystemBanner',
+                    'banner-top@main': {
+                        component: 'systemBanner',
                     },
                     'nav@main': {
-                        component: 'veNav',
+                        component: 'navBar',
                         bindings: {
                             mmsOrg: 'orgOb',
                             mmsOrgs: 'orgObs',
@@ -493,7 +568,7 @@ veApp.config([
                         },
                     },
                     'menu@main': {
-                        component: 'veMenu',
+                        component: 'mainMenu',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
@@ -529,8 +604,8 @@ veApp.config([
                     'toolbar-right@main': {
                         component: 'rightToolbar',
                     },
-                    'footer@main': {
-                        component: 'veFooter',
+                    'banner-bottom@main': {
+                        component: 'systemFooter',
                     },
                 },
             })
@@ -548,18 +623,17 @@ veApp.config([
                     documentObs: [
                         'ResolveService',
                         'params',
-                        function (
+                        (
                             resolveSvc: ResolveService,
                             params: ParamsObject
-                        ) {
+                        ): VePromise<DocumentObject[]> => {
                             return resolveSvc.getProjectDocuments(params)
                         },
                     ],
                 },
                 views: {
                     'pane-center@main': {
-                        templateUrl: 'partials/ve-utils/reorder-groups.html',
-                        controller: 'ReorderGroupCtrl',
+                        component: 'reorderGroup',
                     },
                 },
             })
@@ -572,21 +646,21 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        ($transition$): ParamsObject => {
+                        ($transition$: Transition): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
                     documentOb: [
                         'ResolveService',
                         'params',
-                        'refresh',
                         'refOb',
+                        'refresh',
                         (
                             resolveSvc: ResolveService,
                             params: ParamsObject,
-                            refresh: boolean,
-                            refOb
-                        ) => {
+                            refOb: RefObject,
+                            refresh: boolean
+                        ): VePromise<DocumentObject> => {
                             return resolveSvc.getDocumentPreview(
                                 params,
                                 refOb,
@@ -596,7 +670,7 @@ veApp.config([
                     ],
                     viewOb: [
                         'documentOb',
-                        (documentOb) => {
+                        (documentOb: DocumentObject): ViewObject => {
                             return documentOb
                         },
                     ],
@@ -604,18 +678,18 @@ veApp.config([
                         'groupObs',
                         'documentOb',
                         'ResolveService',
-                        function (
-                            groupObs,
-                            documentOb,
+                        (
+                            groupObs: GroupObject[],
+                            documentOb: DocumentObject,
                             resolveSvc: ResolveService
-                        ) {
-                            resolveSvc.getGroup(groupObs, documentOb)
+                        ): GroupObject => {
+                            return resolveSvc.getGroup(groupObs, documentOb)
                         },
                     ],
                 },
                 views: {
                     'menu@main': {
-                        component: 'veMenu',
+                        component: 'mainMenu',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
@@ -640,7 +714,7 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        ($transition$): ParamsObject => {
+                        ($transition$: Transition): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
@@ -648,11 +722,11 @@ veApp.config([
                         'params',
                         'refresh',
                         'ResolveService',
-                        function (
+                        (
                             params: ParamsObject,
                             refresh: boolean,
                             resolveSvc: ResolveService
-                        ) {
+                        ): VePromise<DocumentObject> => {
                             return resolveSvc.getProjectDocument(
                                 params,
                                 refresh
@@ -661,7 +735,7 @@ veApp.config([
                     ],
                     viewOb: [
                         'documentOb',
-                        (documentOb: ViewObject) => {
+                        (documentOb: DocumentObject): ViewObject => {
                             return documentOb
                         },
                     ],
@@ -669,19 +743,22 @@ veApp.config([
                         'groupObs',
                         'documentOb',
                         'ResolveService',
-                        function (
-                            groupObs,
-                            documentOb,
+                        (
+                            groupObs: GroupObject[],
+                            documentOb: DocumentObject,
                             resolveSvc: ResolveService
-                        ) {
-                            resolveSvc.getGroup(groupObs, documentOb)
+                        ): GroupObject => {
+                            return resolveSvc.getGroup(groupObs, documentOb)
                         },
                     ],
                     docMeta: [
                         'ViewService',
                         'documentOb',
-                        (ViewService, documentOb) => {
-                            return ViewService.getDocMetadata({
+                        (
+                            viewSvc: ViewService,
+                            documentOb: DocumentObject
+                        ): VePromise<DocumentMetadata> => {
+                            return viewSvc.getDocumentMetadata({
                                 projectId: documentOb._projectId,
                                 refId: documentOb._refId,
                                 elementId: documentOb.id,
@@ -691,7 +768,7 @@ veApp.config([
                 },
                 views: {
                     'menu@main': {
-                        component: 'veMenu',
+                        component: 'mainMenu',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
@@ -733,7 +810,7 @@ veApp.config([
                 resolve: {
                     params: [
                         '$transition$',
-                        ($transition$): ParamsObject => {
+                        ($transition$: Transition): ParamsObject => {
                             return $transition$.params()
                         },
                     ],
@@ -741,7 +818,11 @@ veApp.config([
                         'ResolveService',
                         'params',
                         'refresh',
-                        (resolveSvc: ResolveService, params, refresh) => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject,
+                            refresh: boolean
+                        ): VePromise<ViewObject> => {
                             return resolveSvc.getView(params, refresh)
                         },
                     ],
@@ -749,18 +830,18 @@ veApp.config([
                         'groupObs',
                         'documentOb',
                         'ResolveService',
-                        function (
-                            groupObs,
-                            documentOb,
+                        (
+                            groupObs: GroupObject[],
+                            documentOb: DocumentObject,
                             resolveSvc: ResolveService
-                        ) {
-                            resolveSvc.getGroup(groupObs, documentOb)
+                        ): GroupObject => {
+                            return resolveSvc.getGroup(groupObs, documentOb)
                         },
                     ],
                 },
                 views: {
                     'menu@main': {
-                        component: 'veMenu',
+                        component: 'mainMenu',
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsProjects: 'projectObs',
@@ -786,10 +867,10 @@ veApp.config([
                     documentOb: [
                         'params',
                         'ResolveService',
-                        function (
+                        (
                             params: ParamsObject,
                             resolveSvc: ResolveService
-                        ) {
+                        ): VePromise<DocumentObject> => {
                             return resolveSvc.getProjectDocument(params, true)
                         },
                     ],
@@ -822,14 +903,20 @@ veApp.config([
                     field: [
                         'ResolveService',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject) => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): string => {
                             return resolveSvc.getField(params)
                         },
                     ],
                     search: [
                         'ResolveService',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject) => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): string => {
                             return resolveSvc.getSearch(params)
                         },
                     ],
@@ -837,6 +924,40 @@ veApp.config([
                 views: {
                     'pane-center@main': {
                         component: 'search',
+                    },
+                },
+            })
+            .state('main.share', {
+                url: '/s/:shortUrl',
+                resolve: {
+                    token: [
+                        'ResolveService',
+                        (
+                            resolveSvc: ResolveService
+                        ): VePromise<string, CheckAuthResponse> => {
+                            return resolveSvc.getToken()
+                        },
+                    ],
+                    paramsOb: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params()
+                        },
+                    ],
+                    decodedUrl: [
+                        'ResolveService',
+                        'paramsOb',
+                        (
+                            resolveSvc: ResolveService,
+                            paramsOb: ParamsObject
+                        ): VePromise<ParamsObject> => {
+                            return resolveSvc.decodeUrl(paramsOb)
+                        },
+                    ],
+                },
+                views: {
+                    'login@main': {
+                        component: 'shortUrl',
                     },
                 },
             })
@@ -852,9 +973,9 @@ veApp.config([
                 $location: ILocationService,
                 uRLSvc: URLService,
                 eventSvc: EventService
-            ) {
+            ): IHttpInterceptor {
                 return {
-                    request: (config: IRequestConfig) => {
+                    request: (config: IRequestConfig): IRequestConfig => {
                         config.headers = uRLSvc.getAuthorizationHeader(
                             config.headers
                         )
@@ -866,29 +987,11 @@ veApp.config([
                         }
                         return config
                     },
-                }
-            },
-        ])
-
-        $httpProvider.interceptors.push([
-            '$q',
-            '$location',
-            'URLService',
-            'EventService',
-            function (
-                $q: IQService,
-                $location: ILocationService,
-                uRLSvc: URLService,
-                eventSvc: EventService
-            ) {
-                return {
                     responseError: (
                         rejection: IHttpResponse<any>
-                    ):
-                        | angular.IPromise<angular.IHttpResponse<any>>
-                        | IHttpResponse<any> => {
-                        const timeout: angular.IPromise<string> = rejection
-                            .config.timeout as IPromise<any>
+                    ): IPromise<IHttpResponse<any>> | IHttpResponse<any> => {
+                        const timeout: IPromise<string> = rejection.config
+                            .timeout as IPromise<string>
                         if (timeout.state && timeout.state === 'cancelled') {
                             rejection.data = 'cancelled'
                             return $q.when(rejection)
@@ -906,23 +1009,7 @@ veApp.config([
                         }
                         return $q.reject(rejection)
                     },
-                }
-            },
-        ])
-
-        $httpProvider.interceptors.push([
-            '$q',
-            '$location',
-            'URLService',
-            'EventService',
-            function (
-                $q: IQService,
-                $location: ILocationService,
-                uRLSvc: URLService,
-                eventSvc: EventService
-            ) {
-                return {
-                    response: (response) => {
+                    response: (response): IHttpResponse<any> => {
                         if (response.status === 202) {
                             eventSvc.$broadcast('mms.working', response)
                         }
@@ -955,11 +1042,11 @@ veApp.run([
     'AuthService',
     'EventService',
     function (
-        $q,
+        $q: IQService,
         $http: IHttpService,
         $interval: IIntervalService,
         $location: ILocationService,
-        $uibModal,
+        $uibModal: VeModalService,
         $uiRouter: UIRouter,
         $uiRouterGlobals: UIRouterGlobals,
         $state: StateService,
@@ -967,51 +1054,49 @@ veApp.run([
         rootScopeSvc: RootScopeService,
         authSvc: AuthService,
         eventSvc: EventService
-    ) {
+    ): void {
         rootScopeSvc.loginModalOpen(false)
         $transitions.onBefore({}, (transition: Transition) => {
             if (
                 $uiRouterGlobals.current.name === 'main.login' ||
                 transition.$to().name === 'main.login' ||
                 rootScopeSvc.loginModalOpen()
-            )
+            ) {
                 return
-            const deferred = $q.defer()
-            authSvc.checkLogin().then(
-                (result) => {
-                    if (transition.$to().name === 'main') {
-                        deferred.resolve($state.target('main.login.select'))
-                    }
-                    if (transition.$to().name === 'main.project.ref') {
-                        deferred.resolve(
-                            $state.target('main.project.ref.portal')
-                        )
-                    }
-                    deferred.resolve()
-                },
-                () => {
-                    $http.pendingRequests.forEach((pendingReq) => {
-                        if (pendingReq.cancel) {
-                            pendingReq.cancel.resolve('cancelled')
+            }
+            return new Promise((resolve) => {
+                authSvc.checkLogin().then(
+                    () => {
+                        if (transition.$to().name === 'main') {
+                            resolve($state.target('main.login.select'))
                         }
-                    })
-                    if (transition.$to().name !== 'main') {
-                        rootScopeSvc.veRedirect({
-                            toState: transition.to(),
-                            toParams: transition.params(),
+                        if (transition.$to().name === 'main.project.ref') {
+                            resolve($state.target('main.project.ref.portal'))
+                        }
+                        resolve()
+                    },
+                    () => {
+                        $http.pendingRequests.forEach((pendingReq) => {
+                            if (pendingReq.cancel) {
+                                pendingReq.cancel.resolve('cancelled')
+                            }
                         })
-                        deferred.resolve(
-                            $state.target('main.login', {
-                                next: transition.to().url,
+                        if (transition.$to().name !== 'main') {
+                            rootScopeSvc.veRedirect({
+                                toState: transition.to(),
+                                toParams: transition.params(),
                             })
-                        )
-                    } else {
-                        deferred.resolve($state.target('main.login'))
+                            resolve(
+                                $state.target('main.login', {
+                                    next: transition.to().url,
+                                })
+                            )
+                        } else {
+                            resolve($state.target('main.login'))
+                        }
                     }
-                }
-            )
-
-            return deferred.promise
+                )
+            })
         })
         $transitions.onError({}, (reason) => {
             console.log(reason)
@@ -1031,7 +1116,7 @@ veApp.run([
                         $uiRouterGlobals.transition.$to.name ===
                             'main.login.select')
                 ) {
-                    $state.target('main.login')
+                    void $state.go('main.login')
                 }
                 return
             }
@@ -1056,7 +1141,7 @@ veApp.run([
         })
 
         // broadcast mms.unauthorized every 10 minutes with interval service
-        $interval(
+        void $interval(
             () => {
                 eventSvc.$broadcast('mms.unauthorized')
             },
@@ -1068,18 +1153,18 @@ veApp.run([
         // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
         $uiRouter.urlService.rules.otherwise(
             (match, url: UrlParts | undefined) => {
-                authSvc.checkLogin().then((checkLogin) => {
+                void authSvc.checkLogin().then((checkLogin) => {
                     if (checkLogin) {
                         if ($location.url().includes('workspace')) {
                             rootScopeSvc.veRedirectFromOld(true)
                             rootScopeSvc.veCrushUrl($location.path())
-                            $state.go('main.login.redirect')
+                            void $state.go('main.login.redirect')
                         } else {
                             rootScopeSvc.veRedirectFromOld(false)
-                            $state.go('main.login.select')
+                            void $state.go('main.login.select')
                         }
                     } else {
-                        $state.go('main.login')
+                        void $state.go('main.login')
                     }
                 })
             }
@@ -1087,13 +1172,11 @@ veApp.run([
     },
 ])
 
-veApp.run([
-    '$uiRouter',
-    '$trace',
-    ($uiRouter, $trace) => {
-        //var pluginInstance = $uiRouter.plugin(Visualizer);
-        $trace.enable('TRANSITION')
-    },
-])
-
-veApp.constant(' ', window.__env)
+// veApp.run([
+//     '$uiRouter',
+//     '$trace',
+//     ($uiRouter, $trace) => {
+//         //var pluginInstance = $uiRouter.plugin(Visualizer);
+//         $trace.enable('TRANSITION')
+//     },
+// ])

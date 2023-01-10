@@ -42,7 +42,7 @@ import angular from 'angular'
  *  <pre>
     angular.module('exampleApp', ['ve-utils'])
     .controller('exampleCtrl', ['$scope', 'ElementService',
-        function($scope, ElementService) { //dependency injections
+        function = ($scope, ElementService) => { //dependency injections
             ElementService.getElement('_element_id').then(
                 function(element) { //success handler
                     $scope.element = element;
@@ -55,7 +55,7 @@ import angular from 'angular'
     ]);
     </pre>
  */
-export const veUtils = angular.module('ve-utils', [])
+export const veUtils = angular.module('ve-utils', ['angular-growl'])
 
 veUtils
     .config([

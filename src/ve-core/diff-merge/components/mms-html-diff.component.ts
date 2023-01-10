@@ -43,7 +43,10 @@ export class MmsHtmlDiffController implements angular.IComponentController {
             this._performDiff(this.mmsBaseHtml, this.mmsComparedHtml)
     }
 
-    public changeAction: onChangesCallback = (newBaseHtml, oldBaseHtml) => {
+    public changeAction: onChangesCallback<string> = (
+        newBaseHtml,
+        oldBaseHtml
+    ) => {
         if (
             this.mmsComparedHtml &&
             this.mmsBaseHtml &&

@@ -15,18 +15,19 @@ import {
 } from '@ve-utils/services'
 import { handleChange } from '@ve-utils/utils'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import {
     VeComponentOptions,
     VePromise,
     VePromiseReason,
+    VeQService,
 } from '@ve-types/angular'
 import { ElementObject, ElementsRequest, RequestObject } from '@ve-types/mms'
 
 /**
  * @ngdoc directive
- * @name veCore.component:mmsDiffAttr
+ * @name veComponent.component:mmsDiffAttr
  *
  * @requires veUtils/ElementService
  * @requires $compile
@@ -83,7 +84,7 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
     static $inject = [...Transclusion.$inject, '$interval']
 
     constructor(
-        $q: angular.IQService,
+        $q: VeQService,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
         $element: JQuery<HTMLElement>,
@@ -366,7 +367,7 @@ const TranscludeDiffAttrComponent: VeComponentOptions = {
     },
 }
 
-veCore.component(
+veComponents.component(
     TranscludeDiffAttrComponent.selector,
     TranscludeDiffAttrComponent
 )

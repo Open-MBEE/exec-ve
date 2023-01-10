@@ -1,9 +1,7 @@
 import angular from 'angular'
 
-import { AddElementData } from '@ve-app/main/modals/add-item-modal.component'
-import { AddElement } from '@ve-components/add-elements'
+import { AddElement, AddElementsService } from '@ve-components/add-elements'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
-import { CoreUtilsService } from '@ve-core/services'
 import {
     ApiService,
     ElementService,
@@ -15,7 +13,8 @@ import { ApplicationService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { AddElementData } from '@ve-types/components'
 import {
     InstanceValueObject,
     ViewCreationRequest,
@@ -37,7 +36,7 @@ class AddPeController extends AddElement<AddPresentationData> {
 
     constructor(
         $scope: angular.IScope,
-        $q: angular.IQService,
+        $q: VeQService,
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         $timeout: angular.ITimeoutService,
@@ -49,7 +48,7 @@ class AddPeController extends AddElement<AddPresentationData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: CoreUtilsService
+        utils: AddElementsService
     ) {
         super(
             $scope,
@@ -68,7 +67,10 @@ class AddPeController extends AddElement<AddPresentationData> {
             utils
         )
         this.displayName = this.type
-        this.addType = 'pe'
+    }
+
+    $onInit(): void {
+        super.$onInit()
     }
 
     public queryFilter = (): SearchFilter => {

@@ -1,6 +1,31 @@
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
+
+import { MMSMentionController } from '@ve-core/editor/components/mention.component'
 
 import { veCore } from '@ve-core'
+
+import { ElementObject } from '@ve-types/mms'
+
+class MMSMentionInterceptController implements IComponentController {
+    public mmsMentionInterceptValue: string
+    mmsFastCf: ElementObject[]
+
+    private ngModel: angular.INgModelController
+    mentionCtrl: MMSMentionController
+
+    $onChanges(changes: angular.IOnChangesObject): void {
+        if (changes.mmsMentionInterceptValue) {
+            this.ngModel.$setViewValue(
+                changes.mmsMentionInterceptValue.currentValue
+            )
+            this.ngModel.$render()
+        }
+    }
+
+    public selectMentionItem($item: ElementObject): void {
+        this.mentionCtrl.selectMentionItem($item)
+    }
+}
 
 // Used to sync value between input from the ckeditor and the uib-typeahead directive
 const MMSMentionIntercept = {
@@ -23,30 +48,7 @@ const MMSMentionIntercept = {
         mmsFastCf: '<',
         mmsMentionId: '<',
     },
-    controller: class MMSMentionInterceptController
-        implements angular.IComponentController
-    {
-        public mmsMentionInterceptValue
-        mmsFastCf
-
-        private ngModel
-        mentionCtrl
-
-        constructor() {}
-
-        $onChanges(changes) {
-            if (changes.mmsMentionInterceptValue) {
-                this.ngModel.$setViewValue(
-                    changes.mmsMentionInterceptValue.currentValue
-                )
-                this.ngModel.$render()
-            }
-        }
-
-        public selectMentionItem($item, $model) {
-            this.mentionCtrl.selectMentionItem($item)
-        }
-    },
+    controller: MMSMentionInterceptController,
 }
 
 veCore.component(MMSMentionIntercept.selector, MMSMentionIntercept)

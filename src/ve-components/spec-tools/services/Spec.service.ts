@@ -1,8 +1,7 @@
 import angular, { Injectable } from 'angular'
 
 import { ComponentService } from '@ve-components/services'
-import { EditingApi } from '@ve-core/editor'
-import { ToolbarService } from '@ve-core/tool-bar'
+import { ToolbarService } from '@ve-core/toolbar'
 import {
     AuthService,
     ElementService,
@@ -15,7 +14,8 @@ import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
 
 import { PropertySpec, veComponents } from '@ve-components'
 
-import { VePromise, VePromiseReason } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
+import { EditingApi } from '@ve-types/core/editor'
 import {
     DocumentObject,
     ElementObject,
@@ -29,9 +29,9 @@ import {
 
 export interface SpecApi extends ElementsRequest<string> {
     docId?: string
-    refType: 'Branch' | 'Tag'
+    refType: string
     displayOldSpec?: boolean | null
-    relatedDocuments?: any
+    relatedDocuments?: ViewObject[]
     propSpec?: PropertySpec
     typeClass?: string
     dataLink?: string
@@ -78,7 +78,7 @@ export class SpecService implements Injectable<any> {
     private lastid: string
     private gettingSpec: boolean
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $timeout: angular.ITimeoutService,
         private growl: angular.growl.IGrowlService,
         private elementSvc: ElementService,
@@ -100,7 +100,7 @@ export class SpecService implements Injectable<any> {
      *
      * @return {boolean} toggle successful
      */
-    public toggleEditing(): boolean {
+    public toggleEditing = (): boolean => {
         if (!this.editing) {
             if (this.editable) this.editing = true
             else return false
@@ -116,7 +116,7 @@ export class SpecService implements Injectable<any> {
      * @param {boolean} mode true or false
      * @return {boolean} set successful
      */
-    public setEditing(mode): boolean {
+    public setEditing = (mode): boolean => {
         if (mode) {
             if (this.editable) this.editing = true
             else return false
@@ -129,7 +129,7 @@ export class SpecService implements Injectable<any> {
      *
      * @return {boolean} editor or not
      */
-    public getEditing(): boolean {
+    public getEditing = (): boolean => {
         return this.editing
     }
     /**
@@ -139,23 +139,23 @@ export class SpecService implements Injectable<any> {
      * @return {Object} may be null or undefined, if not, is
      *  current element object that can be edited (may include changes)
      */
-    public getEdits(): ElementObject {
+    public getEdits = (): ElementObject => {
         return this.edit
     }
 
-    public setEdits(edit: ElementObject): void {
+    public setEdits = (edit: ElementObject): void => {
         this.edit = edit
     }
 
-    public getElement(): ElementObject {
+    public getElement = (): ElementObject => {
         return this.element
     }
 
-    public getDocument(): DocumentObject {
+    public getDocument = (): DocumentObject => {
         return this.document
     }
 
-    public getModifier(): UserObject {
+    public getModifier = (): UserObject => {
         return this.modifier
     }
 
@@ -163,11 +163,11 @@ export class SpecService implements Injectable<any> {
         return this.values
     }
 
-    public getRef(): RefObject {
+    public getRef = (): RefObject => {
         return this.ref
     }
 
-    public getTypeClass(element: ElementObject): void {
+    public getTypeClass = (element: ElementObject): void => {
         // Get Type
         this.specApi.typeClass = this.utilsSvc.getElementTypeClass(
             element,
@@ -196,7 +196,7 @@ export class SpecService implements Injectable<any> {
         return deferred.promise
     }
 
-    public setElement(): void {
+    public setElement = (): void => {
         this.specApi.relatedDocuments = null
         this.specApi.propSpec = {}
 
@@ -210,7 +210,7 @@ export class SpecService implements Injectable<any> {
         this._updateElement()
     }
 
-    private _updateElement(): void {
+    private _updateElement = (): void => {
         const reqOb = Object.assign({}, this.specApi)
         this.elementSvc
             .getElement(reqOb, 2, false)
@@ -401,7 +401,7 @@ export class SpecService implements Injectable<any> {
      *
      * @return {boolean} has changes or not
      */
-    public hasEdits(): boolean {
+    public hasEdits = (): boolean => {
         return this.componentSvc.hasEdits(this.edit)
     }
 
@@ -410,18 +410,18 @@ export class SpecService implements Injectable<any> {
         this.editValues.push(...values)
     }
 
-    public setKeepMode(value?: boolean): void {
+    public setKeepMode = (value?: boolean): void => {
         if (value === undefined) {
             this.keepMode()
         }
         this.keeping = value
     }
 
-    public getKeepMode(): boolean {
+    public getKeepMode = (): boolean => {
         return this.keeping
     }
 
-    public keepMode(): void {
+    public keepMode = (): void => {
         this.keeping = true
     }
 
@@ -432,14 +432,14 @@ export class SpecService implements Injectable<any> {
         return this.$q.resolve(false)
     }
 
-    revertEdits(): void {
+    revertEdits = (): void => {
         this.editValues = this.componentSvc.revertEdits(
             this.editValues,
             this.edit
         )
     }
 
-    public save(continueEdit: boolean): void {
+    public save = (continueEdit: boolean): void => {
         this.eventSvc.$broadcast('element-saving', true)
         const saveEdit = this.edit
         this.componentSvc.clearAutosave(
@@ -528,7 +528,7 @@ export class SpecService implements Injectable<any> {
     }
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
-    public cleanUpSaveAll(): void {
+    public cleanUpSaveAll = (): void => {
         if (this.autosaveSvc.openEdits() > 0) {
             this.eventSvc.$broadcast(this.toolbarSvc.constants.SETPERMISSION, {
                 id: 'spec-editor-saveall',

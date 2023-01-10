@@ -14,7 +14,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -78,7 +78,7 @@ export class TranscludeDocController
     static $inject = Transclusion.$inject
 
     constructor(
-        $q: angular.IQService,
+        $q: VeQService,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
         $element: JQuery<HTMLElement>,
@@ -313,7 +313,7 @@ export const TranscludeDocComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
-        mmsCallback: '&',,
+        mmsCallback: '&',
     },
     require: {
         mmsViewCtrl: '?^view',

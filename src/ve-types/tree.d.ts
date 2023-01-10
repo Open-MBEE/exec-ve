@@ -10,6 +10,7 @@ import { ElementObject, ViewObject } from '@ve-types/mms'
 export interface TreeBranch extends ITreeNode {
     label: string
     type: string
+    priority?: number
     group?: ElementObject
     data: ViewObject
     children: TreeBranch[]
@@ -139,6 +140,7 @@ declare namespace AngularUITree {
     interface ITreeNodeScope extends angular.IScope {
         $element: JQuery<HTMLElement>
         $modelValue: any // Model value for node;
+        $nodeScope: ITreeNodeScope // uiTreeNode Scope of this node
         $parentNodeScope: IParentTreeNodeScope[] // uiTreeNode Scope of parent node;
         $childNodesScope: ITreeNodeScope[] // uiTreeNodes Scope of child nodes.
         $parentNodesScope: angular.IScope // uiTreeNodes Scope of parent nodes.

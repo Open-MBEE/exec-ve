@@ -2,9 +2,9 @@ import angular from 'angular'
 
 import { veComponents } from '@ve-components'
 
-import { PresentationComponentOptions } from '@ve-types/components'
+import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 
-const PresentTableTComponent: PresentationComponentOptions = {
+const PresentTableTComponent: IPresentationComponentOptions = {
     selector: 'presentTableT',
     template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
 `,

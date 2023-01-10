@@ -1,5 +1,6 @@
 import { StateService } from '@uirouter/angularjs'
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
+import _ from 'lodash'
 
 import { AppUtilsService } from '@ve-app/main/services'
 import { TreeService, TreeApi } from '@ve-core/tree'
@@ -30,7 +31,7 @@ import {
  * @requires veUtils/AppUtilsService
  * @requires veUtils/TreeService
  */
-class ReorderController implements angular.IComponentController {
+class ReorderController implements IComponentController {
     //bindings
     private documentOb: ViewObject
 
@@ -99,15 +100,22 @@ class ReorderController implements angular.IComponentController {
                 this.handleSingleView,
                 this.handleChildren
             )
-            .then((docNode: TreeBranch) => {
-                let num = 1
-                docNode.children.forEach((node) => {
-                    this.updateNumber(node, num + '', 'old')
-                    this.updateNumber(node, num + '', 'new')
-                    num++
-                })
-                this.tree = [docNode]
-            })
+            .then(
+                (docNode: TreeBranch) => {
+                    let num = 1
+                    docNode.children.forEach((node) => {
+                        this.updateNumber(node, `${num}`, 'old')
+                        this.updateNumber(node, `${num}`, 'new')
+                        num++
+                    })
+                    this.tree = [docNode]
+                },
+                (reason) => {
+                    this.growl.error(
+                        'Error Getting Child Views: ' + reason.message
+                    )
+                }
+            )
         this.subs.push(
             this.eventSvc.$on('foobar', () => {
                 const root = this.tree
@@ -115,14 +123,14 @@ class ReorderController implements angular.IComponentController {
             })
         )
         this.treeOptions = {
-            dropped: (e) => {
-                this.$timeout(() => {
+            dropped: (e): void => {
+                void this.$timeout(() => {
                     for (let i = 0; i < this.tree.length; i++) {
                         const root = this.tree[i]
                         root.new = ''
                         let num = 1
                         for (let j = 0; j < root.children.length; j++) {
-                            this.updateNumber(root.children[j], num + '', 'new')
+                            this.updateNumber(root.children[j], `${num}`, 'new')
                             num++
                         }
                     }
@@ -139,23 +147,29 @@ class ReorderController implements angular.IComponentController {
             //         }
             //     }
             // },
-            dragStart: () => {},
-            accept: function (
+            dragStart: (): void => {
+                //Do Nothing
+            },
+            accept: (
                 sourceNodeScope: VeTreeNodeScope,
                 destNodeScope: VeTreeNodeScope,
                 destIndex
-            ) {
+            ): boolean => {
                 if (destNodeScope.$element.hasClass('root')) return false //don't allow moving to outside doc
                 return destNodeScope.node.aggr != 'none'
             },
         }
     }
 
-    public updateNumber = (node, curSection, key) => {
+    public updateNumber = (
+        node: TreeBranch,
+        curSection: string,
+        key: string
+    ): void => {
         node[key] = curSection
         let num = 1
         for (let i = 0; i < node.children.length; i++) {
-            this.updateNumber(node.children[i], curSection + '.' + num, key)
+            this.updateNumber(node.children[i], `${curSection}.${num}`, key)
             num++
         }
     }
@@ -181,7 +195,10 @@ class ReorderController implements angular.IComponentController {
         return curNode
     }
 
-    public handleChildren = (curNode: TreeBranch, childNodes: TreeBranch[]) => {
+    public handleChildren = (
+        curNode: TreeBranch,
+        childNodes: TreeBranch[]
+    ): void => {
         const newChildNodes: TreeBranch[] = []
         for (let i = 0; i < childNodes.length; i++) {
             const node: TreeBranch = childNodes[i]
@@ -191,10 +208,10 @@ class ReorderController implements angular.IComponentController {
             this.seenViewIds[node.data.id] = node
             newChildNodes.push(node)
         }
-        curNode.children.push.apply(curNode.children, newChildNodes)
+        curNode.children.push(...newChildNodes)
     }
 
-    public save = () => {
+    public save = (): void => {
         if (this.saving) {
             this.growl.info('please wait')
             return
@@ -258,7 +275,7 @@ class ReorderController implements angular.IComponentController {
                     this.navigate(true)
                 },
                 (response) => {
-                    const reason = response.failedRequests[0]
+                    const reason = response.data.failedRequests[0]
                     const errorMessage = reason.message
                     if (reason.status === 409) {
                         this.growl.error(
@@ -275,20 +292,24 @@ class ReorderController implements angular.IComponentController {
             })
     }
 
-    public cancel = () => {
+    public cancel = (): void => {
         this.navigate(false)
     }
 
-    public navigate = (reload) => {
+    public navigate = (reload: boolean): void => {
         const curBranch = this.treeApi.getSelectedBranch()
         if (!curBranch) {
-            this.$state.go('main.project.ref.document', {}, { reload: true })
+            void this.$state.go(
+                'main.project.ref.document',
+                {},
+                { reload: true }
+            )
         } else {
             let goToId: string = curBranch.data.id
             if (curBranch.type !== 'section' && curBranch.type !== 'view') {
                 goToId = curBranch.viewId ? curBranch.viewId : ''
             }
-            this.$state.go(
+            void this.$state.go(
                 'main.project.ref.document.view',
                 { viewId: goToId },
                 { reload: reload }

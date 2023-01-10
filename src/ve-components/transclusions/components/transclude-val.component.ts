@@ -20,14 +20,14 @@ import {
 
 import { PropertySpec, veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import { SlotObject, ValueObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
  * @name veComponents/TranscludeValController
  *
- * @requires {angular.IQService} $q
+ * @requires {VeQService} $q
  * @requires {angular.IScope} $scope
  * @requires {angular.ICompileService} $compile
  * @requires {JQuery<HTMLElement>} $element
@@ -83,7 +83,7 @@ export class TranscludeValController
     <span ng-switch-default>{{$ctrl.first ? $ctrl.values : value}}</span>
 </span>
 `
-    editTemplate = `
+    previewTemplate = `
     <div class="panel panel-info">
     <span ng-repeat="value in $ctrl.editValues" ng-switch on="value.type">
         <span ng-switch-when="LiteralInteger">{{value.value}}</span>
@@ -97,7 +97,7 @@ export class TranscludeValController
     </span>
 </div>
 `
-    frameTemplate = `
+    editTemplate = `
     <div class="panel panel-default no-print">
     <div ng-if="!$ctrl.mmsSpecEditorCtrl" class="panel-heading clearfix">
         <h3 class="panel-title pull-left">Value : {{element.name}}</h3>
@@ -183,7 +183,7 @@ export class TranscludeValController
     static $inject = [...Transclusion.$inject, 'SpecService']
 
     constructor(
-        $q: angular.IQService,
+        $q: VeQService,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
         $element: JQuery<HTMLElement>,
@@ -336,7 +336,7 @@ export class TranscludeValController
             }
         } else {
             if (preview) {
-                deferred.resolve(this.editTemplate)
+                deferred.resolve(this.previewTemplate)
             } else {
                 if (this.first) {
                     this.values = [this.values[0]]
@@ -360,7 +360,7 @@ export class TranscludeValController
                 this,
                 isEditable,
                 this.$element,
-                this.frameTemplate,
+                this.editTemplate,
                 false
             )
             return
@@ -372,7 +372,7 @@ export class TranscludeValController
                     this,
                     isEditable,
                     this.$element,
-                    this.frameTemplate,
+                    this.editTemplate,
                     false
                 )
             },
@@ -381,7 +381,7 @@ export class TranscludeValController
                     this,
                     isEditable,
                     this.$element,
-                    this.frameTemplate,
+                    this.editTemplate,
                     false
                 )
                 this.growl.error(
@@ -417,7 +417,7 @@ export const TranscludeValComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
-        mmsCallback: '&',,
+        mmsCallback: '&',
         first: '<',
     },
     transclude: true,

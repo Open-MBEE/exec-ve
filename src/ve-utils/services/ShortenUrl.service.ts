@@ -11,6 +11,7 @@ import { veUtils } from '@ve-utils'
 
 import { UtilsService } from './Utils.service'
 
+import { VeQService } from '@ve-types/angular'
 import { ParamsObject, ShortUrlRequest } from '@ve-types/mms'
 
 export class ShortenUrlService {
@@ -31,7 +32,7 @@ export class ShortenUrlService {
 
     constructor(
         private $http,
-        private $q: angular.IQService,
+        private $q: VeQService,
         private uRLSvc: URLService,
         private projectSvc: ProjectService,
         private viewSvc: ViewService,
@@ -176,7 +177,7 @@ export class ShortenUrlService {
         )
     }
 
-    public getShortUrl(paramOb: ShortUrlRequest): string {
+    public getShortUrl = (paramOb: ShortUrlRequest): string => {
         const ids: string[] = []
         const sPId = paramOb.projectId.split(/[-_]+/)
         ids.push(sPId[sPId.length - 1])
@@ -192,9 +193,9 @@ export class ShortenUrlService {
             const sVId = paramOb.viewId.split(/[-_]+/)
             ids.push(sVId[sVId.length - 1])
         }
-        let result = `${this.uRLSvc.getUrl().toString()}/link/`
+        let result = `${this.uRLSvc.getUrl().toString()}/s/`
         ids.forEach((id) => {
-            result += `_${id}`
+            result += `-${id}`
         })
         return result
     }

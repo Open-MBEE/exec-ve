@@ -12,7 +12,8 @@ import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { PresentationComponentOptions } from '@ve-types/components'
+import { IPresentationComponentOptions } from '@ve-types/components/presentation'
+import { PresentListObject } from '@ve-types/mms'
 
 class PresentListController extends Presentation {
     static $inject = Presentation.$inject
@@ -45,11 +46,11 @@ class PresentListController extends Presentation {
     }
 
     protected getContent = (): string => {
-        return this.viewHtmlSvc.makeHtmlList(this.peObject)
+        return this.viewHtmlSvc.makeHtmlList(this.peObject as PresentListObject)
     }
 }
 
-const PresentListComponent: PresentationComponentOptions = {
+const PresentListComponent: IPresentationComponentOptions = {
     selector: 'presentList',
     template: ``,
     bindings: {

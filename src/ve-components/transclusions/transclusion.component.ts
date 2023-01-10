@@ -1,4 +1,4 @@
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
 
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
@@ -27,7 +27,7 @@ import { RequestObject } from '@ve-types/mms'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  */
 
-export class TransclusionController implements angular.IComponentController {
+export class TransclusionController implements IComponentController {
     //Bindings
     mmsElementId: string
     mmsProjectId: string

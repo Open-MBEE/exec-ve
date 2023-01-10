@@ -11,7 +11,6 @@ import {
     ButtonBarService,
     IButtonBarButton,
 } from '@ve-core/button-bar'
-import { EditingApi } from '@ve-core/editor'
 import { AuthService, ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
@@ -22,8 +21,9 @@ import {
 } from '@ve-utils/services'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
-import { VePromise } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
+import { EditingToolbar, EditingApi } from '@ve-types/core/editor'
 import {
     ElementObject,
     InstanceSpecObject,
@@ -57,13 +57,6 @@ export interface ITransclusion
     addValue?(type: string): void
     removeVal?(i: number): void
     addEnumerationValue?(): void
-
-    save?(e?): void
-    saveC?(e?): void
-    cancel?(e?): void
-    startEdit?(e?): void
-    preview?(e?): void
-    delete?(e?): void
 }
 
 export interface TranscludeScope extends IPaneScope {
@@ -105,7 +98,7 @@ export interface TranscludeScope extends IPaneScope {
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class Transclusion implements ITransclusion {
+export class Transclusion implements ITransclusion, EditingToolbar {
     //Regex
     fixPreSpanRegex: RegExp = /<\/span>\s*<mms-cf/g
     fixPostSpanRegex: RegExp = /<\/mms-cf>\s*<span[^>]*>/g
@@ -176,12 +169,15 @@ export class Transclusion implements ITransclusion {
 
     public schema = 'cameo'
 
-    public save?(e?): void
-    public saveC?(e?): void
-    public cancel?(e?): void
-    public startEdit?(e?): void
-    public preview?(e?): void
-    public delete?(e?): void
+    //Default Toolbar Api
+    /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
+    cancel(e?): void {}
+    delete(e?): void {}
+    preview(e?): void {}
+    save(e?): void {}
+    saveC(e?): void {}
+    startEdit(e?): void {}
+    /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
 
     static $inject: string[] = [
         '$q',
@@ -202,7 +198,7 @@ export class Transclusion implements ITransclusion {
     ]
 
     constructor(
-        public $q: angular.IQService,
+        public $q: VeQService,
         public $scope: angular.IScope,
         protected $compile: angular.ICompileService,
         protected $element: JQuery<HTMLElement>,
@@ -304,7 +300,7 @@ export class Transclusion implements ITransclusion {
         )
     }
 
-    protected changeAction: onChangesCallback = (
+    protected changeAction: onChangesCallback<string> = (
         newVal,
         oldVal,
         firstChange

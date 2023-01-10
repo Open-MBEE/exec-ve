@@ -16,7 +16,10 @@ import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { PresentationComponentOptions, TableConfig } from '@ve-types/components'
+import {
+    IPresentationComponentOptions,
+    ITableConfig,
+} from '@ve-types/components/presentation'
 import { PresentTableObject, TableEntryObject } from '@ve-types/mms'
 
 interface TableEvent {
@@ -30,7 +33,7 @@ class PresentTableController extends Presentation implements IPresentation {
     public $captionEl: JQuery<HTMLTableCaptionElement>
 
     public table: PresentTableObject
-    public tableConfig: TableConfig
+    public tableConfig: ITableConfig
     private trs: JQuery<HTMLElement>
     public ngModelOptions: INgModelOptions
     public showFilter: boolean = false
@@ -256,7 +259,7 @@ class PresentTableController extends Presentation implements IPresentation {
 
     /** Add column(s)-wise filter ability **/
     public addColumnsWiseFilter = (
-        tableConfig: TableConfig,
+        tableConfig: ITableConfig,
         trs: JQuery<HTMLElement>
     ): void => {
         this._addWatchersForAllHeaderColumnsInput(tableConfig)
@@ -282,7 +285,7 @@ class PresentTableController extends Presentation implements IPresentation {
 
     /** Add watchers to all header columns inputs for filtering **/
     private _addWatchersForAllHeaderColumnsInput = (
-        tableConfig: TableConfig
+        tableConfig: ITableConfig
     ): void => {
         if (!this.table.header) {
             return
@@ -663,17 +666,10 @@ class PresentTableController extends Presentation implements IPresentation {
             downloadLink.attr('target', '_blank')
 
             this.$document.find('body').append(downloadContainer)
-            this.$timeout(() => {
+            void this.$timeout(() => {
                 downloadLink[0].click()
                 downloadLink.remove()
-            }, null).then(
-                () => {
-                    /* Do Nothing */
-                },
-                () => {
-                    /* Do Nothing */
-                }
-            )
+            }, null)
         } else {
             this.growl.error('Error generating CSV; Please Try Again')
         }
@@ -868,7 +864,7 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 }
 
-const PresentTableComponent: PresentationComponentOptions = {
+const PresentTableComponent: IPresentationComponentOptions = {
     selector: 'presentTable',
     template: `
     <div class="tableSearch ve-table-filter">

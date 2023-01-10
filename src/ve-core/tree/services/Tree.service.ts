@@ -1,14 +1,11 @@
 import angular from 'angular'
 
 import { TreeApi } from '@ve-core/tree'
-import {
-    ApplicationService,
-    EventService,
-    RootScopeService,
-} from '@ve-utils/services'
+import { ApplicationService, EventService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
+import { VePromiseReason, VeQService } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
 import { TreeBranch, TreeConfig } from '@ve-types/tree'
 
@@ -42,17 +39,26 @@ export class TreeService {
         'view-none',
     ]
 
-    static $inject = ['$timeout', 'ApplicationService', 'EventService']
+    static $inject = [
+        '$q',
+        '$timeout',
+        'growl',
+        'ApplicationService',
+        'EventService',
+    ]
 
     constructor(
+        private $q: VeQService,
         private $timeout: angular.ITimeoutService,
+        private growl: angular.growl.IGrowlService,
         private applicationSvc: ApplicationService,
         private eventSvc: EventService
     ) {}
 
-    getApi(config?: TreeConfig): TreeApi {
+    getApi = (config?: TreeConfig): TreeApi => {
         if (config && !this.treeApi)
             this.treeApi = new TreeApi(
+                this.$q,
                 this.$timeout,
                 this.eventSvc,
                 config,
@@ -61,9 +67,10 @@ export class TreeService {
         return this.treeApi
     }
 
-    getPeApi(config: TreeConfig): TreeApi {
+    getPeApi = (config: TreeConfig): TreeApi => {
         if (!this.peTreeApis[config.id])
             this.peTreeApis[config.id] = new TreeApi(
+                this.$q,
                 this.$timeout,
                 this.eventSvc,
                 config,
@@ -72,47 +79,57 @@ export class TreeService {
         return this.peTreeApis[config.id]
     }
 
-    getAllPeApi() {
+    getAllPeApi(): { [key: string]: TreeApi } {
         return this.peTreeApis
     }
 
-    destroyPeApi(id: string) {
+    destroyPeApi = (id: string): void => {
         delete this.peTreeApis[id]
     }
 
     // Function to refresh pe tree when new item added, deleted or reordered
-    refreshPeTrees(cb?: () => void) {
+    public refreshPeTrees = (cb?: () => void): void => {
         Object.keys(this.peTreeApis).forEach((id) => {
             this.refreshPeTree(id, cb)
         })
     }
 
-    refreshPeTree(treeId: string, cb?: () => void) {
+    public refreshPeTree = (treeId: string, cb?: () => void): void => {
         if (this.peTreeApis[treeId]) {
             const api = this.peTreeApis[treeId]
             api.treeData.length = 0
-            this.getPeTreeData(
-                this.treeApi.getRows()[0].branch,
-                api.treeConfig.types,
-                api.treeData
-            )
-            api.refresh().then(() => {
-                if (cb) cb()
-            })
+            const rows = this.treeApi.getRows()
+            if (rows.length > 0) {
+                this._getPeTreeData(
+                    rows[0].branch,
+                    api.treeConfig.types,
+                    api.treeData
+                )
+                api.refresh().then(
+                    () => {
+                        if (cb) cb()
+                    },
+                    (reason) => {
+                        this.growl.error(
+                            'Unable to refresh numbering: ' + reason.message
+                        )
+                    }
+                )
+            }
         }
     }
 
     // Get a list of specific PE type from branch
-    getPeTreeData(
+    private _getPeTreeData = (
         branch: TreeBranch,
         types: string[],
         peTreeData: TreeBranch[]
-    ) {
+    ): void => {
         if (types.includes(branch.type)) {
             peTreeData.push(branch)
         }
         for (let i = 0; i < branch.children.length; i++) {
-            this.getPeTreeData(branch.children[i], types, peTreeData)
+            this._getPeTreeData(branch.children[i], types, peTreeData)
         }
     }
 
@@ -120,65 +137,64 @@ export class TreeService {
      * @name veUtils/TreeService#buildTreeHierarchy
      * builds hierarchy of tree branch objects
      *
-     * @param {array} array array of objects
-     * @param {string} id key of id field
+     * @param {array} elementObs array of objects
+     * @param {string} idKey key of id field
      * @param {string} type type of object
-     * @param {object} parent key of parent field
-     * @param {angular.IComponentController} ctrl
+     * @param {string} parentKey key of parent field
      * @param {callback} level2_Func function to get child objects
      * @returns {void} root node
      */
     public buildTreeHierarchy = (
-        array: ElementObject[],
-        id: string,
+        elementObs: ElementObject[],
+        idKey: string,
         type: string,
-        parent: string,
-        ctrl: angular.IComponentController,
-        level2_Func
+        parentKey: string,
+        level2_Func: (elementOb: ElementObject, node: TreeBranch) => void
     ): TreeBranch[] => {
         const rootNodes: TreeBranch[] = []
         const data2Node: { [key: string]: TreeBranch } = {}
-        let data = null
-        // make first pass to create all nodes
-        for (let i = 0; i < array.length; i++) {
-            data = array[i]
-            data2Node[data[id]] = {
-                label: data.name,
+        elementObs.forEach((elementOb) => {
+            data2Node[elementOb[idKey] as string] = {
+                label: elementOb.name,
                 type: type,
-                data: data,
+                data: elementOb,
                 children: [],
                 loading: true,
             }
-        }
+        })
+
         // make second pass to associate data to parent nodes
-        for (let i = 0; i < array.length; i++) {
-            data = array[i]
-            if (data2Node[data[id]].type === 'group') {
-                data2Node[data[id]].loading = false
+        elementObs.forEach((elementOb) => {
+            if (data2Node[elementOb[idKey] as string].type === 'group') {
+                data2Node[elementOb[idKey] as string].loading = false
             }
-            // If theres an element in data2Node whose key matches the 'parent' value in the array element
+            // If there's an element in data2Node whose key matches the 'parent' value in the array element
             // add the array element to the children array of the matched data2Node element
-            if (data[parent] && data2Node[data[parent]]) {
+            if (
+                elementOb[parentKey] &&
+                data2Node[elementOb[parentKey] as string]
+            ) {
                 //bad data!
-                data2Node[data[parent]].children.push(data2Node[data[id]])
+                data2Node[elementOb[parentKey] as string].children.push(
+                    data2Node[elementOb[idKey] as string]
+                )
             } else {
                 // If theres not an element in data2Node whose key matches the 'parent' value in the array element
                 // it's a "root node" and so it should be pushed to the root nodes array along with its children
 
-                rootNodes.push(data2Node[data[id]])
+                rootNodes.push(data2Node[elementOb[idKey] as string])
             }
-        }
+        })
 
         //apply level2 function if available
         if (level2_Func) {
-            for (let i = 0; i < array.length; i++) {
-                data = array[i]
-                const level1_parentNode = data2Node[data[id]]
-                level2_Func(ctrl, data, level1_parentNode)
-            }
+            elementObs.forEach((elementOb) => {
+                const level1_parentNode = data2Node[elementOb[idKey] as string]
+                level2_Func(elementOb, level1_parentNode)
+            })
         }
 
-        const sortFunction = (a, b) => {
+        const sortFunction = (a: TreeBranch, b: TreeBranch): number => {
             if (a.children.length > 1) {
                 a.children.sort(sortFunction)
             }
@@ -257,21 +273,9 @@ export class TreeService {
         }
     }
 
-    // public refreshNumbering(tree, centerElement) {
-    //     this.utilsSvc.makeTablesAndFiguresTOC(tree, centerElement, true, false);
-    // };
-
-    // getChangeTypeName = (type: string): string => {
-    //     type = type.toLowerCase()
-    //     switch (type) {
-    //         case 'added':
-    //             return 'Addition'
-    //         case 'updated':
-    //             return 'Modification'
-    //         case 'removed':
-    //             return 'Removal'
-    //     }
-    // }
+    static treeError(reason: VePromiseReason<unknown>): string {
+        return 'Error refreshing tree: ' + reason.message
+    }
 }
 
 veCore.service('TreeService', TreeService)

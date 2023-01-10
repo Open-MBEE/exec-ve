@@ -1,3 +1,3 @@
-import "./angularjs-dropdown-multiselect.module";
+import './angularjs-dropdown-multiselect.module'
 
-import "./directives";
+import './directives'

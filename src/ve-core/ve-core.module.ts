@@ -83,7 +83,11 @@ veCore
         '$sceProvider',
         'growlProvider',
         'uiTreeFilterSettingsProvider',
-        ($sceProvider, growlProvider, uiTreeFilterSettingsProvider) => {
+        (
+            $sceProvider: angular.ISCEProvider,
+            growlProvider: angular.growl.IGrowlProvider,
+            uiTreeFilterSettingsProvider
+        ): void => {
             $sceProvider.enabled(false)
             growlProvider.onlyUniqueMessages(false)
             growlProvider.globalTimeToLive({

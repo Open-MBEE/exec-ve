@@ -1,13 +1,16 @@
-(() => {
-    const TextDiff = require('diff/lib/diff/word');
-    const VirtualDomDiff = require('virtual-dom/diff');
-    const VirtualText = require('virtual-dom/vnode/vtext');
-    const VirtualNode = require('virtual-dom/vnode/vnode');
-    const IsVNode = require('virtual-dom/vnode/is-vnode');
-    const IsVText = require('virtual-dom/vnode/is-vtext');
-    const VPATCH = require('virtual-dom/vnode/vpatch');
-    const ToHtml = require('vdom-to-html');
-    const ToVNode = require('html-to-vdom')({VNode: VirtualNode, VText: VirtualText});
+;(function () {
+    const TextDiff = require('diff/lib/diff/word')
+    const VirtualDomDiff = require('virtual-dom/diff')
+    const VirtualText = require('virtual-dom/vnode/vtext')
+    const VirtualNode = require('virtual-dom/vnode/vnode')
+    const IsVNode = require('virtual-dom/vnode/is-vnode')
+    const IsVText = require('virtual-dom/vnode/is-vtext')
+    const VPATCH = require('virtual-dom/vnode/vpatch')
+    const ToHtml = require('vdom-to-html')
+    const ToVNode = require('@openmbee/html-to-vdom')({
+        VNode: VirtualNode,
+        VText: VirtualText,
+    })
 
     let api = {
         generateDiff: generateDiff,
@@ -20,19 +23,18 @@
         _applyVTextPatch: applyVTextPatch,
         _applyInsertPatch: applyInsertPatch,
         _applyRemovePatch: applyRemovePatch,
-        _applyVPropsPatch: applyVPropsPatch
-    };
+        _applyVPropsPatch: applyVPropsPatch,
+    }
 
     if (typeof window !== 'undefined') {
-        window.HtmlRenderedDiff = api;
+        window.HtmlRenderedDiff = api
     }
 
     if (typeof module !== 'undefined') {
-        module.exports = api;
+        module.exports = api
     }
 
-
-    let allNodesRequiredToPatch = [];
+    let allNodesRequiredToPatch = []
 
     /**
      * Patches is an object with this format {'a': original tree, 0: virtualPatch or [virtualPatch..], 1: virtualPatch or [VirtualPatch...]}
@@ -54,147 +56,227 @@
      * **/
     function patcher(patches) {
         if (!patches) {
-            return;
+            return
         }
 
-        let listOfPatches = getAllPatches(patches);
-        allNodesRequiredToPatch = getNodesNeedPatching(listOfPatches);
-        let originalTree = patches['a'];
+        let listOfPatches = getAllPatches(patches)
+        allNodesRequiredToPatch = getNodesNeedPatching(listOfPatches)
+        let originalTree = patches['a']
         listOfPatches.forEach((virtualPatch) => {
             switch (virtualPatch.type) {
                 case VPATCH.VNODE:
-                    applyVNodePatch(virtualPatch, originalTree);
-                    break;
+                    applyVNodePatch(virtualPatch, originalTree)
+                    break
                 case VPATCH.PROPS:
-                    applyVPropsPatch(virtualPatch, originalTree, allNodesRequiredToPatch);
-                    break;
+                    applyVPropsPatch(
+                        virtualPatch,
+                        originalTree,
+                        allNodesRequiredToPatch
+                    )
+                    break
                 case VPATCH.VTEXT:
-                    applyVTextPatch(virtualPatch, originalTree);
-                    break;
+                    applyVTextPatch(virtualPatch, originalTree)
+                    break
                 case VPATCH.INSERT:
-                    applyInsertPatch(virtualPatch);
-                    break;
+                    applyInsertPatch(virtualPatch)
+                    break
                 case VPATCH.REMOVE:
-                    applyRemovePatch(virtualPatch, originalTree);
-                    break;
+                    applyRemovePatch(virtualPatch, originalTree)
+                    break
             }
-        });
-        return originalTree;
+        })
+        return originalTree
     }
 
     /** VirtualNode Patch ( against another VirtualNode|VirtualText )  **/
     function applyVNodePatch(virtualPatch, originalTree) {
-        let nodeToAdd = virtualPatch.patch; // this must be a VirtualNode
-        let nodeToRemove = virtualPatch.vNode; // this can be a VirtualNode or a VirtualText
-        let found = findNode(nodeToRemove, originalTree);
+        let nodeToAdd = virtualPatch.patch // this must be a VirtualNode
+        let nodeToRemove = virtualPatch.vNode // this can be a VirtualNode or a VirtualText
+        let found = findNode(nodeToRemove, originalTree)
         if (found) {
-            let wrapNodeToAdd = new VirtualNode('SPAN', {attributes: {class: 'patcher-replaceIn'}}, [nodeToAdd]);
-            let wrapNodeToRemove = new VirtualNode('SPAN', {attributes: {class: 'patcher-replaceOut'}}, [nodeToRemove]);
-            found.foundIn.splice(found.at, 1, wrapNodeToAdd);
-            found.foundIn.splice(found.at, 0, wrapNodeToRemove);
+            let wrapNodeToAdd = new VirtualNode(
+                'SPAN',
+                { attributes: { class: 'patcher-replaceIn' } },
+                [nodeToAdd]
+            )
+            let wrapNodeToRemove = new VirtualNode(
+                'SPAN',
+                { attributes: { class: 'patcher-replaceOut' } },
+                [nodeToRemove]
+            )
+            found.foundIn.splice(found.at, 1, wrapNodeToAdd)
+            found.foundIn.splice(found.at, 0, wrapNodeToRemove)
         } else {
-            console.log('Applying VNodePatch. This case is not possible');
+            console.log('Applying VNodePatch. This case is not possible')
         }
     }
 
     /** VirtualText Patch (against another VirtualNode|VirtualText **/
     function applyVTextPatch(virtualPatch, originalTree) {
-        let nodeToAdd = virtualPatch.patch;
-        let nodeToRemove = virtualPatch.vNode;
-        let found = findNode(nodeToRemove, originalTree);
+        let nodeToAdd = virtualPatch.patch
+        let nodeToRemove = virtualPatch.vNode
+        let found = findNode(nodeToRemove, originalTree)
         if (found) {
             if (IsVNode(nodeToRemove)) {
-                let wrapNodeToAdd = createWrapper('SPAN', 'patcher-replaceIn', [nodeToAdd]);
-                let wrapNodeToRemove = createWrapper('SPAN', 'patcher-replaceOut', [nodeToRemove]);
-                found.foundIn.splice(found.at, 1, wrapNodeToAdd);
-                found.foundIn.splice(found.at, 0, wrapNodeToRemove);
+                let wrapNodeToAdd = createWrapper('SPAN', 'patcher-replaceIn', [
+                    nodeToAdd,
+                ])
+                let wrapNodeToRemove = createWrapper(
+                    'SPAN',
+                    'patcher-replaceOut',
+                    [nodeToRemove]
+                )
+                found.foundIn.splice(found.at, 1, wrapNodeToAdd)
+                found.foundIn.splice(found.at, 0, wrapNodeToRemove)
             } else if (IsVText(nodeToRemove)) {
                 // text-diff
-                let diffResults = TextDiff.diffWords(nodeToRemove.text, nodeToAdd.text);
+                let diffResults = TextDiff.diffWords(
+                    nodeToRemove.text,
+                    nodeToAdd.text
+                )
                 if (diffResults.length > 0) {
-                    let childNodes = [];
+                    let childNodes = []
                     diffResults.forEach((result) => {
-                        let className = result.added ? 'patcher-text-insertion' : result.removed ? 'patcher-text-deletion' : 'patcher-text-same';
-                        childNodes.push(createWrapper('SPAN', className, [new VirtualText(result.value)]));
-                    });
+                        let className = result.added
+                            ? 'patcher-text-insertion'
+                            : result.removed
+                            ? 'patcher-text-deletion'
+                            : 'patcher-text-same'
+                        childNodes.push(
+                            createWrapper('SPAN', className, [
+                                new VirtualText(result.value),
+                            ])
+                        )
+                    })
 
-                    let topWrapper = createWrapper('SPAN', 'patcher-text-diff', childNodes);
-                    found.foundIn.splice(found.at, 1, topWrapper);
+                    let topWrapper = createWrapper(
+                        'SPAN',
+                        'patcher-text-diff',
+                        childNodes
+                    )
+                    found.foundIn.splice(found.at, 1, topWrapper)
                 }
             }
         } else {
-            console.log('applying VTextPatch. This case is not possible 2');
+            console.log('applying VTextPatch. This case is not possible 2')
         }
     }
 
     /** VirtualProps Patch **/
-    function applyVPropsPatch(virtualPatch, originalTree, allNodesRequiredToPatch) {
-        let nodeToPatch = virtualPatch.vNode;
-        let patchProperties = virtualPatch.patch;
-        applyVPropPatchHelper(nodeToPatch, patchProperties, originalTree, allNodesRequiredToPatch);
+    function applyVPropsPatch(
+        virtualPatch,
+        originalTree,
+        allNodesRequiredToPatch
+    ) {
+        let nodeToPatch = virtualPatch.vNode
+        let patchProperties = virtualPatch.patch
+        applyVPropPatchHelper(
+            nodeToPatch,
+            patchProperties,
+            originalTree,
+            allNodesRequiredToPatch
+        )
     }
 
     /** Helper function for applying property updates to VirtualNode. Only generate wrapper node to show
      * diff if an only if there are no other patches for nodeToPatch or its descendants **/
-    function applyVPropPatchHelper(nodeToPatch, patchProperties, originalTree, allNodesRequiredToPatch) {
-        const containPropWeCare = containsAllowedProps(patchProperties);
-        const affectedByOtherPatches = hasFurtherChanges(nodeToPatch, allNodesRequiredToPatch);
+    function applyVPropPatchHelper(
+        nodeToPatch,
+        patchProperties,
+        originalTree,
+        allNodesRequiredToPatch
+    ) {
+        const containPropWeCare = containsAllowedProps(patchProperties)
+        const affectedByOtherPatches = hasFurtherChanges(
+            nodeToPatch,
+            allNodesRequiredToPatch
+        )
         if (containPropWeCare && !affectedByOtherPatches) {
-            let cloneOfNodeToPatch = new VirtualNode(nodeToPatch.tagName, {}, nodeToPatch.children);
-            deepCopyProperties(nodeToPatch.properties, cloneOfNodeToPatch.properties);
-            deepCopyProperties(patchProperties, nodeToPatch.properties);
+            let cloneOfNodeToPatch = new VirtualNode(
+                nodeToPatch.tagName,
+                {},
+                nodeToPatch.children
+            )
+            deepCopyProperties(
+                nodeToPatch.properties,
+                cloneOfNodeToPatch.properties
+            )
+            deepCopyProperties(patchProperties, nodeToPatch.properties)
 
-            let wrapBefore = createWrapper('SPAN', 'patcher-attribute-replace-out', [cloneOfNodeToPatch]);
-            let wrapAfter = createWrapper('SPAN', 'patcher-attribute-replace-in', [nodeToPatch]);
-            let found = findNode(nodeToPatch, originalTree);
+            let wrapBefore = createWrapper(
+                'SPAN',
+                'patcher-attribute-replace-out',
+                [cloneOfNodeToPatch]
+            )
+            let wrapAfter = createWrapper(
+                'SPAN',
+                'patcher-attribute-replace-in',
+                [nodeToPatch]
+            )
+            let found = findNode(nodeToPatch, originalTree)
             if (found) {
                 // add it
-                let foundIn = found.foundIn;
-                let at = found.at;
-                foundIn.splice(at, 1, wrapAfter);
-                foundIn.splice(at, 0, wrapBefore);
+                let foundIn = found.foundIn
+                let at = found.at
+                foundIn.splice(at, 1, wrapAfter)
+                foundIn.splice(at, 0, wrapBefore)
             } else {
-                console.log('Applying prop patch. This is not possible');
+                console.log('Applying prop patch. This is not possible')
             }
         } else {
             // just need to apply property changes
-            deepCopyProperties(patchProperties, nodeToPatch.properties);
+            deepCopyProperties(patchProperties, nodeToPatch.properties)
         }
     }
 
     /** Insert Patch. We are only gonna wrap if nodeToInsert is a VText to avoid issue with table  **/
     function applyInsertPatch(virtualPatch) {
-        let nodeToInsert = virtualPatch.patch;
-        let whereToInsert = virtualPatch.vNode;
+        let nodeToInsert = virtualPatch.patch
+        let whereToInsert = virtualPatch.vNode
         if (IsVText(nodeToInsert)) {
-            whereToInsert.children.push(new VirtualNode('SPAN', {attributes: {class: 'patcher-insert'}}, [nodeToInsert]));
+            whereToInsert.children.push(
+                new VirtualNode(
+                    'SPAN',
+                    { attributes: { class: 'patcher-insert' } },
+                    [nodeToInsert]
+                )
+            )
         } else if (IsVNode(nodeToInsert)) {
-
-            if (nodeToInsert.properties.attributes && nodeToInsert.properties.attributes.class) {
-                nodeToInsert.properties.attributes.class += ' patcher-insert';
+            if (
+                nodeToInsert.properties.attributes &&
+                nodeToInsert.properties.attributes.class
+            ) {
+                nodeToInsert.properties.attributes.class += ' patcher-insert'
             } else {
-                nodeToInsert.properties.attributes.class = 'patcher-insert';
+                nodeToInsert.properties.attributes.class = 'patcher-insert'
             }
-            whereToInsert.children.push(nodeToInsert);
+            whereToInsert.children.push(nodeToInsert)
         }
-
     }
 
     /** Remove this from sourceNode. We are only gonna wrap if nodeToInsert is a VText to avoid issue with table  **/
     function applyRemovePatch(virtualPatch, sourceNode) {
-        let nodeToDelete = virtualPatch.vNode;
-        let found = findNode(nodeToDelete, sourceNode);
+        let nodeToDelete = virtualPatch.vNode
+        let found = findNode(nodeToDelete, sourceNode)
         if (found) {
             if (IsVText(nodeToDelete)) {
-                let wrapDeleteNode = new VirtualNode('SPAN', {attributes: {class: 'patcher-delete'}}, [nodeToDelete]);
-                found.foundIn.splice(found.at, 1, wrapDeleteNode);
+                let wrapDeleteNode = new VirtualNode(
+                    'SPAN',
+                    { attributes: { class: 'patcher-delete' } },
+                    [nodeToDelete]
+                )
+                found.foundIn.splice(found.at, 1, wrapDeleteNode)
             } else {
-                if (nodeToDelete.properties.attributes && nodeToDelete.properties.attributes.class) {
-                    nodeToDelete.properties.attributes.class += ' patcher-delete';
+                if (
+                    nodeToDelete.properties.attributes &&
+                    nodeToDelete.properties.attributes.class
+                ) {
+                    nodeToDelete.properties.attributes.class +=
+                        ' patcher-delete'
                 } else {
-                    nodeToDelete.properties.attributes.class = 'patcher-delete';
+                    nodeToDelete.properties.attributes.class = 'patcher-delete'
                 }
-                found.foundIn.splice(found.at, 1, nodeToDelete);
+                found.foundIn.splice(found.at, 1, nodeToDelete)
             }
         }
     }
@@ -206,33 +288,36 @@
      *      Return {foundIn: array of where nodeToFind is in, at: index in that array}
      * **/
     function findNode(nodeToFind, sourceNode) {
-        if ((!IsVNode(nodeToFind) && !IsVText(nodeToFind)) || !IsVNode(sourceNode)) {
-            return false;
+        if (
+            (!IsVNode(nodeToFind) && !IsVText(nodeToFind)) ||
+            !IsVNode(sourceNode)
+        ) {
+            return false
         }
-        return helper(nodeToFind, sourceNode);
+        return helper(nodeToFind, sourceNode)
 
         function helper(nodeToFind, sourceNode) {
             if (IsVText(sourceNode)) {
-                return false;
+                return false
             }
-            let children = sourceNode.children;
+            let children = sourceNode.children
             // Look at child level
             for (let i = 0; i < children.length; i++) {
-                let childNode = children[i];
+                let childNode = children[i]
                 if (nodeToFind === childNode) {
-                    return {foundIn: children, at: i};
+                    return { foundIn: children, at: i }
                 }
             }
 
             // look at descendants
             for (let i = 0; i < children.length; i++) {
-                let childNode = children[i];
-                let found = helper(nodeToFind, childNode);
+                let childNode = children[i]
+                let found = helper(nodeToFind, childNode)
                 if (found) {
-                    return found;
+                    return found
                 }
             }
-            return false;
+            return false
         }
     }
 
@@ -242,20 +327,25 @@
      *      Return true, if successful. False if either parameter is not an object
      * **/
     function deepCopyProperties(fromHere, toHere) {
-        if (typeof fromHere !== 'object' || typeof toHere !== 'object' || fromHere === null || toHere === null) {
-            return false;
+        if (
+            typeof fromHere !== 'object' ||
+            typeof toHere !== 'object' ||
+            fromHere === null ||
+            toHere === null
+        ) {
+            return false
         }
         Object.entries(fromHere).forEach((entry) => {
-            let key = entry[0];
-            let value = entry[1];
+            let key = entry[0]
+            let value = entry[1]
             if (typeof value === 'string') {
-                toHere[key] = value;
+                toHere[key] = value
             } else if (typeof value === 'object') {
-                toHere[key] = {};
-                deepCopyProperties(value, toHere[key]);
+                toHere[key] = {}
+                deepCopyProperties(value, toHere[key])
             }
-        });
-        return true;
+        })
+        return true
     }
 
     /** Only the following properties should be considered during attribute diffing
@@ -266,17 +356,17 @@
      * **/
     function containsAllowedProps(properties) {
         if (properties === null || typeof properties !== 'object') {
-            return false;
+            return false
         }
         return Object.entries(properties).some((property) => {
-            let key = property[0];
-            let value = property[1];
+            let key = property[0]
+            let value = property[1]
             if (typeof value === 'string') {
-                return key === 'style' || key === 'src' || key === 'href';
+                return key === 'style' || key === 'src' || key === 'href'
             } else if (typeof value === 'object' && key === 'attributes') {
-                return 'class' in properties.attributes;
+                return 'class' in properties.attributes
             }
-        });
+        })
     }
 
     /** No further changes if nodeToPatch doesn't have children or if non of its descendants are affected by other patches
@@ -284,36 +374,42 @@
      *      Return true, if either nodeToPatch is not a VirtualNode or there is no more patches
      * **/
     function hasFurtherChanges(nodeToPatch, allNodesRequiredToPatch) {
-        if (!IsVNode(nodeToPatch) || nodeToPatch.children.length === 0 || allNodesRequiredToPatch.length === 0) {
-            return false;
+        if (
+            !IsVNode(nodeToPatch) ||
+            nodeToPatch.children.length === 0 ||
+            allNodesRequiredToPatch.length === 0
+        ) {
+            return false
         }
-        return helper(nodeToPatch);
+        return helper(nodeToPatch)
 
         function helper(nodeToPatch) {
             if (IsVText(nodeToPatch)) {
-                return false;
+                return false
             }
             // check at child level
             let isAffected = nodeToPatch.children.some((childNode) => {
-                let isAffected = allNodesRequiredToPatch.some((nodeNeedPatching) => {
-                    return nodeNeedPatching === childNode;
-                });
+                let isAffected = allNodesRequiredToPatch.some(
+                    (nodeNeedPatching) => {
+                        return nodeNeedPatching === childNode
+                    }
+                )
                 if (isAffected) {
-                    return true;
+                    return true
                 }
-            });
+            })
 
             if (isAffected) {
-                return true;
+                return true
             }
             // check at next level
             isAffected = nodeToPatch.children.some((childNode) => {
-                let isAffected = helper(childNode);
+                let isAffected = helper(childNode)
                 if (isAffected) {
-                    return true;
+                    return true
                 }
-            });
-            return isAffected;
+            })
+            return isAffected
         }
     }
 
@@ -322,24 +418,24 @@
      */
     function getAllPatches(patches) {
         if (!patches || typeof patches !== 'object') {
-            return [];
+            return []
         }
-        let results = [];
+        let results = []
         Object.entries(patches)
             .filter((entry) => {
                 return entry[0] !== 'a'
             })
             .forEach((entry) => {
-                let virtualPatch = entry[1]; // this could be an array (case where propPatch follow by multiple insertion patches
+                let virtualPatch = entry[1] // this could be an array (case where propPatch follow by multiple insertion patches
                 if (virtualPatch.constructor === Array) {
                     virtualPatch.forEach((patch) => {
-                        results.push(patch);
-                    });
+                        results.push(patch)
+                    })
                 } else {
-                    results.push(virtualPatch);
+                    results.push(virtualPatch)
                 }
-            });
-        return results;
+            })
+        return results
     }
 
     /** Return a list of Nodes that need patching
@@ -347,22 +443,28 @@
      * **/
     function getNodesNeedPatching(patches) {
         return patches.map((patch) => {
-            return patch.vNode;
-        });
+            return patch.vNode
+        })
     }
 
     /** Wrap VirtualNode|VirtualText **/
     function createWrapper(tagName, className, children) {
-        return new VirtualNode(tagName, {attributes: {class: className}}, children);
+        return new VirtualNode(
+            tagName,
+            { attributes: { class: className } },
+            children
+        )
     }
 
     function generateDiff(originalHtml, modifiedHtml) {
         // we need to wrap both parameter in a the same tag to avoid change at the root level
-        originalHtml = '<span>' + originalHtml + '</span>';
-        modifiedHtml = '<span>' + modifiedHtml + '</span>';
-        let patches = VirtualDomDiff(ToVNode(originalHtml), ToVNode(modifiedHtml));
-        let result = patcher(patches);
-        return ToHtml(result);
+        originalHtml = '<span>' + originalHtml + '</span>'
+        modifiedHtml = '<span>' + modifiedHtml + '</span>'
+        let patches = VirtualDomDiff(
+            ToVNode(originalHtml),
+            ToVNode(modifiedHtml)
+        )
+        let result = patcher(patches)
+        return ToHtml(result)
     }
-}());
-
+})()

@@ -1,3 +1,1 @@
-
-import "./left-pane.component";
-
+import './left-pane.component'

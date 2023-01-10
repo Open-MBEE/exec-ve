@@ -6,8 +6,12 @@ import CopyPlugin from 'copy-webpack-plugin'
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import * as webpack from 'webpack'
-import { AutomaticPrefetchPlugin, Compiler, Configuration } from 'webpack'
+import { PackageJson } from 'type-fest'
+import webpack, {
+    AutomaticPrefetchPlugin,
+    Compiler,
+    Configuration,
+} from 'webpack'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -16,13 +20,17 @@ import {
     VeExperimentDescriptor,
 } from '@ve-components/services'
 
-import packageJson from './package.json'
 import environment from './src/lib/environment'
 
 import { VeConfig } from '@ve-types/config'
 
 const sourceDir = './ve-custom'
 const extensionsDir = './src/ve-extensions'
+
+interface ArgV {
+    mode: 'none' | 'development' | 'production'
+    [key: string]: unknown
+}
 
 class WatchRunPlugin implements AutomaticPrefetchPlugin {
     apply(compiler: Compiler): void {
@@ -52,16 +60,18 @@ class WatchRunPlugin implements AutomaticPrefetchPlugin {
 }
 
 class SetupPlugin implements AutomaticPrefetchPlugin {
-    private readonly mode
-    private ran
+    private readonly mode: string
+    private ran: boolean
     constructor(mode) {
         this.mode = mode === 'development' ? '-dev' : ''
         this.ran = false
     }
     apply(compiler: Compiler): void {
-        compiler.hooks.beforeCompile.tap('Setup', async (comp) => {
+        compiler.hooks.beforeCompile.tap('Setup', (comp) => {
             const configObj: VeConfig =
-                (await require(`./config/${process.env.VE_ENV}.json`)) as VeConfig
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                require(`./config/${process.env.VE_ENV}.json`) as VeConfig
+
             if (this.ran) {
                 return
             }
@@ -108,8 +118,9 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                     if (ext.config) {
                         extConfPath = ext.config
                     }
-                    const extConf =
-                        (await require(extConfPath)) as VeExperimentConfig
+
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    const extConf = require(extConfPath) as VeExperimentConfig
                     for (const extType of validExt) {
                         if (
                             extConf[extType] &&
@@ -130,7 +141,8 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                     }
                 }
             }
-            await packageJson
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const packageJson = require('./package.json') as PackageJson
             configObj.version = `${packageJson.version}${this.mode}`
             fs.mkdirSync('./dist/config', { recursive: true })
             fs.writeFile(
@@ -146,7 +158,7 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
     }
 }
 
-const config = (env: any, argv: any): Configuration => ({
+const config = (env: any, argv: ArgV): Configuration => ({
     mode: argv.mode ? argv.mode : 'production',
     experiments: {
         topLevelAwait: true,
@@ -179,7 +191,22 @@ const config = (env: any, argv: any): Configuration => ({
         modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
         // Add '.ts' and '.tsx' as a resolvable extension.
         extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
-        alias: hq.get('webpack'),
+        alias: hq.get('webpack') as
+            | {
+                  /**
+                   * New request.
+                   */
+                  alias: string | false | string[]
+                  /**
+                   * Request to be redirected.
+                   */
+                  name: string
+                  /**
+                   * Redirect only exact matching request.
+                   */
+                  onlyModule?: boolean
+              }[]
+            | { [index: string]: string | false | string[] },
     },
     watchOptions: {
         aggregateTimeout: 300,

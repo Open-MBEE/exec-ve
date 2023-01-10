@@ -9,6 +9,7 @@ export interface OrgObject extends MmsObject {
 }
 
 export interface ProjectObject extends MmsObject {
+    _refId?: string
     schema?: string
     _creator?: string
     _docId?: string
@@ -37,4 +38,5 @@ export interface RefObject extends MmsObject {
     _projectId: string
     permission?: string
     parentCommitId?: string
+    timestamp?: Date
 }

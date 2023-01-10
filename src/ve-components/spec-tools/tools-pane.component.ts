@@ -3,7 +3,7 @@ import _ from 'lodash'
 import Rx from 'rx-lite'
 
 import { ComponentService, ExtensionService } from '@ve-components/services'
-import { IToolBarButton, ToolbarService } from '@ve-core/tool-bar'
+import { IToolBarButton, ToolbarService } from '@ve-core/toolbar'
 import {
     ElementService,
     ProjectService,
@@ -20,7 +20,7 @@ import { veComponents } from '@ve-components'
 import { ReorderService } from './services/Reorder.service'
 import { SpecApi, SpecService } from './services/Spec.service'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
@@ -53,10 +53,10 @@ import { VeModalService } from '@ve-types/view-editor'
     angular.module('app', ['veComponents'])
     .controller('SpecCtrl', ['$scope', function($scope) {
         $this.api = {}; //empty object to be populated by the spec api
-       public edit() {
+       public edit = () => {
             $this.api.setEditing(true);
         };
-       public save() {
+       public save = () => {
             $this.api.save()
             .then((e) => {
                 //success
@@ -153,7 +153,7 @@ class ToolsPaneController implements IComponentController {
         private $scope: angular.IScope,
         private $element: JQuery,
         private $uibModal: VeModalService,
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $timeout: angular.ITimeoutService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
         private growl: angular.growl.IGrowlService,
@@ -506,7 +506,7 @@ class ToolsPaneController implements IComponentController {
     //     this.specApi.commitId = this.mmsRefId;
     // }
 
-    public cleanUpEdit(editOb: ElementObject, cleanAll?: boolean): void {
+    public cleanUpEdit = (editOb: ElementObject, cleanAll?: boolean): void => {
         if (!this.componentSvc.hasEdits(editOb) || cleanAll) {
             const key =
                 editOb.id + '|' + editOb._projectId + '|' + editOb._refId
@@ -515,7 +515,7 @@ class ToolsPaneController implements IComponentController {
         }
     }
 
-    public save(continueEdit: boolean): void {
+    public save = (continueEdit: boolean): void => {
         if (this.elementSaving) {
             this.growl.info('Please Wait...')
             return
@@ -523,7 +523,7 @@ class ToolsPaneController implements IComponentController {
         this.specSvc.save(continueEdit)
     }
 
-    public etrackerChange(): void {
+    public etrackerChange = (): void => {
         this.specSvc.keepMode()
         const id = this.specSvc.tracker.etrackerSelected
         if (!id) return

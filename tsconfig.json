@@ -17,10 +17,8 @@
     "target": "es2017",
     "typeRoots": [
       "node_modules/@types",
-      "types"
-    ],
-    "exclude": [
-      "src/lib/ckeditor/ckeditor4.js"
+      "types",
+      "node_modules/type-fest/index.d.ts"
     ],
     "rootDir": "src",
     "paths": {
@@ -36,13 +34,24 @@
     },
     "skipLibCheck": true
   },
+  "exclude": [
+    "src/lib/ckeditor/ckeditor4.js",
+    "src/lib/html-rendered-diff/index.js",
+    "./webpack.config.ts",
+    "./webpack.dev.config.ts",
+    "types/**/*.ts"
+  ],
   "ts-node": {
-    "files": true,
     "compilerOptions": {
       "esModuleInterop": true,
+      "resolveJsonModule": true,
       "module": "CommonJS",
       "target": "es5",
       "rootDir": "."
     },
+    "include": [
+      "webpack.config.ts",
+      "webpack.dev.config.ts"
+    ]
   }
 }

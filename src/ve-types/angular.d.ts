@@ -4,6 +4,8 @@ import angular, {
     IHttpHeadersGetter,
     INgModelController,
     IPromise,
+    IQResolveReject,
+    IQService,
     IRequestConfig,
 } from 'angular'
 
@@ -11,6 +13,21 @@ import { ElementObject, ElementsResponse } from '@ve-types/mms'
 
 export interface VeComponentOptions extends IComponentOptions {
     selector: string
+}
+
+export interface VeQService extends IQService {
+    new <T, U>(
+        resolver: (
+            resolve: IQResolveReject<T>,
+            reject: IQResolveReject<VePromiseReason<U>>
+        ) => any
+    ): VePromise<T, U>
+    <T, U>(
+        resolver: (
+            resolve: IQResolveReject<T>,
+            reject: IQResolveReject<VePromiseReason<U>>
+        ) => any
+    ): VePromise<T, U>
 }
 
 export interface VePromise<T, U = ElementsResponse<T>> extends IPromise<T> {
@@ -26,7 +43,35 @@ export interface VePromise<T, U = ElementsResponse<T>> extends IPromise<T> {
               ) => PromiseLike<never> | PromiseLike<TResult2> | TResult2)
             | null,
         notifyCallback?: (state: unknown) => unknown
-    ): IPromise<TResult1 | TResult2>
+    ): VePromise<TResult1 | TResult2, U>
+    then<TResult1 = T, TResult2 = never>(
+        successCallback?:
+            | ((
+                  value: T
+              ) => PromiseLike<never> | PromiseLike<TResult1> | TResult1)
+            | null,
+        errorCallback?:
+            | ((
+                  reason: VePromiseReason<U>
+              ) => PromiseLike<never> | PromiseLike<TResult2> | TResult2)
+            | null,
+        notifyCallback?: (state: unknown) => unknown
+    ): VePromise<TResult1 | TResult2, U>
+
+    catch<TResult = never>(
+        onRejected?:
+            | ((
+                  reason: VePromiseReason<U>
+              ) => PromiseLike<never> | PromiseLike<TResult> | TResult)
+            | null
+    ): VePromise<T | TResult, U>
+    catch<TResult = never>(
+        onRejected?:
+            | ((
+                  reason: VePromiseReason<U>
+              ) => VePromise<never> | IPromise<TResult> | TResult)
+            | null
+    ): VePromise<T | TResult, U>
 }
 
 export interface VePromisesResponse<T> {

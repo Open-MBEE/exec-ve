@@ -6,7 +6,7 @@ import { handleChange } from '@ve-utils/utils'
 
 import { veCore } from '@ve-core'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import {
     CommitObject,
     ElementObject,
@@ -74,7 +74,7 @@ class MmsHistoryController implements IComponentController {
     ]
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $element: JQuery<HTMLElement>,
         private growl: angular.growl.IGrowlService,
         private elementSvc: ElementService,

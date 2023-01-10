@@ -4,6 +4,7 @@ import { URLService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
     PermissionsObject,
     PermissionsResponse,
@@ -31,7 +32,7 @@ export class PermissionsService {
     static $inject = ['$q', '$http', 'URLService']
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $http: angular.IHttpService,
         private uRLSvc: URLService
     ) {}
@@ -39,7 +40,7 @@ export class PermissionsService {
     public initializePermissions(
         projectOb: ProjectObject,
         refOb: RefObject
-    ): angular.IPromise<PermissionCache> {
+    ): VePromise<PermissionCache, PermissionsResponse> {
         const url = this.uRLSvc.getPermissionsLookupURL()
 
         const deferred = this.$q.defer<PermissionCache>()
@@ -91,21 +92,21 @@ export class PermissionsService {
         return deferred.promise
     }
 
-    public hasProjectEditPermission(projectOb: string): boolean {
-        return this.permissions.project[projectOb]
+    public hasProjectEditPermission = (projectOb: ProjectObject): boolean => {
+        return this.permissions.project[projectOb.id]
     }
 
-    public hasBranchEditPermission(refOb: RefObject): boolean {
+    public hasBranchEditPermission = (refOb: RefObject): boolean => {
         return this.hasProjectIdBranchIdEditPermission(
             refOb._projectId,
             refOb.id
         )
     }
 
-    public hasProjectIdBranchIdEditPermission(
+    public hasProjectIdBranchIdEditPermission = (
         projectId: string,
         refId: string
-    ): boolean {
+    ): boolean => {
         return this.permissions.ref[projectId + '/' + refId]
     }
 }

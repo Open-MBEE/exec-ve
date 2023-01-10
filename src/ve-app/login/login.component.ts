@@ -3,7 +3,7 @@ import {
     TransitionPromise,
     UIRouterGlobals,
 } from '@uirouter/angularjs'
-import angular, { IQService } from 'angular'
+import angular, { IComponentController, IQService } from 'angular'
 
 import { AuthService } from '@ve-utils/mms-api-client'
 import { BrandingStyle, RootScopeService } from '@ve-utils/services'
@@ -40,7 +40,7 @@ const LoginComponent: VeComponentOptions = {
         mmsLoginBanner: '<',
         paramsOb: '<',
     },
-    controller: class LoginController implements angular.IComponentController {
+    controller: class LoginController implements IComponentController {
         static $inject = [
             '$q',
             '$state',

@@ -18,6 +18,7 @@ export interface ViewObject extends ElementObject {
     _childViews?: ViewObject[]
     _displayedElementIds?: string[]
     _veNumber?: string
+    _printCss?: string
 }
 
 export interface DocumentObject extends ViewObject {
@@ -67,11 +68,6 @@ export interface PresentContentObject extends PresentationInstanceObject {
 
 export interface PresentImageObject extends PresentContentObject {
     id: string
-}
-
-export interface PresentPlotObject extends PresentContentObject {
-    ptype?: string
-    config?: unknown
 }
 
 export interface PresentListObject extends PresentContentObject {

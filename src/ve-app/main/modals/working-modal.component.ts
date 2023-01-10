@@ -1,8 +1,25 @@
-import angular from 'angular'
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
+import {
+    VeModalController,
+    VeModalResolve,
+    VeModalResolveFn,
+} from '@ve-types/view-editor'
+
+export interface WorkingTimeObject {
+    startTime: Date
+}
+
+export interface WorkingTimeModalResolveFn extends VeModalResolveFn {
+    getWorkingTime(): WorkingTimeObject
+}
+
+interface WorkingTimeModalResolve extends VeModalResolve {
+    getWorkingTime: WorkingTimeObject
+}
 
 const WorkingModalComponent: VeComponentOptions = {
     selector: 'workingModal',
@@ -13,25 +30,17 @@ const WorkingModalComponent: VeComponentOptions = {
 </div> 
 `,
     bindings: {
-        close: '<',
-        dismiss: '<',
         modalInstance: '<',
         resolve: '<',
     },
     controller: class WorkingModalController
-        implements angular.IComponentController
+        extends VeModalControllerImpl<void, WorkingTimeModalResolve>
+        implements VeModalController
     {
-        //bindings
-        private dismiss
-        close
-        resolve
-
         public workingTime
 
-        constructor() {}
-
         $onInit(): void {
-            this.workingTime = this.resolve.getWorkingTime()
+            this.workingTime = this.resolve.getWorkingTime
         }
     },
 }

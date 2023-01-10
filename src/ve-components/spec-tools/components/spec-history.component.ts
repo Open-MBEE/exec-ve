@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { ComponentService } from '@ve-components/services'
 import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
 import { Commit } from '@ve-core/diff-merge'
-import { ToolbarService } from '@ve-core/tool-bar'
+import { ToolbarService } from '@ve-core/toolbar'
 import {
     ApiService,
     AuthService,
@@ -18,7 +18,7 @@ import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -58,7 +58,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
     constructor(
         $scope: angular.IScope,
         $element: JQuery<HTMLElement>,
-        $q: angular.IQService,
+        $q: VeQService,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,

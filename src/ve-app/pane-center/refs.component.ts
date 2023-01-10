@@ -6,6 +6,7 @@ import Rx from 'rx-lite'
 import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
 import { AppUtilsService } from '@ve-app/main/services'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
+import { AddRefData } from '@ve-components/add-elements/components/add-ref.component'
 import { ProjectService, ElementService } from '@ve-utils/mms-api-client'
 import {
     ApplicationService,
@@ -15,8 +16,14 @@ import {
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { RefObject } from '@ve-types/mms'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { AddElementResolveFn } from '@ve-types/components'
+import {
+    OrgObject,
+    ParamsObject,
+    ProjectObject,
+    RefObject,
+} from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class RefsController {
@@ -42,31 +49,30 @@ class RefsController {
     public subs: Rx.IDisposable[]
 
     //Bindings
-    public mmsOrg
-    mmsProject
-    mmsRef
-    mmsRefs
-    mmsTags
-    mmsBranches
+    public mmsOrg: OrgObject
+    mmsProject: ProjectObject
+    mmsRef: RefObject
+    mmsRefs: RefObject[]
+    mmsTags: RefObject[]
+    mmsBranches: RefObject[]
 
     //Local
     public refManageView
     refData
     bbApi
     buttons
-    branches
-    tags
+    branches: RefObject[]
+    tags: RefObject[]
     activeTab
-    refSelected
+    refSelected: RefObject
     search
     view
     fromParams
-    htmlTooltip
-    addElementData
+    htmlTooltip: string
 
     constructor(
         private $sce: angular.ISCEService,
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $filter: angular.IFilterService,
         private $location: angular.ILocationService,
         private $uibModal: VeModalService,
@@ -88,7 +94,6 @@ class RefsController {
 
         this.contentWindowSvc.toggleLeftPane(true)
 
-        this.rootScopeSvc.mmsRefOb(this.mmsRef)
         this.refManageView = true
         this.refData = []
         this.bbApi = {}
@@ -110,10 +115,10 @@ class RefsController {
 
         this.htmlTooltip = this.$sce.trustAsHtml(
             'Branch temporarily unavailable during duplication.'
-        )
+        ) as string
 
         this.subs.push(
-            this.eventSvc.$on('fromParamChange', (fromParams) => {
+            this.eventSvc.$on<ParamsObject>('fromParamChange', (fromParams) => {
                 const index = _.findIndex(this.mmsRefs, {
                     name: fromParams.refId,
                 })
@@ -124,7 +129,7 @@ class RefsController {
         )
     }
 
-    selectMasterDefault() {
+    selectMasterDefault = (): void => {
         const masterIndex = _.findIndex(this.mmsRefs, { name: 'master' })
         if (masterIndex > -1) {
             this.fromParams = this.mmsRefs[masterIndex]
@@ -132,35 +137,37 @@ class RefsController {
         }
     }
 
-    addBranch(e) {
+    addBranch = (e): void => {
         this.addElement('Branch')
     }
 
-    addTag(e) {
+    addTag = (e): void => {
         this.addElement('Tag')
     }
 
-    deleteRef(e) {
+    deleteRef = (e): void => {
         this.deleteItem()
     }
 
-    refClickHandler(ref) {
+    refClickHandler = (ref: RefObject): void => {
         this.projectSvc.getRef(ref.id, this.mmsProject.id).then(
             (data) => {
                 this.refSelected = data
             },
             (error) => {
-                this.growl.error('Ref click handler error: ' + error)
+                this.growl.error('Ref click handler error: ' + error.message)
                 return
             }
         )
     }
 
-    addElement(itemType) {
-        this.addElementData = {
-            itemType: itemType,
-            createParentRefId: {},
-            from: '',
+    addElement = (itemType: string): void => {
+        const addElementData: AddRefData = {
+            type: itemType,
+            parentRefId: '',
+            parentTitle: '',
+            addType: 'item',
+            lastCommit: true,
         }
         const branch = this.refSelected
         // Item specific setup:
@@ -172,11 +179,11 @@ class RefsController {
                 return
             }
             if (branch.type === 'Tag') {
-                this.addElementData.from = 'Tag ' + branch.name
+                addElementData.parentTitle = 'Tag ' + branch.name
             } else {
-                this.addElementData.from = 'Branch ' + branch.name
+                addElementData.parentTitle = 'Branch ' + branch.name
             }
-            this.addElementData.createParentRefId = branch.id
+            addElementData.parentRefId = branch.id
         } else if (itemType === 'Tag') {
             if (!branch) {
                 this.growl.warning(
@@ -184,18 +191,21 @@ class RefsController {
                 )
                 return
             }
-            this.addElementData.createParentRefId = branch.id
+            addElementData.parentRefId = branch.id
         } else {
             this.growl.error(
                 'Add Item of Type ' + itemType + ' is not supported'
             )
             return
         }
-        const instance = this.$uibModal.open({
+        const instance = this.$uibModal.open<
+            AddElementResolveFn<AddRefData>,
+            RefObject
+        >({
             component: 'addElementModal',
             resolve: {
                 getAddData: () => {
-                    return this.addElementData
+                    return addElementData
                 },
                 getFilter: () => {
                     return this.$filter
@@ -214,7 +224,7 @@ class RefsController {
                 },
             },
         })
-        instance.result.then((data) => {
+        void instance.result.then((data) => {
             //TODO add load handling once mms returns status
             const tag: RefObject[] = []
             for (let i = 0; i < this.mmsRefs.length; i++) {
@@ -242,15 +252,15 @@ class RefsController {
         })
     }
 
-    deleteItem() {
+    deleteItem = (): void => {
         const branch = this.refSelected
         if (!branch) {
             this.growl.warning('Select item to delete.')
             return
         }
-        const settings: VeModalSettings = {
+        const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
             component: 'confirmDeleteModal',
-            resolve: <ConfirmDeleteModalResolveFn>{
+            resolve: {
                 getName: () => {
                     return branch.name
                 },
@@ -271,10 +281,12 @@ class RefsController {
                 },
             },
         }
-        const instance = this.$uibModal.open(settings)
-        instance.result.then(() => {
+        const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>(
+            settings
+        )
+        void instance.result.then(() => {
             //TODO $state project with no selected ref
-            let index
+            let index: number
             if (this.refSelected.type === 'Branch') {
                 index = this.branches.indexOf(this.refSelected)
                 this.branches.splice(index, 1)

@@ -1,11 +1,19 @@
-import angular from 'angular'
+import { IComponentController } from 'angular'
+
+import { SearchController } from '@ve-core/search'
 
 import { veCore } from '@ve-core'
 
 import { VeComponentOptions } from '@ve-types/angular'
+import { ElementObject } from '@ve-types/mms'
 
-export class MmsSearchResultsController
-    implements angular.IComponentController {}
+export class MmsSearchResultsController implements IComponentController {
+    //Parent Controllers
+    private $search: SearchController
+
+    //Bindings
+    private elem: ElementObject
+}
 const MmsSearchResultsComponent: VeComponentOptions = {
     selector: 'mmsSearchResults',
     require: {

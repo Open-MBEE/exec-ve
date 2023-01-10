@@ -7,7 +7,6 @@ import { ViewController } from '@ve-components/presentations'
 import { ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarApi } from '@ve-core/button-bar'
 import { SaveConflictResolveFn } from '@ve-core/diff-merge'
-import { EditingApi } from '@ve-core/editor'
 import {
     ApiService,
     AuthService,
@@ -27,8 +26,9 @@ import { ValueSpec } from '@ve-utils/utils'
 
 import { PropertySpec, veComponents } from '@ve-components'
 
-import { VePromise, VePromiseReason } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
+import { EditingApi } from '@ve-types/core/editor'
 import {
     ConstraintObject,
     ElementObject,
@@ -90,7 +90,7 @@ export class ComponentService {
     ]
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $uibModal: VeModalService,
         private $timeout: angular.ITimeoutService,
         private $compile: angular.ICompileService,
@@ -109,11 +109,11 @@ export class ComponentService {
         private apiSvc: ApiService
     ) {}
 
-    public hasCircularReference(
+    public hasCircularReference = (
         ctrl: ITransclusion,
         curId: string,
         curType: string
-    ): boolean {
+    ): boolean => {
         let curscope = ctrl.$scope
         while (curscope.$parent) {
             const parent = curscope.$parent
@@ -129,7 +129,7 @@ export class ComponentService {
         return false
     }
 
-    public clearAutosave(autosaveKey: string, elementType: string): void {
+    public clearAutosave = (autosaveKey: string, elementType: string): void => {
         if (elementType === 'Slot') {
             Object.keys(this.$window.localStorage).forEach((key) => {
                 if (key.indexOf(autosaveKey) !== -1) {
@@ -397,7 +397,7 @@ export class ComponentService {
      * @param {object} editOb edit object
      * @return {boolean} has changes or not
      */
-    public hasEdits(editOb: ElementObject): boolean {
+    public hasEdits = (editOb: ElementObject): boolean => {
         editOb._commitId = 'latest'
         const cachedKey = this.apiSvc.makeCacheKey(
             this.apiSvc.makeRequestObject(editOb),
@@ -773,11 +773,11 @@ export class ComponentService {
      * @param {object} domElement dom of the directive, jquery wrapped
      * @param {boolean} continueEdit save and continue
      */
-    public saveAction(
+    public saveAction = (
         ctrl: ComponentController,
         domElement: JQuery,
         continueEdit: boolean
-    ): void {
+    ): void => {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
@@ -939,7 +939,7 @@ export class ComponentService {
                                 deleteOb.element.id,
                             deleteOb.type
                         )
-                        return this.$q.resolve(true)
+                        return this.$q.resolve()
                     }
                 },
             },
@@ -949,11 +949,11 @@ export class ComponentService {
         )
     }
 
-    public deleteAction(
+    public deleteAction = (
         ctrl: ComponentController,
         bbApi: ButtonBarApi,
         section: ViewObject
-    ): void {
+    ): void => {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
@@ -977,7 +977,7 @@ export class ComponentService {
                                 ctrl.element.id,
                             ctrl.edit.type
                         )
-                        return this.$q.resolve(true)
+                        return this.$q.resolve()
                     }
                 },
             },
@@ -1098,11 +1098,11 @@ export class ComponentService {
         return parent && parent.nodeName !== 'MMS-VIEW'
     }
 
-    public hasHtml(s: string): boolean {
+    public hasHtml = (s: string): boolean => {
         return s.indexOf('<p>') !== -1
     }
 
-    private _scrollToElement(domElement: JQuery): void {
+    private _scrollToElement = (domElement: JQuery): void => {
         this.$timeout(
             () => {
                 const el = domElement[0]
@@ -1132,10 +1132,10 @@ export class ComponentService {
      * @param {ITransclusion} ctrl scope of the transclude directives or view section directive
      * @param {String} transcludeType name, documentation, or value
      */
-    public reopenUnsavedElts(
+    public reopenUnsavedElts = (
         ctrl: ITransclusion,
         transcludeType: string
-    ): void {
+    ): void => {
         let unsavedEdits: { [p: string]: ElementObject } = {}
         if (this.autosaveSvc.openEdits() > 0) {
             unsavedEdits = this.autosaveSvc.getAll()

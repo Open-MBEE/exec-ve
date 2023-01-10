@@ -19,7 +19,7 @@ import { handleChange } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { ViewObject } from '@ve-types/mms'
 
 /**
@@ -53,7 +53,7 @@ class TranscludeGroupDocsController
     static $inject = [...Transclusion.$inject, 'ViewService']
 
     constructor(
-        $q: angular.IQService,
+        $q: VeQService,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
         $element: JQuery<HTMLElement>,
@@ -132,7 +132,7 @@ class TranscludeGroupDocsController
         return deferred.promise
     }
 
-    public update = () => {
+    public update = (): void => {
         const docs: ViewObject[] = []
         const groupId = this.mmsGroupId === '' ? undefined : this.mmsGroupId
         for (let i = 0; i < this.documents.length; i++) {

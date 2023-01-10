@@ -1,4 +1,4 @@
-import angular, { IComponentController } from 'angular'
+import { IComponentController } from 'angular'
 
 import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
 import { RootScopeService } from '@ve-utils/services'
@@ -11,9 +11,8 @@ import { ViewObject } from '@ve-types/mms'
 class AddPeMenuController implements IComponentController {
     // Bindings
     private mmsView: ViewObject
-    private index: number
 
-    private addPeIndex: number
+    public addPeIndex: number
 
     static $inject = ['PresentationService', 'RootScopeService']
 
@@ -25,7 +24,7 @@ class AddPeMenuController implements IComponentController {
      * @name veComponents.directive:mmsView#addEltAction
      * Add specified element at the defined 'index'
      */
-    public addEltAction(index: number, type: string): void {
+    public addEltAction = (index: number, type: string): void => {
         if (!this.rootScopeSvc.veEditMode()) {
             return
         }

@@ -1,10 +1,11 @@
 import angular from 'angular'
 
-import { ComponentToolbar } from '@ve-components/types'
 import { ButtonBarApi } from '@ve-core/button-bar'
 import { EventService } from '@ve-utils/services'
 
 import { veUtils } from '@ve-utils'
+
+import { EditingToolbar } from '@ve-types/core/editor'
 
 export interface IButtonBarButton {
     id: string
@@ -48,7 +49,7 @@ export class ButtonBarService {
 
     constructor(private eventSvc: EventService) {}
 
-    getApi(id: string): ButtonBarApi {
+    getApi = (id: string): ButtonBarApi => {
         if (this.buttonBars.hasOwnProperty(id)) {
             return this.buttonBars[id]
         }
@@ -94,10 +95,7 @@ export class ButtonBarService {
         }
     }
 
-    getButtonBarButton(
-        button: string,
-        ctrl?: ComponentToolbar
-    ): IButtonBarButton {
+    getButtonBarButton = (button: string, ctrl?: EditingToolbar) => {
         if (!button.startsWith('presentation-element')) {
             switch (button) {
                 case 'button-bar-menu':
@@ -106,7 +104,7 @@ export class ButtonBarService {
                         icon: 'fa-solid fa-bars',
                         selectable: false,
                         permission: true,
-                        tooltip: 'Menu',
+                        tooltip: 'menu',
                         spinner: false,
                         toggleable: false,
                         placement: 'bottom-left',

@@ -20,7 +20,6 @@ import {
     ElementObject,
     ElementsRequest,
     ExpressionObject,
-    InstanceSpecObject,
     InstanceValueObject,
     RequestObject,
     UserObject,
@@ -49,10 +48,10 @@ import {
     angular.module('app', ['ve-components'])
     .controller('ViewCtrl', ['this', function(this) {
         this.api = {}; //empty object to be populated by the view directive
-       public handler(elementId) {
+       public handler = (elementId) => {
             //element with elementId clicked in view
         };
-       public showComments() {
+       public showComments = () => {
             this.api.setShowComments(true);
         };
     }]);
@@ -197,7 +196,7 @@ export class ViewController implements IComponentController {
         handleChange(onChangesObj, 'mmsElementId', this._changeView, true)
     }
 
-    public isTranscludedElement(elementName): boolean {
+    public isTranscludedElement = (elementName): boolean => {
         return (
             elementName === 'MMS-TRANSCLUDE-COM' ||
             elementName === 'MMS-TRANSCLUDE-DOC' ||
@@ -208,16 +207,16 @@ export class ViewController implements IComponentController {
         )
     }
 
-    public isEditable(): boolean {
+    public isEditable = (): boolean => {
         return this.showEdits
     }
 
-    public transcludeClicked(elementOb: ElementObject): void {
+    public transcludeClicked = (elementOb: ElementObject): void => {
         if (this.mmsViewApi && this.mmsViewApi.elementClicked && elementOb)
             this.mmsViewApi.elementClicked(elementOb)
     }
 
-    public elementTranscluded(elem: ElementObject, type: string): void {
+    public elementTranscluded = (elem: ElementObject, type: string): void => {
         if (elem) {
             if (elem._modified > this.modified && type !== 'Comment') {
                 this.modified = elem._modified
@@ -238,7 +237,7 @@ export class ViewController implements IComponentController {
     }
 
     //INFO this was getWsAndVersion
-    public getElementOrigin(): RequestObject {
+    public getElementOrigin = (): RequestObject => {
         return {
             projectId: this.mmsProjectId,
             refId: this.mmsRefId,
@@ -246,15 +245,15 @@ export class ViewController implements IComponentController {
         }
     }
 
-    public getView(): ViewObject {
+    public getView = (): ViewObject => {
         // this view gets set in the viewlink fnc
         return this.view
     }
 
-    public hoverIn(): void {
+    public hoverIn = (): void => {
         this.isHover = true
     }
-    public hoverOut(): void {
+    public hoverOut = (): void => {
         this.isHover = false
     }
 
@@ -269,7 +268,7 @@ export class ViewController implements IComponentController {
     //      });
     //  };
 
-    private _changeView: onChangesCallback = (newVal, oldVal) => {
+    private _changeView: onChangesCallback<string> = (newVal, oldVal) => {
         if (!newVal || (newVal === oldVal && this.processed)) return
 
         this.processed = true
@@ -325,7 +324,7 @@ export class ViewController implements IComponentController {
                         )
                         return
                     }
-                    this.viewSvc.getViewElements(this.reqOb, 1).finally(() => {
+                    this.viewSvc.getViewDatas(this.reqOb, 1).finally(() => {
                         this.view = data
                         this.modified = data._modified
                         this.componentSvc.getModifier(data._modifier).then(
@@ -354,7 +353,7 @@ export class ViewController implements IComponentController {
      * @name veComponents.component:mmsView#toggleShowElements
      * toggle elements highlighting
      */
-    public toggleShowElements(value?: boolean): void {
+    public toggleShowElements = (value?: boolean): void => {
         if (typeof value !== 'undefined') {
             this.showElements = value
         } else {
@@ -371,7 +370,7 @@ export class ViewController implements IComponentController {
      * @name veComponents.component:mmsView#toggleShowComments
      * toggle comments visibility
      */
-    public toggleShowComments(value?: boolean): void {
+    public toggleShowComments = (value?: boolean): void => {
         if (typeof value !== 'undefined') {
             this.showComments = value
         } else {
@@ -388,7 +387,7 @@ export class ViewController implements IComponentController {
      * @name veComponents.component:mmsView#toggleShowEdits
      * toggle elements editor panel
      */
-    public toggleShowEdits(value?: boolean): void {
+    public toggleShowEdits = (value?: boolean): void => {
         if (typeof value !== 'undefined') {
             this.showEdits = value
         } else {

@@ -1,11 +1,14 @@
-// Core Services
-import "./services"
+//VE Modules
+// import '@ve-utils'
+
+//Module Main
+import './ve-core.module'
 
 // Core Component Libraries
-import "./diff-merge"
-import "./button-bar"
-import "./tool-bar"
-import "./editor"
-import "./search"
+import './diff-merge'
+import './button-bar'
+import './toolbar'
+import './editor'
+import './search'
 
-export * from "./ve-core.module"
+export * from './ve-core.module'

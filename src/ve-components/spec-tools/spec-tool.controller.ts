@@ -3,8 +3,7 @@ import angular, { IComponentController, Injectable } from 'angular'
 import Rx from 'rx-lite'
 
 import { ComponentService } from '@ve-components/services'
-import { EditingApi } from '@ve-core/editor'
-import { ToolbarService, ToolbarApi } from '@ve-core/tool-bar'
+import { ToolbarService, ToolbarApi } from '@ve-core/toolbar'
 import {
     ApiService,
     AuthService,
@@ -18,8 +17,9 @@ import { EventService, UtilsService } from '@ve-utils/services'
 
 import { SpecApi, SpecService } from './services/Spec.service'
 
-import { VePromise } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
+import { EditingApi } from '@ve-types/core/editor'
 import {
     ElementObject,
     RefObject,
@@ -163,7 +163,7 @@ export class SpecTool implements ISpecTool {
     constructor(
         public $scope: angular.IScope,
         public $element: JQuery<HTMLElement>,
-        protected $q: angular.IQService,
+        protected $q: VeQService,
         protected growl: angular.growl.IGrowlService,
         protected componentSvc: ComponentService,
         protected uRLSvc: URLService,
@@ -181,41 +181,41 @@ export class SpecTool implements ISpecTool {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        this.tbApi = this.toolbarSvc.getApi('right-toolbar')
+
         this.editValues = this.specSvc.editValues
-
+        this.toolbarSvc.getApi('right-toolbar').then(
+            (result) => {
+                this.tbApi = result
+                if (
+                    this.tbApi.buttons
+                        .map((value) => value.id)
+                        .filter((value) => value === this.specType).length <
+                        1 &&
+                    window.__env &&
+                    window.__env.enableDebug
+                ) {
+                    console.log(
+                        'Spec View: ' +
+                            this.specType +
+                            'is missing a button definition'
+                    )
+                }
+            },
+            (reason) => {
+                this.growl.error(reason.message)
+            }
+        )
         this.changeElement()
-
-        if (
-            this.tbApi.buttons
-                .map((value) => value.id)
-                .filter((value) => value === this.specType).length < 1 &&
-            window.__env &&
-            window.__env.enableDebug
-        ) {
-            console.log(
-                'Spec View: ' + this.specType + 'is missing a button definition'
-            )
-        }
 
         this.subs.push(
             this.eventSvc.$on('element.selected', () => {
                 if (this.edit && this.editorApi.save) {
-                    this.editorApi.save().then(
-                        () => {
-                            /* Do Nothing */
-                        },
-                        () => {
-                            /* Do Nothing */
-                        }
-                    )
+                    void this.editorApi.save()
                 }
             })
         )
         this.subs.push(this.eventSvc.$on('spec.ready', this.changeElement))
-        this.config()
         this.subs.push(this.eventSvc.$on(this.specType, this.initCallback))
-        this.initCallback()
     }
 
     $onDestroy(): void {
@@ -284,7 +284,7 @@ export class SpecTool implements ISpecTool {
         obj.value = parseInt(obj.value as string)
     }
 
-    public propertyTypeClicked(id: string): void {
+    public propertyTypeClicked = (id: string): void => {
         const elementOb = {
             id: id,
             _projectId: this.element._projectId,
@@ -311,7 +311,7 @@ export class SpecTool implements ISpecTool {
         return this.componentSvc.save(this.edit, this.editorApi, this, false)
     }
 
-    public hasHtml(s: string): boolean {
+    public hasHtml = (s: string): boolean => {
         return this.componentSvc.hasHtml(s)
     }
 }

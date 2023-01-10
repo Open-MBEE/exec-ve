@@ -1,11 +1,17 @@
 // import "./transclusion.controller"
-export * from "./transclusion.controller"
+export * from './transclusion.controller'
 
-import "./transclusion.component";
+import './services/Transclusion.service'
 
-import "./components"
-import "./mms-transclude-compatibility.component"
+export * from './services/Transclusion.service'
 
+import './transclusion.component'
 
+import './components'
+import './mms-transclude-compatibility.component'
+
+import './modals/create-transclusion.modal'
+
+export * from './modals/create-transclusion.modal'
 
 // import "./mmsTsDiagram.directive";

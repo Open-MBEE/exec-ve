@@ -1,4 +1,4 @@
-import "./ve-footer.component";
-import "./ve-menu.component";
-import "./ve-nav.component";
-import "./ve-system-banner.component";
+import './system-footer.component'
+import './main-menu.component'
+import './nav-bar.component'
+import './system-banner.component'

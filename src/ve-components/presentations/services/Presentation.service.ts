@@ -1,17 +1,15 @@
 import angular from 'angular'
 
-import { AddElementResolveFn } from '@ve-app/main/modals/add-item-modal.component'
 import { AddPresentationData } from '@ve-components/add-elements/components/add-pe.component'
 import { ViewService } from '@ve-utils/mms-api-client'
-import { InstanceSpec } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
+import { AddElementResolveFn } from '@ve-types/components'
 import {
     ElementObject,
     InstanceSpecObject,
     InstanceValueObject,
-    ValueObject,
 } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
@@ -107,7 +105,7 @@ export class PresentationService {
                 ) {
                     return //do not open editor for existing pes added or if pe/owner is a section
                 }
-                this.$timeout(
+                void this.$timeout(
                     () => {
                         //auto open editor for newly added pe
                         $('#' + data.id)

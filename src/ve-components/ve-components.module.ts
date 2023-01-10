@@ -6,6 +6,7 @@ import angular from 'angular'
  */
 export const veComponents = angular.module('ve-components', [
     've-utils',
+    've-core',
     'ui.bootstrap',
     'angular-growl',
     'ngSanitize',
@@ -21,11 +22,11 @@ export const veComponents = angular.module('ve-components', [
 // }])
 veComponents
     .filter('veRealNum', () => {
-        return (n) => {
+        return (n: string | number): string => {
             if (Number.isInteger(n)) {
-                return n + '.0'
+                return `${n}.0`
             }
-            return n
+            return n as string
         }
     })
     .constant('CKEDITOR', window.CKEDITOR)

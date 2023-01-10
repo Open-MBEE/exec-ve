@@ -12,7 +12,8 @@ import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { PresentationComponentOptions } from '@ve-types/components'
+import { IPresentationComponentOptions } from '@ve-types/components/presentation'
+import { PresentTextObject } from '@ve-types/mms'
 
 class PresentParagraph extends Presentation implements IComponentController {
     static $inject = Presentation.$inject
@@ -45,11 +46,11 @@ class PresentParagraph extends Presentation implements IComponentController {
     }
 
     protected getContent = (): string => {
-        return this.viewHtmlSvc.makeHtmlPara(this.peObject)
+        return this.viewHtmlSvc.makeHtmlPara(this.peObject as PresentTextObject)
     }
 }
 
-const PresentParagraphComponent: PresentationComponentOptions = {
+const PresentParagraphComponent: IPresentationComponentOptions = {
     selector: 'presentParagraph',
     template: `<div></div>`,
     bindings: {

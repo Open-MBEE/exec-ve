@@ -1,5 +1,4 @@
 {
-  "ignorePatterns": ["**/@types"],
   "settings": {
     "import/extensions": [".js", ".ts"],
     "import/parsers": {

@@ -3,7 +3,6 @@ import angular from 'angular'
 import { ExtensionService } from '@ve-components/services'
 import { SchemaService } from '@ve-utils/model-schema'
 import { EventService, UtilsService } from '@ve-utils/services'
-import { InstanceSpec } from '@ve-utils/utils'
 
 import { veUtils } from '@ve-utils'
 
@@ -13,7 +12,6 @@ import {
     ElementsRequest,
     InstanceSpecObject,
     LiteralObject,
-    RequestObject,
 } from '@ve-types/mms'
 
 export interface AnnotationObject {
@@ -185,7 +183,7 @@ class AnnotationController implements angular.IComponentController {
         }
     }
 
-    private _getValueForTranscludeVal(element: ElementObject): string {
+    private _getValueForTranscludeVal = (element: ElementObject): string => {
         let value: unknown
 
         if (

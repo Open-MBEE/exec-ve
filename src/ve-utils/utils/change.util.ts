@@ -13,9 +13,9 @@ import angular from 'angular'
  *      }
  *
  */
-export type onChangesCallback = (
-    newVal?: unknown,
-    oldVal?: unknown,
+export type onChangesCallback<T> = (
+    newVal?: T,
+    oldVal?: T,
     firstChange?: boolean
 ) => void
 
@@ -41,22 +41,22 @@ export type onChangesCallback = (
  * @param {boolean} ignoreFirst -
  * @returns {any}
  */
-export function handleChange(
+export function handleChange<T>(
     changesObj: angular.IOnChangesObject,
     watch: string,
-    callback: onChangesCallback,
+    callback: onChangesCallback<T>,
     ignoreFirst?: boolean
-): any {
+): void {
     if (watch === '') {
         return callback()
     } else if (changesObj[watch]) {
         if (ignoreFirst && changesObj[watch].isFirstChange()) {
             return
         }
-        const newVal = changesObj[watch].currentValue
-        const oldVal = changesObj[watch].previousValue
+        const newVal: T = changesObj[watch].currentValue as T
+        const oldVal: T = changesObj[watch].previousValue as T
         const firstChange = changesObj[watch].isFirstChange()
-        return callback(newVal, oldVal, firstChange)
+        callback(newVal, oldVal, firstChange)
     }
     return
 }

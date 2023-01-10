@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { ComponentService } from '@ve-components/services'
 import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
 import { MergeConfirmResolveFn } from '@ve-core/diff-merge/modals/merge-confirm-modal.component'
-import { ToolbarService } from '@ve-core/tool-bar'
+import { ToolbarService } from '@ve-core/toolbar'
 import {
     ApiService,
     AuthService,
@@ -18,7 +18,7 @@ import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import { RefObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
@@ -28,7 +28,7 @@ import { VeModalService } from '@ve-types/view-editor'
  *
  * @requires {angular.IScope} $scope
  * @requires {JQuery<HTMLElement>} $element
- * @requires {angular.IQService} $q
+ * @requires {VeQService} $q
  * @requires {angular.growl.IGrowlService} growl
  * @requires {ComponentService} componentSvc
  * @requires {URLService} uRLSvc
@@ -62,7 +62,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
     constructor(
         $scope: angular.IScope,
         $element: JQuery<HTMLElement>,
-        $q: angular.IQService,
+        $q: VeQService,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
@@ -100,7 +100,8 @@ class SpecRefListController extends SpecTool implements ISpecTool {
         this.specTitle = 'Branch/Tag List'
     }
 
-    public config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         this.showMerge =
             this.uRLSvc.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1
         this.runCleared = true

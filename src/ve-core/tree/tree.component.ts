@@ -207,7 +207,7 @@ class TreeController implements angular.IComponentController {
         this.eventSvc.destroy(this.subs)
     }
 
-    public expandCallback(branch: TreeBranch, e) {
+    public expandCallback = (branch: TreeBranch, e) => {
         branch.loading = true
         if (!branch.expanded && this.options.expandCallback) {
             this.options.expandCallback(branch.data.id, branch, false)
@@ -224,7 +224,7 @@ class TreeController implements angular.IComponentController {
         })
     }
 
-    public userClicksBranch(branch: TreeBranch) {
+    public userClicksBranch = (branch: TreeBranch) => {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
         if (branch.onSelect) {
             branch.onSelect(branch)
@@ -233,7 +233,7 @@ class TreeController implements angular.IComponentController {
         }
     }
 
-    public userDblClicksBranch(branch: TreeBranch) {
+    public userDblClicksBranch = (branch: TreeBranch) => {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
         if (branch.onDblClick) {
             branch.onDblClick(branch)
@@ -242,7 +242,7 @@ class TreeController implements angular.IComponentController {
         }
     }
 
-    public getHref(row) {
+    public getHref = (row) => {
         //var data = row.branch.data;
         /*if (row.branch.type !== 'group' && UtilsService.isDocument(data) && !ApplicationService.getState().fullDoc) {
             var ref = data._refId ? data._refId : 'master';

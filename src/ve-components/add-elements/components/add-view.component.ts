@@ -1,9 +1,7 @@
 import angular from 'angular'
 
-import { AddElementData } from '@ve-app/main/modals/add-item-modal.component'
-import { AddElement } from '@ve-components/add-elements'
+import { AddElement, AddElementsService } from '@ve-components/add-elements'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
-import { CoreUtilsService } from '@ve-core/services'
 import {
     ApiService,
     ElementService,
@@ -15,7 +13,8 @@ import { ApplicationService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { AddElementData } from '@ve-types/components'
 import { ViewObject } from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
 import { VeModalService } from '@ve-types/view-editor'
@@ -23,6 +22,7 @@ import { VeModalService } from '@ve-types/view-editor'
 export interface AddViewData extends AddElementData {
     parentBranch: TreeBranch
     seenViewIds: { [viewId: string]: TreeBranch }
+    newViewAggr?: 'composite' | 'shared'
 }
 
 class AddViewController extends AddElement<AddViewData> {
@@ -32,7 +32,7 @@ class AddViewController extends AddElement<AddViewData> {
 
     constructor(
         $scope: angular.IScope,
-        $q: angular.IQService,
+        $q: VeQService,
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         $timeout: angular.ITimeoutService,
@@ -44,7 +44,7 @@ class AddViewController extends AddElement<AddViewData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: CoreUtilsService
+        utils: AddElementsService
     ) {
         super(
             $scope,
@@ -63,16 +63,20 @@ class AddViewController extends AddElement<AddViewData> {
             utils
         )
         this.displayName = this.type
-        this.addType = 'item'
     }
 
-    protected config = (): void => {
+    public $onInit(): void {
+        super.$onInit()
+        if (this.addElementData.newViewAggr) {
+            this.aggr = this.addElementData.newViewAggr
+        }
         if (this.addElementData.parentBranch) {
             this.parentData = this.addElementData.parentBranch.data
         }
     }
 
-    public callback = (data: ViewObject): void => {
+    public addExisting = (data: ViewObject): VePromise<ViewObject> => {
+        const deferred = this.$q.defer<ViewObject>()
         const view = data
         const viewId = view.id
         if (this.addElementData.seenViewIds[viewId]) {
@@ -109,23 +113,23 @@ class AddViewController extends AddElement<AddViewData> {
                         )
                         .then(
                             (realView) => {
-                                this.addElementApi.resolve(realView)
+                                deferred.resolve(realView)
                             },
-                            () => {
-                                this.addElementApi.reject(view)
+                            (reason) => {
+                                reason.data.elements = [view]
+                                deferred.reject(reason)
                             }
                         )
-                        .finally(() => {
-                            this.growl.success('View Added')
-                        })
                 },
                 (reason) => {
                     this.growl.error(`View Add Error: ${reason.message}`)
                 }
             )
-            .finally(() => {
-                this.oking = false
-            })
+        return deferred.promise
+    }
+
+    public last = (): void => {
+        this.growl.success('View Added')
     }
 
     public queryFilter = (): SearchFilter => {

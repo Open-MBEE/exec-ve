@@ -8,7 +8,7 @@ import {
     ISpecTool,
     ReorderService,
 } from '@ve-components/spec-tools'
-import { ToolbarService } from '@ve-core/tool-bar'
+import { ToolbarService } from '@ve-core/toolbar'
 import {
     AuthService,
     PermissionsService,
@@ -22,7 +22,7 @@ import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import {
     PresentationReference,
     ViewInstanceSpec,
@@ -56,7 +56,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
     constructor(
         $scope: angular.IScope,
         $element: JQuery<HTMLElement>,
-        $q: angular.IQService,
+        $q: VeQService,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
@@ -146,9 +146,10 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                             this.toolbarSvc.constants.TOGGLEICONSPINNER,
                             { id: 'spec-reorder-save' }
                         )
-                        this.eventSvc.$broadcast('spec-reorder-saved', {
-                            id: this.specApi.elementId,
-                        })
+                        this.eventSvc.$broadcast(
+                            'spec-reorder-saved',
+                            this.specApi.elementId
+                        )
                     },
                     (response) => {
                         this.reorderSvc.refresh()

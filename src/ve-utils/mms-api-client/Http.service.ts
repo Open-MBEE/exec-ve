@@ -29,7 +29,7 @@ export class HttpService {
         this.queue[1] = [] //low prority
     }
 
-    setOutboundLimit(limit: number): void {
+    setOutboundLimit = (limit: number): void => {
         this.getLimit = limit
     }
 
@@ -137,7 +137,7 @@ export class HttpService {
      * @param {string} url url to get
      * @param {number} weight (optional)
      */
-    ping(url: string, weight?: number): void {
+    ping = (url: string, weight?: number): void => {
         // ping should simply change the weight
         if (weight === undefined) {
             weight = 1
@@ -174,7 +174,7 @@ export class HttpService {
      *
      * @description Changes all requests in the Queue 1 to Queue 0
      */
-    transformQueue(): void {
+    transformQueue = (): void => {
         if (this.queue[1].length > 0) {
             //will the queue ever be defined?
             for (let i = 0; i < this.queue[1].length; i++) {
@@ -189,7 +189,7 @@ export class HttpService {
         }
     }
 
-    dropAll(): void {
+    dropAll = (): void => {
         this.queue[1].length = 0
         this.queue[0].length = 0
         this.cache = {}

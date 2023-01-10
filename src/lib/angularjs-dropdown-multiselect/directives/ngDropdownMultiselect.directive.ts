@@ -1,38 +1,76 @@
-import angular from 'angular'
+import angular, { IScope } from 'angular'
 import _ from 'lodash'
 
-const angularjsDropdownMultiselect = angular.module(
-    'angularjs-dropdown-multiselect'
-)
+import { angularjsDropdownMultiselect } from '../angularjs-dropdown-multiselect.module'
 
-interface NgDropdownMultiselectScope extends angular.IScope {
-    open
-    externalEvents: any
-    settings
-    texts
-    searchFilter
-    orderedItems
-    singleSelection
-    selectedModel
-    getGroupTitle
-    extraSettings
-    events
-    translationTexts
-    getButtonText
-    options
+interface NgDropdownMultiselectScope extends IScope {
+    open?: unknown
+    externalEvents: {
+        onSelectAll(): void
+        onDeselectAll(): void
+        onItemDeselect(findObj: { [key: string]: string }): void
+        onItemSelect(selectedObj: { [key: string]: string }): void
+        onInitDone(): void
+        onMaxSelectionReached(): void
+    }
+    settings: NgDropdownMultiselectSettings
+    texts?: {
+        checkAll: string
+        uncheckAll: string
+        selectionCount: string
+        selectionOf: string
+        searchPlaceholder: string
+        buttonDefaultText: string
+        dynamicButtonTextSuffix: string
+    }
+    searchFilter?: unknown
+    orderedItems?: unknown
+    singleSelection?: boolean
+    selectedModel?: { [key: string]: string }[]
+    getGroupTitle?(groupValue: string): string
+    extraSettings?: unknown
+    events?: unknown
+    translationTexts?: unknown
+    getButtonText?(): string
+    options?: { [key: string]: string }[]
 
     toggleDropdown(): void
     checkboxClick($event, id): void
     setSelectedItem(id: string, dontRemove?: boolean): void
-    isChecked(id: string): any | boolean
-    getPropertyForObject(object, property): any | string
+    isChecked(id: string): boolean
+    getPropertyForObject(
+        object: { [key: string]: string } | string,
+        property: string
+    ): string
 
     selectAll(): void
     deselectAll(sendEvent: boolean)
 }
 
-// @ts-ignore
-// TODO: Figure out why this is failing ts type checking
+interface NgDropdownMultiselectSettings {
+    dynamicTitle: boolean
+    scrollable: boolean
+    scrollableHeight: string
+    closeOnBlur: boolean
+    displayProp: string
+    idProp: string
+    externalIdProp: string
+    enableSearch: boolean
+    selectionLimit: number
+    showCheckAll: boolean
+    showUncheckAll: boolean
+    closeOnSelect: boolean
+    buttonClasses: string
+    closeOnDeselect: boolean
+    groupBy?: string
+    smartButtonMaxItems: number
+    smartButtonTextConverter?(
+        displayText: string,
+        optionItem: { [key: string]: string } | string
+    ): string
+    groupByTextProvider?(groupValue: string): string
+}
+
 angularjsDropdownMultiselect.directive('ngDropdownMultiselect', [
     '$filter',
     '$document',
@@ -41,7 +79,12 @@ angularjsDropdownMultiselect.directive('ngDropdownMultiselect', [
     ngDropdownMultiselect,
 ])
 
-function ngDropdownMultiselect($filter, $document, $compile, $parse) {
+function ngDropdownMultiselect(
+    $filter: angular.IFilterService,
+    $document: angular.IDocumentService,
+    $compile: angular.ICompileService,
+    $parse: angular.IParseService
+): angular.IDirective {
     return {
         restrict: 'AE',
         scope: {
@@ -53,7 +96,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
             translationTexts: '=',
             groupBy: '@',
         },
-        template: (element, attrs) => {
+        template: (element, attrs): string => {
             const checkboxes = !!attrs.checkboxes
             const groups = !!attrs.groupBy
 
@@ -103,26 +146,34 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
             template += '</div>'
 
             element.html(template)
+            return template
         },
-        link: ($scope: NgDropdownMultiselectScope, $element, $attrs) => {
+        link: (
+            $scope: NgDropdownMultiselectScope,
+            $element,
+            $attrs: angular.IAttributes
+        ): void => {
             const $dropdownTrigger = $element.children()[0]
 
-            $scope.toggleDropdown = () => {
+            $scope.toggleDropdown = (): void => {
                 $scope.open = !$scope.open
             }
 
-            $scope.checkboxClick = ($event, id) => {
+            $scope.checkboxClick = (
+                $event: JQuery.ClickEvent,
+                id: string
+            ): void => {
                 $scope.setSelectedItem(id)
                 $event.stopImmediatePropagation()
             }
-
+            /* eslint-disable @typescript-eslint/no-empty-function */
             $scope.externalEvents = {
-                onItemSelect: angular.noop,
-                onItemDeselect: angular.noop,
-                onSelectAll: angular.noop,
-                onDeselectAll: angular.noop,
-                onInitDone: angular.noop,
-                onMaxSelectionReached: angular.noop,
+                onItemSelect: (): void => {},
+                onItemDeselect: (): void => {},
+                onSelectAll: (): void => {},
+                onDeselectAll: (): void => {},
+                onInitDone: (): void => {},
+                onMaxSelectionReached: (): void => {},
             }
 
             $scope.settings = {
@@ -140,12 +191,12 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 closeOnSelect: false,
                 buttonClasses: 'btn btn-default',
                 closeOnDeselect: false,
-                groupBy: $attrs.groupBy || undefined,
+                groupBy: ($attrs.groupBy as string) || undefined,
                 groupByTextProvider: null,
                 smartButtonMaxItems: 0,
-                smartButtonTextConverter: angular.noop,
+                smartButtonTextConverter: (): string => null,
             }
-
+            /* eslint-enable @typescript-eslint/no-empty-function */
             $scope.texts = {
                 checkAll: 'Check All',
                 uncheckAll: 'Uncheck All',
@@ -159,7 +210,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
             $scope.searchFilter = $scope.searchFilter || ''
 
             if (angular.isDefined($scope.settings.groupBy)) {
-                $scope.$watch('options', (newValue) => {
+                $scope.$watch('options', (newValue: unknown[]) => {
                     if (angular.isDefined(newValue)) {
                         $scope.orderedItems = $filter('orderBy')(
                             newValue,
@@ -175,7 +226,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
 
             $scope.singleSelection = $scope.settings.selectionLimit === 1
 
-            function getFindObj(id) {
+            function getFindObj(id: string): { [key: string]: string } {
                 const findObj = {}
 
                 if ($scope.settings.externalIdProp === '') {
@@ -187,7 +238,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 return findObj
             }
 
-            function clearObject(object) {
+            function clearObject(object: { [key: string]: unknown }): void {
                 for (const prop in object) {
                     delete object[prop]
                 }
@@ -198,13 +249,15 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                     Array.isArray($scope.selectedModel) &&
                     $scope.selectedModel.length === 0
                 ) {
-                    clearObject($scope.selectedModel)
+                    clearObject(
+                        $scope.selectedModel[0] as { [key: string]: unknown }
+                    )
                 }
             }
 
             if ($scope.settings.closeOnBlur) {
                 $document.on('click', (e) => {
-                    let target = e.target.parentElement
+                    let target = (e.target as HTMLElement).parentElement
                     let parentFound = false
 
                     while (
@@ -234,7 +287,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 })
             }
 
-            $scope.getGroupTitle = (groupValue) => {
+            $scope.getGroupTitle = (groupValue: string): string => {
                 if ($scope.settings.groupByTextProvider !== null) {
                     return $scope.settings.groupByTextProvider(groupValue)
                 }
@@ -242,7 +295,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 return groupValue
             }
 
-            $scope.getButtonText = () => {
+            $scope.getButtonText = (): string => {
                 if (
                     $scope.settings.dynamicTitle &&
                     ($scope.selectedModel.length > 0 ||
@@ -252,32 +305,37 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                     if ($scope.settings.smartButtonMaxItems > 0) {
                         let itemsText: any[] = []
 
-                        $scope.options.forEach((optionItem) => {
-                            if (
-                                $scope.isChecked(
-                                    $scope.getPropertyForObject(
-                                        optionItem,
-                                        $scope.settings.idProp
+                        $scope.options.forEach(
+                            (
+                                optionItem: { [key: string]: string } | string
+                            ) => {
+                                if (
+                                    $scope.isChecked(
+                                        $scope.getPropertyForObject(
+                                            optionItem,
+                                            $scope.settings.idProp
+                                        )
                                     )
-                                )
-                            ) {
-                                const displayText = $scope.getPropertyForObject(
-                                    optionItem,
-                                    $scope.settings.displayProp
-                                )
-                                const converterResponse =
-                                    $scope.settings.smartButtonTextConverter(
-                                        displayText,
-                                        optionItem
-                                    )
+                                ) {
+                                    const displayText =
+                                        $scope.getPropertyForObject(
+                                            optionItem,
+                                            $scope.settings.displayProp
+                                        )
+                                    const converterResponse =
+                                        $scope.settings.smartButtonTextConverter(
+                                            displayText,
+                                            optionItem
+                                        )
 
-                                itemsText.push(
-                                    converterResponse
-                                        ? converterResponse
-                                        : displayText
-                                )
+                                    itemsText.push(
+                                        converterResponse
+                                            ? converterResponse
+                                            : displayText
+                                    )
+                                }
                             }
-                        })
+                        )
 
                         if (
                             $scope.selectedModel.length >
@@ -292,7 +350,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
 
                         return itemsText.join(', ')
                     } else {
-                        let totalSelected
+                        let totalSelected: number
 
                         if ($scope.singleSelection) {
                             totalSelected =
@@ -313,11 +371,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                         if (totalSelected === 0) {
                             return $scope.texts.buttonDefaultText
                         } else {
-                            return (
-                                totalSelected +
-                                ' ' +
-                                $scope.texts.dynamicButtonTextSuffix
-                            )
+                            return `${totalSelected} ${$scope.texts.dynamicButtonTextSuffix}`
                         }
                     }
                 } else {
@@ -325,7 +379,10 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 }
             }
 
-            $scope.getPropertyForObject = (object, property) => {
+            $scope.getPropertyForObject = (
+                object: { [key: string]: string },
+                property: string
+            ): string => {
                 if (
                     angular.isDefined(object) &&
                     object.hasOwnProperty(property)
@@ -336,7 +393,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 return ''
             }
 
-            $scope.selectAll = () => {
+            $scope.selectAll = (): void => {
                 $scope.deselectAll(false)
                 $scope.externalEvents.onSelectAll()
 
@@ -345,7 +402,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 })
             }
 
-            $scope.deselectAll = (sendEvent) => {
+            $scope.deselectAll = (sendEvent): void => {
                 sendEvent = sendEvent || true
 
                 if (sendEvent) {
@@ -353,24 +410,28 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 }
 
                 if ($scope.singleSelection) {
-                    clearObject($scope.selectedModel)
+                    clearObject($scope.selectedModel[0])
                 } else {
                     $scope.selectedModel.splice(0, $scope.selectedModel.length)
                 }
             }
 
-            $scope.setSelectedItem = (id, dontRemove?) => {
+            $scope.setSelectedItem = (id, dontRemove?): void => {
                 const findObj = getFindObj(id)
-                let finalObj: object
+                let finalObj: {
+                    [key: string]: string
+                }
 
                 if ($scope.settings.externalIdProp === '') {
-                    finalObj = _.find($scope.options, findObj)
+                    finalObj = _.find($scope.options, findObj) as {
+                        [key: string]: string
+                    }
                 } else {
                     finalObj = findObj
                 }
 
                 if ($scope.singleSelection) {
-                    clearObject($scope.selectedModel)
+                    clearObject($scope.selectedModel[0])
                     angular.extend($scope.selectedModel, finalObj)
                     $scope.externalEvents.onItemSelect(finalObj)
                     if ($scope.settings.closeOnSelect) $scope.open = false
@@ -400,7 +461,7 @@ function ngDropdownMultiselect($filter, $document, $compile, $parse) {
                 if ($scope.settings.closeOnSelect) $scope.open = false
             }
 
-            $scope.isChecked = (id) => {
+            $scope.isChecked = (id): boolean => {
                 if ($scope.singleSelection) {
                     return (
                         $scope.selectedModel !== null &&

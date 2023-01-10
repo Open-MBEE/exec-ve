@@ -1,6 +1,6 @@
-import angular, { IComponentController } from 'angular'
+import { IComponentController } from 'angular'
 
-import { ApplicationService } from '@ve-utils/services'
+import { ApiService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
@@ -10,7 +10,7 @@ import { VeModalInstanceService } from '@ve-types/view-editor'
 const AboutModalComponent: VeComponentOptions = {
     selector: 'aboutModal',
     template: `
-    <div class="modal-header">
+    <div class="modal-header"> 
     <h4>About</h4>
 </div>
 
@@ -28,7 +28,7 @@ const AboutModalComponent: VeComponentOptions = {
         resolve: '@',
     },
     controller: class AboutModalController implements IComponentController {
-        static $inject = ['ApplicationService']
+        static $inject = ['ApiService']
 
         //bindings
         public modalInstance: VeModalInstanceService<void>
@@ -38,13 +38,15 @@ const AboutModalComponent: VeComponentOptions = {
         public veV
         public mmsV
 
-        constructor(private applicationSvc: ApplicationService) {}
+        constructor(private apiSvc: ApiService) {}
 
         $onInit(): void {
-            this.veV = window.__env.version ? window.__env.version : '3.6.1'
+            this.veV = window.__env.version
+                ? window.__env.version
+                : 'No Version Specified'
             this.mmsV = 'Loading...'
 
-            this.applicationSvc.getMmsVersion().then(
+            this.apiSvc.getMmsVersion().then(
                 (data) => {
                     this.mmsV = data
                 },

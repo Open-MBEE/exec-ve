@@ -3,6 +3,7 @@ import angular from 'angular'
 import { TreeService } from '@ve-core/tree'
 import { EventService } from '@ve-utils/services'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
 import { TreeBranch, TreeConfig, TreeOptions, TreeRow } from '@ve-types/tree'
 
@@ -19,9 +20,10 @@ export class TreeApi {
 
     public loading: boolean
 
-    private inProgress: Promise<boolean>
+    private inProgress: VePromise<void, void>
 
     constructor(
+        private $q: VeQService,
         private $timeout: angular.ITimeoutService,
         private eventSvc: EventService,
         config: TreeConfig,
@@ -35,7 +37,7 @@ export class TreeApi {
      * @name TreeApi#expandAll
      * self explanatory
      */
-    public expandAll = () => {
+    public expandAll = (): VePromise<void, void> => {
         this.forEachBranch((b, level) => {
             //scope.expandCallback({ branch: b });
             b.expanded = true
@@ -46,7 +48,9 @@ export class TreeApi {
      * @name TreeApi#collapseAll
      * self explanatory
      */
-    public collapseAll = (excludeBranch?: TreeBranch): Promise<boolean> => {
+    public collapseAll = (
+        excludeBranch?: TreeBranch
+    ): VePromise<void, void> => {
         this.forEachBranch((b, level) => {
             b.expanded = false
         }, excludeBranch)
@@ -57,16 +61,16 @@ export class TreeApi {
      * Gets the first branch in the tree
      * @returns {TreeBranch}
      */
-    public getFirstBranch = () => {
+    public getFirstBranch = (): TreeBranch => {
         if (this.treeData.length > 0) return this.treeData[0]
     }
 
     /**
      * Selects the first branch in the tree
      */
-    public selectFirstBranch = () => {
+    public selectFirstBranch = (): VePromise<void, void> => {
         const b = this.getFirstBranch()
-        this.selectBranch(b)
+        return this.selectBranch(b)
     }
 
     /**
@@ -75,21 +79,21 @@ export class TreeApi {
      *
      * @return {Object} current selected branch
      */
-    public getSelectedBranch = () => {
+    public getSelectedBranch = (): TreeBranch => {
         return this.selectedBranch
     }
 
-    public clearSelectedBranch = () => {
+    public clearSelectedBranch = (): void => {
         this.selectedBranch = null
     }
 
-    public getChildren = (b: TreeBranch) => {
+    public getChildren = (b: TreeBranch): TreeBranch[] => {
         return b.children
     }
 
-    public selectParentBranch = (branch: TreeBranch) => {
+    public selectParentBranch = (branch: TreeBranch): VePromise<void, void> => {
         const p = this.getParent(branch)
-        if (p) this.selectBranch(p)
+        if (p) return this.selectBranch(p)
     }
 
     /**
@@ -101,11 +105,11 @@ export class TreeApi {
      * @param {TreeBranch} new_branch new branch to be added to the tree
      * @param {boolean} top boolean determining if this item should be at the top
      */
-    public addBranch(
+    public addBranch = (
         parent: TreeBranch,
         new_branch: TreeBranch,
         top: boolean
-    ): Promise<boolean> {
+    ): VePromise<void, void> => {
         if (parent) {
             if (top) parent.children.unshift(new_branch)
             else parent.children.push(new_branch)
@@ -117,12 +121,12 @@ export class TreeApi {
         return this.refresh()
     }
 
-    public removeBranch = (branch) => {
+    public removeBranch = (branch: TreeBranch): VePromise<void, void> => {
         this._removeBranch(branch, false)
         return this.refresh()
     }
 
-    public removeSingleBranch = (branch) => {
+    public removeSingleBranch = (branch: TreeBranch): VePromise<void, void> => {
         this._removeBranch(branch, true)
         return this.refresh()
     }
@@ -133,7 +137,7 @@ export class TreeApi {
      *
      * @param {TreeBranch} branch branch to expand
      */
-    public expandBranch(branch: TreeBranch): Promise<boolean> {
+    public expandBranch = (branch: TreeBranch): VePromise<void, void> => {
         if (!branch) branch = this.getSelectedBranch()
         if (branch) {
             //scope.expandCallback({ branch: b });
@@ -148,7 +152,7 @@ export class TreeApi {
      *
      * @param {TreeBranch} branch branch to close
      */
-    public closeBranch(branch: TreeBranch): Promise<boolean> {
+    public closeBranch = (branch: TreeBranch): VePromise<void, void> => {
         if (!branch) branch = this.getSelectedBranch()
         if (branch) {
             //scope.expandCallback({ branch: b });
@@ -162,8 +166,8 @@ export class TreeApi {
      * @param {TreeBranch} branch
      * @returns {TreeBranch[]}
      */
-    getSiblings(branch: TreeBranch): TreeBranch[] {
-        let siblings
+    public getSiblings = (branch: TreeBranch): TreeBranch[] => {
+        let siblings: TreeBranch[]
         const p = this.getParent(branch)
         if (p) siblings = p.children
         else siblings = this.treeData
@@ -266,42 +270,55 @@ export class TreeApi {
      * @name TreeApi#refresh
      * rerender the tree when data or options change
      */
-    public refresh = (): Promise<boolean> => {
-        if (!this.inProgress) {
+    public refresh = (): VePromise<void, void> => {
+        if (!this.loading) {
             this.loading = true
             return (this.inProgress = this._onTreeDataChange().then(() => {
                 this.loading = false
-                return true
+                return
             }))
         }
         return this.inProgress.then(() => {
             this.loading = true
             return (this.inProgress = this._onTreeDataChange().then(() => {
                 this.loading = false
-                return true
+                return
             }))
         })
     }
 
-    public initialSelect = (): Promise<boolean> => {
+    public initialSelect = (): VePromise<void, void> => {
+        const deferred = this.$q.defer<void>()
         const initialSelection = this.initialSelection
         if (initialSelection) {
-            this.forEachBranch((b) => {
+            this.forEachBranch((b): void => {
                 if (b.data.id === initialSelection) {
-                    this.selectBranch(b, true)
+                    this.selectBranch(b, true).then(
+                        () => deferred.resolve(),
+                        (reason) => deferred.reject(reason)
+                    )
                 }
             })
+        } else {
+            this.refresh().then(
+                () => {
+                    deferred.resolve()
+                },
+                (reason) => {
+                    deferred.reject(reason)
+                }
+            )
         }
         this.initialSelection = null
-        return this.refresh()
+        return deferred.promise
     }
 
     /**
      * @name TreeApi#getBranch
      * Returns the branch with the specified data
      */
-    getBranch(data: ElementObject): TreeBranch {
-        let branch = null
+    public getBranch = (data: ElementObject): TreeBranch => {
+        let branch: TreeBranch = null
         this.forEachBranch((b) => {
             // if (_.isEqual(b.data,data)) {
             //     branch = b;
@@ -313,7 +330,7 @@ export class TreeApi {
         return branch
     }
 
-    getRows(): TreeRow[] {
+    public getRows = (): TreeRow[] => {
         return this.treeRows
     }
 
@@ -325,8 +342,8 @@ export class TreeApi {
     public forEachBranch = (
         func: (branch: TreeBranch, level: number) => void,
         excludeBranch?: TreeBranch
-    ) => {
-        const run = (branch, level) => {
+    ): void => {
+        const run = (branch: TreeBranch, level: number): void => {
             func(branch, level)
             if (branch.children) {
                 for (let i = 0; i < branch.children.length; i++) {
@@ -344,7 +361,10 @@ export class TreeApi {
         })
     }
 
-    private _removeBranch(branch, singleBranch) {
+    private _removeBranch = (
+        branch: TreeBranch,
+        singleBranch: boolean
+    ): void => {
         const parent_branch = this.getParent(branch)
         if (!parent_branch) {
             for (let j = 0; j < this.treeData.length; j++) {
@@ -371,7 +391,7 @@ export class TreeApi {
      * @returns {TreeBranch}
      */
     public getParent = (child: TreeBranch): TreeBranch => {
-        let parent = null
+        let parent: TreeBranch = null
         if (child !== null && child.parent_uid) {
             this.forEachBranch((b) => {
                 if (b.uid === child.parent_uid) {
@@ -382,32 +402,32 @@ export class TreeApi {
         return parent
     }
 
-    public expandPathToSelectedBranch = () => {
+    public expandPathToSelectedBranch = (): VePromise<void, void> => {
         if (this.selectedBranch) {
             return this.expandAllParents(this.selectedBranch)
         }
-        return Promise.resolve(true)
+        return this.$q.resolve()
     }
 
     public forAllAncestors = (
         child: TreeBranch,
-        fn: (parent: TreeBranch) => Promise<boolean>
-    ): Promise<boolean> => {
+        fn: (parent: TreeBranch) => VePromise<void, void>
+    ): VePromise<void, void> => {
         const parent = this.getParent(child)
         if (parent) {
             return fn(parent).then(() => {
                 return this.forAllAncestors(parent, fn)
             })
         }
-        return Promise.resolve(true)
+        return this.$q.resolve()
     }
 
-    public expandAllParents = (child: TreeBranch): Promise<boolean> => {
+    public expandAllParents = (child: TreeBranch): VePromise<void, void> => {
         return this.forAllAncestors(child, (b) => {
             if (b.expandable && !b.expanded) {
                 return this.expandBranch(b)
             }
-            return Promise.resolve(true)
+            return this.$q.resolve()
         })
     }
 
@@ -416,17 +436,23 @@ export class TreeApi {
      * @param branch
      * @param noClick
      */
-    public selectBranch = (branch?: TreeBranch, noClick?) => {
+    public selectBranch = (
+        branch?: TreeBranch,
+        noClick?
+    ): VePromise<void, void> => {
+        const deferred = this.$q.defer<void>()
         if (!branch) {
             if (this.selectedBranch) this.selectedBranch.selected = false
-            this.selectedBranch = null
+            this.clearSelectedBranch()
             return
         }
         if (branch !== this.selectedBranch) {
             if (this.selectedBranch) this.selectedBranch.selected = false
             branch.selected = true
             this.selectedBranch = branch
-            this.expandAllParents(branch).then(() => {
+        }
+        this.expandAllParents(branch).then(
+            () => {
                 if (!noClick) {
                     if (branch.onSelect != null) {
                         branch.onSelect(branch)
@@ -440,19 +466,23 @@ export class TreeApi {
                         treeId: this.treeConfig.id,
                     })
                 }
-            })
-        } else {
-            this.expandAllParents(branch)
-        }
+                deferred.resolve()
+            },
+            (reason) => deferred.reject(reason)
+        )
+        return deferred.promise
     }
 
-    private _onTreeDataChange = (): Promise<boolean> => {
-        return new Promise<boolean>((resolve, reject) => {
+    private _onTreeDataChange = (): VePromise<void, void> => {
+        return this.$q<void, void>((resolve, reject) => {
             if (!Array.isArray(this.treeData)) {
-                reject('[warn] treeData is not an array!')
+                reject({
+                    message: '[warn] treeData is not an array!',
+                    status: 500,
+                })
             }
             this.forEachBranch((b, level) => {
-                if (!b.uid) b.uid = '' + Math.random()
+                if (!b.uid) b.uid = `${Math.random()}`
             })
             this.forEachBranch((b) => {
                 if (Array.isArray(b.children)) {
@@ -474,7 +504,7 @@ export class TreeApi {
                 branch: TreeBranch,
                 visible: boolean,
                 peNums: { [type: string]: number }
-            ) => {
+            ): void => {
                 let type_icon = this.defaultIcon
                 let haveVisibleChild = false
                 let aggr = branch.aggr
@@ -525,12 +555,11 @@ export class TreeApi {
                         } else if (
                             section.length >= this.treeOptions.numberingDepth
                         ) {
-                            number =
-                                section
-                                    .slice(0, this.treeOptions.numberingDepth)
-                                    .join('.') +
-                                this.treeOptions.numberingSeparator +
-                                peNums[branch.type]
+                            number = `${section
+                                .slice(0, this.treeOptions.numberingDepth)
+                                .join('.')}${
+                                this.treeOptions.numberingSeparator
+                            }${peNums[branch.type]}`
                         } else {
                             const sectionCopy = [...section]
                             while (
@@ -539,10 +568,9 @@ export class TreeApi {
                             ) {
                                 sectionCopy.push('0')
                             }
-                            number =
-                                sectionCopy.join('.') +
-                                this.treeOptions.numberingSeparator +
-                                peNums[branch.type]
+                            number = `${sectionCopy.join('.')}${
+                                this.treeOptions.numberingSeparator
+                            }${peNums[branch.type]}`
                         }
                     }
                     if (
@@ -649,12 +677,12 @@ export class TreeApi {
             if (!this.peTree)
                 this.eventSvc.$broadcast(TreeService.events.UPDATED)
 
-            resolve(true)
+            resolve()
         })
     }
 
     // TODO: Update sort function to handle all cases
-    private _treeSortFunction = (a, b) => {
+    private _treeSortFunction = (a: TreeBranch, b: TreeBranch): number => {
         a.priority = 100
         if (a.type === 'tag') {
             a.priority = 0

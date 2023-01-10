@@ -1,15 +1,17 @@
+import { VePromise } from '@ve-types/angular'
+
 export interface EditingApi {
-    save?(e?): VePromise<boolean>
+    save?(e?: JQuery.ClickEvent): VePromise<boolean>
 
-    saveC?(e?): void
+    saveC?(e?: JQuery.ClickEvent): void
 
-    cancel?(e?): VePromise<boolean>
+    cancel?(e?: JQuery.ClickEvent): VePromise<boolean>
 
-    startEdit?(e?): void
+    startEdit?(e?: JQuery.ClickEvent): void
 
-    preview?(e?): void
+    preview?(e?: JQuery.ClickEvent): void
 
-    delete?(e?): void
+    delete?(e?: JQuery.ClickEvent): void
 }
 
 export interface EditingToolbar {

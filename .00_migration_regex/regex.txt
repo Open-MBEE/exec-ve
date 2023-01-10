@@ -53,8 +53,8 @@ private ([a-zA-Z]{0,20}) ?:? ?([a-zA-Z$]*)
 
 
 //Change existing prototypes to instances for callback
-(   )(public|private)? ([_a-zA-Z]{2,50})(\([A-Za-z:=>\(\), \$\?]*\))(: [A-Za-z]*)? \{
-$1 $2 $3 = $4 => {
+(   )(public|private)? ([_a-zA-Z]{2,50})(\<[A-Z,]*\>)?(\([\n_A-Za-z:=>\(\), \$\?]*\))(: [| A-Z_a-z]*)? \{
+$1$2 $3 = $4$5 => {
 
 For refactoring
 ((import \{)(, )?(.*)(\} from "@ve-utils/mms-api-client")(;)?\n)?((import \{)(.*), ?(AuthService|CacheService|ElementService|HttpService|PermissionsService|ProjectService|URLService|ViewService)(\n)?(, )?(.*)?(, )?(\} from "@ve-utils/services"))

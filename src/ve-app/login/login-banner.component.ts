@@ -1,4 +1,4 @@
-import angular, { IComponentController } from 'angular'
+import { IComponentController } from 'angular'
 
 import { BrandingStyle } from '@ve-utils/services'
 

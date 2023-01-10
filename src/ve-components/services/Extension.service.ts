@@ -1,7 +1,7 @@
 import angular from 'angular'
 import _ from 'lodash'
 
-import { IToolBarButton } from '@ve-core/tool-bar'
+import { IToolBarButton } from '@ve-core/toolbar'
 
 import { veComponents } from '@ve-components'
 
@@ -58,7 +58,7 @@ export class ExtensionService {
         // }
     }
 
-    public getTagByType(extPrefix: string, type: string): string {
+    public getTagByType = (extPrefix: string, type: string): string => {
         if (!this.allowedExtensions.includes(extPrefix)) {
             this.growl.error('Unknown Extension Prefix: ' + extPrefix)
             return 'extension-error'

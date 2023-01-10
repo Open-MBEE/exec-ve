@@ -12,7 +12,7 @@ import { AutosaveService, SessionService } from '@ve-utils/services'
 
 import { veUtils } from '@ve-utils'
 
-import { VePromise } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
     AuthRequest,
     AuthResponse,
@@ -48,7 +48,7 @@ export class AuthService {
         'AutosaveService',
     ]
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $http: angular.IHttpService,
         private cacheSvc: CacheService,
         private uRLSvc: URLService,
@@ -81,7 +81,7 @@ export class AuthService {
         return deferred.promise
     }
 
-    removeToken(): void {
+    removeToken = (): void => {
         localStorage.removeItem('token')
         this.token = undefined
         this.uRLSvc.setToken(null)
@@ -94,7 +94,7 @@ export class AuthService {
         this.sessionSvc.clear()
     }
 
-    getToken(): string {
+    getToken = (): string => {
         return this.token
     }
 

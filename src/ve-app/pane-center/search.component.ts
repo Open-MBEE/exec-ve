@@ -43,7 +43,7 @@ class SearchController {
             searchField: this.field,
             getProperties: true,
             closeable: true,
-            callback: (elementOb) => {
+            callback: (elementOb): void => {
                 const data = {
                     elementOb: elementOb,
                     commitId: 'latest',
@@ -55,9 +55,9 @@ class SearchController {
                 )
                     this.eventSvc.$broadcast('right-pane.toggle', false)
             },
-            relatedCallback: (doc, view, elem) => {
+            relatedCallback: (doc, view, elem): void => {
                 //siteId, documentId, viewId) {
-                this.$state.go('main.project.ref.document.view', {
+                void this.$state.go('main.project.ref.document.view', {
                     projectId: doc._projectId,
                     documentId: doc.id,
                     viewId: view.id,

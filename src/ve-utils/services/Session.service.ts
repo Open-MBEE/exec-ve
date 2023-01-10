@@ -1,5 +1,3 @@
-import { isNullOrUndefined } from 'util'
-
 import { veUtils } from '@ve-utils'
 
 import { EventService } from './Event.service'
@@ -9,16 +7,16 @@ export class SessionService {
         DELETEKEY: 'session-delete',
     }
 
-    static $inject = ['$window', 'EventService']
+    static $inject = ['EventService']
 
     constructor(private eventSvc: EventService) {}
 
-    private _setStorage<T>(key: string, realValue: T): void {
+    private static _setStorage<T>(key: string, realValue: T): void {
         const value = realValue == null ? null : JSON.stringify(realValue)
         return sessionStorage.setItem(key, value)
     }
 
-    private _getStorage<T>(key: string): T {
+    private static _getStorage<T>(key: string): T {
         const sessionValue = sessionStorage.getItem(key)
         if (sessionValue === null) {
             return null
@@ -27,7 +25,7 @@ export class SessionService {
         }
     }
 
-    private _removeStorage(key: string): void {
+    private static _removeStorage(key: string): void {
         return sessionStorage.removeItem(key)
     }
 
@@ -35,25 +33,25 @@ export class SessionService {
         sessionStorage.clear()
     }
 
-    public accessor<T>(
+    public accessor = <T>(
         name: string,
         value: T,
         defaultValue: T = null,
-        emit: boolean = false
-    ): T {
+        emit = false
+    ): T => {
         if (value === undefined) {
-            let val = this._getStorage<T>(name)
+            let val = SessionService._getStorage<T>(name)
             if (val == null) {
                 val = defaultValue
-                this._setStorage(name, val)
+                SessionService._setStorage(name, val)
             }
             return val
         }
         if (value === this.constants.DELETEKEY) {
-            this._removeStorage(name)
+            SessionService._removeStorage(name)
             return null
         }
-        this._setStorage(name, value)
+        SessionService._setStorage(name, value)
         if (emit) {
             this.eventSvc.$broadcast(name, value)
         }

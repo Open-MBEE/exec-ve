@@ -19,7 +19,7 @@ import {
 
 import { veUtils } from '@ve-utils'
 
-import { VePromise } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
@@ -46,12 +46,13 @@ import {
 } from '@ve-types/mms'
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
 
-export interface ViewElement {
+export interface ViewData {
     id: string
     api: ViewApi
     number?: string
     topLevel?: boolean
     first?: boolean
+    data?: ViewObject
 }
 
 export interface ViewApi {
@@ -59,15 +60,15 @@ export interface ViewApi {
     elementTranscluded(elementOb: ElementObject, type: string): void
 }
 
-export interface DocMetadata {
+export interface DocumentMetadata {
     numberingDepth: number
     numberingSeparator: string
+    'top-left'?: string
     top?: string
+    'top-right'?: string
+    'bottom-left'?: string
     bottom?: string
-    topl?: string
-    bottoml?: string
-    topr?: string
-    bottomr?: string
+    'bottom-right'?: string
 }
 
 /**
@@ -102,7 +103,7 @@ export class ViewService {
         'SchemaService',
     ]
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $http: angular.IHttpService,
         private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
@@ -185,7 +186,10 @@ export class ViewService {
             return deferred.promise
         }
         this.inProgress[inProgKey] = deferred.promise
-        const searchTerms: VePromise<SearchResponse<ViewObject>>[] = []
+        const searchTerms: VePromise<
+            SearchResponse<ViewObject>,
+            SearchResponse<ViewObject>
+        >[] = []
         const stereoIds = [
             this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
             this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
@@ -217,7 +221,7 @@ export class ViewService {
     }
 
     /**
-     * @name ViewService#getViewElements
+     * @name ViewService#getViewDatas
      * Gets the element objects for elements allowed in this view. The references are
      * the same as ones gotten from this.elementSvc.
      *
@@ -228,7 +232,7 @@ export class ViewService {
      *      it's displayed, except for the editables)
      * @returns {Promise} The promise will be resolved with array of element objects.
      */
-    public getViewElements(
+    public getViewDatas(
         reqOb: ElementsRequest<string>,
         weight: number,
         update?: boolean
@@ -236,7 +240,7 @@ export class ViewService {
         this.apiSvc.normalize(reqOb)
         const deferred = this.$q.defer<ViewObject[]>()
         const key = this.apiSvc
-            .makeCacheKey(reqOb, reqOb.elementId, false, 'viewElements')
+            .makeCacheKey(reqOb, reqOb.elementId, false, 'ViewDatas')
             .join('-')
         if (this.inProgress.hasOwnProperty(key)) {
             return this.inProgress[key] as VePromise<ViewObject[]>
@@ -1457,9 +1461,9 @@ export class ViewService {
      * @param {object} instanceSpec instance specification object
      * @returns {object} The json object for the corresponding presentation element
      */
-    public getPresentationInstanceObject(
+    public getPresentationInstanceObject = (
         instanceSpec: InstanceSpecObject
-    ): PresentationInstanceObject | ElementObject {
+    ): PresentationInstanceObject | ElementObject => {
         const instanceSpecSpec: ValueObject = instanceSpec.specification
         if (!instanceSpecSpec) {
             this.growl.error('missing specification')
@@ -1569,7 +1573,7 @@ export class ViewService {
      * @param {Object} instanceSpec A InstanceSpecification json object
      * @returns {boolean} whether it's a section
      */
-    public isSection(instanceSpec: ViewInstanceSpec): boolean {
+    public isSection = (instanceSpec: ViewInstanceSpec): boolean => {
         return (
             instanceSpec.classifierIds &&
             instanceSpec.classifierIds.length > 0 &&
@@ -1590,7 +1594,7 @@ export class ViewService {
         )
     }
 
-    public isTable(instanceSpec: InstanceSpecObject): boolean {
+    public isTable = (instanceSpec: InstanceSpecObject): boolean => {
         return (
             instanceSpec.classifierIds &&
             instanceSpec.classifierIds.length > 0 &&
@@ -1611,7 +1615,7 @@ export class ViewService {
         )
     }
 
-    public isFigure(instanceSpec: InstanceSpecObject): boolean {
+    public isFigure = (instanceSpec: InstanceSpecObject): boolean => {
         return (
             instanceSpec.classifierIds &&
             instanceSpec.classifierIds.length > 0 &&
@@ -1646,7 +1650,7 @@ export class ViewService {
         )
     }
 
-    public isEquation(instanceSpec: InstanceSpecObject): boolean {
+    public isEquation = (instanceSpec: InstanceSpecObject): boolean => {
         return (
             instanceSpec.classifierIds &&
             instanceSpec.classifierIds.length > 0 &&
@@ -1660,7 +1664,7 @@ export class ViewService {
         )
     }
 
-    public getTreeType(instanceSpec: ViewInstanceSpec): string {
+    public getTreeType = (instanceSpec: ViewInstanceSpec): string => {
         if (this.isSection(instanceSpec)) return 'section'
         if (
             instanceSpec.specification &&
@@ -1711,7 +1715,7 @@ export class ViewService {
     }
 
     /**
-     * @name ViewService#getDocMetadata
+     * @name ViewService#getDocumentMetadata
      * gets Document properties from docgen's stereotypes
      *
      * @param {object} reqOb see this.elementSvc.getElement
@@ -1719,31 +1723,35 @@ export class ViewService {
      * @returns {Promise} The promise will be resolved with metadata object
      *                      with name value pairs corresponding to document stereotype
      */
-    public getDocMetadata(
+    public getDocumentMetadata(
         reqOb: ElementsRequest<string>,
-        weight: number
-    ): VePromise<DocMetadata> {
-        const deferred = this.$q.defer<DocMetadata>()
-        const metadata: DocMetadata = {
+        weight?: number
+    ): VePromise<DocumentMetadata> {
+        const deferred = this.$q.defer<DocumentMetadata>()
+        const metadata: DocumentMetadata = {
             numberingDepth: 0,
             numberingSeparator: '.',
         }
         const elementIds = [
             `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>(
                 'DOCUMENT_IDS',
-                'Header'
+                'Header',
+                this.schema
             )}`, //header
             `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>(
                 'DOCUMENT_IDS',
-                'Footer'
+                'Footer',
+                this.schema
             )}`, //footer
             `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>(
                 'DOCUMENT_IDS',
-                'NumDepth'
+                'NumDepth',
+                this.schema
             )}`, //numbering depth
             `${reqOb.elementId}_asi-slot-${this.schemaSvc.getValue<string>(
                 'DOCUMENT_IDS',
-                'NumSep'
+                'NumSep',
+                this.schema
             )}`, //numbering separator
         ]
         const metaReqOb: ElementsRequest<string[]> = Object.assign(reqOb, {
@@ -1780,8 +1788,10 @@ export class ViewService {
                             //header
                             result = this.processSlotStrings(value)
                             metadata.top = result.length > 0 ? result[0] : ''
-                            metadata.topl = result.length > 1 ? result[1] : ''
-                            metadata.topr = result.length > 2 ? result[2] : ''
+                            metadata['top-left'] =
+                                result.length > 1 ? result[1] : ''
+                            metadata['top-right'] =
+                                result.length > 2 ? result[2] : ''
                         } else if (
                             feature ==
                             this.schemaSvc.getValue(
@@ -1794,9 +1804,9 @@ export class ViewService {
                             //footer
                             result = this.processSlotStrings(value)
                             metadata.bottom = result.length > 0 ? result[0] : ''
-                            metadata.bottoml =
+                            metadata['bottom-left'] =
                                 result.length > 1 ? result[1] : ''
-                            metadata.bottomr =
+                            metadata['bottom-right'] =
                                 result.length > 2 ? result[2] : ''
                         } else if (
                             feature ==
@@ -1837,7 +1847,9 @@ export class ViewService {
         return deferred.promise
     }
 
-    public getPresentationElementType(instanceSpec: ViewInstanceSpec): string {
+    public getPresentationElementType = (
+        instanceSpec: ViewInstanceSpec
+    ): string => {
         if (instanceSpec.type === 'InstanceSpecification') {
             if (this.isSection(instanceSpec)) {
                 return 'Section'
@@ -1874,7 +1886,7 @@ export class ViewService {
         }
     }
 
-    public getElementType(element: ElementObject): string {
+    public getElementType = (element: ElementObject): string => {
         // Get Type
         let elementType = ''
         if (this.apiSvc.isRequirement(element)) {
@@ -1891,7 +1903,7 @@ export class ViewService {
         return elementType
     }
 
-    public reset(): void {
+    public reset = (): void => {
         this.inProgress = {}
     }
 }

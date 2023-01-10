@@ -1,8 +1,6 @@
 import jQuery from 'jquery'
 
-jQuery.fn.table2CSV = (
-    inputOptions: JQuery.table2CSV.inputOptions
-): string | boolean => {
+jQuery.fn.table2CSV = (inputOptions: JQuery.table2CSV.inputOptions): string => {
     const options = jQuery.extend(
         <JQuery.table2CSV.inputOptions>{
             separator: ',',

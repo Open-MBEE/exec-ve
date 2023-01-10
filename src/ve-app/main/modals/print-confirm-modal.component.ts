@@ -1,17 +1,335 @@
 import angular from 'angular'
 import _ from 'lodash'
 
-import { AppUtilsService } from '@ve-app/main/services'
+import { AppUtilsService, DocumentStructure } from '@ve-app/main/services'
 import {
     ElementService,
     ViewService,
-    DocMetadata,
+    DocumentMetadata,
+    ProjectService,
 } from '@ve-utils/mms-api-client'
+import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 import { UtilsService, AutosaveService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
-const PrintConfirmModalComponent: angular.Injectable<any> = {
+import { VePromise } from '@ve-types/angular'
+import {
+    CommitObject,
+    CommitResponse,
+    RefObject,
+    ViewObject,
+} from '@ve-types/mms'
+import {
+    VeModalComponent,
+    VeModalController,
+    VeModalResolve,
+    VeModalResolveFn,
+} from '@ve-types/view-editor'
+
+interface PrintModalResolve extends VeModalResolve {
+    print: JQLite
+    refOb: RefObject
+    viewOrDocOb: ViewObject
+    isDoc: boolean
+    mode: number
+}
+
+export interface PrintModalResolveFn extends VeModalResolveFn {
+    print(): JQLite
+    refOb(): RefObject
+    viewOrDocOb(): ViewObject
+    isDoc(): boolean
+    mode(): number
+}
+
+export interface PrintConfirmResult {
+    status: string
+    customization?: boolean
+    meta?: DocumentMetadata
+    model?: { genTotf: boolean; landscape: boolean; htmlTotf: boolean }
+    customCSS?: string
+}
+
+class PrintConfirmModalController
+    extends VeModalControllerImpl<PrintConfirmResult>
+    implements VeModalController
+{
+    static $inject = [
+        '$filter',
+        '$window',
+        'growl',
+        'UtilsService',
+        'ViewService',
+        'AutosaveService',
+        'ElementService',
+        'ProjectService',
+        'AppUtilsService',
+    ]
+
+    protected resolve: PrintModalResolve
+
+    private refOb: RefObject
+    type: string
+    mode: number
+    action: string
+    viewOrDocOb: ViewObject
+    printElement: JQLite
+    label: string
+    meta: DocumentMetadata
+    customizeDoc: {
+        useCustomStyle: boolean
+        customCSS: string
+    }
+    hasError: boolean
+    isDoc: boolean
+    elementSaving: boolean
+    unsaved: boolean
+    docOption: boolean
+    model: { genTotf: boolean; landscape: boolean; htmlTotf: boolean }
+    previewResult: DocumentStructure
+
+    constructor(
+        private $filter: angular.IFilterService,
+        private $window: angular.IWindowService,
+        private growl: angular.growl.IGrowlService,
+        private utilsSvc: UtilsService,
+        private viewSvc: ViewService,
+        private autosaveSvc: AutosaveService,
+        private elementSvc: ElementService,
+        private projectSvc: ProjectService,
+        private appUtilsSvc: AppUtilsService
+    ) {
+        super()
+    }
+
+    $onInit(): void {
+        this.refOb = this.resolve.refOb
+        this.isDoc = this.resolve.isDoc
+        this.type = this.isDoc ? 'DOCUMENT' : 'VIEW'
+        this.mode = this.resolve.mode
+        this.viewOrDocOb = this.resolve.viewOrDocOb
+        this.printElement = this.resolve.print
+        this.action =
+            this.mode === 1
+                ? 'print'
+                : this.mode === 3
+                ? 'Generate PDF'
+                : 'Generate word'
+        this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : ''
+        this.customizeDoc.useCustomStyle = false
+
+        if (this.printElement.find('.ve-error').length > 0) {
+            this.hasError = true
+        }
+
+        if (this.isDoc) {
+            // If _printCss, use to set doc css for export/print
+            this.customizeDoc.useCustomStyle = false
+            if (this.viewOrDocOb._printCss) {
+                // If _printCss, show tab for custom css
+                this.customizeDoc.useCustomStyle = true
+                this.customizeDoc.customCSS = this.viewOrDocOb._printCss
+            } else {
+                this.customizeDoc.customCSS = this.utilsSvc.getPrintCss(
+                    false,
+                    false,
+                    { numberingDepth: 0, numberingSeparator: '.' }
+                )
+            }
+
+            // Get/Set document header/footer for PDF generation
+            this.meta = {
+                numberingDepth: 0,
+                numberingSeparator: '.',
+                'top-left': 'loading...',
+                top: 'loading...',
+                'top-right': 'loading...',
+                'bottom-left': 'loading...',
+                bottom: 'loading...',
+                'bottom-right': 'loading...',
+            }
+            this.viewSvc
+                .getDocumentMetadata(
+                    {
+                        elementId: this.viewOrDocOb.id,
+                        projectId: this.viewOrDocOb._projectId,
+                        refId: this.viewOrDocOb._refId,
+                    },
+                    2
+                )
+                .then(
+                    (metadata: DocumentMetadata) => {
+                        let displayTime = 'latest'
+                        let promise: VePromise<
+                            CommitObject | CommitObject[],
+                            CommitResponse
+                        >
+                        if (this.refOb.parentCommitId) {
+                            promise = this.projectSvc.getCommit(
+                                this.refOb._projectId,
+                                this.refOb.id,
+                                this.refOb.parentCommitId
+                            )
+                        } else {
+                            promise = this.projectSvc.getCommits(
+                                this.refOb._projectId,
+                                this.refOb.id,
+                                null,
+                                1
+                            )
+                        }
+
+                        promise
+                            .then(
+                                (result) => {
+                                    let commit: CommitObject
+                                    if (Array.isArray(result)) {
+                                        commit = result[0]
+                                    } else {
+                                        commit = result
+                                    }
+                                    displayTime = this.$filter('date')(
+                                        commit._created,
+                                        'M/d/yy h:mm a'
+                                    )
+                                },
+                                (reason) => {
+                                    this.growl.error(
+                                        'Warning: RefOb parent commit does not exist; Defaulting to current time'
+                                    )
+                                }
+                            )
+                            .finally(() => {
+                                const defaultMetadata: DocumentMetadata = {
+                                    numberingDepth: 0,
+                                    numberingSeparator: '.',
+                                    top: '',
+                                    bottom: '',
+                                    'top-left': '',
+                                    'top-right': '',
+                                    'bottom-left': '',
+                                    'bottom-right': 'counter(page)',
+                                }
+                                this.meta = Object.assign(
+                                    metadata,
+                                    defaultMetadata
+                                )
+                                if (this.refOb && this.refOb.type === 'Tag') {
+                                    this.meta['top-right'] =
+                                        this.meta['top-right'] +
+                                        ' ' +
+                                        this.refOb.name
+                                }
+                                if (displayTime === 'latest') {
+                                    displayTime = this.$filter('date')(
+                                        new Date(),
+                                        'M/d/yy h:mm a'
+                                    )
+                                }
+                                this.meta['top-right'] =
+                                    this.meta['top-right'] + ' ' + displayTime
+                            })
+                    },
+                    (reason) => {
+                        this.meta['top-left'] =
+                            this.meta.top =
+                            this.meta['top-right'] =
+                            this.meta['bottom-left'] =
+                            this.meta.bottom =
+                                ''
+                        this.meta['bottom-right'] = 'counter(page)'
+                    }
+                )
+        }
+        this.unsaved =
+            this.autosaveSvc.getAll() && !_.isEmpty(this.autosaveSvc.getAll())
+        this.docOption = !this.isDoc && (this.mode === 3 || this.mode === 2)
+        this.model = { genTotf: false, landscape: false, htmlTotf: false }
+    }
+
+    public saveStyleUpdate(): void {
+        // To only update _printCss, create new ob with doc info
+        this.elementSaving = true
+        const docOb = {
+            id: this.viewOrDocOb.id,
+            _projectId: this.viewOrDocOb._projectId,
+            _refId: this.viewOrDocOb._refId,
+            _printCss: this.customizeDoc.customCSS,
+        }
+        this.elementSvc.updateElement(docOb).then(
+            () => {
+                this.elementSaving = false
+                this.growl.success('Save Successful')
+            },
+            () => {
+                this.elementSaving = false
+                this.growl.warning('Save was not complete. Please try again.')
+            }
+        )
+    }
+    public preview(): void {
+        if (!this.previewResult) {
+            this.previewResult = this.appUtilsSvc.printOrGenerate(
+                this.viewOrDocOb,
+                3,
+                true,
+                true,
+                false
+            )
+            this.previewResult.tof =
+                this.previewResult.tof + this.previewResult.toe
+        }
+        const result = this.previewResult
+        const htmlArr = [
+            '<html><head><title>' +
+                this.viewOrDocOb.name +
+                '</title><style type="text/css">',
+            this.customizeDoc.customCSS,
+            '</style></head><body style="overflow: auto">',
+            result.cover,
+        ]
+        if (result.toc != '') htmlArr.push(result.toc)
+        if (result.tot != '' && this.model.genTotf) htmlArr.push(result.tot)
+        if (result.tof != '' && this.model.genTotf) htmlArr.push(result.tof)
+        htmlArr.push(result.contents, '</body></html>')
+        const htmlString = htmlArr.join('')
+        const popupWin: Window | null = this.$window.open(
+            'about:blank',
+            '_blank',
+            'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1'
+        )
+        if (popupWin) {
+            popupWin.document.open()
+            popupWin.document.write(htmlString)
+            popupWin.document.close()
+        } else {
+            this.growl.error(
+                'Popup Window Failed to open. Allow popups and try again'
+            )
+        }
+    }
+    public print(): void {
+        const result = {
+            status: 'ok',
+            model: this.model,
+            meta: this.meta,
+            customization: this.customizeDoc.useCustomStyle,
+            customCSS: this.customizeDoc.useCustomStyle
+                ? this.customizeDoc.customCSS
+                : null,
+        }
+        this.modalInstance.close(result)
+    }
+    public fulldoc(): void {
+        this.modalInstance.close({ status: 'fulldoc' })
+    }
+    public cancel(): void {
+        this.modalInstance.dismiss()
+    }
+}
+
+const PrintConfirmModalComponent: VeModalComponent = {
     selector: 'printConfirmModal',
     template: `
     <div class="modal-header">
@@ -127,264 +445,10 @@ const PrintConfirmModalComponent: angular.Injectable<any> = {
 </div>
 `,
     bindings: {
-        close: '<',
-        dismiss: '<',
         modalInstance: '<',
         resolve: '<',
     },
-    controller: class PrintConfirmModalController
-        implements angular.IComponentController
-    {
-        static $inject = [
-            '$filter',
-            '$window',
-            'growl',
-            'UtilsService',
-            'ViewService',
-            'AutosaveService',
-            'ElementService',
-            'AppUtilsService',
-        ]
-
-        //bindings
-        public modalInstance
-        dismiss
-        close
-        resolve
-
-        private refOb: any
-        type: string
-        mode: any
-        action: string
-        viewOrDocOb: any
-        printElement: any
-        label: string
-        meta: {
-            'top-left': string
-            top: string
-            'top-right': string
-            'bottom-left': string
-            bottom: string
-            'bottom-right': string
-        }
-        customizeDoc: {
-            useCustomStyle: boolean
-            customCSS: any
-        }
-        hasError: boolean
-        isDoc: boolean
-        elementSaving: boolean
-        unsaved: boolean
-        docOption: boolean
-        model: { genTotf: boolean; landscape: boolean; htmlTotf: boolean }
-        previewResult: any
-        customization: any
-
-        constructor(
-            private $filter: angular.IFilterService,
-            private $window: angular.IWindowService,
-            private growl: angular.growl.IGrowlService,
-            private utilsSvc: UtilsService,
-            private viewSvc: ViewService,
-            private autosaveSvc: AutosaveService,
-            private elementSvc: ElementService,
-            private appUtilsSvc: AppUtilsService
-        ) {}
-
-        $onInit(): void {
-            this.refOb = this.resolve.refOb()
-            this.isDoc = this.resolve.isDoc()
-            this.type = this.isDoc ? 'DOCUMENT' : 'VIEW'
-            this.mode = this.resolve.mode()
-            this.viewOrDocOb = this.resolve.viewOrDocOb()
-            this.printElement = this.resolve.print()
-            this.action =
-                this.mode === 1
-                    ? 'print'
-                    : this.mode === 3
-                    ? 'Generate PDF'
-                    : 'Generate word'
-            this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : ''
-            this.customizeDoc.useCustomStyle = false
-
-            if (this.printElement.find('.ve-error').length > 0) {
-                this.hasError = true
-            }
-
-            if (this.isDoc) {
-                // If _printCss, use to set doc css for export/print
-                this.customizeDoc.useCustomStyle = false
-                if (this.viewOrDocOb._printCss) {
-                    // If _printCss, show tab for custom css
-                    this.customizeDoc.useCustomStyle = true
-                    this.customizeDoc.customCSS = this.viewOrDocOb._printCss
-                } else {
-                    this.customizeDoc.customCSS = this.utilsSvc.getPrintCss(
-                        false,
-                        false,
-                        {}
-                    )
-                }
-
-                // Get/Set document header/footer for PDF generation
-                this.meta = {
-                    'top-left': 'loading...',
-                    top: 'loading...',
-                    'top-right': 'loading...',
-                    'bottom-left': 'loading...',
-                    bottom: 'loading...',
-                    'bottom-right': 'loading...',
-                }
-                this.viewSvc
-                    .getDocMetadata(
-                        {
-                            elementId: this.viewOrDocOb.id,
-                            projectId: this.viewOrDocOb._projectId,
-                            refId: this.viewOrDocOb._refId,
-                        },
-                        2
-                    )
-                    .then(
-                        (metadata: DocMetadata) => {
-                            this.meta.top = metadata.top ? metadata.top : ''
-                            this.meta.bottom = metadata.bottom
-                                ? metadata.bottom
-                                : ''
-                            this.meta['top-left'] = metadata.topl
-                                ? metadata.topl
-                                : ''
-                            this.meta['top-right'] = metadata.topr
-                                ? metadata.topr
-                                : ''
-                            if (this.refOb && this.refOb.type === 'Tag') {
-                                this.meta['top-right'] =
-                                    this.meta['top-right'] +
-                                    ' ' +
-                                    this.refOb.name
-                            }
-                            let displayTime =
-                                this.refOb.type === 'Tag'
-                                    ? this.refOb._timestamp
-                                    : 'latest'
-                            if (displayTime === 'latest') {
-                                displayTime = new Date()
-                                displayTime = this.$filter('date')(
-                                    displayTime,
-                                    'M/d/yy h:mm a'
-                                )
-                            }
-                            this.meta['top-right'] =
-                                this.meta['top-right'] + ' ' + displayTime
-                            this.meta['bottom-left'] = metadata.bottoml
-                                ? metadata.bottoml
-                                : ''
-                            this.meta['bottom-right'] = metadata.bottomr
-                                ? metadata.bottomr
-                                : 'counter(page)'
-                        },
-                        (reason) => {
-                            this.meta['top-left'] =
-                                this.meta.top =
-                                this.meta['top-right'] =
-                                this.meta['bottom-left'] =
-                                this.meta.bottom =
-                                    ''
-                            this.meta['bottom-right'] = 'counter(page)'
-                        }
-                    )
-            }
-            this.unsaved =
-                this.autosaveSvc.getAll() &&
-                !_.isEmpty(this.autosaveSvc.getAll())
-            this.docOption = !this.isDoc && (this.mode === 3 || this.mode === 2)
-            this.model = { genTotf: false, landscape: false, htmlTotf: false }
-        }
-
-        public saveStyleUpdate() {
-            // To only update _printCss, create new ob with doc info
-            this.elementSaving = true
-            const docOb = {
-                id: this.viewOrDocOb.id,
-                _projectId: this.viewOrDocOb._projectId,
-                _refId: this.viewOrDocOb._refId,
-                _printCss: this.customizeDoc.customCSS,
-            }
-            this.elementSvc.updateElement(docOb).then(
-                () => {
-                    this.elementSaving = false
-                    this.growl.success('Save Successful')
-                },
-                () => {
-                    this.elementSaving = false
-                    this.growl.warning(
-                        'Save was not complete. Please try again.'
-                    )
-                }
-            )
-        }
-        public preview() {
-            if (!this.previewResult) {
-                this.previewResult = this.appUtilsSvc.printOrGenerate(
-                    this.viewOrDocOb,
-                    3,
-                    true,
-                    true,
-                    false
-                )
-                this.previewResult.tof =
-                    this.previewResult.tof + this.previewResult.toe
-            }
-            const result = this.previewResult
-            const htmlArr = [
-                '<html><head><title>' +
-                    this.viewOrDocOb.name +
-                    '</title><style type="text/css">',
-                this.customizeDoc.customCSS,
-                '</style></head><body style="overflow: auto">',
-                result.cover,
-            ]
-            if (result.toc != '') htmlArr.push(result.toc)
-            if (result.tot != '' && this.model.genTotf) htmlArr.push(result.tot)
-            if (result.tof != '' && this.model.genTotf) htmlArr.push(result.tof)
-            htmlArr.push(result.contents, '</body></html>')
-            const htmlString = htmlArr.join('')
-            const popupWin: Window | null = this.$window.open(
-                'about:blank',
-                '_blank',
-                'width=800,height=600,scrollbars=1,status=1,toolbar=1,menubar=1'
-            )
-            if (popupWin) {
-                popupWin.document.open()
-                popupWin.document.write(htmlString)
-                popupWin.document.close()
-            } else {
-                this.growl.error(
-                    'Popup Window Failed to open. Allow popups and try again'
-                )
-            }
-        }
-        public print() {
-            this.customization = this.customizeDoc.useCustomStyle
-                ? this.customizeDoc.customCSS
-                : false
-            this.close({
-                $value: [
-                    'ok',
-                    this.model.genTotf,
-                    this.model.htmlTotf,
-                    this.model.landscape,
-                    this.meta,
-                    this.customization,
-                ],
-            })
-        }
-        public fulldoc() {
-            this.close({ $value: ['fulldoc'] })
-        }
-        public cancel() {
-            this.dismiss()
-        }
-    },
+    controller: PrintConfirmModalController,
 }
 
 veApp.component(PrintConfirmModalComponent.selector, PrintConfirmModalComponent)

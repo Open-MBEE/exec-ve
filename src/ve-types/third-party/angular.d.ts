@@ -1,13 +1,14 @@
-import angular from 'angular';
+/* eslint-disable unused-imports/no-unused-imports */
+import angular from 'angular'
 
 declare module 'angular' {
-    export interface IRequestConfig {
-        cancel: IDeferred<any>;
+    interface IRequestConfig {
+        cancel: IDeferred<any>
     }
-    export interface IPromise<T> {
+    interface IPromise<T> {
         state: string
     }
-    export interface IDeferred<T> {
+    interface IDeferred<T> {
         state: string
     }
 }

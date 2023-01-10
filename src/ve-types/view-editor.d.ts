@@ -1,20 +1,27 @@
 import angular, { IComponentController } from 'angular'
 
-import { ElementObject, MmsObject, ViewObject } from '@ve-types/mms'
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
-
 import IModalService = angular.ui.bootstrap.IModalService
 import IModalSettings = angular.ui.bootstrap.IModalSettings
 import IModalInstanceService = angular.ui.bootstrap.IModalInstanceService
 
-export interface VeSearchOptions<T extends MmsObject> {
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { MmsObject, OrgObject, ProjectObject, ViewObject } from '@ve-types/mms'
+
+import { ngStorage } from 'ngstorage'
+
+export type veSearchCallback<T extends MmsObject = MmsObject> = (
+    elem: T,
+    property: string
+) => void
+
+export interface VeSearchOptions<T extends MmsObject = ElementObject> {
     getProperties?: boolean
     searchResult?: T[]
     searchField?: string
     closeable: boolean
     searchInput?: string
     hideFilterOptions?: boolean
-    callback?(elem: T, property: string): void
+    callback?: veSearchCallback
     relatedCallback?(doc: ViewObject, view: ViewObject, elem: T): void
     filterCallback?(elements: T[]): T[]
     filterQueryList?: [(...any) => { [key: string]: string[] }]
@@ -63,6 +70,11 @@ export interface VeModalResolveFn {
     [key: string]: () => unknown
 }
 
+export interface VeStorageService extends ngStorage.StorageService {
+    token: string
+    org: OrgObject
+    project: ProjectObject
+}
 // {
 //     getProperties: any
 //     emptyDocTxt?: string

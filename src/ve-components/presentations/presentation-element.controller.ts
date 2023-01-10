@@ -8,12 +8,11 @@ import {
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService } from '@ve-components/services'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
-import { EditingApi } from '@ve-core/editor'
 import { SchemaService } from '@ve-utils/model-schema'
 import { EventService, ImageService } from '@ve-utils/services'
 
 import { ComponentController } from '@ve-types/components'
-import { EditingToolbar } from '@ve-types/core/editor'
+import { EditingApi, EditingToolbar } from '@ve-types/core/editor'
 import {
     ElementObject,
     InstanceSpecObject,

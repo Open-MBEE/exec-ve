@@ -7,7 +7,7 @@ import { veComponents } from '@ve-components'
 
 import { SpecService } from './Spec.service'
 
-import { VePromise } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
     BulkResponse,
     ElementObject,
@@ -28,7 +28,7 @@ export class ReorderService {
     view: ViewObject | ViewInstanceSpec
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private growl: angular.growl.IGrowlService,
         private elementSvc: ElementService,
         private viewSvc: ViewService,
@@ -130,7 +130,7 @@ export class ReorderService {
         return this.elementSvc.updateElements(elementObsToUpdate, false)
     }
 
-    public revert(): void {
+    public revert = (): void => {
         this.elementReferenceTree = _.cloneDeepWith(
             this.originalElementReferenceTree,
             (value: unknown, key) => {
@@ -146,7 +146,7 @@ export class ReorderService {
         ) as PresentationReference[]
     }
 
-    public refresh(): void {
+    public refresh = (): void => {
         let contents: ExpressionObject<InstanceValueObject> = null
         if (this.view._contents) {
             contents = (this.view as ViewObject)._contents

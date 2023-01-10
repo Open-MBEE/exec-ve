@@ -12,7 +12,7 @@ import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { PresentationComponentOptions } from '@ve-types/components'
+import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 import { ElementObject } from '@ve-types/mms'
 
 class PresentSectionController extends Presentation {
@@ -148,7 +148,7 @@ class PresentSectionController extends Presentation {
     }
 }
 
-const PresentSectionComponent: PresentationComponentOptions = {
+const PresentSectionComponent: IPresentationComponentOptions = {
     selector: 'presentSection',
     bindings: {
         peObject: '<',

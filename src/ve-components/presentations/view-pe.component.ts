@@ -133,21 +133,12 @@ export class ViewPresentationElemController implements IComponentController {
                     }
                     const hash = this.$location.hash()
                     if (hash === instanceSpec.id) {
-                        this.$timeout(
+                        void this.$timeout(
                             () => {
                                 this.$anchorScroll()
                             },
                             1000,
                             false
-                        ).then(
-                            () => {
-                                /* Do Nothing*/
-                            },
-                            () => {
-                                this.growl.error(
-                                    'Unable to scroll to requested element'
-                                )
-                            }
                         )
                     }
                     if (this.viewCtrl) {

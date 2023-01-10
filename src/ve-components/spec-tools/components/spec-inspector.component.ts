@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import { ComponentService } from '@ve-components/services'
 import { SpecService, ISpecTool, SpecTool } from '@ve-components/spec-tools'
-import { ToolbarService } from '@ve-core/tool-bar'
+import { ToolbarService } from '@ve-core/toolbar'
 import {
     ProjectService,
     URLService,
@@ -17,7 +17,7 @@ import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 
 /**
  * @ngdoc directive
@@ -93,7 +93,7 @@ class SpecInspectorController extends SpecTool implements ISpecTool {
     constructor(
         $scope: angular.IScope,
         $element: JQuery<HTMLElement>,
-        $q: angular.IQService,
+        $q: VeQService,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,

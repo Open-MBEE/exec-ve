@@ -65,4 +65,4 @@ export class CameoSchema implements Schema {
     }
 }
 
-veUtils.service('CameoSchema(', CameoSchema)
+veUtils.service('CameoSchema', CameoSchema)

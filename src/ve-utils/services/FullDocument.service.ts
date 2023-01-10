@@ -1,30 +1,31 @@
 import angular from 'angular'
 import _ from 'lodash'
 
+import { ViewData } from '@ve-utils/mms-api-client'
+
 import { veUtils } from '@ve-utils'
 
-import { ViewObject } from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
 
 export class FullDocumentService {
-    public viewsBuffer: ViewObject[] = []
+    public viewsBuffer: ViewData[] = []
 
     private _isLoadingRemaingViews: boolean = false
     _isFullDocFullyLoaded: boolean = false
     _loadingRemainingViewsMessage: angular.growl.IGrowlMessage
 
     constructor(
-        private _views: ViewObject[],
+        private _views: ViewData[],
         private $timeout: angular.ITimeoutService,
         private $interval: angular.IIntervalService,
         private $http: angular.IHttpService,
         private growl: angular.growl.IGrowlService
     ) {}
 
-    public handleClickOnBranch(
+    public handleClickOnBranch = (
         branch: TreeBranch,
         callback: () => void
-    ): boolean {
+    ): boolean => {
         const viewId: string =
             branch.type === 'view' ? branch.data.id : branch.viewId
         const isViewLoadedBefore = this._loadViewsUntilViewWith(viewId) // load some views if necessary
@@ -41,7 +42,7 @@ export class FullDocumentService {
         return isViewLoadedBefore
     }
 
-    public loadRemainingViews(callback: () => void): void {
+    public loadRemainingViews = (callback: () => void): void => {
         if (this._isFullDocFullyLoaded) {
             callback()
         } else {
@@ -84,7 +85,7 @@ export class FullDocumentService {
         }
     }
 
-    public handleDocumentScrolling(): boolean {
+    public handleDocumentScrolling = (): boolean => {
         return this._pushNewViewsToBuffer(
             this.viewsBuffer.length,
             this.viewsBuffer.length
@@ -99,7 +100,10 @@ export class FullDocumentService {
         this._incrementallyAddViewTillScroll(destroyMessage, isScrollbarVisible)
     }
 
-    public handleViewAdd(view: ViewObject, prevSiblingViewId: string): void {
+    public handleViewAdd = (
+        view: ViewData,
+        prevSiblingViewId: string
+    ): void => {
         // load the new view into the original views right after its sibling
         const siblingIndex = this._findViewFromOriginalViews(prevSiblingViewId)
         this._views.splice(siblingIndex + 1, 0, view)
@@ -119,21 +123,21 @@ export class FullDocumentService {
         }
     }
 
-    public handleViewDelete(deletedBranch: TreeBranch): void {
+    public handleViewDelete = (deletedBranch: TreeBranch): void => {
         const viewIdsToDelete: string[] = []
         this._getAllViewsStartingAt(deletedBranch, viewIdsToDelete)
         this._deleteViewsFrom(this._views, viewIdsToDelete)
         this._deleteViewsFrom(this.viewsBuffer, viewIdsToDelete)
     }
 
-    private _addNewViewToBufferAt(index: number): void {
+    private _addNewViewToBufferAt = (index: number): void => {
         this.viewsBuffer.splice(index, 0, this._views[index])
     }
 
-    private _pushNewViewsToBuffer(
+    private _pushNewViewsToBuffer = (
         startIndex: number,
         endIndex: number
-    ): boolean {
+    ): boolean => {
         let isLoadedBefore = true
         if (startIndex < this._views.length && endIndex < this._views.length) {
             Array.prototype.push.apply(
@@ -150,7 +154,7 @@ export class FullDocumentService {
         return isLoadedBefore
     }
 
-    private _loadViewsUntilViewWith(viewId: string): boolean {
+    private _loadViewsUntilViewWith = (viewId: string): boolean => {
         let isViewLoadedBefore = true
         // if not, find the index of that view and load starting from lastLoadedViewIndex till that view + 1
         if (this._findViewFromLoadedViews(viewId) === -1) {
@@ -197,40 +201,33 @@ export class FullDocumentService {
     }
 
     private _deleteViewsFrom(
-        viewListToDeleteFrom: ViewObject[],
+        viewListToDeleteFrom: ViewData[],
         viewIdsToDelete: string[]
     ): void {
-        _.remove(viewListToDeleteFrom, (view: ViewObject) => {
+        _.remove(viewListToDeleteFrom, (view: ViewData) => {
             return viewIdsToDelete.indexOf(view.id) !== -1
         })
     }
 
-    private _findViewFromLoadedViews(viewId: string): number {
+    private _findViewFromLoadedViews = (viewId: string): number => {
         return _.findIndex(this.viewsBuffer, { id: viewId })
     }
 
-    private _findViewFromOriginalViews(viewId: string): number {
+    private _findViewFromOriginalViews = (viewId: string): number => {
         return _.findIndex(this._views, { id: viewId })
     }
 
-    private _waitTillAfterDigestCycle(callback: () => void): void {
-        this.$timeout(() => {
+    private _waitTillAfterDigestCycle = (callback: () => void): void => {
+        void this.$timeout(() => {
             if (this._isViewsFullyLoaded()) {
                 callback()
             } else {
                 this._waitTillAfterDigestCycle(callback)
             }
-        }, 500).then(
-            () => {
-                /* Do Nothing */
-            },
-            () => {
-                /* Do Nothing */
-            }
-        )
+        }, 500)
     }
 
-    private _isViewsFullyLoaded(): boolean {
+    private _isViewsFullyLoaded = (): boolean => {
         return this.$http.pendingRequests.length === 0
     }
 }
@@ -245,7 +242,7 @@ export class FullDocumentServiceFactory {
         private growl: angular.growl.IGrowlService
     ) {}
 
-    get(views: ViewObject[]): FullDocumentService {
+    get(views: ViewData[]): FullDocumentService {
         return new FullDocumentService(
             views,
             this.$timeout,

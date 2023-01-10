@@ -1,19 +1,21 @@
-import angular from 'angular'
+import { IComponentController } from 'angular'
 
 import { EditorService, MentionService } from '@ve-core/editor'
 
 import { veCore } from '@ve-core'
 
-export class MMSMentionController implements angular.IComponentController {
+import { ElementObject } from '@ve-types/mms'
+
+export class MMSMentionController implements IComponentController {
     //Bindings
-    public mmsEditor
-    mmsMentionValue
-    mmsMentionId
-    mmsProjectId
-    mmsRefId
+    public mmsEditor: CKEDITOR.editor
+    mmsMentionValue: string
+    mmsMentionId: string
+    mmsProjectId: string
+    mmsRefId: string
 
     //Local
-    public fastCfListing
+    public fastCfListing: ElementObject[]
 
     static $inject = ['MentionService', 'EditorService']
 
@@ -30,7 +32,7 @@ export class MMSMentionController implements angular.IComponentController {
         // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
     }
 
-    public selectMentionItem($item) {
+    public selectMentionItem($item: ElementObject): void {
         this._createCf($item)
         this.mentionSvc.handleMentionSelection(
             this.mmsEditor,
@@ -38,7 +40,7 @@ export class MMSMentionController implements angular.IComponentController {
         )
     }
 
-    private _createCf($item) {
+    private _createCf($item: ElementObject): void {
         const tag =
             '<transclusion mms-cf-type="' +
             $item.type +

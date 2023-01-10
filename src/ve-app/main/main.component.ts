@@ -1,6 +1,3 @@
-import angular from 'angular'
-import Rx from 'rx-lite'
-import 'angular-growl-v2'
 import {
     StateService,
     Transition,
@@ -8,27 +5,35 @@ import {
     UIRouter,
     UIRouterGlobals,
 } from '@uirouter/angularjs'
+import angular, { IComponentController, IHttpResponse } from 'angular'
+import _ from 'lodash'
+import Rx from 'rx-lite'
+import 'angular-growl-v2'
 
+import {
+    WorkingTimeModalResolveFn,
+    WorkingTimeObject,
+} from '@ve-app/main/modals/working-modal.component'
 import {
     AuthService,
     CacheService,
     HttpService,
     URLService,
     ElementService,
+    ApiService,
 } from '@ve-utils/mms-api-client'
 import {
     ApplicationService,
     AutosaveService,
     EventService,
     RootScopeService,
-    UtilsService,
 } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
-import { ElementObject, ElementsRequest } from '@ve-types/mms'
+import { ElementObject, ParamsObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 const MainComponent: VeComponentOptions = {
@@ -44,11 +49,11 @@ const MainComponent: VeComponentOptions = {
     </div>
 
     <div id="inner-wrap">
-        <ui-view name="banner"></ui-view>
+        <ui-view name="banner-top"></ui-view>
         <ui-view name="nav"></ui-view>
         <ui-view name="menu"></ui-view>
         <ui-view name="manage-refs" ng-show="$ctrl.showManageRefs" style="height: 100vh"></ui-view>
-        <ui-view name="footer"></ui-view>
+        <ui-view name="banner-bottom"></ui-view>
         <div ng-hide="$ctrl.hidePanes">
             <ng-pane pane-id="main" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="ng-pane" id="main-pane">
                 <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-tabs" pane-closed="$ctrl.paneClosed">
@@ -73,7 +78,7 @@ const MainComponent: VeComponentOptions = {
     </div>
 </div>
 `,
-    controller: class MainController implements angular.IComponentController {
+    controller: class MainController implements IComponentController {
         static $inject = [
             '$scope',
             '$timeout',
@@ -82,7 +87,6 @@ const MainComponent: VeComponentOptions = {
             '$uibModal',
             '$interval',
             '$http',
-            'veConfig',
             'growl',
             'hotkeys',
             'growlMessages',
@@ -90,7 +94,7 @@ const MainComponent: VeComponentOptions = {
             '$transitions',
             '$state',
             'URLService',
-            'UtilsService',
+            'ApiService',
             'HttpService',
             'AuthService',
             'ElementService',
@@ -104,11 +108,12 @@ const MainComponent: VeComponentOptions = {
         //local
         public subs: Rx.IDisposable[]
         openEdits = {}
+        readonly veConfig: VeConfig
 
         private hidePanes: boolean = false
         showManageRefs: boolean = false
         showLogin: boolean = true
-        mmsWorkingTime: any
+        mmsWorkingTime: WorkingTimeObject
         workingModalOpen = false
 
         readonly paneClosed: boolean = false
@@ -123,15 +128,14 @@ const MainComponent: VeComponentOptions = {
             private $uibModal: VeModalService,
             private $interval: angular.IIntervalService,
             private $http: angular.IHttpService,
-            private veConfig: VeConfig,
             private growl: angular.growl.IGrowlService,
-            private hotkeys,
-            private growlMessages,
+            private hotkeys: angular.hotkeys.HotkeysProvider,
+            private growlMessages: angular.growl.IGrowlMessagesService,
             private $uiRouter: UIRouter,
             private $transitions: TransitionService,
             private $state: StateService,
             private uRLSvc: URLService,
-            private utilsSvc: UtilsService,
+            private apiSvc: ApiService,
             private httpSvc: HttpService,
             private authSvc: AuthService,
             private elementSvc: ElementService,
@@ -140,7 +144,9 @@ const MainComponent: VeComponentOptions = {
             private rootScopeSvc: RootScopeService,
             private autosaveSvc: AutosaveService,
             private eventSvc: EventService
-        ) {}
+        ) {
+            this.veConfig = window.__env
+        }
 
         $onInit(): void {
             this.eventSvc.$init(this)
@@ -155,7 +161,7 @@ const MainComponent: VeComponentOptions = {
             this.subs.push(
                 this.eventSvc.$on(
                     this.rootScopeSvc.constants.VETITLE,
-                    (value) => {
+                    (value: string) => {
                         this.$window.document.title = value + ' | View Editor'
                     }
                 )
@@ -164,7 +170,7 @@ const MainComponent: VeComponentOptions = {
             this.subs.push(
                 this.eventSvc.$on(
                     this.rootScopeSvc.constants.VESHOWLOGIN,
-                    (value) => {
+                    (value: boolean) => {
                         this.showLogin = value
                     }
                 )
@@ -173,7 +179,7 @@ const MainComponent: VeComponentOptions = {
             this.subs.push(
                 this.eventSvc.$on(
                     this.rootScopeSvc.constants.VESHOWMANAGEREFS,
-                    (value) => {
+                    (value: boolean) => {
                         this.showManageRefs = value
                     }
                 )
@@ -182,7 +188,7 @@ const MainComponent: VeComponentOptions = {
             this.subs.push(
                 this.eventSvc.$on(
                     this.rootScopeSvc.constants.VEHIDEPANES,
-                    (value) => {
+                    (value: boolean) => {
                         this.hidePanes = value
                     }
                 )
@@ -215,32 +221,37 @@ const MainComponent: VeComponentOptions = {
                 .add({
                     combo: '@',
                     description: 'fast cf in editor',
-                    callback: () => {},
+                    callback: () => {
+                        // TODO: Something here?
+                    },
                 })
 
             this.subs.push(
-                this.eventSvc.$on('mms.working', (response) => {
-                    this.rootScopeSvc.veViewContentLoading(false)
-                    if (this.workingModalOpen) {
-                        return
-                    }
-                    this.mmsWorkingTime = response.data
-                    this.workingModalOpen = true
-                    this.$uibModal
-                        .open({
-                            component: 'workingModal',
-                            backdrop: true,
-                            resolve: {
-                                getWorkingTime: () => {
-                                    return this.mmsWorkingTime
+                this.eventSvc.$on(
+                    'mms.working',
+                    (response: IHttpResponse<WorkingTimeObject>) => {
+                        this.rootScopeSvc.veViewContentLoading(false)
+                        if (this.workingModalOpen) {
+                            return
+                        }
+                        this.mmsWorkingTime = response.data
+                        this.workingModalOpen = true
+                        this.$uibModal
+                            .open<WorkingTimeModalResolveFn, void>({
+                                component: 'workingModal',
+                                backdrop: true,
+                                resolve: {
+                                    getWorkingTime: () => {
+                                        return this.mmsWorkingTime
+                                    },
                                 },
-                            },
-                            size: 'md',
-                        })
-                        .result.finally(() => {
-                            this.workingModalOpen = false
-                        })
-                })
+                                size: 'md',
+                            })
+                            .result.finally(() => {
+                                this.workingModalOpen = false
+                            })
+                    }
+                )
             )
 
             this.subs.push(
@@ -254,7 +265,8 @@ const MainComponent: VeComponentOptions = {
                         //if element is not being edited and there's a cached edit object, update the edit object also
                         //so next time edit forms will show updated data (mainly for stomp updates)
                         const editKey = this.apiSvc.makeCacheKey(
-                            this.utilsSvc.makeRequestObject(element),
+                            this.apiSvc.makeRequestObject(element),
+                            element.id,
                             true
                         )
                         const veEditsKey =
@@ -313,7 +325,8 @@ const MainComponent: VeComponentOptions = {
                 this.rootScopeSvc.veStateChanging(false)
                 this.rootScopeSvc.veViewContentLoading(false)
                 //check if error is ticket error
-                const error: angular.IHttpResponse<any> = trans.error().detail
+                const error: angular.IHttpResponse<any> = trans.error()
+                    .detail as angular.IHttpResponse<any>
                 if (
                     !error ||
                     error.status === 401 ||
@@ -377,43 +390,50 @@ const MainComponent: VeComponentOptions = {
                     this.$uiRouterGlobals.$current.name ===
                     'main.project.ref.portal'
                 ) {
-                    this.rootScopeSvc.treeInitialSelection(trans.params().refId)
+                    this.rootScopeSvc.treeInitialSelection(
+                        (trans.params() as ParamsObject).refId
+                    )
                 } else if (
                     this.$uiRouterGlobals.$current.name ===
                     'main.project.ref.preview'
                 ) {
-                    const index = trans.params().documentId.indexOf('_cover')
+                    const index = (
+                        trans.params() as ParamsObject
+                    ).documentId.indexOf('_cover')
                     if (index > 0)
                         this.rootScopeSvc.treeInitialSelection(
-                            trans.params().documentId.substring(5, index)
+                            (
+                                trans.params() as ParamsObject
+                            ).documentId.substring(5, index)
                         )
                     else
                         this.rootScopeSvc.treeInitialSelection(
-                            trans.params().documentId
+                            (trans.params() as ParamsObject).documentId
                         )
                 } else if (
                     this.$state.includes('main.project.ref.document') &&
                     this.$state.current.name !==
                         'main.project.ref.document.order'
                 ) {
-                    if (trans.params().viewId !== undefined)
+                    if ((trans.params() as ParamsObject).viewId !== undefined)
                         this.rootScopeSvc.treeInitialSelection(
-                            trans.params().viewId
+                            (trans.params() as ParamsObject).viewId
                         )
                     else if (trans.params()['#'] !== undefined)
                         this.rootScopeSvc.treeInitialSelection(
-                            trans.params()['#']
+                            (trans.params() as ParamsObject)['#']
                         )
                     else
                         this.rootScopeSvc.treeInitialSelection(
-                            trans.params().documentId
+                            (trans.params() as ParamsObject).documentId
                         )
                 }
                 if (this.$state.includes('main.project.ref.document')) {
                     const state = this.applicationSvc.getState()
                     this.applicationSvc.getState().inDoc = true
-                    this.applicationSvc.getState().currentDoc =
-                        trans.params().documentId
+                    this.applicationSvc.getState().currentDoc = (
+                        trans.params() as ParamsObject
+                    ).documentId
                     this.applicationSvc.getState().fullDoc =
                         !!this.$state.includes('main.project.ref.document.full')
                 } else {
@@ -428,14 +448,14 @@ const MainComponent: VeComponentOptions = {
                         trans.from().name === 'project' ||
                         trans.from().name === 'main.login.redirect')
                 ) {
-                    this.$timeout(
+                    void this.$timeout(
                         () => {
                             this.eventSvc.$broadcast('left-pane.toggle')
                         },
                         1,
                         false
                     )
-                    this.$timeout(
+                    void this.$timeout(
                         () => {
                             this.eventSvc.$broadcast('left-pane.toggle')
                         },
@@ -446,7 +466,7 @@ const MainComponent: VeComponentOptions = {
             })
 
             if (this.$uiRouterGlobals.$current.name == 'main') {
-                this.$state.go('main.login')
+                void this.$state.go('main.login')
             }
         }
     },

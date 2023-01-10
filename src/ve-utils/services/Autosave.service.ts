@@ -12,7 +12,7 @@ export class AutosaveService {
 
     constructor(private eventSvc: EventService) {}
 
-    trigger(): void {
+    trigger = (): void => {
         this.eventSvc.$broadcast(this.EVENT)
     }
 
@@ -24,21 +24,21 @@ export class AutosaveService {
         return this.edits
     }
 
-    openEdits(): number {
+    openEdits = (): number => {
         return Object.keys(this.edits).length
     }
 
-    addOrUpdate(key: string, value: ElementObject): void {
+    addOrUpdate = (key: string, value: ElementObject): void => {
         this.edits[key] = value
         this.trigger()
     }
 
-    remove(key: string): void {
+    remove = (key: string): void => {
         delete this.edits[key]
         this.trigger()
     }
 
-    reset(): void {
+    reset = (): void => {
         const keys = Object.keys(this.edits)
         for (let i = 0; i < keys.length; i++) {
             delete this.edits[keys[i]]

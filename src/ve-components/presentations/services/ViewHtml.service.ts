@@ -1,8 +1,8 @@
-import { TableConfig } from '@ve-components/presentations'
 import { ApplicationService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
+import { ITableConfig } from '@ve-types/components/presentation'
 import {
     PresentationInstanceObject,
     PresentImageObject,
@@ -13,7 +13,7 @@ import {
 } from '@ve-types/mms'
 
 export class ViewHtmlService {
-    public tableConfig: TableConfig = {
+    public tableConfig: ITableConfig = {
         sortByColumnFn: () => {
             /* Put Sorting Logic here */
         },
@@ -35,12 +35,12 @@ export class ViewHtmlService {
      * @param {boolean} isSortable table content
      * @returns {string} generated html string
      */
-    public makeHtmlTable(
+    public makeHtmlTable = (
         table: PresentTableObject,
         isFilterable?: boolean,
         isSortable?: boolean,
         pe?
-    ): string {
+    ): string => {
         const result = [
             '<table class="table-bordered table-condensed ' +
                 (table.style ? table.style : '') +
@@ -177,7 +177,7 @@ export class ViewHtmlService {
      * @param {object} list list specification object
      * @returns {string} generated html string
      */
-    public makeHtmlList(list: PresentListObject): string {
+    public makeHtmlList = (list: PresentListObject): string => {
         const result: string[] = []
         if (list.ordered) result.push('<ol>')
         else result.push('<ul>')
@@ -202,7 +202,7 @@ export class ViewHtmlService {
      * @param {object} para paragraph spec object
      * @returns {string} generated html string
      */
-    public makeHtmlPara(para: PresentTextObject): string {
+    public makeHtmlPara = (para: PresentTextObject): string => {
         if (para.sourceType === 'text') return para.text
         let t = 'doc'
         let attr = ''
@@ -226,7 +226,7 @@ export class ViewHtmlService {
         )
     }
 
-    public makeHtml(thing: PresentationInstanceObject): string {
+    public makeHtml = (thing: PresentationInstanceObject): string => {
         if (thing.type === 'Paragraph') {
             return this.makeHtmlPara(thing as PresentTextObject)
         } else if (thing.type === 'Table') {

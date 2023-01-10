@@ -3,26 +3,28 @@ import Rx from 'rx-lite'
 
 import { veUtils } from '@ve-utils'
 
-export type eventHandlerFn = (...args: any) => void
+export type eventHandlerFn<T> = (data: T) => void
 
 export class EventService {
-    private subjects: { [key: string]: Rx.ISubject<any> } = {}
+    private subjects: { [key: string]: Rx.ISubject<unknown> } = {}
 
     //API
-    public $broadcast = (name: string, data?: any): void =>
+    public $broadcast = <T>(name: string, data?: T): void =>
         this.emit(name, data)
-    public $on = (name: string, handler: eventHandlerFn): Rx.IDisposable =>
-        this.listen(name, handler)
+    public $on = <T>(
+        name: string,
+        handler: eventHandlerFn<T>
+    ): Rx.IDisposable => this.listen<T>(name, handler)
     public $destroy = (subs: Rx.IDisposable[]): void => this.destroy(subs)
     public $init = (
         ctrl: { subs: Rx.IDisposable[] } & angular.IComponentController
     ): void => this.initEventSvc(ctrl)
 
-    createName(name: string): string {
+    createName = (name: string): string => {
         return `$ ${name}`
     }
 
-    emit(name: string, data?: unknown): void {
+    emit<T = unknown>(name: string, data?: T): void {
         const fnName = this.createName(name)
         //$rootScope.$broadcast(name,data);
         if (!this.subjects[fnName]) {
@@ -31,7 +33,10 @@ export class EventService {
         this.subjects[fnName].onNext(data)
     }
 
-    listen(name: string, handler: eventHandlerFn): Rx.IDisposable {
+    listen<T = unknown>(
+        name: string,
+        handler: eventHandlerFn<T>
+    ): Rx.IDisposable {
         const fnName = this.createName(name)
         if (!this.subjects[fnName]) {
             this.subjects[fnName] = new Rx.Subject<unknown>()

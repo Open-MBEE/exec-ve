@@ -20,8 +20,8 @@ export class SchemaService {
     public veConfig: VeConfig = window.__env
     public defaultSchema: 'cameo'
     public schemaList: { [key: string]: string } = {
-        cameo: 'CameoSchema(',
-        jupyter: 'JupyterSchema(',
+        cameo: 'CameoSchema',
+        jupyter: 'JupyterSchema',
     }
 
     public schemas: { [key: string]: Schema } = {}
@@ -36,7 +36,11 @@ export class SchemaService {
         }
     }
 
-    getSchema<T>(name: string, schemaName?: string, sourceId?: string): T {
+    getSchema = <T>(
+        name: string,
+        schemaName?: string,
+        sourceId?: string
+    ): T => {
         const schema: Schema = this._getSchema(schemaName, sourceId)
         if (schema.schema[name]) {
             return schema.schema[name] as T
@@ -45,12 +49,12 @@ export class SchemaService {
         }
     }
 
-    getValue<T>(
+    getValue = <T>(
         name: string,
         key: string,
         schemaName?: string,
         sourceId?: string
-    ): T {
+    ): T => {
         const lookup = this.getSchema(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
             return lookup[key] as T
@@ -75,7 +79,7 @@ export class SchemaService {
         }
     }
 
-    getMap<T>(name: string, schemaName?: string, sourceId?: string): T {
+    getMap = <T>(name: string, schemaName?: string, sourceId?: string): T => {
         const schema: Schema = this._getSchema(schemaName, sourceId)
         if (schema.map && schema.map[name]) {
             return schema.schema[name] as T
@@ -85,24 +89,24 @@ export class SchemaService {
         }
     }
 
-    getMappedValue<T>(
+    getMappedValue = <T>(
         name: string,
         key: string,
         schemaName?: string,
         sourceId?: string
-    ): T {
+    ): T => {
         const lookup = this.getMap(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
             return lookup[key] as T
         }
     }
 
-    getKeyByValue<T>(
+    getKeyByValue = <T>(
         name: string,
         value: T,
         schemaName?: string,
         sourceId?: string
-    ): string {
+    ): string => {
         const lookup = this.getSchema(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
             let response = ''
@@ -117,7 +121,7 @@ export class SchemaService {
         }
     }
 
-    private _schemaError(name: string, schemaName?: string) {
+    private _schemaError = (name: string, schemaName?: string): void => {
         schemaName = schemaName ? schemaName : this.defaultSchema
         this.growl.error('Schema Lookup Error')
         if (this.veConfig.enableDebug) {
@@ -130,7 +134,7 @@ export class SchemaService {
         }
     }
 
-    private _getSchema(schemaName?: string, id?: string): Schema | null {
+    private _getSchema = (schemaName?: string, id?: string): Schema | null => {
         schemaName = schemaName ? schemaName : this.defaultSchema
         id = id ? id : 'error: unknown'
         if (this.schemas.hasOwnProperty(schemaName)) {

@@ -14,14 +14,14 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject, LiteralObject, SlotObject } from '@ve-types/mms'
 
 /**
  * @ngdoc component
  * @name veComponents/TranscludeNameController
  *
- * @requires {angular.IQService} $q
+ * @requires {VeQService} $q
  * @requires {angular.IScope} $scope
  * @requires {angular.ICompileService} $compile
  * @requires {JQuery<HTMLElement>} $element
@@ -56,7 +56,7 @@ export class TranscludeNameController
     static $inject = Transclusion.$inject
 
     constructor(
-        $q: angular.IQService,
+        $q: VeQService,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
         $element: JQuery<HTMLElement>,

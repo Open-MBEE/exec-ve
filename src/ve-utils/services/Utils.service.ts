@@ -1,10 +1,15 @@
 import angular from 'angular'
 import _ from 'lodash'
 
-import { ApiService, URLService } from '@ve-utils/mms-api-client'
+import {
+    ApiService,
+    DocumentMetadata,
+    URLService,
+} from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject, ViewObject } from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
 
@@ -34,7 +39,7 @@ export class UtilsService {
     static $inject = ['$q', '$http', 'growl', 'URLService', 'ApiService']
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $http: angular.IHttpService,
         private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
@@ -48,7 +53,7 @@ export class UtilsService {
      * @param {TreeBranch} rootBranch the root element (document or view) of the main tree
      * @returns {string} toc string
      */
-    public makeHtmlTOC(rootBranch: TreeBranch): string {
+    public makeHtmlTOC = (rootBranch: TreeBranch): string => {
         let result =
             '<div class="toc"><h1 class="header">Table of Contents</h1>'
         result += this.makeHtmlTOCChild(rootBranch, true)
@@ -63,7 +68,7 @@ export class UtilsService {
      * @param skip
      * @return {string}
      */
-    public makeHtmlTOCChild(branch: TreeBranch, skip?): string {
+    public makeHtmlTOCChild = (branch: TreeBranch, skip?): string => {
         let result = ''
         if (!skip) {
             const anchor: string = '<a href=#' + branch.data.id + '>'
@@ -364,7 +369,7 @@ export class UtilsService {
      * @param {string} prefix "tbl_" when creating an id for a table, "fig_" when creating an id for a figuer
      * @returns {string} unique ID wit prefix, tbl_ or fig_
      */
-    public generateAnchorId(prefix: string): string {
+    public generateAnchorId = (prefix: string): string => {
         return `${prefix}${this.apiSvc.createUniqueId()}`
     }
 
@@ -495,142 +500,134 @@ export class UtilsService {
                 };
      * @returns {string} document/view content string to be passed to the server for conversion
      */
-    public getPrintCss(
+    public getPrintCss = (
         htmlFlag: boolean,
         landscape: boolean,
-        meta: { [x: string]: string }
-    ): string {
-        let ret =
-            '/*------------------------------------------------------------------\n' +
-            'Custom CSS Table of Contents\n' +
-            '1. Images\n' +
-            '2. Tables\n' +
-            '3. Typography\n' +
-            '   3.1 Diff\n' +
-            '   3.2 Errors\n' +
-            '4. Figure Captions\n' +
-            '5. Table of Contents\n' +
-            '6. Page Layout\n' +
-            '7. Headers and Footers\n' +
-            '8. Signature Box\n' +
-            '9. Bookmark Level\n' +
-            '------------------------------------------------------------------*/\n' +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '1. Images\n' +
-            '------------------------------------------------------------------*/\n' +
-            'img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}\n' +
-            'img.image-center {display: block;}\n' +
-            'figure img {display: block;}\n' +
-            '.pull-right {float: right;}\n' +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '2. Tables\n' +
-            '------------------------------------------------------------------*/\n' +
-            ' tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}\n' +
-            'table {width: 100%; border-collapse: collapse;}\n' +
-            'table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}\n' +
-            "table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}\n" +
-            'table, th > p, td > p {margin: 0px; padding: 0px;}\n' +
-            'table, th > div > p, td > div > p {margin: 0px; padding: 0px;}\n' +
-            'table transclude-doc p {margin: 0 0 5px;}\n' +
-            'th {background-color: #f2f3f2;}\n' +
-            //"table p {word-break: break-all;}\n" +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '3. Typography\n' +
-            '------------------------------------------------------------------*/\n' +
-            "h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}\n" +
-            //"h1 {font-size: 18pt;} h2 {font-size: 16pt;} h3 {font-size: 14pt;} h4 {font-size: 13pt;} h5 {font-size: 12pt;} h6 {font-size: 11pt;}\n" +
-            '.h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}\n' +
-            '.ng-hide {display: none;}\n' +
-            '.chapter h1.view-title {font-size: 20pt; }\n' +
-            "body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }\n" +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '   3.1 Diff\n' +
-            '------------------------------------------------------------------*/\n' +
-            'ins, .ins {color: black; background: #dafde0;}\n' +
-            'del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}\n' +
-            '.match,.textdiff span {color: gray;}\n' +
-            '.patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {background-color: #dafde0;}\n' +
-            '.patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {border: 2px dashed #abffb9;}\n' +
-            '.patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {background-color: #ffe3e3; text-decoration: line-through;}\n' +
-            '.patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {border: 2px dashed #ffb6b6;}\n' +
-            '.patcher-text-insertion, .patcher-text-deletion {display: inline !important;}\n' +
-            '[class*="patcher-"]:not(td):not(tr) {display: inline-block;}\n' +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '   3.2 Errors\n' +
-            '------------------------------------------------------------------*/\n' +
-            '.ve-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}\n' +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '4. Figure Captions\n' +
-            '------------------------------------------------------------------*/\n' +
-            'caption, figcaption, .caption-type-equation {text-align: center; font-weight: bold;}\n' +
-            'table, figure {margin-bottom: 10px;}\n' +
-            '.caption-type-equation {float: right;}\n' +
-            'mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}\n' +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '5. Table of Contents\n' +
-            '------------------------------------------------------------------*/\n' +
-            '.toc, .tof, .tot {page-break-after:always;}\n' +
-            '.toc {page-break-before: always;}\n' +
-            '.toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }\n' +
-            '.toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }\n' +
-            '.toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }\n' +
-            '.tof ul, .tot ul {padding-left:0;}\n' +
-            '.toc ul {padding-left:4em;}\n' +
-            '.toc > ul {padding-left:0;}\n' +
-            ".toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
-            ".tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
-            ".tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}\n" +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '6. Page Layout\n' +
-            '------------------------------------------------------------------*/\n' +
-            '@page {margin: 0.5in;}\n' +
-            '@page landscape {size: 11in 8.5in;}\n' +
-            '.landscape {page: landscape;}\n' +
-            '.chapter {page-break-before: always}\n' +
-            'p, div {widows: 2; orphans: 2;}\n' +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '7. Headers and Footers\n' +
-            '------------------------------------------------------------------*/\n' +
-            "@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}\n" +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '8. Signature Box\n' +
-            '------------------------------------------------------------------*/\n' +
-            '.signature-box td.signature-name-styling {width: 60%;}\n' +
-            '.signature-box td.signature-space-styling {width: 1%;}\n' +
-            '.signature-box td.signature-date-styling {width: 39%;}\n' +
-            '\n' +
-            '/*------------------------------------------------------------------\n' +
-            '9. Bookmark Level\n' +
-            '------------------------------------------------------------------*/\n'
+        meta: DocumentMetadata
+    ): string => {
+        let ret = `
+        /*------------------------------------------------------------------
+Custom CSS Table of Contents
+1. Images
+2. Tables
+3. Typography
+   3.1 Diff
+   3.2 Errors
+4. Figure Captions
+5. Table of Contents
+6. Page Layout
+7. Headers and Footers
+8. Signature Box
+9. Bookmark Level
+------------------------------------------------------------------*/
+
+/*------------------------------------------------------------------
+1. Images
+------------------------------------------------------------------*/
+img {max-width: 100%; page-break-inside: avoid; page-break-before: auto; page-break-after: auto; margin-left: auto; margin-right: auto;}
+img.image-center {display: block;}
+figure img {display: block;}
+.pull-right {float: right;}
+
+/*------------------------------------------------------------------
+2. Tables
+------------------------------------------------------------------*/
+ tr, td, th { page-break-inside: avoid; } thead {display: table-header-group;}
+table {width: 100%; border-collapse: collapse;}
+table, th, td {border: 1px solid black; padding: 4px; font-size: 10pt;}
+table[border='0'], table[border='0'] th, table[border='0'] td {border: 0px;}
+table, th > p, td > p {margin: 0px; padding: 0px;}
+table, th > div > p, td > div > p {margin: 0px; padding: 0px;}
+table transclude-doc p {margin: 0 0 5px;}
+th {background-color: #f2f3f2;}
+
+/*------------------------------------------------------------------
+3. Typography
+------------------------------------------------------------------*/
+h1, h2, h3, h4, h5, h6 {font-family: 'Arial', sans-serif; margin: 10px 0; page-break-inside: avoid; page-break-after: avoid;}
+.h1 {font-size: 18pt;} .h2 {font-size: 14pt;} .h3 {font-size: 12pt;} .h4 {font-size: 10pt;} .h5, .h6, .h7, .h8, .h9 {font-size: 9pt;}
+.ng-hide {display: none;}
+.chapter h1.view-title {font-size: 20pt; }
+body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }
+
+/*------------------------------------------------------------------
+   3.1 Diff
+------------------------------------------------------------------*/
+ins, .ins {color: black; background: #dafde0;}
+del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}
+.match,.textdiff span {color: gray;}
+.patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {background-color: #dafde0;}
+.patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {border: 2px dashed #abffb9;}
+.patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {background-color: #ffe3e3; text-decoration: line-through;}
+.patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {border: 2px dashed #ffb6b6;}
+.patcher-text-insertion, .patcher-text-deletion {display: inline !important;}
+[class*="patcher-"]:not(td):not(tr) {display: inline-block;}
+
+/*------------------------------------------------------------------
+   3.2 Errors
+------------------------------------------------------------------*/
+.ve-error {background: repeating-linear-gradient(45deg,#fff,#fff 10px,#fff2e4 10px,#fff2e4 20px);}
+
+/*------------------------------------------------------------------
+4. Figure Captions
+------------------------------------------------------------------*/
+caption, figcaption, .caption-type-equation {text-align: center; font-weight: bold;}
+table, figure {margin-bottom: 10px;}
+.caption-type-equation {float: right;}
+mms-view-equation, mms-view-figure, mms-view-image {page-break-inside: avoid;}
+
+/*------------------------------------------------------------------
+5. Table of Contents
+------------------------------------------------------------------*/
+.toc, .tof, .tot {page-break-after:always;}
+.toc {page-break-before: always;}
+.toc a, .tof a, .tot a { text-decoration:none; color: #000; font-size:9pt; }
+.toc .header, .tof .header, .tot .header { margin-bottom: 4px; font-weight: bold; font-size:24px; }
+.toc ul, .tof ul, .tot ul {list-style-type:none; margin: 0; }
+.tof ul, .tot ul {padding-left:0;}
+.toc ul {padding-left:4em;}
+.toc > ul {padding-left:0;}
+.toc li > a[href]::after {content: leader('.') target-counter(attr(href), page);}
+.tot li > a[href]::after {content: leader('.') target-counter(attr(href), page);}
+.tof li > a[href]::after {content: leader('.') target-counter(attr(href), page);}
+
+/*------------------------------------------------------------------
+6. Page Layout
+------------------------------------------------------------------*/
+@page {margin: 0.5in;}
+@page landscape {size: 11in 8.5in;}
+.landscape {page: landscape;}
+.chapter {page-break-before: always}
+p, div {widows: 2; orphans: 2;}
+
+/*------------------------------------------------------------------
+7. Headers and Footers
+------------------------------------------------------------------*/
+@page:first {@top {content: ''} @bottom {content: ''} @top-left {content: ''} @top-right {content: ''} @bottom-left {content: ''} @bottom-right {content: ''}}
+
+/*------------------------------------------------------------------
+8. Signature Box
+`
         for (let i = 1; i < 10; i++) {
             ret += `.h${i} {bookmark-level: ${i};}
 `
         }
         if (htmlFlag) {
-            ret +=
-                '.toc { counter-reset: table-counter figure-counter;}\n' +
-                'figure { counter-increment: figure-counter; }\n' +
-                'figcaption::before {content: "Figure " counter(figure-counter) ". "; }\n' +
-                'table { counter-increment: table-counter; }\n' +
-                'caption::before {content: "Table " counter(table-counter) ". "; }\n'
+            ret += `
+            .toc { counter-reset: table-counter figure-counter;}
+figure { counter-increment: figure-counter; }
+figcaption::before {content: "Figure " counter(figure-counter) ". "; }
+table { counter-increment: table-counter; }
+caption::before {content: "Table " counter(table-counter) ". "; }
+`
         }
         Object.keys(meta).forEach((key) => {
             if (meta[key]) {
                 let content: string
-                if (meta[key] === 'this.counter(page)') {
-                    content = meta[key]
+                if (meta[key] === 'counter(page)') {
+                    content = meta[key] as string
                 } else {
-                    content = '"' + meta[key] + '"'
+                    content = `"${(meta[key] as string | number).toString()}"`
                 }
                 ret += `@page {@${key} {font-size: 9px; content: ${content};}}
 `
@@ -659,7 +656,7 @@ export class UtilsService {
             refId: string
             css: string
         }
-    ): angular.IPromise<string> {
+    ): VePromise<string, string> {
         let accept: string
         switch (exportType) {
             case 2:
@@ -688,7 +685,7 @@ export class UtilsService {
                 () => {
                     deferred.resolve('ok')
                 },
-                (error: angular.IHttpResponse<unknown>) => {
+                (error: angular.IHttpResponse<string>) => {
                     deferred.reject(this.uRLSvc.handleHttpStatus(error))
                 }
             )
@@ -711,10 +708,10 @@ export class UtilsService {
         window.getSelection().removeAllRanges()
     }
 
-    public getElementTypeClass(
+    public getElementTypeClass = (
         element: ElementObject,
         elementType: string
-    ): string {
+    ): string => {
         let elementTypeClass = ''
         if (element.type === 'InstanceSpecification') {
             elementTypeClass = 'pe-type-' + _.kebabCase(elementType)

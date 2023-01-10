@@ -1,7 +1,8 @@
 import { StateService } from '@uirouter/angularjs'
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
+import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService } from '@ve-app/main/services'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
 import {
@@ -26,22 +27,30 @@ import { handleChange } from '@ve-utils/utils'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
+import {
+    DocumentObject,
+    ElementObject,
+    GroupObject,
+    OrgObject,
+    ProjectObject,
+    RefObject,
+    ViewObject,
+} from '@ve-types/mms'
 
-class SlideshowController implements angular.IComponentController {
-    public orgOb
-    projectOb
-    refOb
-    groupOb
-    documentOb
-    viewOb
+class SlideshowController implements IComponentController {
+    public orgOb: OrgObject
+    projectOb: ProjectObject
+    refOb: RefObject
+    groupOb: GroupObject
+    documentOb: DocumentObject
+    viewOb: ViewObject
 
     private treeApi: TreeApi
     subs: Rx.IDisposable[]
     vidLink: boolean
     viewContentLoading: boolean
 
-    public bbApi
+    public bbApi: ButtonBarApi
     bbId = 'view-ctrl'
     bars: string[] = []
     comments: {
@@ -55,10 +64,12 @@ class SlideshowController implements angular.IComponentController {
         lastCommentedBy: '',
         map: {},
     }
-    buttons: any[]
-    dynamicPopover: { templateUrl: 'shareUrlTemplate.html'; title: 'Share' }
-    copyToClipboard: ($event: any) => void
-    handleShareURL: any
+    buttons: IButtonBarButton[]
+    dynamicPopover: { templateUrl: string; title: string } = {
+        templateUrl: 'shareUrlTemplate.html',
+        title: 'Share',
+    }
+    shortUrl: string
     viewApi: ViewApi
     number: string
 
@@ -127,7 +138,7 @@ class SlideshowController implements angular.IComponentController {
             this.rootScopeSvc.veFullDocMode(false)
 
         this.subs.push(
-            this.eventSvc.$on(
+            this.eventSvc.$on<boolean>(
                 this.rootScopeSvc.constants.VEVIEWCONTENTLOADING,
                 (newValue) => {
                     this.viewContentLoading = newValue
@@ -150,7 +161,6 @@ class SlideshowController implements angular.IComponentController {
                         'show-edits',
                         this.rootScopeSvc.veEditMode()
                     )
-                    // @ts-ignore
                     this.hotkeys.bindTo(this.$scope).add({
                         combo: 'alt+d',
                         description: 'toggle edit mode',
@@ -230,7 +240,6 @@ class SlideshowController implements angular.IComponentController {
                             this.buttonBarSvc.getButtonBarButton('center-next')
                         )
                         // Set hotkeys for toolbar
-                        // @ts-ignore
                         this.hotkeys
                             .bindTo(this.$scope)
                             .add({
@@ -380,21 +389,23 @@ class SlideshowController implements angular.IComponentController {
 
         // Share URL button settings
         this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
-        this.copyToClipboard = this.shortenUrlSvc.copyToClipboard
-        this.handleShareURL = this.shortenUrlSvc.getShortUrl.bind(
-            null,
-            this.$location.absUrl(),
-            this
-        )
 
-        if (this.viewOb && this.$state.includes('main.project.ref')) {
-            this.$timeout(() => {
-                const data = {
-                    elementOb: this.viewOb,
-                    commitId: 'latest',
-                }
-                this.eventSvc.$broadcast('view.selected', data)
-            }, 1000)
+        this.shortUrl = this.shortenUrlSvc.getShortUrl({
+            documentId: this.documentOb.id,
+            viewId: this.viewOb ? this.viewOb.id : '',
+            projectId: this.projectOb.id,
+            refId: this.refOb.id,
+        })
+
+        if (this.$state.includes('main.project.ref')) {
+            const data = {
+                elementOb: this.viewOb,
+                commitId: 'latest',
+            }
+            this.eventSvc.$broadcast<veAppEvents.viewSelectedData>(
+                'view.selected',
+                data
+            )
         }
 
         this.subs.push(
@@ -428,7 +439,7 @@ class SlideshowController implements angular.IComponentController {
         this.subs.push(
             this.eventSvc.$on('print', () => {
                 if (this.isPageLoading()) return
-                this.appUtilsSvc.printModal(
+                void this.appUtilsSvc.printModal(
                     angular.element('#print-div'),
                     this.viewOb,
                     this.refOb,
@@ -479,10 +490,18 @@ class SlideshowController implements angular.IComponentController {
         this.subs.push(
             this.eventSvc.$on('refresh-numbering', () => {
                 if (this.isPageLoading()) return
-                this.treeApi.refresh().then(() => {
-                    this.treeSvc.refreshPeTrees()
-                    this.number = this.treeApi.branch2viewNumber[this.viewOb.id]
-                })
+                this.treeApi.refresh().then(
+                    () => {
+                        this.treeSvc.refreshPeTrees()
+                        this.number =
+                            this.treeApi.branch2viewNumber[this.viewOb.id]
+                    },
+                    (reason) => {
+                        this.growl.error(
+                            'Unable to refresh numbering: ' + reason.message
+                        )
+                    }
+                )
             })
         )
 
@@ -495,7 +514,7 @@ class SlideshowController implements angular.IComponentController {
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject): void {
-        handleChange(onChangesObj, 'viewOb', (newVal) => {
+        handleChange<ViewObject>(onChangesObj, 'viewOb', (newVal) => {
             if (newVal) console.log('View Change:' + newVal.id)
         })
     }
@@ -505,7 +524,11 @@ class SlideshowController implements angular.IComponentController {
         this.buttonBarSvc.destroy(this.bars)
     }
 
-    public elementTranscluded = (elementOb: ElementObject, type) => {
+    public copyToClipboard = ($event: JQuery.ClickEvent): void => {
+        this.shortenUrlSvc.copyToClipboard($event)
+    }
+
+    public elementTranscluded = (elementOb: ElementObject, type): void => {
         if (
             type === 'Comment' &&
             !this.comments.map.hasOwnProperty(elementOb.id)
@@ -519,7 +542,7 @@ class SlideshowController implements angular.IComponentController {
         }
     }
 
-    public elementClicked = (elementOb: ElementObject) => {
+    public elementClicked = (elementOb: ElementObject): void => {
         const data = {
             elementOb: elementOb,
             commitId: 'latest',
@@ -527,7 +550,7 @@ class SlideshowController implements angular.IComponentController {
         this.eventSvc.$broadcast('element.selected', data)
     }
 
-    isPageLoading() {
+    public isPageLoading = (): boolean => {
         if (this.$element.find('.isLoading').length > 0) {
             this.growl.warning('Still loading!')
             return true

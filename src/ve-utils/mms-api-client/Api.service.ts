@@ -1,12 +1,13 @@
 import angular from 'angular'
 import _ from 'lodash'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 
-import { URLService } from '@ve-utils/mms-api-client/URL.provider'
+import { URLService } from '@ve-utils/mms-api-client/URL.service'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veUtils } from '@ve-utils'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
 import {
     ElementObject,
@@ -16,6 +17,7 @@ import {
     LiteralObject,
     RequestObject,
     ValueObject,
+    VersionResponse,
     ViewObject,
 } from '@ve-types/mms'
 
@@ -39,28 +41,26 @@ export class ApiService {
     static $inject = ['$q', '$http', 'URLService', 'SchemaService']
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $http: angular.IHttpService,
         private uRLSvc: URLService,
         private schemaSvc: SchemaService
     ) {}
 
-    public getMmsVersion(): angular.IPromise<string> {
+    public getMmsVersion(): VePromise<string, VersionResponse> {
         const deferred = this.$q.defer<string>()
-        this.$http
-            .get<{ mmsVersion: string }>(this.uRLSvc.getMmsVersionURL())
-            .then(
-                (response) => {
-                    deferred.resolve(response.data.mmsVersion)
-                },
-                (response: angular.IHttpResponse<unknown>) => {
-                    deferred.reject(this.uRLSvc.handleHttpStatus(response))
-                }
-            )
+        this.$http.get<VersionResponse>(this.uRLSvc.getMmsVersionURL()).then(
+            (response) => {
+                deferred.resolve(response.data.mmsVersion)
+            },
+            (response: angular.IHttpResponse<VersionResponse>) => {
+                deferred.reject(this.uRLSvc.handleHttpStatus(response))
+            }
+        )
         return deferred.promise
     }
 
-    public getVeVersion(): string {
+    public getVeVersion = () => {
         return this.veConfig.version
     }
 
@@ -76,7 +76,7 @@ export class ApiService {
         deferred: angular.IDeferred<U>,
         type?: 'error' | 'warning' | 'info'
     ): void {
-        const res = this.uRLSvc.handleHttpStatus(response)
+        const res = this.uRLSvc.handleHttpStatus<T>(response)
         if (type) {
             res.type = type
         }
@@ -91,7 +91,7 @@ export class ApiService {
      * @returns {void} nothing
      */
 
-    private _cleanValueSpec(vs: ValueObject): void {
+    private _cleanValueSpec = (vs: ValueObject): void => {
         if (vs.hasOwnProperty('valueExpression')) delete vs.valueExpression
         if (vs.operand && Array.isArray(vs.operand)) {
             for (let i = 0; i < vs.operand.length; i++) {
@@ -169,7 +169,7 @@ export class ApiService {
      * @param {RequestObject} reqOb
      * @returns {RequestObject} with default values for ref and commit
      */
-    public normalize(reqOb: RequestObject): RequestObject {
+    public normalize = (reqOb: RequestObject): RequestObject => {
         reqOb.refId = !reqOb.refId ? 'master' : reqOb.refId
         reqOb.commitId = !reqOb.commitId ? 'latest' : reqOb.commitId
         return reqOb
@@ -182,7 +182,7 @@ export class ApiService {
      * @param {ElementObject} elementOb
      * @returns {RequestObject}
      */
-    public makeRequestObject(elementOb: ElementObject): RequestObject {
+    public makeRequestObject = (elementOb: ElementObject): RequestObject => {
         return {
             projectId: elementOb._projectId,
             refId: elementOb._refId,
@@ -274,11 +274,11 @@ export class ApiService {
      * @param {Object} server version of elem object from server.
      * @returns {Boolean} true if conflict, false if not
      */
-    public hasConflict(
+    public hasConflict = (
         edit: ElementObject,
         orig: ElementObject,
         server: ElementObject
-    ): boolean {
+    ): boolean => {
         for (const i in edit) {
             if (
                 i === '_read' ||
@@ -334,7 +334,7 @@ export class ApiService {
      * Alias for the currently adopted UUID standard for View Editor/MMS
      *
      */
-    public createUUID(): string {
+    public createUUID = (): string => {
         return uuid.v4()
     }
 
@@ -344,7 +344,7 @@ export class ApiService {
      *
      * @returns {string} unique SysML element ID
      */
-    public createUniqueId(): string {
+    public createUniqueId = (): string => {
         return `ve-${this.getVeVersion().replace(
             '.',
             '-'
@@ -358,7 +358,7 @@ export class ApiService {
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    public isView(e: ElementObject): boolean {
+    public isView = (e: ElementObject): boolean => {
         if (e._appliedStereotypeIds) {
             if (
                 e._appliedStereotypeIds.indexOf(
@@ -390,7 +390,7 @@ export class ApiService {
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    public isDocument(e: ElementObject): boolean {
+    public isDocument = (e: ElementObject): boolean => {
         return (
             e._appliedStereotypeIds &&
             e._appliedStereotypeIds.indexOf(
@@ -406,7 +406,7 @@ export class ApiService {
      * @param {Object} e element
      * @returns {boolean} boolean
      */
-    public isRequirement(e: ElementObject): boolean {
+    public isRequirement = (e: ElementObject): boolean => {
         if (e._appliedStereotypeIds) {
             const reqSids = this.schemaSvc.getSchema<string[]>(
                 'REQUIREMENT_SID',

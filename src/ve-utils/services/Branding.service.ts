@@ -1,6 +1,8 @@
 import { veUtils } from '@ve-utils'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
+import { ProjectsResponse } from '@ve-types/mms'
 
 export interface BrandingStyle {
     labels?: string[] | string[][]
@@ -49,7 +51,9 @@ export class BrandingService {
         disabled: false,
     }
 
-    constructor() {
+    static $inject = ['$q']
+
+    constructor(private $q: VeQService) {
         if (this.config.customLabels) {
             this.labels = Object.assign(
                 this.defaultLabels,
@@ -122,16 +126,16 @@ export class BrandingService {
         return msg
     }
 
-    getBanner(): BrandingStyle {
-        return this.banner
+    getBanner(): VePromise<BrandingStyle, ProjectsResponse> {
+        return this.$q.resolve(this.banner)
     }
 
-    getLoginBanner(): BrandingStyle {
-        return this.loginBanner
+    getLoginBanner(): VePromise<BrandingStyle, ProjectsResponse> {
+        return this.$q.resolve(this.loginBanner)
     }
 
-    getFooter(): BrandingStyle {
-        return this.footer
+    getFooter(): VePromise<BrandingStyle, ProjectsResponse> {
+        return this.$q.resolve(this.footer)
     }
 }
 

@@ -7,11 +7,3 @@ export * from './services'
 import './components/mention.component'
 import './components/mention-intercept.component'
 import './ve-editor.component'
-
-//Modals
-import './modals'
-
-export * from './modals'
-
-//Types
-export * from '@ve-types/core/editor'

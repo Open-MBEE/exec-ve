@@ -4,7 +4,7 @@ declare global {
     interface JQuery {
         isOnScreen(x?: number, y?: number): boolean
 
-        table2CSV(inputOptions: table2CSV.inputOptions): string | boolean
+        table2CSV(inputOptions: table2CSV.inputOptions): string
     }
 
     namespace JQuery {

@@ -6,7 +6,7 @@ angular
     /**
      * @name ui.tree-filter.provider:uiTreeFilterSettings
      */
-    .provider('uiTreeFilterSettings', () => {
+    .provider('uiTreeFilterSettings', function () {
         var uiTreeFilterSettings = this
 
         this.addresses = ['title']
@@ -26,7 +26,7 @@ angular
      */
     .filter('uiTreeFilter', [
         'uiTreeFilterSettings',
-        (uiTreeFilterSettings) => {
+        function (uiTreeFilterSettings) {
             /**
              * Iterates through given collection if flag is not true and sets a flag to true on first match.
              *

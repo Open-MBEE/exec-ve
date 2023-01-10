@@ -30,6 +30,3 @@ import './components/present-section.component'
 
 //Compatibility
 import './mms-view-compatibility.component'
-
-//Types
-export * from '@ve-types/components/presentation'

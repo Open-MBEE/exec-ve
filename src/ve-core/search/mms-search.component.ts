@@ -1,5 +1,5 @@
 import { StateService } from '@uirouter/angularjs'
-import angular from 'angular'
+import angular, { IComponentController } from 'angular'
 import _ from 'lodash'
 
 import {
@@ -13,11 +13,11 @@ import { RootScopeService, UtilsService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import {
+    DocumentObject,
     ElementObject,
-    ElementsRequest,
-    ElementsResponse,
+    MountObject,
     ProjectObject,
     QueryObject,
     RequestObject,
@@ -50,6 +50,11 @@ export interface SearchFilter {
     classifierIds?: string[]
 }
 
+export interface SearchObject extends ViewObject {
+    allRelatedDocuments?: ViewObject[]
+    remainingRelatedDocuments?: ViewObject[]
+}
+
 /**
  * @ngdoc directive
  * @name veCore.directive:mmsSearch
@@ -59,8 +64,8 @@ export interface SearchFilter {
  * @scope
  *
  */
-class SearchController implements angular.IComponentController {
-    private mmsOptions: VeSearchOptions
+export class SearchController implements IComponentController {
+    private mmsOptions: VeSearchOptions<ElementObject>
     private mmsProjectId: string
     private mmsRefId: string
     private embedded: boolean
@@ -147,10 +152,10 @@ class SearchController implements angular.IComponentController {
     }
 
     // event handler for multiselect metatype dropdown
-    public multiselectEvent = {
-        onItemSelect: (ob) => {},
-        onItemDeselect: (ob) => {},
-        onDeselectAll: (ob) => {},
+    public multiselectEvent: {
+        onItemSelect(ob): void
+        onItemDeselect(ob): void
+        onDeselectAll(ob): void
     }
 
     protected filterOptions = [
@@ -185,7 +190,7 @@ class SearchController implements angular.IComponentController {
     ]
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $state: StateService,
         private growl: angular.growl.IGrowlService,
         private $timeout: angular.ITimeoutService,
@@ -204,24 +209,25 @@ class SearchController implements angular.IComponentController {
         this.refId = this.mmsRefId ? this.mmsRefId : 'master'
 
         // Set functions
-        this.projectSvc.getProjectMounts(this.mmsProjectId, this.refId) //ensure project mounts object is cached
+        void this.projectSvc.getProjectMounts(this.mmsProjectId, this.refId)
+        //ensure project mounts object is cached
         // Function used to get string value of metatype names for advanced search
 
         this.getMetaTypes()
 
         this.multiselectEvent = {
-            onItemSelect: (ob) => {
-                this.$timeout(() => {
+            onItemSelect: (ob): void => {
+                void this.$timeout(() => {
                     this.stringQueryUpdate()
                 }, 500)
             },
-            onItemDeselect: (ob) => {
-                this.$timeout(() => {
+            onItemDeselect: (ob): void => {
+                void this.$timeout(() => {
                     this.stringQueryUpdate()
                 }, 500)
             },
-            onDeselectAll: (ob) => {
-                this.$timeout(() => {
+            onDeselectAll: (ob): void => {
+                void this.$timeout(() => {
                     this.stringQueryUpdate()
                 }, 500)
             },
@@ -231,7 +237,7 @@ class SearchController implements angular.IComponentController {
 
         // Set options
         if (this.mmsOptions.searchResult) {
-            const data1: ElementObject[] = this.mmsOptions.searchResult
+            const data1 = this.mmsOptions.searchResult
             this.searchResults = data1
             this.paginationCache[0] = data1
         }
@@ -258,7 +264,7 @@ class SearchController implements angular.IComponentController {
         }
     }
 
-    handleChange = (newVal) => {
+    handleChange = (newVal: ElementObject[]): void => {
         if (!newVal) return
         if (!this.mmsOptions.getProperties) {
             return
@@ -278,9 +284,8 @@ class SearchController implements angular.IComponentController {
                     refId: elem._refId,
                     depth: 2,
                 }
-                this.elementSvc
-                    .getOwnedElements(reqOb, 2)
-                    .then((data: ElementObject[]) => {
+                this.elementSvc.getOwnedElements(reqOb, 2).then(
+                    (data: ElementObject[]) => {
                         const properties: ElementObject[] = []
                         //TODO might not be elements
                         data.forEach((elt) => {
@@ -305,12 +310,16 @@ class SearchController implements angular.IComponentController {
                         //     }
                         //     elem._properties2 = properties2;
                         // }
-                    })
+                    },
+                    (reason) => {
+                        this.growl.error(reason.message)
+                    }
+                )
             }
         })
     }
 
-    public qualifiedNameFormatter = (qualifiedName) => {
+    public qualifiedNameFormatter = (qualifiedName: string): string => {
         if (qualifiedName) {
             const parts = qualifiedName.split('/')
             let result = qualifiedName
@@ -324,29 +333,34 @@ class SearchController implements angular.IComponentController {
         }
     }
 
-    public expandQualifiedName = ($event, qualifiedName) => {
-        $event.currentTarget.innerHTML = qualifiedName
+    public expandQualifiedName = (
+        $event: JQuery.ClickEvent,
+        qualifiedName: string
+    ): void => {
+        ;($event.currentTarget as HTMLElement).innerHTML = qualifiedName
     }
 
-    public showMoreRelatedViews = (element) => {
+    public showMoreRelatedViews = (element: SearchObject): void => {
         element.remainingRelatedDocuments = element.allRelatedDocuments.slice(
             3,
             element.allRelatedDocuments.length
         )
     }
 
-    public closeSearch = () => {
-        this.$state.go(
+    public closeSearch = (): void => {
+        void this.$state.go(
             'main.project.ref.portal',
             { search: null, field: null },
             { reload: true }
         )
     }
 
-    public advancedSearchHandler = () => {}
+    public advancedSearchHandler = (): void => {
+        /* TODO: Reimplement Advanced Search */
+    }
 
     // Get metatypes for dropdown options
-    public getMetaTypes = () => {
+    public getMetaTypes = (): void => {
         // this.metatypeSearch = "fa fa-spin fa-spinner";
         // this.projectSvc.getMetatypes(scope.mmsProjectId, scope.refId)
         //     .then((data) => {
@@ -360,12 +374,12 @@ class SearchController implements angular.IComponentController {
         this.advancedSearchHandler()
     }
 
-    public getMetatypeSelection = (id) => {
+    public getMetatypeSelection = (id: string): string => {
         const mainElement = angular.element(id)
         return mainElement.find('div').attr('value')
     }
 
-    public getTypeClass = (element) => {
+    public getTypeClass = (element: ElementObject): string => {
         // Get Type
         return this.utilsSvc.getElementTypeClass(
             element,
@@ -374,14 +388,14 @@ class SearchController implements angular.IComponentController {
     }
 
     // Filter options
-    public getActiveFilterClass = (item) => {
+    public getActiveFilterClass = (item: unknown[]): boolean => {
         if (!this.activeFilter.length) {
-            return ''
+            return false
         }
         return _.includes(this.activeFilter, item)
     }
 
-    public filterSearchResults = (type) => {
+    public filterSearchResults = (type: string): void => {
         const tempArr = _.clone(this.activeFilter)
         if (_.includes(this.activeFilter, type)) {
             _.pull(this.activeFilter, type)
@@ -391,7 +405,7 @@ class SearchController implements angular.IComponentController {
         this._applyFilters()
     }
 
-    private _applyFilters = () => {
+    private _applyFilters = (): void => {
         if (!this.activeFilter.length) {
             this.filteredSearchResults = this.baseSearchResults
         } else {
@@ -417,7 +431,7 @@ class SearchController implements angular.IComponentController {
      * @name veCore.directive:mmsSearch#stringQueryUpdate
      * Updates advanced search main query input
      */
-    public stringQueryUpdate = () => {
+    public stringQueryUpdate = (): void => {
         const rowLength = this.advanceSearchRows.length
         this.stringQuery = Array(rowLength + 1).join('(')
         this.stringQuery += this.mainSearch.searchField.label + ':'
@@ -437,8 +451,9 @@ class SearchController implements angular.IComponentController {
                 ':'
             if (this.advanceSearchRows[i].searchField.id === 'metatype') {
                 this.stringQuery +=
-                    this.getMetatypeSelection('#searchMetatypeSelect-' + i) +
-                    ')'
+                    this.getMetatypeSelection(
+                        '#searchMetatypeSelect-' + i.toString()
+                    ) + ')'
             } else {
                 this.stringQuery += this.advanceSearchRows[i].searchText + ')'
             }
@@ -449,7 +464,7 @@ class SearchController implements angular.IComponentController {
      * @name veCore.directive:mmsSearch#addAdvanceSearchRow
      * Adds new row with empty fields and updates advanced search main query input
      */
-    public addAdvanceSearchRow = () => {
+    public addAdvanceSearchRow = (): void => {
         this.advanceSearchRows.push({
             operator: 'And',
             searchField: {
@@ -467,17 +482,17 @@ class SearchController implements angular.IComponentController {
      *
      * @param {object} row advanced search row
      */
-    public removeRowAdvanceSearch = (row) => {
+    public removeRowAdvanceSearch = (row: AdvancedSearchQuery): void => {
         this.advanceSearchRows = _.without(this.advanceSearchRows, row)
         this.stringQueryUpdate()
     }
 
-    public modifyAdvanceSearch = () => {
+    public modifyAdvanceSearch = (): void => {
         this.advanceSearch = !this.advanceSearch
         this.advancedSearchResults = !this.advancedSearchResults
     }
 
-    public nextPage = () => {
+    public nextPage = (): void => {
         if (this.paginationCache[this.currentPage + 1]) {
             this.baseSearchResults = this.paginationCache[this.currentPage + 1]
             this.currentPage += 1
@@ -492,7 +507,7 @@ class SearchController implements angular.IComponentController {
         this.$anchorScroll('ve-search-results')
     }
 
-    public prevPage = () => {
+    public prevPage = (): void => {
         if (this.paginationCache[this.currentPage - 1]) {
             this.baseSearchResults = this.paginationCache[this.currentPage - 1]
             this.currentPage -= 1
@@ -506,7 +521,7 @@ class SearchController implements angular.IComponentController {
         }
     }
 
-    public goTo = (page: number) => {
+    public goTo = (page: number): void => {
         if (this.paginationCache[page]) {
             this.baseSearchResults = this.paginationCache[page]
             this.currentPage = page
@@ -525,10 +540,14 @@ class SearchController implements angular.IComponentController {
      * @param {number} page page number of search results
      * @param {number} numItems number of items to return per page
      */
-    public search = (query: SearchQuery, page: number, numItems: number) => {
+    public search = (
+        query: SearchQuery,
+        page: number,
+        numItems: number
+    ): void => {
         this.searchLoading = true
         if (!this.embedded) {
-            this.$state.go('.', {
+            void this.$state.go('.', {
                 search: query.searchText,
                 field: query.searchField.id,
             })
@@ -542,21 +561,24 @@ class SearchController implements angular.IComponentController {
             projectId: this.mmsProjectId,
             refId: this.refId,
         }
-        const promises: angular.IPromise<SearchResponse>[] = []
+        const promises: VePromise<
+            SearchResponse<ElementObject>,
+            SearchResponse<ElementObject>
+        >[] = []
         for (const queryOb of queryObs) {
             promises.push(this._performSearch(reqOb, queryOb))
         }
 
         this.$q
-            .all(promises)
+            .allSettled<SearchResponse<ElementObject>>(promises)
             .then(
                 (data) => {
                     const elements: ElementObject[] = []
                     this.searchResults = []
                     this.totalResults = 0
                     for (const d of data) {
-                        elements.push(...d.elements)
-                        this.totalResults = this.totalResults + d.total
+                        elements.push(...d.value.elements)
+                        this.totalResults = this.totalResults + d.value.total
                     }
                     if (this.mmsOptions.filterCallback) {
                         const results = this.mmsOptions.filterCallback(elements)
@@ -568,7 +590,7 @@ class SearchController implements angular.IComponentController {
                     } else if (elements.length > 0) {
                         this.searchResults = elements
                     }
-                    this.combineRelatedViews(this)
+                    this.combineRelatedViews()
                     this.maxPages = Math.ceil(
                         this.totalResults / this.itemsPerPage
                     )
@@ -599,11 +621,11 @@ class SearchController implements angular.IComponentController {
     private _performSearch(
         reqOb: RequestObject,
         queryOb: QueryObject
-    ): angular.IPromise<SearchResponse> {
-        return this.elementSvc.search(reqOb, queryOb, 2)
+    ): VePromise<SearchResponse<ElementObject>, SearchResponse<ElementObject>> {
+        return this.elementSvc.search<ElementObject>(reqOb, queryOb)
     }
 
-    newSearch = (query) => {
+    public newSearch = (query: SearchQuery): void => {
         this.paginationCache = {}
         this.search(query, 0, this.itemsPerPage)
     }
@@ -617,29 +639,33 @@ class SearchController implements angular.IComponentController {
      *
      * @return {object} Elastic query JSON object with list of project mounts
      */
-    getProjectMountsQuery = () => {
-        let projList: ProjectObject[] = []
+    getProjectMountsQuery = (): VePromise<MountObject[]> => {
+        const deferred: angular.IDeferred<MountObject[]> = this.$q.defer()
+        const projList: MountObject[] = []
 
         const mountCacheKey = ['project-mounts', this.mmsProjectId, this.refId]
         if (this.cacheSvc.exists(mountCacheKey)) {
-            projList = this.cacheSvc.get<ProjectObject[]>(mountCacheKey)
+            const project = this.cacheSvc.get<MountObject>(mountCacheKey)
+            this.getAllMountsAsArray(project, projList)
+            deferred.resolve(projList)
         } else {
             // Get project element data to gather mounted project list
-            const cacheKey = ['project', this.mmsProjectId, this.refId]
-            const cachedProj: ProjectObject | undefined =
-                this.cacheSvc.get(cacheKey)
-            if (cachedProj) {
-                this.getAllMountsAsArray(cachedProj, projList)
-            } else {
-                const project: ProjectObject = {
-                    id: this.mmsProjectId,
-                    _refId: this.refId,
-                }
-                this.getAllMountsAsArray(project, projList)
-            }
-            this.cacheSvc.put(mountCacheKey, projList, false)
+            this.projectSvc
+                .getProjectMounts(this.mmsProjectId, this.refId)
+                .then(
+                    (project) => {
+                        this.getAllMountsAsArray(project, projList)
+                        deferred.resolve(projList)
+                    },
+                    (reason) => {
+                        this.growl.error(
+                            'Problem getting Project Mounts:' + reason.message
+                        )
+                        deferred.resolve(projList)
+                    }
+                )
         }
-        return projList
+        return deferred.promise
     }
 
     /**
@@ -651,9 +677,9 @@ class SearchController implements angular.IComponentController {
     public getAllMountsAsArray = (
         project: ProjectObject,
         projectsList: ProjectObject[]
-    ) => {
+    ): void => {
         projectsList.push(project)
-        const mounts = project._mounts
+        const mounts = (project as MountObject)._mounts
         if (Array.isArray(mounts) && mounts.length !== 0) {
             for (let i = 0; i < mounts.length; i++) {
                 if (mounts[i]._mounts) {
@@ -661,10 +687,11 @@ class SearchController implements angular.IComponentController {
                 }
             }
         }
-        return
     }
 
-    public buildSearchClause = (query) => {}
+    public buildSearchClause = (query): void => {
+        /*TODO*/
+    }
 
     /**
      * @name veCore.directive:mmsSearch#buildQuery
@@ -673,7 +700,7 @@ class SearchController implements angular.IComponentController {
      *
      * @return {object} {{query: {bool: {must: *[]}}}} JSON object from post data.
      */
-    public buildQuery = (query: SearchQuery) => {
+    public buildQuery = (query: SearchQuery): QueryObject[] => {
         // Set project and mounted projects filter
         //var projectList = this.getProjectMountsQuery()
         const filterTerms: { [key: string]: string[] } = {}
@@ -712,9 +739,12 @@ class SearchController implements angular.IComponentController {
         if (this.docsviews.selected) {
             const queryObs: QueryObject[] = []
             const stereoIds = [
-                this.schemaSvc.getSchema('VIEW_SID', this.schema),
-                this.schemaSvc.getSchema('DOCUMENT_SID', this.schema),
-                ...this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema),
+                this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
+                this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
+                ...this.schemaSvc.getSchema<string[]>(
+                    'OTHER_VIEW_SID',
+                    this.schema
+                ),
             ]
             /*If the filter list already contain the view id's do not add them a second time since filtering is done
             client side */
@@ -745,8 +775,8 @@ class SearchController implements angular.IComponentController {
         return queryObs
     }
 
-    private combineRelatedViews = (scope) => {
-        scope.searchResults.forEach((element: ViewObject) => {
+    private combineRelatedViews = (): void => {
+        this.searchResults.forEach((element: ViewObject) => {
             const allRelatedDocuments: {
                 relatedDocument: ViewObject
                 relatedView: ViewObject
@@ -768,13 +798,18 @@ class SearchController implements angular.IComponentController {
         })
     }
 
-    public userResultClick = (elem, property) => {
+    public userResultClick = (elem: ElementObject, property: string): void => {
         if (this.mmsOptions.callback) {
             this.mmsOptions.callback(elem, property)
         }
     }
 
-    public userRelatedClick = (event, doc, view, elem) => {
+    public userRelatedClick = (
+        event: JQuery.ClickEvent,
+        doc: DocumentObject,
+        view: ViewObject,
+        elem: ElementObject
+    ): void => {
         event.preventDefault()
         event.stopPropagation()
         if (this.mmsOptions.relatedCallback)

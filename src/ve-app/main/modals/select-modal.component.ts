@@ -10,6 +10,8 @@ import {
     VeModalComponent,
     VeModalResolve,
     VeModalController,
+    VeModalInstanceService,
+    VeModalResolveFn,
 } from '@ve-types/view-editor'
 
 interface SelectModalResolve extends VeModalResolve {
@@ -17,14 +19,20 @@ interface SelectModalResolve extends VeModalResolve {
     mmsOrg: OrgObject
     mmsProjects: ProjectObject[]
     mmsProject: ProjectObject
-    selectedProject: ProjectObject
+}
+
+export interface SelectModalResolveFn extends VeModalResolveFn {
+    mmsOrgs(): OrgObject[]
+    mmsOrg(): OrgObject
+    mmsProjects(): ProjectObject[]
+    mmsProject(): ProjectObject
 }
 
 class SelectModalController implements VeModalController {
     static $inject = ['$scope', '$state', 'ProjectService']
 
     //bindings
-    public modalInstance: VeModalInstanceService<unknown>
+    public modalInstance: VeModalInstanceService<void>
     private resolve: SelectModalResolve
 
     //local
@@ -52,12 +60,10 @@ class SelectModalController implements VeModalController {
         this.projectId = this.resolve.mmsProject.id
 
         this.selectedOrg = this.resolve.mmsOrg.name
-        this.selectedProject = this.projects.filter((e) => {
-            return e.id === this.projectId
-        })[0].name
+        this.selectedProject = this.resolve.mmsProject.name
     }
 
-    public selectOrg = (org) => {
+    public selectOrg = (org: OrgObject): void => {
         if (org) {
             this.orgId = org.id
             this.selectedOrg = org.name
@@ -67,14 +73,14 @@ class SelectModalController implements VeModalController {
         }
     }
 
-    public selectProject = (project) => {
+    public selectProject = (project: ProjectObject): void => {
         if (project) {
             this.projectId = project.id
             this.selectedProject = project.name
         }
     }
 
-    public continue = () => {
+    public continue = (): void => {
         if (this.orgId && this.projectId) {
             // was the same project selected? cancel...
             if (
@@ -91,19 +97,15 @@ class SelectModalController implements VeModalController {
                         refId: 'master',
                         search: undefined,
                     })
-                    .then(
-                        (data) => {
-                            this.modalInstance.dismiss()
-                        },
-                        (reject) => {
-                            this.spin = false
-                        }
-                    )
+                    .finally(() => {
+                        this.spin = false
+                        this.modalInstance.close()
+                    })
             }
         }
     }
 
-    public refreshOrgs = () => {
+    public refreshOrgs = (): void => {
         this.orgSpin = true
         this.orgs.length = 0
         this.projectSvc
@@ -116,7 +118,7 @@ class SelectModalController implements VeModalController {
             })
     }
 
-    public refreshProjects = () => {
+    public refreshProjects = (): void => {
         this.projSpin = true
         this.projects.length = 0
         this.projectSvc
@@ -140,7 +142,7 @@ class SelectModalController implements VeModalController {
             })
     }
 
-    public cancel = () => {
+    public cancel = (): void => {
         this.modalInstance.dismiss()
     }
 }

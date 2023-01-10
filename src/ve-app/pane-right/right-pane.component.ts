@@ -1,9 +1,10 @@
-import angular from 'angular'
+import { IPane } from '@openmbee/pane-layout'
+import angular, { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
+import { veAppEvents } from '@ve-app/events'
 import { SpecApi, SpecService } from '@ve-components/spec-tools'
-import { CoreUtilsService } from '@ve-core/services'
-import { ToolbarService } from '@ve-core/tool-bar'
+import { ToolbarService } from '@ve-core/toolbar'
 import {
     ElementService,
     PermissionsService,
@@ -17,8 +18,14 @@ import {
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import {
+    DocumentObject,
+    ElementObject,
+    ProjectObject,
+    RefObject,
+    ViewObject,
+} from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 const RightPaneComponent: VeComponentOptions = {
@@ -39,15 +46,13 @@ const RightPaneComponent: VeComponentOptions = {
     require: {
         $pane: '^^ngPane',
     },
-    controller: class RightPaneController
-        implements angular.IComponentController
-    {
-        private projectOb
-        refOb
-        tagObs
-        branchObs
-        documentOb
-        viewOb
+    controller: class RightPaneController implements IComponentController {
+        private projectOb: ProjectObject
+        refOb: RefObject
+        tagObs: RefObject[]
+        branchObs: RefObject[]
+        documentOb: DocumentObject
+        viewOb: ViewObject
 
         public subs: Rx.IDisposable[]
 
@@ -60,7 +65,7 @@ const RightPaneComponent: VeComponentOptions = {
         // openEdits: number;
         // edits: {};
         // viewCommitId: any;
-        private $pane
+        private $pane: IPane
 
         static $inject = [
             '$scope',
@@ -71,7 +76,6 @@ const RightPaneComponent: VeComponentOptions = {
             'growl',
             'ElementService',
             'ProjectService',
-            'CoreUtilsService',
             'PermissionsService',
             'RootScopeService',
             'EventService',
@@ -83,13 +87,12 @@ const RightPaneComponent: VeComponentOptions = {
         constructor(
             private $scope,
             private $uibModal: VeModalService,
-            private $q: angular.IQService,
+            private $q: VeQService,
             private $timeout: angular.ITimeoutService,
             private hotkeys: angular.hotkeys.HotkeysProvider,
             private growl: angular.growl.IGrowlService,
             private elementSvc: ElementService,
             private projectSvc: ProjectService,
-            private utils: CoreUtilsService,
             private permissionsSvc: PermissionsService,
             private rootScopeSvc: RootScopeService,
             private eventSvc: EventService,
@@ -216,27 +219,32 @@ const RightPaneComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on('view.selected', (data) => {
-                    const elementOb = data.elementOb
-                    const commitId = data.commitId ? data.commitId : null
-                    this.eventSvc.$broadcast('element.selected', {
-                        elementOb: elementOb,
-                        commitId: commitId,
-                    })
-                    this.viewOb = elementOb
-                    const editable =
-                        this.refOb.type === 'Branch' &&
-                        commitId === 'latest' &&
-                        this.permissionsSvc.hasBranchEditPermission(this.refOb)
-                    //this.viewCommitId = commitId ? commitId : elementOb._commitId;
-                    this.eventSvc.$broadcast(
-                        this.toolbarSvc.constants.SETPERMISSION,
-                        {
-                            id: 'view',
-                            value: editable,
-                        }
-                    )
-                })
+                this.eventSvc.$on<veAppEvents.viewSelectedData>(
+                    'view.selected',
+                    (data) => {
+                        const elementOb = data.elementOb
+                        const commitId = data.commitId ? data.commitId : null
+                        this.eventSvc.$broadcast('element.selected', {
+                            elementOb: elementOb,
+                            commitId: commitId,
+                        })
+                        this.viewOb = elementOb
+                        const editable =
+                            this.refOb.type === 'Branch' &&
+                            commitId === 'latest' &&
+                            this.permissionsSvc.hasBranchEditPermission(
+                                this.refOb
+                            )
+                        //this.viewCommitId = commitId ? commitId : elementOb._commitId;
+                        this.eventSvc.$broadcast(
+                            this.toolbarSvc.constants.SETPERMISSION,
+                            {
+                                id: 'view',
+                                value: editable,
+                            }
+                        )
+                    }
+                )
             )
         }
 
@@ -247,7 +255,10 @@ const RightPaneComponent: VeComponentOptions = {
                     elementOb: this.viewOb ? this.viewOb : this.documentOb,
                     commitId: 'latest',
                 }
-                this.eventSvc.$broadcast('view.selected', data)
+                this.eventSvc.$broadcast<veAppEvents.viewSelectedData>(
+                    'view.selected',
+                    data
+                )
             }
         }
     },

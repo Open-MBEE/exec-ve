@@ -14,29 +14,37 @@ import {
     ApplicationService,
     BrandingService,
     BrandingStyle,
+    ShortenUrlService,
 } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
+    CheckAuthResponse,
     DocumentObject,
-    ElementObject,
-    ElementsResponse,
+    GroupObject,
+    GroupsResponse,
     MountObject,
     OrgObject,
+    OrgsResponse,
     ParamsObject,
+    PermissionsResponse,
     ProjectObject,
+    ProjectsResponse,
     RefObject,
-    RequestObject,
+    RefsResponse,
     ViewObject,
 } from '@ve-types/mms'
+import { VeStorageService } from '@ve-types/view-editor'
 
 export class ResolveService {
     static $inject = [
-        '$window',
+        '$localStorage',
         '$q',
         '$cookies',
         '$uiRouter',
+        'ShortenUrlService',
         'BrandingService',
         'URLService',
         'AuthService',
@@ -48,10 +56,11 @@ export class ResolveService {
     ]
 
     constructor(
-        private $window: angular.IWindowService,
-        private $q: angular.IQService,
+        private $localStorage: VeStorageService,
+        private $q: VeQService,
         private $cookies: angular.cookies.ICookiesService,
         private $uiRouter: UIRouter,
+        private shortenUrlSvc: ShortenUrlService,
         private brandingSvc: BrandingService,
         private uRLSvc: URLService,
         private authSvc: AuthService,
@@ -62,19 +71,24 @@ export class ResolveService {
         private permissionsSvc: PermissionsService
     ) {}
 
-    public getBanner(): BrandingStyle {
+    public decodeUrl(paramsOb: ParamsObject): VePromise<ParamsObject> {
+        if (!paramsOb.shortUrl) return
+        return this.shortenUrlSvc.decodeShortUrl(paramsOb.shortUrl)
+    }
+
+    public getBanner(): VePromise<BrandingStyle, ProjectsResponse> {
         return this.brandingSvc.getBanner()
     }
 
-    public getLoginBanner(): BrandingStyle {
+    public getLoginBanner(): VePromise<BrandingStyle, ProjectsResponse> {
         return this.brandingSvc.getLoginBanner()
     }
-    public getToken(): angular.IPromise<string> {
+    public getToken(): VePromise<string, CheckAuthResponse> {
         const deferred = this.$q.defer<string>()
         this.authSvc.checkLogin().then(
             (data) => {
-                this.uRLSvc.setToken(this.$window.localStorage.getItem('token'))
-                deferred.resolve(this.$window.localStorage.getItem('token'))
+                this.uRLSvc.setToken(this.$localStorage.token)
+                deferred.resolve(this.$localStorage.token)
                 this.$cookies.put(
                     'com.tomsawyer.web.license.user',
                     data.username,
@@ -88,27 +102,31 @@ export class ResolveService {
         return deferred.promise
     }
 
-    public getOrg(projectOb: ProjectObject): angular.IPromise<OrgObject> {
+    public getOrg(
+        projectOb: ProjectObject
+    ): VePromise<OrgObject, OrgsResponse> {
         return this.projectSvc.getOrg(projectOb.orgId)
     }
 
-    public getOrgs(): angular.IPromise<OrgObject[]> {
+    public getOrgs(): VePromise<OrgObject[], OrgsResponse> {
         return this.projectSvc.getOrgs()
     }
 
-    public getProject(params: ParamsObject): angular.IPromise<ProjectObject> {
+    public getProject(
+        params: ParamsObject
+    ): VePromise<ProjectObject, ProjectsResponse> {
         return this.projectSvc.getProject(params.projectId)
     }
 
     public getProjects(
         projectOb: ProjectObject
-    ): angular.IPromise<ProjectObject[]> {
+    ): VePromise<ProjectObject[], ProjectsResponse> {
         return this.projectSvc.getProjects(projectOb.orgId)
     }
 
     public getProjectMounts(
         params: ParamsObject
-    ): angular.IPromise<MountObject> {
+    ): VePromise<MountObject, ProjectsResponse> {
         return this.projectSvc.getProjectMounts(
             params.projectId,
             params.refId,
@@ -116,11 +134,11 @@ export class ResolveService {
         )
     }
 
-    public getRef(params: ParamsObject) {
+    public getRef(params: ParamsObject): VePromise<RefObject, RefsResponse> {
         return this.projectSvc.getRef(params.refId, params.projectId)
     }
 
-    public getRefs(params: ParamsObject) {
+    public getRefs(params: ParamsObject): VePromise<RefObject[], RefsResponse> {
         return this.projectSvc.getRefs(params.projectId)
     }
 
@@ -134,7 +152,7 @@ export class ResolveService {
         return ret
     }
 
-    public getTag(refOb: RefObject): RefObject {
+    public getTag = (refOb: RefObject): RefObject => {
         return this._filterRefs('Tag', [refOb])[0]
     }
 
@@ -142,7 +160,7 @@ export class ResolveService {
         return this._filterRefs('Tag', refObs)
     }
 
-    public getBranch(refOb: RefObject): RefObject {
+    public getBranch = (refOb: RefObject): RefObject => {
         return this._filterRefs('Branch', [refOb])[0]
     }
 
@@ -153,7 +171,7 @@ export class ResolveService {
     public getGroups(
         params: ParamsObject,
         refresh?: boolean
-    ): angular.IPromise<ElementObject[]> {
+    ): VePromise<GroupObject[], GroupsResponse> {
         return this.projectSvc.getGroups(
             params.projectId,
             params.refId,
@@ -162,10 +180,10 @@ export class ResolveService {
     }
 
     public getGroup(
-        groupObs: ElementObject[],
+        groupObs: GroupObject[],
         documentOb: DocumentObject
-    ): ElementObject {
-        let group: ElementObject = null
+    ): GroupObject {
+        let group: GroupObject = null
         if (documentOb) {
             for (let i = 0; i < groupObs.length; i++) {
                 if (groupObs[i].id == documentOb._groupId) {
@@ -182,7 +200,7 @@ export class ResolveService {
         refOb: RefObject,
         projectOb: ProjectObject,
         refresh?: boolean
-    ): angular.IPromise<DocumentObject> {
+    ): VePromise<DocumentObject> {
         const deferred = this.$q.defer<DocumentObject>()
         const eid = params.projectId + '_cover'
         this.elementSvc
@@ -199,11 +217,7 @@ export class ResolveService {
                 (data) => {
                     deferred.resolve(data)
                 },
-                (
-                    reason: angular.IHttpResponse<
-                        ElementsResponse<DocumentObject>
-                    >
-                ) => {
+                (reason) => {
                     if (reason.status === 404) {
                         if (refOb.type === 'Tag') {
                             deferred.resolve(null)
@@ -287,14 +301,14 @@ export class ResolveService {
         params: ParamsObject,
         refOb: RefObject,
         refresh?: boolean
-    ): angular.IPromise<ElementObject> {
-        const deferred = this.$q.defer<ElementObject>()
+    ): VePromise<DocumentObject> {
+        const deferred = this.$q.defer<DocumentObject>()
         const eid: string = params.documentId
         const coverIndex = eid.indexOf('_cover')
         if (coverIndex > 0) {
             const groupId = eid.substring(5, coverIndex)
-            this.elementSvc
-                .getElement(
+            this.viewSvc
+                .getProjectDocument(
                     {
                         projectId: params.projectId,
                         refId: params.refId,
@@ -308,7 +322,7 @@ export class ResolveService {
                     (data) => {
                         deferred.resolve(data)
                     },
-                    (reason: angular.IHttpResponse<ElementsResponse>) => {
+                    (reason) => {
                         if (reason.status === 404) {
                             if (refOb.type === 'Tag') {
                                 deferred.resolve(null)
@@ -353,16 +367,12 @@ export class ResolveService {
                                                     (data) => {
                                                         deferred.resolve(data)
                                                     },
-                                                    (
-                                                        reason3: angular.IHttpResponse<ElementsResponse>
-                                                    ) => {
+                                                    (reason3) => {
                                                         deferred.reject(reason)
                                                     }
                                                 )
                                         },
-                                        (
-                                            reason2: angular.IHttpResponse<ElementsResponse>
-                                        ) => {
+                                        (reason2) => {
                                             deferred.reject(reason2)
                                         }
                                     )
@@ -388,7 +398,7 @@ export class ResolveService {
     public getProjectDocument(
         params: ParamsObject,
         refresh?: boolean
-    ): angular.IPromise<ViewObject> {
+    ): VePromise<ViewObject> {
         return this.viewSvc.getProjectDocument(
             {
                 projectId: params.projectId,
@@ -403,7 +413,7 @@ export class ResolveService {
     public getProjectDocuments(
         params: ParamsObject,
         refresh?: boolean
-    ): angular.IPromise<DocumentObject[]> {
+    ): VePromise<DocumentObject[]> {
         return this.viewSvc.getProjectDocuments(
             {
                 projectId: params.projectId,
@@ -417,7 +427,7 @@ export class ResolveService {
     public getView(
         params: ParamsObject,
         refresh?: boolean
-    ): angular.IPromise<ViewObject> {
+    ): VePromise<ViewObject> {
         return this.elementSvc.getElement(
             {
                 projectId: params.projectId,
@@ -429,28 +439,28 @@ export class ResolveService {
         )
     }
 
-    public getSearch(params: ParamsObject) {
+    public getSearch = (params: ParamsObject): string => {
         if (params.search === undefined) {
             return null
         }
         return params.search
     }
 
-    public getField(params: ParamsObject) {
+    public getField = (params: ParamsObject): string => {
         if (params.field === undefined) {
             return 'all'
         }
         return params.field
     }
 
-    public getFooter(): BrandingStyle {
+    public getFooter(): VePromise<BrandingStyle, ProjectsResponse> {
         return this.brandingSvc.getFooter()
     }
 
     public initializePermissions(
         projectOb: ProjectObject,
         refOb: RefObject
-    ): angular.IPromise<PermissionCache> {
+    ): VePromise<PermissionCache, PermissionsResponse> {
         return this.permissionsSvc.initializePermissions(projectOb, refOb)
     }
 }

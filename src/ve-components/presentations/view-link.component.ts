@@ -107,7 +107,7 @@ class ViewLinkController implements IComponentController {
         this.changeAction(this.mmsElementId, '', false)
     }
 
-    protected changeAction: onChangesCallback = (
+    protected changeAction: onChangesCallback<string> = (
         newVal,
         oldVal,
         firstChange

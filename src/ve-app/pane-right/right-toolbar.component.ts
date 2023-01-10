@@ -1,15 +1,17 @@
 import { UIRouterGlobals } from '@uirouter/angularjs'
-import angular from 'angular'
+import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
+import { veComponentsEvents } from '@ve-components/events'
 import { ExtensionService } from '@ve-components/services'
-import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/tool-bar'
+import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { PermissionsService } from '@ve-utils/mms-api-client'
 import { AutosaveService, EventService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
+import { DocumentObject, RefObject } from '@ve-types/mms'
 
 /* Classes */
 const RightToolbarComponent: VeComponentOptions = {
@@ -19,7 +21,7 @@ const RightToolbarComponent: VeComponentOptions = {
         refOb: '<',
         documentOb: '<',
     },
-    controller: class ToolbarController implements angular.IComponentController {
+    controller: class ToolbarController implements IComponentController {
         static $inject = [
             '$state',
             'ExtensionService',
@@ -33,8 +35,8 @@ const RightToolbarComponent: VeComponentOptions = {
         public subs: Rx.IDisposable[]
 
         //Bindings
-        public refOb
-        public documentOb
+        public refOb: RefObject
+        public documentOb: DocumentObject
 
         //Local
         public tbApi: ToolbarApi
@@ -60,7 +62,7 @@ const RightToolbarComponent: VeComponentOptions = {
             this.buttons = this.tbApi.buttons
 
             this.subs.push(
-                this.eventSvc.$on(
+                this.eventSvc.$on<veComponentsEvents.setPermissionData>(
                     this.toolbarSvc.constants.SETPERMISSION,
                     (data) => {
                         this.tbApi.setPermission(data.id, data.value)
@@ -69,13 +71,16 @@ const RightToolbarComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on(this.toolbarSvc.constants.SETICON, (data) => {
-                    this.tbApi.setIcon(data.id, data.value)
-                })
+                this.eventSvc.$on<veComponentsEvents.setIconData>(
+                    this.toolbarSvc.constants.SETICON,
+                    (data) => {
+                        this.tbApi.setIcon(data.id, data.value)
+                    }
+                )
             )
 
             this.subs.push(
-                this.eventSvc.$on(
+                this.eventSvc.$on<veComponentsEvents.setToggleData>(
                     this.toolbarSvc.constants.TOGGLEICONSPINNER,
                     (data) => {
                         this.tbApi.toggleButtonSpinner(data.id)
@@ -84,13 +89,16 @@ const RightToolbarComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on(this.toolbarSvc.constants.SELECT, (data) => {
-                    this.tbApi.select(data.id)
-                })
+                this.eventSvc.$on<veComponentsEvents.setToggleData>(
+                    this.toolbarSvc.constants.SELECT,
+                    (data) => {
+                        this.tbApi.select(data.id)
+                    }
+                )
             )
         }
 
-        tbInit = (tbApi: ToolbarApi) => {
+        tbInit = (tbApi: ToolbarApi): void => {
             for (const tool of this.extensionSvc.getExtensions('spec')) {
                 const button = this.toolbarSvc.getToolbarButton(tool)
                 tbApi.addButton(button)

@@ -9,6 +9,11 @@ export * from './mms.d'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MmsObject = Record<string, any>
 
+export interface TransclusionObject extends MmsObject {
+    element?: ElementObject
+    tag: string
+}
+
 export interface ElementObject extends MmsObject {
     id: string
     _projectId: string

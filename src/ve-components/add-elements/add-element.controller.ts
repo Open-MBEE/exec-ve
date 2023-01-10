@@ -1,13 +1,8 @@
 import angular from 'angular'
-import flatpickr from 'flatpickr'
 import _ from 'lodash'
 
-import {
-    AddElementApi,
-    AddElementData,
-} from '@ve-app/main/modals/add-item-modal.component'
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
-import { CoreUtilsService } from '@ve-core/services'
+import { AddElementsService } from '@ve-components/add-elements'
 import {
     ApiService,
     ElementService,
@@ -17,11 +12,13 @@ import {
 import { SchemaService } from '@ve-utils/model-schema'
 import { ApplicationService, UtilsService } from '@ve-utils/services'
 
-import { VePromise, VePromiseReason } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
+import { AddElementApi, AddElementData } from '@ve-types/components'
 import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms'
 import {
     VeModalService,
     VeModalSettings,
+    veSearchCallback,
     VeSearchOptions,
 } from '@ve-types/view-editor'
 
@@ -30,16 +27,23 @@ import {
  * @description
  * Generic controller used for the creation and update of elements.
  *
- * @template T Type of the add data required for creation of the desired element
- * @template U Type of the eventual element that will be returned by the Server
  */
 export class AddElement<
+    /**
+     * @typedef T Type of the add data required for creation of the desired element
+     */
     T extends AddElementData,
+    /**
+     * @typedef U Type of the eventual object that will be returned by the Server
+     */
     U extends MmsObject = ElementObject
 > {
     //Bindings
     public addElementData: T
-    public addElementApi: AddElementApi<U>
+    public addElementApi: AddElementApi<
+        U,
+        VePromiseReason<BasicResponse<MmsObject>>
+    >
     public mmsProjectId: string
     public mmsRefId: string
     public mmsOrgId: string
@@ -51,14 +55,13 @@ export class AddElement<
     type: string
     createForm: boolean = true
     oking: boolean = false
+    continue: boolean = false
     projectId: string
     refId: string
     orgId: string
     displayName: string = ''
     addType: string
     newItem: U
-    now: Date
-    dateTimeOpts: flatpickr.Options.Options
 
     static $inject = [
         '$scope',
@@ -73,7 +76,7 @@ export class AddElement<
         'ApplicationService',
         'UtilsService',
         'ApiService',
-        'CoreUtilsService',
+        'AddElementsService',
     ]
 
     protected schema = 'cameo'
@@ -84,7 +87,7 @@ export class AddElement<
 
     constructor(
         protected $scope: angular.IScope,
-        protected $q: angular.IQService,
+        protected $q: VeQService,
         protected $element: JQuery<HTMLElement>,
         protected growl: angular.growl.IGrowlService,
         protected $timeout: angular.ITimeoutService,
@@ -96,12 +99,13 @@ export class AddElement<
         protected applicationSvc: ApplicationService,
         protected utilsSvc: UtilsService,
         protected apiSvc: ApiService,
-        protected utils: CoreUtilsService
+        protected utils: AddElementsService
     ) {}
 
     public parentData: ElementObject = {} as ElementObject
 
     $onInit(): void {
+        this.addType = this.addElementData.addType
         this.projectId = this.mmsProjectId
         this.refId = this.mmsRefId ? this.mmsRefId : ''
         this.orgId = this.mmsOrgId
@@ -115,12 +119,6 @@ export class AddElement<
         }
 
         this.type = this.addElementData.type
-        // if (this.resolve.init && this.resolve.init instanceof Function) {
-        //     this.resolve.init(this)
-        //     return
-        // }
-
-        this.config()
     }
 
     public ok = (): void => {
@@ -134,14 +132,21 @@ export class AddElement<
             ? this.parentData.id
             : 'holding_bin_' + this.projectId
 
-        this.create().then(this.resolve, this.reject, this.last)
+        this.create()
+            .then((data) => {
+                this.addResolve(data, 'created')
+            }, this.addReject)
+            .finally(this.addFinally)
     }
 
     public loginCb = (result?: boolean): void => {
         if (result) {
             this.ok()
         } else {
-            this.reject({ status: 666, message: 'User not Authenticated' })
+            this.addReject({
+                status: 666,
+                message: 'User not Authenticated',
+            })
         }
     }
 
@@ -160,27 +165,34 @@ export class AddElement<
             settings
         )
         instance.result.then(this.loginCb, () => {
-            this.reject({
+            this.addReject({
                 status: 666,
                 message: 'User Cancelled Authentication',
             })
         })
     }
-    protected resolve = (data: U): void => {
-        this.growl.success(this.displayName + ' is being created')
+
+    public addResolve = (data: U, type: string): void => {
+        this.growl.success(this.displayName + ' is being ' + type)
         this.success(data)
         this.addElementApi.resolve(data)
     }
-    protected reject = (reason: VePromiseReason<BasicResponse<U>>): void => {
+
+    protected addReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(
+        reason: V
+    ): void => {
         this.fail(reason)
-        this.addElementApi.reject(reason)
+        if (!this.continue) {
+            this.addElementApi.reject(reason)
+        }
+        this.continue = false
     }
 
     public success = (data?: U): void => {
         /* Put custom success logic here*/
     }
 
-    public fail = (reason: VePromiseReason<BasicResponse<U>>): void => {
+    public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {
         if (reason.status === 401) {
             this.reLogin()
         } else {
@@ -193,37 +205,33 @@ export class AddElement<
     }
 
     public last = (): void => {
-        this.oking = false
+        /* Put custom finally logic here*/
     }
 
-    /**
-     * @name Presentation/config
-     *
-     * @description Extension API method to allow presentation components to implement custom initialization steps.
-     * Such as non-standard variables or services.
-     */
-    protected config = (): void => {
-        /* Implement any initialization Logic Here */
-        this.growl.warning(
-            `Add ${
-                this.addType === 'item'
-                    ? 'Item'
-                    : 'PE' + ' of Type ' + this.type + ' is not supported'
-            }`
-        )
+    public addFinally = (): void => {
+        this.last()
+        this.oking = false
     }
 
     /**
      * @name AddElement/callback
      * @param {ElementObject} data
+     * @param {string} property
      */
-    public callback = (data: U): void => {
+    public callback: veSearchCallback<U> = (
+        data: U,
+        property?: string
+    ): void => {
         if (this.oking) {
             this.growl.info('Please wait...')
             return
         }
         this.oking = true
-        this.addExisting(data).then(this.resolve, this.reject, this.last)
+        this.addExisting(data, property)
+            .then((finalData) => {
+                this.addResolve(finalData, 'added')
+            }, this.addReject)
+            .finally(this.addFinally)
     }
     /**
      *
@@ -239,6 +247,10 @@ export class AddElement<
         }
     }
 
+    /**
+     *
+     * @return {VePromise<U, BasicResponse<U>>}
+     */
     public create = (): VePromise<U, BasicResponse<U>> => {
         this.growl.error(`Add Item of Type ${this.type} is not supported`)
         return this.$q.reject()
@@ -247,9 +259,10 @@ export class AddElement<
     /**
      * @name AddElement/addExisting
      * @param {U} existingOb
+     * @param {string} property any property that was specified for use as a transclusion target
      * @return {VePromise<U>}
      */
-    public addExisting = (existingOb: U): VePromise<U> => {
+    public addExisting = (existingOb: U, property?: string): VePromise<U> => {
         return this.$q.resolve<U>(null as U)
     }
 }

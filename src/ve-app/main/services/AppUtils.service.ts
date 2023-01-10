@@ -1,13 +1,29 @@
 import { StateService } from '@uirouter/angularjs'
 import angular from 'angular'
 
+import {
+    PrintConfirmResult,
+    PrintModalResolveFn,
+} from '@ve-app/main/modals/print-confirm-modal.component'
+import { TableExportModalResolveFn } from '@ve-app/main/modals/table-export-modal.component'
 import { TreeService } from '@ve-core/tree'
 import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
-import { VeModalService } from '@ve-types/view-editor'
+import { VePromise, VeQService } from '@ve-types/angular'
+import { RefObject, ViewObject } from '@ve-types/mms'
+import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
+
+export interface DocumentStructure {
+    cover: string
+    contents: string
+    tot: string
+    toc: string
+    tof: string
+    toe: string
+}
 
 /**
  * @ngdoc service
@@ -15,8 +31,6 @@ import { VeModalService } from '@ve-types/view-editor'
  * * Utilities
  */
 export class AppUtilsService implements angular.Injectable<any> {
-    private style: any
-
     static $inject = [
         '$q',
         '$uibModal',
@@ -33,7 +47,7 @@ export class AppUtilsService implements angular.Injectable<any> {
         'TreeService',
     ]
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $uibModal: VeModalService,
         private $timeout: angular.ITimeoutService,
         private $location: angular.ILocationService,
@@ -48,9 +62,12 @@ export class AppUtilsService implements angular.Injectable<any> {
         private treeSvc: TreeService
     ) {}
 
-    public tableToCsv(tables: JQLite, isDoc: boolean) {
+    public tableToCsv = (tables: JQLite, isDoc: boolean): void => {
         //Export to CSV button Pop-up Generated Here
-        const modalInstance = this.$uibModal.open({
+        const modalInstance = this.$uibModal.open<
+            TableExportModalResolveFn,
+            string
+        >({
             component: 'tableExportModal',
             resolve: {
                 type: () => {
@@ -90,11 +107,9 @@ if (window.navigator.msSaveOrOpenBlob) {
 </script>
 `
 
-        modalInstance.result.then((data) => {
-            const choice = data.$value
-            if (choice === 'export') {
-                const tableCSV: { caption: string; val: string | boolean }[] =
-                    []
+        void modalInstance.result.then((data) => {
+            if (data === 'export') {
+                const tableCSV: { caption: string; val: string }[] = []
                 // Grab all tables and run export to csv fnc
                 tables
                     .find('table')
@@ -110,7 +125,7 @@ if (window.navigator.msSaveOrOpenBlob) {
                         }
                         tableCSV.push(tableObj)
                     })
-                const exportPopup = (data) => {
+                const exportPopup = (data: string): void => {
                     const generator = window.open(
                         '',
                         'csv',
@@ -129,25 +144,19 @@ if (window.navigator.msSaveOrOpenBlob) {
                             'Popup Window Failed to open. Allow popups and try again'
                         )
                     }
-                    return true
+                    //return true
                 }
                 // generate text area content for popup
                 let genTextArea = ''
                 let num = 0
                 tableCSV.forEach(
-                    (
-                        element: { caption: string; val: string | boolean },
-                        index
-                    ) => {
-                        genTextArea +=
-                            '<h2>' +
-                            element.caption +
-                            '</h2><div><button class="btn btn-sm btn-primary" onclick="doClick(\'textArea' +
-                            num +
-                            '\')">Save CSV</button></div><textArea cols=100 rows=15 wrap="off" id="textArea' +
-                            num +
-                            '">'
-                        genTextArea += element.val + '</textArea>'
+                    (element: { caption: string; val: string }) => {
+                        genTextArea = `
+    <h2>${element.caption}</h2>
+<div><button class="btn btn-sm btn-primary" onclick="doClick('textArea${num}')">
+Save CSV</button></div>
+<textArea cols=100 rows=15 wrap="off" id="textArea${num}">${element.val}</textArea>
+`
                         num++
                     }
                 )
@@ -170,13 +179,22 @@ if (window.navigator.msSaveOrOpenBlob) {
      * @returns {Promise} The promise returned from this.utilsSvc.exportHtmlAs - server response
      *
      */
-    public printModal(printElement: JQLite, viewOrDocOb, refOb, isDoc, mode) {
-        const deferred = this.$q.defer()
-        const modalInstance = this.$uibModal.open({
-            component: 'partials/ve-utils/printConfirm.html',
+    public printModal(
+        printElement: JQLite,
+        viewOrDocOb: ViewObject,
+        refOb: RefObject,
+        isDoc: boolean,
+        mode: number
+    ): VePromise<void, void> {
+        const deferred = this.$q.defer<void>()
+        const settings: VeModalSettings<PrintModalResolveFn> = {
+            component: 'printConfirmModal',
             resolve: {
                 print: () => {
                     return printElement
+                },
+                refOb: () => {
+                    return refOb
                 },
                 viewOrDocOb: () => {
                     return viewOrDocOb
@@ -190,7 +208,11 @@ if (window.navigator.msSaveOrOpenBlob) {
             },
             backdrop: 'static',
             keyboard: false,
-        })
+        }
+        const modalInstance = this.$uibModal.open<
+            PrintModalResolveFn,
+            PrintConfirmResult
+        >(settings)
         /* choice:
             ['ok', $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]
             [0] 'ok' - modal button to confirm print/export
@@ -201,19 +223,22 @@ if (window.navigator.msSaveOrOpenBlob) {
                 bottom, bottom-left, bottom-right, top, top-left, top-right
             [5] customization: CSS String || false
             */
-        modalInstance.result.then((choice) => {
-            if (choice[0] === 'ok') {
+        void modalInstance.result.then((choice) => {
+            if (choice.status === 'ok') {
                 const result = this.printOrGenerate(
                     viewOrDocOb,
                     mode,
                     isDoc,
-                    choice[1],
-                    choice[2]
+                    choice.model.genTotf,
+                    choice.model.htmlTotf
                 )
-                const customization = choice[5]
-                const css = customization
-                    ? customization
-                    : this.utilsSvc.getPrintCss(choice[2], choice[3], choice[4])
+                const css = choice.customization
+                    ? choice.customCSS
+                    : this.utilsSvc.getPrintCss(
+                          choice.model.htmlTotf,
+                          choice.model.landscape,
+                          choice.meta
+                      )
                 result.toe = choice[2] ? '' : result.toe
                 if (mode === 1) {
                     const popupWin = this.$window.open(
@@ -224,22 +249,24 @@ if (window.navigator.msSaveOrOpenBlob) {
                     if (popupWin) {
                         const popup: Window = popupWin
                         popup.document.open()
-                        popup.document.write(
-                            '<html><head><title>' +
-                                viewOrDocOb.name +
-                                '</title><style type="text/css">' +
-                                css +
-                                '</style></head><body style="overflow: auto">' +
-                                result.cover +
-                                result.toc +
-                                result.tot +
-                                result.tof +
-                                result.toe +
-                                result.contents +
-                                '</body></html>'
-                        )
+                        popup.document.write(`
+                        <html lang="EN">
+    <head>
+        <title>${viewOrDocOb.name}</title>
+        <style type="text/css">${css}</style>
+    </head>
+    <body style="overflow: auto">
+        ${result.cover}
+        ${result.toc}
+        ${result.tot}
+        ${result.tof}
+        ${result.toe}
+        ${result.contents}
+    </body>
+</html>
+`)
                         popup.document.close()
-                        this.$timeout(
+                        void this.$timeout(
                             () => {
                                 popup.print()
                             },
@@ -276,8 +303,8 @@ if (window.navigator.msSaveOrOpenBlob) {
                             css: css,
                         })
                         .then(
-                            (result) => {
-                                deferred.resolve(result)
+                            () => {
+                                deferred.resolve()
                             },
                             (reason) => {
                                 deferred.reject(reason)
@@ -288,6 +315,7 @@ if (window.navigator.msSaveOrOpenBlob) {
                 this.eventSvc.$broadcast('tree-full-document', {
                     search: undefined,
                 })
+                deferred.reject({ message: 'User Cancelled' })
             }
         })
         return deferred.promise
@@ -316,7 +344,13 @@ if (window.navigator.msSaveOrOpenBlob) {
      * }
      * </pre>
      */
-    public printOrGenerate(viewOrDocOb, mode, isDoc, genTotf, htmlTotf) {
+    public printOrGenerate = (
+        viewOrDocOb: ViewObject,
+        mode: number,
+        isDoc: boolean,
+        genTotf: boolean,
+        htmlTotf: boolean
+    ): DocumentStructure => {
         let printContents = ''
         let printElementCopy = angular.element('#print-div')
 
@@ -333,7 +367,7 @@ if (window.navigator.msSaveOrOpenBlob) {
         const prefix =
             protocol +
             ':// hostname' +
-            (port == 80 || port == 443 ? '' : ':' + port)
+            (port == 80 || port == 443 ? '' : `:${port}`)
         const mmsIndex = absurl.indexOf('index.html')
         let toc = this.utilsSvc.makeHtmlTOC(
             this.treeSvc.getApi().getRows()[0].branch
@@ -405,14 +439,14 @@ if (window.navigator.msSaveOrOpenBlob) {
         printElementCopy
             .find('[style]')
             .not('hr')
-            .each(() => {
-                this.style.removeProperty('font-size')
-                this.style.removeProperty('width')
-                this.style.removeProperty('min-width')
-                this.style.removeProperty('height')
+            .each((index, element) => {
+                element.style.removeProperty('font-size')
+                element.style.removeProperty('width')
+                element.style.removeProperty('min-width')
+                element.style.removeProperty('height')
                 //remove frozen headers and column
-                this.style.removeProperty('transform')
-                this.style.removeProperty('will-change')
+                element.style.removeProperty('transform')
+                element.style.removeProperty('will-change')
             })
         printElementCopy.find('.math').remove() //this won't work in chrome for popups since chrome can't display mathml
         printElementCopy.find('script').remove()
@@ -442,8 +476,10 @@ if (window.navigator.msSaveOrOpenBlob) {
     }
 
     /** Store all tomsawyer diagram(canvas) as an img element **/
-    private _storeTomsawyerDiagramAsImg(originalDom) {
-        const mapping = {}
+    private _storeTomsawyerDiagramAsImg(
+        originalDom: JQuery<HTMLElement>
+    ): JQuery<HTMLElement>[] {
+        const mapping: JQuery<HTMLElement>[] = []
         originalDom.find('mms-ts-diagram').each((index, element) => {
             const tsDom = $(element)
             const canvas = tsDom.find('canvas')[0]
@@ -457,7 +493,10 @@ if (window.navigator.msSaveOrOpenBlob) {
     }
 
     /** Replace all mms-ts-diagram elements with their corresponding img elements **/
-    private _replaceMmsTsDiagramWithImg(element, mapping) {
+    private _replaceMmsTsDiagramWithImg(
+        element: JQuery<HTMLElement>,
+        mapping: JQuery<HTMLElement>[]
+    ): void {
         element.find('mms-ts-diagram').each((index) => {
             const imgDom = mapping[index]
             $(this).replaceWith(imgDom)

@@ -139,7 +139,7 @@ export class MentionService {
     ): void {
         const mentionId = existingMentionPlaceHolder
             ? existingMentionPlaceHolder.mentionId
-            : MentionService._getNewMentionId()
+            : this.apiSvc.createUUID()
         const mentionPlaceHolderId = existingMentionPlaceHolder
             ? existingMentionPlaceHolder.mentionPlaceHolderId
             : this._createMentionPlaceHolder(editor, mentionId)
@@ -312,10 +312,10 @@ export class MentionService {
         return value
     }
 
-    private _retrieveMentionState(
+    private _retrieveMentionState = (
         editorId: string,
         mentionId: string
-    ): MentionState {
+    ): MentionState => {
         return this.mentions[
             MentionService._getMentionStateId(editorId, mentionId)
         ]
@@ -339,14 +339,9 @@ export class MentionService {
         return id
     }
 
-    // Generate unique id
-    private static _getNewMentionId(): string {
-        return this.apiSvc.createUUID()
-    }
-
-    private _getMentionIdFromMentionPlaceHolder(
+    private _getMentionIdFromMentionPlaceHolder = (
         currentEditingElementId: string
-    ): string {
+    ): string => {
         if (
             currentEditingElementId &&
             currentEditingElementId.indexOf(this.mentionPlacerHolderPrefix) > -1
@@ -357,7 +352,11 @@ export class MentionService {
         return null
     }
 
-    private _cleanup(editor: CKEDITOR.editor, mentionId: string, unwrapOnly?) {
+    private _cleanup(
+        editor: CKEDITOR.editor,
+        mentionId: string,
+        unwrapOnly?
+    ): void {
         const mentionState = this._retrieveMentionState(editor.id, mentionId)
         const mentionPlaceHolderId = mentionState.mentionPlaceHolderId
         const mentionPlaceHolderDom =
@@ -385,7 +384,13 @@ export class MentionService {
         ]
     }
 
-    private _handleSpecialKeys(evt, mentionId, editor, projectId, refId) {
+    private _handleSpecialKeys(
+        evt: CKEDITOR.eventInfo<CKEDITOR.dom.event<KeyboardEvent>>,
+        mentionId: string,
+        editor: CKEDITOR.editor,
+        projectId: string,
+        refId: string
+    ): void {
         switch (evt.data.$.which) {
             case 38: // up arrow
                 this._handleArrowKey(mentionId, false)
@@ -401,14 +406,23 @@ export class MentionService {
         }
     }
 
-    private _getMentionItem(key, projectId, refId) {
+    private _getMentionItem = (
+        key: string,
+        projectId: string,
+        refId: string
+    ): ElementObject => {
         const cfListing = this.getFastCfListing(projectId, refId)
         return cfListing.find((cf) => {
             return cf.id + cf.type === key
         })
     }
 
-    private _handleEnterKey(editorId, mentionId, projectId, refId) {
+    private _handleEnterKey = (
+        editorId: string,
+        mentionId: string,
+        projectId: string,
+        refId: string
+    ): void => {
         const matchDom = $('#' + mentionId + ' .active .mentionMatch')
         if (matchDom.length > 0) {
             const key = matchDom.attr('id')
@@ -418,11 +432,14 @@ export class MentionService {
         }
     }
 
-    private _handleEscKey(editor, mentionId) {
+    private _handleEscKey(editor: CKEDITOR.editor, mentionId: string): void {
         this._cleanup(editor, mentionId, true)
     }
 
-    private _handleArrowKey(mentionId, isDownArrow) {
+    private _handleArrowKey = (
+        mentionId: string,
+        isDownArrow: boolean
+    ): void => {
         const popUpEl = $('#' + mentionId)
         const allOptions = popUpEl.find('li')
         const len = allOptions.length
@@ -433,7 +450,7 @@ export class MentionService {
             }
         })
         if (activeIndex !== -1) {
-            let nextIndex
+            let nextIndex: number
             if (isDownArrow) {
                 nextIndex = (activeIndex + 1) % len
             } else {
@@ -451,7 +468,10 @@ export class MentionService {
         }
     }
 
-    private _repositionDropdownIfOffScreen(editor, mentionState) {
+    private _repositionDropdownIfOffScreen(
+        editor: CKEDITOR.editor,
+        mentionState: MentionState
+    ): void {
         // wait for dropdown result to render so that we can determine whether it is on/off-screen
         this.$timeout(
             () => {
@@ -474,6 +494,13 @@ export class MentionService {
             },
             0,
             false
+        ).then(
+            () => {
+                /*Do Nothing*/
+            },
+            () => {
+                /*Do Nothing*/
+            }
         )
     }
 }

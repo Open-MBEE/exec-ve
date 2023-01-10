@@ -1,4 +1,3 @@
-import { StateParams } from '@uirouter/core/lib/params/stateParams'
 import { StateDeclaration } from '@uirouter/core/lib/state/interface'
 
 import { veUtils } from '@ve-utils'

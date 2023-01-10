@@ -1,9 +1,8 @@
-import angular from 'angular'
-
 import { VePromiseReason } from '@ve-types/angular'
 import {
     CommitObject,
     ElementObject,
+    GroupObject,
     MmsObject,
     OrgObject,
     ProjectObject,
@@ -105,8 +104,11 @@ export interface ParamsObject {
     refId?: string
     viewId?: string
     documentId?: string
+    shortUrl?: string
     search?: string
     field?: string
+    fromLogin?: boolean
+    '#'?: string
     [param: string]: string
 }
 
@@ -126,8 +128,12 @@ export interface QueryParams extends MmsObject {
     [key: string]: string | boolean | number
 }
 
-export interface AuthResponse extends angular.IHttpResponse<unknown> {
+export interface AuthResponse {
     token: string
+}
+
+export interface VersionResponse {
+    mmsVersion: string
 }
 
 export interface CheckAuthResponse {
@@ -197,7 +203,7 @@ export interface CommitResponse extends BasicResponse<CommitObject> {
 }
 
 export interface GroupsResponse extends BasicResponse<ElementObject> {
-    groups: ElementObject[]
+    groups: GroupObject[]
 }
 
 export interface UsersResponse extends BasicResponse<UserObject> {

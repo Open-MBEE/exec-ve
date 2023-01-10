@@ -6,7 +6,7 @@ import { ApiService, ElementService } from '@ve-utils/mms-api-client'
 
 import { veCore } from '@ve-core'
 
-import { VePromise } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
     CommitObject,
     ElementObject,
@@ -44,7 +44,7 @@ export interface DiffDetail {
 export class DiffMergeService {
     static $inject = ['growl', '$uibModal', 'ApiService']
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private growl: angular.growl.IGrowlService,
         private $uibModal: VeModalService,
         private apiSvc: ApiService,

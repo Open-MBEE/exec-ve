@@ -1,5 +1,5 @@
 //Services
-import './VeEditor.service'
+import './Editor.service'
 import './Mention.service'
 
 export * from './Editor.service'

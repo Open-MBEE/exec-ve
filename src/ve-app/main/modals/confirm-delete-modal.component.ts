@@ -6,6 +6,7 @@ import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { RefsResponse } from '@ve-types/mms'
 import {
     VeModalController,
     VeModalResolve,
@@ -15,13 +16,13 @@ import {
 export interface ConfirmDeleteModalResolve extends VeModalResolve {
     getType: string
     getName: string
-    finalize(): VePromise<boolean>
+    finalize(): VePromise<void, RefsResponse>
 }
 
 export interface ConfirmDeleteModalResolveFn extends VeModalResolveFn {
     getType(): string
     getName(): string
-    finalize(): () => VePromise<boolean>
+    finalize(): () => VePromise<void, RefsResponse>
 }
 
 const ConfirmDeleteModalComponent: VeComponentOptions = {

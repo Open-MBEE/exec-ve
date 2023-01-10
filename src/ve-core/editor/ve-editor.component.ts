@@ -1,10 +1,9 @@
 import angular, { IComponentController } from 'angular'
-import * as CKEDITOR from 'ckeditor4'
 import $ from 'jquery'
 import _ from 'lodash'
 
-import { MentionService, EditingApi } from '@ve-core/editor'
-import { TranscludeModalResolveFn } from '@ve-core/editor/modals/transclude-modal.component'
+import { AddTransclusionData } from '@ve-components/transclusions'
+import { MentionService } from '@ve-core/editor'
 import { EditorService } from '@ve-core/editor/services/Editor.service'
 import {
     ApiService,
@@ -17,8 +16,14 @@ import { ImageService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
-import { VeComponentOptions, VeNgModelController } from '@ve-types/angular'
+import {
+    VeComponentOptions,
+    VeNgModelController,
+    VeQService,
+} from '@ve-types/angular'
+import { AddElementData, AddElementResolveFn } from '@ve-types/components'
 import { VeConfig } from '@ve-types/config'
+import { EditingApi } from '@ve-types/core/editor'
 import { ElementObject, ElementsResponse } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
@@ -49,7 +54,7 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
  */
 export class VeEditorController implements IComponentController {
     private veConfig: VeConfig = window.__env
-    private ckEditor: CKEDITOR.CKEditorStatic = window.CKEDITOR
+    private ckEditor = window.CKEDITOR
 
     private ngModelCtrl: VeNgModelController<string>
 
@@ -107,7 +112,7 @@ export class VeEditorController implements IComponentController {
     /**
      *
      * @param {angular.ICompileService} $compile
-     * @param {angular.IQService} $q
+     * @param {VeQService} $q
      * @param {VeModalService} $uibModal
      * @param {angular.IAttributes} $attrs
      * @param {JQuery<HTMLElement>} $element
@@ -125,7 +130,7 @@ export class VeEditorController implements IComponentController {
      */
     constructor(
         private $compile: angular.ICompileService,
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $uibModal: VeModalService,
         private $attrs: angular.IAttributes,
         private $element: JQuery<HTMLElement>,
@@ -590,21 +595,34 @@ export class VeEditorController implements IComponentController {
     }
 
     public transcludeCallback = (ed: CKEDITOR.editor): void => {
-        const tSettings: VeModalSettings<TranscludeModalResolveFn> = {
+        const tSettings: VeModalSettings<
+            AddElementResolveFn<AddTransclusionData>
+        > = {
             component: 'transcludeModal',
             resolve: {
-                editor: () => {
-                    return this
+                getAddData: (): AddTransclusionData => {
+                    return {
+                        type: 'Transclusion',
+                        viewLink: false,
+                        addType: 'text',
+                    }
                 },
-                viewLink: () => {
-                    return false
+                getProjectId: () => {
+                    return this.mmsProjectId
+                },
+                getRefId: () => {
+                    return this.mmsRefId
+                },
+                getOrgId: () => {
+                    return ''
                 },
             },
             size: 'lg',
         }
-        const tInstance = this.$uibModal.open<TranscludeModalResolveFn, string>(
-            tSettings
-        )
+        const tInstance = this.$uibModal.open<
+            AddElementResolveFn<AddTransclusionData>,
+            string
+        >(tSettings)
         tInstance.result.then(
             (result) => {
                 this._addWidgetTag(ed, result)
@@ -623,54 +641,85 @@ export class VeEditorController implements IComponentController {
     // Also defines options for search interfaces -- see mmsSearch.js for more info
 
     public viewLinkCallback = (ed: CKEDITOR.editor): void => {
-        const vSettings: VeModalSettings<TranscludeModalResolveFn> = {
+        const tSettings: VeModalSettings<
+            AddElementResolveFn<AddTransclusionData>
+        > = {
             component: 'transcludeModal',
             resolve: {
-                editor: () => {
-                    return this
+                getAddData: (): AddTransclusionData => {
+                    return {
+                        type: 'ViewLink',
+                        viewLink: true,
+                        addType: 'text',
+                    }
                 },
-                viewLink: () => {
-                    return true
+                getProjectId: () => {
+                    return this.mmsProjectId
+                },
+                getRefId: () => {
+                    return this.mmsRefId
+                },
+                getOrgId: () => {
+                    return ''
                 },
             },
             size: 'lg',
         }
-        const vInstance = this.$uibModal.open<TranscludeModalResolveFn, string>(
-            vSettings
-        )
-
-        vInstance.result.then(
-            (tag) => {
-                this._addWidgetTag(ed, tag)
+        const tInstance = this.$uibModal.open<
+            AddElementResolveFn<AddTransclusionData>,
+            string
+        >(tSettings)
+        tInstance.result.then(
+            (result) => {
+                this._addWidgetTag(ed, result)
             },
             () => {
-                /* Do Nothing */
+                const focusManager: CKEDITOR.focusManager =
+                    new this.ckEditor.focusManager(ed)
+                focusManager.focus()
             }
         )
     }
 
     public commentCallback = (ed: CKEDITOR.editor): void => {
-        const cSettings: VeModalSettings<TranscludeModalResolveFn> = {
-            component: 'transcludeModal',
-            resolve: {
-                editor: () => {
-                    return this
+        const cSettings: VeModalSettings<AddElementResolveFn<AddElementData>> =
+            {
+                component: 'addElementModal',
+                resolve: {
+                    getAddData: (): AddElementData => {
+                        return {
+                            type: 'Comment',
+                            addType: 'item',
+                        }
+                    },
+                    getProjectId: () => {
+                        return this.mmsProjectId
+                    },
+                    getRefId: () => {
+                        return this.mmsRefId
+                    },
+                    getOrgId: () => {
+                        return ''
+                    },
                 },
-                viewLink: () => {
-                    return false
-                },
-            },
-        }
-        const cInstance = this.$uibModal.open<TranscludeModalResolveFn, string>(
-            cSettings
-        )
+            }
+        const cInstance = this.$uibModal.open<
+            AddElementResolveFn<AddElementData>,
+            ElementObject
+        >(cSettings)
 
         cInstance.result.then(
-            (tag) => {
+            (data) => {
+                const tag =
+                    '<transclusion mms-cf-type="com" mms-element-id="' +
+                    data.id +
+                    '">comment:' +
+                    data._creator +
+                    '</transclusion>'
                 this._addWidgetTag(ed, tag)
             },
-            () => {
-                /* Do Nothing */
+            (reason) => {
+                this.growl.error('Comment Error: ' + reason.message)
             }
         )
     }
@@ -759,8 +808,12 @@ export class VeEditorController implements IComponentController {
         this.ckEditor.instances[this.id].on('contentDom', () => {
             keyupHandler = this.ckEditor.instances[
                 this.instance.name
-            ].document.on<CKEDITOR.dom.node<KeyboardEvent>>('keyup', (e) => {
-                if (this._isMentionKey(e.data.$)) {
+            ].document.on('keyup', (e) => {
+                if (
+                    this._isMentionKey(
+                        (e.data as CKEDITOR.dom.node<KeyboardEvent>).$
+                    )
+                ) {
                     this.mentionSvc.createMention(
                         this.instance,
                         this.$scope.$new(),
@@ -769,7 +822,9 @@ export class VeEditorController implements IComponentController {
                     )
                 } else {
                     this.mentionSvc.handleInput(
-                        e,
+                        e as CKEDITOR.eventInfo<
+                            CKEDITOR.dom.event<KeyboardEvent>
+                        >,
                         this.$scope.$new(),
                         this.instance,
                         this.mmsProjectId,
@@ -854,7 +909,7 @@ export class VeEditorController implements IComponentController {
         editor.addMenuItem('formatAsCode', {
             label: 'Format as inline code',
             command: 'formatAsCode',
-            group: 'veGroup',
+            group: 'group',
             icon: 'codeSnippet',
         })
         editor.contextMenu.addListener((element) => {
@@ -865,7 +920,7 @@ export class VeEditorController implements IComponentController {
 }
 
 const veEditorComponent: VeComponentOptions = {
-    selector: 'veEditor',
+    selector: 'editor',
     template: `<textarea id="{{$ctrl.id}}"></textarea>`,
     require: {
         ngModelCtrl: '^ngModel',

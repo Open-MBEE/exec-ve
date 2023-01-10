@@ -1,4 +1,4 @@
-import angular from 'angular'
+import { VePromise } from '@ve-types/angular'
 
 declare module 'angular' {
     type PromiseState = 'pending' | 'fulfilled' | 'rejected'
@@ -14,18 +14,30 @@ declare module 'angular' {
         // tslint:disable:max-line-length
         allSettled<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
             values: [
-                T1 | IPromise<T1>,
-                T2 | IPromise<T2>,
-                T3 | IPromise<T3>,
-                T4 | IPromise<T4>,
-                T5 | IPromise<T5>,
-                T6 | IPromise<T6>,
-                T7 | IPromise<T7>,
-                T8 | IPromise<T8>,
-                T9 | IPromise<T9>,
-                T10 | IPromise<T10>
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>,
+                T4 | VePromise<T4, T4>,
+                T5 | VePromise<T5, T5>,
+                T6 | VePromise<T6, T6>,
+                T7 | VePromise<T7, T7>,
+                T8 | VePromise<T8, T8>,
+                T9 | VePromise<T9, T9>,
+                T10 | VePromise<T10, T10>
             ]
-        ): IPromise<
+        ): VePromise<
+            [
+                PromiseValue<T1>,
+                PromiseValue<T2>,
+                PromiseValue<T3>,
+                PromiseValue<T4>,
+                PromiseValue<T5>,
+                PromiseValue<T6>,
+                PromiseValue<T7>,
+                PromiseValue<T8>,
+                PromiseValue<T9>,
+                PromiseValue<T10>
+            ],
             [
                 PromiseValue<T1>,
                 PromiseValue<T2>,
@@ -41,17 +53,28 @@ declare module 'angular' {
         >
         allSettled<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
             values: [
-                T1 | IPromise<T1>,
-                T2 | IPromise<T2>,
-                T3 | IPromise<T3>,
-                T4 | IPromise<T4>,
-                T5 | IPromise<T5>,
-                T6 | IPromise<T6>,
-                T7 | IPromise<T7>,
-                T8 | IPromise<T8>,
-                T9 | IPromise<T9>
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>,
+                T4 | VePromise<T4, T4>,
+                T5 | VePromise<T5, T5>,
+                T6 | VePromise<T6, T6>,
+                T7 | VePromise<T7, T7>,
+                T8 | VePromise<T8, T8>,
+                T9 | VePromise<T9, T9>
             ]
-        ): IPromise<
+        ): VePromise<
+            [
+                PromiseValue<T1>,
+                PromiseValue<T2>,
+                PromiseValue<T3>,
+                PromiseValue<T4>,
+                PromiseValue<T5>,
+                PromiseValue<T6>,
+                PromiseValue<T7>,
+                PromiseValue<T8>,
+                PromiseValue<T9>
+            ],
             [
                 PromiseValue<T1>,
                 PromiseValue<T2>,
@@ -66,16 +89,26 @@ declare module 'angular' {
         >
         allSettled<T1, T2, T3, T4, T5, T6, T7, T8>(
             values: [
-                T1 | IPromise<T1>,
-                T2 | IPromise<T2>,
-                T3 | IPromise<T3>,
-                T4 | IPromise<T4>,
-                T5 | IPromise<T5>,
-                T6 | IPromise<T6>,
-                T7 | IPromise<T7>,
-                T8 | IPromise<T8>
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>,
+                T4 | VePromise<T4, T4>,
+                T5 | VePromise<T5, T5>,
+                T6 | VePromise<T6, T6>,
+                T7 | VePromise<T7, T7>,
+                T8 | VePromise<T8, T8>
             ]
-        ): IPromise<
+        ): VePromise<
+            [
+                PromiseValue<T1>,
+                PromiseValue<T2>,
+                PromiseValue<T3>,
+                PromiseValue<T4>,
+                PromiseValue<T5>,
+                PromiseValue<T6>,
+                PromiseValue<T7>,
+                PromiseValue<T8>
+            ],
             [
                 PromiseValue<T1>,
                 PromiseValue<T2>,
@@ -89,15 +122,24 @@ declare module 'angular' {
         >
         allSettled<T1, T2, T3, T4, T5, T6, T7>(
             values: [
-                T1 | IPromise<T1>,
-                T2 | IPromise<T2>,
-                T3 | IPromise<T3>,
-                T4 | IPromise<T4>,
-                T5 | IPromise<T5>,
-                T6 | IPromise<T6>,
-                T7 | IPromise<T7>
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>,
+                T4 | VePromise<T4, T4>,
+                T5 | VePromise<T5, T5>,
+                T6 | VePromise<T6, T6>,
+                T7 | VePromise<T7, T7>
             ]
-        ): IPromise<
+        ): VePromise<
+            [
+                PromiseValue<T1>,
+                PromiseValue<T2>,
+                PromiseValue<T3>,
+                PromiseValue<T4>,
+                PromiseValue<T5>,
+                PromiseValue<T6>,
+                PromiseValue<T7>
+            ],
             [
                 PromiseValue<T1>,
                 PromiseValue<T2>,
@@ -110,14 +152,22 @@ declare module 'angular' {
         >
         allSettled<T1, T2, T3, T4, T5, T6>(
             values: [
-                T1 | IPromise<T1>,
-                T2 | IPromise<T2>,
-                T3 | IPromise<T3>,
-                T4 | IPromise<T4>,
-                T5 | IPromise<T5>,
-                T6 | IPromise<T6>
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>,
+                T4 | VePromise<T4, T4>,
+                T5 | VePromise<T5, T5>,
+                T6 | VePromise<T6, T6>
             ]
-        ): IPromise<
+        ): VePromise<
+            [
+                PromiseValue<T1>,
+                PromiseValue<T2>,
+                PromiseValue<T3>,
+                PromiseValue<T4>,
+                PromiseValue<T5>,
+                PromiseValue<T6>
+            ],
             [
                 PromiseValue<T1>,
                 PromiseValue<T2>,
@@ -129,13 +179,20 @@ declare module 'angular' {
         >
         allSettled<T1, T2, T3, T4, T5>(
             values: [
-                T1 | IPromise<T1>,
-                T2 | IPromise<T2>,
-                T3 | IPromise<T3>,
-                T4 | IPromise<T4>,
-                T5 | IPromise<T5>
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>,
+                T4 | VePromise<T4, T4>,
+                T5 | VePromise<T5, T5>
             ]
-        ): IPromise<
+        ): VePromise<
+            [
+                PromiseValue<T1>,
+                PromiseValue<T2>,
+                PromiseValue<T3>,
+                PromiseValue<T4>,
+                PromiseValue<T5>
+            ],
             [
                 PromiseValue<T1>,
                 PromiseValue<T2>,
@@ -146,12 +203,18 @@ declare module 'angular' {
         >
         allSettled<T1, T2, T3, T4>(
             values: [
-                T1 | IPromise<T1>,
-                T2 | IPromise<T2>,
-                T3 | IPromise<T3>,
-                T4 | IPromise<T4>
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>,
+                T4 | VePromise<T4, T4>
             ]
-        ): IPromise<
+        ): VePromise<
+            [
+                PromiseValue<T1>,
+                PromiseValue<T2>,
+                PromiseValue<T3>,
+                PromiseValue<T4>
+            ],
             [
                 PromiseValue<T1>,
                 PromiseValue<T2>,
@@ -160,20 +223,30 @@ declare module 'angular' {
             ]
         >
         allSettled<T1, T2, T3>(
-            values: [T1 | IPromise<T1>, T2 | IPromise<T2>, T3 | IPromise<T3>]
-        ): IPromise<[PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>]>
+            values: [
+                T1 | VePromise<T1, T1>,
+                T2 | VePromise<T2, T2>,
+                T3 | VePromise<T3, T3>
+            ]
+        ): VePromise<
+            [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>],
+            [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>]
+        >
         allSettled<T1, T2>(
-            values: [T1 | IPromise<T1>, T2 | IPromise<T2>]
-        ): IPromise<[PromiseValue<T1>, PromiseValue<T2>]>
+            values: [T1 | VePromise<T1, T1>, T2 | VePromise<T2, T2>]
+        ): VePromise<
+            [PromiseValue<T1>, PromiseValue<T2>],
+            [PromiseValue<T1>, PromiseValue<T2>]
+        >
         // tslint:enable:max-line-length
 
         allSettled<TAll>(
-            promises: Array<TAll | IPromise<TAll>>
-        ): IPromise<Array<PromiseValue<TAll>>>
+            promises: Array<TAll | VePromise<TAll, TAll>>
+        ): VePromise<Array<PromiseValue<TAll>>, Array<PromiseValue<TAll>>>
 
         allSettled<T>(promises: {
-            [K in keyof T]: T[K] | IPromise<T[K]>
-        }): IPromise<{ [K in keyof T]: PromiseValue<T[K]> }>
+            [K in keyof T]: T[K] | VePromise<T[K]>
+        }): VePromise<{ [K in keyof T]: PromiseValue<T[K]> }>
 
         isFulfilledState(promise: PromiseValue<unknown>): boolean
         isRejectedState(promise: PromiseValue<unknown>): boolean

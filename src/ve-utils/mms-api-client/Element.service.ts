@@ -11,7 +11,7 @@ import {
 
 import { veUtils } from '@ve-utils'
 
-import { VePromise, VePromiseReason } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import {
     BulkResponse,
     CommitObject,
@@ -56,7 +56,7 @@ export class ElementService {
     ]
 
     constructor(
-        private $q: angular.IQService,
+        private $q: VeQService,
         private $http: angular.IHttpService,
         private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
@@ -307,7 +307,10 @@ export class ElementService {
         return result
     }
 
-    cacheDeletedElement(reqOb: RequestObject, deletedOb: ElementObject): void {
+    cacheDeletedElement = (
+        reqOb: RequestObject,
+        deletedOb: ElementObject
+    ): void => {
         const requestCacheKey = this.getElementKey(reqOb, deletedOb.id)
         requestCacheKey.push('deleted')
         const deletedReqOb: RequestObject = {
@@ -482,7 +485,7 @@ export class ElementService {
 
     //called by updateElement, fills in all keys for element to be updated
     //will also send any cached edited field for the element to be updated
-    fillInElement(elementOb: ElementObject): ElementObject {
+    fillInElement = (elementOb: ElementObject): ElementObject => {
         /*
         var deferred = this.$q.defer();
         this.getElement({
@@ -984,7 +987,7 @@ export class ElementService {
         query: QueryObject,
         queryParams?: QueryParams,
         weight?
-    ): VePromise<SearchResponse<T>> {
+    ): VePromise<SearchResponse<T>, SearchResponse<T>> {
         this.apiSvc.normalize(reqOb)
         const url = this.uRLSvc.getElementSearchURL(reqOb, queryParams)
         const deferred = this.$q.defer<SearchResponse<T>>()
@@ -1104,7 +1107,7 @@ export class ElementService {
         return deferred.promise
     }
 
-    public reset(): void {
+    public reset = (): void => {
         this.inProgressElements = {}
     }
 
@@ -1222,7 +1225,7 @@ export class ElementService {
         deferred.resolve(results)
     }
 
-    private _isInProgress(key: string): boolean {
+    private _isInProgress = (key: string): boolean => {
         return this.inProgressElements.hasOwnProperty(key)
     }
 
@@ -1241,7 +1244,7 @@ export class ElementService {
         this.inProgressElements[key] = promise
     }
 
-    private _removeInProgress(key: string): void {
+    private _removeInProgress = (key: string): void => {
         delete this.inProgressElements[key]
     }
 }

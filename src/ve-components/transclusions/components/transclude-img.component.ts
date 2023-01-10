@@ -18,7 +18,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -67,7 +67,7 @@ export class TranscludeImgController
     static $inject: string[] = [...Transclusion.$inject, 'URLService']
 
     constructor(
-        $q: angular.IQService,
+        $q: VeQService,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
         $element: JQuery<HTMLElement>,
@@ -158,7 +158,7 @@ export const TranscludeImgComponent: VeComponentOptions = {
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
-        mmsCallback: '&',,
+        mmsCallback: '&',
     },
     require: {
         mmsViewCtrl: '?^view',
