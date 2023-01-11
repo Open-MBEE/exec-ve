@@ -85,15 +85,6 @@ export class ViewPresentationElemController implements IComponentController {
         this.treeApi = this.treeSvc.getApi()
         this.eventSvc.$init(this)
 
-        this.subs.push(
-            this.eventSvc.$on(TreeService.events.UPDATED, () => {
-                if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
-                    this.peNumber =
-                        this.treeApi.branch2viewNumber[this.instanceSpec.id]
-                }
-            })
-        )
-
         if (!this.mmsInstanceVal || !this.mmsInstanceVal.instanceId) {
             this.$element.html(
                 '<span class="ve-error">Reference is null</span>'
@@ -172,6 +163,20 @@ export class ViewPresentationElemController implements IComponentController {
                     )
                     $(this.$element).append(newPe)
                     this.$compile(newPe)(this.$scope)
+                    this.subs.push(
+                        this.eventSvc.$on(TreeService.events.UPDATED, () => {
+                            if (
+                                this.treeApi.branch2viewNumber[
+                                    this.instanceSpec.id
+                                ]
+                            ) {
+                                this.peNumber =
+                                    this.treeApi.branch2viewNumber[
+                                        this.instanceSpec.id
+                                    ]
+                            }
+                        })
+                    )
                 },
                 (reason) => {
                     if (reason.status === 500) {

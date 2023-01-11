@@ -16,5 +16,5 @@ import '@ve-app'
  *      - Allow users to favorite items
  *      - Setup a way to leverage on-login webhooks for element updates and comment replies
  * - Tree pane has a favorites window and tabs for the spec tree and other tree
- * - Factor the toolbar out to allow additional tool-bar (i.e near tree pane?)
+ * - Factor the toolbar out to allow additional toolbar (i.e. near tree pane?)
  */

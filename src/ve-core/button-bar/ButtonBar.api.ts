@@ -110,8 +110,7 @@ export class ButtonBarApi {
             if (button.id === id) {
                 if (button.toggleable) {
                     const original = button.toggle_state
-                    if ((!original && state) || (original && !state))
-                        this.toggleButtonState(id)
+                    if (original != state) this.toggleButtonState(id, state)
                 }
             }
         })
@@ -182,16 +181,16 @@ export class ButtonBarApi {
                 if (button.toggleable) {
                     button.toggle_state =
                         state != null ? state : !button.toggle_state
-                    if (
-                        button.toggle_state &&
-                        button.toggle_icon &&
-                        button.toggle_tooltip
-                    ) {
-                        button.icon = button.toggle_icon
-                        button.tooltip = button.toggle_tooltip
+                    if (button.toggle_state) {
+                        if (button.toggle_tooltip) {
+                            button.tooltip = button.toggle_tooltip
+                        }
+                        if (button.toggle_icon) {
+                            button.icon = button.toggle_icon
+                        }
                     } else {
                         button.icon = button.icon_original
-                        if (button.icon_original) {
+                        if (button.tooltip_orginal) {
                             button.tooltip = button.tooltip_orginal
                         }
                     }

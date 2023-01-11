@@ -150,10 +150,12 @@ ul.ve-light-list {
     letter-spacing: 0.14em;
     font-size: 12px;
     color: globals.$ve-light-text;
-  }
 
-  .ref-title h2 .fa {
-    padding-right: 4px;
+    .fa,
+    .fa-solid,
+    .fa-regular {
+      padding-right: 4px;
+    }
   }
 
   li.ref-title {

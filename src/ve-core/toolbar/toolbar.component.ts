@@ -11,7 +11,7 @@ import { ToolbarService } from './services/Toolbar.service'
 import { VeComponentOptions } from '@ve-types/angular'
 
 const ToolbarComponent: VeComponentOptions = {
-    selector: 'toolbar',
+    selector: 'toolBar',
     template: `
 	<div class="right-toolbar">
     <div class="toolbox">
@@ -46,7 +46,7 @@ const ToolbarComponent: VeComponentOptions = {
         ) {}
 
         $onInit(): void {
-            this.toolbarSvc.getApi('right-toolbar').then(
+            this.toolbarSvc.waitForApi('right-toolbar').then(
                 (result) => {
                     this.tbApi = result
                     this.buttons = this.tbApi.buttons

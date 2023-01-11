@@ -801,7 +801,7 @@ veApp.config([
                         component: 'rightPane',
                     },
                     'toolbar-right@main': {
-                        component: 'toolbar',
+                        component: 'rightToolbar',
                     },
                 },
             })

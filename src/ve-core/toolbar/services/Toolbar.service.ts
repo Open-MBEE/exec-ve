@@ -81,8 +81,8 @@ export class ToolbarService {
         [key: string]: {
             resolve?(result: ToolbarApi): void
             reject?(reason: VePromiseReason<ToolbarApi>): void
-            promise: VePromise<ToolbarApi, void>
-            api: ToolbarApi
+            promise?: VePromise<ToolbarApi, void>
+            api?: ToolbarApi
         }
     } = {}
     private buttons: { [key: string]: IToolBarButton } = {}
@@ -128,8 +128,9 @@ export class ToolbarService {
         }
     }
 
-    public getApi = (id: string): VePromise<ToolbarApi, void> => {
+    public waitForApi = (id: string): VePromise<ToolbarApi, void> => {
         if (!this.toolbars.hasOwnProperty(id)) {
+            this.toolbars[id] = {}
             this.toolbars[id].promise = new this.$q<ToolbarApi>(
                 (resolve, reject) => {
                     this.toolbars[id].resolve = resolve
@@ -159,15 +160,20 @@ export class ToolbarService {
 
         const api = new ToolbarApi(id)
         init(api)
-        if (this.toolbars[id] && this.toolbars[id].resolve) {
-            this.toolbars[id].api = api
-            this.toolbars[id].resolve(api)
+        if (!this.toolbars[id]) {
+            this.toolbars[id] = {
+                api,
+            }
         } else {
+            this.toolbars[id].api = api
+        }
+        if (!this.toolbars[id].resolve) {
             this.toolbars[id].promise = new this.$q((resolve, reject) => {
                 this.toolbars[id].resolve = resolve
                 this.toolbars[id].reject = reject
             })
         }
+        this.toolbars[id].resolve(api)
         return api
     }
 

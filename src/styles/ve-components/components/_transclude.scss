@@ -260,7 +260,7 @@ transclude-img img {
   .btn-tools {
     @include bootstrap.button-variant(globals.$base-grey, globals.$quaternary-grey, globals.$quaternary-grey);
 
-    &:not(.dropdown-toggle) .fa {
+    &:not(.dropdown-toggle) .fa .fa-solid .fa-regular {
       padding-right: 0;
     }
 

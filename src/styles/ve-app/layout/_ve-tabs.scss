@@ -92,7 +92,9 @@
     }
   }
 
-  .fa {
+  .fa,
+  .fa-regular,
+  .fa-solid {
     opacity: 0.4;
     padding-right: 6px;
   }

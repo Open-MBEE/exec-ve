@@ -20,7 +20,7 @@ const ButtonBarComponent: VeComponentOptions = {
       <a type="button" ng-if="!button.dropdown_buttons" class="btn btn-tools btn-sm {{button.id}}"
           ng-click="button.action($event)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
           tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
-          <span class="fa-stack fa-xl">
+          <span class="fa-stack">
             <i ng-show="button.toggle_state" class="fa-solid fa-square fa-stack-2x"></i>
             <i class="{{ button.icon }} fa-stack-1x {{(button.toggle_state) ? 'fa-inverse' : ''}}"></i>
           </span>

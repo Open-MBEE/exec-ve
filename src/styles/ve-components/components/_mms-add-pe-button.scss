@@ -41,7 +41,7 @@
 
   /* Special line-height so icons align */
   .dropdown-menu a::before,
-  a.dropdown-toggle .fa {
+  a.dropdown-toggle .fa .fa-solid .fa-regular {
     line-height: 1.5;
     padding-right: 0;
   }

@@ -95,7 +95,10 @@ export class ButtonBarService {
         }
     }
 
-    getButtonBarButton = (button: string, ctrl?: EditingToolbar) => {
+    getButtonBarButton = (
+        button: string,
+        ctrl?: EditingToolbar
+    ): IButtonBarButton => {
         if (!button.startsWith('presentation-element')) {
             switch (button) {
                 case 'button-bar-menu':
@@ -108,8 +111,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: false,
                         placement: 'bottom-left',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                         dropdown_toggleable: true,
                         dropdown_icon: 'fa-solid fa-caret-down',
@@ -126,8 +129,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: false,
                         placement: 'bottom-left',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-collapse':
@@ -139,8 +142,8 @@ export class ButtonBarService {
                         tooltip: 'Collapse All',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-filter':
@@ -152,8 +155,8 @@ export class ButtonBarService {
                         tooltip: 'Filter',
                         spinner: false,
                         toggleable: true,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-add-document-or-group':
@@ -166,8 +169,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: false,
                         placement: 'bottom-right',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                         dropdown_buttons: [
                             this.getButtonBarButton('tree-add-group'),
@@ -183,8 +186,8 @@ export class ButtonBarService {
                         tooltip: 'Remove',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-add-view':
@@ -196,8 +199,8 @@ export class ButtonBarService {
                         tooltip: 'Add View',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-add-group':
@@ -209,8 +212,8 @@ export class ButtonBarService {
                         tooltip: 'Add Group',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-clear-select':
@@ -222,8 +225,8 @@ export class ButtonBarService {
                         tooltip: 'Clear Selection',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-add-document':
@@ -235,8 +238,8 @@ export class ButtonBarService {
                         tooltip: 'Add Document',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-refresh':
@@ -248,8 +251,8 @@ export class ButtonBarService {
                         tooltip: 'Refresh Tree Data',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-add-tag':
@@ -261,8 +264,8 @@ export class ButtonBarService {
                         tooltip: 'Add Tag',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-add-branch':
@@ -274,8 +277,8 @@ export class ButtonBarService {
                         tooltip: 'Add Branch',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-delete':
@@ -287,8 +290,8 @@ export class ButtonBarService {
                         tooltip: 'Remove',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-delete-view':
@@ -300,8 +303,8 @@ export class ButtonBarService {
                         tooltip: 'Remove View',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-reorder-view':
@@ -313,8 +316,8 @@ export class ButtonBarService {
                         tooltip: 'Reorder Views',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-reorder-group':
@@ -326,8 +329,8 @@ export class ButtonBarService {
                         tooltip: 'Organize Groups/Docs',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-full-document':
@@ -340,8 +343,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: true,
                         toggle_tooltip: 'View Mode',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-show-pe':
@@ -355,8 +358,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: true,
                         toggle_tooltip: 'Hide PE',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-mode-dropdown':
@@ -370,8 +373,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: false,
                         placement: 'bottom-left',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                         dropdown_toggleable: true,
                         dropdown_icon: 'fa-solid fa-caret-down',
@@ -394,8 +397,8 @@ export class ButtonBarService {
                         tooltip: 'Close All',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-show-tables':
@@ -407,8 +410,8 @@ export class ButtonBarService {
                         tooltip: 'Show List of Tables',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-show-figures':
@@ -420,8 +423,8 @@ export class ButtonBarService {
                         tooltip: 'Show List of Figures',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tree-show-equations':
@@ -433,8 +436,8 @@ export class ButtonBarService {
                         tooltip: 'Show List of Equations',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
 
@@ -448,8 +451,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: true,
                         toggle_tooltip: 'Disable Edits (alt + d)',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'show-elements':
@@ -462,8 +465,8 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: true,
                         toggle_tooltip: 'Hide Elements (alt + e)',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'show-comments':
@@ -476,14 +479,14 @@ export class ButtonBarService {
                         spinner: false,
                         toggleable: true,
                         toggle_tooltip: 'Hide Comments (alt + c)',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'show-numbering':
                     return {
                         id: button,
-                        icon: 'fa-solid fa-list-ol fa-stack-1x',
+                        icon: 'fa-solid fa-list-ol',
                         selectable: true,
                         permission: true,
                         tooltip: 'Hide Numbering',
@@ -491,8 +494,8 @@ export class ButtonBarService {
                         toggleable: true,
                         toggle_stack: true,
                         toggle_tooltip: 'Show Numbering',
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'refresh-numbering':
@@ -504,8 +507,8 @@ export class ButtonBarService {
                         tooltip: 'Refresh Figure Numbering',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'share-url':
@@ -517,8 +520,8 @@ export class ButtonBarService {
                         tooltip: 'Share Short URL',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'center-previous':
@@ -530,8 +533,8 @@ export class ButtonBarService {
                         tooltip: 'Previous (alt + ,)',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'center-next':
@@ -543,8 +546,8 @@ export class ButtonBarService {
                         tooltip: 'Next (alt + .)',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'export':
@@ -557,8 +560,8 @@ export class ButtonBarService {
                         button_content: 'Export',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                         dropdown_buttons: [
                             this.getButtonBarButton('word'),
@@ -574,8 +577,8 @@ export class ButtonBarService {
                         tooltip: 'Print',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'convert-pdf':
@@ -587,8 +590,8 @@ export class ButtonBarService {
                         tooltip: 'Export to PDF',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'word':
@@ -600,8 +603,8 @@ export class ButtonBarService {
                         tooltip: 'Export to Word',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
                 case 'tabletocsv':
@@ -613,8 +616,8 @@ export class ButtonBarService {
                         tooltip: 'Table to CSV',
                         spinner: false,
                         toggleable: false,
-                        action: ($event): void => {
-                            this.eventSvc.$broadcast(button, $event)
+                        action: (): void => {
+                            this.eventSvc.$broadcast(button)
                         },
                     }
             }

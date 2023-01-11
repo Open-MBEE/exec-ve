@@ -28,7 +28,7 @@ import { PropertySpec, veComponents } from '@ve-components'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
-import { EditingApi } from '@ve-types/core/editor'
+import { EditingApi, EditingToolbar } from '@ve-types/core/editor'
 import {
     ConstraintObject,
     ElementObject,
@@ -1133,7 +1133,7 @@ export class ComponentService {
      * @param {String} transcludeType name, documentation, or value
      */
     public reopenUnsavedElts = (
-        ctrl: ITransclusion,
+        ctrl: ITransclusion & EditingToolbar,
         transcludeType: string
     ): void => {
         let unsavedEdits: { [p: string]: ElementObject } = {}

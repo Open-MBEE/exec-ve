@@ -183,7 +183,7 @@ export class SpecTool implements ISpecTool {
         this.eventSvc.$init(this)
 
         this.editValues = this.specSvc.editValues
-        this.toolbarSvc.getApi('right-toolbar').then(
+        this.toolbarSvc.waitForApi('right-toolbar').then(
             (result) => {
                 this.tbApi = result
                 if (
