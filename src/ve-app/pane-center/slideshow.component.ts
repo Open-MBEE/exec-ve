@@ -65,10 +65,7 @@ class SlideshowController implements IComponentController {
         map: {},
     }
     buttons: IButtonBarButton[]
-    dynamicPopover: { templateUrl: string; title: string } = {
-        templateUrl: 'shareUrlTemplate.html',
-        title: 'Share',
-    }
+    dynamicPopover: { templateUrl: string; title: string }
     shortUrl: string
     viewApi: ViewApi
     number: string
@@ -133,7 +130,7 @@ class SlideshowController implements IComponentController {
         }
 
         this.viewContentLoading = false
-        this.rootScopeSvc.veNumberingOn(true)
+        this.rootScopeSvc.veNumberingOn(false)
         if (this.rootScopeSvc.veFullDocMode())
             this.rootScopeSvc.veFullDocMode(false)
 
@@ -188,7 +185,7 @@ class SlideshowController implements IComponentController {
                 )
                 api.setToggleState(
                     'show-numbering',
-                    this.rootScopeSvc.veNumberingOn()
+                    !this.rootScopeSvc.veNumberingOn()
                 )
 
                 // Set hotkeys for toolbar
@@ -218,9 +215,9 @@ class SlideshowController implements IComponentController {
                             'refresh-numbering'
                         )
                     )
-                    api.addButton(
-                        this.buttonBarSvc.getButtonBarButton('share-url')
-                    )
+                    // api.addButton(
+                    //     this.buttonBarSvc.getButtonBarButton('share-url')
+                    // )
                     api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
                     if (this.$state.includes('main.project.ref.document')) {
                         const exportButtons: IButtonBarButton =
@@ -272,9 +269,7 @@ class SlideshowController implements IComponentController {
         this.subs.push(
             this.eventSvc.$on(TreeService.events.UPDATED, () => {
                 if (this.treeApi.branch2viewNumber[this.viewOb.id]) {
-                    this.number = this.rootScopeSvc.veNumberingOn()
-                        ? this.treeApi.branch2viewNumber[this.viewOb.id]
-                        : ''
+                    this.number = this.treeApi.branch2viewNumber[this.viewOb.id]
                 }
             })
         )
@@ -283,10 +278,9 @@ class SlideshowController implements IComponentController {
             this.eventSvc.$on('show-comments', (data?: boolean) => {
                 this.bbApi.toggleButtonState(
                     'show-comments',
-                    data != null ? data : null
-                )
-                this.rootScopeSvc.veCommentsOn(
-                    data != null ? data : !this.rootScopeSvc.veCommentsOn()
+                    this.rootScopeSvc.veCommentsOn(
+                        data != null ? data : !this.rootScopeSvc.veCommentsOn()
+                    )
                 )
             })
         )
@@ -295,14 +289,10 @@ class SlideshowController implements IComponentController {
             this.eventSvc.$on('show-numbering', (data?: boolean) => {
                 this.bbApi.toggleButtonState(
                     'show-numbering',
-                    data != null ? data : null
+                    !this.rootScopeSvc.veNumberingOn(
+                        data != null ? data : !this.rootScopeSvc.veNumberingOn()
+                    )
                 )
-                this.rootScopeSvc.veNumberingOn(
-                    data != null ? data : !this.rootScopeSvc.veNumberingOn()
-                )
-                this.number = this.rootScopeSvc.veNumberingOn()
-                    ? this.treeApi.branch2viewNumber[this.viewOb.id]
-                    : ''
             })
         )
 
@@ -310,11 +300,11 @@ class SlideshowController implements IComponentController {
             this.eventSvc.$on('show-elements', (data?: boolean) => {
                 this.bbApi.toggleButtonState(
                     'show-elements',
-                    data != null ? data : null
+                    this.rootScopeSvc.veElementsOn(
+                        data != null ? data : !this.rootScopeSvc.veElementsOn()
+                    )
                 )
-                this.rootScopeSvc.veElementsOn(
-                    data != null ? data : !this.rootScopeSvc.veElementsOn()
-                )
+
                 if (
                     !this.rootScopeSvc.veElementsOn() &&
                     this.rootScopeSvc.veEditMode()
@@ -344,6 +334,12 @@ class SlideshowController implements IComponentController {
                         this.rootScopeSvc.veEditMode()
                     )
                 }
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.$on('share-url', ($event?: JQuery.ClickEvent) => {
+                this.shortenUrlSvc.copyToClipboard(this.$element, $event)
             })
         )
 
@@ -391,8 +387,14 @@ class SlideshowController implements IComponentController {
         this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
 
         this.shortUrl = this.shortenUrlSvc.getShortUrl({
-            documentId: this.documentOb.id,
-            viewId: this.viewOb ? this.viewOb.id : '',
+            orgId: this.projectOb.orgId,
+            documentId: this.documentOb.id.endsWith('_cover')
+                ? ''
+                : this.documentOb.id,
+            viewId:
+                this.viewOb && !this.documentOb.id.endsWith('_cover')
+                    ? this.viewOb.id
+                    : '',
             projectId: this.projectOb.id,
             refId: this.refOb.id,
         })
@@ -525,7 +527,7 @@ class SlideshowController implements IComponentController {
     }
 
     public copyToClipboard = ($event: JQuery.ClickEvent): void => {
-        this.shortenUrlSvc.copyToClipboard($event)
+        this.shortenUrlSvc.copyToClipboard(this.$element, $event)
     }
 
     public elementTranscluded = (elementOb: ElementObject, type): void => {
@@ -566,6 +568,11 @@ const SlideshowComponent: VeComponentOptions = {
     <div ng-if="$ctrl.viewOb !== null">
     <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
         <div class="pane-center-toolbar">
+            <div class="share-link">
+                <button type="button" class="btn btn-tools btn-sm share-url" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"
+                popover-trigger="outsideClick" uib-popover-template="$ctrl.dynamicPopover.templateUrl" popover-title="{{$ctrl.dynamicPopover.title}}" popover-placement="bottom-left">
+                <i class="fa-solid fa-share-from-square"></i></button>
+            </div>
             <div class="pane-center-btn-group">
                 <button-bar button-api="$ctrl.bbApi" class="bordered-button-bar"></button-bar>
             </div>

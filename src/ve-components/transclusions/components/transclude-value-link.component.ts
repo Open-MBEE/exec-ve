@@ -96,7 +96,8 @@ export class TranscludeNameController
         this.nonEditable = true
     }
 
-    protected config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         if (typeof this.mmsLinkText === 'undefined')
             this.mmsLinkText = this.mmsCfLabel ? this.mmsCfLabel : 'Link'
     }

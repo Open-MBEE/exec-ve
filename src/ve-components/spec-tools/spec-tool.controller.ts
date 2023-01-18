@@ -175,7 +175,7 @@ export class SpecTool implements ISpecTool {
         protected viewSvc: ViewService,
         protected permissionsSvc: PermissionsService,
         protected eventSvc: EventService,
-        protected specSvc: SpecService,
+        public specSvc: SpecService,
         protected toolbarSvc: ToolbarService
     ) {}
 
@@ -200,6 +200,7 @@ export class SpecTool implements ISpecTool {
                             'is missing a button definition'
                     )
                 }
+                this.configToolbar()
             },
             (reason) => {
                 this.growl.error(reason.message)
@@ -226,12 +227,12 @@ export class SpecTool implements ISpecTool {
     /**
      * @name veComponents/SpecTool#config
      *
-     * Use this API to implement any tool-specific initialization steps that would normally be called in the $onInit callback
+     * Use this API to implement any toolbar-specific initialization steps that would normally be called in the toolbar Promise callback
      *
      * @protected
      */
-    protected config = (): void => {
-        /* Implement any initialization Logic Here */
+    protected configToolbar = (): void => {
+        /* Implement any toolbar initialization Logic Here */
     }
 
     /**

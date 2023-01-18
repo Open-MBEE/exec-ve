@@ -1229,13 +1229,6 @@
   resolved "https://registry.npmjs.org/@types/estree/-/estree-0.0.51.tgz"
   integrity sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==
 
-"@types/favicons@5.5.0":
-  version "5.5.0"
-  resolved "https://registry.npmjs.org/@types/favicons/-/favicons-5.5.0.tgz"
-  integrity sha512-s76OlRaBfqtGu2ZBobnZv2NETfqsQUVfKKlOkKNGo4ArBsqiblodKsnQ3j29hCCgmpQacEfLxealV96za+tzVQ==
-  dependencies:
-    "@types/node" "*"
-
 "@types/html-minifier-terser@^6.0.0":
   version "6.1.0"
   resolved "https://registry.npmjs.org/@types/html-minifier-terser/-/html-minifier-terser-6.1.0.tgz"
@@ -2903,6 +2896,11 @@ entities@^2.0.0:
   resolved "https://registry.npmjs.org/entities/-/entities-2.2.0.tgz"
   integrity sha512-p92if5Nz619I0w+akJrLZH0MX0Pb5DX39XOwQTtXSdQQOaYH03S1uIQp4mhOZtAXrxq4ViO67YTiLBo2638o9A==
 
+entities@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-4.4.0.tgz#97bdaba170339446495e653cfd2db78962900174"
+  integrity sha512-oYp7156SP8LkeGD0GF85ad1X9Ai79WtRsZ2gxJqtBuzH+98YUV6jkHEKlZkMbcrjJjIVJNIDP/3WL9wQkoPbWA==
+
 entities@~2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/entities/-/entities-2.1.0.tgz"
@@ -3361,25 +3359,24 @@ fastq@^1.6.0:
   dependencies:
     reusify "^1.0.4"
 
-favicons-webpack-plugin@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.npmjs.org/favicons-webpack-plugin/-/favicons-webpack-plugin-5.0.2.tgz"
-  integrity sha512-D/A+Ze0x57+YZBU69hK/lR3NI636qQnKduWyQm0THGl1y3jt16whPHHsi8yjsuXvetv84Eh/I/yYJbAMC2iQxg==
+favicons-webpack-plugin@^6.2.2:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/favicons-webpack-plugin/-/favicons-webpack-plugin-6.0.0.tgz#a54777103e98ad64929e3ed5fbcafe6b3bae357c"
+  integrity sha512-wryICW2NjR9BORYjP1PN3CDbjVzXDxcemLMWQBdLJGhZlj0sYF7NNq+ddQtO/YJvBurYQ3YR1df5uXZRmcF9hw==
   dependencies:
-    "@types/favicons" "5.5.0"
     find-root "^1.1.0"
     parse-author "^2.0.0"
-    parse5 "^6.0.1"
+    parse5 "^7.1.1"
   optionalDependencies:
-    html-webpack-plugin ">=5.0.0"
+    html-webpack-plugin "^5.5.0"
 
-favicons@^7.0.0-beta.3:
-  version "7.0.0"
-  resolved "https://registry.npmjs.org/favicons/-/favicons-7.0.0.tgz"
-  integrity sha512-G922WcQLwHcXG7f8P5iFt0tALs6Ymzu8ETFRzCnoamKsFUZ2yVA2UVkMrSUjOuFQy4KO8mYC2BrL8SgYI7LUKw==
+favicons@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/favicons/-/favicons-7.0.2.tgz#a4a5b34928d61e007fb8814d2eee283aeb3c9304"
+  integrity sha512-M/qE3ERHOBu0+Op+61jx8CdvOnSKrrl2zxUPpoGgsNyfjuGqRsK80zYoA5Uwdxl8QM4egfhBWZp1j7KK3YnOMg==
   dependencies:
     escape-html "^1.0.3"
-    sharp "^0.30.7"
+    sharp "^0.31.1"
     xml2js "^0.4.23"
 
 figures@^3.0.0:
@@ -3853,7 +3850,7 @@ html-tags@^3.2.0:
   resolved "https://registry.npmjs.org/html-tags/-/html-tags-3.2.0.tgz"
   integrity sha512-vy7ClnArOZwCnqZgvv+ddgHgJiAFXe3Ge9ML5/mBctVJoUoYPCdxVucOywjDARn6CVoh3dRSFdPHy2sX80L0Wg==
 
-html-webpack-plugin@>=5.0.0, html-webpack-plugin@^5.5.0:
+html-webpack-plugin@^5.5.0:
   version "5.5.0"
   resolved "https://registry.npmjs.org/html-webpack-plugin/-/html-webpack-plugin-5.5.0.tgz"
   integrity sha512-sy88PC2cRTVxvETRgUHFrL4No3UxvcH8G1NepGhqaTT+GXN2kTamqasot0inS5hXeg1cMbFDt27zzo9p35lZVw==
@@ -5345,10 +5342,12 @@ parse-json@^5.0.0:
     json-parse-even-better-errors "^2.3.0"
     lines-and-columns "^1.1.6"
 
-parse5@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.npmjs.org/parse5/-/parse5-6.0.1.tgz"
-  integrity sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==
+parse5@^7.1.1:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/parse5/-/parse5-7.1.2.tgz#0736bebbfd77793823240a23b7fc5e010b7f8e32"
+  integrity sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==
+  dependencies:
+    entities "^4.4.0"
 
 pascal-case@^3.1.2:
   version "3.1.2"
@@ -6066,6 +6065,13 @@ semver@^7.3.4, semver@^7.3.5, semver@^7.3.7:
   dependencies:
     lru-cache "^6.0.0"
 
+semver@^7.3.8:
+  version "7.3.8"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.8.tgz#07a78feafb3f7b32347d725e33de7e2a2df67798"
+  integrity sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==
+  dependencies:
+    lru-cache "^6.0.0"
+
 send@0.15.3:
   version "0.15.3"
   resolved "https://registry.npmjs.org/send/-/send-0.15.3.tgz"
@@ -6147,16 +6153,16 @@ shallow-clone@^3.0.0:
   dependencies:
     kind-of "^6.0.2"
 
-sharp@^0.30.7:
-  version "0.30.7"
-  resolved "https://registry.npmjs.org/sharp/-/sharp-0.30.7.tgz"
-  integrity sha512-G+MY2YW33jgflKPTXXptVO28HvNOo9G3j0MybYAHeEmby+QuD2U98dT6ueht9cv/XDqZspSpIhoSW+BAKJ7Hig==
+sharp@^0.31.1:
+  version "0.31.3"
+  resolved "https://registry.yarnpkg.com/sharp/-/sharp-0.31.3.tgz#60227edc5c2be90e7378a210466c99aefcf32688"
+  integrity sha512-XcR4+FCLBFKw1bdB+GEhnUNXNXvnt0tDo4WsBsraKymuo/IAuPuCBVAL2wIkUw2r/dwFW5Q5+g66Kwl2dgDFVg==
   dependencies:
     color "^4.2.3"
     detect-libc "^2.0.1"
     node-addon-api "^5.0.0"
     prebuild-install "^7.1.1"
-    semver "^7.3.7"
+    semver "^7.3.8"
     simple-get "^4.0.1"
     tar-fs "^2.1.1"
     tunnel-agent "^0.6.0"

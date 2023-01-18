@@ -130,8 +130,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         this.specTitle = 'Edit Element'
     }
 
-    $onInit(): void {
-        super.$onInit()
+    configToolbar = (): void => {
         if (this.autosaveSvc.openEdits() > 0) {
             this.tbApi.setIcon('spec-editor', 'fa-edit-asterisk')
             this.tbApi.setPermission('spec-editor-saveall', true)
@@ -175,67 +174,19 @@ const SpecEditorComponent: VeComponentOptions = {
 
     <h1 class="prop" ng-if="$ctrl.edit.name !== undefined"><input class="form-control ve-plain-input" type="text" ng-model="$ctrl.edit.name"></h1>
     <span class="elem-updated-wrapper">Last modified {{$ctrl.element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email != undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b></span>
-    <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
-        <h2 class="prop-title spec-view-value-heading">Property Value</h2>
-        <div ng-if="!isEnumeration">
-            <div ng-if="editValues.length == 0">
-                <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
-                <button class="btn btn-sm btn-default" ng-click="addValue(addValueType)">Add</button>
-            </div>
-            <div ng-repeat="value in editValues" ng-switch on="value.type" ng-form="valForm">
-                <div ng-switch-when="LiteralInteger" ng-class="{'has-error': valForm.$error.pattern}">
-                    <div class="form-inline">
-                    <input class="form-control ve-plain-input" type="number" ng-model="value.value" ng-pattern="/^-?\\d+$/" ng-blur="cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                    </div>
-                    <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid integer</label>
-                </div>
-                <div ng-switch-when="LiteralUnlimitedNatural" ng-class="{'has-error': valForm.$error.pattern}">
-                    <div class="form-inline">
-                    <input class="form-control ve-plain-input" type="number" name="natVal" ng-model="value.value" ng-pattern="/^\\d+$/" ng-blur="cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                    </div>
-                    <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid natural number</label>
-                </div>
-                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value">&nbsp;{{value.value}}&nbsp;<a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-                <div ng-switch-when="LiteralReal">
-                    <div class="form-inline">
-                        <input class="form-control ve-plain-input" type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)">&nbsp;<i class="fa fa-close"></i></a>
-                    </div>
-                </div>
-                <div ng-switch-when="LiteralString">
-                    <div ng-if="hasHtml(value.value)">
-                        <ckeditor edit-value="value.value" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-element-id="{{element.id}}" autosave-key="{{element._projectId + element._refId + element.id + 'index:' + $index}}"></ckeditor>
-                    </div>
 
-                    <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
-                    <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                </div>
-                <div ng-switch-when="OpaqueExpression">
-                    <textarea ng-model="value.body[0]"></textarea><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                </div>
-                <div ng-switch-default>Editing not supported for now</div>
-            </div>
-            <div ng-if="editValues.length != 0 && isSlot">
-                <button class="btn btn-sm btn-default" ng-click="addValue(editValues[0].type)">Add</button>
-            </div>
-        </div>
-        <div ng-if="isEnumeration" ng-repeat="val in editValues">
-            <select ng-model="val.instanceId" ng-options="el.id as el.name for el in options">
-            </select><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-        </div>
-        <div ng-if="(isSlot || editValues.length == 0) && isEnumeration">
-            <button class="btn btn-sm btn-default" ng-click="addEnumerationValue()">Add</button>
-        </div>
-    </div>
-    
+    <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}" non-editable="false"></transclude-val>
+            
+        
     <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <ve-editor ng-model="$ctrl.edit.documentation" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></ve-editor>
+    <editor ng-model="$ctrl.edit.documentation" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></editor>
 
     <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
     <span class="elem-type-wrapper prop">
         <span class="elem-type">{{$ctrl.element.type}}</span>
-        <div ng-repeat="type in $ctrl.element._appliedStereotypeIds" class="prop elem-type"><transclude-name mms-element-id="{{type}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" no-click="true"></transclude-name></div>
+        <div ng-repeat="type in $ctrl.element._appliedStereotypeIds" class="prop elem-type">
+            <transclude-name mms-element-id="{{type}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" no-click="true" non-editable="true"></transclude-name>
+        </div>
     </span>
     <h2 class="prop-title">Location</h2>
     <span class="prop">{{$ctrl.qualifiedName}}</span>
@@ -249,100 +200,6 @@ const SpecEditorComponent: VeComponentOptions = {
     <span class="prop">{{$ctrl.element._modified}}</span>
     <h2 class="prop-title">Commit</h2>
     <span class="prop">{{$ctrl.element._commitId}}</span>
-</div>
-<div ng-if="!noEdit && editing" class="editing">
-
-    <div ng-if="edit.type === 'Property' || edit.type === 'Port' || edit.type === 'Slot'">
-        <h2 class="prop-title spec-view-value-heading">Property Value</h2>
-        <div ng-if="!isEnumeration">
-            <div ng-if="editValues.length == 0">
-                <select ng-model="addValueType" ng-options="key for (key, value) in addValueTypes"></select>
-                <button class="btn btn-sm btn-default" ng-click="addValue(addValueType)">Add</button>
-            </div>
-            <div ng-repeat="value in editValues" ng-switch on="value.type" ng-form="valForm">
-                <div ng-switch-when="LiteralInteger" ng-class="{'has-error': valForm.$error.pattern}">
-                    <div class="form-inline">
-                    <input class="form-control ve-plain-input" type="number" ng-model="value.value" ng-pattern="/^-?\\d+$/" ng-blur="cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                    </div>
-                    <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid integer</label>
-                </div>
-                <div ng-switch-when="LiteralUnlimitedNatural" ng-class="{'has-error': valForm.$error.pattern}">
-                    <div class="form-inline">
-                    <input class="form-control ve-plain-input" type="number" name="natVal" ng-model="value.value" ng-pattern="/^\\d+$/" ng-blur="cleanupVal(value)">&nbsp;
-                    <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                    </div>
-                    <label class="control-label mms-error-icon" ng-show="valForm.$error.pattern">Not a valid natural number</label>
-                </div>
-                <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="value.value">&nbsp;{{value.value}}&nbsp;<a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a></div>
-                <div ng-switch-when="LiteralReal">
-                    <div class="form-inline">
-                        <input class="form-control ve-plain-input" type="number" ng-model="value.value" step="any"><a ng-if="!$first" ng-click="removeVal($index)">&nbsp;<i class="fa fa-close"></i></a>
-                    </div>
-                </div>
-                <div ng-switch-when="LiteralString">
-                    <div ng-if="hasHtml(value.value)">
-                        <ckeditor edit-value="value.value" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" mms-element-id="{{element.id}}" autosave-key="{{element._projectId + element._refId + element.id + 'index:' + $index}}"></ckeditor>
-                    </div>
-
-                    <div ng-if="!hasHtml(value.value)"><textarea ng-model="value.value"></textarea><a ng-click="addHtml(value)"><i class="fa fa-html5"></i></a></div>
-                    <a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                </div>
-                <div ng-switch-when="OpaqueExpression">
-                    <textarea ng-model="value.body[0]"></textarea><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-                </div>
-                <div ng-switch-default>Editing not supported for now</div>
-            </div>
-            <div ng-if="editValues.length != 0 && isSlot">
-                <button class="btn btn-sm btn-default" ng-click="addValue(editValues[0].type)">Add</button>
-            </div>
-        </div>
-        <div ng-if="isEnumeration" ng-repeat="val in editValues">
-            <select ng-model="val.instanceId" ng-options="el.id as el.name for el in options">
-            </select><a ng-if="!$first" ng-click="removeVal($index)"><i class="fa fa-close"></i></a>
-        </div>
-        <div ng-if="(isSlot || editValues.length == 0) && isEnumeration">
-            <button class="btn btn-sm btn-default" ng-click="addEnumerationValue()">Add</button>
-        </div>
-    </div>
-
-    <div ng-if="edit.type === 'Constraint'">
-        <h2 class="prop-title spec-view-value-heading">Constraint Specification</h2>
-        <div ng-switch on="editValues[0].type">
-            <div ng-switch-when="LiteralInteger"><input class="form-control ve-plain-input" type="number" ng-model="editValues[0].value"></div>
-            <div ng-switch-when="LiteralUnlimitedNatural"><input class="form-control ve-plain-input" type="number" ng-model="editValues[0].value"></div>
-            <div ng-switch-when="LiteralBoolean"><input type="checkbox" ng-model="editValues[0].value"></div>
-            <div ng-switch-when="LiteralReal"><input class="form-control ve-plain-input" type="number" ng-model="editValues[0].value" step="any"></div>
-            <div ng-switch-when="LiteralString">
-                <textarea ng-model="editValues[0].value"></textarea>
-            </div>
-            <div ng-switch-when="OpaqueExpression">
-                <textarea ng-model="editValues[0].body[0]"></textarea>
-            </div>
-            <div ng-switch-default>Editing not supported for now</div>
-        </div>
-    </div>
-
-    <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-    <textarea ng-model="edit.documentation" mms-ckeditor mms-editor-api="editorApi" mms-project-id="{{element._projectId}}" mms-ref-id="{{element._refId}}" autosave-key="{{element._projectId + element._refId + element.id}}"></textarea>
-
-    <h2 class="prop-title spec-view-type-heading">Metatypes</h2>
-    <span class="elem-type-wrapper prop">
-        <span class="elem-type">{{element.type}}</span>
-        <div ng-repeat="type in element._appliedStereotypeIds" class="prop elem-type"><mms-transclude-name mms-element-id="{{type}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" no-click="true"></mms-transclude-name></div>
-    </span>
-    <h2 class="prop-title">Location</h2>
-    <span class="prop">{{element._qualifiedName}}</span>
-    <h2 class="prop-title">ID</h2>
-    <span class="prop id">{{element.id}}</span>
-    <h2 class="prop-title">Branch/Tag</h2>
-    <span class="prop">{{element._refId}}</span>
-    <h2 class="prop-title">Project</h2>
-    <span class="prop">{{element._projectId}}</span>
-    <h2 class="prop-title">Formatted Modified Time</h2>
-    <span class="prop">{{element._modified}}</span>
-    <h2 class="prop-title">Commit</h2>
-    <span class="prop">{{element._commitId}}</span>
 </div>
     `,
     bindings: {

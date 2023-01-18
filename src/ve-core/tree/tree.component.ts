@@ -124,6 +124,7 @@ class TreeController implements angular.IComponentController {
         '$scope',
         '$timeout',
         '$filter',
+        'growl',
         'ApplicationService',
         'UtilsService',
         'TreeService',
@@ -135,6 +136,7 @@ class TreeController implements angular.IComponentController {
         private $scope: angular.IScope,
         private $timeout: angular.ITimeoutService,
         private $filter: angular.IFilterService,
+        private growl: angular.growl.IGrowlService,
         private applicationSvc: ApplicationService,
         private utilsSvc: UtilsService,
         private treeSvc: TreeService,
@@ -207,7 +209,10 @@ class TreeController implements angular.IComponentController {
         this.eventSvc.destroy(this.subs)
     }
 
-    public expandCallback = (branch: TreeBranch, e) => {
+    public expandCallback = (
+        branch: TreeBranch,
+        e: JQuery.ClickEvent
+    ): void => {
         branch.loading = true
         if (!branch.expanded && this.options.expandCallback) {
             this.options.expandCallback(branch.data.id, branch, false)
@@ -218,13 +223,18 @@ class TreeController implements angular.IComponentController {
         const promise = branch.expanded
             ? this.treeApi.closeBranch(branch)
             : this.treeApi.expandBranch(branch)
-        promise.then(() => {
-            branch.loading = false
-            //this.$scope.$apply();
-        })
+        promise.then(
+            () => {
+                branch.loading = false
+                //this.$scope.$apply();
+            },
+            (reason) => {
+                this.growl.error(reason.message)
+            }
+        )
     }
 
-    public userClicksBranch = (branch: TreeBranch) => {
+    public userClicksBranch = (branch: TreeBranch): void => {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
         if (branch.onSelect) {
             branch.onSelect(branch)
@@ -233,7 +243,7 @@ class TreeController implements angular.IComponentController {
         }
     }
 
-    public userDblClicksBranch = (branch: TreeBranch) => {
+    public userDblClicksBranch = (branch: TreeBranch): void => {
         this.eventSvc.$broadcast('tree-branch-selected', branch)
         if (branch.onDblClick) {
             branch.onDblClick(branch)
@@ -242,13 +252,14 @@ class TreeController implements angular.IComponentController {
         }
     }
 
-    public getHref = (row) => {
-        //var data = row.branch.data;
-        /*if (row.branch.type !== 'group' && UtilsService.isDocument(data) && !ApplicationService.getState().fullDoc) {
-            var ref = data._refId ? data._refId : 'master';
-            return UtilsService.PROJECT_URL_PREFIX + data._projectId + '/' + ref+ '/documents/' + data.id + '/views/' + data.id;
-        }*/
-    }
+    // public getHref = (row: TreeRow): string => {
+    //     //var data = row.branch.data;
+    //     /*if (row.branch.type !== 'group' && UtilsService.isDocument(data) && !ApplicationService.getState().fullDoc) {
+    //         var ref = data._refId ? data._refId : 'master';
+    //         return UtilsService.PROJECT_URL_PREFIX + data._projectId + '/' + ref+ '/documents/' + data.id + '/views/' + data.id;
+    //     }*/
+    //     return ''
+    // }
 }
 
 const TreeComponent: VeComponentOptions = {
@@ -264,13 +275,13 @@ const TreeComponent: VeComponentOptions = {
             ng-class="'level-' + {{row.level}}" class="abn-tree-row">
             <div class="arrow" ng-click="$ctrl.userClicksBranch(row.branch)" ng-dblclick="$ctrl.userDblClicksBranch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
                 <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
-                    <a ng-href="{{$ctrl.getHref(row);}}" class="tree-item">
+                    <div class="tree-item">
                         <i ng-show="!row.branch.loading && row.visibleChild" ng-class="{'active-text': row.branch.selected}" ng-click="$ctrl.expandCallback(row.branch, $event)" class="indented tree-icon {{(row.branch.expanded) ? $ctrl.icons.iconExpand : $ctrl.icons.iconCollapse}}" ></i>
                         <i ng-hide="row.branch.loading || row.visibleChild" class="fa fa-lg fa-fw"></i>
                         <i ng-hide="row.branch.loading" ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
                         <i ng-show="row.branch.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
                         <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
-                    </a>
+                    </div>
                 </div>
             </div>
         </li>

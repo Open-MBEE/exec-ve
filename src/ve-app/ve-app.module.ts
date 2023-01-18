@@ -22,6 +22,7 @@ import angular, {
     IRequestConfig,
 } from 'angular'
 
+import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { ResolveService } from '@ve-app/main/services'
 import {
     AuthService,
@@ -944,16 +945,6 @@ veApp.config([
                             return $transition$.params()
                         },
                     ],
-                    decodedUrl: [
-                        'ResolveService',
-                        'paramsOb',
-                        (
-                            resolveSvc: ResolveService,
-                            paramsOb: ParamsObject
-                        ): VePromise<ParamsObject> => {
-                            return resolveSvc.decodeUrl(paramsOb)
-                        },
-                    ],
                 },
                 views: {
                     'login@main': {
@@ -1128,8 +1119,13 @@ veApp.run([
                 () => {
                     rootScopeSvc.loginModalOpen(true)
                     $uibModal
-                        .open({
+                        .open<LoginModalResolveFn, boolean>({
                             component: 'loginModal',
+                            resolve: {
+                                continue: () => {
+                                    return true
+                                },
+                            },
                             backdrop: 'static',
                             size: 'md',
                         })

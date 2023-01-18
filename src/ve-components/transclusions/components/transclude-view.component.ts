@@ -101,7 +101,8 @@ export class TranscludeViewController
         this.checkCircular = true
     }
 
-    protected config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         if (typeof this.noTitle === 'undefined') {
             this.noTitle = true
         }

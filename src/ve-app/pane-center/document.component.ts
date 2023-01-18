@@ -65,13 +65,13 @@ class FullDocumentController implements IComponentController {
     private handleShareURL: any
     private copyToClipboard: ($event) => void
     private dynamicPopover: {
-        templateUrl: 'shareUrlTemplate.html'
-        title: 'Share'
+        templateUrl: string
+        title: string
     }
 
     static $inject = [
         '$scope',
-        '$window',
+        '$element',
         '$state',
         '$anchorScroll',
         '$location',
@@ -94,7 +94,7 @@ class FullDocumentController implements IComponentController {
     ]
     constructor(
         private $scope: angular.IScope,
-        private $window: angular.IWindowService,
+        private $element: JQuery<HTMLElement>,
         private $state: StateService,
         private $anchorScroll: angular.IAnchorScrollService,
         private $location: angular.ILocationService,
@@ -249,12 +249,6 @@ class FullDocumentController implements IComponentController {
                     )
                 }
             )
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('share-url', ($event?: JQuery.ClickEvent) => {
-                this.shortenUrlSvc.copyToClipboard($event)
-            })
         )
 
         this.subs.push(
@@ -435,9 +429,10 @@ class FullDocumentController implements IComponentController {
         )
 
         // Share URL button settings
-        // this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
+        this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
 
         this.shortUrl = this.shortenUrlSvc.getShortUrl({
+            orgId: this.projectOb.orgId,
             projectId: this.projectOb.id,
             refId: this.refOb.id,
             documentId: this.documentOb.id,
@@ -577,6 +572,11 @@ const DocumentComponent: VeComponentOptions = {
     <div>
     <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
         <div class="pane-center-toolbar">
+            <div class="share-link">
+                <button type="button" class="btn btn-tools btn-sm share-url" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"
+                popover-trigger="outsideClick" uib-popover-template="$ctrl.dynamicPopover.templateUrl" popover-title="{{$ctrl.dynamicPopover.title}}" popover-placement="bottom-left">
+                <i class="fa-solid fa-share-from-square"></i></button>
+            </div>
             <div class="pane-center-btn-group">
                 <button-bar button-api="$ctrl.bbApi" class="bordered-button-bar"></button-bar>
             </div>

@@ -135,7 +135,7 @@ export class TranscludeValController
                 </div>
                 <div ng-switch-when="LiteralString">
                     <div ng-if="$ctrl.hasHtml(value.value)">
-                        <ve-editor ng-model="value.value" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-element-id="{{$ctrl.element.id}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id + 'index:' + $index}}"></ve-editor>
+                        <editor ng-model="value.value" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-element-id="{{$ctrl.element.id}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id + 'index:' + $index}}"></editor>
                     </div>
                     <div ng-if="!$ctrl.hasHtml(value.value)">
                         <textarea ng-model="value.value"></textarea>
@@ -223,30 +223,8 @@ export class TranscludeValController
         this.checkCircular = false
     }
 
-    protected config = (): void => {
-        this.componentSvc.getPropertySpec(this.element).then(
-            (value) => {
-                this.propertySpec = value
-            },
-            (reason) => {
-                this.growl.error(
-                    'Failed to get property spec: ' + reason.message
-                )
-            }
-        )
-        this.componentSvc.setupValEditFunctions(this)
-
-        this.isEditing = false
-        this.elementSaving = false
-
-        if (this.mmsSpecEditorCtrl) {
-            this._startEdit(this.specSvc.editable)
-            this.changeAction = (): void => {
-                this.config()
-            }
-            return
-        }
-
+    $onInit(): void {
+        super.$onInit()
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) {
                 this.startEdit()
@@ -276,12 +254,20 @@ export class TranscludeValController
                 this._startEdit(this.mmsViewCtrl.isEditable())
             }
         }
+        if (this.mmsSpecEditorCtrl) {
+            this.startEdit = (): void => {
+                this._startEdit(this.specSvc.editable)
+            }
+        }
     }
 
     public getContent = (
         preview?
     ): angular.IPromise<string | HTMLElement[]> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
+
+        this.isEditing = false
+        this.elementSaving = false
         const toCompileList: any[] = []
         let areStrings = false
         this.values = this.componentSvc.setupValCf(this.element)
@@ -347,6 +333,14 @@ export class TranscludeValController
         return deferred.promise
     }
 
+    protected recompile = (preview?: boolean): void => {
+        if (!this.nonEditable && this.mmsSpecEditorCtrl && !this.edit) {
+            this._startEdit(this.specSvc.editable)
+        } else {
+            super.recompile(preview)
+        }
+    }
+
     private _startEdit = (isEditable: boolean): void => {
         let id = this.element.typeId
         if (this.element.type === 'Slot') {
@@ -368,6 +362,7 @@ export class TranscludeValController
         this.componentSvc.getPropertySpec(this.element).then(
             (value) => {
                 this.propertySpec = value
+                this.componentSvc.setupValEditFunctions(this)
                 this.componentSvc.startEdit(
                     this,
                     isEditable,

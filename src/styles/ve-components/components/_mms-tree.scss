@@ -10,7 +10,7 @@ ul.abn-tree {
     line-height: 1.8em;
     margin-top: 0;
 
-    a.tree-item {
+    div.tree-item {
       @include globals.border-radius(0);
 
       margin-top: 3px;

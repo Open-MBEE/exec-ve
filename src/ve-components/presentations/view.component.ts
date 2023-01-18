@@ -114,6 +114,7 @@ export class ViewController implements IComponentController {
     private number: string
     private showComments: boolean
     private showElements: boolean
+    private showNumbering: boolean
     public subs: Rx.IDisposable[]
     private treeApi: TreeApi
 
@@ -143,6 +144,7 @@ export class ViewController implements IComponentController {
         this.processed = false
 
         this.number = this.mmsNumber ? this.mmsNumber.toString(10) : ''
+        this.showNumbering = this.rootScopeSvc.veNumberingOn()
 
         this.isSection = false
         this.showElements = false
@@ -172,6 +174,12 @@ export class ViewController implements IComponentController {
                     this.toggleShowElements()
                 }
                 this.toggleShowEdits()
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.$on('show-numbering', (data?: boolean) => {
+                this.showNumbering = this.rootScopeSvc.veNumberingOn()
             })
         )
 
@@ -412,13 +420,13 @@ export const ViewComponent: VeComponentOptions = {
     <div id="{{$ctrl.mmsElementId}}" ng-class="{landscape: $ctrl.view._printLandscape}">
     <div ng-if="!$ctrl.noTitle">
         <h1 ng-if="$ctrl.mmsLink" class="view-title">
-          <span class="ve-view-number">{{$ctrl.number}}</span> <view-link ng-class="{'docTitle-underlined': isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
+          <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> <view-link ng-class="{'docTitle-underlined': isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
           <view-link class="open-document" ng-mouseover="hoverIn()" ng-mouseleave="hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
             link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
         </h1>
     
         <h1 ng-if="!$ctrl.mmsLink" class="view-title h{{level}}">
-            <span class="ve-view-number">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}"></transclude-name>
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}"></transclude-name>
         </h1>
     
         <div class="ve-secondary-text last-modified no-print">

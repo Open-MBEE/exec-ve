@@ -144,7 +144,11 @@ h4 {
 
 .btn-sm {
   padding: inherit;
-  font-size: inherit;
+  font-size: 16px;
+
+  .btn-sm-label {
+    font-size: 12px;
+  }
 }
 
 .btn-copy {

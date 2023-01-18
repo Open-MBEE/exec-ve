@@ -208,44 +208,44 @@ export class ProjectService {
                             })
                             return
                         }
-                        const orgProjects: {
-                            [orgId: string]: ProjectObject[]
-                        } = {}
-                        for (
-                            let i = 0;
-                            i < response.data.projects.length;
-                            i++
-                        ) {
-                            const project = response.data.projects[i]
-                            const porg = project.orgId
-                            const cacheKey = this.apiSvc.makeCacheKey(
-                                null,
-                                project.id,
-                                false,
-                                'project'
-                            )
-                            this.cacheSvc.put(cacheKey, project, true)
-                            if (orgProjects[porg] === undefined) {
-                                orgProjects[porg] = []
-                            }
-                            orgProjects[porg].push(
-                                this.cacheSvc.get<ProjectObject>(cacheKey)
-                            )
-                        }
-                        Object.keys(orgProjects).forEach((orgId) => {
-                            this.cacheSvc.put(
-                                this.apiSvc.makeCacheKey(
+                        if (!orgId) {
+                            const orgProjects: {
+                                [orgId: string]: ProjectObject[]
+                            } = {}
+                            response.data.projects.forEach((project) => {
+                                const porg = project.orgId
+                                const pCacheKey = this.apiSvc.makeCacheKey(
                                     null,
-                                    orgId,
+                                    project.id,
                                     false,
-                                    'projects'
-                                ),
-                                orgProjects[orgId],
-                                false
-                            )
-                        })
+                                    'project'
+                                )
+
+                                if (orgProjects[porg] === undefined) {
+                                    orgProjects[porg] = []
+                                }
+                                orgProjects[porg].push(
+                                    this.cacheSvc.put(pCacheKey, project, true)
+                                )
+                                Object.keys(orgProjects).forEach((orgId) => {
+                                    this.cacheSvc.put(
+                                        this.apiSvc.makeCacheKey(
+                                            null,
+                                            orgId,
+                                            false,
+                                            'projects'
+                                        ),
+                                        orgProjects[orgId],
+                                        false
+                                    )
+                                })
+                            })
+                        }
                         deferred.resolve(
-                            this.cacheSvc.get<ProjectObject[]>(cacheKey)
+                            this.cacheSvc.put<ProjectObject[]>(
+                                cacheKey,
+                                response.data.projects
+                            )
                         )
                     },
                     (response: angular.IHttpResponse<ProjectsResponse>) => {

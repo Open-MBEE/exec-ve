@@ -6,4 +6,4 @@ export * from './services'
 //Components
 import './components/mention.component'
 import './components/mention-intercept.component'
-import './ve-editor.component'
+import './editor.component'

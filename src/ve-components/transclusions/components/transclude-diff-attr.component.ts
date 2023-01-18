@@ -124,7 +124,8 @@ class MmsDiffAttrController extends Transclusion implements ITransclusion {
         this.checkCircular = false
     }
 
-    config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         this.viewOrigin = this.mmsViewCtrl
             ? this.mmsViewCtrl.getElementOrigin()
             : null

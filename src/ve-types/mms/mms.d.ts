@@ -53,6 +53,7 @@ export interface RequestObject extends MmsObject {
 }
 
 export interface ShortUrlRequest extends RequestObject {
+    orgId: string
     viewId?: string
     documentId: string
 }

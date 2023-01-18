@@ -25,7 +25,7 @@ export interface LoginModalResolve extends VeModalResolve {
 }
 
 class LoginModalController
-    extends VeModalControllerImpl<boolean>
+    extends VeModalControllerImpl<boolean, LoginModalResolve>
     implements VeModalController
 {
     static $inject = [

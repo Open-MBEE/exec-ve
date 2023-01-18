@@ -28,11 +28,11 @@ const ButtonBarComponent: VeComponentOptions = {
       </a>
     
       <!-- Button with dropdown buttons -->
-      <span ng-if="button.dropdown_buttons" class="btn-group" uib-dropdown>
+      <span ng-if="button.dropdown_buttons" class="btn-group" on-toggle="$ctrl.bbApi.toggleButtonState(button.id)" uib-dropdown>
         <button type="button" class="btn btn-tools btn-sm dropdown-toggle {{button.id}}" uib-dropdown-toggle uib-tooltip="{{button.tooltip}}"
             tooltip-append-to-body="false" tooltip-trigger="mouseenter" tooltip-popup-delay="100"
-            tooltip-placement="{{button.placement}}" on-toggle="$ctrl.bbApi.toggleButtonState(button.id)">
-            <i class="{{button.icon}} fa-lg"></i>{{button.button_content}}<i class="{{button.dropdown_icon}} fa-1xs"></i></button>
+            tooltip-placement="{{button.placement}}">
+            <i class="{{button.icon}} fa-lg"></i><span class="btn-sm-label">{{button.button_content}}</span><i class="{{button.dropdown_icon}} fa-1xs"></i></button>
         <ul class="dropdown-menu" role="menu">
           <li ng-repeat="dropdown_button in button.dropdown_buttons | filter: {permission: true}">
               <a  type="button"

@@ -1,6 +1,7 @@
 import angular from 'angular'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
+import { SpecTool } from '@ve-components/spec-tools'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { ElementService, AuthService } from '@ve-utils/mms-api-client'
@@ -49,11 +50,26 @@ export class TranscludeNameController
     extends Transclusion
     implements ITransclusion
 {
+    protected editTemplate: string = `
+    <div>
+    <form class="input-group" ng-submit="$ctrl.save($event)">
+        <input type="text" class="form-control" ng-model="$ctrl.edit.name" aria-describedby="basic-addon2">
+        <span class="input-group-addon transclude-name-label">Name</span>
+        <span class="input-group-addon" ng-click="$ctrl.save($event)" title="Save">
+            <i ng-if="!$ctrl.elementSaving" class="fa fa-save"></i>
+            <i ng-if="$ctrl.elementSaving" class="fa fa-spinner fa-spin"></i>
+        </span>
+        <span class="input-group-addon" ng-click="$ctrl.cancel($event)"><i class="fa fa-times" title="Cancel"></i></span>
+    </form>
+</div>
+`
+
     //Locals
     noClick: unknown | undefined
     clickHandler: () => void
+    mmsSpecEditorCtrl: SpecTool
 
-    static $inject = Transclusion.$inject
+    static $inject = [...Transclusion.$inject, 'SpecService']
 
     constructor(
         $q: VeQService,
@@ -95,7 +111,8 @@ export class TranscludeNameController
         this.checkCircular = false
     }
 
-    protected config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         this.$element.on('click', (e) => {
             if (this.noClick) return
 
@@ -117,36 +134,6 @@ export class TranscludeNameController
             this.mmsViewCtrl.transcludeClicked(this.element)
             e.stopPropagation()
         })
-
-        if (this.mmsViewCtrl) {
-            this.isEditing = false
-            this.elementSaving = false
-            this.view = this.mmsViewCtrl.getView()
-
-            this.save = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
-                this.componentSvc.saveAction(this, this.$element, false)
-            }
-
-            this.cancel = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
-                this.componentSvc.cancelAction(
-                    this,
-                    this.recompile,
-                    this.$element
-                )
-            }
-
-            this.startEdit = (): void => {
-                this.componentSvc.startEdit(
-                    this,
-                    this.mmsViewCtrl.isEditable(),
-                    this.$element,
-                    TranscludeNameComponent.template,
-                    false
-                )
-            }
-        }
     }
 
     public getContent = (
@@ -171,19 +158,7 @@ export class TranscludeNameController
 
 export const TranscludeNameComponent: VeComponentOptions = {
     selector: 'transcludeName',
-    template: `
-    <div>
-    <form class="input-group" ng-submit="$ctrl.save($event)">
-        <input type="text" class="form-control" ng-model="$ctrl.edit.name" aria-describedby="basic-addon2">
-        <span class="input-group-addon transclude-name-label">Name</span>
-        <span class="input-group-addon" ng-click="$ctrl.save($event)" title="Save">
-            <i ng-if="!$ctrl.elementSaving" class="fa fa-save"></i>
-            <i ng-if="$ctrl.elementSaving" class="fa fa-spinner fa-spin"></i>
-        </span>
-        <span class="input-group-addon" ng-click="$ctrl.cancel($event)"><i class="fa fa-times" title="Cancel"></i></span>
-    </form>
-</div>
-`,
+    template: `<div></div>`,
     bindings: {
         mmsElementId: '@',
         mmsProjectId: '@',
@@ -198,6 +173,7 @@ export const TranscludeNameComponent: VeComponentOptions = {
     transclude: true,
     require: {
         mmsViewCtrl: '?^^view',
+        mmsSpecEditor: '?^^specEditor',
     },
     controller: TranscludeNameController,
 }

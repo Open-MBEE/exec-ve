@@ -108,7 +108,9 @@ export class TranscludeArtController
         this.checkCircular = true
     }
 
-    config = (): void => {
+    $onInit(): void {
+        super.$onInit()
+
         this.artExt = this.mmsArtExt
 
         this.$element.on('click', (e) => {

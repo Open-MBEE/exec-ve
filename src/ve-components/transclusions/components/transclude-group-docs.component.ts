@@ -97,7 +97,8 @@ class TranscludeGroupDocsController
         this.changeAction(this.mmsGroupId, '', false)
     }
 
-    protected config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         this.mmsGroupId = this.mmsElementId
     }
 

@@ -44,7 +44,7 @@ export class TranscludeComController
     extends Transclusion
     implements ITransclusion
 {
-    protected editorTemplate: string = `
+    protected editTemplate: string = `
     <div class="panel panel-default no-print">
     <div class="panel-heading clearfix">
         <h3 class="panel-title pull-left">
@@ -60,7 +60,7 @@ export class TranscludeComController
         </div>
     </div>
     <div class="panel-body no-padding-panel">
-        <ve-editor ng-model="$ctrl.edit.documentation" mms-editor-type="{{$ctrl.editorType}}" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></ve-editor>
+        <editor ng-model="$ctrl.edit.documentation" mms-editor-type="{{$ctrl.editorType}}" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></editor>
     </div>
 </div>
 `
@@ -107,7 +107,8 @@ export class TranscludeComController
         this.checkCircular = true
     }
 
-    protected config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) this.startEdit()
 
@@ -154,7 +155,7 @@ export class TranscludeComController
                     this,
                     this.mmsViewCtrl.isEditable(),
                     this.$element,
-                    this.editorTemplate,
+                    this.editTemplate,
                     false
                 )
             }

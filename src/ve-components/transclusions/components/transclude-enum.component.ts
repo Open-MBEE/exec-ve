@@ -103,7 +103,8 @@ export class TranscludeEnumController
         this.checkCircular = false
     }
 
-    protected config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         // Need a way to put in a query for allowed options.
         // Value to save the resulting pointer
         // Transclusion for new options

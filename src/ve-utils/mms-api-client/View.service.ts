@@ -201,16 +201,18 @@ export class ViewService {
         stereoIds.forEach((stId) => {
             searchTerms.push(
                 this.elementSvc.search<ViewObject>(reqOb, {
-                    params: { _appliedStereotypeId: stId },
+                    params: { _appliedStereotypeIds: stId },
                 })
             )
         })
         this.$q.all(searchTerms).then(
             (results) => {
-                const views: ViewObject[] = []
+                let viewKeys = {}
+
                 results.forEach((result) => {
-                    views.push(...result.elements)
+                    viewKeys = _(viewKeys).merge(_.keyBy(result.elements, 'id'))
                 })
+                const views = _(viewKeys).values().value() as ViewObject[]
                 deferred.resolve(this.cacheSvc.put(key, views))
                 delete this.inProgress[inProgKey]
             },
@@ -218,6 +220,7 @@ export class ViewService {
                 deferred.reject(reason)
             }
         )
+        return deferred.promise
     }
 
     /**

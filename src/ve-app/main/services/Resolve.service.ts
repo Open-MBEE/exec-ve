@@ -71,11 +71,6 @@ export class ResolveService {
         private permissionsSvc: PermissionsService
     ) {}
 
-    public decodeUrl(paramsOb: ParamsObject): VePromise<ParamsObject> {
-        if (!paramsOb.shortUrl) return
-        return this.shortenUrlSvc.decodeShortUrl(paramsOb.shortUrl)
-    }
-
     public getBanner(): VePromise<BrandingStyle, ProjectsResponse> {
         return this.brandingSvc.getBanner()
     }

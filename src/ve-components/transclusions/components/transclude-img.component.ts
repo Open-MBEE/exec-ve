@@ -107,7 +107,8 @@ export class TranscludeImgController
         this.checkCircular = true
     }
 
-    config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         this.$element.on('click', (e) => {
             if (this.mmsViewCtrl)
                 this.mmsViewCtrl.transcludeClicked(this.element)

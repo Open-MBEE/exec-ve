@@ -6,7 +6,7 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
     if (window.CKEDITOR && window.CKEDITOR.dom) return
     window.CKEDITOR ||
         (window.CKEDITOR = (function () {
-            var a = /(^|.*[\\\/])ckeditor\.js(?:\?.*|;.*)?$/i,
+            var a = /(^|.*[\\\/])ckeditor4\.js(?:\?.*|;.*)?$/i,
                 d = {
                     timestamp: 'M6K9',
                     version: '4.19.1',
@@ -375,7 +375,7 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
                     delete CKEDITOR.loadFullCore
                     var a = document.createElement('script')
                     a.type = 'text/javascript'
-                    a.src = CKEDITOR.basePath + 'ckeditor.js'
+                    a.src = CKEDITOR.basePath + 'ckeditor4.js'
                     document.getElementsByTagName('head')[0].appendChild(a)
                 }
             }

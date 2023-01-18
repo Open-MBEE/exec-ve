@@ -2,7 +2,7 @@ import { StateService } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
-import { RootScopeService } from '@ve-utils/services'
+import { RootScopeService, ShortenUrlService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
@@ -25,50 +25,77 @@ const ShortUrlComponent: VeComponentOptions = {
     </div>
 </div>
 `,
+    bindings: {
+        paramsOb: '<',
+    },
     controller: class ShortUrlController implements IComponentController {
-        private decodedUrl: ParamsObject
+        private paramsOb: ParamsObject
         public subs: Rx.IDisposable[]
 
+        decodedUrl: ParamsObject
         redirect_noResults: boolean = false
         spin: boolean = true
+        error: string = ''
 
-        static $inject = ['$state', 'RootScopeService']
+        static $inject = [
+            '$state',
+            'growl',
+            'ShortenUrlService',
+            'RootScopeService',
+        ]
 
         constructor(
             private $state: StateService,
+            private growl: angular.growl.IGrowlService,
+            private shortenUrlSvc: ShortenUrlService,
             private rootScopeSvc: RootScopeService
         ) {}
 
         $onInit(): void {
             this.rootScopeSvc.veTitle('Redirecting... | View Editor') //what to name this?
-
-            if (this.decodedUrl) {
-                if (this.decodedUrl.viewId) {
-                    void this.$state.go(
-                        'main.project.ref.document.view',
-                        this.decodedUrl
-                    )
-                    return
-                }
-                if (this.decodedUrl.documentId) {
-                    void this.$state.go(
-                        'main.project.ref.document',
-                        this.decodedUrl
-                    )
-                    return
-                }
-                if (this.decodedUrl.refId) {
-                    void this.$state.go(
-                        'main.project.ref.portal',
-                        this.decodedUrl
-                    )
-                    return
-                }
-                if (this.decodedUrl.projectId) {
-                    void this.$state.go('main.project.refs', this.decodedUrl)
-                    return
-                }
+            if (this.paramsOb && this.paramsOb.shortUrl) {
+                this.shortenUrlSvc.decodeShortUrl(this.paramsOb.shortUrl).then(
+                    (result) => {
+                        this.decodedUrl = result
+                        if (this.decodedUrl.viewId) {
+                            void this.$state.go(
+                                'main.project.ref.document.view',
+                                this.decodedUrl
+                            )
+                            return
+                        }
+                        if (this.decodedUrl.documentId) {
+                            void this.$state.go(
+                                'main.project.ref.document',
+                                this.decodedUrl
+                            )
+                            return
+                        }
+                        if (this.decodedUrl.refId) {
+                            void this.$state.go(
+                                'main.project.ref.portal',
+                                this.decodedUrl
+                            )
+                            return
+                        }
+                        if (this.decodedUrl.projectId) {
+                            void this.$state.go(
+                                'main.project.refs',
+                                this.decodedUrl
+                            )
+                            return
+                        }
+                    },
+                    (reason) => {
+                        this.spin = false
+                        this.redirect_noResults = true
+                        this.growl.error(reason.message)
+                    }
+                )
             } else {
+                this.spin = false
+                this.redirect_noResults = true
+                this.growl.error('No short URL found.')
             }
         }
 

@@ -49,10 +49,10 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
  * Allows the setting of an Autosave key.
  * ### Example
  * <pre>
-   <ve-editor ng-model="element.documentation"></ve-editor>
+   <editor ng-model="element.documentation"></editor>
    </pre>
  */
-export class VeEditorController implements IComponentController {
+export class EditorController implements IComponentController {
     private veConfig: VeConfig = window.__env
     private ckEditor = window.CKEDITOR
 
@@ -101,7 +101,7 @@ export class VeEditorController implements IComponentController {
         'growl',
         'CacheService',
         'ElementService',
-        'UtilsService',
+        'ApiService',
         'ViewService',
         'URLService',
         'MentionService',
@@ -374,7 +374,7 @@ export class VeEditorController implements IComponentController {
                 const highlightActiveEditor = (
                     instance: CKEDITOR.editor
                 ): void => {
-                    const activeEditorClass = 'active-editor'
+                    const activeEditorClass = 'actieditor'
                     $('transclude-doc')
                         .children('div')
                         .removeClass(activeEditorClass)
@@ -919,7 +919,7 @@ export class VeEditorController implements IComponentController {
     }
 }
 
-const veEditorComponent: VeComponentOptions = {
+const EditorComponent: VeComponentOptions = {
     selector: 'editor',
     template: `<textarea id="{{$ctrl.id}}"></textarea>`,
     require: {
@@ -933,7 +933,7 @@ const veEditorComponent: VeComponentOptions = {
         mmsEditorType: '@',
         mmsEditorApi: '<?',
     },
-    controller: VeEditorController,
+    controller: EditorController,
 }
 
-veCore.component(veEditorComponent.selector, veEditorComponent)
+veCore.component(EditorComponent.selector, EditorComponent)

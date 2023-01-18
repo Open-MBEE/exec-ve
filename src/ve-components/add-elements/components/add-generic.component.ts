@@ -166,7 +166,7 @@ const AddGenericComponent: VeComponentOptions = {
             </div>
             <div class="form-group">
                 <label class="label-documentation">Documentation</label>
-                <ve-editor ng-model="$ctrl.newE.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></ve-editor>
+                <editor ng-model="$ctrl.newE.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>

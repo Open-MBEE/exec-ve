@@ -203,7 +203,6 @@ export class ButtonBarApi {
                         button.dropdown_toggle_icon
                     ) {
                         button.dropdown_icon = button.dropdown_toggle_icon
-                        button.tooltip = button.toggle_tooltip
                     } else {
                         button.dropdown_icon = button.dropdown_icon_original
                     }

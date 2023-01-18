@@ -35,7 +35,7 @@ export interface IButtonBarButton {
 }
 
 export interface buttonActionFn {
-    (event?: angular.IAngularEvent): void
+    (event?: JQuery.ClickEvent): void
 }
 
 export interface buttonInitFn {
@@ -520,8 +520,8 @@ export class ButtonBarService {
                         tooltip: 'Share Short URL',
                         spinner: false,
                         toggleable: false,
-                        action: (): void => {
-                            this.eventSvc.$broadcast(button)
+                        action: (e: JQuery.ClickEvent): void => {
+                            this.eventSvc.$broadcast(button, e)
                         },
                     }
                 case 'center-previous':
@@ -559,7 +559,7 @@ export class ButtonBarService {
                         tooltip: 'Export',
                         button_content: 'Export',
                         spinner: false,
-                        toggleable: false,
+                        toggleable: true,
                         action: (): void => {
                             this.eventSvc.$broadcast(button)
                         },
@@ -567,6 +567,9 @@ export class ButtonBarService {
                             this.getButtonBarButton('word'),
                             this.getButtonBarButton('tabletocsv'),
                         ],
+                        dropdown_toggleable: true,
+                        dropdown_icon: 'fa-solid fa-plus',
+                        dropdown_toggle_icon: 'fa-solid fa-minus',
                     }
                 case 'print':
                     return {
@@ -598,7 +601,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-file-word',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Export to Word',
                         spinner: false,
@@ -611,7 +614,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-table',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Table to CSV',
                         spinner: false,

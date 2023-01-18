@@ -6,6 +6,7 @@ import Rx from 'rx-lite'
 import { ViewPresentationElemController } from '@ve-components/presentations/view-pe.component'
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
+import { SpecTool } from '@ve-components/spec-tools'
 import {
     ButtonBarApi,
     ButtonBarService,
@@ -110,6 +111,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     //Required Controllers
     protected mmsViewCtrl: ViewController
     protected mmsViewPresentationElemCtrl: ViewPresentationElemController
+    protected mmsSpecEditorCtrl: SpecTool
 
     //Bindings
     mmsElementId: string
@@ -138,9 +140,9 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected refId: string
 
     public editorApi: EditingApi = {}
-    public isEditing: boolean
+    public isEditing: boolean = false
     public inPreviewMode: boolean
-    public elementSaving: boolean
+    public elementSaving: boolean = false
     public skipBroadcast: boolean
     protected clearWatch: boolean = false
 
@@ -162,6 +164,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected $transcludeEl: JQuery<HTMLElement>
 
     protected template: string | Injectable<(...args: unknown[]) => string>
+    protected editTemplate: string | Injectable<(...args: unknown[]) => string>
 
     public bbApi: ButtonBarApi
     public bars: string[]
@@ -224,7 +227,61 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                     'please see the release documentation for further details'
             )
         }
-        this.config()
+        let editable = false
+        if (this.mmsViewCtrl) {
+            this.view = this.mmsViewCtrl.getView()
+            editable = this.mmsViewCtrl.isEditable()
+            this.isDirectChildOfPresentationElement =
+                this.componentSvc.isDirectChildOfPresentationElementFunc(
+                    this.$element,
+                    this.mmsViewCtrl
+                )
+        }
+
+        if (
+            this.mmsSpecEditorCtrl &&
+            this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId
+        ) {
+            editable = this.mmsSpecEditorCtrl.specSvc.editable
+        }
+
+        if (!this.nonEditable && this.editTemplate) {
+            this.save = (e: JQuery.ClickEvent): void => {
+                e.stopPropagation()
+                this.componentSvc.saveAction(this, this.$element, false)
+            }
+
+            this.saveC = (): void => {
+                this.componentSvc.saveAction(this, this.$element, true)
+            }
+
+            this.cancel = (e: JQuery.ClickEvent): void => {
+                e.stopPropagation()
+                this.componentSvc.cancelAction(
+                    this,
+                    this.recompile,
+                    this.$element
+                )
+            }
+
+            this.startEdit = (): void => {
+                this.componentSvc.startEdit(
+                    this,
+                    editable,
+                    this.$element,
+                    this.editTemplate,
+                    false
+                )
+            }
+
+            this.preview = (): void => {
+                this.componentSvc.previewAction(
+                    this,
+                    this.recompile,
+                    this.$element
+                )
+            }
+        }
     }
 
     $onDestroy(): void {
@@ -240,15 +297,6 @@ export class Transclusion implements ITransclusion, EditingToolbar {
 
     $postLink(): void {
         this.changeAction(this.mmsElementId, '', false)
-    }
-
-    /**
-     * @name veComponents/Transclusion#config
-     *     *
-     * @protected
-     */
-    protected config: () => void = () => {
-        /* Implement custom initialization logic here */
     }
 
     /**
