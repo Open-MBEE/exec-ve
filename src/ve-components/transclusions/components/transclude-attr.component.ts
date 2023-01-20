@@ -115,11 +115,20 @@ export class TranscludeAttrController
             else if (Array.isArray(this.element[this.mmsAttr])) {
                 ;(this.element[this.mmsAttr] as Array<unknown>).forEach(
                     (value) => {
-                        this.attrValues.push(
-                            `<span class="panel-body">${value.toString()}</span>`
-                        )
+                        if (typeof this.element[this.mmsAttr] === 'object') {
+                            value = JSON.stringify(value)
+                        }
+                        this.attrValues.push(`<span>${value.toString()}</span>`)
                     }
                 )
+            } else {
+                let value: string
+                if (typeof this.element[this.mmsAttr] === 'object') {
+                    value = JSON.stringify(this.element[this.mmsAttr])
+                } else {
+                    value = (this.element[this.mmsAttr] as unknown).toString()
+                }
+                this.attrValues.push(`<span>${value}</span>`)
             }
             // Convert referenced ids array to CF list
             if (ids.length > 0) {
@@ -127,7 +136,7 @@ export class TranscludeAttrController
                     this.attrValues.push(
                         `<transclude-name mms-element-id="${id}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" ${
                             this.noClick ? 'no-click="true"' : ''
-                        }}></transclude-name></br>`
+                        }}></transclude-name>`
                     )
                 })
             }
@@ -136,16 +145,15 @@ export class TranscludeAttrController
                 `<span class="no-print placeholder">(empty)</span>`
             )
         }
+        if (this.mmsCfLabel) {
+            contentTemplate = `<h2 class="prop-title">{{$ctrl.mmsAttr}}</h2>`
+        }
 
-        let defaultTemplate = `
-        <div ng-hide="$ctrl.hideName" class="panel-heading">
-        {{$ctrl.mmsAttr}}: 
-        </div>
-`
-        this.attrValues.forEach((value) => {
-            defaultTemplate += value
+        this.attrValues.forEach((value, index) => {
+            const sep = index == this.attrValues.length - 1 ? '' : ', '
+            contentTemplate += `${value}${this.mmsCfLabel ? '</br>' : sep}`
         })
-        deferred.resolve(defaultTemplate)
+        deferred.resolve(contentTemplate)
 
         return deferred.promise
     }
@@ -162,7 +170,6 @@ export const TranscludeNameComponent: VeComponentOptions = {
         mmsCommitId: '@',
         mmsWatchId: '@',
         mmsCfLabel: '@',
-        hideName: '@',
         noClick: '<',
     },
     transclude: true,

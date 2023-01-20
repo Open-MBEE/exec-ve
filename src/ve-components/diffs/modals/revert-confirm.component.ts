@@ -152,16 +152,16 @@ const RevertConfirmComponent: VeComponentOptions = {
     <h3>Preview Element</h3>
     <div class="element-preview-box">
         <h1 class="prop element-title">
-            <mms-cf mms-cf-type="name" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></mms-cf>
+            <cross-reference mms-cf-type="name" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></cross-reference>
         </h1>
         <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
         <p ng-show="!$ctrl.showDocHTML" class="doc-text">
-            <mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></mms-cf>
+            <cross-reference mms-cf-type="doc" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></cross-reference>
         </p>
         <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
         <h2 class="prop-title">Property Value</h2>
         <span class="prop">
-            <mms-cf mms-cf-type="val" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></mms-cf>
+            <cross-reference mms-cf-type="val" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></cross-reference>
         </span></div>
     </div>
 </div>

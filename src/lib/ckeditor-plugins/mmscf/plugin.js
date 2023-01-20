@@ -15,7 +15,7 @@ CKEDITOR.plugins.add('mmscf', {
 
             allowedContent:
                 'mms-cf[*];mms-transclude-doc[*];mms-transclude-val[*];mms-transclude-name[*];' +
-                'transclusion[*];transclude[*];',
+                'cross-reference[*];transclude[*];',
             inline: true,
             insert: () => {
                 var defaultConfig = {
@@ -37,7 +37,8 @@ CKEDITOR.plugins.add('mmscf', {
                 return (
                     new RegExp(`(mms-)?transclude-[a-z]*`).test(element.name) ||
                     element.name === 'mms-cf' ||
-                    element.name === 'transclusion'
+                    element.name === 'transclusion' ||
+                    element.name === 'cross-reference'
                 )
             },
         })

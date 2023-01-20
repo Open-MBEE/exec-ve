@@ -234,9 +234,9 @@ export class ViewHtmlService {
         } else if (thing.type === 'List') {
             return this.makeHtmlList(thing as PresentListObject)
         } else if (thing.type === 'Image') {
-            return `<mms-cf mms-cf-type="img" mms-element-id="${
+            return `<cross-reference mms-cf-type="img" mms-element-id="${
                 (thing as PresentImageObject).id
-            }"></mms-cf>`
+            }"></cross-reference>`
         }
     }
 }

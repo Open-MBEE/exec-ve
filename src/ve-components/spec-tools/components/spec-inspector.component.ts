@@ -195,7 +195,7 @@ const SpecInspectorComponent: VeComponentOptions = {
         </div>
         <h2 class="prop-title spec-view-doc-heading">Documentation <a ng-click="$ctrl.showDocHTML = !$ctrl.showDocHTML"><i class="fa fa-code"></i></a></h2>
         <p ng-show="!$ctrl.showDocHTML" class="doc-text">
-            <mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}" mms-watch-id="true"></mms-cf>
+            <cross-reference mms-cf-type="doc" mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}" mms-watch-id="true"></cross-reference>
         </p>
         <div ng-show="$ctrl.showDocHTML">{{$ctrl.element.documentation}}</div>
 

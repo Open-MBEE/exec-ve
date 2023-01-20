@@ -2,7 +2,7 @@ import angular, { IComponentController } from 'angular'
 
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
-import { TransclusionController } from '@ve-components/transclusions/transclusion.component'
+import { CrossReferenceController } from '@ve-components/transclusions/cross-reference.component'
 import {
     ApiService,
     ElementService,
@@ -49,7 +49,7 @@ class ViewLinkController implements IComponentController {
     showName: boolean
 
     // Controllers
-    private mmsCfCtrl: TransclusionController
+    private mmsCfCtrl: CrossReferenceController
     private mmsViewCtrl: ViewController
 
     // Locals

@@ -206,8 +206,8 @@ export class TranscludeDocController
                 this.panelType +
                 ')</p>'
         }
-        doc = doc.replace(this.fixPreSpanRegex, '<mms-cf')
-        doc = doc.replace(this.fixPostSpanRegex, '</mms-cf>')
+        doc = doc.replace(this.fixPreSpanRegex, '<cross-reference')
+        doc = doc.replace(this.fixPostSpanRegex, '</cross-reference>')
         doc = doc.replace(this.spacePeriod, '>.')
         doc = doc.replace(this.spaceSpace, '> ')
         doc = doc.replace(this.spaceComma, '>,')

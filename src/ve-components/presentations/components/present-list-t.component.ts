@@ -7,7 +7,7 @@ import { InstanceSpecObject, PresentationInstanceObject } from '@ve-types/mms'
 
 const PresentListTComponent: IPresentationComponentOptions = {
     selector: 'presentListT',
-    template: `<mms-cf mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></mms-cf>
+    template: `<cross-reference mms-cf-type="doc" mms-element-id="{{$ctrl.peObject.source}}"></cross-reference>
 `,
     bindings: {
         peObject: '<',

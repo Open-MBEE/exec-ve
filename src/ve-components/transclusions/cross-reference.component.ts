@@ -27,7 +27,7 @@ import { RequestObject } from '@ve-types/mms'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  */
 
-export class TransclusionController implements IComponentController {
+export class CrossReferenceController implements IComponentController {
     //Bindings
     mmsElementId: string
     mmsProjectId: string
@@ -41,7 +41,7 @@ export class TransclusionController implements IComponentController {
     mmsCfLabel: boolean
 
     //Deps
-    transclusionCtrl: TransclusionController
+    transclusionCtrl: CrossReferenceController
     mmsViewCtrl: ViewController
 
     //Local
@@ -132,7 +132,7 @@ export class TransclusionController implements IComponentController {
                             : '') +
                         (this.mmsAttr ? ' mms-attr={{$ctrl.mmsAttr}}' : '') +
                         (typeof this.mmsCfLabel !== 'undefined'
-                            ? ' mms-cf-label="{{$ctrl.templateElementHtml}}'
+                            ? ' mms-cf-label={{$ctrl.mmsCfLabel}}'
                             : '') +
                         ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable"></' +
                         tag +
@@ -145,8 +145,8 @@ export class TransclusionController implements IComponentController {
     }
 }
 
-const TransclusionComponent: VeComponentOptions = {
-    selector: 'transclusion',
+const CrossReferenceComponent: VeComponentOptions = {
+    selector: 'crossReference',
     template: `<div></div>`,
     transclude: true,
     bindings: {
@@ -165,9 +165,10 @@ const TransclusionComponent: VeComponentOptions = {
         transclusionCtrl: '?^^transclusion',
         mmsViewCtrl: '?^^view',
     },
-    controller: TransclusionController,
+    controller: CrossReferenceController,
 }
 
 veComponents
-    .component(TransclusionComponent.selector, TransclusionComponent)
-    .component('mmsCf', TransclusionComponent)
+    .component(CrossReferenceComponent.selector, CrossReferenceComponent)
+    .component('mmsCf', CrossReferenceComponent)
+    .component('transclusion', CrossReferenceComponent)

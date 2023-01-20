@@ -351,7 +351,9 @@ export class UtilsService {
             capEq.html(equationCap)
             // If caption does not exist, add to html
             if (capEq.length === 0) {
-                el.find('mms-view-equation > mms-cf > transclude-doc > p')
+                el.find(
+                    'present-equation > cross-reference > transclude-doc > p'
+                )
                     .last()
                     .append(
                         '<span class="caption-type-equation pull-right">' +

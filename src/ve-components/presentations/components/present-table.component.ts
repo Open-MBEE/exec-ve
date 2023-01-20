@@ -582,7 +582,7 @@ class PresentTableController extends Presentation implements IPresentation {
         } else if (!containerDivContent.prop('tagName')) {
             return cell.text().trim()
         } else {
-            const cf = 'mms-cf'
+            const cf = 'cross-reference'
             const contentTag: string = (
                 containerDivContent.prop('tagName') as object
             )

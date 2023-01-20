@@ -118,8 +118,8 @@ export interface TranscludeScope extends IPaneScope {
  */
 export class Transclusion implements ITransclusion, EditingToolbar {
     //Regex
-    fixPreSpanRegex: RegExp = /<\/span>\s*<mms-cf/g
-    fixPostSpanRegex: RegExp = /<\/mms-cf>\s*<span[^>]*>/g
+    fixPreSpanRegex: RegExp = /<\/span>\s*<cross-reference/g
+    fixPostSpanRegex: RegExp = /<\/cross-reference>\s*<span[^>]*>/g
     emptyRegex: RegExp = /^\s*$/
     spacePeriod: RegExp = />(?:\s|&nbsp;)\./g
     spaceSpace: RegExp = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g
