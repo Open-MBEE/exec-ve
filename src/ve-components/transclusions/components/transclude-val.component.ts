@@ -2,8 +2,12 @@ import angular from 'angular'
 import $ from 'jquery'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { SpecService, SpecTool } from '@ve-components/spec-tools'
-import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import { SpecTool } from '@ve-components/spec-tools'
+import {
+    ITransclusion,
+    ITransclusionComponentOptions,
+    Transclusion,
+} from '@ve-components/transclusions'
 import {
     ButtonBarApi,
     ButtonBarService,
@@ -20,7 +24,7 @@ import {
 
 import { PropertySpec, veComponents } from '@ve-components'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeQService } from '@ve-types/angular'
 import { SlotObject, ValueObject } from '@ve-types/mms'
 
 /**
@@ -71,7 +75,7 @@ export class TranscludeValController
     protected buttons: IButtonBarButton[] = []
 
     //Templates
-    valTemplate = `
+    template = `
     <span ng-repeat="value in $ctrl.values | limitTo: ($ctrl.first ? 1 : $ctrl.values.length)" ng-switch on="value.type">
     <span ng-switch-when="LiteralInteger">{{::value.value}}</span>
     <span ng-switch-when="LiteralBoolean">{{::value.value}}</span>
@@ -180,7 +184,7 @@ export class TranscludeValController
 </div>
 `
 
-    static $inject = [...Transclusion.$inject, 'SpecService']
+    static $inject = [...Transclusion.$inject]
 
     constructor(
         $q: VeQService,
@@ -197,8 +201,7 @@ export class TranscludeValController
         mathJaxSvc: MathJaxService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
-        imageSvc: ImageService,
-        private specSvc: SpecService
+        imageSvc: ImageService
     ) {
         super(
             $q,
@@ -226,6 +229,8 @@ export class TranscludeValController
     $onInit(): void {
         super.$onInit()
         this.$element.on('click', (e) => {
+            if (this.noClick) return
+
             if (this.startEdit && !this.nonEditable) {
                 this.startEdit()
             }
@@ -242,22 +247,9 @@ export class TranscludeValController
             e.stopPropagation()
         })
 
-        if (this.mmsViewCtrl) {
-            this.isDirectChildOfPresentationElement =
-                this.componentSvc.isDirectChildOfPresentationElementFunc(
-                    this.$element,
-                    this.mmsViewCtrl
-                )
-            this.view = this.mmsViewCtrl.getView()
-
-            this.startEdit = (): void => {
-                this._startEdit(this.mmsViewCtrl.isEditable())
-            }
-        }
-        if (this.mmsSpecEditorCtrl) {
-            this.startEdit = (): void => {
-                this._startEdit(this.specSvc.editable)
-            }
+        //Custom Start Edit functions
+        this.startEdit = (): void => {
+            this._startEdit(this.editable())
         }
     }
 
@@ -327,7 +319,7 @@ export class TranscludeValController
                 if (this.first) {
                     this.values = [this.values[0]]
                 }
-                deferred.resolve(this.valTemplate)
+                deferred.resolve(this.template)
             }
         }
         return deferred.promise
@@ -335,7 +327,7 @@ export class TranscludeValController
 
     protected recompile = (preview?: boolean): void => {
         if (!this.nonEditable && this.mmsSpecEditorCtrl && !this.edit) {
-            this._startEdit(this.specSvc.editable)
+            this._startEdit(this.editable())
         } else {
             super.recompile(preview)
         }
@@ -401,7 +393,7 @@ export class TranscludeValController
     }
 }
 
-export const TranscludeValComponent: VeComponentOptions = {
+export const TranscludeValComponent: ITransclusionComponentOptions = {
     selector: 'transcludeVal',
     template: `<div></div>`,
     bindings: {
@@ -410,9 +402,11 @@ export const TranscludeValComponent: VeComponentOptions = {
         mmsRefId: '@',
         mmsCommitId: '@',
         nonEditable: '<',
+        noClick: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',
         mmsCallback: '&',
+        mmsWatchId: '<',
         first: '<',
     },
     transclude: true,

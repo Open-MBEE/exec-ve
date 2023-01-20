@@ -129,36 +129,6 @@ export class TranscludeEnumController
             this.mmsViewCtrl.transcludeClicked(this.element)
             e.stopPropagation()
         })
-
-        if (this.mmsViewCtrl) {
-            this.isEditing = false
-            this.elementSaving = false
-            this.view = this.mmsViewCtrl.getView()
-
-            this.save = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
-                this.componentSvc.saveAction(this, this.$element, false)
-            }
-
-            this.cancel = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
-                this.componentSvc.cancelAction(
-                    this,
-                    this.recompile,
-                    this.$element
-                )
-            }
-
-            this.startEdit = (): void => {
-                this.componentSvc.startEdit(
-                    this,
-                    this.mmsViewCtrl.isEditable(),
-                    this.$element,
-                    TranscludeEnumComponent.template,
-                    false
-                )
-            }
-        }
     }
 
     public getContent = (
@@ -304,6 +274,7 @@ export const TranscludeEnumComponent: VeComponentOptions = {
     transclude: true,
     require: {
         mmsViewCtrl: '?^^view',
+        mmsSpecEditor: '?^^specEditor',
     },
     controller: TranscludeEnumController,
 }

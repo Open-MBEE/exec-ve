@@ -1,7 +1,11 @@
 import angular from 'angular'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import {
+    ITransclusion,
+    ITransclusionComponentOptions,
+    Transclusion,
+} from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { ElementService, AuthService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
@@ -14,7 +18,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject, LiteralObject, SlotObject } from '@ve-types/mms'
 
 /**
@@ -98,8 +102,7 @@ export class TranscludeNameController
 
     $onInit(): void {
         super.$onInit()
-        if (typeof this.mmsLinkText === 'undefined')
-            this.mmsLinkText = this.mmsCfLabel ? this.mmsCfLabel : 'Link'
+        if (typeof this.mmsLinkText === 'undefined') this.mmsLinkText = 'Link'
     }
 
     public getContent = (): VePromise<string | HTMLElement[], string> => {
@@ -133,7 +136,7 @@ export class TranscludeNameController
     }
 }
 
-export const TranscludeValueLinkComponent: VeComponentOptions = {
+export const TranscludeValueLinkComponent: ITransclusionComponentOptions = {
     selector: 'transcludeValueLink',
     template: `
     <div></div>
@@ -143,7 +146,7 @@ export const TranscludeValueLinkComponent: VeComponentOptions = {
         mmsProjectId: '@',
         mmsRefId: '@',
         mmsCommitId: '@',
-        mmsWatchId: '@',
+        mmsWatchId: '<',
         mmsCfLabel: '@',
         mmsLinkText: '@',
     },

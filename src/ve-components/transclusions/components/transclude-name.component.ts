@@ -65,7 +65,6 @@ export class TranscludeNameController
 `
 
     //Locals
-    noClick: unknown | undefined
     clickHandler: () => void
     mmsSpecEditorCtrl: SpecTool
 
@@ -141,9 +140,9 @@ export class TranscludeNameController
     ): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string>()
         const defaultTemplate =
-            '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">(no name)</span>'
+            '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
         const editTemplate =
-            '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">(no name)</span>'
+            '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
         if (preview) {
             deferred.resolve(
                 '<div class="panel panel-info">' + editTemplate + '</div>'

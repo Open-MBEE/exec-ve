@@ -3,10 +3,10 @@ import $ from 'jquery'
 import _ from 'lodash'
 
 import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
+import { SaveConflictResolveFn } from '@ve-components/diffs'
 import { ViewController } from '@ve-components/presentations'
 import { ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarApi } from '@ve-core/button-bar'
-import { SaveConflictResolveFn } from '@ve-core/diff-merge'
 import {
     ApiService,
     AuthService,

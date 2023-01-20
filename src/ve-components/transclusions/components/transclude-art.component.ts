@@ -1,7 +1,11 @@
 import angular from 'angular'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { Transclusion, ITransclusion } from '@ve-components/transclusions'
+import {
+    Transclusion,
+    ITransclusion,
+    ITransclusionComponentOptions,
+} from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import {
     ElementService,
@@ -18,7 +22,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 
 /**
  * @ngdoc component
@@ -156,7 +160,7 @@ export class TranscludeArtController
     }
 }
 
-export const TranscludeArtComponent: VeComponentOptions = {
+export const TranscludeArtComponent: ITransclusionComponentOptions = {
     selector: 'transcludeArt',
     template: `<div></div>`,
     bindings: {
@@ -164,7 +168,7 @@ export const TranscludeArtComponent: VeComponentOptions = {
         mmsProjectId: '@',
         mmsRefId: '@',
         mmsCommitId: '@',
-        mmsWatchId: '@',
+        mmsWatchId: '<',
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',

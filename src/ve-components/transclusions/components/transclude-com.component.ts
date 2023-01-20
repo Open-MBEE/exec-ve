@@ -1,7 +1,11 @@
 import angular from 'angular'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import { ITransclusion, Transclusion } from '@ve-components/transclusions'
+import {
+    ITransclusion,
+    ITransclusionComponentOptions,
+    Transclusion,
+} from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { AuthService, ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
@@ -14,7 +18,7 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 
 /**
  * @ngdoc directive
@@ -250,7 +254,7 @@ export class TranscludeComController
     }
 }
 
-export const TranscludeComComponent: VeComponentOptions = {
+export const TranscludeComComponent: ITransclusionComponentOptions = {
     selector: 'transcludeCom',
     template: `<div></div>`,
     bindings: {
@@ -258,7 +262,7 @@ export const TranscludeComComponent: VeComponentOptions = {
         mmsProjectId: '@',
         mmsRefId: '@',
         mmsCommitId: '@',
-        mmsWatchId: '@',
+        mmsWatchId: '<',
         nonEditable: '<',
         mmsCfLabel: '@',
         mmsGenerateForDiff: '<',

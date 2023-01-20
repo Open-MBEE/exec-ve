@@ -1,7 +1,7 @@
 import angular from 'angular'
 import _ from 'lodash'
 
-import { Commit, CompareData } from '@ve-core/diff-merge'
+import { Commit, CompareData } from '@ve-components/diffs'
 import { ElementService } from '@ve-utils/mms-api-client'
 import { EventService } from '@ve-utils/services'
 

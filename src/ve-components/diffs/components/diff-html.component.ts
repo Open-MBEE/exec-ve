@@ -1,19 +1,16 @@
 import angular from 'angular'
 
-import { handleChange, onChangesCallback } from '@ve-utils/utils'
+import {
+    Diff,
+    IDiff,
+    IDiffComponentOptions,
+} from '@ve-components/diffs/diff.controller'
 
 import { veCore } from '@ve-core'
 
 import { HtmlRenderedDiff } from '../../../lib/html-rendered-diff'
 
-import { VeComponentOptions } from '@ve-types/angular'
-
-export class MmsHtmlDiffController implements angular.IComponentController {
-    // Bindings
-    mmsBaseHtml: string
-    mmsComparedHtml: string
-    public mmsDiffFinish?(): void
-
+class DiffHtmlController extends Diff<string> implements IDiff<string> {
     private htmlRenderedDiff: HtmlRenderedDiff
     htmlDiffIdPrefix: string = 'htmlDiff-'
     htmlDiffId: string
@@ -22,10 +19,11 @@ export class MmsHtmlDiffController implements angular.IComponentController {
     static $inject = ['$scope', '$timeout', 'growl']
 
     constructor(
-        private $scope: angular.IScope,
-        private $timeout: angular.ITimeoutService,
-        private growl: angular.growl.IGrowlService
+        $scope: angular.IScope,
+        $timeout: angular.ITimeoutService,
+        growl: angular.growl.IGrowlService
     ) {
+        super($scope, $timeout, growl)
         this.htmlRenderedDiff = window.HtmlRenderedDiff
     }
 
@@ -33,33 +31,10 @@ export class MmsHtmlDiffController implements angular.IComponentController {
         this.htmlDiffId = `${this.htmlDiffIdPrefix}${this.$scope.$id}`
     }
 
-    $onChanges(onChangesObj: angular.IOnChangesObject): void {
-        handleChange(onChangesObj, 'mmsBaseHtml', this.changeAction)
-        handleChange(onChangesObj, 'mmsComparedHtml', this.changeAction)
-    }
-
-    $postLink(): void {
-        if (this.mmsComparedHtml && this.mmsBaseHtml)
-            this._performDiff(this.mmsBaseHtml, this.mmsComparedHtml)
-    }
-
-    public changeAction: onChangesCallback<string> = (
-        newBaseHtml,
-        oldBaseHtml
-    ) => {
-        if (
-            this.mmsComparedHtml &&
-            this.mmsBaseHtml &&
-            newBaseHtml !== oldBaseHtml
-        ) {
-            this._performDiff(this.mmsBaseHtml, this.mmsComparedHtml)
-        }
-    }
-
-    private _performDiff = (baseHtml: string, comparedHtml: string): void => {
+    protected performDiff = (): void => {
         this.diffResult = this.htmlRenderedDiff.generateDiff(
-            MmsHtmlDiffController._preformatHtml(baseHtml),
-            MmsHtmlDiffController._preformatHtml(comparedHtml)
+            DiffHtmlController._preformatHtml(this.baseContent),
+            DiffHtmlController._preformatHtml(this.comparedContent)
         )
         this.$timeout(() => {
             const diffContainer = $('#' + this.htmlDiffId)
@@ -67,7 +42,7 @@ export class MmsHtmlDiffController implements angular.IComponentController {
             this._formatRowDiff(diffContainer)
         }).then(
             () => {
-                if (this.mmsDiffFinish) this.mmsDiffFinish()
+                if (this.diffCallback) this.diffCallback()
             },
             () => {
                 this.growl.error('Problem performing diff.')
@@ -113,18 +88,19 @@ export class MmsHtmlDiffController implements angular.IComponentController {
     }
 }
 
-const MmsHtmlDiffComponent: VeComponentOptions = {
-    selector: 'mmsHtmlDiff',
+const DiffHtmlComponent: IDiffComponentOptions = {
+    selector: 'diffHtml',
     template: `
     <div id="{{$ctrl.htmlDiffId}}" class="htmlDiff" ng-bind-html="$ctrl.diffResult" ng-hide="$ctrl.spin"></div>
     <i class="fa fa-spin fa-spinner" ng-show="$ctrl.spin"></i>
 `,
     bindings: {
-        mmsBaseHtml: '<',
-        mmsComparedHtml: '<',
-        mmsDiffFinish: '<',
+        baseContent: '<',
+        comparedContent: '<',
+        attr: '<',
+        diffCallback: '&',
     },
-    controller: MmsHtmlDiffController,
+    controller: DiffHtmlController,
 }
 
-veCore.component(MmsHtmlDiffComponent.selector, MmsHtmlDiffComponent)
+veCore.component(DiffHtmlComponent.selector, DiffHtmlComponent)

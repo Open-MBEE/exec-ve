@@ -1338,7 +1338,7 @@
 
 "@types/virtual-dom@^2.1.1":
   version "2.1.1"
-  resolved "https://registry.npmjs.org/@types/virtual-dom/-/virtual-dom-2.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/@types/virtual-dom/-/virtual-dom-2.1.1.tgz#c895327d55d7f340b11bbcd84c626c8d9d1f37af"
   integrity sha512-BPy2A3WXWL9RMoQQ0UQueKX93N/NL9KmlyNiSklj+Sbn91unDLcIUS00diWzV32N9CD7rRUrXE9VIzqMAZ3Wcg==
 
 "@types/webpack@^5.28.0":
@@ -3359,7 +3359,7 @@ fastq@^1.6.0:
   dependencies:
     reusify "^1.0.4"
 
-favicons-webpack-plugin@^6.2.2:
+favicons-webpack-plugin@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/favicons-webpack-plugin/-/favicons-webpack-plugin-6.0.0.tgz#a54777103e98ad64929e3ed5fbcafe6b3bae357c"
   integrity sha512-wryICW2NjR9BORYjP1PN3CDbjVzXDxcemLMWQBdLJGhZlj0sYF7NNq+ddQtO/YJvBurYQ3YR1df5uXZRmcF9hw==

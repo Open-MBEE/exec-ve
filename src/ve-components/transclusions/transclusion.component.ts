@@ -37,6 +37,8 @@ export class TransclusionController implements IComponentController {
     mmsWatchId: string
     nonEditable: boolean
     mmsGenerateForDiff: boolean
+    mmsAttr: string
+    mmsCfLabel: boolean
 
     //Deps
     transclusionCtrl: TransclusionController
@@ -50,7 +52,6 @@ export class TransclusionController implements IComponentController {
     extType: string = 'transclusion'
 
     static $inject = ['$compile', '$scope', '$element', 'ExtensionService']
-    private templateElementHtml: any
 
     protected $transcludeEl: JQuery
 
@@ -127,9 +128,13 @@ export class TransclusionController implements IComponentController {
                     '<' +
                         tag +
                         (this.mmsGenerateForDiff
-                            ? ' mms-generate-for-diff-merge="mmsGenerateForDiff" '
+                            ? ' mms-generate-for-diff="$ctrl.mmsGenerateForDiff"'
                             : '') +
-                        ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable" mms-cf-label="{{$ctrl.templateElementHtml}}"></' +
+                        (this.mmsAttr ? ' mms-attr={{$ctrl.mmsAttr}}' : '') +
+                        (typeof this.mmsCfLabel !== 'undefined'
+                            ? ' mms-cf-label="{{$ctrl.templateElementHtml}}'
+                            : '') +
+                        ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable"></' +
                         tag +
                         '>'
                 )
@@ -153,6 +158,8 @@ const TransclusionComponent: VeComponentOptions = {
         mmsWatchId: '@',
         nonEditable: '<',
         mmsGenerateForDiff: '<',
+        mmsAttr: '@',
+        mmsCfLabel: '@',
     },
     require: {
         transclusionCtrl: '?^^transclusion',

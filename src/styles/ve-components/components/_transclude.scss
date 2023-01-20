@@ -7,6 +7,7 @@
 
 /* Stylesheet for transclusion-related elements */
 transclude-doc,
+transclude-attr,
 transclude-val > span,
 transclude-name > span,
 transclude-val > p,
@@ -39,6 +40,7 @@ view.outline,
 view.editing {
   /* Transclusions borders when editing mode */
   transclude-doc,
+  transclude-attr,
   transclude-name > span,
   transclude-val > span,
   transclude-val > p {
@@ -55,6 +57,7 @@ view.editing {
   }
 
   transclude-doc,
+  transclude-attr,
   transclude-com {
     display: block;
 

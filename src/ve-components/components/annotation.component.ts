@@ -69,8 +69,7 @@ class AnnotationController implements angular.IComponentController {
         } else {
             displayContent = this._getContentIfElementNotFound(
                 this.mmsType,
-                this.mmsReqOb,
-                this.mmsCfLabel
+                this.mmsReqOb
             )
         }
         this.displayContent = displayContent
@@ -148,12 +147,11 @@ class AnnotationController implements angular.IComponentController {
 
     private _getContentIfElementNotFound(
         type: number,
-        reqOb: ElementsRequest<string>,
-        cfLabel: string
+        reqOb: ElementsRequest<string>
     ): AnnotationObject {
         const AT = this.extensionSvc.AnnotationType
         let inlineContent = ''
-        const label = cfLabel ? '(' + cfLabel + ')' : ''
+        const label = reqOb.elementId ? '(' + reqOb.elementId + ')' : ''
         switch (type) {
             case AT.mmsTranscludeName:
                 inlineContent = 'cf name' + label + ' does not exist'
@@ -227,7 +225,6 @@ const AnnotationComponent: VeComponentOptions = {
         mmsReqOb: '<',
         mmsRecentElement: '<',
         mmsType: '<',
-        mmsCfLabel: '<',
     },
     controller: AnnotationController,
 }

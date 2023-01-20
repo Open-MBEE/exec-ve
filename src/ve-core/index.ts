@@ -5,7 +5,6 @@
 import './ve-core.module'
 
 // Core Component Libraries
-import './diff-merge'
 import './button-bar'
 import './toolbar'
 import './editor'

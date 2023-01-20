@@ -22,7 +22,7 @@ import {
 } from '@ve-utils/services'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
 import { EditingToolbar, EditingApi } from '@ve-types/core/editor'
 import {
@@ -58,6 +58,23 @@ export interface ITransclusion
     addValue?(type: string): void
     removeVal?(i: number): void
     addEnumerationValue?(): void
+}
+
+export interface ITransclusionComponentOptions extends VeComponentOptions {
+    bindings: TranscludeDefaultBindings
+}
+
+interface TranscludeDefaultBindings {
+    mmsElementId: '@'
+    mmsProjectId: '@'
+    mmsRefId: '@'
+    mmsCommitId: '@'
+    mmsWatchId: '<'
+    mmsCfLabel: '@'
+    mmsGenerateForDiff?: '<'
+    noClick?: '<'
+    nonEditable?: '<'
+    [key: string]: string
 }
 
 export interface TranscludeScope extends IPaneScope {
@@ -120,7 +137,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     mmsCommitId: string
     mmsWatchId: string
     nonEditable: boolean
-    mmsCfLabel: string
+    noClick: boolean
+    mmsCfLabel: boolean
     mmsGenerateForDiff: boolean
     mmsCallback: () => void
 
@@ -132,6 +150,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
 
     //Locals
     protected isDirectChildOfPresentationElement: boolean
+    protected editable: () => boolean = () => false
 
     public subs: Rx.IDisposable[]
 
@@ -163,8 +182,12 @@ export class Transclusion implements ITransclusion, EditingToolbar {
 
     protected $transcludeEl: JQuery<HTMLElement>
 
+    // Possible templates to manage api functions
     protected template: string | Injectable<(...args: unknown[]) => string>
     protected editTemplate: string | Injectable<(...args: unknown[]) => string>
+    protected previewTemplate:
+        | string
+        | Injectable<(...args: unknown[]) => string>
 
     public bbApi: ButtonBarApi
     public bars: string[]
@@ -227,10 +250,9 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                     'please see the release documentation for further details'
             )
         }
-        let editable = false
         if (this.mmsViewCtrl) {
             this.view = this.mmsViewCtrl.getView()
-            editable = this.mmsViewCtrl.isEditable()
+            this.editable = this.mmsViewCtrl.isEditable
             this.isDirectChildOfPresentationElement =
                 this.componentSvc.isDirectChildOfPresentationElementFunc(
                     this.$element,
@@ -242,12 +264,12 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             this.mmsSpecEditorCtrl &&
             this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId
         ) {
-            editable = this.mmsSpecEditorCtrl.specSvc.editable
+            this.editable = (): boolean =>
+                this.mmsSpecEditorCtrl.specSvc.editable
         }
 
-        if (!this.nonEditable && this.editTemplate) {
+        if (this.editTemplate) {
             this.save = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
                 this.componentSvc.saveAction(this, this.$element, false)
             }
 
@@ -256,7 +278,6 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             }
 
             this.cancel = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
                 this.componentSvc.cancelAction(
                     this,
                     this.recompile,
@@ -267,7 +288,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             this.startEdit = (): void => {
                 this.componentSvc.startEdit(
                     this,
-                    editable,
+                    this.editable(),
                     this.$element,
                     this.editTemplate,
                     false
@@ -430,7 +451,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                     this.$element.empty()
                     //TODO: Add reason/errorMessage handling here.
                     this.$transcludeEl = $(
-                        '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type" mms-cf-label="::cfLabel"></annotation>'
+                        '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
                     )
                     this.$element.append(this.$transcludeEl)
                     this.$compile(this.$transcludeEl)(
@@ -438,7 +459,6 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                             reqOb: reqOb,
                             recentElement: reason.recentVersionOfElement,
                             type: this.extensionSvc.AnnotationType,
-                            cfLabel: this.mmsCfLabel,
                         })
                     )
                 }

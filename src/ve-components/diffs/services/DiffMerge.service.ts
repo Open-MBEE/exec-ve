@@ -1,7 +1,7 @@
 import angular from 'angular'
 import _ from 'lodash'
 
-import { RevertConfirmResolveFn } from '@ve-core/diff-merge'
+import { RevertConfirmResolveFn } from '@ve-components/diffs'
 import { ApiService, ElementService } from '@ve-utils/mms-api-client'
 
 import { veCore } from '@ve-core'

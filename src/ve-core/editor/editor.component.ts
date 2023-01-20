@@ -405,14 +405,19 @@ export class EditorController implements IComponentController {
                                     return
                                 }
 
-                                if (element.name.startsWith('mms-')) {
+                                if (
+                                    element.name.startsWith('transclude-') ||
+                                    element.name.startsWith('present-') ||
+                                    element.name.startsWith('view')
+                                ) {
                                     if (
                                         element.name !== 'view-link' &&
                                         element.name !== 'transclusion' &&
                                         element.name !==
                                             'transclude-group-docs' &&
-                                        element.name !== 'mms-diff-attr' &&
-                                        element.name !== 'mms-value-link'
+                                        element.name !==
+                                            'transclude-diff-attr' &&
+                                        element.name !== 'transclude-value-link'
                                     ) {
                                         element.replaceWithChildren()
                                         return

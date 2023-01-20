@@ -589,7 +589,7 @@ export class TreeApi {
 
                 tree_rows.push({
                     level: level,
-                    section: number,
+                    section: number ? number : '',
                     branch: branch,
                     label: branch.label,
                     visibleChild: haveVisibleChild,

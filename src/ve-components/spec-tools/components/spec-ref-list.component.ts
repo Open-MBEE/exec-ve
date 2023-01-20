@@ -1,9 +1,9 @@
 import angular from 'angular'
 import _ from 'lodash'
 
+import { MergeConfirmResolveFn } from '@ve-components/diffs'
 import { ComponentService } from '@ve-components/services'
 import { ISpecTool, SpecService, SpecTool } from '@ve-components/spec-tools'
-import { MergeConfirmResolveFn } from '@ve-core/diff-merge/modals/merge-confirm-modal.component'
 import { ToolbarService } from '@ve-core/toolbar'
 import {
     ApiService,
