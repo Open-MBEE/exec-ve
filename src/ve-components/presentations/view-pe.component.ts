@@ -3,7 +3,7 @@ import Rx from 'rx-lite'
 
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
-import { TreeApi, TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-core/tree'
 import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { EventService } from '@ve-utils/services'
 
@@ -44,7 +44,6 @@ export class ViewPresentationElemController implements IComponentController {
     private viewCtrl: ViewController
 
     public subs: Rx.IDisposable[]
-    private treeApi: TreeApi
 
     public presentationElemLoading: boolean
     public instanceSpec: InstanceSpecObject
@@ -82,7 +81,6 @@ export class ViewPresentationElemController implements IComponentController {
 
     $onInit(): void {
         this.presentationElemLoading = true
-        this.treeApi = this.treeSvc.getApi()
         this.eventSvc.$init(this)
 
         if (!this.mmsInstanceVal || !this.mmsInstanceVal.instanceId) {
@@ -118,9 +116,15 @@ export class ViewPresentationElemController implements IComponentController {
                     this.instanceSpec = instanceSpec
                     this.presentationElemLoading = false
                     //Init PeNumber
-                    if (this.treeApi.branch2viewNumber[this.instanceSpec.id]) {
+                    if (
+                        this.treeSvc.getApi('contents').branch2viewNumber[
+                            this.instanceSpec.id
+                        ]
+                    ) {
                         this.peNumber =
-                            this.treeApi.branch2viewNumber[this.instanceSpec.id]
+                            this.treeSvc.getApi('contents').branch2viewNumber[
+                                this.instanceSpec.id
+                            ]
                     }
                     const hash = this.$location.hash()
                     if (hash === instanceSpec.id) {
@@ -156,7 +160,7 @@ export class ViewPresentationElemController implements IComponentController {
                     $(newPe).append(
                         '<' +
                             tag +
-                            ' pe-object="::$ctrl.presentationElem" element="::$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
+                            ' pe-object="$ctrl.presentationElem" element="$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
                             '</' +
                             tag +
                             '>'
@@ -166,14 +170,13 @@ export class ViewPresentationElemController implements IComponentController {
                     this.subs.push(
                         this.eventSvc.$on(TreeService.events.UPDATED, () => {
                             if (
-                                this.treeApi.branch2viewNumber[
-                                    this.instanceSpec.id
-                                ]
+                                this.treeSvc.getApi('contents')
+                                    .branch2viewNumber[this.instanceSpec.id]
                             ) {
                                 this.peNumber =
-                                    this.treeApi.branch2viewNumber[
-                                        this.instanceSpec.id
-                                    ]
+                                    this.treeSvc.getApi(
+                                        'contents'
+                                    ).branch2viewNumber[this.instanceSpec.id]
                             }
                         })
                     )
@@ -186,10 +189,13 @@ export class ViewPresentationElemController implements IComponentController {
                                 ' invalid specification</span>'
                         )
                     } else {
-                        this.$element.html(
+                        this.$element.empty()
+
+                        const annotation = $(
                             '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
                         )
-                        this.$compile($(this.$element))(
+                        this.$element.append(annotation)
+                        this.$compile(annotation)(
                             Object.assign(this.$scope.$new(), {
                                 reqOb: reqOb,
                                 recentElement: reason.recentVersionOfElement,

@@ -3,14 +3,14 @@ import angular, { IComponentController } from 'angular'
 import _ from 'lodash'
 
 import { AppUtilsService } from '@ve-app/main/services'
-import { TreeService, TreeApi } from '@ve-core/tree'
+import { TreeService } from '@ve-core/tree'
 import { ViewService, ElementService } from '@ve-utils/mms-api-client'
 import { EventService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular'
-import { ViewObject } from '@ve-types/mms'
+import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { DocumentObject, ViewObject } from '@ve-types/mms'
 import {
     AngularUITree,
     TreeBranch,
@@ -33,7 +33,7 @@ import {
  */
 class ReorderController implements IComponentController {
     //bindings
-    private documentOb: ViewObject
+    private mmsDocument: VePromise<DocumentObject>
 
     //local
     protected doc: ViewObject
@@ -46,7 +46,6 @@ class ReorderController implements IComponentController {
     private saving: boolean = false
 
     //injectables
-    private treeApi: TreeApi
     public subs: Rx.IDisposable[]
 
     static $inject = [
@@ -74,48 +73,54 @@ class ReorderController implements IComponentController {
     ) {}
 
     $onInit(): void {
-        this.doc = this.documentOb
-        this.treeApi = this.treeSvc.getApi()
         this.eventSvc.$init(this)
 
-        const name = this.documentOb.name
-            ? this.documentOb.name
-            : this.documentOb.id
-        this.viewIds2node[this.documentOb.id] = {
-            label: name,
-            type: 'view',
-            data: this.documentOb,
-            aggr: 'composite',
-            children: [],
-        }
+        this.mmsDocument.then(
+            (doc) => {
+                this.doc = doc
+                const name = this.doc.name ? this.doc.name : this.doc.id
 
-        this.viewSvc
-            .handleChildViews(
-                this.documentOb,
-                'composite',
-                undefined,
-                this.documentOb._projectId,
-                this.documentOb._refId,
-                this.viewIds2node,
-                this.handleSingleView,
-                this.handleChildren
-            )
-            .then(
-                (docNode: TreeBranch) => {
-                    let num = 1
-                    docNode.children.forEach((node) => {
-                        this.updateNumber(node, `${num}`, 'old')
-                        this.updateNumber(node, `${num}`, 'new')
-                        num++
-                    })
-                    this.tree = [docNode]
-                },
-                (reason) => {
-                    this.growl.error(
-                        'Error Getting Child Views: ' + reason.message
-                    )
+                this.viewIds2node[this.doc.id] = {
+                    label: name,
+                    type: 'view',
+                    data: this.doc,
+                    aggr: 'composite',
+                    children: [],
                 }
-            )
+
+                this.viewSvc
+                    .handleChildViews(
+                        this.doc,
+                        'composite',
+                        undefined,
+                        this.doc._projectId,
+                        this.doc._refId,
+                        this.viewIds2node,
+                        this.handleSingleView,
+                        this.handleChildren
+                    )
+                    .then(
+                        (docNode: TreeBranch) => {
+                            let num = 1
+                            docNode.children.forEach((node) => {
+                                this.updateNumber(node, `${num}`, 'old')
+                                this.updateNumber(node, `${num}`, 'new')
+                                num++
+                            })
+                            this.tree = [docNode]
+                        },
+                        (reason) => {
+                            this.growl.error(
+                                'Error Getting Child Views: ' + reason.message
+                            )
+                        }
+                    )
+            },
+            (reason) => {
+                this.growl.error('Error Getting Child Views: ' + reason.message)
+            }
+        )
+
         this.subs.push(
             this.eventSvc.$on('foobar', () => {
                 const root = this.tree
@@ -216,10 +221,7 @@ class ReorderController implements IComponentController {
             this.growl.info('please wait')
             return
         }
-        if (
-            this.tree.length > 1 ||
-            this.tree[0].data.id !== this.documentOb.id
-        ) {
+        if (this.tree.length > 1 || this.tree[0].data.id !== this.doc.id) {
             this.growl.error(
                 'Views cannot be re-ordered outside the context of the current document.'
             )
@@ -297,7 +299,7 @@ class ReorderController implements IComponentController {
     }
 
     public navigate = (reload: boolean): void => {
-        const curBranch = this.treeApi.getSelectedBranch()
+        const curBranch = this.treeSvc.getApi('contents').getSelectedBranch()
         if (!curBranch) {
             void this.$state.go(
                 'main.project.ref.document',
@@ -345,7 +347,7 @@ const ReorderComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        documentOb: '<',
+        mmsDocument: '<',
     },
     controller: ReorderController,
 }

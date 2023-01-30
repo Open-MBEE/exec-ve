@@ -62,6 +62,7 @@ class ViewLinkController implements IComponentController {
     element: ElementObject
     elementName: string
     type: string
+    $transcludeEl: JQuery<HTMLElement>
 
     static $inject = [
         '$scope',
@@ -151,123 +152,129 @@ class ViewLinkController implements IComponentController {
             refId,
             commitId,
         }
-        this.elementSvc.getElement(reqOb, 1).then(
-            (data: ElementObject) => {
-                this.element = data
-                this.elementName = data.name
-                this.type = 'Section '
-                this.suffix = ''
-                this.hash = '#' + data.id
-                if (this.mmsPeId && this.mmsPeId !== '') {
-                    const reqPEOb: ElementsRequest<string> = {
-                        elementId: this.mmsPeId,
-                        projectId,
-                        refId,
-                        commitId,
-                    }
-                    this.elementSvc.getElement(reqPEOb).then(
-                        (pe) => {
-                            this.hash = '#' + pe.id
-                            this.element = pe
-                            this.elementName = pe.name
-                            if (this.viewSvc.isTable(pe)) {
-                                this.type = 'Table '
-                            } else if (this.viewSvc.isFigure(pe)) {
-                                this.type = 'Fig. '
-                            } else if (this.viewSvc.isEquation(pe)) {
-                                this.type = 'Eq. ('
-                                this.suffix = ')'
-                            }
-                            if (this.applicationSvc.getState().fullDoc) {
-                                this.href =
-                                    this.utilsSvc.PROJECT_URL_PREFIX +
-                                    this.projectId +
-                                    '/' +
-                                    this.refId +
-                                    '/documents/' +
-                                    this.docid +
-                                    '/full' +
-                                    this.hash
-                            } else {
-                                this.href =
-                                    this.utilsSvc.PROJECT_URL_PREFIX +
-                                    this.projectId +
-                                    '/' +
-                                    this.refId +
-                                    '/documents/' +
-                                    this.docid +
-                                    '/views/' +
-                                    this.vid +
-                                    this.hash
-                            }
-                        },
-                        (reason) => {
-                            this.growl.warning(
-                                `Unable to retrieve element: ${reason.message}`
-                            )
+        this.elementSvc
+            .getElement(reqOb, 1)
+            .then(
+                (data: ElementObject) => {
+                    this.element = data
+                    this.elementName = data.name
+                    this.type = 'Section '
+                    this.suffix = ''
+                    this.hash = '#' + data.id
+                    if (this.mmsPeId && this.mmsPeId !== '') {
+                        const reqPEOb: ElementsRequest<string> = {
+                            elementId: this.mmsPeId,
+                            projectId,
+                            refId,
+                            commitId,
                         }
-                    )
-                }
-                if (this.apiSvc.isDocument(data)) {
-                    docid = data.id
-                    this.docid = docid
-                    this.vid = data.id
-                } else if (
-                    this.apiSvc.isView(data) ||
-                    data.type === 'InstanceSpecification'
-                ) {
-                    if (!docid || docid === '') {
-                        docid = data.id
+                        this.elementSvc.getElement(reqPEOb).then(
+                            (pe) => {
+                                this.hash = '#' + pe.id
+                                this.element = pe
+                                this.elementName = pe.name
+                                if (this.viewSvc.isTable(pe)) {
+                                    this.type = 'Table '
+                                } else if (this.viewSvc.isFigure(pe)) {
+                                    this.type = 'Fig. '
+                                } else if (this.viewSvc.isEquation(pe)) {
+                                    this.type = 'Eq. ('
+                                    this.suffix = ')'
+                                }
+                                if (this.applicationSvc.getState().fullDoc) {
+                                    this.href =
+                                        this.utilsSvc.PROJECT_URL_PREFIX +
+                                        this.projectId +
+                                        '/' +
+                                        this.refId +
+                                        '/documents/' +
+                                        this.docid +
+                                        '/full' +
+                                        this.hash
+                                } else {
+                                    this.href =
+                                        this.utilsSvc.PROJECT_URL_PREFIX +
+                                        this.projectId +
+                                        '/' +
+                                        this.refId +
+                                        '/documents/' +
+                                        this.docid +
+                                        '/views/' +
+                                        this.vid +
+                                        this.hash
+                                }
+                            },
+                            (reason) => {
+                                this.growl.warning(
+                                    `Unable to retrieve element: ${reason.message}`
+                                )
+                            }
+                        )
                     }
-                    this.docid = docid
-                    this.vid = data.id
-                } else {
-                    this.$element.html(
-                        '<span class="ve-error">view link doesn\'t refer to a view</span>'
+                    if (this.apiSvc.isDocument(data)) {
+                        docid = data.id
+                        this.docid = docid
+                        this.vid = data.id
+                    } else if (
+                        this.apiSvc.isView(data) ||
+                        data.type === 'InstanceSpecification'
+                    ) {
+                        if (!docid || docid === '') {
+                            docid = data.id
+                        }
+                        this.docid = docid
+                        this.vid = data.id
+                    } else {
+                        this.$element.html(
+                            '<span class="ve-error">view link doesn\'t refer to a view</span>'
+                        )
+                    }
+                    if (this.applicationSvc.getState().fullDoc) {
+                        this.href =
+                            this.utilsSvc.PROJECT_URL_PREFIX +
+                            this.projectId +
+                            '/' +
+                            this.refId +
+                            '/documents/' +
+                            this.docid +
+                            '/full' +
+                            this.hash
+                    } else {
+                        this.href =
+                            this.utilsSvc.PROJECT_URL_PREFIX +
+                            this.projectId +
+                            '/' +
+                            this.refId +
+                            '/documents/' +
+                            this.docid +
+                            '/views/' +
+                            this.vid
+                    }
+                    this.showNum =
+                        this.applicationSvc.getState().inDoc &&
+                        this.applicationSvc.getState().currentDoc ===
+                            this.docid &&
+                        !this.suppressNumbering
+                },
+                (reason) => {
+                    this.$element.empty()
+                    this.$transcludeEl = $(
+                        '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                    )
+                    this.$element.append(this.$transcludeEl)
+                    this.$compile(this.$transcludeEl)(
+                        Object.assign(this.$scope.$new(), {
+                            reqOb: reqOb,
+                            recentElement: reason.recentVersionOfElement,
+                            type: this.extensionSvc.AnnotationType
+                                .mmsPresentationElement,
+                        })
                     )
                 }
+            )
+            .finally(() => {
                 this.loading = false
-                if (this.applicationSvc.getState().fullDoc) {
-                    this.href =
-                        this.utilsSvc.PROJECT_URL_PREFIX +
-                        this.projectId +
-                        '/' +
-                        this.refId +
-                        '/documents/' +
-                        this.docid +
-                        '/full' +
-                        this.hash
-                } else {
-                    this.href =
-                        this.utilsSvc.PROJECT_URL_PREFIX +
-                        this.projectId +
-                        '/' +
-                        this.refId +
-                        '/documents/' +
-                        this.docid +
-                        '/views/' +
-                        this.vid
-                }
-                this.showNum =
-                    this.applicationSvc.getState().inDoc &&
-                    this.applicationSvc.getState().currentDoc === this.docid &&
-                    !this.suppressNumbering
-            },
-            (reason) => {
-                this.$element.html(
-                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
-                )
-                this.$compile($(this.$element))(
-                    Object.assign(this.$scope.$new(), {
-                        reqOb: reqOb,
-                        recentElement: reason.recentVersionOfElement,
-                        type: this.extensionSvc.AnnotationType
-                            .mmsPresentationElement,
-                    })
-                )
-                this.loading = false
-            }
-        )
+            })
     }
 }
 

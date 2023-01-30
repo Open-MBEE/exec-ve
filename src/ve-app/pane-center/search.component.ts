@@ -6,12 +6,9 @@ import { EventService, RootScopeService } from '@ve-utils/services'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { OrgObject, ProjectObject } from '@ve-types/mms'
 import { VeSearchOptions } from '@ve-types/view-editor'
 
 class SearchController {
-    projectOb: ProjectObject
-    orgOb: OrgObject
     search: string
     field: string
 
@@ -76,17 +73,15 @@ const SearchComponent: VeComponentOptions = {
     <ng-pane pane-id="center-view" pane-closed="false" pane-anchor="center" pane-no-toggle="true" parent-ctrl="$ctrl">
         <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="$ctrl.searchContentLoading"></i>
         <div ng-hide="$ctrl.searchContentLoading" class="container-fluid">
-            <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.projectOb.id}}" mms-ref-id="{{$ctrl.refOb.id}}"></mms-search>
+            <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.params.projectId}}" mms-ref-id="{{$ctrl.params.refId}}"></mms-search>
         </div>
     </ng-pane>
 </div>
 `,
     bindings: {
+        params: '<',
         search: '<',
         field: '<',
-        projectOb: '<',
-        refOb: '<',
-        documentOb: '<',
     },
     controller: SearchController,
 }

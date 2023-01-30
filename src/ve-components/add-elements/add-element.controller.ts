@@ -69,6 +69,7 @@ export class AddElement<
         '$element',
         'growl',
         '$timeout',
+        '$uibModal',
         'ViewService',
         'ElementService',
         'ProjectService',
@@ -128,9 +129,10 @@ export class AddElement<
         }
         this.oking = true
 
-        this.ownerId = this.parentData
-            ? this.parentData.id
-            : 'holding_bin_' + this.projectId
+        this.ownerId =
+            this.parentData && this.parentData.id
+                ? this.parentData.id
+                : 'holding_bin_' + this.projectId
 
         this.create()
             .then((data) => {

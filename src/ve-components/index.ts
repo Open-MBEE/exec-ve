@@ -16,6 +16,7 @@ import './services'
 import './components'
 
 // Extensions
+import './diffs'
 import './presentations'
 import './transclusions'
 import './spec-tools'

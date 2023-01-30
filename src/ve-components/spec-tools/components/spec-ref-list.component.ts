@@ -50,6 +50,8 @@ import { VeModalService } from '@ve-types/view-editor'
  */
 class SpecRefListController extends SpecTool implements ISpecTool {
     //Locals
+    isLoading: boolean = true
+    refs: RefObject[]
     showMerge: boolean
     runCleared: boolean
     docEditable: boolean
@@ -106,6 +108,20 @@ class SpecRefListController extends SpecTool implements ISpecTool {
             this.uRLSvc.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1
         this.runCleared = true
         this.docEditable = false
+
+        this.projectSvc
+            .getRefs(this.projectId)
+            .then(
+                (refs) => {
+                    this.refs = refs
+                },
+                (reason) => {
+                    this.growl.error('Error getting refs: ' + reason.message)
+                }
+            )
+            .finally(() => {
+                this.isLoading = false
+            })
     }
     //Callback function for document change
     public initCallback = (): void => {
@@ -119,7 +135,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
 
         this.docEditable =
             this.specApi.refType != 'Tag' &&
-            this.permissionsSvc.hasProjectIdBranchIdEditPermission(
+            this.permissionsSvc.hasBranchEditPermission(
                 this.specApi.projectId,
                 this.specApi.refId
             )
@@ -154,10 +170,11 @@ class SpecRefListController extends SpecTool implements ISpecTool {
 const SpecRefListComponent: VeComponentOptions = {
     selector: 'specRefList',
     template: `
-    
-<input class="form-control" ng-model="refFilter" type="text" placeholder="Filter branches/tags">
+    <i ng-show="$ctrl.isLoading" class="pane-center-spinner fa fa-5x fa-spinner fa-spin"></i>
+<div ng-hide="$ctrl.isLoading">
+    <input class="form-control" ng-model="refFilter" type="text" placeholder="Filter branches/tags">
 
-<table class="tags-table table table-condensed">
+    <table class="tags-table table table-condensed">
     <thead>
         <tr>
             <td><h3 class="Tag-icon">Tag</h3></td>
@@ -166,7 +183,7 @@ const SpecRefListComponent: VeComponentOptions = {
         </tr>
     </thead>
     <tbody ng-show="filteredTags.length">
-        <tr ng-repeat="tag in filteredTags = (mmsTags | orderBy:'-_created' | filter: {name : refFilter})">
+        <tr ng-repeat="tag in filteredTags = ($ctrl.refs | orderBy:'-_created' | filter: {name : refFilter, type: 'Tag'})">
             <td>
                 <a ui-sref="{refId: tag.id}"><b>{{tag.name}}</b></a>
                 <div>{{tag.description}}</div>
@@ -189,7 +206,7 @@ const SpecRefListComponent: VeComponentOptions = {
         </tr>
     </tbody>
 
-    <tbody ng-show="$ctrl.mmsTags.length && !$ctrl.filteredTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags found</td></tr></tbody>
+    <tbody ng-show="$ctrl.mmsTags.length && !filteredTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags found</td></tr></tbody>
 
     <tbody ng-hide="$ctrl.mmsTags.length"><tr><td colspan="3" class="ve-secondary-text">No tags in current project.</td></tr></tbody>
 
@@ -201,7 +218,7 @@ const SpecRefListComponent: VeComponentOptions = {
         </tr>
     </thead>
     <tbody ng-show="filteredBranches.length">
-        <tr ng-repeat="branch in filteredBranches = ($ctrl.mmsBranches | orderBy:'-_created' | filter: {name : refFilter})">
+        <tr ng-repeat="branch in filteredBranches = ($ctrl.refs | orderBy:'-_created' | filter: {name : refFilter, type: 'Branch'})">
             <td>
                 <a ui-sref="{refId: branch.id}"><b>{{branch.name}}</b></a>
                 <div>{{branch.description}}</div>
@@ -225,10 +242,10 @@ const SpecRefListComponent: VeComponentOptions = {
     </tbody>
     <tbody><tr ng-hide="filteredBranches.length"><td colspan="3" class="ve-secondary-text">No branches found</td></tr></tbody>
 </table>    
+</div>
 `,
     bindings: {
-        mmsBranches: '<',
-        mmsTags: '<',
+        mmsRefs: '<',
     },
     controller: SpecRefListController,
 }

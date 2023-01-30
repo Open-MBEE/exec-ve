@@ -2,7 +2,7 @@ import angular from 'angular'
 
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import { RefObject } from '@ve-types/mms'
 import {
@@ -100,7 +100,7 @@ const MergeConfirmModalComponent: VeModalComponent = {
     controller: MergeConfirmModalController,
 }
 
-veCore.component(
+veComponents.component(
     MergeConfirmModalComponent.selector,
     MergeConfirmModalComponent
 )

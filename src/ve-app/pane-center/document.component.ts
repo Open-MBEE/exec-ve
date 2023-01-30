@@ -11,7 +11,7 @@ import {
     ButtonBarApi,
     ButtonBarService,
 } from '@ve-core/button-bar'
-import { TreeApi, TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-core/tree'
 import {
     PermissionsService,
     ViewData,
@@ -29,7 +29,7 @@ import {
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
@@ -40,18 +40,22 @@ import {
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
 
 class FullDocumentController implements IComponentController {
+    //Bindings
+    public mmsDocument: DocumentObject
+    public mmsProject: ProjectObject
+    public mmsRef: RefObject
+    //
+    // //Locals
+    // public document: DocumentObject
+    // public project: ProjectObject
+    // public ref: RefObject
+
     public subs: Rx.IDisposable[]
     bars: string[]
     bbApi: ButtonBarApi
     bbId = 'full-doc'
     fullDocumentSvc: FullDocumentService
-
-    private projectOb: ProjectObject
-    private refOb: RefObject
-    private documentOb: DocumentObject
-
-    public viewContentLoading: boolean
-    treeApi: TreeApi
+    viewContentLoading: boolean
     buttons: IButtonBarButton[] = []
     latestElement: Date
     scrollApi: IPaneScrollApi
@@ -62,14 +66,13 @@ class FullDocumentController implements IComponentController {
     seenViewIds = {}
     shortUrl: string = ''
 
-    private handleShareURL: any
-    private copyToClipboard: ($event) => void
     private dynamicPopover: {
         templateUrl: string
         title: string
     }
 
     static $inject = [
+        '$q',
         '$scope',
         '$element',
         '$state',
@@ -93,6 +96,7 @@ class FullDocumentController implements IComponentController {
         'ButtonBarService',
     ]
     constructor(
+        private $q: VeQService,
         private $scope: angular.IScope,
         private $element: JQuery<HTMLElement>,
         private $state: StateService,
@@ -114,13 +118,44 @@ class FullDocumentController implements IComponentController {
         private treeSvc: TreeService,
         private eventSvc: EventService,
         private buttonBarSvc: ButtonBarService
-    ) {
-        this.treeApi = this.treeSvc.getApi()
-    }
+    ) {}
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        this.viewContentLoading = false
+
+        this.treeSvc.waitForApi('contents').then(
+            () => {
+                this.bbApi = this.buttonBarSvc.initApi(
+                    this.bbId,
+                    this.bbInit,
+                    this
+                )
+
+                this.view2Node[this.mmsDocument.id] = {
+                    label: this.mmsDocument.name,
+                    data: this.mmsDocument,
+                    type: 'view',
+                    children: [],
+                }
+                this.view2Children[this.mmsDocument.id] = []
+
+                // Share URL button settings
+                this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
+
+                this.shortUrl = this.shortenUrlSvc.getShortUrl({
+                    orgId: this.mmsProject.orgId,
+                    projectId: this.mmsProject.id,
+                    refId: this.mmsRef.id,
+                    documentId: this.mmsDocument.id,
+                })
+
+                this.viewContentLoading =
+                    this.rootScopeSvc.veViewContentLoading(false)
+            },
+            (reason) => {
+                console.log('Error: ' + reason.message)
+            }
+        )
 
         this.subs.push(
             this.eventSvc.$on<boolean>(
@@ -129,80 +164,6 @@ class FullDocumentController implements IComponentController {
                     this.viewContentLoading = data
                 }
             )
-        )
-
-        this.bbApi = this.buttonBarSvc.initApi(
-            this.bbId,
-            (api: ButtonBarApi) => {
-                if (
-                    this.documentOb &&
-                    this.refOb.type === 'Branch' &&
-                    this.permissionsSvc.hasBranchEditPermission(this.refOb)
-                ) {
-                    api.addButton(
-                        this.buttonBarSvc.getButtonBarButton('show-edits')
-                    )
-                    api.setToggleState(
-                        'show-edits',
-                        this.rootScopeSvc.veEditMode()
-                    )
-
-                    this.hotkeys.bindTo(this.$scope).add({
-                        combo: 'alt+d',
-                        description: 'toggle edit mode',
-                        callback: () => {
-                            this.eventSvc.$broadcast('show-edits')
-                        },
-                    })
-                }
-                api.addButton(this.buttonBarSvc.getButtonBarButton('share-url'))
-                api.addButton(
-                    this.buttonBarSvc.getButtonBarButton('show-elements')
-                )
-                api.addButton(
-                    this.buttonBarSvc.getButtonBarButton('show-comments')
-                )
-                api.addButton(
-                    this.buttonBarSvc.getButtonBarButton('refresh-numbering')
-                )
-                api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
-                const exportButtons: IButtonBarButton =
-                    this.buttonBarSvc.getButtonBarButton('export')
-                if (!exportButtons.dropdown_buttons) {
-                    exportButtons.dropdown_buttons = [] as IButtonBarButton[]
-                }
-                exportButtons.dropdown_buttons.push(
-                    this.buttonBarSvc.getButtonBarButton('convert-pdf')
-                )
-
-                api.addButton(exportButtons)
-                api.setToggleState(
-                    'show-comments',
-                    this.rootScopeSvc.veCommentsOn()
-                )
-                api.setToggleState(
-                    'show-elements',
-                    this.rootScopeSvc.veElementsOn()
-                )
-
-                this.hotkeys
-                    .bindTo(this.$scope)
-                    .add({
-                        combo: 'alt+c',
-                        description: 'toggle show comments',
-                        callback: () => {
-                            this.eventSvc.$broadcast('show-comments')
-                        },
-                    })
-                    .add({
-                        combo: 'alt+e',
-                        description: 'toggle show elements',
-                        callback: () => {
-                            this.eventSvc.$broadcast('show-elements')
-                        },
-                    })
-            },
-            this
         )
 
         // api to communicate with borderlayout library
@@ -216,14 +177,6 @@ class FullDocumentController implements IComponentController {
             frequency: 100, // how fast to add more views
         }
 
-        this.view2Node[this.documentOb.id] = {
-            label: this.documentOb.name,
-            data: this.documentOb,
-            type: 'view',
-            children: [],
-        }
-        this.view2Children[this.documentOb.id] = []
-
         this.subs.push(
             this.eventSvc.$on<TreeBranch>('mms-tree-click', (branch) => {
                 this.fullDocumentSvc.handleClickOnBranch(branch, () => {
@@ -234,14 +187,17 @@ class FullDocumentController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on('view.deleted', (deletedBranch: TreeBranch) => {
-                this.fullDocumentSvc.handleViewDelete(deletedBranch)
-            })
+            this.eventSvc.$on(
+                'mmsView.deleted',
+                (deletedBranch: TreeBranch) => {
+                    this.fullDocumentSvc.handleViewDelete(deletedBranch)
+                }
+            )
         )
 
         this.subs.push(
             this.eventSvc.$on(
-                'view.added',
+                'mmsView.added',
                 (data: veAppEvents.viewAddedData) => {
                     this.fullDocumentSvc.handleViewAdd(
                         this._buildViewData(data.vId, data.curSec),
@@ -319,8 +275,8 @@ class FullDocumentController implements IComponentController {
                     this.appUtilsSvc
                         .printModal(
                             angular.element('#print-div'),
-                            this.documentOb,
-                            this.refOb,
+                            this.mmsDocument,
+                            this.mmsRef,
                             true,
                             3
                         )
@@ -347,8 +303,8 @@ class FullDocumentController implements IComponentController {
                 this.fullDocumentSvc.loadRemainingViews(() => {
                     void this.appUtilsSvc.printModal(
                         angular.element('#print-div'),
-                        this.documentOb,
-                        this.refOb,
+                        this.mmsDocument,
+                        this.mmsRef,
                         true,
                         1
                     )
@@ -362,8 +318,8 @@ class FullDocumentController implements IComponentController {
                     this.appUtilsSvc
                         .printModal(
                             angular.element('#print-div'),
-                            this.documentOb,
-                            this.refOb,
+                            this.mmsDocument,
+                            this.mmsRef,
                             true,
                             2
                         )
@@ -400,43 +356,45 @@ class FullDocumentController implements IComponentController {
             this.eventSvc.$on('refresh-numbering', (reNumOnly: boolean) => {
                 this.fullDocumentSvc.loadRemainingViews(() => {
                     if (!reNumOnly) {
-                        void this.treeSvc
-                            .getApi()
+                        this.treeSvc
+                            .getApi('contents')
                             .refresh()
-                            .then(() => {
-                                this.treeSvc.refreshPeTrees()
-                                this.views.forEach((view) => {
-                                    if (
-                                        this.treeApi.branch2viewNumber[view.id]
-                                    ) {
-                                        view.number =
-                                            this.treeApi.branch2viewNumber[
-                                                view.id
-                                            ]
-                                    }
-                                })
-                            })
+                            .then(
+                                () => {
+                                    this.views.forEach((view) => {
+                                        if (
+                                            this.treeSvc.getApi('contents')
+                                                .branch2viewNumber[view.id]
+                                        ) {
+                                            view.number =
+                                                this.treeSvc.getApi(
+                                                    'contents'
+                                                ).branch2viewNumber[view.id]
+                                        }
+                                    })
+                                },
+                                (reason) => {
+                                    this.growl.error(
+                                        TreeService.treeError(reason)
+                                    )
+                                }
+                            )
                     } else {
                         this.views.forEach((view) => {
-                            if (this.treeApi.branch2viewNumber[view.id]) {
+                            if (
+                                this.treeSvc.getApi('contents')
+                                    .branch2viewNumber[view.id]
+                            ) {
                                 view.number =
-                                    this.treeApi.branch2viewNumber[view.id]
+                                    this.treeSvc.getApi(
+                                        'contents'
+                                    ).branch2viewNumber[view.id]
                             }
                         })
                     }
                 })
             })
         )
-
-        // Share URL button settings
-        this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
-
-        this.shortUrl = this.shortenUrlSvc.getShortUrl({
-            orgId: this.projectOb.orgId,
-            projectId: this.projectOb.id,
-            refId: this.refOb.id,
-            documentId: this.documentOb.id,
-        })
     }
 
     $postLink(): void {
@@ -454,25 +412,81 @@ class FullDocumentController implements IComponentController {
         })
     }
 
+    public bbInit = (api: ButtonBarApi): void => {
+        if (
+            this.mmsDocument &&
+            this.mmsRef.type === 'Branch' &&
+            this.permissionsSvc.hasBranchEditPermission(
+                this.mmsProject.id,
+                this.mmsRef.id
+            )
+        ) {
+            api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
+            api.setToggleState('show-edits', this.rootScopeSvc.veEditMode())
+
+            this.hotkeys.bindTo(this.$scope).add({
+                combo: 'alt+d',
+                description: 'toggle edit mode',
+                callback: () => {
+                    this.eventSvc.$broadcast('show-edits')
+                },
+            })
+        }
+        api.addButton(this.buttonBarSvc.getButtonBarButton('share-url'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
+        const exportButtons: IButtonBarButton =
+            this.buttonBarSvc.getButtonBarButton('export')
+        if (!exportButtons.dropdown_buttons) {
+            exportButtons.dropdown_buttons = [] as IButtonBarButton[]
+        }
+        exportButtons.dropdown_buttons.push(
+            this.buttonBarSvc.getButtonBarButton('convert-pdf')
+        )
+
+        api.addButton(exportButtons)
+        api.setToggleState('show-comments', this.rootScopeSvc.veCommentsOn())
+        api.setToggleState('show-elements', this.rootScopeSvc.veElementsOn())
+
+        this.hotkeys
+            .bindTo(this.$scope)
+            .add({
+                combo: 'alt+c',
+                description: 'toggle show comments',
+                callback: () => {
+                    this.eventSvc.$broadcast('show-comments')
+                },
+            })
+            .add({
+                combo: 'alt+e',
+                description: 'toggle show elements',
+                callback: () => {
+                    this.eventSvc.$broadcast('show-elements')
+                },
+            })
+    }
+
     private _createViews = (): VePromise<void, void> => {
         const message = this._loadingViewsFromServer()
         this.views.push({
-            id: this.documentOb.id,
+            id: this.mmsDocument.id,
             api: {
                 elementTranscluded: this._elementTranscluded,
                 elementClicked: this._elementClicked,
             },
         })
-        if (!this.documentOb._childViews) {
-            this.documentOb._childViews = []
+        if (!this.mmsDocument._childViews) {
+            this.mmsDocument._childViews = []
         }
         return this.viewSvc
             .handleChildViews(
-                this.documentOb,
+                this.mmsDocument,
                 'composite',
                 undefined,
-                this.projectOb.id,
-                this.refOb.id,
+                this.mmsProject.id,
+                this.mmsRef.id,
                 this.view2Node,
                 this._handleSingleView
             )
@@ -563,6 +577,10 @@ class FullDocumentController implements IComponentController {
     public notifyOnScroll = (): boolean => {
         return this.fullDocumentSvc.handleDocumentScrolling()
     }
+
+    public copyToClipboard = ($event: JQuery.ClickEvent): void => {
+        this.shortenUrlSvc.copyToClipboard(this.$element, $event)
+    }
 }
 
 /* Controller */
@@ -583,14 +601,14 @@ const DocumentComponent: VeComponentOptions = {
         </div>
     </ng-pane>
     <ng-pane pane-id="center-view" pane-closed="false" pane-anchor="center" pane-no-toggle="true" parent-ctrl="$ctrl">
-        <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="viewContentLoading"></i>
-        <div class="ve-notify-banner" ng-show="$ctrl.refOb.type === 'Tag'">
+        <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="$ctrl.viewContentLoading"></i>
+        <div class="ve-notify-banner" ng-show="$ctrl.mmsRef.type === 'Tag'">
             <span><strong>Tags are read only:</strong> Switch to a branch to edit</span>
         </div>
         <div class="container-fluid ve-secondary-text"> Document Last Modified: {{ $ctrl.latestElement | date:'M/d/yy h:mm a' }}</div>
         <div class="pane-center container-fluid" id="print-div">
             <div ng-repeat="view in $ctrl.views track by view.id" ng-class="{chapter: view.topLevel, 'first-chapter': view.first}">
-                <view mms-element-id="{{view.id}}" mms-commit-id="latest" mms-project-id="{{$ctrl.projectOb.id}}" mms-ref-id="{{$ctrl.refOb.id}}" mms-number="{{view.number}}" mms-view-api="view.api"></view>
+                <view mms-element-id="{{view.id}}" mms-commit-id="latest" mms-project-id="{{$ctrl.mmsProject.id}}" mms-ref-id="{{$ctrl.mmsRef.id}}" mms-number="{{view.number}}" mms-view-api="view.api"></view>
             </div>
         </div>
     </ng-pane>
@@ -604,9 +622,9 @@ const DocumentComponent: VeComponentOptions = {
 </script>    
 `,
     bindings: {
-        projectOb: '<',
-        refOb: '<',
-        documentOb: '<',
+        mmsProject: '<',
+        mmsRef: '<',
+        mmsDocument: '<',
     },
     controller: FullDocumentController,
 }

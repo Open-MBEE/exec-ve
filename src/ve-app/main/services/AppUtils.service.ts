@@ -370,7 +370,7 @@ Save CSV</button></div>
             (port == 80 || port == 443 ? '' : `:${port}`)
         const mmsIndex = absurl.indexOf('index.html')
         let toc = this.utilsSvc.makeHtmlTOC(
-            this.treeSvc.getApi().getRows()[0].branch
+            this.treeSvc.getApi('contents').getRows()[0].branch
         )
 
         // Conver to proper links for word/pdf
@@ -378,7 +378,7 @@ Save CSV</button></div>
 
         // Get correct table/image numbering based on doc hierarchy
         const tableAndFigTOC = this.utilsSvc.makeTablesAndFiguresTOC(
-            this.treeSvc.getApi().getRows()[0].branch,
+            this.treeSvc.getApi('contents').getRows()[0].branch,
             printElementCopy,
             false,
             htmlTotf

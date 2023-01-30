@@ -1209,8 +1209,7 @@ export class ViewService {
      */
     public createGroup(
         name: string,
-        ownerOb: ViewObject,
-        orgId: string
+        ownerOb: ViewObject
     ): VePromise<GroupObject> {
         const deferred = this.$q.defer<GroupObject>()
 

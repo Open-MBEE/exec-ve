@@ -7,7 +7,7 @@ export type eventHandlerFn<T> = (data: T) => void
 
 export class EventService {
     private subjects: { [key: string]: Rx.ISubject<unknown> } = {}
-
+    private bindings: { [key: string]: Rx.ISubject<unknown> } = {}
     //API
     public $broadcast = <T>(name: string, data?: T): void =>
         this.emit(name, data)
@@ -22,6 +22,27 @@ export class EventService {
 
     createName = (name: string): string => {
         return `$ ${name}`
+    }
+
+    resolve<T = unknown>(name: string, data?: T): void {
+        const fnName = this.createName(name)
+        //$rootScope.$broadcast(name,data);
+        if (!this.bindings[fnName]) {
+            this.bindings[fnName] = new Rx.BehaviorSubject<unknown>(data)
+        } else {
+            this.bindings[fnName].onNext(data)
+        }
+    }
+
+    binding<T = unknown>(
+        name: string,
+        handler: eventHandlerFn<T>
+    ): Rx.IDisposable {
+        const fnName = this.createName(name)
+        if (!this.bindings[fnName]) {
+            this.bindings[fnName] = new Rx.BehaviorSubject<unknown>(null)
+        }
+        return this.bindings[fnName].subscribe(handler)
     }
 
     emit<T = unknown>(name: string, data?: T): void {

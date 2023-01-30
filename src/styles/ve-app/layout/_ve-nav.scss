@@ -1,3 +1,5 @@
+@use "sass:math";
+
 /* VE base styles */
 @use "src/styles/globals";
 
@@ -42,6 +44,11 @@
   a:visited {
     text-decoration: none;
     color: white;
+  }
+
+  .nav-spin {
+    margin-left: 10px;
+    margin-top: math.div(globals.$nav-height, 2) - math.div(14px, 2);
   }
 }
 

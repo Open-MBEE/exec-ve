@@ -348,6 +348,10 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     }
 
     protected recompile = (preview?: boolean): void => {
+        this.defaultRecompile(preview)
+    }
+
+    public defaultRecompile = (preview?: boolean): void => {
         this.getContent(preview).then(
             (result) => {
                 this.$element.empty()

@@ -8,11 +8,7 @@ import {
     ITransclusionComponentOptions,
     Transclusion,
 } from '@ve-components/transclusions'
-import {
-    ButtonBarApi,
-    ButtonBarService,
-    IButtonBarButton,
-} from '@ve-core/button-bar'
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { AuthService, ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import {
@@ -72,7 +68,6 @@ export class TranscludeValController
     propertySpec: PropertySpec
     public bbApi: ButtonBarApi
     public bars: string[]
-    protected buttons: IButtonBarButton[] = []
 
     //Templates
     template = `
@@ -104,9 +99,9 @@ export class TranscludeValController
     editTemplate = `
     <div class="panel panel-default no-print">
     <div ng-if="!$ctrl.mmsSpecEditorCtrl" class="panel-heading clearfix">
-        <h3 class="panel-title pull-left">Value : {{element.name}}</h3>
+        <h3 class="panel-title pull-left">Value : {{$ctrl.element.name}}</h3>
         <div class="btn-group pull-right">
-            <button-bar class="transclude-panel-toolbar" buttons="buttons" mms-bb-api="bbApi"></button-bar>
+            <button-bar class="transclude-panel-toolbar" button-api="$ctrl.bbApi"></button-bar>
         </div>
     </div>
     <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
@@ -329,7 +324,7 @@ export class TranscludeValController
         if (!this.nonEditable && this.mmsSpecEditorCtrl && !this.edit) {
             this._startEdit(this.editable())
         } else {
-            super.recompile(preview)
+            this.defaultRecompile(preview)
         }
     }
 

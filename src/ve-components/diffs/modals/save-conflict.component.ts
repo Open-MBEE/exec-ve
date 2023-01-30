@@ -1,6 +1,6 @@
 import { IComponentController } from 'angular'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
@@ -75,4 +75,4 @@ const SaveConflictComponent: VeComponentOptions = {
     controller: SaveConflictController,
 }
 
-veCore.component(SaveConflictComponent.selector, SaveConflictComponent)
+veComponents.component(SaveConflictComponent.selector, SaveConflictComponent)

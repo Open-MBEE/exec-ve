@@ -568,8 +568,8 @@ export class ButtonBarService {
                             this.getButtonBarButton('tabletocsv'),
                         ],
                         dropdown_toggleable: true,
-                        dropdown_icon: 'fa-solid fa-plus',
-                        dropdown_toggle_icon: 'fa-solid fa-minus',
+                        dropdown_icon: 'fa-solid fa-caret-down',
+                        dropdown_toggle_icon: 'fa-solid fa-caret-up',
                     }
                 case 'print':
                     return {

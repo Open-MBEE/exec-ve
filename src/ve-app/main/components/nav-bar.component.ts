@@ -52,6 +52,8 @@ class NavBarController implements IComponentController {
     private project: ProjectObject
     private org: OrgObject
     private ref: RefObject
+    private projects: ProjectObject[]
+    private orgs: OrgObject[]
 
     constructor(
         private $uiRouter: UIRouter,

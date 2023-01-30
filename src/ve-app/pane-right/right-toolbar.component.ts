@@ -4,22 +4,21 @@ import Rx from 'rx-lite'
 
 import { veComponentsEvents } from '@ve-components/events'
 import { ExtensionService } from '@ve-components/services'
-import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
+import { ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { PermissionsService } from '@ve-utils/mms-api-client'
 import { AutosaveService, EventService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { DocumentObject, RefObject } from '@ve-types/mms'
+import { RefObject } from '@ve-types/mms'
 
 /* Classes */
 const RightToolbarComponent: VeComponentOptions = {
     selector: 'rightToolbar', //toolbar-component
     template: `<tool-bar on-click="$ctrl.onClick(button)" />`,
     bindings: {
-        refOb: '<',
-        documentOb: '<',
+        mmsRef: '<',
     },
     controller: class ToolbarController implements IComponentController {
         static $inject = [
@@ -35,12 +34,10 @@ const RightToolbarComponent: VeComponentOptions = {
         public subs: Rx.IDisposable[]
 
         //Bindings
-        public refOb: RefObject
-        public documentOb: DocumentObject
+        public mmsRef: RefObject
 
         //Local
         public tbApi: ToolbarApi
-        public buttons: IToolBarButton[]
 
         constructor(
             public $uiRouterGlobals: UIRouterGlobals,
@@ -59,13 +56,13 @@ const RightToolbarComponent: VeComponentOptions = {
                 this.tbInit,
                 this
             )
-            this.buttons = this.tbApi.buttons
 
             this.subs.push(
                 this.eventSvc.$on<veComponentsEvents.setPermissionData>(
                     this.toolbarSvc.constants.SETPERMISSION,
                     (data) => {
-                        this.tbApi.setPermission(data.id, data.value)
+                        if (this.tbApi)
+                            this.tbApi.setPermission(data.id, data.value)
                     }
                 )
             )
@@ -74,7 +71,7 @@ const RightToolbarComponent: VeComponentOptions = {
                 this.eventSvc.$on<veComponentsEvents.setIconData>(
                     this.toolbarSvc.constants.SETICON,
                     (data) => {
-                        this.tbApi.setIcon(data.id, data.value)
+                        if (this.tbApi) this.tbApi.setIcon(data.id, data.value)
                     }
                 )
             )
@@ -83,7 +80,7 @@ const RightToolbarComponent: VeComponentOptions = {
                 this.eventSvc.$on<veComponentsEvents.setToggleData>(
                     this.toolbarSvc.constants.TOGGLEICONSPINNER,
                     (data) => {
-                        this.tbApi.toggleButtonSpinner(data.id)
+                        if (this.tbApi) this.tbApi.toggleButtonSpinner(data.id)
                     }
                 )
             )
@@ -92,7 +89,7 @@ const RightToolbarComponent: VeComponentOptions = {
                 this.eventSvc.$on<veComponentsEvents.setToggleData>(
                     this.toolbarSvc.constants.SELECT,
                     (data) => {
-                        this.tbApi.select(data.id)
+                        if (this.tbApi) this.tbApi.select(data.id)
                     }
                 )
             )
@@ -129,9 +126,12 @@ const RightToolbarComponent: VeComponentOptions = {
                 }
                 if (!button.permission) {
                     button.permission =
-                        this.refOb &&
-                        this.refOb.type === 'Branch' &&
-                        this.permissionsSvc.hasBranchEditPermission(this.refOb)
+                        this.mmsRef &&
+                        this.mmsRef.type === 'Branch' &&
+                        this.permissionsSvc.hasBranchEditPermission(
+                            this.mmsRef._projectId,
+                            this.mmsRef.id
+                        )
                 }
             }
         }

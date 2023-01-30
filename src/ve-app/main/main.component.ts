@@ -68,13 +68,13 @@ const MainComponent: VeComponentOptions = {
                     </ng-pane>
                     <ng-pane pane-id="center" pane-anchor="center" class="pane-center" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
                         <ui-view name="pane-center">
-                            <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin"></i>
+                           
                         </ui-view>
                     </ng-pane>
                 </ng-pane>
             </ng-pane>
         </div>
-   
+        <i ng-show="$ctrl.hidePanes" class="pane-center-spinner fa fa-5x fa-spinner fa-spin"></i>
     </div>
 </div>
 `,
@@ -296,6 +296,7 @@ const MainComponent: VeComponentOptions = {
             )
 
             this.$transitions.onStart({}, (trans) => {
+                this.rootScopeSvc.veHidePanes(true)
                 this.rootScopeSvc.veViewContentLoading(true)
                 this.httpSvc.transformQueue()
                 this.rootScopeSvc.veStateChanging(true)
@@ -352,9 +353,14 @@ const MainComponent: VeComponentOptions = {
 
             this.$transitions.onSuccess({}, (trans: Transition) => {
                 this.rootScopeSvc.veStateChanging(false)
-                this.rootScopeSvc.veHidePanes(false)
                 this.rootScopeSvc.veShowManageRefs(false)
-                this.rootScopeSvc.veShowLogin(false)
+                if (this.$uiRouterGlobals.$current.name === 'main.share') {
+                    this.rootScopeSvc.veHidePanes(true)
+                    this.rootScopeSvc.veShowLogin(true)
+                } else {
+                    this.rootScopeSvc.veHidePanes(false)
+                    this.rootScopeSvc.veShowLogin(false)
+                }
                 if (
                     this.rootScopeSvc.veRedirect() &&
                     this.$uiRouterGlobals.$current.name ===
@@ -386,10 +392,7 @@ const MainComponent: VeComponentOptions = {
                         trans.params('from')
                     )
                 }
-                if (
-                    this.$uiRouterGlobals.$current.name ===
-                    'main.project.ref.portal'
-                ) {
+                if (this.$state.includes('main.project.ref.portal')) {
                     this.rootScopeSvc.treeInitialSelection(
                         (trans.params() as ParamsObject).refId
                     )

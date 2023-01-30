@@ -1,7 +1,6 @@
-import angular, { IComponentController } from 'angular'
+import { IComponentController } from 'angular'
 
 import { BrandingStyle } from '@ve-utils/services'
-import { handleChange } from '@ve-utils/utils/change.util'
 
 import { veApp } from '@ve-app'
 
@@ -10,32 +9,33 @@ import { VeComponentOptions } from '@ve-types/angular'
 const SystemFooterComponent: VeComponentOptions = {
     selector: 'systemFooter',
     template: `
-    <footer ng-show="!$ctrl.footerOb.disabled" class="footer">
+    <footer ng-show="$ctrl.disabled" class="footer">
     <div class="block">
-        <div ng-repeat="message in $ctrl.footerMessage">
+        <div ng-hide="$ctrl.loading" ng-repeat="message in $ctrl.footerMessage">
                 {{ message }}
             </div>
     </div>
 </footer>
 `,
     bindings: {
-        footerOb: '<',
+        mmsFooter: '<',
     },
     controller: class FooterController implements IComponentController {
-        private footerOb: BrandingStyle
+        private mmsFooter: BrandingStyle
 
+        public disabled: boolean
+        public loading: boolean
         public footerMessage: string | string[]
 
         $onInit(): void {
-            if (Array.isArray(this.footerOb.message))
-                this.footerMessage = this.footerOb.message
-            else this.footerMessage = [this.footerOb.message]
-        }
-
-        $onChanges(onChangesObj: angular.IOnChangesObject): void {
-            handleChange(onChangesObj, 'footerOb', () => {
-                this.footerMessage = this.footerOb.message
-            })
+            this.loading = true
+            if (Array.isArray(this.mmsFooter.message))
+                this.footerMessage = this.mmsFooter.message
+            else this.footerMessage = [this.mmsFooter.message]
+            this.disabled = this.mmsFooter.disabled
+                ? this.mmsFooter.disabled
+                : false
+            this.loading = false
         }
     },
 }

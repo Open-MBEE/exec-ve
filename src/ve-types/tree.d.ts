@@ -60,6 +60,8 @@ export interface TreeConfig {
     title?: string
     icon?: string
     types?: string[]
+    treeData?: TreeBranch[]
+    treeRows?: TreeRow[]
 }
 
 export interface TreeIcons {

@@ -9,13 +9,14 @@ import {
     PresentationService,
     ViewHtmlService,
 } from '@ve-components/presentations'
-import { ComponentService } from '@ve-components/services'
+import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { SchemaService } from '@ve-utils/model-schema'
 import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
     IPresentationComponentOptions,
     ITableConfig,
@@ -87,6 +88,7 @@ class PresentTableController extends Presentation implements IPresentation {
     ]
 
     constructor(
+        $q: VeQService,
         $element: JQuery<HTMLElement>,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
@@ -98,11 +100,13 @@ class PresentTableController extends Presentation implements IPresentation {
         eventSvc: EventService,
         imageSvc: ImageService,
         buttonBarSvc: ButtonBarService,
+        extensionSvc: ExtensionService,
         private $document: angular.IDocumentService,
         private $window: angular.IWindowService,
         private $timeout: angular.ITimeoutService
     ) {
         super(
+            $q,
             $element,
             $scope,
             $compile,
@@ -113,7 +117,8 @@ class PresentTableController extends Presentation implements IPresentation {
             componentSvc,
             eventSvc,
             imageSvc,
-            buttonBarSvc
+            buttonBarSvc,
+            extensionSvc
         )
     }
 
@@ -122,36 +127,61 @@ class PresentTableController extends Presentation implements IPresentation {
         this.inPreviewMode = false
 
         this.setNumber()
+        this.getContent().then(
+            (result) => {
+                this.$transcludeEl = $(result)
+                this.$transcludeEl.find('img').each((index, element) => {
+                    this.imageSvc.fixImgSrc($(element))
+                })
 
-        this.$transcludeEl = $(this.getContent())
-        this.$transcludeEl.find('img').each((index, element) => {
-            this.imageSvc.fixImgSrc($(element))
-        })
+                this.$element.append(this.$transcludeEl)
+                this.nextIndex = 0
+                this.$tHeadEl = this.$transcludeEl.find('thead')
+                this.$compile(this.$tHeadEl)(this.$scope)
+                this.$searchEl = this.$element.children().eq(0)
+                this.$compile(this.$searchEl)(this.$scope)
+                this.$captionEl = this.$transcludeEl.find('caption')
+                this.$compile(this.$captionEl)(this.$scope)
+                //Add the search input here (before the TRS, aka the columns/rows)
+                this.tbody = this.$element
+                    .find('.table-wrapper')
+                    .children('table')
+                    .children('tbody')
+                this.trs = this.tbody.children('tr')
 
-        this.$element.append(this.$transcludeEl)
-        this.nextIndex = 0
-        this.$tHeadEl = this.$transcludeEl.find('thead')
-        this.$compile(this.$tHeadEl)(this.$scope)
-        this.$searchEl = this.$element.children().eq(0)
-        this.$compile(this.$searchEl)(this.$scope)
-        this.$captionEl = this.$transcludeEl.find('caption')
-        this.$compile(this.$captionEl)(this.$scope)
-        //Add the search input here (before the TRS, aka the columns/rows)
-        this.tbody = this.$element
-            .find('.table-wrapper')
-            .children('table')
-            .children('tbody')
-        this.trs = this.tbody.children('tr')
+                this.lastIndex = this.trs.length
+                this.numFiltered = this.lastIndex
+                this.numTotal = this.lastIndex
 
-        this.lastIndex = this.trs.length
-        this.numFiltered = this.lastIndex
-        this.numTotal = this.lastIndex
+                this.addFullTableFilter(this.trs)
+                this.addColumnsWiseFilter(this.tableConfig, this.trs)
+                this.addSorting(this.trs, this.tbody)
 
-        this.addFullTableFilter(this.trs)
-        this.addColumnsWiseFilter(this.tableConfig, this.trs)
-        this.addSorting(this.trs, this.tbody)
-
-        this.compileTable()
+                this.compileTable()
+            },
+            (reason) => {
+                const reqOb = {
+                    elementId: this.element.id,
+                    projectId: this.projectId,
+                    refId: this.refId,
+                    commitId: this.commitId,
+                    //includeRecentVersionElement: true,
+                }
+                this.$element.empty()
+                //TODO: Add reason/errorMessage handling here.
+                this.$transcludeEl = $(
+                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                )
+                this.$element.append(this.$transcludeEl)
+                this.$compile(this.$transcludeEl)(
+                    Object.assign(this.$scope.$new(), {
+                        reqOb: reqOb,
+                        recentElement: reason.recentVersionOfElement,
+                        type: this.extensionSvc.AnnotationType,
+                    })
+                )
+            }
+        )
     }
 
     config = (): void => {
@@ -170,14 +200,14 @@ class PresentTableController extends Presentation implements IPresentation {
         }
     }
 
-    getContent = (): string => {
+    getContent = (): VePromise<string, string> => {
         const html = this.viewHtmlSvc.makeHtmlTable(
             this.table,
             true,
             true,
             this.element
         )
-        return `<div class="table-wrapper">${html}</div>`
+        return this.$q.resolve(`<div class="table-wrapper">${html}</div>`)
     }
 
     /** Full Table Filter **/
@@ -695,7 +725,7 @@ class PresentTableController extends Presentation implements IPresentation {
             })
         }
     }
-    public makeFixedHeader = () => {
+    public makeFixedHeader = (): void => {
         if (!this.fixedHeaders) {
             this.$element
                 .find('.table-wrapper')
@@ -723,7 +753,7 @@ class PresentTableController extends Presentation implements IPresentation {
         )
     }
 
-    public makeFixedColumn = () => {
+    public makeFixedColumn = (): void => {
         if (!this.fixedColumns) {
             this.$element
                 .find('.table-wrapper')
@@ -764,17 +794,21 @@ class PresentTableController extends Presentation implements IPresentation {
         )
     }
 
-    public updateFixedColumns = () => {
+    public updateFixedColumns = (): void => {
         this.fixedColumns = false
         this.makeFixedColumn()
         this.fixedColumns = true
         this.makeFixedColumn()
     }
 
-    private _findColumnCells = (bodyTag, cellTag, n) => {
-        const spanData = {} //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
+    private _findColumnCells = (
+        bodyTag: string,
+        cellTag: string,
+        n: number
+    ): JQuery<HTMLElement> => {
+        const spanData: boolean[][] = [] //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
         let curRow = 0
-        let data = $()
+        let data = $('<div></div>')
         $(this.$element)
             .find('.table-fix-column table')
             .children(bodyTag)
@@ -798,36 +832,37 @@ class PresentTableController extends Presentation implements IPresentation {
                             if (rowspan > 1) {
                                 for (let i = 1; i < rowspan; i++) {
                                     if (!spanData[curRow + i]) {
-                                        spanData[curRow + i] = {}
+                                        spanData[curRow + i] = []
+
+                                        spanData[curRow + i][curCol] = true
                                     }
-                                    spanData[curRow + i][curCol] = true
                                 }
                             }
-                        }
-                        const colstring = $(element).attr('colspan')
-                        if (!colstring) {
-                            curCol++
-                            return
-                        }
-                        let colspan = parseInt(colstring)
-                        while (colspan > 1) {
-                            curCol++
-                            colspan--
-                            if (rowspan > 1) {
-                                for (let j = 1; j < rowspan; j++) {
-                                    spanData[curRow + j][curCol] = true
+                            const colstring = $(element).attr('colspan')
+                            if (!colstring) {
+                                curCol++
+                                return
+                            }
+                            let colspan = parseInt(colstring)
+                            while (colspan > 1) {
+                                curCol++
+                                colspan--
+                                if (rowspan > 1) {
+                                    for (let j = 1; j < rowspan; j++) {
+                                        spanData[curRow + j][curCol] = true
+                                    }
                                 }
                             }
+                            curCol++
                         }
-                        curCol++
                     })
                 curRow++
             })
         return data
     }
 
-    private compileTable() {
-        this.$timeout(
+    private compileTable(): void {
+        void this.$timeout(
             () => {
                 const first = this.nextIndex
                 if (first > this.lastIndex) return

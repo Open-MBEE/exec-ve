@@ -2,7 +2,7 @@ import angular from 'angular'
 
 import { EventService, RootScopeService } from '@ve-utils/services'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 export class AddElementsService {
     static $inject = ['$timeout', 'growl', 'RootScopeService', 'EventService']
@@ -31,4 +31,4 @@ export class AddElementsService {
     }
 }
 
-veCore.service('AddElementsService', AddElementsService)
+veComponents.service('AddElementsService', AddElementsService)

@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { RevertConfirmResolveFn } from '@ve-components/diffs'
 import { ApiService, ElementService } from '@ve-utils/mms-api-client'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import {
@@ -42,7 +42,13 @@ export interface DiffDetail {
 }
 
 export class DiffMergeService {
-    static $inject = ['growl', '$uibModal', 'ApiService']
+    static $inject = [
+        '$q',
+        'growl',
+        '$uibModal',
+        'ApiService',
+        'ElementService',
+    ]
     constructor(
         private $q: VeQService,
         private growl: angular.growl.IGrowlService,
@@ -168,4 +174,4 @@ export class DiffMergeService {
     }
 }
 
-veCore.service('DiffMergeService', DiffMergeService)
+veComponents.service('DiffMergeService', DiffMergeService)

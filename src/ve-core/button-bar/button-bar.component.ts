@@ -60,6 +60,7 @@ const ButtonBarComponent: VeComponentOptions = {
         private bbApi: ButtonBarApi
         private minSize: number = 100
 
+        public init: boolean = false
         public buttons: IButtonBarButton[]
         public dropdownIcon: { [id: string]: string }
         private squished: boolean = false
@@ -73,7 +74,7 @@ const ButtonBarComponent: VeComponentOptions = {
             private buttonBarSvc: ButtonBarService
         ) {}
 
-        $onInit(): void {
+        configure = (): void => {
             this.squishButton =
                 this.buttonBarSvc.getButtonBarButton('button-bar-menu')
             this.squishButton.dropdown_buttons = this.buttons
@@ -104,8 +105,9 @@ const ButtonBarComponent: VeComponentOptions = {
         }
 
         $doCheck(): void {
-            if (this.bbApi instanceof ButtonBarApi) {
+            if (this.bbApi instanceof ButtonBarApi && !this.init) {
                 this.buttons = this.bbApi.buttons
+                this.configure()
             }
         }
     },

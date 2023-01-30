@@ -86,15 +86,6 @@ export interface ISpecToolScope extends IPaneScope {
  * @param {boolean=false} nonEditable can edit inline or not
  */
 export class SpecTool implements ISpecTool {
-    //Bindings
-    // mmsBranches
-    // mmsTags
-    // mmsElementId;
-    // mmsProjectId;
-    // mmsRefId;
-    // mmsCommitId;
-    // mmsElement;
-
     //
     public specApi: SpecApi
 
@@ -206,6 +197,7 @@ export class SpecTool implements ISpecTool {
                 this.growl.error(reason.message)
             }
         )
+
         this.changeElement()
 
         this.subs.push(

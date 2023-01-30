@@ -665,7 +665,7 @@ export class ComponentService {
             !ctrl.isEditing &&
             ctrl.element &&
             ctrl.commitId === 'latest' &&
-            this.permissionsSvc.hasProjectIdBranchIdEditPermission(
+            this.permissionsSvc.hasBranchEditPermission(
                 ctrl.element._projectId,
                 ctrl.element._refId
             )

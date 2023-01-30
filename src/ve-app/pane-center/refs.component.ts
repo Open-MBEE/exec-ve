@@ -16,13 +16,14 @@ import {
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { AddElementResolveFn } from '@ve-types/components'
 import {
-    OrgObject,
     ParamsObject,
     ProjectObject,
+    ProjectsResponse,
     RefObject,
+    RefsResponse,
 } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
@@ -49,18 +50,18 @@ class RefsController {
     public subs: Rx.IDisposable[]
 
     //Bindings
-    public mmsOrg: OrgObject
-    mmsProject: ProjectObject
-    mmsRef: RefObject
-    mmsRefs: RefObject[]
-    mmsTags: RefObject[]
-    mmsBranches: RefObject[]
+    mmsRef: VePromise<RefObject, RefsResponse>
+    mmsRefs: VePromise<RefObject[], RefsResponse>
+    mmsProject: VePromise<ProjectObject, ProjectsResponse>
 
     //Local
-    public refManageView
+    public refManageView: boolean
+    isLoading: boolean
     refData
     bbApi
     buttons
+    project: ProjectObject
+    refs: RefObject[]
     branches: RefObject[]
     tags: RefObject[]
     activeTab
@@ -90,6 +91,7 @@ class RefsController {
     ) {}
 
     $onInit(): void {
+        this.isLoading = true
         this.eventSvc.$init(this)
 
         this.contentWindowSvc.toggleLeftPane(true)
@@ -98,20 +100,55 @@ class RefsController {
         this.refData = []
         this.bbApi = {}
         this.buttons = []
-        this.branches = this.mmsBranches
-        this.tags = this.mmsTags
         this.activeTab = 0
         this.refSelected = null
         this.search = null
         this.view = null
         this.fromParams = {}
 
-        if (_.isEmpty(this.mmsRef)) {
-            this.selectMasterDefault()
-        } else {
-            this.fromParams = this.mmsRef
-            this.refSelected = this.mmsRef
-        }
+        const promises: VePromise<unknown, unknown>[] = []
+        promises.push(this.mmsProject, this.mmsRef)
+
+        this.mmsRefs.then(
+            (refs) => {
+                this.refs = refs
+                this.branches = refs.filter((ref) => {
+                    return ref.type === 'Branch'
+                })
+                this.tags = refs.filter((ref) => {
+                    return ref.type === 'Tag'
+                })
+
+                if (_.isEmpty(this.mmsRef)) {
+                    this.selectMasterDefault()
+                } else {
+                    this.mmsRef.then(
+                        (ref) => {
+                            this.fromParams = ref
+                            this.refSelected = ref
+                        },
+                        (reason) => {
+                            console.log('Menu Error: ' + reason.message)
+                        }
+                    )
+                }
+            },
+            (reason) => {
+                console.log('Menu Error: ' + reason.message)
+            }
+        )
+        this.mmsProject.then(
+            (project) => {
+                this.project = project
+            },
+            (reason) => {
+                console.log('Menu Error: ' + reason.message)
+            }
+        )
+
+        this.$q.allSettled(promises).finally(() => {
+            this.isLoading = false
+        })
 
         this.htmlTooltip = this.$sce.trustAsHtml(
             'Branch temporarily unavailable during duplication.'
@@ -119,38 +156,41 @@ class RefsController {
 
         this.subs.push(
             this.eventSvc.$on<ParamsObject>('fromParamChange', (fromParams) => {
-                const index = _.findIndex(this.mmsRefs, {
+                const index = _.findIndex(this.refs, {
                     name: fromParams.refId,
                 })
                 if (index > -1) {
-                    this.fromParams = this.mmsRefs[index]
+                    this.fromParams = this.refs[index]
                 }
             })
         )
     }
 
     selectMasterDefault = (): void => {
-        const masterIndex = _.findIndex(this.mmsRefs, { name: 'master' })
+        const masterIndex = _.findIndex(this.refs, { name: 'master' })
         if (masterIndex > -1) {
-            this.fromParams = this.mmsRefs[masterIndex]
-            this.refSelected = this.mmsRefs[masterIndex]
+            this.fromParams = this.refs[masterIndex]
+            this.refSelected = this.refs[masterIndex]
         }
     }
 
-    addBranch = (e): void => {
+    addBranch = (e: JQuery.ClickEvent): void => {
+        e.stopPropagation()
         this.addElement('Branch')
     }
 
-    addTag = (e): void => {
+    addTag = (e: JQuery.ClickEvent): void => {
+        e.stopPropagation()
         this.addElement('Tag')
     }
 
-    deleteRef = (e): void => {
+    deleteRef = (e: JQuery.ClickEvent): void => {
+        e.stopPropagation()
         this.deleteItem()
     }
 
     refClickHandler = (ref: RefObject): void => {
-        this.projectSvc.getRef(ref.id, this.mmsProject.id).then(
+        this.projectSvc.getRef(ref.id, this.project.id).then(
             (data) => {
                 this.refSelected = data
             },
@@ -211,45 +251,54 @@ class RefsController {
                     return this.$filter
                 },
                 getProjectId: () => {
-                    return this.mmsProject.id
+                    return this.project.id
                 },
                 getRefId: () => {
                     return null
                 },
                 getOrgId: () => {
-                    return this.mmsOrg.id
+                    return this.project.orgId
                 },
                 getSeenViewIds: () => {
                     return null
                 },
             },
         })
-        void instance.result.then((data) => {
-            //TODO add load handling once mms returns status
-            const tag: RefObject[] = []
-            for (let i = 0; i < this.mmsRefs.length; i++) {
-                if (this.mmsRefs[i].type === 'Tag') tag.push(this.mmsRefs[i])
-            }
-            this.tags = tag
+        instance.result.then(
+            (data) => {
+                //TODO add load handling once mms returns status
+                const tag: RefObject[] = []
+                for (let i = 0; i < this.refs.length; i++) {
+                    if (this.refs[i].type === 'Tag') tag.push(this.refs[i])
+                }
+                this.tags = tag
 
-            const branches: RefObject[] = []
-            for (let j = 0; j < this.mmsRefs.length; j++) {
-                if (this.mmsRefs[j].type === 'Branch')
-                    branches.push(this.mmsRefs[j])
+                const branches: RefObject[] = []
+                for (let j = 0; j < this.refs.length; j++) {
+                    if (this.refs[j].type === 'Branch')
+                        branches.push(this.refs[j])
+                }
+                this.branches = branches
+                if (data.type === 'Branch') {
+                    this.branches.push(data)
+                    this.refSelected = data
+                    this.activeTab = 0
+                } else {
+                    this.tags.push(data)
+                    this.refSelected = data
+                    this.activeTab = 1
+                }
+            },
+            (reason?) => {
+                if (reason) {
+                    this.growl.error('Ref Creation Error:' + reason.message)
+                } else {
+                    this.growl.info('Ref Creation Cancelled', {
+                        ttl: 1000,
+                    })
+                }
             }
-            this.branches = branches
-            if (data.type === 'Branch') {
-                //data.loading = true;
-                //$scope.branches.push(data);
-                this.refSelected = data
-                this.activeTab = 0
-            } else {
-                //data.loading = true;
-                //$scope.tags.push(data);
-                this.refSelected = data
-                this.activeTab = 1
-            }
-        })
+        )
     }
 
     deleteItem = (): void => {
@@ -275,7 +324,7 @@ class RefsController {
                     return () => {
                         return this.projectSvc.deleteRef(
                             branch.id,
-                            this.mmsProject.id
+                            this.project.id
                         )
                     }
                 },
@@ -284,19 +333,30 @@ class RefsController {
         const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>(
             settings
         )
-        void instance.result.then(() => {
-            //TODO $state project with no selected ref
-            let index: number
-            if (this.refSelected.type === 'Branch') {
-                index = this.branches.indexOf(this.refSelected)
-                this.branches.splice(index, 1)
-                this.selectMasterDefault()
-            } else if (this.refSelected.type === 'Tag') {
-                index = this.tags.indexOf(this.refSelected)
-                this.tags.splice(index, 1)
+        instance.result.then(
+            () => {
+                //TODO $state project with no selected ref
+                let index: number
+                if (this.refSelected.type === 'Branch') {
+                    index = this.branches.indexOf(this.refSelected)
+                    this.branches.splice(index, 1)
+                    this.selectMasterDefault()
+                } else if (this.refSelected.type === 'Tag') {
+                    index = this.tags.indexOf(this.refSelected)
+                    this.tags.splice(index, 1)
+                }
+                this.refSelected = null
+            },
+            (reason?) => {
+                if (reason) {
+                    this.growl.error('Ref Deletion Error:' + reason.message)
+                } else {
+                    this.growl.info('Ref Deletion Cancelled', {
+                        ttl: 1000,
+                    })
+                }
             }
-            this.refSelected = null
-        })
+        )
     }
 }
 
@@ -337,11 +397,11 @@ const RefsComponent: VeComponentOptions = {
                         <div class="panels-detail-title clearfix">
                             <h3 class="{{$ctrl.refSelected.type}}-icon">{{$ctrl.refSelected.name}}</h3>
                             <div class="ref-button-options" style="float:right">
-                            <button class="btn btn-default" ng-disabled="$ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.deleteRef()" ng-if="$ctrl.refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
-                            <button class="btn btn-primary" ng-disabled="$ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addTag()"><i class="fa fa-plus"></i> Tag</button>
-                            <button class="btn btn-primary" ng-disabled="$ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addBranch()"><i class="fa fa-plus"></i> Branch</button>
+                            <button class="btn btn-default" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.deleteRef()" ng-if="$ctrl.refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
+                            <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addTag()"><i class="fa fa-plus"></i> Tag</button>
+                            <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addBranch()"><i class="fa fa-plus"></i> Branch</button>
                             </div>
-                            <!-- <button-bar buttons="buttons" mms-bb-api="bbApi"></button-bar> -->
+                            <!-- <button-bar button-api="bbApi"></button-bar> -->
                         </div>
                         <dl class="dl-horizontal ve-light-panels-detail-content">
                             <dt></dt>
@@ -380,12 +440,9 @@ const RefsComponent: VeComponentOptions = {
 </div>      
 `,
     bindings: {
-        mmsOrg: '<',
         mmsProject: '<',
         mmsRef: '<',
         mmsRefs: '<',
-        mmsTags: '<',
-        mmsBranches: '<',
     },
     controller: RefsController,
 }

@@ -5,7 +5,7 @@ import { Commit, CompareData } from '@ve-components/diffs'
 import { ElementService } from '@ve-utils/mms-api-client'
 import { EventService } from '@ve-utils/services'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import {
@@ -181,4 +181,4 @@ const RevertConfirmComponent: VeComponentOptions = {
     controller: RevertConfirmController,
 }
 
-veCore.component(RevertConfirmComponent.selector, RevertConfirmComponent)
+veComponents.component(RevertConfirmComponent.selector, RevertConfirmComponent)

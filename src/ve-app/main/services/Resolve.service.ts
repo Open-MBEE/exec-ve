@@ -14,6 +14,7 @@ import {
     ApplicationService,
     BrandingService,
     BrandingStyle,
+    EventService,
     ShortenUrlService,
 } from '@ve-utils/services'
 
@@ -42,6 +43,7 @@ export class ResolveService {
     static $inject = [
         '$localStorage',
         '$q',
+        'growl',
         '$cookies',
         '$uiRouter',
         'ShortenUrlService',
@@ -53,11 +55,13 @@ export class ResolveService {
         'ViewService',
         'ElementService',
         'PermissionsService',
+        'EventService',
     ]
 
     constructor(
         private $localStorage: VeStorageService,
         private $q: VeQService,
+        private growl: angular.growl.IGrowlService,
         private $cookies: angular.cookies.ICookiesService,
         private $uiRouter: UIRouter,
         private shortenUrlSvc: ShortenUrlService,
@@ -68,16 +72,26 @@ export class ResolveService {
         private applicationSvc: ApplicationService,
         private viewSvc: ViewService,
         private elementSvc: ElementService,
-        private permissionsSvc: PermissionsService
+        private permissionsSvc: PermissionsService,
+        private eventSvc: EventService
     ) {}
 
-    public getBanner(): VePromise<BrandingStyle, ProjectsResponse> {
-        return this.brandingSvc.getBanner()
+    public getBanner(
+        params?: ParamsObject
+    ): VePromise<BrandingStyle, ProjectsResponse> {
+        return this.brandingSvc.getBanner(params)
     }
 
     public getLoginBanner(): VePromise<BrandingStyle, ProjectsResponse> {
         return this.brandingSvc.getLoginBanner()
     }
+
+    public getFooter(
+        params?: ParamsObject
+    ): VePromise<BrandingStyle, ProjectsResponse> {
+        return this.brandingSvc.getFooter(params)
+    }
+
     public getToken(): VePromise<string, CheckAuthResponse> {
         const deferred = this.$q.defer<string>()
         this.authSvc.checkLogin().then(
@@ -100,78 +114,128 @@ export class ResolveService {
     public getOrg(
         projectOb: ProjectObject
     ): VePromise<OrgObject, OrgsResponse> {
-        return this.projectSvc.getOrg(projectOb.orgId)
+        const promise = this.projectSvc.getOrg(projectOb.orgId)
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsOrg', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getOrgs(): VePromise<OrgObject[], OrgsResponse> {
-        return this.projectSvc.getOrgs()
+        const promise = this.projectSvc.getOrgs()
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsOrgs', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getProject(
         params: ParamsObject
     ): VePromise<ProjectObject, ProjectsResponse> {
-        return this.projectSvc.getProject(params.projectId)
+        const promise = this.projectSvc.getProject(params.projectId)
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsProject', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getProjects(
-        projectOb: ProjectObject
+        projectOb: ProjectObject,
+        refresh?: boolean
     ): VePromise<ProjectObject[], ProjectsResponse> {
-        return this.projectSvc.getProjects(projectOb.orgId)
+        const promise = this.projectSvc.getProjects(projectOb.orgId, refresh)
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsProjects', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getProjectMounts(
-        params: ParamsObject
+        params: ParamsObject,
+        refresh?: boolean
     ): VePromise<MountObject, ProjectsResponse> {
-        return this.projectSvc.getProjectMounts(
+        const promise = this.projectSvc.getProjectMounts(
             params.projectId,
             params.refId,
-            true
+            refresh
         )
+
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast<MountObject>('mmsProject', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getRef(params: ParamsObject): VePromise<RefObject, RefsResponse> {
-        return this.projectSvc.getRef(params.refId, params.projectId)
+        const promise = this.projectSvc.getRef(params.refId, params.projectId)
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsRef', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getRefs(params: ParamsObject): VePromise<RefObject[], RefsResponse> {
-        return this.projectSvc.getRefs(params.projectId)
-    }
-
-    private _filterRefs(refType: string, refObs: RefObject[]): RefObject[] {
-        const ret: RefObject[] = []
-        refObs.forEach((ref: RefObject) => {
-            if (ref.type === refType) {
-                ret.push(ref)
+        const promise = this.projectSvc.getRefs(params.projectId)
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsRefs', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
             }
-        })
-        return ret
-    }
-
-    public getTag = (refOb: RefObject): RefObject => {
-        return this._filterRefs('Tag', [refOb])[0]
-    }
-
-    public getTags(refObs: RefObject[]): RefObject[] {
-        return this._filterRefs('Tag', refObs)
-    }
-
-    public getBranch = (refOb: RefObject): RefObject => {
-        return this._filterRefs('Branch', [refOb])[0]
-    }
-
-    public getBranches(refObs: RefObject[]): RefObject[] {
-        return this._filterRefs('Branch', refObs)
+        )
+        return promise
     }
 
     public getGroups(
         params: ParamsObject,
         refresh?: boolean
     ): VePromise<GroupObject[], GroupsResponse> {
-        return this.projectSvc.getGroups(
+        const promise = this.projectSvc.getGroups(
             params.projectId,
             params.refId,
             refresh
         )
+
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsGroups', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getGroup(
@@ -187,10 +251,11 @@ export class ResolveService {
                 }
             }
         }
+        this.eventSvc.$broadcast('mmsGroup', group)
         return group
     }
 
-    public getDocument(
+    public getCoverDocument(
         params: ParamsObject,
         refOb: RefObject,
         projectOb: ProjectObject,
@@ -210,6 +275,10 @@ export class ResolveService {
             )
             .then(
                 (data) => {
+                    this.eventSvc.$broadcast<DocumentObject>(
+                        'mmsDocument',
+                        data
+                    )
                     deferred.resolve(data)
                 },
                 (reason) => {
@@ -234,6 +303,10 @@ export class ResolveService {
                                 )
                                 .then(
                                     (data) => {
+                                        this.eventSvc.$broadcast(
+                                            'mmsDocument',
+                                            data
+                                        )
                                         deferred.resolve(data)
                                     },
                                     (reason2) => {
@@ -302,8 +375,8 @@ export class ResolveService {
         const coverIndex = eid.indexOf('_cover')
         if (coverIndex > 0) {
             const groupId = eid.substring(5, coverIndex)
-            this.viewSvc
-                .getProjectDocument(
+            this.elementSvc
+                .getElement(
                     {
                         projectId: params.projectId,
                         refId: params.refId,
@@ -315,6 +388,7 @@ export class ResolveService {
                 )
                 .then(
                     (data) => {
+                        this.eventSvc.$broadcast('mmsDocument', data)
                         deferred.resolve(data)
                     },
                     (reason) => {
@@ -360,6 +434,10 @@ export class ResolveService {
                                                 )
                                                 .then(
                                                     (data) => {
+                                                        this.eventSvc.$broadcast(
+                                                            'mmsDocument',
+                                                            data
+                                                        )
                                                         deferred.resolve(data)
                                                     },
                                                     (reason3) => {
@@ -394,7 +472,7 @@ export class ResolveService {
         params: ParamsObject,
         refresh?: boolean
     ): VePromise<ViewObject> {
-        return this.viewSvc.getProjectDocument(
+        const promise = this.elementSvc.getElement(
             {
                 projectId: params.projectId,
                 refId: params.refId,
@@ -403,13 +481,23 @@ export class ResolveService {
             2,
             refresh
         )
+
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsDocument', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getProjectDocuments(
         params: ParamsObject,
         refresh?: boolean
     ): VePromise<DocumentObject[]> {
-        return this.viewSvc.getProjectDocuments(
+        const promise = this.viewSvc.getProjectDocuments(
             {
                 projectId: params.projectId,
                 refId: params.refId,
@@ -417,13 +505,23 @@ export class ResolveService {
             2,
             refresh
         )
+
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsDocuments', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getView(
         params: ParamsObject,
         refresh?: boolean
     ): VePromise<ViewObject> {
-        return this.elementSvc.getElement(
+        const promise = this.elementSvc.getElement(
             {
                 projectId: params.projectId,
                 refId: params.refId,
@@ -432,6 +530,16 @@ export class ResolveService {
             2,
             refresh
         )
+
+        promise.then(
+            (result) => {
+                this.eventSvc.$broadcast('mmsView', result)
+            },
+            (reason) => {
+                this.growl.error('Resolve Error: ' + reason.message)
+            }
+        )
+        return promise
     }
 
     public getSearch = (params: ParamsObject): string => {
@@ -446,10 +554,6 @@ export class ResolveService {
             return 'all'
         }
         return params.field
-    }
-
-    public getFooter(): VePromise<BrandingStyle, ProjectsResponse> {
-        return this.brandingSvc.getFooter()
     }
 
     public initializePermissions(

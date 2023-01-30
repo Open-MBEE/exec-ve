@@ -6,7 +6,7 @@ import {
     IDiffComponentOptions,
 } from '@ve-components/diffs/diff.controller'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import { HtmlRenderedDiff } from '../../../lib/html-rendered-diff'
 
@@ -103,4 +103,4 @@ const DiffHtmlComponent: IDiffComponentOptions = {
     controller: DiffHtmlController,
 }
 
-veCore.component(DiffHtmlComponent.selector, DiffHtmlComponent)
+veComponents.component(DiffHtmlComponent.selector, DiffHtmlComponent)

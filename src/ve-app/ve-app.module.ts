@@ -27,7 +27,6 @@ import { ResolveService } from '@ve-app/main/services'
 import {
     AuthService,
     URLService,
-    ProjectService,
     PermissionCache,
     ViewService,
     DocumentMetadata,
@@ -38,7 +37,7 @@ import {
     RootScopeService,
 } from '@ve-utils/services'
 
-import { VePromise } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import {
     CheckAuthResponse,
     DocumentObject,
@@ -148,6 +147,7 @@ veApp.config([
             })
             .state('main.login', {
                 url: '/login?next',
+
                 params: {
                     next: {
                         type: 'query',
@@ -181,6 +181,9 @@ veApp.config([
                 views: {
                     'banner-top@main': {
                         component: 'systemBanner',
+                        bindings: {
+                            mmsBanner: 'bannerOb',
+                        },
                     },
                     'login@main': {
                         component: 'login',
@@ -192,6 +195,7 @@ veApp.config([
             })
             .state('main.login.redirect', {
                 url: '/redirect',
+
                 resolve: {
                     token: [
                         'ResolveService',
@@ -210,6 +214,7 @@ veApp.config([
             })
             .state('main.login.select', {
                 url: '/select?fromLogin',
+
                 params: {
                     fromLogin: {
                         type: 'query',
@@ -252,6 +257,9 @@ veApp.config([
                 views: {
                     'banner-top@main': {
                         component: 'systemBanner',
+                        bindings: {
+                            mmsBanner: 'bannerOb',
+                        },
                     },
                     'login@main': {
                         component: 'projectSelect',
@@ -266,6 +274,7 @@ veApp.config([
                 //TODO this will be the ui to diff and merge and manage refs
                 url: '/projects/:projectId',
                 abstract: true,
+
                 params: {
                     projectId: {
                         type: 'path',
@@ -284,6 +293,16 @@ veApp.config([
                             resolveSvc: ResolveService
                         ): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
+                        },
+                    ],
+                    refresh: [
+                        '$transition$',
+                        ($transition$: Transition): boolean => {
+                            const options = $transition$.options()
+                            return (
+                                options.reload === true ||
+                                options.reload === 'true'
+                            )
                         },
                     ],
                     bannerOb: [
@@ -305,13 +324,15 @@ veApp.config([
                         },
                     ],
                     projectObs: [
-                        'ProjectService',
+                        'refresh',
+                        'ResolveService',
                         'projectOb',
                         (
-                            projectSvc: ProjectService,
+                            refresh: boolean,
+                            resolveSvc: ResolveService,
                             projectOb: ProjectObject
                         ): VePromise<ProjectObject[], ProjectsResponse> => {
-                            return projectSvc.getProjects(projectOb.orgId)
+                            return resolveSvc.getProjects(projectOb, refresh)
                         },
                     ],
                     orgOb: [
@@ -342,36 +363,13 @@ veApp.config([
                             return resolveSvc.getRefs(params)
                         },
                     ],
-                    tagObs: [
-                        'ResolveService',
-                        'refObs',
-                        (
-                            resolveSvc: ResolveService,
-                            refObs: RefObject[]
-                        ): RefObject[] => {
-                            return resolveSvc.getTags(refObs)
-                        },
-                    ],
-                    branchObs: [
-                        'ResolveService',
-                        'refObs',
-                        (
-                            resolveSvc: ResolveService,
-                            refObs: RefObject[]
-                        ): RefObject[] => {
-                            return resolveSvc.getBranches(refObs)
-                        },
-                    ],
-                    documentOb: () => {
-                        return null
-                    },
-                    viewOb: () => {
-                        return null
-                    },
                 },
                 views: {
                     'banner-top@main': {
                         component: 'systemBanner',
+                        bindings: {
+                            mmsBanner: 'bannerOb',
+                        },
                     },
                     'nav@main': {
                         component: 'navBar',
@@ -390,13 +388,8 @@ veApp.config([
                             mmsProjects: 'projectObs',
                             mmsGroup: 'groupOb',
                             mmsGroups: 'groupObs',
-                            mmsBranch: 'branchOb',
-                            mmsBranches: 'branchObs',
+                            mmsRefs: 'refObs',
                             mmsRef: 'refOb',
-                            mmsTag: 'tagOb',
-                            mmsTags: 'tagObs',
-                            mmsDocument: 'documentOb',
-                            mmsView: 'viewOb',
                         },
                     },
                 },
@@ -411,8 +404,6 @@ veApp.config([
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
-                            mmsTags: 'tagObs',
-                            mmsBranches: 'branchObs',
                         },
                     },
                 },
@@ -420,6 +411,7 @@ veApp.config([
             .state('main.project.ref', {
                 // equivalent to old sites and documents page
                 url: '/:refId',
+
                 resolve: {
                     params: [
                         '$transition$',
@@ -457,29 +449,6 @@ veApp.config([
                             return resolveSvc.getRef(params)
                         },
                     ],
-                    tagOb: [
-                        'refOb',
-                        'ResolveService',
-                        (
-                            refOb: RefObject,
-                            resolveSvc: ResolveService
-                        ): RefObject => {
-                            return resolveSvc.getTag(refOb)
-                        },
-                    ],
-                    branchOb: [
-                        'refOb',
-                        'ResolveService',
-                        (
-                            refOb: RefObject,
-                            resolveSvc: ResolveService
-                        ): RefObject => {
-                            return resolveSvc.getBranch(refOb)
-                        },
-                    ],
-                    groupOb: () => {
-                        return null
-                    },
                     groupObs: [
                         'ResolveService',
                         'params',
@@ -492,52 +461,41 @@ veApp.config([
                             return resolveSvc.getGroups(params, refresh)
                         },
                     ],
-                    documentOb: [
+                    documentObs: [
+                        'ResolveService',
                         'params',
                         'refresh',
-                        'refOb',
-                        'projectOb',
-                        'ResolveService',
                         (
+                            resolveSvc: ResolveService,
                             params: ParamsObject,
-                            refresh: boolean,
-                            refOb: RefObject,
-                            projectOb: ProjectObject,
-                            resolveSvc: ResolveService
-                        ): VePromise<DocumentObject> => {
-                            return resolveSvc.getDocument(
+                            refresh: boolean
+                        ): VePromise<DocumentObject[]> => {
+                            return resolveSvc.getProjectDocuments(
                                 params,
-                                refOb,
-                                projectOb,
                                 refresh
                             )
                         },
                     ],
-                    viewOb: [
-                        'documentOb',
-                        (documentOb: DocumentObject): ViewObject => {
-                            return documentOb
-                        },
-                    ],
                     bannerOb: [
                         'ResolveService',
+                        'params',
                         (
-                            resolveSvc: ResolveService
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
                         ): VePromise<BrandingStyle, ProjectsResponse> => {
-                            return resolveSvc.getBanner()
+                            return resolveSvc.getBanner(params)
                         },
                     ],
                     footerOb: [
                         'ResolveService',
+                        'params',
                         (
-                            resolveSvc: ResolveService
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
                         ): VePromise<BrandingStyle, ProjectsResponse> => {
-                            return resolveSvc.getFooter()
+                            return resolveSvc.getFooter(params)
                         },
                     ],
-                    docMeta: () => {
-                        return {}
-                    },
                     permissions: [
                         'refOb',
                         'projectOb',
@@ -557,6 +515,9 @@ veApp.config([
                 views: {
                     'banner-top@main': {
                         component: 'systemBanner',
+                        bindings: {
+                            mmsBanner: 'bannerOb',
+                        },
                     },
                     'nav@main': {
                         component: 'navBar',
@@ -575,47 +536,114 @@ veApp.config([
                             mmsProjects: 'projectObs',
                             mmsGroup: 'groupOb',
                             mmsGroups: 'groupObs',
-                            mmsBranch: 'branchOb',
-                            mmsBranches: 'branchObs',
                             mmsRef: 'refOb',
-                            mmsTag: 'tagOb',
-                            mmsTags: 'tagObs',
-                            mmsDocument: 'documentOb',
-                            mmsView: 'viewOb',
+                            mmsRefs: 'refObs',
+                        },
+                    },
+                    'banner-bottom@main': {
+                        component: 'systemFooter',
+                        bindings: {
+                            mmsFooter: 'footerOb',
                         },
                     },
                     'pane-left@main': {
                         component: 'leftPane',
                         bindings: {
-                            mmsDocument: 'documentOb',
+                            mmsGroups: 'groupObs',
+                            mmsDocuments: 'documentObs',
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsGroups: 'groupObs',
-                            docMeta: 'docMeta',
                         },
-                    },
-
-                    'pane-center@main': {
-                        component: 'slideshow',
-                    },
-                    'pane-right@main': {
-                        component: 'rightPane',
-                    },
-                    'toolbar-right@main': {
-                        component: 'rightToolbar',
-                    },
-                    'banner-bottom@main': {
-                        component: 'systemFooter',
                     },
                 },
             })
             .state('main.project.ref.portal', {
                 url: '/portal',
+
+                resolve: {
+                    documentOb: [
+                        'params',
+                        'refOb',
+                        'projectOb',
+                        'refresh',
+                        'ResolveService',
+                        (
+                            params: ParamsObject,
+                            refOb: RefObject,
+                            projectOb: ProjectObject,
+                            refresh: boolean,
+                            resolveSvc: ResolveService
+                        ): VePromise<DocumentObject> => {
+                            return resolveSvc.getCoverDocument(
+                                params,
+                                refOb,
+                                projectOb,
+                                refresh
+                            )
+                        },
+                    ],
+                    groupOb: [
+                        'groupObs',
+                        'documentOb',
+                        'ResolveService',
+                        (
+                            groupObs: GroupObject[],
+                            documentOb: DocumentObject,
+                            resolveSvc: ResolveService
+                        ): GroupObject => {
+                            return resolveSvc.getGroup(groupObs, documentOb)
+                        },
+                    ],
+                    docMeta: [
+                        'ViewService',
+                        'documentOb',
+                        (
+                            viewSvc: ViewService,
+                            documentOb: DocumentObject
+                        ): VePromise<DocumentMetadata> => {
+                            return viewSvc.getDocumentMetadata({
+                                projectId: documentOb._projectId,
+                                refId: documentOb._refId,
+                                elementId: documentOb.id,
+                            })
+                        },
+                    ],
+                },
                 views: {
                     'pane-center@main': {
                         component: 'slideshow',
+                        bindings: {
+                            mmsParams: 'params',
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
+                            mmsGroup: 'groupOb',
+                            mmsDocument: 'documentOb',
+                        },
                     },
+                    'pane-left@main': {
+                        component: 'leftPane',
+                        bindings: {
+                            mmsDocuments: 'documentObs',
+                            mmsOrg: 'orgOb',
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
+                            mmsGroups: 'groupObs',
+                        },
+                    },
+                    // 'pane-right@main': {
+                    //     component: 'rightPane',
+                    //     bindings: {
+                    //         mmsRef: 'refOb',
+                    //         mmsDocument: 'documentOb',
+                    //     },
+                    // },
+                    // 'toolbar-right@main': {
+                    //     component: 'rightToolbar',
+                    //     bindings: {
+                    //         mmsRef: 'refOb',
+                    //     },
+                    // },
                 },
             })
             .state('main.project.ref.groupReorder', {
@@ -635,6 +663,10 @@ veApp.config([
                 views: {
                     'pane-center@main': {
                         component: 'reorderGroup',
+                        bindings: {
+                            mmsGroups: 'groupObs',
+                            mmsDocuments: 'documentObs',
+                        },
                     },
                 },
             })
@@ -669,12 +701,6 @@ veApp.config([
                             )
                         },
                     ],
-                    viewOb: [
-                        'documentOb',
-                        (documentOb: DocumentObject): ViewObject => {
-                            return documentOb
-                        },
-                    ],
                     groupOb: [
                         'groupObs',
                         'documentOb',
@@ -696,18 +722,34 @@ veApp.config([
                             mmsProjects: 'projectObs',
                             mmsGroup: 'groupOb',
                             mmsGroups: 'groupObs',
-                            mmsBranch: 'branchOb',
-                            mmsBranches: 'branchObs',
                             mmsRef: 'refOb',
-                            mmsTag: 'tagOb',
-                            mmsTags: 'tagObs',
+                            mmsRefs: 'refObs',
                             mmsDocument: 'documentOb',
-                            mmsView: 'viewOb',
                         },
                     },
                     'pane-center@main': {
                         component: 'slideshow',
+                        bindings: {
+                            mmsParams: 'params',
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
+                            mmsGroup: 'groupOb',
+                            mmsDocument: 'documentOb',
+                        },
                     },
+                    // 'pane-right@main': {
+                    //     component: 'rightPane',
+                    //     bindings: {
+                    //         mmsRef: 'refOb',
+                    //         mmsDocument: 'documentOb',
+                    //     },
+                    // },
+                    // 'toolbar-right@main': {
+                    //     component: 'rightToolbar',
+                    //     bindings: {
+                    //         mmsRef: 'refOb',
+                    //     },
+                    // },
                 },
             })
             .state('main.project.ref.document', {
@@ -735,9 +777,13 @@ veApp.config([
                         },
                     ],
                     viewOb: [
+                        '$q',
                         'documentOb',
-                        (documentOb: DocumentObject): ViewObject => {
-                            return documentOb
+                        (
+                            $q: VeQService,
+                            documentOb: DocumentObject
+                        ): VePromise<ViewObject> => {
+                            return $q.resolve(documentOb)
                         },
                     ],
                     groupOb: [
@@ -775,11 +821,8 @@ veApp.config([
                             mmsProjects: 'projectObs',
                             mmsGroup: 'groupOb',
                             mmsGroups: 'groupObs',
-                            mmsBranch: 'branchOb',
-                            mmsBranches: 'branchObs',
                             mmsRef: 'refOb',
-                            mmsTag: 'tagOb',
-                            mmsTags: 'tagObs',
+                            mmsRefs: 'refObs',
                             mmsDocument: 'documentOb',
                             mmsView: 'viewOb',
                         },
@@ -791,23 +834,39 @@ veApp.config([
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsGroups: 'groupObs',
-                            docMeta: 'docMeta',
+                            mmsDocMeta: 'docMeta',
                         },
                     },
                     'pane-center@main': {
                         component: 'slideshow',
+                        bindings: {
+                            mmsParams: 'params',
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
+                            mmsGroup: 'groupOb',
+                            mmsDocument: 'documentOb',
+                            mmsView: 'viewOb',
+                        },
                     },
-                    'pane-right@main': {
-                        component: 'rightPane',
-                    },
-                    'toolbar-right@main': {
-                        component: 'rightToolbar',
-                    },
+                    // 'pane-right@main': {
+                    //     component: 'rightPane',
+                    //     bindings: {
+                    //         mmsRef: 'refOb',
+                    //         mmsDocument: 'documentOb',
+                    //         mmsView: 'viewOb',
+                    //     },
+                    // },
+                    // 'toolbar-right@main': {
+                    //     component: 'rightToolbar',
+                    //     bindings: {
+                    //         mmsRef: 'refOb',
+                    //     },
+                    // },
                 },
             })
             .state('main.project.ref.document.view', {
                 url: '/views/:viewId',
+
                 resolve: {
                     params: [
                         '$transition$',
@@ -848,22 +907,17 @@ veApp.config([
                             mmsProjects: 'projectObs',
                             mmsGroup: 'groupOb',
                             mmsGroups: 'groupObs',
-                            mmsBranch: 'branchOb',
-                            mmsBranches: 'branchObs',
                             mmsRef: 'refOb',
-                            mmsTag: 'tagOb',
-                            mmsTags: 'tagObs',
+                            mmsRefs: 'refObs',
                             mmsDocument: 'documentOb',
                             mmsView: 'viewOb',
                         },
-                    },
-                    'pane-center@main': {
-                        component: 'slideshow',
                     },
                 },
             })
             .state('main.project.ref.document.order', {
                 url: '/order',
+
                 resolve: {
                     documentOb: [
                         'params',
@@ -879,6 +933,9 @@ veApp.config([
                 views: {
                     'pane-center@main': {
                         component: 'reorderDocument',
+                        bindings: {
+                            mmsDocument: 'documentOb',
+                        },
                     },
                 },
             })
@@ -887,6 +944,11 @@ veApp.config([
                 views: {
                     'pane-center@main': {
                         component: 'document',
+                        bindings: {
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
+                            mmsDocument: 'documentOb',
+                        },
                     },
                 },
             })

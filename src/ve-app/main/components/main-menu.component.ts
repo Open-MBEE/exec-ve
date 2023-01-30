@@ -2,16 +2,20 @@ import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
 
 import { CacheService, ProjectService } from '@ve-utils/mms-api-client'
-import { RootScopeService, UtilsService } from '@ve-utils/services'
-import { onChangesCallback } from '@ve-utils/utils'
+import {
+    EventService,
+    RootScopeService,
+    UtilsService,
+} from '@ve-utils/services'
+import { onChangesCallback, watchChangeEvent } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import {
     DocumentObject,
-    ElementObject,
     GroupObject,
+    ParamsObject,
     ProjectObject,
     RefObject,
     ViewObject,
@@ -26,24 +30,25 @@ interface BreadcrumbObject {
 
 class MenuController implements IComponentController {
     //bindings
+    public params: ParamsObject
     public mmsProject: ProjectObject
     public mmsProjects: ProjectObject[]
-    public mmsGroup: ElementObject
-    public mmsGroups: ElementObject[]
-    public mmsBranch: RefObject
+    public mmsGroup: GroupObject
+    public mmsGroups: GroupObject[]
     public mmsRef: RefObject
-    public mmsBranches: RefObject[]
-    public mmsTag: RefObject
-    public mmsTags: RefObject[]
+    public mmsRefs: RefObject[]
     public mmsDocument: DocumentObject
     public mmsView: ViewObject
 
     //Locals
+    spin: boolean
     public child: DocumentObject | GroupObject
-    parentId: string
     crumbs: BreadcrumbObject[] = []
     groups: GroupObject[]
     projects: ProjectObject[]
+    refs: RefObject[]
+    document: DocumentObject
+    view: ViewObject
     groupsMap: {
         [id: string]: { id: string; name: string; parentId: string }
     } = {}
@@ -55,8 +60,10 @@ class MenuController implements IComponentController {
     public currentTag: string
     public breadcrumbs: BreadcrumbObject[]
     public truncateStyle
+    public subs: Rx.IDisposable[]
 
     static $inject = [
+        '$q',
         '$uiRouterGlobals',
         '$state',
         '$sce',
@@ -66,8 +73,10 @@ class MenuController implements IComponentController {
         'CacheService',
         'UtilsService',
         'RootScopeService',
+        'EventService',
     ]
     constructor(
+        public $q: VeQService,
         private $uiRouterGlobals: UIRouterGlobals,
         private $state: StateService,
         private $sce: angular.ISCEService,
@@ -76,41 +85,37 @@ class MenuController implements IComponentController {
         private projectSvc: ProjectService,
         private cacheSvc: CacheService,
         private utilsSvc: UtilsService,
-        private rootScopeSvc: RootScopeService
+        private rootScopeSvc: RootScopeService,
+        public eventSvc: EventService
     ) {
         this.htmlTooltip = 'Branch temporarily unavailable during duplication.'
     }
 
     $onInit(): void {
+        this.eventSvc.$init(this)
         this.projects = this.mmsProjects
         this.groups = this.mmsGroups
         if (this.mmsProject && !this.currentProject) {
             this.currentProject = this.mmsProject.name
         }
-        if (
-            this.mmsRef &&
-            (this.mmsBranch || this.mmsTag) &&
-            !this.currentRef
-        ) {
+        if (this.mmsRef && !this.currentRef) {
             this.currentRef = this.mmsRef
             if (this.mmsRef.type === 'Branch') {
-                this.currentBranch = this.mmsBranch.name
+                this.currentBranch = this.mmsRef.name
             } else if (this.mmsRef.type === 'Tag') {
-                this.currentTag = this.mmsTag.name
+                this.currentTag = this.mmsRef.name
             }
         }
 
+        watchChangeEvent(this, 'mmsDocument', this.updateBreadcrumbs, true)
+        watchChangeEvent(this, 'mmsGroups', this.updateGroups, true)
         this.updateGroups()
     }
 
-    // $onChanges(onChangesObj: angular.IOnChangesObject): void {
-    //     handleChange(onChangesObj, 'mmsDocument', this.updateBreadcrumbs)
-    //     handleChange(onChangesObj, 'mmsGroups', this.updateGroups)
-    // }
-
     updateGroups: onChangesCallback<undefined> = () => {
         this.groupsMap = {}
-        if (this.mmsGroups) {
+        this.spin = true
+        if (typeof this.mmsGroups !== 'undefined') {
             this.groups = this.mmsGroups
             for (let i = 0; i < this.groups.length; i++) {
                 this.groupsMap[this.groups[i].id] = {
@@ -119,8 +124,10 @@ class MenuController implements IComponentController {
                     parentId: this.groups[i]._parentId,
                 }
             }
+            this.updateBreadcrumbs()
+        } else {
+            this.updateBreadcrumbs()
         }
-        this.updateBreadcrumbs()
     }
 
     public updateBreadcrumbs: onChangesCallback<undefined> = () => {
@@ -201,6 +208,7 @@ class MenuController implements IComponentController {
                 }
             })
         }
+        this.spin = false
     }
 
     updateProject(project: ProjectObject): void {
@@ -222,7 +230,7 @@ class MenuController implements IComponentController {
             void this.$state.go(
                 this.$uiRouterGlobals.$current.name,
                 {
-                    projectId: this.mmsProject.id,
+                    projectId: ref._projectId,
                     refId: ref.id,
                     search: undefined,
                 },
@@ -234,7 +242,7 @@ class MenuController implements IComponentController {
     refsView(): void {
         void this.$state.go(
             'main.project.refs',
-            { projectId: this.mmsProject.id },
+            { projectId: this.params.projectId },
             { reload: true }
         )
     }
@@ -251,14 +259,14 @@ class MenuController implements IComponentController {
     getHrefForRef(branch: RefObject): string {
         let res =
             this.utilsSvc.PROJECT_URL_PREFIX +
-            this.mmsProject.id +
+            this.params.projectId +
             '/' +
             branch.id
-        if (this.mmsDocument) {
-            res += '/documents/' + this.mmsDocument.id
+        if (this.params.documentId) {
+            res += '/documents/' + this.params.documentId
         }
-        if (this.mmsView) {
-            res += '/views/' + this.mmsView.id
+        if (this.params.viewId) {
+            res += '/views/' + this.params.viewId
         }
         return res
     }
@@ -268,6 +276,7 @@ const MainMenuComponent: VeComponentOptions = {
     selector: 'mainMenu',
     template: `
     <nav class="project-level-header navbar navbar-inverse navbar-fixed-top block" role="navigation">
+    <i ng-show="$ctrl.spin" class="fa fa-spin fa-spinner nav-spin"></i>
     <div class="btn-group ve-dark-dropdown-nav pull-left" uib-dropdown keyboard-nav>
         <button type="button" class="dropdown-toggle" uib-dropdown-toggle>
             <span class="label-dropdown">Project:&nbsp;</span><span class="selected-dropdown">{{ $ctrl.currentProject }}</span>
@@ -280,10 +289,10 @@ const MainMenuComponent: VeComponentOptions = {
             </li>
         </ul>
     </div>
-    <div class="breadcrumbs">
+    <div ng-hide="$ctrl.spin" class="breadcrumbs">
         <ul>
             <li ng-style="truncateStyle">
-                <a class="back-to-proj" ui-sref="main.project.ref.portal({refId: $ctrl.mmsBranch.id? $ctrl.mmsBranch.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
+                <a class="back-to-proj" ui-sref="main.project.ref.portal({refId: $ctrl.currentBranch ? $ctrl.currentRef.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
                     uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa-solid fa-home fa-1x" aria-hidden="true"></i>
                 </a>
@@ -317,7 +326,7 @@ const MainMenuComponent: VeComponentOptions = {
                 </li>
                 <uib-tabset active="active" type="tabs" justified="false">
                     <uib-tab index="0" classes="tab-item" heading="Branches">
-                        <li ng-repeat="branch in $ctrl.mmsBranches | orderBy:'name' | filter:{name:refFilter} " ng-click="$ctrl.updateRef(branch)"
+                        <li ng-repeat="branch in $ctrl.mmsRefs | orderBy:'name' | filter:{name:refFilter, type: 'Branch' } " ng-click="$ctrl.updateRef(branch)"
                             ng-class="{'checked-list-item': branch.name === $ctrl.currentBranch, 'branch-disabled': branch.status == 'creating'}"
                             is-open="false" tooltip-placement="left" uib-tooltip-html="$ctrl.htmlTooltip"
                             tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">
@@ -325,7 +334,7 @@ const MainMenuComponent: VeComponentOptions = {
                         </li>
                     </uib-tab>
                     <uib-tab index="1" classes="tab-item" heading="Tags">
-                        <li ng-if="tags.length" ng-repeat="tag in $ctrl.mmsTags | orderBy:'name' | filter:{name:refFilter}" ng-click="$ctrl.updateRef(tag)"
+                        <li ng-if="tags.length" ng-repeat="tag in $ctrl.mmsRefs | orderBy:'name' | filter:{name:refFilter, type: 'Tag' }" ng-click="$ctrl.updateRef(tag)"
                             ng-class="{'checked-list-item': tag.name === $ctrl.currentTag, 'branch-disabled': tag.status == 'creating'}"
                             is-open="false" tooltip-placement="left" uib-tooltip-html="$ctrl.htmlTooltip"
                             tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">
@@ -340,15 +349,13 @@ const MainMenuComponent: VeComponentOptions = {
 </nav>
 `,
     bindings: {
+        params: '<',
         mmsProject: '<',
         mmsProjects: '<',
         mmsGroup: '<',
         mmsGroups: '<',
-        mmsBranch: '<',
         mmsRef: '<',
-        mmsBranches: '<',
-        mmsTag: '<',
-        mmsTags: '<',
+        mmsRefs: '<',
         mmsDocument: '<',
         mmsView: '<',
     },

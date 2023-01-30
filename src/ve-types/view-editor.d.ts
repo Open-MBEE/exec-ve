@@ -4,7 +4,11 @@ import IModalService = angular.ui.bootstrap.IModalService
 import IModalSettings = angular.ui.bootstrap.IModalSettings
 import IModalInstanceService = angular.ui.bootstrap.IModalInstanceService
 
-import { VeComponentOptions, VePromise } from '@ve-types/angular'
+import {
+    VeComponentOptions,
+    VePromise,
+    VePromiseReason,
+} from '@ve-types/angular'
 import { MmsObject, OrgObject, ProjectObject, ViewObject } from '@ve-types/mms'
 
 import { ngStorage } from 'ngstorage'
@@ -74,6 +78,15 @@ export interface VeStorageService extends ngStorage.StorageService {
     token: string
     org: OrgObject
     project: ProjectObject
+}
+
+export interface VeApiObject<T> {
+    [key: string]: {
+        resolve?(result: T): void
+        reject?(reason: VePromiseReason<T>): void
+        promise?: VePromise<T, void>
+        api?: T
+    }
 }
 // {
 //     getProperties: any

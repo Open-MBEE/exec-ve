@@ -281,7 +281,7 @@ export class SpecService implements Injectable<any> {
                     if (
                         (this.specApi.commitId &&
                             this.specApi.commitId !== 'latest') ||
-                        !this.permissionsSvc.hasProjectIdBranchIdEditPermission(
+                        !this.permissionsSvc.hasBranchEditPermission(
                             this.specApi.projectId,
                             this.specApi.refId
                         ) ||
@@ -514,7 +514,7 @@ export class SpecService implements Injectable<any> {
                     )
             })
         this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {
-            id: 'spec-editor',
+            id: 'spec-inspector',
         })
     }
 

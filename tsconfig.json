@@ -18,7 +18,8 @@
     "typeRoots": [
       "node_modules/@types",
       "types",
-      "node_modules/type-fest/index.d.ts"
+      "node_modules/type-fest/index.d.ts",
+      "src/lib"
     ],
     "rootDir": "src",
     "paths": {

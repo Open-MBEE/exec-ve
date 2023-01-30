@@ -154,7 +154,7 @@ class AddViewController extends AddElement<AddViewData> {
                     id: this.ownerId,
                 },
                 {
-                    name: this.name,
+                    name: this.newItem.name,
                     id: this.apiSvc.createUniqueId(),
                     isDoc: true,
                     _projectId: this.projectId,
@@ -165,21 +165,17 @@ class AddViewController extends AddElement<AddViewData> {
         } else if (this.type === 'View') {
             return this.viewSvc.createView(this.parentData, {
                 id: this.apiSvc.createUniqueId(),
-                name: this.name,
+                name: this.newItem.name,
                 _projectId: this.projectId,
                 _refId: this.refId,
                 type: 'Class',
             })
         } else if (this.type === 'Group') {
-            return this.viewSvc.createGroup(
-                this.name,
-                {
-                    _projectId: this.projectId,
-                    _refId: this.refId,
-                    id: this.ownerId,
-                },
-                this.orgId
-            )
+            return this.viewSvc.createGroup(this.newItem.name, {
+                _projectId: this.projectId,
+                _refId: this.refId,
+                id: this.ownerId,
+            })
         } else {
             return this.$q.reject({
                 status: 666,
@@ -245,3 +241,5 @@ const AddViewComponent: VeComponentOptions = {
 }
 
 veComponents.component(AddViewComponent.selector, AddViewComponent)
+veComponents.component('addGroup', AddViewComponent)
+veComponents.component('addDocument', AddViewComponent)

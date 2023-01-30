@@ -3,7 +3,7 @@ import Rx from 'rx-lite'
 
 import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
 import { ComponentService } from '@ve-components/services'
-import { TreeApi, TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-core/tree'
 import {
     AuthService,
     ElementService,
@@ -116,7 +116,6 @@ export class ViewController implements IComponentController {
     private showElements: boolean
     private showNumbering: boolean
     public subs: Rx.IDisposable[]
-    private treeApi: TreeApi
 
     constructor(
         private $element: JQuery<HTMLElement>,
@@ -133,7 +132,6 @@ export class ViewController implements IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        this.treeApi = this.treeSvc.getApi()
 
         this.reqOb = {
             elementId: this.mmsElementId,
@@ -185,11 +183,14 @@ export class ViewController implements IComponentController {
 
         this.subs.push(
             this.eventSvc.$on(TreeService.events.UPDATED, () => {
-                if (this.treeApi.branch2viewNumber[this.mmsElementId]) {
-                    this.level =
-                        this.treeApi.branch2viewNumber[this.mmsElementId].split(
-                            '.'
-                        ).length
+                if (
+                    this.treeSvc.getApi('contents').branch2viewNumber[
+                        this.mmsElementId
+                    ]
+                ) {
+                    this.level = this.treeSvc
+                        .getApi('contents')
+                        .branch2viewNumber[this.mmsElementId].split('.').length
                 }
             })
         )
@@ -281,7 +282,12 @@ export class ViewController implements IComponentController {
 
         this.processed = true
         this.$element.addClass('isLoading')
-        this.reqOb.elementId = this.mmsElementId
+        this.reqOb = {
+            elementId: this.mmsElementId,
+            projectId: this.mmsProjectId,
+            refId: this.mmsRefId,
+            commitId: this.mmsCommitId,
+        }
         this.elementSvc
             .getElement<ElementObject>(this.reqOb, 1)
             .then(
@@ -426,7 +432,7 @@ export const ViewComponent: VeComponentOptions = {
         </h1>
     
         <h1 ng-if="!$ctrl.mmsLink" class="view-title h{{level}}">
-            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}"></transclude-name>
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}" mms-watch-id="true"></transclude-name>
         </h1>
     
         <div class="ve-secondary-text last-modified no-print">
@@ -440,14 +446,14 @@ export const ViewComponent: VeComponentOptions = {
     <div ng-if="$ctrl.view._contents">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
         <div ng-repeat="instanceVal in $ctrl.view._contents.operand track by instanceVal.instanceId"> 
-            <view-pe mms-instance-val="::instanceVal"></view-pe>
+            <view-pe mms-instance-val="instanceVal"></view-pe>
             <add-pe-menu mms-view="$ctrl.view" index="$index" class="add-pe-button-container no-print"></add-pe-menu>
         </div>
     </div>
     <div ng-if="$ctrl.view.specification">
         <!-- Cant use track by instanceVal.instance b/c of possible duplicate entries -->
         <div ng-repeat="instanceVal in $ctrl.view.specification.operand track by instanceVal.instanceId"> 
-            <view-pe mms-instance-val="::instanceVal"></view-pe>
+            <view-pe mms-instance-val="instanceVal"></view-pe>
             <add-pe-menu mms-view="$ctrl.view" index="$index" class="add-pe-button-container no-print"></add-pe-menu>
         </div>
     </div>

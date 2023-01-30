@@ -37,9 +37,10 @@ class SelectController implements IComponentController {
     private $uiRouterGlobals: UIRouterGlobals = this.$uiRouter.globals
     public subs: Rx.IDisposable[]
 
-    //bindings
+    //Bindings
     public mmsOrgs: OrgObject[]
     mmsLoginBanner: BrandingStyle
+    mmsProjects: ProjectObject[]
 
     //local
     public redirect_from_old: boolean
@@ -56,6 +57,7 @@ class SelectController implements IComponentController {
     loginBanner: BrandingStyle
     protected orgSpin: boolean
     protected projSpin: boolean
+    protected bannerSpin: boolean
 
     constructor(
         private $uiRouter: UIRouter,
@@ -70,7 +72,15 @@ class SelectController implements IComponentController {
     ) {}
 
     $onInit(): void {
+        this.orgSpin = true
+        if (!this.mmsLoginBanner) {
+            this.mmsLoginBanner = {
+                labels: ['Select Desired Org/Project Above'],
+                disabled: false,
+            }
+        }
         this.loginBanner = this.mmsLoginBanner
+
         this.eventSvc.$init(this)
         this.rootScopeSvc.veTitle('View Editor') //what to name this?
         this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld()
@@ -281,8 +291,8 @@ const SelectComponent: VeComponentOptions = {
                     <span ng-if="$ctrl.spin"><i class="fa fa-spin fa-spinner"></i></span>
                 </button>
             </form>
-        </div>
-
+        </div>   
+        <br/>
         <login-banner mms-login-banner="$ctrl.loginBanner"></login-banner>
     </div>
 </div>

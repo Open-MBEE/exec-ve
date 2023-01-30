@@ -92,18 +92,11 @@ export class PermissionsService {
         return deferred.promise
     }
 
-    public hasProjectEditPermission = (projectOb: ProjectObject): boolean => {
-        return this.permissions.project[projectOb.id]
+    public hasProjectEditPermission = (projectId: string): boolean => {
+        return this.permissions.project[projectId]
     }
 
-    public hasBranchEditPermission = (refOb: RefObject): boolean => {
-        return this.hasProjectIdBranchIdEditPermission(
-            refOb._projectId,
-            refOb.id
-        )
-    }
-
-    public hasProjectIdBranchIdEditPermission = (
+    public hasBranchEditPermission = (
         projectId: string,
         refId: string
     ): boolean => {

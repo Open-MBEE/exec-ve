@@ -1,7 +1,7 @@
 import angular from 'angular'
 
 import { TreeService } from '@ve-core/tree'
-import { EventService } from '@ve-utils/services'
+import { EventService, RootScopeService } from '@ve-utils/services'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
@@ -20,15 +20,18 @@ export class TreeApi {
 
     public loading: boolean
 
-    private inProgress: VePromise<void, void>
+    private inProgress: VePromise<void, void> = null
 
     constructor(
         private $q: VeQService,
         private $timeout: angular.ITimeoutService,
         private eventSvc: EventService,
+        private rootScopeSvc: RootScopeService,
+        private treeSvc: TreeService,
         config: TreeConfig,
         peTree: boolean
     ) {
+        this.treeData = this.treeSvc.getTreeData()
         this.treeConfig = config
         this.peTree = peTree
     }
@@ -271,20 +274,49 @@ export class TreeApi {
      * rerender the tree when data or options change
      */
     public refresh = (): VePromise<void, void> => {
-        if (!this.loading) {
-            this.loading = true
-            return (this.inProgress = this._onTreeDataChange().then(() => {
-                this.loading = false
-                return
-            }))
+        this.loading = true
+        if (this.inProgress == null) {
+            this.inProgress = this.$q.resolve()
         }
-        return this.inProgress.then(() => {
-            this.loading = true
-            return (this.inProgress = this._onTreeDataChange().then(() => {
-                this.loading = false
-                return
-            }))
+        return new this.$q<void, void>((resolve, reject) => {
+            this.inProgress.then(
+                () => {
+                    this._onTreeDataChange()
+                        .then(
+                            () => resolve(),
+                            () => reject()
+                        )
+                        .finally(() => {
+                            this.loading = false
+                        })
+                },
+                () => {
+                    this._onTreeDataChange()
+                        .then(
+                            () => resolve(),
+                            () => reject()
+                        )
+                        .finally(() => {
+                            this.loading = false
+                        })
+                }
+            )
         })
+        // if (!this.loading) {
+        //     this.loading = true
+        //     this.inProgress = this._onTreeDataChange()
+        //     this.inProgress.finally(() => {
+        //         this.loading = false
+        //     })
+        //     return this.inProgress
+        // }
+        // return this.inProgress.then(() => {
+        //     this.loading = true
+        //     return (this.inProgress = this._onTreeDataChange().then(() => {
+        //         this.loading = false
+        //         return
+        //     }))
+        // })
     }
 
     public initialSelect = (): VePromise<void, void> => {
@@ -474,7 +506,7 @@ export class TreeApi {
     }
 
     private _onTreeDataChange = (): VePromise<void, void> => {
-        return this.$q<void, void>((resolve, reject) => {
+        return new this.$q<void, void>((resolve, reject) => {
             if (!Array.isArray(this.treeData)) {
                 reject({
                     message: '[warn] treeData is not an array!',
@@ -512,20 +544,19 @@ export class TreeApi {
                 else aggr = '-' + aggr.toLowerCase()
                 if (!branch.expanded) branch.expanded = false
 
-                if (
-                    (branch.children && branch.children.length > 0) ||
-                    branch.expandable === true
-                ) {
+                branch.expandable =
+                    branch.children && branch.children.length > 0
+
+                for (let i = 0; i < branch.children.length; i++) {
                     if (
-                        this.treeConfig.types &&
-                        !this.treeConfig.types.includes(branch.type)
-                    )
-                        haveVisibleChild = false
-                    for (let i = 0; i < branch.children.length; i++) {
-                        if (!branch.children[i].hide) {
-                            haveVisibleChild = true
-                            break
-                        }
+                        (this.treeConfig.types &&
+                            this.treeConfig.types.includes(
+                                branch.children[i].type
+                            )) ||
+                        this.rootScopeSvc.treeShowPe()
+                    ) {
+                        haveVisibleChild = true
+                        break
                     }
                 }
                 if (this.treeOptions && this.treeOptions.typeIcons) {
@@ -543,53 +574,57 @@ export class TreeApi {
                     }
                 }
                 let number = ''
-                if (!this.peTree) {
-                    if (section) number = section.join('.')
-                    if (
-                        this.treeConfig.types &&
-                        !this.treeConfig.types.includes(branch.type)
+                if (section) number = section.join('.')
+
+                if (
+                    this.treeConfig.types &&
+                    !this.treeConfig.types.includes(branch.type)
+                ) {
+                    if (!peNums[branch.type]) peNums[branch.type] = 0
+                    peNums[branch.type]++
+                    if (this.treeOptions.numberingDepth === 0) {
+                        number = peNums[branch.type].toString(10)
+                    } else if (
+                        section.length >= this.treeOptions.numberingDepth
                     ) {
-                        peNums[branch.type]++
-                        if (this.treeOptions.numberingDepth === 0) {
-                            number = peNums[branch.type].toString(10)
-                        } else if (
-                            section.length >= this.treeOptions.numberingDepth
+                        number = `${section
+                            .slice(0, this.treeOptions.numberingDepth)
+                            .join('.')}${this.treeOptions.numberingSeparator}${
+                            peNums[branch.type]
+                        }`
+                    } else {
+                        const sectionCopy = [...section]
+                        while (
+                            sectionCopy.length < this.treeOptions.numberingDepth
                         ) {
-                            number = `${section
-                                .slice(0, this.treeOptions.numberingDepth)
-                                .join('.')}${
-                                this.treeOptions.numberingSeparator
-                            }${peNums[branch.type]}`
-                        } else {
-                            const sectionCopy = [...section]
-                            while (
-                                sectionCopy.length <
-                                this.treeOptions.numberingDepth
-                            ) {
-                                sectionCopy.push('0')
-                            }
-                            number = `${sectionCopy.join('.')}${
-                                this.treeOptions.numberingSeparator
-                            }${peNums[branch.type]}`
+                            sectionCopy.push('0')
                         }
+                        number = `${sectionCopy.join('.')}${
+                            this.treeOptions.numberingSeparator
+                        }${peNums[branch.type]}`
                     }
-                    if (
-                        branch.data &&
-                        branch.data.id &&
-                        this.treeOptions.sectionNumbering
-                    ) {
-                        this.branch2viewNumber[branch.data.id] = number
-                        branch.data._veNumber = number
-                    }
-                } else if (branch.data._veNumber) {
+                }
+                if (
+                    branch.data &&
+                    branch.data.id &&
+                    this.treeOptions.sectionNumbering
+                ) {
+                    this.branch2viewNumber[branch.data.id] = number
+                    branch.data._veNumber = number
+                }
+                if (branch.data._veNumber) {
                     number = branch.data._veNumber
                 }
-                if (!this.peTree && branch.hide) visible = false
-                else if (this.peTree && level === 1) visible = true
+                if (branch.hide) visible = false
 
                 tree_rows.push({
                     level: level,
-                    section: number ? number : '',
+                    section:
+                        number &&
+                        !number.includes('undefined') &&
+                        !number.includes('NaN')
+                            ? number
+                            : '',
                     branch: branch,
                     label: branch.label,
                     visibleChild: haveVisibleChild,
@@ -612,9 +647,9 @@ export class TreeApi {
                         //if (branch.children[i].type === 'section')
                         //    addBranchToList(level + 1, '§ ', branch.children[i], child_visible);
                         if (
-                            branch.children[i].type === 'figure' ||
-                            branch.children[i].type === 'table' ||
-                            branch.children[i].type === 'equation'
+                            !this.treeConfig.types.includes(
+                                branch.children[i].type
+                            )
                         ) {
                             addBranchToList(
                                 level + 1,
@@ -639,9 +674,7 @@ export class TreeApi {
                                     nextSection.length <=
                                     this.treeOptions.numberingDepth
                                 ) {
-                                    peNums.table = 0
-                                    peNums.figure = 0
-                                    peNums.equaton = 0
+                                    peNums = {}
                                 }
                                 addBranchToList(
                                     level + 1,
@@ -667,11 +700,7 @@ export class TreeApi {
 
             this.branch2viewNumber = {}
             for (let i = 0; i < this.treeData.length; i++) {
-                addBranchToList(1, [], this.treeData[i], true, {
-                    figure: 0,
-                    table: 0,
-                    equation: 0,
-                })
+                addBranchToList(1, [], this.treeData[i], true, {})
             }
             this.treeRows.push(...tree_rows)
             if (!this.peTree)

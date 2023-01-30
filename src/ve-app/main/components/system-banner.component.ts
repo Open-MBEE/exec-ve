@@ -10,9 +10,9 @@ const SystemBannerComponent: VeComponentOptions = {
     selector: 'systemBanner',
     template: `
     <nav class="nav-level-banner navbar-fixed-top" role="navigation">
-    <div ng-show="!$ctrl.bannerOb.disabled" class="block">
+    <div ng-hide="$ctrl.disabled" class="block">
         <div class="navbar-banner-header">
-            <div ng-repeat="message in $ctrl.bannerMessage">
+            <div ng-hide="$ctrl.loading" ng-repeat="message in $ctrl.bannerMessage">
                 {{ message }}
             </div>
         </div>
@@ -20,17 +20,24 @@ const SystemBannerComponent: VeComponentOptions = {
 </nav>    
 `,
     bindings: {
-        bannerOb: '<',
+        mmsBanner: '<',
     },
     controller: class SystemBannerController implements IComponentController {
-        public bannerOb: BrandingStyle
+        public mmsBanner: BrandingStyle
 
+        public disabled: boolean
+        public loading: boolean
         public bannerMessage: string[] = ['Loading...']
 
         $onInit(): void {
-            if (Array.isArray(this.bannerOb.message))
-                this.bannerMessage = this.bannerOb.message
-            else this.bannerMessage = [this.bannerOb.message]
+            this.loading = true
+            if (Array.isArray(this.mmsBanner.message))
+                this.bannerMessage = this.mmsBanner.message
+            else this.bannerMessage = [this.mmsBanner.message]
+            this.disabled = this.mmsBanner.disabled
+                ? this.mmsBanner.disabled
+                : false
+            this.loading = false
         }
     },
 }

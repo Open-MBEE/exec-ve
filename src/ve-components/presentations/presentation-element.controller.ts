@@ -1,4 +1,5 @@
 import angular from 'angular'
+import $ from 'jquery'
 
 import {
     ViewHtmlService,
@@ -6,11 +7,12 @@ import {
     PresentationService,
 } from '@ve-components/presentations'
 import { ViewController } from '@ve-components/presentations/view.component'
-import { ComponentService } from '@ve-components/services'
+import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { SchemaService } from '@ve-utils/model-schema'
 import { EventService, ImageService } from '@ve-utils/services'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
 import { EditingApi, EditingToolbar } from '@ve-types/core/editor'
 import {
@@ -85,6 +87,7 @@ export class Presentation
     private schema = 'cameo'
 
     static $inject = [
+        '$q',
         '$element',
         '$scope',
         '$compile',
@@ -96,8 +99,10 @@ export class Presentation
         'EventService',
         'ImageService',
         'ButtonBarService',
+        'ExtensionService',
     ]
     constructor(
+        protected $q: VeQService,
         protected $element: JQuery<HTMLElement>,
         public $scope: angular.IScope,
         protected $compile: angular.ICompileService,
@@ -108,7 +113,8 @@ export class Presentation
         protected componentSvc: ComponentService,
         protected eventSvc: EventService,
         protected imageSvc: ImageService,
-        protected buttonBarSvc: ButtonBarService
+        protected buttonBarSvc: ButtonBarService,
+        protected extensionSvc: ExtensionService
     ) {
         super()
     }
@@ -250,8 +256,8 @@ export class Presentation
      *
      * @description Extension API method in which presentation components should return the content they wish to display.
      */
-    protected getContent = (): string => {
-        return 'Not Yet Implemented'
+    protected getContent = (): VePromise<string | HTMLElement[], string> => {
+        return this.$q.reject('Not Yet Implemented')
     }
 
     /**
@@ -266,14 +272,39 @@ export class Presentation
         this.inPreviewMode = false
 
         this.setNumber()
-
-        this.$element.empty()
-        this.$transcludeEl = $(this.getContent())
-        this.$transcludeEl.find('img').each((index, element) => {
-            this.imageSvc.fixImgSrc($(element))
-        })
-        this.$element.append(this.$transcludeEl)
-        this.$compile(this.$transcludeEl)(this.$scope)
+        this.getContent().then(
+            (result) => {
+                this.$element.empty()
+                this.$transcludeEl = $(result)
+                this.$transcludeEl.find('img').each((index, element) => {
+                    this.imageSvc.fixImgSrc($(element))
+                })
+                this.$element.append(this.$transcludeEl)
+                this.$compile(this.$transcludeEl)(this.$scope)
+            },
+            (reason) => {
+                const reqOb = {
+                    elementId: this.element.id,
+                    projectId: this.projectId,
+                    refId: this.refId,
+                    commitId: this.commitId,
+                    //includeRecentVersionElement: true,
+                }
+                this.$element.empty()
+                //TODO: Add reason/errorMessage handling here.
+                this.$transcludeEl = $(
+                    '<annotation mms-req-ob="::reqOb" mms-recent-element="::recentElement" mms-type="::type"></annotation>'
+                )
+                this.$element.append(this.$transcludeEl)
+                this.$compile(this.$transcludeEl)(
+                    Object.assign(this.$scope.$new(), {
+                        reqOb: reqOb,
+                        recentElement: reason.recentVersionOfElement,
+                        type: this.extensionSvc.AnnotationType,
+                    })
+                )
+            }
+        )
     }
 
     // Static Helper Functions

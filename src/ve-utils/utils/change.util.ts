@@ -1,4 +1,9 @@
 import angular from 'angular'
+import Rx from 'rx-lite'
+
+import { EventService } from '@ve-utils/services'
+
+import { VePromise, VeQService } from '@ve-types/angular'
 
 /**
  * @name onChangesCallback
@@ -59,4 +64,59 @@ export function handleChange<T>(
         callback(newVal, oldVal, firstChange)
     }
     return
+}
+
+interface EventWatcher {
+    $q: VeQService
+    eventSvc: EventService
+    subs: Rx.IDisposable[]
+}
+
+export function watchChangeEvent<T>(
+    $ctrl: EventWatcher & angular.IComponentController,
+    name: string,
+    changeAction: onChangesCallback<T>,
+    update?: boolean
+): void {
+    $ctrl.subs.push(
+        $ctrl.eventSvc.$on<T>(name, (data) => {
+            const change: angular.IChangesObject<T> = {
+                currentValue: data,
+                previousValue: $ctrl[name] as T,
+                isFirstChange: () => {
+                    return typeof $ctrl[name] === 'undefined'
+                },
+            }
+            if (data !== $ctrl[name] && update) {
+                $ctrl[name] = data
+            }
+            watchChange(change, changeAction)
+        })
+    )
+}
+
+export function watchChange<T>(
+    changeObj: angular.IChangesObject<T>,
+    callback: onChangesCallback<T>,
+    ignoreFirst?: boolean
+): void {
+    if (!changeObj) {
+        return callback()
+    } else {
+        if (ignoreFirst && changeObj.isFirstChange()) {
+            return
+        }
+        const newVal: T = changeObj.currentValue
+        const oldVal: T = changeObj.previousValue
+        const firstChange = changeObj.isFirstChange()
+        callback(newVal, oldVal, firstChange)
+    }
+    return
+}
+
+export function waitFor(
+    $ctrl: EventWatcher & angular.IComponentController,
+    bindings: string[]
+): VePromise<void, void> {
+    return new $ctrl.$q((resolve, reject) => {})
 }

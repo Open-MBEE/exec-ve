@@ -12,8 +12,9 @@ import {
 
 import { ToolbarApi } from './Toolbar.api'
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
+import { VePromise, VeQService } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
+import { VeApiObject } from '@ve-types/view-editor'
 
 export interface IToolBarButton {
     id: string
@@ -77,14 +78,7 @@ export class ToolbarService {
         SELECT: 'tb-select',
     }
 
-    private toolbars: {
-        [key: string]: {
-            resolve?(result: ToolbarApi): void
-            reject?(reason: VePromiseReason<ToolbarApi>): void
-            promise?: VePromise<ToolbarApi, void>
-            api?: ToolbarApi
-        }
-    } = {}
+    private toolbars: VeApiObject<ToolbarApi> = {}
     private buttons: { [key: string]: IToolBarButton } = {}
     private dynamic_buttons: { [key: string]: IToolBarButton } = {}
     private veConfig: VeConfig

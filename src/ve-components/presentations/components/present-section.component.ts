@@ -33,7 +33,7 @@ class PresentSectionController extends Presentation {
                 <div ng-class="{prop: $ctrl.isEditing}"><input class="form-control" type="text" ng-model="$ctrl.edit.name"/></div>
             </h3>
             <div class="btn-group pull-right">
-                <button-bar class="transclude-panel-toolbar" mms-bb-api="$ctrl.bbApi"></button-bar>
+                <button-bar class="transclude-panel-toolbar" button-api="$ctrl.bbApi"></button-bar>
             </div>
         </div>
         <div ng-class="{'panel-body' : $ctrl.isEditing}">

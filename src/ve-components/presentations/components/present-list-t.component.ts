@@ -1,9 +1,8 @@
-import { IComponentController } from 'angular'
+import { PresentationLite } from '@ve-components/presentations'
 
 import { veComponents } from '@ve-components'
 
 import { IPresentationComponentOptions } from '@ve-types/components/presentation'
-import { InstanceSpecObject, PresentationInstanceObject } from '@ve-types/mms'
 
 const PresentListTComponent: IPresentationComponentOptions = {
     selector: 'presentListT',
@@ -14,13 +13,7 @@ const PresentListTComponent: IPresentationComponentOptions = {
         element: '<',
         peNumber: '<',
     },
-    controller: class PresentListTController implements IComponentController {
-        public peObject: PresentationInstanceObject
-        public element: InstanceSpecObject
-        public peNumber: string
-
-        constructor() {}
-    },
+    controller: PresentationLite,
 }
 
 veComponents.component(PresentListTComponent.selector, PresentListTComponent)

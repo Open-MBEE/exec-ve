@@ -1,20 +1,28 @@
 import angular from 'angular'
 
 import { TreeApi } from '@ve-core/tree'
-import { ApplicationService, EventService } from '@ve-utils/services'
+import {
+    ApplicationService,
+    EventService,
+    RootScopeService,
+} from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
-import { VePromiseReason, VeQService } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
-import { TreeBranch, TreeConfig } from '@ve-types/tree'
+import { TreeBranch, TreeConfig, TreeOptions, TreeRow } from '@ve-types/tree'
+import { VeApiObject } from '@ve-types/view-editor'
 
 export class TreeService {
-    private treeApi: TreeApi
-    private peTreeApis: { [key: string]: TreeApi } = {}
+    private treeData: TreeBranch[]
+    private treeRows: TreeRow[]
+
+    private treeApi: VeApiObject<TreeApi> = {}
 
     static events = {
         UPDATED: 'tree.updated',
+        RELOAD: 'tree.reload',
     }
 
     static MetaTypes = [
@@ -44,6 +52,7 @@ export class TreeService {
         '$timeout',
         'growl',
         'ApplicationService',
+        'RootScopeService',
         'EventService',
     ]
 
@@ -52,84 +61,79 @@ export class TreeService {
         private $timeout: angular.ITimeoutService,
         private growl: angular.growl.IGrowlService,
         private applicationSvc: ApplicationService,
+        private rootScopeSvc: RootScopeService,
         private eventSvc: EventService
     ) {}
 
-    getApi = (config?: TreeConfig): TreeApi => {
-        if (config && !this.treeApi)
-            this.treeApi = new TreeApi(
-                this.$q,
-                this.$timeout,
-                this.eventSvc,
-                config,
-                false
+    public waitForApi = (id: string): VePromise<TreeApi, void> => {
+        if (!this.treeApi.hasOwnProperty(id)) {
+            this.treeApi[id] = {}
+            this.treeApi[id].promise = new this.$q<TreeApi>(
+                (resolve, reject) => {
+                    this.treeApi[id].resolve = resolve
+                    this.treeApi[id].reject = reject
+                }
             )
-        return this.treeApi
+        }
+        return this.treeApi[id].promise
     }
 
-    getPeApi = (config: TreeConfig): TreeApi => {
-        if (!this.peTreeApis[config.id])
-            this.peTreeApis[config.id] = new TreeApi(
-                this.$q,
-                this.$timeout,
-                this.eventSvc,
-                config,
-                true
-            )
-        return this.peTreeApis[config.id]
-    }
+    public initApi(
+        config: TreeConfig,
+        treeOptions: TreeOptions,
+        peTree?: boolean
+    ): TreeApi {
+        const id = config.id
 
-    getAllPeApi(): { [key: string]: TreeApi } {
-        return this.peTreeApis
-    }
+        const api = new TreeApi(
+            this.$q,
+            this.$timeout,
+            this.eventSvc,
+            this.rootScopeSvc,
+            this,
+            config,
+            typeof peTree === 'undefined' ? false : peTree
+        )
 
-    destroyPeApi = (id: string): void => {
-        delete this.peTreeApis[id]
-    }
-
-    // Function to refresh pe tree when new item added, deleted or reordered
-    public refreshPeTrees = (cb?: () => void): void => {
-        Object.keys(this.peTreeApis).forEach((id) => {
-            this.refreshPeTree(id, cb)
-        })
-    }
-
-    public refreshPeTree = (treeId: string, cb?: () => void): void => {
-        if (this.peTreeApis[treeId]) {
-            const api = this.peTreeApis[treeId]
-            api.treeData.length = 0
-            const rows = this.treeApi.getRows()
-            if (rows.length > 0) {
-                this._getPeTreeData(
-                    rows[0].branch,
-                    api.treeConfig.types,
-                    api.treeData
-                )
-                api.refresh().then(
-                    () => {
-                        if (cb) cb()
-                    },
-                    (reason) => {
-                        this.growl.error(
-                            'Unable to refresh numbering: ' + reason.message
-                        )
-                    }
-                )
+        if (!this.treeApi[id]) {
+            this.treeApi[id] = {
+                api,
             }
+        } else {
+            this.treeApi[id].api = api
         }
+        if (!this.treeApi[id].resolve) {
+            this.treeApi[id].promise = new this.$q((resolve, reject) => {
+                this.treeApi[id].resolve = resolve
+                this.treeApi[id].reject = reject
+            })
+        }
+        if (!peTree && this.rootScopeSvc.treeInitialSelection())
+            api.initialSelection = this.rootScopeSvc.treeInitialSelection()
+        api.treeOptions = treeOptions
+        this.treeApi[id].resolve(api)
+        return api
     }
 
-    // Get a list of specific PE type from branch
-    private _getPeTreeData = (
-        branch: TreeBranch,
-        types: string[],
-        peTreeData: TreeBranch[]
-    ): void => {
-        if (types.includes(branch.type)) {
-            peTreeData.push(branch)
-        }
-        for (let i = 0; i < branch.children.length; i++) {
-            this._getPeTreeData(branch.children[i], types, peTreeData)
+    public getTreeData = (): TreeBranch[] => {
+        return this.treeData
+    }
+
+    public setTreeData = (treeData: TreeBranch[]): void => {
+        this.treeData = treeData
+    }
+
+    public getTreeRows = (): TreeRow[] => {
+        return this.treeRows
+    }
+
+    public setTreeRows = (treeData: TreeRow[]): void => {
+        this.treeRows = treeData
+    }
+
+    public getApi = (id: string): TreeApi => {
+        if (this.treeApi[id] && this.treeApi[id].api) {
+            return this.treeApi[id].api
         }
     }
 

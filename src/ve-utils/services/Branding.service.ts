@@ -2,7 +2,7 @@ import { veUtils } from '@ve-utils'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
-import { ProjectsResponse } from '@ve-types/mms'
+import { ParamsObject, ProjectsResponse } from '@ve-types/mms'
 
 export interface BrandingStyle {
     labels?: string[] | string[][]
@@ -126,7 +126,9 @@ export class BrandingService {
         return msg
     }
 
-    getBanner(): VePromise<BrandingStyle, ProjectsResponse> {
+    getBanner(
+        params?: ParamsObject
+    ): VePromise<BrandingStyle, ProjectsResponse> {
         return this.$q.resolve(this.banner)
     }
 
@@ -134,7 +136,9 @@ export class BrandingService {
         return this.$q.resolve(this.loginBanner)
     }
 
-    getFooter(): VePromise<BrandingStyle, ProjectsResponse> {
+    getFooter(
+        params?: ParamsObject
+    ): VePromise<BrandingStyle, ProjectsResponse> {
         return this.$q.resolve(this.footer)
     }
 }

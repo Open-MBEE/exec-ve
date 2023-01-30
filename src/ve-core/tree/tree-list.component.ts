@@ -12,7 +12,13 @@ import {
 import { veCore } from '@ve-core'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { TreeBranch, TreeIcons, TreeOptions, TreeRow } from '@ve-types/tree'
+import {
+    TreeBranch,
+    TreeConfig,
+    TreeIcons,
+    TreeOptions,
+    TreeRow,
+} from '@ve-types/tree'
 
 /**
  * @ngdoc directive
@@ -56,12 +62,12 @@ import { TreeBranch, TreeIcons, TreeOptions, TreeRow } from '@ve-types/tree'
  *  <pre>
  angular.module('app', ['ve-core'])
  .controller('TreeCtrl', ['$scope', function($scope) {
-        $scope.api = {}; //empty object to be populated by the spec api
-        $public handler(branch) {
+ $scope.api = {}; //empty object to be populated by the spec api
+ $public handler(branch) {
             //branch selected
         };
-        this.treeData = [
-            {
+ this.treeData = [
+ {
                 label: 'Root',
                 type: 'Package',
                 data: {
@@ -82,14 +88,14 @@ import { TreeBranch, TreeIcons, TreeOptions, TreeRow } from '@ve-types/tree'
                     }
                 ]
             }
-        ];
-        $scope.options = {
+ ];
+ $scope.options = {
             types: {
                 'Package': 'fa fa-folder',
                 'Class': 'fa fa-bomb'
             }
         };
-    }]);
+ }]);
  </pre>
  * ### template (html)
  *  <pre>
@@ -102,17 +108,17 @@ import { TreeBranch, TreeIcons, TreeOptions, TreeRow } from '@ve-types/tree'
  * @param {Object=} treeControl Empty object to populate with api
  * @param {Object=} options Options object to customize icons for types and statuses
  */
-class TreeController implements angular.IComponentController {
+class TreeListController implements angular.IComponentController {
     //Bindings
     private treeOptions: TreeOptions
     private treeIcons: TreeIcons
-    private treeApi: TreeApi
+    private treeConfig: TreeConfig
 
     public init: boolean = false
-    public treeRows: TreeRow[]
     public title
     private selectedBranch: any
     public treeSpin: boolean = true
+    public treeRows: TreeRow[]
 
     public subs: Rx.IDisposable[]
     private treeFilter: angular.uiTreeFilter.IFilterUiTree<TreeRow>
@@ -120,6 +126,7 @@ class TreeController implements angular.IComponentController {
     //Locals
     public icons: TreeIcons
     public options: TreeOptions
+    public treeApi: TreeApi
 
     static $inject = [
         '$scope',
@@ -147,23 +154,12 @@ class TreeController implements angular.IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        this.configure()
-    }
 
-    $onDestroy(): void {
-        this.eventSvc.destroy(this.subs)
-    }
-
-    configure(): void {
-        if (!this.init) {
-            this.init = true
-        }
+        this.treeApi = this.treeSvc.getApi('contents')
         this.treeSpin = false
-
         this.treeRows = this.treeApi.getRows()
-        this.title = this.treeApi.treeConfig.title
-            ? this.treeApi.treeConfig.title
-            : ''
+
+        this.title = this.treeConfig.title ? this.treeConfig.title : ''
         this.selectedBranch = this.treeApi.getSelectedBranch()
 
         if (!this.treeOptions) {
@@ -218,6 +214,10 @@ class TreeController implements angular.IComponentController {
         })
     }
 
+    $onDestroy(): void {
+        this.eventSvc.destroy(this.subs)
+    }
+
     public expandCallback = (
         branch: TreeBranch,
         e: JQuery.ClickEvent
@@ -270,8 +270,8 @@ class TreeController implements angular.IComponentController {
     // }
 }
 
-const TreeComponent: VeComponentOptions = {
-    selector: 'tree',
+const TreeListComponent: VeComponentOptions = {
+    selector: 'treeList',
     transclude: true,
     template: `
 <div ng-show="$ctrl.title">
@@ -279,8 +279,8 @@ const TreeComponent: VeComponentOptions = {
 </div>
 <div ng-hide="$ctrl.treeSpin">
     <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-        <li ng-repeat="row in $ctrl.treeRows | filter:{visible:true} track by row.branch.uid" ng-hide="!$ctrl.treeFilter(row, $ctrl.options.search)"
-            ng-class="" class="abn-tree-row {{ 'level-' + row.level }}">
+        <li ng-repeat="row in $ctrl.treeRows track by row.branch.uid" ng-show="$ctrl.treeConfig.types.includes(row.branch.type) && $ctrl.treeFilter(row, $ctrl.options.search)"
+            ng-class="" class="abn-tree-row level-1">
             <div class="arrow" ng-click="$ctrl.userClicksBranch(row.branch)" ng-dblclick="$ctrl.userDblClicksBranch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
                 <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
                     <div class="tree-item">
@@ -299,11 +299,11 @@ const TreeComponent: VeComponentOptions = {
     
 `,
     bindings: {
-        treeApi: '<',
-        treeIcons: '<',
+        treeConfig: '<',
         treeOptions: '<',
+        treeIcons: '<',
     },
-    controller: TreeController,
+    controller: TreeListController,
 }
 
-veCore.component(TreeComponent.selector, TreeComponent)
+veCore.component(TreeListComponent.selector, TreeListComponent)

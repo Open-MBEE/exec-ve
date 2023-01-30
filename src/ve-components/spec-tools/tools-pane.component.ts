@@ -478,13 +478,7 @@ class ToolsPaneController implements IComponentController {
                 '<extension-error type="$ctrl.errorType" mms-element-id="$ctrl.mmsElementId" kind="Spec"></extension-error>'
             )
         } else {
-            newTool.append(
-                '<' +
-                    tag +
-                    ' mms-branches="$ctrl.mmsBranches" mms-tags="$ctrl.mmsTags"></' +
-                    tag +
-                    '>'
-            )
+            newTool.append('<' + tag + '></' + tag + '>')
         }
 
         if (category === 'document') {
@@ -563,8 +557,7 @@ const ToolsPaneComponent: VeComponentOptions = {
 </div>
     `,
     bindings: {
-        mmsBranches: '@',
-        mmsTags: '@',
+        mmsRefs: '<',
         toolsCategory: '@',
     },
     controller: ToolsPaneController,

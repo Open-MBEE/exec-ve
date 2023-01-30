@@ -1,4 +1,4 @@
-import angular from 'angular'
+import { PresentationLite } from '@ve-components/presentations'
 
 import { veComponents } from '@ve-components'
 
@@ -13,15 +13,7 @@ const PresentTableTComponent: IPresentationComponentOptions = {
         element: '<',
         peNumber: '<',
     },
-    controller: class PresentTableTController
-        implements angular.IComponentController
-    {
-        public peObject
-        public element
-        public peNumber
-
-        constructor() {}
-    },
+    controller: PresentationLite,
 }
 
 veComponents.component(PresentTableTComponent.selector, PresentTableTComponent)

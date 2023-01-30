@@ -179,6 +179,7 @@ export class ElementService {
             const data = response.data
             const reason = this.uRLSvc.handleHttpStatus(response)
             if (
+                data &&
                 data.deleted &&
                 data.deleted.length > 0 &&
                 data.deleted[0].id === reqOb.elementId

@@ -60,14 +60,14 @@ export class ExtensionService {
 
     public getTagByType = (extPrefix: string, type: string): string => {
         if (!this.allowedExtensions.includes(extPrefix)) {
-            this.growl.error('Unknown Extension Prefix: ' + extPrefix)
+            // this.growl.error('Unknown Extension Prefix: ' + extPrefix)
             return 'extension-error'
         }
         const tag = _.kebabCase(
             type.startsWith(extPrefix) ? type : extPrefix + _.capitalize(type)
         )
         if (!this.extensionTags.includes(tag)) {
-            this.growl.error('Unknown Extension type: ' + type)
+            // this.growl.error('Unknown Extension type: ' + type)
             return 'extension-error'
         }
         return tag

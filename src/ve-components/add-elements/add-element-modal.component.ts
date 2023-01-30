@@ -27,6 +27,7 @@ class AddElementController
         '$element',
         'growl',
         '$timeout',
+        '$uibModal',
         'ExtensionService',
     ]
 
@@ -83,19 +84,16 @@ class AddElementController
     }
 
     public recompile = (): void => {
-        const tag = this.extensionSvc.getTagByType('add', this.type)
-
+        let tag = this.extensionSvc.getTagByType('add', this.type)
+        if (tag === 'extension-error') {
+            tag = 'add-generic'
+        }
         const newPe = $('<div></div>')
         $(newPe).append(
-            '<' +
-                tag +
-                ' add-element-data="::$ctrl.addElementData" add-element-api="$ctrl.addElementApi" ' +
-                'mms-project-id="{{$ctrl.projectId}}" ' +
-                this.refId
-                ? 'mms-ref-id="{{$ctrl.refId}}" '
-                : '' + this.orgId
-                ? 'mms-org-id="{{$ctrl.orgId}}" '
-                : '' + '</' + tag + '>'
+            `<${tag} add-element-data="$ctrl.addElementData" add-element-api="$ctrl.addElementApi" 
+                mms-project-id="{{$ctrl.projectId}}" ${
+                    this.refId ? `mms-ref-id="{{$ctrl.refId}}" ` : ''
+                }${this.orgId ? 'mms-org-id="{{$ctrl.orgId}}" ' : ''}></${tag}>`
         )
         $(this.$element).append(newPe)
         this.$compile(newPe)(this.$scope)
