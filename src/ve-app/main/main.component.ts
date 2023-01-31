@@ -398,7 +398,7 @@ const MainComponent: VeComponentOptions = {
                     )
                 } else if (
                     this.$uiRouterGlobals.$current.name ===
-                    'main.project.ref.preview'
+                    'main.project.ref.portal.preview'
                 ) {
                     const index = (
                         trans.params() as ParamsObject

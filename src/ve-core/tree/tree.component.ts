@@ -1,7 +1,7 @@
 import angular from 'angular'
 import Rx from 'rx-lite'
 
-import { TreeApi, TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-core/tree'
 import {
     ApplicationService,
     EventService,
@@ -115,7 +115,6 @@ class TreeController implements angular.IComponentController {
     private treeConfig: TreeConfig
 
     public init: boolean = false
-    public treeApi: TreeApi
     public treeRows: TreeRow[]
     public title
     private selectedBranch: any
@@ -153,10 +152,15 @@ class TreeController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
+        this.treeSpin = true
         this.eventSvc.$init(this)
         this.treeSvc.waitForApi(this.treeConfig.id).then(
             (api) => {
-                this.treeApi = api
+                this.subs.push(
+                    this.eventSvc.$on(TreeService.events.UPDATED, () => {
+                        this.configure()
+                    })
+                )
                 this.configure()
             },
             (reason) => {
@@ -167,26 +171,21 @@ class TreeController implements angular.IComponentController {
 
     $onDestroy(): void {
         this.eventSvc.destroy(this.subs)
+        this.treeSpin = true
     }
 
     configure(): void {
-        if (!this.init) {
-            this.init = true
+        this.treeRows = this.treeSvc.getApi(this.treeConfig.id).getRows()
+        if (this.treeRows.length > 0) {
+            this.treeSpin = false
         }
-        this.treeSpin = false
 
-        this.treeRows = this.treeApi.getRows()
         this.title = this.treeConfig.title ? this.treeConfig.title : ''
-        this.selectedBranch = this.treeApi.getSelectedBranch()
+        this.selectedBranch = this.treeSvc
+            .getApi(this.treeConfig.id)
+            .getSelectedBranch()
 
-        if (!this.treeOptions) {
-            this.options = {
-                expandLevel: 1,
-                search: '',
-            }
-        } else {
-            this.options = this.treeOptions
-        }
+        this.options = this.treeOptions
         const iconsDefault: TreeIcons = {
             iconExpand: 'fa-solid fa-caret-down fa-lg fa-fw',
             iconCollapse: 'fa-solid fa-caret-right fa-lg fa-fw',
@@ -194,7 +193,8 @@ class TreeController implements angular.IComponentController {
         }
         this.icons = this.treeIcons ? this.treeIcons : iconsDefault
 
-        this.treeApi.defaultIcon = this.icons.iconDefault
+        this.treeSvc.getApi(this.treeConfig.id).defaultIcon =
+            this.icons.iconDefault
 
         if (!this.options.expandLevel && this.options.expandLevel !== 0)
             this.options.expandLevel = 1
@@ -225,7 +225,7 @@ class TreeController implements angular.IComponentController {
 
         this.treeFilter = this.$filter('uiTreeFilter')
 
-        this.treeApi.forEachBranch((b, level) => {
+        this.treeSvc.getApi(this.treeConfig.id).forEachBranch((b, level) => {
             b.level = level
             b.expanded = b.level <= expand_level
         })
@@ -243,8 +243,8 @@ class TreeController implements angular.IComponentController {
             e.stopPropagation()
         }
         const promise = branch.expanded
-            ? this.treeApi.closeBranch(branch)
-            : this.treeApi.expandBranch(branch)
+            ? this.treeSvc.getApi(this.treeConfig.id).closeBranch(branch)
+            : this.treeSvc.getApi(this.treeConfig.id).expandBranch(branch)
         promise.then(
             () => {
                 branch.loading = false
@@ -257,7 +257,8 @@ class TreeController implements angular.IComponentController {
 
     public userClicksBranch = (branch: TreeBranch): void => {
         branch.loading = true
-        this.treeApi
+        this.treeSvc
+            .getApi(this.treeConfig.id)
             .selectBranch(branch, true)
             .then(
                 () => {
@@ -278,7 +279,8 @@ class TreeController implements angular.IComponentController {
 
     public userDblClicksBranch = (branch: TreeBranch): void => {
         branch.loading = true
-        this.treeApi
+        this.treeSvc
+            .getApi(this.treeConfig.id)
             .selectBranch(branch, true)
             .then(
                 () => {

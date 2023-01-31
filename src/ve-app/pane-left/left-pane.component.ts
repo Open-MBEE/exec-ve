@@ -18,6 +18,7 @@ import {
     ButtonBarService,
     ButtonWrapEvent,
 } from '@ve-core/button-bar'
+import { veCoreEvents } from '@ve-core/events'
 import { TreeApi, TreeService } from '@ve-core/tree'
 import {
     ApiService,
@@ -45,6 +46,7 @@ import {
     ExpressionObject,
     GroupObject,
     InstanceValueObject,
+    ParamsObject,
     ProjectObject,
     RefObject,
     RefsResponse,
@@ -68,6 +70,7 @@ class LeftPaneController implements IComponentController {
     public bars: string[]
 
     public treeOptions: TreeOptions
+
     public mainTree: TreeConfig
     public peTrees: TreeConfig[]
     public treeData: TreeBranch[]
@@ -80,6 +83,7 @@ class LeftPaneController implements IComponentController {
     public seenViewIds: { [key: string]: TreeBranch } = {}
 
     //Bindings
+    private mmsParams: ParamsObject
     private mmsDocument: DocumentObject
     private mmsDocuments: DocumentObject[]
     private mmsProject: ProjectObject
@@ -88,7 +92,7 @@ class LeftPaneController implements IComponentController {
     private docMeta: DocumentMetadata
 
     //Binding Values
-    // protected project: ProjectObject
+    //protected project: ProjectObject
     // protected ref: RefObject
     // protected document: DocumentObject
     // protected documents: DocumentObject[]
@@ -100,6 +104,8 @@ class LeftPaneController implements IComponentController {
     public addElementData: AddViewData
     protected squishSize: number = 250
     public filterInputPlaceholder: string
+    private processed: string = ''
+    private treeContentLoading: boolean
 
     static $inject = [
         '$anchorScroll',
@@ -125,7 +131,6 @@ class LeftPaneController implements IComponentController {
         'EventService',
         'ButtonBarService',
     ]
-    private init: boolean = false
 
     constructor(
         private $anchorScroll: angular.IAnchorScrollService,
@@ -152,10 +157,6 @@ class LeftPaneController implements IComponentController {
         private buttonBarSvc: ButtonBarService
     ) {
         //TODO: Make main tree more configurable; Add Toolbar?
-        this.mainTree = {
-            id: 'contents',
-            types: [],
-        }
         this.peTrees = [
             {
                 id: 'table',
@@ -179,20 +180,8 @@ class LeftPaneController implements IComponentController {
     }
 
     $onInit(): void {
-        this.eventSvc.$init(this)
-        //watchChangeEvent(this, 'mmsDocument', this.changeAction, true)
-        this.paneClosed = false
-        this.treeData = this.treeSvc.getTreeData()
-        if (!this.treeData) {
-            this.treeSvc.setTreeData([])
-            this.treeData = this.treeSvc.getTreeData()
-        }
-        this.treeRows = this.treeSvc.getTreeRows()
-        if (!this.treeRows) {
-            this.treeSvc.setTreeRows([])
-            this.treeRows = this.treeSvc.getTreeRows()
-        }
-        this.treeOptions = {
+        this.treeContentLoading = true
+        const defaultTreeOptions = {
             typeIcons: this.treeSvc.getTreeTypes(),
             sectionNumbering: this.$state.includes('main.project.ref.document'),
             numberingDepth: 2,
@@ -207,7 +196,38 @@ class LeftPaneController implements IComponentController {
             onDblClick: this.treeDblClickCallback,
             sort: !this.$state.includes('main.project.ref.document'),
         }
-        this.treeApi = this.treeSvc.initApi(this.mainTree, this.treeOptions)
+        this.eventSvc.$init(this)
+        this.paneClosed = false
+        this.treeData = this.treeSvc.getTreeData()
+        if (!this.treeData) {
+            this.treeSvc.setTreeData([])
+            this.treeData = this.treeSvc.getTreeData()
+        }
+        this.treeRows = this.treeSvc.getTreeRows()
+        if (!this.treeRows) {
+            this.treeSvc.setTreeRows([])
+            this.treeRows = this.treeSvc.getTreeRows()
+        }
+        this.treeOptions = defaultTreeOptions
+        if (
+            !this.treeSvc.checkRef('contents', this.mmsRef) ||
+            this.$state.includes('main.project.ref.document')
+        ) {
+            this.treeData.length = 0
+            this.treeRows.length = 0
+            this.mainTree = {
+                id: 'contents',
+                types: [],
+            }
+            this.treeApi = this.treeSvc.initApi(
+                this.mainTree,
+                this.treeOptions,
+                this.mmsRef
+            )
+        } else {
+            this.treeApi = this.treeSvc.getApi('contents')
+            this.mainTree = this.treeApi.treeConfig
+        }
 
         this.bbSize = '83px'
 
@@ -218,7 +238,7 @@ class LeftPaneController implements IComponentController {
             this.rootScopeSvc.veFullDocMode(true)
         }
 
-        this.changeAction()
+        this.changeDocument()
 
         this.$transitions.onSuccess({}, (trans: Transition) => {
             this.bbApi.resetButtons()
@@ -245,147 +265,119 @@ class LeftPaneController implements IComponentController {
                 }
             })
         )
-
         this.subs.push(
-            this.eventSvc.$on('tree-expand', () => {
-                void this.treeApi.expandAll()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-collapse', () => {
-                void this.treeApi.collapseAll()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-add-document', () => {
-                this.addElement('Document').then(
-                    () => {
-                        //Do Nothing
-                    },
-                    (reason) => {
-                        this.growl.error(reason.message)
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(
+                'button-clicked-tree-button-bar',
+                (data) => {
+                    switch (data.clicked) {
+                        case 'tree-expand': {
+                            void this.treeApi.expandAll()
+                            break
+                        }
+                        case 'tree-collapse': {
+                            void this.treeApi.collapseAll()
+                            break
+                        }
+                        case 'tree-add-document': {
+                            this.addElement('Document').then(
+                                () => {
+                                    //Do Nothing
+                                },
+                                (reason) => {
+                                    this.growl.error(reason.message)
+                                }
+                            )
+                            break
+                        }
+                        case 'tree-add-view': {
+                            this.addElement('View').catch((reason) => {
+                                this.growl.error(reason.message)
+                            })
+                            break
+                        }
+                        case 'tree-delete': {
+                            this.deleteItem()
+                            break
+                        }
+                        case 'tree-reorder-view': {
+                            this.rootScopeSvc.veFullDocMode(false)
+                            this.bbApi.setToggleState(
+                                'tree-full-document',
+                                false
+                            )
+                            void this.$state.go(
+                                'main.project.ref.document.order',
+                                {
+                                    search: undefined,
+                                }
+                            )
+                            break
+                        }
+                        case 'tree-reorder-group': {
+                            void this.$state.go('main.project.ref.groupReorder')
+                            break
+                        }
+                        case 'tree-add-group': {
+                            this.addElement('Group').catch((reason) => {
+                                this.growl.error(reason.message)
+                            })
+                            break
+                        }
+                        case 'tree-show-pe': {
+                            this.rootScopeSvc.treeShowPe(
+                                !this.rootScopeSvc.treeShowPe()
+                            )
+                            this.bbApi.setToggleState(
+                                'tree-show-pe',
+                                this.rootScopeSvc.treeShowPe()
+                            )
+                            this.setPeVisibility(
+                                this.viewId2node[this.mmsDocument.id]
+                            )
+                            this.treeApi.refresh().catch((reason) => {
+                                this.growl.error(TreeService.treeError(reason))
+                            })
+                            break
+                        }
+                        case 'tree-full-document': {
+                            this.fullDocMode()
+                            break
+                        }
+                        case 'tree-refresh': {
+                            this.reloadData()
+                            break
+                        }
                     }
-                )
-            })
+                    data.$event.stopPropagation()
+                }
+            )
         )
 
         this.subs.push(
-            this.eventSvc.$on('tree-delete-document', () => {
-                this.deleteItem()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-add-view', () => {
-                this.addElement('View').then(
-                    () => {
-                        //Do Nothing
-                    },
-                    (reason) => {
-                        this.growl.error(reason.message)
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(
+                'button-clicked-tree-tool-bar',
+                (data) => {
+                    switch (data.clicked) {
+                        case 'tree-show-tables': {
+                            this.toggle('table')
+                            break
+                        }
+                        case 'tree-show-figures': {
+                            this.toggle('figure')
+                            break
+                        }
+                        case 'tree-show-equations': {
+                            this.toggle('equation')
+                            break
+                        }
+                        case 'tree-close-all': {
+                            this.closeAll()
+                            break
+                        }
                     }
-                )
-            })
+                }
+            )
         )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-delete', () => {
-                this.deleteItem()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-delete-view', () => {
-                this.deleteItem((deleteBranch) => {
-                    this.eventSvc.$broadcast('view.deleted', deleteBranch)
-                })
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-reorder-view', () => {
-                this.rootScopeSvc.veFullDocMode(false)
-                this.bbApi.setToggleState('tree-full-document', false)
-                void this.$state.go('main.project.ref.document.order', {
-                    search: undefined,
-                })
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-reorder-group', () => {
-                void this.$state.go('main.project.ref.groupReorder')
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-add-group', () => {
-                this.addElement('Group').then(
-                    () => {
-                        //Do Nothing
-                    },
-                    (reason) => {
-                        this.growl.error(reason.message)
-                    }
-                )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-show-pe', () => {
-                this.rootScopeSvc.treeShowPe(!this.rootScopeSvc.treeShowPe())
-                this.bbApi.setToggleState(
-                    'tree-show-pe',
-                    this.rootScopeSvc.treeShowPe()
-                )
-                this.setPeVisibility(this.viewId2node[this.mmsDocument.id])
-                this.treeApi.refresh().catch((reason) => {
-                    this.growl.error(TreeService.treeError(reason))
-                })
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-show-tables', () => {
-                this.toggle('table')
-            })
-        )
-        this.subs.push(
-            this.eventSvc.$on('tree-show-figures', () => {
-                this.toggle('figure')
-            })
-        )
-        this.subs.push(
-            this.eventSvc.$on('tree-show-equations', () => {
-                this.toggle('equation')
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-close-all', () => {
-                this.closeAll()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-full-document', () => {
-                this.fullDocMode()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tree-refresh', () => {
-                this.reloadData()
-            })
-        )
-
-        if (this.$state.includes('project.ref.document')) {
-            this.filterInputPlaceholder = 'Filter table of contents'
-        } else {
-            this.filterInputPlaceholder = 'Filter groups/docs'
-        }
 
         // Utils creates this event when deleting instances from the view
         this.subs.push(
@@ -445,10 +437,15 @@ class LeftPaneController implements IComponentController {
         this.eventSvc.destroy(this.subs)
     }
 
-    changeAction: onChangesCallback<void> = () => {
-        if (!this.init) {
-            this.init = true
+    changeDocument: onChangesCallback<void> = () => {
+        if (this.$state.includes('main.project.ref.document')) {
+            this.filterInputPlaceholder = 'Filter table of contents'
+        } else {
+            this.filterInputPlaceholder = 'Filter groups/docs'
         }
+
+        if (!this.mmsDocument || this.processed === this.mmsDocument.id) return
+        this.processed = this.mmsDocument.id
 
         this.docEditable =
             this.mmsDocument &&
@@ -469,11 +466,6 @@ class LeftPaneController implements IComponentController {
             this.treeOptions.numberingSeparator =
                 this.docMeta.numberingSeparator
             this.treeOptions.startChapter = this.mmsDocument._startChapter
-        } else {
-            this.treeOptions.numberingDepth = 2
-            this.treeOptions.numberingSeparator = '.'
-            if (this.treeOptions.startChapter)
-                delete this.treeOptions.startChapter
         }
 
         this.bbApi = this.buttonBarSvc.initApi(
@@ -509,41 +501,86 @@ class LeftPaneController implements IComponentController {
             if (this.$state.includes('main.project.ref.portal')) {
                 this.treeApi.clearSelectedBranch()
             }
+            this.treeApi
+                .refresh()
+                .catch((reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                })
+                .finally(() => {
+                    this.treeContentLoading = false
+                })
         } else if (
             this.$state.includes('main.project.ref') &&
             !this.$state.includes('main.project.ref.document')
         ) {
             this.treeData.length = 0
+            this.mainTree.types.length = 0
             this.mainTree.types = ['group']
             if (this.mmsRef.type === 'Branch') {
                 this.mainTree.types.push('view')
             } else {
                 this.mainTree.types.push('snapshot')
             }
-            this.treeData.push(
-                ...this.treeSvc.buildTreeHierarchy(
-                    this.mmsGroups,
-                    'id',
-                    'group',
-                    '_parentId',
-                    this.groupLevel2Func
-                )
-            )
-            this.mmsDocuments.forEach((document) => {
-                if (
-                    !document._groupId ||
-                    document._groupId == this.mmsProject.id
-                ) {
-                    this.treeData.push({
-                        label: document.name,
-                        type: 'view',
-                        data: document,
-                        children: [],
-                    })
+            this.projectSvc.getGroups(this.mmsProject.id, this.mmsRef.id).then(
+                (groups) => {
+                    this.mmsGroups = groups
+                    this.viewSvc
+                        .getProjectDocuments({
+                            projectId: this.mmsProject.id,
+                            refId: this.mmsRef.id,
+                        })
+                        .then(
+                            (documents) => {
+                                this.mmsDocuments = documents
+                                this.treeData.push(
+                                    ...this.treeSvc.buildTreeHierarchy(
+                                        this.mmsGroups,
+                                        'id',
+                                        'group',
+                                        '_parentId',
+                                        this.groupLevel2Func
+                                    )
+                                )
+                                this.mmsDocuments.forEach((document) => {
+                                    if (
+                                        !document._groupId ||
+                                        document._groupId == this.mmsProject.id
+                                    ) {
+                                        this.treeData.push({
+                                            label: document.name,
+                                            type: 'view',
+                                            data: document,
+                                            children: [],
+                                        })
+                                    }
+                                })
+                                this.treeApi
+                                    .initialSelect()
+                                    .catch((reason) => {
+                                        this.growl.error(
+                                            TreeService.treeError(reason)
+                                        )
+                                    })
+                                    .finally(() => {
+                                        this.treeContentLoading = false
+                                    })
+                            },
+                            (reason) => {
+                                this.growl.error(
+                                    'Error getting Documents: ' + reason.message
+                                )
+                                this.treeContentLoading = false
+                            }
+                        )
+                },
+                (reason) => {
+                    this.growl.error('Error getting Groups: ' + reason.message)
+                    this.treeContentLoading = false
                 }
-            })
+            )
         } else {
-            this.mainTree.types = ['view', 'section']
+            this.mainTree.types.length = 0
+            this.mainTree.types.push('view', 'section')
             if (!this.mmsDocument._childViews) {
                 this.mmsDocument._childViews = []
             }
@@ -594,23 +631,27 @@ class LeftPaneController implements IComponentController {
                                         true
                                     )
                                 }
-                                this.treeApi.initialSelect().catch((reason) => {
-                                    this.growl.error(
-                                        TreeService.treeError(reason)
-                                    )
-                                })
+                                this.treeData.push(
+                                    this.viewId2node[this.mmsDocument.id]
+                                )
+                                this.treeApi
+                                    .initialSelect()
+                                    .catch((reason) => {
+                                        this.growl.error(
+                                            TreeService.treeError(reason)
+                                        )
+                                    })
+                                    .finally(() => {
+                                        this.treeContentLoading = false
+                                    })
                             })
                     },
                     (reason) => {
-                        console.log(reason)
+                        TreeService.treeError(reason)
+                        this.treeContentLoading = false
                     }
                 )
-            this.treeData.push(this.viewId2node[this.mmsDocument.id])
         }
-
-        this.treeApi.initialSelect().catch((reason) => {
-            this.growl.error(TreeService.treeError(reason))
-        })
     }
 
     tbInit = (api: ButtonBarApi): void => {
@@ -947,12 +988,12 @@ class LeftPaneController implements IComponentController {
             !this.$state.includes('main.project.ref.document')
         ) {
             if (branch.type === 'group') {
-                void this.$state.go('main.project.ref.preview', {
+                void this.$state.go('main.project.ref.portal.preview', {
                     documentId: 'site_' + branch.data.id + '_cover',
                     search: undefined,
                 })
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
-                void this.$state.go('main.project.ref.preview', {
+                void this.$state.go('main.project.ref.portal.preview', {
                     documentId: branch.data.id,
                     search: undefined,
                 })
@@ -1041,6 +1082,7 @@ class LeftPaneController implements IComponentController {
 
     reloadData = (): void => {
         this.bbApi.toggleButtonSpinner('tree-refresh')
+        this.processed = ''
         this.$state.reload().then(
             () => {
                 this.treeApi.refresh().then(
@@ -1432,6 +1474,7 @@ class LeftPaneController implements IComponentController {
                             this.$state.includes('main.project.ref.document') &&
                             branch.type === 'view'
                         ) {
+                            this.eventSvc.$broadcast('view.deleted', branch)
                             this.processDeletedViewBranch(branch)
                         }
                         if (this.rootScopeSvc.veFullDocMode() && cb) {
@@ -1536,7 +1579,10 @@ const LeftPaneComponent: VeComponentOptions = {
 </ng-pane>
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
     <div class="pane-left" style="display:table;">
-        <tree tree-config="$ctrl.mainTree" tree-options="$ctrl.treeOptions"></tree>
+        <i ng-show="$ctrl.treeContentLoading" class="fa fa-spin fa-spinner"></i>
+        <div ng-hide="$ctrl.treeContentLoading">
+            <tree tree-config="$ctrl.mainTree" tree-options="$ctrl.treeOptions"></tree>
+        </div>
         <div data-ng-repeat="view in $ctrl.peTrees" ng-if="$ctrl.activeMenu[view.id]">
             <tree-list tree-options="$ctrl.treeOptions" tree-config="view"></tree-list>
         </div>
@@ -1545,11 +1591,10 @@ const LeftPaneComponent: VeComponentOptions = {
 </ng-pane>
 `,
     bindings: {
+        mmsParams: '<paramsOb',
         mmsDocument: '<',
         mmsProject: '<',
         mmsRef: '<',
-        mmsGroups: '<',
-        mmsDocuments: '<',
         mmsDocMeta: '<',
     },
     require: {

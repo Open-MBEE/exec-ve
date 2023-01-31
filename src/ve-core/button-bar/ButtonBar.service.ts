@@ -194,7 +194,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-plus',
-                        selectable: true,
+                        selectable: false,
                         permission: false,
                         tooltip: 'Add View',
                         spinner: false,
@@ -207,7 +207,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-folder',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Add Group',
                         spinner: false,
@@ -220,7 +220,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-folder',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Clear Selection',
                         spinner: false,
@@ -233,7 +233,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-file',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Add Document',
                         spinner: false,
@@ -246,7 +246,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-refresh',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Refresh Tree Data',
                         spinner: false,
@@ -259,7 +259,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-tag',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Add Tag',
                         spinner: false,
@@ -272,7 +272,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-plus',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Add Branch',
                         spinner: false,
@@ -285,7 +285,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-trash',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Remove',
                         spinner: false,
@@ -298,7 +298,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-trash',
-                        selectable: true,
+                        selectable: false,
                         permission: false,
                         tooltip: 'Remove View',
                         spinner: false,
@@ -311,7 +311,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-arrows-v',
-                        selectable: true,
+                        selectable: false,
                         permission: false,
                         tooltip: 'Reorder Views',
                         spinner: false,
@@ -324,7 +324,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-arrows-v',
-                        selectable: true,
+                        selectable: false,
                         permission: false,
                         tooltip: 'Organize Groups/Docs',
                         spinner: false,
@@ -337,7 +337,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-file-text',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Full Document',
                         spinner: false,
@@ -352,7 +352,7 @@ export class ButtonBarService {
                         id: button,
                         icon: 'fa-regular fa-image',
                         selected: false,
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Show PE',
                         spinner: false,
@@ -367,7 +367,7 @@ export class ButtonBarService {
                         id: button,
                         icon: 'fa-solid fa-ellipsis-vertical',
                         selected: false,
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Show Content Tables',
                         spinner: false,
@@ -391,7 +391,7 @@ export class ButtonBarService {
                         id: button,
                         icon: 'fa-solid fa-xmark',
                         selected: false,
-                        selectable: false,
+                        selectable: true,
                         active: false,
                         permission: true,
                         tooltip: 'Close All',
@@ -445,7 +445,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-pen-to-square',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Enable Edits (alt + d)',
                         spinner: false,
@@ -459,7 +459,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-brands fa-codepen',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Show Elements (alt + e)',
                         spinner: false,
@@ -473,7 +473,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-comment',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Show Comments (alt + c)',
                         spinner: false,
@@ -487,7 +487,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-list-ol',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Hide Numbering',
                         spinner: false,
@@ -502,7 +502,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-sort-numeric-asc',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Refresh Figure Numbering',
                         spinner: false,
@@ -515,7 +515,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-arrow-up-right-from-square',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Share Short URL',
                         spinner: false,
@@ -528,7 +528,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-chevron-left',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Previous (alt + ,)',
                         spinner: false,
@@ -541,7 +541,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-chevron-right',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Next (alt + .)',
                         spinner: false,
@@ -554,7 +554,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-download',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Export',
                         button_content: 'Export',
@@ -575,7 +575,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-print',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Print',
                         spinner: false,
@@ -588,7 +588,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-file-pdf',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Export to PDF',
                         spinner: false,
@@ -631,7 +631,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-trash',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Remove',
                         spinner: false,
@@ -645,7 +645,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-save',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Save',
                         spinner: false,
@@ -659,7 +659,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-paper-plane',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Save and Continue',
                         spinner: false,
@@ -673,7 +673,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-solid fa-times',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Cancel',
                         spinner: false,
@@ -687,7 +687,7 @@ export class ButtonBarService {
                     return {
                         id: button,
                         icon: 'fa-regular fa-file-powerpoint',
-                        selectable: true,
+                        selectable: false,
                         permission: true,
                         tooltip: 'Preview Changes',
                         spinner: false,

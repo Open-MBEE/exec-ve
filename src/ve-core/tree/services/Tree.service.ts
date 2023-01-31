@@ -10,7 +10,7 @@ import {
 import { veCore } from '@ve-core'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
+import { ElementObject, RefObject } from '@ve-types/mms'
 import { TreeBranch, TreeConfig, TreeOptions, TreeRow } from '@ve-types/tree'
 import { VeApiObject } from '@ve-types/view-editor'
 
@@ -81,7 +81,7 @@ export class TreeService {
     public initApi(
         config: TreeConfig,
         treeOptions: TreeOptions,
-        peTree?: boolean
+        ref: RefObject
     ): TreeApi {
         const id = config.id
 
@@ -107,11 +107,21 @@ export class TreeService {
                 this.treeApi[id].reject = reject
             })
         }
-        if (!peTree && this.rootScopeSvc.treeInitialSelection())
+        this.treeApi[id].refId = ref.id
+        this.treeApi[id].projectId = ref._projectId
+        if (this.rootScopeSvc.treeInitialSelection())
             api.initialSelection = this.rootScopeSvc.treeInitialSelection()
         api.treeOptions = treeOptions
         this.treeApi[id].resolve(api)
         return api
+    }
+
+    public checkRef = (id: string, ref: RefObject): boolean => {
+        return (
+            this.treeApi[id] &&
+            this.treeApi[id].refId === ref.id &&
+            this.treeApi[id].projectId === ref._projectId
+        )
     }
 
     public getTreeData = (): TreeBranch[] => {
@@ -232,11 +242,11 @@ export class TreeService {
         t = t.toLowerCase()
         switch (t) {
             case 'tag':
-                return 'fa fa-tag'
+                return 'fa-solid fa-tag'
             case 'connector':
-                return 'fa fa-expand'
+                return 'fa-solid fa-expand'
             case 'dependency':
-                return 'fa fa-long-arrow-right'
+                return 'fa-solid fa-long-arrow-right'
             case 'directedrelationship':
                 return 'fa-solid fa-arrow-right-long'
             case 'element':
@@ -272,7 +282,7 @@ export class TreeService {
             case 'equation':
                 return 'fa-solid fa-superscript'
             default:
-                return 'fa-solid fa-file-circle-quesiton'
+                return 'fa-solid fa-file-circle-question'
         }
     }
 

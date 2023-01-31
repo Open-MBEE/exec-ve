@@ -159,7 +159,7 @@ class MenuController implements IComponentController {
                     name: this.child.name,
                     id: this.child.id,
                     type: 'group',
-                    link: "main.project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})",
+                    link: "main.project.ref.portal.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})",
                 })
                 if (this.child._parentId) {
                     parentId = (this.child as GroupObject)._parentId
@@ -182,7 +182,7 @@ class MenuController implements IComponentController {
                         name: this.groupsMap[id].name,
                         id: id,
                         type: 'group',
-                        link: "main.project.ref.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})",
+                        link: "main.project.ref.portal.preview({documentId: 'site_' + breadcrumb.id + '_cover', search: undefined})",
                     })
                     parentId = this.groupsMap[id].parentId
                 }

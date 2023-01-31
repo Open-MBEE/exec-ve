@@ -154,13 +154,33 @@ class TreeListController implements angular.IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
+        this.treeSvc.waitForApi('contents').then(
+            (api) => {
+                this.subs.push(
+                    this.eventSvc.$on(TreeService.events.UPDATED, () => {
+                        this.configure()
+                    })
+                )
+                this.configure()
+            },
+            (reason) => {
+                TreeService.treeError(reason)
+            }
+        )
+    }
 
-        this.treeApi = this.treeSvc.getApi('contents')
+    $onDestroy(): void {
+        this.eventSvc.destroy(this.subs)
+    }
+
+    public configure = () => {
         this.treeSpin = false
         this.treeRows = this.treeApi.getRows()
 
         this.title = this.treeConfig.title ? this.treeConfig.title : ''
-        this.selectedBranch = this.treeApi.getSelectedBranch()
+        this.selectedBranch = this.treeSvc
+            .getApi('contents')
+            .getSelectedBranch()
 
         if (!this.treeOptions) {
             this.options = {
@@ -177,8 +197,6 @@ class TreeListController implements angular.IComponentController {
         }
         this.icons = this.treeIcons ? this.treeIcons : iconsDefault
 
-        this.treeApi.defaultIcon = this.icons.iconDefault
-
         if (!this.options.expandLevel && this.options.expandLevel !== 0)
             this.options.expandLevel = 1
         const expand_level = this.options.expandLevel
@@ -187,7 +205,10 @@ class TreeListController implements angular.IComponentController {
             this.eventSvc.$on(
                 'tree-get-branch-element',
                 (data: { id: string; treeId: string }) => {
-                    if (data.treeId === this.treeApi.treeConfig.id) {
+                    if (
+                        data.treeId ===
+                        this.treeSvc.getApi('contents').treeConfig.id
+                    ) {
                         void this.$timeout(
                             () => {
                                 const el = $('#tree-branch-' + data.id)
@@ -207,15 +228,6 @@ class TreeListController implements angular.IComponentController {
         )
 
         this.treeFilter = this.$filter('uiTreeFilter')
-
-        this.treeApi.forEachBranch((b, level) => {
-            b.level = level
-            b.expanded = b.level <= expand_level
-        })
-    }
-
-    $onDestroy(): void {
-        this.eventSvc.destroy(this.subs)
     }
 
     public expandCallback = (
@@ -230,8 +242,8 @@ class TreeListController implements angular.IComponentController {
             e.stopPropagation()
         }
         const promise = branch.expanded
-            ? this.treeApi.closeBranch(branch)
-            : this.treeApi.expandBranch(branch)
+            ? this.treeSvc.getApi('contents').closeBranch(branch)
+            : this.treeSvc.getApi('contents').expandBranch(branch)
         promise.then(
             () => {
                 branch.loading = false
@@ -244,7 +256,8 @@ class TreeListController implements angular.IComponentController {
 
     public userClicksBranch = (branch: TreeBranch): void => {
         branch.loading = true
-        this.treeApi
+        this.treeSvc
+            .getApi('contents')
             .selectBranch(branch, true)
             .then(
                 () => {
@@ -265,7 +278,8 @@ class TreeListController implements angular.IComponentController {
 
     public userDblClicksBranch = (branch: TreeBranch): void => {
         branch.loading = true
-        this.treeApi
+        this.treeSvc
+            .getApi(this.treeConfig.id)
             .selectBranch(branch, true)
             .then(
                 () => {

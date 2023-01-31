@@ -84,6 +84,7 @@ export class TreeApi {
     }
 
     public clearSelectedBranch = (): void => {
+        this.selectedBranch.selected = false
         this.selectedBranch = null
     }
 
@@ -284,7 +285,7 @@ export class TreeApi {
                             () => reject()
                         )
                         .finally(() => {
-                            this.loading = false
+                            if (this.treeRows.length > 0) this.loading = false
                         })
                 },
                 () => {
@@ -294,7 +295,7 @@ export class TreeApi {
                             () => reject()
                         )
                         .finally(() => {
-                            this.loading = false
+                            if (this.treeRows.length > 0) this.loading = false
                         })
                 }
             )
@@ -546,10 +547,9 @@ export class TreeApi {
 
                 for (let i = 0; i < branch.children.length; i++) {
                     if (
-                        (this.treeConfig.types &&
-                            this.treeConfig.types.includes(
-                                branch.children[i].type
-                            )) ||
+                        this.treeConfig.types.includes(
+                            branch.children[i].type
+                        ) ||
                         this.rootScopeSvc.treeShowPe()
                     ) {
                         haveVisibleChild = true
@@ -573,10 +573,7 @@ export class TreeApi {
                 let number = ''
                 if (section) number = section.join('.')
 
-                if (
-                    this.treeConfig.types &&
-                    !this.treeConfig.types.includes(branch.type)
-                ) {
+                if (!this.treeConfig.types.includes(branch.type)) {
                     if (!peNums[branch.type]) peNums[branch.type] = 0
                     peNums[branch.type]++
                     if (this.treeOptions.numberingDepth === 0) {
@@ -694,13 +691,16 @@ export class TreeApi {
                     }
                 }
             }
-
-            this.branch2viewNumber = {}
-            for (let i = 0; i < this.treeData.length; i++) {
-                addBranchToList(1, [], this.treeData[i], true, {})
+            if (this.treeConfig.types && this.treeConfig.types.length > 0) {
+                this.branch2viewNumber = {}
+                for (let i = 0; i < this.treeData.length; i++) {
+                    addBranchToList(1, [], this.treeData[i], true, {})
+                }
+                this.treeRows.push(...tree_rows)
+                this.eventSvc.$broadcast(TreeService.events.UPDATED)
+            } else {
+                console.log('HELP')
             }
-            this.treeRows.push(...tree_rows)
-            this.eventSvc.$broadcast(TreeService.events.UPDATED)
 
             resolve()
         })

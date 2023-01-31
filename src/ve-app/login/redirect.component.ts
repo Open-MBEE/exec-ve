@@ -184,7 +184,7 @@ const RedirectComponent: VeComponentOptions = {
                                 name: data[0].name,
                                 type: 'group',
                                 link:
-                                    "main.project.ref.preview({projectId:'" +
+                                    "main.project.ref.portal.preview({projectId:'" +
                                     data[0]._projectId +
                                     "',refId:'master',documentId:'" +
                                     data[0].id +
@@ -192,7 +192,7 @@ const RedirectComponent: VeComponentOptions = {
                             }
                             redirectFnc = (): void => {
                                 void this.$state.go(
-                                    'main.project.ref.preview',
+                                    'main.project.ref.portal.preview',
                                     {
                                         projectId: data[0]._projectId,
                                         refId: 'master',
@@ -244,7 +244,7 @@ const RedirectComponent: VeComponentOptions = {
                                 name: data[0].name,
                                 type: 'doc',
                                 link:
-                                    "main.project.ref.preview({projectId:'" +
+                                    "main.project.ref.portal.preview({projectId:'" +
                                     data[0]._projectId +
                                     "',refId:'master',documentId:'" +
                                     data[0].id +
@@ -252,7 +252,7 @@ const RedirectComponent: VeComponentOptions = {
                             }
                             redirectFnc = (): void => {
                                 void this.$state.go(
-                                    'main.project.ref.preview',
+                                    'main.project.ref.portal.preview',
                                     {
                                         projectId: data[0]._projectId,
                                         refId: 'master',

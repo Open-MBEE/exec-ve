@@ -50,7 +50,10 @@ export const default_toolbar_buttons: IToolBarButton[] = [
         tooltip: 'Reorder Spec',
         spinner: false,
         dynamic_ids: ['spec-reorder-save', 'spec-reorder-cancel'],
-        enabledFor: ['main.project.ref.preview', 'main.project.ref.document'],
+        enabledFor: [
+            'main.project.ref.portal.preview',
+            'main.project.ref.document',
+        ],
     },
     {
         id: 'spec-ref-list',

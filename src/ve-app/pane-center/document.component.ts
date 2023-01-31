@@ -187,12 +187,9 @@ class FullDocumentController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on(
-                'mmsView.deleted',
-                (deletedBranch: TreeBranch) => {
-                    this.fullDocumentSvc.handleViewDelete(deletedBranch)
-                }
-            )
+            this.eventSvc.$on('view.deleted', (deletedBranch: TreeBranch) => {
+                this.fullDocumentSvc.handleViewDelete(deletedBranch)
+            })
         )
 
         this.subs.push(

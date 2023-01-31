@@ -86,6 +86,8 @@ export interface VeApiObject<T> {
         reject?(reason: VePromiseReason<T>): void
         promise?: VePromise<T, void>
         api?: T
+        refId?: string
+        projectId?: string
     }
 }
 // {

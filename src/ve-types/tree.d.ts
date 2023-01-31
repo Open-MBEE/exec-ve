@@ -47,7 +47,7 @@ export interface TreeOptions {
     numberingDepth?: number
     numberingSeparator?: string
     expandLevel?: number
-    search: string
+    search?: string
     sort?: boolean
     startChapter?: number
     expandCallback?(elementId: string, branch: TreeBranch, recurse: boolean)

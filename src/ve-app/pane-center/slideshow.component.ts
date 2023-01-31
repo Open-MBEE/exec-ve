@@ -426,7 +426,7 @@ class SlideshowController implements IComponentController {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
             this.viewContentLoading = false
         } else if (this.mmsParams.viewId || this.mmsParams.documentId) {
-            if (this.$state.includes('main.project.ref.preview')) {
+            if (this.$state.includes('main.project.ref.portal.preview')) {
                 void this.resolveSvc.getDocumentPreview(
                     this.mmsParams,
                     this.mmsRef
@@ -439,7 +439,7 @@ class SlideshowController implements IComponentController {
 
         this.vidLink = false //whether to have go to document link
         if (
-            this.$state.includes('main.project.ref.preview') &&
+            this.$state.includes('main.project.ref.portal.preview') &&
             this.mmsDocument &&
             this.mmsDocument.id.indexOf('_cover') < 0
         ) {
@@ -550,7 +550,7 @@ class SlideshowController implements IComponentController {
             })
 
         if (
-            this.$state.includes('main.project.ref.preview') ||
+            this.$state.includes('main.project.ref.portal.preview') ||
             this.$state.includes('main.project.ref.document')
         ) {
             api.addButton(

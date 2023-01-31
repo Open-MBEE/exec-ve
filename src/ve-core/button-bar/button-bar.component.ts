@@ -5,6 +5,7 @@ import {
     ButtonBarService,
     IButtonBarButton,
 } from '@ve-core/button-bar'
+import { veCoreEvents } from '@ve-core/events'
 import { EventService } from '@ve-utils/services'
 
 import { veUtils } from '@ve-utils'
@@ -18,7 +19,7 @@ const ButtonBarComponent: VeComponentOptions = {
     <span ng-repeat="button in $ctrl.buttons | filter: {permission: true}" >
       <!-- Normal button -->
       <a type="button" ng-if="!button.dropdown_buttons" class="btn btn-tools btn-sm {{button.id}}"
-          ng-click="button.action($event)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
+          ng-click="$ctrl.buttonClicked($event, button.id)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
           tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
           <span class="fa-stack">
             <i ng-show="button.toggle_state" class="fa-solid fa-square fa-stack-2x"></i>
@@ -37,7 +38,7 @@ const ButtonBarComponent: VeComponentOptions = {
           <li ng-repeat="dropdown_button in button.dropdown_buttons | filter: {permission: true}">
               <a  type="button"
                   class="center {{dropdown_button.id}} {{ dropdown_button.selectable && dropdown_button.selected ? 'checked-list-item' : ''}} {{(!dropdown_button.active) ? 'disabled' : ''}}" 
-                  ng-click="dropdown_button.action($event); $ctrl.bbApi.select(button, dropdown_button)">
+                  ng-click="$ctrl.buttonClicked($event, dropdown_button.id); $ctrl.bbApi.select(button, dropdown_button)">
                   <i class="{{dropdown_button.icon}}"> </i>
                   &nbsp;{{dropdown_button.tooltip}}
               </a>
@@ -75,6 +76,7 @@ const ButtonBarComponent: VeComponentOptions = {
         ) {}
 
         configure = (): void => {
+            //Setup Squish
             this.squishButton =
                 this.buttonBarSvc.getButtonBarButton('button-bar-menu')
             this.squishButton.dropdown_buttons = this.buttons
@@ -109,6 +111,21 @@ const ButtonBarComponent: VeComponentOptions = {
                 this.buttons = this.bbApi.buttons
                 this.configure()
             }
+        }
+
+        buttonClicked(e: JQuery.ClickEvent, button: string): void {
+            const data: veCoreEvents.buttonClicked = {
+                $event: e,
+                clicked: button,
+            }
+            //Setup fire button-bar click event
+            this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                'button-clicked-' + this.bbApi.id,
+                data
+            )
+
+            //Fire backwards compatible click event
+            this.eventSvc.$broadcast(button, e)
         }
     },
 }
