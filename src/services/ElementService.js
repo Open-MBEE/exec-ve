@@ -466,8 +466,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
                 }, Object.assign({timeout: 60000}))
             .then(function(response) {
                 var rejected = response.data.rejected;
-                if (rejected && rejected.length > 0 && rejected[0].code === 304 && rejected[0].element) { //elem will be rejected if server detects no changes
-                    deferred.resolve(rejected[0].element);
+                if (rejected && rejected.length > 0 && rejected[0].code === 304 && rejected[0].object) { //elem will be rejected if server detects no changes
+                    deferred.resolve(rejected[0].object);
                     return;
                 }
                 if (!angular.isArray(response.data.elements) || response.data.elements.length === 0) {
@@ -831,7 +831,7 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
 
     function _bulkUpdateSuccessHandler(serverResponse, deferred) {
         var results = [];
-        var elements = serverResponse.data.elements;
+        var elements = serverResponse.data.elements ? serverResponse.data.elements : [];
         elements.forEach(function (e) {
             var metaOb = _createMetaOb(e);
             var editCopy = JSON.parse(JSON.stringify(e));
@@ -847,8 +847,8 @@ function ElementService($q, $http, URLService, UtilsService, CacheService, HttpS
         var rejected = serverResponse.data.rejected;
         if (rejected && rejected.length > 0) {
             rejected.forEach(function(e) {
-                if (e.code === 304 && e.element) {
-                    results.push(e.element); //add any server rejected elements because they haven't changed
+                if (e.code === 304 && e.object) {
+                    results.push(e.object); //add any server rejected elements because they haven't changed
                 }
             });
         }

@@ -388,6 +388,8 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
     * @param {boolean} doNotScroll whether to scroll to element
     */
     var startEdit = function(scope, mmsViewCtrl, domElement, template, doNotScroll) {
+        PermissionsService.initializePermissions({id: scope.element._projectId}, {id: scope.element._refId, _projectId: scope.element._projectId})
+        .finally(function(data) {
         if (mmsViewCtrl.isEditable() && !scope.isEditing && scope.element && scope.commitId === 'latest' && PermissionsService.hasProjectIdBranchIdEditPermission(scope.element._projectId, scope.element._refId)) {
             var elementOb = scope.element;
             var reqOb = {elementId: elementOb.id, projectId: elementOb._projectId, refId: elementOb._refId};
@@ -443,6 +445,7 @@ function Utils($q, $uibModal, $timeout, $templateCache, $compile, $window, URLSe
                 }
             });
         }
+        });
     };
 
     /**

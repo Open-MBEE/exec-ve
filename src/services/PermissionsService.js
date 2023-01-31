@@ -19,7 +19,10 @@ function PermissionsService($q, $http, URLService, CacheService, _) {
         var url = URLService.getPermissionsLookupURL();
        
         var deferred = $q.defer();                
-
+        if (permissions.project[projectOb.id] !== undefined && permissions.ref[projectOb.id + '/' + refOb.id] !== undefined) {
+            deferred.resolve(permissions);
+            return deferred.promise;
+        }
         $http.put(url, { "lookups" : [ 
             {
                 "type" : "PROJECT",

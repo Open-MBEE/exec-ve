@@ -177,7 +177,9 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                         }
                     });*/
                 }
-                if ((scope.mmsCommitId !== 'latest' && scope.mmsCommitId) || !PermissionsService.hasProjectIdBranchIdEditPermission(scope.mmsProjectId, scope.mmsRefId)) {
+                PermissionsService.initializePermissions({id: scope.element._projectId}, {id: scope.element._refId, _projectId: scope.element._projectId})
+                .finally(function(data) {
+                if ((scope.mmsCommitId !== 'latest' && scope.mmsCommitId) || !PermissionsService.hasProjectIdBranchIdEditPermission(scope.element._projectId, scope.element._refId)) {
                     scope.editable = false;
                     scope.edit = null;
                     scope.editing = false;
@@ -212,6 +214,7 @@ function mmsSpec(Utils, URLService, AuthService, ElementService, UtilsService, V
                         }
                     });
                 }
+                });
                 getTypeClass(scope.element);
                 scope.elementDataLink = URLService.getRoot() + '/projects/'+scope.element._projectId+'/refs/'+scope.element._refId+'/elements/'+scope.element.id+'?commitId='+scope.element._commitId+'&token='+AuthService.getToken();
                 scope.gettingSpec = false;

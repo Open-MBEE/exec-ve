@@ -13,7 +13,7 @@
     //Do not modify the structure of this
     window.__env = {
         // View Editor Version
-        version: '4.0.0',
+        version: '4.0.1',
         // API url
         apiUrl: 'http://localhost:8080',
         // Base url
