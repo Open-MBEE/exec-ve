@@ -12,7 +12,13 @@ import {
 import { veCore } from '@ve-core'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { TreeBranch, TreeIcons, TreeOptions, TreeRow } from '@ve-types/tree'
+import {
+    TreeBranch,
+    TreeConfig,
+    TreeIcons,
+    TreeOptions,
+    TreeRow,
+} from '@ve-types/tree'
 
 /**
  * @ngdoc directive
@@ -106,9 +112,10 @@ class TreeController implements angular.IComponentController {
     //Bindings
     private treeOptions: TreeOptions
     private treeIcons: TreeIcons
-    private treeApi: TreeApi
+    private treeConfig: TreeConfig
 
     public init: boolean = false
+    public treeApi: TreeApi
     public treeRows: TreeRow[]
     public title
     private selectedBranch: any
@@ -147,7 +154,15 @@ class TreeController implements angular.IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        this.configure()
+        this.treeSvc.waitForApi(this.treeConfig.id).then(
+            (api) => {
+                this.treeApi = api
+                this.configure()
+            },
+            (reason) => {
+                TreeService.treeError(reason)
+            }
+        )
     }
 
     $onDestroy(): void {
@@ -161,9 +176,7 @@ class TreeController implements angular.IComponentController {
         this.treeSpin = false
 
         this.treeRows = this.treeApi.getRows()
-        this.title = this.treeApi.treeConfig.title
-            ? this.treeApi.treeConfig.title
-            : ''
+        this.title = this.treeConfig.title ? this.treeConfig.title : ''
         this.selectedBranch = this.treeApi.getSelectedBranch()
 
         if (!this.treeOptions) {
@@ -191,7 +204,7 @@ class TreeController implements angular.IComponentController {
             this.eventSvc.$on(
                 'tree-get-branch-element',
                 (data: { id: string; treeId: string }) => {
-                    if (data.treeId === this.treeApi.treeConfig.id) {
+                    if (data.treeId === this.treeConfig.id) {
                         void this.$timeout(
                             () => {
                                 const el = $('#tree-branch-' + data.id)
@@ -243,21 +256,45 @@ class TreeController implements angular.IComponentController {
     }
 
     public userClicksBranch = (branch: TreeBranch): void => {
-        this.eventSvc.$broadcast('tree-branch-selected', branch)
-        if (branch.onSelect) {
-            branch.onSelect(branch)
-        } else if (this.options.onSelect) {
-            this.options.onSelect(branch)
-        }
+        branch.loading = true
+        this.treeApi
+            .selectBranch(branch, true)
+            .then(
+                () => {
+                    if (branch.onSelect) {
+                        branch.onSelect(branch)
+                    } else if (this.options.onSelect) {
+                        this.options.onSelect(branch)
+                    }
+                },
+                (reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                }
+            )
+            .finally(() => {
+                branch.loading = false
+            })
     }
 
     public userDblClicksBranch = (branch: TreeBranch): void => {
-        this.eventSvc.$broadcast('tree-branch-selected', branch)
-        if (branch.onDblClick) {
-            branch.onDblClick(branch)
-        } else if (this.options.onDblClick) {
-            this.options.onDblClick(branch)
-        }
+        branch.loading = true
+        this.treeApi
+            .selectBranch(branch, true)
+            .then(
+                () => {
+                    if (branch.onDblClick) {
+                        branch.onDblClick(branch)
+                    } else if (this.options.onDblClick) {
+                        this.options.onDblClick(branch)
+                    }
+                },
+                (reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                }
+            )
+            .finally(() => {
+                branch.loading = false
+            })
     }
 
     // public getHref = (row: TreeRow): string => {
@@ -299,7 +336,7 @@ const TreeComponent: VeComponentOptions = {
     
 `,
     bindings: {
-        treeApi: '<',
+        treeConfig: '<',
         treeIcons: '<',
         treeOptions: '<',
     },

@@ -243,21 +243,45 @@ class TreeListController implements angular.IComponentController {
     }
 
     public userClicksBranch = (branch: TreeBranch): void => {
-        this.eventSvc.$broadcast('tree-branch-selected', branch)
-        if (branch.onSelect) {
-            branch.onSelect(branch)
-        } else if (this.options.onSelect) {
-            this.options.onSelect(branch)
-        }
+        branch.loading = true
+        this.treeApi
+            .selectBranch(branch, true)
+            .then(
+                () => {
+                    if (branch.onSelect) {
+                        branch.onSelect(branch)
+                    } else if (this.options.onSelect) {
+                        this.options.onSelect(branch)
+                    }
+                },
+                (reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                }
+            )
+            .finally(() => {
+                branch.loading = false
+            })
     }
 
     public userDblClicksBranch = (branch: TreeBranch): void => {
-        this.eventSvc.$broadcast('tree-branch-selected', branch)
-        if (branch.onDblClick) {
-            branch.onDblClick(branch)
-        } else if (this.options.onDblClick) {
-            this.options.onDblClick(branch)
-        }
+        branch.loading = true
+        this.treeApi
+            .selectBranch(branch, true)
+            .then(
+                () => {
+                    if (branch.onDblClick) {
+                        branch.onDblClick(branch)
+                    } else if (this.options.onDblClick) {
+                        this.options.onDblClick(branch)
+                    }
+                },
+                (reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                }
+            )
+            .finally(() => {
+                branch.loading = false
+            })
     }
 
     // public getHref = (row: TreeRow): string => {

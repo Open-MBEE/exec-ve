@@ -5,19 +5,20 @@ import {
     ViewHtmlService,
     PresentationService,
 } from '@ve-components/presentations'
-import { ComponentService } from '@ve-components/services'
+import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { SchemaService } from '@ve-utils/model-schema'
 import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { IPresentationComponentOptions } from '@ve-types/components/presentation'
-import { ElementObject } from '@ve-types/mms'
+import { InstanceValueObject, ViewInstanceSpec } from '@ve-types/mms'
 
 class PresentSectionController extends Presentation {
     //Local
-    section: ElementObject
+    section: ViewInstanceSpec
     isDirectChildOfPresentationElement: boolean
     sectionInstanceVals: any[] = []
 
@@ -49,6 +50,7 @@ class PresentSectionController extends Presentation {
 
     static $inject = Presentation.$inject
     constructor(
+        $q: VeQService,
         $element: JQuery<HTMLElement>,
         $scope: angular.IScope,
         $compile: angular.ICompileService,
@@ -59,9 +61,11 @@ class PresentSectionController extends Presentation {
         componentSvc: ComponentService,
         eventSvc: EventService,
         imageSvc: ImageService,
-        buttonBarSvc: ButtonBarService
+        buttonBarSvc: ButtonBarService,
+        extensionSvc: ExtensionService
     ) {
         super(
+            $q,
             $element,
             $scope,
             $compile,
@@ -72,11 +76,13 @@ class PresentSectionController extends Presentation {
             componentSvc,
             eventSvc,
             imageSvc,
-            buttonBarSvc
+            buttonBarSvc,
+            extensionSvc
         )
     }
 
-    protected config = (): void => {
+    $onInit(): void {
+        super.$onInit()
         this.section = this.element
 
         this.$element.on('click', (e) => {
@@ -89,7 +95,7 @@ class PresentSectionController extends Presentation {
 
         if (this.section.specification && this.section.specification.operand) {
             const dups = this.presentationSvc.checkForDuplicateInstances(
-                this.section.specification.operand
+                this.section.specification.operand as InstanceValueObject[]
             )
             if (dups.length > 0) {
                 this.growl.warning(
@@ -99,15 +105,15 @@ class PresentSectionController extends Presentation {
         }
 
         if (this.mmsViewCtrl && this.mmsViewPresentationElemCtrl) {
-            this.save = () => {
+            this.save = (): void => {
                 this.componentSvc.saveAction(this, this.$element, false)
             }
 
-            this.saveC = () => {
+            this.saveC = (): void => {
                 this.componentSvc.saveAction(this, this.$element, true)
             }
 
-            this.cancel = () => {
+            this.cancel = (): void => {
                 this.componentSvc.cancelAction(
                     this,
                     this.recompile,
@@ -115,7 +121,7 @@ class PresentSectionController extends Presentation {
                 )
             }
 
-            this.delete = () => {
+            this.delete = (): void => {
                 this.componentSvc.deleteAction(
                     this,
                     this.bbApi,
@@ -123,7 +129,7 @@ class PresentSectionController extends Presentation {
                 )
             }
 
-            this.startEdit = () => {
+            this.startEdit = (): void => {
                 this.componentSvc.startEdit(
                     this,
                     this.mmsViewCtrl.isEditable(),
@@ -133,7 +139,7 @@ class PresentSectionController extends Presentation {
                 )
             }
 
-            this.preview = () => {
+            this.preview = (): void => {
                 this.componentSvc.previewAction(
                     this,
                     this.recompile,
@@ -143,8 +149,8 @@ class PresentSectionController extends Presentation {
         }
     }
 
-    protected getContent = () => {
-        return this.defaultTemplate
+    protected getContent = (): VePromise<string, string> => {
+        return this.$q.resolve(this.defaultTemplate)
     }
 }
 

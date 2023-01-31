@@ -5,13 +5,14 @@ import {
     PresentationService,
     ViewHtmlService,
 } from '@ve-components/presentations'
-import { ComponentService } from '@ve-components/services'
+import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { SchemaService } from '@ve-utils/model-schema'
 import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
 import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 import { PresentContentObject } from '@ve-types/mms'
@@ -39,6 +40,7 @@ const ViewPlotComponent: IPresentationComponentOptions = {
 
         static $inject = Presentation.$inject
         constructor(
+            $q: VeQService,
             $element: JQuery<HTMLElement>,
             $scope: angular.IScope,
             $compile: angular.ICompileService,
@@ -49,9 +51,11 @@ const ViewPlotComponent: IPresentationComponentOptions = {
             componentSvc: ComponentService,
             eventSvc: EventService,
             imageSvc: ImageService,
-            buttonBarSvc: ButtonBarService
+            buttonBarSvc: ButtonBarService,
+            extensionSvc: ExtensionService
         ) {
             super(
+                $q,
                 $element,
                 $scope,
                 $compile,
@@ -62,7 +66,8 @@ const ViewPlotComponent: IPresentationComponentOptions = {
                 componentSvc,
                 eventSvc,
                 imageSvc,
-                buttonBarSvc
+                buttonBarSvc,
+                extensionSvc
             )
         }
 
@@ -70,7 +75,7 @@ const ViewPlotComponent: IPresentationComponentOptions = {
             this.plot = this.peObject as PresentPlotObject
         }
 
-        getContent = (): string => {
+        getContent = (): VePromise<string, string> => {
             if (this.plot.type === 'Plot') {
                 if (
                     this.plot.config !== undefined &&
@@ -87,7 +92,9 @@ const ViewPlotComponent: IPresentationComponentOptions = {
                         console.log('error ignored')
                     }
                 }
-                return `<figure><plot-${this.plot.ptype} plot="plot"></plot-${this.plot.ptype}><figcaption>{{$ctrl.plot.title}}</figcaption></figure>`
+                return this.$q.resolve(
+                    `<figure><plot-${this.plot.ptype} plot="plot"></plot-${this.plot.ptype}><figcaption>{{$ctrl.plot.title}}</figcaption></figure>`
+                )
             }
         }
     },

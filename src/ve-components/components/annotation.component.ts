@@ -210,7 +210,7 @@ class AnnotationController implements angular.IComponentController {
 const AnnotationComponent: VeComponentOptions = {
     selector: 'annotation',
     template: `
-    <span class="ve-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="top-left" popover-title="{{$ctrl.displayContent.toolTipTitle}}"></span>
+    <span class="ve-error" uib-popover-template="'annotationTemplate'" popover-popup-close-delay="500" ng-bind-html="displayContent.inlineContent" popover-placement="bottom-right" popover-title="{{$ctrl.displayContent.toolTipTitle}}"></span>
 <script type="text/ng-template" id="annotationTemplate">
     <p>
         {{$ctrl.displayContent.toolTipContent}}

@@ -91,8 +91,7 @@ export class TreeService {
             this.eventSvc,
             this.rootScopeSvc,
             this,
-            config,
-            typeof peTree === 'undefined' ? false : peTree
+            config
         )
 
         if (!this.treeApi[id]) {

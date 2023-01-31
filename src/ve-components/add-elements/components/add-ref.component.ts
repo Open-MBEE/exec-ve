@@ -65,7 +65,6 @@ class AddRefController extends AddElement<AddRefData, RefObject> {
             apiSvc,
             utils
         )
-        this.displayName = this.type
     }
 
     public $onInit(): void {
@@ -131,7 +130,7 @@ class AddRefController extends AddElement<AddRefData, RefObject> {
     }
 
     public resolve = (data: RefObject): void => {
-        this.growl.success(this.displayName + ' is being created')
+        this.growl.success(this.type + ' is being created')
         if (this.type === 'Tag') {
             this.growl.info(
                 'Please wait for a completion email prior to viewing of the tag.'

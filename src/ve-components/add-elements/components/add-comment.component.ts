@@ -54,7 +54,6 @@ class AddCommentController extends AddElement<AddElementData> {
             apiSvc,
             utils
         )
-        this.displayName = this.type
     }
 
     public $onInit(): void {

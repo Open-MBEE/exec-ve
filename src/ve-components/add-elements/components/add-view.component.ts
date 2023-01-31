@@ -62,7 +62,6 @@ class AddViewController extends AddElement<AddViewData> {
             apiSvc,
             utils
         )
-        this.displayName = this.type
     }
 
     public $onInit(): void {
@@ -207,9 +206,13 @@ const AddViewComponent: VeComponentOptions = {
         <div class="modal-body comment-modal">
             <div class="comment-modal-input" ng-show="$ctrl.createForm">
                 <div class="form-group">
-                    <label>Name (optional):</label>
+                    <label>Name:</label>
                     <input class="form-control" ng-model="$ctrl.newItem.name" type="text"
                         ng-keyup="$event.keyCode == 13 ? $ctrl.ok() : null" placeholder="Type a name for your {{$ctrl.type | lowercase}} here" autofocus>
+                </div>
+                <div class="form-group">
+                    <label class="label-documentation">Documentation (optional):</label>
+                    <editor ng-model="$ctrl.newItem.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
                 </div>
             </div>
         </div>

@@ -66,7 +66,6 @@ class AddPeController extends AddElement<AddPresentationData> {
             apiSvc,
             utils
         )
-        this.displayName = this.type
     }
 
     $onInit(): void {
@@ -161,7 +160,7 @@ class AddPeController extends AddElement<AddPresentationData> {
             elemType,
             this.addElementData.viewOrSectionOb.id
         )
-        this.growl.success(this.displayName + ' is being created')
+        this.growl.success(this.type + ' is being created')
     }
 
     public addExisting = (

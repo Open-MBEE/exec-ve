@@ -32,10 +32,6 @@ class AddGenericController extends AddElement<AddElementData> {
     protected createType: number = 1
     protected description: string
     protected searchExisting: boolean = true
-    protected newE: { name: string; documentation: string } = {
-        name: '',
-        documentation: '',
-    }
 
     static $inject = AddElement.$inject
 
@@ -71,12 +67,10 @@ class AddGenericController extends AddElement<AddElementData> {
             apiSvc,
             utils
         )
-        this.displayName = this.type
     }
 
     public $onInit(): void {
         super.$onInit()
-
         this.description =
             'Search for an existing element before you ' + this.parentAction
 
@@ -86,7 +80,7 @@ class AddGenericController extends AddElement<AddElementData> {
     }
 
     public create = (): VePromise<ElementObject> => {
-        if (!this.newE.name) {
+        if (!this.newItem.name) {
             this.growl.error('Error: A name for your new element is required.')
             return this.$q.reject({ status: 422 })
         }
@@ -95,8 +89,8 @@ class AddGenericController extends AddElement<AddElementData> {
             _projectId: this.mmsProjectId,
             _refId: this.mmsRefId,
             ownerId: 'holding_bin_' + this.mmsProjectId,
-            name: this.newE.name,
-            documentation: this.newE.documentation,
+            name: this.newItem.name,
+            documentation: this.newItem.documentation,
             type: 'Class',
             _appliedStereotypeIds: [],
         }
@@ -162,11 +156,11 @@ const AddGenericComponent: VeComponentOptions = {
         <form>
             <div class="form-group">
                 <label>Name </label><span class="star-mandatory">*</span>
-                <input class="form-control" type="text" ng-model="$ctrl.newE.name" placeholder="Name your new element" autofocus/>
+                <input class="form-control" type="text" ng-model="$ctrl.newItem.name" placeholder="Name your new element" autofocus/>
             </div>
             <div class="form-group">
                 <label class="label-documentation">Documentation</label>
-                <editor ng-model="$ctrl.newE.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
+                <editor ng-model="$ctrl.newItem.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>

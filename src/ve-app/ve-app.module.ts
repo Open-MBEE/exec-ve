@@ -1,13 +1,18 @@
-//const Visualizer = window['ui-router-visualizer'].Visualizer;
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+const Visualizer = window['ui-router-visualizer'].Visualizer as {
+    new (router: UIRouter, options?: any): UIRouterPlugin
+}
 
 import ngPane from '@openmbee/pane-layout'
 import uiRouter, {
     StateProvider,
     StateService,
+    Trace,
     Transition,
     TransitionService,
     UIRouter,
     UIRouterGlobals,
+    UIRouterPlugin,
     UrlParts,
 } from '@uirouter/angularjs'
 import angular, {
@@ -549,18 +554,18 @@ veApp.config([
                     'pane-left@main': {
                         component: 'leftPane',
                         bindings: {
-                            mmsGroups: 'groupObs',
-                            mmsDocuments: 'documentObs',
+                            mmsDocument: 'documentOb',
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
+                            mmsGroups: 'groupObs',
+                            mmsDocuments: 'documentObs',
                         },
                     },
                 },
             })
             .state('main.project.ref.portal', {
                 url: '/portal',
-
                 resolve: {
                     documentOb: [
                         'params',
@@ -624,11 +629,12 @@ veApp.config([
                     'pane-left@main': {
                         component: 'leftPane',
                         bindings: {
-                            mmsDocuments: 'documentObs',
+                            mmsDocument: 'documentOb',
                             mmsOrg: 'orgOb',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
                             mmsGroups: 'groupObs',
+                            mmsDocuments: 'documentObs',
                         },
                     },
                     // 'pane-right@main': {
@@ -675,7 +681,7 @@ veApp.config([
                 url: '/manage',
             })
             .state('main.project.ref.preview', {
-                url: '/document/:documentId',
+                url: '/preview?documentId',
                 resolve: {
                     params: [
                         '$transition$',
@@ -735,6 +741,17 @@ veApp.config([
                             mmsRef: 'refOb',
                             mmsGroup: 'groupOb',
                             mmsDocument: 'documentOb',
+                        },
+                    },
+                    'pane-left@main': {
+                        component: 'leftPane',
+                        bindings: {
+                            mmsDocument: 'documentOb',
+                            mmsOrg: 'orgOb',
+                            mmsProject: 'projectOb',
+                            mmsRef: 'refOb',
+                            mmsGroups: 'groupObs',
+                            mmsDocuments: 'documentObs',
                         },
                     },
                     // 'pane-right@main': {
@@ -1230,11 +1247,11 @@ veApp.run([
     },
 ])
 
-// veApp.run([
-//     '$uiRouter',
-//     '$trace',
-//     ($uiRouter, $trace) => {
-//         //var pluginInstance = $uiRouter.plugin(Visualizer);
-//         $trace.enable('TRANSITION')
-//     },
-// ])
+veApp.run([
+    '$uiRouter',
+    '$trace',
+    ($uiRouter: UIRouter, $trace: Trace): void => {
+        const pluginInstance = $uiRouter.plugin(Visualizer)
+        $trace.enable('TRANSITION')
+    },
+])

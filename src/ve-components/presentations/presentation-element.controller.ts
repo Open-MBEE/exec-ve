@@ -172,8 +172,6 @@ export class Presentation
                 this.isDirectChildOfPresentationElement = false
         }
 
-        this.config()
-
         if (this.commitId === 'latest') {
             this.subs.push(
                 this.eventSvc.$on(

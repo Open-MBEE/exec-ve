@@ -190,13 +190,11 @@ class MenuController implements IComponentController {
             this.breadcrumbs = this.crumbs.reverse()
             void this.$timeout(() => {
                 const eltChildren = this.$element.children().children()
-                const eltParent: HTMLElement = this.$element
-                    .parent()
-                    .parent()[0]
+                const eltParent: Element = document.children[0]
                 const eltWidth =
                     eltParent.clientWidth -
-                    eltChildren[0].scrollWidth -
-                    eltChildren[2].scrollWidth
+                    eltChildren[1].scrollWidth -
+                    eltChildren[3].scrollWidth
                 const crumbcount = this.breadcrumbs.length
                 const liWidth = (eltWidth * 0.85) / crumbcount
                 this.truncateStyle = {
@@ -285,14 +283,14 @@ const MainMenuComponent: VeComponentOptions = {
         <ul class="dropdown-menu list-with-selected-item" uib-dropdown-menu role="menu">
             <li ng-repeat="project in $ctrl.projects | orderBy: 'name'" ng-click="$ctrl.updateProject(project)"
                 ng-class="{'checked-list-item': project.name === $ctrl.currentProject}">
-                <a ng-href="{{$ctrl.getHrefForProject(project);}}"> {{ $ctrl.mmsProject.name }} </a>
+                {{ project.name }}
             </li>
         </ul>
     </div>
     <div ng-hide="$ctrl.spin" class="breadcrumbs">
         <ul>
             <li ng-style="truncateStyle">
-                <a class="back-to-proj" ui-sref="main.project.ref.portal({refId: $ctrl.currentBranch ? $ctrl.currentRef.id : 'master', search: undefined})" ui-sref-opts="{reload:true}"
+                <a class="back-to-proj" ui-sref="main.project.ref.portal({refId: $ctrl.currentBranch ? $ctrl.currentRef.id : 'master', search: undefined})"
                     uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa-solid fa-home fa-1x" aria-hidden="true"></i>
                 </a>
@@ -305,7 +303,6 @@ const MainMenuComponent: VeComponentOptions = {
             </li>
         </ul>
     </div>
-
     <div ng-show="!$ctrl.isRefsView" class="nav navbar-nav navbar-right" style="padding-right: 15px">
         <div class="btn-group ve-dark-dropdown-nav" uib-dropdown keyboard-nav auto-close="outsideClick">
             <button id="task-selection-button" type="button" class="dropdown-toggle" uib-dropdown-toggle>

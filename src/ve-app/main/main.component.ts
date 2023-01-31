@@ -296,30 +296,30 @@ const MainComponent: VeComponentOptions = {
             )
 
             this.$transitions.onStart({}, (trans) => {
-                this.rootScopeSvc.veHidePanes(true)
+                //this.rootScopeSvc.veHidePanes(true)
                 this.rootScopeSvc.veViewContentLoading(true)
                 this.httpSvc.transformQueue()
                 this.rootScopeSvc.veStateChanging(true)
                 const from = trans.$from().name
                 const to = trans.$to().name
-                if (from.split('.').length >= to.split('.').length) {
-                    console.log(
-                        trans.router.viewService._pluginapi._activeViewConfigs()
-                    )
-                    //Code to prune inactive previous leaf configs
-                    //console.log(
-                    trans.router.viewService._pluginapi
-                        ._activeViewConfigs()
-                        .filter((vc) => {
-                            return from === vc.viewDecl.$context.name
-                        })
-                        .forEach((value) => {
-                            trans.router.viewService.deactivateViewConfig(value)
-                        })
-                    console.log(
-                        trans.router.viewService._pluginapi._activeViewConfigs()
-                    )
-                }
+                // if (from.split('.').length >= to.split('.').length) {
+                //     console.log(
+                //         trans.router.viewService._pluginapi._activeViewConfigs()
+                //     )
+                //     //Code to prune inactive previous leaf configs
+                //     //console.log(
+                //     trans.router.viewService._pluginapi
+                //         ._activeViewConfigs()
+                //         .filter((vc) => {
+                //             return from === vc.viewDecl.$context.name
+                //         })
+                //         .forEach((value) => {
+                //             trans.router.viewService.deactivateViewConfig(value)
+                //         })
+                //     console.log(
+                //         trans.router.viewService._pluginapi._activeViewConfigs()
+                //     )
+                // }
             })
 
             this.$transitions.onError({}, (trans: Transition) => {
@@ -415,7 +415,7 @@ const MainComponent: VeComponentOptions = {
                         )
                 } else if (
                     this.$state.includes('main.project.ref.document') &&
-                    this.$state.current.name !==
+                    this.$uiRouterGlobals.$current.name !==
                         'main.project.ref.document.order'
                 ) {
                     if ((trans.params() as ParamsObject).viewId !== undefined)

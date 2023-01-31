@@ -34,7 +34,7 @@ export interface TOCHtmlObject {
  * * Utilities
  */
 export class UtilsService {
-    public PROJECT_URL_PREFIX = 'index.html#/projects/'
+    public PROJECT_URL_PREFIX = '#/projects/'
 
     static $inject = ['$q', '$http', 'growl', 'URLService', 'ApiService']
 

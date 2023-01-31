@@ -15,7 +15,6 @@ export class TreeApi {
     public selectedBranch: TreeBranch = null
     public branch2viewNumber: { [key: string]: string } = {}
     public defaultIcon: string = 'fa-solid fa-file fa-fw'
-    public peTree: boolean
     public treeConfig: TreeConfig
 
     public loading: boolean
@@ -28,12 +27,10 @@ export class TreeApi {
         private eventSvc: EventService,
         private rootScopeSvc: RootScopeService,
         private treeSvc: TreeService,
-        config: TreeConfig,
-        peTree: boolean
+        config: TreeConfig
     ) {
         this.treeData = this.treeSvc.getTreeData()
         this.treeConfig = config
-        this.peTree = peTree
     }
 
     /**
@@ -703,8 +700,7 @@ export class TreeApi {
                 addBranchToList(1, [], this.treeData[i], true, {})
             }
             this.treeRows.push(...tree_rows)
-            if (!this.peTree)
-                this.eventSvc.$broadcast(TreeService.events.UPDATED)
+            this.eventSvc.$broadcast(TreeService.events.UPDATED)
 
             resolve()
         })

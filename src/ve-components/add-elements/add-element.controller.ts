@@ -59,7 +59,6 @@ export class AddElement<
     projectId: string
     refId: string
     orgId: string
-    displayName: string = ''
     addType: string
     newItem: U
 
@@ -110,6 +109,7 @@ export class AddElement<
         this.projectId = this.mmsProjectId
         this.refId = this.mmsRefId ? this.mmsRefId : ''
         this.orgId = this.mmsOrgId
+        this.type = this.addElementData.type
 
         this.searchOptions = {
             callback: this.callback,
@@ -118,8 +118,6 @@ export class AddElement<
             hideFilterOptions: true,
             closeable: false,
         }
-
-        this.type = this.addElementData.type
     }
 
     public ok = (): void => {
@@ -175,7 +173,7 @@ export class AddElement<
     }
 
     public addResolve = (data: U, type: string): void => {
-        this.growl.success(this.displayName + ' is being ' + type)
+        this.growl.success(this.type + ' is being ' + type)
         this.success(data)
         this.addElementApi.resolve(data)
     }

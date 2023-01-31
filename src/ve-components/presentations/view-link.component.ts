@@ -140,9 +140,7 @@ class ViewLinkController implements IComponentController {
         this.refId = refId ? refId : 'master'
         this.commitId = commitId ? commitId : 'latest'
         let elementId = this.mmsElementId
-        if (elementId) {
-            elementId = elementId.replace(/[^\w\-]/gi, '')
-        } else if (this.mmsPeId && !this.mmsDocId) {
+        if (!elementId && this.mmsPeId && !this.mmsDocId) {
             elementId = this.applicationSvc.getState().currentDoc
         }
 
@@ -289,8 +287,8 @@ export const ViewLinkComponent: VeComponentOptions = {
         <span ng-if="!$ctrl.linkText && $ctrl.showNum && !$ctrl.showName">{{$ctrl.type}}{{$ctrl.element._veNumber}}{{$ctrl.suffix}}</span>
         <span ng-if="!$ctrl.linkText && !$ctrl.showNum">{{$ctrl.elementName || "Unnamed View"}}</span>
     </a>
-    <a class="external-link no-print" target="_blank" ng-href="{{$ctrl.href}}" ng-if="$ctrl.mmsExternalLink">
-        <i class="fa fa-external-link" aria-hidden="true" title="Open document in new tab"></i>
+    <a class="btn btn-secondary external-link no-print" target="_blank" ng-href="{{$ctrl.href}}" ng-if="$ctrl.mmsExternalLink">
+        <i class="fa-solid fa-external-link" aria-hidden="true" title="Open document in new tab"></i>
     </a>
 </span>        
 `,

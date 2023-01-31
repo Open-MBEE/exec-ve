@@ -22,7 +22,7 @@ import {
     ShortenUrlService,
     UtilsService,
 } from '@ve-utils/services'
-import { onChangesCallback, watchChangeEvent } from '@ve-utils/utils'
+import { onChangesCallback } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
@@ -123,14 +123,14 @@ class SlideshowController implements IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        if (
-            this.$state.includes('main.project.ref') &&
-            !this.$state.includes('main.project.ref.document')
-        ) {
-            watchChangeEvent(this, 'mmsDocument', this.changeAction, true)
-        } else {
-            watchChangeEvent(this, 'mmsView', this.changeAction, true)
-        }
+        // if (
+        //     this.$state.includes('main.project.ref') &&
+        //     !this.$state.includes('main.project.ref.document')
+        // ) {
+        //     watchChangeEvent(this, 'mmsDocument', this.changeAction, true)
+        // } else {
+        //     watchChangeEvent(this, 'mmsView', this.changeAction, true)
+        // }
 
         this.treeSvc.waitForApi('contents').then(
             () => {

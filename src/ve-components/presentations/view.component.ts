@@ -111,7 +111,7 @@ export class ViewController implements IComponentController {
     private isHover: boolean
     private isSection: boolean
     private level: number
-    private number: string
+    private number: string = ''
     private showComments: boolean
     private showElements: boolean
     private showNumbering: boolean
@@ -140,8 +140,16 @@ export class ViewController implements IComponentController {
             commitId: this.mmsCommitId,
         }
         this.processed = false
-
-        this.number = this.mmsNumber ? this.mmsNumber.toString(10) : ''
+        if (this.mmsNumber) {
+            this.number = this.mmsNumber.toString(10)
+        } else if (
+            this.treeSvc.getApi('contents').branch2viewNumber[this.mmsElementId]
+        ) {
+            this.number =
+                this.treeSvc.getApi('contents').branch2viewNumber[
+                    this.mmsElementId
+                ]
+        }
         this.showNumbering = this.rootScopeSvc.veNumberingOn()
 
         this.isSection = false
@@ -425,15 +433,15 @@ export const ViewComponent: VeComponentOptions = {
     template: `
     <div id="{{$ctrl.mmsElementId}}" ng-class="{landscape: $ctrl.view._printLandscape}">
     <div ng-if="!$ctrl.noTitle">
-        <h1 ng-if="$ctrl.mmsLink" class="view-title">
-          <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> <view-link ng-class="{'docTitle-underlined': isHover}" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}"></view-link>
-          <view-link class="open-document" ng-mouseover="hoverIn()" ng-mouseleave="hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
-            link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
-        </h1>
-    
-        <h1 ng-if="!$ctrl.mmsLink" class="view-title h{{level}}">
+        <h1 class="view-title h{{level}}">
             <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}" mms-watch-id="true"></transclude-name>
         </h1>
+        <div ng-if="$ctrl.mmsLink" class="view-title">
+          <view-link class="open-document" ng-mouseover="hoverIn()" ng-mouseleave="hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
+            link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
+        </div>
+    
+        
     
         <div class="ve-secondary-text last-modified no-print">
           Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email">{{ $ctrl.modifier.email }}</b><b ng-if="!$ctrl.modifier.email">{{ $ctrl.modifier }}</b>
