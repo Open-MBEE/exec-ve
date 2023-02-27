@@ -21,9 +21,9 @@ export class ShortUrlService {
     }
 
     static $inject = [
-        '$location',
-        '$http',
         '$q',
+        '$http',
+        '$location',
         'URLService',
         'ProjectService',
         'ViewService',

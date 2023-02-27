@@ -5,6 +5,7 @@ import './ve-utils.module'
 
 import './third-party'
 
+import './core'
 import './model-schema'
 import './application'
 import './mms-api-client'
