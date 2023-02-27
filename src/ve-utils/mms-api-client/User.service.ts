@@ -7,6 +7,8 @@ import { VePromise, VeQService } from '@ve-types/angular'
 import { UserObject, UsersResponse } from '@ve-types/mms'
 
 export class UserService {
+    static $inject = ['$q', '$http', 'CacheService', 'URLService']
+
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
