@@ -1,12 +1,10 @@
-import angular, { IComponentController } from 'angular'
-
 import { MMSMentionController } from '@ve-core/editor/components/mention.component'
 
 import { veCore } from '@ve-core'
 
 import { ElementObject } from '@ve-types/mms'
 
-class MMSMentionInterceptController implements IComponentController {
+class MMSMentionInterceptController implements angular.IComponentController {
     public mmsMentionInterceptValue: string
     mmsFastCf: ElementObject[]
 

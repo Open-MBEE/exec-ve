@@ -9,7 +9,7 @@ export const veComponents = angular.module('ve-components', [
     've-core',
     'ui.bootstrap',
     'angular-growl',
-    'ngSanitize',
+    // 'ngSanitize',
 ])
 
 // veComponents.config(['$sanitizeProvider', function($sanitizeProvider: angular.sanitize.ISanitizeProvider) {

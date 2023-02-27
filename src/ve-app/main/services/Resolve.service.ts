@@ -1,6 +1,11 @@
 import { UIRouter } from '@uirouter/angularjs'
-import angular from 'angular'
 
+import {
+    BrandingService,
+    BrandingStyle,
+    ShortUrlService,
+} from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import {
     AuthService,
     ElementService,
@@ -10,13 +15,6 @@ import {
     URLService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import {
-    ApplicationService,
-    BrandingService,
-    BrandingStyle,
-    EventService,
-    ShortenUrlService,
-} from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
@@ -46,12 +44,11 @@ export class ResolveService {
         'growl',
         '$cookies',
         '$uiRouter',
-        'ShortenUrlService',
+        'ShortUrlService',
         'BrandingService',
         'URLService',
         'AuthService',
         'ProjectService',
-        'ApplicationService',
         'ViewService',
         'ElementService',
         'PermissionsService',
@@ -64,12 +61,11 @@ export class ResolveService {
         private growl: angular.growl.IGrowlService,
         private $cookies: angular.cookies.ICookiesService,
         private $uiRouter: UIRouter,
-        private shortenUrlSvc: ShortenUrlService,
+        private shortUrlSvc: ShortUrlService,
         private brandingSvc: BrandingService,
         private uRLSvc: URLService,
         private authSvc: AuthService,
         private projectSvc: ProjectService,
-        private applicationSvc: ApplicationService,
         private viewSvc: ViewService,
         private elementSvc: ElementService,
         private permissionsSvc: PermissionsService,
@@ -279,6 +275,7 @@ export class ResolveService {
                         'mmsDocument',
                         data
                     )
+                    if (!data._groupId) data._groupId = params.projectId + '_pm'
                     deferred.resolve(data)
                 },
                 (reason) => {
@@ -299,6 +296,7 @@ export class ResolveService {
                                         _projectId: params.projectId,
                                         _refId: params.refId,
                                         documentation: '',
+                                        _groupId: params.projectId + '_pm',
                                     }
                                 )
                                 .then(

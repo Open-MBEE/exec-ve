@@ -37,19 +37,27 @@ export interface TreeRow {
     label: string
     level: number
     section: string
-    type_icon: string
+    typeIcon: string
     visible: boolean
 }
 
-export interface TreeOptions {
-    typeIcons?: { [key: string]: string }
+export interface TreeApi {
+    rootOb?: ElementObject
+    focusId?: string
+    projectId?: string
+    refId?: string
+    refType?: string
+    commitId?: string
     sectionNumbering?: boolean
+    sectionTypes?: string[]
     numberingDepth?: number
     numberingSeparator?: string
     expandLevel?: number
     search?: string
     sort?: boolean
     startChapter?: number
+    treeContentLoading?: boolean
+    treeCategory?: string
     expandCallback?(elementId: string, branch: TreeBranch, recurse: boolean)
     onSelect?(branch: TreeBranch): void
     onDblClick?(branch: TreeBranch): void

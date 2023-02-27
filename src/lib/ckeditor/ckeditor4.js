@@ -6946,7 +6946,7 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
                     }
                 }
             },
-            addElementCallback: function (a) {
+            InsertCallback: function (a) {
                 this.elementCallbacks || (this.elementCallbacks = [])
                 this.elementCallbacks.push(a)
             },
@@ -14076,7 +14076,7 @@ For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
                                 )
                                     try {
                                         q = c.$.createControlRange()
-                                        q.addElement(c.$)
+                                        q.Insert(c.$)
                                         q.select()
                                         return
                                     } catch (v) {}

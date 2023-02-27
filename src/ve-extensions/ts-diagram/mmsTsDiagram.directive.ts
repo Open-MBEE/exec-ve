@@ -455,7 +455,7 @@ function mmsTsDiagram(
                 updateCommand.data.push({
                     command: 'SetModelAttribute',
                     data: {
-                        attributeName: 'AddElements',
+                        attributeName: 'Inserts',
                         attributeValue: _getElementsArrayString(
                             scope.initElements
                         ),

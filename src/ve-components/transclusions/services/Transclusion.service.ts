@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
+import { ApplicationService } from '@ve-utils/application'
 import { ViewService } from '@ve-utils/mms-api-client'
-import { ApplicationService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 

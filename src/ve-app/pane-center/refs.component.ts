@@ -6,18 +6,15 @@ import Rx from 'rx-lite'
 import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
 import { AppUtilsService } from '@ve-app/main/services'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
-import { AddRefData } from '@ve-components/add-elements/components/add-ref.component'
+import { InsertRefData } from '@ve-components/insertions/components/insert-ref.component'
+import { ApplicationService, RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { ProjectService, ElementService } from '@ve-utils/mms-api-client'
-import {
-    ApplicationService,
-    EventService,
-    RootScopeService,
-} from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { AddElementResolveFn } from '@ve-types/components'
+import { InsertResolveFn } from '@ve-types/components'
 import {
     ParamsObject,
     ProjectObject,
@@ -176,12 +173,12 @@ class RefsController {
 
     addBranch = (e: JQuery.ClickEvent): void => {
         e.stopPropagation()
-        this.addElement('Branch')
+        this.insert('Branch')
     }
 
     addTag = (e: JQuery.ClickEvent): void => {
         e.stopPropagation()
-        this.addElement('Tag')
+        this.insert('Tag')
     }
 
     deleteRef = (e: JQuery.ClickEvent): void => {
@@ -201,8 +198,8 @@ class RefsController {
         )
     }
 
-    addElement = (itemType: string): void => {
-        const addElementData: AddRefData = {
+    insert = (itemType: string): void => {
+        const insertData: InsertRefData = {
             type: itemType,
             parentRefId: '',
             parentTitle: '',
@@ -219,11 +216,11 @@ class RefsController {
                 return
             }
             if (branch.type === 'Tag') {
-                addElementData.parentTitle = 'Tag ' + branch.name
+                insertData.parentTitle = 'Tag ' + branch.name
             } else {
-                addElementData.parentTitle = 'Branch ' + branch.name
+                insertData.parentTitle = 'Branch ' + branch.name
             }
-            addElementData.parentRefId = branch.id
+            insertData.parentRefId = branch.id
         } else if (itemType === 'Tag') {
             if (!branch) {
                 this.growl.warning(
@@ -231,7 +228,7 @@ class RefsController {
                 )
                 return
             }
-            addElementData.parentRefId = branch.id
+            insertData.parentRefId = branch.id
         } else {
             this.growl.error(
                 'Add Item of Type ' + itemType + ' is not supported'
@@ -239,13 +236,13 @@ class RefsController {
             return
         }
         const instance = this.$uibModal.open<
-            AddElementResolveFn<AddRefData>,
+            InsertResolveFn<InsertRefData>,
             RefObject
         >({
-            component: 'addElementModal',
+            component: 'insertElementModal',
             resolve: {
-                getAddData: () => {
-                    return addElementData
+                getInsertData: () => {
+                    return insertData
                 },
                 getFilter: () => {
                     return this.$filter

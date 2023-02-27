@@ -29,7 +29,7 @@ export interface ComponentController {
     editValues?: ValueObject[]
     $scope: angular.IScope
 }
-export { AddElementApi } from '@ve-types/components/add-element'
-export { AddElementData } from '@ve-types/components/add-element'
-export { AddElementResolve } from '@ve-types/components/add-element'
-export { AddElementResolveFn } from '@ve-types/components/add-element'
+export { InsertApi } from '@ve-types/components/insertions'
+export { InsertData } from '@ve-types/components/insertions'
+export { InsertResolve } from '@ve-types/components/insertions'
+export { InsertResolveFn } from '@ve-types/components/insertions'

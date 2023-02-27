@@ -1,4 +1,3 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import { veUtils } from '@ve-utils'
@@ -162,7 +161,7 @@ export class CacheService {
         }
         const removed = this.cache[realKey]
         delete this.cache[realKey]
-        if (angular.isString(removed)) {
+        if (typeof removed === 'string') {
             return this.remove(removed)
         }
         return removed as T
@@ -186,10 +185,10 @@ export class CacheService {
             return false
         }
         const val = this.cache[realKey]
-        if (angular.isObject(val)) {
+        if (typeof val === 'object') {
             return true
         }
-        if (angular.isString(val)) {
+        if (typeof val === 'string') {
             return this.exists(val)
         }
         return false

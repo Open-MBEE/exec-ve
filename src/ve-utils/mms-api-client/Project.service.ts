@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import {
     ApiService,
     CacheService,
@@ -25,7 +23,6 @@ import {
     ProjectsResponse,
     RefObject,
     RefsResponse,
-    RequestObject,
 } from '@ve-types/mms'
 
 /**
@@ -122,14 +119,14 @@ export class ProjectService {
      * @returns {Promise} Resolves into array of org objects.
      */
     public getOrgs(
-        ignoreCache?: boolean
+        updateCache?: boolean
     ): VePromise<OrgObject[], OrgsResponse> {
         const key = 'orgs'
         if (this.inProgress.hasOwnProperty(key)) {
             return this.inProgress[key] as VePromise<OrgObject[], OrgsResponse>
         }
         const deferred = this.$q.defer<OrgObject[]>()
-        if (this.cacheSvc.exists(key) && !ignoreCache) {
+        if (this.cacheSvc.exists(key) && !updateCache) {
             deferred.resolve(this.cacheSvc.get<OrgObject[]>(key))
         } else {
             this.inProgress[key] = deferred.promise
@@ -183,7 +180,7 @@ export class ProjectService {
 
     public getProjects(
         orgId?: string,
-        ignoreCache?: boolean
+        updateCache?: boolean
     ): VePromise<ProjectObject[], ProjectsResponse> {
         const deferred = this.$q.defer<ProjectObject[]>()
         const url = this.uRLSvc.getProjectsURL(orgId)
@@ -191,7 +188,7 @@ export class ProjectService {
             return this.inProgress[url] as angular.IPromise<ProjectObject[]>
         }
         const cacheKey = !orgId ? 'projects' : ['projects', orgId]
-        if (this.cacheSvc.exists(cacheKey) && !ignoreCache) {
+        if (this.cacheSvc.exists(cacheKey) && !updateCache) {
             deferred.resolve(this.cacheSvc.get<ProjectObject[]>(cacheKey))
         } else {
             this.inProgress[url] = deferred.promise
@@ -260,7 +257,8 @@ export class ProjectService {
     }
 
     public getProject(
-        projectId: string
+        projectId: string,
+        updateCache?: string
     ): VePromise<ProjectObject, ProjectsResponse> {
         const deferred = this.$q.defer<ProjectObject>()
         const url = this.uRLSvc.getProjectURL(projectId)
@@ -268,7 +266,8 @@ export class ProjectService {
             return this.inProgress[url] as angular.IPromise<ProjectObject>
         }
         const cacheKey = ['project', projectId]
-        if (this.cacheSvc.exists(cacheKey))
+        const cached = this.cacheSvc.get<ProjectObject>(cacheKey)
+        if (cached && !updateCache)
             deferred.resolve(this.cacheSvc.get<ProjectObject>(cacheKey))
         else {
             this.inProgress[url] = deferred.promise
@@ -311,7 +310,7 @@ export class ProjectService {
     public getProjectMounts(
         projectId: string,
         refId: string,
-        refresh?: boolean
+        updateCache?: boolean
     ): VePromise<MountObject, ProjectsResponse> {
         const deferred = this.$q.defer<MountObject>()
         const cacheKey = this.apiSvc.makeCacheKey(
@@ -332,7 +331,7 @@ export class ProjectService {
                 const result: MountObject = Object.assign(mountOb, response)
                 const cached: MountObject =
                     this.cacheSvc.get<MountObject>(cacheKey)
-                if (this.cacheSvc.exists(cacheKey) && !refresh) {
+                if (this.cacheSvc.exists(cacheKey) && !updateCache) {
                     result._mounts.push(...cached._mounts)
                     deferred.resolve(result)
                     return deferred.promise
@@ -481,33 +480,37 @@ export class ProjectService {
 
     public getRef(
         refId: string,
-        projectId: string
+        projectId: string,
+        updateCache?: boolean
     ): VePromise<RefObject, RefsResponse> {
-        const deferred = this.$q.defer<RefObject>()
+        const url = this.uRLSvc.getRefURL(projectId, refId)
+        if (this.inProgress.hasOwnProperty(url)) {
+            return this.inProgress[url] as VePromise<RefObject, RefsResponse>
+        }
         const cacheKey = this.apiSvc.makeCacheKey(
             { projectId, refId },
             '',
             false,
             'ref'
         )
-        this.getRefs(projectId).then(
-            () => {
-                const result = this.cacheSvc.get<RefObject>(cacheKey)
-                if (result) {
-                    deferred.resolve(result)
-                } else {
-                    deferred.reject({
-                        status: 404,
-                        data: '',
-                        message: 'Ref not found',
-                        type: 'error',
-                    })
+        const cached = this.cacheSvc.get<RefObject>(cacheKey)
+        const deferred = this.$q.defer<RefObject>()
+        if (cached && !updateCache) {
+            deferred.resolve(cached)
+        } else {
+            this.$http.get<RefsResponse>(url).then(
+                (response) => {
+                    this.cacheSvc.put<RefObject>(
+                        cacheKey,
+                        response.data.refs[0]
+                    )
+                    deferred.resolve(this.cacheSvc.get<RefObject>(cacheKey))
+                },
+                (response: angular.IHttpResponse<RefsResponse>) => {
+                    this.apiSvc.handleErrorCallback(response, deferred)
                 }
-            },
-            (reason) => {
-                deferred.reject(reason)
-            }
-        )
+            )
+        }
         return deferred.promise
     }
 
@@ -654,7 +657,7 @@ export class ProjectService {
     }
 
     public updateRef(
-        refOb: RequestObject,
+        refOb: RefObject,
         projectId: string
     ): VePromise<RefObject, RefsResponse> {
         const deferred = this.$q.defer<RefObject>()
@@ -742,7 +745,7 @@ export class ProjectService {
     public getGroups(
         projectId: string,
         refId: string,
-        ignoreCache?: boolean
+        updateCache?: boolean
     ): VePromise<GroupObject[], GroupsResponse> {
         const cacheKey = this.apiSvc.makeCacheKey(
             { projectId, refId },
@@ -758,7 +761,7 @@ export class ProjectService {
             >
         }
         const deferred = this.$q.defer<GroupObject[]>()
-        if (this.cacheSvc.exists(cacheKey) && !ignoreCache) {
+        if (this.cacheSvc.exists(cacheKey) && !updateCache) {
             deferred.resolve(this.cacheSvc.get<GroupObject[]>(cacheKey))
         } else {
             this.inProgress[url] = deferred.promise

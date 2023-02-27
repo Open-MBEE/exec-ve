@@ -1,11 +1,9 @@
-import angular from 'angular'
-
-import { AddPresentationData } from '@ve-components/add-elements/components/add-pe.component'
+import { InsertPresentationData } from '@ve-components/insertions/components/insert-pe.component'
 import { ViewService } from '@ve-utils/mms-api-client'
 
 import { veComponents } from '@ve-components'
 
-import { AddElementResolveFn } from '@ve-types/components'
+import { InsertResolveFn } from '@ve-types/components'
 import {
     ElementObject,
     InstanceSpecObject,
@@ -72,12 +70,12 @@ export class PresentationService {
         // $ctrl.viewOrSectionOb = viewOrSectionOb;
         // $ctrl.presentationElemType = type;
         const instance = this.$uibModal.open<
-            AddElementResolveFn<AddPresentationData>,
+            InsertResolveFn<InsertPresentationData>,
             InstanceSpecObject
         >({
-            component: 'addElementModal',
+            component: 'insertElementModal',
             resolve: {
-                getAddData: (): AddPresentationData => {
+                getInsertData: (): InsertPresentationData => {
                     return {
                         addType: 'pe',
                         type,

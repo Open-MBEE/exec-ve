@@ -1,20 +1,10 @@
-import angular from 'angular'
-
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import {
-    AuthService,
-    ElementService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ImageService, MathService, UtilsService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    EventService,
-    ImageService,
-    MathJaxService,
-    UtilsService,
-} from '@ve-utils/services'
 import { handleChange } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
@@ -62,9 +52,8 @@ class TranscludeGroupDocsController
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
-        authSvc: AuthService,
         eventSvc: EventService,
-        mathJaxSvc: MathJaxService,
+        mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService,
@@ -80,9 +69,8 @@ class TranscludeGroupDocsController
             elementSvc,
             utilsSvc,
             schemaSvc,
-            authSvc,
             eventSvc,
-            mathJaxSvc,
+            mathSvc,
             extensionSvc,
             buttonBarSvc,
             imageSvc

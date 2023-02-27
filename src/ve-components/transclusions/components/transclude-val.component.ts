@@ -1,4 +1,3 @@
-import angular from 'angular'
 import $ from 'jquery'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
@@ -9,14 +8,10 @@ import {
     Transclusion,
 } from '@ve-components/transclusions'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
-import { AuthService, ElementService } from '@ve-utils/mms-api-client'
+import { MathService, UtilsService, ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    MathJaxService,
-    UtilsService,
-    EventService,
-    ImageService,
-} from '@ve-utils/services'
 
 import { PropertySpec, veComponents } from '@ve-components'
 
@@ -39,7 +34,7 @@ import { SlotObject, ValueObject } from '@ve-types/mms'
 
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
- * @requires {MathJaxService} mathJaxSvc
+ * @requires {MathService} mathSvc
  *
  * * Given an element id, puts in the element's name binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and name change,
@@ -179,7 +174,7 @@ export class TranscludeValController
 </div>
 `
 
-    static $inject = [...Transclusion.$inject]
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: VeQService,
@@ -191,9 +186,8 @@ export class TranscludeValController
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
-        authSvc: AuthService,
         eventSvc: EventService,
-        mathJaxSvc: MathJaxService,
+        mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
@@ -208,9 +202,8 @@ export class TranscludeValController
             elementSvc,
             utilsSvc,
             schemaSvc,
-            authSvc,
             eventSvc,
-            mathJaxSvc,
+            mathSvc,
             extensionSvc,
             buttonBarSvc,
             imageSvc
@@ -298,7 +291,7 @@ export class TranscludeValController
 
             if (!this.mmsGenerateForDiff) {
                 const resultHtml = $('<p></p>').html(result).toArray()
-                this.mathJaxSvc.typeset(resultHtml).then(
+                this.mathSvc.typeset(resultHtml).then(
                     () => deferred.resolve(resultHtml),
                     (reason) => {
                         deferred.reject(reason)

@@ -1,14 +1,14 @@
 import { IComponentController } from 'angular'
 
 import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
-import { RootScopeService } from '@ve-utils/services'
+import { RootScopeService } from '@ve-utils/application'
 
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { ViewObject } from '@ve-types/mms'
 
-class AddPeMenuController implements IComponentController {
+class InsertPeMenuController implements IComponentController {
     // Bindings
     private mmsView: ViewObject
 
@@ -46,7 +46,7 @@ class AddPeMenuController implements IComponentController {
     }
 }
 
-const AddPeMenuComponent: VeComponentOptions = {
+const InsertPeMenuComponent: VeComponentOptions = {
     selector: 'addPeMenu',
     template: `
     <div class="mms-add-pe-button" ng-mouseover="$ctrl.setPeLineVisibility($event);" ng-mouseleave="$ctrl.setPeLineVisibility($event);">
@@ -94,7 +94,7 @@ const AddPeMenuComponent: VeComponentOptions = {
         mmsView: '<',
         index: '<',
     },
-    controller: AddPeMenuController,
+    controller: InsertPeMenuController,
 }
 
-veComponents.component(AddPeMenuComponent.selector, AddPeMenuComponent)
+veComponents.component(InsertPeMenuComponent.selector, InsertPeMenuComponent)

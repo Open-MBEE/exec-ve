@@ -2,6 +2,8 @@ import angular from 'angular'
 import _ from 'lodash'
 
 import { AppUtilsService, DocumentStructure } from '@ve-app/main/services'
+import { UtilsService } from '@ve-utils/application'
+import { AutosaveService } from '@ve-utils/core'
 import {
     ElementService,
     ViewService,
@@ -9,7 +11,6 @@ import {
     ProjectService,
 } from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
-import { UtilsService, AutosaveService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 

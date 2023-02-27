@@ -6,9 +6,10 @@ import {
     PrintModalResolveFn,
 } from '@ve-app/main/modals/print-confirm-modal.component'
 import { TableExportModalResolveFn } from '@ve-app/main/modals/table-export-modal.component'
-import { TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-components/trees'
+import { UtilsService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { ElementService, ViewService } from '@ve-utils/mms-api-client'
-import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
@@ -370,7 +371,7 @@ Save CSV</button></div>
             (port == 80 || port == 443 ? '' : `:${port}`)
         const mmsIndex = absurl.indexOf('index.html')
         let toc = this.utilsSvc.makeHtmlTOC(
-            this.treeSvc.getApi('contents').getRows()[0].branch
+            this.treeSvc.getTreeRows('treeOfContents')[0].branch
         )
 
         // Conver to proper links for word/pdf
@@ -378,7 +379,7 @@ Save CSV</button></div>
 
         // Get correct table/image numbering based on doc hierarchy
         const tableAndFigTOC = this.utilsSvc.makeTablesAndFiguresTOC(
-            this.treeSvc.getApi('contents').getRows()[0].branch,
+            this.treeSvc.getTreeRows('treeOfContents')[0].branch,
             printElementCopy,
             false,
             htmlTotf

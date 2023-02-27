@@ -1,9 +1,8 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import { Commit, CompareData } from '@ve-components/diffs'
+import { EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
-import { EventService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -152,16 +151,16 @@ const RevertConfirmComponent: VeComponentOptions = {
     <h3>Preview Element</h3>
     <div class="element-preview-box">
         <h1 class="prop element-title">
-            <cross-reference mms-cf-type="name" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></cross-reference>
+            <view-cf mms-cf-type="name" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></view-cf>
         </h1>
         <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
         <p ng-show="!$ctrl.showDocHTML" class="doc-text">
-            <cross-reference mms-cf-type="doc" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></cross-reference>
+            <view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></view-cf>
         </p>
         <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
         <h2 class="prop-title">Property Value</h2>
         <span class="prop">
-            <cross-reference mms-cf-type="val" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></cross-reference>
+            <view-cf mms-cf-type="val" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></view-cf>
         </span></div>
     </div>
 </div>

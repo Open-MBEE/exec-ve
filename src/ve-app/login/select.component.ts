@@ -7,12 +7,9 @@ import {
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
+import { BrandingStyle, RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { ProjectService, AuthService } from '@ve-utils/mms-api-client'
-import {
-    BrandingStyle,
-    EventService,
-    RootScopeService,
-} from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 

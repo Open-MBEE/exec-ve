@@ -1,4 +1,4 @@
-import { ApplicationService } from '@ve-utils/services'
+import { ApplicationService } from '@ve-utils/application'
 
 import { veComponents } from '@ve-components'
 
@@ -234,9 +234,9 @@ export class ViewHtmlService {
         } else if (thing.type === 'List') {
             return this.makeHtmlList(thing as PresentListObject)
         } else if (thing.type === 'Image') {
-            return `<cross-reference mms-cf-type="img" mms-element-id="${
+            return `<view-cf mms-cf-type="img" mms-element-id="${
                 (thing as PresentImageObject).id
-            }"></cross-reference>`
+            }"></view-cf>`
         }
     }
 }

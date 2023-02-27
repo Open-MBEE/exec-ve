@@ -1,4 +1,3 @@
-import angular from 'angular'
 import $ from 'jquery'
 
 import {
@@ -9,8 +8,9 @@ import {
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
+import { ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
-import { EventService, ImageService } from '@ve-utils/services'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'

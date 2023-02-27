@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import {
     ITransclusion,
@@ -7,14 +5,10 @@ import {
     Transclusion,
 } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import { AuthService, ElementService } from '@ve-utils/mms-api-client'
+import { ImageService, MathService, UtilsService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    EventService,
-    ImageService,
-    MathJaxService,
-    UtilsService,
-} from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -81,9 +75,8 @@ export class TranscludeComController
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
-        authSvc: AuthService,
         eventSvc: EventService,
-        mathJaxSvc: MathJaxService,
+        mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
@@ -98,9 +91,8 @@ export class TranscludeComController
             elementSvc,
             utilsSvc,
             schemaSvc,
-            authSvc,
             eventSvc,
-            mathJaxSvc,
+            mathSvc,
             extensionSvc,
             buttonBarSvc,
             imageSvc
@@ -241,7 +233,7 @@ export class TranscludeComController
         }
         if (!this.mmsGenerateForDiff) {
             const resultHtml = $('<p></p>').html(result).toArray()
-            this.mathJaxSvc.typeset(resultHtml).then(
+            this.mathSvc.typeset(resultHtml).then(
                 () => deferred.resolve(resultHtml),
                 (reason) => {
                     deferred.reject(reason)

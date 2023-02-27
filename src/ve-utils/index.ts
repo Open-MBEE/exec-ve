@@ -1,15 +1,12 @@
 //Libraries
 //import 'angular'
-//import 'rx-angular'
-//import 'angular-growl'
 
 import './ve-utils.module'
 
 import './third-party'
 
-import './utils'
 import './model-schema'
-import './services'
+import './application'
 import './mms-api-client'
 
 export * from './ve-utils.module'

@@ -2,22 +2,19 @@ import { StateService } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import _ from 'lodash'
 
-import { TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-components/trees'
 import { CacheService, ElementService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
     GroupObject,
-    GroupsResponse,
     ParamsObject,
     ProjectObject,
-    ProjectsResponse,
     RefObject,
-    RefsResponse,
 } from '@ve-types/mms'
 import { AngularUITree, VeTreeNodeScope } from '@ve-types/tree'
 
@@ -37,10 +34,10 @@ interface ReorderGroupResult {
 
 class ReorderGroupController implements IComponentController {
     params: ParamsObject
-    mmsProject: VePromise<ProjectObject, ProjectsResponse>
-    mmsRef: VePromise<RefObject, RefsResponse>
-    mmsGroups: VePromise<GroupObject[], GroupsResponse>
-    mmsDocuments: VePromise<DocumentObject[]>
+    mmsProject: ProjectObject
+    mmsRef: RefObject
+    mmsGroups: GroupObject[]
+    mmsDocuments: DocumentObject[]
 
     //Locals
     groups: GroupObject[]
@@ -72,83 +69,60 @@ class ReorderGroupController implements IComponentController {
     ) {}
 
     $onInit(): void {
-        const promises: VePromise<unknown, unknown>[] = []
-        promises.push(
-            this.mmsGroups,
-            this.mmsDocuments,
-            this.treeSvc.waitForApi('contents')
-        )
-        this.mmsGroups.then(
-            (groups) => {
-                this.groups = groups
-            },
-            (reason) => {
-                this.growl.error('Error Getting Child Views: ' + reason.message)
-            }
-        )
+        this.groups = this.mmsGroups
+        this.documents = this.mmsDocuments
 
-        this.mmsDocuments.then(
-            (documents) => {
-                this.documents = documents
-            },
-            (reason) => {
-                this.growl.error('Error Getting Child Views: ' + reason.message)
-            }
-        )
-
-        this.$q.allSettled(promises).finally(() => {
-            const children = this.generateTree()
-            this.sortRecursively(children)
-            const root = this.createNode('Top Level', 'root', children, {
-                id: 'root',
-                _projectId: this.params.projectId,
-                _refId: this.params.refId,
-            })
-            this.tree = [root]
-
-            this.treeOptions = {
-                dropped: (change): void => {
-                    this.sortRecursively(children)
-                    this.targetId = ''
-                },
-                accept: (
-                    sourceNodeScope: VeTreeNodeScope,
-                    destNodeScope: VeTreeNodeScope,
-                    destIndex
-                ): boolean => {
-                    // allow moving to the root or to a group
-                    const accept =
-                        destNodeScope.node &&
-                        (destNodeScope.node.type === 'group' ||
-                            destNodeScope.node.type === 'root')
-                    if (accept) {
-                        if (
-                            destNodeScope.$nodeScope &&
-                            destNodeScope.$nodeScope.$modelValue &&
-                            (
-                                destNodeScope.$nodeScope.$modelValue as {
-                                    id: string
-                                }
-                            ).id
-                        ) {
-                            this.targetId = (
-                                destNodeScope.$nodeScope.$modelValue as {
-                                    id: string
-                                }
-                            ).id
-                        }
-                    }
-                    return accept
-                },
-                dragStart: (data): void => {
-                    this.targetId = (
-                        data.dest.nodesScope.$nodeScope.$modelValue as {
-                            id: string
-                        }
-                    ).id
-                },
-            }
+        const children = this.generateTree()
+        this.sortRecursively(children)
+        const root = this.createNode('Top Level', 'root', children, {
+            id: 'root',
+            _projectId: this.params.projectId,
+            _refId: this.params.refId,
         })
+        this.tree = [root]
+
+        this.treeOptions = {
+            dropped: (change): void => {
+                this.sortRecursively(children)
+                this.targetId = ''
+            },
+            accept: (
+                sourceNodeScope: VeTreeNodeScope,
+                destNodeScope: VeTreeNodeScope,
+                destIndex
+            ): boolean => {
+                // allow moving to the root or to a group
+                const accept =
+                    destNodeScope.node &&
+                    (destNodeScope.node.type === 'group' ||
+                        destNodeScope.node.type === 'root')
+                if (accept) {
+                    if (
+                        destNodeScope.$nodeScope &&
+                        destNodeScope.$nodeScope.$modelValue &&
+                        (
+                            destNodeScope.$nodeScope.$modelValue as {
+                                id: string
+                            }
+                        ).id
+                    ) {
+                        this.targetId = (
+                            destNodeScope.$nodeScope.$modelValue as {
+                                id: string
+                            }
+                        ).id
+                    }
+                }
+                return accept
+            },
+            dragStart: (data): void => {
+                this.targetId = (
+                    data.dest.nodesScope.$nodeScope.$modelValue as {
+                        id: string
+                    }
+                ).id
+            },
+        }
     }
 
     public generateTree(): ReorderGroupNode[] {
@@ -350,7 +324,7 @@ class ReorderGroupController implements IComponentController {
     }
 
     public navigateAway = (reload: boolean): void => {
-        const curBranch = this.treeSvc.getApi('contents').getSelectedBranch()
+        const curBranch = this.treeSvc.getSelectedBranch()
         if (curBranch) {
             const documentId =
                 curBranch.type === 'group'

@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import {
     Diff,
     IDiff,
@@ -16,7 +14,7 @@ class DiffHtmlController extends Diff<string> implements IDiff<string> {
     htmlDiffId: string
     diffResult: string
 
-    static $inject = ['$scope', '$timeout', 'growl']
+    static $inject = Diff.$inject
 
     constructor(
         $scope: angular.IScope,

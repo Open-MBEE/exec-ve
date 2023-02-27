@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { VeComponentOptions } from '@ve-types/angular'

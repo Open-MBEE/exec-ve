@@ -3,9 +3,9 @@ import angular, { IComponentController } from 'angular'
 import _ from 'lodash'
 
 import { AppUtilsService } from '@ve-app/main/services'
-import { TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-components/trees'
+import { EventService } from '@ve-utils/core'
 import { ViewService, ElementService } from '@ve-utils/mms-api-client'
-import { EventService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
@@ -299,10 +299,10 @@ class ReorderController implements IComponentController {
     }
 
     public navigate = (reload: boolean): void => {
-        const curBranch = this.treeSvc.getApi('contents').getSelectedBranch()
+        const curBranch = this.treeSvc.getSelectedBranch()
         if (!curBranch) {
             void this.$state.go(
-                'main.project.ref.document',
+                'main.project.ref.present',
                 {},
                 { reload: true }
             )
@@ -312,7 +312,7 @@ class ReorderController implements IComponentController {
                 goToId = curBranch.viewId ? curBranch.viewId : ''
             }
             void this.$state.go(
-                'main.project.ref.document.view',
+                'main.project.ref.present.view',
                 { viewId: goToId },
                 { reload: reload }
             )

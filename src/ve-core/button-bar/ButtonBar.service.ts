@@ -1,11 +1,11 @@
-import angular from 'angular'
-
 import { ButtonBarApi } from '@ve-core/button-bar'
-import { EventService } from '@ve-utils/services'
+import { EventService } from '@ve-utils/core'
 
 import { veUtils } from '@ve-utils'
 
+import { VePromise, VeQService } from '@ve-types/angular'
 import { EditingToolbar } from '@ve-types/core/editor'
+import { VeApiObject } from '@ve-types/view-editor'
 
 export interface IButtonBarButton {
     id: string
@@ -44,34 +44,34 @@ export interface buttonInitFn {
 
 export class ButtonBarService {
     static $inject = ['EventService']
-    private buttonBars: { [id: string]: ButtonBarApi } = {}
+    private buttonBars: VeApiObject<ButtonBarApi> = {}
     barCounter = 0
 
-    constructor(private eventSvc: EventService) {}
+    constructor(private $q: VeQService, private eventSvc: EventService) {}
 
-    getApi = (id: string): ButtonBarApi => {
-        if (this.buttonBars.hasOwnProperty(id)) {
-            return this.buttonBars[id]
+    public waitForApi = (id: string): VePromise<ButtonBarApi, void> => {
+        if (!this.buttonBars.hasOwnProperty(id)) {
+            this.buttonBars[id] = {}
+            this.buttonBars[id].promise = new this.$q<ButtonBarApi>(
+                (resolve, reject) => {
+                    this.buttonBars[id].resolve = resolve
+                    this.buttonBars[id].reject = reject
+                }
+            )
         }
-        return null
+        return this.buttonBars[id].promise
     }
 
-    initApi(
+    public initApi(
         id: string,
         init: buttonInitFn,
         ctrl: { bars: string[] } & angular.IComponentController
     ): ButtonBarApi {
-        if (id === '') {
-            this.barCounter++
-            id = this.barCounter.toString()
-        } else if (this.buttonBars.hasOwnProperty(id)) {
-            return this.buttonBars[id]
-        }
         if (ctrl) {
             ctrl.bars = []
             if (!ctrl.$onDestroy) {
                 ctrl.$onDestroy = (): void => {
-                    this.destroy(ctrl.bars)
+                    this.destroyAll(ctrl.bars)
                 }
             }
             ctrl.bars.push(id)
@@ -79,20 +79,35 @@ export class ButtonBarService {
         if (!init) {
             return null
         }
-        const api = new ButtonBarApi(id, init)
+        const api = new ButtonBarApi(id)
         init(api)
-        this.buttonBars[id] = api
+        if (!this.buttonBars[id]) {
+            this.buttonBars[id] = {
+                api,
+            }
+        } else {
+            this.buttonBars[id].api = api
+        }
+        if (!this.buttonBars[id].resolve) {
+            this.buttonBars[id].promise = new this.$q((resolve, reject) => {
+                this.buttonBars[id].resolve = resolve
+                this.buttonBars[id].reject = reject
+            })
+        }
+        this.buttonBars[id].resolve(api)
         return api
     }
 
-    destroy(bars: string[]): void {
-        if (bars && bars.length !== 0) {
-            for (let i = 0; i < bars.length; i++) {
-                if (this.buttonBars.hasOwnProperty(bars[i])) {
-                    delete this.buttonBars[bars[i]]
-                }
-            }
+    destroy(id: string): void {
+        if (this.buttonBars.hasOwnProperty(id)) {
+            delete this.buttonBars[id]
         }
+    }
+
+    destroyAll(ids: string[]): void {
+        ids.forEach((bbId) => {
+            this.destroy(bbId)
+        })
     }
 
     getButtonBarButton = (

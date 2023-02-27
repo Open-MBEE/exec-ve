@@ -5,7 +5,7 @@ import './services/Transclusion.service'
 
 export * from './services/Transclusion.service'
 
-import './cross-reference.component'
+import './view-cf.component'
 
 import './components'
 import './mms-transclude-compatibility.component'

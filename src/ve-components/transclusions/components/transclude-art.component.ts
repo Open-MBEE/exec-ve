@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import {
     Transclusion,
@@ -7,18 +5,10 @@ import {
     ITransclusionComponentOptions,
 } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import {
-    ElementService,
-    AuthService,
-    URLService,
-} from '@ve-utils/mms-api-client'
+import { UtilsService, MathService, ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService, URLService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    UtilsService,
-    EventService,
-    MathJaxService,
-    ImageService,
-} from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -41,7 +31,7 @@ import { VePromise, VeQService } from '@ve-types/angular'
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
- * @requires {MathJaxService} mathJaxSvc
+ * @requires {MathService} mathSvc
  * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
@@ -81,9 +71,8 @@ export class TranscludeArtController
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
-        authSvc: AuthService,
         eventSvc: EventService,
-        mathJaxSvc: MathJaxService,
+        mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService,
@@ -99,9 +88,8 @@ export class TranscludeArtController
             elementSvc,
             utilsSvc,
             schemaSvc,
-            authSvc,
             eventSvc,
-            mathJaxSvc,
+            mathSvc,
             extensionSvc,
             buttonBarSvc,
             imageSvc

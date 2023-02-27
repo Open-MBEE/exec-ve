@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { veUtils } from '@ve-utils'
 
 import { VePromiseReason } from '@ve-types/angular'

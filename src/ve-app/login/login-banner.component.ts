@@ -1,6 +1,6 @@
 import { IComponentController } from 'angular'
 
-import { BrandingStyle } from '@ve-utils/services'
+import { BrandingStyle } from '@ve-utils/application'
 import { handleChange } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'

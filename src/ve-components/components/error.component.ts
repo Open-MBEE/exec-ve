@@ -1,7 +1,6 @@
-import angular from 'angular'
 import _ from 'lodash'
 
-import { UtilsService } from '@ve-utils/services'
+import { ApplicationService } from '@ve-utils/application'
 
 import { veUtils } from '@ve-utils'
 
@@ -19,9 +18,12 @@ class ExtensionErrorController implements angular.IComponentController {
     protected title: string
     protected id: string
 
-    static $inject = ['UtilsService']
+    static $inject = ['growl', 'ApplicationService']
 
-    constructor(private utilsSvc: UtilsService) {}
+    constructor(
+        private growl: angular.growl.IGrowlService,
+        private applicationSvc: ApplicationService
+    ) {}
 
     $onInit(): void {
         this.id = this.mmsElementId
@@ -45,7 +47,16 @@ class ExtensionErrorController implements angular.IComponentController {
     }
 
     public copyToClipboard($event: JQuery.ClickEvent): void {
-        this.utilsSvc.copyToClipboard($('#tooltipElementId'), $event)
+        this.applicationSvc
+            .copyToClipboard($('#tooltipElementId'), $event)
+            .then(
+                () => {
+                    this.growl.info('Copied to clipboard!', { ttl: 2000 })
+                },
+                (err) => {
+                    this.growl.error('Unable to copy: ' + err.message)
+                }
+            )
     }
 }
 

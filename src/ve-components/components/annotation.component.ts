@@ -1,8 +1,7 @@
-import angular from 'angular'
-
 import { ExtensionService } from '@ve-components/services'
+import { ApplicationService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
-import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veUtils } from '@ve-utils'
 
@@ -24,9 +23,10 @@ export interface AnnotationObject {
 class AnnotationController implements angular.IComponentController {
     static $inject = [
         '$element',
+        'growl',
         'ExtensionService',
         'SchemaService',
-        'UtilsService',
+        'ApplicationService',
         'EventService',
     ]
 
@@ -42,9 +42,10 @@ class AnnotationController implements angular.IComponentController {
 
     constructor(
         private $element: JQuery<HTMLElement>,
+        private growl: angular.growl.IGrowlService,
         private extensionSvc: ExtensionService,
         private schemaSvc: SchemaService,
-        private utilsSvc: UtilsService,
+        private applicationSvc: ApplicationService,
         private eventSvc: EventService
     ) {}
 
@@ -76,7 +77,16 @@ class AnnotationController implements angular.IComponentController {
     }
 
     public copyToClipboard($event: JQuery.ClickEvent): void {
-        this.utilsSvc.copyToClipboard($('#tooltipElementId'), $event)
+        this.applicationSvc
+            .copyToClipboard($('#tooltipElementId'), $event)
+            .then(
+                () => {
+                    this.growl.info('Copied to clipboard!', { ttl: 2000 })
+                },
+                (err) => {
+                    this.growl.error('Unable to copy: ' + err.message)
+                }
+            )
     }
 
     private _getContentIfElementFound(

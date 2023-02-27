@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { URLService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'

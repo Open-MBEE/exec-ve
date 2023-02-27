@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { veUtils } from '@ve-utils'
 
 export type httpCallback<T> = (response: angular.IHttpResponse<T>) => void

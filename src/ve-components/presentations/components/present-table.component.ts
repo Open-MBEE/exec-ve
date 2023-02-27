@@ -1,7 +1,4 @@
-import angular, { INgModelOptions } from 'angular'
 import $ from 'jquery'
-import JQuery from 'jquery'
-import Rx from 'rx-lite'
 
 import {
     IPresentation,
@@ -11,8 +8,9 @@ import {
 } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
-import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -36,7 +34,7 @@ class PresentTableController extends Presentation implements IPresentation {
     public table: PresentTableObject
     public tableConfig: ITableConfig
     private trs: JQuery<HTMLElement>
-    public ngModelOptions: INgModelOptions
+    public ngModelOptions: angular.INgModelOptions
     public showFilter: boolean = false
     public fixedHeaders: boolean = false
     public fixedColumns: boolean = false
@@ -80,12 +78,7 @@ class PresentTableController extends Presentation implements IPresentation {
         filterInputBinding
     ) => void
 
-    static $inject = [
-        ...Presentation.$inject,
-        '$document',
-        '$window',
-        '$timeout',
-    ]
+    static $inject = [...Presentation.$inject, '$timeout']
 
     constructor(
         $q: VeQService,
@@ -101,8 +94,6 @@ class PresentTableController extends Presentation implements IPresentation {
         imageSvc: ImageService,
         buttonBarSvc: ButtonBarService,
         extensionSvc: ExtensionService,
-        private $document: angular.IDocumentService,
-        private $window: angular.IWindowService,
         private $timeout: angular.ITimeoutService
     ) {
         super(
@@ -612,7 +603,7 @@ class PresentTableController extends Presentation implements IPresentation {
         } else if (!containerDivContent.prop('tagName')) {
             return cell.text().trim()
         } else {
-            const cf = 'cross-reference'
+            const cf = 'view-cf'
             const contentTag: string = (
                 containerDivContent.prop('tagName') as object
             )
@@ -695,7 +686,7 @@ class PresentTableController extends Presentation implements IPresentation {
             downloadLink.attr('download', 'TableData.csv')
             downloadLink.attr('target', '_blank')
 
-            this.$document.find('body').append(downloadContainer)
+            $(document).find('body').append(downloadContainer)
             void this.$timeout(() => {
                 downloadLink[0].click()
                 downloadLink.remove()
@@ -733,7 +724,7 @@ class PresentTableController extends Presentation implements IPresentation {
                 .css('height', '')
             this._fixedHeadersElem.css('transform', '').css('will-change', '')
             this._fixedHeadersElem = null
-            this.$window.localStorage.setItem(
+            window.localStorage.setItem(
                 've-table-header-' + this.element.id,
                 'false'
             )
@@ -742,12 +733,12 @@ class PresentTableController extends Presentation implements IPresentation {
         this.$element
             .find('.table-wrapper')
             .addClass('table-fix-head')
-            .css('height', this.$window.innerHeight - 36 * 3)
+            .css('height', window.innerHeight - 36 * 3)
         //heights for navbar, menu, toolbar
         this._fixedHeadersElem = this.$element.find('thead, caption')
         this._fixedHeadersElem.css('will-change', 'transform') //browser optimization
         this.$element.find('.table-fix-head').on('scroll', this.scroll)
-        this.$window.localStorage.setItem(
+        window.localStorage.setItem(
             've-table-header-' + this.element.id,
             'true'
         )
@@ -764,7 +755,7 @@ class PresentTableController extends Presentation implements IPresentation {
                 .css('will-change', '')
                 .removeClass('table-fixed-cell')
             this._fixedColumnsElem = null
-            this.$window.localStorage.setItem(
+            window.localStorage.setItem(
                 've-table-column-' + this.element.id,
                 'false'
             )
@@ -773,7 +764,7 @@ class PresentTableController extends Presentation implements IPresentation {
         this.$element
             .find('.table-wrapper')
             .addClass('table-fix-column')
-            .css('width', this.$window.innerWidth - 400)
+            .css('width', window.innerWidth - 400)
         this._fixedColumnsElem = this._findColumnCells(
             'thead',
             'th',
@@ -788,7 +779,7 @@ class PresentTableController extends Presentation implements IPresentation {
         this._fixedColumnsElem.css('will-change', 'transform') //browser optimization
         this._fixedColumnsElem.addClass('table-fixed-cell')
         this.$element.find('.table-fix-column').on('scroll', this.scroll)
-        this.$window.localStorage.setItem(
+        window.localStorage.setItem(
             've-table-column-' + this.element.id,
             this.numFixedColumns.toString()
         )
@@ -872,14 +863,14 @@ class PresentTableController extends Presentation implements IPresentation {
                 if (this.nextIndex < this.lastIndex) this.compileTable()
                 else {
                     if (
-                        this.$window.localStorage.getItem(
+                        window.localStorage.getItem(
                             've-table-header-' + this.element.id
                         ) == 'true'
                     ) {
                         this.fixedHeaders = true
                         this.makeFixedHeader()
                     }
-                    const columnFix = this.$window.localStorage.getItem(
+                    const columnFix = window.localStorage.getItem(
                         've-table-column-' + this.element.id
                     )
                     if (

@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import {
     Presentation,
     ViewHtmlService,
@@ -7,8 +5,9 @@ import {
 } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
-import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 

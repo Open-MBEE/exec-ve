@@ -2,7 +2,7 @@ import { StateService } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
-import { RootScopeService, ShortenUrlService } from '@ve-utils/services'
+import { RootScopeService, ShortUrlService } from '@ve-utils/application'
 
 import { veApp } from '@ve-app'
 
@@ -40,33 +40,33 @@ const ShortUrlComponent: VeComponentOptions = {
         static $inject = [
             '$state',
             'growl',
-            'ShortenUrlService',
+            'ShortUrlService',
             'RootScopeService',
         ]
 
         constructor(
             private $state: StateService,
             private growl: angular.growl.IGrowlService,
-            private shortenUrlSvc: ShortenUrlService,
+            private shortUrlSvc: ShortUrlService,
             private rootScopeSvc: RootScopeService
         ) {}
 
         $onInit(): void {
             this.rootScopeSvc.veTitle('Redirecting... | View Editor') //what to name this?
             if (this.paramsOb && this.paramsOb.shortUrl) {
-                this.shortenUrlSvc.decodeShortUrl(this.paramsOb.shortUrl).then(
+                this.shortUrlSvc.decodeShortUrl(this.paramsOb.shortUrl).then(
                     (result) => {
                         this.decodedUrl = result
                         if (this.decodedUrl.viewId) {
                             void this.$state.go(
-                                'main.project.ref.document.view',
+                                'main.project.ref.present.view',
                                 this.decodedUrl
                             )
                             return
                         }
                         if (this.decodedUrl.documentId) {
                             void this.$state.go(
-                                'main.project.ref.document',
+                                'main.project.ref.present',
                                 this.decodedUrl
                             )
                             return

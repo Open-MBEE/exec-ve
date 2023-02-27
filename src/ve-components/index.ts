@@ -16,11 +16,12 @@ import './services'
 import './components'
 
 // Extensions
+import './trees'
 import './diffs'
 import './presentations'
 import './transclusions'
 import './spec-tools'
-import './add-elements'
+import './insertions'
 
 export * from './ve-components.module'
 

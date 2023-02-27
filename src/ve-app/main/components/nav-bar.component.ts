@@ -1,13 +1,9 @@
 import { StateService, UIRouter } from '@uirouter/angularjs'
-import angular, { IComponentController } from 'angular'
 
 import { SelectModalResolveFn } from '@ve-app/main/modals/select-modal.component'
-import { AuthService } from '@ve-utils/mms-api-client'
-import {
-    ApplicationService,
-    EventService,
-    RootScopeService,
-} from '@ve-utils/services'
+import { RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { AuthService, UserService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
@@ -15,7 +11,7 @@ import { VeComponentOptions } from '@ve-types/angular'
 import { OrgObject, ProjectObject, RefObject, UserObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
-class NavBarController implements IComponentController {
+class NavBarController implements angular.IComponentController {
     static $inject = [
         '$uiRouter',
         '$state',
@@ -24,8 +20,8 @@ class NavBarController implements IComponentController {
         '$window',
         'hotkeys',
         'growl',
-        'ApplicationService',
         'AuthService',
+        'UserService',
         'EventService',
         'RootScopeService',
     ]
@@ -63,8 +59,8 @@ class NavBarController implements IComponentController {
         private $window: angular.IWindowService,
         private hotkeys: angular.hotkeys.HotkeysProvider,
         private growl: angular.growl.IGrowlService,
-        private applicationSvc: ApplicationService,
         private authSvc: AuthService,
+        private userSvc: UserService,
         private eventSvc: EventService,
         private rootScopeSvc: RootScopeService
     ) {
@@ -92,7 +88,7 @@ class NavBarController implements IComponentController {
         void this.authSvc.checkLogin().then(
             (data) => {
                 this.username = data.username
-                this.authSvc.getUserData(data.username).then(
+                this.userSvc.getUserData(data.username).then(
                     (userData) => {
                         this.user = userData
                         if (this.user.firstName) {
@@ -167,7 +163,7 @@ class NavBarController implements IComponentController {
     }
 
     search(searchText: string): void {
-        if (this.$state.includes('main.project.ref.document.order')) {
+        if (this.$state.includes('main.project.ref.present.reorder')) {
             this.growl.warning('Please finish reorder action first.')
             return
             // } else if ($state.includes('main.project.diff')) {

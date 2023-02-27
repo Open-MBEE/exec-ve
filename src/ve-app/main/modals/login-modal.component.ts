@@ -2,9 +2,9 @@ import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
 import angular from 'angular'
 import _ from 'lodash'
 
+import { AutosaveService } from '@ve-utils/core'
 import { ApiService, AuthService, CacheService } from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
-import { AutosaveService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 

@@ -1,12 +1,10 @@
-import angular from 'angular'
-
 import {
     ButtonBarApi,
     ButtonBarService,
     IButtonBarButton,
 } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
-import { EventService } from '@ve-utils/services'
+import { EventService } from '@ve-utils/core'
 
 import { veUtils } from '@ve-utils'
 

@@ -1,4 +1,3 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import {
@@ -48,7 +47,6 @@ export class ElementService {
     static $inject = [
         '$q',
         '$http',
-        'growl',
         'URLService',
         'ApiService',
         'CacheService',
@@ -58,7 +56,6 @@ export class ElementService {
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
-        private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
         private apiSvc: ApiService,
         private cacheSvc: CacheService,
@@ -1212,9 +1209,6 @@ export class ElementService {
             rejected.forEach((e) => {
                 if (e.code === 304 && e.object) {
                     results.push(e.object) //add any server rejected elements because they haven't changed
-                    this.growl.warning(
-                        'Bulk Update Partially Rejected. Check logs for more details.'
-                    )
                     console.log(
                         `[BULK UPDATE ELEMENT REJECTED]: ${e.code}: ${e.message}`
                     )

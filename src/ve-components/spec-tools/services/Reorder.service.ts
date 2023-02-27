@@ -1,4 +1,3 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import { ElementService, ViewService } from '@ve-utils/mms-api-client'

@@ -1,14 +1,6 @@
-import { UIRouterGlobals } from '@uirouter/angularjs'
-import angular from 'angular'
-
-import { EventService } from '@ve-utils/services'
+import { EventService } from '@ve-utils/core'
 
 import { veCore } from '@ve-core'
-
-import {
-    default_dynamic_buttons,
-    default_toolbar_buttons,
-} from '../toolbar-button.config'
 
 import { ToolbarApi } from './Toolbar.api'
 
@@ -20,7 +12,7 @@ export interface IToolBarButton {
     id: string
     icon: string
     tooltip: string
-    category: string
+    category?: string
     icon_original?: string
     selected?: boolean
     active?: boolean
@@ -87,36 +79,23 @@ export class ToolbarService {
 
     constructor(private $q: VeQService, private eventSvc: EventService) {
         this.veConfig = window.__env
-        for (const button of default_toolbar_buttons) {
-            this.buttons[button.id] = new ToolButton(button.id, button)
-        }
-        for (const button of default_dynamic_buttons) {
-            this.dynamic_buttons[button.id] = new ToolButton(button.id, button)
-        }
-        if (this.veConfig.expConfig && this.veConfig.expConfig.specTools) {
-            for (const tool of this.veConfig.expConfig.specTools) {
-                if (tool.button) {
-                    this.buttons[tool.button.id] = new ToolButton(
-                        tool.button.id,
-                        tool.button
-                    )
-                }
-                if (tool.dynamic_button) {
-                    for (const dynButton of tool.dynamic_button) {
-                        this.dynamic_buttons[dynButton.id] = new ToolButton(
-                            dynButton.id,
-                            dynButton
-                        )
+        if (this.veConfig.expConfig) {
+            for (const ext of Object.keys(this.veConfig.expConfig)) {
+                if (
+                    this.veConfig.expConfig[ext] &&
+                    this.veConfig.expConfig[ext].length > 0
+                ) {
+                    for (const tool of this.veConfig.expConfig[ext]) {
+                        if (tool.button) {
+                            this.registerToolbarButtons(tool.button)
+                        }
+                        if (
+                            tool.dynamic_button &&
+                            tool.dynamic_button.length > 0
+                        ) {
+                            this.registerDynamicButtons(tool.dynamic_button)
+                        }
                     }
-                }
-            }
-        }
-        for (const id of Object.keys(this.buttons)) {
-            const button = this.buttons[id]
-            if (button.dynamic_ids) {
-                button.dynamic_buttons = []
-                for (const dyn of button.dynamic_ids) {
-                    button.dynamic_buttons.push(this.getDynamicButton(dyn))
                 }
             }
         }
@@ -138,9 +117,9 @@ export class ToolbarService {
     public initApi(
         id: string,
         init: toolbarInitFn,
-        ctrl: {
-            $uiRouterGlobals: UIRouterGlobals
-        } & angular.IComponentController
+        ctrl: angular.IComponentController,
+        buttons?: IToolBarButton[],
+        dynamic_buttons?: IToolBarButton[]
     ): ToolbarApi {
         if (!id) {
             throw new Error('Unable to create Toolbar, missing id')
@@ -153,6 +132,12 @@ export class ToolbarService {
         }
 
         const api = new ToolbarApi(id)
+        if (buttons && buttons.length > 0) {
+            this.registerToolbarButtons(buttons)
+        }
+        if (dynamic_buttons && dynamic_buttons.length > 0) {
+            this.registerDynamicButtons(buttons)
+        }
         init(api)
         if (!this.toolbars[id]) {
             this.toolbars[id] = {
@@ -177,23 +162,56 @@ export class ToolbarService {
         }
     }
 
+    public registerToolbarButtons = (
+        buttons: IToolBarButton | IToolBarButton[]
+    ): void => {
+        if (!Array.isArray(buttons)) {
+            buttons = [buttons]
+        }
+        if (buttons.length > 0) {
+            for (const button of buttons) {
+                if (!this.buttons[button.id]) {
+                    this.buttons[button.id] = button
+                }
+            }
+        }
+    }
+    public registerDynamicButtons = (
+        dynamic_buttons: IToolBarButton | IToolBarButton[]
+    ): void => {
+        if (!Array.isArray(dynamic_buttons)) {
+            dynamic_buttons = [dynamic_buttons]
+        }
+        if (dynamic_buttons.length > 0) {
+            for (const button of dynamic_buttons) {
+                if (!this.dynamic_buttons[button.id]) {
+                    this.dynamic_buttons[button.id] = button
+                }
+            }
+        }
+    }
+
+    public attachDynamicButtons
+
     /**
      * @name veUtils/ToolbarService#this.getToolbarButton
-     * Get pre-defined toolbar buttons
+     * Get pre-defined toolbar button
      *
-     * @param {string} button id
+     * @param {string} buttonId id
      * @param generic
      * @returns {Object} Button object
      */
-    public getToolbarButton = (
-        button: string,
-        generic?: boolean
-    ): IToolBarButton => {
-        if (this.buttons.hasOwnProperty(button)) {
-            return this.buttons[button]
-        }
-        if (generic) {
-            return (this.buttons[button] = new ToolButton(button))
+    public getToolbarButton = (buttonId: string): ToolButton => {
+        if (this.buttons.hasOwnProperty(buttonId)) {
+            const newButton = new ToolButton(buttonId, this.buttons[buttonId])
+            if (this.buttons[buttonId].dynamic_ids) {
+                for (const id of this.buttons[buttonId].dynamic_ids) {
+                    newButton.dynamic_buttons.push(this.getDynamicButton(id))
+                }
+            }
+            return newButton
+        } else {
+            return (this.buttons[buttonId] = new ToolButton(buttonId))
         }
     }
 

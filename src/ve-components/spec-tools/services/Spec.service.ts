@@ -1,16 +1,16 @@
-import angular, { Injectable } from 'angular'
-
 import { ComponentService } from '@ve-components/services'
 import { ToolbarService } from '@ve-core/toolbar'
+import { UtilsService } from '@ve-utils/application'
+import { AutosaveService, EventService } from '@ve-utils/core'
 import {
     AuthService,
     ElementService,
     PermissionsService,
     ProjectService,
     URLService,
+    UserService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
 
 import { PropertySpec, veComponents } from '@ve-components'
 
@@ -38,7 +38,7 @@ export interface SpecApi extends ElementsRequest<string> {
     qualifiedName?: string
 }
 
-export class SpecService implements Injectable<any> {
+export class SpecService implements angular.Injectable<any> {
     private element: ElementObject
     private document: DocumentObject
     private modifier: UserObject
@@ -71,6 +71,7 @@ export class SpecService implements Injectable<any> {
         'ComponentService',
         'URLService',
         'AuthService',
+        'UserService',
         'PermissionsService',
         'UtilsService',
     ]
@@ -90,6 +91,7 @@ export class SpecService implements Injectable<any> {
         private componentSvc: ComponentService,
         private uRLSvc: URLService,
         private authSvc: AuthService,
+        private userSvc: UserService,
         private permissionsSvc: PermissionsService,
         private utilsSvc: UtilsService
     ) {}
@@ -223,7 +225,7 @@ export class SpecService implements Injectable<any> {
                     this.element = data
                     this.values = this.componentSvc.setupValCf(data)
                     promises.push(
-                        this.authSvc
+                        this.userSvc
                             .getUserData(data._modifier)
                             .then((result) => {
                                 this.modifier = result

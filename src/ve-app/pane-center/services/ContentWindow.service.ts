@@ -1,4 +1,5 @@
-import { EventService, RootScopeService } from '@ve-utils/services'
+import { RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 
 import { veApp } from '@ve-app'
 

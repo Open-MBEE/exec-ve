@@ -6,11 +6,7 @@ import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 import { veComponents } from '@ve-components'
 
 import { VePromiseReason } from '@ve-types/angular'
-import {
-    AddElementApi,
-    AddElementData,
-    AddElementResolve,
-} from '@ve-types/components'
+import { InsertApi, InsertData, InsertResolve } from '@ve-types/components'
 import {
     ElementObject,
     ElementsResponse,
@@ -18,14 +14,14 @@ import {
 } from '@ve-types/mms'
 import { VeModalComponent, VeModalController } from '@ve-types/view-editor'
 
-export interface AddTransclusionData extends AddElementData {
+export interface InsertTransclusionData extends InsertData {
     viewLink: boolean
 }
 
-class CreateTransclusionModalController
+class InsertTransclusionModalController
     extends VeModalControllerImpl<
         TransclusionObject,
-        AddElementResolve<AddTransclusionData>
+        InsertResolve<InsertTransclusionData>
     >
     implements VeModalController
 {
@@ -48,7 +44,7 @@ class CreateTransclusionModalController
 `
     protected transclusionTemplate: string = `
     <div>
-    <label>Property to cross-reference</label><span class="star-mandatory">*</span>
+    <label>Property to view-cf</label><span class="star-mandatory">*</span>
     <div class="radio radio-with-label">
         <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('name')">Name</label><br>
         <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('doc')">Documentation</label>
@@ -69,7 +65,7 @@ class CreateTransclusionModalController
 
     protected title: string = 'Insert cross reference'
     protected description: string =
-        'Begin by searching for or creating an element, then click a field to cross-reference.'
+        'Begin by searching for or creating an element, then click a field to view-cf.'
     protected searchExisting: boolean = true
     protected cf: TransclusionObject
     protected element: ElementObject
@@ -84,11 +80,11 @@ class CreateTransclusionModalController
     protected linkText: string
     protected modalBody: JQuery<HTMLElement>
     protected previewEl: JQuery<HTMLElement> = $('<div></div>')
-    protected addElementApi: AddElementApi<
+    protected insertApi: InsertApi<
         ElementObject,
         VePromiseReason<ElementsResponse<ElementObject>>
     >
-    protected addElementData: AddElementData
+    protected insertData: InsertData
     protected projectId: string
     protected refId: string
     protected orgId: string
@@ -117,8 +113,8 @@ class CreateTransclusionModalController
         this.orgId = this.resolve.getOrgId ? this.resolve.getOrgId : null
 
         this.modalBody = this.$element.find('modal-body')
-        this.viewLink = this.resolve.getAddData.viewLink
-        this.addElementApi = {
+        this.viewLink = this.resolve.getInsertData.viewLink
+        this.insertApi = {
             resolve: (result): void => {
                 this.element = result
                 this.selectOptions()
@@ -128,7 +124,7 @@ class CreateTransclusionModalController
                 this.element = null
             },
         }
-        this.addElementData = this.resolve.getAddData
+        this.insertData = this.resolve.getInsertData
         this.cf = {
             tag: '',
         }
@@ -165,12 +161,12 @@ class CreateTransclusionModalController
     public makeNewOrChoose = (): void => {
         this.modalBody.empty()
         this.modalBody.append(
-            '<add-generic add-element-data="::$ctrl.addElementData" add-element-api="$ctrl.addElementApi" mms-project-id="{{$ctrl.projectId}}" ' +
+            '<insert-element insert-data="::$ctrl.InsertData" insert-api="$ctrl.InsertApi" mms-project-id="{{$ctrl.projectId}}" ' +
                 this.refId
                 ? 'mms-ref-id="{{$ctrl.refId}}" '
                 : '' + this.orgId
                 ? 'mms-org-id="{{$ctrl.orgId}}" '
-                : '' + '</add-generic>'
+                : '' + '</insert-element>'
         )
         this.$compile(this.modalBody)(this.$scope.$new())
     }
@@ -205,16 +201,16 @@ class CreateTransclusionModalController
 // Component for inserting cross reference
 // Defines scope variables for html template and how to handle user click
 // Also defines options for search interfaces -- see mmsSearch.js for more info
-const CreateTransclusionModal: VeModalComponent = {
-    selector: 'transclusionModal',
+const InsertTransclusionModal: VeModalComponent = {
+    selector: 'insertTransclusionModal',
     template: `
     <div>
     <div class="modal-header">
-        <h4>Insert {{$ctrl.viewLink ? 'Link': 'Cross-Reference'}}</h4>
+        <h4>Insert {{$ctrl.viewLink ? 'Link': 'view-cf'}}</h4>
     </div>
     <div class="modal-body"></div>
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-show="$ctrl.element" type="button" ng-click="choose()">Create {{$ctrl.viewLink ? 'Link': 'Cross-Reference'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
+        <button class="btn btn-primary" ng-show="$ctrl.element" type="button" ng-click="choose()">Create {{$ctrl.viewLink ? 'Link': 'view-cf'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     </div>
 </div>
@@ -223,10 +219,10 @@ const CreateTransclusionModal: VeModalComponent = {
         modalInstance: '<',
         resolve: '<',
     },
-    controller: CreateTransclusionModalController,
+    controller: InsertTransclusionModalController,
 }
 
 veComponents.component(
-    CreateTransclusionModal.selector,
-    CreateTransclusionModal
+    InsertTransclusionModal.selector,
+    InsertTransclusionModal
 )

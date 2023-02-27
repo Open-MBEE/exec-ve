@@ -1,16 +1,13 @@
-import angular, { IComponentController } from 'angular'
-import Rx from 'rx-lite'
-
 import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
-import { ComponentService } from '@ve-components/services'
-import { TreeService } from '@ve-core/tree'
+import { TreeService } from '@ve-components/trees'
+import { RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import {
-    AuthService,
     ElementService,
+    UserService,
     ViewApi,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import { EventService, RootScopeService } from '@ve-utils/services'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
@@ -74,7 +71,7 @@ import {
  * @param {string=latest} mmsCommitId Commit ID, default is latest
  */
 
-export class ViewController implements IComponentController {
+export class ViewController implements angular.IComponentController {
     // private presentationElemCleanUpFncs: {(): any}[] = [];
     private mmsElementId: string
     private mmsProjectId: string
@@ -88,11 +85,10 @@ export class ViewController implements IComponentController {
     static $inject = [
         '$element',
         'growl',
-        'ComponentService',
-        'AuthService',
         'PresentationService',
         'ViewService',
         'ElementService',
+        'UserService',
         'EventService',
         'TreeService',
         'RootScopeService',
@@ -120,11 +116,10 @@ export class ViewController implements IComponentController {
     constructor(
         private $element: JQuery<HTMLElement>,
         private growl: angular.growl.IGrowlService,
-        private componentSvc: ComponentService,
-        private authSvc: AuthService,
         private presentationSvc: PresentationService,
         private viewSvc: ViewService,
         private elementSvc: ElementService,
+        private userSvc: UserService,
         private eventSvc: EventService,
         private treeSvc: TreeService,
         private rootScopeSvc: RootScopeService
@@ -142,13 +137,8 @@ export class ViewController implements IComponentController {
         this.processed = false
         if (this.mmsNumber) {
             this.number = this.mmsNumber.toString(10)
-        } else if (
-            this.treeSvc.getApi('contents').branch2viewNumber[this.mmsElementId]
-        ) {
-            this.number =
-                this.treeSvc.getApi('contents').branch2viewNumber[
-                    this.mmsElementId
-                ]
+        } else if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
+            this.number = this.treeSvc.branch2viewNumber[this.mmsElementId]
         }
         this.showNumbering = this.rootScopeSvc.veNumberingOn()
 
@@ -190,15 +180,13 @@ export class ViewController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on(TreeService.events.UPDATED, () => {
-                if (
-                    this.treeSvc.getApi('contents').branch2viewNumber[
-                        this.mmsElementId
-                    ]
-                ) {
-                    this.level = this.treeSvc
-                        .getApi('contents')
-                        .branch2viewNumber[this.mmsElementId].split('.').length
+            this.eventSvc.binding(TreeService.events.UPDATED, (data) => {
+                if (!data) return
+                if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
+                    this.level =
+                        this.treeSvc.branch2viewNumber[this.mmsElementId].split(
+                            '.'
+                        ).length
                 }
             })
         )
@@ -238,7 +226,7 @@ export class ViewController implements IComponentController {
             if (elem._modified > this.modified && type !== 'Comment') {
                 this.modified = elem._modified
                 if (elem._modifier) {
-                    this.componentSvc.getModifier(elem._modifier).then(
+                    this.userSvc.getUserData(elem._modifier).then(
                         (result) => {
                             this.modifier = result
                         },
@@ -336,7 +324,7 @@ export class ViewController implements IComponentController {
                         //getting cached individual elements should be faster
                         this.view = data
                         this.modified = data._modified
-                        this.componentSvc.getModifier(data._modifier).then(
+                        this.userSvc.getUserData(data._modifier).then(
                             (result) => {
                                 this.modifier = result
                             },
@@ -349,7 +337,7 @@ export class ViewController implements IComponentController {
                     this.viewSvc.getViewDatas(this.reqOb, 1).finally(() => {
                         this.view = data
                         this.modified = data._modified
-                        this.componentSvc.getModifier(data._modifier).then(
+                        this.userSvc.getUserData(data._modifier).then(
                             (result) => {
                                 this.modifier = result
                             },

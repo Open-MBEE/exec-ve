@@ -1,19 +1,17 @@
 import { IPaneScope } from '@openmbee/pane-layout'
-import angular, { IComponentController, Injectable } from 'angular'
-import Rx from 'rx-lite'
 
 import { ComponentService } from '@ve-components/services'
 import { ToolbarService, ToolbarApi } from '@ve-core/toolbar'
+import { ApplicationService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import {
     ApiService,
-    AuthService,
     ElementService,
     PermissionsService,
     ProjectService,
     URLService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import { EventService, UtilsService } from '@ve-utils/services'
 
 import { SpecApi, SpecService } from './services/Spec.service'
 
@@ -27,7 +25,9 @@ import {
     ViewObject,
 } from '@ve-types/mms'
 
-export interface ISpecTool extends IComponentController, ComponentController {
+export interface ISpecTool
+    extends angular.IComponentController,
+        ComponentController {
     $scope: ISpecToolScope
     commitId: string
     specType: string
@@ -68,7 +68,7 @@ export interface ISpecToolScope extends IPaneScope {
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
- * @requires {MathJaxService} mathJaxSvc
+ * @requires {MathService} mathSvc
  * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
@@ -130,16 +130,15 @@ export class SpecTool implements ISpecTool {
 
     protected $transcludeEl: JQuery<HTMLElement>
 
-    protected template: string | Injectable<(...args: any[]) => string>
+    protected template: string | angular.Injectable<(...args: any[]) => string>
 
     static $inject = [
+        '$q',
         '$scope',
         '$element',
-        '$q',
         'growl',
         'ComponentService',
         'URLService',
-        'AuthService',
         'ElementService',
         'ProjectService',
         'UtilsService',
@@ -152,16 +151,15 @@ export class SpecTool implements ISpecTool {
     ]
 
     constructor(
+        protected $q: VeQService,
         public $scope: angular.IScope,
         public $element: JQuery<HTMLElement>,
-        protected $q: VeQService,
         protected growl: angular.growl.IGrowlService,
         protected componentSvc: ComponentService,
         protected uRLSvc: URLService,
-        protected authSvc: AuthService,
         protected elementSvc: ElementService,
         protected projectSvc: ProjectService,
-        protected utilsSvc: UtilsService,
+        protected applicationSvc: ApplicationService,
         protected apiSvc: ApiService,
         protected viewSvc: ViewService,
         protected permissionsSvc: PermissionsService,
@@ -267,10 +265,16 @@ export class SpecTool implements ISpecTool {
     //Spec Tool Common API
 
     public copyToClipboard($event: JQuery.ClickEvent, selector: string): void {
-        this.utilsSvc.copyToClipboard(
-            this.$element.find<HTMLElement>(selector),
-            $event
-        )
+        this.applicationSvc
+            .copyToClipboard(this.$element.find<HTMLElement>(selector), $event)
+            .then(
+                () => {
+                    this.growl.info('Copied to clipboard!', { ttl: 2000 })
+                },
+                (err) => {
+                    this.growl.error('Unable to copy: ' + err.message)
+                }
+            )
     }
 
     public cleanupVal(obj: { value: unknown }): void {

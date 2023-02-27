@@ -14,6 +14,8 @@ import {
     WorkingTimeModalResolveFn,
     WorkingTimeObject,
 } from '@ve-app/main/modals/working-modal.component'
+import { ApplicationService, RootScopeService } from '@ve-utils/application'
+import { AutosaveService, EventService } from '@ve-utils/core'
 import {
     AuthService,
     CacheService,
@@ -22,12 +24,6 @@ import {
     ElementService,
     ApiService,
 } from '@ve-utils/mms-api-client'
-import {
-    ApplicationService,
-    AutosaveService,
-    EventService,
-    RootScopeService,
-} from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
@@ -56,10 +52,13 @@ const MainComponent: VeComponentOptions = {
         <ui-view name="banner-bottom"></ui-view>
         <div ng-hide="$ctrl.hidePanes">
             <ng-pane pane-id="main" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="ng-pane" id="main-pane">
-                <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-tabs" pane-closed="$ctrl.paneClosed">
+                <ng-pane pane-id="left-toolbar" pane-anchor="west" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
+                    <ui-view name="toolbar-left"></ui-view>
+                </ng-pane>
+                <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.paneClosed">
                     <ui-view name="pane-left" class="container-pane-left"></ui-view>
                 </ng-pane>
-                <ng-pane pane-id="toolbar" pane-anchor="east" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
+                <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
                     <ui-view name="toolbar-right"></ui-view>
                 </ng-pane>
                 <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="content-pane">
@@ -414,9 +413,9 @@ const MainComponent: VeComponentOptions = {
                             (trans.params() as ParamsObject).documentId
                         )
                 } else if (
-                    this.$state.includes('main.project.ref.document') &&
+                    this.$state.includes('main.project.ref.present') &&
                     this.$uiRouterGlobals.$current.name !==
-                        'main.project.ref.document.order'
+                        'main.project.ref.present.reorder'
                 ) {
                     if ((trans.params() as ParamsObject).viewId !== undefined)
                         this.rootScopeSvc.treeInitialSelection(
@@ -431,14 +430,15 @@ const MainComponent: VeComponentOptions = {
                             (trans.params() as ParamsObject).documentId
                         )
                 }
-                if (this.$state.includes('main.project.ref.document')) {
-                    const state = this.applicationSvc.getState()
+                if (this.$state.includes('main.project.ref.present')) {
                     this.applicationSvc.getState().inDoc = true
                     this.applicationSvc.getState().currentDoc = (
                         trans.params() as ParamsObject
                     ).documentId
                     this.applicationSvc.getState().fullDoc =
-                        !!this.$state.includes('main.project.ref.document.full')
+                        !!this.$state.includes(
+                            'main.project.ref.present.document'
+                        )
                 } else {
                     this.applicationSvc.getState().inDoc = false
                     this.applicationSvc.getState().fullDoc = false

@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
 import { veComponents } from '@ve-components'

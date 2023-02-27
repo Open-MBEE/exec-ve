@@ -1,5 +1,3 @@
-import angular from 'angular'
-
 import { veUtils } from '@ve-utils'
 
 import { VeConfig } from '@ve-types/config'
@@ -15,7 +13,7 @@ export interface Schema {
 }
 
 export class SchemaService {
-    static $inject = ['$q', '$injector', 'growl']
+    static $inject = ['$q', '$injector']
 
     public veConfig: VeConfig = window.__env
     public defaultSchema: 'cameo'
@@ -26,11 +24,7 @@ export class SchemaService {
 
     public schemas: { [key: string]: Schema } = {}
 
-    constructor(
-        private $q,
-        private $injector: angular.auto.IInjectorService,
-        private growl: angular.growl.IGrowlService
-    ) {
+    constructor(private $q, private $injector: angular.auto.IInjectorService) {
         for (const [key, value] of Object.entries(this.schemaList)) {
             this.schemas[key] = this.$injector.get(value)
         }
@@ -123,7 +117,6 @@ export class SchemaService {
 
     private _schemaError = (name: string, schemaName?: string): void => {
         schemaName = schemaName ? schemaName : this.defaultSchema
-        this.growl.error('Schema Lookup Error')
         if (this.veConfig.enableDebug) {
             console.log(
                 schemaName +
@@ -140,9 +133,7 @@ export class SchemaService {
         if (this.schemas.hasOwnProperty(schemaName)) {
             return this.schemas[schemaName]
         } else {
-            this.growl.error(
-                `Object ${id} uses an unknown schema ${schemaName}`
-            )
+            console.log(`Object ${id} uses an unknown schema ${schemaName}`)
         }
     }
 }

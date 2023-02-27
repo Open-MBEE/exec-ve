@@ -4,20 +4,13 @@
 // <h2 class="prop-title">Target</h2>
 //     <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._targetIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
 // </div>
-
-import angular from 'angular'
-
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import { ElementService, AuthService } from '@ve-utils/mms-api-client'
+import { MathService, UtilsService, ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    MathJaxService,
-    UtilsService,
-    EventService,
-    ImageService,
-} from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -36,7 +29,7 @@ export class TranscludeAttrController
     //Locals
     attrValues: string[] = []
 
-    static $inject = [...Transclusion.$inject, 'SpecService']
+    static $inject = Transclusion.$inject
 
     constructor(
         $q: VeQService,
@@ -48,9 +41,8 @@ export class TranscludeAttrController
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
-        authSvc: AuthService,
         eventSvc: EventService,
-        mathJaxSvc: MathJaxService,
+        mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
@@ -65,9 +57,8 @@ export class TranscludeAttrController
             elementSvc,
             utilsSvc,
             schemaSvc,
-            authSvc,
             eventSvc,
-            mathJaxSvc,
+            mathSvc,
             extensionSvc,
             buttonBarSvc,
             imageSvc

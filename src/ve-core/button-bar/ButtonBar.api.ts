@@ -1,4 +1,4 @@
-import { buttonInitFn, IButtonBarButton } from '@ve-core/button-bar'
+import { IButtonBarButton } from '@ve-core/button-bar'
 
 export interface ButtonWrapEvent {
     oldSize: number
@@ -9,7 +9,7 @@ export class ButtonBarApi {
     public buttons: IButtonBarButton[] = []
     public WRAP_EVENT: string
 
-    constructor(public id: string, public init: buttonInitFn) {
+    constructor(public id: string) {
         if (this.id === '') {
             this.id = 'unknown'
         }
@@ -18,15 +18,6 @@ export class ButtonBarApi {
 
     public getId = (): string => {
         return this.id
-    }
-
-    public getButtons = (): IButtonBarButton[] => {
-        return this.buttons
-    }
-
-    public resetButtons = (): void => {
-        this.buttons = []
-        this.init(this)
     }
 
     public select = (

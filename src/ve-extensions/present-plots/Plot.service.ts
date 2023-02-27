@@ -1,9 +1,9 @@
+import { UtilsService } from '@ve-utils/application/Utils.service'
 import {
     CacheService,
     ElementService,
     URLService,
 } from '@ve-utils/mms-api-client'
-import { UtilsService } from '@ve-utils/services/Utils.service'
 
 import { veUtils } from '@ve-utils'
 

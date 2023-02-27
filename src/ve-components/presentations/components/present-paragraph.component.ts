@@ -1,5 +1,3 @@
-import angular, { IComponentController } from 'angular'
-
 import {
     ViewHtmlService,
     Presentation,
@@ -7,8 +5,9 @@ import {
 } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
-import { EventService, ImageService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -16,7 +15,10 @@ import { VePromise, VeQService } from '@ve-types/angular'
 import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 import { PresentTextObject } from '@ve-types/mms'
 
-class PresentParagraph extends Presentation implements IComponentController {
+class PresentParagraph
+    extends Presentation
+    implements angular.IComponentController
+{
     static $inject = Presentation.$inject
     constructor(
         $q: VeQService,

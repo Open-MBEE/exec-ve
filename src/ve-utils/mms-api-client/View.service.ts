@@ -1,4 +1,3 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import {
@@ -8,7 +7,6 @@ import {
     ApiService,
 } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import { EventService } from '@ve-utils/services'
 import {
     Class,
     Expression,
@@ -43,6 +41,7 @@ import {
     ViewsRequest,
     PresentTextObject,
     PresentationReference,
+    ElementsResponse,
 } from '@ve-types/mms'
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
 
@@ -94,23 +93,19 @@ export class ViewService {
     static $inject = [
         '$q',
         '$http',
-        'growl',
         'URLService',
         'ElementService',
         'ApiService',
         'CacheService',
-        'EventService',
         'SchemaService',
     ]
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
-        private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
         private elementSvc: ElementService,
         private apiSvc: ApiService,
         private cacheSvc: CacheService,
-        private eventSvc: EventService,
         private schemaSvc: SchemaService
     ) {}
 
@@ -599,7 +594,7 @@ export class ViewService {
     }
 
     /**
-     * @name ViewService#addElementToViewOrSection
+     * @name ViewService#InsertToViewOrSection
      * This updates a view or section to include a new element, the new element must be a child
      * of an existing element in the view
      *
@@ -610,7 +605,7 @@ export class ViewService {
      * @returns {IPromise<ViewObject>} The promise would be resolved with updated view or section object
      */
 
-    public addElementToViewOrSection(
+    public InsertToViewOrSection(
         reqOb: ViewCreationRequest,
         instanceValOb: InstanceValueObject,
         addPeIndex: number
@@ -962,12 +957,6 @@ export class ViewService {
                 for (let i = 0; i < data.length; i++) {
                     const elem = data[i]
                     if (elem.id === newInstanceId) {
-                        if (type === 'Section') {
-                            this.eventSvc.$broadcast('viewctrl.add.section', {
-                                elementOb: elem,
-                                viewOb: viewOrSectionOb,
-                            })
-                        }
                         deferred.resolve(elem)
                         return
                     }
@@ -1342,10 +1331,12 @@ export class ViewService {
                     () => {
                         /*Do Nothing*/
                     },
-                    () => {
-                        this.growl.error(
-                            'Unable to delete group asi. Model inconsistencies may result'
-                        )
+                    (
+                        reason: angular.IHttpResponse<
+                            ElementsResponse<ElementObject>
+                        >
+                    ) => {
+                        deferred.reject(reason)
                     }
                 )
         }
@@ -1465,27 +1456,35 @@ export class ViewService {
      */
     public getPresentationInstanceObject = (
         instanceSpec: InstanceSpecObject
-    ): PresentationInstanceObject | ElementObject => {
-        const instanceSpecSpec: ValueObject = instanceSpec.specification
-        if (!instanceSpecSpec) {
-            this.growl.error('missing specification')
-        }
-        const type = instanceSpecSpec.type
-
-        if (type === 'LiteralString') {
-            // If it is a Opaque List, Paragraph, Table, Image, List:
-            const jsonString = (instanceSpecSpec as LiteralObject<string>).value
-            return JSON.parse(jsonString) as PresentationInstanceObject
-        } else if (type === 'Expression') {
-            // If it is a Opaque Section, or a Expression:
-            // If it is a Opaque Section then we want the instanceSpec:
-            if (this.isSection(instanceSpec)) {
-                return instanceSpec
-            } else {
-                //??
-                return instanceSpecSpec
+    ): VePromise<PresentationInstanceObject | ElementObject> => {
+        return new this.$q((resolve, reject) => {
+            const instanceSpecSpec: ValueObject = instanceSpec.specification
+            if (!instanceSpecSpec) {
+                return reject({
+                    status: 500,
+                    message: 'missing specification',
+                })
             }
-        }
+            const type = instanceSpecSpec.type
+
+            if (type === 'LiteralString') {
+                // If it is an Opaque List, Paragraph, Table, Image, List:
+                const jsonString = (instanceSpecSpec as LiteralObject<string>)
+                    .value
+                return resolve(
+                    JSON.parse(jsonString) as PresentationInstanceObject
+                )
+            } else if (type === 'Expression') {
+                // If it is a Opaque Section, or a Expression:
+                // If it is a Opaque Section then we want the instanceSpec:
+                if (this.isSection(instanceSpec)) {
+                    return resolve(instanceSpec)
+                } else {
+                    //??
+                    return resolve(instanceSpecSpec)
+                }
+            }
+        })
     }
 
     /**
@@ -1683,7 +1682,28 @@ export class ViewService {
         if (this.isTable(instanceSpec)) return 'table'
         if (this.isFigure(instanceSpec)) return 'figure'
         if (this.isEquation(instanceSpec)) return 'equation'
-        return 'none'
+        let result = 'none'
+        if (
+            instanceSpec.classifierIds &&
+            instanceSpec.classifierIds.length > 0
+        ) {
+            const peSids = this.schemaSvc.getSchema<{
+                [peType: string]: string
+            }>('TYPE_TO_CLASSIFIER_ID', this.schema)
+
+            for (const peType of Object.keys(peSids)) {
+                if (
+                    instanceSpec.classifierIds &&
+                    instanceSpec.classifierIds.length > 0 &&
+                    instanceSpec.classifierIds.includes(peSids[peType])
+                ) {
+                    result = peType.toLowerCase()
+                    break
+                }
+            }
+        }
+
+        return result
     }
 
     public processSlotStrings(values: LiteralObject<unknown>[]): string[] {

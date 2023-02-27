@@ -1,7 +1,7 @@
 import { StateService } from '@uirouter/angularjs'
-import angular, { IComponentController } from 'angular'
 import _ from 'lodash'
 
+import { UtilsService } from '@ve-utils/application'
 import {
     CacheService,
     ElementService,
@@ -9,7 +9,6 @@ import {
     ViewService,
 } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import { RootScopeService, UtilsService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
@@ -64,7 +63,7 @@ export interface SearchObject extends ViewObject {
  * @scope
  *
  */
-export class SearchController implements IComponentController {
+export class SearchController implements angular.IComponentController {
     private mmsOptions: VeSearchOptions<ElementObject>
     private mmsProjectId: string
     private mmsRefId: string
@@ -176,32 +175,30 @@ export class SearchController implements IComponentController {
 
     static $inject = [
         '$q',
-        '$state',
-        'growl',
         '$timeout',
         '$anchorScroll',
+        '$state',
+        'growl',
         'CacheService',
         'ElementService',
         'ProjectService',
         'UtilsService',
         'ViewService',
         'SchemaService',
-        'RootScopeService',
     ]
 
     constructor(
         private $q: VeQService,
-        private $state: StateService,
-        private growl: angular.growl.IGrowlService,
         private $timeout: angular.ITimeoutService,
         private $anchorScroll: angular.IAnchorScrollService,
+        private $state: StateService,
+        private growl: angular.growl.IGrowlService,
         private cacheSvc: CacheService,
         private elementSvc: ElementService,
         private projectSvc: ProjectService,
         private utilsSvc: UtilsService,
         private viewSvc: ViewService,
-        private schemaSvc: SchemaService,
-        private rootScopeSvc: RootScopeService
+        private schemaSvc: SchemaService
     ) {}
 
     $onInit(): void {

@@ -1,9 +1,8 @@
-import angular from 'angular'
-import Rx from 'rx-lite'
+import _ from 'lodash'
 
-import { EventService } from '@ve-utils/services'
+import { EventService } from '@ve-utils/core'
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VeQService } from '@ve-types/angular'
 
 /**
  * @name onChangesCallback
@@ -18,11 +17,11 @@ import { VePromise, VeQService } from '@ve-types/angular'
  *      }
  *
  */
-export type onChangesCallback<T> = (
+export type onChangesCallback<T, U = void> = (
     newVal?: T,
     oldVal?: T,
     firstChange?: boolean
-) => void
+) => U
 
 /**
  * @name change.utils#handleChange:
@@ -82,41 +81,21 @@ export function watchChangeEvent<T>(
         $ctrl.eventSvc.$on<T>(name, (data) => {
             const change: angular.IChangesObject<T> = {
                 currentValue: data,
-                previousValue: $ctrl[name] as T,
+                previousValue: _.cloneDeep($ctrl[name] as T),
                 isFirstChange: () => {
                     return typeof $ctrl[name] === 'undefined'
                 },
             }
-            if (data !== $ctrl[name] && update) {
-                $ctrl[name] = data
+            if (data !== $ctrl[name]) {
+                if (update) {
+                    $ctrl[name] = data
+                }
+                changeAction(
+                    change.currentValue,
+                    change.previousValue,
+                    change.isFirstChange()
+                )
             }
-            watchChange(change, changeAction)
         })
     )
-}
-
-export function watchChange<T>(
-    changeObj: angular.IChangesObject<T>,
-    callback: onChangesCallback<T>,
-    ignoreFirst?: boolean
-): void {
-    if (!changeObj) {
-        return callback()
-    } else {
-        if (ignoreFirst && changeObj.isFirstChange()) {
-            return
-        }
-        const newVal: T = changeObj.currentValue
-        const oldVal: T = changeObj.previousValue
-        const firstChange = changeObj.isFirstChange()
-        callback(newVal, oldVal, firstChange)
-    }
-    return
-}
-
-export function waitFor(
-    $ctrl: EventWatcher & angular.IComponentController,
-    bindings: string[]
-): VePromise<void, void> {
-    return new $ctrl.$q((resolve, reject) => {})
 }

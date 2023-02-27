@@ -1,7 +1,8 @@
 import { StateService } from '@uirouter/angularjs'
 
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
-import { EventService, RootScopeService } from '@ve-utils/services'
+import { RootScopeService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 
 import { veApp } from '@ve-app'
 
@@ -54,7 +55,7 @@ class SearchController {
             },
             relatedCallback: (doc, view, elem): void => {
                 //siteId, documentId, viewId) {
-                void this.$state.go('main.project.ref.document.view', {
+                void this.$state.go('main.project.ref.present.view', {
                     projectId: doc._projectId,
                     documentId: doc.id,
                     viewId: view.id,

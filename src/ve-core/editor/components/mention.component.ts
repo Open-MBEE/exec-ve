@@ -1,12 +1,10 @@
-import { IComponentController } from 'angular'
-
 import { EditorService, MentionService } from '@ve-core/editor'
 
 import { veCore } from '@ve-core'
 
 import { ElementObject } from '@ve-types/mms'
 
-export class MMSMentionController implements IComponentController {
+export class MMSMentionController implements angular.IComponentController {
     //Bindings
     public mmsEditor: CKEDITOR.editor
     mmsMentionValue: string

@@ -1,4 +1,3 @@
-import angular, { Injectable } from 'angular'
 import $ from 'jquery'
 import _ from 'lodash'
 
@@ -7,21 +6,16 @@ import { SaveConflictResolveFn } from '@ve-components/diffs'
 import { ViewController } from '@ve-components/presentations'
 import { ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarApi } from '@ve-core/button-bar'
+import { RootScopeService } from '@ve-utils/application'
+import { AutosaveService, EventService } from '@ve-utils/core'
 import {
     ApiService,
-    AuthService,
     CacheService,
     ElementService,
     PermissionsService,
     URLService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import {
-    AutosaveService,
-    EventService,
-    RootScopeService,
-    UtilsService,
-} from '@ve-utils/services'
 import { ValueSpec } from '@ve-utils/utils'
 
 import { PropertySpec, veComponents } from '@ve-components'
@@ -38,7 +32,6 @@ import {
     InstanceValueObject,
     LiteralObject,
     SlotObject,
-    UserObject,
     ValueObject,
     ViewObject,
 } from '@ve-types/mms'
@@ -66,21 +59,16 @@ import {
  *
  */
 export class ComponentService {
-    //locals
-    private addElementData
-
     static $inject = [
         '$q',
-        '$uibModal',
         '$timeout',
         '$compile',
-        '$window',
+        '$uibModal',
         'growl',
         'URLService',
         'CacheService',
         'ElementService',
         'ViewService',
-        'UtilsService',
         'AuthService',
         'PermissionsService',
         'RootScopeService',
@@ -91,17 +79,14 @@ export class ComponentService {
 
     constructor(
         private $q: VeQService,
-        private $uibModal: VeModalService,
         private $timeout: angular.ITimeoutService,
         private $compile: angular.ICompileService,
-        private $window: angular.IWindowService,
+        private $uibModal: VeModalService,
         private growl: angular.growl.IGrowlService,
         private uRLSvc: URLService,
         private cacheSvc: CacheService,
         private elementSvc: ElementService,
         private viewSvc: ViewService,
-        private utilsSvc: UtilsService,
-        private authSvc: AuthService,
         private permissionsSvc: PermissionsService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
@@ -131,13 +116,13 @@ export class ComponentService {
 
     public clearAutosave = (autosaveKey: string, elementType: string): void => {
         if (elementType === 'Slot') {
-            Object.keys(this.$window.localStorage).forEach((key) => {
+            Object.keys(window.localStorage).forEach((key) => {
                 if (key.indexOf(autosaveKey) !== -1) {
-                    this.$window.localStorage.removeItem(key)
+                    window.localStorage.removeItem(key)
                 }
             })
         } else {
-            this.$window.localStorage.removeItem(autosaveKey)
+            window.localStorage.removeItem(autosaveKey)
         }
     }
 
@@ -657,7 +642,7 @@ export class ComponentService {
         ctrl: ComponentController,
         isEditable: boolean,
         domElement: JQuery<HTMLElement>,
-        template: string | Injectable<(...args: any[]) => string>,
+        template: string | angular.Injectable<(...args: any[]) => string>,
         doNotScroll
     ): void {
         if (
@@ -1185,10 +1170,6 @@ export class ComponentService {
         } else if (ctrl.element[transcludeType] !== thisEdits[transcludeType]) {
             ctrl.startEdit()
         }
-    }
-
-    public getModifier(modifier: string): VePromise<UserObject> {
-        return this.authSvc.getUserData(modifier)
     }
 }
 

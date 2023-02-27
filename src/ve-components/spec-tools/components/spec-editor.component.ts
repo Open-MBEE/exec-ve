@@ -1,9 +1,10 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import { ComponentService } from '@ve-components/services'
 import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
 import { ToolbarService } from '@ve-core/toolbar'
+import { ApplicationService } from '@ve-utils/application'
+import { AutosaveService, EventService } from '@ve-utils/core'
 import {
     URLService,
     ElementService,
@@ -13,7 +14,6 @@ import {
     ProjectService,
     ApiService,
 } from '@ve-utils/mms-api-client'
-import { AutosaveService, EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -90,16 +90,16 @@ class SpecEditorController extends SpecTool implements ISpecTool {
     static $inject = [...SpecTool.$inject, 'AutosaveService']
 
     constructor(
+        $q: VeQService,
         $scope: angular.IScope,
         $element: JQuery<HTMLElement>,
-        $q: VeQService,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
         authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
-        utilsSvc: UtilsService,
+        applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
         permissionsSvc: PermissionsService,
@@ -109,16 +109,15 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         private autosaveSvc: AutosaveService
     ) {
         super(
+            $q,
             $scope,
             $element,
-            $q,
             growl,
             componentSvc,
             uRLSvc,
-            authSvc,
             elementSvc,
             projectSvc,
-            utilsSvc,
+            applicationSvc,
             apiSvc,
             viewSvc,
             permissionsSvc,

@@ -1,5 +1,0 @@
-import './add-comment.component'
-import './add-pe.component'
-import './add-view.component'
-import './add-ref.component'
-import './add-generic.component'

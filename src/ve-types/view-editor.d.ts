@@ -1,4 +1,4 @@
-import angular, { IComponentController } from 'angular'
+import { ngStorage } from 'ngstorage'
 
 import IModalService = angular.ui.bootstrap.IModalService
 import IModalSettings = angular.ui.bootstrap.IModalSettings
@@ -10,8 +10,6 @@ import {
     VePromiseReason,
 } from '@ve-types/angular'
 import { MmsObject, OrgObject, ProjectObject, ViewObject } from '@ve-types/mms'
-
-import { ngStorage } from 'ngstorage'
 
 export type veSearchCallback<T extends MmsObject = MmsObject> = (
     elem: T,
@@ -81,14 +79,16 @@ export interface VeStorageService extends ngStorage.StorageService {
 }
 
 export interface VeApiObject<T> {
-    [key: string]: {
-        resolve?(result: T): void
-        reject?(reason: VePromiseReason<T>): void
-        promise?: VePromise<T, void>
-        api?: T
-        refId?: string
-        projectId?: string
-    }
+    [key: string]: VeApiWait<T>
+}
+
+export interface VeApiWait<T> {
+    resolve?(result: T): void
+    reject?(reason: VePromiseReason<T>): void
+    promise?: VePromise<T, void>
+    api?: T
+    refId?: string
+    projectId?: string
 }
 // {
 //     getProperties: any

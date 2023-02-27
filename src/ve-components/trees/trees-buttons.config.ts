@@ -1,0 +1,66 @@
+import { IToolBarButton } from '@ve-core/toolbar'
+
+export const trees_default_buttons: IToolBarButton[] = [
+    {
+        id: 'tree-of-favorites',
+        icon: 'fa-star',
+        selected: false,
+        active: false,
+        permission: true,
+        tooltip: 'Favorite Documents',
+        spinner: false,
+        enabledFor: ['main.project.ref.portal'],
+    },
+    {
+        id: 'tree-of-documents',
+        icon: 'fa-folder-tree',
+        selected: true,
+        active: true,
+        permission: true,
+        tooltip: 'Project Document Tree',
+        spinner: false,
+        enabledFor: ['main.project.ref.portal'],
+    },
+    {
+        id: 'tree-of-views',
+        icon: 'fa-folder-tree',
+        selected: true,
+        active: false,
+        permission: true,
+        tooltip: 'View Tree',
+        spinner: false,
+        enabledFor: ['main.project.ref.present'],
+    },
+    {
+        id: 'tree-of-tables',
+        icon: 'fa-table',
+        selected: false,
+        active: false,
+        permission: true,
+        tooltip: 'Table of Tables',
+        spinner: false,
+        enabledFor: ['main.project.ref.present'],
+    },
+    {
+        id: 'tree-of-figures',
+        icon: 'fa-image',
+        selected: false,
+        active: false,
+        permission: true,
+        tooltip: 'Table of Figures',
+        spinner: false,
+        enabledFor: ['main.project.ref.present'],
+    },
+    {
+        id: 'tree-of-equations',
+        icon: 'fa-superscript',
+        selected: false,
+        active: false,
+        permission: true,
+        tooltip: 'Table of Equations',
+        spinner: false,
+        enabledFor: ['main.project.ref.present'],
+    },
+]
+
+export const trees_dynamic_buttons: IToolBarButton[] = []

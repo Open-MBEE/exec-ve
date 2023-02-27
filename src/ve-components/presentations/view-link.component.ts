@@ -1,14 +1,13 @@
-import angular, { IComponentController } from 'angular'
+import { CrossReferenceController } from '@ve-components/transclusions/view-cf.component'
 
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
-import { CrossReferenceController } from '@ve-components/transclusions/cross-reference.component'
+import { ApplicationService } from '@ve-utils/application'
 import {
     ApiService,
     ElementService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import { ApplicationService, UtilsService } from '@ve-utils/services'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
@@ -32,7 +31,7 @@ import { ElementObject, ElementsRequest } from '@ve-types/mms'
  * @param {string} mmsDocId Document context of view
  * @param {string} mmsPeId Document context of view
  */
-class ViewLinkController implements IComponentController {
+class ViewLinkController implements angular.IComponentController {
     //Bindings
     public mmsElementId: string
     mmsProjectId: string
@@ -67,11 +66,10 @@ class ViewLinkController implements IComponentController {
     static $inject = [
         '$scope',
         '$element',
-        'ElementService',
-        'ApiService',
-        'UtilsService',
         '$compile',
         'growl',
+        'ElementService',
+        'ApiService',
         'ViewService',
         'ApplicationService',
         'ExtensionService',
@@ -86,11 +84,10 @@ class ViewLinkController implements IComponentController {
     constructor(
         private $scope: angular.IScope,
         private $element: JQuery<HTMLElement>,
-        private elementSvc: ElementService,
-        private apiSvc: ApiService,
-        private utilsSvc: UtilsService,
         private $compile: angular.ICompileService,
         private growl: angular.growl.IGrowlService,
+        private elementSvc: ElementService,
+        private apiSvc: ApiService,
         private viewSvc: ViewService,
         private applicationSvc: ApplicationService,
         private extensionSvc: ExtensionService
@@ -181,7 +178,7 @@ class ViewLinkController implements IComponentController {
                                 }
                                 if (this.applicationSvc.getState().fullDoc) {
                                     this.href =
-                                        this.utilsSvc.PROJECT_URL_PREFIX +
+                                        this.applicationSvc.PROJECT_URL_PREFIX +
                                         this.projectId +
                                         '/' +
                                         this.refId +
@@ -191,7 +188,7 @@ class ViewLinkController implements IComponentController {
                                         this.hash
                                 } else {
                                     this.href =
-                                        this.utilsSvc.PROJECT_URL_PREFIX +
+                                        this.applicationSvc.PROJECT_URL_PREFIX +
                                         this.projectId +
                                         '/' +
                                         this.refId +
@@ -229,7 +226,7 @@ class ViewLinkController implements IComponentController {
                     }
                     if (this.applicationSvc.getState().fullDoc) {
                         this.href =
-                            this.utilsSvc.PROJECT_URL_PREFIX +
+                            this.applicationSvc.PROJECT_URL_PREFIX +
                             this.projectId +
                             '/' +
                             this.refId +
@@ -239,7 +236,7 @@ class ViewLinkController implements IComponentController {
                             this.hash
                     } else {
                         this.href =
-                            this.utilsSvc.PROJECT_URL_PREFIX +
+                            this.applicationSvc.PROJECT_URL_PREFIX +
                             this.projectId +
                             '/' +
                             this.refId +

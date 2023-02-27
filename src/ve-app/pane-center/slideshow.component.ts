@@ -1,27 +1,25 @@
 import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
-import angular, { IComponentController } from 'angular'
-import Rx from 'rx-lite'
 
 import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService, ResolveService } from '@ve-app/main/services'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
+import { TreeService } from '@ve-components/trees'
 import {
     IButtonBarButton,
     ButtonBarApi,
     ButtonBarService,
 } from '@ve-core/button-bar'
-import { TreeService } from '@ve-core/tree'
+import {
+    RootScopeService,
+    ShortUrlService,
+    UtilsService,
+} from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import {
     PermissionsService,
     URLService,
     ViewApi,
 } from '@ve-utils/mms-api-client'
-import {
-    EventService,
-    RootScopeService,
-    ShortenUrlService,
-    UtilsService,
-} from '@ve-utils/services'
 import { onChangesCallback } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
@@ -37,7 +35,7 @@ import {
     ViewObject,
 } from '@ve-types/mms'
 
-class SlideshowController implements IComponentController {
+class SlideshowController implements angular.IComponentController {
     //Bindings
     mmsParams: ParamsObject
     mmsProject: ProjectObject
@@ -86,7 +84,7 @@ class SlideshowController implements IComponentController {
         'AppUtilsService',
         'URLService',
         'UtilsService',
-        'ShortenUrlService',
+        'ShortUrlService',
         'ContentWindowService',
         'PermissionsService',
         'RootScopeService',
@@ -111,7 +109,7 @@ class SlideshowController implements IComponentController {
         private appUtilsSvc: AppUtilsService,
         private uRLSvc: URLService,
         private utilsSvc: UtilsService,
-        private shortenUrlSvc: ShortenUrlService,
+        private shortUrlSvc: ShortUrlService,
         private contentWindowSvc: ContentWindowService,
         private permissionsSvc: PermissionsService,
         private rootScopeSvc: RootScopeService,
@@ -123,23 +121,8 @@ class SlideshowController implements IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        // if (
-        //     this.$state.includes('main.project.ref') &&
-        //     !this.$state.includes('main.project.ref.document')
-        // ) {
-        //     watchChangeEvent(this, 'mmsDocument', this.changeAction, true)
-        // } else {
-        //     watchChangeEvent(this, 'mmsView', this.changeAction, true)
-        // }
 
-        this.treeSvc.waitForApi('contents').then(
-            () => {
-                this.changeAction()
-            },
-            (reason) => {
-                TreeService.treeError(reason)
-            }
-        )
+        this.changeView()
 
         this.subs.push(
             this.eventSvc.$on<boolean>(
@@ -151,29 +134,17 @@ class SlideshowController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on(TreeService.events.UPDATED, () => {
+            this.eventSvc.binding(TreeService.events.UPDATED, (data) => {
+                if (!data) return
                 if (
                     this.mmsView &&
-                    this.treeSvc.getApi('contents').branch2viewNumber[
-                        this.mmsView.id
-                    ]
+                    this.treeSvc.branch2viewNumber[this.mmsView.id]
                 ) {
                     this.number =
-                        this.treeSvc.getApi('contents').branch2viewNumber[
-                            this.mmsView.id
-                        ]
+                        this.treeSvc.branch2viewNumber[this.mmsView.id]
                 }
             })
         )
-
-        // this.subs.push(
-        //     this.eventSvc.$on<TreeBranch>('mms-tree-click', (branch) => {
-        //         if (branch.data.id != this.mmsView.id) {
-        //             this.mmsView = branch.data
-        //             this.changeAction()
-        //         }
-        //     })
-        // )
 
         this.subs.push(
             this.eventSvc.$on('show-comments', (data?: boolean) => {
@@ -240,46 +211,36 @@ class SlideshowController implements IComponentController {
 
         this.subs.push(
             this.eventSvc.$on('center-previous', () => {
-                let prev = this.treeSvc
-                    .getApi('contents')
-                    .getPrevBranch(
-                        this.treeSvc.getApi('contents').getSelectedBranch()
-                    )
+                let prev = this.treeSvc.getPrevBranch(
+                    this.treeSvc.getSelectedBranch()
+                )
                 if (!prev) return
                 while (prev.type !== 'view' && prev.type !== 'section') {
-                    prev = this.treeSvc.getApi('contents').getPrevBranch(prev)
+                    prev = this.treeSvc.getPrevBranch(prev)
                     if (!prev) return
                 }
                 this.bbApi.toggleButtonSpinner('center-previous')
-                this.treeSvc
-                    .getApi('contents')
-                    .selectBranch(prev)
-                    .catch((reason) => {
-                        TreeService.treeError(reason)
-                    })
+                this.treeSvc.selectBranch(prev).catch((reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                })
                 this.bbApi.toggleButtonSpinner('center-previous')
             })
         )
 
         this.subs.push(
             this.eventSvc.$on('center-next', () => {
-                let next = this.treeSvc
-                    .getApi('contents')
-                    .getNextBranch(
-                        this.treeSvc.getApi('contents').getSelectedBranch()
-                    )
+                let next = this.treeSvc.getNextBranch(
+                    this.treeSvc.getSelectedBranch()
+                )
                 if (!next) return
                 while (next.type !== 'view' && next.type !== 'section') {
-                    next = this.treeSvc.getApi('contents').getNextBranch(next)
+                    next = this.treeSvc.getNextBranch(next)
                     if (!next) return
                 }
                 this.bbApi.toggleButtonSpinner('center-next')
-                this.treeSvc
-                    .getApi('contents')
-                    .selectBranch(next)
-                    .catch((reason) => {
-                        TreeService.treeError(reason)
-                    })
+                this.treeSvc.selectBranch(next).catch((reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                })
                 this.bbApi.toggleButtonSpinner('center-next')
             })
         )
@@ -382,57 +343,31 @@ class SlideshowController implements IComponentController {
         this.subs.push(
             this.eventSvc.$on('refresh-numbering', () => {
                 if (this.isPageLoading()) return
-                this.treeSvc
-                    .getApi('contents')
-                    .refresh()
-                    .then(
-                        () => {
-                            if (
-                                this.mmsView &&
-                                this.treeSvc.getApi('contents')
-                                    .branch2viewNumber[this.mmsView.id]
-                            ) {
-                                this.number =
-                                    this.treeSvc.getApi(
-                                        'contents'
-                                    ).branch2viewNumber[this.mmsView.id]
-                            }
-                        },
-                        (reason) => {
-                            this.growl.error(
-                                'Unable to refresh numbering: ' + reason.message
-                            )
-                        }
-                    )
+                if (
+                    this.mmsView &&
+                    this.treeSvc.branch2viewNumber[this.mmsView.id]
+                ) {
+                    this.number =
+                        this.treeSvc.branch2viewNumber[this.mmsView.id]
+                }
             })
         )
     }
 
     $onDestroy(): void {
         this.eventSvc.$destroy(this.subs)
-        this.buttonBarSvc.destroy(this.bars)
+        this.buttonBarSvc.destroyAll(this.bars)
     }
 
-    changeAction: onChangesCallback<void> = () => {
+    changeView: onChangesCallback<void> = () => {
         this.viewContentLoading = true
-        if (!this.init) {
-            this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, this)
-            this.init = true
-        }
 
-        this.mmsParams = this.$uiRouterGlobals.params
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, this)
+        this.init = true
 
         if (this.mmsView || this.mmsDocument) {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
             this.viewContentLoading = false
-        } else if (this.mmsParams.viewId || this.mmsParams.documentId) {
-            if (this.$state.includes('main.project.ref.portal.preview')) {
-                void this.resolveSvc.getDocumentPreview(
-                    this.mmsParams,
-                    this.mmsRef
-                )
-                return
-            }
         } else {
             return
         }
@@ -446,13 +381,11 @@ class SlideshowController implements IComponentController {
             this.vidLink = true
         }
 
-        this.shortUrl = this.shortenUrlSvc.getShortUrl({
+        this.shortUrl = this.shortUrlSvc.getShortUrl({
             orgId: this.mmsProject.orgId,
-            documentId:
-                this.mmsParams.documentId &&
-                !this.mmsParams.documentId.endsWith('_cover')
-                    ? this.mmsParams.documentId
-                    : '',
+            documentId: this.mmsParams.documentId
+                ? this.mmsParams.documentId
+                : '',
             viewId:
                 this.mmsParams.viewId &&
                 !this.mmsParams.documentId.endsWith('_cover')
@@ -464,7 +397,10 @@ class SlideshowController implements IComponentController {
 
         if (this.$state.includes('main.project.ref')) {
             const data = {
-                elementOb: this.mmsView ? this.mmsView : this.mmsDocument,
+                rootOb: this.$state.includes('portal')
+                    ? null
+                    : this.mmsDocument,
+                focusId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
                 commitId: 'latest',
             }
             this.eventSvc.$broadcast<veAppEvents.viewSelectedData>(
@@ -488,20 +424,14 @@ class SlideshowController implements IComponentController {
             this.eventSvc.$broadcast('show-edits', false)
 
         // Share URL button settings
-        this.dynamicPopover = this.shortenUrlSvc.dynamicPopover
+        this.dynamicPopover = this.shortUrlSvc.dynamicPopover
 
         this.viewApi = {
             elementClicked: this.elementClicked,
             elementTranscluded: this.elementTranscluded,
         }
-        if (
-            this.mmsView &&
-            this.treeSvc.getApi('contents').branch2viewNumber[this.mmsView.id]
-        ) {
-            this.number =
-                this.treeSvc.getApi('contents').branch2viewNumber[
-                    this.mmsView.id
-                ]
+        if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
+            this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
         }
     }
 
@@ -549,54 +479,54 @@ class SlideshowController implements IComponentController {
                 },
             })
 
-        if (
-            this.$state.includes('main.project.ref.portal.preview') ||
-            this.$state.includes('main.project.ref.document')
-        ) {
+        if (this.$state.includes('main.project.ref.present')) {
             api.addButton(
                 this.buttonBarSvc.getButtonBarButton('refresh-numbering')
             )
             api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
-            if (this.$state.includes('main.project.ref.document')) {
-                const exportButtons: IButtonBarButton =
-                    this.buttonBarSvc.getButtonBarButton('export')
-                if (!exportButtons.dropdown_buttons)
-                    exportButtons.dropdown_buttons = []
-                exportButtons.dropdown_buttons.push(
-                    this.buttonBarSvc.getButtonBarButton('convert-pdf')
-                )
-                api.addButton(exportButtons)
-                api.addButton(
-                    this.buttonBarSvc.getButtonBarButton('center-previous')
-                )
-                api.addButton(
-                    this.buttonBarSvc.getButtonBarButton('center-next')
-                )
-                // Set hotkeys for toolbar
-                this.hotkeys
-                    .bindTo(this.$scope)
-                    .add({
-                        combo: 'alt+.',
-                        description: 'next',
-                        callback: () => {
-                            this.eventSvc.$broadcast('center-next')
-                        },
-                    })
-                    .add({
-                        combo: 'alt+,',
-                        description: 'previous',
-                        callback: () => {
-                            this.eventSvc.$broadcast('center-previous')
-                        },
-                    })
-            } else {
-                api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
-            }
+            const exportButtons: IButtonBarButton =
+                this.buttonBarSvc.getButtonBarButton('export')
+            if (!exportButtons.dropdown_buttons)
+                exportButtons.dropdown_buttons = []
+            exportButtons.dropdown_buttons.push(
+                this.buttonBarSvc.getButtonBarButton('convert-pdf')
+            )
+            api.addButton(exportButtons)
+            api.addButton(
+                this.buttonBarSvc.getButtonBarButton('center-previous')
+            )
+            api.addButton(this.buttonBarSvc.getButtonBarButton('center-next'))
+            // Set hotkeys for toolbar
+            this.hotkeys
+                .bindTo(this.$scope)
+                .add({
+                    combo: 'alt+.',
+                    description: 'next',
+                    callback: () => {
+                        this.eventSvc.$broadcast('center-next')
+                    },
+                })
+                .add({
+                    combo: 'alt+,',
+                    description: 'previous',
+                    callback: () => {
+                        this.eventSvc.$broadcast('center-previous')
+                    },
+                })
+        } else {
+            api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
         }
     }
 
     public copyToClipboard = ($event: JQuery.ClickEvent): void => {
-        this.shortenUrlSvc.copyToClipboard(this.$element, $event)
+        this.shortUrlSvc.copyToClipboard(this.$element, $event).then(
+            () => {
+                this.growl.info('Copied to clipboard!', { ttl: 2000 })
+            },
+            (err) => {
+                this.growl.error('Unable to copy: ' + err.message)
+            }
+        )
     }
 
     public elementTranscluded = (elementOb: ElementObject, type): void => {

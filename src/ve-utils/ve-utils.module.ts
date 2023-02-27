@@ -55,7 +55,7 @@ import angular from 'angular'
     ]);
     </pre>
  */
-export const veUtils = angular.module('ve-utils', ['angular-growl'])
+export const veUtils = angular.module('ve-utils', [])
 
 veUtils
     .config([

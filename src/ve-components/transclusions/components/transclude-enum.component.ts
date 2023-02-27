@@ -5,19 +5,13 @@
  * responsible person for that particular item which gets saved as the Type/Value? of the property You could additionally add a
  * binding which specifies the template for the creation of new objects as types to be placed in the holding bin.
  */
-import angular from 'angular'
-
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import { ElementService, AuthService } from '@ve-utils/mms-api-client'
+import { MathService, UtilsService, ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    MathJaxService,
-    UtilsService,
-    EventService,
-    ImageService,
-} from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -39,7 +33,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
- * @requires {MathJaxService} mathJaxSvc
+ * @requires {MathService} mathSvc
  *
  * @restrict E
  * * Given an element id, puts in the element's name binding, if there's a parent
@@ -73,9 +67,8 @@ export class TranscludeEnumController
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
-        authSvc: AuthService,
         eventSvc: EventService,
-        mathJaxSvc: MathJaxService,
+        mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
@@ -90,9 +83,8 @@ export class TranscludeEnumController
             elementSvc,
             utilsSvc,
             schemaSvc,
-            authSvc,
             eventSvc,
-            mathJaxSvc,
+            mathSvc,
             extensionSvc,
             buttonBarSvc,
             imageSvc

@@ -2,11 +2,16 @@ import { UIRouterGlobals } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
-import { veComponentsEvents } from '@ve-components/events'
 import { ExtensionService } from '@ve-components/services'
-import { ToolbarApi, ToolbarService } from '@ve-core/toolbar'
+import {
+    tools_default_buttons,
+    tools_dynamic_buttons,
+} from '@ve-components/spec-tools/spec-tools-buttons.config'
+import { veCoreEvents } from '@ve-core/events'
+import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
+import { RootScopeService } from '@ve-utils/application'
+import { AutosaveService, EventService } from '@ve-utils/core'
 import { PermissionsService } from '@ve-utils/mms-api-client'
-import { AutosaveService, EventService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 
@@ -16,7 +21,7 @@ import { RefObject } from '@ve-types/mms'
 /* Classes */
 const RightToolbarComponent: VeComponentOptions = {
     selector: 'rightToolbar', //toolbar-component
-    template: `<tool-bar on-click="$ctrl.onClick(button)" />`,
+    template: `<tool-bar toolbar-id="$ctrl.toolbarId" pane-toggle="$ctrl.paneToggle"/>`,
     bindings: {
         mmsRef: '<',
     },
@@ -28,6 +33,7 @@ const RightToolbarComponent: VeComponentOptions = {
             'AutosaveService',
             'EventService',
             'ToolbarService',
+            'RootScopeService',
         ]
 
         //Injected Deps
@@ -38,6 +44,7 @@ const RightToolbarComponent: VeComponentOptions = {
 
         //Local
         public tbApi: ToolbarApi
+        public toolbarId: string
 
         constructor(
             public $uiRouterGlobals: UIRouterGlobals,
@@ -45,20 +52,25 @@ const RightToolbarComponent: VeComponentOptions = {
             private permissionsSvc: PermissionsService,
             private autosaveSvc: AutosaveService,
             private eventSvc: EventService,
-            private toolbarSvc: ToolbarService
-        ) {}
+            private toolbarSvc: ToolbarService,
+            private rootScopeSvc: RootScopeService
+        ) {
+            this.toolbarId = 'right-toolbar'
+        }
 
         $onInit(): void {
             this.eventSvc.$init(this)
 
             this.tbApi = this.toolbarSvc.initApi(
-                'right-toolbar',
+                this.toolbarId,
                 this.tbInit,
-                this
+                this,
+                tools_default_buttons,
+                tools_dynamic_buttons
             )
 
             this.subs.push(
-                this.eventSvc.$on<veComponentsEvents.setPermissionData>(
+                this.eventSvc.$on<veCoreEvents.setPermissionData>(
                     this.toolbarSvc.constants.SETPERMISSION,
                     (data) => {
                         if (this.tbApi)
@@ -68,7 +80,7 @@ const RightToolbarComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on<veComponentsEvents.setIconData>(
+                this.eventSvc.$on<veCoreEvents.setIconData>(
                     this.toolbarSvc.constants.SETICON,
                     (data) => {
                         if (this.tbApi) this.tbApi.setIcon(data.id, data.value)
@@ -77,7 +89,7 @@ const RightToolbarComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on<veComponentsEvents.setToggleData>(
+                this.eventSvc.$on<veCoreEvents.setToggleData>(
                     this.toolbarSvc.constants.TOGGLEICONSPINNER,
                     (data) => {
                         if (this.tbApi) this.tbApi.toggleButtonSpinner(data.id)
@@ -86,10 +98,11 @@ const RightToolbarComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on<veComponentsEvents.setToggleData>(
+                this.eventSvc.$on<veCoreEvents.setToggleData>(
                     this.toolbarSvc.constants.SELECT,
                     (data) => {
-                        if (this.tbApi) this.tbApi.select(data.id)
+                        if (this.tbApi && data.tbId === this.tbApi.id)
+                            this.tbApi.select(data.id)
                     }
                 )
             )
@@ -133,6 +146,23 @@ const RightToolbarComponent: VeComponentOptions = {
                             this.mmsRef.id
                         )
                 }
+            }
+        }
+
+        public paneToggle = (button: IToolBarButton): void => {
+            let toggleDeactivateFlag = false
+            if (
+                this.rootScopeSvc.rightPaneClosed() &&
+                this.rootScopeSvc.rightPaneToggleable()
+            ) {
+                if (button.selected || this.rootScopeSvc.rightPaneClosed()) {
+                    if (button.selected && !this.rootScopeSvc.rightPaneClosed())
+                        toggleDeactivateFlag = true
+                    this.eventSvc.$broadcast('right-pane.toggle')
+                }
+            }
+            if (toggleDeactivateFlag && this.tbApi) {
+                this.tbApi.deactivate(button.id)
             }
         }
     },

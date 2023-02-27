@@ -46,29 +46,29 @@ describe('Directive: mmsViewTable', function () {
         /** First row **/
         trs.first()
             .children('td:nth-child(1)')
-            .find('cross-reference')
+            .find('view-cf')
             .replaceWith(
-                '<cross-reference mms-cf-type="name"><span>ggg</span></cross-reference>'
+                '<view-cf mms-cf-type="name"><span>ggg</span></view-cf>'
             )
         trs.first()
             .children('td:nth-child(2)')
-            .find('cross-reference')
+            .find('view-cf')
             .replaceWith(
-                '<cross-reference mms-cf-type="doc"><p><span class="no-print">ad</span></p></cross-reference>'
+                '<view-cf mms-cf-type="doc"><p><span class="no-print">ad</span></p></view-cf>'
             )
         trs.first()
             .children('td:nth-child(3)')
             .find('mms-cf')
             .first()
             .replaceWith(
-                '<cross-reference mms-cf-type="name"><span>value1</span></cross-reference>'
+                '<view-cf mms-cf-type="name"><span>value1</span></view-cf>'
             )
         // child one again coz the earlier replace mms-cf with sth else
         trs.first()
             .children('td:nth-child(3)')
             .find('mms-cf:nth-child(1)')
             .replaceWith(
-                '<cross-reference mms-cf-type="name"><span>value2</span></mms-cf>'
+                '<view-cf mms-cf-type="name"><span>value2</span></mms-cf>'
             )
         //
         var innerTableBody = trs

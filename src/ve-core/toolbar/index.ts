@@ -6,4 +6,4 @@ export * from './services/Toolbar.api'
 import './services/Toolbar.service'
 
 //Core Components
-import './toolbar.component'
+import './tool-bar.component'

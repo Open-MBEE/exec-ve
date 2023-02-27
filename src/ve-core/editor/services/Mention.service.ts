@@ -1,16 +1,15 @@
-import angular, { IScope } from 'angular'
 import $ from 'jquery'
 import moment from 'moment'
 
 import { MMSMentionController } from '@ve-core/editor/components/mention.component'
+import { UtilsService } from '@ve-utils/application'
 import { ApiService, CacheService, ViewService } from '@ve-utils/mms-api-client'
-import { UtilsService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
 import { ElementObject } from '@ve-types/mms'
 
-export interface MentionScope extends IScope {
+export interface MentionScope extends angular.IScope {
     mmsEditor?: CKEDITOR.editor
     mmsMentionValue?: string
     mmsMentionId?: string

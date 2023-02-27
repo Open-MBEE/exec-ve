@@ -81,7 +81,8 @@ class SetupPlugin implements AutomaticPrefetchPlugin {
                     'specTools',
                     'transclusions',
                     'presentations',
-                    'addElements',
+                    'insertions',
+                    'trees',
                 ]
                 fs.writeFile(
                     `${extensionsDir}/index.ts`,
@@ -214,7 +215,6 @@ const config = (env: any, argv: ArgV): Configuration => ({
         ignored: [
             '**/node_modules/',
             '**/ckeditor-dev',
-            '**/partials',
             '**/src/ve-experimental/index.ts',
         ],
     },
@@ -254,10 +254,6 @@ const config = (env: any, argv: ArgV): Configuration => ({
                         'config',
                         'config.js'
                     ),
-                },
-                {
-                    from: path.resolve(environment.paths.source, 'partials'),
-                    to: path.resolve(environment.paths.output, 'partials'),
                 },
                 {
                     from: path.resolve(

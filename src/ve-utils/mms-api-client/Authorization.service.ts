@@ -1,5 +1,4 @@
-import angular from 'angular'
-
+import { AutosaveService, SessionService } from '@ve-utils/core'
 import {
     CacheService,
     ElementService,
@@ -8,18 +7,11 @@ import {
     URLService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import { AutosaveService, SessionService } from '@ve-utils/services'
 
 import { veUtils } from '@ve-utils'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import {
-    AuthRequest,
-    AuthResponse,
-    CheckAuthResponse,
-    UserObject,
-    UsersResponse,
-} from '@ve-types/mms'
+import { AuthRequest, AuthResponse, CheckAuthResponse } from '@ve-types/mms'
 
 /**
  * @ngdoc service
@@ -140,38 +132,6 @@ export class AuthService {
     //         });
     //     })
     // }
-
-    getUserData(username: string): VePromise<UserObject> {
-        const deferred = this.$q.defer<UserObject>()
-        const key = ['user', username]
-        const urlkey = this.uRLSvc.getPersonURL(username)
-        if (this.cacheSvc.exists(key)) {
-            deferred.resolve(this.cacheSvc.get<UserObject>(key))
-        } else {
-            this.$http.get<UsersResponse>(urlkey).then(
-                (response) => {
-                    if (
-                        !response.data.users ||
-                        response.data.users.length < 1
-                    ) {
-                        deferred.reject({
-                            status: 404,
-                            data: '',
-                            message: 'User not found',
-                        })
-                    } else {
-                        this.cacheSvc.put(key, response.data.users[0], false)
-                        deferred.resolve(this.cacheSvc.get<UserObject>(key))
-                    }
-                },
-                (response: angular.IHttpResponse<UsersResponse>) => {
-                    this.uRLSvc.handleHttpStatus(response)
-                    deferred.reject(response)
-                }
-            )
-        }
-        return deferred.promise
-    }
 
     logout(): VePromise<boolean> {
         const deferred = this.$q.defer<boolean>()

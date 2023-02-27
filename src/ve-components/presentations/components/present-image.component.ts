@@ -8,7 +8,7 @@ const PresentImageComponent: IPresentationComponentOptions = {
     selector: 'presentImage',
     template: `
     <figure>
-    <cross-reference mms-cf-type="img" mms-element-id="{{$ctrl.peObject.id}}"></cross-reference>
+    <view-cf mms-cf-type="img" mms-element-id="{{$ctrl.peObject.id}}"></view-cf>
     <figcaption>
         <span ng-if="!$ctrl.peObject.excludeFromList">Figure {{$ctrl.peNumber}}. 
         </span>{{$ctrl.peObject.title || $ctrl.element.name}}

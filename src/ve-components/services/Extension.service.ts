@@ -9,25 +9,25 @@ export interface VeExperimentDescriptor {
     id: string
     path?: string
     config?: string
+    name?: string
+    button?: IToolBarButton
+    dynamic_button?: IToolBarButton[]
 }
 
 export interface VeExperimentConfig {
-    specTools?: SpecToolConfig[]
-    transclusions?: VeExperimentDescriptor[]
-    presentations?: VeExperimentDescriptor[]
-    addElements?: VeExperimentDescriptor[]
-}
-
-export interface SpecToolConfig extends VeExperimentConfig {
-    name: string
-    button: IToolBarButton
-    dynamic_button: IToolBarButton[]
+    [extensionType: string]: VeExperimentDescriptor[]
 }
 
 export class ExtensionService {
     extensionTags: string[] = []
     extensionData: unknown[] = []
-    allowedExtensions: string[] = ['present', 'transclude', 'spec', 'add']
+    allowedExtensions: string[] = [
+        'present',
+        'transclude',
+        'spec',
+        'insert',
+        'treeOf',
+    ]
 
     public AnnotationType = {
         mmsTranscludeName: 1,
@@ -39,8 +39,8 @@ export class ExtensionService {
         mmsTranscludeView: 7,
     }
 
-    static $inject = ['growl']
-    constructor(private growl: angular.growl.IGrowlService) {
+    static $inject = []
+    constructor() {
         ;(
             angular.module('ve-components')['_invokeQueue'] as {
                 1: string

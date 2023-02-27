@@ -5,8 +5,8 @@ import {
 } from '@uirouter/angularjs'
 import angular, { IComponentController, IQService } from 'angular'
 
+import { BrandingStyle, RootScopeService } from '@ve-utils/application'
 import { AuthService } from '@ve-utils/mms-api-client'
-import { BrandingStyle, RootScopeService } from '@ve-utils/services'
 
 import { veApp } from '@ve-app'
 

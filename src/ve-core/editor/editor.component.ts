@@ -1,10 +1,10 @@
-import angular, { IComponentController } from 'angular'
 import $ from 'jquery'
 import _ from 'lodash'
 
-import { AddTransclusionData } from '@ve-components/transclusions'
+import { InsertTransclusionData } from '@ve-components/transclusions'
 import { MentionService } from '@ve-core/editor'
 import { EditorService } from '@ve-core/editor/services/Editor.service'
+import { ImageService } from '@ve-utils/application'
 import {
     ApiService,
     CacheService,
@@ -12,7 +12,6 @@ import {
     URLService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import { ImageService } from '@ve-utils/services'
 
 import { veCore } from '@ve-core'
 
@@ -21,7 +20,7 @@ import {
     VeNgModelController,
     VeQService,
 } from '@ve-types/angular'
-import { AddElementData, AddElementResolveFn } from '@ve-types/components'
+import { InsertData, InsertResolveFn } from '@ve-types/components'
 import { VeConfig } from '@ve-types/config'
 import { EditingApi } from '@ve-types/core/editor'
 import { ElementObject, ElementsResponse } from '@ve-types/mms'
@@ -52,7 +51,7 @@ import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
    <editor ng-model="element.documentation"></editor>
    </pre>
  */
-export class EditorController implements IComponentController {
+export class EditorController implements angular.IComponentController {
     private veConfig: VeConfig = window.__env
     private ckEditor = window.CKEDITOR
 
@@ -93,11 +92,11 @@ export class EditorController implements IComponentController {
     static $inject = [
         '$compile',
         '$q',
-        '$uibModal',
         '$attrs',
         '$element',
         '$timeout',
         '$scope',
+        '$uibModal',
         'growl',
         'CacheService',
         'ElementService',
@@ -131,11 +130,11 @@ export class EditorController implements IComponentController {
     constructor(
         private $compile: angular.ICompileService,
         private $q: VeQService,
-        private $uibModal: VeModalService,
         private $attrs: angular.IAttributes,
         private $element: JQuery<HTMLElement>,
         private $timeout: angular.ITimeoutService,
         private $scope: angular.IScope,
+        private $uibModal: VeModalService,
         private growl: angular.growl.IGrowlService,
         private cacheSvc: CacheService,
         private elementSvc: ElementService,
@@ -601,11 +600,11 @@ export class EditorController implements IComponentController {
 
     public transcludeCallback = (ed: CKEDITOR.editor): void => {
         const tSettings: VeModalSettings<
-            AddElementResolveFn<AddTransclusionData>
+            InsertResolveFn<InsertTransclusionData>
         > = {
             component: 'transcludeModal',
             resolve: {
-                getAddData: (): AddTransclusionData => {
+                getInsertData: (): InsertTransclusionData => {
                     return {
                         type: 'Transclusion',
                         viewLink: false,
@@ -625,7 +624,7 @@ export class EditorController implements IComponentController {
             size: 'lg',
         }
         const tInstance = this.$uibModal.open<
-            AddElementResolveFn<AddTransclusionData>,
+            InsertResolveFn<InsertTransclusionData>,
             string
         >(tSettings)
         tInstance.result.then(
@@ -647,11 +646,11 @@ export class EditorController implements IComponentController {
 
     public viewLinkCallback = (ed: CKEDITOR.editor): void => {
         const tSettings: VeModalSettings<
-            AddElementResolveFn<AddTransclusionData>
+            InsertResolveFn<InsertTransclusionData>
         > = {
             component: 'transcludeModal',
             resolve: {
-                getAddData: (): AddTransclusionData => {
+                getInsertData: (): InsertTransclusionData => {
                     return {
                         type: 'ViewLink',
                         viewLink: true,
@@ -671,7 +670,7 @@ export class EditorController implements IComponentController {
             size: 'lg',
         }
         const tInstance = this.$uibModal.open<
-            AddElementResolveFn<AddTransclusionData>,
+            InsertResolveFn<InsertTransclusionData>,
             string
         >(tSettings)
         tInstance.result.then(
@@ -687,29 +686,28 @@ export class EditorController implements IComponentController {
     }
 
     public commentCallback = (ed: CKEDITOR.editor): void => {
-        const cSettings: VeModalSettings<AddElementResolveFn<AddElementData>> =
-            {
-                component: 'addElementModal',
-                resolve: {
-                    getAddData: (): AddElementData => {
-                        return {
-                            type: 'Comment',
-                            addType: 'item',
-                        }
-                    },
-                    getProjectId: () => {
-                        return this.mmsProjectId
-                    },
-                    getRefId: () => {
-                        return this.mmsRefId
-                    },
-                    getOrgId: () => {
-                        return ''
-                    },
+        const cSettings: VeModalSettings<InsertResolveFn<InsertData>> = {
+            component: 'insertElementModal',
+            resolve: {
+                getInsertData: (): InsertData => {
+                    return {
+                        type: 'Comment',
+                        addType: 'item',
+                    }
                 },
-            }
+                getProjectId: () => {
+                    return this.mmsProjectId
+                },
+                getRefId: () => {
+                    return this.mmsRefId
+                },
+                getOrgId: () => {
+                    return ''
+                },
+            },
+        }
         const cInstance = this.$uibModal.open<
-            AddElementResolveFn<AddElementData>,
+            InsertResolveFn<InsertData>,
             ElementObject
         >(cSettings)
 

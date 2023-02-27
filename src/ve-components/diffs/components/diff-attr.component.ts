@@ -1,4 +1,3 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import {
@@ -237,11 +236,11 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
         const ignoreMathjaxAutoFormatting =
             type === 'doc' || type === 'val' || type === 'com'
         const html =
-            '<cross-reference ' +
+            '<view-cf ' +
             (ignoreMathjaxAutoFormatting
                 ? 'mms-generate-for-diff="mmsGenerateForDiff" '
                 : '') +
-            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{commitId}}" mms-callback="callback()"></cross-reference>'
+            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{commitId}}" mms-callback="callback()"></view-cf>'
         const newScope = Object.assign(this.$scope.$new(), {
             type: type,
             mmsElementId: reqOb.elementId,

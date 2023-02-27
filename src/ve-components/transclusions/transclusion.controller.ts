@@ -1,7 +1,5 @@
 import { IPaneScope } from '@openmbee/pane-layout'
-import angular, { IComponentController, Injectable } from 'angular'
 import $ from 'jquery'
-import Rx from 'rx-lite'
 
 import { ViewPresentationElemController } from '@ve-components/presentations/view-pe.component'
 import { ViewController } from '@ve-components/presentations/view.component'
@@ -12,14 +10,10 @@ import {
     ButtonBarService,
     IButtonBarButton,
 } from '@ve-core/button-bar'
-import { AuthService, ElementService } from '@ve-utils/mms-api-client'
+import { ImageService, MathService, UtilsService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    EventService,
-    ImageService,
-    MathJaxService,
-    UtilsService,
-} from '@ve-utils/services'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
@@ -35,7 +29,7 @@ import {
 } from '@ve-types/mms'
 
 export interface ITransclusion
-    extends IComponentController,
+    extends angular.IComponentController,
         ComponentController {
     $scope: TranscludeScope
     mmsElementId: string
@@ -99,7 +93,7 @@ export interface TranscludeScope extends IPaneScope {
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
- * @requires {MathJaxService} mathJaxSvc
+ * @requires {MathService} mathSvc
  * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
@@ -118,8 +112,8 @@ export interface TranscludeScope extends IPaneScope {
  */
 export class Transclusion implements ITransclusion, EditingToolbar {
     //Regex
-    fixPreSpanRegex: RegExp = /<\/span>\s*<cross-reference/g
-    fixPostSpanRegex: RegExp = /<\/cross-reference>\s*<span[^>]*>/g
+    fixPreSpanRegex: RegExp = /<\/span>\s*<view-cf/g
+    fixPostSpanRegex: RegExp = /<\/view-cf>\s*<span[^>]*>/g
     emptyRegex: RegExp = /^\s*$/
     spacePeriod: RegExp = />(?:\s|&nbsp;)\./g
     spaceSpace: RegExp = />(?:\s|&nbsp;)(?:\s|&nbsp;)/g
@@ -183,11 +177,15 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected $transcludeEl: JQuery<HTMLElement>
 
     // Possible templates to manage api functions
-    protected template: string | Injectable<(...args: unknown[]) => string>
-    protected editTemplate: string | Injectable<(...args: unknown[]) => string>
+    protected template:
+        | string
+        | angular.Injectable<(...args: unknown[]) => string>
+    protected editTemplate:
+        | string
+        | angular.Injectable<(...args: unknown[]) => string>
     protected previewTemplate:
         | string
-        | Injectable<(...args: unknown[]) => string>
+        | angular.Injectable<(...args: unknown[]) => string>
 
     public bbApi: ButtonBarApi
     public bars: string[]
@@ -217,7 +215,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         'SchemaService',
         'AuthService',
         'EventService',
-        'MathJaxService',
+        'MathService',
         'ExtensionService',
         'ButtonBarService',
         'ImageService',
@@ -233,9 +231,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         protected elementSvc: ElementService,
         protected utilsSvc: UtilsService,
         protected schemaSvc: SchemaService,
-        protected authSvc: AuthService,
         protected eventSvc: EventService,
-        protected mathJaxSvc: MathJaxService,
+        protected mathSvc: MathService,
         protected extensionSvc: ExtensionService,
         protected buttonBarSvc: ButtonBarService,
         protected imageSvc: ImageService

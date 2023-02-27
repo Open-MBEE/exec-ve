@@ -1,16 +1,10 @@
-import angular from 'angular'
-
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { Transclusion, ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
-import { ElementService, AuthService } from '@ve-utils/mms-api-client'
+import { UtilsService, MathService, ImageService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
-import {
-    UtilsService,
-    EventService,
-    MathJaxService,
-    ImageService,
-} from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -33,7 +27,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  * @requires {AuthService} authSvc
  * @requires {EventService} eventSvc
  * @requires {ButtonBarService} buttonBarSvc
- * @requires {MathJaxService} mathJaxSvc
+ * @requires {MathService} mathSvc
  * * Given an element id, puts in the element's documentation binding, if there's a parent
  * mmsView directive, will notify parent view of transclusion on init and doc change,
  * and on click. Nested transclusions inside the documentation will also be registered.
@@ -87,9 +81,8 @@ export class TranscludeDocController
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
-        authSvc: AuthService,
         eventSvc: EventService,
-        mathJaxSvc: MathJaxService,
+        mathSvc: MathService,
         extensionSvc: ExtensionService,
         buttonBarSvc: ButtonBarService,
         imageSvc: ImageService
@@ -104,9 +97,8 @@ export class TranscludeDocController
             elementSvc,
             utilsSvc,
             schemaSvc,
-            authSvc,
             eventSvc,
-            mathJaxSvc,
+            mathSvc,
             extensionSvc,
             buttonBarSvc,
             imageSvc
@@ -206,8 +198,8 @@ export class TranscludeDocController
                 this.panelType +
                 ')</p>'
         }
-        doc = doc.replace(this.fixPreSpanRegex, '<cross-reference')
-        doc = doc.replace(this.fixPostSpanRegex, '</cross-reference>')
+        doc = doc.replace(this.fixPreSpanRegex, '<view-cf')
+        doc = doc.replace(this.fixPostSpanRegex, '</view-cf>')
         doc = doc.replace(this.spacePeriod, '>.')
         doc = doc.replace(this.spaceSpace, '> ')
         doc = doc.replace(this.spaceComma, '>,')
@@ -243,7 +235,7 @@ export class TranscludeDocController
         }
         if (!this.mmsGenerateForDiff) {
             const resultHtml = $('<p></p>').html(result).toArray()
-            this.mathJaxSvc.typeset(resultHtml).then(
+            this.mathSvc.typeset(resultHtml).then(
                 () => deferred.resolve(resultHtml),
                 (reason) => {
                     deferred.reject(reason)

@@ -4,6 +4,8 @@ import _ from 'lodash'
 import { ComponentService } from '@ve-components/services'
 import { SpecTool, ISpecTool, SpecService } from '@ve-components/spec-tools'
 import { ToolbarService } from '@ve-core/toolbar'
+import { ApplicationService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import {
     ApiService,
     AuthService,
@@ -13,7 +15,6 @@ import {
     URLService,
     ViewService,
 } from '@ve-utils/mms-api-client'
-import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -23,16 +24,16 @@ class SpecMagicController extends SpecTool implements ISpecTool {
     static $inject = [...SpecTool.$inject]
 
     constructor(
+        $q: VeQService,
         $scope: angular.IScope,
         $element: JQuery<HTMLElement>,
-        $q: VeQService,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
         authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
-        utilsSvc: UtilsService,
+        applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
         permissionsSvc: PermissionsService,
@@ -41,16 +42,15 @@ class SpecMagicController extends SpecTool implements ISpecTool {
         toolbarSvc: ToolbarService
     ) {
         super(
+            $q,
             $scope,
             $element,
-            $q,
             growl,
             componentSvc,
             uRLSvc,
-            authSvc,
             elementSvc,
             projectSvc,
-            utilsSvc,
+            applicationSvc,
             apiSvc,
             viewSvc,
             permissionsSvc,

@@ -1,12 +1,13 @@
 import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
 
-import { CacheService, ProjectService } from '@ve-utils/mms-api-client'
 import {
-    EventService,
+    ApplicationService,
     RootScopeService,
     UtilsService,
-} from '@ve-utils/services'
+} from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
+import { CacheService } from '@ve-utils/mms-api-client'
 import { onChangesCallback, watchChangeEvent } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
@@ -69,7 +70,7 @@ class MenuController implements IComponentController {
         '$sce',
         '$timeout',
         '$element',
-        'ProjectService',
+        'ApplicationService',
         'CacheService',
         'UtilsService',
         'RootScopeService',
@@ -82,7 +83,7 @@ class MenuController implements IComponentController {
         private $sce: angular.ISCEService,
         private $timeout: angular.ITimeoutService,
         private $element: JQuery<HTMLElement>,
-        private projectSvc: ProjectService,
+        private applicationSvc: ApplicationService,
         private cacheSvc: CacheService,
         private utilsSvc: UtilsService,
         private rootScopeSvc: RootScopeService,
@@ -169,7 +170,7 @@ class MenuController implements IComponentController {
                     name: this.child.name,
                     id: this.child.id,
                     type: 'doc',
-                    link: 'main.project.ref.document({documentId: breadcrumb.id, search: undefined})',
+                    link: 'main.project.ref.present({documentId: breadcrumb.id, search: undefined})',
                 })
                 if (this.child._groupId) {
                     parentId = (this.child as DocumentObject)._groupId
@@ -251,12 +252,12 @@ class MenuController implements IComponentController {
 
     getHrefForProject(project: ProjectObject): string {
         const refId = project._refId || 'master'
-        return this.utilsSvc.PROJECT_URL_PREFIX + project.id + '/' + refId
+        return this.applicationSvc.PROJECT_URL_PREFIX + project.id + '/' + refId
     }
 
     getHrefForRef(branch: RefObject): string {
         let res =
-            this.utilsSvc.PROJECT_URL_PREFIX +
+            this.applicationSvc.PROJECT_URL_PREFIX +
             this.params.projectId +
             '/' +
             branch.id

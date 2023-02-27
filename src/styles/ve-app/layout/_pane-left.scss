@@ -9,7 +9,7 @@
 $pane-left-btn-group-width: 244px;
 
 #main-pane {
-  > .west-tabs {
+  > .west-pane {
     &.ng-pane-orientation-horizontal {
       .ng-pane-handle > .ng-pane-toggle {
         @include globals.box-shadow(2px 0 2px 0 rgba(100, 100, 100, 0.2));
@@ -22,7 +22,7 @@ $pane-left-btn-group-width: 244px;
       }
     }
 
-    .west-tabs {
+    .west-pane {
       @include globals.box-shadow(1px 0 1px 0 rgba(0, 0, 0, 0.2));
     }
   }
@@ -39,7 +39,7 @@ $pane-left-btn-group-width: 244px;
     min-width: $pane-left-btn-group-width;
     padding-block-end: 40px;
 
-    .pane-left-toolbar {
+    .pane-left-buttons {
       padding: 5px 4px;
       background: globals.$white;
     }

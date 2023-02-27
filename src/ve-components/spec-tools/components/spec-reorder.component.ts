@@ -1,4 +1,3 @@
-import angular from 'angular'
 import _ from 'lodash'
 
 import { ComponentService } from '@ve-components/services'
@@ -9,6 +8,8 @@ import {
     ReorderService,
 } from '@ve-components/spec-tools'
 import { ToolbarService } from '@ve-core/toolbar'
+import { ApplicationService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import {
     AuthService,
     PermissionsService,
@@ -18,7 +19,6 @@ import {
     ProjectService,
     ApiService,
 } from '@ve-utils/mms-api-client'
-import { EventService, UtilsService } from '@ve-utils/services'
 
 import { veComponents } from '@ve-components'
 
@@ -54,16 +54,16 @@ class SpecReorderController extends SpecTool implements ISpecTool {
     reorderable: boolean
 
     constructor(
+        $q: VeQService,
         $scope: angular.IScope,
         $element: JQuery<HTMLElement>,
-        $q: VeQService,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
         authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
-        utilsSvc: UtilsService,
+        applicationSvc: ApplicationService,
         apiSvc: ApiService,
         viewSvc: ViewService,
         permissionsSvc: PermissionsService,
@@ -73,16 +73,15 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         private reorderSvc: ReorderService
     ) {
         super(
+            $q,
             $scope,
             $element,
-            $q,
             growl,
             componentSvc,
             uRLSvc,
-            authSvc,
             elementSvc,
             projectSvc,
-            utilsSvc,
+            applicationSvc,
             apiSvc,
             viewSvc,
             permissionsSvc,
