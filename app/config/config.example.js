@@ -13,11 +13,12 @@
     //Do not modify the structure of this
     window.__env = {
         // View Editor Version
-        version: '4.0.1',
+        version: '4.0.2',
         // API url
         apiUrl: 'http://localhost:8080',
         // Base url
         baseUrl: '',
+        printUrl: 'http://localhost:8080/convert',
         enableDebug: true,
         // Configuration for the banner below the login modal (only visible at login)
         loginBanner: {

@@ -1324,14 +1324,21 @@ function UtilsService($q, $http, CacheService, URLService, ApplicationService, _
               accept = 'application/pdf';
         }
         var deferred = $q.defer();
-        $http.post(URLService.getExportHtmlUrl(data.projectId, data.refId), {
-            'Content-Type' : 'text/html',
-            'Accepts' : accept,
-            'body': data.htmlString,
-            'name': data.name,
-            'css': data.css
+        $http.post(URLService.getExportHtmlUrl(), {
+            'html': data.htmlString,
+            'css': data.css,
+            'format': exportType == 2 ? 'docx' : 'pdf'
+        }, {
+            responseType: 'blob'
         })
-        .then(function() {
+        .then(function(data2) {
+            var blob = new Blob([data2.data], {type: accept});
+            var a = window.document.createElement('a');
+            var url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = data.name + (exportType == 2 ? '.docx' : '.pdf');
+            a.click();
+            window.URL.revokeObjectURL(url);
             deferred.resolve('ok');
         }, function(error) {
             URLService.handleHttpStatus(error.data, error.status, error.headers, error.config, deferred);

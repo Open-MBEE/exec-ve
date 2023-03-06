@@ -246,9 +246,9 @@ angular.module('mmsApp')
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 3)
         .then(function(ob) {
-            growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
+           // growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
         }, function(reason){
-            growl.error("Exporting as PDF file Failed: " + reason.message);
+            //growl.error("Exporting as PDF file Failed: " + reason.message);
         });
     }));
 
@@ -263,9 +263,9 @@ angular.module('mmsApp')
             return;
         MmsAppUtils.printModal(viewOb, refOb, false, 2)
         .then(function(ob) {
-            growl.info('Exporting as Word file. Please wait for a completion email.',{ttl: -1});
+            //growl.info('Exporting as Word file. Please wait for a completion email.',{ttl: -1});
         }, function(reason){
-            growl.error("Exporting as Word file Failed: " + reason.message);
+            //growl.error("Exporting as Word file Failed: " + reason.message);
         });
     }));
 

@@ -61,7 +61,9 @@ angular.module('mmsApp', ['mms', 'mms.directives', 'app.tpls', 'fa.directive.bor
         var mmsHost = window.location.protocol + '//' + window.location.host;
         URLServiceProvider.setMmsUrl(mmsHost);
     }
-
+    if (window.__env.printUrl) {
+        URLServiceProvider.setPrintUrl(window.__env.printUrl);
+    }
 
 
 

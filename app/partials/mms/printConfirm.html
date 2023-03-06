@@ -16,10 +16,10 @@
     </p>
     <p ng-if="mode !== 1">
      <span ng-if="type === 'VIEW'">
-      Click on {{action | uppercase}} to generate a {{label}} of this view (it will not include table of contents or cover pages). You will receive an email with subject line "HTML to {{label}} generation completed" with a link to the generated {{label | uppercase}}. If you want the full document instead, please click on GO TO FULL DOCUMENT.
+      Click on {{action | uppercase}} to generate a {{label}} of this view (it will not include table of contents or cover pages). If you want the full document instead, please click on GO TO FULL DOCUMENT.
      </span>
      <span ng-if="type === 'DOCUMENT'">
-      Please wait until the full document appears in this pane before continuing. You will receive an email with subject line "HTML to {{label}} generation completed" with a link to the generated {{label}}.
+      Please wait until the full document appears in this pane before continuing. 
      </span>
     </p>
     <p ng-if="type == 'DOCUMENT' && mode === 3">

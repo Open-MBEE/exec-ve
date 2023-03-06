@@ -256,11 +256,14 @@ function MmsAppUtils($q, $uibModal, $timeout, $location, $window, growl,
                     if (result.tof != '') htmlArr.push(result.tof);
                     htmlArr.push(result.contents, '</body></html>');
                     var htmlString = htmlArr.join('');
+                    growl.info('Generating, please wait...', {ttl: -1});
                     UtilsService.exportHtmlAs(mode, {htmlString: htmlString, name: viewOrDocOb.name, projectId: viewOrDocOb._projectId, refId: viewOrDocOb._refId, css: css})
                         .then(function(result) {
+                            growl.success('File Downloaded', {ttl: -1});
                             deferred.resolve(result);
                         }, function(reason){
                             deferred.reject(reason);
+                            growl.error('Generation Failed');
                         });
                 }
             } else {

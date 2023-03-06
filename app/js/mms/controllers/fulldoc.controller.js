@@ -57,6 +57,7 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
             $scope.bbApi.addButton(UxService.getButtonBarButton('print'));
             var exportButtons = UxService.getButtonBarButton('export');
             exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("convert-pdf"));
+            //exportButtons.dropdown_buttons.push(UxService.getButtonBarButton("word"));
             $scope.bbApi.addButton(exportButtons);
             $scope.bbApi.setToggleState('show-comments', rootScopeSvc.veCommentsOn());
             $scope.bbApi.setToggleState('show-elements', rootScopeSvc.veElementsOn());
@@ -172,9 +173,9 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
         fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.printModal(documentOb, refOb, true, 3)
             .then(function(ob) {
-                growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
+                //growl.info('Exporting as PDF file. Please wait for a completion email.',{ttl: -1});
             }, function(reason){
-                growl.error("Exporting as PDF file Failed: " + reason.message);
+                //growl.error("Exporting as PDF file Failed: " + reason.message);
             });
         });
     }));
@@ -189,9 +190,9 @@ function($scope, $state, $anchorScroll, $location, $timeout, $http, FullDocument
         fullDocumentService.loadRemainingViews(function() {
             MmsAppUtils.printModal(documentOb, refOb, true, 2)
             .then(function(ob) {
-                growl.info('Exporting as Word file. Please wait for a completion email.',{ttl: -1});
+                //growl.info('Exporting as Word file. Please wait for a completion email.',{ttl: -1});
             }, function(reason){
-                growl.error("Exporting as Word file Failed: " + reason.message);
+                //growl.error("Exporting as Word file Failed: " + reason.message);
             });
         });
     }));

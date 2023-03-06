@@ -4,14 +4,18 @@ angular.module('mms')
 .provider('URLService', function URLServiceProvider() {
     var baseUrl = '/api';
     var mmsUrl = 'localhost:8080';
+    var printUrl = 'http://localhost:8080/convert';
     this.setBaseUrl = function (base) {
         baseUrl = base;
     };
     this.setMmsUrl = function (mms) {
         mmsUrl = mms;
     };
+    this.setPrintUrl = function (print) {
+        printUrl = print;
+    };
     this.$get = [function URLServiceFactory() {
-        return urlService(baseUrl, mmsUrl);
+        return urlService(baseUrl, mmsUrl, printUrl);
     }];
 });
 
@@ -37,9 +41,8 @@ angular.module('mms')
  * (You may run into problems like cross origin security policy that prevents it from
  *  actually getting the resources from a different server, solution TBD)
  */
-function urlService(baseUrl, mmsUrl) {
+function urlService(baseUrl, mmsUrl, printUrl) {
     var root = mmsUrl + baseUrl;
-    var jobsRoot = 'https://cae-pma-int:8443/';
     var token;
 
     var getRoot = function() {
@@ -149,9 +152,8 @@ function urlService(baseUrl, mmsUrl) {
      * @param {string} refId id of the ref
      * @returns {string} The url
      */
-    var getExportHtmlUrl = function(projectId, refId) {
-        return root + "/projects/" + projectId +
-            "/refs/" + refId + '/convert';
+    var getExportHtmlUrl = function() {
+        return printUrl;
     };
 
 
