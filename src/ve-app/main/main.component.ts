@@ -393,7 +393,7 @@ const MainComponent: VeComponentOptions = {
                 }
                 if (this.$state.includes('main.project.ref.portal')) {
                     this.rootScopeSvc.treeInitialSelection(
-                        (trans.params() as ParamsObject).refId
+                        (trans.params() as ParamsObject).projectId + '_cover'
                     )
                 } else if (
                     this.$uiRouterGlobals.$current.name ===

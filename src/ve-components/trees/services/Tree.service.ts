@@ -43,7 +43,7 @@ export class TreeService {
     public processedFocus: string = ''
 
     public treeApi: TreeApi
-    private rows: { [id: string]: TreeRow[] }
+    private rows: { [id: string]: TreeRow[] } = {}
 
     treeEditable: boolean
 
@@ -1179,10 +1179,14 @@ export class TreeService {
                                             )
                                         resolve()
                                     },
-                                    (reason) => reject(reason)
+                                    (reason) => {
+                                        reject(reason)
+                                    }
                                 )
                             },
-                            (reason) => reject(reason)
+                            (reason) => {
+                                reject(reason)
+                            }
                         )
                     }
                 }).catch((reason) => {
