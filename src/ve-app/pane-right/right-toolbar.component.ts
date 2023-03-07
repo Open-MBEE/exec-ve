@@ -1,4 +1,4 @@
-import { UIRouterGlobals } from '@uirouter/angularjs'
+import { StateService } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
@@ -7,7 +7,6 @@ import {
     tools_default_buttons,
     tools_dynamic_buttons,
 } from '@ve-components/spec-tools/spec-tools-buttons.config'
-import { veCoreEvents } from '@ve-core/events'
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
@@ -21,12 +20,13 @@ import { RefObject } from '@ve-types/mms'
 /* Classes */
 const RightToolbarComponent: VeComponentOptions = {
     selector: 'rightToolbar', //toolbar-component
-    template: `<tool-bar toolbar-id="$ctrl.toolbarId" pane-toggle="$ctrl.paneToggle"/>`,
+    template: `<tool-bar toolbar-id="{{$ctrl.toolbarId}}" pane-toggle="$ctrl.paneToggle"/>`,
     bindings: {
         mmsRef: '<',
     },
     controller: class ToolbarController implements IComponentController {
         static $inject = [
+            'growl',
             '$state',
             'ExtensionService',
             'PermissionsService',
@@ -43,11 +43,11 @@ const RightToolbarComponent: VeComponentOptions = {
         public mmsRef: RefObject
 
         //Local
-        public tbApi: ToolbarApi
         public toolbarId: string
 
         constructor(
-            public $uiRouterGlobals: UIRouterGlobals,
+            public growl: angular.growl.IGrowlService,
+            public $state: StateService,
             public extensionSvc: ExtensionService,
             private permissionsSvc: PermissionsService,
             private autosaveSvc: AutosaveService,
@@ -61,50 +61,12 @@ const RightToolbarComponent: VeComponentOptions = {
         $onInit(): void {
             this.eventSvc.$init(this)
 
-            this.tbApi = this.toolbarSvc.initApi(
+            this.toolbarSvc.initApi(
                 this.toolbarId,
                 this.tbInit,
                 this,
                 tools_default_buttons,
                 tools_dynamic_buttons
-            )
-
-            this.subs.push(
-                this.eventSvc.$on<veCoreEvents.setPermissionData>(
-                    this.toolbarSvc.constants.SETPERMISSION,
-                    (data) => {
-                        if (this.tbApi)
-                            this.tbApi.setPermission(data.id, data.value)
-                    }
-                )
-            )
-
-            this.subs.push(
-                this.eventSvc.$on<veCoreEvents.setIconData>(
-                    this.toolbarSvc.constants.SETICON,
-                    (data) => {
-                        if (this.tbApi) this.tbApi.setIcon(data.id, data.value)
-                    }
-                )
-            )
-
-            this.subs.push(
-                this.eventSvc.$on<veCoreEvents.setToggleData>(
-                    this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                    (data) => {
-                        if (this.tbApi) this.tbApi.toggleButtonSpinner(data.id)
-                    }
-                )
-            )
-
-            this.subs.push(
-                this.eventSvc.$on<veCoreEvents.setToggleData>(
-                    this.toolbarSvc.constants.SELECT,
-                    (data) => {
-                        if (this.tbApi && data.tbId === this.tbApi.id)
-                            this.tbApi.select(data.id)
-                    }
-                )
             )
         }
 
@@ -115,11 +77,7 @@ const RightToolbarComponent: VeComponentOptions = {
                 if (button.enabledFor) {
                     button.active = false
                     for (const enableState of button.enabledFor) {
-                        if (
-                            this.$uiRouterGlobals.current.name.indexOf(
-                                enableState
-                            ) > -1
-                        ) {
+                        if (this.$state.includes(enableState)) {
                             button.active = true
                             break
                         }
@@ -127,11 +85,7 @@ const RightToolbarComponent: VeComponentOptions = {
                 }
                 if (button.disabledFor) {
                     for (const disableState of button.disabledFor) {
-                        if (
-                            this.$uiRouterGlobals.current.name.indexOf(
-                                disableState
-                            ) > -1
-                        ) {
+                        if (this.$state.includes(disableState)) {
                             button.active = false
                             break
                         }
@@ -161,8 +115,11 @@ const RightToolbarComponent: VeComponentOptions = {
                     this.eventSvc.$broadcast('right-pane.toggle')
                 }
             }
-            if (toggleDeactivateFlag && this.tbApi) {
-                this.tbApi.deactivate(button.id)
+            if (toggleDeactivateFlag) {
+                this.toolbarSvc.waitForApi(this.toolbarId).then(
+                    (api) => api.deactivate(button.id),
+                    (reason) => this.growl.error(ToolbarService.error(reason))
+                )
             }
         }
     },

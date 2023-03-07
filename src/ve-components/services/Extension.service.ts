@@ -1,6 +1,7 @@
 import angular from 'angular'
 import _ from 'lodash'
 
+import { IButtonBarButton } from '@ve-core/button-bar'
 import { IToolBarButton } from '@ve-core/toolbar'
 
 import { veComponents } from '@ve-components'
@@ -10,8 +11,9 @@ export interface VeExperimentDescriptor {
     path?: string
     config?: string
     name?: string
-    button?: IToolBarButton
-    dynamic_button?: IToolBarButton[]
+    toolButton?: IToolBarButton
+    toolDynamicButton?: IToolBarButton[]
+    barButtons?: IButtonBarButton[]
 }
 
 export interface VeExperimentConfig {
@@ -26,7 +28,7 @@ export class ExtensionService {
         'transclude',
         'spec',
         'insert',
-        'treeOf',
+        'tree-of',
     ]
 
     public AnnotationType = {
@@ -59,6 +61,7 @@ export class ExtensionService {
     }
 
     public getTagByType = (extPrefix: string, type: string): string => {
+        extPrefix = _.kebabCase(extPrefix)
         if (!this.allowedExtensions.includes(extPrefix)) {
             // this.growl.error('Unknown Extension Prefix: ' + extPrefix)
             return 'extension-error'
@@ -76,7 +79,7 @@ export class ExtensionService {
     public getExtensions(extPrefix: string, exclude?: string[]): string[] {
         return this.extensionTags.filter((value) => {
             return (
-                value.startsWith(extPrefix) &&
+                value.startsWith(_.kebabCase(extPrefix)) &&
                 (exclude ? !exclude.includes(value) : true)
             )
         })

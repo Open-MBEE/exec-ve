@@ -69,7 +69,6 @@ export class ComponentService {
         'CacheService',
         'ElementService',
         'ViewService',
-        'AuthService',
         'PermissionsService',
         'RootScopeService',
         'EventService',

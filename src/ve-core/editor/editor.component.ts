@@ -714,11 +714,11 @@ export class EditorController implements angular.IComponentController {
         cInstance.result.then(
             (data) => {
                 const tag =
-                    '<transclusion mms-cf-type="com" mms-element-id="' +
+                    '<view-cf mms-cf-type="com" mms-element-id="' +
                     data.id +
                     '">comment:' +
                     data._creator +
-                    '</transclusion>'
+                    '</view-cf>'
                 this._addWidgetTag(ed, tag)
             },
             (reason) => {

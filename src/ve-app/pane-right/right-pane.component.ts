@@ -5,37 +5,24 @@ import Rx from 'rx-lite'
 
 import { veAppEvents } from '@ve-app/events'
 import { SpecApi, SpecService } from '@ve-components/spec-tools'
-import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
 import {
-    DocumentMetadata,
     ElementService,
     PermissionsService,
     ProjectService,
 } from '@ve-utils/mms-api-client'
-import { onChangesCallback } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import {
-    DocumentObject,
-    ElementObject,
-    ParamsObject,
-    RefObject,
-    ViewObject,
-} from '@ve-types/mms'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { ParamsObject, RefsResponse } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 class RightPaneController implements IComponentController {
     //Bindings
     private mmsParams: ParamsObject
-    private mmsDocument: DocumentObject
-    private mmsView: ViewObject
-    private mmsRef: RefObject
-    private mmsDocMeta: DocumentMetadata
 
     //Local Values
     private params: ParamsObject
@@ -48,6 +35,8 @@ class RightPaneController implements IComponentController {
 
     private $pane: IPane
     private $tools: JQuery<HTMLElement>
+
+    private toolbarId: string = 'right-toolbar'
 
     static $inject = [
         '$scope',
@@ -92,14 +81,6 @@ class RightPaneController implements IComponentController {
     $onInit(): void {
         this.eventSvc.$init(this)
         this.params = this.mmsParams
-        this.toolbarSvc.waitForApi('right-toolbar').then(
-            () => {
-                this.changeAction()
-            },
-            () => {
-                console.log('Toolbar did not initialize')
-            }
-        )
 
         //Init Pane Toggle Controls
         this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
@@ -124,71 +105,23 @@ class RightPaneController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on(
+            this.eventSvc.$on<veAppEvents.elementSelectedData>(
                 'element.selected',
-                (data: {
-                    elementOb: ElementObject
-                    commitId: string
-                    displayOldSpec: boolean
-                }) => {
-                    const elementOb = data.elementOb
-                    const commitId = data.commitId ? data.commitId : null
-                    const displayOldSpec = data.displayOldSpec
-                        ? data.displayOldSpec
-                        : null
-                    this.specApi.elementId = elementOb.id
-                    this.specApi.projectId = elementOb._projectId
-                    this.specApi.refId = elementOb._refId
-                    this.specApi.commitId = commitId
-                        ? commitId
-                        : elementOb._commitId
-                    this.specApi.displayOldSpec = displayOldSpec
-
-                    if (this.specSvc.setEditing) {
-                        this.specSvc.setEditing(false)
-                    }
-                    this.projectSvc
-                        .getRef(elementOb._refId, elementOb._projectId)
-                        .then(
-                            (ref) => {
-                                const editable =
-                                    ref.type === 'Branch' &&
-                                    commitId === 'latest' &&
-                                    this.permissionsSvc.hasBranchEditPermission(
-                                        this.params.projectId,
-                                        this.params.refId
-                                    )
-                                this.eventSvc.$broadcast<veCoreEvents.setPermissionData>(
-                                    this.toolbarSvc.constants.SETPERMISSION,
-                                    {
-                                        tbId: 'right-toolbar',
-                                        id: 'element',
-                                        value: editable,
-                                    }
-                                )
-                                this.specSvc.setElement()
-                            },
-                            (reason) => {
-                                this.growl.error(
-                                    'Unable to get ref: ' + reason.message
-                                )
-                            }
-                        )
+                (data) => {
+                    this.changeAction(data)
                 }
             )
         )
 
         this.subs.push(
-            this.eventSvc.$on(
+            this.eventSvc.$on<veAppEvents.elementUpdatedData>(
                 'element.updated',
-                (data: { element: ElementObject; continueEdit: boolean }) => {
-                    const elementOb = data.element
-                    const continueEdit = data.continueEdit
+                (data) => {
                     if (
-                        elementOb.id === this.specApi.elementId &&
-                        elementOb._projectId === this.specApi.projectId &&
-                        elementOb._refId === this.specApi.refId &&
-                        !continueEdit
+                        data.elementId === this.specApi.elementId &&
+                        data.projectId === this.specApi.projectId &&
+                        data.refId === this.specApi.refId &&
+                        !data.continueEdit
                     ) {
                         this.specSvc.setElement()
                     }
@@ -197,107 +130,94 @@ class RightPaneController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.viewSelectedData>(
+            this.eventSvc.$on<veAppEvents.elementSelectedData>(
                 'view.selected',
                 (data) => {
-                    const elementOb = data.focusId ? data.focusId : data.rootOb
-                    const commitId = data.commitId ? data.commitId : null
-                    this.eventSvc.$broadcast('element.selected', {
-                        elementOb: elementOb,
-                        commitId: commitId,
-                    })
-                    const editable =
-                        this.mmsRef.type === 'Branch' &&
-                        commitId === 'latest' &&
-                        this.permissionsSvc.hasBranchEditPermission(
-                            this.params.projectId,
-                            this.params.refId
-                        )
-                    //this.viewCommitId = commitId ? commitId : elementOb._commitId;
-                    this.eventSvc.$broadcast(
-                        this.toolbarSvc.constants.SETPERMISSION,
-                        {
-                            id: 'view',
-                            value: editable,
-                        }
-                    )
+                    this.changeAction(data)
                 }
             )
         )
     }
 
-    $postLink(): void {
-        //If there is a view pre-selected, send the view.selected event to the spec tools system
-        // if (this.params.documentId || this.params.viewId) {
-        //     const data = {
-        //         state: this.$uiRouterGlobals.current.name,
-        //         params: this.params,
-        //         documentId: this.params.documentId
-        //             ? this.params.documentId
-        //             : this.params.projectId + '_cover',
-        //         viewId: this.params.viewId
-        //             ? this.params.viewId
-        //             : this.params.documentId
-        //             ? this.params.documentId
-        //             : null,
-        //     }
-        //     this.eventSvc.$broadcast<veAppEvents.viewSelectedData>(
-        //         'view.selected',
-        //         data
-        //     )
-        // }
-    }
-
-    changeAction: onChangesCallback<void> = (newVal, oldVal) => {
-        if (!this.init) {
-            this.init = true
-        }
-        this.specApi = {
-            refId: this.mmsRef.id,
-            refType: this.mmsRef.type,
-            commitId: 'latest',
-            projectId: this.params.projectId,
-            elementId: '',
-        }
-
-        if (this.mmsDocument) {
-            this.specApi.docId = this.mmsDocument ? this.mmsDocument.id : ''
-        }
-        this.specSvc.specApi = this.specApi
-        this.specSvc.editable =
-            this.mmsDocument &&
-            this.mmsRef.type === 'Branch' &&
-            this.permissionsSvc.hasBranchEditPermission(
-                this.params.projectId,
-                this.params.refId
-            )
-
-        //Set the viewOb if found first otherwise fallback to documentOb or nothing
-        if (this.params.viewId) {
-            this.specApi.elementId = this.params.viewId
-            this.specApi.docId = this.params.documentId
-        } else if (this.params.documentId) {
-            this.specApi.elementId = this.params.documentId
-            this.specApi.docId = this.params.documentId
-        } else {
-            this.specApi.elementId = this.params.projectId + '_cover'
-        }
-
-        //Independent of viewOb if there is a document we want document tools enabled
-        if (this.$state.includes('document')) {
-            this.toolsCategory = 'document'
-        } else if (this.$state.includes('portal')) {
-            this.toolsCategory = 'portal'
-        } else {
-            this.toolsCategory = 'global'
-        }
-
-        this.$tools = $(
-            `<view-tools tools-category="$ctrl.toolsCategory"></view-tools>`
+    changeAction = (data: veAppEvents.elementSelectedData): void => {
+        const elementId = data.elementId
+        const refId = data.refId
+        const projectId = data.projectId
+        const commitId = data.commitId ? data.commitId : null
+        const displayOldSpec = data.displayOldSpec ? data.displayOldSpec : null
+        const promise: VePromise<string, RefsResponse> = new this.$q(
+            (resolve, reject) => {
+                if (
+                    !this.specApi ||
+                    !this.specApi.refType ||
+                    refId != this.specApi.refId ||
+                    projectId != this.specApi.projectId
+                ) {
+                    this.projectSvc.getRef(refId, projectId).then((ref) => {
+                        resolve(ref.type)
+                    }, reject)
+                } else {
+                    resolve(this.specApi.refType)
+                }
+            }
         )
 
-        this.$element.append(this.$tools)
-        this.$compile(this.$tools)(this.$scope)
+        promise.then(
+            (refType) => {
+                this.specApi = {
+                    elementId,
+                    projectId,
+                    refType,
+                    refId,
+                    commitId,
+                    displayOldSpec,
+                }
+
+                this.specSvc.specApi = this.specApi
+
+                if (this.specSvc.setEditing) {
+                    this.specSvc.setEditing(false)
+                }
+
+                this.specApi.rootId = data.rootId ? data.rootId : ''
+
+                this.specSvc.editable =
+                    data.rootId &&
+                    refType === 'Branch' &&
+                    this.permissionsSvc.hasBranchEditPermission(
+                        this.params.projectId,
+                        this.params.refId
+                    )
+
+                //Independent of viewOb if there is a document we want document tools enabled
+                if (!this.init) {
+                    this.init = true
+                    if (this.$state.includes('document')) {
+                        this.toolsCategory = 'document'
+                    } else if (this.$state.includes('**.portal.**')) {
+                        this.toolsCategory = 'portal'
+                    } else {
+                        this.toolsCategory = 'global'
+                    }
+
+                    this.$tools = $(
+                        `<view-tools tools-category="$ctrl.toolsCategory" toolbar-id="${this.toolbarId}"></view-tools>`
+                    )
+
+                    this.$element.append(this.$tools)
+                    this.$compile(this.$tools)(this.$scope)
+                }
+
+                this.toolbarSvc.waitForApi(this.toolbarId).then(
+                    (api) => api.setIcon('spec-editor', 'fa-edit'),
+                    (reason) => this.growl.error(ToolbarService.error(reason))
+                )
+                this.specSvc.setElement()
+            },
+            (reason) => {
+                this.growl.error('Unable to get ref: ' + reason.message)
+            }
+        )
     }
 }
 
@@ -307,11 +227,7 @@ const RightPaneComponent: VeComponentOptions = {
     <div class="pane-right"></div>
     `,
     bindings: {
-        mmsParams: 'params',
-        mmsProject: 'projectOb',
-        mmsRef: 'refOb',
-        mmsGroup: 'groupOb',
-        mmsDocument: 'documentOb',
+        mmsParams: '<',
     },
     require: {
         $pane: '^^ngPane',

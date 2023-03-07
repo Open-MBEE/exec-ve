@@ -2,6 +2,7 @@ import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
 
 import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService, ResolveService } from '@ve-app/main/services'
+import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
 import { TreeService } from '@ve-components/trees'
 import {
@@ -20,7 +21,6 @@ import {
     URLService,
     ViewApi,
 } from '@ve-utils/mms-api-client'
-import { onChangesCallback } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
@@ -35,6 +35,10 @@ import {
     ViewObject,
 } from '@ve-types/mms'
 
+/**
+ * Note: This controller is intended for navigating between 'views' and 'sections' only. If you wish to navigate between
+ * other tree object types you will need to create a new one or modify this one to be more generic.
+ */
 class SlideshowController implements angular.IComponentController {
     //Bindings
     mmsParams: ParamsObject
@@ -120,9 +124,17 @@ class SlideshowController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
+        this.rootScopeSvc.veFullDocMode(false)
         this.eventSvc.$init(this)
 
-        this.changeView()
+        this.bbApi = this.buttonBarSvc.initApi(
+            this.bbId,
+            this.bbInit,
+            this,
+            pane_center_buttons
+        )
+
+        this.initView()
 
         this.subs.push(
             this.eventSvc.$on<boolean>(
@@ -133,17 +145,24 @@ class SlideshowController implements angular.IComponentController {
             )
         )
 
+        //Reset Tree Updated Subject
+        this.eventSvc.resolve(TreeService.events.UPDATED, false)
+
+        //Subscribe to Tree Updated Subject
         this.subs.push(
-            this.eventSvc.binding(TreeService.events.UPDATED, (data) => {
-                if (!data) return
-                if (
-                    this.mmsView &&
-                    this.treeSvc.branch2viewNumber[this.mmsView.id]
-                ) {
-                    this.number =
+            this.eventSvc.binding<boolean>(
+                TreeService.events.UPDATED,
+                (data) => {
+                    if (!data) return
+                    if (
+                        this.mmsView &&
                         this.treeSvc.branch2viewNumber[this.mmsView.id]
+                    ) {
+                        this.number =
+                            this.treeSvc.branch2viewNumber[this.mmsView.id]
+                    }
                 }
-            })
+            )
         )
 
         this.subs.push(
@@ -211,37 +230,49 @@ class SlideshowController implements angular.IComponentController {
 
         this.subs.push(
             this.eventSvc.$on('center-previous', () => {
-                let prev = this.treeSvc.getPrevBranch(
-                    this.treeSvc.getSelectedBranch()
-                )
-                if (!prev) return
-                while (prev.type !== 'view' && prev.type !== 'section') {
-                    prev = this.treeSvc.getPrevBranch(prev)
-                    if (!prev) return
-                }
-                this.bbApi.toggleButtonSpinner('center-previous')
-                this.treeSvc.selectBranch(prev).catch((reason) => {
-                    this.growl.error(TreeService.treeError(reason))
-                })
-                this.bbApi.toggleButtonSpinner('center-previous')
+                this.treeSvc
+                    .getPrevBranch(this.treeSvc.getSelectedBranch(), [
+                        'view',
+                        'section',
+                    ])
+                    .then(
+                        (prev) => {
+                            this.bbApi.toggleButtonSpinner('center-previous')
+                            this.treeSvc.selectBranch(prev).catch((reason) => {
+                                this.growl.error(TreeService.treeError(reason))
+                            })
+                            this.bbApi.toggleButtonSpinner('center-previous')
+                        },
+                        (reason) => {
+                            if (reason.status === 200)
+                                this.growl.info(reason.message)
+                            else this.growl.error(reason.message)
+                        }
+                    )
             })
         )
 
         this.subs.push(
             this.eventSvc.$on('center-next', () => {
-                let next = this.treeSvc.getNextBranch(
-                    this.treeSvc.getSelectedBranch()
-                )
-                if (!next) return
-                while (next.type !== 'view' && next.type !== 'section') {
-                    next = this.treeSvc.getNextBranch(next)
-                    if (!next) return
-                }
-                this.bbApi.toggleButtonSpinner('center-next')
-                this.treeSvc.selectBranch(next).catch((reason) => {
-                    this.growl.error(TreeService.treeError(reason))
-                })
-                this.bbApi.toggleButtonSpinner('center-next')
+                this.treeSvc
+                    .getNextBranch(this.treeSvc.getSelectedBranch(), [
+                        'view',
+                        'section',
+                    ])
+                    .then(
+                        (next) => {
+                            this.bbApi.toggleButtonSpinner('center-next')
+                            this.treeSvc.selectBranch(next).catch((reason) => {
+                                this.growl.error(TreeService.treeError(reason))
+                            })
+                            this.bbApi.toggleButtonSpinner('center-next')
+                        },
+                        (reason) => {
+                            if (reason.status === 200)
+                                this.growl.info(reason.message)
+                            else this.growl.error(reason.message)
+                        }
+                    )
             })
         )
 
@@ -359,11 +390,15 @@ class SlideshowController implements angular.IComponentController {
         this.buttonBarSvc.destroyAll(this.bars)
     }
 
-    changeView: onChangesCallback<void> = () => {
+    initView = (): void => {
         this.viewContentLoading = true
 
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, this)
-        this.init = true
+        this.bbApi = this.buttonBarSvc.initApi(
+            this.bbId,
+            this.bbInit,
+            this,
+            pane_center_buttons
+        )
 
         if (this.mmsView || this.mmsDocument) {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
@@ -397,25 +432,26 @@ class SlideshowController implements angular.IComponentController {
 
         if (this.$state.includes('main.project.ref')) {
             const data = {
-                rootOb: this.$state.includes('portal')
+                rootId: this.$state.includes('**.portal.**')
                     ? null
-                    : this.mmsDocument,
-                focusId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
+                    : this.mmsDocument.id,
+                elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
                 commitId: 'latest',
+                projectId: this.mmsProject.id,
+                refId: this.mmsRef.id,
+                refType: this.mmsRef.type,
             }
-            this.eventSvc.$broadcast<veAppEvents.viewSelectedData>(
+            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
                 'view.selected',
                 data
             )
         }
 
-        if (this.$state.includes('main.project.ref.portal')) {
+        if (this.$state.includes('**.portal.**')) {
             this.contentWindowSvc.toggleLeftPane(false)
         }
 
         this.rootScopeSvc.veNumberingOn(false)
-        if (this.rootScopeSvc.veFullDocMode())
-            this.rootScopeSvc.veFullDocMode(false)
         if (this.rootScopeSvc.veCommentsOn())
             this.eventSvc.$broadcast('show-comments', false)
         if (this.rootScopeSvc.veElementsOn())
@@ -479,7 +515,7 @@ class SlideshowController implements angular.IComponentController {
                 },
             })
 
-        if (this.$state.includes('main.project.ref.present')) {
+        if (this.$state.includes('**.present.**')) {
             api.addButton(
                 this.buttonBarSvc.getButtonBarButton('refresh-numbering')
             )

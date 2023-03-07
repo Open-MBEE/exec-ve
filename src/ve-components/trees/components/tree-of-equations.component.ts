@@ -8,7 +8,7 @@ import {
 import { RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import { VeQService } from '@ve-types/angular'
 
@@ -42,7 +42,10 @@ class TreeOfEquationsController extends TreeController {
 }
 
 const TreeOfEquationsComponent = _.cloneDeep(TreeOfAnyComponent)
-TreeOfEquationsComponent.selector = 'tableOfEquations'
+TreeOfEquationsComponent.selector = 'treeOfEquations'
 TreeOfEquationsComponent.controller = TreeOfEquationsController
 
-veCore.component(TreeOfEquationsComponent.selector, TreeOfEquationsComponent)
+veComponents.component(
+    TreeOfEquationsComponent.selector,
+    TreeOfEquationsComponent
+)

@@ -186,7 +186,7 @@ Save CSV</button></div>
         refOb: RefObject,
         isDoc: boolean,
         mode: number
-    ): VePromise<void, void> {
+    ): VePromise<void, unknown> {
         const deferred = this.$q.defer<void>()
         const settings: VeModalSettings<PrintModalResolveFn> = {
             component: 'printConfirmModal',

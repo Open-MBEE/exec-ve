@@ -20,6 +20,7 @@ import {
     DocumentObject,
     ElementObject,
     ElementsRequest,
+    ElementsResponse,
     LiteralObject,
     RefObject,
     UserObject,
@@ -28,7 +29,7 @@ import {
 } from '@ve-types/mms'
 
 export interface SpecApi extends ElementsRequest<string> {
-    docId?: string
+    rootId?: string
     refType: string
     displayOldSpec?: boolean | null
     relatedDocuments?: ViewObject[]
@@ -51,7 +52,6 @@ export class SpecService implements angular.Injectable<any> {
     private editorApi: EditingApi
 
     public specApi: SpecApi
-
     public tracker: {
         etrackerSelected?: string
     } = {}
@@ -263,9 +263,9 @@ export class SpecService implements angular.Injectable<any> {
                                 })
                         )
                     }
-                    if (this.specApi.docId) {
+                    if (this.specApi.rootId) {
                         const docReq: ElementsRequest<string> = {
-                            elementId: this.specApi.docId,
+                            elementId: this.specApi.rootId,
                             projectId: this.specApi.projectId,
                             refId: this.specApi.refId,
                             commitId: this.specApi.commitId
@@ -441,25 +441,19 @@ export class SpecService implements angular.Injectable<any> {
         )
     }
 
-    public save = (continueEdit: boolean): void => {
+    public save = (
+        toolbarId: string,
+        continueEdit: boolean
+    ): VePromise<void, ElementsResponse<ElementObject>> => {
+        const deferred = this.$q.defer<void>()
         this.eventSvc.$broadcast('element-saving', true)
         const saveEdit = this.edit
         this.componentSvc.clearAutosave(
             saveEdit._projectId + saveEdit._refId + saveEdit.id,
             saveEdit.type
         )
-        if (!continueEdit)
-            this.eventSvc.$broadcast(
-                this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                { id: 'spec-editor-save' }
-            )
-        else
-            this.eventSvc.$broadcast(
-                this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                { id: 'spec-editor-saveC' }
-            )
-        this._save()
-            .then(
+        return new this.$q((resolve, reject) => {
+            this._save().then(
                 (data) => {
                     this.eventSvc.$broadcast('element-saving', false)
                     if (!data) {
@@ -487,36 +481,15 @@ export class SpecService implements angular.Injectable<any> {
                         this.specApi.commitId = 'latest'
                     } else {
                         this.setEditing(false)
-                        this.eventSvc.$broadcast(
-                            this.toolbarSvc.constants.SELECT,
-                            { id: 'spec-inspector' }
-                        )
-                        this.cleanUpSaveAll()
+                        this.cleanUpSaveAll(toolbarId)
                     }
+                    resolve()
                 },
                 (reason) => {
                     this.eventSvc.$broadcast('element-saving', false)
-                    if (reason.type === 'info') this.growl.info(reason.message)
-                    else if (reason.type === 'warning')
-                        this.growl.warning(reason.message)
-                    else if (reason.type === 'error')
-                        this.growl.error(reason.message)
+                    reject(reason)
                 }
             )
-            .finally(() => {
-                if (!continueEdit)
-                    this.eventSvc.$broadcast(
-                        this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                        { id: 'spec-editor-save' }
-                    )
-                else
-                    this.eventSvc.$broadcast(
-                        this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                        { id: 'spec-editor-saveC' }
-                    )
-            })
-        this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {
-            id: 'spec-inspector',
         })
     }
 
@@ -530,26 +503,21 @@ export class SpecService implements angular.Injectable<any> {
     }
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
-    public cleanUpSaveAll = (): void => {
-        if (this.autosaveSvc.openEdits() > 0) {
-            this.eventSvc.$broadcast(this.toolbarSvc.constants.SETPERMISSION, {
-                id: 'spec-editor-saveall',
-                value: true,
-            })
-            this.eventSvc.$broadcast(this.toolbarSvc.constants.SETICON, {
-                id: 'spec-editor',
-                value: 'fa-edit-asterisk',
-            })
-        } else {
-            this.eventSvc.$broadcast(this.toolbarSvc.constants.SETPERMISSION, {
-                id: 'spec-editor-saveall',
-                value: false,
-            })
-            this.eventSvc.$broadcast(this.toolbarSvc.constants.SETICON, {
-                id: 'spec-editor',
-                value: 'fa-edit',
-            })
-        }
+    public cleanUpSaveAll = (toolbarId: string): void => {
+        this.toolbarSvc.waitForApi(toolbarId).then(
+            (api) => {
+                if (this.autosaveSvc.openEdits() > 0) {
+                    api.setPermission('spec-editor.saveall', true)
+                    api.setIcon('spec-editor', 'fa-edit-asterisk')
+                } else {
+                    api.setPermission('spec-editor.saveall', false)
+                    api.setIcon('spec-editor', 'fa-edit')
+                }
+            },
+            (reason) => {
+                this.growl.error(ToolbarService.error(reason))
+            }
+        )
     }
 }
 

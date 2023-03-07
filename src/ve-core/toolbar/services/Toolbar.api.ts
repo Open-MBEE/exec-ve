@@ -12,7 +12,7 @@ export class ToolbarApi {
                 // $scope.clicked(button);
                 if (!button.dynamic) {
                     this.buttons.forEach((b) => {
-                        b.selected = b === button
+                        b.selected = b.id === button.id
                     })
 
                     // de-activate all dynamic this.buttons

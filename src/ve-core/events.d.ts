@@ -4,6 +4,12 @@ export namespace veCoreEvents {
         clicked: string
     }
 
+    interface toolbarClicked {
+        id: string
+        category?: string
+        title?: string
+    }
+
     abstract interface setToolbarData<T> {
         tbId: string
         id: string

@@ -58,7 +58,7 @@ export class ShortUrlService {
             viewId: urlParts[4],
         }
         let orgId: string = urlParts[0]
-        const promises: VePromise<void, void>[] = []
+        const promises: VePromise<void, unknown>[] = []
         // eslint-disable-next-line prefer-const
 
         if (orgId) {
@@ -264,7 +264,7 @@ export class ShortUrlService {
     public copyToClipboard(
         target: JQuery<HTMLElement>,
         $event: JQuery.ClickEvent
-    ): VePromise<void, void> {
+    ): VePromise<void, unknown> {
         const shortUrlEl = target.find('#ve-short-url')
         return this.applicationSvc.copyToClipboard(shortUrlEl, $event)
     }

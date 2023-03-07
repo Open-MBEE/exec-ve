@@ -4,7 +4,7 @@ import { veCore } from '@ve-core'
 
 import { ToolbarApi } from './Toolbar.api'
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
 import { VeApiObject } from '@ve-types/view-editor'
 
@@ -38,9 +38,9 @@ export interface toolbarInitFn {
 
 export class ToolButton implements IToolBarButton {
     id: string
-    category: 'global'
-    icon: 'fa-gears'
-    tooltip: 'Generic Button'
+    category: string = 'global'
+    icon: string = 'fa-gears'
+    tooltip: string = 'Generic Button'
     icon_original?: string
     selected?: boolean
     active?: boolean
@@ -63,13 +63,6 @@ export class ToolButton implements IToolBarButton {
 }
 
 export class ToolbarService {
-    public constants = {
-        SETPERMISSION: 'tb-set-permission',
-        SETICON: 'tb-set-icon',
-        TOGGLEICONSPINNER: 'tb-toggle-icon-spinner',
-        SELECT: 'tb-select',
-    }
-
     private toolbars: VeApiObject<ToolbarApi> = {}
     private buttons: { [key: string]: IToolBarButton } = {}
     private dynamic_buttons: { [key: string]: IToolBarButton } = {}
@@ -86,14 +79,14 @@ export class ToolbarService {
                     this.veConfig.expConfig[ext].length > 0
                 ) {
                     for (const tool of this.veConfig.expConfig[ext]) {
-                        if (tool.button) {
-                            this.registerToolbarButtons(tool.button)
+                        if (tool.toolButton) {
+                            this.registerToolbarButtons(tool.toolButton)
                         }
                         if (
-                            tool.dynamic_button &&
-                            tool.dynamic_button.length > 0
+                            tool.toolDynamicButton &&
+                            tool.toolDynamicButton.length > 0
                         ) {
-                            this.registerDynamicButtons(tool.dynamic_button)
+                            this.registerDynamicButtons(tool.toolDynamicButton)
                         }
                     }
                 }
@@ -136,7 +129,7 @@ export class ToolbarService {
             this.registerToolbarButtons(buttons)
         }
         if (dynamic_buttons && dynamic_buttons.length > 0) {
-            this.registerDynamicButtons(buttons)
+            this.registerDynamicButtons(dynamic_buttons)
         }
         init(api)
         if (!this.toolbars[id]) {
@@ -205,8 +198,11 @@ export class ToolbarService {
         if (this.buttons.hasOwnProperty(buttonId)) {
             const newButton = new ToolButton(buttonId, this.buttons[buttonId])
             if (this.buttons[buttonId].dynamic_ids) {
+                newButton.dynamic_buttons = []
                 for (const id of this.buttons[buttonId].dynamic_ids) {
-                    newButton.dynamic_buttons.push(this.getDynamicButton(id))
+                    newButton.dynamic_buttons.push(
+                        new ToolButton(id, this.getDynamicButton(id))
+                    )
                 }
             }
             return newButton
@@ -219,6 +215,11 @@ export class ToolbarService {
         if (this.dynamic_buttons.hasOwnProperty(button)) {
             return this.dynamic_buttons[button]
         }
+    }
+
+    static error(reason?: VePromiseReason<unknown>): string {
+        if (reason && reason.message) return 'Toolbar error: ' + reason.message
+        else return 'Toolbar Error!'
     }
 }
 

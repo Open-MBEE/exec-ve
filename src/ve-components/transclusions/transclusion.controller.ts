@@ -213,7 +213,6 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         'ElementService',
         'UtilsService',
         'SchemaService',
-        'AuthService',
         'EventService',
         'MathService',
         'ExtensionService',

@@ -2,7 +2,7 @@ import angular from 'angular'
 
 import ITreeNode = AngularUITree.ITreeNode
 
-import { ElementObject, ViewObject } from '@ve-types/mms'
+import { ElementObject, ElementsRequest, ViewObject } from '@ve-types/mms'
 
 /**
  * @typedef TreeBranch
@@ -41,15 +41,10 @@ export interface TreeRow {
     visible: boolean
 }
 
-export interface TreeApi {
-    rootOb?: ElementObject
-    focusId?: string
-    projectId?: string
-    refId?: string
-    refType?: string
-    commitId?: string
+export interface TreeApi extends ElementsRequest<string> {
+    rootId?: string
+    refType: string
     sectionNumbering?: boolean
-    sectionTypes?: string[]
     numberingDepth?: number
     numberingSeparator?: string
     expandLevel?: number

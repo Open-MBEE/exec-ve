@@ -9,7 +9,6 @@ import {
     ProjectService,
     URLService,
     ViewService,
-    AuthService,
     PermissionsService,
     ElementService,
     ApiService,
@@ -97,7 +96,6 @@ class SpecInspectorController extends SpecTool implements ISpecTool {
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
-        authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
         applicationSvc: ApplicationService,
@@ -132,7 +130,7 @@ class SpecInspectorController extends SpecTool implements ISpecTool {
 
     protected initCallback = (): void => {
         this.specSvc.setEditing(false)
-        this.specSvc.cleanUpSaveAll()
+        this.specSvc.cleanUpSaveAll(this.toolbarId)
     }
 }
 

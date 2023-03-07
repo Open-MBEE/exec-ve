@@ -53,7 +53,8 @@ class AnnotationController implements angular.IComponentController {
         this.$element.on('click', () => {
             if (this.mmsRecentElement) {
                 const data = {
-                    elementOb: this.mmsRecentElement,
+                    elementId: this.mmsRecentElement.id,
+
                     commitId: this.mmsRecentElement._commitId,
                     displayOldSpec: true,
                 }

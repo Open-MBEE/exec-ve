@@ -9,7 +9,6 @@ import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import {
     ApiService,
-    AuthService,
     ElementService,
     PermissionsService,
     ProjectService,
@@ -61,7 +60,6 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
-        authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
         applicationSvc: ApplicationService,
@@ -138,7 +136,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
     }
 
     // Get ref list for project and details on
-    getRefs = (): VePromise<void, void> => {
+    getRefs = (): VePromise<void, unknown> => {
         const deferred = this.$q.defer<void>()
         this.projectSvc.getRefs(this.projectId).then(
             (data) => {

@@ -1,8 +1,9 @@
-export * from "./ButtonBar.api"
+export * from './services/ButtonBar.api'
 
 //Service
-import "./ButtonBar.service"
-export * from "./ButtonBar.service"
+import './services/ButtonBar.service'
+
+export * from './services/ButtonBar.service'
 
 //Components
-import "./button-bar.component"
+import './button-bar.component'

@@ -4,7 +4,7 @@ import { TreeService, TreeController } from '@ve-components/trees'
 import { RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
-import { veCore } from '@ve-core'
+import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
 
@@ -80,4 +80,7 @@ const TreeOfContentsComponent: VeComponentOptions = {
     controller: TreeOfContentsController,
 }
 
-veCore.component(TreeOfContentsComponent.selector, TreeOfContentsComponent)
+veComponents.component(
+    TreeOfContentsComponent.selector,
+    TreeOfContentsComponent
+)

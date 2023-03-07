@@ -8,7 +8,6 @@ import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import {
     ApiService,
-    AuthService,
     ElementService,
     PermissionsService,
     ProjectService,
@@ -68,7 +67,6 @@ class SpecRefListController extends SpecTool implements ISpecTool {
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
-        authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
         applicationSvc: ApplicationService,

@@ -9,6 +9,7 @@ import {
     FullDocumentApi,
     FullDocumentService,
 } from '@ve-app/main/services'
+import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
 import { TreeService } from '@ve-components/trees'
 import {
@@ -130,7 +131,12 @@ class FullDocumentController implements IComponentController {
         this.rootScopeSvc.veFullDocMode(true)
         this.eventSvc.$init(this)
 
-        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, this)
+        this.bbApi = this.buttonBarSvc.initApi(
+            this.bbId,
+            this.bbInit,
+            this,
+            pane_center_buttons
+        )
 
         this.view2Node[this.mmsDocument.id] = {
             label: this.mmsDocument.name,
@@ -356,12 +362,17 @@ class FullDocumentController implements IComponentController {
     $postLink(): void {
         // Send view to kick off tree compilation
         const data = {
-            rootOb: this.$state.includes('portal') ? null : this.mmsDocument,
-            focusId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
+            rootOb: this.$state.includes('**.portal.**')
+                ? null
+                : this.mmsDocument.id,
+            elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
             commitId: 'latest',
+            projectId: this.mmsProject.id,
+            refId: this.mmsRef.id,
+            refType: this.mmsRef.type,
         }
 
-        this.eventSvc.$broadcast<veAppEvents.viewSelectedData>(
+        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
             'view.selected',
             data
         )
@@ -434,22 +445,31 @@ class FullDocumentController implements IComponentController {
     }
 
     private _scroll = (viewId: string): void => {
-        const data = {
-            rootOb: this.$state.includes('portal') ? null : this.mmsDocument,
-            focusId: viewId,
-            commitId: 'latest',
-        }
+        if (this.view2Node[viewId]) {
+            const data = {
+                rootId: this.$state.includes('**.portal.**')
+                    ? null
+                    : this.mmsDocument.id,
+                elementId: viewId,
+                commitId: 'latest',
+                projectId: this.mmsProject.id,
+                refId: this.mmsRef.id,
+                refType: this.mmsRef.type,
+            }
 
-        this.eventSvc.$broadcast<veAppEvents.viewSelectedData>(
-            'view.selected',
-            data
-        )
-        if (viewId === this.processed) return
-        this.processed = viewId
-        this.fullDocumentApi.handleClickOnBranch(viewId, () => {
-            this.$location.hash(viewId)
-            this.$anchorScroll()
-        })
+            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
+                'view.selected',
+                data
+            )
+            if (viewId === this.processed) return
+            this.processed = viewId
+            this.fullDocumentApi.handleClickOnBranch(viewId, () => {
+                this.$location.hash(viewId)
+                this.$anchorScroll()
+            })
+        } else {
+            this.growl.error('Invalid Scroll Target')
+        }
     }
 
     private _createViews = (): void => {
@@ -501,7 +521,12 @@ class FullDocumentController implements IComponentController {
 
     private _elementClicked = (elementOb: ElementObject): void => {
         const data = {
-            elementOb: elementOb,
+            rootOb: this.$state.includes('**.portal.**')
+                ? null
+                : this.mmsDocument.id,
+            elementId: elementOb.id,
+            projectId: elementOb._projectId,
+            refId: elementOb._refId,
             commitId: 'latest',
         }
         this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(

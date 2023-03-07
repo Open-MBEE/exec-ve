@@ -86,7 +86,9 @@ export interface ISpecToolScope extends IPaneScope {
  * @param {boolean=false} nonEditable can edit inline or not
  */
 export class SpecTool implements ISpecTool {
-    //
+    //Bindings
+    protected toolbarId: string
+
     public specApi: SpecApi
 
     //Customizers
@@ -94,7 +96,6 @@ export class SpecTool implements ISpecTool {
     public specTitle: string
 
     public subs: Rx.IDisposable[]
-    protected tbApi: ToolbarApi
 
     public commitId: string
     protected projectId: string
@@ -141,7 +142,7 @@ export class SpecTool implements ISpecTool {
         'URLService',
         'ElementService',
         'ProjectService',
-        'UtilsService',
+        'ApplicationService',
         'ApiService',
         'ViewService',
         'PermissionsService',
@@ -172,11 +173,10 @@ export class SpecTool implements ISpecTool {
         this.eventSvc.$init(this)
 
         this.editValues = this.specSvc.editValues
-        this.toolbarSvc.waitForApi('right-toolbar').then(
-            (result) => {
-                this.tbApi = result
+        this.toolbarSvc.waitForApi(this.toolbarId).then(
+            (api) => {
                 if (
-                    this.tbApi.buttons
+                    api.buttons
                         .map((value) => value.id)
                         .filter((value) => value === this.specType).length <
                         1 &&
@@ -189,7 +189,7 @@ export class SpecTool implements ISpecTool {
                             'is missing a button definition'
                     )
                 }
-                this.configToolbar()
+                this.configToolbar(api)
             },
             (reason) => {
                 this.growl.error(reason.message)
@@ -221,7 +221,7 @@ export class SpecTool implements ISpecTool {
      *
      * @protected
      */
-    protected configToolbar = (): void => {
+    protected configToolbar = (api: ToolbarApi): void => {
         /* Implement any toolbar initialization Logic Here */
     }
 

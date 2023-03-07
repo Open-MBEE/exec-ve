@@ -216,13 +216,13 @@ export class ViewHtmlService {
             attr = ` non-editable="${para.nonEditable.toString()}"`
         }
         return (
-            '<transclusion mms-cf-type="' +
+            '<view-cf mms-cf-type="' +
             t +
             '" mms-element-id="' +
             para.source +
             '"' +
             attr +
-            '></transclusion>'
+            '></view-cf>'
         )
     }
 

@@ -20,11 +20,11 @@ export class TransclusionService {
         cfType: string,
         nonEditable?: boolean
     ): string => {
-        return `<transclusion mms-cf-type="${cfType}" mms-element-id="${
+        return `<view-cf mms-cf-type="${cfType}" mms-element-id="${
             element.id
         }"${nonEditable ? ' non-editable="true">' : '>'}[cf:${
             element.name
-        }.${cfType}]</transclusion>`
+        }.${cfType}]</view-cf>`
     }
 
     public createViewLink = (

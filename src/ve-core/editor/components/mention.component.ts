@@ -40,7 +40,7 @@ export class MMSMentionController implements angular.IComponentController {
 
     private _createCf($item: ElementObject): void {
         const tag =
-            '<transclusion mms-cf-type="' +
+            '<view-cf mms-cf-type="' +
             $item.type +
             '" mms-element-id="' +
             $item.id +
@@ -48,7 +48,7 @@ export class MMSMentionController implements angular.IComponentController {
             $item.name +
             '.' +
             $item.type +
-            ']</transclusion>'
+            ']</view-cf>'
         this.mmsEditor.insertHtml(tag)
         this.editorSvc.focusOnEditorAfterAddingWidgetTag(this.mmsEditor)
     }

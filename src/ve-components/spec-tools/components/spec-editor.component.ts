@@ -2,13 +2,12 @@ import _ from 'lodash'
 
 import { ComponentService } from '@ve-components/services'
 import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
-import { ToolbarService } from '@ve-core/toolbar'
+import { ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
 import {
     URLService,
     ElementService,
-    AuthService,
     ViewService,
     PermissionsService,
     ProjectService,
@@ -96,7 +95,6 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
-        authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
         applicationSvc: ApplicationService,
@@ -129,10 +127,11 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         this.specTitle = 'Edit Element'
     }
 
-    configToolbar = (): void => {
+    configToolbar = (api: ToolbarApi): void => {
         if (this.autosaveSvc.openEdits() > 0) {
-            this.tbApi.setIcon('spec-editor', 'fa-edit-asterisk')
-            this.tbApi.setPermission('spec-editor-saveall', true)
+            //Tell toolbar to show an open edit if there are open edits
+            api.setIcon('spec-editor', 'fa-edit-asterisk')
+            api.setPermission('spec-editor.saveall', true)
         }
     }
 
@@ -144,7 +143,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
                 editOb.id + '|' + editOb._projectId + '|' + editOb._refId
             this.specSvc.tracker.etrackerSelected = key
             this.autosaveSvc.addOrUpdate(key, editOb)
-            this.specSvc.cleanUpSaveAll()
+            this.specSvc.cleanUpSaveAll(this.toolbarId)
             this.elementSvc.isCacheOutdated(editOb).then(
                 (data) => {
                     const server = data.server

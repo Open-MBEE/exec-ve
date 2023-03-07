@@ -60,7 +60,7 @@ export class ApplicationService {
     public copyToClipboard(
         target: JQuery<HTMLElement>,
         $event: JQuery.ClickEvent
-    ): VePromise<void, void> {
+    ): VePromise<void, unknown> {
         const deferred = this.$q.defer<void>()
         $event.stopPropagation()
 

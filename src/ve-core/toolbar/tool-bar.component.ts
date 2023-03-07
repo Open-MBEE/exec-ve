@@ -1,3 +1,4 @@
+import { veCoreEvents } from '@ve-core/events'
 import { buttonOnClickFn, IToolBarButton } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -12,7 +13,7 @@ import { VeComponentOptions } from '@ve-types/angular'
 const ToolBarComponent: VeComponentOptions = {
     selector: 'toolBar',
     template: `
-	<div class="right-toolbar">
+	<div class="{{$ctrl.toolbarId}}">
     <div class="toolbox">
         <div ng-repeat="button in $ctrl.buttons | filter: {active: true, permission: true} | orderBy:'priority'">
             <a class="tools {{button.id}}"
@@ -72,8 +73,12 @@ const ToolBarComponent: VeComponentOptions = {
             if (this.paneToggle) {
                 this.paneToggle()
             }
-
-            if (this.tbApi) this.tbApi.select(button.id)
+            if (!button.dynamic) {
+                this.toolbarSvc.waitForApi(this.toolbarId).then(
+                    (api) => api.select(button.id),
+                    (reason) => this.growl.error(ToolbarService.error(reason))
+                )
+            }
 
             if (button.onClick) {
                 button.onClick()
@@ -85,11 +90,18 @@ const ToolBarComponent: VeComponentOptions = {
         }
 
         protected onClick: buttonOnClickFn = (button) => {
-            this.eventSvc.$broadcast(button.id, {
-                id: button.id,
-                category: button.category,
-                title: button.tooltip,
-            })
+            if (!button.dynamic) {
+                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
+                    this.toolbarId,
+                    {
+                        id: button.id,
+                        category: button.category,
+                        title: button.tooltip,
+                    }
+                )
+            } else {
+                this.eventSvc.$broadcast<void>(button.id)
+            }
         }
     },
 }

@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { veCoreEvents } from '@ve-core/events'
-import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
+import { IToolBarButton, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
 import {
@@ -13,7 +13,6 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { ReorderService } from './services/Reorder.service'
 import { SpecApi, SpecService } from './services/Spec.service'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
@@ -99,8 +98,6 @@ class ToolsController implements angular.IComponentController {
     commitId: string
 
     subs: Rx.IDisposable[]
-    private tbApi: ToolbarApi
-    private tools: string[]
     currentTool: string
     defaultTool: string = 'spec-inspector'
     currentTitle: string
@@ -116,9 +113,7 @@ class ToolsController implements angular.IComponentController {
     edits: { [id: string]: ElementObject }
     protected errorType: string
 
-    private templateElementHtml: any
-
-    //protected $toolEl: JQuery;
+    toolbarId: string
 
     protected $globalTool: JQuery
     protected $portalTool: JQuery
@@ -141,7 +136,6 @@ class ToolsController implements angular.IComponentController {
         'AutosaveService',
         'ToolbarService',
         'SpecService',
-        'ReorderService',
         'ExtensionService',
     ]
 
@@ -163,7 +157,6 @@ class ToolsController implements angular.IComponentController {
         private autosaveSvc: AutosaveService,
         private toolbarSvc: ToolbarService,
         private specSvc: SpecService,
-        private specReorderSvc: ReorderService,
         private extensionSvc: ExtensionService
     ) {}
 
@@ -177,10 +170,23 @@ class ToolsController implements angular.IComponentController {
         this.specApi = this.specSvc.specApi
         this.elementSaving = false
 
-        this.tools = this.extensionSvc.getExtensions('spec')
-        this.tools.forEach((tool: string) => {
-            this.subs.push(this.eventSvc.$on(tool, this.changeTool))
+        const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(
+            this.defaultTool
+        )
+        //Initialize Toolbar Clicked Subject
+        this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
+            id: inspect.id,
+            category: inspect.category,
+            title: inspect.tooltip,
         })
+
+        //Listen for Toolbar Clicked Subject
+        this.subs.push(
+            this.eventSvc.binding<veCoreEvents.toolbarClicked>(
+                this.toolbarId,
+                this.changeTool
+            )
+        )
 
         this.subs.push(
             this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
@@ -201,7 +207,7 @@ class ToolsController implements angular.IComponentController {
                 (editOb: ElementObject) => {
                     const key = `${editOb.id}|${editOb._projectId}|${editOb._refId}`
                     this.autosaveSvc.addOrUpdate(key, editOb)
-                    this.specSvc.cleanUpSaveAll()
+                    this.specSvc.cleanUpSaveAll(this.toolbarId)
                 }
             )
         )
@@ -225,12 +231,12 @@ class ToolsController implements angular.IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on('spec-editor-save', () => {
+            this.eventSvc.$on('spec-editor.save', () => {
                 this.save(false)
             })
         )
         this.subs.push(
-            this.eventSvc.$on('spec-editor-saveC', () => {
+            this.eventSvc.$on('spec-editor.saveC', () => {
                 this.save(true)
             })
         )
@@ -245,12 +251,12 @@ class ToolsController implements angular.IComponentController {
             combo: 'alt+a',
             description: 'save all',
             callback: () => {
-                this.eventSvc.$broadcast('spec-editor-saveall')
+                this.eventSvc.$broadcast('spec-editor.saveall')
             },
         })
         let savingAll = false
         this.subs.push(
-            this.eventSvc.$on('spec-editor-saveall', () => {
+            this.eventSvc.$on('spec-editor.saveall', () => {
                 if (savingAll) {
                     this.growl.info('Please wait...')
                     return
@@ -272,9 +278,13 @@ class ToolsController implements angular.IComponentController {
                 this.specSvc.editorSave().then(
                     () => {
                         savingAll = true
-                        this.eventSvc.$broadcast(
-                            this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                            { id: 'spec-editor-saveall' }
+                        this.toolbarSvc.waitForApi(this.toolbarId).then(
+                            (api) => {
+                                api.toggleButtonSpinner('spec-editor.saveall')
+                            },
+                            (reason) => {
+                                this.growl.error(ToolbarService.error(reason))
+                            }
                         )
                         this.elementSvc
                             .updateElements(
@@ -298,12 +308,9 @@ class ToolsController implements angular.IComponentController {
                                             'element.updated',
                                             data
                                         )
-                                        this.eventSvc.$broadcast(
-                                            'spec-inspector',
-                                            {
-                                                id: 'spec-inspector',
-                                            }
-                                        )
+                                        this.eventSvc.resolve('right-toolbar', {
+                                            id: 'spec-inspector',
+                                        })
                                         this.specSvc.setEditing(false)
                                     })
                                     this.growl.success('Save All Successful')
@@ -331,20 +338,40 @@ class ToolsController implements angular.IComponentController {
                                 }
                             )
                             .finally(() => {
-                                this.eventSvc.$broadcast(
-                                    this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                                    { id: 'spec-editor-saveall' }
+                                this.toolbarSvc.waitForApi(this.toolbarId).then(
+                                    (api) => {
+                                        api.toggleButtonSpinner(
+                                            'spec-editor.saveall'
+                                        )
+                                    },
+                                    (reason) => {
+                                        this.growl.error(
+                                            ToolbarService.error(reason)
+                                        )
+                                    }
                                 )
                                 savingAll = false
-                                this.specSvc.cleanUpSaveAll()
+                                this.specSvc.cleanUpSaveAll(this.toolbarId)
                                 if (this.autosaveSvc.openEdits() === 0) {
-                                    this.eventSvc.$broadcast(
-                                        this.toolbarSvc.constants.SETICON,
-                                        {
-                                            id: 'spec-editor',
-                                            value: 'fa-edit',
-                                        }
-                                    )
+                                    this.toolbarSvc
+                                        .waitForApi(this.toolbarId)
+                                        .then(
+                                            (api) => {
+                                                api.setIcon(
+                                                    'spec-editor',
+                                                    'fa-edit'
+                                                )
+                                                api.setPermission(
+                                                    'spec-editor.saveall',
+                                                    false
+                                                )
+                                            },
+                                            (reason) => {
+                                                this.growl.error(
+                                                    ToolbarService.error(reason)
+                                                )
+                                            }
+                                        )
                                 }
                             })
                     },
@@ -355,7 +382,7 @@ class ToolsController implements angular.IComponentController {
             })
         )
         this.subs.push(
-            this.eventSvc.$on('spec-editor-cancel', () => {
+            this.eventSvc.$on('spec-editor.cancel', () => {
                 const go = (): void => {
                     const rmEdit = this.specSvc.getEdits()
                     this.autosaveSvc.remove(
@@ -380,14 +407,13 @@ class ToolsController implements angular.IComponentController {
                         this.eventSvc.$broadcast('spec-inspector', {
                             id: 'spec-inspector',
                         })
-                        this.eventSvc.$broadcast(
-                            this.toolbarSvc.constants.SETICON,
-                            {
-                                id: 'spec-editor',
-                                value: 'fa-edit',
+                        this.toolbarSvc.waitForApi(this.toolbarId).then(
+                            (api) => api.setIcon('spec-editor', 'fa-edit'),
+                            (reason) => {
+                                this.growl.error(ToolbarService.error(reason))
                             }
                         )
-                        this.specSvc.cleanUpSaveAll()
+                        this.specSvc.cleanUpSaveAll(this.toolbarId)
                     }
                 }
                 if (this.specSvc.hasEdits()) {
@@ -410,41 +436,16 @@ class ToolsController implements angular.IComponentController {
         )
     }
 
-    $postLink(): void {
-        if (!this.currentTool) {
-            this.currentTool = ''
-            const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(
-                this.defaultTool
-            )
-            this.eventSvc.$broadcast(inspect.id, {
-                id: inspect.id,
-                category: inspect.category,
-                title: inspect.tooltip,
-            })
-        }
-    }
-
-    private changeTool = (data: {
-        id: string
-        category?: string
-        title?: string
-    }): void => {
+    private changeTool = (data: veCoreEvents.toolbarClicked): void => {
         if (!this.currentTool) {
             this.currentTool = ''
         }
         if (this.currentTool !== data.id) {
-            this.eventSvc.$broadcast<veCoreEvents.setToggleData>(
-                this.toolbarSvc.constants.SELECT,
-                {
-                    id: data.id,
-                    tbId: this.tbApi.id,
-                    value: null,
-                }
-            )
-            if (this.currentTool !== '') {
+            if (this.currentTool !== '')
                 this.show[_.camelCase(this.currentTool)] = false
-            }
+
             this.currentTool = data.id
+
             const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(
                 data.id
             )
@@ -480,7 +481,9 @@ class ToolsController implements angular.IComponentController {
                 '<extension-error type="$ctrl.errorType" mms-element-id="$ctrl.mmsElementId" kind="Spec"></extension-error>'
             )
         } else {
-            newTool.append('<' + tag + '></' + tag + '>')
+            newTool.append(
+                '<' + tag + ' toolbar-id="{{$ctrl.toolbarId}}"></' + tag + '>'
+            )
         }
 
         if (category === 'document') {
@@ -509,7 +512,7 @@ class ToolsController implements angular.IComponentController {
             const key =
                 editOb.id + '|' + editOb._projectId + '|' + editOb._refId
             this.autosaveSvc.remove(key)
-            this.specSvc.cleanUpSaveAll()
+            this.specSvc.cleanUpSaveAll(this.toolbarId)
         }
     }
 
@@ -518,7 +521,45 @@ class ToolsController implements angular.IComponentController {
             this.growl.info('Please Wait...')
             return
         }
-        this.specSvc.save(continueEdit)
+        this.toolbarSvc.waitForApi(this.toolbarId).then(
+            (api) => {
+                if (!continueEdit) {
+                    api.toggleButtonSpinner('spec-editor.save')
+                } else {
+                    api.toggleButtonSpinner('spec-editor.saveC')
+                }
+                this.specSvc
+                    .save(this.toolbarId, continueEdit)
+                    .then(
+                        () => {
+                            this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
+                                this.toolbarId,
+                                {
+                                    id: 'spec-inspector',
+                                }
+                            )
+                        },
+                        (reason) => {
+                            if (reason.type === 'info')
+                                this.growl.info(reason.message)
+                            else if (reason.type === 'warning')
+                                this.growl.warning(reason.message)
+                            else if (reason.type === 'error')
+                                this.growl.error(reason.message)
+                        }
+                    )
+                    .finally(() => {
+                        if (!continueEdit) {
+                            api.toggleButtonSpinner('spec-editor.save')
+                        } else {
+                            api.toggleButtonSpinner('spec-editor.saveC')
+                        }
+                    })
+            },
+            (reason) => {
+                this.growl.error(ToolbarService.error(reason))
+            }
+        )
     }
 
     public etrackerChange = (): void => {
@@ -530,10 +571,14 @@ class ToolsController implements angular.IComponentController {
         this.specApi.projectId = info[1]
         this.specApi.refId = info[2]
         this.specApi.commitId = 'latest'
-        this.eventSvc.$broadcast(this.toolbarSvc.constants.SETPERMISSION, {
-            id: 'spec-editor',
-            value: true,
-        })
+        this.toolbarSvc.waitForApi(this.toolbarId).then(
+            (api) => {
+                api.setPermission('spec-editor', true)
+            },
+            (reason) => {
+                this.growl.error(ToolbarService.error(reason))
+            }
+        )
     }
 }
 
@@ -562,8 +607,8 @@ const ViewToolsComponent: VeComponentOptions = {
 </div>
     `,
     bindings: {
-        mmsRefs: '<',
-        toolsCategory: '@',
+        toolbarId: '@',
+        toolsCategory: '<',
     },
     controller: ToolsController,
 }

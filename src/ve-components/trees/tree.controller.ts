@@ -194,7 +194,7 @@ export class TreeController implements angular.IComponentController {
         this.treeSpin = true
     }
 
-    configure(): VePromise<void, void> {
+    configure(): VePromise<void, unknown> {
         this.setPeVisibility()
         this.preConfig()
         return new this.$q<void>((resolve, reject) => {

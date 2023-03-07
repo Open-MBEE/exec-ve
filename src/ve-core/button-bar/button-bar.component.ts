@@ -118,7 +118,7 @@ const ButtonBarComponent: VeComponentOptions = {
             }
             //Setup fire button-bar click event
             this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                'button-clicked-' + this.bbApi.id,
+                this.bbApi.id,
                 data
             )
 

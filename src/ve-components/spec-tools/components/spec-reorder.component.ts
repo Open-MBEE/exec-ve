@@ -7,11 +7,11 @@ import {
     ISpecTool,
     ReorderService,
 } from '@ve-components/spec-tools'
+import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import {
-    AuthService,
     PermissionsService,
     URLService,
     ElementService,
@@ -60,7 +60,6 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
         uRLSvc: URLService,
-        authSvc: AuthService,
         elementSvc: ElementService,
         projectSvc: ProjectService,
         applicationSvc: ApplicationService,
@@ -114,9 +113,13 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         }
 
         this.subs.push(
-            this.eventSvc.$on('spec-reorder', () => {
-                this.specSvc.setEditing(true)
-            })
+            this.eventSvc.binding<veCoreEvents.toolbarClicked>(
+                this.toolbarId,
+                (data) => {
+                    if (data.id === 'spec-reorder')
+                        this.specSvc.setEditing(true)
+                }
+            )
         )
 
         let viewSaving = false
@@ -126,27 +129,35 @@ class SpecReorderController extends SpecTool implements ISpecTool {
             })
         )
         this.subs.push(
-            this.eventSvc.$on('spec-reorder-save', () => {
+            this.eventSvc.$on('spec-reorder.save', () => {
                 if (viewSaving) {
                     this.growl.info('Please Wait...')
                     return
                 }
                 viewSaving = true
-                this.eventSvc.$broadcast(
-                    this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                    { id: 'spec-reorder-save' }
+                this.toolbarSvc.waitForApi(this.toolbarId).then(
+                    (api) => {
+                        api.toggleButtonSpinner('spec-reorder.save')
+                    },
+                    (reason) => {
+                        this.growl.error(ToolbarService.error(reason))
+                    }
                 )
                 this.reorderSvc.save().then(
                     () => {
                         viewSaving = false
                         this.reorderSvc.refresh()
                         this.growl.success('Save Successful')
-                        this.eventSvc.$broadcast(
-                            this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                            { id: 'spec-reorder-save' }
+                        this.toolbarSvc.waitForApi(this.toolbarId).then(
+                            (api) => {
+                                api.toggleButtonSpinner('spec-reorder.save')
+                            },
+                            (reason) => {
+                                this.growl.error(ToolbarService.error(reason))
+                            }
                         )
                         this.eventSvc.$broadcast(
-                            'spec-reorder-saved',
+                            'spec-reorder.saved',
                             this.specApi.elementId
                         )
                     },
@@ -155,24 +166,34 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                         viewSaving = false
                         const reason = response.data.failedRequests[0]
                         this.growl.error(reason.message)
-                        this.eventSvc.$broadcast(
-                            this.toolbarSvc.constants.TOGGLEICONSPINNER,
-                            { id: 'spec-reorder-save' }
+                        this.toolbarSvc.waitForApi(this.toolbarId).then(
+                            (api) => {
+                                api.toggleButtonSpinner('spec-reorder.save')
+                            },
+                            (reason) => {
+                                this.growl.error(ToolbarService.error(reason))
+                            }
                         )
                     }
                 )
-                this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {
-                    id: 'spec-reorder',
-                })
+                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
+                    this.toolbarId,
+                    {
+                        id: 'spec-inspector',
+                    }
+                )
             })
         )
         this.subs.push(
-            this.eventSvc.$on('spec-reorder-cancel', () => {
+            this.eventSvc.$on('spec-reorder.cancel', () => {
                 this.specSvc.setEditing(false)
                 this.reorderSvc.refresh()
-                this.eventSvc.$broadcast(this.toolbarSvc.constants.SELECT, {
-                    id: 'spec-inspector',
-                })
+                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
+                    this.toolbarId,
+                    {
+                        id: 'spec-inspector',
+                    }
+                )
                 //this.('element');
             })
         )

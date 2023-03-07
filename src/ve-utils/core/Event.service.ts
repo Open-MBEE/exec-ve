@@ -39,7 +39,9 @@ export class EventService {
     ): Rx.IDisposable {
         const fnName = this.createName(name)
         if (!this.bindings[fnName]) {
-            this.bindings[fnName] = new Rx.BehaviorSubject<T>(null)
+            throw Error(
+                'Binding ' + name + ' subscribed before initialization!'
+            )
         }
         return this.bindings[fnName].subscribe(handler)
     }
