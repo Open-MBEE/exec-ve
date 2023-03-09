@@ -1,7 +1,6 @@
-import { CrossReferenceController } from '@ve-components/transclusions/view-cf.component'
-
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
+import { CrossReferenceController } from '@ve-components/transclusions/view-cf.component'
 import { ApplicationService } from '@ve-utils/application'
 import {
     ApiService,
@@ -165,7 +164,7 @@ class ViewLinkController implements angular.IComponentController {
                         }
                         this.elementSvc.getElement(reqPEOb).then(
                             (pe) => {
-                                this.hash = '#' + pe.id
+                                this.vid = pe.id
                                 this.element = pe
                                 this.elementName = pe.name
                                 if (this.viewSvc.isTable(pe)) {
@@ -177,26 +176,9 @@ class ViewLinkController implements angular.IComponentController {
                                     this.suffix = ')'
                                 }
                                 if (this.applicationSvc.getState().fullDoc) {
-                                    this.href =
-                                        this.applicationSvc.PROJECT_URL_PREFIX +
-                                        this.projectId +
-                                        '/' +
-                                        this.refId +
-                                        '/documents/' +
-                                        this.docid +
-                                        '/full' +
-                                        this.hash
+                                    this.href = `main.project.ref.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                                 } else {
-                                    this.href =
-                                        this.applicationSvc.PROJECT_URL_PREFIX +
-                                        this.projectId +
-                                        '/' +
-                                        this.refId +
-                                        '/documents/' +
-                                        this.docid +
-                                        '/views/' +
-                                        this.vid +
-                                        this.hash
+                                    this.href = `main.project.ref.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                                 }
                             },
                             (reason) => {
@@ -225,25 +207,9 @@ class ViewLinkController implements angular.IComponentController {
                         )
                     }
                     if (this.applicationSvc.getState().fullDoc) {
-                        this.href =
-                            this.applicationSvc.PROJECT_URL_PREFIX +
-                            this.projectId +
-                            '/' +
-                            this.refId +
-                            '/documents/' +
-                            this.docid +
-                            '/full' +
-                            this.hash
+                        this.href = `main.project.ref.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                     } else {
-                        this.href =
-                            this.applicationSvc.PROJECT_URL_PREFIX +
-                            this.projectId +
-                            '/' +
-                            this.refId +
-                            '/documents/' +
-                            this.docid +
-                            '/views/' +
-                            this.vid
+                        this.href = `main.project.ref.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                     }
                     this.showNum =
                         this.applicationSvc.getState().inDoc &&
@@ -277,14 +243,14 @@ export const ViewLinkComponent: VeComponentOptions = {
     selector: 'viewLink',
     template: `
     <span ng-if="!$ctrl.loading">
-    <a target="{{$ctrl.target}}" ng-class="$ctrl.linkClass" ng-href="{{$ctrl.href}}">
+    <a target="{{$ctrl.target}}" ng-class="$ctrl.linkClass" ui-sref="{{$ctrl.href}}">
         <i ng-class="$ctrl.linkIconClass" aria-hidden="true"></i>
         <span ng-if="$ctrl.linkText">{{$ctrl.linkText}}</span>
         <span ng-if="!$ctrl.linkText && $ctrl.showNum && $ctrl.showName">{{$ctrl.type}}{{$ctrl.element._veNumber}}{{$ctrl.suffix}} - {{$ctrl.elementName || "Unnamed View"}}</span>
         <span ng-if="!$ctrl.linkText && $ctrl.showNum && !$ctrl.showName">{{$ctrl.type}}{{$ctrl.element._veNumber}}{{$ctrl.suffix}}</span>
         <span ng-if="!$ctrl.linkText && !$ctrl.showNum">{{$ctrl.elementName || "Unnamed View"}}</span>
     </a>
-    <a class="btn btn-secondary external-link no-print" target="_blank" ng-href="{{$ctrl.href}}" ng-if="$ctrl.mmsExternalLink">
+    <a class="btn btn-secondary external-link no-print" target="_blank" ui-sref="{{$ctrl.href}}" ng-if="$ctrl.mmsExternalLink">
         <i class="fa-solid fa-external-link" aria-hidden="true" title="Open document in new tab"></i>
     </a>
 </span>        

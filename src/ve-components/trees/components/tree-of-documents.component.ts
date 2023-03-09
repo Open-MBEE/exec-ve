@@ -59,7 +59,7 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
                     <div class="tree-item">
                         <i ng-show="!row.branch.loading && row.visibleChild" ng-class="{'active-text': row.branch.selected}" ng-click="$ctrl.expandCallback(row.branch, $event)" class="indented tree-icon {{row.branch.expanded ? $ctrl.icons.iconExpand : $ctrl.icons.iconCollapse}}" ></i>
                         <i ng-hide="row.branch.loading || row.visibleChild" class="fa fa-lg fa-fw"></i>
-                        <i ng-hide="row.branch.loading" ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.type_icon}}" ></i>
+                        <i ng-hide="row.branch.loading" class="indented tree-icon {{row.typeIcon}}" ></i>
                         <i ng-show="row.branch.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
                         <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
                     </div>

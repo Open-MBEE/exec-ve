@@ -18,6 +18,7 @@ export namespace veAppEvents {
         rootId?: string
         refType?: string
         displayOldSpec?: boolean
+        refresh?: boolean
     }
 
     interface elementUpdatedData extends elementSelectedData {

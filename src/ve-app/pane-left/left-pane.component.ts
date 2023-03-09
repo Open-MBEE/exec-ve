@@ -67,6 +67,7 @@ class LeftPaneController implements angular.IComponentController {
     private init: boolean
     toolbarId: string = 'left-toolbar'
     buttonId: string = 'tree-button-bar'
+    private spin: boolean
 
     schema = 'cameo'
 
@@ -127,6 +128,7 @@ class LeftPaneController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
+        this.spin = true
         this.transitionCallback()
 
         this.eventSvc.$init(this)
@@ -246,6 +248,12 @@ class LeftPaneController implements angular.IComponentController {
     }
 
     changeData = (data: veAppEvents.elementSelectedData): void => {
+        const finished = this.eventSvc.$on('tree.ready', () => {
+            this.spin = false
+            finished.dispose()
+        })
+        //If the transitioning state detects a refresh, it will let us know to regenerate the tree
+        if (data.refresh) this.treeSvc.processedRoot = ''
         const rootId =
             !data.rootId && data.elementId.endsWith('_cover')
                 ? data.projectId + '_pm'
@@ -254,7 +262,10 @@ class LeftPaneController implements angular.IComponentController {
         const refId = data.refId
         const projectId = data.projectId
         const commitId = data.commitId ? data.commitId : null
-        if (rootId && this.treeSvc.processedRoot !== rootId && rootId != '') {
+        if (
+            (rootId && this.treeSvc.processedRoot !== rootId && rootId != '') ||
+            !this.treeApi
+        ) {
             new this.$q<string, RefsResponse>((resolve, reject) => {
                 if (
                     !this.treeApi ||
@@ -357,7 +368,7 @@ class LeftPaneController implements angular.IComponentController {
                     ).then(
                         (root) => {
                             this.initTrees()
-                            // If there isn't a root it means that we are in the portal and thus will not
+
                             if (!this.rootScopeSvc.treeInitialSelection()) {
                                 this.treeApi.elementId = elementId
                             }
@@ -388,9 +399,9 @@ class LeftPaneController implements angular.IComponentController {
         if (!this.init) {
             this.init = true
             this.$trees = $(
-                `<view-trees trees-category="$ctrl.treesCategory" toolbar-id="${this.toolbarId}" button-id="${this.buttonId}"></view-trees>`
+                `<view-trees ng-hide="$ctrl.spin"  trees-category="$ctrl.treesCategory" toolbar-id="${this.toolbarId}" button-id="${this.buttonId}"></view-trees>`
             )
-            this.$element.append(this.$trees)
+            $('.pane-left').append(this.$trees)
             this.$compile(this.$trees)(this.$scope)
         }
     }
@@ -517,6 +528,10 @@ class LeftPaneController implements angular.IComponentController {
             'view.selected',
             data
         )
+        const finished = this.eventSvc.$on('tree.ready', () => {
+            this.bbApi.toggleButtonSpinner('tree-refresh')
+            finished.dispose()
+        })
     }
 }
 
@@ -525,7 +540,11 @@ const LeftPaneComponent: VeComponentOptions = {
     selector: 'leftPane',
     transclude: true,
     template: `
-  <div class="pane-left"></div>
+    <div class="pane-left">
+    <i ng-show="$ctrl.spin" class="tree-spinner fa fa-2x fa-spinner fa-spin"></i>
+</div>
+  
+  
 `,
     bindings: {
         mmsProject: '<',

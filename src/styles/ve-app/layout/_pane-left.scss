@@ -33,15 +33,30 @@ $pane-left-btn-group-width: 244px;
   width: 100%;
   background: globals.$ve-silver-lighter-1;
 
+  .tree-view,
   .pane-left {
     width: 100%;
     height: 100%;
     min-width: $pane-left-btn-group-width;
     padding-block-end: 40px;
 
-    .pane-left-buttons {
+    .tree-spinner {
+      margin: 50%;
+    }
+
+    .tree-view-buttons {
       padding: 5px 4px;
       background: globals.$white;
+    }
+
+    h4.tree-view-title {
+      display: block;
+      margin: 20px 0;
+    }
+
+    hr.tree-title-divider {
+      margin: 0 -18px;
+      border-color: globals.$ve-silver-darker-2;
     }
 
     .tree-options {

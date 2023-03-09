@@ -96,12 +96,12 @@
         if (found) {
             let wrapNodeToAdd = new VirtualNode(
                 'SPAN',
-                { attributes: { class: 'patcher-replaceIn' } },
+                { attributes: { class: 'patcher-replace-in' } },
                 [nodeToAdd]
             )
             let wrapNodeToRemove = new VirtualNode(
                 'SPAN',
-                { attributes: { class: 'patcher-replaceOut' } },
+                { attributes: { class: 'patcher-replace-out' } },
                 [nodeToRemove]
             )
             found.foundIn.splice(found.at, 1, wrapNodeToAdd)
@@ -118,12 +118,14 @@
         let found = findNode(nodeToRemove, originalTree)
         if (found) {
             if (IsVNode(nodeToRemove)) {
-                let wrapNodeToAdd = createWrapper('SPAN', 'patcher-replaceIn', [
-                    nodeToAdd,
-                ])
+                let wrapNodeToAdd = createWrapper(
+                    'SPAN',
+                    'patcher-replace-in',
+                    [nodeToAdd]
+                )
                 let wrapNodeToRemove = createWrapper(
                     'SPAN',
-                    'patcher-replaceOut',
+                    'patcher-replace-out',
                     [nodeToRemove]
                 )
                 found.foundIn.splice(found.at, 1, wrapNodeToAdd)

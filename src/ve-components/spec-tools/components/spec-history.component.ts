@@ -310,7 +310,7 @@ const SpecHistoryComponent: VeComponentOptions = {
     
 </div>
 
-<hr class="spec-title-divider">
+<hr class="right-title-divider">
 
 <div ng-show="ModelData.ShowDiffPrototype">
     <div class="ve-notify-banner fade-in-out" ng-show="disableRevert">

@@ -23,7 +23,7 @@ export const trees_default_toolbar: IToolBarButton[] = [
         enabledFor: ['main.project.ref.portal'],
     },
     {
-        id: 'tree-of-views',
+        id: 'tree-of-contents',
         icon: 'fa-folder-tree',
         selected: true,
         active: false,

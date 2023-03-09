@@ -455,7 +455,9 @@ class ToolsController implements angular.IComponentController {
             if (!data.category) {
                 data.category = inspect.category
             }
-            this.currentTitle = data.title
+
+            this.currentTitle = data.title ? data.title : inspect.tooltip
+
             if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
                 this.startTool(data.id, data.category)
                 this.show[_.camelCase(data.id)] = true
@@ -600,7 +602,7 @@ const ViewToolsComponent: VeComponentOptions = {
             </div>
         </form>
     </div>
-    <hr class="spec-title-divider">
+    <hr class="right-title-divider">
     <div id="portal-tools" ng-show="$ctrl.toolsCategory === 'portal'"></div>
     <div id="document-tools" ng-show="$ctrl.toolsCategory === 'document'"></div>
     <div id="global-tools"></div>

@@ -1,4 +1,8 @@
-import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
+import {
+    StateService,
+    TransitionService,
+    UIRouterGlobals,
+} from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
 
 import {
@@ -8,7 +12,7 @@ import {
 } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { CacheService } from '@ve-utils/mms-api-client'
-import { onChangesCallback, watchChangeEvent } from '@ve-utils/utils'
+import { onChangesCallback } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
 
@@ -67,7 +71,7 @@ class MenuController implements IComponentController {
         '$q',
         '$uiRouterGlobals',
         '$state',
-        '$sce',
+        '$transitions',
         '$timeout',
         '$element',
         'ApplicationService',
@@ -80,7 +84,7 @@ class MenuController implements IComponentController {
         public $q: VeQService,
         private $uiRouterGlobals: UIRouterGlobals,
         private $state: StateService,
-        private $sce: angular.ISCEService,
+        private $transitions: TransitionService,
         private $timeout: angular.ITimeoutService,
         private $element: JQuery<HTMLElement>,
         private applicationSvc: ApplicationService,
@@ -108,9 +112,12 @@ class MenuController implements IComponentController {
             }
         }
 
-        watchChangeEvent(this, 'mmsDocument', this.updateBreadcrumbs, true)
-        watchChangeEvent(this, 'mmsGroups', this.updateGroups, true)
         this.updateGroups()
+
+        this.$transitions.onSuccess({}, () => {
+            this.spin = true
+            this.updateBreadcrumbs()
+        })
     }
 
     updateGroups: onChangesCallback<undefined> = () => {

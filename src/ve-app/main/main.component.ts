@@ -299,8 +299,8 @@ const MainComponent: VeComponentOptions = {
                 this.rootScopeSvc.veViewContentLoading(true)
                 this.httpSvc.transformQueue()
                 this.rootScopeSvc.veStateChanging(true)
-                const from = trans.$from().name
-                const to = trans.$to().name
+                //const from = trans.$from().name
+
                 // if (from.split('.').length >= to.split('.').length) {
                 //     console.log(
                 //         trans.router.viewService._pluginapi._activeViewConfigs()
@@ -367,9 +367,7 @@ const MainComponent: VeComponentOptions = {
                 ) {
                     this.rootScopeSvc.veRedirect(null)
                 }
-                if (
-                    this.$uiRouterGlobals.$current.name === 'main.project.ref'
-                ) {
+                if (trans.$to().name === 'main.project.ref') {
                     this.$state.target('main.project.ref.portal')
                 }
                 if (this.$state.includes('main.project.ref.search')) {
@@ -391,44 +389,52 @@ const MainComponent: VeComponentOptions = {
                         trans.params('from')
                     )
                 }
-                if (this.$state.includes('main.project.ref.portal')) {
-                    this.rootScopeSvc.treeInitialSelection(
-                        (trans.params() as ParamsObject).projectId + '_cover'
-                    )
-                } else if (
-                    this.$uiRouterGlobals.$current.name ===
-                    'main.project.ref.portal.preview'
-                ) {
-                    const index = (
-                        trans.params() as ParamsObject
-                    ).documentId.indexOf('_cover')
-                    if (index > 0)
-                        this.rootScopeSvc.treeInitialSelection(
-                            (
-                                trans.params() as ParamsObject
-                            ).documentId.substring(5, index)
-                        )
-                    else
-                        this.rootScopeSvc.treeInitialSelection(
-                            (trans.params() as ParamsObject).documentId
-                        )
-                } else if (
-                    this.$state.includes('main.project.ref.present') &&
-                    this.$uiRouterGlobals.$current.name !==
-                        'main.project.ref.present.reorder'
-                ) {
-                    if ((trans.params() as ParamsObject).viewId !== undefined)
-                        this.rootScopeSvc.treeInitialSelection(
-                            (trans.params() as ParamsObject).viewId
-                        )
-                    else if (trans.params()['#'] !== undefined)
-                        this.rootScopeSvc.treeInitialSelection(
-                            (trans.params() as ParamsObject)['#']
-                        )
-                    else
-                        this.rootScopeSvc.treeInitialSelection(
-                            (trans.params() as ParamsObject).documentId
-                        )
+                // if (this.$state.includes('main.project.ref.portal')) {
+                //     this.rootScopeSvc.treeInitialSelection(
+                //         (trans.params() as ParamsObject).projectId + '_cover'
+                //     )
+                // } else if (
+                //     this.$uiRouterGlobals.$current.name ===
+                //     'main.project.ref.portal.preview'
+                // ) {
+                //     const index = (
+                //         trans.params() as ParamsObject
+                //     ).documentId.indexOf('_cover')
+                //     if (index > 0)
+                //         this.rootScopeSvc.treeInitialSelection(
+                //             (
+                //                 trans.params() as ParamsObject
+                //             ).documentId.substring(5, index)
+                //         )
+                //     else
+                //         this.rootScopeSvc.treeInitialSelection(
+                //             (trans.params() as ParamsObject).documentId
+                //         )
+                // } else if (
+                //     this.$state.includes('main.project.ref.present') &&
+                //     this.$uiRouterGlobals.$current.name !==
+                //         'main.project.ref.present.reorder'
+                // ) {
+                //     if ((trans.params() as ParamsObject).viewId !== undefined)
+                //         this.rootScopeSvc.treeInitialSelection(
+                //             (trans.params() as ParamsObject).viewId
+                //         )
+                //     else if (trans.params()['#'] !== undefined)
+                //         this.rootScopeSvc.treeInitialSelection(
+                //             (trans.params() as ParamsObject)['#']
+                //         )
+                //     else
+                //         this.rootScopeSvc.treeInitialSelection(
+                //             (trans.params() as ParamsObject).documentId
+                //         )
+                // }
+                if (trans.$to().name === 'main.project.ref.present') {
+                    const display = (trans.params() as ParamsObject).display
+                    if (!display || display === '' || display === 'slideshow') {
+                        void this.$state.go('main.project.ref.slideshow', {
+                            display: 'slideshow',
+                        })
+                    }
                 }
                 if (this.$state.includes('main.project.ref.present')) {
                     this.applicationSvc.getState().inDoc = true

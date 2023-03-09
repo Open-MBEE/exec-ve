@@ -551,10 +551,10 @@ body {font-size: 10pt; font-family: 'Times New Roman', Times, serif; }
 ins, .ins {color: black; background: #dafde0;}
 del, .del{color: black;background: #ffe3e3;text-decoration: line-through;}
 .match,.textdiff span {color: gray;}
-.patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {background-color: #dafde0;}
-.patcher-replaceIn, .patcher-attribute-replace-in, .patcher-insert {border: 2px dashed #abffb9;}
-.patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {background-color: #ffe3e3; text-decoration: line-through;}
-.patcher-replaceOut, .patcher-delete, .patcher-attribute-replace-out {border: 2px dashed #ffb6b6;}
+.patcher-replace-in, .patcher-attribute-replace-in, .patcher-insert, .patcher-text-insertion {background-color: #dafde0;}
+.patcher-replace-in, .patcher-attribute-replace-in, .patcher-insert {border: 2px dashed #abffb9;}
+.patcher-replace-out, .patcher-delete, .patcher-attribute-replace-out, .patcher-text-deletion {background-color: #ffe3e3; text-decoration: line-through;}
+.patcher-replace-out, .patcher-delete, .patcher-attribute-replace-out {border: 2px dashed #ffb6b6;}
 .patcher-text-insertion, .patcher-text-deletion {display: inline !important;}
 [class*="patcher-"]:not(td):not(tr) {display: inline-block;}
 

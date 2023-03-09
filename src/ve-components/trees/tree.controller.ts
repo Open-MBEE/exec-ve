@@ -141,15 +141,13 @@ export class TreeController implements angular.IComponentController {
     $onInit(): void {
         this.treeApi = this.treeSvc.treeApi
         this.treeFilter = this.$filter('uiTreeFilter')
-        this.treeSpin = true
+
         this.eventSvc.$init(this)
         this.subs.push(
             this.eventSvc.binding<boolean>(
                 TreeService.events.UPDATED,
                 (data) => {
                     if (data) {
-                        if (!this.treeRows) this.treeSpin = true
-
                         this.configure().catch((reason) => {
                             this.growl.error(TreeService.treeError(reason))
                         })
@@ -191,10 +189,10 @@ export class TreeController implements angular.IComponentController {
 
     $onDestroy(): void {
         this.eventSvc.destroy(this.subs)
-        this.treeSpin = true
     }
 
     configure(): VePromise<void, unknown> {
+        this.treeSpin = true
         this.setPeVisibility()
         this.preConfig()
         return new this.$q<void>((resolve, reject) => {
@@ -316,9 +314,6 @@ export const TreeOfAnyComponent: VeComponentOptions = {
     selector: 'treeOfAny',
     transclude: true,
     template: `
-<div ng-show="$ctrl.title">
-    <h4 style="margin: 3px 0px 3px 10px;">{{$ctrl.title}}</h4>
-</div>
 <div ng-hide="$ctrl.treeSpin">
     <ul class="nav nav-list nav-pills nav-stacked abn-tree">
         <li ng-repeat="row in $ctrl.treeRows track by row.branch.uid" ng-show="$ctrl.types.includes(row.branch.type) && $ctrl.treeFilter(row, $ctrl.options.search)"

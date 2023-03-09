@@ -1,5 +1,9 @@
 import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane'
-import { StateService, TransitionService } from '@uirouter/angularjs'
+import {
+    StateService,
+    TransitionService,
+    UIRouterGlobals,
+} from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
@@ -81,6 +85,7 @@ class FullDocumentController implements IComponentController {
         '$scope',
         '$element',
         '$state',
+        '$uiRouterGlobals',
         '$transitions',
         '$anchorScroll',
         '$location',
@@ -106,6 +111,7 @@ class FullDocumentController implements IComponentController {
         private $scope: angular.IScope,
         private $element: JQuery<HTMLElement>,
         private $state: StateService,
+        private $uiRouterGlobals: UIRouterGlobals,
         private $transitions: TransitionService,
         private $anchorScroll: angular.IAnchorScrollService,
         private $location: angular.ILocationService,
@@ -363,13 +369,14 @@ class FullDocumentController implements IComponentController {
         // Send view to kick off tree compilation
         const data = {
             rootOb: this.$state.includes('**.portal.**')
-                ? null
+                ? this.mmsProject.id
                 : this.mmsDocument.id,
             elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
             commitId: 'latest',
             projectId: this.mmsProject.id,
             refId: this.mmsRef.id,
             refType: this.mmsRef.type,
+            refresh: this.$uiRouterGlobals.transition.$from().name === '',
         }
 
         this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(

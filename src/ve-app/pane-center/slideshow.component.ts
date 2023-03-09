@@ -433,13 +433,14 @@ class SlideshowController implements angular.IComponentController {
         if (this.$state.includes('main.project.ref')) {
             const data = {
                 rootId: this.$state.includes('**.portal.**')
-                    ? null
+                    ? this.mmsProject.id
                     : this.mmsDocument.id,
                 elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
                 commitId: 'latest',
                 projectId: this.mmsProject.id,
                 refId: this.mmsRef.id,
                 refType: this.mmsRef.type,
+                refresh: this.$uiRouterGlobals.transition.from().name === '',
             }
             this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
                 'view.selected',

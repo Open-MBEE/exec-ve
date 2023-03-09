@@ -232,7 +232,7 @@ const SpecReorderComponent: VeComponentOptions = {
 </script>
 <div class="container-tree-reorder">
     <h4 class="right-pane-title">Reorder specs</h4>
-    <hr class="spec-title-divider">
+    <hr class="right-title-divider">
     <div ng-show="!$ctrl.elementReferenceTree || $ctrl.elementReferenceTree.length == 0">View specs loading or unavailable
     </div>
     <div ng-show="elementReferenceTree && elementReferenceTree.length > 0"><b>Bold</b> view specs are reorderable</div>

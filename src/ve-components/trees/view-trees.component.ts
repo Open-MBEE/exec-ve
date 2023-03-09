@@ -126,7 +126,7 @@ class ViewTreesController implements IComponentController {
     } = {}
 
     protected errorType: string
-    private bbSize: string
+    private headerSize: string
     private
     protected squishSize: number = 250
 
@@ -134,6 +134,7 @@ class ViewTreesController implements IComponentController {
 
     public filterInputPlaceholder: string
     public treeSearch: string
+    private spin: boolean = true
 
     protected $globalTree: JQuery
     protected $presentTree: JQuery
@@ -187,7 +188,7 @@ class ViewTreesController implements IComponentController {
         this.buttonId = this.buttonId ? this.buttonId : 'tree-button-bar'
         this.toolbarId = this.toolbarId ? this.toolbarId : 'toolbar'
 
-        this.bbSize = '83px'
+        this.headerSize = '93px'
 
         // Initialize button-bar event listeners
         this.subs.push(
@@ -284,7 +285,7 @@ class ViewTreesController implements IComponentController {
         const newTree =
             this.treesCategory === 'portal'
                 ? 'tree-of-documents'
-                : 'tree-of-views'
+                : 'tree-of-contents'
         const inspect: IToolBarButton =
             this.toolbarSvc.getToolbarButton(newTree)
 
@@ -884,41 +885,43 @@ class ViewTreesController implements IComponentController {
     }): void => {
         if (!this.currentTree) {
             this.currentTree = ''
-
-            if (this.currentTree !== data.id) {
-                switch (this.treesCategory) {
-                    case 'present': {
-                        this.filterInputPlaceholder = 'Filter document contents'
-                        break
-                    }
-                    case 'portal': {
-                        this.filterInputPlaceholder = 'Filter groups/docs'
-                        break
-                    }
-                    default: {
-                        this.filterInputPlaceholder = 'Filter tree data'
-                    }
+        }
+        if (this.currentTree !== data.id) {
+            switch (this.treesCategory) {
+                case 'present': {
+                    this.filterInputPlaceholder = 'Filter document contents'
+                    break
                 }
-                if (this.currentTree !== '') {
-                    this.show[_.camelCase(this.currentTree)] = false
+                case 'portal': {
+                    this.filterInputPlaceholder = 'Filter groups/docs'
+                    break
                 }
-                this.currentTree = data.id
-                const inspect: IToolBarButton =
-                    this.toolbarSvc.getToolbarButton(data.id)
-                if (!data.title) {
-                    data.title = inspect.tooltip
-                }
-                if (!data.category) {
-                    data.category = inspect.category
-                }
-                if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
-                    this.startTree(data.id, data.category)
-                    this.show[_.camelCase(data.id)] = true
-                } else {
-                    this.show[_.camelCase(data.id)] = true
+                default: {
+                    this.filterInputPlaceholder = 'Filter tree data'
                 }
             }
+            if (this.currentTree !== '') {
+                this.show[_.camelCase(this.currentTree)] = false
+            }
+            this.currentTree = data.id
+            const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(
+                data.id
+            )
+
+            if (!data.category) {
+                data.category = inspect.category
+            }
+
+            this.currentTitle = data.title ? data.title : inspect.tooltip
+
+            if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
+                this.startTree(data.id, data.category)
+                this.show[_.camelCase(data.id)] = true
+            } else {
+                this.show[_.camelCase(data.id)] = true
+            }
         }
+
         if (!this.bbApi) {
             this.bbApi = this.buttonBarSvc.initApi(
                 this.buttonId,
@@ -931,8 +934,18 @@ class ViewTreesController implements IComponentController {
                     this.bbApi.WRAP_EVENT,
                     (data: ButtonWrapEvent) => {
                         if (data.oldSize != data.newSize) {
-                            const calcSize = Math.round(data.newSize + 47.5 + 5)
-                            this.bbSize = calcSize.toString(10) + 'px'
+                            const title = $('.tree-view-title')
+                            const titleSize =
+                                title.outerHeight() +
+                                parseInt(title.css('marginTop')) +
+                                parseInt(title.css('marginBottom'))
+                            const treeOptions = $('.tree-options').outerHeight()
+                            const buttonSize =
+                                $('.tree-view-buttons').outerHeight()
+                            const calcSize = Math.round(
+                                titleSize + treeOptions + buttonSize
+                            )
+                            this.headerSize = calcSize.toString(10) + 'px'
                             this.$scope.$apply()
                         }
                     }
@@ -947,7 +960,7 @@ class ViewTreesController implements IComponentController {
         const newTree: JQuery = $(
             '<div id="' +
                 treeId +
-                '" class="container-fluid" ng-show="$ctrl.show.' +
+                '" ng-show="$ctrl.show.' +
                 treeId +
                 '"></div>'
         )
@@ -977,15 +990,20 @@ class ViewTreesController implements IComponentController {
         }
 
         this.$compile(newTree)(this.$scope)
+        this.spin = false
     }
 }
 
 const ViewTreesComponent: VeComponentOptions = {
     selector: 'viewTrees',
     template: `
-    <ng-pane pane-anchor="north" pane-size="{{ $ctrl.bbSize }}" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
-    <div class="pane-left">
-        <div class="pane-left-buttons" role="toolbar">
+<ng-pane pane-anchor="north" pane-size="{{ $ctrl.headerSize }}" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
+    <div class="tree-view">
+        <div class="container-fluid">
+            <h4 class="tree-view-title">{{$ctrl.currentTitle}}</h4>
+        </div>
+        <hr class="tree-title-divider">
+        <div class="tree-view-buttons" role="toolbar">
             <button-bar button-api="$ctrl.bbApi"></button-bar>
         </div>
         <div class="tree-options">
@@ -1006,14 +1024,15 @@ const ViewTreesComponent: VeComponentOptions = {
     </div>
 </ng-pane>
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
-    <div class="pane-left" style="display:table;">
-        <div id="trees" class="container-fluid">
+    <div class="tree-view" style="display:table;">
+        <div ng-hide="$ctrl.spin" id="trees" class="container-fluid">
             <div id="present-trees" ng-show="$ctrl.treesCategory === 'present'"></div>
             <div id="portal-trees" ng-show="$ctrl.treesCategory === 'portal'"></div>
             <div id="global-trees"></div>
         </div>
         <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>
     </div>
+    <i ng-show="$ctrl.spin" class="tree-spinner fa fa-2x fa-spinner fa-spin"></i>
 </ng-pane>
 `,
     bindings: {

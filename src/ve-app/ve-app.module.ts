@@ -712,12 +712,19 @@ veApp.config([
                 url: '/manage',
             })
             .state('main.project.ref.present', {
-                url: '/documents/:documentId?viewId',
+                url: '/documents/:documentId?viewId&display',
                 params: {
                     viewId: {
                         inherit: true,
                         type: 'string',
                         value: null,
+                        squash: true,
+                        raw: true,
+                    },
+                    display: {
+                        inherit: true,
+                        type: 'string',
+                        value: 'slideshow',
                         squash: true,
                         raw: true,
                     },
@@ -776,6 +783,41 @@ veApp.config([
                     ],
                 },
                 views: {
+                    'banner-top@main': {
+                        component: 'systemBanner',
+                        bindings: {
+                            mmsBanner: 'bannerOb',
+                        },
+                    },
+                    'nav@main': {
+                        component: 'navBar',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            mmsOrgs: 'orgObs',
+                            mmsProject: 'projectOb',
+                            mmsProjects: 'projectObs',
+                            mmsRef: 'refOb',
+                        },
+                    },
+                    'menu@main': {
+                        component: 'mainMenu',
+                        bindings: {
+                            mmsProject: 'projectOb',
+                            mmsProjects: 'projectObs',
+                            mmsGroup: 'groupOb',
+                            mmsGroups: 'groupObs',
+                            mmsRef: 'refOb',
+                            mmsRefs: 'refObs',
+                            mmsDocument: 'documentOb',
+                            mmsView: 'viewOb',
+                        },
+                    },
+                    'banner-bottom@main': {
+                        component: 'systemFooter',
+                        bindings: {
+                            mmsFooter: 'footerOb',
+                        },
+                    },
                     'pane-center@main': {
                         component: 'slideshow',
                         bindings: {

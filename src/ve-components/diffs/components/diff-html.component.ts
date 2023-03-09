@@ -10,7 +10,7 @@ import { HtmlRenderedDiff } from '../../../lib/html-rendered-diff'
 
 class DiffHtmlController extends Diff<string> implements IDiff<string> {
     private htmlRenderedDiff: HtmlRenderedDiff
-    htmlDiffIdPrefix: string = 'htmlDiff-'
+    htmlDiffIdPrefix: string = 'html-diff-'
     htmlDiffId: string
     diffResult: string
 

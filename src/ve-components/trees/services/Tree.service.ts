@@ -875,6 +875,7 @@ export class TreeService {
                 addBranchData(1, [], branch, true, {})
             })
             this.eventSvc.resolve(TreeService.events.UPDATED, true)
+            this.eventSvc.$broadcast('tree.ready')
             resolve()
         })
     }

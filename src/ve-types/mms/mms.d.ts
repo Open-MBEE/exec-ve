@@ -110,6 +110,7 @@ export interface ParamsObject {
     field?: string
     fromLogin?: boolean
     '#'?: string
+    display?: string
     [param: string]: string
 }
 
