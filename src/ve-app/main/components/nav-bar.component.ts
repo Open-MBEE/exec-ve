@@ -77,7 +77,7 @@ class NavBarController implements angular.IComponentController {
         this.org = this.mmsOrg
 
         this.subs.push(
-            this.eventSvc.$on(
+            this.eventSvc.binding(
                 this.rootScopeSvc.constants.VESHOWSEARCH,
                 (data: boolean) => {
                     this.showSearch = data

@@ -141,7 +141,7 @@ class SlideshowController implements angular.IComponentController {
         this.initView()
 
         this.subs.push(
-            this.eventSvc.$on<boolean>(
+            this.eventSvc.binding<boolean>(
                 this.rootScopeSvc.constants.VEVIEWCONTENTLOADING,
                 (newValue) => {
                     this.viewContentLoading = newValue

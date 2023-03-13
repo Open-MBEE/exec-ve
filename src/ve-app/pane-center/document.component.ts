@@ -177,7 +177,7 @@ class FullDocumentController implements IComponentController {
         })
 
         this.subs.push(
-            this.eventSvc.$on<boolean>(
+            this.eventSvc.binding<boolean>(
                 this.rootScopeSvc.constants.VEVIEWCONTENTLOADING,
                 (data) => {
                     this.viewContentLoading = data

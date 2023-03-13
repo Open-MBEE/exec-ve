@@ -106,7 +106,7 @@ const RedirectComponent: VeComponentOptions = {
 
             this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld()
             this.subs.push(
-                this.eventSvc.$on(
+                this.eventSvc.binding(
                     this.rootScopeSvc.constants.VEREDIRECTFROMOLD,
                     (data: boolean) => {
                         this.redirect_from_old = data

@@ -158,7 +158,7 @@ const MainComponent: VeComponentOptions = {
             this.rootScopeSvc.veEditMode(false)
 
             this.subs.push(
-                this.eventSvc.$on(
+                this.eventSvc.binding(
                     this.rootScopeSvc.constants.VETITLE,
                     (value: string) => {
                         this.$window.document.title = value + ' | View Editor'
@@ -167,7 +167,7 @@ const MainComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on(
+                this.eventSvc.binding(
                     this.rootScopeSvc.constants.VESHOWLOGIN,
                     (value: boolean) => {
                         this.showLogin = value
@@ -176,7 +176,7 @@ const MainComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on(
+                this.eventSvc.binding(
                     this.rootScopeSvc.constants.VESHOWMANAGEREFS,
                     (value: boolean) => {
                         this.showManageRefs = value
@@ -185,7 +185,7 @@ const MainComponent: VeComponentOptions = {
             )
 
             this.subs.push(
-                this.eventSvc.$on(
+                this.eventSvc.binding(
                     this.rootScopeSvc.constants.VEHIDEPANES,
                     (value: boolean) => {
                         this.hidePanes = value
