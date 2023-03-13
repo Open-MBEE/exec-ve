@@ -218,140 +218,135 @@ class FullDocumentController implements IComponentController {
 
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
-            switch (data.clicked) {
-                case 'show-comments':
-
-                this.bbApi.toggleButtonState(
-                    'show-comments',
-                    this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn()
-                )
-
-                )
-                    return
-
-
-        case 'show-elements':
-                this.bbApi.toggleButtonState(
-                    'show-elements',
-                    this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn()
-                    )
-                )
-                this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn()
-                )
-                if (
-                    !this.rootScopeSvc.veElementsOn() &&
-                    this.rootScopeSvc.veEditMode()
-                ) {
-                    this.eventSvc.$broadcast('show-edits', false)
-                }
-                return
-
-        case 'show-edits':
-                this.bbApi.toggleButtonState(
-                    'show-edits',
-                    data != null ? data : null
-                )
-                this.rootScopeSvc.veEditMode(
-                    data != null ? data : !this.rootScopeSvc.veEditMode()
-                )
-                if (
-                    (this.rootScopeSvc.veElementsOn() &&
-                        !this.rootScopeSvc.veEditMode()) ||
-                    (!this.rootScopeSvc.veElementsOn() &&
-                        this.rootScopeSvc.veEditMode())
-                ) {
-                    this.eventSvc.$broadcast(
-                        'show-elements',
-                        this.rootScopeSvc.veEditMode()
-                    )
-                }
-
-
-        case 'convert-pdf':
-                this.fullDocumentApi.loadRemainingViews(() => {
-                    this.appUtilsSvc
-                        .printModal(
-                            angular.element('#print-div'),
-                            this.mmsDocument,
-                            this.mmsRef,
-                            true,
-                            3
+                switch (data.clicked) {
+                    case 'show-comments':
+                        this.bbApi.toggleButtonState(
+                            'show-comments',
+                            this.rootScopeSvc.veCommentsOn(
+                                !this.rootScopeSvc.veCommentsOn()
+                            )
                         )
-                        .then(
-                            (ob) => {
-                                this.growl.info(
-                                    'Exporting as PDF file. Please wait for a completion email.',
-                                    { ttl: -1 }
-                                )
-                            },
-                            (reason) => {
-                                this.growl.error(
-                                    'Exporting as PDF file Failed: ' +
-                                        reason.message
-                                )
-                            }
+                        return
+
+                    case 'show-elements':
+                        this.bbApi.toggleButtonState(
+                            'show-elements',
+                            this.rootScopeSvc.veElementsOn(
+                                !this.rootScopeSvc.veElementsOn()
+                            )
                         )
-                })
-
-
-        case 'print':
-                this.fullDocumentApi.loadRemainingViews(() => {
-                    void this.appUtilsSvc.printModal(
-                        angular.element('#print-div'),
-                        this.mmsDocument,
-                        this.mmsRef,
-                        true,
-                        1
-                    )
-                })
-
-
-        case 'word':
-                this.fullDocumentApi.loadRemainingViews(() => {
-                    this.appUtilsSvc
-                        .printModal(
-                            angular.element('#print-div'),
-                            this.mmsDocument,
-                            this.mmsRef,
-                            true,
-                            2
-                        )
-                        .then(
-                            (ob) => {
-                                this.growl.info(
-                                    'Exporting as Word file. Please wait for a completion email.',
-                                    { ttl: -1 }
-                                )
-                            },
-                            (reason) => {
-                                this.growl.error(
-                                    'Exporting as Word file Failed: ' +
-                                        reason.message
-                                )
-                            }
-                        )
-                })
-
-
-        case 'tabletocsv':
-                this.fullDocumentApi.loadRemainingViews(() => {
-                    this.appUtilsSvc.tableToCsv(
-                        angular.element('#print-div'),
-                        true
-                    )
-                })
-
-
-        case 'refresh-numbering':
-                this.fullDocumentApi.loadRemainingViews(() => {
-                    this.views.forEach((view) => {
-                        if (this.treeSvc.branch2viewNumber[view.id]) {
-                            view.number =
-                                this.treeSvc.branch2viewNumber[view.id]
+                        if (
+                            !this.rootScopeSvc.veElementsOn() &&
+                            this.rootScopeSvc.veEditMode()
+                        ) {
+                            this.bbApi.toggleButtonState('show-edits', false)
+                            this.rootScopeSvc.veEditMode(false)
                         }
-                    })
-                })
-}
+                        return
+
+                    case 'show-edits':
+                        this.bbApi.toggleButtonState(
+                            'show-edits',
+                            this.rootScopeSvc.veEditMode(
+                                !this.rootScopeSvc.veEditMode()
+                            )
+                        )
+                        if (
+                            this.rootScopeSvc.veElementsOn() !==
+                            this.rootScopeSvc.veEditMode()
+                        ) {
+                            this.bbApi.toggleButtonState(
+                                'show-elements',
+                                this.rootScopeSvc.veEditMode()
+                            )
+                            this.rootScopeSvc.veElementsOn(
+                                this.rootScopeSvc.veEditMode()
+                            )
+                        }
+
+                    case 'convert-pdf':
+                        this.fullDocumentApi.loadRemainingViews(() => {
+                            this.appUtilsSvc
+                                .printModal(
+                                    angular.element('#print-div'),
+                                    this.mmsDocument,
+                                    this.mmsRef,
+                                    true,
+                                    3
+                                )
+                                .then(
+                                    (ob) => {
+                                        this.growl.info(
+                                            'Exporting as PDF file. Please wait for a completion email.',
+                                            { ttl: -1 }
+                                        )
+                                    },
+                                    (reason) => {
+                                        this.growl.error(
+                                            'Exporting as PDF file Failed: ' +
+                                                reason.message
+                                        )
+                                    }
+                                )
+                        })
+
+                    case 'print':
+                        this.fullDocumentApi.loadRemainingViews(() => {
+                            void this.appUtilsSvc.printModal(
+                                angular.element('#print-div'),
+                                this.mmsDocument,
+                                this.mmsRef,
+                                true,
+                                1
+                            )
+                        })
+
+                    case 'word':
+                        this.fullDocumentApi.loadRemainingViews(() => {
+                            this.appUtilsSvc
+                                .printModal(
+                                    angular.element('#print-div'),
+                                    this.mmsDocument,
+                                    this.mmsRef,
+                                    true,
+                                    2
+                                )
+                                .then(
+                                    (ob) => {
+                                        this.growl.info(
+                                            'Exporting as Word file. Please wait for a completion email.',
+                                            { ttl: -1 }
+                                        )
+                                    },
+                                    (reason) => {
+                                        this.growl.error(
+                                            'Exporting as Word file Failed: ' +
+                                                reason.message
+                                        )
+                                    }
+                                )
+                        })
+
+                    case 'tabletocsv':
+                        this.fullDocumentApi.loadRemainingViews(() => {
+                            this.appUtilsSvc.tableToCsv(
+                                angular.element('#print-div'),
+                                true
+                            )
+                        })
+
+                    case 'refresh-numbering':
+                        this.fullDocumentApi.loadRemainingViews(() => {
+                            this.views.forEach((view) => {
+                                if (this.treeSvc.branch2viewNumber[view.id]) {
+                                    view.number =
+                                        this.treeSvc.branch2viewNumber[view.id]
+                                }
+                            })
+                        })
+                }
+            })
+        )
 
         this.subs.push(
             this.eventSvc.$on(TreeService.events.UPDATED, () => {

@@ -19,6 +19,7 @@ export class RootScopeService {
         VEREDIRECTFROMOLD: 've-redirect-old',
         VECRUSHURL: 've-crush-url',
         VECOMMENTSON: 've-comments-on',
+        VENUMBERINGON: 've-numbering-on',
         VEFULLDOCMODE: 've-full-doc-mode',
         VEELEMENTSON: 've-elements-on',
         VEEDITMODE: 've-edit-mode',
@@ -130,7 +131,7 @@ export class RootScopeService {
 
     veNumberingOn(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
-            this.constants.VECOMMENTSON,
+            this.constants.VENUMBERINGON,
             value,
             true,
             true

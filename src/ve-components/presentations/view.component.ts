@@ -1,6 +1,5 @@
 import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
 import { TreeService } from '@ve-components/trees'
-import { veCoreEvents } from '@ve-core/events'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import {
@@ -150,32 +149,28 @@ export class ViewController implements angular.IComponentController {
         this.showEdits = false
 
         this.subs.push(
-            this.eventSvc.$on<veCoreEvents.buttonClicked>(
-                this.buttonId,
+            this.eventSvc.binding<boolean>(
+                this.rootScopeSvc.constants.VEELEMENTSON,
                 (data) => {
-                    switch (data.clicked) {
-                        case 'show-comments':
-                            this.toggleShowComments()
-                            break
-                        case 'show-elements':
-                            this.toggleShowElements()
-                            break
-                        case 'show-edits':
-                            if (
-                                (this.rootScopeSvc.veElementsOn() &&
-                                    this.rootScopeSvc.veEditMode()) ||
-                                (!this.rootScopeSvc.veElementsOn() &&
-                                    !this.rootScopeSvc.veEditMode())
-                            ) {
-                                this.toggleShowElements()
-                            }
-                            this.toggleShowEdits()
-                            break
-                        case 'show-numbering':
-                            this.showNumbering =
-                                this.rootScopeSvc.veNumberingOn()
-                            break
-                    }
+                    this.toggleShowElements(data)
+                }
+            ),
+            this.eventSvc.binding<boolean>(
+                this.rootScopeSvc.constants.VECOMMENTSON,
+                (data) => {
+                    this.toggleShowComments(data)
+                }
+            ),
+            this.eventSvc.binding<boolean>(
+                this.rootScopeSvc.constants.VENUMBERINGON,
+                (data) => {
+                    this.showNumbering = data
+                }
+            ),
+            this.eventSvc.binding<boolean>(
+                this.rootScopeSvc.constants.VEEDITMODE,
+                (data) => {
+                    this.toggleShowEdits(data)
                 }
             )
         )
