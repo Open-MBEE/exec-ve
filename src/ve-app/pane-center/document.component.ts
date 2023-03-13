@@ -21,6 +21,7 @@ import {
     ButtonBarApi,
     ButtonBarService,
 } from '@ve-core/button-bar'
+import { veCoreEvents } from '@ve-core/events'
 import {
     RootScopeService,
     ShortUrlService,
@@ -135,7 +136,14 @@ class FullDocumentController implements IComponentController {
 
     $onInit(): void {
         this.rootScopeSvc.veFullDocMode(true)
+        this.rootScopeSvc.veCommentsOn(false)
+        this.rootScopeSvc.veEditMode(false)
+        this.rootScopeSvc.veElementsOn(false)
+        this.rootScopeSvc.veNumberingOn(true)
         this.eventSvc.$init(this)
+
+        //Init/Reset Tree Updated Subject
+        this.eventSvc.resolve(TreeService.events.UPDATED, false)
 
         this.bbApi = this.buttonBarSvc.initApi(
             this.bbId,
@@ -209,25 +217,26 @@ class FullDocumentController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on('show-comments', (data?: boolean) => {
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
+            switch (data.clicked) {
+                case 'show-comments':
+
                 this.bbApi.toggleButtonState(
                     'show-comments',
-                    data != null ? data : null
+                    this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn()
                 )
-                this.rootScopeSvc.veCommentsOn(
-                    data != null ? data : !this.rootScopeSvc.veCommentsOn()
-                )
-            })
-        )
 
-        this.subs.push(
-            this.eventSvc.$on('show-elements', (data?: boolean) => {
+                )
+                    return
+
+
+        case 'show-elements':
                 this.bbApi.toggleButtonState(
                     'show-elements',
-                    data != null ? data : null
+                    this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn()
+                    )
                 )
-                this.rootScopeSvc.veElementsOn(
-                    data != null ? data : !this.rootScopeSvc.veElementsOn()
+                this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn()
                 )
                 if (
                     !this.rootScopeSvc.veElementsOn() &&
@@ -235,11 +244,9 @@ class FullDocumentController implements IComponentController {
                 ) {
                     this.eventSvc.$broadcast('show-edits', false)
                 }
-            })
-        )
+                return
 
-        this.subs.push(
-            this.eventSvc.$on('show-edits', (data?: boolean) => {
+        case 'show-edits':
                 this.bbApi.toggleButtonState(
                     'show-edits',
                     data != null ? data : null
@@ -258,18 +265,9 @@ class FullDocumentController implements IComponentController {
                         this.rootScopeSvc.veEditMode()
                     )
                 }
-            })
-        )
 
-        if (this.rootScopeSvc.veCommentsOn())
-            this.eventSvc.$broadcast('show-comments', false)
-        if (this.rootScopeSvc.veElementsOn())
-            this.eventSvc.$broadcast('show-elements', false)
-        if (this.rootScopeSvc.veEditMode())
-            this.eventSvc.$broadcast('show-edits', false)
 
-        this.subs.push(
-            this.eventSvc.$on('convert-pdf', () => {
+        case 'convert-pdf':
                 this.fullDocumentApi.loadRemainingViews(() => {
                     this.appUtilsSvc
                         .printModal(
@@ -294,11 +292,9 @@ class FullDocumentController implements IComponentController {
                             }
                         )
                 })
-            })
-        )
 
-        this.subs.push(
-            this.eventSvc.$on('print', () => {
+
+        case 'print':
                 this.fullDocumentApi.loadRemainingViews(() => {
                     void this.appUtilsSvc.printModal(
                         angular.element('#print-div'),
@@ -308,11 +304,9 @@ class FullDocumentController implements IComponentController {
                         1
                     )
                 })
-            })
-        )
 
-        this.subs.push(
-            this.eventSvc.$on('word', () => {
+
+        case 'word':
                 this.fullDocumentApi.loadRemainingViews(() => {
                     this.appUtilsSvc
                         .printModal(
@@ -337,22 +331,30 @@ class FullDocumentController implements IComponentController {
                             }
                         )
                 })
-            })
-        )
 
-        this.subs.push(
-            this.eventSvc.$on('tabletocsv', () => {
+
+        case 'tabletocsv':
                 this.fullDocumentApi.loadRemainingViews(() => {
                     this.appUtilsSvc.tableToCsv(
                         angular.element('#print-div'),
                         true
                     )
                 })
-            })
-        )
+
+
+        case 'refresh-numbering':
+                this.fullDocumentApi.loadRemainingViews(() => {
+                    this.views.forEach((view) => {
+                        if (this.treeSvc.branch2viewNumber[view.id]) {
+                            view.number =
+                                this.treeSvc.branch2viewNumber[view.id]
+                        }
+                    })
+                })
+}
 
         this.subs.push(
-            this.eventSvc.$on('refresh-numbering', () => {
+            this.eventSvc.$on(TreeService.events.UPDATED, () => {
                 this.fullDocumentApi.loadRemainingViews(() => {
                     this.views.forEach((view) => {
                         if (this.treeSvc.branch2viewNumber[view.id]) {
@@ -411,13 +413,22 @@ class FullDocumentController implements IComponentController {
                 combo: 'alt+d',
                 description: 'toggle edit mode',
                 callback: () => {
-                    this.eventSvc.$broadcast('show-edits')
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                        this.bbId,
+                        {
+                            clicked: 'show-edits',
+                        }
+                    )
                 },
             })
         }
-        api.addButton(this.buttonBarSvc.getButtonBarButton('share-url'))
+
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
+        api.setToggleState('show-elements', this.rootScopeSvc.veElementsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
+        api.setToggleState('show-comments', this.rootScopeSvc.veCommentsOn())
+        api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
+        api.setToggleState('show-numbering', !this.rootScopeSvc.veNumberingOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
         const exportButtons: IButtonBarButton =
@@ -430,8 +441,6 @@ class FullDocumentController implements IComponentController {
         )
 
         api.addButton(exportButtons)
-        api.setToggleState('show-comments', this.rootScopeSvc.veCommentsOn())
-        api.setToggleState('show-elements', this.rootScopeSvc.veElementsOn())
 
         this.hotkeys
             .bindTo(this.$scope)
@@ -439,14 +448,24 @@ class FullDocumentController implements IComponentController {
                 combo: 'alt+c',
                 description: 'toggle show comments',
                 callback: () => {
-                    this.eventSvc.$broadcast('show-comments')
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                        this.bbId,
+                        {
+                            clicked: 'show-comments',
+                        }
+                    )
                 },
             })
             .add({
                 combo: 'alt+e',
                 description: 'toggle show elements',
                 callback: () => {
-                    this.eventSvc.$broadcast('show-elements')
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                        this.bbId,
+                        {
+                            clicked: 'show-elements',
+                        }
+                    )
                 },
             })
     }

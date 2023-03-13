@@ -123,7 +123,7 @@ const ButtonBarComponent: VeComponentOptions = {
             )
 
             //Fire backwards compatible click event
-            this.eventSvc.$broadcast(button, e)
+            //this.eventSvc.$broadcast(button, e)
         }
     },
 }

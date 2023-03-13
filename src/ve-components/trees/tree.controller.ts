@@ -3,7 +3,7 @@ import { RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { TreeApi, TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree'
+import { TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree'
 
 /**
  * @ngdoc directive
@@ -97,8 +97,8 @@ export class TreeController implements angular.IComponentController {
     //Bindings
 
     public init: boolean = false
-    private treeApi: TreeApi
-    public treeRows: TreeRow[]
+
+    public treeRows: TreeRow[] = []
     public title
     private selectedBranch: any
     public treeSpin: boolean = true
@@ -139,7 +139,6 @@ export class TreeController implements angular.IComponentController {
     }
 
     $onInit(): void {
-        this.treeApi = this.treeSvc.treeApi
         this.treeFilter = this.$filter('uiTreeFilter')
 
         this.eventSvc.$init(this)
@@ -155,9 +154,7 @@ export class TreeController implements angular.IComponentController {
                 }
             ),
             this.eventSvc.$on<void>(TreeService.events.RELOAD, () => {
-                this.configure().catch((reason) => {
-                    this.growl.error(TreeService.treeError(reason))
-                })
+                this.treeSpin = true
             }),
             this.eventSvc.$on(this.id, () => {
                 if (this.treeSvc.isTreeReady()) {
@@ -193,29 +190,21 @@ export class TreeController implements angular.IComponentController {
 
     configure(): VePromise<void, unknown> {
         this.treeSpin = true
+        this.treeRows = []
         this.setPeVisibility()
         this.preConfig()
+        this.selectedBranch = this.treeSvc.getSelectedBranch()
+
+        this.icons = this.icons ? this.icons : this.treeSvc.defaultIcons
+
+        this.treeSvc.defaultIcon = this.icons.iconDefault
         return new this.$q<void>((resolve, reject) => {
-            this.treeSvc.updateRows(this.id, this.types).then(
-                (result) => {
-                    this.treeRows = result
-                    if (this.treeRows.length > 0) {
-                        this.treeSpin = false
-                    }
-
-                    this.selectedBranch = this.treeSvc.getSelectedBranch()
-
-                    this.icons = this.icons
-                        ? this.icons
-                        : this.treeSvc.defaultIcons
-
-                    this.treeSvc.defaultIcon = this.icons.iconDefault
+            this.treeSvc
+                .updateRows(this.id, this.types, this.treeRows)
+                .then(() => {
+                    this.treeSpin = false
                     resolve()
-                },
-                (reason) => {
-                    reject(reason)
-                }
-            )
+                }, reject)
         })
     }
 
@@ -224,8 +213,8 @@ export class TreeController implements angular.IComponentController {
         e: JQuery.ClickEvent
     ): void => {
         branch.loading = true
-        if (!branch.expanded && this.treeApi.expandCallback) {
-            this.treeApi.expandCallback(branch.data.id, branch, false)
+        if (!branch.expanded && this.treeSvc.treeApi.expandCallback) {
+            this.treeSvc.treeApi.expandCallback(branch.data.id, branch, false)
         }
         if (e) {
             e.stopPropagation()
@@ -257,8 +246,8 @@ export class TreeController implements angular.IComponentController {
                 () => {
                     if (branch.onSelect) {
                         branch.onSelect(branch)
-                    } else if (this.treeApi.onSelect) {
-                        this.treeApi.onSelect(branch)
+                    } else if (this.treeSvc.treeApi.onSelect) {
+                        this.treeSvc.treeApi.onSelect(branch)
                     }
                 },
                 (reason) => {
@@ -278,8 +267,8 @@ export class TreeController implements angular.IComponentController {
                 () => {
                     if (branch.onDblClick) {
                         branch.onDblClick(branch)
-                    } else if (this.treeApi.onDblClick) {
-                        this.treeApi.onDblClick(branch)
+                    } else if (this.treeSvc.treeApi.onDblClick) {
+                        this.treeSvc.treeApi.onDblClick(branch)
                     }
                 },
                 (reason) => {
@@ -314,7 +303,7 @@ export const TreeOfAnyComponent: VeComponentOptions = {
     selector: 'treeOfAny',
     transclude: true,
     template: `
-<div ng-hide="$ctrl.treeSpin">
+<div>
     <ul class="nav nav-list nav-pills nav-stacked abn-tree">
         <li ng-repeat="row in $ctrl.treeRows track by row.branch.uid" ng-show="$ctrl.types.includes(row.branch.type) && $ctrl.treeFilter(row, $ctrl.options.search)"
             ng-class="" class="abn-tree-row level-1">
@@ -322,9 +311,9 @@ export const TreeOfAnyComponent: VeComponentOptions = {
                 <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
                     <div class="tree-item">
                         <i ng-show="!row.branch.loading && row.visibleChild" ng-class="{'active-text': row.branch.selected}" ng-click="$ctrl.expandCallback(row, $event)" class="indented tree-icon {{row.branch.expanded ? $ctrl.icons.iconExpand : $ctrl.icons.iconCollapse}}" ></i>
-                        <i ng-hide="row.branch.loading || row.visibleChild" class="fa fa-lg fa-fw"></i>
-                        <i ng-hide="row.branch.loading" ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.typeIcon}}" ></i>
-                        <i ng-show="row.branch.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
+                        <i ng-hide="row.loading || row.visibleChild" class="fa fa-lg fa-fw"></i>
+                        <i ng-hide="row.loading" ng-class="{'active-text': row.branch.selected}" class="indented tree-icon {{row.typeIcon}}" ></i>
+                        <i ng-show="row.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
                         <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
                     </div>
                 </div>
@@ -332,7 +321,7 @@ export const TreeOfAnyComponent: VeComponentOptions = {
         </li>
     </ul>
 </div>
-<i ng-show="$ctrl.treeSpin" class="fa fa-spin fa-spinner"></i>
+<i ng-show="$ctrl.treeSpin" class="tree-spinner fa fa-spin fa-spinner"></i>
     
 `,
 }

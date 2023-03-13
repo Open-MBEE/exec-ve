@@ -391,8 +391,8 @@ export class ViewService {
         const childAggrs: string[] = []
         const childPropIds: string[] = []
         if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
-            if (!Array.isArray(curItem) && curItem.loading) {
-                curItem.loading = false
+            if (!Array.isArray(curItem)) {
+                curItem.loading = true
             }
             deferred.resolve(curItem)
             return deferred.promise

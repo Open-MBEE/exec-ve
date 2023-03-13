@@ -274,6 +274,43 @@ class ViewTreesController implements IComponentController {
                 }
             )
         )
+
+        this.subs.push(
+            this.eventSvc.$on('tree.ready', () => {
+                if (!this.bbApi) {
+                    this.bbApi = this.buttonBarSvc.initApi(
+                        this.buttonId,
+                        this.bbInit,
+                        this,
+                        trees_default_buttons
+                    )
+                    this.subs.push(
+                        this.eventSvc.$on(
+                            this.bbApi.WRAP_EVENT,
+                            (data: ButtonWrapEvent) => {
+                                if (data.oldSize != data.newSize) {
+                                    const title = $('.tree-view-title')
+                                    const titleSize =
+                                        title.outerHeight() +
+                                        parseInt(title.css('marginTop')) +
+                                        parseInt(title.css('marginBottom'))
+                                    const treeOptions =
+                                        $('.tree-options').outerHeight()
+                                    const buttonSize =
+                                        $('.tree-view-buttons').outerHeight()
+                                    const calcSize = Math.round(
+                                        titleSize + treeOptions + buttonSize
+                                    )
+                                    this.headerSize =
+                                        calcSize.toString(10) + 'px'
+                                    this.$scope.$apply()
+                                }
+                            }
+                        )
+                    )
+                }
+            })
+        )
     }
 
     $postLink(): void {
@@ -921,37 +958,6 @@ class ViewTreesController implements IComponentController {
                 this.show[_.camelCase(data.id)] = true
             }
         }
-
-        if (!this.bbApi) {
-            this.bbApi = this.buttonBarSvc.initApi(
-                this.buttonId,
-                this.bbInit,
-                this,
-                trees_default_buttons
-            )
-            this.subs.push(
-                this.eventSvc.$on(
-                    this.bbApi.WRAP_EVENT,
-                    (data: ButtonWrapEvent) => {
-                        if (data.oldSize != data.newSize) {
-                            const title = $('.tree-view-title')
-                            const titleSize =
-                                title.outerHeight() +
-                                parseInt(title.css('marginTop')) +
-                                parseInt(title.css('marginBottom'))
-                            const treeOptions = $('.tree-options').outerHeight()
-                            const buttonSize =
-                                $('.tree-view-buttons').outerHeight()
-                            const calcSize = Math.round(
-                                titleSize + treeOptions + buttonSize
-                            )
-                            this.headerSize = calcSize.toString(10) + 'px'
-                            this.$scope.$apply()
-                        }
-                    }
-                )
-            )
-        }
     }
 
     private startTree = (id: string, category: string): void => {
@@ -990,7 +996,6 @@ class ViewTreesController implements IComponentController {
         }
 
         this.$compile(newTree)(this.$scope)
-        this.spin = false
     }
 }
 
@@ -1003,7 +1008,8 @@ const ViewTreesComponent: VeComponentOptions = {
             <h4 class="tree-view-title">{{$ctrl.currentTitle}}</h4>
         </div>
         <hr class="tree-title-divider">
-        <div class="tree-view-buttons" role="toolbar">
+        <i ng-hide="$ctrl.bbApi" class="fa fa-spinner fa-spin" style="margin: 5px 50%"></i>
+        <div ng-show="$ctrl.bbApi" class="tree-view-buttons" role="toolbar">
             <button-bar button-api="$ctrl.bbApi"></button-bar>
         </div>
         <div class="tree-options">
@@ -1025,14 +1031,13 @@ const ViewTreesComponent: VeComponentOptions = {
 </ng-pane>
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
     <div class="tree-view" style="display:table;">
-        <div ng-hide="$ctrl.spin" id="trees" class="container-fluid">
+        <div id="trees" class="container-fluid">
             <div id="present-trees" ng-show="$ctrl.treesCategory === 'present'"></div>
             <div id="portal-trees" ng-show="$ctrl.treesCategory === 'portal'"></div>
             <div id="global-trees"></div>
         </div>
         <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>
     </div>
-    <i ng-show="$ctrl.spin" class="tree-spinner fa fa-2x fa-spinner fa-spin"></i>
 </ng-pane>
 `,
     bindings: {

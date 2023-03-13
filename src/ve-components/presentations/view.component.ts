@@ -1,5 +1,6 @@
 import { PresentationService } from '@ve-components/presentations/services/Presentation.service'
 import { TreeService } from '@ve-components/trees'
+import { veCoreEvents } from '@ve-core/events'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import {
@@ -81,6 +82,7 @@ export class ViewController implements angular.IComponentController {
     public mmsViewApi: ViewApi
     private mmsNumber: number
     public noTitle: boolean
+    public buttonId: string
 
     static $inject = [
         '$element',
@@ -148,35 +150,34 @@ export class ViewController implements angular.IComponentController {
         this.showEdits = false
 
         this.subs.push(
-            this.eventSvc.$on('show-comments', () => {
-                this.toggleShowComments()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('show-elements', () => {
-                this.toggleShowElements()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('show-edits', () => {
-                if (
-                    (this.rootScopeSvc.veElementsOn() &&
-                        this.rootScopeSvc.veEditMode()) ||
-                    (!this.rootScopeSvc.veElementsOn() &&
-                        !this.rootScopeSvc.veEditMode())
-                ) {
-                    this.toggleShowElements()
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(
+                this.buttonId,
+                (data) => {
+                    switch (data.clicked) {
+                        case 'show-comments':
+                            this.toggleShowComments()
+                            break
+                        case 'show-elements':
+                            this.toggleShowElements()
+                            break
+                        case 'show-edits':
+                            if (
+                                (this.rootScopeSvc.veElementsOn() &&
+                                    this.rootScopeSvc.veEditMode()) ||
+                                (!this.rootScopeSvc.veElementsOn() &&
+                                    !this.rootScopeSvc.veEditMode())
+                            ) {
+                                this.toggleShowElements()
+                            }
+                            this.toggleShowEdits()
+                            break
+                        case 'show-numbering':
+                            this.showNumbering =
+                                this.rootScopeSvc.veNumberingOn()
+                            break
+                    }
                 }
-                this.toggleShowEdits()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('show-numbering', (data?: boolean) => {
-                this.showNumbering = this.rootScopeSvc.veNumberingOn()
-            })
+            )
         )
 
         this.subs.push(
@@ -464,6 +465,7 @@ export const ViewComponent: VeComponentOptions = {
         mmsViewApi: '<',
         mmsNumber: '@',
         noTitle: '@',
+        buttonId: '<',
     },
     controller: ViewController,
 }

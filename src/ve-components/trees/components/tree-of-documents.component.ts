@@ -50,7 +50,7 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
 <div ng-show="$ctrl.title">
     <h4 style="margin: 3px 0px 3px 10px;">{{$ctrl.title}}</h4>
 </div>
-<div ng-hide="$ctrl.treeSpin">
+<div>
     <ul class="nav nav-list nav-pills nav-stacked abn-tree">
         <li ng-repeat="row in $ctrl.treeRows | filter:{visible:true} track by row.branch.uid" ng-hide="!$ctrl.treeFilter(row, $ctrl.options.search)"
             ng-class="" class="abn-tree-row {{ 'level-' + row.level }}">
@@ -68,7 +68,7 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
         </li>
     </ul>
 </div>
-<i ng-show="$ctrl.treeSpin" class="fa fa-spin fa-spinner"></i>
+<i ng-show="$ctrl.treeSpin" class="tree-spinner fa fa-spin fa-spinner"></i>
     
 `,
     controller: TreeOfDocumentsController,

@@ -30,7 +30,6 @@ export class RootScopeService {
         TREEINITIALSELECTION: 'tree-initialSelection',
         TREEICONS: 'tree-icons',
         LEFTPANECLOSED: 'tree-pane-closed',
-        DELETEKEY: this.sessionSvc.constants.DELETEKEY,
     }
 
     static $inject = ['SessionService']
@@ -124,7 +123,8 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VECOMMENTSON,
             value,
-            false
+            false,
+            true
         )
     }
 
@@ -132,6 +132,7 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VECOMMENTSON,
             value,
+            true,
             true
         )
     }
@@ -140,12 +141,18 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VEELEMENTSON,
             value,
-            false
+            false,
+            true
         )
     }
 
     veEditMode(value?: boolean | undefined): boolean {
-        return this.sessionSvc.accessor(this.constants.VEEDITMODE, value, false)
+        return this.sessionSvc.accessor(
+            this.constants.VEEDITMODE,
+            value,
+            false,
+            true
+        )
     }
 
     veHidePanes(value?: boolean | undefined): boolean {

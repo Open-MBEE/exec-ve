@@ -10,6 +10,7 @@ import {
     ButtonBarApi,
     ButtonBarService,
 } from '@ve-core/button-bar'
+import { veCoreEvents } from '@ve-core/events'
 import {
     RootScopeService,
     ShortUrlService,
@@ -134,6 +135,9 @@ class SlideshowController implements angular.IComponentController {
             pane_center_buttons
         )
 
+        //Init/Reset Tree Updated Subject
+        this.eventSvc.resolve(TreeService.events.UPDATED, false)
+
         this.initView()
 
         this.subs.push(
@@ -144,9 +148,6 @@ class SlideshowController implements angular.IComponentController {
                 }
             )
         )
-
-        //Reset Tree Updated Subject
-        this.eventSvc.resolve(TreeService.events.UPDATED, false)
 
         //Subscribe to Tree Updated Subject
         this.subs.push(
@@ -166,220 +167,206 @@ class SlideshowController implements angular.IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on('show-comments', (data?: boolean) => {
-                this.bbApi.toggleButtonState(
-                    'show-comments',
-                    this.rootScopeSvc.veCommentsOn(
-                        data != null ? data : !this.rootScopeSvc.veCommentsOn()
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
+                if (data.clicked === 'show-comments') {
+                    this.bbApi.toggleButtonState(
+                        'show-comments',
+                        this.rootScopeSvc.veCommentsOn(
+                            !this.rootScopeSvc.veCommentsOn()
+                        )
                     )
-                )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('show-numbering', (data?: boolean) => {
-                this.bbApi.toggleButtonState(
-                    'show-numbering',
-                    !this.rootScopeSvc.veNumberingOn(
-                        data != null ? data : !this.rootScopeSvc.veNumberingOn()
+                    return
+                } else if (data.clicked === 'show-numbering') {
+                    this.bbApi.toggleButtonState(
+                        'show-numbering',
+                        !this.rootScopeSvc.veNumberingOn(
+                            !this.rootScopeSvc.veNumberingOn()
+                        )
                     )
-                )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('show-elements', (data?: boolean) => {
-                this.bbApi.toggleButtonState(
-                    'show-elements',
-                    this.rootScopeSvc.veElementsOn(
-                        data != null ? data : !this.rootScopeSvc.veElementsOn()
-                    )
-                )
-
-                if (
-                    !this.rootScopeSvc.veElementsOn() &&
-                    this.rootScopeSvc.veEditMode()
-                ) {
-                    this.eventSvc.$broadcast('show-edits', false)
-                }
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('show-edits', (data?: boolean) => {
-                this.bbApi.toggleButtonState(
-                    'show-edits',
-                    data != null ? data : null
-                )
-                this.rootScopeSvc.veEditMode(
-                    data != null ? data : !this.rootScopeSvc.veEditMode()
-                )
-                if (
-                    (this.rootScopeSvc.veElementsOn() &&
-                        !this.rootScopeSvc.veEditMode()) ||
-                    (!this.rootScopeSvc.veElementsOn() &&
-                        this.rootScopeSvc.veEditMode())
-                ) {
-                    this.eventSvc.$broadcast(
+                    return
+                } else if (data.clicked === 'show-elements') {
+                    this.bbApi.toggleButtonState(
                         'show-elements',
+                        this.rootScopeSvc.veElementsOn(
+                            !this.rootScopeSvc.veElementsOn()
+                        )
+                    )
+
+                    if (
+                        !this.rootScopeSvc.veElementsOn() &&
                         this.rootScopeSvc.veEditMode()
+                    ) {
+                        this.eventSvc.$broadcast('show-edits', false)
+                    }
+                    return
+                } else if (data.clicked === 'show-edits') {
+                    this.bbApi.toggleButtonState(
+                        'show-edits',
+                        this.rootScopeSvc.veEditMode(
+                            !this.rootScopeSvc.veEditMode()
+                        )
                     )
-                }
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('center-previous', () => {
-                this.treeSvc
-                    .getPrevBranch(this.treeSvc.getSelectedBranch(), [
-                        'view',
-                        'section',
-                    ])
-                    .then(
-                        (prev) => {
-                            this.bbApi.toggleButtonSpinner('center-previous')
-                            this.treeSvc.selectBranch(prev).catch((reason) => {
-                                this.growl.error(TreeService.treeError(reason))
-                            })
-                            this.bbApi.toggleButtonSpinner('center-previous')
-                        },
-                        (reason) => {
-                            if (reason.status === 200)
-                                this.growl.info(reason.message)
-                            else this.growl.error(reason.message)
-                        }
-                    )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('center-next', () => {
-                this.treeSvc
-                    .getNextBranch(this.treeSvc.getSelectedBranch(), [
-                        'view',
-                        'section',
-                    ])
-                    .then(
-                        (next) => {
-                            this.bbApi.toggleButtonSpinner('center-next')
-                            this.treeSvc.selectBranch(next).catch((reason) => {
-                                this.growl.error(TreeService.treeError(reason))
-                            })
-                            this.bbApi.toggleButtonSpinner('center-next')
-                        },
-                        (reason) => {
-                            if (reason.status === 200)
-                                this.growl.info(reason.message)
-                            else this.growl.error(reason.message)
-                        }
-                    )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('convert-pdf', () => {
-                if (this.isPageLoading()) return
-                this.appUtilsSvc
-                    .printModal(
-                        angular.element('#print-div'),
-                        this.mmsView,
-                        this.mmsRef,
-                        false,
-                        3
-                    )
-                    .then(
-                        (ob) => {
-                            this.growl.info(
-                                'Exporting as PDF file. Please wait for a completion email.',
-                                { ttl: -1 }
-                            )
-                        },
-                        (reason) => {
-                            this.growl.error(
-                                'Exporting as PDF file Failed: ' +
-                                    reason.message
-                            )
-                        }
-                    )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('print', () => {
-                if (this.isPageLoading()) return
-                void this.appUtilsSvc
-                    .printModal(
-                        angular.element('#print-div'),
-                        this.mmsView,
-                        this.mmsRef,
-                        false,
-                        1
-                    )
-                    .catch((reason?) => {
-                        if (reason) {
-                            this.growl.error('Print Error:' + reason.message)
-                        } else {
-                            this.growl.info('Print Cancelled', {
-                                ttl: 1000,
-                            })
-                        }
-                    })
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('word', () => {
-                if (this.isPageLoading()) return
-                this.appUtilsSvc
-                    .printModal(
-                        angular.element('#print-div'),
-                        this.mmsView,
-                        this.mmsRef,
-                        false,
-                        2
-                    )
-                    .then(
-                        (ob) => {
-                            this.growl.info(
-                                'Exporting as Word file. Please wait for a completion email.',
-                                { ttl: -1 }
-                            )
-                        },
-                        (reason?) => {
-                            if (reason) {
+                    if (
+                        (this.rootScopeSvc.veElementsOn() &&
+                            !this.rootScopeSvc.veEditMode()) ||
+                        (!this.rootScopeSvc.veElementsOn() &&
+                            this.rootScopeSvc.veEditMode())
+                    ) {
+                        this.eventSvc.$broadcast(
+                            'show-elements',
+                            this.rootScopeSvc.veEditMode()
+                        )
+                    }
+                    return
+                } else if (data.clicked === 'center-previous') {
+                    this.treeSvc
+                        .getPrevBranch(this.treeSvc.getSelectedBranch(), [
+                            'view',
+                            'section',
+                        ])
+                        .then(
+                            (prev) => {
+                                this.bbApi.toggleButtonSpinner(
+                                    'center-previous'
+                                )
+                                this.treeSvc
+                                    .selectBranch(prev)
+                                    .catch((reason) => {
+                                        this.growl.error(
+                                            TreeService.treeError(reason)
+                                        )
+                                    })
+                                this.bbApi.toggleButtonSpinner(
+                                    'center-previous'
+                                )
+                            },
+                            (reason) => {
+                                if (reason.status === 200)
+                                    this.growl.info(reason.message)
+                                else this.growl.error(reason.message)
+                            }
+                        )
+                    return
+                } else if (data.clicked === 'center-next') {
+                    this.treeSvc
+                        .getNextBranch(this.treeSvc.getSelectedBranch(), [
+                            'view',
+                            'section',
+                        ])
+                        .then(
+                            (next) => {
+                                this.bbApi.toggleButtonSpinner('center-next')
+                                this.treeSvc
+                                    .selectBranch(next)
+                                    .catch((reason) => {
+                                        this.growl.error(
+                                            TreeService.treeError(reason)
+                                        )
+                                    })
+                                this.bbApi.toggleButtonSpinner('center-next')
+                            },
+                            (reason) => {
+                                if (reason.status === 200)
+                                    this.growl.info(reason.message)
+                                else this.growl.error(reason.message)
+                            }
+                        )
+                    return
+                } else if (data.clicked === 'convert-pdf') {
+                    if (this.isPageLoading()) return
+                    this.appUtilsSvc
+                        .printModal(
+                            angular.element('#print-div'),
+                            this.mmsView,
+                            this.mmsRef,
+                            false,
+                            3
+                        )
+                        .then(
+                            (ob) => {
+                                this.growl.info(
+                                    'Exporting as PDF file. Please wait for a completion email.',
+                                    { ttl: -1 }
+                                )
+                            },
+                            (reason) => {
                                 this.growl.error(
-                                    'Exporting as Word file Failed: ' +
+                                    'Exporting as PDF file Failed: ' +
                                         reason.message
                                 )
+                            }
+                        )
+                    return
+                } else if (data.clicked === 'print') {
+                    if (this.isPageLoading()) return
+                    void this.appUtilsSvc
+                        .printModal(
+                            angular.element('#print-div'),
+                            this.mmsView,
+                            this.mmsRef,
+                            false,
+                            1
+                        )
+                        .catch((reason?) => {
+                            if (reason) {
+                                this.growl.error(
+                                    'Print Error:' + reason.message
+                                )
                             } else {
-                                this.growl.info('Export Cancelled', {
+                                this.growl.info('Print Cancelled', {
                                     ttl: 1000,
                                 })
                             }
-                        }
+                        })
+                    return
+                } else if (data.clicked === 'word') {
+                    if (this.isPageLoading()) return
+                    this.appUtilsSvc
+                        .printModal(
+                            angular.element('#print-div'),
+                            this.mmsView,
+                            this.mmsRef,
+                            false,
+                            2
+                        )
+                        .then(
+                            (ob) => {
+                                this.growl.info(
+                                    'Exporting as Word file. Please wait for a completion email.',
+                                    { ttl: -1 }
+                                )
+                            },
+                            (reason?) => {
+                                if (reason) {
+                                    this.growl.error(
+                                        'Exporting as Word file Failed: ' +
+                                            reason.message
+                                    )
+                                } else {
+                                    this.growl.info('Export Cancelled', {
+                                        ttl: 1000,
+                                    })
+                                }
+                            }
+                        )
+                    return
+                } else if (data.clicked === 'tabletocsv') {
+                    if (this.isPageLoading()) return
+                    this.appUtilsSvc.tableToCsv(
+                        angular.element('#print-div'),
+                        false
                     )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('tabletocsv', () => {
-                if (this.isPageLoading()) return
-                this.appUtilsSvc.tableToCsv(
-                    angular.element('#print-div'),
-                    false
-                )
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on('refresh-numbering', () => {
-                if (this.isPageLoading()) return
-                if (
-                    this.mmsView &&
-                    this.treeSvc.branch2viewNumber[this.mmsView.id]
-                ) {
-                    this.number =
+                    return
+                } else if (data.clicked === 'refresh-numbering') {
+                    if (this.isPageLoading()) return
+                    if (
+                        this.mmsView &&
                         this.treeSvc.branch2viewNumber[this.mmsView.id]
+                    ) {
+                        this.number =
+                            this.treeSvc.branch2viewNumber[this.mmsView.id]
+                    }
+                    return
                 }
             })
         )
@@ -453,12 +440,6 @@ class SlideshowController implements angular.IComponentController {
         }
 
         this.rootScopeSvc.veNumberingOn(false)
-        if (this.rootScopeSvc.veCommentsOn())
-            this.eventSvc.$broadcast('show-comments', false)
-        if (this.rootScopeSvc.veElementsOn())
-            this.eventSvc.$broadcast('show-elements', false)
-        if (this.rootScopeSvc.veEditMode())
-            this.eventSvc.$broadcast('show-edits', false)
 
         // Share URL button settings
         this.dynamicPopover = this.shortUrlSvc.dynamicPopover
@@ -487,7 +468,12 @@ class SlideshowController implements angular.IComponentController {
                 combo: 'alt+d',
                 description: 'toggle edit mode',
                 callback: () => {
-                    this.eventSvc.$broadcast('show-edits')
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                        this.bbId,
+                        {
+                            clicked: 'show-edits',
+                        }
+                    )
                 },
             })
         }
@@ -505,14 +491,24 @@ class SlideshowController implements angular.IComponentController {
                 combo: 'alt+c',
                 description: 'toggle show comments',
                 callback: () => {
-                    this.eventSvc.$broadcast('show-comments')
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                        this.bbId,
+                        {
+                            clicked: 'show-comments',
+                        }
+                    )
                 },
             })
             .add({
                 combo: 'alt+e',
                 description: 'toggle show elements',
                 callback: () => {
-                    this.eventSvc.$broadcast('show-elements')
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                        this.bbId,
+                        {
+                            clicked: 'show-elements',
+                        }
+                    )
                 },
             })
 
@@ -540,14 +536,24 @@ class SlideshowController implements angular.IComponentController {
                     combo: 'alt+.',
                     description: 'next',
                     callback: () => {
-                        this.eventSvc.$broadcast('center-next')
+                        this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                            this.bbId,
+                            {
+                                clicked: 'center-next',
+                            }
+                        )
                     },
                 })
                 .add({
                     combo: 'alt+,',
                     description: 'previous',
                     callback: () => {
-                        this.eventSvc.$broadcast('center-previous')
+                        this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                            this.bbId,
+                            {
+                                clicked: 'center-previous',
+                            }
+                        )
                     },
                 })
         } else {

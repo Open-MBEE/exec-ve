@@ -3,17 +3,13 @@ import { veUtils } from '@ve-utils'
 import { EventService } from './Event.service'
 
 export class SessionService {
-    public constants = {
-        DELETEKEY: 'session-delete',
-    }
-
     static $inject = ['EventService']
 
     constructor(private eventSvc: EventService) {}
 
     private static _setStorage<T>(key: string, realValue: T): void {
         const value = realValue == null ? null : JSON.stringify(realValue)
-        return sessionStorage.setItem(key, value)
+        sessionStorage.setItem(key, value)
     }
 
     private static _getStorage<T>(key: string): T {
@@ -26,7 +22,7 @@ export class SessionService {
     }
 
     private static _removeStorage(key: string): void {
-        return sessionStorage.removeItem(key)
+        sessionStorage.removeItem(key)
     }
 
     public clear = (): void => {
@@ -43,18 +39,13 @@ export class SessionService {
             let val = SessionService._getStorage<T>(name)
             if (val == null) {
                 val = defaultValue
+                this.eventSvc.resolve(name, val)
                 SessionService._setStorage(name, val)
             }
             return val
         }
-        if (value === this.constants.DELETEKEY) {
-            SessionService._removeStorage(name)
-            return null
-        }
+        this.eventSvc.resolve(name, value)
         SessionService._setStorage(name, value)
-        if (emit) {
-            this.eventSvc.$broadcast(name, value)
-        }
         return value
     }
 }

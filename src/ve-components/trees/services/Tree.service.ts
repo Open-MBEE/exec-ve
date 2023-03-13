@@ -31,6 +31,8 @@ export class TreeService {
         iconDefault: 'fa-solid fa-file fa-fw',
     }
 
+    public defaultSectionTypes = ['view', 'section']
+
     public loading: boolean
 
     private inProgress: VePromise<void, unknown> = null
@@ -162,7 +164,7 @@ export class TreeService {
                         data2Node[elementOb[idKey] as string]
                     )
                 } else {
-                    // If theres not an element in data2Node whose key matches the 'parent' value in the array element
+                    // If there's not an element in data2Node whose key matches the 'parent' value in the array element
                     // it's a "root node" and so it should be pushed to the root nodes array along with its children
 
                     rootNodes.push(data2Node[elementOb[idKey] as string])
@@ -254,7 +256,7 @@ export class TreeService {
 
     /**
      * @name TreeApi#expandAll
-     * self explanatory
+     * self-explanatory
      */
     public expandAll = (): VePromise<void, unknown> => {
         return this.forEachBranch((b) => {
@@ -264,7 +266,7 @@ export class TreeService {
     }
     /**
      * @name TreeApi#collapseAll
-     * self explanatory
+     * self-explanatory
      */
     public collapseAll = (
         excludeBranch?: TreeBranch
@@ -768,6 +770,8 @@ export class TreeService {
                 })
             }
 
+            const sectionTypes = this.defaultSectionTypes
+
             const addBranchData = (
                 level: number,
                 section: string[],
@@ -784,24 +788,32 @@ export class TreeService {
                 let number = ''
                 if (section) number = section.join('.')
 
-                if (!peNums[branch.type]) peNums[branch.type] = 0
-                peNums[branch.type]++
-                if (this.treeApi.numberingDepth === 0) {
-                    number = peNums[branch.type].toString(10)
-                } else if (section.length >= this.treeApi.numberingDepth) {
-                    number = `${section
-                        .slice(0, this.treeApi.numberingDepth)
-                        .join('.')}${this.treeApi.numberingSeparator}${
-                        peNums[branch.type]
-                    }`
-                } else {
-                    const sectionCopy = [...section]
-                    while (sectionCopy.length < this.treeApi.numberingDepth) {
-                        sectionCopy.push('0')
+                // Handle numbering of non-section types
+                if (!sectionTypes.includes(branch.type)) {
+                    if (!peNums[branch.type]) peNums[branch.type] = 0
+                    peNums[branch.type]++
+                    if (
+                        this.treeApi.numberingDepth === 0 &&
+                        !sectionTypes.includes(branch.type)
+                    ) {
+                        number = peNums[branch.type].toString(10)
+                    } else if (section.length >= this.treeApi.numberingDepth) {
+                        number = `${section
+                            .slice(0, this.treeApi.numberingDepth)
+                            .join('.')}${this.treeApi.numberingSeparator}${
+                            peNums[branch.type]
+                        }`
+                    } else {
+                        const sectionCopy = [...section]
+                        while (
+                            sectionCopy.length < this.treeApi.numberingDepth
+                        ) {
+                            sectionCopy.push('0')
+                        }
+                        number = `${sectionCopy.join('.')}${
+                            this.treeApi.numberingSeparator
+                        }${peNums[branch.type]}`
                     }
-                    number = `${sectionCopy.join('.')}${
-                        this.treeApi.numberingSeparator
-                    }${peNums[branch.type]}`
                 }
                 if (
                     branch.data &&
@@ -858,6 +870,8 @@ export class TreeService {
                                 peNums
                             )
                         }
+                        j++
+                        this.eventSvc.resolve(TreeService.events.UPDATED, true)
                     })
 
                     if (this.treeApi.sort) {
@@ -870,6 +884,7 @@ export class TreeService {
                     )
                         this.treeApi.expandLevel = 1
                 }
+                branch.loading = false
             }
             this.treeData.forEach((branch) => {
                 addBranchData(1, [], branch, true, {})
@@ -882,11 +897,10 @@ export class TreeService {
 
     public updateRows = (
         id: string,
-        types: string[]
+        types: string[],
+        treeRows: TreeRow[]
     ): VePromise<TreeRow[], void> => {
         return new this.$q<TreeRow[], void>((resolve, reject) => {
-            const treeRows: TreeRow[] = []
-
             const addBranchToList = (
                 level: number,
                 branch: TreeBranch,
@@ -923,8 +937,7 @@ export class TreeService {
 
                 if (!types.includes('all') && !types.includes(branch.type))
                     visible = false
-
-                treeRows.push({
+                const treeRow = {
                     level,
                     section:
                         number &&
@@ -938,10 +951,8 @@ export class TreeService {
                     visible,
                     typeIcon,
                     children: branch.children,
-                })
-
-                //This branch is done, stop loading
-                branch.loading = false
+                }
+                treeRows.push(treeRow)
 
                 //Work on children
                 if (branch.children) {
@@ -949,6 +960,7 @@ export class TreeService {
                         const child_visible = visible && branch.expanded
                         addBranchToList(level + 1, child, child_visible)
                     })
+                    //This branch is done, stop loading
                 }
             }
             if (types && types.length > 0) {
@@ -1237,7 +1249,6 @@ export class TreeService {
                                 children: [],
                             })
                         }
-                        groupNode.loading = false
                         resolve()
                     },
                     (reason) => {
@@ -1285,7 +1296,6 @@ export class TreeService {
             newChildNodes.push(node)
         }
         curNode.children.push(...newChildNodes)
-        curNode.loading = false
         //this.eventSvc.$broadcast(TreeService.events.RELOAD)
     }
 
