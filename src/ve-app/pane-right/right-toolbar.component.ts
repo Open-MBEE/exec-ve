@@ -66,7 +66,8 @@ const RightToolbarComponent: VeComponentOptions = {
                 this.tbInit,
                 this,
                 tools_default_buttons,
-                tools_dynamic_buttons
+                tools_dynamic_buttons,
+                'spec-inspect'
             )
         }
 

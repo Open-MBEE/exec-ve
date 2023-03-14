@@ -1014,10 +1014,6 @@ export class TreeService {
     changeRoots = (root?: ElementObject): VePromise<void, unknown> => {
         this.processedRoot = this.treeApi.rootId
 
-        if (this.rootScopeSvc.treeShowPe() === null) {
-            this.rootScopeSvc.treeShowPe(false)
-        }
-
         const treeData: TreeBranch[] = []
         return new this.$q<void, unknown>((resolve, reject) => {
             if (!root) {
@@ -1169,10 +1165,6 @@ export class TreeService {
 
     changeElement = (): VePromise<void, unknown> => {
         if (this.treeApi.elementId === this.processedFocus) return
-        const initialSelection = this.rootScopeSvc.treeInitialSelection()
-        if (initialSelection) {
-            this.treeApi.elementId = initialSelection
-        }
 
         this.processedFocus = this.treeApi.elementId
         return new this.$q<void, unknown>((resolve, reject) => {
@@ -1184,18 +1176,7 @@ export class TreeService {
                     if (b.data.id === this.treeApi.elementId) {
                         this.selectBranch(b, true).then(
                             () => {
-                                this._onTreeDataChange().then(
-                                    () => {
-                                        if (initialSelection)
-                                            this.rootScopeSvc.treeInitialSelection(
-                                                null
-                                            )
-                                        resolve()
-                                    },
-                                    (reason) => {
-                                        reject(reason)
-                                    }
-                                )
+                                this._onTreeDataChange().then(resolve, reject)
                             },
                             (reason) => {
                                 reject(reason)

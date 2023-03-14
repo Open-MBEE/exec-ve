@@ -37,9 +37,6 @@ export class TreeOfContentsController extends TreeController {
     }
 
     protected setPeVisibility = (): void => {
-        if (this.showPe !== this.rootScopeSvc.treeShowPe()) {
-            this.showPe = this.rootScopeSvc.treeShowPe()
-        }
         this.types.length = 0
         if (this.showPe) {
             this.types.push('all')
@@ -77,6 +74,11 @@ const TreeOfContentsComponent: VeComponentOptions = {
 <i ng-show="$ctrl.treeSpin" class="tree-spinner fa fa-spin fa-spinner"></i>
     
 `,
+    bindings: {
+        toolbarId: '@',
+        buttonId: '@',
+        showPe: '<',
+    },
     controller: TreeOfContentsController,
 }
 

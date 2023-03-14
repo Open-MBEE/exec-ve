@@ -99,7 +99,6 @@ class ToolsController implements angular.IComponentController {
 
     subs: Rx.IDisposable[]
     currentTool: string
-    defaultTool: string = 'spec-inspector'
     currentTitle: string
     private specApi: SpecApi
     show: {
@@ -115,9 +114,7 @@ class ToolsController implements angular.IComponentController {
 
     toolbarId: string
 
-    protected $globalTool: JQuery
-    protected $portalTool: JQuery
-    protected $documentTool: JQuery
+    protected $tools: JQuery
     static $inject = [
         '$q',
         '$timeout',
@@ -163,22 +160,10 @@ class ToolsController implements angular.IComponentController {
     $onInit(): void {
         this.eventSvc.$init(this)
 
-        this.$documentTool = $('#document-tools')
-        this.$portalTool = $('#portal-tools')
-        this.$globalTool = $('#global-tools')
+        this.$tools = $('#tools')
 
         this.specApi = this.specSvc.specApi
         this.elementSaving = false
-
-        const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(
-            this.defaultTool
-        )
-        //Initialize Toolbar Clicked Subject
-        this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
-            id: inspect.id,
-            category: inspect.category,
-            title: inspect.tooltip,
-        })
 
         //Listen for Toolbar Clicked Subject
         this.subs.push(
@@ -488,13 +473,7 @@ class ToolsController implements angular.IComponentController {
             )
         }
 
-        if (category === 'document') {
-            this.$documentTool.append(newTool)
-        } else if (category === 'portal') {
-            this.$portalTool.append(newTool)
-        } else {
-            this.$globalTool.append(newTool)
-        }
+        this.$tools.append(newTool)
 
         this.$compile(newTool)(this.$scope)
     }
@@ -603,9 +582,7 @@ const ViewToolsComponent: VeComponentOptions = {
         </form>
     </div>
     <hr class="right-title-divider">
-    <div id="portal-tools" ng-show="$ctrl.toolsCategory === 'portal'"></div>
-    <div id="document-tools" ng-show="$ctrl.toolsCategory === 'document'"></div>
-    <div id="global-tools"></div>
+    <div id="tools"></div>
 </div>
     `,
     bindings: {

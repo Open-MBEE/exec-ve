@@ -4,7 +4,7 @@ import { SessionService } from '@ve-utils/core'
 
 import { veUtils } from '@ve-utils'
 
-import { ParamsObject, RefObject } from '@ve-types/mms'
+import { ParamsObject } from '@ve-types/mms'
 
 export class RootScopeService {
     public constants = {
@@ -24,7 +24,6 @@ export class RootScopeService {
         VEELEMENTSON: 've-elements-on',
         VEEDITMODE: 've-edit-mode',
         VEHIDEPANES: 've-hide-panes',
-        VESHOWMANAGEREFS: 've-show-manage-refs',
         VESHOWLOGIN: 've-show-login',
         VESHOWSEARCH: 've-show-search',
         TREESHOWPE: 'tree-show-pe',
@@ -37,16 +36,31 @@ export class RootScopeService {
 
     constructor(private sessionSvc: SessionService) {}
 
+    init(): void {
+        this.loginModalOpen()
+        this.rightPaneToggleable()
+        this.rightPaneClosed()
+        this.veTitle()
+        this.veStateChanging()
+        this.veViewContentLoading()
+        this.veRedirect()
+        this.veRedirectFromOld()
+        this.veCrushUrl()
+        this.veFullDocMode()
+        this.veCommentsOn()
+
+        this.veNumberingOn()
+        this.veElementsOn()
+        this.veEditMode()
+        this.veHidePanes()
+    }
+
     loginModalOpen(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.LOGINMODALOPEN,
             value,
             false
         )
-    }
-
-    mmsRefOb(value?: RefObject | undefined): RefObject {
-        return this.sessionSvc.accessor(this.constants.MMSREFOB, value, null)
     }
 
     rightPaneToggleable(value?: boolean | undefined): boolean {
@@ -69,8 +83,7 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VETITLE,
             value,
-            'View Editor',
-            true
+            'View Editor'
         )
     }
 
@@ -86,8 +99,7 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VEVIEWCONTENTLOADING,
             value,
-            false,
-            true
+            false
         )
     }
 
@@ -103,8 +115,7 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VEREDIRECTFROMOLD,
             value,
-            false,
-            true
+            false
         )
     }
 
@@ -124,8 +135,7 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VECOMMENTSON,
             value,
-            false,
-            true
+            false
         )
     }
 
@@ -133,7 +143,6 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VENUMBERINGON,
             value,
-            true,
             true
         )
     }
@@ -142,35 +151,19 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VEELEMENTSON,
             value,
-            false,
-            true
+            false
         )
     }
 
     veEditMode(value?: boolean | undefined): boolean {
-        return this.sessionSvc.accessor(
-            this.constants.VEEDITMODE,
-            value,
-            false,
-            true
-        )
+        return this.sessionSvc.accessor(this.constants.VEEDITMODE, value, false)
     }
 
     veHidePanes(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.VEHIDEPANES,
             value,
-            false,
-            true
-        )
-    }
-
-    veShowManageRefs(value?: boolean | undefined): boolean {
-        return this.sessionSvc.accessor(
-            this.constants.VESHOWMANAGEREFS,
-            value,
-            false,
-            true
+            false
         )
     }
 
@@ -178,30 +171,7 @@ export class RootScopeService {
         return this.sessionSvc.accessor(
             this.constants.VESHOWLOGIN,
             value,
-            false,
-            true
-        )
-    }
-
-    veShowSearch(value?: boolean | undefined): boolean | undefined {
-        return this.sessionSvc.accessor(
-            this.constants.VESHOWSEARCH,
-            value,
-            false,
-            true
-        )
-    }
-
-    treeShowPe(value?: boolean | undefined): boolean {
-        return this.sessionSvc.accessor(this.constants.TREESHOWPE, value, false)
-    }
-
-    treeInitialSelection(value?: string | undefined): string {
-        return this.sessionSvc.accessor(
-            this.constants.TREEINITIALSELECTION,
-            value,
-            null,
-            true
+            false
         )
     }
 

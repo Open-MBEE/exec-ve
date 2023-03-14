@@ -1,18 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-const Visualizer = window['ui-router-visualizer'].Visualizer as {
-    new (router: UIRouter, options?: any): UIRouterPlugin
-}
+// const Visualizer = window['ui-router-visualizer'].Visualizer as {
+//     new (router: UIRouter, options?: any): UIRouterPlugin
+// }
 
 import ngPane from '@openmbee/pane-layout'
 import uiRouter, {
     StateProvider,
     StateService,
-    Trace,
     Transition,
     TransitionService,
     UIRouter,
     UIRouterGlobals,
-    UIRouterPlugin,
     UrlParts,
 } from '@uirouter/angularjs'
 import angular, {
@@ -1224,11 +1222,11 @@ veApp.run([
     },
 ])
 
-veApp.run([
-    '$uiRouter',
-    '$trace',
-    ($uiRouter: UIRouter, $trace: Trace): void => {
-        const pluginInstance = $uiRouter.plugin(Visualizer)
-        $trace.enable('TRANSITION')
-    },
-])
+// veApp.run([
+//     '$uiRouter',
+//     '$trace',
+//     ($uiRouter: UIRouter, $trace: Trace): void => {
+//         const pluginInstance = $uiRouter.plugin(Visualizer)
+//         $trace.enable('TRANSITION')
+//     },
+// ])

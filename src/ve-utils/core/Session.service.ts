@@ -32,8 +32,7 @@ export class SessionService {
     public accessor = <T>(
         name: string,
         value: T,
-        defaultValue: T = null,
-        emit = false
+        defaultValue: T = null
     ): T => {
         if (value === undefined) {
             let val = SessionService._getStorage<T>(name)

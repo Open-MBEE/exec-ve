@@ -10,7 +10,8 @@ export const trees_default_toolbar: IToolBarButton[] = [
         permission: true,
         tooltip: 'Favorite Documents',
         spinner: false,
-        enabledFor: ['main.project.ref.portal'],
+        category: 'portal',
+        enabledFor: ['**.portal.**'],
     },
     {
         id: 'tree-of-documents',
@@ -20,7 +21,7 @@ export const trees_default_toolbar: IToolBarButton[] = [
         permission: true,
         tooltip: 'Project Document Tree',
         spinner: false,
-        enabledFor: ['main.project.ref.portal'],
+        enabledFor: ['**.portal.**'],
     },
     {
         id: 'tree-of-contents',
@@ -30,7 +31,7 @@ export const trees_default_toolbar: IToolBarButton[] = [
         permission: true,
         tooltip: 'View Tree',
         spinner: false,
-        enabledFor: ['main.project.ref.present'],
+        enabledFor: ['**.present.**'],
     },
     {
         id: 'tree-of-tables',
@@ -40,7 +41,7 @@ export const trees_default_toolbar: IToolBarButton[] = [
         permission: true,
         tooltip: 'Table of Tables',
         spinner: false,
-        enabledFor: ['main.project.ref.present'],
+        enabledFor: ['**.present.**'],
     },
     {
         id: 'tree-of-figures',
@@ -50,7 +51,7 @@ export const trees_default_toolbar: IToolBarButton[] = [
         permission: true,
         tooltip: 'Table of Figures',
         spinner: false,
-        enabledFor: ['main.project.ref.present'],
+        enabledFor: ['**.present.**'],
     },
     {
         id: 'tree-of-equations',
@@ -60,7 +61,7 @@ export const trees_default_toolbar: IToolBarButton[] = [
         permission: true,
         tooltip: 'Table of Equations',
         spinner: false,
-        enabledFor: ['main.project.ref.present'],
+        enabledFor: ['**.present.**'],
     },
 ]
 

@@ -435,9 +435,7 @@ class SlideshowController implements angular.IComponentController {
             )
         }
 
-        if (this.$state.includes('**.portal.**')) {
-            this.contentWindowSvc.toggleLeftPane(false)
-        }
+        this.contentWindowSvc.toggleLeftPane(false)
 
         this.rootScopeSvc.veNumberingOn(false)
 

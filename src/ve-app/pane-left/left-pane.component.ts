@@ -45,7 +45,6 @@ class LeftPaneController implements angular.IComponentController {
 
     private $pane: IPane
     private $trees: JQuery<HTMLElement>
-    private paneClosed: boolean
 
     public bbApi: ButtonBarApi
     public bbSize: string
@@ -133,8 +132,6 @@ class LeftPaneController implements angular.IComponentController {
 
         this.eventSvc.$init(this)
 
-        this.paneClosed = false
-
         this.bbSize = '83px'
 
         this.$transitions.onSuccess({}, () => {
@@ -151,15 +148,14 @@ class LeftPaneController implements angular.IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on('left-pane.toggle', (paneClosed) => {
-                if (paneClosed === undefined) {
-                    this.$pane.toggle()
-                } else if (paneClosed && !this.$pane.closed) {
-                    this.$pane.toggle()
-                } else if (!paneClosed && this.$pane.closed) {
-                    this.$pane.toggle()
+            this.eventSvc.binding(
+                this.rootScopeSvc.constants.LEFTPANECLOSED,
+                (paneClosed) => {
+                    if (paneClosed !== this.$pane.closed) {
+                        this.$pane.toggle()
+                    }
                 }
-            })
+            )
         )
 
         // Start listening to change events
@@ -363,9 +359,7 @@ class LeftPaneController implements angular.IComponentController {
                         }
                     ).then(
                         (root) => {
-                            if (!this.rootScopeSvc.treeInitialSelection()) {
-                                this.treeApi.elementId = elementId
-                            }
+                            this.treeApi.elementId = elementId
                             this.treeSvc.changeRoots(root).catch((reason) => {
                                 this.growl.error(TreeService.treeError(reason))
                             })
@@ -380,9 +374,7 @@ class LeftPaneController implements angular.IComponentController {
                 }
             )
         } else {
-            if (!this.rootScopeSvc.treeInitialSelection()) {
-                this.treeApi.elementId = elementId
-            }
+            this.treeApi.elementId = elementId
             this.treeSvc.changeElement().catch((reason) => {
                 this.growl.error(TreeService.treeError(reason))
             })
@@ -403,13 +395,6 @@ class LeftPaneController implements angular.IComponentController {
     }
 
     transitionCallback = (): void => {
-        if (this.$state.includes('**.present.**')) {
-            this.treesCategory = 'present'
-        } else if (this.$state.includes('**.portal.**')) {
-            this.treesCategory = 'portal'
-        } else {
-            this.treesCategory = 'global'
-        }
         this.buttonBarSvc.waitForApi(this.buttonId).then(
             (api) => {
                 this.bbApi = api

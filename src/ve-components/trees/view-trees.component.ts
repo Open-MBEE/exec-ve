@@ -122,7 +122,7 @@ class ViewTreesController implements IComponentController {
     currentTree: string
     currentTitle: string
     show: {
-        [key: string]: boolean
+        [key: string]: { tree: boolean; pe: boolean }
     } = {}
 
     protected errorType: string
@@ -136,9 +136,7 @@ class ViewTreesController implements IComponentController {
     public treeSearch: string
     private spin: boolean = true
 
-    protected $globalTree: JQuery
-    protected $presentTree: JQuery
-    protected $portalTree: JQuery
+    protected $trees: JQuery
 
     bbApi: ButtonBarApi
 
@@ -201,7 +199,8 @@ class ViewTreesController implements IComponentController {
                                 this.treeSvc.expandAll().then(
                                     () => {
                                         this.eventSvc.$broadcast(
-                                            TreeService.events.RELOAD
+                                            TreeService.events.RELOAD,
+                                            this.currentTree
                                         )
                                     },
                                     (reason) => {
@@ -216,7 +215,8 @@ class ViewTreesController implements IComponentController {
                                 this.treeSvc.collapseAll().then(
                                     () => {
                                         this.eventSvc.$broadcast(
-                                            TreeService.events.RELOAD
+                                            TreeService.events.RELOAD,
+                                            this.currentTree
                                         )
                                     },
                                     (reason) => {
@@ -256,15 +256,15 @@ class ViewTreesController implements IComponentController {
                                 break
                             }
                             case 'tree-show-pe': {
-                                this.rootScopeSvc.treeShowPe(
-                                    !this.rootScopeSvc.treeShowPe()
-                                )
+                                this.show[_.camelCase(this.currentTree)].pe =
+                                    !this.show[_.camelCase(this.currentTree)].pe
                                 this.bbApi.setToggleState(
                                     'tree-show-pe',
-                                    this.rootScopeSvc.treeShowPe()
+                                    this.show[_.camelCase(this.currentTree)].pe
                                 )
                                 this.eventSvc.$broadcast(
-                                    TreeService.events.RELOAD
+                                    TreeService.events.RELOAD,
+                                    this.currentTree
                                 )
                                 break
                             }
@@ -314,23 +314,7 @@ class ViewTreesController implements IComponentController {
     }
 
     $postLink(): void {
-        this.$presentTree = $('#present-trees')
-        this.$portalTree = $('#portal-trees')
-        this.$globalTree = $('#global-trees')
-
-        //Initialize Toolbar Clicked Subject
-        const newTree =
-            this.treesCategory === 'portal'
-                ? 'tree-of-documents'
-                : 'tree-of-contents'
-        const inspect: IToolBarButton =
-            this.toolbarSvc.getToolbarButton(newTree)
-
-        this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
-            id: inspect.id,
-            category: inspect.category,
-            title: inspect.tooltip,
-        })
+        this.$trees = $('#trees')
 
         //Listen for Toolbar Clicked Subject
         this.subs.push(
@@ -612,12 +596,14 @@ class ViewTreesController implements IComponentController {
                                     )
                                     .finally(() => {
                                         this.eventSvc.$broadcast(
-                                            TreeService.events.RELOAD
+                                            TreeService.events.RELOAD,
+                                            this.currentTree
                                         )
                                     })
                             } else {
                                 this.eventSvc.$broadcast(
-                                    TreeService.events.RELOAD
+                                    TreeService.events.RELOAD,
+                                    this.currentTree
                                 )
                             }
                         },
@@ -891,7 +877,10 @@ class ViewTreesController implements IComponentController {
                 () => {
                     this.treeSvc.expandPathToSelectedBranch().then(
                         () => {
-                            this.eventSvc.$broadcast(TreeService.events.RELOAD)
+                            this.eventSvc.$broadcast(
+                                TreeService.events.RELOAD,
+                                this.currentTree
+                            )
                         },
                         (reason) => {
                             this.growl.error(TreeService.treeError(reason))
@@ -906,7 +895,10 @@ class ViewTreesController implements IComponentController {
             // expand all branches so that the filter works correctly
             this.treeSvc.expandAll().then(
                 () => {
-                    this.eventSvc.$broadcast(TreeService.events.RELOAD)
+                    this.eventSvc.$broadcast(
+                        TreeService.events.RELOAD,
+                        this.currentTree
+                    )
                 },
                 (reason) => {
                     this.growl.error(TreeService.treeError(reason))
@@ -938,7 +930,7 @@ class ViewTreesController implements IComponentController {
                 }
             }
             if (this.currentTree !== '') {
-                this.show[_.camelCase(this.currentTree)] = false
+                this.show[_.camelCase(this.currentTree)].tree = false
             }
             this.currentTree = data.id
             const inspect: IToolBarButton = this.toolbarSvc.getToolbarButton(
@@ -952,23 +944,21 @@ class ViewTreesController implements IComponentController {
             this.currentTitle = data.title ? data.title : inspect.tooltip
 
             if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
-                this.startTree(data.id, data.category)
-                this.show[_.camelCase(data.id)] = true
+                this.startTree(data.id)
+                this.show[_.camelCase(data.id)].tree = true
+                this.show[_.camelCase(data.id)].pe = false
             } else {
-                this.show[_.camelCase(data.id)] = true
+                this.eventSvc.$broadcast(TreeService.events.RELOAD, data.id)
+                this.show[_.camelCase(data.id)].tree = true
             }
         }
     }
 
-    private startTree = (id: string, category: string): void => {
+    private startTree = (id: string): void => {
         const tag = this.extensionSvc.getTagByType('treeOf', id)
         const treeId: string = _.camelCase(id)
         const newTree: JQuery = $(
-            '<div id="' +
-                treeId +
-                '" ng-show="$ctrl.show.' +
-                treeId +
-                '"></div>'
+            `<div id="${treeId}" ng-show="$ctrl.show.${treeId}.tree"></div>`
         )
         if (tag === 'extensionError') {
             this.errorType = this.currentTree.replace('tree-of-', '')
@@ -977,23 +967,11 @@ class ViewTreesController implements IComponentController {
             )
         } else {
             newTree.append(
-                `<${tag} toolbar-id="${this.toolbarId}" button-id="${this.buttonId}"}></${tag}>`
+                `<${tag} show-pe="$ctrl.show.${treeId}.pe" toolbar-id="${this.toolbarId}" button-id="${this.buttonId}"}></${tag}>`
             )
         }
 
-        switch (category) {
-            case 'document': {
-                this.$presentTree.append(newTree)
-                break
-            }
-            case 'portal': {
-                this.$portalTree.append(newTree)
-                break
-            }
-            default: {
-                this.$globalTree.append(newTree)
-            }
-        }
+        this.$trees.append(newTree)
 
         this.$compile(newTree)(this.$scope)
     }
@@ -1032,9 +1010,6 @@ const ViewTreesComponent: VeComponentOptions = {
 <ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
     <div class="tree-view" style="display:table;">
         <div id="trees" class="container-fluid">
-            <div id="present-trees" ng-show="$ctrl.treesCategory === 'present'"></div>
-            <div id="portal-trees" ng-show="$ctrl.treesCategory === 'portal'"></div>
-            <div id="global-trees"></div>
         </div>
         <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>
     </div>

@@ -95,6 +95,9 @@ import { TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree'
  */
 export class TreeController implements angular.IComponentController {
     //Bindings
+    showPe: boolean
+    toolbarId: boolean
+    buttonId: boolean
 
     public init: boolean = false
 
@@ -107,7 +110,7 @@ export class TreeController implements angular.IComponentController {
     private treeFilter: angular.uiTreeFilter.IFilterUiTree<TreeRow>
 
     //Locals
-    showPe: boolean = false
+
     public icons: TreeIcons
     types: string[]
     id: string
@@ -153,17 +156,21 @@ export class TreeController implements angular.IComponentController {
                     }
                 }
             ),
-            this.eventSvc.$on<void>(TreeService.events.RELOAD, () => {
-                this.treeSpin = true
-            }),
-            this.eventSvc.$on(this.id, () => {
-                if (this.treeSvc.isTreeReady()) {
+            this.eventSvc.$on<string>(TreeService.events.RELOAD, (data) => {
+                if ((data && this.id === data) || !data) {
+                    this.treeSpin = true
                     this.configure().catch((reason) => {
                         this.growl.error(TreeService.treeError(reason))
                     })
                 }
             })
         )
+
+        if (this.treeSvc.isTreeReady()) {
+            this.configure().catch((reason) => {
+                this.growl.error(TreeService.treeError(reason))
+            })
+        }
 
         // this.subs.push(
         //     this.eventSvc.$on(
@@ -281,8 +288,7 @@ export class TreeController implements angular.IComponentController {
     }
 
     protected setPeVisibility = (): void => {
-        if (this.showPe !== this.rootScopeSvc.treeShowPe())
-            this.showPe = this.rootScopeSvc.treeShowPe()
+        //Implement any custom logic for showing PE's here
     }
 
     protected preConfig = (): void => {

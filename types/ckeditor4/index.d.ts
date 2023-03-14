@@ -48,11 +48,11 @@
 /// <reference path="./plugins/dialog.d.ts" />
 /// <reference path="./plugins/elementspath.d.ts" />
 
-export default CKEDITOR;
+export default CKEDITOR
 
 declare global {
     interface Window {
-        CKEDITOR: CKEDITOR.CKEditorStatic;
-        CKEDITOR_BASEPATH: string;
+        CKEDITOR: CKEDITOR.CKEditorStatic
+        CKEDITOR_BASEPATH: string | undefined
     }
 }

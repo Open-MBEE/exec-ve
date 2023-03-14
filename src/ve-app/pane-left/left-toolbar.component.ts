@@ -66,7 +66,10 @@ const LeftToolbarComponent: VeComponentOptions = {
                 this.tbInit,
                 this,
                 trees_default_toolbar,
-                trees_dynamic_toolbar
+                trees_dynamic_toolbar,
+                this.$state.includes('**.portal.**')
+                    ? 'tree-of-documents'
+                    : 'tree-of-contents'
             )
         }
 
@@ -110,7 +113,7 @@ const LeftToolbarComponent: VeComponentOptions = {
                 if (button.selected || this.rootScopeSvc.leftPaneClosed()) {
                     if (button.selected && !this.rootScopeSvc.leftPaneClosed())
                         toggleDeactivateFlag = true
-                    this.eventSvc.$broadcast('right-pane.toggle')
+                    this.eventSvc.$broadcast('left-pane.toggle')
                 }
             }
             if (toggleDeactivateFlag) {

@@ -1,7 +1,7 @@
-import { IToolBarButton } from '@ve-core/toolbar'
+import { ToolButton } from '@ve-core/toolbar'
 
 export class ToolbarApi {
-    public buttons: IToolBarButton[] = []
+    public buttons: ToolButton[] = []
 
     constructor(public id: string) {}
 
@@ -22,8 +22,8 @@ export class ToolbarApi {
                         }
                     })
 
-                    if (button.dynamic_buttons) {
-                        button.dynamic_buttons.forEach((b) => {
+                    if (button.dynamicButtons) {
+                        button.dynamicButtons.forEach((b) => {
                             b.active = true
                         })
                     }
@@ -37,9 +37,9 @@ export class ToolbarApi {
     public deactivate = (id: string): void => {
         this.buttons.forEach((button) => {
             if (button.id === id) {
-                if (button.dynamic_buttons) {
+                if (button.dynamicButtons) {
                     // de-activate all dynamic buttons
-                    button.dynamic_buttons.forEach((b) => {
+                    button.dynamicButtons.forEach((b) => {
                         b.active = false
                     })
                 }
@@ -71,12 +71,12 @@ export class ToolbarApi {
         })
     }
 
-    public addButton = (button: IToolBarButton): void => {
+    public addButton = (button: ToolButton): void => {
         button.priority = this.buttons.length
         this.buttons.push(button)
-        if (button.dynamic_buttons) {
+        if (button.dynamicButtons) {
             let firstButton = true
-            button.dynamic_buttons.forEach((buttonLoop) => {
+            button.dynamicButtons.forEach((buttonLoop) => {
                 if (
                     !this.buttons
                         .map((button) => button.id)
