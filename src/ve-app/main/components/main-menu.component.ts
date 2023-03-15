@@ -177,7 +177,7 @@ class MenuController implements IComponentController {
                     name: this.child.name,
                     id: this.child.id,
                     type: 'doc',
-                    link: 'main.project.ref.present({documentId: breadcrumb.id, search: undefined})',
+                    link: 'main.project.ref.view.present({documentId: breadcrumb.id, search: undefined})',
                 })
                 if (this.child._groupId) {
                     parentId = (this.child as DocumentObject)._groupId
@@ -269,10 +269,10 @@ class MenuController implements IComponentController {
             '/' +
             branch.id
         if (this.params.documentId) {
-            res += '/documents/' + this.params.documentId
+            res += '/present/' + this.params.documentId
         }
         if (this.params.viewId) {
-            res += '/views/' + this.params.viewId
+            res += '?viewId=' + this.params.viewId
         }
         return res
     }

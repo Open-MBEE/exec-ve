@@ -31,6 +31,7 @@ import {
     ElementObject,
     ElementsRequest,
     ElementsResponse,
+    ParamsObject,
     ProjectObject,
     RefObject,
     RefsResponse,
@@ -211,7 +212,7 @@ class LeftPaneController implements angular.IComponentController {
                                         false
                                     )
                                     void this.$state.go(
-                                        'main.project.ref.present.reorder',
+                                        'main.project.ref.view.reorder',
                                         {
                                             search: undefined,
                                         }
@@ -435,26 +436,28 @@ class LeftPaneController implements angular.IComponentController {
                     data
                 )
             }
-            let goTo = ''
-            if (this.$state.includes('slideshow'))
-                goTo = 'main.project.ref.present.slideshow'
-            else if (this.$state.includes('document')) {
-                goTo = 'main.project.ref.present.document.anchor'
-            }
-            void this.$state.go(goTo, {
-                viewId: viewId,
-                search: undefined,
-            })
+            void this.$state.go(
+                'main.project.ref.view.present.' +
+                    (this.$uiRouterGlobals.params as ParamsObject).display,
+                {
+                    viewId,
+                    search: undefined,
+                }
+            )
         }
     }
 
     treeDblClickCallback = (branch: TreeBranch): void => {
         if (this.$state.includes('**.portal.**')) {
             if (branch.type === 'view' || branch.type === 'snapshot') {
-                void this.$state.go('main.project.ref.present.snapshot', {
-                    documentId: branch.data.id,
-                    search: undefined,
-                })
+                void this.$state.go(
+                    'main.project.ref.view.present.' +
+                        (this.$uiRouterGlobals.params as ParamsObject).display,
+                    {
+                        documentId: branch.data.id,
+                        search: undefined,
+                    }
+                )
             }
         } else if (this.$state.includes('**.present.**')) {
             this.treeSvc.expandBranch(branch).catch((reason) => {
@@ -464,34 +467,20 @@ class LeftPaneController implements angular.IComponentController {
     }
 
     public fullDocMode = (): void => {
-        const curBranch = this.treeSvc.getSelectedBranch()
-        let viewId = ''
-        if (curBranch) {
-            if (curBranch.type !== 'view') {
-                if (
-                    curBranch.type === 'section' &&
-                    curBranch.data.type === 'InstanceSpecification'
-                ) {
-                    viewId = curBranch.data.id
-                } else {
-                    viewId = curBranch.viewId
-                }
-            } else {
-                viewId = curBranch.data.id
-            }
-        }
-
-        if (this.$state.includes('document')) {
-            void this.$state.go('main.project.ref.present.slideshow', {
-                viewId,
-                search: undefined,
-            })
+        let display = ''
+        this.bbApi.setToggleState(
+            'tree-full-document',
+            this.rootScopeSvc.veFullDocMode(!this.rootScopeSvc.veFullDocMode())
+        )
+        if (this.rootScopeSvc.veFullDocMode()) {
+            display = 'document'
         } else {
-            void this.$state.go('main.project.ref.present.document', {
-                viewId,
-                search: undefined,
-            })
+            display = 'slideshow'
         }
+        void this.$state.go('main.project.ref.view.present.' + display, {
+            search: undefined,
+            display,
+        })
     }
 
     reloadData = (): void => {

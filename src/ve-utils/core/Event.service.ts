@@ -88,6 +88,14 @@ export class EventService {
             }
         }
     }
+
+    exists(eventOrBinding: string): boolean {
+        const name = this.createName(eventOrBinding)
+        return (
+            this.subjects.hasOwnProperty(name) ||
+            this.bindings.hasOwnProperty(name)
+        )
+    }
 }
 
 veUtils.service('EventService', EventService)

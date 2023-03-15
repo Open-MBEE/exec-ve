@@ -1,17 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-// const Visualizer = window['ui-router-visualizer'].Visualizer as {
-//     new (router: UIRouter, options?: any): UIRouterPlugin
-// }
+const Visualizer = window['ui-router-visualizer'].Visualizer as {
+    new (router: UIRouter, options?: any): UIRouterPlugin
+}
 
 import ngPane from '@openmbee/pane-layout'
 import uiRouter, {
     StateProvider,
     StateService,
+    Trace,
     Transition,
     TransitionService,
     UIRouter,
     UIRouterGlobals,
-    UrlParts,
+    UIRouterPlugin,
 } from '@uirouter/angularjs'
 import angular, {
     IHttpInterceptor,
@@ -277,6 +278,7 @@ veApp.config([
 
                 params: {
                     projectId: {
+                        inherit: true,
                         type: 'path',
                     },
                 },
@@ -411,7 +413,12 @@ veApp.config([
             .state('main.project.ref', {
                 // equivalent to old sites and documents page
                 url: '/:refId',
-
+                params: {
+                    refId: {
+                        inherit: true,
+                        type: 'path',
+                    },
+                },
                 resolve: {
                     params: [
                         '$transition$',
@@ -597,22 +604,12 @@ veApp.config([
                     'pane-left@main': {
                         component: 'leftPane',
                         bindings: {
-                            mmsParams: 'params',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsGroup: 'groupOb',
-                            mmsDocument: 'documentOb',
                         },
                     },
                     'pane-right@main': {
                         component: 'rightPane',
-                        bindings: {
-                            mmsParams: 'params',
-                            mmsProject: 'projectOb',
-                            mmsRef: 'refOb',
-                            mmsGroup: 'groupOb',
-                            mmsDocument: 'documentOb',
-                        },
                     },
                     'toolbar-right@main': {
                         component: 'rightToolbar',
@@ -630,6 +627,12 @@ veApp.config([
             })
             .state('main.project.ref.portal.preview', {
                 url: '?documentId',
+                params: {
+                    documentId: {
+                        inherit: true,
+                        type: 'query',
+                    },
+                },
                 resolve: {
                     params: [
                         '$transition$',
@@ -709,24 +712,7 @@ veApp.config([
                 //not needed right now, for managing mounts
                 url: '/manage',
             })
-            .state('main.project.ref.present', {
-                url: '/documents/:documentId?viewId&display',
-                params: {
-                    viewId: {
-                        inherit: true,
-                        type: 'string',
-                        value: null,
-                        squash: true,
-                        raw: true,
-                    },
-                    display: {
-                        inherit: true,
-                        type: 'string',
-                        value: 'slideshow',
-                        squash: true,
-                        raw: true,
-                    },
-                },
+            .state('main.project.ref.view', {
                 resolve: {
                     params: [
                         '$transition$',
@@ -816,39 +802,15 @@ veApp.config([
                             mmsFooter: 'footerOb',
                         },
                     },
-                    'pane-center@main': {
-                        component: 'slideshow',
-                        bindings: {
-                            mmsParams: 'params',
-                            mmsProject: 'projectOb',
-                            mmsRef: 'refOb',
-                            mmsDocument: 'documentOb',
-                            mmsView: 'viewOb',
-                            mmsDocMeta: 'docMeta',
-                        },
-                    },
                     'pane-left@main': {
                         component: 'leftPane',
                         bindings: {
-                            mmsParams: 'params',
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsGroup: 'groupOb',
-                            mmsDocument: 'documentOb',
-                            mmsView: 'viewOb',
-                            mmsDocMeta: 'docMeta',
                         },
                     },
                     'pane-right@main': {
                         component: 'rightPane',
-                        bindings: {
-                            mmsParams: 'params',
-                            mmsProject: 'projectOb',
-                            mmsRef: 'refOb',
-                            mmsGroup: 'groupOb',
-                            mmsDocument: 'documentOb',
-                            mmsView: 'viewOb',
-                        },
                     },
                     'toolbar-right@main': {
                         component: 'rightToolbar',
@@ -864,7 +826,31 @@ veApp.config([
                     },
                 },
             })
-            .state('main.project.ref.present.slideshow', {
+            .state('main.project.ref.view.present', {
+                url: '/:documentId/present?viewId?display',
+                params: {
+                    documentId: {
+                        inherit: true,
+                        type: 'path',
+                        raw: true,
+                    },
+                    viewId: {
+                        inherit: true,
+                        type: 'query',
+                        value: null,
+                        squash: true,
+                        raw: true,
+                    },
+                    display: {
+                        inherit: true,
+                        type: 'query',
+                        value: 'slideshow',
+                        squash: true,
+                        raw: true,
+                    },
+                },
+            })
+            .state('main.project.ref.view.present.slideshow', {
                 views: {
                     'pane-center@main': {
                         component: 'slideshow',
@@ -879,7 +865,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.project.ref.present.document', {
+            .state('main.project.ref.view.present.document', {
                 views: {
                     'pane-center@main': {
                         component: 'document',
@@ -894,8 +880,7 @@ veApp.config([
                     },
                 },
             })
-            .state('main.project.ref.present.document.anchor', {})
-            // .state('main.project.ref.present.view', {
+            // .state('main.project.ref.view.present', {
             //     url: '?viewId',
             //     resolve: {
             //         params: [
@@ -919,7 +904,7 @@ veApp.config([
             //         },
             //     },
             // })
-            .state('main.project.ref.present.reorder', {
+            .state('main.project.ref.view.reorder', {
                 url: '/order',
 
                 resolve: {
@@ -977,6 +962,16 @@ veApp.config([
                     ],
                 },
                 views: {
+                    'nav@main': {
+                        component: 'navBar',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            mmsOrgs: 'orgObs',
+                            mmsProject: 'projectOb',
+                            mmsProjects: 'projectObs',
+                            mmsRef: 'refOb',
+                        },
+                    },
                     'pane-center@main': {
                         component: 'search',
                     },
@@ -1112,13 +1107,38 @@ veApp.run([
             return new Promise((resolve) => {
                 authSvc.checkLogin().then(
                     () => {
-                        if (transition.$to().name === 'main') {
+                        const to = transition.$to().name
+                        if (to === 'main') {
                             resolve($state.target('main.login.select'))
-                        }
-                        if (transition.$to().name === 'main.project.ref') {
+                        } else if (to === 'main.project.ref') {
                             resolve($state.target('main.project.ref.portal'))
+                        } else if (to === 'main.project.ref.view.present') {
+                            const params: ParamsObject = transition.params()
+                            if (!params.display || params.display === '') {
+                                params.display = 'slideshow'
+                            }
+                            resolve(
+                                $state.target(
+                                    'main.project.ref.view.present.' +
+                                        params.display,
+                                    params
+                                )
+                            )
+                        } else if (
+                            $state.includes('*.present.**') &&
+                            !(transition.params() as ParamsObject).display
+                        ) {
+                            const display = transition.$to().name.split('.')[
+                                transition.$to().name.split('.').length
+                            ]
+                            resolve(
+                                $state.target(transition.$to().name, {
+                                    display,
+                                })
+                            )
+                        } else {
+                            resolve()
                         }
-                        resolve()
                     },
                     () => {
                         $http.pendingRequests.forEach((pendingReq) => {
@@ -1201,32 +1221,32 @@ veApp.run([
         )
 
         // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
-        $uiRouter.urlService.rules.otherwise(
-            (match, url: UrlParts | undefined) => {
-                void authSvc.checkLogin().then((checkLogin) => {
-                    if (checkLogin) {
-                        if ($location.url().includes('workspace')) {
-                            rootScopeSvc.veRedirectFromOld(true)
-                            rootScopeSvc.veCrushUrl($location.path())
-                            void $state.go('main.login.redirect')
-                        } else {
-                            rootScopeSvc.veRedirectFromOld(false)
-                            void $state.go('main.login.select')
-                        }
-                    } else {
-                        void $state.go('main.login')
-                    }
-                })
-            }
-        )
+        // $uiRouter.urlService.rules.otherwise(
+        //     (match, url: UrlParts | undefined) => {
+        //         void authSvc.checkLogin().then((checkLogin) => {
+        //             if (checkLogin) {
+        //                 if ($location.url().includes('workspace')) {
+        //                     rootScopeSvc.veRedirectFromOld(true)
+        //                     rootScopeSvc.veCrushUrl($location.path())
+        //                     void $state.go('main.login.redirect')
+        //                 } else {
+        //                     rootScopeSvc.veRedirectFromOld(false)
+        //                     void $state.go('main.login.select')
+        //                 }
+        //             } else {
+        //                 void $state.go('main.login')
+        //             }
+        //         })
+        //     }
+        //)
     },
 ])
 
-// veApp.run([
-//     '$uiRouter',
-//     '$trace',
-//     ($uiRouter: UIRouter, $trace: Trace): void => {
-//         const pluginInstance = $uiRouter.plugin(Visualizer)
-//         $trace.enable('TRANSITION')
-//     },
-// ])
+veApp.run([
+    '$uiRouter',
+    '$trace',
+    ($uiRouter: UIRouter, $trace: Trace): void => {
+        const pluginInstance = $uiRouter.plugin(Visualizer)
+        $trace.enable('TRANSITION')
+    },
+])

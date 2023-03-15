@@ -11,6 +11,11 @@ import { AuthService } from '@ve-utils/mms-api-client'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromiseReason } from '@ve-types/angular'
+import {
+    VeModalResolveFn,
+    VeModalService,
+    VeModalSettings,
+} from '@ve-types/view-editor'
 
 const LoginComponent: VeComponentOptions = {
     selector: 'login',
@@ -45,6 +50,7 @@ const LoginComponent: VeComponentOptions = {
             '$q',
             '$state',
             '$uiRouterGlobals',
+            '$uibModal',
             'growl',
             'AuthService',
             'RootScopeService',
@@ -59,6 +65,7 @@ const LoginComponent: VeComponentOptions = {
             private $q: IQService,
             private $state: StateService,
             private $uiRouterGlobals: UIRouterGlobals,
+            private $uibModal: VeModalService,
             private growl: angular.growl.IGrowlService,
             private authSvc: AuthService,
             private rootScopeSvc: RootScopeService
@@ -66,7 +73,11 @@ const LoginComponent: VeComponentOptions = {
 
         $onInit(): void {
             this.rootScopeSvc.veTitle('Login')
+            this.rootScopeSvc.veShowLogin(true)
             this.loginBanner = this.mmsLoginBanner
+            if (!this.rootScopeSvc.veWarningOk()) {
+                this.warning()
+            }
         }
 
         login(credentials: {
@@ -122,6 +133,13 @@ const LoginComponent: VeComponentOptions = {
                 )
             }
             return deferred.promise
+        }
+
+        warning(): void {
+            const settings: VeModalSettings<VeModalResolveFn> = {
+                component: 'loginWarningModal',
+            }
+            this.$uibModal.open<VeModalResolveFn, boolean>(settings)
         }
     },
 }

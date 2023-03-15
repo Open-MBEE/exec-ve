@@ -52,7 +52,7 @@ const RedirectComponent: VeComponentOptions = {
                 <h2>This link is not valid</h2>
                 <h4>Here are documents related to the content you are looking for:</h4>
                 <div ng-repeat="$ctrl.relatedDocument in $ctrl.redirect_relatedDocs" class="elem-documentation">
-                    <a style="text-decoration:underline;" ng-repeat="relatedView in $ctrl.relatedDocument._parentViews" ui-sref="main.project.ref.present.view({documentId: $ctrl.relatedDocument.id, viewId: relatedView.id, projectId: $ctrl.relatedDocument._projectId, refId: $ctrl.relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, $ctrl.relatedDocument, relatedView, $ctrl.elem)">
+                    <a style="text-decoration:underline;" ng-repeat="relatedView in $ctrl.relatedDocument._parentViews" ui-sref="main.project.ref.view.present({documentId: $ctrl.relatedDocument.id, viewId: relatedView.id, projectId: $ctrl.relatedDocument._projectId, refId: $ctrl.relatedDocument._refId, search: undefined})" ng-click="userRelatedClick($event, $ctrl.relatedDocument, relatedView, $ctrl.elem)">
                         <i class="fa fa-file" aria-hidden="true"></i>
                         <view-link mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedDocument.id}}"></view-link> > <view-link mms-project-id="{{$ctrl.elem._projectId}}" mms-ref-id="{{$ctrl.elem._refId}}" mms-doc-id="{{$ctrl.relatedDocument.id}}" mms-element-id="{{$ctrl.relatedView.id}}"></view-link><br/>
                     </a>
@@ -217,7 +217,7 @@ const RedirectComponent: VeComponentOptions = {
                                 name: data[0].name,
                                 type: 'doc',
                                 link:
-                                    "main.project.ref.present({projectId:'" +
+                                    "main.project.ref.view.present({projectId:'" +
                                     data[0]._projectId +
                                     "',refId:'master',documentId:'" +
                                     data[0].id +
@@ -225,7 +225,7 @@ const RedirectComponent: VeComponentOptions = {
                             }
                             redirectFnc = (): void => {
                                 void this.$state.go(
-                                    'main.project.ref.present',
+                                    'main.project.ref.view.present',
                                     {
                                         projectId: data[0]._projectId,
                                         refId: 'master',
@@ -278,7 +278,7 @@ const RedirectComponent: VeComponentOptions = {
                                     name: data[0].name,
                                     type: 'doc',
                                     link:
-                                        "main.project.ref.present.view({projectId:'" +
+                                        "main.project.ref.view.present({projectId:'" +
                                         data[0]._projectId +
                                         "',refId:'master',documentId:'" +
                                         data[0].id +
@@ -288,7 +288,7 @@ const RedirectComponent: VeComponentOptions = {
                                 }
                                 redirectFnc = (): void => {
                                     void this.$state.go(
-                                        'main.project.ref.present.view',
+                                        'main.project.ref.view.present',
                                         {
                                             projectId: data[0]._projectId,
                                             refId: 'master',
@@ -315,7 +315,7 @@ const RedirectComponent: VeComponentOptions = {
                                         name: data[0].name,
                                         type: 'doc',
                                         link:
-                                            "main.project.ref.present.view({projectId:'" +
+                                            "main.project.ref.view.present({projectId:'" +
                                             data[0]._projectId +
                                             "',refId:'master',documentId:'" +
                                             data[0].id +
@@ -325,7 +325,7 @@ const RedirectComponent: VeComponentOptions = {
                                     }
                                     redirectFnc = (): void => {
                                         void this.$state.go(
-                                            'main.project.ref.present.view',
+                                            'main.project.ref.view.present',
                                             {
                                                 projectId: data[0]._projectId,
                                                 refId: 'master',
@@ -343,7 +343,7 @@ const RedirectComponent: VeComponentOptions = {
                                         name: data[0].name,
                                         type: 'doc',
                                         link:
-                                            "main.project.ref.present.view({projectId:'" +
+                                            "main.project.ref.view.present({projectId:'" +
                                             data[0]._projectId +
                                             "',refId:'master',documentId:'" +
                                             data[1].id +
@@ -353,7 +353,7 @@ const RedirectComponent: VeComponentOptions = {
                                     }
                                     redirectFnc = (): void => {
                                         void this.$state.go(
-                                            'main.project.ref.present.view',
+                                            'main.project.ref.view.present',
                                             {
                                                 projectId: data[0]._projectId,
                                                 refId: 'master',
@@ -373,7 +373,7 @@ const RedirectComponent: VeComponentOptions = {
                                         name: data[0].name,
                                         type: 'doc',
                                         link:
-                                            "main.project.ref.present({projectId:'" +
+                                            "main.project.ref.view.present({projectId:'" +
                                             data[0]._projectId +
                                             "',refId:'master',documentId:'" +
                                             data[0].id +
@@ -381,7 +381,7 @@ const RedirectComponent: VeComponentOptions = {
                                     }
                                     redirectFnc = (): void => {
                                         void this.$state.go(
-                                            'main.project.ref.present',
+                                            'main.project.ref.view.present',
                                             {
                                                 projectId: data[0]._projectId,
                                                 refId: 'master',
@@ -406,7 +406,7 @@ const RedirectComponent: VeComponentOptions = {
                                 name: data[0].name,
                                 type: 'doc',
                                 link:
-                                    "main.project.ref.present.document({projectId:'" +
+                                    "main.project.ref.view.present.document({projectId:'" +
                                     data[0]._projectId +
                                     "',refId:'master',documentId:'" +
                                     data[0].id +
@@ -414,7 +414,7 @@ const RedirectComponent: VeComponentOptions = {
                             }
                             redirectFnc = (): void => {
                                 void this.$state.go(
-                                    'main.project.ref.present.document',
+                                    'main.project.ref.view.present.document',
                                     {
                                         projectId: data[0]._projectId,
                                         refId: 'master',

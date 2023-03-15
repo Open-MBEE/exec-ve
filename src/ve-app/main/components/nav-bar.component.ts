@@ -76,14 +76,7 @@ class NavBarController implements angular.IComponentController {
         this.ref = this.mmsRef
         this.org = this.mmsOrg
 
-        this.subs.push(
-            this.eventSvc.binding(
-                this.rootScopeSvc.constants.VESHOWSEARCH,
-                (data: boolean) => {
-                    this.showSearch = data
-                }
-            )
-        )
+        this.showSearch = this.$state.includes('**.search.**')
 
         void this.authSvc.checkLogin().then(
             (data) => {
@@ -163,7 +156,7 @@ class NavBarController implements angular.IComponentController {
     }
 
     search(searchText: string): void {
-        if (this.$state.includes('main.project.ref.present.reorder')) {
+        if (this.$state.includes('main.project.ref.view.reorder')) {
             this.growl.warning('Please finish reorder action first.')
             return
             // } else if ($state.includes('main.project.diff')) {

@@ -3,7 +3,6 @@ import { IToolBarButton } from '@ve-core/toolbar'
 export const tools_default_buttons: IToolBarButton[] = [
     {
         id: 'spec-inspector',
-        category: 'global',
         icon: 'fa-eye',
         selected: true,
         active: true,
@@ -11,10 +10,10 @@ export const tools_default_buttons: IToolBarButton[] = [
         tooltip: 'Preview Element',
         spinner: false,
         dynamic_ids: ['spec-editor.saveall'],
+        enabledFor: ['main.project.ref'],
     },
     {
         id: 'spec-history',
-        category: 'global',
         icon: 'fa-history',
         selected: false,
         active: true,
@@ -22,10 +21,10 @@ export const tools_default_buttons: IToolBarButton[] = [
         tooltip: 'Element History',
         spinner: false,
         dynamic_ids: ['spec-editor.saveall'],
+        enabledFor: ['main.project.ref'],
     },
     {
         id: 'spec-editor',
-        category: 'global',
         icon: 'fa-edit',
         selected: false,
         active: true,
@@ -38,10 +37,10 @@ export const tools_default_buttons: IToolBarButton[] = [
             'spec-editor.saveall',
             'spec-editor.cancel',
         ],
+        enabledFor: ['main.project.ref'],
     },
     {
         id: 'spec-reorder',
-        category: 'global',
         icon: 'fa-arrows-v',
         selected: false,
         active: true,
@@ -49,24 +48,23 @@ export const tools_default_buttons: IToolBarButton[] = [
         tooltip: 'Reorder Spec',
         spinner: false,
         dynamic_ids: ['spec-reorder.save', 'spec-reorder.cancel'],
-        enabledFor: ['main.project.ref.portal', 'main.project.ref.present'],
+        enabledFor: ['**.portal.**', '**.present.**'],
     },
     {
         id: 'spec-ref-list',
-        category: 'global',
         icon: 'fa-code-fork',
         selected: false,
         active: true,
         permission: true,
         tooltip: 'Branches and Tags',
         spinner: false,
+        enabledFor: ['main.project.ref'],
     },
 ]
 
 export const tools_dynamic_buttons: IToolBarButton[] = [
     {
         id: 'spec-editor.save',
-        category: 'dynamic',
         icon: 'fa-save',
         dynamic: true,
         selected: false,
@@ -77,7 +75,6 @@ export const tools_dynamic_buttons: IToolBarButton[] = [
     },
     {
         id: 'spec-editor.saveC',
-        category: 'dynamic',
         icon: 'fa-regular fa-paper-plane',
         dynamic: true,
         selected: false,
@@ -88,7 +85,6 @@ export const tools_dynamic_buttons: IToolBarButton[] = [
     },
     {
         id: 'spec-editor.saveall',
-        category: 'dynamic',
         icon: 'fa-save-all',
         dynamic: true,
         selected: false,
@@ -99,7 +95,6 @@ export const tools_dynamic_buttons: IToolBarButton[] = [
     },
     {
         id: 'spec-editor.cancel',
-        category: 'dynamic',
         icon: 'fa-times',
         dynamic: true,
         selected: false,
@@ -110,7 +105,6 @@ export const tools_dynamic_buttons: IToolBarButton[] = [
     },
     {
         id: 'spec-reorder.save',
-        category: 'dynamic',
         icon: 'fa-save',
         dynamic: true,
         selected: false,
@@ -121,7 +115,6 @@ export const tools_dynamic_buttons: IToolBarButton[] = [
     },
     {
         id: 'spec-reorder.cancel',
-        category: 'dynamic',
         icon: 'fa-times',
         dynamic: true,
         selected: false,

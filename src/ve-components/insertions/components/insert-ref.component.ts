@@ -151,9 +151,9 @@ const InsertRefComponent: VeComponentOptions = {
     <div class="modal-body">
         <div class="modal-body comment-modal">
             <p class="modal-description" ng-show="$ctrl.type === 'Tag'">A <b>tag</b> is a read-only version of your project at a specific moment in time, typically a release or review.
-    <!--            <a ui-sref="main.project.ref.present.view({documentId: '_18_0_2_8630260_1446850132083_177552_51111', viewId: 'MMS_1453977130045_239e2aee-1243-4480-a6f8-61ff7bed700f', projectId: 'PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85', refId: 'master', search: undefined})">more</a></p>-->
+    <!--            <a ui-sref="main.project.ref.view.present({documentId: '_18_0_2_8630260_1446850132083_177552_51111', viewId: 'MMS_1453977130045_239e2aee-1243-4480-a6f8-61ff7bed700f', projectId: 'PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85', refId: 'master', search: undefined})">more</a></p>-->
             <p class="modal-description" ng-show="$ctrl.type === 'Branch'">A <b>branch</b> is a copy of your project for you to work on specific tasks or sandbox ideas, without interfering with other copies.
-    <!--            <a ui-sref="main.project.ref.present.view({documentId: '_18_0_2_8630260_1446850132083_177552_51111', viewId: 'MMS_1453977130045_239e2aee-1243-4480-a6f8-61ff7bed700f', projectId: 'PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85', refId: 'master', search: undefined})">more</a></p>-->
+    <!--            <a ui-sref="main.project.ref.view.present({documentId: '_18_0_2_8630260_1446850132083_177552_51111', viewId: 'MMS_1453977130045_239e2aee-1243-4480-a6f8-61ff7bed700f', projectId: 'PROJECT-ID_10_15_15_1_41_52_PM_5b84f7be_1506a83819c__6bce_cae_tw_jpl_nasa_gov_128_149_19_85', refId: 'master', search: undefined})">more</a></p>-->
             <div class="comment-modal-input" ng-show="$ctrl.createForm">
                 <div class="form-group">
                     <label>Name:</label>

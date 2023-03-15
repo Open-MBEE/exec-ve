@@ -59,14 +59,14 @@ const ShortUrlComponent: VeComponentOptions = {
                         this.decodedUrl = result
                         if (this.decodedUrl.viewId) {
                             void this.$state.go(
-                                'main.project.ref.present.view',
+                                'main.project.ref.view.present',
                                 this.decodedUrl
                             )
                             return
                         }
                         if (this.decodedUrl.documentId) {
                             void this.$state.go(
-                                'main.project.ref.present',
+                                'main.project.ref.view.present',
                                 this.decodedUrl
                             )
                             return

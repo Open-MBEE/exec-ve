@@ -105,15 +105,7 @@ class MainController implements IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-
-        this.rootScopeSvc.veViewContentLoading(false)
-
-        this.rootScopeSvc.veCommentsOn(false)
-        this.rootScopeSvc.veElementsOn(false)
-        this.rootScopeSvc.veEditMode(false)
-        this.rootScopeSvc.veNumberingOn(false)
-
-        this.rootScopeSvc.veTitle('View Editor')
+        this.rootScopeSvc.init()
 
         this.subs.push(
             this.eventSvc.binding(
@@ -241,11 +233,9 @@ class MainController implements IComponentController {
         )
 
         this.$transitions.onStart({}, (trans) => {
-            //this.rootScopeSvc.veHidePanes(true)
             this.rootScopeSvc.veViewContentLoading(true)
             this.httpSvc.transformQueue()
             this.rootScopeSvc.veStateChanging(true)
-            //const from = trans.$from().name
 
             // if (from.split('.').length >= to.split('.').length) {
             //     console.log(
@@ -287,7 +277,9 @@ class MainController implements IComponentController {
                     toState: trans.to(),
                     toParams: trans.params(),
                 })
-                this.$state.target('main.login', { next: trans.$to().url })
+                return this.$state.target('main.login', {
+                    next: trans.$to().url,
+                })
             }
             if (this.veConfig.enableDebug) {
                 this.growl.warning('Error: ' + trans.error().message, {
@@ -312,9 +304,7 @@ class MainController implements IComponentController {
             ) {
                 this.rootScopeSvc.veRedirect(null)
             }
-            if (trans.$to().name === 'main.project.ref') {
-                this.$state.target('main.project.ref.portal')
-            }
+
             if (this.$state.includes('main.login')) {
                 this.rootScopeSvc.veHidePanes(true)
                 this.rootScopeSvc.veShowLogin(true)
@@ -344,9 +334,9 @@ class MainController implements IComponentController {
             //             (trans.params() as ParamsObject).documentId
             //         )
             // } else if (
-            //     this.$state.includes('main.project.ref.present') &&
+            //     this.$state.includes('main.project.ref.view.present') &&
             //     this.$uiRouterGlobals.$current.name !==
-            //         'main.project.ref.present.reorder'
+            //         'main.project.ref.view.reorder'
             // ) {
             //     if ((trans.params() as ParamsObject).viewId !== undefined)
             //         this.rootScopeSvc.treeInitialSelection(
@@ -361,32 +351,30 @@ class MainController implements IComponentController {
             //             (trans.params() as ParamsObject).documentId
             //         )
             // }
-            if (trans.$to().name === 'main.project.ref.present') {
-                const display = (trans.params() as ParamsObject).display
-                if (!display || display === '' || display === 'slideshow') {
-                    void this.$state.go('main.project.ref.slideshow', {
-                        display: 'slideshow',
-                    })
-                }
-            }
-            if (this.$state.includes('main.project.ref.present')) {
+
+            if (this.$state.includes('main.project.ref.view.present')) {
                 this.applicationSvc.getState().inDoc = true
                 this.applicationSvc.getState().currentDoc = (
                     trans.params() as ParamsObject
                 ).documentId
                 this.applicationSvc.getState().fullDoc = !!this.$state.includes(
-                    'main.project.ref.present.document'
+                    'main.project.ref.view.present.document'
                 )
             } else {
                 this.applicationSvc.getState().inDoc = false
                 this.applicationSvc.getState().fullDoc = false
             }
             this.rootScopeSvc.veViewContentLoading(false)
+            if (!(trans.params() as ParamsObject).display) {
+                const display = trans.$to().name.split('.')[
+                    trans.$to().name.split('.').length
+                ]
+                void this.$state.target(trans.$to().name, { display })
+            }
             if (
                 this.$state.includes('main.project.ref') &&
                 (trans.from().name === 'main.login' ||
                     trans.from().name === 'main.login.select' ||
-                    trans.from().name === 'project' ||
                     trans.from().name === 'main.login.redirect')
             ) {
                 void this.$timeout(

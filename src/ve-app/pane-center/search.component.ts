@@ -55,7 +55,7 @@ class SearchController {
             },
             relatedCallback: (doc, view, elem): void => {
                 //siteId, documentId, viewId) {
-                void this.$state.go('main.project.ref.present.view', {
+                void this.$state.go('main.project.ref.view.present', {
                     projectId: doc._projectId,
                     documentId: doc.id,
                     viewId: view.id,

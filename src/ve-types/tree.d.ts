@@ -26,6 +26,7 @@ export interface TreeBranch extends ITreeNode {
     selected?: boolean
     expanded?: boolean
     expandable?: boolean
+    favorite?: boolean
     onSelect?(branch: TreeBranch): void
     onDblClick?(branch: TreeBranch): void
 }

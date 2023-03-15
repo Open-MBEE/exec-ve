@@ -176,9 +176,9 @@ class ViewLinkController implements angular.IComponentController {
                                     this.suffix = ')'
                                 }
                                 if (this.applicationSvc.getState().fullDoc) {
-                                    this.href = `main.project.ref.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
+                                    this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                                 } else {
-                                    this.href = `main.project.ref.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
+                                    this.href = `main.project.ref.view.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                                 }
                             },
                             (reason) => {
@@ -207,9 +207,9 @@ class ViewLinkController implements angular.IComponentController {
                         )
                     }
                     if (this.applicationSvc.getState().fullDoc) {
-                        this.href = `main.project.ref.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
+                        this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                     } else {
-                        this.href = `main.project.ref.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
+                        this.href = `main.project.ref.view.present.slideshow({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
                     }
                     this.showNum =
                         this.applicationSvc.getState().inDoc &&

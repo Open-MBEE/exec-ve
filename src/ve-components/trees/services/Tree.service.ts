@@ -784,6 +784,7 @@ export class TreeService {
                     branch.expanded = level <= this.treeApi.expandLevel
                 branch.expandable =
                     branch.children && branch.children.length > 0
+                branch.favorite = false
 
                 let number = ''
                 if (section) number = section.join('.')
@@ -900,6 +901,7 @@ export class TreeService {
         types: string[],
         treeRows: TreeRow[]
     ): VePromise<TreeRow[], void> => {
+        treeRows.length = 0
         return new this.$q<TreeRow[], void>((resolve, reject) => {
             const addBranchToList = (
                 level: number,
@@ -935,7 +937,10 @@ export class TreeService {
                     }
                 }
 
-                if (!types.includes('all') && !types.includes(branch.type))
+                if (
+                    (!types.includes('all') && !types.includes(branch.type)) ||
+                    (types.includes('favorite') && !branch.favorite)
+                )
                     visible = false
                 const treeRow = {
                     level,
@@ -1082,6 +1087,7 @@ export class TreeService {
                     )
             } else {
                 this.seenViewIds = {}
+                this.viewId2node = {}
                 const reqOb: ElementsRequest<string> = {
                     elementId: this.treeApi.rootId,
                     refId: this.treeApi.refId,

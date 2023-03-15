@@ -25,7 +25,6 @@ class RightPaneController implements IComponentController {
     private mmsParams: ParamsObject
 
     //Local Values
-    private params: ParamsObject
 
     public subs: Rx.IDisposable[]
 
@@ -80,7 +79,6 @@ class RightPaneController implements IComponentController {
 
     $onInit(): void {
         this.eventSvc.$init(this)
-        this.params = this.mmsParams
 
         //Init Pane Toggle Controls
         this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
@@ -185,8 +183,8 @@ class RightPaneController implements IComponentController {
                     data.rootId &&
                     refType === 'Branch' &&
                     this.permissionsSvc.hasBranchEditPermission(
-                        this.params.projectId,
-                        this.params.refId
+                        projectId,
+                        refId
                     )
 
                 //Independent of viewOb if there is a document we want document tools enabled
@@ -226,9 +224,6 @@ const RightPaneComponent: VeComponentOptions = {
     template: `
     <div class="pane-right"></div>
     `,
-    bindings: {
-        mmsParams: '<',
-    },
     require: {
         $pane: '^^ngPane',
     },

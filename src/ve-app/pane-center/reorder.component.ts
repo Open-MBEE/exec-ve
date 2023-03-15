@@ -302,7 +302,7 @@ class ReorderController implements IComponentController {
         const curBranch = this.treeSvc.getSelectedBranch()
         if (!curBranch) {
             void this.$state.go(
-                'main.project.ref.present',
+                'main.project.ref.view.present',
                 {},
                 { reload: true }
             )
@@ -312,7 +312,7 @@ class ReorderController implements IComponentController {
                 goToId = curBranch.viewId ? curBranch.viewId : ''
             }
             void this.$state.go(
-                'main.project.ref.present.view',
+                'main.project.ref.view.present',
                 { viewId: goToId },
                 { reload: reload }
             )

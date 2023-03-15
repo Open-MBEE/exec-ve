@@ -38,8 +38,10 @@ export class SessionService {
             let val = SessionService._getStorage<T>(name)
             if (val == null) {
                 val = defaultValue
-                this.eventSvc.resolve(name, val)
                 SessionService._setStorage(name, val)
+            }
+            if (!this.eventSvc.exists(name)) {
+                this.eventSvc.resolve(name, val)
             }
             return val
         }

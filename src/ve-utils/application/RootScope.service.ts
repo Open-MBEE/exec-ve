@@ -12,6 +12,7 @@ export class RootScopeService {
         MMSREFOB: 'mms-ref-ob',
         RIGHTPANETOGGLEABLE: 'mms-pane-toggleable',
         RIGHTPANECLOSED: 'mms-pane-closed',
+        VEWARNINGOK: 've-warning-ok',
         VETITLE: 've-title',
         VESTATECHANGING: 've-state-changing',
         VEVIEWCONTENTLOADING: 've-view-content-loading',
@@ -25,7 +26,6 @@ export class RootScopeService {
         VEEDITMODE: 've-edit-mode',
         VEHIDEPANES: 've-hide-panes',
         VESHOWLOGIN: 've-show-login',
-        VESHOWSEARCH: 've-show-search',
         TREESHOWPE: 'tree-show-pe',
         TREEINITIALSELECTION: 'tree-initialSelection',
         TREEICONS: 'tree-icons',
@@ -41,6 +41,7 @@ export class RootScopeService {
         this.rightPaneToggleable()
         this.rightPaneClosed()
         this.veTitle()
+        this.veShowLogin()
         this.veStateChanging()
         this.veViewContentLoading()
         this.veRedirect()
@@ -74,6 +75,14 @@ export class RootScopeService {
     rightPaneClosed(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(
             this.constants.RIGHTPANECLOSED,
+            value,
+            false
+        )
+    }
+
+    veWarningOk(value?: boolean | undefined): boolean {
+        return this.sessionSvc.accessor(
+            this.constants.VEWARNINGOK,
             value,
             false
         )

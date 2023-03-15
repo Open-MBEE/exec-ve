@@ -339,49 +339,39 @@ class ViewTreesController implements IComponentController {
             'tree-delete',
             this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
         )
-        if (this.treesCategory === 'portal') {
-            api.setActive('tree-add.group', true, 'tree-add')
-            api.setPermission(
-                'tree-add.group',
-                this.permissionsSvc.hasProjectEditPermission(
-                    this.treeSvc.treeApi.projectId
-                )
+        api.setPermission(
+            'tree-add.group',
+            this.permissionsSvc.hasProjectEditPermission(
+                this.treeSvc.treeApi.projectId
             )
-            api.setActive('tree-add.document', true, 'tree-add')
-            api.setPermission(
-                'tree-add.document',
-                this.treeSvc.treeApi.refType !== 'Tag' &&
-                    this.treeSvc.treeEditable
-            )
+        )
+        api.setPermission(
+            'tree-add.document',
+            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
+        )
 
-            api.addButton(
-                this.buttonBarSvc.getButtonBarButton('tree-reorder-group')
+        api.addButton(
+            this.buttonBarSvc.getButtonBarButton('tree-reorder-group')
+        )
+        api.setPermission(
+            'tree-reorder-group',
+            this.permissionsSvc.hasProjectEditPermission(
+                this.treeSvc.treeApi.projectId
             )
-            api.setPermission(
-                'tree-reorder-group',
-                this.permissionsSvc.hasProjectEditPermission(
-                    this.treeSvc.treeApi.projectId
-                )
-            )
-        } else if (this.treesCategory === 'present') {
-            api.setActive('tree-add.view', true, 'tree-add')
-            api.setPermission(
-                'tree-add.view',
-                this.treeSvc.treeApi.refType !== 'Tag' &&
-                    this.treeSvc.treeEditable
-            )
+        )
+        api.setPermission(
+            'tree-add.view',
+            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
+        )
 
-            api.addButton(
-                this.buttonBarSvc.getButtonBarButton('tree-reorder-view')
-            )
-            api.addButton(
-                this.buttonBarSvc.getButtonBarButton('tree-full-document')
-            )
-            api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'))
-            api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
-            if (this.rootScopeSvc.veFullDocMode()) {
-                api.setToggleState('tree-full-document', true)
-            }
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))
+        api.addButton(
+            this.buttonBarSvc.getButtonBarButton('tree-full-document')
+        )
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'))
+        api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
+        if (this.rootScopeSvc.veFullDocMode()) {
+            api.setToggleState('tree-full-document', true)
         }
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-refresh'))
     }
@@ -945,8 +935,7 @@ class ViewTreesController implements IComponentController {
 
             if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
                 this.startTree(data.id)
-                this.show[_.camelCase(data.id)].tree = true
-                this.show[_.camelCase(data.id)].pe = false
+                this.show[_.camelCase(data.id)] = { tree: true, pe: false }
             } else {
                 this.eventSvc.$broadcast(TreeService.events.RELOAD, data.id)
                 this.show[_.camelCase(data.id)].tree = true
