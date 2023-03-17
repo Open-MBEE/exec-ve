@@ -1,5 +1,6 @@
 import { IPaneScope } from '@openmbee/pane-layout'
 
+import { veAppEvents } from '@ve-app/events'
 import { ComponentService } from '@ve-components/services'
 import { ToolbarService, ToolbarApi } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
@@ -282,12 +283,16 @@ export class SpecTool implements ISpecTool {
     }
 
     public propertyTypeClicked = (id: string): void => {
-        const elementOb = {
-            id: id,
-            _projectId: this.element._projectId,
-            _refId: this.element._refId,
+        const data = {
+            elementId: id,
+            projectId: this.element._projectId,
+            refId: this.element._refId,
+            commitId: 'latest',
         }
-        this.eventSvc.$broadcast('element.selected', { elementOb: elementOb })
+        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
+            'element.selected',
+            data
+        )
     }
 
     public addHtml(value: { value: string }): void {

@@ -54,7 +54,7 @@ export class TranscludeComController
             </div></form>
         </h3>
         <div class="btn-group pull-right">
-            <button-bar class="transclude-panel-toolbar" button-api="$ctrl.bbApi"></button-bar>
+            <button-bar class="transclude-panel-toolbar" button-id="$ctrl.bbId"></button-bar>
         </div>
     </div>
     <div class="panel-body no-padding-panel">

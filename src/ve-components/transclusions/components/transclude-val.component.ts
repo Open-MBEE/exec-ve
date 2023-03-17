@@ -96,7 +96,7 @@ export class TranscludeValController
     <div ng-if="!$ctrl.mmsSpecEditorCtrl" class="panel-heading clearfix">
         <h3 class="panel-title pull-left">Value : {{$ctrl.element.name}}</h3>
         <div class="btn-group pull-right">
-            <button-bar class="transclude-panel-toolbar" button-api="$ctrl.bbApi"></button-bar>
+            <button-bar class="transclude-panel-toolbar" button-id="$ctrl.bbId"></button-bar>
         </div>
     </div>
     <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">

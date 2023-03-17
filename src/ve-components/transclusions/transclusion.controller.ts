@@ -188,6 +188,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         | angular.Injectable<(...args: unknown[]) => string>
 
     public bbApi: ButtonBarApi
+    public bbId: string
     public bars: string[]
     protected buttons: IButtonBarButton[] = []
 

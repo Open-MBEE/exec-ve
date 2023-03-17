@@ -10,7 +10,12 @@ import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService } from '@ve-app/main/services'
 import { InsertViewData } from '@ve-components/insertions/components/insert-view.component'
 import { TreeService } from '@ve-components/trees'
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
+import { trees_default_buttons } from '@ve-components/trees/trees-buttons.config'
+import {
+    ButtonBarApi,
+    ButtonBarService,
+    ButtonWrapEvent,
+} from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -50,6 +55,8 @@ class LeftPaneController implements angular.IComponentController {
     public bbApi: ButtonBarApi
     public bbSize: string
     public bars: string[]
+    private headerSize: string = '93px'
+    protected squishSize: number = 250
 
     protected treesCategory: string
     public treeSearch: string = ''
@@ -198,6 +205,43 @@ class LeftPaneController implements angular.IComponentController {
             )
         )
 
+        this.subs.push(
+            this.eventSvc.$on('tree.ready', () => {
+                if (!this.bbApi) {
+                    this.bbApi = this.buttonBarSvc.initApi(
+                        this.buttonId,
+                        this.bbInit,
+                        this,
+                        trees_default_buttons
+                    )
+                    this.subs.push(
+                        this.eventSvc.$on(
+                            this.bbApi.WRAP_EVENT,
+                            (data: ButtonWrapEvent) => {
+                                if (data.oldSize != data.newSize) {
+                                    const title = $('.tree-view-title')
+                                    const titleSize =
+                                        title.outerHeight() +
+                                        parseInt(title.css('marginTop')) +
+                                        parseInt(title.css('marginBottom'))
+                                    const treeOptions =
+                                        $('.tree-options').outerHeight()
+                                    const buttonSize =
+                                        $('.tree-view-buttons').outerHeight()
+                                    const calcSize = Math.round(
+                                        titleSize + treeOptions + buttonSize
+                                    )
+                                    this.headerSize =
+                                        calcSize.toString(10) + 'px'
+                                    this.$scope.$apply()
+                                }
+                            }
+                        )
+                    )
+                }
+            })
+        )
+
         this.buttonBarSvc.waitForApi(this.buttonId).then(
             (api) => {
                 this.bbApi = api
@@ -207,7 +251,7 @@ class LeftPaneController implements angular.IComponentController {
                         (data) => {
                             switch (data.clicked) {
                                 case 'tree-reorder-view': {
-                                    this.bbApi.setToggleState(
+                                    this.bbApi.toggleButton(
                                         'tree-full-document',
                                         false
                                     )
@@ -242,6 +286,79 @@ class LeftPaneController implements angular.IComponentController {
                 console.log(reason.message)
             }
         )
+    }
+
+    bbInit = (api: ButtonBarApi): void => {
+        api.buttons.length = 0
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-expand'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-collapse'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-add'))
+        api.setPermission(
+            'tree-add',
+            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
+        )
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-delete'))
+        api.setPermission(
+            'tree-delete',
+            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
+        )
+        api.setPermission(
+            'tree-add.group',
+            this.permissionsSvc.hasProjectEditPermission(
+                this.treeSvc.treeApi.projectId
+            )
+        )
+        api.setPermission(
+            'tree-add.document',
+            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
+        )
+
+        api.addButton(
+            this.buttonBarSvc.getButtonBarButton('tree-reorder-group')
+        )
+        api.setPermission(
+            'tree-reorder-group',
+            this.permissionsSvc.hasProjectEditPermission(
+                this.treeSvc.treeApi.projectId
+            )
+        )
+        api.setPermission(
+            'tree-add.view',
+            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
+        )
+
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))
+        api.addButton(
+            this.buttonBarSvc.getButtonBarButton('tree-full-document')
+        )
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'))
+        api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
+        if (this.rootScopeSvc.veFullDocMode()) {
+            api.toggleButton('tree-full-document', true)
+        }
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-refresh'))
+        api.buttons.forEach((b) => {
+            const button = b.config
+            if (button) {
+                if (button.enabledFor) {
+                    b.active = false
+                    for (const enableState of button.enabledFor) {
+                        if (this.$state.includes(enableState)) {
+                            b.active = true
+                            break
+                        }
+                    }
+                }
+                if (button.disabledFor) {
+                    for (const disableState of button.disabledFor) {
+                        if (this.$state.includes(disableState)) {
+                            b.active = false
+                            break
+                        }
+                    }
+                }
+            }
+        })
     }
 
     changeData = (data: veAppEvents.elementSelectedData): void => {
@@ -468,7 +585,7 @@ class LeftPaneController implements angular.IComponentController {
 
     public fullDocMode = (): void => {
         let display = ''
-        this.bbApi.setToggleState(
+        this.bbApi.toggleButton(
             'tree-full-document',
             this.rootScopeSvc.veFullDocMode(!this.rootScopeSvc.veFullDocMode())
         )
@@ -511,7 +628,30 @@ const LeftPaneComponent: VeComponentOptions = {
     transclude: true,
     template: `
     <div class="pane-left">
-    <i ng-show="$ctrl.spin" class="tree-spinner fa fa-2x fa-spinner fa-spin"></i>
+    <ng-pane pane-anchor="north" pane-size="{{ $ctrl.headerSize }}" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
+    <div class="tree-view">
+        
+        <i ng-hide="$ctrl.bbApi" class="fa fa-spinner fa-spin" style="margin: 5px 50%"></i>
+        <div ng-show="$ctrl.bbApi" class="tree-view-buttons" role="toolbar">
+            <button-bar button-id="$ctrl.buttonId"></button-bar>
+        </div>
+        <div class="tree-options">
+            <button ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" uib-popover-template="'filterTemplate.html'" 
+              popover-title="Filter Tree" popover-placement="right-bottom" popover-append-to-body="true" 
+              popover-trigger="'outsideClick'" type="button" class="btn btn-tools btn-sm">
+                <i class="fa-solid fa-filter fa-2x"></i>
+            </button>
+            <script type="text/ng-template" id="filterTemplate.html">
+                  <input ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
+                    ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
+                    ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
+            </script>
+            <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
+                ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
+                ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
+        </div>
+    </div>
+</ng-pane>
 </div>
   
   

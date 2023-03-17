@@ -5,11 +5,7 @@ import { AppUtilsService, ResolveService } from '@ve-app/main/services'
 import { pane_center_buttons } from '@ve-app/pane-center/pane-center-buttons.config'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
 import { TreeService } from '@ve-components/trees'
-import {
-    IButtonBarButton,
-    ButtonBarApi,
-    ButtonBarService,
-} from '@ve-core/button-bar'
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import {
     RootScopeService,
@@ -169,7 +165,7 @@ class SlideshowController implements angular.IComponentController {
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 if (data.clicked === 'show-comments') {
-                    this.bbApi.toggleButtonState(
+                    this.bbApi.toggleButton(
                         'show-comments',
                         this.rootScopeSvc.veCommentsOn(
                             !this.rootScopeSvc.veCommentsOn()
@@ -177,7 +173,7 @@ class SlideshowController implements angular.IComponentController {
                     )
                     return
                 } else if (data.clicked === 'show-numbering') {
-                    this.bbApi.toggleButtonState(
+                    this.bbApi.toggleButton(
                         'show-numbering',
                         !this.rootScopeSvc.veNumberingOn(
                             !this.rootScopeSvc.veNumberingOn()
@@ -185,7 +181,7 @@ class SlideshowController implements angular.IComponentController {
                     )
                     return
                 } else if (data.clicked === 'show-elements') {
-                    this.bbApi.toggleButtonState(
+                    this.bbApi.toggleButton(
                         'show-elements',
                         this.rootScopeSvc.veElementsOn(
                             !this.rootScopeSvc.veElementsOn()
@@ -200,7 +196,7 @@ class SlideshowController implements angular.IComponentController {
                     }
                     return
                 } else if (data.clicked === 'show-edits') {
-                    this.bbApi.toggleButtonState(
+                    this.bbApi.toggleButton(
                         'show-edits',
                         this.rootScopeSvc.veEditMode(
                             !this.rootScopeSvc.veEditMode()
@@ -461,7 +457,7 @@ class SlideshowController implements angular.IComponentController {
             )
         ) {
             api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
-            api.setToggleState('show-edits', this.rootScopeSvc.veEditMode())
+            api.toggleButton('show-edits', this.rootScopeSvc.veEditMode())
             this.hotkeys.bindTo(this.$scope).add({
                 combo: 'alt+d',
                 description: 'toggle edit mode',
@@ -476,11 +472,11 @@ class SlideshowController implements angular.IComponentController {
             })
         }
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
-        api.setToggleState('show-elements', this.rootScopeSvc.veElementsOn())
+        api.toggleButton('show-elements', this.rootScopeSvc.veElementsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
-        api.setToggleState('show-comments', this.rootScopeSvc.veCommentsOn())
+        api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.setToggleState('show-numbering', !this.rootScopeSvc.veNumberingOn())
+        api.toggleButton('show-numbering', !this.rootScopeSvc.veNumberingOn())
 
         // Set hotkeys for toolbar
         this.hotkeys
@@ -515,14 +511,7 @@ class SlideshowController implements angular.IComponentController {
                 this.buttonBarSvc.getButtonBarButton('refresh-numbering')
             )
             api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
-            const exportButtons: IButtonBarButton =
-                this.buttonBarSvc.getButtonBarButton('export')
-            if (!exportButtons.dropdown_buttons)
-                exportButtons.dropdown_buttons = []
-            exportButtons.dropdown_buttons.push(
-                this.buttonBarSvc.getButtonBarButton('convert-pdf')
-            )
-            api.addButton(exportButtons)
+            api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
             api.addButton(
                 this.buttonBarSvc.getButtonBarButton('center-previous')
             )
@@ -586,10 +575,18 @@ class SlideshowController implements angular.IComponentController {
 
     public elementClicked = (elementOb: ElementObject): void => {
         const data = {
-            elementOb: elementOb,
+            rootOb: this.$state.includes('**.portal.**')
+                ? null
+                : this.mmsDocument.id,
+            elementId: elementOb.id,
+            projectId: elementOb._projectId,
+            refId: elementOb._refId,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast('element.selected', data)
+        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
+            'element.selected',
+            data
+        )
     }
 
     public isPageLoading = (): boolean => {
@@ -614,7 +611,7 @@ const SlideshowComponent: VeComponentOptions = {
                 <i class="fa-solid fa-share-from-square"></i></button>
             </div>
             <div class="pane-center-btn-group">
-                <button-bar button-api="$ctrl.bbApi" class="bordered-button-bar"></button-bar>
+                <button-bar button-id="$ctrl.bbId" class="bordered-button-bar"></button-bar>
             </div>
         </div>
     </ng-pane>

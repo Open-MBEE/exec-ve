@@ -1,4 +1,4 @@
-import { IButtonBarButton } from '@ve-core/button-bar'
+import { BarButton } from '@ve-core/button-bar'
 
 export interface ButtonWrapEvent {
     oldSize: number
@@ -6,7 +6,7 @@ export interface ButtonWrapEvent {
 }
 
 export class ButtonBarApi {
-    public buttons: IButtonBarButton[] = []
+    public buttons: BarButton[] = []
     public WRAP_EVENT: string
 
     constructor(public id: string) {
@@ -20,13 +20,10 @@ export class ButtonBarApi {
         return this.id
     }
 
-    public select = (
-        parentButton: IButtonBarButton,
-        childButton: IButtonBarButton
-    ): void => {
-        if (parentButton && childButton && childButton.selectable) {
+    public select = (parentButton: BarButton, childButton: BarButton): void => {
+        if (parentButton && childButton && childButton.config.selectable) {
             parentButton.dropdown_buttons.forEach((dropdownButton) => {
-                if (parentButton.dropdown_toggleable) {
+                if (parentButton.config.dropdown) {
                     if (dropdownButton.id === childButton.id) {
                         dropdownButton.selected = dropdownButton.selected
                             ? !dropdownButton.selected
@@ -41,30 +38,18 @@ export class ButtonBarApi {
     }
 
     public deselect = (
-        parentButton: IButtonBarButton,
-        childButton: IButtonBarButton
+        parentButton: BarButton,
+        childButton: BarButton
     ): void => {
         if (parentButton && childButton) {
             parentButton.dropdown_buttons.forEach((dropdownButton) => {
-                if (parentButton.dropdown_toggleable) {
+                if (parentButton.config.dropdown) {
                     if (dropdownButton.id === childButton.id) {
                         dropdownButton.selected = false
                     }
                 }
             })
         }
-    }
-
-    public deselectAll = (id: string): void => {
-        this.buttons.forEach((button) => {
-            if (button.id === id && button.dropdown_buttons) {
-                button.dropdown_buttons.forEach((dropdownButton) => {
-                    if (button.dropdown_toggleable) {
-                        dropdownButton.selected = false
-                    }
-                })
-            }
-        })
     }
 
     public setPermission = (id: string, permission: boolean): void => {
@@ -84,121 +69,25 @@ export class ButtonBarApi {
         })
     }
 
-    public setTooltip = (id: string, tooltip: string): void => {
-        this.buttons.forEach((button) => {
-            if (button.id === id) button.tooltip = tooltip
-        })
-    }
-
-    public setIcon = (id: string, icon: string): void => {
-        this.buttons.forEach((button) => {
-            if (button.id === id) button.icon = icon
-        })
-    }
-
-    public setToggleState = (id: string, state: boolean): void => {
-        this.buttons.forEach((button) => {
-            if (button.id === id) {
-                if (button.toggleable) {
-                    const original = button.toggle_state
-                    if (original != state) this.toggleButtonState(id, state)
-                }
-            }
-        })
-    }
-
-    public getToggleState = (id: string): boolean => {
-        let buttonTemp: IButtonBarButton = {} as IButtonBarButton
-
-        this.buttons.forEach((button: IButtonBarButton) => {
-            if (button.id === id) {
-                buttonTemp = button
-                if (!button.toggleable) button.toggle_state = false
-                if (!button.toggle_state) button.toggle_state = false
-            }
-        })
-
-        return buttonTemp.toggle_state ? buttonTemp.toggle_state : false
-    }
-
-    public addButton = (button: IButtonBarButton): void => {
-        this._initButton(button)
-        this.buttons.push(button)
-    }
-
-    private _initButton = (button: IButtonBarButton): void => {
+    public addButton = (button: BarButton): void => {
         if (this.buttons.length === 0) {
             button.placement = 'bottom-left'
         } else if (!button.placement) {
             // else {
             button.placement = 'bottom'
         }
-
-        if (button.toggleable) {
-            button.toggle_state = false
-            button.tooltip_orginal = button.tooltip
-        }
-        button.icon_original = button.icon
-        if (button.dropdown_toggleable) {
-            button.dropdown_toggle_state = false
-        }
-        if (button.dropdown_icon) {
-            button.dropdown_icon_original = button.dropdown_icon
-        }
-        if (typeof button.active === 'undefined') {
-            button.active = true
-        }
-        if (button.dropdown_buttons && button.dropdown_buttons.length > 0)
-            button.dropdown_buttons.forEach((b) => this._initButton(b))
+        this.buttons.push(button)
     }
 
     public toggleButtonSpinner = (id: string): void => {
         this.buttons.forEach((button) => {
-            if (button.id === id) {
-                if (button.spinner) {
-                    button.icon = button.icon_original
-                } else {
-                    button.icon_original = button.icon
-                    button.icon = 'fa fa-spinner fa-spin'
-                }
-                button.spinner = !button.spinner
-            }
+            if (button.id === id) button.toggleSpin()
         })
     }
 
-    public toggleButtonState = (id: string, state?: boolean): void => {
+    public toggleButton = (id: string, state?: boolean): void => {
         this.buttons.forEach((button) => {
-            if (button.id === id) {
-                if (button.toggleable) {
-                    button.toggle_state =
-                        state != null ? state : !button.toggle_state
-                    if (button.toggle_state) {
-                        if (button.toggle_tooltip) {
-                            button.tooltip = button.toggle_tooltip
-                        }
-                        if (button.toggle_icon) {
-                            button.icon = button.toggle_icon
-                        }
-                    } else {
-                        button.icon = button.icon_original
-                        if (button.tooltip_orginal) {
-                            button.tooltip = button.tooltip_orginal
-                        }
-                    }
-                }
-                if (button.dropdown_toggleable && button.dropdown_icon) {
-                    button.dropdown_toggle_state =
-                        state != null ? state : !button.dropdown_toggle_state
-                    if (
-                        button.dropdown_toggle_state &&
-                        button.dropdown_toggle_icon
-                    ) {
-                        button.dropdown_icon = button.dropdown_toggle_icon
-                    } else {
-                        button.dropdown_icon = button.dropdown_icon_original
-                    }
-                }
-            }
+            if (button.id === id) button.toggle(state)
         })
     }
 }

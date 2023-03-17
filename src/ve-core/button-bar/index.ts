@@ -1,3 +1,4 @@
+export * from './services/BarButton.api'
 export * from './services/ButtonBar.api'
 
 //Service

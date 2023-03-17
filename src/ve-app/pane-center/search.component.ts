@@ -1,5 +1,6 @@
 import { StateService } from '@uirouter/angularjs'
 
+import { veAppEvents } from '@ve-app/events'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -7,6 +8,7 @@ import { EventService } from '@ve-utils/core'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
+import { ElementObject } from '@ve-types/mms'
 import { VeSearchOptions } from '@ve-types/view-editor'
 
 class SearchController {
@@ -41,12 +43,17 @@ class SearchController {
             searchField: this.field,
             getProperties: true,
             closeable: true,
-            callback: (elementOb): void => {
+            callback: (elementOb: ElementObject): void => {
                 const data = {
-                    elementOb: elementOb,
+                    elementId: elementOb.id,
+                    projectId: elementOb._projectId,
+                    refId: elementOb._refId,
                     commitId: 'latest',
                 }
-                this.eventSvc.$broadcast('element.selected', data)
+                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
+                    'element.selected',
+                    data
+                )
                 if (
                     typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' &&
                     this.rootScopeSvc.rightPaneClosed()

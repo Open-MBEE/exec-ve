@@ -4,6 +4,7 @@
 // <h2 class="prop-title">Target</h2>
 //     <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._targetIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
 // </div>
+import { veAppEvents } from '@ve-app/events'
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
@@ -76,10 +77,15 @@ export class TranscludeAttrController
             e.stopPropagation()
             if (this.noClick) return
             const data = {
-                elementOb: this.element,
-                commitId: this.mmsCommitId ? this.mmsCommitId : 'latest',
+                elementId: this.element.id,
+                projectId: this.element._projectId,
+                refId: this.element._refId,
+                commitId: 'latest',
             }
-            this.eventSvc.$broadcast('element.selected', data)
+            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
+                'element.selected',
+                data
+            )
         })
     }
 

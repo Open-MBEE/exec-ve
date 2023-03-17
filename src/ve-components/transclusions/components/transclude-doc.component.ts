@@ -1,3 +1,4 @@
+import { presentations_buttons } from '@ve-components/presentations/presentations-buttons.config'
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { Transclusion, ITransclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
@@ -60,7 +61,7 @@ export class TranscludeDocController
             </div></form>
         </h3>
         <div class="btn-group pull-right">
-            <button-bar class="transclude-panel-toolbar" button-api="$ctrl.bbApi"></button-bar>
+            <button-bar class="transclude-panel-toolbar" button-id="$ctrl.bbId"></button-bar>
         </div>
     </div>
     <div class="panel-body no-padding-panel">
@@ -111,7 +112,16 @@ export class TranscludeDocController
 
     $onInit(): void {
         super.$onInit()
-        this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this)
+
+        this.bbId = this.buttonBarSvc.generateBarId(
+            `${this.element.id}_${this.cfType}`
+        )
+        this.bbApi = this.buttonBarSvc.initApi(
+            this.bbId,
+            this.bbInit,
+            this,
+            presentations_buttons
+        )
 
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) this.startEdit()

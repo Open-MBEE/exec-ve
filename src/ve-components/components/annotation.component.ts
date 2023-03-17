@@ -1,3 +1,4 @@
+import { veAppEvents } from '@ve-app/events'
 import { ExtensionService } from '@ve-components/services'
 import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -54,11 +55,15 @@ class AnnotationController implements angular.IComponentController {
             if (this.mmsRecentElement) {
                 const data = {
                     elementId: this.mmsRecentElement.id,
-
+                    projectId: this.mmsRecentElement._projectId,
+                    refId: this.mmsRecentElement._refId,
                     commitId: this.mmsRecentElement._commitId,
                     displayOldSpec: true,
                 }
-                this.eventSvc.$broadcast('element.selected', data)
+                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
+                    'element.selected',
+                    data
+                )
             }
         })
 

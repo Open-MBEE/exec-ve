@@ -1,8 +1,4 @@
-import {
-    ButtonBarApi,
-    ButtonBarService,
-    IButtonBarButton,
-} from '@ve-core/button-bar'
+import { BarButton, ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import { EventService } from '@ve-utils/core'
 
@@ -20,14 +16,14 @@ const ButtonBarComponent: VeComponentOptions = {
           ng-click="$ctrl.buttonClicked($event, button.id)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
           tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
           <span class="fa-stack">
-            <i ng-show="button.toggle_state" class="fa-solid fa-square fa-stack-2x"></i>
-            <i class="{{ button.icon }} fa-stack-1x {{(button.toggle_state) ? 'fa-inverse' : ''}}"></i>
+            <i ng-show="button.toggled" class="fa-solid fa-square fa-stack-2x"></i>
+            <i class="{{ button.icon }} fa-stack-1x {{(button.toggled) ? 'fa-inverse' : ''}}"></i>
           </span>
           {{button.text}}
       </a>
     
       <!-- Button with dropdown buttons -->
-      <span ng-if="button.dropdown_buttons" class="btn-group" on-toggle="$ctrl.bbApi.toggleButtonState(button.id)" uib-dropdown>
+      <span ng-if="button.dropdown_buttons" class="btn-group" on-toggle="$ctrl.bbApi.toggleButton(button.id)" uib-dropdown>
         <button type="button" class="btn btn-tools btn-sm dropdown-toggle {{button.id}}" uib-dropdown-toggle uib-tooltip="{{button.tooltip}}"
             tooltip-append-to-body="false" tooltip-trigger="mouseenter" tooltip-popup-delay="100"
             tooltip-placement="{{button.placement}}">
@@ -49,21 +45,22 @@ const ButtonBarComponent: VeComponentOptions = {
 
 `,
     bindings: {
-        bbApi: '<buttonApi',
+        buttonId: '<',
         minSize: '<',
     },
     controller: class ButtonBarController
         implements angular.IComponentController
     {
         // Bindings
-        private bbApi: ButtonBarApi
+        private buttonId: string
         private minSize: number = 100
 
+        private bbApi: ButtonBarApi
         public init: boolean = false
-        public buttons: IButtonBarButton[]
+        public buttons: BarButton[]
         public dropdownIcon: { [id: string]: string }
         private squished: boolean = false
-        private squishButton: IButtonBarButton
+        private squishButton: BarButton
         private currentHeight: number
         static $inject = ['$element', 'EventService', 'ButtonBarService']
 
@@ -72,6 +69,12 @@ const ButtonBarComponent: VeComponentOptions = {
             private eventSvc: EventService,
             private buttonBarSvc: ButtonBarService
         ) {}
+
+        $onInit(): void {
+            this.buttonBarSvc.waitForApi(this.buttonId).then((api) => {
+                this.bbApi = api
+            })
+        }
 
         configure = (): void => {
             //Setup Squish
@@ -104,12 +107,7 @@ const ButtonBarComponent: VeComponentOptions = {
             observer.observe(observed)
         }
 
-        $doCheck(): void {
-            if (this.bbApi instanceof ButtonBarApi && !this.init) {
-                this.buttons = this.bbApi.buttons
-                this.configure()
-            }
-        }
+        $doCheck(): void {}
 
         buttonClicked(e: JQuery.ClickEvent, button: string): void {
             const data: veCoreEvents.buttonClicked = {

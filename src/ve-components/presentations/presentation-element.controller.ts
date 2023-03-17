@@ -1,10 +1,12 @@
 import $ from 'jquery'
+import _ from 'lodash'
 
 import {
     ViewHtmlService,
     ViewPresentationElemController,
     PresentationService,
 } from '@ve-components/presentations'
+import { presentations_buttons } from '@ve-components/presentations/presentations-buttons.config'
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
@@ -51,6 +53,7 @@ export class Presentation
 
     subs: Rx.IDisposable[]
     public bbApi: ButtonBarApi
+    public bbId: string
     public bars: string[]
 
     //Common
@@ -131,7 +134,15 @@ export class Presentation
 
         this.setNumber()
 
-        this.bbApi = this.buttonBarSvc.initApi('', this.bbInit, this)
+        this.bbId = this.buttonBarSvc.generateBarId(
+            `${this.element.id}_${_.camelCase(this.peObject.type)}`
+        )
+        this.bbApi = this.buttonBarSvc.initApi(
+            this.bbId,
+            this.bbInit,
+            this,
+            presentations_buttons
+        )
 
         let projectId = this.mmsProjectId
         let refId = this.mmsRefId

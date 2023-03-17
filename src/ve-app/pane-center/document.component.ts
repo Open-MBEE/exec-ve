@@ -220,7 +220,7 @@ class FullDocumentController implements IComponentController {
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 switch (data.clicked) {
                     case 'show-comments':
-                        this.bbApi.toggleButtonState(
+                        this.bbApi.toggleButton(
                             'show-comments',
                             this.rootScopeSvc.veCommentsOn(
                                 !this.rootScopeSvc.veCommentsOn()
@@ -229,7 +229,7 @@ class FullDocumentController implements IComponentController {
                         return
 
                     case 'show-elements':
-                        this.bbApi.toggleButtonState(
+                        this.bbApi.toggleButton(
                             'show-elements',
                             this.rootScopeSvc.veElementsOn(
                                 !this.rootScopeSvc.veElementsOn()
@@ -239,13 +239,13 @@ class FullDocumentController implements IComponentController {
                             !this.rootScopeSvc.veElementsOn() &&
                             this.rootScopeSvc.veEditMode()
                         ) {
-                            this.bbApi.toggleButtonState('show-edits', false)
+                            this.bbApi.toggleButton('show-edits', false)
                             this.rootScopeSvc.veEditMode(false)
                         }
                         return
 
                     case 'show-edits':
-                        this.bbApi.toggleButtonState(
+                        this.bbApi.toggleButton(
                             'show-edits',
                             this.rootScopeSvc.veEditMode(
                                 !this.rootScopeSvc.veEditMode()
@@ -255,7 +255,7 @@ class FullDocumentController implements IComponentController {
                             this.rootScopeSvc.veElementsOn() !==
                             this.rootScopeSvc.veEditMode()
                         ) {
-                            this.bbApi.toggleButtonState(
+                            this.bbApi.toggleButton(
                                 'show-elements',
                                 this.rootScopeSvc.veEditMode()
                             )
@@ -402,7 +402,7 @@ class FullDocumentController implements IComponentController {
             )
         ) {
             api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
-            api.setToggleState('show-edits', this.rootScopeSvc.veEditMode())
+            api.toggleButton('show-edits', this.rootScopeSvc.veEditMode())
 
             this.hotkeys.bindTo(this.$scope).add({
                 combo: 'alt+d',
@@ -419,23 +419,14 @@ class FullDocumentController implements IComponentController {
         }
 
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-elements'))
-        api.setToggleState('show-elements', this.rootScopeSvc.veElementsOn())
+        api.toggleButton('show-elements', this.rootScopeSvc.veElementsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
-        api.setToggleState('show-comments', this.rootScopeSvc.veCommentsOn())
+        api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.setToggleState('show-numbering', !this.rootScopeSvc.veNumberingOn())
+        api.toggleButton('show-numbering', !this.rootScopeSvc.veNumberingOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
-        const exportButtons: IButtonBarButton =
-            this.buttonBarSvc.getButtonBarButton('export')
-        if (!exportButtons.dropdown_buttons) {
-            exportButtons.dropdown_buttons = [] as IButtonBarButton[]
-        }
-        exportButtons.dropdown_buttons.push(
-            this.buttonBarSvc.getButtonBarButton('convert-pdf')
-        )
-
-        api.addButton(exportButtons)
+        api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
 
         this.hotkeys
             .bindTo(this.$scope)
@@ -636,7 +627,7 @@ const DocumentComponent: VeComponentOptions = {
                 <i class="fa-solid fa-share-from-square"></i></button>
             </div>
             <div class="pane-center-btn-group">
-                <button-bar button-api="$ctrl.bbApi" class="bordered-button-bar"></button-bar>
+                <button-bar button-id="$ctrl.bbId" class="bordered-button-bar"></button-bar>
             </div>
         </div>
     </ng-pane>

@@ -7,12 +7,7 @@ import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-
 import { InsertViewData } from '@ve-components/insertions/components/insert-view.component'
 import { ExtensionService } from '@ve-components/services'
 import { TreeService } from '@ve-components/trees/services/Tree.service'
-import { trees_default_buttons } from '@ve-components/trees/trees-buttons.config'
-import {
-    ButtonBarApi,
-    ButtonBarService,
-    ButtonWrapEvent,
-} from '@ve-core/button-bar'
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import { IToolBarButton, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
@@ -116,9 +111,8 @@ class ViewTreesController implements IComponentController {
     refId: string
     commitId: string
 
-    bars: string[]
     subs: Rx.IDisposable[]
-    private trees: string[]
+
     currentTree: string
     currentTitle: string
     show: {
@@ -126,9 +120,6 @@ class ViewTreesController implements IComponentController {
     } = {}
 
     protected errorType: string
-    private headerSize: string
-    private
-    protected squishSize: number = 250
 
     private insertData: InsertViewData
 
@@ -185,8 +176,6 @@ class ViewTreesController implements IComponentController {
 
         this.buttonId = this.buttonId ? this.buttonId : 'tree-button-bar'
         this.toolbarId = this.toolbarId ? this.toolbarId : 'toolbar'
-
-        this.headerSize = '93px'
 
         // Initialize button-bar event listeners
         this.subs.push(
@@ -258,7 +247,7 @@ class ViewTreesController implements IComponentController {
                             case 'tree-show-pe': {
                                 this.show[_.camelCase(this.currentTree)].pe =
                                     !this.show[_.camelCase(this.currentTree)].pe
-                                this.bbApi.setToggleState(
+                                this.bbApi.toggleButton(
                                     'tree-show-pe',
                                     this.show[_.camelCase(this.currentTree)].pe
                                 )
@@ -274,43 +263,6 @@ class ViewTreesController implements IComponentController {
                 }
             )
         )
-
-        this.subs.push(
-            this.eventSvc.$on('tree.ready', () => {
-                if (!this.bbApi) {
-                    this.bbApi = this.buttonBarSvc.initApi(
-                        this.buttonId,
-                        this.bbInit,
-                        this,
-                        trees_default_buttons
-                    )
-                    this.subs.push(
-                        this.eventSvc.$on(
-                            this.bbApi.WRAP_EVENT,
-                            (data: ButtonWrapEvent) => {
-                                if (data.oldSize != data.newSize) {
-                                    const title = $('.tree-view-title')
-                                    const titleSize =
-                                        title.outerHeight() +
-                                        parseInt(title.css('marginTop')) +
-                                        parseInt(title.css('marginBottom'))
-                                    const treeOptions =
-                                        $('.tree-options').outerHeight()
-                                    const buttonSize =
-                                        $('.tree-view-buttons').outerHeight()
-                                    const calcSize = Math.round(
-                                        titleSize + treeOptions + buttonSize
-                                    )
-                                    this.headerSize =
-                                        calcSize.toString(10) + 'px'
-                                    this.$scope.$apply()
-                                }
-                            }
-                        )
-                    )
-                }
-            })
-        )
     }
 
     $postLink(): void {
@@ -323,57 +275,6 @@ class ViewTreesController implements IComponentController {
                 this.changeTree
             )
         )
-    }
-
-    bbInit = (api: ButtonBarApi): void => {
-        api.buttons.length = 0
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-expand'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-collapse'))
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-add'))
-        api.setPermission(
-            'tree-add',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-delete'))
-        api.setPermission(
-            'tree-delete',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
-        api.setPermission(
-            'tree-add.group',
-            this.permissionsSvc.hasProjectEditPermission(
-                this.treeSvc.treeApi.projectId
-            )
-        )
-        api.setPermission(
-            'tree-add.document',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
-
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('tree-reorder-group')
-        )
-        api.setPermission(
-            'tree-reorder-group',
-            this.permissionsSvc.hasProjectEditPermission(
-                this.treeSvc.treeApi.projectId
-            )
-        )
-        api.setPermission(
-            'tree-add.view',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
-
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('tree-full-document')
-        )
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'))
-        api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
-        if (this.rootScopeSvc.veFullDocMode()) {
-            api.setToggleState('tree-full-document', true)
-        }
-        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-refresh'))
     }
 
     insert(itemType: string): VePromise<void, string> {
@@ -969,35 +870,13 @@ class ViewTreesController implements IComponentController {
 const ViewTreesComponent: VeComponentOptions = {
     selector: 'viewTrees',
     template: `
-<ng-pane pane-anchor="north" pane-size="{{ $ctrl.headerSize }}" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
-    <div class="tree-view">
+
+<ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
+    <div class="tree-view" style="display:table;">
         <div class="container-fluid">
             <h4 class="tree-view-title">{{$ctrl.currentTitle}}</h4>
         </div>
         <hr class="tree-title-divider">
-        <i ng-hide="$ctrl.bbApi" class="fa fa-spinner fa-spin" style="margin: 5px 50%"></i>
-        <div ng-show="$ctrl.bbApi" class="tree-view-buttons" role="toolbar">
-            <button-bar button-api="$ctrl.bbApi"></button-bar>
-        </div>
-        <div class="tree-options">
-            <button ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" uib-popover-template="'filterTemplate.html'" 
-              popover-title="Filter Tree" popover-placement="right-bottom" popover-append-to-body="true" 
-              popover-trigger="'outsideClick'" type="button" class="btn btn-tools btn-sm">
-                <i class="fa-solid fa-filter fa-2x"></i>
-            </button>
-            <script type="text/ng-template" id="filterTemplate.html">
-                  <input ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
-                    ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
-                    ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
-            </script>
-            <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
-                ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
-                ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
-        </div>
-    </div>
-</ng-pane>
-<ng-pane pane-anchor="center" pane-no-toggle="true" pane-closed="false" parent-ctrl="$ctrl" >
-    <div class="tree-view" style="display:table;">
         <div id="trees" class="container-fluid">
         </div>
         <div ng-click="$ctrl.userClicksPane()" style="height: 100%"></div>

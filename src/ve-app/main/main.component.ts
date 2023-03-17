@@ -365,7 +365,10 @@ class MainController implements IComponentController {
                 this.applicationSvc.getState().fullDoc = false
             }
             this.rootScopeSvc.veViewContentLoading(false)
-            if (!(trans.params() as ParamsObject).display) {
+            if (
+                this.$state.includes('main.project.ref.view.present') &&
+                !(trans.params() as ParamsObject).display
+            ) {
                 const display = trans.$to().name.split('.')[
                     trans.$to().name.split('.').length
                 ]
