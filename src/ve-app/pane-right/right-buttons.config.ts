@@ -1,6 +1,6 @@
 import { IToolBarButton } from '@ve-core/toolbar'
 
-export const tools_default_buttons: IToolBarButton[] = [
+export const right_default_toolbar: IToolBarButton[] = [
     {
         id: 'spec-inspector',
         icon: 'fa-eye',
@@ -62,7 +62,7 @@ export const tools_default_buttons: IToolBarButton[] = [
     },
 ]
 
-export const tools_dynamic_buttons: IToolBarButton[] = [
+export const right_dynamic_toolbar: IToolBarButton[] = [
     {
         id: 'spec-editor.save',
         icon: 'fa-save',

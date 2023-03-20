@@ -389,9 +389,12 @@ class ToolsController implements angular.IComponentController {
                         this.specApi.commitId = 'latest'
                     } else {
                         this.specSvc.setEditing(false)
-                        this.eventSvc.$broadcast('spec-inspector', {
-                            id: 'spec-inspector',
-                        })
+                        this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
+                            this.toolbarId,
+                            {
+                                id: 'spec-inspector',
+                            }
+                        )
                         this.toolbarSvc.waitForApi(this.toolbarId).then(
                             (api) => api.setIcon('spec-editor', 'fa-edit'),
                             (reason) => {

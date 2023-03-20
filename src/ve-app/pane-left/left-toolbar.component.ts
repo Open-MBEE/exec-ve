@@ -3,16 +3,17 @@ import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
 import { ExtensionService } from '@ve-components/services'
-import {
-    trees_default_toolbar,
-    trees_dynamic_toolbar,
-} from '@ve-components/trees/trees-buttons.config'
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
 import { PermissionsService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
+
+import {
+    left_default_toolbar,
+    left_dynamic_toolbar,
+} from './left-buttons.config'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { RefObject } from '@ve-types/mms'
@@ -65,8 +66,8 @@ const LeftToolbarComponent: VeComponentOptions = {
                 this.toolbarId,
                 this.tbInit,
                 this,
-                trees_default_toolbar,
-                trees_dynamic_toolbar,
+                left_default_toolbar,
+                left_dynamic_toolbar,
                 this.$state.includes('**.portal.**')
                     ? 'tree-of-documents'
                     : 'tree-of-contents'

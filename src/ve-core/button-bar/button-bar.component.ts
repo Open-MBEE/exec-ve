@@ -10,9 +10,9 @@ const ButtonBarComponent: VeComponentOptions = {
     selector: 'buttonBar',
     template: `
     <div class="button-bar">
-    <span ng-repeat="button in $ctrl.buttons | filter: {permission: true}" >
+    <span ng-repeat="button in $ctrl.buttons | filter: {active: true, permission: true}"  >
       <!-- Normal button -->
-      <a type="button" ng-if="!button.dropdown_buttons" class="btn btn-tools btn-sm {{button.id}}"
+      <a type="button" ng-hide="button.dropdown_buttons.length > 0" class="btn btn-tools btn-sm {{button.id}}"
           ng-click="$ctrl.buttonClicked($event, button.id)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
           tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
           <span class="fa-stack">
@@ -23,7 +23,7 @@ const ButtonBarComponent: VeComponentOptions = {
       </a>
     
       <!-- Button with dropdown buttons -->
-      <span ng-if="button.dropdown_buttons" class="btn-group" on-toggle="$ctrl.bbApi.toggleButton(button.id)" uib-dropdown>
+      <span ng-show="button.dropdown_buttons.length > 0" class="btn-group" on-toggle="$ctrl.bbApi.toggleButton(button.id)" uib-dropdown>
         <button type="button" class="btn btn-tools btn-sm dropdown-toggle {{button.id}}" uib-dropdown-toggle uib-tooltip="{{button.tooltip}}"
             tooltip-append-to-body="false" tooltip-trigger="mouseenter" tooltip-popup-delay="100"
             tooltip-placement="{{button.placement}}">
@@ -62,18 +62,31 @@ const ButtonBarComponent: VeComponentOptions = {
         private squished: boolean = false
         private squishButton: BarButton
         private currentHeight: number
-        static $inject = ['$element', 'EventService', 'ButtonBarService']
+        static $inject = [
+            '$element',
+            'growl',
+            'EventService',
+            'ButtonBarService',
+        ]
 
         constructor(
             private $element: JQuery<HTMLElement>,
+            private growl: angular.growl.IGrowlService,
             private eventSvc: EventService,
             private buttonBarSvc: ButtonBarService
         ) {}
 
         $onInit(): void {
-            this.buttonBarSvc.waitForApi(this.buttonId).then((api) => {
-                this.bbApi = api
-            })
+            this.buttonBarSvc.waitForApi(this.buttonId).then(
+                (api) => {
+                    this.bbApi = api
+                    this.buttons = this.bbApi.buttons
+                    this.configure()
+                },
+                (reason) => {
+                    this.growl.error(reason.message)
+                }
+            )
         }
 
         configure = (): void => {
@@ -106,8 +119,6 @@ const ButtonBarComponent: VeComponentOptions = {
 
             observer.observe(observed)
         }
-
-        $doCheck(): void {}
 
         buttonClicked(e: JQuery.ClickEvent, button: string): void {
             const data: veCoreEvents.buttonClicked = {

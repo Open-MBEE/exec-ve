@@ -61,13 +61,18 @@ export class BarButton {
                 this.icon = this.icon_original = this.config.icon
 
             if (this.config.tooltip) {
-                this.tooltip = this.tooltip_original = this.tooltip
+                this.tooltip = this.tooltip_original = this.config.tooltip
             }
             if (this.config.button_content) {
                 this.button_content = this.config.button_content
             }
-            if (this.config.dropdown && this.config.dropdown.icon) {
-                this.dropdown_icon_original = this.config.dropdown.icon
+            if (
+                this.config.dropdown &&
+                this.config.dropdown.icon &&
+                this.config.dropdown.icon !== ''
+            ) {
+                this.dropdown_icon = this.dropdown_icon_original =
+                    this.config.dropdown.icon
             }
         }
     }

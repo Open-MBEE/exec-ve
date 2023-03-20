@@ -10,7 +10,6 @@ import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService } from '@ve-app/main/services'
 import { InsertViewData } from '@ve-components/insertions/components/insert-view.component'
 import { TreeService } from '@ve-components/trees'
-import { trees_default_buttons } from '@ve-components/trees/trees-buttons.config'
 import {
     ButtonBarApi,
     ButtonBarService,
@@ -29,6 +28,8 @@ import {
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veApp } from '@ve-app'
+
+import { left_default_buttons } from './left-buttons.config'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import {
@@ -212,24 +213,19 @@ class LeftPaneController implements angular.IComponentController {
                         this.buttonId,
                         this.bbInit,
                         this,
-                        trees_default_buttons
+                        left_default_buttons
                     )
                     this.subs.push(
                         this.eventSvc.$on(
                             this.bbApi.WRAP_EVENT,
                             (data: ButtonWrapEvent) => {
                                 if (data.oldSize != data.newSize) {
-                                    const title = $('.tree-view-title')
-                                    const titleSize =
-                                        title.outerHeight() +
-                                        parseInt(title.css('marginTop')) +
-                                        parseInt(title.css('marginBottom'))
                                     const treeOptions =
                                         $('.tree-options').outerHeight()
                                     const buttonSize =
                                         $('.tree-view-buttons').outerHeight()
                                     const calcSize = Math.round(
-                                        titleSize + treeOptions + buttonSize
+                                        treeOptions + buttonSize
                                     )
                                     this.headerSize =
                                         calcSize.toString(10) + 'px'
@@ -337,27 +333,8 @@ class LeftPaneController implements angular.IComponentController {
             api.toggleButton('tree-full-document', true)
         }
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-refresh'))
-        api.buttons.forEach((b) => {
-            const button = b.config
-            if (button) {
-                if (button.enabledFor) {
-                    b.active = false
-                    for (const enableState of button.enabledFor) {
-                        if (this.$state.includes(enableState)) {
-                            b.active = true
-                            break
-                        }
-                    }
-                }
-                if (button.disabledFor) {
-                    for (const disableState of button.disabledFor) {
-                        if (this.$state.includes(disableState)) {
-                            b.active = false
-                            break
-                        }
-                    }
-                }
-            }
+        api.checkActive((state: string) => {
+            return this.$state.includes(state)
         })
     }
 

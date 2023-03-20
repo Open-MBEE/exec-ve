@@ -90,4 +90,44 @@ export class ButtonBarApi {
             if (button.id === id) button.toggle(state)
         })
     }
+
+    public checkActive = (
+        cb: (enableState: string) => boolean,
+        parent?: BarButton
+    ): void => {
+        const buttons = parent ? parent.dropdown_buttons : this.buttons
+        buttons.forEach((button) => {
+            const config = button.config
+            if (config) {
+                if (config.enabledFor) {
+                    this.setActive(button.id, false, parent ? parent.id : null)
+                    for (const enableState of config.enabledFor) {
+                        if (cb(enableState)) {
+                            this.setActive(
+                                button.id,
+                                true,
+                                parent ? parent.id : null
+                            )
+                            break
+                        }
+                    }
+                }
+                if (config.disabledFor) {
+                    for (const disableState of config.disabledFor) {
+                        if (cb(disableState)) {
+                            this.setActive(
+                                button.id,
+                                false,
+                                parent ? parent.id : null
+                            )
+                            break
+                        }
+                    }
+                }
+            }
+            if (button.dropdown_buttons.length > 0) {
+                this.checkActive(cb, button)
+            }
+        })
+    }
 }

@@ -2,11 +2,11 @@ import { StateService } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
-import { ExtensionService } from '@ve-components/services'
 import {
-    tools_default_buttons,
-    tools_dynamic_buttons,
-} from '@ve-components/spec-tools/spec-tools-buttons.config'
+    right_default_toolbar,
+    right_dynamic_toolbar,
+} from '@ve-app/pane-right/right-buttons.config'
+import { ExtensionService } from '@ve-components/services'
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
@@ -65,8 +65,8 @@ const RightToolbarComponent: VeComponentOptions = {
                 this.toolbarId,
                 this.tbInit,
                 this,
-                tools_default_buttons,
-                tools_dynamic_buttons,
+                right_default_toolbar,
+                right_dynamic_toolbar,
                 'spec-inspect'
             )
         }

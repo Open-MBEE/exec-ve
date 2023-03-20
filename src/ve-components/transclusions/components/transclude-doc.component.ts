@@ -114,7 +114,7 @@ export class TranscludeDocController
         super.$onInit()
 
         this.bbId = this.buttonBarSvc.generateBarId(
-            `${this.element.id}_${this.cfType}`
+            `${this.mmsElementId}_${this.cfType}`
         )
         this.bbApi = this.buttonBarSvc.initApi(
             this.bbId,

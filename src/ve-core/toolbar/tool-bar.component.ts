@@ -5,7 +5,6 @@ import { EventService } from '@ve-utils/core'
 
 import { veCore } from '@ve-core'
 
-import { ToolbarApi } from './services/Toolbar.api'
 import { ToolbarService } from './services/Toolbar.service'
 
 import { VeComponentOptions } from '@ve-types/angular'
@@ -19,23 +18,29 @@ const ToolBarComponent: VeComponentOptions = {
             <a class="tools {{button.id}}"
                ng-class="{selected: button.selected, dynamic: button.dynamic, pulldown: button.pullDown}"
                ng-click="$ctrl.clicked(button)" uib-tooltip="{{button.tooltip}}" tooltip-trigger="mouseenter"
-               tooltip-popup-delay="100" tooltip-placement="left" tooltip-append-to-body="true"><i
+               tooltip-popup-delay="100" tooltip-placement="{{$ctrl.tooltipAnchor}}" tooltip-append-to-body="true"><i
                 class="fa {{button.icon}}"></i></a>
         </div>
     </div>
 </div>
 `,
     bindings: {
+        anchor: '<',
         toolbarId: '@',
         paneToggle: '&',
     },
     controller: class VeToolbarController
         implements angular.IComponentController
     {
+        public subs: Rx.IDisposable[]
+
+        private anchor: string
         private toolbarId: string
         private paneToggle?(): void
-        private tbApi: ToolbarApi
+
         public buttons: IToolBarButton[]
+
+        tooltipAnchor
 
         static $inject = [
             'growl',
@@ -52,10 +57,44 @@ const ToolBarComponent: VeComponentOptions = {
         ) {}
 
         $onInit(): void {
+            this.eventSvc.$init(this)
+
+            if (this.anchor) {
+                switch (this.anchor) {
+                    case 'left':
+                        this.tooltipAnchor = 'right'
+                        break
+                    case 'right':
+                        this.tooltipAnchor = 'left'
+                        break
+                    case 'top':
+                        this.tooltipAnchor = 'bottom'
+                        break
+                    case 'bottom':
+                        this.tooltipAnchor = 'top'
+                        break
+                }
+            } else {
+                this.tooltipAnchor = 'left'
+            }
+
             this.toolbarSvc.waitForApi(this.toolbarId).then(
-                (result) => {
-                    this.tbApi = result
-                    this.buttons = this.tbApi.buttons
+                (api) => {
+                    this.buttons = api.buttons
+
+                    //Binding to catch all "clicks" on tb and execute select function
+                    this.eventSvc.binding<veCoreEvents.toolbarClicked>(
+                        this.toolbarId,
+                        (data) => {
+                            this.toolbarSvc.waitForApi(this.toolbarId).then(
+                                (api) => api.select(data.id),
+                                (reason) =>
+                                    this.growl.error(
+                                        ToolbarService.error(reason)
+                                    )
+                            )
+                        }
+                    )
                 },
                 (reason) => {
                     this.growl.error(reason.message)
@@ -72,12 +111,6 @@ const ToolBarComponent: VeComponentOptions = {
 
             if (this.paneToggle) {
                 this.paneToggle()
-            }
-            if (!button.dynamic) {
-                this.toolbarSvc.waitForApi(this.toolbarId).then(
-                    (api) => api.select(button.id),
-                    (reason) => this.growl.error(ToolbarService.error(reason))
-                )
             }
 
             if (button.onClick) {

@@ -60,9 +60,7 @@ export class ToolButton implements IToolBarButton {
         }
     }
 
-    onClick: buttonOnClickFn = () => {
-        return
-    }
+    onClick: buttonOnClickFn
 }
 
 export class ToolbarService {

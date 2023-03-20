@@ -1,7 +1,7 @@
 import { IButtonBarButton } from '@ve-core/button-bar'
 import { IToolBarButton } from '@ve-core/toolbar'
 
-export const trees_default_toolbar: IToolBarButton[] = [
+export const left_default_toolbar: IToolBarButton[] = [
     {
         id: 'tree-of-favorites',
         icon: 'fa-star',
@@ -65,9 +65,9 @@ export const trees_default_toolbar: IToolBarButton[] = [
     },
 ]
 
-export const trees_dynamic_toolbar: IToolBarButton[] = []
+export const left_dynamic_toolbar: IToolBarButton[] = []
 
-export const trees_default_buttons: IButtonBarButton[] = [
+export const left_default_buttons: IButtonBarButton[] = [
     {
         id: 'tree-expand',
         icon: 'fa-regular fa-caret-square-down',
@@ -109,24 +109,28 @@ export const trees_default_buttons: IButtonBarButton[] = [
         icon: 'fa-solid fa-plus',
         selectable: false,
         tooltip: 'Add View',
+        enabledFor: ['**.present.**'],
     },
     {
         id: 'tree-add.group',
         icon: 'fa-solid fa-folder',
         selectable: false,
         tooltip: 'Add Group',
+        enabledFor: ['**.portal.**'],
     },
     {
         id: 'tree-clear-select',
         icon: 'fa-regular fa-folder',
         selectable: false,
         tooltip: 'Clear Selection',
+        enabledFor: ['**.portal.**'],
     },
     {
         id: 'tree-add.document',
         icon: 'fa-solid fa-file',
         selectable: false,
         tooltip: 'Add Document',
+        enabledFor: ['**.portal.**'],
     },
     {
         id: 'tree-refresh',
@@ -139,12 +143,14 @@ export const trees_default_buttons: IButtonBarButton[] = [
         icon: 'fa-solid fa-tag',
         selectable: false,
         tooltip: 'Add Tag',
+        enabledFor: ['**.refs.**'],
     },
     {
         id: 'tree-add.branch',
         icon: 'fa-solid fa-plus',
         selectable: false,
         tooltip: 'Add Branch',
+        enabledFor: ['**.refs.**'],
     },
     {
         id: 'tree-delete',
@@ -157,12 +163,14 @@ export const trees_default_buttons: IButtonBarButton[] = [
         icon: 'fa-solid fa-arrows-v',
         selectable: false,
         tooltip: 'Reorder Views',
+        enabledFor: ['**.present.**'],
     },
     {
         id: 'tree-reorder-group',
         icon: 'fa-solid fa-arrows-v',
         selectable: false,
         tooltip: 'Organize Groups/Docs',
+        enabledFor: ['**.portal.**'],
     },
     {
         id: 'tree-full-document',
@@ -172,6 +180,7 @@ export const trees_default_buttons: IButtonBarButton[] = [
         toggle: {
             tooltip: 'View Mode',
         },
+        enabledFor: ['**.present.**'],
     },
     {
         id: 'tree-show-pe',
@@ -181,5 +190,6 @@ export const trees_default_buttons: IButtonBarButton[] = [
         toggle: {
             tooltip: 'Hide PE',
         },
+        enabledFor: ['**.present.**'],
     },
 ]
