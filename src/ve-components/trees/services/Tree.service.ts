@@ -733,7 +733,7 @@ export class TreeService {
         if (!branch) {
             if (this.selectedBranch) this.selectedBranch.selected = false
             this.clearSelectedBranch()
-            return
+            return this.$q.resolve()
         }
         if (branch !== this.selectedBranch) {
             if (this.selectedBranch) this.selectedBranch.selected = false
