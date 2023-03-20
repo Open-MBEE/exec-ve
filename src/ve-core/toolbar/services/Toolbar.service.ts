@@ -119,12 +119,21 @@ export class ToolbarService {
         if (!id) {
             throw new Error('Unable to create Toolbar, missing id')
         }
-
-        if (!ctrl.$onDestroy) {
-            ctrl.$onDestroy = (): void => {
-                this.destroyApi(id)
-            }
+        if (!this.toolbars[id]) {
+            this.toolbars[id] = {}
         }
+        if (!this.toolbars[id].resolve) {
+            this.toolbars[id].promise = new this.$q((resolve, reject) => {
+                this.toolbars[id].resolve = resolve
+                this.toolbars[id].reject = reject
+            })
+        }
+
+        // if (!ctrl.$onDestroy) {
+        //     ctrl.$onDestroy = (): void => {
+        //         this.destroyApi(id)
+        //     }
+        // }
 
         const api = new ToolbarApi(id)
         if (buttons && buttons.length > 0) {
@@ -133,14 +142,10 @@ export class ToolbarService {
         if (dynamicButtons && dynamicButtons.length > 0) {
             this.registerDynamicButtons(dynamicButtons)
         }
+
         init(api)
-        if (!this.toolbars[id]) {
-            this.toolbars[id] = {
-                api,
-            }
-        } else {
-            this.toolbars[id].api = api
-        }
+        this.toolbars[id].api = api
+
         let inspect: IToolBarButton
         if (initialSelection) {
             inspect = this.getToolbarButton(initialSelection)
@@ -154,12 +159,6 @@ export class ToolbarService {
             title: inspect.tooltip,
         })
 
-        if (!this.toolbars[id].resolve) {
-            this.toolbars[id].promise = new this.$q((resolve, reject) => {
-                this.toolbars[id].resolve = resolve
-                this.toolbars[id].reject = reject
-            })
-        }
         this.toolbars[id].resolve(api)
         return api
     }

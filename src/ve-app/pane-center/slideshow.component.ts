@@ -127,12 +127,11 @@ class SlideshowController implements angular.IComponentController {
         this.bbApi = this.buttonBarSvc.initApi(
             this.bbId,
             this.bbInit,
-            this,
             pane_center_buttons
         )
 
         //Init/Reset Tree Updated Subject
-        this.eventSvc.resolve(TreeService.events.UPDATED, false)
+        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
 
         this.subs.push(
             this.eventSvc.binding<boolean>(
@@ -368,20 +367,8 @@ class SlideshowController implements angular.IComponentController {
         )
     }
 
-    $onDestroy(): void {
-        this.eventSvc.$destroy(this.subs)
-        this.buttonBarSvc.destroyAll(this.bars)
-    }
-
     initView = (): void => {
         this.rootScopeSvc.veViewContentLoading(true)
-
-        this.bbApi = this.buttonBarSvc.initApi(
-            this.bbId,
-            this.bbInit,
-            this,
-            pane_center_buttons
-        )
 
         if (this.mmsView || this.mmsDocument) {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
@@ -445,6 +432,11 @@ class SlideshowController implements angular.IComponentController {
         if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
             this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
         }
+    }
+
+    $onDestroy(): void {
+        this.eventSvc.$destroy(this.subs)
+        this.buttonBarSvc.destroy(this.bbId)
     }
 
     public bbInit = (api: ButtonBarApi): void => {

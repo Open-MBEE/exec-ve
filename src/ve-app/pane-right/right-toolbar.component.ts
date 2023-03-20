@@ -15,7 +15,7 @@ import { PermissionsService } from '@ve-utils/mms-api-client'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { DocumentObject, RefObject } from '@ve-types/mms'
+import { ElementObject, RefObject } from '@ve-types/mms'
 
 class RightToolbarController implements IComponentController {
     static $inject = [
@@ -33,11 +33,11 @@ class RightToolbarController implements IComponentController {
     public subs: Rx.IDisposable[]
 
     //Bindings
-    public mmsRef: RefObject
+    private mmsRef: RefObject
 
     // Though we don't explicitly use it right now, we do need it to trigger updates when
     // entering/exiting certain states
-    public mmsDocument: DocumentObject
+    private mmsRoot: ElementObject
 
     //Local
     public toolbarId: string
@@ -66,6 +66,11 @@ class RightToolbarController implements IComponentController {
             right_dynamic_toolbar,
             'spec-inspect'
         )
+    }
+
+    $onDestroy(): void {
+        this.eventSvc.$destroy(this.subs)
+        this.toolbarSvc.destroyApi(this.toolbarId)
     }
 
     tbInit = (tbApi: ToolbarApi): void => {
@@ -128,7 +133,7 @@ const RightToolbarComponent: VeComponentOptions = {
     template: `<tool-bar toolbar-id="{{$ctrl.toolbarId}}" pane-toggle="$ctrl.paneToggle"/>`,
     bindings: {
         mmsRef: '<',
-        mmsDocument: '<',
+        mmsRoot: '<',
     },
     controller: RightToolbarController,
 }

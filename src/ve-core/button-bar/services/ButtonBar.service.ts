@@ -82,18 +82,8 @@ export class ButtonBarService {
     public initApi(
         id: string,
         init: buttonInitFn,
-        ctrl: { bars: string[] } & angular.IComponentController,
         buttons?: IButtonBarButton[]
     ): ButtonBarApi {
-        if (ctrl) {
-            ctrl.bars = []
-            if (!ctrl.$onDestroy) {
-                ctrl.$onDestroy = (): void => {
-                    this.destroyAll(ctrl.bars)
-                }
-            }
-            ctrl.bars.push(id)
-        }
         if (!init) {
             return null
         }

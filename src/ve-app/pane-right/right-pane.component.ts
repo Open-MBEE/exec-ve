@@ -17,7 +17,7 @@ import {
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { DocumentObject, RefObject, RefsResponse } from '@ve-types/mms'
+import { ElementObject, RefObject, RefsResponse } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 class RightPaneController implements IComponentController {
@@ -26,7 +26,7 @@ class RightPaneController implements IComponentController {
 
     // Though we don't explicitly use it right now, we do need it to trigger updates when
     // entering/exiting certain states
-    private mmsDocument: DocumentObject
+    private mmsRoot: ElementObject
 
     //Local Values
 
@@ -141,6 +141,10 @@ class RightPaneController implements IComponentController {
         )
     }
 
+    $onDestroy(): void {
+        this.eventSvc.$destroy(this.subs)
+    }
+
     changeAction = (data: veAppEvents.elementSelectedData): void => {
         const elementId = data.elementId
         const refId = data.refId
@@ -192,25 +196,6 @@ class RightPaneController implements IComponentController {
                         refId
                     )
 
-                //Independent of viewOb if there is a document we want document tools enabled
-                if (!this.init) {
-                    this.init = true
-                    if (this.$state.includes('document')) {
-                        this.toolsCategory = 'document'
-                    } else if (this.$state.includes('**.portal.**')) {
-                        this.toolsCategory = 'portal'
-                    } else {
-                        this.toolsCategory = 'global'
-                    }
-
-                    this.$tools = $(
-                        `<view-tools tools-category="$ctrl.toolsCategory" toolbar-id="${this.toolbarId}"></view-tools>`
-                    )
-
-                    this.$element.append(this.$tools)
-                    this.$compile(this.$tools)(this.$scope)
-                }
-
                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                     (api) => api.setIcon('spec-editor', 'fa-edit'),
                     (reason) => this.growl.error(ToolbarService.error(reason))
@@ -227,14 +212,16 @@ class RightPaneController implements IComponentController {
 const RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
     template: `
-    <div class="pane-right"></div>
+    <div class="pane-right">
+    <view-tools toolbar-id="{{$ctrl.toolbarId}}"></view-tools>
+</div>
     `,
     require: {
         $pane: '^^ngPane',
     },
     bindings: {
         mmsRef: '<',
-        mmsDocument: '<',
+        mmsRoot: '<',
     },
     controller: RightPaneController,
 }

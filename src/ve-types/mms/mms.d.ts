@@ -111,6 +111,7 @@ export interface ParamsObject {
     fromLogin?: boolean
     '#'?: string
     display?: string
+    preview?: string
     [param: string]: string
 }
 

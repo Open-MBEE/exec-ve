@@ -47,6 +47,7 @@ import {
     MountObject,
     OrgObject,
     OrgsResponse,
+    PackageObject,
     ParamsObject,
     PermissionsResponse,
     ProjectObject,
@@ -556,6 +557,16 @@ veApp.config([
                             return resolveSvc.getGroup(groupObs, documentOb)
                         },
                     ],
+                    rootOb: [
+                        'params',
+                        'ResolveService',
+                        (
+                            params: ParamsObject,
+                            resolveSvc: ResolveService
+                        ): VePromise<PackageObject> => {
+                            return resolveSvc.getProjectRoot(params)
+                        },
+                    ],
                 },
                 views: {
                     'banner-top@main': {
@@ -606,29 +617,36 @@ veApp.config([
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
+                            mmsRoot: 'rootOb',
                         },
                     },
                     'pane-right@main': {
                         component: 'rightPane',
+                        bindings: {
+                            mmsRef: 'refOb',
+                            mmsRoot: 'rootOb',
+                        },
                     },
                     'toolbar-right@main': {
                         component: 'rightToolbar',
                         bindings: {
                             mmsRef: 'refOb',
+                            mmsRoot: 'rootOb',
                         },
                     },
                     'toolbar-left@main': {
                         component: 'leftToolbar',
                         bindings: {
                             mmsRef: 'refOb',
+                            mmsRoot: 'rootOb',
                         },
                     },
                 },
             })
             .state('main.project.ref.portal.preview', {
-                url: '?documentId',
+                url: '?preview',
                 params: {
-                    documentId: {
+                    preview: {
                         inherit: true,
                         type: 'query',
                     },
@@ -651,7 +669,7 @@ veApp.config([
                             refOb: RefObject,
                             refresh: boolean
                         ): VePromise<DocumentObject> => {
-                            return resolveSvc.getDocumentPreview(
+                            return resolveSvc.getPreviewDocument(
                                 params,
                                 refOb,
                                 refresh
@@ -784,7 +802,7 @@ veApp.config([
                             mmsGroups: 'groupObs',
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
-                            mmsDocument: 'documentOb',
+                            mmsRoot: 'documentOb',
                         },
                     },
                     'banner-bottom@main': {
@@ -798,28 +816,28 @@ veApp.config([
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
-                            mmsDocument: 'documentOb',
+                            mmsRoot: 'documentOb',
                         },
                     },
                     'pane-right@main': {
                         component: 'rightPane',
                         bindings: {
                             mmsRef: 'refOb',
-                            mmsDocument: 'documentOb',
+                            mmsRoot: 'documentOb',
                         },
                     },
                     'toolbar-right@main': {
                         component: 'rightToolbar',
                         bindings: {
                             mmsRef: 'refOb',
-                            mmsDocument: 'documentOb',
+                            mmsRoot: 'documentOb',
                         },
                     },
                     'toolbar-left@main': {
                         component: 'leftToolbar',
                         bindings: {
                             mmsRef: 'refOb',
-                            mmsDocument: 'documentOb',
+                            mmsRoot: 'documentOb',
                         },
                     },
                 },

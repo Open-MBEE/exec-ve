@@ -27,6 +27,7 @@ import {
     MountObject,
     OrgObject,
     OrgsResponse,
+    PackageObject,
     ParamsObject,
     PermissionsResponse,
     ProjectObject,
@@ -113,7 +114,7 @@ export class ResolveService {
         const promise = this.projectSvc.getOrg(projectOb.orgId)
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsOrg', result)
+                this.eventSvc.resolve('mmsOrg', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -126,7 +127,7 @@ export class ResolveService {
         const promise = this.projectSvc.getOrgs()
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsOrgs', result)
+                this.eventSvc.resolve('mmsOrgs', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -141,7 +142,7 @@ export class ResolveService {
         const promise = this.projectSvc.getProject(params.projectId)
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsProject', result)
+                this.eventSvc.resolve('mmsProject', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -157,7 +158,7 @@ export class ResolveService {
         const promise = this.projectSvc.getProjects(projectOb.orgId, refresh)
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsProjects', result)
+                this.eventSvc.resolve('mmsProjects', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -178,7 +179,7 @@ export class ResolveService {
 
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast<MountObject>('mmsProject', result)
+                this.eventSvc.resolve<MountObject>('mmsProject', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -191,7 +192,7 @@ export class ResolveService {
         const promise = this.projectSvc.getRef(params.refId, params.projectId)
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsRef', result)
+                this.eventSvc.resolve('mmsRef', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -204,7 +205,7 @@ export class ResolveService {
         const promise = this.projectSvc.getRefs(params.projectId)
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsRefs', result)
+                this.eventSvc.resolve('mmsRefs', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -225,7 +226,7 @@ export class ResolveService {
 
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsGroups', result)
+                this.eventSvc.resolve('mmsGroups', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -247,8 +248,16 @@ export class ResolveService {
                 }
             }
         }
-        this.eventSvc.$broadcast('mmsGroup', group)
+        this.eventSvc.resolve('mmsGroup', group)
         return group
+    }
+
+    public getProjectRoot(params: ParamsObject): VePromise<PackageObject> {
+        return this.elementSvc.getElement({
+            projectId: params.projectId,
+            refId: params.refId,
+            elementId: params.projectId + '_pm',
+        })
     }
 
     public getCoverDocument(
@@ -271,10 +280,7 @@ export class ResolveService {
             )
             .then(
                 (data) => {
-                    this.eventSvc.$broadcast<DocumentObject>(
-                        'mmsDocument',
-                        data
-                    )
+                    this.eventSvc.resolve<DocumentObject>('mmsDocument', data)
                     if (!data._groupId) data._groupId = params.projectId + '_pm'
                     deferred.resolve(data)
                 },
@@ -301,7 +307,7 @@ export class ResolveService {
                                 )
                                 .then(
                                     (data) => {
-                                        this.eventSvc.$broadcast(
+                                        this.eventSvc.resolve(
                                             'mmsDocument',
                                             data
                                         )
@@ -363,13 +369,13 @@ export class ResolveService {
         return deferred.promise
     }
 
-    public getDocumentPreview(
+    public getPreviewDocument(
         params: ParamsObject,
         refOb: RefObject,
         refresh?: boolean
     ): VePromise<DocumentObject> {
         const deferred = this.$q.defer<DocumentObject>()
-        const eid: string = params.documentId
+        const eid: string = params.preview
         const coverIndex = eid.indexOf('_cover')
         if (coverIndex > 0) {
             const groupId = eid.substring(5, coverIndex)
@@ -386,7 +392,7 @@ export class ResolveService {
                 )
                 .then(
                     (data) => {
-                        this.eventSvc.$broadcast('mmsDocument', data)
+                        this.eventSvc.resolve('mmsDocument', data)
                         deferred.resolve(data)
                     },
                     (reason) => {
@@ -432,7 +438,7 @@ export class ResolveService {
                                                 )
                                                 .then(
                                                     (data) => {
-                                                        this.eventSvc.$broadcast(
+                                                        this.eventSvc.resolve(
                                                             'mmsDocument',
                                                             data
                                                         )
@@ -474,7 +480,7 @@ export class ResolveService {
             {
                 projectId: params.projectId,
                 refId: params.refId,
-                elementId: params.documentId,
+                elementId: params.preview ? params.preview : params.documentId,
             },
             2,
             refresh
@@ -482,7 +488,7 @@ export class ResolveService {
 
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsDocument', result)
+                this.eventSvc.resolve('mmsDocument', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -506,7 +512,7 @@ export class ResolveService {
 
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsDocuments', result)
+                this.eventSvc.resolve('mmsDocuments', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)
@@ -531,7 +537,7 @@ export class ResolveService {
 
         promise.then(
             (result) => {
-                this.eventSvc.$broadcast('mmsView', result)
+                this.eventSvc.resolve('mmsView', result)
             },
             (reason) => {
                 this.growl.error('Resolve Error: ' + reason.message)

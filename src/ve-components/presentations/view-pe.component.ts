@@ -174,7 +174,7 @@ export class ViewPresentationElemController
                                 $(this.$element).append(newPe)
                                 this.$compile(newPe)(this.$scope)
                                 this.subs.push(
-                                    this.eventSvc.binding(
+                                    this.eventSvc.binding<boolean>(
                                         TreeService.events.UPDATED,
                                         (data) => {
                                             if (!data) return

@@ -872,7 +872,10 @@ export class TreeService {
                             )
                         }
                         j++
-                        this.eventSvc.resolve(TreeService.events.UPDATED, true)
+                        this.eventSvc.resolve<boolean>(
+                            TreeService.events.UPDATED,
+                            true
+                        )
                     })
 
                     if (this.treeApi.sort) {
@@ -890,7 +893,7 @@ export class TreeService {
             this.treeData.forEach((branch) => {
                 addBranchData(1, [], branch, true, {})
             })
-            this.eventSvc.resolve(TreeService.events.UPDATED, true)
+            this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, true)
             this.eventSvc.$broadcast('tree.ready')
             resolve()
         })

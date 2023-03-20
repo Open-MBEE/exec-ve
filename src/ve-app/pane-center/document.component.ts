@@ -143,12 +143,11 @@ class FullDocumentController implements IComponentController {
         this.eventSvc.$init(this)
 
         //Init/Reset Tree Updated Subject
-        this.eventSvc.resolve(TreeService.events.UPDATED, false)
+        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
 
         this.bbApi = this.buttonBarSvc.initApi(
             this.bbId,
             this.bbInit,
-            this,
             pane_center_buttons
         )
 
@@ -349,17 +348,26 @@ class FullDocumentController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on(TreeService.events.UPDATED, () => {
-                this.fullDocumentApi.loadRemainingViews(() => {
-                    this.views.forEach((view) => {
-                        if (this.treeSvc.branch2viewNumber[view.id]) {
-                            view.number =
-                                this.treeSvc.branch2viewNumber[view.id]
-                        }
+            this.eventSvc.binding<boolean>(
+                TreeService.events.UPDATED,
+                (data) => {
+                    if (!data) return
+                    this.fullDocumentApi.loadRemainingViews(() => {
+                        this.views.forEach((view) => {
+                            if (this.treeSvc.branch2viewNumber[view.id]) {
+                                view.number =
+                                    this.treeSvc.branch2viewNumber[view.id]
+                            }
+                        })
                     })
-                })
-            })
+                }
+            )
         )
+    }
+
+    $onDestroy(): void {
+        this.eventSvc.$destroy(this.subs)
+        this.buttonBarSvc.destroy(this.bbId)
     }
 
     $postLink(): void {

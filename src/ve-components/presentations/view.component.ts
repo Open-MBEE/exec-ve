@@ -176,15 +176,18 @@ export class ViewController implements angular.IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.binding(TreeService.events.UPDATED, (data) => {
-                if (!data) return
-                if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
-                    this.level =
-                        this.treeSvc.branch2viewNumber[this.mmsElementId].split(
-                            '.'
-                        ).length
+            this.eventSvc.binding<boolean>(
+                TreeService.events.UPDATED,
+                (data) => {
+                    if (!data) return
+                    if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
+                        this.level =
+                            this.treeSvc.branch2viewNumber[
+                                this.mmsElementId
+                            ].split('.').length
+                    }
                 }
-            })
+            )
         )
 
         this._changeView(this.mmsElementId, '')

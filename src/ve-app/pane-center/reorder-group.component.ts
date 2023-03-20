@@ -332,7 +332,7 @@ class ReorderGroupController implements IComponentController {
                     : curBranch.data.id
             void this.$state.go(
                 'main.project.ref.portal.preview',
-                { documentId: documentId },
+                { preview: documentId },
                 { reload: reload }
             )
         } else {

@@ -8,7 +8,6 @@ import {
 
 import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService } from '@ve-app/main/services'
-import { InsertViewData } from '@ve-components/insertions/components/insert-view.component'
 import { TreeService } from '@ve-components/trees'
 import {
     ButtonBarApi,
@@ -51,7 +50,6 @@ class LeftPaneController implements angular.IComponentController {
     public subs: Rx.IDisposable[]
 
     private $pane: IPane
-    private $trees: JQuery<HTMLElement>
 
     public bbApi: ButtonBarApi
     public bbSize: string
@@ -59,23 +57,17 @@ class LeftPaneController implements angular.IComponentController {
     private headerSize: string = '93px'
     protected squishSize: number = 250
 
-    protected treesCategory: string
-    public treeSearch: string = ''
-
     //Bindings
     private mmsProject: ProjectObject
     private mmsRef: RefObject
+    private mmsRoot: ElementObject
 
     //Tree Api
     private treeApi: TreeApi
 
     //Local Variables
-    public docEditable: boolean
-    public insertData: InsertViewData
-    private init: boolean
     toolbarId: string = 'left-toolbar'
     buttonId: string = 'tree-button-bar'
-    private spin: boolean
 
     schema = 'cameo'
 
@@ -136,7 +128,9 @@ class LeftPaneController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
-        this.spin = true
+        //Init/Reset Tree Updated Subject
+        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
+
         this.transitionCallback()
 
         this.eventSvc.$init(this)
@@ -212,7 +206,6 @@ class LeftPaneController implements angular.IComponentController {
                     this.bbApi = this.buttonBarSvc.initApi(
                         this.buttonId,
                         this.bbInit,
-                        this,
                         left_default_buttons
                     )
                     this.subs.push(
@@ -282,6 +275,11 @@ class LeftPaneController implements angular.IComponentController {
                 console.log(reason.message)
             }
         )
+    }
+
+    $onDestroy(): void {
+        this.eventSvc.$destroy(this.subs)
+        this.buttonBarSvc.destroy(this.buttonId)
     }
 
     bbInit = (api: ButtonBarApi): void => {
@@ -474,19 +472,6 @@ class LeftPaneController implements angular.IComponentController {
                 this.growl.error(TreeService.treeError(reason))
             })
         }
-        this.initTrees()
-    }
-
-    initTrees = (): void => {
-        if (!this.init) {
-            this.init = true
-            this.$trees = $(
-                `<view-trees ng-hide="$ctrl.spin"  trees-category="$ctrl.treesCategory" toolbar-id="${this.toolbarId}" button-id="${this.buttonId}"></view-trees>`
-            )
-            $('.pane-left').append(this.$trees)
-            this.spin = false
-            this.$compile(this.$trees)(this.$scope)
-        }
     }
 
     transitionCallback = (): void => {
@@ -504,12 +489,12 @@ class LeftPaneController implements angular.IComponentController {
         if (this.$state.includes('**.portal.**')) {
             if (branch.type === 'group') {
                 void this.$state.go('main.project.ref.portal.preview', {
-                    documentId: 'site_' + branch.data.id + '_cover',
+                    preview: 'site_' + branch.data.id + '_cover',
                     search: undefined,
                 })
             } else if (branch.type === 'view' || branch.type === 'snapshot') {
                 void this.$state.go('main.project.ref.portal.preview', {
-                    documentId: branch.data.id,
+                    preview: branch.data.id,
                     search: undefined,
                 })
             }
@@ -606,29 +591,30 @@ const LeftPaneComponent: VeComponentOptions = {
     template: `
     <div class="pane-left">
     <ng-pane pane-anchor="north" pane-size="{{ $ctrl.headerSize }}" pane-no-toggle="true" pane-no-scroll="true" pane-closed="false" parent-ctrl="$ctrl">
-    <div class="tree-view">
-        
-        <i ng-hide="$ctrl.bbApi" class="fa fa-spinner fa-spin" style="margin: 5px 50%"></i>
-        <div ng-show="$ctrl.bbApi" class="tree-view-buttons" role="toolbar">
-            <button-bar button-id="$ctrl.buttonId"></button-bar>
-        </div>
-        <div class="tree-options">
-            <button ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" uib-popover-template="'filterTemplate.html'" 
-              popover-title="Filter Tree" popover-placement="right-bottom" popover-append-to-body="true" 
-              popover-trigger="'outsideClick'" type="button" class="btn btn-tools btn-sm">
-                <i class="fa-solid fa-filter fa-2x"></i>
-            </button>
-            <script type="text/ng-template" id="filterTemplate.html">
-                  <input ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
+        <div class="tree-view">
+            
+            <i ng-hide="$ctrl.bbApi" class="fa fa-spinner fa-spin" style="margin: 5px 50%"></i>
+            <div ng-show="$ctrl.bbApi" class="tree-view-buttons" role="toolbar">
+                <button-bar button-id="$ctrl.buttonId"></button-bar>
+            </div>
+            <div class="tree-options">
+                <button ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" uib-popover-template="'filterTemplate.html'" 
+                  popover-title="Filter Tree" popover-placement="right-bottom" popover-append-to-body="true" 
+                  popover-trigger="'outsideClick'" type="button" class="btn btn-tools btn-sm">
+                    <i class="fa-solid fa-filter fa-2x"></i>
+                </button>
+                <script type="text/ng-template" id="filterTemplate.html">
+                      <input ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
+                        ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
+                        ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
+                </script>
+                <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
                     ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
                     ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
-            </script>
-            <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
-                ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
-                ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
+            </div>
         </div>
-    </div>
-</ng-pane>
+    </ng-pane>
+    <view-trees toolbar-id="{{$ctrl.toolbarId}}" button-id="{{$ctrl.buttonId}}"></view-trees>
 </div>
   
   
@@ -636,6 +622,7 @@ const LeftPaneComponent: VeComponentOptions = {
     bindings: {
         mmsProject: '<',
         mmsRef: '<',
+        mmsRoot: '<',
     },
     require: {
         $pane: '^ngPane',

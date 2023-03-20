@@ -187,7 +187,7 @@ const RedirectComponent: VeComponentOptions = {
                                 link:
                                     "main.project.ref.portal.preview({projectId:'" +
                                     data[0]._projectId +
-                                    "',refId:'master',documentId:'" +
+                                    "',refId:'master',preview:'" +
                                     data[0].id +
                                     "'})",
                             }
@@ -197,7 +197,7 @@ const RedirectComponent: VeComponentOptions = {
                                     {
                                         projectId: data[0]._projectId,
                                         refId: 'master',
-                                        documentId: data[0].id,
+                                        preview: data[0].id,
                                     }
                                 )
                             }
@@ -247,7 +247,7 @@ const RedirectComponent: VeComponentOptions = {
                                 link:
                                     "main.project.ref.portal.preview({projectId:'" +
                                     data[0]._projectId +
-                                    "',refId:'master',documentId:'" +
+                                    "',refId:'master',preview:'" +
                                     data[0].id +
                                     "'})",
                             }
@@ -257,7 +257,7 @@ const RedirectComponent: VeComponentOptions = {
                                     {
                                         projectId: data[0]._projectId,
                                         refId: 'master',
-                                        documentId: data[0].id,
+                                        preview: data[0].id,
                                     }
                                 )
                             }

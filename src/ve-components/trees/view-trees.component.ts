@@ -265,6 +265,10 @@ class ViewTreesController implements IComponentController {
         )
     }
 
+    $onDestroy(): void {
+        this.eventSvc.$destroy(this.subs)
+    }
+
     $postLink(): void {
         this.$trees = $('#trees')
 

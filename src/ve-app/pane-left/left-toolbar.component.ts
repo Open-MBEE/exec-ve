@@ -16,7 +16,7 @@ import {
 } from './left-buttons.config'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { DocumentObject, RefObject } from '@ve-types/mms'
+import { ElementObject, RefObject } from '@ve-types/mms'
 
 /* Classes */
 const LeftToolbarComponent: VeComponentOptions = {
@@ -24,7 +24,7 @@ const LeftToolbarComponent: VeComponentOptions = {
     template: `<tool-bar toolbar-id="{{$ctrl.toolbarId}}" pane-toggle="$ctrl.paneToggle"/>`,
     bindings: {
         mmsRef: '<',
-        mmsDocument: '<',
+        mmsRoot: '<',
     },
     controller: class ToolbarController implements IComponentController {
         static $inject = [
@@ -42,11 +42,11 @@ const LeftToolbarComponent: VeComponentOptions = {
         public subs: Rx.IDisposable[]
 
         //Bindings
-        public mmsRef: RefObject
+        private mmsRef: RefObject
 
         // Though we don't explicitly use it right now, we do need it to trigger updates when
         // entering/exiting certain states
-        public mmsDocument: DocumentObject
+        private mmsRoot: ElementObject
 
         //Local
         public toolbarId: string
@@ -77,6 +77,11 @@ const LeftToolbarComponent: VeComponentOptions = {
                     ? 'tree-of-documents'
                     : 'tree-of-contents'
             )
+        }
+
+        $onDestroy(): void {
+            this.eventSvc.$destroy(this.subs)
+            this.toolbarSvc.destroyApi(this.toolbarId)
         }
 
         tbInit = (tbApi: ToolbarApi): void => {

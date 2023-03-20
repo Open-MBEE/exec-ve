@@ -119,7 +119,6 @@ export class TranscludeDocController
         this.bbApi = this.buttonBarSvc.initApi(
             this.bbId,
             this.bbInit,
-            this,
             presentations_buttons
         )
 
