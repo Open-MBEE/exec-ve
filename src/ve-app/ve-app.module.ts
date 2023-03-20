@@ -713,6 +713,14 @@ veApp.config([
                 url: '/manage',
             })
             .state('main.project.ref.view', {
+                url: '/:documentId',
+                params: {
+                    documentId: {
+                        inherit: true,
+                        type: 'path',
+                        raw: true,
+                    },
+                },
                 resolve: {
                     params: [
                         '$transition$',
@@ -733,22 +741,6 @@ veApp.config([
                                 params,
                                 refresh
                             )
-                        },
-                    ],
-                    viewOb: [
-                        'ResolveService',
-                        'params',
-                        'refresh',
-                        (
-                            resolveSvc: ResolveService,
-                            params: ParamsObject,
-                            refresh: boolean
-                        ): VePromise<ViewObject> => {
-                            if (params.viewId) {
-                                return resolveSvc.getView(params, refresh)
-                            } else {
-                                return null
-                            }
                         },
                     ],
                     docMeta: [
@@ -793,7 +785,6 @@ veApp.config([
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
                             mmsDocument: 'documentOb',
-                            mmsView: 'viewOb',
                         },
                     },
                     'banner-bottom@main': {
@@ -807,33 +798,35 @@ veApp.config([
                         bindings: {
                             mmsProject: 'projectOb',
                             mmsRef: 'refOb',
+                            mmsDocument: 'documentOb',
                         },
                     },
                     'pane-right@main': {
                         component: 'rightPane',
+                        bindings: {
+                            mmsRef: 'refOb',
+                            mmsDocument: 'documentOb',
+                        },
                     },
                     'toolbar-right@main': {
                         component: 'rightToolbar',
                         bindings: {
                             mmsRef: 'refOb',
+                            mmsDocument: 'documentOb',
                         },
                     },
                     'toolbar-left@main': {
                         component: 'leftToolbar',
                         bindings: {
                             mmsRef: 'refOb',
+                            mmsDocument: 'documentOb',
                         },
                     },
                 },
             })
             .state('main.project.ref.view.present', {
-                url: '/:documentId/present?viewId?display',
+                url: '/present?viewId&display',
                 params: {
-                    documentId: {
-                        inherit: true,
-                        type: 'path',
-                        raw: true,
-                    },
                     viewId: {
                         inherit: true,
                         type: 'query',
@@ -848,6 +841,30 @@ veApp.config([
                         squash: true,
                         raw: true,
                     },
+                },
+                resolve: {
+                    params: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params()
+                        },
+                    ],
+                    viewOb: [
+                        'ResolveService',
+                        'params',
+                        'refresh',
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject,
+                            refresh: boolean
+                        ): VePromise<ViewObject> => {
+                            if (params.viewId) {
+                                return resolveSvc.getView(params, refresh)
+                            } else {
+                                return null
+                            }
+                        },
+                    ],
                 },
             })
             .state('main.project.ref.view.present.slideshow', {

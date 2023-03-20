@@ -43,7 +43,6 @@ class MenuController implements IComponentController {
     public mmsRef: RefObject
     public mmsRefs: RefObject[]
     public mmsDocument: DocumentObject
-    public mmsView: ViewObject
 
     //Locals
     spin: boolean
@@ -362,7 +361,6 @@ const MainMenuComponent: VeComponentOptions = {
         mmsRef: '<',
         mmsRefs: '<',
         mmsDocument: '<',
-        mmsView: '<',
     },
     controller: MenuController,
 }

@@ -17,12 +17,16 @@ import {
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
-import { ParamsObject, RefsResponse } from '@ve-types/mms'
+import { DocumentObject, RefObject, RefsResponse } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 class RightPaneController implements IComponentController {
     //Bindings
-    private mmsParams: ParamsObject
+    private mmsRef: RefObject
+
+    // Though we don't explicitly use it right now, we do need it to trigger updates when
+    // entering/exiting certain states
+    private mmsDocument: DocumentObject
 
     //Local Values
 
@@ -181,6 +185,7 @@ class RightPaneController implements IComponentController {
 
                 this.specSvc.editable =
                     data.rootId &&
+                    this.mmsRef.type === 'Branch' &&
                     refType === 'Branch' &&
                     this.permissionsSvc.hasBranchEditPermission(
                         projectId,
@@ -226,6 +231,10 @@ const RightPaneComponent: VeComponentOptions = {
     `,
     require: {
         $pane: '^^ngPane',
+    },
+    bindings: {
+        mmsRef: '<',
+        mmsDocument: '<',
     },
     controller: RightPaneController,
 }

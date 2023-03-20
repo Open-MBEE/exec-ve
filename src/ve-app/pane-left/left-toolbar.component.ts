@@ -16,7 +16,7 @@ import {
 } from './left-buttons.config'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { RefObject } from '@ve-types/mms'
+import { DocumentObject, RefObject } from '@ve-types/mms'
 
 /* Classes */
 const LeftToolbarComponent: VeComponentOptions = {
@@ -24,6 +24,7 @@ const LeftToolbarComponent: VeComponentOptions = {
     template: `<tool-bar toolbar-id="{{$ctrl.toolbarId}}" pane-toggle="$ctrl.paneToggle"/>`,
     bindings: {
         mmsRef: '<',
+        mmsDocument: '<',
     },
     controller: class ToolbarController implements IComponentController {
         static $inject = [
@@ -42,6 +43,10 @@ const LeftToolbarComponent: VeComponentOptions = {
 
         //Bindings
         public mmsRef: RefObject
+
+        // Though we don't explicitly use it right now, we do need it to trigger updates when
+        // entering/exiting certain states
+        public mmsDocument: DocumentObject
 
         //Local
         public toolbarId: string

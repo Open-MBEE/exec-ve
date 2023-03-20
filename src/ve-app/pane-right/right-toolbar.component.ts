@@ -15,7 +15,112 @@ import { PermissionsService } from '@ve-utils/mms-api-client'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { RefObject } from '@ve-types/mms'
+import { DocumentObject, RefObject } from '@ve-types/mms'
+
+class RightToolbarController implements IComponentController {
+    static $inject = [
+        'growl',
+        '$state',
+        'ExtensionService',
+        'PermissionsService',
+        'AutosaveService',
+        'EventService',
+        'ToolbarService',
+        'RootScopeService',
+    ]
+
+    //Injected Deps
+    public subs: Rx.IDisposable[]
+
+    //Bindings
+    public mmsRef: RefObject
+
+    // Though we don't explicitly use it right now, we do need it to trigger updates when
+    // entering/exiting certain states
+    public mmsDocument: DocumentObject
+
+    //Local
+    public toolbarId: string
+
+    constructor(
+        public growl: angular.growl.IGrowlService,
+        public $state: StateService,
+        public extensionSvc: ExtensionService,
+        private permissionsSvc: PermissionsService,
+        private autosaveSvc: AutosaveService,
+        private eventSvc: EventService,
+        private toolbarSvc: ToolbarService,
+        private rootScopeSvc: RootScopeService
+    ) {
+        this.toolbarId = 'right-toolbar'
+    }
+
+    $onInit(): void {
+        this.eventSvc.$init(this)
+
+        this.toolbarSvc.initApi(
+            this.toolbarId,
+            this.tbInit,
+            this,
+            right_default_toolbar,
+            right_dynamic_toolbar,
+            'spec-inspect'
+        )
+    }
+
+    tbInit = (tbApi: ToolbarApi): void => {
+        for (const tool of this.extensionSvc.getExtensions('spec')) {
+            const button = this.toolbarSvc.getToolbarButton(tool)
+            tbApi.addButton(button)
+            if (button.enabledFor) {
+                button.active = false
+                for (const enableState of button.enabledFor) {
+                    if (this.$state.includes(enableState)) {
+                        button.active = true
+                        break
+                    }
+                }
+            }
+            if (button.disabledFor) {
+                for (const disableState of button.disabledFor) {
+                    if (this.$state.includes(disableState)) {
+                        button.active = false
+                        break
+                    }
+                }
+            }
+            if (!button.permission) {
+                button.permission =
+                    this.mmsRef &&
+                    this.mmsRef.type === 'Branch' &&
+                    this.permissionsSvc.hasBranchEditPermission(
+                        this.mmsRef._projectId,
+                        this.mmsRef.id
+                    )
+            }
+        }
+    }
+
+    public paneToggle = (button: IToolBarButton): void => {
+        let toggleDeactivateFlag = false
+        if (
+            this.rootScopeSvc.rightPaneClosed() &&
+            this.rootScopeSvc.rightPaneToggleable()
+        ) {
+            if (button.selected || this.rootScopeSvc.rightPaneClosed()) {
+                if (button.selected && !this.rootScopeSvc.rightPaneClosed())
+                    toggleDeactivateFlag = true
+                this.eventSvc.$broadcast('right-pane.toggle')
+            }
+        }
+        if (toggleDeactivateFlag) {
+            this.toolbarSvc.waitForApi(this.toolbarId).then(
+                (api) => api.deactivate(button.id),
+                (reason) => this.growl.error(ToolbarService.error(reason))
+            )
+        }
+    }
+}
 
 /* Classes */
 const RightToolbarComponent: VeComponentOptions = {
@@ -23,107 +128,9 @@ const RightToolbarComponent: VeComponentOptions = {
     template: `<tool-bar toolbar-id="{{$ctrl.toolbarId}}" pane-toggle="$ctrl.paneToggle"/>`,
     bindings: {
         mmsRef: '<',
+        mmsDocument: '<',
     },
-    controller: class ToolbarController implements IComponentController {
-        static $inject = [
-            'growl',
-            '$state',
-            'ExtensionService',
-            'PermissionsService',
-            'AutosaveService',
-            'EventService',
-            'ToolbarService',
-            'RootScopeService',
-        ]
-
-        //Injected Deps
-        public subs: Rx.IDisposable[]
-
-        //Bindings
-        public mmsRef: RefObject
-
-        //Local
-        public toolbarId: string
-
-        constructor(
-            public growl: angular.growl.IGrowlService,
-            public $state: StateService,
-            public extensionSvc: ExtensionService,
-            private permissionsSvc: PermissionsService,
-            private autosaveSvc: AutosaveService,
-            private eventSvc: EventService,
-            private toolbarSvc: ToolbarService,
-            private rootScopeSvc: RootScopeService
-        ) {
-            this.toolbarId = 'right-toolbar'
-        }
-
-        $onInit(): void {
-            this.eventSvc.$init(this)
-
-            this.toolbarSvc.initApi(
-                this.toolbarId,
-                this.tbInit,
-                this,
-                right_default_toolbar,
-                right_dynamic_toolbar,
-                'spec-inspect'
-            )
-        }
-
-        tbInit = (tbApi: ToolbarApi): void => {
-            for (const tool of this.extensionSvc.getExtensions('spec')) {
-                const button = this.toolbarSvc.getToolbarButton(tool)
-                tbApi.addButton(button)
-                if (button.enabledFor) {
-                    button.active = false
-                    for (const enableState of button.enabledFor) {
-                        if (this.$state.includes(enableState)) {
-                            button.active = true
-                            break
-                        }
-                    }
-                }
-                if (button.disabledFor) {
-                    for (const disableState of button.disabledFor) {
-                        if (this.$state.includes(disableState)) {
-                            button.active = false
-                            break
-                        }
-                    }
-                }
-                if (!button.permission) {
-                    button.permission =
-                        this.mmsRef &&
-                        this.mmsRef.type === 'Branch' &&
-                        this.permissionsSvc.hasBranchEditPermission(
-                            this.mmsRef._projectId,
-                            this.mmsRef.id
-                        )
-                }
-            }
-        }
-
-        public paneToggle = (button: IToolBarButton): void => {
-            let toggleDeactivateFlag = false
-            if (
-                this.rootScopeSvc.rightPaneClosed() &&
-                this.rootScopeSvc.rightPaneToggleable()
-            ) {
-                if (button.selected || this.rootScopeSvc.rightPaneClosed()) {
-                    if (button.selected && !this.rootScopeSvc.rightPaneClosed())
-                        toggleDeactivateFlag = true
-                    this.eventSvc.$broadcast('right-pane.toggle')
-                }
-            }
-            if (toggleDeactivateFlag) {
-                this.toolbarSvc.waitForApi(this.toolbarId).then(
-                    (api) => api.deactivate(button.id),
-                    (reason) => this.growl.error(ToolbarService.error(reason))
-                )
-            }
-        }
-    },
+    controller: RightToolbarController,
 }
 /* Controllers */
 
