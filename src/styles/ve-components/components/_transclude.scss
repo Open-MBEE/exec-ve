@@ -20,7 +20,10 @@ transclude-img {
 view {
   // set display inline for nested transcluded paragraphs and first p in table cells
   // to prevent unwanted newlines and excessive spacing in table cells
-  view-cf view-cf {
+  view-cf view-cf,
+  mms-cf mms-cf,
+  view-cf mms-cf,
+  mms-cf view-cf {
     transclude-doc {
       > p:first-child {
         display: inline;
@@ -87,6 +90,11 @@ view:not(.editing, .outline) {
   present-table-t > view-cf > transclude-doc,
   present-figure > view-cf > transclude-doc,
   present-equation > view-cf > transclude-doc,
+  present-paragraph > mms-cf > transclude-doc,
+  present-list-t > mms-cf > transclude-doc,
+  present-table-t > mms-cf > transclude-doc,
+  present-figure > mms-cf > transclude-doc,
+  present-equation > mms-cf > transclude-doc,
   present-section {
     border: 2px solid white;
     display: block;

@@ -772,15 +772,15 @@ export class EditorController implements angular.IComponentController {
     public mmsResetCallback = (ed: CKEDITOR.editor): void => {
         const body: CKEDITOR.dom.element = ed.document.getBody()
         this.resetCrossRef(
-            body.find("transclude[mms-cf-type='name']").toArray(),
+            body.find("view-cf[mms-cf-type='name']").toArray(),
             '.name]'
         )
         this.resetCrossRef(
-            body.find("transclude[mms-cf-type='doc']").toArray(),
+            body.find("view-cf[mms-cf-type='doc']").toArray(),
             '.doc]'
         )
         this.resetCrossRef(
-            body.find("transclude[mms-cf-type='val']").toArray(),
+            body.find("view-cf[mms-cf-type='val']").toArray(),
             '.val]'
         )
         this.resetCrossRef(body.find('view-link').toArray(), '.vlink]')
