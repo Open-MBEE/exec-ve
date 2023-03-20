@@ -29,7 +29,7 @@ const ButtonBarComponent: VeComponentOptions = {
             tooltip-placement="{{button.placement}}">
             <i class="{{button.icon}} fa-lg"></i><span class="btn-sm-label">{{button.button_content}}</span><i class="{{button.dropdown_icon}} fa-1xs"></i></button>
         <ul class="dropdown-menu" role="menu">
-          <li ng-repeat="dropdown_button in button.dropdown_buttons | filter: {permission: true}">
+          <li ng-repeat="dropdown_button in button.dropdown_buttons | filter: {active: true, permission: true}">
               <a  type="button"
                   class="center {{dropdown_button.id}} {{ dropdown_button.selectable && dropdown_button.selected ? 'checked-list-item' : ''}} {{(!dropdown_button.active) ? 'disabled' : ''}}" 
                   ng-click="$ctrl.buttonClicked($event, dropdown_button.id); $ctrl.bbApi.select(button, dropdown_button)">

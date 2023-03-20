@@ -134,8 +134,6 @@ class SlideshowController implements angular.IComponentController {
         //Init/Reset Tree Updated Subject
         this.eventSvc.resolve(TreeService.events.UPDATED, false)
 
-        this.initView()
-
         this.subs.push(
             this.eventSvc.binding<boolean>(
                 this.rootScopeSvc.constants.VEVIEWCONTENTLOADING,
@@ -144,6 +142,8 @@ class SlideshowController implements angular.IComponentController {
                 }
             )
         )
+
+        this.initView()
 
         //Subscribe to Tree Updated Subject
         this.subs.push(
@@ -374,7 +374,7 @@ class SlideshowController implements angular.IComponentController {
     }
 
     initView = (): void => {
-        this.viewContentLoading = true
+        this.rootScopeSvc.veViewContentLoading(true)
 
         this.bbApi = this.buttonBarSvc.initApi(
             this.bbId,
@@ -385,7 +385,7 @@ class SlideshowController implements angular.IComponentController {
 
         if (this.mmsView || this.mmsDocument) {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
-            this.viewContentLoading = false
+            this.rootScopeSvc.veViewContentLoading(false)
         } else {
             return
         }
@@ -448,15 +448,15 @@ class SlideshowController implements angular.IComponentController {
     }
 
     public bbInit = (api: ButtonBarApi): void => {
-        if (
-            this.mmsView &&
-            this.mmsRef.type === 'Branch' &&
-            this.permissionsSvc.hasBranchEditPermission(
-                this.mmsProject.id,
-                this.mmsRef.id
-            )
-        ) {
+        if (this.mmsRef.type === 'Branch') {
             api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
+            api.setPermission(
+                'show-edits',
+                this.permissionsSvc.hasBranchEditPermission(
+                    this.mmsProject.id,
+                    this.mmsRef.id
+                )
+            )
             api.toggleButton('show-edits', this.rootScopeSvc.veEditMode())
             this.hotkeys.bindTo(this.$scope).add({
                 combo: 'alt+d',

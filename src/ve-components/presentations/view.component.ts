@@ -417,16 +417,14 @@ export const ViewComponent: VeComponentOptions = {
     template: `
     <div id="{{$ctrl.mmsElementId}}" ng-class="{landscape: $ctrl.view._printLandscape}">
     <div ng-if="!$ctrl.noTitle">
-        <h1 class="view-title h{{level}}">
-            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}" mms-watch-id="true"></transclude-name>
+        <h1 class="view-title h{{$ctrl.level}}">
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> 
+            <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}" mms-watch-id="true"></transclude-name>
         </h1>
         <div ng-if="$ctrl.mmsLink" class="view-title">
           <view-link class="open-document" ng-mouseover="hoverIn()" ng-mouseleave="hoverOut()" mms-element-id="{{$ctrl.view.id}}" mms-doc-id="{{$ctrl.view.id}}" 
             link-text="Open Document" link-class="btn btn-primary no-print" mms-external-link="true" link-icon-class="fa fa-share"></view-link>
         </div>
-    
-        
-    
         <div class="ve-secondary-text last-modified no-print">
           Last Modified: {{$ctrl.modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email">{{ $ctrl.modifier.email }}</b><b ng-if="!$ctrl.modifier.email">{{ $ctrl.modifier }}</b>
         </div>

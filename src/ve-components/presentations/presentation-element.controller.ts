@@ -1,15 +1,13 @@
 import $ from 'jquery'
-import _ from 'lodash'
 
 import {
     ViewHtmlService,
     ViewPresentationElemController,
     PresentationService,
 } from '@ve-components/presentations'
-import { presentations_buttons } from '@ve-components/presentations/presentations-buttons.config'
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
-import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
+import { ButtonBarService } from '@ve-core/button-bar'
 import { ImageService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
@@ -52,9 +50,6 @@ export class Presentation
     protected mmsViewCtrl: ViewController
 
     subs: Rx.IDisposable[]
-    public bbApi: ButtonBarApi
-    public bbId: string
-    public bars: string[]
 
     //Common
     //public element: ElementObject;
@@ -134,16 +129,6 @@ export class Presentation
 
         this.setNumber()
 
-        this.bbId = this.buttonBarSvc.generateBarId(
-            `${this.element.id}_${_.camelCase(this.peObject.type)}`
-        )
-        this.bbApi = this.buttonBarSvc.initApi(
-            this.bbId,
-            this.bbInit,
-            this,
-            presentations_buttons
-        )
-
         let projectId = this.mmsProjectId
         let refId = this.mmsRefId
         let commitId = this.mmsCommitId
@@ -209,43 +194,6 @@ export class Presentation
 
     $postLink(): void {
         this.recompile()
-    }
-
-    private bbInit = (api: ButtonBarApi): void => {
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-preview',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-save',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-saveC',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-cancel',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-delete',
-                this
-            )
-        )
-        api.setPermission(
-            'presentation-element-delete',
-            this.isDirectChildOfPresentationElement
-        )
     }
 
     // Presentation Api
