@@ -206,8 +206,10 @@ export class SpecTool implements ISpecTool {
                 }
             })
         )
-        this.subs.push(this.eventSvc.$on('spec.ready', this.changeElement))
-        this.subs.push(this.eventSvc.$on(this.specType, this.initCallback))
+        this.subs.push(
+            this.eventSvc.binding<boolean>('spec.ready', this.changeElement)
+        )
+        //this.subs.push(this.eventSvc.$on(this.specType, this.initCallback))
     }
 
     $onDestroy(): void {
@@ -248,7 +250,8 @@ export class SpecTool implements ISpecTool {
         /* Implement any custom on destroy logic to unregister listeners etc */
     }
 
-    public changeElement = (): void => {
+    public changeElement = (ready?: boolean): void => {
+        if (!ready) return
         this.specApi = this.specSvc.specApi
         this.refId = this.specApi.refId
         this.projectId = this.specApi.projectId

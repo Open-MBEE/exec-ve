@@ -33,8 +33,8 @@ class RightPaneController implements IComponentController {
     public subs: Rx.IDisposable[]
 
     private specApi: SpecApi
-    protected toolsCategory: string = 'global'
-    private init: boolean
+    private openEdits: number
+    private edits: { [id: string]: ElementObject }
 
     private $pane: IPane
     private $tools: JQuery<HTMLElement>
@@ -87,6 +87,9 @@ class RightPaneController implements IComponentController {
         //Init Pane Toggle Controls
         this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
 
+        //Init spec ready binding
+        this.eventSvc.resolve<boolean>('spec.ready', false)
+
         this.subs.push(
             this.$pane.$toggled.subscribe(() => {
                 this.rootScopeSvc.rightPaneClosed(this.$pane.closed)
@@ -125,6 +128,7 @@ class RightPaneController implements IComponentController {
                         data.refId === this.specApi.refId &&
                         !data.continueEdit
                     ) {
+                        this.eventSvc.resolve<boolean>('spec.ready', false)
                         this.specSvc.setElement()
                     }
                 }
@@ -139,6 +143,19 @@ class RightPaneController implements IComponentController {
                 }
             )
         )
+
+        this.subs.push(
+            this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
+                this.openEdits = this.autosaveSvc.openEdits()
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
+                this.openEdits = this.autosaveSvc.openEdits()
+            })
+        )
+        this.edits = this.autosaveSvc.getAll()
     }
 
     $onDestroy(): void {
@@ -146,6 +163,7 @@ class RightPaneController implements IComponentController {
     }
 
     changeAction = (data: veAppEvents.elementSelectedData): void => {
+        this.eventSvc.resolve<boolean>('spec.ready', false)
         const elementId = data.elementId
         const refId = data.refId
         const projectId = data.projectId
@@ -213,6 +231,20 @@ const RightPaneComponent: VeComponentOptions = {
     selector: 'rightPane',
     template: `
     <div class="pane-right">
+    <div ng-if="$ctrl.specSvc.getEditing()" class="container-fluid">        
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Edits ({{$ctrl.openEdits}}):</label>
+                <div class="col-sm-9">
+                    <select class="form-control"
+                        ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in $ctrl.edits"
+                        ng-model="$ctrl.specSvc.tracker.etrackerSelected" ng-change="$ctrl.etrackerChange()">
+                    </select>
+                </div>
+            </div>
+        </form>
+        <hr class="right-title-divider">
+    </div>
     <view-tools toolbar-id="{{$ctrl.toolbarId}}"></view-tools>
 </div>
     `,

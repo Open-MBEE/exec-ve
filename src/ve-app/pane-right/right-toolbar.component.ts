@@ -64,7 +64,7 @@ class RightToolbarController implements IComponentController {
             this,
             right_default_toolbar,
             right_dynamic_toolbar,
-            'spec-inspect'
+            'spec-inspector'
         )
     }
 

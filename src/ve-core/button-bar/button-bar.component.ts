@@ -13,7 +13,7 @@ const ButtonBarComponent: VeComponentOptions = {
     <span ng-repeat="button in $ctrl.buttons | filter: {active: true, permission: true}"  >
       <!-- Normal button -->
       <a type="button" ng-hide="button.dropdown_buttons.length > 0" class="btn btn-tools btn-sm {{button.id}}"
-          ng-click="$ctrl.buttonClicked($event, button.id)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
+          ng-click="$ctrl.buttonClicked($event, button)" uib-tooltip="{{button.tooltip}}" tooltip-append-to-body="false"
           tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="{{button.placement}}">
           <span class="fa-stack">
             <i ng-show="button.toggled" class="fa-solid fa-square fa-stack-2x"></i>
@@ -32,7 +32,7 @@ const ButtonBarComponent: VeComponentOptions = {
           <li ng-repeat="dropdown_button in button.dropdown_buttons | filter: {active: true, permission: true}">
               <a  type="button"
                   class="center {{dropdown_button.id}} {{ dropdown_button.selectable && dropdown_button.selected ? 'checked-list-item' : ''}} {{(!dropdown_button.active) ? 'disabled' : ''}}" 
-                  ng-click="$ctrl.buttonClicked($event, dropdown_button.id); $ctrl.bbApi.select(button, dropdown_button)">
+                  ng-click="$ctrl.buttonClicked($event, dropdown_button); $ctrl.bbApi.select(button, dropdown_button)">
                   <i class="{{dropdown_button.icon}}"> </i>
                   &nbsp;{{dropdown_button.tooltip}}
               </a>
@@ -120,19 +120,20 @@ const ButtonBarComponent: VeComponentOptions = {
             observer.observe(observed)
         }
 
-        buttonClicked(e: JQuery.ClickEvent, button: string): void {
-            const data: veCoreEvents.buttonClicked = {
-                $event: e,
-                clicked: button,
+        buttonClicked(e: JQuery.ClickEvent, button: BarButton): void {
+            if (button.action) {
+                button.action(e)
+            } else {
+                const data: veCoreEvents.buttonClicked = {
+                    $event: e,
+                    clicked: button.id,
+                }
+                //Setup fire button-bar click event
+                this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
+                    this.bbApi.id,
+                    data
+                )
             }
-            //Setup fire button-bar click event
-            this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                this.bbApi.id,
-                data
-            )
-
-            //Fire backwards compatible click event
-            //this.eventSvc.$broadcast(button, e)
         }
     },
 }

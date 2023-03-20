@@ -378,7 +378,8 @@ export class SpecService implements angular.Injectable<any> {
                         this.authSvc.getToken()
 
                     this.$q.allSettled(promises).then(
-                        () => this.eventSvc.$broadcast('spec.ready'),
+                        () =>
+                            this.eventSvc.resolve<boolean>('spec.ready', true),
                         (reason: VePromiseReason<unknown>) => {
                             this.growl.error(
                                 'Getting Element Error: ' + reason.message

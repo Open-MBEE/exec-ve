@@ -108,8 +108,7 @@ class ToolsController implements angular.IComponentController {
     editable: boolean
     viewId: string
     elementSaving: boolean
-    openEdits: number
-    edits: { [id: string]: ElementObject }
+
     protected errorType: string
 
     toolbarId: string
@@ -172,19 +171,6 @@ class ToolsController implements angular.IComponentController {
                 this.changeTool
             )
         )
-
-        this.subs.push(
-            this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
-                this.openEdits = this.autosaveSvc.openEdits()
-            })
-        )
-
-        this.subs.push(
-            this.eventSvc.$on(this.autosaveSvc.EVENT, () => {
-                this.openEdits = this.autosaveSvc.openEdits()
-            })
-        )
-        this.edits = this.autosaveSvc.getAll()
 
         this.subs.push(
             this.eventSvc.$on(
@@ -447,7 +433,7 @@ class ToolsController implements angular.IComponentController {
             this.currentTitle = data.title ? data.title : inspect.tooltip
 
             if (!this.show.hasOwnProperty(_.camelCase(data.id))) {
-                this.startTool(data.id, data.category)
+                this.startTool(data.id)
                 this.show[_.camelCase(data.id)] = true
             } else {
                 this.show[_.camelCase(data.id)] = true
@@ -455,7 +441,7 @@ class ToolsController implements angular.IComponentController {
         }
     }
 
-    private startTool = (id: string, category: string): void => {
+    private startTool = (id: string): void => {
         const tag = this.extensionSvc.getTagByType('spec', id)
         const toolId: string = _.camelCase(id)
         const newTool: JQuery = $(
@@ -571,19 +557,6 @@ const ViewToolsComponent: VeComponentOptions = {
     template: `
     <div class="container-fluid">
     <h4 class="right-pane-title">{{$ctrl.currentTitle}}</h4>
-    <div ng-if="$ctrl.specSvc.getEditing()" class="container-fluid" ng-if="$ctrl.toolsCategory">        
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Edits ({{$ctrl.openEdits}}):</label>
-                <div class="col-sm-9">
-                    <select class="form-control"
-                        ng-options="eid as edit.type + ': ' + edit.name for (eid, edit) in $ctrl.edits"
-                        ng-model="$ctrl.specSvc.tracker.etrackerSelected" ng-change="$ctrl.etrackerChange()">
-                    </select>
-                </div>
-            </div>
-        </form>
-    </div>
     <hr class="right-title-divider">
     <div id="tools"></div>
 </div>
