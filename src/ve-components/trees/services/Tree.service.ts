@@ -1,3 +1,5 @@
+import { IQResolveReject } from 'angular'
+
 import { ApplicationService, RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import {
@@ -1098,10 +1100,13 @@ export class TreeService {
                 }
                 this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
                     if (this.apiSvc.isDocument(root)) {
-                        const rootBranch = this.handleSingleView(root, 'composite')
+                        const rootBranch = this.handleSingleView(
+                            root,
+                            'composite'
+                        )
                         this.treeData.length = 0
                         this.treeData.push(rootBranch)
-                        this._onTreeDataChange()
+                        this._onTreeDataChange().catch(reject)
                         this.viewSvc
                             .handleChildViews(
                                 root,
@@ -1272,7 +1277,8 @@ export class TreeService {
 
     public handleChildren = (
         curNode: TreeBranch,
-        childNodes: TreeBranch[]
+        childNodes: TreeBranch[],
+        reject: IQResolveReject<VePromiseReason<unknown>>
     ): void => {
         const newChildNodes: TreeBranch[] = []
         let node: TreeBranch
@@ -1290,7 +1296,7 @@ export class TreeService {
             newChildNodes.push(node)
         }
         curNode.children.push(...newChildNodes)
-        this._onTreeDataChange();
+        this._onTreeDataChange().catch(reject)
         //this.eventSvc.$broadcast(TreeService.events.RELOAD)
     }
 

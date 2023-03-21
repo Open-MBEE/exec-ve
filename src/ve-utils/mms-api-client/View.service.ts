@@ -1,3 +1,4 @@
+import { IQResolveReject } from 'angular'
 import _ from 'lodash'
 
 import {
@@ -17,7 +18,7 @@ import {
 
 import { veUtils } from '@ve-utils'
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import {
     DocumentObject,
     ElementObject,
@@ -377,44 +378,46 @@ export class ViewService {
         ) => TreeBranch | string[],
         childrenFunc?: (
             currItem: TreeBranch | string[],
-            childNodes: (string[] | TreeBranch)[]
+            childNodes: (string[] | TreeBranch)[],
+            reject: IQResolveReject<VePromiseReason<unknown>>
         ) => void,
         seen?: { [key: string]: ViewObject }
     ): VePromise<TreeBranch | string[]> {
         let seenViews = seen
         if (!seenViews) seenViews = {}
-        const deferred: angular.IDeferred<TreeBranch | string[]> =
-            this.$q.defer()
-        const curItem: TreeBranch | string[] = curItemFunc(v, aggr, propId)
-        seenViews[v.id] = v
-        const childIds: string[] = []
-        const childAggrs: string[] = []
-        const childPropIds: string[] = []
-        if (!v._childViews || v._childViews.length === 0 || aggr === 'none') {
-            if (!Array.isArray(curItem) && curItem.loading) {
-                curItem.loading = false
+        return new this.$q<TreeBranch | string[]>((resolve, reject) => {
+            const curItem: TreeBranch | string[] = curItemFunc(v, aggr, propId)
+            seenViews[v.id] = v
+            const childIds: string[] = []
+            const childAggrs: string[] = []
+            const childPropIds: string[] = []
+            if (
+                !v._childViews ||
+                v._childViews.length === 0 ||
+                aggr === 'none'
+            ) {
+                if (!Array.isArray(curItem) && curItem.loading) {
+                    curItem.loading = false
+                }
+                resolve(curItem)
+            } else {
             }
-            deferred.resolve(curItem)
-            return deferred.promise
-        } else {
-        }
-        for (let i = 0; i < v._childViews.length; i++) {
-            if (seenViews[v._childViews[i].id]) continue
-            childIds.push(v._childViews[i].id)
-            childAggrs.push(v._childViews[i].aggregation)
-            childPropIds.push(v._childViews[i].propertyId)
-        }
-        this.elementSvc
-            .getElements(
-                {
-                    elementId: childIds,
-                    projectId: projectId,
-                    refId: refId,
-                },
-                2
-            )
-            .then(
-                (childViews: ViewObject[]) => {
+            for (let i = 0; i < v._childViews.length; i++) {
+                if (seenViews[v._childViews[i].id]) continue
+                childIds.push(v._childViews[i].id)
+                childAggrs.push(v._childViews[i].aggregation)
+                childPropIds.push(v._childViews[i].propertyId)
+            }
+            this.elementSvc
+                .getElements(
+                    {
+                        elementId: childIds,
+                        projectId: projectId,
+                        refId: refId,
+                    },
+                    2
+                )
+                .then((childViews: ViewObject[]) => {
                     const mapping: { [id: string]: ViewObject } = {}
                     for (let i = 0; i < childViews.length; i++) {
                         mapping[childViews[i].id] = childViews[i]
@@ -457,22 +460,13 @@ export class ViewService {
                     }
                     v._childViews = processedChildViews
                     if (childrenFunc) {
-                        childrenFunc(curItem, childNodes)
+                        childrenFunc(curItem, childNodes, reject)
                     }
-                    this.$q.all(childPromises).then(
-                        () => {
-                            deferred.resolve(curItem)
-                        },
-                        (reason) => {
-                            deferred.reject(reason)
-                        }
-                    )
-                },
-                (reason) => {
-                    deferred.reject(reason)
-                }
-            )
-        return deferred.promise
+                    this.$q.all(childPromises).then(() => {
+                        resolve(curItem)
+                    }, reject)
+                }, reject)
+        })
     }
 
     /**
