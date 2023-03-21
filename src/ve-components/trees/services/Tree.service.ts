@@ -1098,6 +1098,10 @@ export class TreeService {
                 }
                 this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
                     if (this.apiSvc.isDocument(root)) {
+                        const rootBranch = this.handleSingleView(root, 'composite')
+                        this.treeData.length = 0
+                        this.treeData.push(rootBranch)
+                        this._onTreeDataChange()
                         this.viewSvc
                             .handleChildViews(
                                 root,
@@ -1286,6 +1290,7 @@ export class TreeService {
             newChildNodes.push(node)
         }
         curNode.children.push(...newChildNodes)
+        this._onTreeDataChange();
         //this.eventSvc.$broadcast(TreeService.events.RELOAD)
     }
 
