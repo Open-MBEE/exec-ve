@@ -838,42 +838,44 @@ export class TreeService {
                     branch.children.forEach((child) => {
                         child.parent_uid = branch.uid
                         const child_visible = visible && branch.expanded
-                        //if (branch.children[i].type === 'section')
-                        //    addBranchToList(level + 1, '§ ', branch.children[i], child_visible);
-                        if (this.treeApi.sectionNumbering) {
-                            if (child.data._isAppendix) {
-                                alpha = true
-                                j = 0
-                            }
-                            const nextSection = [
-                                ...section,
-                                alpha
-                                    ? String.fromCharCode(j + 65)
-                                    : j.toString(10),
-                            ]
-                            if (
-                                nextSection.length <=
-                                this.treeApi.numberingDepth
-                            ) {
-                                peNums = {}
-                            }
-                            addBranchData(
-                                level + 1,
-                                nextSection,
-                                child,
-                                child_visible,
-                                peNums
-                            )
+                        if (!sectionTypes.includes(child.type)) {
+                            addBranchData(level + 1, section, child, child_visible, peNums )
                         } else {
-                            addBranchData(
-                                level + 1,
-                                [],
-                                child,
-                                child_visible,
-                                peNums
-                            )
+                            if (this.treeApi.sectionNumbering) {
+                                if (child.data._isAppendix) {
+                                    alpha = true
+                                    j = 0
+                                }
+                                const nextSection = [
+                                    ...section,
+                                    alpha
+                                        ? String.fromCharCode(j + 65)
+                                        : j.toString(10),
+                                ]
+                                if (
+                                    nextSection.length <=
+                                    this.treeApi.numberingDepth
+                                ) {
+                                    peNums = {}
+                                }
+                                addBranchData(
+                                    level + 1,
+                                    nextSection,
+                                    child,
+                                    child_visible,
+                                    peNums
+                                )
+                            } else {
+                                addBranchData(
+                                    level + 1,
+                                    [],
+                                    child,
+                                    child_visible,
+                                    peNums
+                                )
+                            }
+                            j++
                         }
-                        j++
                     })
 
                     if (this.treeApi.sort) {
