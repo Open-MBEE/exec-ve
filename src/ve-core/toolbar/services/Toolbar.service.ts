@@ -98,7 +98,7 @@ export class ToolbarService {
     public waitForApi = (id: string): VePromise<ToolbarApi, void> => {
         if (!this.toolbars.hasOwnProperty(id)) {
             this.toolbars[id] = {}
-            this.toolbars[id].promise = new this.$q<ToolbarApi>(
+            this.toolbars[id].promise = new this.$q<ToolbarApi, void>(
                 (resolve, reject) => {
                     this.toolbars[id].resolve = resolve
                     this.toolbars[id].reject = reject

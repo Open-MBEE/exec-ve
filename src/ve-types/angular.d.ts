@@ -16,7 +16,7 @@ export interface VeComponentOptions extends IComponentOptions {
 }
 
 export interface VeQService extends IQService {
-    new <T, U>(
+    new <T, U = unknown>(
         resolver: (
             resolve: IQResolveReject<T>,
             reject: IQResolveReject<VePromiseReason<U>>

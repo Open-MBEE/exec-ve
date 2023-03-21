@@ -382,7 +382,7 @@ export class ViewService {
             reject: IQResolveReject<VePromiseReason<unknown>>
         ) => void,
         seen?: { [key: string]: ViewObject }
-    ): VePromise<TreeBranch | string[]> {
+    ): VePromise<TreeBranch | string[], unknown> {
         let seenViews = seen
         if (!seenViews) seenViews = {}
         return new this.$q<TreeBranch | string[]>((resolve, reject) => {
@@ -422,7 +422,10 @@ export class ViewService {
                     for (let i = 0; i < childViews.length; i++) {
                         mapping[childViews[i].id] = childViews[i]
                     }
-                    const childPromises: VePromise<string[] | TreeBranch>[] = []
+                    const childPromises: VePromise<
+                        string[] | TreeBranch,
+                        unknown
+                    >[] = []
                     const childNodes: (string[] | TreeBranch)[] = []
                     const processedChildViews: ViewObject[] = []
                     for (let i = 0; i < childIds.length; i++) {
