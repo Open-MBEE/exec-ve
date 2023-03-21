@@ -32,7 +32,7 @@ export class TreeOfContentsController extends TreeController {
             eventSvc
         )
 
-        this.types = ['view']
+        this.types = ['view', 'section']
         this.id = 'tree-of-contents'
     }
 
@@ -41,7 +41,7 @@ export class TreeOfContentsController extends TreeController {
         if (this.showPe) {
             this.types.push('all')
         } else {
-            this.types.push('view')
+            this.types = ['view', 'section']
         }
     }
 }

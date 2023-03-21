@@ -874,10 +874,6 @@ export class TreeService {
                             )
                         }
                         j++
-                        this.eventSvc.resolve<boolean>(
-                            TreeService.events.UPDATED,
-                            true
-                        )
                     })
 
                     if (this.treeApi.sort) {
@@ -1099,7 +1095,7 @@ export class TreeService {
                     projectId: this.treeApi.projectId,
                 }
                 this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
-                    if (this.apiSvc.isDocument(root)) {
+                    if (this.apiSvc.isView(root)) {
                         const rootBranch = this.handleSingleView(
                             root,
                             'composite'
@@ -1157,16 +1153,7 @@ export class TreeService {
                                                 true
                                             ).catch(reject)
                                         }
-                                        treeData.push(
-                                            this.viewId2node[
-                                                this.treeApi.rootId
-                                            ]
-                                        )
                                         this.processedFocus = ''
-                                        if (treeData.length > 0) {
-                                            this.treeData.length = 0
-                                            this.treeData.push(...treeData)
-                                        }
                                         this.changeElement().then(
                                             resolve,
                                             reject
@@ -1182,7 +1169,8 @@ export class TreeService {
     }
 
     changeElement = (): VePromise<void, unknown> => {
-        if (this.treeApi.elementId === this.processedFocus) return
+        if (this.treeApi.elementId === this.processedFocus)
+            return new this.$q<void, unknown>((resolve, reject) => {resolve()})
 
         this.processedFocus = this.treeApi.elementId
         return new this.$q<void, unknown>((resolve, reject) => {
@@ -1397,8 +1385,9 @@ export class TreeService {
                                             otherTreeNode
                                         )
                                     }
+                                    this._onTreeDataChange().catch(reject)
                                 }
-                                if (!initial) {
+                                if (initial) {
                                     this.changeElement().catch(reject)
                                 }
                             }, reject)
