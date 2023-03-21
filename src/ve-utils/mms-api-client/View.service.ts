@@ -400,7 +400,7 @@ export class ViewService {
                     curItem.loading = false
                 }
                 resolve(curItem)
-            } else {
+                return
             }
             for (let i = 0; i < v._childViews.length; i++) {
                 if (seenViews[v._childViews[i].id]) continue

@@ -258,7 +258,7 @@ export class URLService {
      * @returns {string} The url.
      */
     getElementURL(reqOb: ElementsRequest<string>): string {
-        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}`
+        const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/views/${reqOb.elementId}`
         return this.addVersion(r, reqOb.commitId)
     }
 
