@@ -250,6 +250,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
 
         if (this.editTemplate) {
             this.save = (e: JQuery.ClickEvent): void => {
+                e.stopPropagation()
                 this.componentSvc.saveAction(this, this.$element, false)
             }
 
@@ -258,6 +259,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             }
 
             this.cancel = (e: JQuery.ClickEvent): void => {
+                e.stopPropagation()
                 this.componentSvc.cancelAction(this, this.recompile, this.$element)
             }
 
