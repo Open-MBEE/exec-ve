@@ -33,7 +33,7 @@ export class TreeService {
         iconDefault: 'fa-solid fa-file fa-fw',
     }
 
-    public defaultSectionTypes = ['view', 'section']
+    public defaultSectionTypes = ['group', 'view', 'section']
 
     public loading: boolean
 
@@ -771,6 +771,8 @@ export class TreeService {
             this.treeData.forEach((branch) => {
                 this._addBranchData(1, [], branch, true, {})
             })
+
+            this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, true)
             this.eventSvc.$broadcast('tree.ready')
             resolve()
         })
@@ -884,6 +886,7 @@ export class TreeService {
                 this.treeApi.expandLevel = 1
         }
         branch.loading = false
+        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
     }
 
     public updateRows = (
@@ -907,7 +910,8 @@ export class TreeService {
                 for (let i = 0; i < branch.children.length; i++) {
                     if (
                         types.includes('all') ||
-                        types.includes(branch.children[i].type)
+                        types.includes(branch.children[i].type) ||
+                        (types.includes('favorite') && branch.favorite)
                     ) {
                         visibleChild = true
                         break
@@ -1228,7 +1232,7 @@ export class TreeService {
                                 children: [],
                             })
                         }
-                        //this._addBranchData(1, [], branch, true, {})
+                        this._onTreeDataChange().catch(reject)
                         resolve()
                     },
                     (reason) => {
