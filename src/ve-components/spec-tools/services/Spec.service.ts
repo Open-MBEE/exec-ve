@@ -439,6 +439,7 @@ export class SpecService implements angular.Injectable<any> {
     }
 
     private _save(): VePromise<ElementObject> {
+        //TODO value edits don't save because they're handled by transclude val
         return this.componentSvc.save(this.edit, this.editorApi, { element: this.element }, false)
     }
 
