@@ -66,6 +66,7 @@ export class ExtensionService {
             // this.growl.error('Unknown Extension Prefix: ' + extPrefix)
             return 'extension-error'
         }
+        if (type == 'InstanceSpecification') type = 'section'
         const tag = _.kebabCase(
             type.startsWith(extPrefix) ? type : extPrefix + _.capitalize(type)
         )
