@@ -29,9 +29,7 @@ const ToolBarComponent: VeComponentOptions = {
         toolbarId: '@',
         paneToggle: '&',
     },
-    controller: class VeToolbarController
-        implements angular.IComponentController
-    {
+    controller: class VeToolbarController implements angular.IComponentController {
         public subs: Rx.IDisposable[]
 
         private anchor: string
@@ -42,12 +40,7 @@ const ToolBarComponent: VeComponentOptions = {
 
         tooltipAnchor
 
-        static $inject = [
-            'growl',
-            'RootScopeService',
-            'EventService',
-            'ToolbarService',
-        ]
+        static $inject = ['growl', 'RootScopeService', 'EventService', 'ToolbarService']
 
         constructor(
             private growl: angular.growl.IGrowlService,
@@ -83,18 +76,12 @@ const ToolBarComponent: VeComponentOptions = {
                     this.buttons = api.buttons
 
                     //Binding to catch all "clicks" on tb and execute select function
-                    this.eventSvc.binding<veCoreEvents.toolbarClicked>(
-                        this.toolbarId,
-                        (data) => {
-                            this.toolbarSvc.waitForApi(this.toolbarId).then(
-                                (api) => api.select(data.id),
-                                (reason) =>
-                                    this.growl.error(
-                                        ToolbarService.error(reason)
-                                    )
-                            )
-                        }
-                    )
+                    this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, (data) => {
+                        this.toolbarSvc.waitForApi(this.toolbarId).then(
+                            (api) => api.select(data.id),
+                            (reason) => this.growl.error(ToolbarService.error(reason))
+                        )
+                    })
                 },
                 (reason) => {
                     this.growl.error(reason.message)
@@ -124,14 +111,11 @@ const ToolBarComponent: VeComponentOptions = {
 
         protected onClick: buttonOnClickFn = (button) => {
             if (!button.dynamic) {
-                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
-                    this.toolbarId,
-                    {
-                        id: button.id,
-                        category: button.category,
-                        title: button.tooltip,
-                    }
-                )
+                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
+                    id: button.id,
+                    category: button.category,
+                    title: button.tooltip,
+                })
             } else {
                 this.eventSvc.$broadcast<void>(button.id)
             }

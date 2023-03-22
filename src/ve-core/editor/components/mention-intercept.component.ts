@@ -13,9 +13,7 @@ class MMSMentionInterceptController implements angular.IComponentController {
 
     $onChanges(changes: angular.IOnChangesObject): void {
         if (changes.mmsMentionInterceptValue) {
-            this.ngModel.$setViewValue(
-                changes.mmsMentionInterceptValue.currentValue
-            )
+            this.ngModel.$setViewValue(changes.mmsMentionInterceptValue.currentValue)
             this.ngModel.$render()
         }
     }

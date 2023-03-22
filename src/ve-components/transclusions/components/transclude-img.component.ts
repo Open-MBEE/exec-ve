@@ -44,10 +44,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeImgController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeImgController extends Transclusion implements ITransclusion {
     //Locals
     includeExt = ['svg', 'png']
     svg: { url: string; image: boolean; ext: string }[]
@@ -98,16 +95,13 @@ export class TranscludeImgController
     $onInit(): void {
         super.$onInit()
         this.$element.on('click', (e) => {
-            if (this.mmsViewCtrl)
-                this.mmsViewCtrl.transcludeClicked(this.element)
+            if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
 
             e.stopPropagation()
         })
     }
 
-    public getContent = (
-        preview?
-    ): VePromise<string | HTMLElement[], string> => {
+    public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
         const artifacts = this.element._artifacts
         if (artifacts !== undefined) {
             const reqOb = {

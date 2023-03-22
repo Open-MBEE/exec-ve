@@ -15,13 +15,7 @@ import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { InsertResolveFn } from '@ve-types/components'
-import {
-    ParamsObject,
-    ProjectObject,
-    ProjectsResponse,
-    RefObject,
-    RefsResponse,
-} from '@ve-types/mms'
+import { ParamsObject, ProjectObject, ProjectsResponse, RefObject, RefsResponse } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 class RefsController {
@@ -147,9 +141,7 @@ class RefsController {
             this.isLoading = false
         })
 
-        this.htmlTooltip = this.$sce.trustAsHtml(
-            'Branch temporarily unavailable during duplication.'
-        ) as string
+        this.htmlTooltip = this.$sce.trustAsHtml('Branch temporarily unavailable during duplication.') as string
 
         this.subs.push(
             this.eventSvc.$on<ParamsObject>('fromParamChange', (fromParams) => {
@@ -210,9 +202,7 @@ class RefsController {
         // Item specific setup:
         if (itemType === 'Branch') {
             if (!branch) {
-                this.growl.warning(
-                    'Add Branch Error: Select a branch or tag first'
-                )
+                this.growl.warning('Add Branch Error: Select a branch or tag first')
                 return
             }
             if (branch.type === 'Tag') {
@@ -223,22 +213,15 @@ class RefsController {
             insertData.parentRefId = branch.id
         } else if (itemType === 'Tag') {
             if (!branch) {
-                this.growl.warning(
-                    'Add Tag Error: Select a branch or tag first'
-                )
+                this.growl.warning('Add Tag Error: Select a branch or tag first')
                 return
             }
             insertData.parentRefId = branch.id
         } else {
-            this.growl.error(
-                'Add Item of Type ' + itemType + ' is not supported'
-            )
+            this.growl.error('Add Item of Type ' + itemType + ' is not supported')
             return
         }
-        const instance = this.$uibModal.open<
-            InsertResolveFn<InsertRefData>,
-            RefObject
-        >({
+        const instance = this.$uibModal.open<InsertResolveFn<InsertRefData>, RefObject>({
             component: 'insertElementModal',
             resolve: {
                 getInsertData: () => {
@@ -272,8 +255,7 @@ class RefsController {
 
                 const branches: RefObject[] = []
                 for (let j = 0; j < this.refs.length; j++) {
-                    if (this.refs[j].type === 'Branch')
-                        branches.push(this.refs[j])
+                    if (this.refs[j].type === 'Branch') branches.push(this.refs[j])
                 }
                 this.branches = branches
                 if (data.type === 'Branch') {
@@ -319,17 +301,12 @@ class RefsController {
                 },
                 finalize: () => {
                     return () => {
-                        return this.projectSvc.deleteRef(
-                            branch.id,
-                            this.project.id
-                        )
+                        return this.projectSvc.deleteRef(branch.id, this.project.id)
                     }
                 },
             },
         }
-        const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>(
-            settings
-        )
+        const instance = this.$uibModal.open<ConfirmDeleteModalResolveFn, void>(settings)
         instance.result.then(
             () => {
                 //TODO $state project with no selected ref

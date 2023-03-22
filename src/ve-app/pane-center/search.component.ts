@@ -18,12 +18,7 @@ class SearchController {
     searchContentLoading: boolean = true
     searchOptions: VeSearchOptions
 
-    static $inject = [
-        '$state',
-        'ContentWindowService',
-        'RootScopeService',
-        'EventService',
-    ]
+    static $inject = ['$state', 'ContentWindowService', 'RootScopeService', 'EventService']
 
     constructor(
         private $state: StateService,
@@ -50,14 +45,8 @@ class SearchController {
                     refId: elementOb._refId,
                     commitId: 'latest',
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-                    'element.selected',
-                    data
-                )
-                if (
-                    typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' &&
-                    this.rootScopeSvc.rightPaneClosed()
-                )
+                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+                if (typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' && this.rootScopeSvc.rightPaneClosed())
                     this.eventSvc.$broadcast('right-pane.toggle', false)
             },
             relatedCallback: (doc, view, elem): void => {

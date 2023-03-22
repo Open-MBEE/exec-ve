@@ -3,12 +3,7 @@ import { URLService } from '@ve-utils/mms-api-client'
 import { veUtils } from '@ve-utils'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import {
-    PermissionsObject,
-    PermissionsResponse,
-    ProjectObject,
-    RefObject,
-} from '@ve-types/mms'
+import { PermissionsObject, PermissionsResponse, ProjectObject, RefObject } from '@ve-types/mms'
 
 export interface PermissionCache {
     project: { [id: string]: boolean }
@@ -29,11 +24,7 @@ export class PermissionsService {
 
     static $inject = ['$q', '$http', 'URLService']
 
-    constructor(
-        private $q: VeQService,
-        private $http: angular.IHttpService,
-        private uRLSvc: URLService
-    ) {}
+    constructor(private $q: VeQService, private $http: angular.IHttpService, private uRLSvc: URLService) {}
 
     public initializePermissions(
         projectOb: ProjectObject,
@@ -65,12 +56,9 @@ export class PermissionsService {
                     if (Array.isArray(data) && data.length > 0) {
                         data.forEach((d) => {
                             if (d.type == 'PROJECT') {
-                                this.permissions.project[d.projectId] =
-                                    d.hasPrivilege
+                                this.permissions.project[d.projectId] = d.hasPrivilege
                             } else {
-                                this.permissions.ref[
-                                    d.projectId + '/' + d.refId
-                                ] = d.hasPrivilege
+                                this.permissions.ref[d.projectId + '/' + d.refId] = d.hasPrivilege
                             }
                         })
                         deferred.resolve(this.permissions)
@@ -94,10 +82,7 @@ export class PermissionsService {
         return this.permissions.project[projectId]
     }
 
-    public hasBranchEditPermission = (
-        projectId: string,
-        refId: string
-    ): boolean => {
+    public hasBranchEditPermission = (projectId: string, refId: string): boolean => {
         return this.permissions.ref[projectId + '/' + refId]
     }
 }

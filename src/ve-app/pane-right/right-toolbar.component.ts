@@ -2,10 +2,7 @@ import { StateService } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
-import {
-    right_default_toolbar,
-    right_dynamic_toolbar,
-} from '@ve-app/pane-right/right-buttons.config'
+import { right_default_toolbar, right_dynamic_toolbar } from '@ve-app/pane-right/right-buttons.config'
 import { ExtensionService } from '@ve-components/services'
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
@@ -98,23 +95,16 @@ class RightToolbarController implements IComponentController {
                 button.permission =
                     this.mmsRef &&
                     this.mmsRef.type === 'Branch' &&
-                    this.permissionsSvc.hasBranchEditPermission(
-                        this.mmsRef._projectId,
-                        this.mmsRef.id
-                    )
+                    this.permissionsSvc.hasBranchEditPermission(this.mmsRef._projectId, this.mmsRef.id)
             }
         }
     }
 
     public paneToggle = (button: IToolBarButton): void => {
         let toggleDeactivateFlag = false
-        if (
-            this.rootScopeSvc.rightPaneClosed() &&
-            this.rootScopeSvc.rightPaneToggleable()
-        ) {
+        if (this.rootScopeSvc.rightPaneClosed() && this.rootScopeSvc.rightPaneToggleable()) {
             if (button.selected || this.rootScopeSvc.rightPaneClosed()) {
-                if (button.selected && !this.rootScopeSvc.rightPaneClosed())
-                    toggleDeactivateFlag = true
+                if (button.selected && !this.rootScopeSvc.rightPaneClosed()) toggleDeactivateFlag = true
                 this.eventSvc.$broadcast('right-pane.toggle')
             }
         }

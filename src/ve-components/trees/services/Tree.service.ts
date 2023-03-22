@@ -2,12 +2,7 @@ import { IQResolveReject } from 'angular'
 
 import { ApplicationService, RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
-import {
-    ApiService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 
 import { veCore } from '@ve-core'
 
@@ -132,10 +127,7 @@ export class TreeService {
         idKey: string,
         type: string,
         parentKey: string,
-        level2_Func: (
-            elementOb: ElementObject,
-            node: TreeBranch
-        ) => VePromise<void, unknown>
+        level2_Func: (elementOb: ElementObject, node: TreeBranch) => VePromise<void, unknown>
     ): VePromise<TreeBranch[], unknown> => {
         return new this.$q<TreeBranch[], unknown>((resolve, reject) => {
             const rootNodes: TreeBranch[] = []
@@ -266,9 +258,7 @@ export class TreeService {
      * @name TreeApi#collapseAll
      * self-explanatory
      */
-    public collapseAll = (
-        excludeBranch?: TreeBranch
-    ): VePromise<void, unknown> => {
+    public collapseAll = (excludeBranch?: TreeBranch): VePromise<void, unknown> => {
         return this.forEachBranch(
             (b, level) => {
                 b.expanded = false
@@ -313,9 +303,7 @@ export class TreeService {
         return b.children
     }
 
-    public selectParentBranch = (
-        branch: TreeBranch
-    ): VePromise<void, unknown> => {
+    public selectParentBranch = (branch: TreeBranch): VePromise<void, unknown> => {
         return this.$q<void, unknown>((resolve, reject) => {
             this.getParent(branch).then((p) => {
                 this.selectBranch(p).then(resolve, reject)
@@ -332,11 +320,7 @@ export class TreeService {
      * @param {TreeBranch} new_branch new branch to be added to the tree
      * @param {boolean} top boolean determining if this item should be at the top
      */
-    public addBranch = (
-        parent: TreeBranch,
-        new_branch: TreeBranch,
-        top: boolean
-    ): VePromise<void, unknown> => {
+    public addBranch = (parent: TreeBranch, new_branch: TreeBranch, top: boolean): VePromise<void, unknown> => {
         if (parent) {
             if (top) parent.children.unshift(new_branch)
             else parent.children.push(new_branch)
@@ -353,9 +337,7 @@ export class TreeService {
         return this.$q.resolve()
     }
 
-    public removeSingleBranch = (
-        branch: TreeBranch
-    ): VePromise<void, unknown> => {
+    public removeSingleBranch = (branch: TreeBranch): VePromise<void, unknown> => {
         this._removeBranch(branch, true)
         return this.$q.resolve()
     }
@@ -395,9 +377,7 @@ export class TreeService {
      * @param {TreeBranch} branch
      * @returns {TreeBranch[]}
      */
-    public getSiblings = (
-        branch: TreeBranch
-    ): VePromise<TreeBranch[], unknown> => {
+    public getSiblings = (branch: TreeBranch): VePromise<TreeBranch[], unknown> => {
         return this.$q<TreeBranch[], unknown>((resolve) => {
             this.getParent(branch).then(
                 (p) => {
@@ -415,9 +395,7 @@ export class TreeService {
      * @param {TreeBranch} branch
      * @returns {TreeBranch}
      */
-    public getNextSibling = (
-        branch: TreeBranch
-    ): VePromise<TreeBranch, unknown> => {
+    public getNextSibling = (branch: TreeBranch): VePromise<TreeBranch, unknown> => {
         return this.$q<TreeBranch, unknown>((resolve, reject) => {
             this.getSiblings(branch).then((siblings) => {
                 if (Array.isArray(siblings)) {
@@ -433,9 +411,7 @@ export class TreeService {
      * @param {TreeBranch} branch
      * @returns {TreeBranch}
      */
-    public getPrevSibling = (
-        branch: TreeBranch
-    ): VePromise<TreeBranch, unknown> => {
+    public getPrevSibling = (branch: TreeBranch): VePromise<TreeBranch, unknown> => {
         return this.$q<TreeBranch, unknown>((resolve, reject) => {
             this.getSiblings(branch).then((siblings) => {
                 if (Array.isArray(siblings)) {
@@ -454,8 +430,7 @@ export class TreeService {
      */
     public getFirstChild = (branch: TreeBranch): TreeBranch => {
         if (!branch) branch = this.selectedBranch
-        if (branch && branch.children && branch.children.length > 0)
-            return branch.children[0]
+        if (branch && branch.children && branch.children.length > 0) return branch.children[0]
     }
 
     /**
@@ -463,9 +438,7 @@ export class TreeService {
      * @param {TreeBranch} branch
      * @returns {TreeBranch}
      */
-    public getClosestAncestorNextSibling = (
-        branch: TreeBranch
-    ): VePromise<TreeBranch, unknown> => {
+    public getClosestAncestorNextSibling = (branch: TreeBranch): VePromise<TreeBranch, unknown> => {
         return this.$q<TreeBranch, unknown>((resolve, reject) => {
             this.getNextSibling(branch).then(
                 (b) => {
@@ -473,10 +446,7 @@ export class TreeService {
                 },
                 () => {
                     this.getParent(branch).then((next) => {
-                        this.getClosestAncestorNextSibling(next).then(
-                            resolve,
-                            reject
-                        )
+                        this.getClosestAncestorNextSibling(next).then(resolve, reject)
                     }, reject)
                 }
             )
@@ -490,29 +460,20 @@ export class TreeService {
      *                          this list
      * @returns {TreeBranch}
      */
-    public getNextBranch = (
-        branch: TreeBranch,
-        types?: string[]
-    ): VePromise<TreeBranch, unknown> => {
+    public getNextBranch = (branch: TreeBranch, types?: string[]): VePromise<TreeBranch, unknown> => {
         return this.$q<TreeBranch, unknown>((resolve, reject) => {
             if (!branch) branch = this.selectedBranch
             if (branch) {
                 const next = this.getFirstChild(branch)
                 if (next) resolve(next)
                 else {
-                    this.getClosestAncestorNextSibling(branch).then(
-                        (nextSib) => {
-                            if (types && !types.includes(nextSib.type)) {
-                                this.getNextBranch(nextSib).then(
-                                    resolve,
-                                    reject
-                                )
-                            } else {
-                                resolve(nextSib)
-                            }
-                        },
-                        reject
-                    )
+                    this.getClosestAncestorNextSibling(branch).then((nextSib) => {
+                        if (types && !types.includes(nextSib.type)) {
+                            this.getNextBranch(nextSib).then(resolve, reject)
+                        } else {
+                            resolve(nextSib)
+                        }
+                    }, reject)
                 }
             } else reject({ message: 'No More branches!', status: 200 })
         })
@@ -523,9 +484,7 @@ export class TreeService {
      * @param {TreeBranch} branch
      * @returns {TreeBranch}
      */
-    public lastDescendant = (
-        branch: TreeBranch
-    ): VePromise<TreeBranch, unknown> => {
+    public lastDescendant = (branch: TreeBranch): VePromise<TreeBranch, unknown> => {
         return new this.$q<TreeBranch, unknown>((resolve, reject) => {
             if (branch) {
                 if (branch.children.length === 0) resolve(branch)
@@ -544,19 +503,13 @@ export class TreeService {
      *                          this list
      * @returns {TreeBranch}
      */
-    public getPrevBranch = (
-        branch: TreeBranch,
-        types?: string[]
-    ): VePromise<TreeBranch, unknown> => {
+    public getPrevBranch = (branch: TreeBranch, types?: string[]): VePromise<TreeBranch, unknown> => {
         return new this.$q<TreeBranch, unknown>((resolve, reject) => {
             this.getPrevSibling(branch).then(
                 (prevSibling) => {
                     this.lastDescendant(prevSibling).then((last) => {
                         if (types && !types.includes(last.type)) {
-                            this.getPrevBranch(last, types).then(
-                                resolve,
-                                reject
-                            )
+                            this.getPrevBranch(last, types).then(resolve, reject)
                         } else {
                             resolve(last)
                         }
@@ -586,9 +539,7 @@ export class TreeService {
      * @name TreeApi#getBranch
      * Returns the branch with the specified data
      */
-    public getBranch = (
-        data: ElementObject
-    ): VePromise<TreeBranch, unknown> => {
+    public getBranch = (data: ElementObject): VePromise<TreeBranch, unknown> => {
         return new this.$q<TreeBranch, unknown>((resolve, reject) => {
             this.forEachBranch((b) => {
                 if (b.data.id === data.id) {
@@ -610,11 +561,7 @@ export class TreeService {
     ): VePromise<void, unknown> => {
         return new this.$q<void, unknown>((resolve, reject) => {
             const flag = false
-            const run = (
-                branch: TreeBranch,
-                level: number,
-                flag: boolean
-            ): void => {
+            const run = (branch: TreeBranch, level: number, flag: boolean): void => {
                 if (flag && !useFlag) resolve()
                 func(branch, flag)
                 if (branch.children) {
@@ -636,10 +583,7 @@ export class TreeService {
         })
     }
 
-    private _removeBranch = (
-        branch: TreeBranch,
-        singleBranch: boolean
-    ): void => {
+    private _removeBranch = (branch: TreeBranch, singleBranch: boolean): void => {
         this.getParent(branch).then(
             (parentBranch) => {
                 for (let i = 0; i < parentBranch.children.length; i++) {
@@ -669,8 +613,7 @@ export class TreeService {
      */
     public getParent = (child: TreeBranch): VePromise<TreeBranch, unknown> => {
         return new this.$q<TreeBranch, unknown>((resolve, reject) => {
-            if (child === null)
-                reject({ message: 'No child specified!', status: 404 })
+            if (child === null) reject({ message: 'No child specified!', status: 404 })
 
             if (child.parent_uid) {
                 this.forEachBranch((b) => {
@@ -723,10 +666,7 @@ export class TreeService {
      * @param branch
      * @param noClick
      */
-    public selectBranch = (
-        branch?: TreeBranch,
-        noClick?
-    ): VePromise<void, unknown> => {
+    public selectBranch = (branch?: TreeBranch, noClick?): VePromise<void, unknown> => {
         const deferred = this.$q.defer<void>()
         if (!branch) {
             if (this.selectedBranch) this.selectedBranch.selected = false
@@ -786,8 +726,7 @@ export class TreeService {
         peNums: { [type: string]: number }
     ): void => {
         if (!branch.uid) branch.uid = `${Math.random()}`
-        if (typeof branch.expanded === 'undefined')
-            branch.expanded = level <= this.treeApi.expandLevel
+        if (typeof branch.expanded === 'undefined') branch.expanded = level <= this.treeApi.expandLevel
         branch.expandable = branch.children && branch.children.length > 0
         branch.favorite = false
 
@@ -798,15 +737,10 @@ export class TreeService {
         if (!this.defaultSectionTypes.includes(branch.type)) {
             if (!peNums[branch.type]) peNums[branch.type] = 0
             peNums[branch.type]++
-            if (
-                this.treeApi.numberingDepth === 0 &&
-                !this.defaultSectionTypes.includes(branch.type)
-            ) {
+            if (this.treeApi.numberingDepth === 0 && !this.defaultSectionTypes.includes(branch.type)) {
                 number = peNums[branch.type].toString(10)
             } else if (section.length >= this.treeApi.numberingDepth) {
-                number = `${section
-                    .slice(0, this.treeApi.numberingDepth)
-                    .join('.')}${this.treeApi.numberingSeparator}${
+                number = `${section.slice(0, this.treeApi.numberingDepth).join('.')}${this.treeApi.numberingSeparator}${
                     peNums[branch.type]
                 }`
             } else {
@@ -814,9 +748,7 @@ export class TreeService {
                 while (sectionCopy.length < this.treeApi.numberingDepth) {
                     sectionCopy.push('0')
                 }
-                number = `${sectionCopy.join('.')}${
-                    this.treeApi.numberingSeparator
-                }${peNums[branch.type]}`
+                number = `${sectionCopy.join('.')}${this.treeApi.numberingSeparator}${peNums[branch.type]}`
             }
         }
         if (branch.data && branch.data.id && this.treeApi.sectionNumbering) {
@@ -836,43 +768,20 @@ export class TreeService {
                 child.parent_uid = branch.uid
                 const child_visible = visible && branch.expanded
                 if (!this.defaultSectionTypes.includes(child.type)) {
-                    this._addBranchData(
-                        level + 1,
-                        section,
-                        child,
-                        child_visible,
-                        peNums
-                    )
+                    this._addBranchData(level + 1, section, child, child_visible, peNums)
                 } else {
                     if (this.treeApi.sectionNumbering) {
                         if (child.data._isAppendix) {
                             alpha = true
                             j = 0
                         }
-                        const nextSection = [
-                            ...section,
-                            alpha
-                                ? String.fromCharCode(j + 65)
-                                : j.toString(10),
-                        ]
+                        const nextSection = [...section, alpha ? String.fromCharCode(j + 65) : j.toString(10)]
                         if (nextSection.length <= this.treeApi.numberingDepth) {
                             peNums = {}
                         }
-                        this._addBranchData(
-                            level + 1,
-                            nextSection,
-                            child,
-                            child_visible,
-                            peNums
-                        )
+                        this._addBranchData(level + 1, nextSection, child, child_visible, peNums)
                     } else {
-                        this._addBranchData(
-                            level + 1,
-                            [],
-                            child,
-                            child_visible,
-                            peNums
-                        )
+                        this._addBranchData(level + 1, [], child, child_visible, peNums)
                     }
                     j++
                 }
@@ -882,25 +791,16 @@ export class TreeService {
                 this.treeData.sort(this._treeSortFunction)
             }
 
-            if (!this.treeApi.expandLevel && this.treeApi.expandLevel !== 0)
-                this.treeApi.expandLevel = 1
+            if (!this.treeApi.expandLevel && this.treeApi.expandLevel !== 0) this.treeApi.expandLevel = 1
         }
         branch.loading = false
         this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
     }
 
-    public updateRows = (
-        id: string,
-        types: string[],
-        treeRows: TreeRow[]
-    ): VePromise<TreeRow[], void> => {
+    public updateRows = (id: string, types: string[], treeRows: TreeRow[]): VePromise<TreeRow[], void> => {
         treeRows.length = 0
         return new this.$q<TreeRow[], void>((resolve, reject) => {
-            const addBranchToList = (
-                level: number,
-                branch: TreeBranch,
-                visible: boolean
-            ): void => {
+            const addBranchToList = (level: number, branch: TreeBranch, visible: boolean): void => {
                 let typeIcon = this.defaultIcon
                 let visibleChild = false
                 let aggr = branch.aggr
@@ -918,9 +818,7 @@ export class TreeService {
                     }
                 }
                 if (this.getTypeIcon(branch.type.toLowerCase() + aggr)) {
-                    typeIcon = this.getTypeIcon(
-                        branch.type.toLowerCase() + aggr
-                    )
+                    typeIcon = this.getTypeIcon(branch.type.toLowerCase() + aggr)
                 } else if (this.getTypeIcon('default')) {
                     typeIcon = this.getTypeIcon('default')
                 }
@@ -938,12 +836,7 @@ export class TreeService {
                 ) {
                     const treeRow = {
                         level,
-                        section:
-                            number &&
-                            !number.includes('undefined') &&
-                            !number.includes('NaN')
-                                ? number
-                                : '',
+                        section: number && !number.includes('undefined') && !number.includes('NaN') ? number : '',
                         branch,
                         label: branch.label,
                         visibleChild,
@@ -1022,64 +915,52 @@ export class TreeService {
                 // } else {
                 //     treeOptions.sectionTypes.push('snapshot')
                 // }
-                this.projectSvc
-                    .getGroups(this.treeApi.projectId, this.treeApi.refId)
-                    .then(
-                        (groups) => {
-                            this.viewSvc
-                                .getProjectDocuments({
-                                    projectId: this.treeApi.projectId,
-                                    refId: this.treeApi.refId,
-                                })
-                                .then(
-                                    (documents) => {
-                                        this.buildTreeHierarchy(
-                                            groups,
-                                            'id',
-                                            'group',
-                                            '_parentId',
-                                            this.groupLevel2Func
-                                        ).then((treeHierarchy) => {
-                                            treeData.push(...treeHierarchy)
-                                            documents.forEach((document) => {
-                                                if (
-                                                    !document._groupId ||
-                                                    document._groupId ==
-                                                        this.treeApi.projectId
-                                                ) {
-                                                    treeData.push({
-                                                        label: document.name,
-                                                        type: 'view',
-                                                        data: document,
-                                                        children: [],
-                                                    })
-                                                }
-                                            })
-                                            this.processedFocus = ''
-                                            if (treeData.length > 0) {
-                                                this.treeData.length = 0
-                                                this.treeData.push(...treeData)
+                this.projectSvc.getGroups(this.treeApi.projectId, this.treeApi.refId).then(
+                    (groups) => {
+                        this.viewSvc
+                            .getProjectDocuments({
+                                projectId: this.treeApi.projectId,
+                                refId: this.treeApi.refId,
+                            })
+                            .then(
+                                (documents) => {
+                                    this.buildTreeHierarchy(
+                                        groups,
+                                        'id',
+                                        'group',
+                                        '_parentId',
+                                        this.groupLevel2Func
+                                    ).then((treeHierarchy) => {
+                                        treeData.push(...treeHierarchy)
+                                        documents.forEach((document) => {
+                                            if (!document._groupId || document._groupId == this.treeApi.projectId) {
+                                                treeData.push({
+                                                    label: document.name,
+                                                    type: 'view',
+                                                    data: document,
+                                                    children: [],
+                                                })
                                             }
-                                            this.changeElement().then(
-                                                resolve,
-                                                reject
-                                            )
-                                        }, reject)
-                                    },
-                                    (reason) => {
-                                        reason.message =
-                                            'Error getting Documents: ' +
-                                            reason.message
-                                        reject(reason)
-                                    }
-                                )
-                        },
-                        (reason) => {
-                            reason.message =
-                                'Error getting Groups: ' + reason.message
-                            reject(reason)
-                        }
-                    )
+                                        })
+                                        this.processedFocus = ''
+                                        if (treeData.length > 0) {
+                                            this.treeData.length = 0
+                                            this.treeData.push(...treeData)
+                                        }
+                                        this.changeElement().then(resolve, reject)
+                                    }, reject)
+                                },
+                                (reason) => {
+                                    reason.message = 'Error getting Documents: ' + reason.message
+                                    reject(reason)
+                                }
+                            )
+                    },
+                    (reason) => {
+                        reason.message = 'Error getting Groups: ' + reason.message
+                        reject(reason)
+                    }
+                )
             } else {
                 this.seenViewIds = {}
                 this.viewId2node = {}
@@ -1090,10 +971,7 @@ export class TreeService {
                 }
                 this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
                     if (this.apiSvc.isView(root)) {
-                        const rootBranch = this.handleSingleView(
-                            root,
-                            'composite'
-                        )
+                        const rootBranch = this.handleSingleView(root, 'composite')
                         this.treeData.length = 0
                         this.treeData.push(rootBranch)
                         this._onTreeDataChange().catch(reject)
@@ -1111,21 +989,10 @@ export class TreeService {
                             .then(() => {
                                 const bulkGet: string[] = []
                                 for (const i in this.viewId2node) {
-                                    const view: ViewObject =
-                                        this.viewId2node[i].data
-                                    if (
-                                        view._contents &&
-                                        view._contents.operand
-                                    ) {
-                                        for (
-                                            let j = 0;
-                                            j < view._contents.operand.length;
-                                            j++
-                                        ) {
-                                            bulkGet.push(
-                                                view._contents.operand[j]
-                                                    .instanceId
-                                            )
+                                    const view: ViewObject = this.viewId2node[i].data
+                                    if (view._contents && view._contents.operand) {
+                                        for (let j = 0; j < view._contents.operand.length; j++) {
+                                            bulkGet.push(view._contents.operand[j].instanceId)
                                         }
                                     }
                                 }
@@ -1148,10 +1015,7 @@ export class TreeService {
                                             ).catch(reject)
                                         }
                                         this.processedFocus = ''
-                                        this.changeElement().then(
-                                            resolve,
-                                            reject
-                                        )
+                                        this.changeElement().then(resolve, reject)
                                     })
                             }, reject)
                     } else {
@@ -1195,10 +1059,7 @@ export class TreeService {
         })
     }
 
-    groupLevel2Func = (
-        groupOb: ElementObject,
-        groupNode: TreeBranch
-    ): VePromise<void, unknown> => {
+    groupLevel2Func = (groupOb: ElementObject, groupNode: TreeBranch): VePromise<void, unknown> => {
         groupNode.loading = true
         return new this.$q<void, unknown>((resolve, reject) => {
             this.viewSvc
@@ -1223,10 +1084,7 @@ export class TreeService {
                             docOb = docs[i]
                             groupNode.children.unshift({
                                 label: docOb.name,
-                                type:
-                                    this.treeApi.refType === 'Branch'
-                                        ? 'view'
-                                        : 'snapshot',
+                                type: this.treeApi.refType === 'Branch' ? 'view' : 'snapshot',
                                 data: docOb,
                                 group: groupOb,
                                 children: [],
@@ -1236,8 +1094,7 @@ export class TreeService {
                         resolve()
                     },
                     (reason) => {
-                        reason.message =
-                            'Error getting project Documents: ' + reason.message
+                        reason.message = 'Error getting project Documents: ' + reason.message
                         reject(reason)
                     }
                 )
@@ -1270,11 +1127,7 @@ export class TreeService {
         for (let i = 0; i < childNodes.length; i++) {
             node = childNodes[i]
             if (this.seenViewIds[node.data.id]) {
-                this.growl.error(
-                    'Warning: View ' +
-                        node.data.name +
-                        ' have multiple parents! Duplicates not shown.'
-                )
+                this.growl.error('Warning: View ' + node.data.name + ' have multiple parents! Duplicates not shown.')
                 continue
             }
             this.seenViewIds[node.data.id] = node
@@ -1307,9 +1160,7 @@ export class TreeService {
         return new this.$q<void, unknown>((resolve, reject) => {
             let contents: ValueObject | null = null
 
-            const addContentsSectionTreeNode = (
-                operand: InstanceValueObject[]
-            ): void => {
+            const addContentsSectionTreeNode = (operand: InstanceValueObject[]): void => {
                 const bulkGet: string[] = []
                 const i = 0
                 operand.forEach((operator) => {
@@ -1342,48 +1193,31 @@ export class TreeService {
                             this.$q.allSettled(instances).then((results) => {
                                 let k = results.length - 1
                                 for (; k >= 0; k--) {
-                                    const instance: ViewInstanceSpec =
-                                        results[k].value
+                                    const instance: ViewInstanceSpec = results[k].value
                                     if (this.viewSvc.isSection(instance)) {
                                         const sectionTreeNode = {
-                                            label: instance.name
-                                                ? instance.name
-                                                : viewNode.data.id,
+                                            label: instance.name ? instance.name : viewNode.data.id,
                                             type: 'section',
                                             viewId: viewNode.data.id,
                                             data: instance,
                                             children: [],
                                         }
-                                        this.viewId2node[instance.id] =
-                                            sectionTreeNode
-                                        parentNode.children.unshift(
-                                            sectionTreeNode
+                                        this.viewId2node[instance.id] = sectionTreeNode
+                                        parentNode.children.unshift(sectionTreeNode)
+                                        this.addSectionElements(instance, viewNode, sectionTreeNode, initial).catch(
+                                            reject
                                         )
-                                        this.addSectionElements(
-                                            instance,
-                                            viewNode,
-                                            sectionTreeNode,
-                                            initial
-                                        ).catch(reject)
-                                    } else if (
-                                        this.viewSvc.getTreeType(instance) !==
-                                        'none'
-                                    ) {
+                                    } else if (this.viewSvc.getTreeType(instance) !== 'none') {
                                         const otherTreeNode: TreeBranch = {
                                             label: instance.name,
-                                            type: this.viewSvc.getTreeType(
-                                                instance
-                                            ),
+                                            type: this.viewSvc.getTreeType(instance),
                                             data: instance,
                                             children: [],
                                         }
                                         if (otherTreeNode.type !== 'view') {
-                                            otherTreeNode.viewId =
-                                                viewNode.data.id
+                                            otherTreeNode.viewId = viewNode.data.id
                                         }
-                                        parentNode.children.unshift(
-                                            otherTreeNode
-                                        )
+                                        parentNode.children.unshift(otherTreeNode)
                                     }
                                     this._onTreeDataChange().catch(reject)
                                 }
@@ -1393,9 +1227,7 @@ export class TreeService {
                             }, reject)
                         },
                         (reason) => {
-                            reason.message =
-                                'Error retrieving contained elements: ' +
-                                reason.message
+                            reason.message = 'Error retrieving contained elements: ' + reason.message
                             reject(reason)
                         }
                     )
@@ -1403,18 +1235,13 @@ export class TreeService {
 
             if (element._contents) {
                 contents = (element as ViewObject)._contents
-            } else if (
-                this.viewSvc.isSection(element) &&
-                element.specification
-            ) {
+            } else if (this.viewSvc.isSection(element) && element.specification) {
                 contents = (element as ViewInstanceSpec).specification // For Sections, the contents expression is the specification
             } else {
                 //bad?
             }
             if (contents && contents.operand) {
-                addContentsSectionTreeNode(
-                    (contents as ExpressionObject).operand
-                )
+                addContentsSectionTreeNode((contents as ExpressionObject).operand)
             }
             resolve()
         })

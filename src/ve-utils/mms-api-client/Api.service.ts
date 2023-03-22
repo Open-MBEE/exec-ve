@@ -107,28 +107,20 @@ export class ApiService {
      * @param {boolean} [forEdit=false] (optional) forEdit.
      * @returns {ElementObject} clean elem
      */
-    public cleanElement<T extends ElementObject>(
-        elem: T,
-        forEdit?: boolean
-    ): T {
+    public cleanElement<T extends ElementObject>(elem: T, forEdit?: boolean): T {
         if (elem.type === 'Property' || elem.type === 'Port') {
             if (!elem.defaultValue) {
                 elem.defaultValue = null
             }
         }
         if (elem.type === 'Slot') {
-            if (!Array.isArray(elem.value))
-                (elem as LiteralObject<unknown[]>).value = []
+            if (!Array.isArray(elem.value)) (elem as LiteralObject<unknown[]>).value = []
         }
         if (elem.value && Array.isArray(elem.value)) {
-            ;(elem as LiteralObject<unknown[]>).value.forEach(
-                (value: unknown) => {
-                    if (typeof value === 'object' && value !== null)
-                        this._cleanValueSpec(
-                            value as ExpressionObject<ValueObject>
-                        )
-                }
-            )
+            ;(elem as LiteralObject<unknown[]>).value.forEach((value: unknown) => {
+                if (typeof value === 'object' && value !== null)
+                    this._cleanValueSpec(value as ExpressionObject<ValueObject>)
+            })
         }
         if (elem._contents) {
             this._cleanValueSpec((elem as ViewObject)._contents)
@@ -196,9 +188,7 @@ export class ApiService {
      * @param {ElementObject} elementOb
      * @returns {ElementsRequest}
      */
-    public makeElementRequestObject(
-        elementOb: ElementObject
-    ): ElementsRequest<string> {
+    public makeElementRequestObject(elementOb: ElementObject): ElementsRequest<string> {
         return {
             elementId: elementOb.id,
             projectId: elementOb._projectId,
@@ -217,19 +207,13 @@ export class ApiService {
      * @param {boolean} [edit=false] element is to be edited
      * @returns {Array} key to be used in CacheService
      */
-    public makeCacheKey(
-        reqOb: RequestObject | null,
-        elementId: string,
-        edit?: boolean,
-        type?: string
-    ): string[] {
+    public makeCacheKey(reqOb: RequestObject | null, elementId: string, edit?: boolean, type?: string): string[] {
         const key: string[] = []
         const keyType: string = type ? type : 'element'
         key.push(keyType)
         if (reqOb !== null) {
             if (reqOb.projectId) key.push(reqOb.projectId)
-            if (reqOb.refId !== null)
-                key.push(!reqOb.refId ? 'master' : reqOb.refId)
+            if (reqOb.refId !== null) key.push(!reqOb.refId ? 'master' : reqOb.refId)
             if (!keyType.includes('history') && reqOb.commitId !== null)
                 key.push(!reqOb.commitId ? 'latest' : reqOb.commitId)
         }
@@ -273,11 +257,7 @@ export class ApiService {
      * @param {Object} server version of elem object from server.
      * @returns {Boolean} true if conflict, false if not
      */
-    public hasConflict = (
-        edit: ElementObject,
-        orig: ElementObject,
-        server: ElementObject
-    ): boolean => {
+    public hasConflict = (edit: ElementObject, orig: ElementObject, server: ElementObject): boolean => {
         for (const i in edit) {
             if (
                 i === '_read' ||
@@ -289,11 +269,7 @@ export class ApiService {
             ) {
                 continue
             }
-            if (
-                edit.hasOwnProperty(i) &&
-                orig.hasOwnProperty(i) &&
-                server.hasOwnProperty(i)
-            ) {
+            if (edit.hasOwnProperty(i) && orig.hasOwnProperty(i) && server.hasOwnProperty(i)) {
                 if (!_.isEqual(orig[i], server[i])) {
                     return true
                 }
@@ -344,10 +320,7 @@ export class ApiService {
      * @returns {string} unique SysML element ID
      */
     public createUniqueId = (): string => {
-        return `ve-${this.getVeVersion().replace(
-            '.',
-            '-'
-        )}-${this.createUUID()}`
+        return `ve-${this.getVeVersion().replace('.', '-')}-${this.createUUID()}`
     }
 
     /**
@@ -360,19 +333,12 @@ export class ApiService {
     public isView = (e: ElementObject): boolean => {
         if (e._appliedStereotypeIds) {
             if (
-                e._appliedStereotypeIds.indexOf(
-                    this.schemaSvc.getSchema('VIEW_SID', this.schema)
-                ) >= 0 ||
-                e._appliedStereotypeIds.indexOf(
-                    this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)
-                ) >= 0
+                e._appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('VIEW_SID', this.schema)) >= 0 ||
+                e._appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
             ) {
                 return true
             }
-            const otherViewSids: string[] = this.schemaSvc.getSchema(
-                'OTHER_VIEW_SID',
-                this.schema
-            )
+            const otherViewSids: string[] = this.schemaSvc.getSchema('OTHER_VIEW_SID', this.schema)
             for (const otherViewSid of otherViewSids) {
                 if (e._appliedStereotypeIds.indexOf(otherViewSid) >= 0) {
                     return true
@@ -392,9 +358,7 @@ export class ApiService {
     public isDocument = (e: ElementObject): boolean => {
         return (
             e._appliedStereotypeIds &&
-            e._appliedStereotypeIds.indexOf(
-                this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)
-            ) >= 0
+            e._appliedStereotypeIds.indexOf(this.schemaSvc.getSchema('DOCUMENT_SID', this.schema)) >= 0
         )
     }
 
@@ -407,10 +371,7 @@ export class ApiService {
      */
     public isRequirement = (e: ElementObject): boolean => {
         if (e._appliedStereotypeIds) {
-            const reqSids = this.schemaSvc.getSchema<string[]>(
-                'REQUIREMENT_SID',
-                this.schema
-            )
+            const reqSids = this.schemaSvc.getSchema<string[]>('REQUIREMENT_SID', this.schema)
             for (const reqSid of reqSids) {
                 if (e._appliedStereotypeIds.indexOf(reqSid) >= 0) {
                     return true

@@ -1,7 +1,6 @@
 import { VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
-export interface InsertResolveFn<T extends InsertData>
-    extends VeModalResolveFn {
+export interface InsertResolveFn<T extends InsertData> extends VeModalResolveFn {
     getInsertData(): T
 
     getProjectId(): string

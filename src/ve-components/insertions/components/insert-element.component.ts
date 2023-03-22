@@ -2,23 +2,13 @@ import _ from 'lodash'
 
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import {
-    ApiService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import { Class } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
-import {
-    VeComponentOptions,
-    VePromise,
-    VePromiseReason,
-    VeQService,
-} from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertData } from '@ve-types/components'
 import { ElementCreationRequest, ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
@@ -70,12 +60,10 @@ class InsertElementController extends Insertion<InsertData> {
 
     public $onInit(): void {
         super.$onInit()
-        this.description =
-            'Search for an existing element before you ' + this.parentAction
+        this.description = 'Search for an existing element before you ' + this.parentAction
 
         this.searchOptions.getProperties = true
-        this.searchOptions.emptyDocTxt =
-            'This field is empty, but you can still click here to view-cf a placeholder.'
+        this.searchOptions.emptyDocTxt = 'This field is empty, but you can still click here to view-cf a placeholder.'
     }
 
     public create = (): VePromise<ElementObject> => {
@@ -114,11 +102,7 @@ class InsertElementController extends Insertion<InsertData> {
         } else if (reason.status === 422) {
             this.continue = true
         } else {
-            this.growl.error(
-                `Create ${_.upperCase(this.insertData.type)} Error: ${
-                    reason.message
-                }`
-            )
+            this.growl.error(`Create ${_.upperCase(this.insertData.type)} Error: ${reason.message}`)
         }
     }
 }

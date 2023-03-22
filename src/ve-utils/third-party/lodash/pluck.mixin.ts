@@ -8,13 +8,7 @@ declare module 'lodash' {
 }
 
 _.mixin({
-    properties: (paths: [any]) => (obj) =>
-        paths.reduce((memo, path) => [...memo, obj[path]], []),
+    properties: (paths: [any]) => (obj) => paths.reduce((memo, path) => [...memo, obj[path]], []),
     pluck: (obj, ...keys) =>
-        _.map(
-            obj,
-            _.flatten(keys).length > 1
-                ? _.properties(_.flatten(keys))
-                : (o: any) => o[keys[0]]
-        ),
+        _.map(obj, _.flatten(keys).length > 1 ? _.properties(_.flatten(keys)) : (o: any) => o[keys[0]]),
 })

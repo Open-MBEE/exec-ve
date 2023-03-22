@@ -4,17 +4,10 @@ import IModalService = angular.ui.bootstrap.IModalService
 import IModalSettings = angular.ui.bootstrap.IModalSettings
 import IModalInstanceService = angular.ui.bootstrap.IModalInstanceService
 
-import {
-    VeComponentOptions,
-    VePromise,
-    VePromiseReason,
-} from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VePromiseReason } from '@ve-types/angular'
 import { MmsObject, OrgObject, ProjectObject, ViewObject } from '@ve-types/mms'
 
-export type veSearchCallback<T extends MmsObject = MmsObject> = (
-    elem: T,
-    property: string
-) => void
+export type veSearchCallback<T extends MmsObject = MmsObject> = (elem: T, property: string) => void
 
 export interface VeSearchOptions<T extends MmsObject = ElementObject> {
     getProperties?: boolean
@@ -35,8 +28,7 @@ export interface VeModalService extends IModalService {
     open?<U, V>(settings: VeModalSettings<U>): VeModalInstanceService<V>
 }
 
-export interface VeModalSettings<U extends VeModalResolveFn>
-    extends IModalSettings {
+export interface VeModalSettings<U extends VeModalResolveFn> extends IModalSettings {
     component: string
     resolve?: U
     // bindings?: {

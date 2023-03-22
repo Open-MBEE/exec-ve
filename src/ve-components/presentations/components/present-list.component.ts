@@ -1,8 +1,4 @@
-import {
-    Presentation,
-    PresentationService,
-    ViewHtmlService,
-} from '@ve-components/presentations'
+import { Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { ImageService } from '@ve-utils/application'
@@ -50,9 +46,7 @@ class PresentListController extends Presentation {
     }
 
     protected getContent = (): VePromise<string, string> => {
-        return this.$q.resolve(
-            this.viewHtmlSvc.makeHtmlList(this.peObject as PresentListObject)
-        )
+        return this.$q.resolve(this.viewHtmlSvc.makeHtmlList(this.peObject as PresentListObject))
     }
 }
 

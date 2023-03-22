@@ -26,10 +26,7 @@ export class ImageService {
             }
             const parent = imgDom.parent('p')
             if (parent.length > 0) {
-                if (
-                    parent.css('text-align') == 'center' ||
-                    parent.hasClass('image-center')
-                ) {
+                if (parent.css('text-align') == 'center' || parent.hasClass('image-center')) {
                     imgDom.addClass('image-center')
                 }
                 imgDom.unwrap() //note this removes parent p and puts img and any of its siblings in its place

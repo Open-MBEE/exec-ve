@@ -1,9 +1,5 @@
 import { UtilsService } from '@ve-utils/application/Utils.service'
-import {
-    CacheService,
-    ElementService,
-    URLService,
-} from '@ve-utils/mms-api-client'
+import { CacheService, ElementService, URLService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -30,40 +26,20 @@ export class PlotService {
         const plotConfig = defaultPlotConfig
         if (clientConfig !== undefined) {
             if (clientConfig.size !== undefined) {
-                if (
-                    clientConfig.size.width != undefined &&
-                    !isNaN(clientConfig.size.width)
-                )
+                if (clientConfig.size.width != undefined && !isNaN(clientConfig.size.width))
                     plotConfig.width = Number(clientConfig.size.width)
-                if (
-                    clientConfig.size.height != undefined &&
-                    !isNaN(clientConfig.size.height)
-                )
+                if (clientConfig.size.height != undefined && !isNaN(clientConfig.size.height))
                     plotConfig.height = Number(clientConfig.size.height)
             }
             if (clientConfig.padding !== undefined) {
-                if (
-                    clientConfig.padding.top != undefined &&
-                    !isNaN(clientConfig.padding.top)
-                )
+                if (clientConfig.padding.top != undefined && !isNaN(clientConfig.padding.top))
                     plotConfig.marginTop = Number(clientConfig.padding.top)
-                if (
-                    clientConfig.padding.right != undefined &&
-                    !isNaN(clientConfig.padding.right)
-                )
+                if (clientConfig.padding.right != undefined && !isNaN(clientConfig.padding.right))
                     plotConfig.marginRight = Number(clientConfig.padding.right)
-                if (
-                    clientConfig.padding.left != undefined &&
-                    !isNaN(clientConfig.padding.left)
-                )
+                if (clientConfig.padding.left != undefined && !isNaN(clientConfig.padding.left))
                     plotConfig.marginLeft = Number(clientConfig.padding.left)
-                if (
-                    clientConfig.padding.bottom != undefined &&
-                    !isNaN(clientConfig.padding.bottom)
-                )
-                    plotConfig.marginBottom = Number(
-                        clientConfig.padding.bottom
-                    )
+                if (clientConfig.padding.bottom != undefined && !isNaN(clientConfig.padding.bottom))
+                    plotConfig.marginBottom = Number(clientConfig.padding.bottom)
             }
         }
         return plotConfig
@@ -77,20 +53,12 @@ export class PlotService {
             refId: refId,
             commitId: commitId,
         }
-        const isHeader =
-            plot.table.header !== undefined && plot.table.header.length > 0
+        const isHeader = plot.table.header !== undefined && plot.table.header.length > 0
 
         if (isHeader) {
-            const aheader = this._asyncReadTableHeader(
-                aMmsEid,
-                plot.table.header[0]
-            )
+            const aheader = this._asyncReadTableHeader(aMmsEid, plot.table.header[0])
             aheader.then((tableheader) => {
-                const abody = this._asyncReadTableBody2(
-                    aMmsEid,
-                    plot.table.body,
-                    tableheader
-                )
+                const abody = this._asyncReadTableBody2(aMmsEid, plot.table.body, tableheader)
                 abody.then((tablebody) => {
                     const r = {
                         tableheader: tableheader,
@@ -118,14 +86,10 @@ export class PlotService {
             refId: refId,
             commitId: commitId,
         }
-        const isHeader =
-            plot.table.header !== undefined && plot.table.header.length > 0
+        const isHeader = plot.table.header !== undefined && plot.table.header.length > 0
 
         if (isHeader) {
-            const aheader = this._asyncReadTableHeader(
-                aMmsEid,
-                plot.table.header[0]
-            )
+            const aheader = this._asyncReadTableHeader(aMmsEid, plot.table.header[0])
             aheader.then((tableheader) => {
                 const abody = this._asyncReadTableBody(aMmsEid, plot.table.body)
                 abody.then((tablebody) => {
@@ -186,19 +150,17 @@ export class PlotService {
             const mtableheader = tableheader.slice(0)
             mtableheader.splice(0, 0, 'rowheader')
             tablebody.forEach((row) => {
-                this._readRowValues2(row, aMmsEid, mtableheader).then(
-                    (yyvalue) => {
-                        c3_data.push(yyvalue.valuesx)
-                        valuesO.push(yyvalue.valuesO)
-                        if (valuesO.length === tablebody.length) {
-                            const r = {
-                                c3_data: c3_data,
-                                valuesO: valuesO,
-                            }
-                            resolve(r)
+                this._readRowValues2(row, aMmsEid, mtableheader).then((yyvalue) => {
+                    c3_data.push(yyvalue.valuesx)
+                    valuesO.push(yyvalue.valuesO)
+                    if (valuesO.length === tablebody.length) {
+                        const r = {
+                            c3_data: c3_data,
+                            valuesO: valuesO,
                         }
+                        resolve(r)
                     }
-                )
+                })
             })
         })
     }
@@ -207,11 +169,7 @@ export class PlotService {
         if (datavalue && datavalue.type === 'LiteralString') {
             if (isNaN(datavalue.value)) return datavalue.value
             else return Number(datavalue.value)
-        } else if (
-            datavalue &&
-            (datavalue.type === 'LiteralReal' ||
-                datavalue.type === 'LiteralInteger')
-        ) {
+        } else if (datavalue && (datavalue.type === 'LiteralReal' || datavalue.type === 'LiteralInteger')) {
             return datavalue.value
         }
     }
@@ -220,10 +178,7 @@ export class PlotService {
         return this.$q((resolve) => {
             if (e.content[0].sourceType == 'text') {
                 //console.log("text");
-                let tv = e.content[0].text
-                    .replace('<p>', '')
-                    .replace('</p>', '')
-                    .trim()
+                let tv = e.content[0].text.replace('<p>', '').replace('</p>', '').trim()
                 if (!isNaN(tv)) tv = Number(tv)
                 resolve({ index: index, value: tv, valueO: e })
             } else if (e.content[0].sourceType === 'reference') {
@@ -231,66 +186,54 @@ export class PlotService {
 
                 if (e.content[0].sourceProperty === 'name') {
                     //console.log("name");
-                    this.elementSvc
-                        .getElement(aMmsEid, 1, false)
-                        .then((refe) => {
-                            //value = refe.name;
-                            //valueO= refe;
-                            let nameModified: number | string = refe.name
-                            if (!isNaN(Number(refe.name)))
-                                //means its a number
-                                nameModified = Number(refe.name)
-                            resolve({
-                                index: index,
-                                value: nameModified,
-                                valueO: refe,
-                            })
+                    this.elementSvc.getElement(aMmsEid, 1, false).then((refe) => {
+                        //value = refe.name;
+                        //valueO= refe;
+                        let nameModified: number | string = refe.name
+                        if (!isNaN(Number(refe.name)))
+                            //means its a number
+                            nameModified = Number(refe.name)
+                        resolve({
+                            index: index,
+                            value: nameModified,
+                            valueO: refe,
                         })
+                    })
                 } else if (e.content[0].sourceProperty === 'documentation') {
                     //console.log("doc");
-                    this.elementSvc
-                        .getElement(aMmsEid, 1, false)
-                        .then((refe) => {
-                            let docModified: number | string =
-                                refe.documentation
-                                    .replace('<p>', '')
-                                    .replace('</p>', '')
-                                    .trim()
-                            //seems adding \n at the end when modified at vieweditor so if number goahead to conver to number
-                            //i.e., "5\n" will be a number.
-                            if (!isNaN(Number(docModified)))
-                                //means it is a number
-                                docModified = Number(docModified)
-                            resolve({
-                                index: index,
-                                value: docModified,
-                                valueO: refe,
-                            })
+                    this.elementSvc.getElement(aMmsEid, 1, false).then((refe) => {
+                        let docModified: number | string = refe.documentation
+                            .replace('<p>', '')
+                            .replace('</p>', '')
+                            .trim()
+                        //seems adding \n at the end when modified at vieweditor so if number goahead to conver to number
+                        //i.e., "5\n" will be a number.
+                        if (!isNaN(Number(docModified)))
+                            //means it is a number
+                            docModified = Number(docModified)
+                        resolve({
+                            index: index,
+                            value: docModified,
+                            valueO: refe,
                         })
+                    })
                 } else {
                     //sourceProperty === 'value'
                     //console.log('value');
-                    this.elementSvc
-                        .getElement(aMmsEid, 1, false)
-                        .then((refe) => {
-                            const valueO = refe
-                            let value = ''
-                            if (
-                                refe.type === 'Property' ||
-                                refe.type === 'Port'
-                            ) {
-                                if (refe.defaultValue) {
-                                    value = PlotService._getValue(
-                                        refe.defaultValue
-                                    ) //default value
-                                } else {
-                                    value = ''
-                                }
+                    this.elementSvc.getElement(aMmsEid, 1, false).then((refe) => {
+                        const valueO = refe
+                        let value = ''
+                        if (refe.type === 'Property' || refe.type === 'Port') {
+                            if (refe.defaultValue) {
+                                value = PlotService._getValue(refe.defaultValue) //default value
+                            } else {
+                                value = ''
                             }
-                            if (refe.type === 'Slot') {
-                                value = PlotService._getValue(refe.value[0]) //scope.element.value
-                            }
-                            /* not sure what to do
+                        }
+                        if (refe.type === 'Slot') {
+                            value = PlotService._getValue(refe.value[0]) //scope.element.value
+                        }
+                        /* not sure what to do
                                 if (refe.type === 'Constraint' && refe.specification) {
                                     value = refe.specification;
                                 }
@@ -298,12 +241,12 @@ export class PlotService {
                                     value = refe.operand;
                                 }
                                 */
-                            resolve({
-                                index: index,
-                                value: value,
-                                valueO: valueO,
-                            })
+                        resolve({
+                            index: index,
+                            value: value,
+                            valueO: valueO,
                         })
+                    })
                 } //end of else
             } //reference
         })
@@ -321,19 +264,17 @@ export class PlotService {
                     index++
                 } else {
                     if (e.content[0].type == 'Paragraph') {
-                        this._readParagraphValue(e, aMmsEid, index++).then(
-                            (r) => {
-                                values[r.index] = r.value
-                                valuesO[r.index] = r.valueO
-                                if (values.length === row.length) {
-                                    const result = {
-                                        values: values,
-                                        valuesO: valuesO,
-                                    }
-                                    resolve(result)
+                        this._readParagraphValue(e, aMmsEid, index++).then((r) => {
+                            values[r.index] = r.value
+                            valuesO[r.index] = r.valueO
+                            if (values.length === row.length) {
+                                const result = {
+                                    values: values,
+                                    valuesO: valuesO,
                                 }
+                                resolve(result)
                             }
-                        )
+                        })
                     } // Paragraph
                 } //end of else
             }) //for each row
@@ -351,19 +292,17 @@ export class PlotService {
                     index++
                 } else {
                     if (e.content[0].type == 'Paragraph') {
-                        this._readParagraphValue(e, aMmsEid, index++).then(
-                            (r) => {
-                                valuesx[mtableheader[r.index]] = r.value
-                                valuesO[r.index] = r.valueO
-                                if (valuesO.length === row.length) {
-                                    const result = {
-                                        valuesx: valuesx,
-                                        valuesO: valuesO,
-                                    }
-                                    resolve(result)
+                        this._readParagraphValue(e, aMmsEid, index++).then((r) => {
+                            valuesx[mtableheader[r.index]] = r.value
+                            valuesO[r.index] = r.valueO
+                            if (valuesO.length === row.length) {
+                                const result = {
+                                    valuesx: valuesx,
+                                    valuesO: valuesO,
                                 }
+                                resolve(result)
                             }
-                        )
+                        })
                     } // Paragraph
                 } //end of else
             }) //for each row
@@ -371,13 +310,6 @@ export class PlotService {
     } //end of function
 }
 
-PlotService.$inject = [
-    '$q',
-    '$http',
-    'URLService',
-    'UtilsService',
-    'CacheService',
-    'ElementService',
-]
+PlotService.$inject = ['$q', '$http', 'URLService', 'UtilsService', 'CacheService', 'ElementService']
 
 veUtils.service('PlotService', PlotService)

@@ -7,12 +7,7 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { veUtils } from '@ve-utils'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import {
-    ElementObject,
-    ElementsRequest,
-    InstanceSpecObject,
-    LiteralObject,
-} from '@ve-types/mms'
+import { ElementObject, ElementsRequest, InstanceSpecObject, LiteralObject } from '@ve-types/mms'
 
 export interface AnnotationObject {
     toolTipTitle: string
@@ -22,14 +17,7 @@ export interface AnnotationObject {
 }
 
 class AnnotationController implements angular.IComponentController {
-    static $inject = [
-        '$element',
-        'growl',
-        'ExtensionService',
-        'SchemaService',
-        'ApplicationService',
-        'EventService',
-    ]
+    static $inject = ['$element', 'growl', 'ExtensionService', 'SchemaService', 'ApplicationService', 'EventService']
 
     //Bindings
     private mmsReqOb: ElementsRequest<string>
@@ -60,45 +48,31 @@ class AnnotationController implements angular.IComponentController {
                     commitId: this.mmsRecentElement._commitId,
                     displayOldSpec: true,
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-                    'element.selected',
-                    data
-                )
+                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
             }
         })
 
         let displayContent: AnnotationObject
         if (this.mmsRecentElement) {
-            displayContent = this._getContentIfElementFound(
-                this.mmsType,
-                this.mmsRecentElement
-            )
+            displayContent = this._getContentIfElementFound(this.mmsType, this.mmsRecentElement)
         } else {
-            displayContent = this._getContentIfElementNotFound(
-                this.mmsType,
-                this.mmsReqOb
-            )
+            displayContent = this._getContentIfElementNotFound(this.mmsType, this.mmsReqOb)
         }
         this.displayContent = displayContent
     }
 
     public copyToClipboard($event: JQuery.ClickEvent): void {
-        this.applicationSvc
-            .copyToClipboard($('#tooltipElementId'), $event)
-            .then(
-                () => {
-                    this.growl.info('Copied to clipboard!', { ttl: 2000 })
-                },
-                (err) => {
-                    this.growl.error('Unable to copy: ' + err.message)
-                }
-            )
+        this.applicationSvc.copyToClipboard($('#tooltipElementId'), $event).then(
+            () => {
+                this.growl.info('Copied to clipboard!', { ttl: 2000 })
+            },
+            (err) => {
+                this.growl.error('Unable to copy: ' + err.message)
+            }
+        )
     }
 
-    private _getContentIfElementFound(
-        type: number,
-        element: ElementObject
-    ): AnnotationObject {
+    private _getContentIfElementFound(type: number, element: ElementObject): AnnotationObject {
         const AT = this.extensionSvc.AnnotationType
         let inlineContent = ''
         let toolTipTitle: string
@@ -110,10 +84,7 @@ class AnnotationController implements angular.IComponentController {
         )
 
         if (classifierType.endsWith('T')) {
-            classifierType = classifierType.substring(
-                0,
-                classifierType.length - 1
-            )
+            classifierType = classifierType.substring(0, classifierType.length - 1)
         }
 
         switch (type) {
@@ -125,20 +96,17 @@ class AnnotationController implements angular.IComponentController {
             case AT.mmsTranscludeDoc:
                 inlineContent = element.documentation
                 toolTipTitle = 'Referenced element not found'
-                toolTipContent =
-                    'Displaying last found documentation as placeholder.'
+                toolTipContent = 'Displaying last found documentation as placeholder.'
                 break
             case AT.mmsTranscludeCom:
                 inlineContent = element.documentation
                 toolTipTitle = 'Referenced comment not found.'
-                toolTipContent =
-                    'Displaying last found comment content as a placeholder.'
+                toolTipContent = 'Displaying last found comment content as a placeholder.'
                 break
             case AT.mmsViewLink:
                 inlineContent = element.name
                 toolTipTitle = 'Referenced view link not found'
-                toolTipContent =
-                    'Displaying last found view link as placeholder.'
+                toolTipContent = 'Displaying last found view link as placeholder.'
                 break
             case AT.mmsTranscludeVal:
                 inlineContent = this._getValueForTranscludeVal(element)
@@ -146,8 +114,7 @@ class AnnotationController implements angular.IComponentController {
                 toolTipContent = 'Displaying last found value as placeholder.'
                 break
             case AT.mmsPresentationElement:
-                inlineContent =
-                    element.documentation || '<span>(no text)</span>'
+                inlineContent = element.documentation || '<span>(no text)</span>'
                 toolTipTitle = 'Referenced ' + classifierType + ' not found.'
                 toolTipContent = 'Displaying last found content as placeholder.'
                 break
@@ -161,10 +128,7 @@ class AnnotationController implements angular.IComponentController {
         }
     }
 
-    private _getContentIfElementNotFound(
-        type: number,
-        reqOb: ElementsRequest<string>
-    ): AnnotationObject {
+    private _getContentIfElementNotFound(type: number, reqOb: ElementsRequest<string>): AnnotationObject {
         const AT = this.extensionSvc.AnnotationType
         let inlineContent = ''
         const label = reqOb.elementId ? '(' + reqOb.elementId + ')' : ''
@@ -200,23 +164,15 @@ class AnnotationController implements angular.IComponentController {
     private _getValueForTranscludeVal = (element: ElementObject): string => {
         let value: unknown
 
-        if (
-            element.type === 'Property' ||
-            element.type === 'Port' ||
-            element.type === 'Slot'
-        ) {
+        if (element.type === 'Property' || element.type === 'Port' || element.type === 'Slot') {
             if (element.defaultValue) {
                 value = (element.defaultValue as LiteralObject<string>).value
             } else if ((element as LiteralObject<string>).value) {
-                value = (element as LiteralObject<LiteralObject<string>[]>)
-                    .value[0].value
+                value = (element as LiteralObject<LiteralObject<string>[]>).value[0].value
             }
         }
         if (element.type === 'Constraint' && element.specification) {
-            value = (
-                (element as InstanceSpecObject)
-                    .specification as LiteralObject<string>
-            ).value
+            value = ((element as InstanceSpecObject).specification as LiteralObject<string>).value
         }
         return value.toString()
     }

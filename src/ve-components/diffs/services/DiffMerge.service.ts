@@ -6,12 +6,7 @@ import { ApiService, ElementService } from '@ve-utils/mms-api-client'
 import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import {
-    CommitObject,
-    ElementObject,
-    ElementsRequest,
-    RefObject,
-} from '@ve-types/mms'
+import { CommitObject, ElementObject, ElementsRequest, RefObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 export interface Commit {
@@ -41,13 +36,7 @@ export interface DiffDetail {
 }
 
 export class DiffMergeService {
-    static $inject = [
-        '$q',
-        'growl',
-        '$uibModal',
-        'ApiService',
-        'ElementService',
-    ]
+    static $inject = ['$q', 'growl', '$uibModal', 'ApiService', 'ElementService']
     constructor(
         private $q: VeQService,
         private growl: angular.growl.IGrowlService,
@@ -70,11 +59,7 @@ export class DiffMergeService {
      * @param {angular.IComponentController} $ctrl of the transclude component or view section component
      * @param {JQLite} domElement dom of the directive, jquery wrapped
      */
-    public revertAction(
-        reqOb: ElementsRequest<string>,
-        revertData: CompareData,
-        domElement: JQLite
-    ): void {
+    public revertAction(reqOb: ElementsRequest<string>, revertData: CompareData, domElement: JQLite): void {
         const instance = this.$uibModal.open<RevertConfirmResolveFn, void>({
             size: 'lg',
             windowClass: 'revert-spec',
@@ -106,69 +91,53 @@ export class DiffMergeService {
             value: false,
         }
         let response: DiffResponse
-        this.elementSvc
-            .getElement<ElementObject>(
-                this.apiSvc.makeElementRequestObject(sourceOb),
-                1,
-                true,
-                true
-            )
-            .then(
-                (targetOb) => {
-                    if (!targetOb) {
-                        response.status = 'new'
-                        deferred.resolve(response)
-                    }
-                    if (sourceOb.name !== targetOb.name) {
-                        diff.name = true
-                    }
-                    if (sourceOb.documentation !== targetOb.documentation) {
-                        diff.documentation = true
-                    }
-                    if (
-                        (sourceOb.type === 'Property' ||
-                            sourceOb.type === 'Port') &&
-                        !_.isEqual(sourceOb.defaultValue, targetOb.defaultValue)
-                    ) {
-                        diff.value = true
-                    } else if (
-                        sourceOb.type === 'Slot' &&
-                        !_.isEqual(sourceOb.value, targetOb.value)
-                    ) {
-                        diff.value = true
-                    } else if (
-                        sourceOb.type === 'Constraint' &&
-                        !_.isEqual(
-                            sourceOb.specification,
-                            targetOb.specification
-                        )
-                    ) {
-                        diff.value = true
-                    }
-                    let changed = false
-                    Object.keys(diff).forEach((value) => {
-                        changed = changed || diff[value]
-                    })
-                    if (changed) {
-                        response = {
-                            status: 'changed',
-                            diff,
-                        }
-                    }
+        this.elementSvc.getElement<ElementObject>(this.apiSvc.makeElementRequestObject(sourceOb), 1, true, true).then(
+            (targetOb) => {
+                if (!targetOb) {
+                    response.status = 'new'
                     deferred.resolve(response)
-                },
-                (reason) => {
-                    if (reason.status === 410) {
-                        response.status = 'deleted'
-                        deferred.resolve(response)
-                    } else {
-                        this.growl.error(
-                            `Diff Check not completed - ${reason.message}`
-                        )
-                        deferred.reject(null)
+                }
+                if (sourceOb.name !== targetOb.name) {
+                    diff.name = true
+                }
+                if (sourceOb.documentation !== targetOb.documentation) {
+                    diff.documentation = true
+                }
+                if (
+                    (sourceOb.type === 'Property' || sourceOb.type === 'Port') &&
+                    !_.isEqual(sourceOb.defaultValue, targetOb.defaultValue)
+                ) {
+                    diff.value = true
+                } else if (sourceOb.type === 'Slot' && !_.isEqual(sourceOb.value, targetOb.value)) {
+                    diff.value = true
+                } else if (
+                    sourceOb.type === 'Constraint' &&
+                    !_.isEqual(sourceOb.specification, targetOb.specification)
+                ) {
+                    diff.value = true
+                }
+                let changed = false
+                Object.keys(diff).forEach((value) => {
+                    changed = changed || diff[value]
+                })
+                if (changed) {
+                    response = {
+                        status: 'changed',
+                        diff,
                     }
                 }
-            )
+                deferred.resolve(response)
+            },
+            (reason) => {
+                if (reason.status === 410) {
+                    response.status = 'deleted'
+                    deferred.resolve(response)
+                } else {
+                    this.growl.error(`Diff Check not completed - ${reason.message}`)
+                    deferred.reject(null)
+                }
+            }
+        )
         return deferred.promise
     }
 }

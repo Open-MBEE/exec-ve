@@ -11,12 +11,7 @@ import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromise } from '@ve-types/angular'
 import { DocumentObject, ViewObject } from '@ve-types/mms'
-import {
-    AngularUITree,
-    TreeBranch,
-    VeTreeNodeScope,
-    View2NodeMap,
-} from '@ve-types/tree'
+import { AngularUITree, TreeBranch, VeTreeNodeScope, View2NodeMap } from '@ve-types/tree'
 
 /* Controllers */
 /**
@@ -110,9 +105,7 @@ class ReorderController implements IComponentController {
                             this.tree = [docNode]
                         },
                         (reason) => {
-                            this.growl.error(
-                                'Error Getting Child Views: ' + reason.message
-                            )
+                            this.growl.error('Error Getting Child Views: ' + reason.message)
                         }
                     )
             },
@@ -155,22 +148,14 @@ class ReorderController implements IComponentController {
             dragStart: (): void => {
                 //Do Nothing
             },
-            accept: (
-                sourceNodeScope: VeTreeNodeScope,
-                destNodeScope: VeTreeNodeScope,
-                destIndex
-            ): boolean => {
+            accept: (sourceNodeScope: VeTreeNodeScope, destNodeScope: VeTreeNodeScope, destIndex): boolean => {
                 if (destNodeScope.$element.hasClass('root')) return false //don't allow moving to outside doc
                 return destNodeScope.node.aggr != 'none'
             },
         }
     }
 
-    public updateNumber = (
-        node: TreeBranch,
-        curSection: string,
-        key: string
-    ): void => {
+    public updateNumber = (node: TreeBranch, curSection: string, key: string): void => {
         node[key] = curSection
         let num = 1
         for (let i = 0; i < node.children.length; i++) {
@@ -179,11 +164,7 @@ class ReorderController implements IComponentController {
         }
     }
 
-    public handleSingleView = (
-        v: ViewObject,
-        aggr: string,
-        propId: string
-    ): TreeBranch => {
+    public handleSingleView = (v: ViewObject, aggr: string, propId: string): TreeBranch => {
         let curNode: TreeBranch = this.viewIds2node[v.id]
         if (!curNode) {
             curNode = {
@@ -200,10 +181,7 @@ class ReorderController implements IComponentController {
         return curNode
     }
 
-    public handleChildren = (
-        curNode: TreeBranch,
-        childNodes: TreeBranch[]
-    ): void => {
+    public handleChildren = (curNode: TreeBranch, childNodes: TreeBranch[]): void => {
         const newChildNodes: TreeBranch[] = []
         for (let i = 0; i < childNodes.length; i++) {
             const node: TreeBranch = childNodes[i]
@@ -222,9 +200,7 @@ class ReorderController implements IComponentController {
             return
         }
         if (this.tree.length > 1 || this.tree[0].data.id !== this.doc.id) {
-            this.growl.error(
-                'Views cannot be re-ordered outside the context of the current document.'
-            )
+            this.growl.error('Views cannot be re-ordered outside the context of the current document.')
             return
         }
         this.saving = true
@@ -248,8 +224,7 @@ class ReorderController implements IComponentController {
             }
             const orig = this.origViews[id]
             if (
-                ((!orig._childViews || orig._childViews.length === 0) &&
-                    childViews.length > 0) ||
+                ((!orig._childViews || orig._childViews.length === 0) && childViews.length > 0) ||
                 (orig._childViews && !_.isEqual(orig._childViews, childViews))
             ) {
                 toSave.push({
@@ -280,9 +255,7 @@ class ReorderController implements IComponentController {
                     const reason = response.data.failedRequests[0]
                     const errorMessage = reason.message
                     if (reason.status === 409) {
-                        this.growl.error(
-                            "There's a conflict in the views you're trying to change!"
-                        )
+                        this.growl.error("There's a conflict in the views you're trying to change!")
                     } else {
                         this.growl.error(errorMessage)
                     }
@@ -301,21 +274,13 @@ class ReorderController implements IComponentController {
     public navigate = (reload: boolean): void => {
         const curBranch = this.treeSvc.getSelectedBranch()
         if (!curBranch) {
-            void this.$state.go(
-                'main.project.ref.view.present',
-                {},
-                { reload: true }
-            )
+            void this.$state.go('main.project.ref.view.present', {}, { reload: true })
         } else {
             let goToId: string = curBranch.data.id
             if (curBranch.type !== 'section' && curBranch.type !== 'view') {
                 goToId = curBranch.viewId ? curBranch.viewId : ''
             }
-            void this.$state.go(
-                'main.project.ref.view.present',
-                { viewId: goToId },
-                { reload: reload }
-            )
+            void this.$state.go('main.project.ref.view.present', { viewId: goToId }, { reload: reload })
         }
     }
 }

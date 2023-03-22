@@ -115,10 +115,7 @@ export class CrossReferenceController implements IComponentController {
         //this.templateElementHtml = this.$element[0].innerHTML;
         if (this.mmsCfType) {
             this.$element.empty()
-            const tag = this.extensionSvc.getTagByType(
-                'transclude',
-                this.mmsCfType
-            )
+            const tag = this.extensionSvc.getTagByType('transclude', this.mmsCfType)
             if (tag === 'extension-error') {
                 this.$transcludeEl = $(
                     '<error ext-kind="$ctrl.extType" ext-type="$ctrl.mmsCfType" mms-element-id="$ctrl.mmsElementId"></error>'
@@ -127,13 +124,9 @@ export class CrossReferenceController implements IComponentController {
                 this.$transcludeEl = $(
                     '<' +
                         tag +
-                        (this.mmsGenerateForDiff
-                            ? ' mms-generate-for-diff="$ctrl.mmsGenerateForDiff"'
-                            : '') +
+                        (this.mmsGenerateForDiff ? ' mms-generate-for-diff="$ctrl.mmsGenerateForDiff"' : '') +
                         (this.mmsAttr ? ' mms-attr={{$ctrl.mmsAttr}}' : '') +
-                        (typeof this.mmsCfLabel !== 'undefined'
-                            ? ' mms-cf-label={{$ctrl.mmsCfLabel}}'
-                            : '') +
+                        (typeof this.mmsCfLabel !== 'undefined' ? ' mms-cf-label={{$ctrl.mmsCfLabel}}' : '') +
                         ' mms-element-id="{{$ctrl.mmsElementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.refId}}" mms-commit-id="{{$ctrl.commitId}}" non-editable="$ctrl.nonEditable"></' +
                         tag +
                         '>'
@@ -168,6 +161,4 @@ const ViewCfComponent: VeComponentOptions = {
     controller: CrossReferenceController,
 }
 
-veComponents
-    .component(ViewCfComponent.selector, ViewCfComponent)
-    .component('mmsCf', ViewCfComponent)
+veComponents.component(ViewCfComponent.selector, ViewCfComponent).component('mmsCf', ViewCfComponent)

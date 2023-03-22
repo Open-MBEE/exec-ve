@@ -1,8 +1,4 @@
-import {
-    Presentation,
-    ViewHtmlService,
-    PresentationService,
-} from '@ve-components/presentations'
+import { Presentation, ViewHtmlService, PresentationService } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { ImageService } from '@ve-utils/application'
@@ -85,8 +81,7 @@ class PresentSectionController extends Presentation {
         this.$element.on('click', (e) => {
             //should not do anything if section is not an instancespec
             if (this.startEdit) this.startEdit()
-            if (this.view && this.mmsViewPresentationElemCtrl)
-                this.mmsViewCtrl.transcludeClicked(this.section) //show instance spec if clicked
+            if (this.view && this.mmsViewPresentationElemCtrl) this.mmsViewCtrl.transcludeClicked(this.section) //show instance spec if clicked
             e.stopPropagation()
         })
 
@@ -95,9 +90,7 @@ class PresentSectionController extends Presentation {
                 this.section.specification.operand as InstanceValueObject[]
             )
             if (dups.length > 0) {
-                this.growl.warning(
-                    'There are duplicates in this section, duplicates ignored!'
-                )
+                this.growl.warning('There are duplicates in this section, duplicates ignored!')
             }
         }
     }
@@ -125,7 +118,4 @@ const PresentSectionComponent: IPresentationComponentOptions = {
     },
 }
 
-veComponents.component(
-    PresentSectionComponent.selector,
-    PresentSectionComponent
-)
+veComponents.component(PresentSectionComponent.selector, PresentSectionComponent)

@@ -29,15 +29,7 @@ export class MentionService {
     mentions: { [id: string]: MentionState } = {}
     mentionPlacerHolderPrefix = 'mentionPlaceHolder'
 
-    static $inject = [
-        '$compile',
-        '$timeout',
-        'growl',
-        'CacheService',
-        'ViewService',
-        'UtilsService',
-        'ApiService',
-    ]
+    static $inject = ['$compile', '$timeout', 'growl', 'CacheService', 'ViewService', 'UtilsService', 'ApiService']
 
     constructor(
         private $compile: angular.ICompileService,
@@ -51,8 +43,7 @@ export class MentionService {
     /** Used to maintain all mention in all ckeditors **/
 
     public getFastCfListing(projectId: string, refId: string): ElementObject[] {
-        const latestElements: ElementObject[] =
-            this.cacheSvc.getLatestElements<ElementObject>(projectId, refId)
+        const latestElements: ElementObject[] = this.cacheSvc.getLatestElements<ElementObject>(projectId, refId)
 
         latestElements.reduce(
             (
@@ -70,13 +61,8 @@ export class MentionService {
                 cacheElement
             ) => {
                 const elementType = this.viewSvc.getElementType(cacheElement)
-                const elementName = cacheElement.name
-                    ? cacheElement.name
-                    : cacheElement.id
-                const iconClass = this.utilsSvc.getElementTypeClass(
-                    cacheElement,
-                    elementType
-                )
+                const elementName = cacheElement.name ? cacheElement.name : cacheElement.id
+                const iconClass = this.utilsSvc.getElementTypeClass(cacheElement, elementType)
                 result.push({
                     id: cacheElement.id,
                     name: elementName,
@@ -100,10 +86,7 @@ export class MentionService {
                     })
                 }
 
-                if (
-                    cacheElement.type === 'Property' &&
-                    cacheElement.defaultValue
-                ) {
+                if (cacheElement.type === 'Property' && cacheElement.defaultValue) {
                     let value = String(cacheElement.defaultValue.value)
                     if (!value || value === 'undefined') {
                         value = 'this field is empty'
@@ -136,30 +119,13 @@ export class MentionService {
             mentionPlaceHolderId: string
         }
     ): void {
-        const mentionId = existingMentionPlaceHolder
-            ? existingMentionPlaceHolder.mentionId
-            : this.apiSvc.createUUID()
+        const mentionId = existingMentionPlaceHolder ? existingMentionPlaceHolder.mentionId : this.apiSvc.createUUID()
         const mentionPlaceHolderId = existingMentionPlaceHolder
             ? existingMentionPlaceHolder.mentionPlaceHolderId
             : this._createMentionPlaceHolder(editor, mentionId)
-        const mention = this._createMentionDirective(
-            editor,
-            mentionScope,
-            mentionId,
-            projectId,
-            refId
-        )
-        this._createNewMentionState(
-            editor,
-            mention,
-            mentionPlaceHolderId,
-            mentionId
-        )
-        MentionService._positionMentionElement(
-            editor,
-            mention,
-            mentionPlaceHolderId
-        )
+        const mention = this._createMentionDirective(editor, mentionScope, mentionId, projectId, refId)
+        this._createNewMentionState(editor, mention, mentionPlaceHolderId, mentionId)
+        MentionService._positionMentionElement(editor, mention, mentionPlaceHolderId)
     }
 
     public handleInput(
@@ -172,26 +138,17 @@ export class MentionService {
         if (editor._ && editor._.elementsPath) {
             const elementsPath = editor._.elementsPath
             const currentEditingElement = elementsPath.list[0].$
-            const currentEditingElementId =
-                currentEditingElement.getAttribute('id')
-            const mentionId = this._getMentionIdFromMentionPlaceHolder(
-                currentEditingElementId
-            )
+            const currentEditingElementId = currentEditingElement.getAttribute('id')
+            const mentionId = this._getMentionIdFromMentionPlaceHolder(currentEditingElementId)
             if (mentionId) {
-                let mentionState = this._retrieveMentionState(
-                    editor.id,
-                    mentionId
-                )
+                let mentionState = this._retrieveMentionState(editor.id, mentionId)
                 // logic to reactivate existing "@" when reloading ckeditor
                 if (!mentionState) {
                     this.createMention(editor, newScope, projectId, refId, {
                         mentionId: mentionId,
                         mentionPlaceHolderId: currentEditingElementId,
                     })
-                    mentionState = this._retrieveMentionState(
-                        editor.id,
-                        mentionId
-                    )
+                    mentionState = this._retrieveMentionState(editor.id, mentionId)
                 }
 
                 const mentionScope = mentionState.mentionScope
@@ -202,21 +159,12 @@ export class MentionService {
                     this._repositionDropdownIfOffScreen(editor, mentionState)
                 })
 
-                this._handleSpecialKeys(
-                    event,
-                    mentionId,
-                    editor,
-                    projectId,
-                    refId
-                )
+                this._handleSpecialKeys(event, mentionId, editor, projectId, refId)
             }
         }
     }
 
-    public handleMentionSelection(
-        editor: CKEDITOR.editor,
-        mentionId: string
-    ): void {
+    public handleMentionSelection(editor: CKEDITOR.editor, mentionId: string): void {
         this._cleanup(editor, mentionId)
     }
 
@@ -234,9 +182,7 @@ export class MentionService {
     public hasMentionResults(editor: CKEDITOR.editor): boolean {
         const currentEditingElement = editor._.elementsPath.list[0].$
         const currentEditingElementId = currentEditingElement.getAttribute('id')
-        const mentionId = this._getMentionIdFromMentionPlaceHolder(
-            currentEditingElementId
-        )
+        const mentionId = this._getMentionIdFromMentionPlaceHolder(currentEditingElementId)
         if (mentionId) {
             return MentionService._hasMentionResults(mentionId)
         }
@@ -268,9 +214,7 @@ export class MentionService {
         )(mentionScope)
     }
 
-    private static _getCkeditorFrame(
-        editor: CKEDITOR.editor
-    ): HTMLIFrameElement {
+    private static _getCkeditorFrame(editor: CKEDITOR.editor): HTMLIFrameElement {
         return editor.container.$.getElementsByTagName('iframe')[0]
     }
 
@@ -281,10 +225,8 @@ export class MentionService {
     ): void {
         const ckeditorFrame = MentionService._getCkeditorFrame(editor)
         const ckeditorBox = ckeditorFrame.getBoundingClientRect()
-        const mentionPlaceHolder =
-            ckeditorFrame.contentDocument.getElementById(mentionPlaceHolderId)
-        const mentionPlaceHolderBox =
-            $(mentionPlaceHolder)[0].getBoundingClientRect()
+        const mentionPlaceHolder = ckeditorFrame.contentDocument.getElementById(mentionPlaceHolderId)
+        const mentionPlaceHolderBox = $(mentionPlaceHolder)[0].getBoundingClientRect()
         mentionElement.css({
             position: 'absolute',
             top: ckeditorBox.top + mentionPlaceHolderBox.top + 30,
@@ -311,55 +253,33 @@ export class MentionService {
         return value
     }
 
-    private _retrieveMentionState = (
-        editorId: string,
-        mentionId: string
-    ): MentionState => {
-        return this.mentions[
-            MentionService._getMentionStateId(editorId, mentionId)
-        ]
+    private _retrieveMentionState = (editorId: string, mentionId: string): MentionState => {
+        return this.mentions[MentionService._getMentionStateId(editorId, mentionId)]
     }
 
-    private static _getMentionStateId(
-        editorId: string,
-        mentionId: string
-    ): string {
+    private static _getMentionStateId(editorId: string, mentionId: string): string {
         return editorId + '-' + mentionId
     }
 
-    private _createMentionPlaceHolder(
-        editor: CKEDITOR.editor,
-        mentionId: string
-    ): string {
-        const id =
-            this.mentionPlacerHolderPrefix + '-' + editor.id + '-' + mentionId
+    private _createMentionPlaceHolder(editor: CKEDITOR.editor, mentionId: string): string {
+        const id = this.mentionPlacerHolderPrefix + '-' + editor.id + '-' + mentionId
         const mentionPlaceHolder = '<span id="' + id + '">@</span>'
         editor.insertHtml(mentionPlaceHolder)
         return id
     }
 
-    private _getMentionIdFromMentionPlaceHolder = (
-        currentEditingElementId: string
-    ): string => {
-        if (
-            currentEditingElementId &&
-            currentEditingElementId.indexOf(this.mentionPlacerHolderPrefix) > -1
-        ) {
+    private _getMentionIdFromMentionPlaceHolder = (currentEditingElementId: string): string => {
+        if (currentEditingElementId && currentEditingElementId.indexOf(this.mentionPlacerHolderPrefix) > -1) {
             const splits = currentEditingElementId.split('-')
             return splits[2]
         }
         return null
     }
 
-    private _cleanup(
-        editor: CKEDITOR.editor,
-        mentionId: string,
-        unwrapOnly?
-    ): void {
+    private _cleanup(editor: CKEDITOR.editor, mentionId: string, unwrapOnly?): void {
         const mentionState = this._retrieveMentionState(editor.id, mentionId)
         const mentionPlaceHolderId = mentionState.mentionPlaceHolderId
-        const mentionPlaceHolderDom =
-            editor.document.getById(mentionPlaceHolderId)
+        const mentionPlaceHolderDom = editor.document.getById(mentionPlaceHolderId)
         if (unwrapOnly) {
             const range = editor.createRange()
             if (range && mentionPlaceHolderDom) {
@@ -378,9 +298,7 @@ export class MentionService {
         const mentionElement = mentionState.mentionElement
         mentionElement.remove()
         // remove the mention state
-        delete this.mentions[
-            MentionService._getMentionStateId(editor.id, mentionId)
-        ]
+        delete this.mentions[MentionService._getMentionStateId(editor.id, mentionId)]
     }
 
     private _handleSpecialKeys(
@@ -405,23 +323,14 @@ export class MentionService {
         }
     }
 
-    private _getMentionItem = (
-        key: string,
-        projectId: string,
-        refId: string
-    ): ElementObject => {
+    private _getMentionItem = (key: string, projectId: string, refId: string): ElementObject => {
         const cfListing = this.getFastCfListing(projectId, refId)
         return cfListing.find((cf) => {
             return cf.id + cf.type === key
         })
     }
 
-    private _handleEnterKey = (
-        editorId: string,
-        mentionId: string,
-        projectId: string,
-        refId: string
-    ): void => {
+    private _handleEnterKey = (editorId: string, mentionId: string, projectId: string, refId: string): void => {
         const matchDom = $('#' + mentionId + ' .active .mentionMatch')
         if (matchDom.length > 0) {
             const key = matchDom.attr('id')
@@ -435,10 +344,7 @@ export class MentionService {
         this._cleanup(editor, mentionId, true)
     }
 
-    private _handleArrowKey = (
-        mentionId: string,
-        isDownArrow: boolean
-    ): void => {
+    private _handleArrowKey = (mentionId: string, isDownArrow: boolean): void => {
         const popUpEl = $('#' + mentionId)
         const allOptions = popUpEl.find('li')
         const len = allOptions.length
@@ -467,24 +373,14 @@ export class MentionService {
         }
     }
 
-    private _repositionDropdownIfOffScreen(
-        editor: CKEDITOR.editor,
-        mentionState: MentionState
-    ): void {
+    private _repositionDropdownIfOffScreen(editor: CKEDITOR.editor, mentionState: MentionState): void {
         // wait for dropdown result to render so that we can determine whether it is on/off-screen
         this.$timeout(
             () => {
                 const mentionElement = mentionState.mentionElement
-                const dropdownResultElement =
-                    mentionElement.find('ul.dropdown-menu')
-                if (
-                    dropdownResultElement.children().length > 0 &&
-                    !dropdownResultElement.isOnScreen()
-                ) {
-                    const ckeditorBox =
-                        MentionService._getCkeditorFrame(
-                            editor
-                        ).getBoundingClientRect()
+                const dropdownResultElement = mentionElement.find('ul.dropdown-menu')
+                if (dropdownResultElement.children().length > 0 && !dropdownResultElement.isOnScreen()) {
+                    const ckeditorBox = MentionService._getCkeditorFrame(editor).getBoundingClientRect()
                     mentionElement.css({
                         top: ckeditorBox.top,
                         left: ckeditorBox.left,

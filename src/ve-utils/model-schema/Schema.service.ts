@@ -30,11 +30,7 @@ export class SchemaService {
         }
     }
 
-    getSchema = <T>(
-        name: string,
-        schemaName?: string,
-        sourceId?: string
-    ): T => {
+    getSchema = <T>(name: string, schemaName?: string, sourceId?: string): T => {
         const schema: Schema = this._getSchema(schemaName, sourceId)
         if (schema.schema[name]) {
             return schema.schema[name] as T
@@ -43,24 +39,14 @@ export class SchemaService {
         }
     }
 
-    getValue = <T>(
-        name: string,
-        key: string,
-        schemaName?: string,
-        sourceId?: string
-    ): T => {
+    getValue = <T>(name: string, key: string, schemaName?: string, sourceId?: string): T => {
         const lookup = this.getSchema(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
             return lookup[key] as T
         }
     }
 
-    getValues<T>(
-        name: string,
-        keys: string[],
-        schemaName?: string,
-        sourceId?: string
-    ): T[] | null {
+    getValues<T>(name: string, keys: string[], schemaName?: string, sourceId?: string): T[] | null {
         const lookup = this.getSchema(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
             const response: T[] = []
@@ -83,24 +69,14 @@ export class SchemaService {
         }
     }
 
-    getMappedValue = <T>(
-        name: string,
-        key: string,
-        schemaName?: string,
-        sourceId?: string
-    ): T => {
+    getMappedValue = <T>(name: string, key: string, schemaName?: string, sourceId?: string): T => {
         const lookup = this.getMap(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
             return lookup[key] as T
         }
     }
 
-    getKeyByValue = <T>(
-        name: string,
-        value: T,
-        schemaName?: string,
-        sourceId?: string
-    ): string => {
+    getKeyByValue = <T>(name: string, value: T, schemaName?: string, sourceId?: string): string => {
         const lookup = this.getSchema(name, schemaName, sourceId)
         if (lookup && typeof lookup === 'object') {
             let response = ''
@@ -118,12 +94,7 @@ export class SchemaService {
     private _schemaError = (name: string, schemaName?: string): void => {
         schemaName = schemaName ? schemaName : this.defaultSchema
         if (this.veConfig.enableDebug) {
-            console.log(
-                schemaName +
-                    ' does not have table' +
-                    name +
-                    'or it is not properly configured'
-            )
+            console.log(schemaName + ' does not have table' + name + 'or it is not properly configured')
         }
     }
 

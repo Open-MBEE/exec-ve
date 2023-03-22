@@ -89,6 +89,4 @@ const ngFlatpickrComponent: VeComponentOptions = {
         }
     },
 }
-angular
-    .module('angular-flatpickr', [])
-    .component(ngFlatpickrComponent.selector, ngFlatpickrComponent)
+angular.module('angular-flatpickr', []).component(ngFlatpickrComponent.selector, ngFlatpickrComponent)

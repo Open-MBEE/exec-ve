@@ -25,10 +25,7 @@ export class UserService {
         } else {
             this.$http.get<UsersResponse>(urlkey).then(
                 (response) => {
-                    if (
-                        !response.data.users ||
-                        response.data.users.length < 1
-                    ) {
+                    if (!response.data.users || response.data.users.length < 1) {
                         deferred.reject({
                             status: 404,
                             data: '',

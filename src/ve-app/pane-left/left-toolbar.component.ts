@@ -10,10 +10,7 @@ import { PermissionsService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
-import {
-    left_default_toolbar,
-    left_dynamic_toolbar,
-} from './left-buttons.config'
+import { left_default_toolbar, left_dynamic_toolbar } from './left-buttons.config'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { ElementObject, RefObject } from '@ve-types/mms'
@@ -73,9 +70,7 @@ const LeftToolbarComponent: VeComponentOptions = {
                 this,
                 left_default_toolbar,
                 left_dynamic_toolbar,
-                this.$state.includes('**.portal.**')
-                    ? 'tree-of-documents'
-                    : 'tree-of-contents'
+                this.$state.includes('**.portal.**') ? 'tree-of-documents' : 'tree-of-contents'
             )
         }
 
@@ -110,10 +105,7 @@ const LeftToolbarComponent: VeComponentOptions = {
                     button.permission =
                         this.mmsRef &&
                         this.mmsRef.type === 'Branch' &&
-                        this.permissionsSvc.hasBranchEditPermission(
-                            this.mmsRef._projectId,
-                            this.mmsRef.id
-                        )
+                        this.permissionsSvc.hasBranchEditPermission(this.mmsRef._projectId, this.mmsRef.id)
                 }
             }
         }
@@ -122,8 +114,7 @@ const LeftToolbarComponent: VeComponentOptions = {
             let toggleDeactivateFlag = false
             if (this.rootScopeSvc.leftPaneClosed()) {
                 if (button.selected || this.rootScopeSvc.leftPaneClosed()) {
-                    if (button.selected && !this.rootScopeSvc.leftPaneClosed())
-                        toggleDeactivateFlag = true
+                    if (button.selected && !this.rootScopeSvc.leftPaneClosed()) toggleDeactivateFlag = true
                     this.eventSvc.$broadcast('left-pane.toggle')
                 }
             }

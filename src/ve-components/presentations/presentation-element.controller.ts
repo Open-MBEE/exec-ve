@@ -1,10 +1,6 @@
 import $ from 'jquery'
 
-import {
-    ViewHtmlService,
-    ViewPresentationElemController,
-    PresentationService,
-} from '@ve-components/presentations'
+import { ViewHtmlService, ViewPresentationElemController, PresentationService } from '@ve-components/presentations'
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
@@ -36,10 +32,7 @@ export class PresentationLite {
     public peNumber: string
 }
 
-export class Presentation
-    extends PresentationLite
-    implements IPresentation, EditingToolbar
-{
+export class Presentation extends PresentationLite implements IPresentation, EditingToolbar {
     //Bindings
     protected mmsProjectId: string
     protected mmsRefId: string
@@ -149,45 +142,33 @@ export class Presentation
             this.elementSaving = false
             this.cleanUp = false
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
-            this.presentationElem =
-                this.mmsViewPresentationElemCtrl.getPresentationElement()
+            this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
             this.view = this.mmsViewCtrl.getView()
-            this.isDirectChildOfPresentationElement =
-                this.componentSvc.isDirectChildOfPresentationElementFunc(
-                    this.$element,
-                    this.mmsViewCtrl
-                )
+            this.isDirectChildOfPresentationElement = this.componentSvc.isDirectChildOfPresentationElementFunc(
+                this.$element,
+                this.mmsViewCtrl
+            )
             if (
                 this.element.classifierIds[0] ===
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Section',
-                    this.schema
-                )
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Section', this.schema)
             )
                 this.isDirectChildOfPresentationElement = false
         }
 
         if (this.commitId === 'latest') {
             this.subs.push(
-                this.eventSvc.$on(
-                    'element.updated',
-                    (data: {
-                        element: ElementObject
-                        continueEdit: boolean
-                    }) => {
-                        const elementOb = data.element
-                        const continueEdit = data.continueEdit
-                        if (
-                            elementOb.id === this.element.id &&
-                            elementOb._projectId === this.element._projectId &&
-                            elementOb._refId === this.element._refId &&
-                            !continueEdit
-                        ) {
-                            this.recompile()
-                        }
+                this.eventSvc.$on('element.updated', (data: { element: ElementObject; continueEdit: boolean }) => {
+                    const elementOb = data.element
+                    const continueEdit = data.continueEdit
+                    if (
+                        elementOb.id === this.element.id &&
+                        elementOb._projectId === this.element._projectId &&
+                        elementOb._refId === this.element._refId &&
+                        !continueEdit
+                    ) {
+                        this.recompile()
                     }
-                )
+                })
             )
         }
         this.config()

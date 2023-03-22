@@ -4,11 +4,7 @@ import { ViewService } from '@ve-utils/mms-api-client'
 import { veComponents } from '@ve-components'
 
 import { InsertResolveFn } from '@ve-types/components'
-import {
-    ElementObject,
-    InstanceSpecObject,
-    InstanceValueObject,
-} from '@ve-types/mms'
+import { ElementObject, InstanceSpecObject, InstanceValueObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
 export class PresentationService {
@@ -30,9 +26,7 @@ export class PresentationService {
         private viewSvc: ViewService
     ) {}
 
-    public checkForDuplicateInstances(
-        operand: InstanceValueObject[]
-    ): InstanceValueObject[] {
+    public checkForDuplicateInstances(operand: InstanceValueObject[]): InstanceValueObject[] {
         const seen: { [id: string]: boolean } = {},
             dups: InstanceValueObject[] = [],
             cleared: InstanceValueObject[] = []
@@ -62,17 +56,10 @@ export class PresentationService {
      * @param {string} type type of presentation element (Paragraph, Section)
      * @param {ElementObject} viewOrSectionOb the view or section (instance spec) object
      */
-    public addPresentationElement(
-        $ctrl: { addPeIndex: number },
-        type: string,
-        viewOrSectionOb: ElementObject
-    ): void {
+    public addPresentationElement($ctrl: { addPeIndex: number }, type: string, viewOrSectionOb: ElementObject): void {
         // $ctrl.viewOrSectionOb = viewOrSectionOb;
         // $ctrl.presentationElemType = type;
-        const instance = this.$uibModal.open<
-            InsertResolveFn<InsertPresentationData>,
-            InstanceSpecObject
-        >({
+        const instance = this.$uibModal.open<InsertResolveFn<InsertPresentationData>, InstanceSpecObject>({
             component: 'insertElementModal',
             resolve: {
                 getInsertData: (): InsertPresentationData => {
@@ -97,10 +84,7 @@ export class PresentationService {
         })
         instance.result.then(
             (data) => {
-                if (
-                    data.type !== 'InstanceSpecification' ||
-                    this.viewSvc.isSection(data)
-                ) {
+                if (data.type !== 'InstanceSpecification' || this.viewSvc.isSection(data)) {
                     return //do not open editor for existing pes added or if pe/owner is a section
                 }
                 void this.$timeout(

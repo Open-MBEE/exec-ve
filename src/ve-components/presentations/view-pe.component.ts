@@ -35,9 +35,7 @@ import {
  * @param {Object} mmsInstanceVal A InstanceValue json object
  * @param {Object} mmsParentSection the parent section if available
  */
-export class ViewPresentationElemController
-    implements angular.IComponentController
-{
+export class ViewPresentationElemController implements angular.IComponentController {
     private mmsInstanceVal: InstanceValueObject
     private mmsParentSection: InstanceSpecObject
 
@@ -84,9 +82,7 @@ export class ViewPresentationElemController
         this.eventSvc.$init(this)
 
         if (!this.mmsInstanceVal || !this.mmsInstanceVal.instanceId) {
-            this.$element.html(
-                '<span class="ve-error">Reference is null</span>'
-            )
+            this.$element.html('<span class="ve-error">Reference is null</span>')
             return
         }
         let projectId: string = null
@@ -112,90 +108,60 @@ export class ViewPresentationElemController
             .then(
                 (instanceSpec) => {
                     this.instanceSpec = instanceSpec
-                    this.viewSvc
-                        .getPresentationInstanceObject(instanceSpec)
-                        .then(
-                            (presentationElem) => {
-                                this.presentationElem = presentationElem
+                    this.viewSvc.getPresentationInstanceObject(instanceSpec).then(
+                        (presentationElem) => {
+                            this.presentationElem = presentationElem
 
-                                this.presentationElemLoading = false
-                                //Init PeNumber
-                                if (
-                                    this.treeSvc.branch2viewNumber[
-                                        this.instanceSpec.id
-                                    ]
-                                ) {
-                                    this.peNumber =
-                                        this.treeSvc.branch2viewNumber[
-                                            this.instanceSpec.id
-                                        ]
-                                }
-                                const hash = this.$location.hash()
-                                if (hash === instanceSpec.id) {
-                                    void this.$timeout(
-                                        () => {
-                                            this.$anchorScroll()
-                                        },
-                                        1000,
-                                        false
-                                    )
-                                }
-                                if (this.viewCtrl) {
-                                    this.viewCtrl.elementTranscluded(
-                                        instanceSpec,
-                                        this.presentationElem.type
-                                    )
-                                }
-                                this.$element.on('click', (e) => {
-                                    if (this.viewCtrl)
-                                        this.viewCtrl.transcludeClicked(
-                                            instanceSpec
-                                        )
-                                    e.stopPropagation()
-                                })
-                                const tag = this.extensionSvc.getTagByType(
-                                    'present',
-                                    this.presentationElem.type
-                                )
-
-                                const newPe = $(
-                                    '<div id="' +
-                                        this.instanceSpec.id +
-                                        '" ng-if="!$ctrl.presentationElemLoading"></div>'
-                                )
-                                $(newPe).append(
-                                    '<' +
-                                        tag +
-                                        ' pe-object="$ctrl.presentationElem" element="$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
-                                        '</' +
-                                        tag +
-                                        '>'
-                                )
-                                $(this.$element).append(newPe)
-                                this.$compile(newPe)(this.$scope)
-                                this.subs.push(
-                                    this.eventSvc.binding<boolean>(
-                                        TreeService.events.UPDATED,
-                                        (data) => {
-                                            if (!data) return
-                                            if (
-                                                this.treeSvc.branch2viewNumber[
-                                                    this.instanceSpec.id
-                                                ]
-                                            ) {
-                                                this.peNumber =
-                                                    this.treeSvc.branch2viewNumber[
-                                                        this.instanceSpec.id
-                                                    ]
-                                            }
-                                        }
-                                    )
-                                )
-                            },
-                            (reason) => {
-                                this._error(reqOb, reason)
+                            this.presentationElemLoading = false
+                            //Init PeNumber
+                            if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
+                                this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
                             }
-                        )
+                            const hash = this.$location.hash()
+                            if (hash === instanceSpec.id) {
+                                void this.$timeout(
+                                    () => {
+                                        this.$anchorScroll()
+                                    },
+                                    1000,
+                                    false
+                                )
+                            }
+                            if (this.viewCtrl) {
+                                this.viewCtrl.elementTranscluded(instanceSpec, this.presentationElem.type)
+                            }
+                            this.$element.on('click', (e) => {
+                                if (this.viewCtrl) this.viewCtrl.transcludeClicked(instanceSpec)
+                                e.stopPropagation()
+                            })
+                            const tag = this.extensionSvc.getTagByType('present', this.presentationElem.type)
+
+                            const newPe = $(
+                                '<div id="' + this.instanceSpec.id + '" ng-if="!$ctrl.presentationElemLoading"></div>'
+                            )
+                            $(newPe).append(
+                                '<' +
+                                    tag +
+                                    ' pe-object="$ctrl.presentationElem" element="$ctrl.instanceSpec" pe-number="$ctrl.peNumber">' +
+                                    '</' +
+                                    tag +
+                                    '>'
+                            )
+                            $(this.$element).append(newPe)
+                            this.$compile(newPe)(this.$scope)
+                            this.subs.push(
+                                this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
+                                    if (!data) return
+                                    if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
+                                        this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
+                                    }
+                                })
+                            )
+                        },
+                        (reason) => {
+                            this._error(reqOb, reason)
+                        }
+                    )
                 },
                 (reason) => {
                     this._error(reqOb, reason)
@@ -214,9 +180,7 @@ export class ViewPresentationElemController
         return this.mmsInstanceVal
     }
 
-    public getPresentationElement = ():
-        | ElementObject
-        | PresentationInstanceObject => {
+    public getPresentationElement = (): ElementObject | PresentationInstanceObject => {
         return this.presentationElem
     }
 
@@ -224,10 +188,7 @@ export class ViewPresentationElemController
         return this.mmsParentSection
     }
 
-    private _error = (
-        reqOb: ElementsRequest<string>,
-        reason: VePromiseReason<unknown>
-    ): void => {
+    private _error = (reqOb: ElementsRequest<string>, reason: VePromiseReason<unknown>): void => {
         if (reason.status === 500) {
             this.$element.html(
                 '<span class="ve-error">View element reference error: ' +
@@ -245,8 +206,7 @@ export class ViewPresentationElemController
                 Object.assign(this.$scope.$new(), {
                     reqOb: reqOb,
                     recentElement: reason.recentVersionOfElement,
-                    type: this.extensionSvc.AnnotationType
-                        .mmsPresentationElement,
+                    type: this.extensionSvc.AnnotationType.mmsPresentationElement,
                 })
             )
         }

@@ -92,36 +92,20 @@ function mmsTsDiagram(
     }
 
     $window.onPerspectivesCommandSuccess = (successfulCommand) => {
-        console.log(
-            'Perspectives command: ' +
-                successfulCommand.command +
-                ' completed successfully'
-        )
+        console.log('Perspectives command: ' + successfulCommand.command + ' completed successfully')
         $window.hidePerspectivesProgressIndicator()
     }
-    $window.onPerspectivesCommandFailure = function (
-        failedCommand,
-        message,
-        callstack
-    ) {
-        console.log(
-            'Perspectives command ' +
-                failedCommand.commmand +
-                ' failed. Reason is: ' +
-                message
-        )
+    $window.onPerspectivesCommandFailure = function (failedCommand, message, callstack) {
+        console.log('Perspectives command ' + failedCommand.commmand + ' failed. Reason is: ' + message)
         $window.hidePerspectivesProgressIndicator()
         console.log(callstack)
     }
     $window.onPerspectivesProjectLoad = (projectID) => {
-        console.log(
-            'All project UI elements should now be on the DOM for ' + projectID
-        )
+        console.log('All project UI elements should now be on the DOM for ' + projectID)
     }
     $window.onPerspectivesProjectReady = (projectID) => {
         console.log(
-            'All project RPC calls are complete and you can now access all project resources via the DOM. ' +
-                projectID
+            'All project RPC calls are complete and you can now access all project resources via the DOM. ' + projectID
         )
         if (!projectIdLoaded[projectID]) {
             $window.showPerspectivesProgressIndicator()
@@ -129,61 +113,26 @@ function mmsTsDiagram(
             projectIdLoaded[projectID] = true
         }
     }
-    $window.onPerspectivesViewLoaded = function (
-        projectID,
-        moduleName,
-        modelID,
-        viewID,
-        viewName
-    ) {
+    $window.onPerspectivesViewLoaded = function (projectID, moduleName, modelID, viewID, viewName) {
         console.log('The Perspectives view ' + viewID + ' is now on the DOM.')
     }
-    $window.onPerspectivesViewUpdated = function (
-        projectID,
-        moduleName,
-        modelID,
-        viewID,
-        viewNamem,
-        peObject
-    ) {
-        console.log(
-            'The Perspectives view' +
-                viewID +
-                ' was udpdated with data ' +
-                peObject
-        )
+    $window.onPerspectivesViewUpdated = function (projectID, moduleName, modelID, viewID, viewNamem, peObject) {
+        console.log('The Perspectives view' + viewID + ' was udpdated with data ' + peObject)
     }
-    $window.onPerspectivesViewCanvasRendered = function (
-        projectID,
-        moduleName,
-        modelID,
-        viewID,
-        viewName
-    ) {
-        console.log(
-            'The Perspectives canvas for view' + viewID + ' was rendered'
-        )
+    $window.onPerspectivesViewCanvasRendered = function (projectID, moduleName, modelID, viewID, viewName) {
+        console.log('The Perspectives canvas for view' + viewID + ' was rendered')
     }
     $window.onPerspectivesMouseClickOnObject = (data) => {
         if (data) {
-            console.log(
-                'JavaScript Callback = Mouse clicked on object with ID = ' +
-                    data.objectID
-            )
+            console.log('JavaScript Callback = Mouse clicked on object with ID = ' + data.objectID)
         }
     }
     $window.onPerspectivesMouseDoubleClickOnObject = (data) => {
         if (data) {
-            console.log(
-                'JavaScript Callback = Mouse double clicked on object with ID = ' +
-                    data.objectID
-            )
+            console.log('JavaScript Callback = Mouse double clicked on object with ID = ' + data.objectID)
         }
     }
-    $window.PerspectivesErrorDialogHandler = function (
-        message,
-        callStackString
-    ) {
+    $window.PerspectivesErrorDialogHandler = function (message, callStackString) {
         //prevent ts error dialog from appearing for any js exception
         console.log(message)
         console.log(callStackString)
@@ -225,10 +174,8 @@ function mmsTsDiagram(
             controlsName: controlMapping[scope.mmsTspSpec.diagramType],
         }
 
-        if (scope.mmsTspSpec && scope.mmsTspSpec.elements)
-            scope.initElements = scope.mmsTspSpec.elements
-        if (scope.mmsTspSpec && scope.mmsTspSpec.context)
-            scope.context = scope.mmsTspSpec.context
+        if (scope.mmsTspSpec && scope.mmsTspSpec.elements) scope.initElements = scope.mmsTspSpec.elements
+        if (scope.mmsTspSpec && scope.mmsTspSpec.context) scope.context = scope.mmsTspSpec.context
 
         const webProjectCommand = _createWebProjectCommand(scope, params, id)
         mapping[id] = _createUpdateCommand(scope, params.viewName, id)
@@ -396,12 +343,8 @@ function mmsTsDiagram(
             {
                 command: 'Custom',
                 data: {
-                    serverClassName:
-                        'gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl',
-                    args: [
-                        'int-add-' + id,
-                        URLService.getMmsServer() + URLService.getRoot(),
-                    ],
+                    serverClassName: 'gov.nasa.jpl.mbee.ems.action.SetMmsRestBaseUrlCommandImpl',
+                    args: ['int-add-' + id, URLService.getMmsServer() + URLService.getRoot()],
                     modelID: 'model-' + id,
                     module: 'SysML',
                     project: id,
@@ -456,9 +399,7 @@ function mmsTsDiagram(
                     command: 'SetModelAttribute',
                     data: {
                         attributeName: 'Inserts',
-                        attributeValue: _getElementsArrayString(
-                            scope.initElements
-                        ),
+                        attributeValue: _getElementsArrayString(scope.initElements),
                         modelID: 'model-' + id,
                         module: 'SysML',
                         project: id,
@@ -487,8 +428,7 @@ function mmsTsDiagram(
                         project: id,
                         module: 'SysML',
                         modelID: 'model-' + id,
-                        serverClassName:
-                            'gov.nasa.jpl.mbee.ems.command.NewContextCommand',
+                        serverClassName: 'gov.nasa.jpl.mbee.ems.command.NewContextCommand',
                         viewID: 'view-' + id,
                         viewName: viewName,
                         args: ['' + scope.context],

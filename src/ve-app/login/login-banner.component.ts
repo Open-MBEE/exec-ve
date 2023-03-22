@@ -31,9 +31,7 @@ const LoginBannerComponent: VeComponentOptions = {
             handleChange(onChangesObj, 'mmsLoginBanner', () => {
                 if (this.mmsLoginBanner) {
                     this.spin = false
-                    this.message = this.mmsLoginBanner
-                        ? this.mmsLoginBanner.message
-                        : ''
+                    this.message = this.mmsLoginBanner ? this.mmsLoginBanner.message : ''
                 } else {
                     this.spin = true
                     this.message = ''

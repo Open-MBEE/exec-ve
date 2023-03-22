@@ -3,12 +3,7 @@ import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 import { veComponents } from '@ve-components'
 
 import { RefObject } from '@ve-types/mms'
-import {
-    VeModalComponent,
-    VeModalController,
-    VeModalResolve,
-    VeModalResolveFn,
-} from '@ve-types/view-editor'
+import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface MergeConfirmResolve extends VeModalResolve {
     getSrcRefOb: RefObject
@@ -19,10 +14,7 @@ export interface MergeConfirmResolveFn extends VeModalResolveFn {
     getDocName(): string
 }
 
-class MergeConfirmModalController
-    extends VeModalControllerImpl<void>
-    implements VeModalController
-{
+class MergeConfirmModalController extends VeModalControllerImpl<void> implements VeModalController {
     //Bindings
     protected resolve: MergeConfirmResolve
 
@@ -98,7 +90,4 @@ const MergeConfirmModalComponent: VeModalComponent = {
     controller: MergeConfirmModalController,
 }
 
-veComponents.component(
-    MergeConfirmModalComponent.selector,
-    MergeConfirmModalComponent
-)
+veComponents.component(MergeConfirmModalComponent.selector, MergeConfirmModalComponent)

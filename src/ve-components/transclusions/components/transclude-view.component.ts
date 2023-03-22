@@ -44,10 +44,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeViewController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeViewController extends Transclusion implements ITransclusion {
     //Custom Bindings
     public noTitle: boolean
 
@@ -132,7 +129,4 @@ const TranscludeViewComponent: VeComponentOptions = {
     controller: TranscludeViewController,
 }
 
-veComponents.component(
-    TranscludeViewComponent.selector,
-    TranscludeViewComponent
-)
+veComponents.component(TranscludeViewComponent.selector, TranscludeViewComponent)

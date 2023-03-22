@@ -1,9 +1,4 @@
-import {
-    ApiService,
-    CacheService,
-    ElementService,
-    URLService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, CacheService, ElementService, URLService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -39,20 +34,10 @@ import {
  */
 export class ProjectService {
     private inProgress: {
-        [url: string]: VePromise<
-            MmsObject | MmsObject[],
-            BasicResponse<MmsObject>
-        >
+        [url: string]: VePromise<MmsObject | MmsObject[], BasicResponse<MmsObject>>
     } = {}
 
-    static $inject = [
-        '$q',
-        '$http',
-        'CacheService',
-        'ElementService',
-        'URLService',
-        'ApiService',
-    ]
+    static $inject = ['$q', '$http', 'CacheService', 'ElementService', 'URLService', 'ApiService']
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
@@ -84,10 +69,7 @@ export class ProjectService {
                 .get(urlkey)
                 .then(
                     (response: angular.IHttpResponse<OrgsResponse>) => {
-                        if (
-                            !response.data.orgs ||
-                            response.data.orgs.length < 1
-                        ) {
+                        if (!response.data.orgs || response.data.orgs.length < 1) {
                             deferred.reject({
                                 status: 404,
                                 data: '',
@@ -100,10 +82,7 @@ export class ProjectService {
                         }
                     },
                     (response: angular.IHttpResponse<OrgObject>) =>
-                        this.apiSvc.handleErrorCallback<OrgObject, OrgObject>(
-                            response,
-                            deferred
-                        )
+                        this.apiSvc.handleErrorCallback<OrgObject, OrgObject>(response, deferred)
                 )
                 .finally(() => {
                     delete this.inProgress[urlkey]
@@ -118,9 +97,7 @@ export class ProjectService {
      *
      * @returns {Promise} Resolves into array of org objects.
      */
-    public getOrgs(
-        updateCache?: boolean
-    ): VePromise<OrgObject[], OrgsResponse> {
+    public getOrgs(updateCache?: boolean): VePromise<OrgObject[], OrgsResponse> {
         const key = 'orgs'
         if (this.inProgress.hasOwnProperty(key)) {
             return this.inProgress[key] as VePromise<OrgObject[], OrgsResponse>
@@ -138,9 +115,7 @@ export class ProjectService {
                         for (let i = 0; i < response.data.orgs.length; i++) {
                             const org = response.data.orgs[i]
                             this.cacheSvc.put(['org', org.id], org, true)
-                            orgs.push(
-                                this.cacheSvc.get<OrgObject>(['org', org.id])
-                            )
+                            orgs.push(this.cacheSvc.get<OrgObject>(['org', org.id]))
                         }
                         this.cacheSvc.put(key, orgs, false)
                         deferred.resolve(this.cacheSvc.get<OrgObject[]>(key))
@@ -178,10 +153,7 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public getProjects(
-        orgId?: string,
-        updateCache?: boolean
-    ): VePromise<ProjectObject[], ProjectsResponse> {
+    public getProjects(orgId?: string, updateCache?: boolean): VePromise<ProjectObject[], ProjectsResponse> {
         const deferred = this.$q.defer<ProjectObject[]>()
         const url = this.uRLSvc.getProjectsURL(orgId)
         if (this.inProgress.hasOwnProperty(url)) {
@@ -211,39 +183,22 @@ export class ProjectService {
                             } = {}
                             response.data.projects.forEach((project) => {
                                 const porg = project.orgId
-                                const pCacheKey = this.apiSvc.makeCacheKey(
-                                    null,
-                                    project.id,
-                                    false,
-                                    'project'
-                                )
+                                const pCacheKey = this.apiSvc.makeCacheKey(null, project.id, false, 'project')
 
                                 if (orgProjects[porg] === undefined) {
                                     orgProjects[porg] = []
                                 }
-                                orgProjects[porg].push(
-                                    this.cacheSvc.put(pCacheKey, project, true)
-                                )
+                                orgProjects[porg].push(this.cacheSvc.put(pCacheKey, project, true))
                                 Object.keys(orgProjects).forEach((orgId) => {
                                     this.cacheSvc.put(
-                                        this.apiSvc.makeCacheKey(
-                                            null,
-                                            orgId,
-                                            false,
-                                            'projects'
-                                        ),
+                                        this.apiSvc.makeCacheKey(null, orgId, false, 'projects'),
                                         orgProjects[orgId],
                                         false
                                     )
                                 })
                             })
                         }
-                        deferred.resolve(
-                            this.cacheSvc.put<ProjectObject[]>(
-                                cacheKey,
-                                response.data.projects
-                            )
-                        )
+                        deferred.resolve(this.cacheSvc.put<ProjectObject[]>(cacheKey, response.data.projects))
                     },
                     (response: angular.IHttpResponse<ProjectsResponse>) => {
                         this.apiSvc.handleErrorCallback(response, deferred)
@@ -256,10 +211,7 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public getProject(
-        projectId: string,
-        updateCache?: string
-    ): VePromise<ProjectObject, ProjectsResponse> {
+    public getProject(projectId: string, updateCache?: string): VePromise<ProjectObject, ProjectsResponse> {
         const deferred = this.$q.defer<ProjectObject>()
         const url = this.uRLSvc.getProjectURL(projectId)
         if (this.inProgress.hasOwnProperty(url)) {
@@ -267,18 +219,14 @@ export class ProjectService {
         }
         const cacheKey = ['project', projectId]
         const cached = this.cacheSvc.get<ProjectObject>(cacheKey)
-        if (cached && !updateCache)
-            deferred.resolve(this.cacheSvc.get<ProjectObject>(cacheKey))
+        if (cached && !updateCache) deferred.resolve(this.cacheSvc.get<ProjectObject>(cacheKey))
         else {
             this.inProgress[url] = deferred.promise
             this.$http
                 .get<ProjectsResponse>(url)
                 .then(
                     (response) => {
-                        if (
-                            !Array.isArray(response.data.projects) ||
-                            response.data.projects.length === 0
-                        ) {
+                        if (!Array.isArray(response.data.projects) || response.data.projects.length === 0) {
                             deferred.reject({
                                 status: 500,
                                 data: '',
@@ -287,14 +235,8 @@ export class ProjectService {
                             })
                             return
                         }
-                        this.cacheSvc.put(
-                            cacheKey,
-                            response.data.projects[0],
-                            true
-                        )
-                        deferred.resolve(
-                            this.cacheSvc.get<ProjectObject>(cacheKey)
-                        )
+                        this.cacheSvc.put(cacheKey, response.data.projects[0], true)
+                        deferred.resolve(this.cacheSvc.get<ProjectObject>(cacheKey))
                     },
                     (response: angular.IHttpResponse<ProjectsResponse>) => {
                         this.apiSvc.handleErrorCallback(response, deferred)
@@ -313,12 +255,7 @@ export class ProjectService {
         updateCache?: boolean
     ): VePromise<MountObject, ProjectsResponse> {
         const deferred = this.$q.defer<MountObject>()
-        const cacheKey = this.apiSvc.makeCacheKey(
-            { projectId, refId },
-            '',
-            false,
-            'project-mounts'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'project-mounts')
 
         this.getProject(projectId).then(
             (response: ProjectObject) => {
@@ -329,8 +266,7 @@ export class ProjectService {
                     _refId: refId,
                 }
                 const result: MountObject = Object.assign(mountOb, response)
-                const cached: MountObject =
-                    this.cacheSvc.get<MountObject>(cacheKey)
+                const cached: MountObject = this.cacheSvc.get<MountObject>(cacheKey)
                 if (this.cacheSvc.exists(cacheKey) && !updateCache) {
                     result._mounts.push(...cached._mounts)
                     deferred.resolve(result)
@@ -338,20 +274,14 @@ export class ProjectService {
                 }
                 const url = this.uRLSvc.getProjectMountsURL(projectId, refId)
                 if (this.inProgress.hasOwnProperty(url)) {
-                    return this.inProgress[url] as VePromise<
-                        MountObject,
-                        ProjectsResponse
-                    >
+                    return this.inProgress[url] as VePromise<MountObject, ProjectsResponse>
                 } else {
                     this.inProgress[url] = deferred.promise
                     this.$http
                         .get<ProjectsResponse>(url)
                         .then(
                             (response) => {
-                                if (
-                                    !Array.isArray(response.data.projects) ||
-                                    response.data.projects.length === 0
-                                ) {
+                                if (!Array.isArray(response.data.projects) || response.data.projects.length === 0) {
                                     deferred.reject({
                                         status: 500,
                                         data: '',
@@ -361,25 +291,12 @@ export class ProjectService {
                                     return
                                 }
                                 if (response.data.projects[0]._mounts) {
-                                    result._mounts = (
-                                        response.data.projects[0] as MountObject
-                                    )._mounts
+                                    result._mounts = (response.data.projects[0] as MountObject)._mounts
                                 }
-                                deferred.resolve(
-                                    this.cacheSvc.put<MountObject>(
-                                        cacheKey,
-                                        result,
-                                        false
-                                    )
-                                )
+                                deferred.resolve(this.cacheSvc.put<MountObject>(cacheKey, result, false))
                             },
-                            (
-                                response: angular.IHttpResponse<ProjectsResponse>
-                            ) => {
-                                this.apiSvc.handleErrorCallback(
-                                    response,
-                                    deferred
-                                )
+                            (response: angular.IHttpResponse<ProjectsResponse>) => {
+                                this.apiSvc.handleErrorCallback(response, deferred)
                             }
                         )
                         .finally(() => {
@@ -397,10 +314,7 @@ export class ProjectService {
     public getAllMountsAsArray = (project: MountObject): MountObject[] => {
         const projectsList: MountObject[] = [project]
         const mounts = project._mounts
-        const getMountsArray = (
-            mounts: MountObject[],
-            projectsList: MountObject[]
-        ): void => {
+        const getMountsArray = (mounts: MountObject[], projectsList: MountObject[]): void => {
             if (Array.isArray(mounts) && mounts.length !== 0) {
                 for (let i = 0; i < mounts.length; i++) {
                     projectsList.push(mounts[i])
@@ -415,12 +329,7 @@ export class ProjectService {
     }
 
     public getRefs(projectId: string): VePromise<RefObject[], RefsResponse> {
-        const cacheKey = this.apiSvc.makeCacheKey(
-            null,
-            projectId,
-            false,
-            'refs'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey(null, projectId, false, 'refs')
         const url = this.uRLSvc.getRefsURL(projectId)
         if (this.inProgress.hasOwnProperty(url)) {
             return this.inProgress[url] as VePromise<RefObject[], RefsResponse>
@@ -443,29 +352,22 @@ export class ProjectService {
                             return
                         }
                         const refs: RefObject[] = []
-                        for (
-                            let index = 0;
-                            index < response.data.refs.length;
-                            index++
-                        ) {
+                        for (let index = 0; index < response.data.refs.length; index++) {
                             const ref: RefObject = response.data.refs[index]
                             if (ref.id === 'master') {
                                 ref.type = 'Branch'
                             }
-                            const refCacheKey: string[] =
-                                this.apiSvc.makeCacheKey(
-                                    { projectId: projectId, refId: ref.id },
-                                    '',
-                                    false,
-                                    'ref'
-                                )
+                            const refCacheKey: string[] = this.apiSvc.makeCacheKey(
+                                { projectId: projectId, refId: ref.id },
+                                '',
+                                false,
+                                'ref'
+                            )
                             this.cacheSvc.put(refCacheKey, ref, true)
                             refs.push(this.cacheSvc.get<RefObject>(refCacheKey))
                         }
                         this.cacheSvc.put(cacheKey, refs, false)
-                        deferred.resolve(
-                            this.cacheSvc.get<RefObject[]>(cacheKey)
-                        )
+                        deferred.resolve(this.cacheSvc.get<RefObject[]>(cacheKey))
                     },
                     (response: angular.IHttpResponse<RefsResponse>) => {
                         this.apiSvc.handleErrorCallback(response, deferred)
@@ -478,21 +380,12 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public getRef(
-        refId: string,
-        projectId: string,
-        updateCache?: boolean
-    ): VePromise<RefObject, RefsResponse> {
+    public getRef(refId: string, projectId: string, updateCache?: boolean): VePromise<RefObject, RefsResponse> {
         const url = this.uRLSvc.getRefURL(projectId, refId)
         if (this.inProgress.hasOwnProperty(url)) {
             return this.inProgress[url] as VePromise<RefObject, RefsResponse>
         }
-        const cacheKey = this.apiSvc.makeCacheKey(
-            { projectId, refId },
-            '',
-            false,
-            'ref'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'ref')
         const cached = this.cacheSvc.get<RefObject>(cacheKey)
         const deferred = this.$q.defer<RefObject>()
         if (cached && !updateCache) {
@@ -500,10 +393,7 @@ export class ProjectService {
         } else {
             this.$http.get<RefsResponse>(url).then(
                 (response) => {
-                    this.cacheSvc.put<RefObject>(
-                        cacheKey,
-                        response.data.refs[0]
-                    )
+                    this.cacheSvc.put<RefObject>(cacheKey, response.data.refs[0])
                     deferred.resolve(this.cacheSvc.get<RefObject>(cacheKey))
                 },
                 (response: angular.IHttpResponse<RefsResponse>) => {
@@ -532,15 +422,11 @@ export class ProjectService {
             .get<CommitResponse>(url)
             .then(
                 (response) => {
-                    if (
-                        !Array.isArray(response.data.commits) ||
-                        response.data.commits.length === 0
-                    ) {
+                    if (!Array.isArray(response.data.commits) || response.data.commits.length === 0) {
                         deferred.reject({
                             status: 500,
                             data: '',
-                            message:
-                                'Project does not exist at specified time.',
+                            message: 'Project does not exist at specified time.',
                             type: 'error',
                         })
                         return
@@ -557,25 +443,13 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public getCommit(
-        projectId: string,
-        refId: string,
-        commitId: string
-    ): VePromise<CommitObject, CommitResponse> {
+    public getCommit(projectId: string, refId: string, commitId: string): VePromise<CommitObject, CommitResponse> {
         const deferred = this.$q.defer<CommitObject>()
         const url = this.uRLSvc.getCommitUrl(projectId, refId, commitId)
         if (this.inProgress.hasOwnProperty(url)) {
-            return this.inProgress[url] as VePromise<
-                CommitObject,
-                CommitResponse
-            >
+            return this.inProgress[url] as VePromise<CommitObject, CommitResponse>
         }
-        const cacheKey = this.apiSvc.makeCacheKey(
-            { projectId, refId, commitId },
-            '',
-            false,
-            'commit'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId, commitId }, '', false, 'commit')
         if (this.cacheSvc.exists(cacheKey)) {
             deferred.resolve(this.cacheSvc.get<CommitObject>(cacheKey))
         } else {
@@ -584,12 +458,7 @@ export class ProjectService {
                 .get<CommitResponse>(url)
                 .then(
                     (response) => {
-                        deferred.resolve(
-                            this.cacheSvc.put(
-                                cacheKey,
-                                response.data.commits[0]
-                            )
-                        )
+                        deferred.resolve(this.cacheSvc.put(cacheKey, response.data.commits[0]))
                     },
                     (response: angular.IHttpResponse<CommitResponse>) => {
                         this.apiSvc.handleErrorCallback(response, deferred)
@@ -602,18 +471,10 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public createRef(
-        refOb: RefObject,
-        projectId: string
-    ): VePromise<RefObject, RefsResponse> {
+    public createRef(refOb: RefObject, projectId: string): VePromise<RefObject, RefsResponse> {
         const deferred = this.$q.defer<RefObject>()
         const url = this.uRLSvc.getRefsURL(projectId)
-        const cacheKey = this.apiSvc.makeCacheKey(
-            { projectId: refOb._projectId, refId: refOb.id },
-            '',
-            false,
-            'ref'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId: refOb._projectId, refId: refOb.id }, '', false, 'ref')
         this.$http
             .post<RefsResponse>(url, {
                 refs: [refOb],
@@ -621,10 +482,7 @@ export class ProjectService {
             })
             .then(
                 (response) => {
-                    if (
-                        !Array.isArray(response.data.refs) ||
-                        response.data.refs.length === 0
-                    ) {
+                    if (!Array.isArray(response.data.refs) || response.data.refs.length === 0) {
                         deferred.reject({
                             status: 500,
                             data: '',
@@ -635,12 +493,7 @@ export class ProjectService {
                     }
                     const createdRef = response.data.refs[0]
                     const list = this.cacheSvc.get<RefObject[]>(
-                        this.apiSvc.makeCacheKey(
-                            null,
-                            projectId,
-                            false,
-                            'refs'
-                        ),
+                        this.apiSvc.makeCacheKey(null, projectId, false, 'refs'),
                         true
                     )
                     if (list) {
@@ -656,10 +509,7 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public updateRef(
-        refOb: RefObject,
-        projectId: string
-    ): VePromise<RefObject, RefsResponse> {
+    public updateRef(refOb: RefObject, projectId: string): VePromise<RefObject, RefsResponse> {
         const deferred = this.$q.defer<RefObject>()
         const url = this.uRLSvc.getRefsURL(projectId)
         this.$http
@@ -669,10 +519,7 @@ export class ProjectService {
             })
             .then(
                 (response) => {
-                    if (
-                        !Array.isArray(response.data.refs) ||
-                        response.data.refs.length === 0
-                    ) {
+                    if (!Array.isArray(response.data.refs) || response.data.refs.length === 0) {
                         deferred.reject({
                             status: 500,
                             data: '',
@@ -683,13 +530,7 @@ export class ProjectService {
                     }
                     const resp = response.data.refs[0]
                     this.cacheSvc.put(['ref', projectId, resp.id], resp, true)
-                    deferred.resolve(
-                        this.cacheSvc.get<RefObject>([
-                            'ref',
-                            projectId,
-                            resp.id,
-                        ])
-                    )
+                    deferred.resolve(this.cacheSvc.get<RefObject>(['ref', projectId, resp.id]))
                 },
                 (response: angular.IHttpResponse<RefsResponse>) => {
                     this.apiSvc.handleErrorCallback(response, deferred)
@@ -698,30 +539,17 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public deleteRef(
-        refId: string,
-        projectId: string
-    ): VePromise<void, RefsResponse> {
+    public deleteRef(refId: string, projectId: string): VePromise<void, RefsResponse> {
         const deferred = this.$q.defer<void>()
         const url = this.uRLSvc.getRefURL(projectId, refId)
         this.$http.delete<RefsResponse>(url).then(
             (response) => {
-                const key = this.apiSvc.makeCacheKey(
-                    { refId, projectId },
-                    '',
-                    false,
-                    'ref'
-                )
+                const key = this.apiSvc.makeCacheKey({ refId, projectId }, '', false, 'ref')
                 const refOb = this.cacheSvc.get<RefObject>(key)
                 if (refOb) {
                     this.cacheSvc.remove(key)
                     const list = this.cacheSvc.get<RefObject[]>(
-                        this.apiSvc.makeCacheKey(
-                            null,
-                            projectId,
-                            false,
-                            'refs'
-                        ),
+                        this.apiSvc.makeCacheKey(null, projectId, false, 'refs'),
                         true
                     )
                     if (list) {
@@ -747,18 +575,10 @@ export class ProjectService {
         refId: string,
         updateCache?: boolean
     ): VePromise<GroupObject[], GroupsResponse> {
-        const cacheKey = this.apiSvc.makeCacheKey(
-            { projectId, refId },
-            '',
-            false,
-            'groups'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'groups')
         const url = this.uRLSvc.getGroupsURL(projectId, refId)
         if (this.inProgress.hasOwnProperty(url)) {
-            return this.inProgress[url] as VePromise<
-                GroupObject[],
-                GroupsResponse
-            >
+            return this.inProgress[url] as VePromise<GroupObject[], GroupsResponse>
         }
         const deferred = this.$q.defer<GroupObject[]>()
         if (this.cacheSvc.exists(cacheKey) && !updateCache) {
@@ -788,29 +608,12 @@ export class ProjectService {
                         for (let i = 0; i < response.data.groups.length; i++) {
                             let group: GroupObject = response.data.groups[i]
                             reqOb.elementId = group.id
-                            group = this.elementSvc.cacheElement(
-                                reqOb,
-                                group,
-                                false
-                            )
-                            this.cacheSvc.put(
-                                ['group', projectId, refId, group.id],
-                                group,
-                                true
-                            )
-                            groups.push(
-                                this.cacheSvc.get<GroupObject>([
-                                    'group',
-                                    projectId,
-                                    refId,
-                                    group.id,
-                                ])
-                            )
+                            group = this.elementSvc.cacheElement(reqOb, group, false)
+                            this.cacheSvc.put(['group', projectId, refId, group.id], group, true)
+                            groups.push(this.cacheSvc.get<GroupObject>(['group', projectId, refId, group.id]))
                         }
                         this.cacheSvc.put(cacheKey, groups, false)
-                        deferred.resolve(
-                            this.cacheSvc.get<GroupObject[]>(cacheKey)
-                        )
+                        deferred.resolve(this.cacheSvc.get<GroupObject[]>(cacheKey))
                     },
                     (response: angular.IHttpResponse<GroupObject[]>) => {
                         this.apiSvc.handleErrorCallback(response, deferred)
@@ -823,20 +626,11 @@ export class ProjectService {
         return deferred.promise
     }
 
-    public getGroup(
-        id: string,
-        projectId: string,
-        refId: string
-    ): VePromise<ElementObject> {
+    public getGroup(id: string, projectId: string, refId: string): VePromise<ElementObject> {
         const deferred = this.$q.defer<ElementObject>()
         this.getGroups(projectId, refId).then(
             (data) => {
-                const result = this.cacheSvc.get<ElementObject>([
-                    'group',
-                    projectId,
-                    refId,
-                    id,
-                ])
+                const result = this.cacheSvc.get<ElementObject>(['group', projectId, refId, id])
                 if (result) {
                     deferred.resolve(result)
                 } else {

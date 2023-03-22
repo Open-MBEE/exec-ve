@@ -2,11 +2,7 @@ import { veComponents } from '@ve-components'
 //d3js grouped horizontal bar chart is created by referencing
 //http://bl.ocks.org/erikvullings/51cc5332439939f1f292
 
-veComponents.directive('mmsD3GroupedHorizontalBarPlot', [
-    'PlotService',
-    '$window',
-    mmsD3GroupedHorizontalBarPlot,
-])
+veComponents.directive('mmsD3GroupedHorizontalBarPlot', ['PlotService', '$window', mmsD3GroupedHorizontalBarPlot])
 function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
     const mmsChartLink = function (scope, element, attrs, mmsViewCtrl) {
         const d3 = $window.d3
@@ -18,10 +14,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
             marginBottom: 30,
             marginLeft: 40,
         }
-        const plotConfig = PlotService.plotConfig(
-            scope.plot.config.options,
-            defaultPlotConfig
-        )
+        const plotConfig = PlotService.plotConfig(scope.plot.config.options, defaultPlotConfig)
         let achartdata
         element.click(function (e) {
             //stop Propogating event to parent(transclude-doc) element.
@@ -30,9 +23,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
 
         const d3colorR = d3.scaleOrdinal(d3.schemeCategory10).range()
         function getColor(data, i) {
-            return data.colors !== undefined
-                ? d3colorR[data.colors[i]]
-                : d3colorR[i]
+            return data.colors !== undefined ? d3colorR[data.colors[i]] : d3colorR[i]
         }
         let projectId
         let refId
@@ -49,39 +40,23 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
             opacitynotselected = 0.3
 
         function mouseout() {
-            d3.selectAll('.ghbbar')
-                .transition(200)
-                .style('fill-opacity', opacitydefault)
+            d3.selectAll('.ghbbar').transition(200).style('fill-opacity', opacitydefault)
 
-            d3.selectAll('.legendRect')
-                .transition(200)
-                .style('fill-opacity', opacitydefault)
+            d3.selectAll('.legendRect').transition(200).style('fill-opacity', opacitydefault)
 
-            d3.selectAll('.legentFilter')
-                .transition(200)
-                .style('opacity', opacitydefault)
+            d3.selectAll('.legentFilter').transition(200).style('opacity', opacitydefault)
         } //end of function mouseout
 
         function mouseover(mouseoverClassId) {
-            d3.selectAll('.ghbbar')
-                .transition(200)
-                .style('fill-opacity', opacitynotselected)
+            d3.selectAll('.ghbbar').transition(200).style('fill-opacity', opacitynotselected)
 
-            d3.selectAll('.legendRect')
-                .transition(200)
-                .style('fill-opacity', opacitynotselected)
+            d3.selectAll('.legendRect').transition(200).style('fill-opacity', opacitynotselected)
 
-            d3.selectAll('.legentFilter')
-                .transition(200)
-                .style('opacity', opacitynotselected)
+            d3.selectAll('.legentFilter').transition(200).style('opacity', opacitynotselected)
 
-            d3.selectAll(mouseoverClassId)
-                .transition(200)
-                .style('fill-opacity', opacityselected)
+            d3.selectAll(mouseoverClassId).transition(200).style('fill-opacity', opacityselected)
 
-            d3.selectAll(mouseoverClassId)
-                .transition(200)
-                .style('opacity', opacityselected)
+            d3.selectAll(mouseoverClassId).transition(200).style('opacity', opacityselected)
         } //end of function mouseover
 
         function createFilters(data) {
@@ -101,21 +76,10 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                 .enter()
                 .append('div')
                 .attr('class', function (d, i) {
-                    return (
-                        'legentFilter ' +
-                        data.id +
-                        ' ' +
-                        PlotService.toValidId(d)
-                    )
+                    return 'legentFilter ' + data.id + ' ' + PlotService.toValidId(d)
                 })
                 .attr('style', function (d, i) {
-                    return (
-                        'opacity: ' +
-                        opacitydefault +
-                        ';background-color:' +
-                        getColor(data, i) +
-                        ';'
-                    )
+                    return 'opacity: ' + opacitydefault + ';background-color:' + getColor(data, i) + ';'
                 })
                 .on('mouseover', (d, i) => {
                     mouseover('.' + data.id + '.' + PlotService.toValidId(d))
@@ -130,27 +94,16 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                         .append('input')
                         .attr('type', 'checkbox')
                         .attr('checked', function (d, i) {
-                            if (
-                                data.legendsFilter[PlotService.toValidId(d)] ===
-                                true
-                            )
-                                return true
+                            if (data.legendsFilter[PlotService.toValidId(d)] === true) return true
                             else return null
                         })
                         .attr('style', function (d, i) {
                             const color = getColor(data, i)
-                            return (
-                                'color: ' +
-                                color +
-                                ';background-color:' +
-                                color +
-                                ';'
-                            )
+                            return 'color: ' + color + ';background-color:' + color + ';'
                         })
                         .on('click', (d) => {
                             // filter by legends
-                            data.legendsFilter[PlotService.toValidId(d)] =
-                                this.checked
+                            data.legendsFilter[PlotService.toValidId(d)] = this.checked
                             createGroupedHorizontalBarChart(achartdata)
                             createFilters(achartdata)
                         })
@@ -171,12 +124,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                 .enter()
                 .append('div')
                 .attr('class', function (d, i) {
-                    return (
-                        'columnfilter ' +
-                        data.id +
-                        ' ' +
-                        PlotService.toValidId(d)
-                    )
+                    return 'columnfilter ' + data.id + ' ' + PlotService.toValidId(d)
                 })
                 .on('mouseover', function (d, i) {
                     mouseover('.' + data.id + '.' + PlotService.toValidId(d))
@@ -191,17 +139,12 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                         .append('input')
                         .attr('type', 'checkbox')
                         .attr('checked', function (d, i) {
-                            if (
-                                data.labelsFilter[PlotService.toValidId(d)] ===
-                                true
-                            )
-                                return true
+                            if (data.labelsFilter[PlotService.toValidId(d)] === true) return true
                             else return null
                         })
                         .on('click', (d) => {
                             //filter by columns(labels)
-                            data.labelsFilter[PlotService.toValidId(d)] =
-                                this.checked
+                            data.labelsFilter[PlotService.toValidId(d)] = this.checked
                             createGroupedHorizontalBarChart(achartdata) //2nd argument is not used
                             createFilters(achartdata)
                         })
@@ -215,13 +158,9 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
 
         function createGroupedHorizontalBarChart(data) {
             divchart.selectAll('*').remove()
-            divchart
-                .attr('class', achartdata.id)
-                .attr('style', 'border:1px solid #ddd')
+            divchart.attr('class', achartdata.id).attr('style', 'border:1px solid #ddd')
 
-            const svg = divchart
-                .append('svg:svg')
-                .attr('class', 'ghbchart ' + data.id)
+            const svg = divchart.append('svg:svg').attr('class', 'ghbchart ' + data.id)
 
             const filteredDataValues: any[] = []
             const filteredDataSysmlids: any[] = []
@@ -238,25 +177,16 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                     for (let j = 0; j < data.values.length; j++) {
                         //data.values.length == data.legends.length
                         counter++
-                        if (
-                            datalegendsfilter[
-                                PlotService.toValidId(data.legends[j])
-                            ]
-                        ) {
+                        if (datalegendsfilter[PlotService.toValidId(data.legends[j])]) {
                             filteredDataValues.push(Number(data.values[j][i]))
                             filteredDataSysmlids.push(data.valueIds[j][i])
-                            filteredDataColors.push(
-                                getColor(data, counter % data.legends.length)
-                            )
-                            filteredDataLegends.push(
-                                PlotService.toValidId(data.legends[j])
-                            )
+                            filteredDataColors.push(getColor(data, counter % data.legends.length))
+                            filteredDataLegends.push(PlotService.toValidId(data.legends[j]))
                         }
                     }
                 }
             }
-            const filteredLegendsLength =
-                filteredDataLegends.length / filteredDataLabels.length
+            const filteredLegendsLength = filteredDataLegends.length / filteredDataLabels.length
 
             const chartWidth = plotConfig.width - 260,
                 barHeight = 20,
@@ -265,9 +195,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                 spaceForLabels = plotConfig.marginLeft,
                 spaceForLegend = 200,
                 marginbottom = 50
-            const chartHeight =
-                barHeight * filteredDataValues.length +
-                gapBetweenGroups * filteredDataLabels.length
+            const chartHeight = barHeight * filteredDataValues.length + gapBetweenGroups * filteredDataLabels.length
 
             const x = d3
                 .scaleLinear() //d3.scale.linear()
@@ -284,9 +212,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                 .tickSize(0)
 
             // Specify the chart area and dimensions
-            const chart = svg
-                .attr('width', plotConfig.width)
-                .attr('height', chartHeight + marginbottom)
+            const chart = svg.attr('width', plotConfig.width).attr('height', chartHeight + marginbottom)
 
             // Create bars
             const bar = chart
@@ -299,14 +225,11 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                         'translate(' +
                         spaceForLabels +
                         ',' +
-                        (i * barHeight +
-                            gapBetweenGroups *
-                                (0.5 + Math.floor(i / filteredLegendsLength))) +
+                        (i * barHeight + gapBetweenGroups * (0.5 + Math.floor(i / filteredLegendsLength))) +
                         ')'
                     )
                 })
-            const numRows =
-                filteredDataLegends.length / filteredDataLabels.length
+            const numRows = filteredDataLegends.length / filteredDataLabels.length
             // Create rectangles of the correct width
             bar.append('rect')
                 .attr('id', function (d, i) {
@@ -323,9 +246,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                         ' ' +
                         filteredDataLegends[i] +
                         ' ' +
-                        PlotService.toValidId(
-                            filteredDataLabels[Math.floor(i / numRows)]
-                        )
+                        PlotService.toValidId(filteredDataLabels[Math.floor(i / numRows)])
                     )
                 })
                 .attr('width', x)
@@ -364,25 +285,14 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                         })
                         .attr('y', groupHeight / 2)
                         .attr('dy', '.35em')
-                        .text(
-                            filteredDataLabels[
-                                Math.floor(i / filteredLegendsLength)
-                            ]
-                        )
+                        .text(filteredDataLabels[Math.floor(i / filteredLegendsLength)])
                 }
             })
             chart
                 .append('g')
                 .attr('class', 'y axis')
                 .attr('id', 'ghbaxis')
-                .attr(
-                    'transform',
-                    'translate(' +
-                        spaceForLabels +
-                        ', ' +
-                        -gapBetweenGroups / 2 +
-                        ')'
-                )
+                .attr('transform', 'translate(' + spaceForLabels + ', ' + -gapBetweenGroups / 2 + ')')
                 .call(yAxis)
 
             // Draw legend
@@ -397,8 +307,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                 .attr('transform', (d, i) => {
                     const height = legendRectSize + legendSpacing
                     const offset = -gapBetweenGroups / 2
-                    const horz =
-                        spaceForLabels + chartWidth + 60 + legendRectSize
+                    const horz = spaceForLabels + chartWidth + 60 + legendRectSize
                     const vert = i * height - offset
                     return 'translate(' + horz + ',' + vert + ')'
                 })
@@ -412,9 +321,7 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
             legend
                 .append('rect')
                 .attr('class', function (d, i) {
-                    return (
-                        'legendRect ' + data.id + ' ' + PlotService.toValidId(d)
-                    )
+                    return 'legendRect ' + data.id + ' ' + PlotService.toValidId(d)
                 })
                 .attr('width', legendRectSize)
                 .attr('height', legendRectSize)
@@ -436,57 +343,55 @@ function mmsD3GroupedHorizontalBarPlot(PlotService, $window) {
                 })
         }
         scope.render = function () {
-            PlotService.readValues(scope.plot, projectId, refId, commitId).then(
-                function (value) {
-                    const tablebody = value.tablebody
-                    const tableheader = value.tableheader
-                    //scope.isHeader = value.isHeader;
-                    scope.valuesO = value.tablebody.valuesO //value objects used in watch
-                    if (tablebody.c3_data.length === 0) {
-                        //no data
-                        return
-                    }
-                    let udcolors
-                    if (scope.plot.config.colors !== undefined) {
-                        udcolors = scope.plot.config.colors
-                    }
-                    const rowvalues: number[] = []
-                    const cellIds: number[] = [] //0, 1, 2, 3
-                    const legends: any[] = []
-                    const legendsFilter: boolean[] = []
-                    let rowvalue: number[]
-                    let cellId: number[]
-                    let cid = 0
-                    tablebody.c3_data.forEach(function (row) {
-                        legends.push(row[0])
-                        legendsFilter[row[0]] = true
-                        rowvalue = [] //reset
-                        cellId = [] //reset
-                        for (let i = 1; i < row.length; i++) {
-                            rowvalue.push(row[i])
-                            cellId.push(cid++)
-                        }
-                        cellIds.push(...cellId)
-                        rowvalues.push(...rowvalue)
-                    })
-                    const labelsFilter: { [key: string]: boolean } = {}
-                    tableheader.forEach(function (item) {
-                        labelsFilter[item] = true
-                    })
-                    achartdata = {
-                        id: '_' + scope.$id,
-                        labels: tableheader,
-                        legends: legends, //row headers
-                        colors: udcolors,
-                        values: rowvalues, //table body without row headers
-                        valueIds: cellIds,
-                        legendsFilter: legendsFilter,
-                        labelsFilter: labelsFilter,
-                    }
-                    createGroupedHorizontalBarChart(achartdata)
-                    createFilters(achartdata)
+            PlotService.readValues(scope.plot, projectId, refId, commitId).then(function (value) {
+                const tablebody = value.tablebody
+                const tableheader = value.tableheader
+                //scope.isHeader = value.isHeader;
+                scope.valuesO = value.tablebody.valuesO //value objects used in watch
+                if (tablebody.c3_data.length === 0) {
+                    //no data
+                    return
                 }
-            )
+                let udcolors
+                if (scope.plot.config.colors !== undefined) {
+                    udcolors = scope.plot.config.colors
+                }
+                const rowvalues: number[] = []
+                const cellIds: number[] = [] //0, 1, 2, 3
+                const legends: any[] = []
+                const legendsFilter: boolean[] = []
+                let rowvalue: number[]
+                let cellId: number[]
+                let cid = 0
+                tablebody.c3_data.forEach(function (row) {
+                    legends.push(row[0])
+                    legendsFilter[row[0]] = true
+                    rowvalue = [] //reset
+                    cellId = [] //reset
+                    for (let i = 1; i < row.length; i++) {
+                        rowvalue.push(row[i])
+                        cellId.push(cid++)
+                    }
+                    cellIds.push(...cellId)
+                    rowvalues.push(...rowvalue)
+                })
+                const labelsFilter: { [key: string]: boolean } = {}
+                tableheader.forEach(function (item) {
+                    labelsFilter[item] = true
+                })
+                achartdata = {
+                    id: '_' + scope.$id,
+                    labels: tableheader,
+                    legends: legends, //row headers
+                    colors: udcolors,
+                    values: rowvalues, //table body without row headers
+                    valueIds: cellIds,
+                    legendsFilter: legendsFilter,
+                    labelsFilter: labelsFilter,
+                }
+                createGroupedHorizontalBarChart(achartdata)
+                createFilters(achartdata)
+            })
         } //end of render
         scope.$watch(
             'valuesO',

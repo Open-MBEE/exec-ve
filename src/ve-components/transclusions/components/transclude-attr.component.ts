@@ -17,10 +17,7 @@ import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 
-export class TranscludeAttrController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeAttrController extends Transclusion implements ITransclusion {
     protected template: string = `
 
 `
@@ -82,23 +79,17 @@ export class TranscludeAttrController
                 refId: this.element._refId,
                 commitId: 'latest',
             }
-            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-                'element.selected',
-                data
-            )
+            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
         })
     }
 
-    public getContent = (
-        preview?
-    ): VePromise<string | HTMLElement[], string> => {
+    public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string>()
         let contentTemplate: string
         const ids: string[] = []
         if (
             this.element[this.mmsAttr] ||
-            (Array.isArray(this.element[this.mmsAttr]) &&
-                (this.element[this.mmsAttr] as Array<unknown>).length > 0)
+            (Array.isArray(this.element[this.mmsAttr]) && (this.element[this.mmsAttr] as Array<unknown>).length > 0)
         ) {
             //Grab id reference to an array for CF
             if (this.mmsAttr.endsWith('Id')) {
@@ -110,14 +101,12 @@ export class TranscludeAttrController
             }
             // Convert List of elements to strings
             else if (Array.isArray(this.element[this.mmsAttr])) {
-                ;(this.element[this.mmsAttr] as Array<unknown>).forEach(
-                    (value) => {
-                        if (typeof this.element[this.mmsAttr] === 'object') {
-                            value = JSON.stringify(value)
-                        }
-                        this.attrValues.push(`<span>${value.toString()}</span>`)
+                ;(this.element[this.mmsAttr] as Array<unknown>).forEach((value) => {
+                    if (typeof this.element[this.mmsAttr] === 'object') {
+                        value = JSON.stringify(value)
                     }
-                )
+                    this.attrValues.push(`<span>${value.toString()}</span>`)
+                })
             } else {
                 let value: string
                 if (typeof this.element[this.mmsAttr] === 'object') {
@@ -138,9 +127,7 @@ export class TranscludeAttrController
                 })
             }
         } else {
-            this.attrValues.push(
-                `<span class="no-print placeholder">(empty)</span>`
-            )
+            this.attrValues.push(`<span class="no-print placeholder">(empty)</span>`)
         }
         if (this.mmsCfLabel) {
             contentTemplate = `<h2 class="prop-title">{{$ctrl.mmsAttr}}</h2>`
@@ -177,7 +164,4 @@ export const TranscludeNameComponent: VeComponentOptions = {
     controller: TranscludeAttrController,
 }
 
-veComponents.component(
-    TranscludeNameComponent.selector,
-    TranscludeNameComponent
-)
+veComponents.component(TranscludeNameComponent.selector, TranscludeNameComponent)

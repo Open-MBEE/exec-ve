@@ -5,21 +5,11 @@ import { InsertTransclusionData } from '@ve-components/transclusions'
 import { MentionService } from '@ve-core/editor'
 import { EditorService } from '@ve-core/editor/services/Editor.service'
 import { ImageService } from '@ve-utils/application'
-import {
-    ApiService,
-    CacheService,
-    ElementService,
-    URLService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, CacheService, ElementService, URLService, ViewService } from '@ve-utils/mms-api-client'
 
 import { veCore } from '@ve-core'
 
-import {
-    VeComponentOptions,
-    VeNgModelController,
-    VeQService,
-} from '@ve-types/angular'
+import { VeComponentOptions, VeNgModelController, VeQService } from '@ve-types/angular'
 import { InsertData, InsertResolveFn } from '@ve-types/components'
 import { VeConfig } from '@ve-types/config'
 import { EditingApi } from '@ve-types/core/editor'
@@ -249,9 +239,7 @@ export class EditorController implements angular.IComponentController {
             () => {
                 // Initialize ckeditor and set event handlers
                 this.$element.empty()
-                this.$transcludeEl = $(
-                    '<textarea id="' + this.id + '"></textarea>'
-                )
+                this.$transcludeEl = $('<textarea id="' + this.id + '"></textarea>')
                 this.$transcludeEl.val(this.ngModelCtrl.$modelValue)
 
                 this.$element.append(this.$transcludeEl)
@@ -291,41 +279,22 @@ export class EditorController implements angular.IComponentController {
                                 // Adds the token to img's in the editor environment to allow images to be displayed while editor
                                 $: (element: CKEDITOR.htmlParser.element) => {
                                     element
-                                        .find(
-                                            (
-                                                el: CKEDITOR.htmlParser.element
-                                            ) => {
-                                                return (
-                                                    el.name == 'img' &&
-                                                    el.attributes[
-                                                        'data-cke-saved-src'
-                                                    ] &&
-                                                    (el.attributes[
-                                                        'data-cke-saved-src'
-                                                    ].indexOf(
-                                                        this.veConfig.apiUrl
-                                                    ) > -1 ||
-                                                        el.attributes[
-                                                            'data-cke-saved-src'
-                                                        ].indexOf('http') < 0)
-                                                )
-                                            },
-                                            true
-                                        )
-                                        .forEach(
-                                            (
-                                                el: CKEDITOR.htmlParser.element
-                                            ) => {
-                                                el.attributes['src'] =
-                                                    this.imageSvc.fixImgUrl(
-                                                        el.attributes[
-                                                            'data-cke-saved-src'
-                                                        ],
-                                                        true
-                                                    )
-                                                // el.attributes['src'] = el.attributes['data-cke-saved-src'];
-                                            }
-                                        )
+                                        .find((el: CKEDITOR.htmlParser.element) => {
+                                            return (
+                                                el.name == 'img' &&
+                                                el.attributes['data-cke-saved-src'] &&
+                                                (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) >
+                                                    -1 ||
+                                                    el.attributes['data-cke-saved-src'].indexOf('http') < 0)
+                                            )
+                                        }, true)
+                                        .forEach((el: CKEDITOR.htmlParser.element) => {
+                                            el.attributes['src'] = this.imageSvc.fixImgUrl(
+                                                el.attributes['data-cke-saved-src'],
+                                                true
+                                            )
+                                            // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                                        })
                                 },
                             },
                         })
@@ -344,58 +313,34 @@ export class EditorController implements angular.IComponentController {
                                     .find((el: CKEDITOR.htmlParser.element) => {
                                         return (
                                             el.name == 'img' &&
-                                            el.attributes[
-                                                'data-cke-saved-src'
-                                            ] &&
-                                            el.attributes[
-                                                'data-cke-saved-src'
-                                            ].indexOf(this.veConfig.apiUrl) > -1
+                                            el.attributes['data-cke-saved-src'] &&
+                                            el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
                                         )
                                     }, true)
-                                    .forEach(
-                                        (el: CKEDITOR.htmlParser.element) => {
-                                            el.attributes[
-                                                'data-cke-saved-src'
-                                            ] = this.imageSvc.fixImgUrl(
-                                                el.attributes[
-                                                    'data-cke-saved-src'
-                                                ],
-                                                false
-                                            )
-                                            // el.attributes['src'] = el.attributes['data-cke-saved-src'];
-                                        }
-                                    )
+                                    .forEach((el: CKEDITOR.htmlParser.element) => {
+                                        el.attributes['data-cke-saved-src'] = this.imageSvc.fixImgUrl(
+                                            el.attributes['data-cke-saved-src'],
+                                            false
+                                        )
+                                        // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                                    })
                             },
                         },
                     })
                 })
 
-                const highlightActiveEditor = (
-                    instance: CKEDITOR.editor
-                ): void => {
+                const highlightActiveEditor = (instance: CKEDITOR.editor): void => {
                     const activeEditorClass = 'actieditor'
-                    $('transclude-doc')
-                        .children('div')
-                        .removeClass(activeEditorClass)
-                    $(instance.element.$)
-                        .closest('transclude-doc')
-                        .children('div')
-                        .addClass(activeEditorClass)
+                    $('transclude-doc').children('div').removeClass(activeEditorClass)
+                    $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
 
                     instance.on('focus', () => {
-                        $('transclude-doc')
-                            .children('div')
-                            .removeClass(activeEditorClass)
-                        $(instance.element.$)
-                            .closest('transclude-doc')
-                            .children('div')
-                            .addClass(activeEditorClass)
+                        $('transclude-doc').children('div').removeClass(activeEditorClass)
+                        $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
                     })
                 }
 
-                const addCkeditorHtmlFilterRule = (
-                    instance: CKEDITOR.editor
-                ): void => {
+                const addCkeditorHtmlFilterRule = (instance: CKEDITOR.editor): void => {
                     instance.dataProcessor.htmlFilter.addRules({
                         elements: {
                             $: (element: CKEDITOR.htmlParser.element) => {
@@ -412,10 +357,8 @@ export class EditorController implements angular.IComponentController {
                                     if (
                                         element.name !== 'view-link' &&
                                         element.name !== 'transclusion' &&
-                                        element.name !==
-                                            'transclude-group-docs' &&
-                                        element.name !==
-                                            'transclude-diff-attr' &&
+                                        element.name !== 'transclude-group-docs' &&
+                                        element.name !== 'transclude-diff-attr' &&
                                         element.name !== 'transclude-value-link'
                                     ) {
                                         element.replaceWithChildren()
@@ -423,9 +366,7 @@ export class EditorController implements angular.IComponentController {
                                     }
                                 }
 
-                                const attributesToDelete = Object.keys(
-                                    element.attributes
-                                ).filter((attrKey) => {
+                                const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
                                     return attrKey.startsWith('ng-')
                                 })
                                 attributesToDelete.forEach((attrToDelete) => {
@@ -449,10 +390,8 @@ export class EditorController implements angular.IComponentController {
                                 ) {
                                     if (
                                         element.name !== 'view-link' &&
-                                        element.name !==
-                                            'transclude-group-docs' &&
-                                        element.name !==
-                                            'transclude-diff-merge-attr' &&
+                                        element.name !== 'transclude-group-docs' &&
+                                        element.name !== 'transclude-diff-merge-attr' &&
                                         element.name !== 'mms-value-link'
                                     ) {
                                         element.replaceWithChildren()
@@ -460,9 +399,7 @@ export class EditorController implements angular.IComponentController {
                                     }
                                 }
 
-                                const attributesToDelete = Object.keys(
-                                    element.attributes
-                                ).filter((attrKey) => {
+                                const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
                                     return attrKey.startsWith('ng-')
                                 })
                                 attributesToDelete.forEach((attrToDelete) => {
@@ -492,16 +429,13 @@ export class EditorController implements angular.IComponentController {
                     this.mmsEditorApi.save = (): angular.IPromise<boolean> => {
                         return this.update()
                     }
-                    this.mmsEditorApi.cancel =
-                        (): angular.IPromise<boolean> => {
-                            return this.update()
-                        }
+                    this.mmsEditorApi.cancel = (): angular.IPromise<boolean> => {
+                        return this.update()
+                    }
                 }
                 this.instance.on(
                     'fileUploadRequest',
-                    (
-                        evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>
-                    ) => {
+                    (evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
                         const fileLoader = evt.data.fileLoader
                         const formData = new FormData()
                         const xhr = fileLoader.xhr
@@ -511,22 +445,13 @@ export class EditorController implements angular.IComponentController {
                             this.uRLSvc.getPutArtifactsURL({
                                 projectId: this.mmsProjectId,
                                 refId: this.mmsRefId,
-                                elementId: this.apiSvc
-                                    .createUniqueId()
-                                    .replace('MMS', 'VE'),
+                                elementId: this.apiSvc.createUniqueId().replace('MMS', 'VE'),
                             }),
                             true
                         )
                         //xhr.withCredentials = true;
-                        xhr.setRequestHeader(
-                            'Authorization',
-                            this.uRLSvc.getAuthorizationHeaderValue()
-                        )
-                        formData.append(
-                            'file',
-                            fileLoader.file,
-                            fileLoader.fileName
-                        )
+                        xhr.setRequestHeader('Authorization', this.uRLSvc.getAuthorizationHeaderValue())
+                        formData.append('file', fileLoader.file, fileLoader.fileName)
                         if (fileLoader.fileName) {
                             formData.append('name', fileLoader.fileName)
                         }
@@ -539,19 +464,16 @@ export class EditorController implements angular.IComponentController {
                 )
                 this.instance.on(
                     'fileUploadResponse',
-                    (
-                        evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>
-                    ) => {
+                    (evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
                         // Prevent the default response handler.
                         evt.stop()
 
                         // Get XHR and response.
                         const data = evt.data
                         const xhr = data.fileLoader.xhr
-                        const response: ElementsResponse<ElementObject> =
-                            JSON.parse(
-                                xhr.response as string
-                            ) as ElementsResponse<ElementObject>
+                        const response: ElementsResponse<ElementObject> = JSON.parse(
+                            xhr.response as string
+                        ) as ElementsResponse<ElementObject>
 
                         if (
                             !response.elements ||
@@ -569,8 +491,7 @@ export class EditorController implements angular.IComponentController {
                                 projectId: element._projectId,
                                 refId: element._refId,
                                 elementId: element.id,
-                                artifactExtension:
-                                    element._artifacts[0].extension,
+                                artifactExtension: element._artifacts[0].extension,
                             })
                         }
                     }
@@ -599,9 +520,7 @@ export class EditorController implements angular.IComponentController {
     }
 
     public transcludeCallback = (ed: CKEDITOR.editor): void => {
-        const tSettings: VeModalSettings<
-            InsertResolveFn<InsertTransclusionData>
-        > = {
+        const tSettings: VeModalSettings<InsertResolveFn<InsertTransclusionData>> = {
             component: 'transcludeModal',
             resolve: {
                 getInsertData: (): InsertTransclusionData => {
@@ -623,17 +542,13 @@ export class EditorController implements angular.IComponentController {
             },
             size: 'lg',
         }
-        const tInstance = this.$uibModal.open<
-            InsertResolveFn<InsertTransclusionData>,
-            string
-        >(tSettings)
+        const tInstance = this.$uibModal.open<InsertResolveFn<InsertTransclusionData>, string>(tSettings)
         tInstance.result.then(
             (result) => {
                 this._addWidgetTag(ed, result)
             },
             () => {
-                const focusManager: CKEDITOR.focusManager =
-                    new this.ckEditor.focusManager(ed)
+                const focusManager: CKEDITOR.focusManager = new this.ckEditor.focusManager(ed)
                 focusManager.focus()
             }
         )
@@ -645,9 +560,7 @@ export class EditorController implements angular.IComponentController {
     // Also defines options for search interfaces -- see mmsSearch.js for more info
 
     public viewLinkCallback = (ed: CKEDITOR.editor): void => {
-        const tSettings: VeModalSettings<
-            InsertResolveFn<InsertTransclusionData>
-        > = {
+        const tSettings: VeModalSettings<InsertResolveFn<InsertTransclusionData>> = {
             component: 'transcludeModal',
             resolve: {
                 getInsertData: (): InsertTransclusionData => {
@@ -669,17 +582,13 @@ export class EditorController implements angular.IComponentController {
             },
             size: 'lg',
         }
-        const tInstance = this.$uibModal.open<
-            InsertResolveFn<InsertTransclusionData>,
-            string
-        >(tSettings)
+        const tInstance = this.$uibModal.open<InsertResolveFn<InsertTransclusionData>, string>(tSettings)
         tInstance.result.then(
             (result) => {
                 this._addWidgetTag(ed, result)
             },
             () => {
-                const focusManager: CKEDITOR.focusManager =
-                    new this.ckEditor.focusManager(ed)
+                const focusManager: CKEDITOR.focusManager = new this.ckEditor.focusManager(ed)
                 focusManager.focus()
             }
         )
@@ -706,10 +615,7 @@ export class EditorController implements angular.IComponentController {
                 },
             },
         }
-        const cInstance = this.$uibModal.open<
-            InsertResolveFn<InsertData>,
-            ElementObject
-        >(cSettings)
+        const cInstance = this.$uibModal.open<InsertResolveFn<InsertData>, ElementObject>(cSettings)
 
         cInstance.result.then(
             (data) => {
@@ -727,10 +633,7 @@ export class EditorController implements angular.IComponentController {
         )
     }
 
-    public resetCrossRef = (
-        type: CKEDITOR.dom.node<Node>[],
-        typeString: string
-    ): void => {
+    public resetCrossRef = (type: CKEDITOR.dom.node<Node>[], typeString: string): void => {
         type.forEach((node, key) => {
             const value = node.$
             const transclusionObject = angular.element(value)
@@ -743,8 +646,7 @@ export class EditorController implements angular.IComponentController {
                 transclusionId,
                 false
             )
-            const inCache: ElementObject =
-                this.cacheSvc.get<ElementObject>(transclusionKey)
+            const inCache: ElementObject = this.cacheSvc.get<ElementObject>(transclusionKey)
             if (inCache) {
                 transclusionObject.html(`[cf:${inCache.name}${typeString}`)
             } else {
@@ -771,18 +673,9 @@ export class EditorController implements angular.IComponentController {
 
     public mmsResetCallback = (ed: CKEDITOR.editor): void => {
         const body: CKEDITOR.dom.element = ed.document.getBody()
-        this.resetCrossRef(
-            body.find("view-cf[mms-cf-type='name']").toArray(),
-            '.name]'
-        )
-        this.resetCrossRef(
-            body.find("view-cf[mms-cf-type='doc']").toArray(),
-            '.doc]'
-        )
-        this.resetCrossRef(
-            body.find("view-cf[mms-cf-type='val']").toArray(),
-            '.val]'
-        )
+        this.resetCrossRef(body.find("view-cf[mms-cf-type='name']").toArray(), '.name]')
+        this.resetCrossRef(body.find("view-cf[mms-cf-type='doc']").toArray(), '.doc]')
+        this.resetCrossRef(body.find("view-cf[mms-cf-type='val']").toArray(), '.val]')
         this.resetCrossRef(body.find('view-link').toArray(), '.vlink]')
         this.update().then(
             () => {
@@ -796,8 +689,7 @@ export class EditorController implements angular.IComponentController {
 
     public update = (): angular.IPromise<boolean> => {
         // getData() returns CKEditor's processed/clean HTML content.
-        if (this.instance)
-            this.ngModelCtrl.$setViewValue(this.instance.getData())
+        if (this.instance) this.ngModelCtrl.$setViewValue(this.instance.getData())
         return this.$q.resolve<boolean>(true)
     }
 
@@ -809,25 +701,12 @@ export class EditorController implements angular.IComponentController {
     private _addInlineMention = (): void => {
         let keyupHandler: CKEDITOR.listenerRegistration
         this.ckEditor.instances[this.id].on('contentDom', () => {
-            keyupHandler = this.ckEditor.instances[
-                this.instance.name
-            ].document.on('keyup', (e) => {
-                if (
-                    this._isMentionKey(
-                        (e.data as CKEDITOR.dom.node<KeyboardEvent>).$
-                    )
-                ) {
-                    this.mentionSvc.createMention(
-                        this.instance,
-                        this.$scope.$new(),
-                        this.mmsProjectId,
-                        this.mmsRefId
-                    )
+            keyupHandler = this.ckEditor.instances[this.instance.name].document.on('keyup', (e) => {
+                if (this._isMentionKey((e.data as CKEDITOR.dom.node<KeyboardEvent>).$)) {
+                    this.mentionSvc.createMention(this.instance, this.$scope.$new(), this.mmsProjectId, this.mmsRefId)
                 } else {
                     this.mentionSvc.handleInput(
-                        e as CKEDITOR.eventInfo<
-                            CKEDITOR.dom.event<KeyboardEvent>
-                        >,
+                        e as CKEDITOR.eventInfo<CKEDITOR.dom.event<KeyboardEvent>>,
                         this.$scope.$new(),
                         this.instance,
                         this.mmsProjectId,
@@ -844,18 +723,14 @@ export class EditorController implements angular.IComponentController {
         })
     }
 
-    private _keyHandler = (
-        e: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>
-    ): boolean => {
+    private _keyHandler = (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>): boolean => {
         if (this._isMentionKey(e.data.domEvent.$)) {
             return false // to prevent "@" from getting written to the editor
         }
 
         // when tab is pressed or any of these special keys is pressed while the mention results show up, ignore default ckeditor's behaviour
         const ignoreDefaultBehaviour =
-            this._isTabKey(e) ||
-            (this._isSpecialKey(e) &&
-                this.mentionSvc.hasMentionResults(this.instance))
+            this._isTabKey(e) || (this._isSpecialKey(e) && this.mentionSvc.hasMentionResults(this.instance))
         if (ignoreDefaultBehaviour) {
             e.cancel()
             e.stop()
@@ -872,16 +747,12 @@ export class EditorController implements angular.IComponentController {
     }
 
     // 13 = enter, 38 = up arrow, 40 = down arrow
-    private _isSpecialKey = (
-        event: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>
-    ): boolean => {
+    private _isSpecialKey = (event: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>): boolean => {
         const key = event.data.domEvent.$.which
         return key === 13 || key === 38 || key === 40
     }
 
-    private _isTabKey = (
-        event: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>
-    ): boolean => {
+    private _isTabKey = (event: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>): boolean => {
         return event.data.domEvent.$.which === 9
     }
 

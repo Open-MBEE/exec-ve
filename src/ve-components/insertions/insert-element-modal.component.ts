@@ -5,25 +5,10 @@ import { veComponents } from '@ve-components'
 
 import { InsertApi, InsertData, InsertResolve } from '@ve-types/components'
 import { ElementObject, MmsObject } from '@ve-types/mms'
-import {
-    VeModalComponent,
-    VeModalController,
-    VeModalService,
-} from '@ve-types/view-editor'
+import { VeModalComponent, VeModalController, VeModalService } from '@ve-types/view-editor'
 
-class InsertController
-    extends VeModalControllerImpl<MmsObject>
-    implements VeModalController
-{
-    static $inject = [
-        '$scope',
-        '$compile',
-        '$element',
-        '$timeout',
-        '$uibModal',
-        'growl',
-        'ExtensionService',
-    ]
+class InsertController extends VeModalControllerImpl<MmsObject> implements VeModalController {
+    static $inject = ['$scope', '$compile', '$element', '$timeout', '$uibModal', 'growl', 'ExtensionService']
 
     private schema = 'cameo'
 
@@ -85,9 +70,9 @@ class InsertController
         const newPe = $('<div></div>')
         $(newPe).append(
             `<${tag} insert-data="$ctrl.InsertData" insert-api="$ctrl.InsertApi" 
-                mms-project-id="{{$ctrl.projectId}}" ${
-                    this.refId ? `mms-ref-id="{{$ctrl.refId}}" ` : ''
-                }${this.orgId ? 'mms-org-id="{{$ctrl.orgId}}" ' : ''}></${tag}>`
+                mms-project-id="{{$ctrl.projectId}}" ${this.refId ? `mms-ref-id="{{$ctrl.refId}}" ` : ''}${
+                this.orgId ? 'mms-org-id="{{$ctrl.orgId}}" ' : ''
+            }></${tag}>`
         )
         $(this.$element).append(newPe)
         this.$compile(newPe)(this.$scope)
@@ -115,7 +100,4 @@ const InsertElementModalComponent: VeModalComponent = {
     controller: InsertController,
 }
 
-veComponents.component(
-    InsertElementModalComponent.selector,
-    InsertElementModalComponent
-)
+veComponents.component(InsertElementModalComponent.selector, InsertElementModalComponent)

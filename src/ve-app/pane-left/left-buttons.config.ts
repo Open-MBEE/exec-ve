@@ -96,12 +96,7 @@ export const left_default_buttons: IButtonBarButton[] = [
         dropdown: {
             icon: '',
             toggle_icon: '',
-            ids: [
-                'tree-add.group',
-                'tree-add.document',
-                'tree-add.view',
-                'tree-add.tag',
-            ],
+            ids: ['tree-add.group', 'tree-add.document', 'tree-add.view', 'tree-add.tag'],
         },
     },
     {

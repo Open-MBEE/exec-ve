@@ -10,28 +10,15 @@ import { ElementObject, ViewObject } from '@ve-types/mms'
 export class TransclusionService {
     static $inject = ['ApplicationService', 'ViewService']
 
-    constructor(
-        private applicationSvc: ApplicationService,
-        private viewSvc: ViewService
-    ) {}
+    constructor(private applicationSvc: ApplicationService, private viewSvc: ViewService) {}
 
-    public createTransclusion = (
-        element: ElementObject,
-        cfType: string,
-        nonEditable?: boolean
-    ): string => {
-        return `<view-cf mms-cf-type="${cfType}" mms-element-id="${
-            element.id
-        }"${nonEditable ? ' non-editable="true">' : '>'}[cf:${
-            element.name
-        }.${cfType}]</view-cf>`
+    public createTransclusion = (element: ElementObject, cfType: string, nonEditable?: boolean): string => {
+        return `<view-cf mms-cf-type="${cfType}" mms-element-id="${element.id}"${
+            nonEditable ? ' non-editable="true">' : '>'
+        }[cf:${element.name}.${cfType}]</view-cf>`
     }
 
-    public createViewLink = (
-        elem: ViewObject,
-        linkType: number,
-        linkText?: string
-    ): string => {
+    public createViewLink = (elem: ViewObject, linkType: number, linkText?: string): string => {
         let did: string
         let vid: string
         let peid: string

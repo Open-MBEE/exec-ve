@@ -1,10 +1,7 @@
 import { StateService } from '@uirouter/angularjs'
 import angular from 'angular'
 
-import {
-    PrintConfirmResult,
-    PrintModalResolveFn,
-} from '@ve-app/main/modals/print-confirm-modal.component'
+import { PrintConfirmResult, PrintModalResolveFn } from '@ve-app/main/modals/print-confirm-modal.component'
 import { TableExportModalResolveFn } from '@ve-app/main/modals/table-export-modal.component'
 import { TreeService } from '@ve-components/trees'
 import { UtilsService } from '@ve-utils/application'
@@ -65,10 +62,7 @@ export class AppUtilsService implements angular.Injectable<any> {
 
     public tableToCsv = (tables: JQLite, isDoc: boolean): void => {
         //Export to CSV button Pop-up Generated Here
-        const modalInstance = this.$uibModal.open<
-            TableExportModalResolveFn,
-            string
-        >({
+        const modalInstance = this.$uibModal.open<TableExportModalResolveFn, string>({
             component: 'tableExportModal',
             resolve: {
                 type: () => {
@@ -112,55 +106,41 @@ if (window.navigator.msSaveOrOpenBlob) {
             if (data === 'export') {
                 const tableCSV: { caption: string; val: string }[] = []
                 // Grab all tables and run export to csv fnc
-                tables
-                    .find('table')
-                    .each((index: number, elt: HTMLTableElement) => {
-                        const tableObj = {
-                            caption: 'no caption',
-                            val: angular
-                                .element(elt)
-                                .table2CSV({ delivery: 'value' }),
-                        }
-                        if (elt.caption) {
-                            tableObj.caption = elt.caption.innerHTML
-                        }
-                        tableCSV.push(tableObj)
-                    })
+                tables.find('table').each((index: number, elt: HTMLTableElement) => {
+                    const tableObj = {
+                        caption: 'no caption',
+                        val: angular.element(elt).table2CSV({ delivery: 'value' }),
+                    }
+                    if (elt.caption) {
+                        tableObj.caption = elt.caption.innerHTML
+                    }
+                    tableCSV.push(tableObj)
+                })
                 const exportPopup = (data: string): void => {
-                    const generator = window.open(
-                        '',
-                        'csv',
-                        'height=600,width=800,scrollbars=1'
-                    )
+                    const generator = window.open('', 'csv', 'height=600,width=800,scrollbars=1')
                     if (generator) {
-                        generator.document.write(
-                            '<html><head><title>Tables to CSV</title>'
-                        )
+                        generator.document.write('<html><head><title>Tables to CSV</title>')
                         generator.document.write('</head><body >')
                         generator.document.write(data)
                         generator.document.write('</body></html>')
                         generator.document.close()
                     } else {
-                        this.growl.error(
-                            'Popup Window Failed to open. Allow popups and try again'
-                        )
+                        this.growl.error('Popup Window Failed to open. Allow popups and try again')
                     }
                     //return true
                 }
                 // generate text area content for popup
                 let genTextArea = ''
                 let num = 0
-                tableCSV.forEach(
-                    (element: { caption: string; val: string }) => {
-                        genTextArea = `
+                tableCSV.forEach((element: { caption: string; val: string }) => {
+                    genTextArea = `
     <h2>${element.caption}</h2>
 <div><button class="btn btn-sm btn-primary" onclick="doClick('textArea${num}')">
 Save CSV</button></div>
 <textArea cols=100 rows=15 wrap="off" id="textArea${num}">${element.val}</textArea>
 `
-                        num++
-                    }
-                )
+                    num++
+                })
                 genTextArea += string
                 exportPopup(genTextArea)
             }
@@ -210,10 +190,7 @@ Save CSV</button></div>
             backdrop: 'static',
             keyboard: false,
         }
-        const modalInstance = this.$uibModal.open<
-            PrintModalResolveFn,
-            PrintConfirmResult
-        >(settings)
+        const modalInstance = this.$uibModal.open<PrintModalResolveFn, PrintConfirmResult>(settings)
         /* choice:
             ['ok', $scope.model.genTotf, $scope.model.htmlTotf, $scope.model.landscape, $scope.meta]
             [0] 'ok' - modal button to confirm print/export
@@ -235,11 +212,7 @@ Save CSV</button></div>
                 )
                 const css = choice.customization
                     ? choice.customCSS
-                    : this.utilsSvc.getPrintCss(
-                          choice.model.htmlTotf,
-                          choice.model.landscape,
-                          choice.meta
-                      )
+                    : this.utilsSvc.getPrintCss(choice.model.htmlTotf, choice.model.landscape, choice.meta)
                 result.toe = choice[2] ? '' : result.toe
                 if (mode === 1) {
                     const popupWin = this.$window.open(
@@ -275,17 +248,13 @@ Save CSV</button></div>
                             false
                         )
                     } else {
-                        this.growl.error(
-                            'Popup Window Failed to open. Allow popups and try again'
-                        )
+                        this.growl.error('Popup Window Failed to open. Allow popups and try again')
                     }
                 } else {
                     result.tof = choice[1] ? result.tof + result.toe : ''
                     result.tot = choice[1] ? result.tot : ''
                     const htmlArr = [
-                        '<html><head><title>' +
-                            viewOrDocOb.name +
-                            '</title><style type="text/css">',
+                        '<html><head><title>' + viewOrDocOb.name + '</title><style type="text/css">',
                         css,
                         '</style></head><body>',
                         result.cover,
@@ -365,14 +334,9 @@ Save CSV</button></div>
         const port = this.$location.port()
         const protocol = this.$location.protocol()
         const absurl = this.$location.absUrl()
-        const prefix =
-            protocol +
-            ':// hostname' +
-            (port == 80 || port == 443 ? '' : `:${port}`)
+        const prefix = protocol + ':// hostname' + (port == 80 || port == 443 ? '' : `:${port}`)
         const mmsIndex = absurl.indexOf('index.html')
-        let toc = this.utilsSvc.makeHtmlTOC(
-            this.treeSvc.getTreeRows('treeOfContents')[0].branch
-        )
+        let toc = this.utilsSvc.makeHtmlTOC(this.treeSvc.getTreeRows('treeOfContents')[0].branch)
 
         // Conver to proper links for word/pdf
         this.utilsSvc.convertViewLinks(printElementCopy)
@@ -401,12 +365,9 @@ Save CSV</button></div>
             .attr('href', (index, old) => {
                 if (!old) return old
                 if (old.indexOf('/') === 0) return prefix + old
-                if (old.indexOf('../../') === 0)
-                    return prefix + old.substring(5)
-                if (old.indexOf('../') === 0)
-                    return prefix + '/alfresco' + old.substring(2)
-                if (old.indexOf('mms.html') === 0)
-                    return absurl.substring(0, mmsIndex) + old
+                if (old.indexOf('../../') === 0) return prefix + old.substring(5)
+                if (old.indexOf('../') === 0) return prefix + '/alfresco' + old.substring(2)
+                if (old.indexOf('mms.html') === 0) return absurl.substring(0, mmsIndex) + old
                 return old
             })
 
@@ -432,11 +393,7 @@ Save CSV</button></div>
                 $this.remove()
             }
         })
-        printElementCopy
-            .find('[width]')
-            .not('img')
-            .not('.ve-fixed-width')
-            .removeAttr('width')
+        printElementCopy.find('[width]').not('img').not('.ve-fixed-width').removeAttr('width')
         printElementCopy
             .find('[style]')
             .not('hr')
@@ -456,9 +413,7 @@ Save CSV</button></div>
         // Get doc cover page by doc ID
         let coverHtml = ''
         if (isDoc) {
-            const cover = printElementCopy.find(
-                "view[mms-element-id='" + viewOrDocOb.id + "']"
-            )
+            const cover = printElementCopy.find("view[mms-element-id='" + viewOrDocOb.id + "']")
             cover.remove()
             // Add class to style cover page
             cover.addClass('ve-cover-page')
@@ -477,9 +432,7 @@ Save CSV</button></div>
     }
 
     /** Store all tomsawyer diagram(canvas) as an img element **/
-    private _storeTomsawyerDiagramAsImg(
-        originalDom: JQuery<HTMLElement>
-    ): JQuery<HTMLElement>[] {
+    private _storeTomsawyerDiagramAsImg(originalDom: JQuery<HTMLElement>): JQuery<HTMLElement>[] {
         const mapping: JQuery<HTMLElement>[] = []
         originalDom.find('mms-ts-diagram').each((index, element) => {
             const tsDom = $(element)
@@ -494,10 +447,7 @@ Save CSV</button></div>
     }
 
     /** Replace all mms-ts-diagram elements with their corresponding img elements **/
-    private _replaceMmsTsDiagramWithImg(
-        element: JQuery<HTMLElement>,
-        mapping: JQuery<HTMLElement>[]
-    ): void {
+    private _replaceMmsTsDiagramWithImg(element: JQuery<HTMLElement>, mapping: JQuery<HTMLElement>[]): void {
         element.find('mms-ts-diagram').each((index) => {
             const imgDom = mapping[index]
             $(this).replaceWith(imgDom)

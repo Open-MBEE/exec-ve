@@ -1,10 +1,6 @@
 import _ from 'lodash'
 
-import {
-    Diff,
-    IDiff,
-    IDiffComponentOptions,
-} from '@ve-components/diffs/diff.controller'
+import { Diff, IDiff, IDiffComponentOptions } from '@ve-components/diffs/diff.controller'
 import { ViewController } from '@ve-components/presentations'
 import { ExtensionService } from '@ve-components/services'
 import { ElementService } from '@ve-utils/mms-api-client'
@@ -65,13 +61,7 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
     comparedElementHtml: string
     message: string
 
-    static $inject = [
-        ...Diff.$inject,
-        'ElementService',
-        'ExtensionService',
-        '$compile',
-        '$q',
-    ]
+    static $inject = [...Diff.$inject, 'ElementService', 'ExtensionService', '$compile', '$q']
 
     constructor(
         $scope: angular.IScope,
@@ -86,9 +76,7 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
     }
 
     $onInit(): void {
-        this.viewOrigin = this.mmsViewCtrl
-            ? this.mmsViewCtrl.getElementOrigin()
-            : null
+        this.viewOrigin = this.mmsViewCtrl ? this.mmsViewCtrl.getElementOrigin() : null
     }
 
     $postLink(): void {
@@ -106,36 +94,24 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
     }
 
     protected performDiff = (): void => {
-        if (
-            this.attr &&
-            this.extensionSvc.getTagByType('transclude', this.attr) !==
-                'extension-error'
-        ) {
+        if (this.attr && this.extensionSvc.getTagByType('transclude', this.attr) !== 'extension-error') {
             this.getDiff().then(
                 (responses: angular.PromiseValue<ElementObject>[]) => {
                     const respForBaseElement = responses[0]
                     if (respForBaseElement.state === 'fulfilled') {
                         this._fullyRender(respForBaseElement.value).then(
                             (baseElementHtml) => {
-                                this.baseElementHtml = $(baseElementHtml)
-                                    .children()
-                                    .html()
+                                this.baseElementHtml = $(baseElementHtml).children().html()
                             },
                             (reason) => {
-                                this.growl.error(
-                                    `Error getting Diff: ${reason.message}`
-                                )
+                                this.growl.error(`Error getting Diff: ${reason.message}`)
                             }
                         )
                     } else {
                         if (
                             respForBaseElement.reason &&
-                            (
-                                respForBaseElement.reason as VePromiseReason<ElementObject>
-                            ).message &&
-                            (
-                                respForBaseElement.reason as VePromiseReason<ElementObject>
-                            ).message
+                            (respForBaseElement.reason as VePromiseReason<ElementObject>).message &&
+                            (respForBaseElement.reason as VePromiseReason<ElementObject>).message
                                 .toLowerCase()
                                 .includes('deleted')
                         ) {
@@ -150,11 +126,7 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
                     if (respForComparedElement.state === 'fulfilled') {
                         this._fullyRender(respForComparedElement.value).then(
                             (comparedElementHtml) => {
-                                this.comparedElementHtml = $(
-                                    comparedElementHtml
-                                )
-                                    .children()
-                                    .html()
+                                this.comparedElementHtml = $(comparedElementHtml).children().html()
                             },
                             () => {
                                 this.growl.error('Problem Rendering Diff')
@@ -163,12 +135,8 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
                     } else {
                         if (
                             respForComparedElement.reason &&
-                            (
-                                respForComparedElement.reason as VePromiseReason<ElementObject>
-                            ).message &&
-                            (
-                                respForComparedElement.reason as VePromiseReason<ElementObject>
-                            ).message
+                            (respForComparedElement.reason as VePromiseReason<ElementObject>).message &&
+                            (respForComparedElement.reason as VePromiseReason<ElementObject>).message
                                 .toLowerCase()
                                 .includes('deleted')
                         ) {
@@ -192,13 +160,10 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
     public getDiff = (): VePromise<angular.PromiseValue<ElementObject>[]> => {
         this.diffLoading = true
 
-        const baseProjectId =
-            this.projectId ||
-            (this.viewOrigin ? this.viewOrigin.projectId : null)
+        const baseProjectId = this.projectId || (this.viewOrigin ? this.viewOrigin.projectId : null)
         const compareProjectId = this.compareProjectId || baseProjectId
 
-        const baseRefId =
-            this.refId || (this.viewOrigin ? this.viewOrigin.refId : 'master')
+        const baseRefId = this.refId || (this.viewOrigin ? this.viewOrigin.refId : 'master')
         const compareRefId = this.compareRefId || baseRefId
 
         const baseCommitId = this.commitId || 'latest'
@@ -233,13 +198,10 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
         reqOb: ElementsRequest<string>,
         callback: () => void
     ): JQuery<HTMLElement> => {
-        const ignoreMathjaxAutoFormatting =
-            type === 'doc' || type === 'val' || type === 'com'
+        const ignoreMathjaxAutoFormatting = type === 'doc' || type === 'val' || type === 'com'
         const html =
             '<view-cf ' +
-            (ignoreMathjaxAutoFormatting
-                ? 'mms-generate-for-diff="mmsGenerateForDiff" '
-                : '') +
+            (ignoreMathjaxAutoFormatting ? 'mms-generate-for-diff="mmsGenerateForDiff" ' : '') +
             'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{commitId}}" mms-callback="callback()"></view-cf>'
         const newScope = Object.assign(this.$scope.$new(), {
             type: type,

@@ -20,18 +20,13 @@ class ExtensionErrorController implements angular.IComponentController {
 
     static $inject = ['growl', 'ApplicationService']
 
-    constructor(
-        private growl: angular.growl.IGrowlService,
-        private applicationSvc: ApplicationService
-    ) {}
+    constructor(private growl: angular.growl.IGrowlService, private applicationSvc: ApplicationService) {}
 
     $onInit(): void {
         this.id = this.mmsElementId
         if (!this.extKind && !this.extType) {
             this.title = 'Error'
-            this.content = this.errorMsg
-                ? this.errorMsg
-                : 'There was a problem displaying your content.'
+            this.content = this.errorMsg ? this.errorMsg : 'There was a problem displaying your content.'
             return
         }
         const localKind = this.extKind ? _.capitalize(this.extKind) : 'Element'
@@ -39,24 +34,18 @@ class ExtensionErrorController implements angular.IComponentController {
 
         this.title = 'Unsupported ' + localKind + ' Type: ' + localExtType
         this.content =
-            'This ' +
-            localKind +
-            ' has a rendering type: ' +
-            localExtType +
-            ' that is not supported by View Editor'
+            'This ' + localKind + ' has a rendering type: ' + localExtType + ' that is not supported by View Editor'
     }
 
     public copyToClipboard($event: JQuery.ClickEvent): void {
-        this.applicationSvc
-            .copyToClipboard($('#tooltipElementId'), $event)
-            .then(
-                () => {
-                    this.growl.info('Copied to clipboard!', { ttl: 2000 })
-                },
-                (err) => {
-                    this.growl.error('Unable to copy: ' + err.message)
-                }
-            )
+        this.applicationSvc.copyToClipboard($('#tooltipElementId'), $event).then(
+            () => {
+                this.growl.info('Copied to clipboard!', { ttl: 2000 })
+            },
+            (err) => {
+                this.growl.error('Unable to copy: ' + err.message)
+            }
+        )
     }
 }
 

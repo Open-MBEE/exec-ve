@@ -31,12 +31,7 @@ export const right_default_toolbar: IToolBarButton[] = [
         permission: false,
         tooltip: 'Edit Element',
         spinner: false,
-        dynamic_ids: [
-            'spec-editor.save',
-            'spec-editor.saveC',
-            'spec-editor.saveall',
-            'spec-editor.cancel',
-        ],
+        dynamic_ids: ['spec-editor.save', 'spec-editor.saveC', 'spec-editor.saveall', 'spec-editor.cancel'],
         enabledFor: ['main.project.ref'],
     },
     {

@@ -7,11 +7,7 @@ import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromise } from '@ve-types/angular'
 import { RefsResponse } from '@ve-types/mms'
-import {
-    VeModalController,
-    VeModalResolve,
-    VeModalResolveFn,
-} from '@ve-types/view-editor'
+import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface ConfirmDeleteModalResolve extends VeModalResolve {
     getType: string
@@ -51,10 +47,7 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
         modalInstance: '<',
         resolve: '<',
     },
-    controller: class ConfirmDeleteModalController
-        extends VeModalControllerImpl<string>
-        implements VeModalController
-    {
+    controller: class ConfirmDeleteModalController extends VeModalControllerImpl<string> implements VeModalController {
         static $inject = ['growl']
 
         protected resolve: ConfirmDeleteModalResolve
@@ -89,9 +82,7 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
                     },
                     (reason) => {
                         if (reason.message) {
-                            this.growl.error(
-                                this.type + ' Removal Error: ' + reason.message
-                            )
+                            this.growl.error(this.type + ' Removal Error: ' + reason.message)
                         }
                         this.oking = false
                         this.modalInstance.dismiss(reason.message)
@@ -106,7 +97,4 @@ const ConfirmDeleteModalComponent: VeComponentOptions = {
     },
 }
 
-veApp.component(
-    ConfirmDeleteModalComponent.selector,
-    ConfirmDeleteModalComponent
-)
+veApp.component(ConfirmDeleteModalComponent.selector, ConfirmDeleteModalComponent)

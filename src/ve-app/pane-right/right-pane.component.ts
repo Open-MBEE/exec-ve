@@ -8,11 +8,7 @@ import { SpecApi, SpecService } from '@ve-components/spec-tools'
 import { ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
-import {
-    ElementService,
-    PermissionsService,
-    ProjectService,
-} from '@ve-utils/mms-api-client'
+import { ElementService, PermissionsService, ProjectService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
@@ -110,38 +106,29 @@ class RightPaneController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>(
-                'element.selected',
-                (data) => {
-                    this.changeAction(data)
-                }
-            )
+            this.eventSvc.$on<veAppEvents.elementSelectedData>('element.selected', (data) => {
+                this.changeAction(data)
+            })
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementUpdatedData>(
-                'element.updated',
-                (data) => {
-                    if (
-                        data.elementId === this.specApi.elementId &&
-                        data.projectId === this.specApi.projectId &&
-                        data.refId === this.specApi.refId &&
-                        !data.continueEdit
-                    ) {
-                        this.eventSvc.resolve<boolean>('spec.ready', false)
-                        this.specSvc.setElement()
-                    }
+            this.eventSvc.$on<veAppEvents.elementUpdatedData>('element.updated', (data) => {
+                if (
+                    data.elementId === this.specApi.elementId &&
+                    data.projectId === this.specApi.projectId &&
+                    data.refId === this.specApi.refId &&
+                    !data.continueEdit
+                ) {
+                    this.eventSvc.resolve<boolean>('spec.ready', false)
+                    this.specSvc.setElement()
                 }
-            )
+            })
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>(
-                'view.selected',
-                (data) => {
-                    this.changeAction(data)
-                }
-            )
+            this.eventSvc.$on<veAppEvents.elementSelectedData>('view.selected', (data) => {
+                this.changeAction(data)
+            })
         )
 
         this.subs.push(
@@ -169,22 +156,20 @@ class RightPaneController implements IComponentController {
         const projectId = data.projectId
         const commitId = data.commitId ? data.commitId : null
         const displayOldSpec = data.displayOldSpec ? data.displayOldSpec : null
-        const promise: VePromise<string, RefsResponse> = new this.$q(
-            (resolve, reject) => {
-                if (
-                    !this.specApi ||
-                    !this.specApi.refType ||
-                    refId != this.specApi.refId ||
-                    projectId != this.specApi.projectId
-                ) {
-                    this.projectSvc.getRef(refId, projectId).then((ref) => {
-                        resolve(ref.type)
-                    }, reject)
-                } else {
-                    resolve(this.specApi.refType)
-                }
+        const promise: VePromise<string, RefsResponse> = new this.$q((resolve, reject) => {
+            if (
+                !this.specApi ||
+                !this.specApi.refType ||
+                refId != this.specApi.refId ||
+                projectId != this.specApi.projectId
+            ) {
+                this.projectSvc.getRef(refId, projectId).then((ref) => {
+                    resolve(ref.type)
+                }, reject)
+            } else {
+                resolve(this.specApi.refType)
             }
-        )
+        })
 
         promise.then(
             (refType) => {
@@ -209,10 +194,7 @@ class RightPaneController implements IComponentController {
                     data.rootId &&
                     this.mmsRef.type === 'Branch' &&
                     refType === 'Branch' &&
-                    this.permissionsSvc.hasBranchEditPermission(
-                        projectId,
-                        refId
-                    )
+                    this.permissionsSvc.hasBranchEditPermission(projectId, refId)
 
                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                     (api) => api.setIcon('spec-editor', 'fa-edit'),

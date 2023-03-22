@@ -35,11 +35,7 @@ import {
     ValueObject,
     ViewObject,
 } from '@ve-types/mms'
-import {
-    VeModalInstanceService,
-    VeModalService,
-    VeModalSettings,
-} from '@ve-types/view-editor'
+import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 /**
  * @internal
@@ -93,20 +89,12 @@ export class ComponentService {
         private apiSvc: ApiService
     ) {}
 
-    public hasCircularReference = (
-        ctrl: ITransclusion,
-        curId: string,
-        curType: string
-    ): boolean => {
+    public hasCircularReference = (ctrl: ITransclusion, curId: string, curType: string): boolean => {
         let curscope = ctrl.$scope
         while (curscope.$parent) {
             const parent = curscope.$parent
             if (curscope.$parent.$ctrl) {
-                if (
-                    parent.$ctrl.mmsElementId === curId &&
-                    parent.$ctrl.cfType === curType
-                )
-                    return true
+                if (parent.$ctrl.mmsElementId === curId && parent.$ctrl.cfType === curType) return true
             }
             curscope = parent
         }
@@ -128,9 +116,7 @@ export class ComponentService {
     // var ENUM_ID = '_9_0_62a020a_1105704885400_895774_7947';
     // var ENUM_LITERAL = '_9_0_62a020a_1105704885423_380971_7955';
 
-    public setupValEditFunctions(
-        ctrl: { propertySpec: PropertySpec } & ITransclusion
-    ): void {
+    public setupValEditFunctions(ctrl: { propertySpec: PropertySpec } & ITransclusion): void {
         ctrl.addValueTypes = {
             string: 'LiteralString',
             boolean: 'LiteralBoolean',
@@ -197,10 +183,7 @@ export class ComponentService {
             }
 
             ctrl.editValues.push(newValueSpec)
-            if (
-                ctrl.element.type == 'Property' ||
-                ctrl.element.type == 'Port'
-            ) {
+            if (ctrl.element.type == 'Property' || ctrl.element.type == 'Port') {
                 ctrl.edit.defaultValue = newValueSpec
             }
         }
@@ -216,10 +199,7 @@ export class ComponentService {
                 ownerId: ctrl.element.id,
             })
             ctrl.editValues.push(newValueSpec)
-            if (
-                ctrl.element.type == 'Property' ||
-                ctrl.element.type == 'Port'
-            ) {
+            if (ctrl.element.type == 'Property' || ctrl.element.type == 'Port') {
                 ctrl.edit.defaultValue = newValueSpec
             }
         }
@@ -296,10 +276,7 @@ export class ComponentService {
                     (reason: VePromiseReason<ElementsResponse<T>>) => {
                         if (reason.status === 409) {
                             const latest = reason.data.elements[0]
-                            const instance = this.$uibModal.open<
-                                SaveConflictResolveFn<T>,
-                                string
-                            >({
+                            const instance = this.$uibModal.open<SaveConflictResolveFn<T>, string>({
                                 component: 'saveConflict',
                                 size: 'lg',
                                 resolve: {
@@ -318,24 +295,11 @@ export class ComponentService {
                                             refId: latest._refId,
                                             commitId: 'latest',
                                         }
-                                        this.elementSvc.cacheElement(
-                                            reqOb,
-                                            latest,
-                                            true
-                                        )
-                                        this.elementSvc.cacheElement(
-                                            reqOb,
-                                            latest,
-                                            false
-                                        )
+                                        this.elementSvc.cacheElement(reqOb, latest, true)
+                                        this.elementSvc.cacheElement(reqOb, latest, false)
                                     } else if (choice === 'force') {
                                         edit._modified = latest._modified
-                                        this.save(
-                                            edit,
-                                            editorApi,
-                                            ctrl,
-                                            continueEdit
-                                        ).then(
+                                        this.save(edit, editorApi, ctrl, continueEdit).then(
                                             (resolved) => {
                                                 deferred.resolve(resolved)
                                             },
@@ -349,8 +313,7 @@ export class ComponentService {
                                 },
                                 () => {
                                     this.handleError({
-                                        message:
-                                            'An error occurred. Please try your request again',
+                                        message: 'An error occurred. Please try your request again',
                                         type: 'error',
                                     })
                                 }
@@ -383,13 +346,8 @@ export class ComponentService {
      */
     public hasEdits = (editOb: ElementObject): boolean => {
         editOb._commitId = 'latest'
-        const cachedKey = this.apiSvc.makeCacheKey(
-            this.apiSvc.makeRequestObject(editOb),
-            editOb.id,
-            false
-        )
-        const elementOb: ElementObject =
-            this.cacheSvc.get<ElementObject>(cachedKey)
+        const cachedKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(editOb), editOb.id, false)
+        const elementOb: ElementObject = this.cacheSvc.get<ElementObject>(cachedKey)
         if (editOb.name !== elementOb.name) {
             return true
         }
@@ -401,15 +359,9 @@ export class ComponentService {
             !_.isEqual(editOb.defaultValue, elementOb.defaultValue)
         ) {
             return true
-        } else if (
-            editOb.type === 'Slot' &&
-            !_.isEqual(editOb.value, elementOb.value)
-        ) {
+        } else if (editOb.type === 'Slot' && !_.isEqual(editOb.value, elementOb.value)) {
             return true
-        } else if (
-            editOb.type === 'Constraint' &&
-            !_.isEqual(editOb.specification, elementOb.specification)
-        ) {
+        } else if (editOb.type === 'Constraint' && !_.isEqual(editOb.specification, elementOb.specification)) {
             return true
         }
         return false
@@ -423,18 +375,10 @@ export class ComponentService {
      * @param {object} editOb scope with common properties
      * @param {object} editorApi editor api to kill editor if reverting changes
      */
-    public revertEdits(
-        editValues: ValueObject[],
-        editOb: ElementObject
-    ): ValueObject[] {
+    public revertEdits(editValues: ValueObject[], editOb: ElementObject): ValueObject[] {
         editOb._commitId = 'latest'
-        const cachedKey = this.apiSvc.makeCacheKey(
-            this.apiSvc.makeRequestObject(editOb),
-            editOb.id,
-            false
-        )
-        const elementOb: ElementObject =
-            this.cacheSvc.get<ElementObject>(cachedKey)
+        const cachedKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(editOb), editOb.id, false)
+        const elementOb: ElementObject = this.cacheSvc.get<ElementObject>(cachedKey)
 
         if (elementOb.name) {
             editOb.name = elementOb.name
@@ -448,24 +392,16 @@ export class ComponentService {
                 editValues = []
             }
         } else if (editOb.type === 'Slot') {
-            ;(editOb as SlotObject).value = _.cloneDeep(
-                (elementOb as SlotObject).value
-            )
+            ;(editOb as SlotObject).value = _.cloneDeep((elementOb as SlotObject).value)
             editValues = (editOb as SlotObject).value
         } else if (editOb.type === 'Constraint' && editOb.specification) {
-            ;(editOb as ConstraintObject).specification = _.cloneDeep(
-                (elementOb as ConstraintObject).specification
-            )
+            ;(editOb as ConstraintObject).specification = _.cloneDeep((elementOb as ConstraintObject).specification)
             editValues = [(editOb as ConstraintObject).specification]
         }
         return editValues
     }
 
-    public handleError<T>(
-        reason:
-            | { message: string; type: 'error' | 'warning' | 'info' }
-            | VePromiseReason<T>
-    ): void {
+    public handleError<T>(reason: { message: string; type: 'error' | 'warning' | 'info' } | VePromiseReason<T>): void {
         if (reason.type === 'info') this.growl.info(reason.message)
         else if (reason.type === 'warning') this.growl.warning(reason.message)
         else if (reason.type === 'error') this.growl.error(reason.message)
@@ -649,10 +585,7 @@ export class ComponentService {
             !ctrl.isEditing &&
             ctrl.element &&
             ctrl.commitId === 'latest' &&
-            this.permissionsSvc.hasBranchEditPermission(
-                ctrl.element._projectId,
-                ctrl.element._refId
-            )
+            this.permissionsSvc.hasBranchEditPermission(ctrl.element._projectId, ctrl.element._refId)
         ) {
             const elementOb = ctrl.element
             const reqOb = {
@@ -674,13 +607,8 @@ export class ComponentService {
                         if (Array.isArray(data.value)) {
                             ctrl.editValues = (data as SlotObject).value
                         }
-                    } else if (
-                        data.type === 'Constraint' &&
-                        data.specification
-                    ) {
-                        ctrl.editValues = [
-                            (data as ConstraintObject).specification,
-                        ]
+                    } else if (data.type === 'Constraint' && data.specification) {
+                        ctrl.editValues = [(data as ConstraintObject).specification]
                     }
                     if (!ctrl.editValues) {
                         ctrl.editValues = []
@@ -696,9 +624,7 @@ export class ComponentService {
                         if (typeof template === 'string') {
                             transcludeEl = $(template)
                         } else {
-                            this.growl.error(
-                                'Editing is not supported for Injected Templates!'
-                            )
+                            this.growl.error('Editing is not supported for Injected Templates!')
                             return
                         }
                         domElement.append(transcludeEl)
@@ -706,10 +632,7 @@ export class ComponentService {
                     }
                     if (!ctrl.skipBroadcast) {
                         // Broadcast message for the toolCtrl:
-                        this.eventSvc.$broadcast(
-                            'presentationElem.edit',
-                            ctrl.edit
-                        )
+                        this.eventSvc.$broadcast('presentationElem.edit', ctrl.edit)
                     } else {
                         ctrl.skipBroadcast = false
                     }
@@ -725,13 +648,9 @@ export class ComponentService {
 
             this.elementSvc.isCacheOutdated(ctrl.element).then(
                 (data) => {
-                    if (
-                        data.status &&
-                        data.server._modified > data.cache._modified
-                    ) {
+                    if (data.status && data.server._modified > data.cache._modified) {
                         this.handleError({
-                            message:
-                                'This element has been updated on the server',
+                            message: 'This element has been updated on the server',
                             type: 'warning',
                         })
                     }
@@ -757,19 +676,12 @@ export class ComponentService {
      * @param {object} domElement dom of the directive, jquery wrapped
      * @param {boolean} continueEdit save and continue
      */
-    public saveAction = (
-        ctrl: ComponentController,
-        domElement: JQuery,
-        continueEdit: boolean
-    ): void => {
+    public saveAction = (ctrl: ComponentController, domElement: JQuery, continueEdit: boolean): void => {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
         }
-        this.clearAutosave(
-            ctrl.element._projectId + ctrl.element._refId + ctrl.element.id,
-            ctrl.edit.type
-        )
+        this.clearAutosave(ctrl.element._projectId + ctrl.element._refId + ctrl.element.id, ctrl.edit.type)
         if (ctrl.bbApi) {
             if (!continueEdit) {
                 ctrl.bbApi.toggleButtonSpinner('presentation-element-save')
@@ -785,10 +697,7 @@ export class ComponentService {
                     ctrl.elementSaving = false
                     if (!continueEdit) {
                         ctrl.isEditing = false
-                        this.eventSvc.$broadcast(
-                            'presentationElem.save',
-                            ctrl.edit
-                        )
+                        this.eventSvc.$broadcast('presentationElem.save', ctrl.edit)
                     }
                     if (!data) {
                         this.growl.info('Save Skipped (No Changes)')
@@ -805,13 +714,9 @@ export class ComponentService {
             .finally(() => {
                 if (ctrl.bbApi) {
                     if (!continueEdit) {
-                        ctrl.bbApi.toggleButtonSpinner(
-                            'presentation-element-save'
-                        )
+                        ctrl.bbApi.toggleButtonSpinner('presentation-element-save')
                     } else {
-                        ctrl.bbApi.toggleButtonSpinner(
-                            'presentation-element-saveC'
-                        )
+                        ctrl.bbApi.toggleButtonSpinner('presentation-element-saveC')
                     }
                 }
             })
@@ -879,17 +784,13 @@ export class ComponentService {
                         })
                         .finally(() => {
                             if (ctrl.bbApi) {
-                                ctrl.bbApi.toggleButtonSpinner(
-                                    'presentation-element-cancel'
-                                )
+                                ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
                             }
                         })
                 } else {
                     cancelCleanUp()
                     if (ctrl.bbApi) {
-                        ctrl.bbApi.toggleButtonSpinner(
-                            'presentation-element-cancel'
-                        )
+                        ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
                     }
                 }
             },
@@ -902,10 +803,7 @@ export class ComponentService {
         )
     }
 
-    public deleteEditModal(deleteOb: {
-        type: string
-        element: ElementObject
-    }): VeModalInstanceService<string> {
+    public deleteEditModal(deleteOb: { type: string; element: ElementObject }): VeModalInstanceService<string> {
         const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
             component: 'confirmDeleteModal',
             resolve: {
@@ -918,9 +816,7 @@ export class ComponentService {
                 finalize: () => {
                     return () => {
                         this.clearAutosave(
-                            deleteOb.element._projectId +
-                                deleteOb.element._refId +
-                                deleteOb.element.id,
+                            deleteOb.element._projectId + deleteOb.element._refId + deleteOb.element.id,
                             deleteOb.type
                         )
                         return this.$q.resolve()
@@ -928,16 +824,10 @@ export class ComponentService {
                 },
             },
         }
-        return this.$uibModal.open<ConfirmDeleteModalResolveFn, string>(
-            settings
-        )
+        return this.$uibModal.open<ConfirmDeleteModalResolveFn, string>(settings)
     }
 
-    public deleteAction = (
-        ctrl: ComponentController,
-        bbApi: ButtonBarApi,
-        section: ViewObject
-    ): void => {
+    public deleteAction = (ctrl: ComponentController, bbApi: ButtonBarApi, section: ViewObject): void => {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
@@ -956,9 +846,7 @@ export class ComponentService {
                 finalize: () => {
                     return () => {
                         this.clearAutosave(
-                            ctrl.element._projectId +
-                                ctrl.element._refId +
-                                ctrl.element.id,
+                            ctrl.element._projectId + ctrl.element._refId + ctrl.element.id,
                             ctrl.edit.type
                         )
                         return this.$q.resolve()
@@ -976,35 +864,27 @@ export class ComponentService {
                     refId: viewOrSec._refId,
                     commitId: 'latest',
                 }
-                this.viewSvc
-                    .removeElementFromViewOrSection(reqOb, ctrl.instanceVal)
-                    .then(
-                        (data) => {
-                            if (
-                                this.viewSvc.isSection(ctrl.instanceSpec) ||
-                                this.viewSvc.isTable(ctrl.instanceSpec) ||
-                                this.viewSvc.isFigure(ctrl.instanceSpec) ||
-                                this.viewSvc.isEquation(ctrl.instanceSpec)
-                            ) {
-                                // Broadcast message to TreeCtrl:
-                                this.eventSvc.$broadcast(
-                                    'viewctrl.delete.element',
-                                    ctrl.instanceSpec
-                                )
-                            }
+                this.viewSvc.removeElementFromViewOrSection(reqOb, ctrl.instanceVal).then(
+                    (data) => {
+                        if (
+                            this.viewSvc.isSection(ctrl.instanceSpec) ||
+                            this.viewSvc.isTable(ctrl.instanceSpec) ||
+                            this.viewSvc.isFigure(ctrl.instanceSpec) ||
+                            this.viewSvc.isEquation(ctrl.instanceSpec)
+                        ) {
+                            // Broadcast message to TreeCtrl:
+                            this.eventSvc.$broadcast('viewctrl.delete.element', ctrl.instanceSpec)
+                        }
 
-                            this.eventSvc.$broadcast('content-reorder.refresh')
+                        this.eventSvc.$broadcast('content-reorder.refresh')
 
-                            // Broadcast message for the ToolCtrl:
-                            this.eventSvc.$broadcast(
-                                'presentationElem.cancel',
-                                ctrl.edit
-                            )
+                        // Broadcast message for the ToolCtrl:
+                        this.eventSvc.$broadcast('presentationElem.cancel', ctrl.edit)
 
-                            this.growl.success('Remove Successful')
-                        },
-                        (reason) => this.handleError(reason)
-                    )
+                        this.growl.success('Remove Successful')
+                    },
+                    (reason) => this.handleError(reason)
+                )
             })
             .finally(() => {
                 ctrl.bbApi.toggleButtonSpinner('presentation-element-delete')
@@ -1030,11 +910,7 @@ export class ComponentService {
      * @param {object} recompile recompile function object
      * @param {object} domElement dom of the directive, jquery wrapped
      */
-    public previewAction(
-        ctrl: ComponentController,
-        recompile: () => void,
-        domElement: JQuery<HTMLElement>
-    ): void {
+    public previewAction(ctrl: ComponentController, recompile: () => void, domElement: JQuery<HTMLElement>): void {
         if (ctrl.elementSaving) {
             this.growl.info('Please Wait...')
             return
@@ -1058,16 +934,9 @@ export class ComponentService {
         this._scrollToElement(domElement)
     }
 
-    public isDirectChildOfPresentationElementFunc(
-        element: JQuery<HTMLElement>,
-        mmsViewCtrl: ViewController
-    ): boolean {
+    public isDirectChildOfPresentationElementFunc(element: JQuery<HTMLElement>, mmsViewCtrl: ViewController): boolean {
         let parent = element[0].parentElement
-        while (
-            parent &&
-            parent.nodeName !== 'MMS-VIEW-PRESENTATION-ELEM' &&
-            parent.nodeName !== 'MMS-VIEW'
-        ) {
+        while (parent && parent.nodeName !== 'MMS-VIEW-PRESENTATION-ELEM' && parent.nodeName !== 'MMS-VIEW') {
             if (mmsViewCtrl.isTranscludedElement(parent.nodeName)) {
                 return false
             }
@@ -1116,34 +985,21 @@ export class ComponentService {
      * @param {ITransclusion} ctrl scope of the transclude directives or view section directive
      * @param {String} transcludeType name, documentation, or value
      */
-    public reopenUnsavedElts = (
-        ctrl: ITransclusion & EditingToolbar,
-        transcludeType: string
-    ): void => {
+    public reopenUnsavedElts = (ctrl: ITransclusion & EditingToolbar, transcludeType: string): void => {
         let unsavedEdits: { [p: string]: ElementObject } = {}
         if (this.autosaveSvc.openEdits() > 0) {
             unsavedEdits = this.autosaveSvc.getAll()
         }
-        const key =
-            ctrl.element.id +
-            '|' +
-            ctrl.element._projectId +
-            '|' +
-            ctrl.element._refId
+        const key = ctrl.element.id + '|' + ctrl.element._projectId + '|' + ctrl.element._refId
         const thisEdits = unsavedEdits[key]
         if (!thisEdits || ctrl.commitId !== 'latest') {
             return
         }
         if (transcludeType === 'value') {
-            if (
-                ctrl.element.type === 'Property' ||
-                ctrl.element.type === 'Port'
-            ) {
+            if (ctrl.element.type === 'Property' || ctrl.element.type === 'Port') {
                 if (
-                    ctrl.element.defaultValue.value !==
-                        thisEdits.defaultValue.value ||
-                    ctrl.element.defaultValue.instanceId !==
-                        thisEdits.defaultValue.instanceId
+                    ctrl.element.defaultValue.value !== thisEdits.defaultValue.value ||
+                    ctrl.element.defaultValue.instanceId !== thisEdits.defaultValue.instanceId
                 ) {
                     ctrl.startEdit()
                 }

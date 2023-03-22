@@ -1,11 +1,6 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import {
-    ApiService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import { Class } from '@ve-utils/utils'
 

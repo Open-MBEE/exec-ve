@@ -1,10 +1,5 @@
 import { ApplicationService } from '@ve-utils/application/Application.service'
-import {
-    ElementService,
-    ProjectService,
-    URLService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ElementService, ProjectService, URLService, ViewService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -53,8 +48,7 @@ export class ShortUrlService {
         const result: ParamsObject = {
             projectId: urlParts[1],
             refId: urlParts[2],
-            documentId:
-                urlParts[3] && urlParts[3] === 'cover' ? null : urlParts[3],
+            documentId: urlParts[3] && urlParts[3] === 'cover' ? null : urlParts[3],
             viewId: urlParts[4],
         }
         let orgId: string = urlParts[0]
@@ -114,9 +108,7 @@ export class ShortUrlService {
                             this.projectSvc.getRefs(result.projectId).then(
                                 (data) => {
                                     const refOb = data.filter((r) => {
-                                        return result.refId === 'm'
-                                            ? r.id === 'master'
-                                            : r.id.endsWith(result.refId)
+                                        return result.refId === 'm' ? r.id === 'master' : r.id.endsWith(result.refId)
                                     })
                                     if (refOb.length > 0) {
                                         result.refId = refOb[0].id
@@ -150,9 +142,7 @@ export class ShortUrlService {
                                     .then(
                                         (data) => {
                                             const doc = data.filter((d) => {
-                                                return d.id.endsWith(
-                                                    result.documentId
-                                                )
+                                                return d.id.endsWith(result.documentId)
                                             })
                                             if (doc.length > 0) {
                                                 result.documentId = doc[0].id
@@ -182,13 +172,9 @@ export class ShortUrlService {
                                         })
                                         .then(
                                             (data) => {
-                                                const view = data.filter(
-                                                    (v) => {
-                                                        return v.id.endsWith(
-                                                            result.viewId
-                                                        )
-                                                    }
-                                                )
+                                                const view = data.filter((v) => {
+                                                    return v.id.endsWith(result.viewId)
+                                                })
                                                 if (view.length > 0) {
                                                     result.viewId = view[0].id
                                                     deferView.resolve()
@@ -255,16 +241,11 @@ export class ShortUrlService {
 
         const rootUrl = this.$location.absUrl().split('#')[0]
         let fragment = ids.join('-')
-        fragment = fragment.endsWith('-')
-            ? fragment.substring(0, fragment.length - 1)
-            : fragment
+        fragment = fragment.endsWith('-') ? fragment.substring(0, fragment.length - 1) : fragment
         return `${rootUrl}#/s/${fragment}`
     }
 
-    public copyToClipboard(
-        target: JQuery<HTMLElement>,
-        $event: JQuery.ClickEvent
-    ): VePromise<void, unknown> {
+    public copyToClipboard(target: JQuery<HTMLElement>, $event: JQuery.ClickEvent): VePromise<void, unknown> {
         const shortUrlEl = target.find('#ve-short-url')
         return this.applicationSvc.copyToClipboard(shortUrlEl, $event)
     }

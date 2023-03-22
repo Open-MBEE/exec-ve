@@ -29,11 +29,7 @@ export class SessionService {
         sessionStorage.clear()
     }
 
-    public accessor = <T>(
-        name: string,
-        value: T,
-        defaultValue: T = null
-    ): T => {
+    public accessor = <T>(name: string, value: T, defaultValue: T = null): T => {
         if (value === undefined) {
             let val = SessionService._getStorage<T>(name)
             if (val == null) {

@@ -47,10 +47,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeEnumController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeEnumController extends Transclusion implements ITransclusion {
     //Locals
     noClick: boolean | undefined
     clickHandler: () => void
@@ -111,11 +108,7 @@ export class TranscludeEnumController
 
             if (!this.mmsViewCtrl) return false
 
-            if (
-                this.nonEditable &&
-                this.mmsViewCtrl &&
-                this.mmsViewCtrl.isEditable()
-            ) {
+            if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
                 this.growl.warning('Cross Reference is not editable.')
             }
             this.mmsViewCtrl.transcludeClicked(this.element)
@@ -123,18 +116,14 @@ export class TranscludeEnumController
         })
     }
 
-    public getContent = (
-        preview?: boolean
-    ): VePromise<string | HTMLElement[], string> => {
+    public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
         const defaultTemplate =
             '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">(no name)</span>'
         const editTemplate =
             '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">(no name)</span>'
         if (preview) {
-            deferred.resolve(
-                '<div class="panel panel-info">' + editTemplate + '</div>'
-            )
+            deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>')
         } else {
             this.isEditing = false
             deferred.resolve(defaultTemplate)
@@ -271,7 +260,4 @@ export const TranscludeEnumComponent: VeComponentOptions = {
     controller: TranscludeEnumController,
 }
 
-veComponents.component(
-    TranscludeEnumComponent.selector,
-    TranscludeEnumComponent
-)
+veComponents.component(TranscludeEnumComponent.selector, TranscludeEnumComponent)

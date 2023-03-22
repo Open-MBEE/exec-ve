@@ -4,18 +4,12 @@ import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
 import { ElementObject } from '@ve-types/mms'
-import {
-    VeModalInstanceService,
-    VeModalResolve,
-    VeModalResolveFn,
-} from '@ve-types/view-editor'
+import { VeModalInstanceService, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
-export interface SaveConflictResolve<T extends ElementObject>
-    extends VeModalResolve {
+export interface SaveConflictResolve<T extends ElementObject> extends VeModalResolve {
     latest: T
 }
-export interface SaveConflictResolveFn<T extends ElementObject>
-    extends VeModalResolveFn {
+export interface SaveConflictResolveFn<T extends ElementObject> extends VeModalResolveFn {
     latest(): T
 }
 

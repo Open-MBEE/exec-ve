@@ -57,8 +57,7 @@ export class BarButton {
     constructor(id: string, readonly config?: IButtonBarButton) {
         this.id = id
         if (this.config) {
-            if (this.config.icon)
-                this.icon = this.icon_original = this.config.icon
+            if (this.config.icon) this.icon = this.icon_original = this.config.icon
 
             if (this.config.tooltip) {
                 this.tooltip = this.tooltip_original = this.config.tooltip
@@ -66,13 +65,8 @@ export class BarButton {
             if (this.config.button_content) {
                 this.button_content = this.config.button_content
             }
-            if (
-                this.config.dropdown &&
-                this.config.dropdown.icon &&
-                this.config.dropdown.icon !== ''
-            ) {
-                this.dropdown_icon = this.dropdown_icon_original =
-                    this.config.dropdown.icon
+            if (this.config.dropdown && this.config.dropdown.icon && this.config.dropdown.icon !== '') {
+                this.dropdown_icon = this.dropdown_icon_original = this.config.dropdown.icon
             }
         }
     }
@@ -85,21 +79,11 @@ export class BarButton {
         if (this.config.toggle) {
             this.toggled = state != null ? state : !this.toggled
             if (this.toggled) {
-                if (
-                    (this.config.toggle as { tooltip: string; icon: string })
-                        .tooltip
-                ) {
-                    this.tooltip = (
-                        this.config.toggle as { tooltip: string; icon: string }
-                    ).tooltip
+                if ((this.config.toggle as { tooltip: string; icon: string }).tooltip) {
+                    this.tooltip = (this.config.toggle as { tooltip: string; icon: string }).tooltip
                 }
-                if (
-                    (this.config.toggle as { tooltip: string; icon: string })
-                        .icon
-                ) {
-                    this.icon = (
-                        this.config.toggle as { tooltip: string; icon: string }
-                    ).icon
+                if ((this.config.toggle as { tooltip: string; icon: string }).icon) {
+                    this.icon = (this.config.toggle as { tooltip: string; icon: string }).icon
                 }
             } else {
                 this.icon = this.icon_original
@@ -109,8 +93,7 @@ export class BarButton {
             }
         }
         if (this.config.dropdown && this.config.dropdown.icon) {
-            this.dropdown_toggled =
-                state != null ? state : !this.dropdown_toggled
+            this.dropdown_toggled = state != null ? state : !this.dropdown_toggled
             if (this.dropdown_toggled && this.config.dropdown.toggle_icon) {
                 this.dropdown_icon = this.config.dropdown.toggle_icon
             } else {
@@ -122,9 +105,7 @@ export class BarButton {
     public toggleSpin = (): void => {
         if (this.spinner) {
             if (this.toggled && this.config.toggle) {
-                this.icon = (
-                    this.config.toggle as { tooltip: string; icon: string }
-                ).icon
+                this.icon = (this.config.toggle as { tooltip: string; icon: string }).icon
             } else {
                 this.icon = this.icon_original
             }

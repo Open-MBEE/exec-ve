@@ -45,10 +45,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeDocController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeDocController extends Transclusion implements ITransclusion {
     protected editTemplate: string = `
     <div class="panel panel-default no-print">
     <div class="panel-heading clearfix">
@@ -113,25 +110,14 @@ export class TranscludeDocController
     $onInit(): void {
         super.$onInit()
 
-        this.bbId = this.buttonBarSvc.generateBarId(
-            `${this.mmsElementId}_${this.cfType}`
-        )
-        this.bbApi = this.buttonBarSvc.initApi(
-            this.bbId,
-            this.bbInit,
-            presentations_buttons
-        )
+        this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`)
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, presentations_buttons)
 
         this.$element.on('click', (e) => {
             if (this.startEdit && !this.nonEditable) this.startEdit()
 
-            if (this.mmsViewCtrl)
-                this.mmsViewCtrl.transcludeClicked(this.element)
-            if (
-                this.nonEditable &&
-                this.mmsViewCtrl &&
-                this.mmsViewCtrl.isEditable()
-            ) {
+            if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
+            if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
                 this.growl.warning('Cross Reference is not editable.')
             }
             e.stopPropagation()
@@ -139,39 +125,17 @@ export class TranscludeDocController
 
         if (this.mmsViewPresentationElemCtrl) {
             this.delete = (): void => {
-                this.componentSvc.deleteAction(
-                    this,
-                    this.bbApi,
-                    this.mmsViewPresentationElemCtrl.getParentSection()
-                )
+                this.componentSvc.deleteAction(this, this.bbApi, this.mmsViewPresentationElemCtrl.getParentSection())
             }
 
-            this.instanceSpec =
-                this.mmsViewPresentationElemCtrl.getInstanceSpec()
+            this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
-            this.presentationElem =
-                this.mmsViewPresentationElemCtrl.getPresentationElement()
+            this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
             const auto = [
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Image',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Paragraph',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'List',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Table',
-                    this.schema
-                ),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Image', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Paragraph', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'List', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Table', this.schema),
             ]
 
             if (auto.indexOf(this.instanceSpec.classifierIds[0]) >= 0)
@@ -181,13 +145,9 @@ export class TranscludeDocController
                 this.panelTitle = this.instanceSpec.name
                 this.panelType = this.presentationElem.type //this is hack for fake table/list/equation until we get actual editors
                 if (this.panelType.charAt(this.panelType.length - 1) === 'T')
-                    this.panelType = this.panelType.substring(
-                        0,
-                        this.panelType.length - 1
-                    )
+                    this.panelType = this.panelType.substring(0, this.panelType.length - 1)
                 if (this.panelType === 'Paragraph') this.panelType = 'Text'
-                if (this.panelType === 'Figure' || this.panelType === 'ImageT')
-                    this.panelType = 'Image'
+                if (this.panelType === 'Figure' || this.panelType === 'ImageT') this.panelType = 'Image'
             }
             if (this.presentationElem) {
                 this.editorType = this.presentationElem.type
@@ -195,17 +155,12 @@ export class TranscludeDocController
         }
     }
 
-    public getContent = (
-        preview?: boolean
-    ): VePromise<string | HTMLElement[], string> => {
+    public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
 
         let doc = preview ? this.edit.documentation : this.element.documentation
         if (!doc || this.emptyRegex.test(doc)) {
-            doc =
-                '<p class="no-print placeholder">(no ' +
-                this.panelType +
-                ')</p>'
+            doc = '<p class="no-print placeholder">(no ' + this.panelType + ')</p>'
         }
         doc = doc.replace(this.fixPreSpanRegex, '<view-cf')
         doc = doc.replace(this.fixPostSpanRegex, '</view-cf>')
@@ -220,8 +175,7 @@ export class TranscludeDocController
             result = doc
         }
         if (this.mmsViewPresentationElemCtrl) {
-            const element =
-                this.mmsViewPresentationElemCtrl.getPresentationElement()
+            const element = this.mmsViewPresentationElemCtrl.getPresentationElement()
             const pe = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             if (
                 pe &&
@@ -232,10 +186,7 @@ export class TranscludeDocController
                     element.type === 'Equation' ||
                     element.type === 'ImageT')
             ) {
-                this.type =
-                    element.type === 'TableT'
-                        ? 'table'
-                        : element.type.toLowerCase()
+                this.type = element.type === 'TableT' ? 'table' : element.type.toLowerCase()
                 if (this.type === 'imaget') {
                     this.type = 'figure'
                 }

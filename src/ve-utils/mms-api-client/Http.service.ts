@@ -45,12 +45,7 @@ export class HttpService {
      * @param {string} weight by weight
      * @param {Object} config object containing http configuration parameters
      */
-    get<T>(
-        url: string,
-        successCallback: httpCallback<T>,
-        errorCallback: httpCallback<T>,
-        weight: number
-    ): void {
+    get<T>(url: string, successCallback: httpCallback<T>, errorCallback: httpCallback<T>, weight: number): void {
         if (weight === undefined) {
             weight = 1
         }
@@ -83,8 +78,7 @@ export class HttpService {
                 this.queue[1].push(request)
             }
             if (this.cache.hasOwnProperty(url)) {
-                if (this.cache[url].weight < request.weight)
-                    this.cache[url].weight = request.weight
+                if (this.cache[url].weight < request.weight) this.cache[url].weight = request.weight
             } else {
                 this.cache[url] = request
             }
@@ -109,20 +103,10 @@ export class HttpService {
                     }
                     if (this.queue[1].length > 0) {
                         next = this.queue[1].shift()
-                        this.get(
-                            next.url,
-                            next.successCallback,
-                            next.errorCallback,
-                            next.weight
-                        )
+                        this.get(next.url, next.successCallback, next.errorCallback, next.weight)
                     } else if (this.queue[0].length > 0) {
                         next = this.queue[0].shift()
-                        this.get(
-                            next.url,
-                            next.successCallback,
-                            next.errorCallback,
-                            next.weight
-                        )
+                        this.get(next.url, next.successCallback, next.errorCallback, next.weight)
                     }
                 })
         }
@@ -156,12 +140,7 @@ export class HttpService {
                     } else {
                         this.queue[1].splice(index, 1)
                     }
-                    this.get(
-                        request.url,
-                        request.successCallback,
-                        request.errorCallback,
-                        weight
-                    )
+                    this.get(request.url, request.successCallback, request.errorCallback, weight)
                 }
             }
         }

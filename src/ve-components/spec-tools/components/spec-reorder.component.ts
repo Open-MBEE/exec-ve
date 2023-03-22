@@ -1,12 +1,7 @@
 import _ from 'lodash'
 
 import { ComponentService } from '@ve-components/services'
-import {
-    SpecService,
-    SpecTool,
-    ISpecTool,
-    ReorderService,
-} from '@ve-components/spec-tools'
+import { SpecService, SpecTool, ISpecTool, ReorderService } from '@ve-components/spec-tools'
 import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
@@ -23,11 +18,7 @@ import {
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import {
-    PresentationReference,
-    ViewInstanceSpec,
-    ViewObject,
-} from '@ve-types/mms'
+import { PresentationReference, ViewInstanceSpec, ViewObject } from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -96,30 +87,19 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         this.reorderSvc.view = this.view = this.element
         this.reorderSvc.refresh()
         this.elementReferenceTree = this.reorderSvc.elementReferenceTree
-        this.originalElementReferenceTree =
-            this.reorderSvc.originalElementReferenceTree
+        this.originalElementReferenceTree = this.reorderSvc.originalElementReferenceTree
         this.treeOptions = {
-            accept: (
-                sourceNodeScope: SpecTool,
-                destNodeScope: SpecTool,
-                destIndex: number
-            ): boolean => {
+            accept: (sourceNodeScope: SpecTool, destNodeScope: SpecTool, destIndex: number): boolean => {
                 if (sourceNodeScope.element.isOpaque) return false
                 if (destNodeScope.$element.hasClass('root')) return true
-                return !!this.viewSvc.isSection(
-                    destNodeScope.element as ViewInstanceSpec
-                )
+                return !!this.viewSvc.isSection(destNodeScope.element as ViewInstanceSpec)
             },
         }
 
         this.subs.push(
-            this.eventSvc.binding<veCoreEvents.toolbarClicked>(
-                this.toolbarId,
-                (data) => {
-                    if (data.id === 'spec-reorder')
-                        this.specSvc.setEditing(true)
-                }
-            )
+            this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, (data) => {
+                if (data.id === 'spec-reorder') this.specSvc.setEditing(true)
+            })
         )
 
         let viewSaving = false
@@ -156,10 +136,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                                 this.growl.error(ToolbarService.error(reason))
                             }
                         )
-                        this.eventSvc.$broadcast(
-                            'spec-reorder.saved',
-                            this.specApi.elementId
-                        )
+                        this.eventSvc.$broadcast('spec-reorder.saved', this.specApi.elementId)
                     },
                     (response) => {
                         this.reorderSvc.refresh()
@@ -176,24 +153,18 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                         )
                     }
                 )
-                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
-                    this.toolbarId,
-                    {
-                        id: 'spec-inspector',
-                    }
-                )
+                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
+                    id: 'spec-inspector',
+                })
             })
         )
         this.subs.push(
             this.eventSvc.$on('spec-reorder.cancel', () => {
                 this.specSvc.setEditing(false)
                 this.reorderSvc.refresh()
-                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(
-                    this.toolbarId,
-                    {
-                        id: 'spec-inspector',
-                    }
-                )
+                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
+                    id: 'spec-inspector',
+                })
                 //this.('element');
             })
         )

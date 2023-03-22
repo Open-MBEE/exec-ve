@@ -7,17 +7,9 @@ import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow
 import { TreeService } from '@ve-components/trees'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
-import {
-    RootScopeService,
-    ShortUrlService,
-    UtilsService,
-} from '@ve-utils/application'
+import { RootScopeService, ShortUrlService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
-import {
-    PermissionsService,
-    URLService,
-    ViewApi,
-} from '@ve-utils/mms-api-client'
+import { PermissionsService, URLService, ViewApi } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
 
@@ -124,41 +116,27 @@ class SlideshowController implements angular.IComponentController {
         this.rootScopeSvc.veFullDocMode(false)
         this.eventSvc.$init(this)
 
-        this.bbApi = this.buttonBarSvc.initApi(
-            this.bbId,
-            this.bbInit,
-            pane_center_buttons
-        )
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons)
 
         //Init/Reset Tree Updated Subject
         this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
 
         this.subs.push(
-            this.eventSvc.binding<boolean>(
-                this.rootScopeSvc.constants.VEVIEWCONTENTLOADING,
-                (newValue) => {
-                    this.viewContentLoading = newValue
-                }
-            )
+            this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VEVIEWCONTENTLOADING, (newValue) => {
+                this.viewContentLoading = newValue
+            })
         )
 
         this.initView()
 
         //Subscribe to Tree Updated Subject
         this.subs.push(
-            this.eventSvc.binding<boolean>(
-                TreeService.events.UPDATED,
-                (data) => {
-                    if (!data) return
-                    if (
-                        this.mmsView &&
-                        this.treeSvc.branch2viewNumber[this.mmsView.id]
-                    ) {
-                        this.number =
-                            this.treeSvc.branch2viewNumber[this.mmsView.id]
-                    }
+            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
+                if (!data) return
+                if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
+                    this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
                 }
-            )
+            })
         )
 
         this.subs.push(
@@ -166,147 +144,86 @@ class SlideshowController implements angular.IComponentController {
                 if (data.clicked === 'show-comments') {
                     this.bbApi.toggleButton(
                         'show-comments',
-                        this.rootScopeSvc.veCommentsOn(
-                            !this.rootScopeSvc.veCommentsOn()
-                        )
+                        this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn())
                     )
                     return
                 } else if (data.clicked === 'show-numbering') {
                     this.bbApi.toggleButton(
                         'show-numbering',
-                        !this.rootScopeSvc.veNumberingOn(
-                            !this.rootScopeSvc.veNumberingOn()
-                        )
+                        !this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
                     )
                     return
                 } else if (data.clicked === 'show-elements') {
                     this.bbApi.toggleButton(
                         'show-elements',
-                        this.rootScopeSvc.veElementsOn(
-                            !this.rootScopeSvc.veElementsOn()
-                        )
+                        this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn())
                     )
 
-                    if (
-                        !this.rootScopeSvc.veElementsOn() &&
-                        this.rootScopeSvc.veEditMode()
-                    ) {
+                    if (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) {
                         this.eventSvc.$broadcast('show-edits', false)
                     }
                     return
                 } else if (data.clicked === 'show-edits') {
-                    this.bbApi.toggleButton(
-                        'show-edits',
-                        this.rootScopeSvc.veEditMode(
-                            !this.rootScopeSvc.veEditMode()
-                        )
-                    )
+                    this.bbApi.toggleButton('show-edits', this.rootScopeSvc.veEditMode(!this.rootScopeSvc.veEditMode()))
                     if (
-                        (this.rootScopeSvc.veElementsOn() &&
-                            !this.rootScopeSvc.veEditMode()) ||
-                        (!this.rootScopeSvc.veElementsOn() &&
-                            this.rootScopeSvc.veEditMode())
+                        (this.rootScopeSvc.veElementsOn() && !this.rootScopeSvc.veEditMode()) ||
+                        (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode())
                     ) {
-                        this.eventSvc.$broadcast(
-                            'show-elements',
-                            this.rootScopeSvc.veEditMode()
-                        )
+                        this.eventSvc.$broadcast('show-elements', this.rootScopeSvc.veEditMode())
                     }
                     return
                 } else if (data.clicked === 'center-previous') {
-                    this.treeSvc
-                        .getPrevBranch(this.treeSvc.getSelectedBranch(), [
-                            'view',
-                            'section',
-                        ])
-                        .then(
-                            (prev) => {
-                                this.bbApi.toggleButtonSpinner(
-                                    'center-previous'
-                                )
-                                this.treeSvc
-                                    .selectBranch(prev)
-                                    .catch((reason) => {
-                                        this.growl.error(
-                                            TreeService.treeError(reason)
-                                        )
-                                    })
-                                this.bbApi.toggleButtonSpinner(
-                                    'center-previous'
-                                )
-                            },
-                            (reason) => {
-                                if (reason.status === 200)
-                                    this.growl.info(reason.message)
-                                else this.growl.error(reason.message)
-                            }
-                        )
+                    this.treeSvc.getPrevBranch(this.treeSvc.getSelectedBranch(), ['view', 'section']).then(
+                        (prev) => {
+                            this.bbApi.toggleButtonSpinner('center-previous')
+                            this.treeSvc.selectBranch(prev).catch((reason) => {
+                                this.growl.error(TreeService.treeError(reason))
+                            })
+                            this.bbApi.toggleButtonSpinner('center-previous')
+                        },
+                        (reason) => {
+                            if (reason.status === 200) this.growl.info(reason.message)
+                            else this.growl.error(reason.message)
+                        }
+                    )
                     return
                 } else if (data.clicked === 'center-next') {
-                    this.treeSvc
-                        .getNextBranch(this.treeSvc.getSelectedBranch(), [
-                            'view',
-                            'section',
-                        ])
-                        .then(
-                            (next) => {
-                                this.bbApi.toggleButtonSpinner('center-next')
-                                this.treeSvc
-                                    .selectBranch(next)
-                                    .catch((reason) => {
-                                        this.growl.error(
-                                            TreeService.treeError(reason)
-                                        )
-                                    })
-                                this.bbApi.toggleButtonSpinner('center-next')
-                            },
-                            (reason) => {
-                                if (reason.status === 200)
-                                    this.growl.info(reason.message)
-                                else this.growl.error(reason.message)
-                            }
-                        )
+                    this.treeSvc.getNextBranch(this.treeSvc.getSelectedBranch(), ['view', 'section']).then(
+                        (next) => {
+                            this.bbApi.toggleButtonSpinner('center-next')
+                            this.treeSvc.selectBranch(next).catch((reason) => {
+                                this.growl.error(TreeService.treeError(reason))
+                            })
+                            this.bbApi.toggleButtonSpinner('center-next')
+                        },
+                        (reason) => {
+                            if (reason.status === 200) this.growl.info(reason.message)
+                            else this.growl.error(reason.message)
+                        }
+                    )
                     return
                 } else if (data.clicked === 'convert-pdf') {
                     if (this.isPageLoading()) return
                     this.appUtilsSvc
-                        .printModal(
-                            angular.element('#print-div'),
-                            this.mmsView,
-                            this.mmsRef,
-                            false,
-                            3
-                        )
+                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 3)
                         .then(
                             (ob) => {
-                                this.growl.info(
-                                    'Exporting as PDF file. Please wait for a completion email.',
-                                    { ttl: -1 }
-                                )
+                                this.growl.info('Exporting as PDF file. Please wait for a completion email.', {
+                                    ttl: -1,
+                                })
                             },
                             (reason) => {
-                                this.growl.error(
-                                    'Exporting as PDF file Failed: ' +
-                                        reason.message
-                                )
+                                this.growl.error('Exporting as PDF file Failed: ' + reason.message)
                             }
                         )
                     return
                 } else if (data.clicked === 'print') {
                     if (this.isPageLoading()) return
                     void this.appUtilsSvc
-                        .printModal(
-                            angular.element('#print-div'),
-                            this.mmsView,
-                            this.mmsRef,
-                            false,
-                            1
-                        )
+                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 1)
                         .catch((reason?) => {
                             if (reason) {
-                                this.growl.error(
-                                    'Print Error:' + reason.message
-                                )
+                                this.growl.error('Print Error:' + reason.message)
                             } else {
                                 this.growl.info('Print Cancelled', {
                                     ttl: 1000,
@@ -317,26 +234,16 @@ class SlideshowController implements angular.IComponentController {
                 } else if (data.clicked === 'word') {
                     if (this.isPageLoading()) return
                     this.appUtilsSvc
-                        .printModal(
-                            angular.element('#print-div'),
-                            this.mmsView,
-                            this.mmsRef,
-                            false,
-                            2
-                        )
+                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 2)
                         .then(
                             (ob) => {
-                                this.growl.info(
-                                    'Exporting as Word file. Please wait for a completion email.',
-                                    { ttl: -1 }
-                                )
+                                this.growl.info('Exporting as Word file. Please wait for a completion email.', {
+                                    ttl: -1,
+                                })
                             },
                             (reason?) => {
                                 if (reason) {
-                                    this.growl.error(
-                                        'Exporting as Word file Failed: ' +
-                                            reason.message
-                                    )
+                                    this.growl.error('Exporting as Word file Failed: ' + reason.message)
                                 } else {
                                     this.growl.info('Export Cancelled', {
                                         ttl: 1000,
@@ -347,19 +254,12 @@ class SlideshowController implements angular.IComponentController {
                     return
                 } else if (data.clicked === 'tabletocsv') {
                     if (this.isPageLoading()) return
-                    this.appUtilsSvc.tableToCsv(
-                        angular.element('#print-div'),
-                        false
-                    )
+                    this.appUtilsSvc.tableToCsv(angular.element('#print-div'), false)
                     return
                 } else if (data.clicked === 'refresh-numbering') {
                     if (this.isPageLoading()) return
-                    if (
-                        this.mmsView &&
-                        this.treeSvc.branch2viewNumber[this.mmsView.id]
-                    ) {
-                        this.number =
-                            this.treeSvc.branch2viewNumber[this.mmsView.id]
+                    if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
+                        this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
                     }
                     return
                 }
@@ -388,23 +288,15 @@ class SlideshowController implements angular.IComponentController {
 
         this.shortUrl = this.shortUrlSvc.getShortUrl({
             orgId: this.mmsProject.orgId,
-            documentId: this.mmsParams.documentId
-                ? this.mmsParams.documentId
-                : '',
-            viewId:
-                this.mmsParams.viewId &&
-                !this.mmsParams.documentId.endsWith('_cover')
-                    ? this.mmsParams.viewId
-                    : '',
+            documentId: this.mmsParams.documentId ? this.mmsParams.documentId : '',
+            viewId: this.mmsParams.viewId && !this.mmsParams.documentId.endsWith('_cover') ? this.mmsParams.viewId : '',
             projectId: this.mmsParams.projectId,
             refId: this.mmsParams.refId,
         })
 
         if (this.$state.includes('main.project.ref')) {
             const data = {
-                rootId: this.$state.includes('**.portal.**')
-                    ? this.mmsProject.id
-                    : this.mmsDocument.id,
+                rootId: this.$state.includes('**.portal.**') ? this.mmsProject.id : this.mmsDocument.id,
                 elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
                 commitId: 'latest',
                 projectId: this.mmsProject.id,
@@ -412,10 +304,7 @@ class SlideshowController implements angular.IComponentController {
                 refType: this.mmsRef.type,
                 refresh: this.$uiRouterGlobals.transition.from().name === '',
             }
-            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-                'view.selected',
-                data
-            )
+            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
         }
 
         this.contentWindowSvc.toggleLeftPane(false)
@@ -444,22 +333,16 @@ class SlideshowController implements angular.IComponentController {
             api.addButton(this.buttonBarSvc.getButtonBarButton('show-edits'))
             api.setPermission(
                 'show-edits',
-                this.permissionsSvc.hasBranchEditPermission(
-                    this.mmsProject.id,
-                    this.mmsRef.id
-                )
+                this.permissionsSvc.hasBranchEditPermission(this.mmsProject.id, this.mmsRef.id)
             )
             api.toggleButton('show-edits', this.rootScopeSvc.veEditMode())
             this.hotkeys.bindTo(this.$scope).add({
                 combo: 'alt+d',
                 description: 'toggle edit mode',
                 callback: () => {
-                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                        this.bbId,
-                        {
-                            clicked: 'show-edits',
-                        }
-                    )
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
+                        clicked: 'show-edits',
+                    })
                 },
             })
         }
@@ -477,36 +360,26 @@ class SlideshowController implements angular.IComponentController {
                 combo: 'alt+c',
                 description: 'toggle show comments',
                 callback: () => {
-                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                        this.bbId,
-                        {
-                            clicked: 'show-comments',
-                        }
-                    )
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
+                        clicked: 'show-comments',
+                    })
                 },
             })
             .add({
                 combo: 'alt+e',
                 description: 'toggle show elements',
                 callback: () => {
-                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                        this.bbId,
-                        {
-                            clicked: 'show-elements',
-                        }
-                    )
+                    this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
+                        clicked: 'show-elements',
+                    })
                 },
             })
 
         if (this.$state.includes('**.present.**')) {
-            api.addButton(
-                this.buttonBarSvc.getButtonBarButton('refresh-numbering')
-            )
+            api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
             api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
             api.addButton(this.buttonBarSvc.getButtonBarButton('export'))
-            api.addButton(
-                this.buttonBarSvc.getButtonBarButton('center-previous')
-            )
+            api.addButton(this.buttonBarSvc.getButtonBarButton('center-previous'))
             api.addButton(this.buttonBarSvc.getButtonBarButton('center-next'))
             // Set hotkeys for toolbar
             this.hotkeys
@@ -515,24 +388,18 @@ class SlideshowController implements angular.IComponentController {
                     combo: 'alt+.',
                     description: 'next',
                     callback: () => {
-                        this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                            this.bbId,
-                            {
-                                clicked: 'center-next',
-                            }
-                        )
+                        this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
+                            clicked: 'center-next',
+                        })
                     },
                 })
                 .add({
                     combo: 'alt+,',
                     description: 'previous',
                     callback: () => {
-                        this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                            this.bbId,
-                            {
-                                clicked: 'center-previous',
-                            }
-                        )
+                        this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbId, {
+                            clicked: 'center-previous',
+                        })
                     },
                 })
         } else {
@@ -552,10 +419,7 @@ class SlideshowController implements angular.IComponentController {
     }
 
     public elementTranscluded = (elementOb: ElementObject, type): void => {
-        if (
-            type === 'Comment' &&
-            !this.comments.map.hasOwnProperty(elementOb.id)
-        ) {
+        if (type === 'Comment' && !this.comments.map.hasOwnProperty(elementOb.id)) {
             this.comments.map[elementOb.id] = elementOb
             this.comments.count++
             if (elementOb._modified > this.comments.lastCommented) {
@@ -567,18 +431,13 @@ class SlideshowController implements angular.IComponentController {
 
     public elementClicked = (elementOb: ElementObject): void => {
         const data = {
-            rootOb: this.$state.includes('**.portal.**')
-                ? null
-                : this.mmsDocument.id,
+            rootOb: this.$state.includes('**.portal.**') ? null : this.mmsDocument.id,
             elementId: elementOb.id,
             projectId: elementOb._projectId,
             refId: elementOb._refId,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-            'element.selected',
-            data
-        )
+        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
     }
 
     public isPageLoading = (): boolean => {

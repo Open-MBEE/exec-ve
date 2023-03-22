@@ -43,16 +43,11 @@ export class Diff<T> implements IDiff<T> {
         if (this.baseContent && this.comparedContent) this.performDiff()
     }
 
-    protected changeAction: onChangesCallback<T> = (
-        newVal,
-        oldVal,
-        firstChange
-    ) => {
+    protected changeAction: onChangesCallback<T> = (newVal, oldVal, firstChange) => {
         if (!newVal || firstChange) {
             return
         }
-        if (this.baseContent && this.comparedContent && oldVal !== newVal)
-            this.performDiff()
+        if (this.baseContent && this.comparedContent && oldVal !== newVal) this.performDiff()
     }
 
     protected performDiff = (): void => {

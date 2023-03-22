@@ -4,12 +4,7 @@ import { SpecApi } from '@ve-components/spec-tools'
 import { ButtonBarApi } from '@ve-core/button-bar'
 
 import { EditingApi } from '@ve-types/core/editor'
-import {
-    ElementObject,
-    InstanceValueObject,
-    ValueObject,
-    ViewObject,
-} from '@ve-types/mms'
+import { ElementObject, InstanceValueObject, ValueObject, ViewObject } from '@ve-types/mms'
 
 export interface ComponentController {
     element: ElementObject

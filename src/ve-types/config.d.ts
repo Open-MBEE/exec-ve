@@ -1,7 +1,4 @@
-import {
-    VeExperimentConfig,
-    VeExperimentDescriptor,
-} from '@ve-components/services'
+import { VeExperimentConfig, VeExperimentDescriptor } from '@ve-components/services'
 
 export interface VeConfig {
     version?: string

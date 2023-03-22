@@ -5,10 +5,7 @@ import { veApp } from '@ve-app'
 
 import { VeModalComponent, VeModalController } from '@ve-types/view-editor'
 
-class LoginWarningModalController
-    extends VeModalControllerImpl<boolean>
-    implements VeModalController
-{
+class LoginWarningModalController extends VeModalControllerImpl<boolean> implements VeModalController {
     static $inject = ['RootScopeService']
 
     constructor(private rootScopeSvc: RootScopeService) {

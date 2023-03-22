@@ -54,9 +54,7 @@ export class AuthService {
         this.token = localStorage.getItem('token')
     }
 
-    getAuthorized(
-        credentialsJSON: AuthRequest
-    ): VePromise<string, AuthResponse> {
+    getAuthorized(credentialsJSON: AuthRequest): VePromise<string, AuthResponse> {
         const deferred = this.$q.defer<string>()
         const loginURL = this.uRLSvc.getAuthenticationUrl()
         this.$http.post<AuthResponse>(loginURL, credentialsJSON).then(

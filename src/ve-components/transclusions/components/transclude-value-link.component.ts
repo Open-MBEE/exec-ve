@@ -1,9 +1,5 @@
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import {
-    ITransclusion,
-    ITransclusionComponentOptions,
-    Transclusion,
-} from '@ve-components/transclusions'
+import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { MathService, UtilsService, ImageService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -44,10 +40,7 @@ import { ElementObject, LiteralObject, SlotObject } from '@ve-types/mms'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeNameController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeNameController extends Transclusion implements ITransclusion {
     //Custom Bindings
     mmsLinkText: string
 
@@ -108,20 +101,14 @@ export class TranscludeNameController
             if (
                 angular.isArray(this.element.value) &&
                 this.element.value.length > 0 &&
-                (this.element.value[0] as ElementObject).type ===
-                    'LiteralString'
+                (this.element.value[0] as ElementObject).type === 'LiteralString'
             ) {
-                url = (
-                    (this.element as SlotObject)
-                        .value[0] as LiteralObject<string>
-                ).value
+                url = ((this.element as SlotObject).value[0] as LiteralObject<string>).value
             }
         }
 
         if (url !== '') {
-            return this.$q.resolve(
-                '<a ng-href="' + url + '">' + this.mmsLinkText + '</a>'
-            )
+            return this.$q.resolve('<a ng-href="' + url + '">' + this.mmsLinkText + '</a>')
         } else {
             return this.$q.reject('Element does not provide link value.')
         }
@@ -150,7 +137,4 @@ export const TranscludeValueLinkComponent: ITransclusionComponentOptions = {
     controller: TranscludeNameController,
 }
 
-veComponents.component(
-    TranscludeValueLinkComponent.selector,
-    TranscludeValueLinkComponent
-)
+veComponents.component(TranscludeValueLinkComponent.selector, TranscludeValueLinkComponent)

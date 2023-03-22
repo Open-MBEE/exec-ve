@@ -1,9 +1,4 @@
-import {
-    StateService,
-    TransitionService,
-    UIRouter,
-    UIRouterGlobals,
-} from '@uirouter/angularjs'
+import { StateService, TransitionService, UIRouter, UIRouterGlobals } from '@uirouter/angularjs'
 import { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
@@ -84,18 +79,13 @@ class SelectController implements IComponentController {
         this.redirect_from_old = this.rootScopeSvc.veRedirectFromOld()
 
         this.subs.push(
-            this.eventSvc.binding(
-                this.rootScopeSvc.constants.VEREDIRECTFROMOLD,
-                (data: boolean) => {
-                    this.redirect_from_old = data
-                }
-            )
+            this.eventSvc.binding(this.rootScopeSvc.constants.VEREDIRECTFROMOLD, (data: boolean) => {
+                this.redirect_from_old = data
+            })
         )
         this.rootScopeSvc.veTitle('Projects')
         this.pageTitle = 'View Editor'
-        this.fromLogin = (
-            this.$uiRouterGlobals.params as ParamsObject
-        ).fromLogin
+        this.fromLogin = (this.$uiRouterGlobals.params as ParamsObject).fromLogin
         this.$localStorage.$default({ org: this.mmsOrgs[0] })
         this.orgs = this.mmsOrgs
         if (this.$localStorage.org) {
@@ -114,15 +104,8 @@ class SelectController implements IComponentController {
                 (data) => {
                     this.projects = data
                     if (data && data.length > 0) {
-                        if (
-                            this.$localStorage.project &&
-                            this.checkForProject(
-                                data,
-                                this.$localStorage.project
-                            )
-                        ) {
-                            this.selectedProject =
-                                this.$localStorage.project.name
+                        if (this.$localStorage.project && this.checkForProject(data, this.$localStorage.project)) {
+                            this.selectedProject = this.$localStorage.project.name
                             this.projectId = this.$localStorage.project.id
                         } else {
                             this.selectProject(data[0])
@@ -130,9 +113,7 @@ class SelectController implements IComponentController {
                     }
                 },
                 (reason) => {
-                    this.growl.error(
-                        'Error getting project data: ' + reason.message
-                    )
+                    this.growl.error('Error getting project data: ' + reason.message)
                 }
             )
         }
@@ -183,10 +164,7 @@ class SelectController implements IComponentController {
             })
     }
 
-    public checkForProject(
-        projectArray: ProjectObject[],
-        project: ProjectObject
-    ): boolean {
+    public checkForProject(projectArray: ProjectObject[], project: ProjectObject): boolean {
         for (let i = 0; i < projectArray.length; i++) {
             if (projectArray[i].id === project.id) {
                 return true

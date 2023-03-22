@@ -9,12 +9,7 @@ import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 import { veApp } from '@ve-app'
 
 import { AuthRequest } from '@ve-types/mms'
-import {
-    VeModalComponent,
-    VeModalController,
-    VeModalResolve,
-    VeModalResolveFn,
-} from '@ve-types/view-editor'
+import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface LoginModalResolveFn extends VeModalResolveFn {
     continue(): boolean
@@ -24,10 +19,7 @@ export interface LoginModalResolve extends VeModalResolve {
     continue: boolean
 }
 
-class LoginModalController
-    extends VeModalControllerImpl<boolean, LoginModalResolve>
-    implements VeModalController
-{
+class LoginModalController extends VeModalControllerImpl<boolean, LoginModalResolve> implements VeModalController {
     static $inject = [
         '$state',
         '$uiRouterGlobals',
@@ -66,26 +58,18 @@ class LoginModalController
                 const edits = this.autosaveSvc.getAll()
                 _.map(edits, (element, key) => {
                     const reqOb = this.apiSvc.makeRequestObject(element)
-                    const cacheKey = this.apiSvc.makeCacheKey(
-                        reqOb,
-                        element.id,
-                        true
-                    )
+                    const cacheKey = this.apiSvc.makeCacheKey(reqOb, element.id, true)
                     this.cacheSvc.put(cacheKey, element)
                 })
                 if (this.resolve.continue) {
-                    this.$state
-                        .go(this.$uiRouterGlobals.current, {}, { reload: true })
-                        .then(
-                            () => {
-                                this.modalInstance.close(true)
-                            },
-                            () => {
-                                this.growl.error(
-                                    'Redirect error; Please reload the page'
-                                )
-                            }
-                        )
+                    this.$state.go(this.$uiRouterGlobals.current, {}, { reload: true }).then(
+                        () => {
+                            this.modalInstance.close(true)
+                        },
+                        () => {
+                            this.growl.error('Redirect error; Please reload the page')
+                        }
+                    )
                 }
             },
             (reason) => {

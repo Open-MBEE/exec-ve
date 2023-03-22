@@ -1,10 +1,6 @@
 import angular from 'angular'
 
-import {
-    Presentation,
-    PresentationService,
-    ViewHtmlService,
-} from '@ve-components/presentations'
+import { Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { ImageService } from '@ve-utils/application'
@@ -32,10 +28,7 @@ const ViewPlotComponent: IPresentationComponentOptions = {
         element: '<',
         peNumber: '<',
     },
-    controller: class ViewPlotController
-        extends Presentation
-        implements ComponentController
-    {
+    controller: class ViewPlotController extends Presentation implements ComponentController {
         public plot: PresentPlotObject
         public plotConfig: PresentPlotObject
 
@@ -78,14 +71,9 @@ const ViewPlotComponent: IPresentationComponentOptions = {
 
         getContent = (): VePromise<string, string> => {
             if (this.plot.type === 'Plot') {
-                if (
-                    this.plot.config !== undefined &&
-                    this.plot.config.trim().length !== 0
-                ) {
+                if (this.plot.config !== undefined && this.plot.config.trim().length !== 0) {
                     try {
-                        this.plotConfig = JSON.parse(
-                            this.plot.config.replace(/'/g, '"')
-                        ) as PresentPlotObject
+                        this.plotConfig = JSON.parse(this.plot.config.replace(/'/g, '"')) as PresentPlotObject
                         if (this.plotConfig.ptype !== undefined) {
                             this.plot.ptype = this.plotConfig.ptype
                         }

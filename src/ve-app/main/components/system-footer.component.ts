@@ -29,12 +29,9 @@ const SystemFooterComponent: VeComponentOptions = {
 
         $onInit(): void {
             this.loading = true
-            if (Array.isArray(this.mmsFooter.message))
-                this.footerMessage = this.mmsFooter.message
+            if (Array.isArray(this.mmsFooter.message)) this.footerMessage = this.mmsFooter.message
             else this.footerMessage = [this.mmsFooter.message]
-            this.disabled = this.mmsFooter.disabled
-                ? this.mmsFooter.disabled
-                : false
+            this.disabled = this.mmsFooter.disabled ? this.mmsFooter.disabled : false
             this.loading = false
         }
     },

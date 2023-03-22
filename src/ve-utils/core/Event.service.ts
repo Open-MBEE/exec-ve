@@ -8,16 +8,10 @@ export class EventService {
     private subjects: { [key: string]: Rx.ISubject<unknown> } = {}
     private bindings: { [key: string]: Rx.ISubject<unknown> } = {}
     //API
-    public $broadcast = <T>(name: string, data?: T): void =>
-        this.emit(name, data)
-    public $on = <T>(
-        name: string,
-        handler: eventHandlerFn<T>
-    ): Rx.IDisposable => this.listen<T>(name, handler)
+    public $broadcast = <T>(name: string, data?: T): void => this.emit(name, data)
+    public $on = <T>(name: string, handler: eventHandlerFn<T>): Rx.IDisposable => this.listen<T>(name, handler)
     public $destroy = (subs: Rx.IDisposable[]): void => this.destroy(subs)
-    public $init = (
-        ctrl: { subs: Rx.IDisposable[] } & angular.IComponentController
-    ): void => this.initEventSvc(ctrl)
+    public $init = (ctrl: { subs: Rx.IDisposable[] } & angular.IComponentController): void => this.initEventSvc(ctrl)
 
     createName = (name: string): string => {
         return `$ ${name}`
@@ -33,15 +27,10 @@ export class EventService {
         }
     }
 
-    binding<T = unknown>(
-        name: string,
-        handler: eventHandlerFn<T>
-    ): Rx.IDisposable {
+    binding<T = unknown>(name: string, handler: eventHandlerFn<T>): Rx.IDisposable {
         const fnName = this.createName(name)
         if (!this.bindings[fnName]) {
-            throw Error(
-                'Binding ' + name + ' subscribed before initialization!'
-            )
+            throw Error('Binding ' + name + ' subscribed before initialization!')
         }
         return this.bindings[fnName].subscribe(handler)
     }
@@ -55,10 +44,7 @@ export class EventService {
         this.subjects[fnName].onNext(data)
     }
 
-    listen<T = unknown>(
-        name: string,
-        handler: eventHandlerFn<T>
-    ): Rx.IDisposable {
+    listen<T = unknown>(name: string, handler: eventHandlerFn<T>): Rx.IDisposable {
         const fnName = this.createName(name)
         if (!this.subjects[fnName]) {
             this.subjects[fnName] = new Rx.Subject<T>()
@@ -91,10 +77,7 @@ export class EventService {
 
     exists(eventOrBinding: string): boolean {
         const name = this.createName(eventOrBinding)
-        return (
-            this.subjects.hasOwnProperty(name) ||
-            this.bindings.hasOwnProperty(name)
-        )
+        return this.subjects.hasOwnProperty(name) || this.bindings.hasOwnProperty(name)
     }
 }
 

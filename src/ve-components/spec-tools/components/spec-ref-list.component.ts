@@ -101,8 +101,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
 
     $onInit(): void {
         super.$onInit()
-        this.showMerge =
-            this.uRLSvc.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1
+        this.showMerge = this.uRLSvc.getMmsServer().indexOf('opencae.jpl.nasa.gov') == -1
         this.runCleared = true
         this.docEditable = false
 
@@ -132,10 +131,7 @@ class SpecRefListController extends SpecTool implements ISpecTool {
 
         this.docEditable =
             this.specApi.refType != 'Tag' &&
-            this.permissionsSvc.hasBranchEditPermission(
-                this.specApi.projectId,
-                this.specApi.refId
-            )
+            this.permissionsSvc.hasBranchEditPermission(this.specApi.projectId, this.specApi.refId)
     }
 
     public docMergeAction = (srcRef: RefObject): void => {

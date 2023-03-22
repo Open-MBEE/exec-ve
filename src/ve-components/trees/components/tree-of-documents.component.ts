@@ -19,17 +19,7 @@ class TreeOfDocumentsController extends TreeController {
         rootScopeSvc: RootScopeService,
         eventSvc: EventService
     ) {
-        super(
-            $q,
-            $scope,
-            $timeout,
-            $filter,
-            growl,
-            utilsSvc,
-            treeSvc,
-            rootScopeSvc,
-            eventSvc
-        )
+        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
         this.id = 'tree-of-documents'
         this.types = ['group']
     }
@@ -81,7 +71,4 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
     controller: TreeOfDocumentsController,
 }
 
-veComponents.component(
-    TreeOfDocumentsComponent.selector,
-    TreeOfDocumentsComponent
-)
+veComponents.component(TreeOfDocumentsComponent.selector, TreeOfDocumentsComponent)

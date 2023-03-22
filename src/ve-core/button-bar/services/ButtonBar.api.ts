@@ -25,22 +25,16 @@ export class ButtonBarApi {
             parentButton.dropdown_buttons.forEach((dropdownButton) => {
                 if (parentButton.config.dropdown) {
                     if (dropdownButton.id === childButton.id) {
-                        dropdownButton.selected = dropdownButton.selected
-                            ? !dropdownButton.selected
-                            : true
+                        dropdownButton.selected = dropdownButton.selected ? !dropdownButton.selected : true
                     }
                 } else {
-                    dropdownButton.selected =
-                        dropdownButton.id === childButton.id
+                    dropdownButton.selected = dropdownButton.id === childButton.id
                 }
             })
         }
     }
 
-    public deselect = (
-        parentButton: BarButton,
-        childButton: BarButton
-    ): void => {
+    public deselect = (parentButton: BarButton, childButton: BarButton): void => {
         if (parentButton && childButton) {
             parentButton.dropdown_buttons.forEach((dropdownButton) => {
                 if (parentButton.config.dropdown) {
@@ -91,10 +85,7 @@ export class ButtonBarApi {
         })
     }
 
-    public checkActive = (
-        cb: (enableState: string) => boolean,
-        parent?: BarButton
-    ): void => {
+    public checkActive = (cb: (enableState: string) => boolean, parent?: BarButton): void => {
         const buttons = parent ? parent.dropdown_buttons : this.buttons
         buttons.forEach((button) => {
             const config = button.config
@@ -103,11 +94,7 @@ export class ButtonBarApi {
                     this.setActive(button.id, false, parent ? parent.id : null)
                     for (const enableState of config.enabledFor) {
                         if (cb(enableState)) {
-                            this.setActive(
-                                button.id,
-                                true,
-                                parent ? parent.id : null
-                            )
+                            this.setActive(button.id, true, parent ? parent.id : null)
                             break
                         }
                     }
@@ -115,11 +102,7 @@ export class ButtonBarApi {
                 if (config.disabledFor) {
                     for (const disableState of config.disabledFor) {
                         if (cb(disableState)) {
-                            this.setActive(
-                                button.id,
-                                false,
-                                parent ? parent.id : null
-                            )
+                            this.setActive(button.id, false, parent ? parent.id : null)
                             break
                         }
                     }

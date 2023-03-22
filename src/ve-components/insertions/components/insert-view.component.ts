@@ -1,12 +1,7 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import {
-    ApiService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
@@ -77,9 +72,7 @@ class InsertViewController extends Insertion<InsertViewData> {
         const view = data
         const viewId = view.id
         if (this.insertData.seenViewIds[viewId]) {
-            this.growl.error(
-                'Error: View ' + view.name + ' is already in this document.'
-            )
+            this.growl.error('Error: View ' + view.name + ' is already in this document.')
             return
         }
         if (this.oking) {
@@ -134,10 +127,7 @@ class InsertViewController extends Insertion<InsertViewData> {
         filters._appliedStereotypeIds = [
             this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
             this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
-            ...this.schemaSvc.getSchema<string[]>(
-                'OTHER_VIEW_SID',
-                this.schema
-            ),
+            ...this.schemaSvc.getSchema<string[]>('OTHER_VIEW_SID', this.schema),
         ]
         return filters
     }

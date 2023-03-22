@@ -1,10 +1,6 @@
 import _ from 'lodash'
 
-import {
-    ApiService,
-    DocumentMetadata,
-    URLService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, DocumentMetadata, URLService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -49,8 +45,7 @@ export class UtilsService {
      * @returns {string} toc string
      */
     public makeHtmlTOC = (rootBranch: TreeBranch): string => {
-        let result =
-            '<div class="toc"><h1 class="header">Table of Contents</h1>'
+        let result = '<div class="toc"><h1 class="header">Table of Contents</h1>'
         result += this.makeHtmlTOCChild(rootBranch, true)
         result += '</div>'
         return result
@@ -122,29 +117,17 @@ export class UtilsService {
             // return obHTML;
         } else {
             for (let i = 0; i < rootBranch.children.length; i++) {
-                this.makeTablesAndFiguresTOCChild(
-                    rootBranch.children[i],
-                    printElement,
-                    ob,
-                    live,
-                    false
-                )
+                this.makeTablesAndFiguresTOCChild(rootBranch.children[i], printElement, ob, live, false)
             }
         }
         ob.tables = ob.tables.length
-            ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>' +
-              ob.tables +
-              '</ul></div>'
+            ? '<div class="tot"><h1 class="header">List of Tables</h1><ul>' + ob.tables + '</ul></div>'
             : ''
         ob.figures = ob.figures.length
-            ? '<div class="tof"><h1 class="header">List of Figures</h1><ul>' +
-              ob.figures +
-              '</ul></div>'
+            ? '<div class="tof"><h1 class="header">List of Figures</h1><ul>' + ob.figures + '</ul></div>'
             : ''
         ob.equations = ob.equations.length
-            ? '<div class="tof"><h1 class="header">List of Equations</h1><ul>' +
-              ob.equations +
-              '</ul></div>'
+            ? '<div class="tof"><h1 class="header">List of Equations</h1><ul>' + ob.equations + '</ul></div>'
             : ''
         return ob
     }
@@ -173,11 +156,7 @@ export class UtilsService {
         let prefix = ''
         const el = printElement.find('#' + sysmlId)
         const refs = printElement.find(
-            'view-link[mms-pe-id="' +
-                sysmlId +
-                '"], view-link[data-mms-pe-id="' +
-                sysmlId +
-                '"]'
+            'view-link[mms-pe-id="' + sysmlId + '"], view-link[data-mms-pe-id="' + sysmlId + '"]'
         )
         let cap = ''
         let name = ''
@@ -186,11 +165,7 @@ export class UtilsService {
             prefix = 'Table ' + veNumber + '. '
             const capTbl = el.find('table > caption')
             name = capTbl.text()
-            if (
-                name !== '' &&
-                name.indexOf('Table') === 0 &&
-                name.split('. ').length > 0
-            ) {
+            if (name !== '' && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
                 name = pe.name
@@ -219,11 +194,7 @@ export class UtilsService {
             prefix = 'Figure ' + veNumber + '. '
             const capFig = el.find('figure > figcaption')
             name = capFig.text()
-            if (
-                name !== '' &&
-                name.indexOf('Figure') === 0 &&
-                name.split('. ').length > 0
-            ) {
+            if (name !== '' && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
                 name = pe.name
@@ -252,8 +223,7 @@ export class UtilsService {
         if (child.type === 'equation') {
             ob.equationCount++
             cap = veNumber + '. ' + pe.name
-            ob.equations +=
-                '<li><a href="#' + sysmlId + '">' + cap + '</a></li>'
+            ob.equations += '<li><a href="#' + sysmlId + '">' + cap + '</a></li>'
             const equationCap = '(' + veNumber + ')'
             const capEq = el.find('.caption-type-equation')
             capEq.html(equationCap)
@@ -261,11 +231,7 @@ export class UtilsService {
             if (capEq.length === 0) {
                 el.find('present-equation > transclude > transclude-doc > p')
                     .last()
-                    .append(
-                        '<span class="caption-type-equation pull-right">' +
-                            equationCap +
-                            '</span>'
-                    )
+                    .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>')
             }
             if (!live) {
                 refs.find('a').attr('href', '#' + sysmlId)
@@ -276,21 +242,11 @@ export class UtilsService {
                 .html('Eq. ' + equationCap)
         }
         for (let i = 0; i < child.children.length; i++) {
-            this.makeTablesAndFiguresTOCChild(
-                child.children[i],
-                printElement,
-                ob,
-                live,
-                showRefName
-            )
+            this.makeTablesAndFiguresTOCChild(child.children[i], printElement, ob, live, showRefName)
         }
     }
 
-    public addLiveNumbering(
-        pe: ViewObject,
-        el: JQuery<HTMLElement>,
-        type: string
-    ): void {
+    public addLiveNumbering(pe: ViewObject, el: JQuery<HTMLElement>, type: string): void {
         const veNumber = pe._veNumber
         if (!veNumber) {
             return
@@ -302,11 +258,7 @@ export class UtilsService {
             prefix = 'Table ' + veNumber + '. '
             const capTbl = el.find('table > caption')
             name = capTbl.text()
-            if (
-                name !== '' &&
-                name.indexOf('Table') === 0 &&
-                name.split('. ').length > 0
-            ) {
+            if (name !== '' && name.indexOf('Table') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
                 name = pe.name
@@ -322,11 +274,7 @@ export class UtilsService {
             prefix = 'Figure ' + veNumber + '. '
             const capFig = el.find('figure > figcaption')
             name = capFig.text()
-            if (
-                name !== '' &&
-                name.indexOf('Figure') === 0 &&
-                name.split('. ').length > 0
-            ) {
+            if (name !== '' && name.indexOf('Figure') === 0 && name.split('. ').length > 0) {
                 name = name.substring(name.indexOf(prefix) + prefix.length)
             } else if (name === '') {
                 name = pe.name
@@ -348,11 +296,7 @@ export class UtilsService {
             if (capEq.length === 0) {
                 el.find('present-equation > view-cf > transclude-doc > p')
                     .last()
-                    .append(
-                        '<span class="caption-type-equation pull-right">' +
-                            equationCap +
-                            '</span>'
-                    )
+                    .append('<span class="caption-type-equation pull-right">' + equationCap + '</span>')
             }
         }
     }
@@ -405,12 +349,8 @@ export class UtilsService {
             tbl.attr('id', anchorId)
 
             // Append li to the List of Tables
-            thisCap =
-                tblCap && tblCap.text() !== ''
-                    ? `${j + 1}. ${tblCap.text()}`
-                    : `${j + 1}. `
-            ob.tables +=
-                '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
+            thisCap = tblCap && tblCap.text() !== '' ? `${j + 1}. ${tblCap.text()}` : `${j + 1}. `
+            ob.tables += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
 
             // If no caption exists, add empty caption for numbering
             if (tblCap.length === 0) {
@@ -428,12 +368,8 @@ export class UtilsService {
             fig.attr('id', anchorId)
 
             // Append li to the List of Figures
-            thisCap =
-                figcap && figcap.text() !== ''
-                    ? `${j + 1}. ${figcap.text()}`
-                    : `${j + 1}`
-            ob.figures +=
-                '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
+            thisCap = figcap && figcap.text() !== '' ? `${j + 1}. ${figcap.text()}` : `${j + 1}`
+            ob.figures += '<li><a href="#' + anchorId + '">' + thisCap + '</a></li>'
 
             // If no caption exists, add empty caption for numbering
             if (figcap.length === 0) {
@@ -469,9 +405,7 @@ export class UtilsService {
     public convertViewLinks(printElement: JQuery<HTMLElement>): void {
         printElement.find('view-link').each((index) => {
             const $this = $(this)
-            let elementId =
-                $this.attr('mms-element-id') ||
-                $this.attr('data-mms-element-id')
+            let elementId = $this.attr('mms-element-id') || $this.attr('data-mms-element-id')
             if (!elementId) {
                 return
             }
@@ -495,11 +429,7 @@ export class UtilsService {
                 };
      * @returns {string} document/view content string to be passed to the server for conversion
      */
-    public getPrintCss = (
-        htmlFlag: boolean,
-        landscape: boolean,
-        meta: DocumentMetadata
-    ): string => {
+    public getPrintCss = (htmlFlag: boolean, landscape: boolean, meta: DocumentMetadata): string => {
         let ret = `
         /*------------------------------------------------------------------
 Custom CSS Table of Contents
@@ -655,8 +585,7 @@ caption::before {content: "Table " counter(table-counter) ". "; }
         let accept: string
         switch (exportType) {
             case 2:
-                accept =
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                accept = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                 break
             case 3:
                 accept = 'application/pdf'
@@ -666,16 +595,13 @@ caption::before {content: "Table " counter(table-counter) ". "; }
         }
         const deferred = this.$q.defer<string>()
         this.$http
-            .post<string>(
-                this.uRLSvc.getExportHtmlUrl(data.projectId, data.refId),
-                {
-                    'Content-Type': 'text/html',
-                    Accepts: accept,
-                    body: data.htmlString,
-                    name: data.name,
-                    css: data.css,
-                }
-            )
+            .post<string>(this.uRLSvc.getExportHtmlUrl(data.projectId, data.refId), {
+                'Content-Type': 'text/html',
+                Accepts: accept,
+                body: data.htmlString,
+                name: data.name,
+                css: data.css,
+            })
             .then(
                 () => {
                     deferred.resolve('ok')
@@ -687,10 +613,7 @@ caption::before {content: "Table " counter(table-counter) ". "; }
         return deferred.promise
     }
 
-    public getElementTypeClass = (
-        element: ElementObject,
-        elementType: string
-    ): string => {
+    public getElementTypeClass = (element: ElementObject, elementType: string): string => {
         let elementTypeClass = ''
         if (element.type === 'InstanceSpecification') {
             elementTypeClass = 'pe-type-' + _.kebabCase(elementType)

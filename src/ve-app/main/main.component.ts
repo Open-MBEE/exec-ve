@@ -1,20 +1,11 @@
 import 'angular-growl-v2'
 
-import {
-    StateService,
-    Transition,
-    TransitionService,
-    UIRouter,
-    UIRouterGlobals,
-} from '@uirouter/angularjs'
+import { StateService, Transition, TransitionService, UIRouter, UIRouterGlobals } from '@uirouter/angularjs'
 import angular, { IComponentController, IHttpResponse } from 'angular'
 import _ from 'lodash'
 import Rx from 'rx-lite'
 
-import {
-    WorkingTimeModalResolveFn,
-    WorkingTimeObject,
-} from '@ve-app/main/modals/working-modal.component'
+import { WorkingTimeModalResolveFn, WorkingTimeObject } from '@ve-app/main/modals/working-modal.component'
 import { ApplicationService, RootScopeService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
 import {
@@ -108,30 +99,21 @@ class MainController implements IComponentController {
         this.rootScopeSvc.init()
 
         this.subs.push(
-            this.eventSvc.binding(
-                this.rootScopeSvc.constants.VETITLE,
-                (value: string) => {
-                    this.$window.document.title = value + ' | View Editor'
-                }
-            )
+            this.eventSvc.binding(this.rootScopeSvc.constants.VETITLE, (value: string) => {
+                this.$window.document.title = value + ' | View Editor'
+            })
         )
 
         this.subs.push(
-            this.eventSvc.binding(
-                this.rootScopeSvc.constants.VESHOWLOGIN,
-                (value: boolean) => {
-                    this.showLogin = value
-                }
-            )
+            this.eventSvc.binding(this.rootScopeSvc.constants.VESHOWLOGIN, (value: boolean) => {
+                this.showLogin = value
+            })
         )
 
         this.subs.push(
-            this.eventSvc.binding(
-                this.rootScopeSvc.constants.VEHIDEPANES,
-                (value: boolean) => {
-                    this.hidePanes = value
-                }
-            )
+            this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDEPANES, (value: boolean) => {
+                this.hidePanes = value
+            })
         )
 
         this.subs.push(
@@ -142,8 +124,7 @@ class MainController implements IComponentController {
 
         this.$window.addEventListener('beforeunload', (event) => {
             if (Object.keys(this.openEdits).length > 0) {
-                const message =
-                    'You may have unsaved changes, are you sure you want to leave?'
+                const message = 'You may have unsaved changes, are you sure you want to leave?'
                 event.returnValue = message
                 return message
             }
@@ -167,69 +148,50 @@ class MainController implements IComponentController {
             })
 
         this.subs.push(
-            this.eventSvc.$on(
-                'mms.working',
-                (response: IHttpResponse<WorkingTimeObject>) => {
-                    this.rootScopeSvc.veViewContentLoading(false)
-                    if (this.workingModalOpen) {
-                        return
-                    }
-                    this.mmsWorkingTime = response.data
-                    this.workingModalOpen = true
-                    this.$uibModal
-                        .open<WorkingTimeModalResolveFn, void>({
-                            component: 'workingModal',
-                            backdrop: true,
-                            resolve: {
-                                getWorkingTime: () => {
-                                    return this.mmsWorkingTime
-                                },
-                            },
-                            size: 'md',
-                        })
-                        .result.finally(() => {
-                            this.workingModalOpen = false
-                        })
+            this.eventSvc.$on('mms.working', (response: IHttpResponse<WorkingTimeObject>) => {
+                this.rootScopeSvc.veViewContentLoading(false)
+                if (this.workingModalOpen) {
+                    return
                 }
-            )
+                this.mmsWorkingTime = response.data
+                this.workingModalOpen = true
+                this.$uibModal
+                    .open<WorkingTimeModalResolveFn, void>({
+                        component: 'workingModal',
+                        backdrop: true,
+                        resolve: {
+                            getWorkingTime: () => {
+                                return this.mmsWorkingTime
+                            },
+                        },
+                        size: 'md',
+                    })
+                    .result.finally(() => {
+                        this.workingModalOpen = false
+                    })
+            })
         )
 
         this.subs.push(
-            this.eventSvc.$on(
-                'element.updated',
-                (data: { element: ElementObject; continueEdit: boolean }) => {
-                    const element = data.element
-                    //if element is not being edited and there's a cached edit object, update the edit object also
-                    //so next time edit forms will show updated data (mainly for stomp updates)
-                    const editKey = this.apiSvc.makeCacheKey(
-                        this.apiSvc.makeRequestObject(element),
-                        element.id,
+            this.eventSvc.$on('element.updated', (data: { element: ElementObject; continueEdit: boolean }) => {
+                const element = data.element
+                //if element is not being edited and there's a cached edit object, update the edit object also
+                //so next time edit forms will show updated data (mainly for stomp updates)
+                const editKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(element), element.id, true)
+                const veEditsKey = element.id + '|' + element._projectId + '|' + element._refId
+                if (this.autosaveSvc.getAll() && !this.autosaveSvc.get(veEditsKey) && this.cacheSvc.exists(editKey)) {
+                    this.elementSvc.cacheElement(
+                        {
+                            projectId: element._projectId,
+                            refId: element._refId,
+                            elementId: element.id,
+                            commitId: 'latest',
+                        },
+                        _.cloneDeep(element),
                         true
                     )
-                    const veEditsKey =
-                        element.id +
-                        '|' +
-                        element._projectId +
-                        '|' +
-                        element._refId
-                    if (
-                        this.autosaveSvc.getAll() &&
-                        !this.autosaveSvc.get(veEditsKey) &&
-                        this.cacheSvc.exists(editKey)
-                    ) {
-                        this.elementSvc.cacheElement(
-                            {
-                                projectId: element._projectId,
-                                refId: element._refId,
-                                elementId: element.id,
-                                commitId: 'latest',
-                            },
-                            _.cloneDeep(element),
-                            true
-                        )
-                    }
                 }
-            )
+            })
         )
 
         this.$transitions.onStart({}, (trans) => {
@@ -261,8 +223,7 @@ class MainController implements IComponentController {
             this.rootScopeSvc.veStateChanging(false)
             this.rootScopeSvc.veViewContentLoading(false)
             //check if error is ticket error
-            const error: angular.IHttpResponse<any> = trans.error()
-                .detail as angular.IHttpResponse<any>
+            const error: angular.IHttpResponse<any> = trans.error().detail as angular.IHttpResponse<any>
             if (
                 !error ||
                 error.status === 401 ||
@@ -299,8 +260,7 @@ class MainController implements IComponentController {
             }
             if (
                 this.rootScopeSvc.veRedirect() &&
-                this.$uiRouterGlobals.$current.name ===
-                    this.rootScopeSvc.veRedirect().toState.name
+                this.$uiRouterGlobals.$current.name === this.rootScopeSvc.veRedirect().toState.name
             ) {
                 this.rootScopeSvc.veRedirect(null)
             }
@@ -353,9 +313,7 @@ class MainController implements IComponentController {
             // }
             if (this.$state.includes('main.project.ref.view.present')) {
                 this.applicationSvc.getState().inDoc = true
-                this.applicationSvc.getState().currentDoc = (
-                    trans.params() as ParamsObject
-                ).documentId
+                this.applicationSvc.getState().currentDoc = (trans.params() as ParamsObject).documentId
                 this.applicationSvc.getState().fullDoc = !!this.$state.includes(
                     'main.project.ref.view.present.document'
                 )
@@ -364,13 +322,8 @@ class MainController implements IComponentController {
                 this.applicationSvc.getState().fullDoc = false
             }
             this.rootScopeSvc.veViewContentLoading(false)
-            if (
-                this.$state.includes('main.project.ref.view.present') &&
-                !(trans.params() as ParamsObject).display
-            ) {
-                const display = trans.$to().name.split('.')[
-                    trans.$to().name.split('.').length
-                ]
+            if (this.$state.includes('main.project.ref.view.present') && !(trans.params() as ParamsObject).display) {
+                const display = trans.$to().name.split('.')[trans.$to().name.split('.').length]
                 void this.$state.go(trans.$to().name, { display })
             }
             if (
