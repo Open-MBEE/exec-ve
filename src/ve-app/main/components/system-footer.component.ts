@@ -9,7 +9,7 @@ import { VeComponentOptions } from '@ve-types/angular'
 const SystemFooterComponent: VeComponentOptions = {
     selector: 'systemFooter',
     template: `
-    <footer ng-show="$ctrl.disabled" class="footer">
+    <footer ng-hide="$ctrl.disabled" class="footer">
     <div class="block">
         <div ng-hide="$ctrl.loading" ng-repeat="message in $ctrl.footerMessage">
                 {{ message }}
