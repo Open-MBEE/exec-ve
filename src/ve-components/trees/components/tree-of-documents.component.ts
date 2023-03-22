@@ -33,8 +33,10 @@ class TreeOfDocumentsController extends TreeController {
         }
     }
 
-    toggleFavorite(branch: TreeBranch): void {
+    toggleFavorite($event: JQuery.ClickEvent, branch: TreeBranch): void {
+        $event.stopPropagation()
         branch.favorite = !branch.favorite
+        this.eventSvc.$broadcast(TreeService.events.RELOAD, 'table-of-favorites')
     }
 }
 
@@ -57,8 +59,8 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
                         <i ng-hide="row.branch.loading" class="indented tree-icon {{row.typeIcon}}" ></i>
                         <i ng-show="row.branch.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
                         <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
-                        <i ng-show="showFavs && row.branch.favorite" class="fa-solid fa-star" ng-click="$ctrl.toggleFavorite(row.branch)"></i>
-                        <i ng-show="showFavs && !row.branch.favorite" class="fa-regular fa-star" ng-click="$ctrl.toggleFavorite(row.branch)"></i>
+                        <i ng-show="showFavs && row.branch.favorite && row.branch.type !== 'group'" class="fa-solid fa-star" ng-click="$ctrl.toggleFavorite($event, row.branch)"></i>
+                        <i ng-show="showFavs && !row.branch.favorite && row.branch.type !== 'group'" class="fa-regular fa-star" ng-click="$ctrl.toggleFavorite($event, row.branch)"></i>
                     </div>
                 </div>
             </div>
