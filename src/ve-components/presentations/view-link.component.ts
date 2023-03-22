@@ -2,11 +2,7 @@ import { ViewController } from '@ve-components/presentations/view.component'
 import { ExtensionService } from '@ve-components/services'
 import { CrossReferenceController } from '@ve-components/transclusions/view-cf.component'
 import { ApplicationService } from '@ve-utils/application'
-import {
-    ApiService,
-    ElementService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ViewService } from '@ve-utils/mms-api-client'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
@@ -104,11 +100,7 @@ class ViewLinkController implements angular.IComponentController {
         this.changeAction(this.mmsElementId, '', false)
     }
 
-    protected changeAction: onChangesCallback<string> = (
-        newVal,
-        oldVal,
-        firstChange
-    ) => {
+    protected changeAction: onChangesCallback<string> = (newVal, oldVal, firstChange) => {
         if (!newVal || (newVal === oldVal && this.processed)) return
 
         this.processed = true
@@ -182,9 +174,7 @@ class ViewLinkController implements angular.IComponentController {
                                 }
                             },
                             (reason) => {
-                                this.growl.warning(
-                                    `Unable to retrieve element: ${reason.message}`
-                                )
+                                this.growl.warning(`Unable to retrieve element: ${reason.message}`)
                             }
                         )
                     }
@@ -192,19 +182,14 @@ class ViewLinkController implements angular.IComponentController {
                         docid = data.id
                         this.docid = docid
                         this.vid = data.id
-                    } else if (
-                        this.apiSvc.isView(data) ||
-                        data.type === 'InstanceSpecification'
-                    ) {
+                    } else if (this.apiSvc.isView(data) || data.type === 'InstanceSpecification') {
                         if (!docid || docid === '') {
                             docid = data.id
                         }
                         this.docid = docid
                         this.vid = data.id
                     } else {
-                        this.$element.html(
-                            '<span class="ve-error">view link doesn\'t refer to a view</span>'
-                        )
+                        this.$element.html('<span class="ve-error">view link doesn\'t refer to a view</span>')
                     }
                     if (this.applicationSvc.getState().fullDoc) {
                         this.href = `main.project.ref.view.present.document({ projectId: $ctrl.projectId, refId: $ctrl.refId, documentId: $ctrl.docid, viewId: $ctrl.vid })`
@@ -213,8 +198,7 @@ class ViewLinkController implements angular.IComponentController {
                     }
                     this.showNum =
                         this.applicationSvc.getState().inDoc &&
-                        this.applicationSvc.getState().currentDoc ===
-                            this.docid &&
+                        this.applicationSvc.getState().currentDoc === this.docid &&
                         !this.suppressNumbering
                 },
                 (reason) => {
@@ -227,8 +211,7 @@ class ViewLinkController implements angular.IComponentController {
                         Object.assign(this.$scope.$new(), {
                             reqOb: reqOb,
                             recentElement: reason.recentVersionOfElement,
-                            type: this.extensionSvc.AnnotationType
-                                .mmsPresentationElement,
+                            type: this.extensionSvc.AnnotationType.mmsPresentationElement,
                         })
                     )
                 }

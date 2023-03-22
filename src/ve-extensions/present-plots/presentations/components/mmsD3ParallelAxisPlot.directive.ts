@@ -1,10 +1,6 @@
 import { veComponents } from '@ve-components'
 
-veComponents.directive('mmsD3ParallelAxisPlot', [
-    'PlotService',
-    '$window',
-    mmsD3ParallelAxisPlot,
-])
+veComponents.directive('mmsD3ParallelAxisPlot', ['PlotService', '$window', mmsD3ParallelAxisPlot])
 function mmsD3ParallelAxisPlot(PlotService, $window) {
     const mmsChartLink = function (scope, element, attrs, mmsViewCtrl) {
         scope.rowHeaders = [] //not null when render is called 1st time.
@@ -31,20 +27,12 @@ function mmsD3ParallelAxisPlot(PlotService, $window) {
         }
 
         function vf_pplot(_out) {
-            const plotConfig = PlotService.plotConfig(
-                scope.plot.config.options,
-                defaultPlotConfig
-            )
+            const plotConfig = PlotService.plotConfig(scope.plot.config.options, defaultPlotConfig)
 
             const outputs = _out
             const width = plotConfig.width
             const height = plotConfig.width * 0.37
-            const m = [
-                plotConfig.marginTop,
-                plotConfig.marginRight,
-                plotConfig.marginBottom,
-                plotConfig.marginLeft,
-            ] //top, right, bottom, left
+            const m = [plotConfig.marginTop, plotConfig.marginRight, plotConfig.marginBottom, plotConfig.marginLeft] //top, right, bottom, left
 
             let maxSize = 0
             let size = 0
@@ -65,10 +53,7 @@ function mmsD3ParallelAxisPlot(PlotService, $window) {
                 h = height - m[0] - m[2]
 
             const colorscale = d3.scaleOrdinal(d3.schemeCategory10)
-            const x = d3
-                    .scalePoint(d3.schemeCategory10)
-                    .domain(outputs.variables)
-                    .range([0, w]),
+            const x = d3.scalePoint(d3.schemeCategory10).domain(outputs.variables).range([0, w]),
                 y = {}
             let line = d3.line(),
                 foreground
@@ -96,12 +81,10 @@ function mmsD3ParallelAxisPlot(PlotService, $window) {
 
                 for (let j = 0; j < outputs.table.length; j++) {
                     //test to see if minTest is still the minimum
-                    if (minTest > outputs.table[j].values[d])
-                        minTest = outputs.table[j].values[d]
+                    if (minTest > outputs.table[j].values[d]) minTest = outputs.table[j].values[d]
 
                     //tests to see if maxTest is still the maximum
-                    if (maxTest < outputs.table[j].values[d])
-                        maxTest = outputs.table[j].values[d]
+                    if (maxTest < outputs.table[j].values[d]) maxTest = outputs.table[j].values[d]
                 }
                 minMax[d].min = minTest
                 minMax[d].max = maxTest
@@ -135,10 +118,7 @@ function mmsD3ParallelAxisPlot(PlotService, $window) {
 
             //Create a scale and brush for each variables.
             outputs.variables.forEach((d) => {
-                y[d] = d3
-                    .scaleLinear()
-                    .domain([minimum[d], maximum[d]])
-                    .range([h, 0])
+                y[d] = d3.scaleLinear().domain([minimum[d], maximum[d]]).range([h, 0])
             })
 
             const tooltip = svg
@@ -268,49 +248,46 @@ function mmsD3ParallelAxisPlot(PlotService, $window) {
         function getTickColor(rowHeaderName) {
             if (scope.plot.config.ticks !== undefined) {
                 for (let kk = 0; kk < scope.plot.config.ticks.length; kk++) {
-                    if (scope.plot.config.ticks[kk].name === rowHeaderName)
-                        return scope.plot.config.ticks[kk].color
+                    if (scope.plot.config.ticks[kk].name === rowHeaderName) return scope.plot.config.ticks[kk].color
                 }
             }
             return undefined
         }
 
         scope.render = function () {
-            PlotService.readValues(scope.plot, projectId, refId, commitId).then(
-                function (value) {
-                    scope.tablebody = value.tablebody
-                    scope.tableheader = value.tableheader
-                    scope.isHeader = value.isHeader
-                    scope.valuesO = value.tablebody.valuesO //value objects used in watch
-                    if (scope.tablebody.c3_data.length === 0) {
-                        //no data
-                        return
-                    }
-                    const dataseries: {
-                        row: any
-                        tickColor: any
-                        values: any
-                    }[] = []
-                    let tickColor
-                    scope.tablebody.c3_data.forEach(function (row) {
-                        const values: { [key: string]: any } = {}
-                        for (let i = 1; i < row.length; i++) {
-                            values[scope.tableheader[i - 1]] = row[i]
-                            tickColor = getTickColor(row[0])
-                        }
-                        dataseries.push({
-                            row: row[0],
-                            tickColor: tickColor,
-                            values: values,
-                        })
-                    })
-                    const modelData = {
-                        variables: scope.tableheader,
-                        table: dataseries, //columnHeader and values
-                    }
-                    vf_pplot(modelData)
+            PlotService.readValues(scope.plot, projectId, refId, commitId).then(function (value) {
+                scope.tablebody = value.tablebody
+                scope.tableheader = value.tableheader
+                scope.isHeader = value.isHeader
+                scope.valuesO = value.tablebody.valuesO //value objects used in watch
+                if (scope.tablebody.c3_data.length === 0) {
+                    //no data
+                    return
                 }
-            ) //end of PlotService
+                const dataseries: {
+                    row: any
+                    tickColor: any
+                    values: any
+                }[] = []
+                let tickColor
+                scope.tablebody.c3_data.forEach(function (row) {
+                    const values: { [key: string]: any } = {}
+                    for (let i = 1; i < row.length; i++) {
+                        values[scope.tableheader[i - 1]] = row[i]
+                        tickColor = getTickColor(row[0])
+                    }
+                    dataseries.push({
+                        row: row[0],
+                        tickColor: tickColor,
+                        values: values,
+                    })
+                })
+                const modelData = {
+                    variables: scope.tableheader,
+                    table: dataseries, //columnHeader and values
+                }
+                vf_pplot(modelData)
+            }) //end of PlotService
         } //end of render
 
         scope.$watch(

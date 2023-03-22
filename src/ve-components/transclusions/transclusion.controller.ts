@@ -5,11 +5,7 @@ import { ViewPresentationElemController } from '@ve-components/presentations/vie
 import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { SpecTool } from '@ve-components/spec-tools'
-import {
-    ButtonBarApi,
-    ButtonBarService,
-    IButtonBarButton,
-} from '@ve-core/button-bar'
+import { ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar'
 import { ImageService, MathService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
@@ -28,9 +24,7 @@ import {
     ViewObject,
 } from '@ve-types/mms'
 
-export interface ITransclusion
-    extends angular.IComponentController,
-        ComponentController {
+export interface ITransclusion extends angular.IComponentController, ComponentController {
     $scope: TranscludeScope
     mmsElementId: string
     mmsProjectId: string
@@ -177,15 +171,9 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected $transcludeEl: JQuery<HTMLElement>
 
     // Possible templates to manage api functions
-    protected template:
-        | string
-        | angular.Injectable<(...args: unknown[]) => string>
-    protected editTemplate:
-        | string
-        | angular.Injectable<(...args: unknown[]) => string>
-    protected previewTemplate:
-        | string
-        | angular.Injectable<(...args: unknown[]) => string>
+    protected template: string | angular.Injectable<(...args: unknown[]) => string>
+    protected editTemplate: string | angular.Injectable<(...args: unknown[]) => string>
+    protected previewTemplate: string | angular.Injectable<(...args: unknown[]) => string>
 
     public bbApi: ButtonBarApi
     public bbId: string
@@ -250,19 +238,14 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         if (this.mmsViewCtrl) {
             this.view = this.mmsViewCtrl.getView()
             this.editable = this.mmsViewCtrl.isEditable
-            this.isDirectChildOfPresentationElement =
-                this.componentSvc.isDirectChildOfPresentationElementFunc(
-                    this.$element,
-                    this.mmsViewCtrl
-                )
+            this.isDirectChildOfPresentationElement = this.componentSvc.isDirectChildOfPresentationElementFunc(
+                this.$element,
+                this.mmsViewCtrl
+            )
         }
 
-        if (
-            this.mmsSpecEditorCtrl &&
-            this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId
-        ) {
-            this.editable = (): boolean =>
-                this.mmsSpecEditorCtrl.specSvc.editable
+        if (this.mmsSpecEditorCtrl && this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId) {
+            this.editable = (): boolean => this.mmsSpecEditorCtrl.specSvc.editable
         }
 
         if (this.editTemplate) {
@@ -275,29 +258,15 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             }
 
             this.cancel = (e: JQuery.ClickEvent): void => {
-                this.componentSvc.cancelAction(
-                    this,
-                    this.recompile,
-                    this.$element
-                )
+                this.componentSvc.cancelAction(this, this.recompile, this.$element)
             }
 
             this.startEdit = (): void => {
-                this.componentSvc.startEdit(
-                    this,
-                    this.editable(),
-                    this.$element,
-                    this.editTemplate,
-                    false
-                )
+                this.componentSvc.startEdit(this, this.editable(), this.$element, this.editTemplate, false)
             }
 
             this.preview = (): void => {
-                this.componentSvc.previewAction(
-                    this,
-                    this.recompile,
-                    this.$element
-                )
+                this.componentSvc.previewAction(this, this.recompile, this.$element)
             }
         }
     }
@@ -338,9 +307,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         /* Implement Custom Destroy Logic Here */
     }
 
-    public getContent = (
-        preview?: boolean
-    ): VePromise<string | HTMLElement[], string> => {
+    public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
         return this.$q.resolve('Not Yet Implemented')
     }
 
@@ -370,11 +337,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         )
     }
 
-    protected changeAction: onChangesCallback<string> = (
-        newVal,
-        oldVal,
-        firstChange
-    ) => {
+    protected changeAction: onChangesCallback<string> = (newVal, oldVal, firstChange) => {
         if (this.clearWatch || !newVal || !this.mmsProjectId || firstChange) {
             return
         }
@@ -382,16 +345,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             this.clearWatch = true
         }
         if (this.checkCircular) {
-            if (
-                this.componentSvc.hasCircularReference(
-                    this,
-                    this.mmsElementId,
-                    'doc'
-                )
-            ) {
-                this.$element.html(
-                    '<span class="ve-error">Circular Reference!</span>'
-                )
+            if (this.componentSvc.hasCircularReference(this, this.mmsElementId, 'doc')) {
+                this.$element.html('<span class="ve-error">Circular Reference!</span>')
                 return
             }
         }
@@ -417,27 +372,19 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                         this.panelType = this.cfKind
                     }
                     this.recompile()
-                    this.componentSvc.reopenUnsavedElts(
-                        this,
-                        this.cfTitle.toLowerCase()
-                    )
+                    this.componentSvc.reopenUnsavedElts(this, this.cfTitle.toLowerCase())
 
                     if (this.commitId === 'latest') {
                         this.subs.push(
                             this.eventSvc.$on(
                                 'element.updated',
-                                (data: {
-                                    element: ElementObject
-                                    continueEdit: boolean
-                                }) => {
+                                (data: { element: ElementObject; continueEdit: boolean }) => {
                                     const elementOb = data.element
                                     const continueEdit = data.continueEdit
                                     if (
                                         elementOb.id === this.element.id &&
-                                        elementOb._projectId ===
-                                            this.element._projectId &&
-                                        elementOb._refId ===
-                                            this.element._refId &&
+                                        elementOb._projectId === this.element._projectId &&
+                                        elementOb._refId === this.element._refId &&
                                         !continueEdit
                                     ) {
                                         this.element = elementOb
@@ -471,40 +418,12 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     }
 
     protected bbInit = (api: ButtonBarApi): void => {
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-preview',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-save',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-saveC',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-cancel',
-                this
-            )
-        )
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton(
-                'presentation-element-delete',
-                this
-            )
-        )
-        api.setPermission(
-            'presentation-element-delete',
-            this.isDirectChildOfPresentationElement
-        )
+        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-preview', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-save', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-saveC', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-cancel', this))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('presentation-element-delete', this))
+        api.setPermission('presentation-element-delete', this.isDirectChildOfPresentationElement)
     }
 
     //Transclusion API

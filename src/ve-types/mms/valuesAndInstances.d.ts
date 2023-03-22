@@ -11,8 +11,7 @@ export interface LiteralObject<T> extends ValueObject {
 export interface InstanceValueObject extends ValueObject {
     instanceId?: string
 }
-export interface ExpressionObject<T extends ValueObject = ValueObject>
-    extends ValueObject {
+export interface ExpressionObject<T extends ValueObject = ValueObject> extends ValueObject {
     operand?: T[]
 }
 

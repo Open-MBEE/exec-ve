@@ -46,11 +46,7 @@ class SelectModalController implements VeModalController {
     protected orgSpin: boolean
     protected projSpin: boolean
 
-    constructor(
-        private $scope: angular.IScope,
-        private $state: StateService,
-        private projectSvc: ProjectService
-    ) {}
+    constructor(private $scope: angular.IScope, private $state: StateService, private projectSvc: ProjectService) {}
 
     $onInit(): void {
         this.orgs = this.resolve.mmsOrgs
@@ -83,10 +79,7 @@ class SelectModalController implements VeModalController {
     public continue = (): void => {
         if (this.orgId && this.projectId) {
             // was the same project selected? cancel...
-            if (
-                this.resolve.mmsProject.orgId === this.orgId &&
-                this.resolve.mmsProject.id === this.projectId
-            ) {
+            if (this.resolve.mmsProject.orgId === this.orgId && this.resolve.mmsProject.id === this.projectId) {
                 this.cancel()
             } else {
                 this.spin = true

@@ -17,11 +17,7 @@ import { VeQService } from '@ve-types/angular'
  *      }
  *
  */
-export type onChangesCallback<T, U = void> = (
-    newVal?: T,
-    oldVal?: T,
-    firstChange?: boolean
-) => U
+export type onChangesCallback<T, U = void> = (newVal?: T, oldVal?: T, firstChange?: boolean) => U
 
 /**
  * @name change.utils#handleChange:
@@ -90,11 +86,7 @@ export function watchChangeEvent<T>(
                 if (update) {
                     $ctrl[name] = data
                 }
-                changeAction(
-                    change.currentValue,
-                    change.previousValue,
-                    change.isFirstChange()
-                )
+                changeAction(change.currentValue, change.previousValue, change.isFirstChange())
             }
         })
     )

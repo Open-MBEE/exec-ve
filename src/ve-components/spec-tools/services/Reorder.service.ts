@@ -36,37 +36,28 @@ export class ReorderService {
 
     public save(): VePromise<ElementObject[], BulkResponse<ElementObject>> {
         const elementObsToUpdate: ElementObject[] = []
-        const updateSectionElementOrder = (
-            elementReference: PresentationReference
-        ): void => {
+        const updateSectionElementOrder = (elementReference: PresentationReference): void => {
             const sectionEdit: ViewInstanceSpec = {
                 id: elementReference.instanceId,
                 //_modified: elementReference.instanceSpecification._modified,
                 _projectId: elementReference.instanceSpecification._projectId,
                 _refId: elementReference.instanceSpecification._refId,
                 type: elementReference.instanceSpecification.type,
-                specification: _.cloneDeep(
-                    elementReference.instanceSpecification.specification
-                ),
+                specification: _.cloneDeep(elementReference.instanceSpecification.specification),
             }
             //sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
-            const operand: InstanceValueObject[] =
-                (sectionEdit.specification.operand = [])
+            const operand: InstanceValueObject[] = (sectionEdit.specification.operand = [])
 
             if (!elementReference.instanceSpecification.specification) {
                 this.growl.error('Malformed Reference Tree; Aborting')
             }
             const origOperand = (
-                elementReference.instanceSpecification
-                    .specification as ExpressionObject<InstanceValueObject>
+                elementReference.instanceSpecification.specification as ExpressionObject<InstanceValueObject>
             ).operand
-            elementReference.sectionElements.forEach(
-                (sectionElement, index) => {
-                    operand.push(sectionElement.instanceVal)
-                    if (sectionElement.sectionElements.length > 0)
-                        updateSectionElementOrder(sectionElement)
-                }
-            )
+            elementReference.sectionElements.forEach((sectionElement, index) => {
+                operand.push(sectionElement.instanceVal)
+                if (sectionElement.sectionElements.length > 0) updateSectionElementOrder(sectionElement)
+            })
 
             if (!_.isEqual(operand, origOperand)) {
                 elementObsToUpdate.push(sectionEdit)
@@ -84,8 +75,7 @@ export class ReorderService {
         if (this.elementReferenceTree.length === 0) {
             deferred.reject({
                 type: 'error',
-                message:
-                    'View specs were not initialized properly or is empty.',
+                message: 'View specs were not initialized properly or is empty.',
             })
             return deferred.promise
         }
@@ -98,18 +88,14 @@ export class ReorderService {
             specification: null,
         }
         if (this.view.specification) {
-            viewEdit.specification = _.cloneDeep(
-                (this.view as ViewInstanceSpec).specification
-            )
+            viewEdit.specification = _.cloneDeep((this.view as ViewInstanceSpec).specification)
             const specs = (viewEdit as ViewInstanceSpec).specification
             const origSpecs = (this.view as ViewInstanceSpec).specification
             // Update the View edit object on Save
             if (specs.operand) {
                 specs.operand = []
                 this.elementReferenceTree.forEach((elementRef) => {
-                    ;(specs as ExpressionObject).operand.push(
-                        elementRef.instanceVal
-                    )
+                    ;(specs as ExpressionObject).operand.push(elementRef.instanceVal)
                 })
                 if (specs && !_.isEqual(specs.operand, origSpecs.operand)) {
                     elementObsToUpdate.push(viewEdit)
@@ -117,10 +103,7 @@ export class ReorderService {
             }
             // Recurse
             this.elementReferenceTree.forEach((elementReference) => {
-                if (
-                    elementReference.sectionElements &&
-                    elementReference.sectionElements.length > 0
-                ) {
+                if (elementReference.sectionElements && elementReference.sectionElements.length > 0) {
                     updateSectionElementOrder(elementReference)
                 }
             })
@@ -130,19 +113,16 @@ export class ReorderService {
     }
 
     public revert = (): void => {
-        this.elementReferenceTree = _.cloneDeepWith(
-            this.originalElementReferenceTree,
-            (value: unknown, key) => {
-                if (
-                    key === 'instanceId' ||
-                    key === 'instanceSpecification' ||
-                    key === 'presentationElement' ||
-                    key === 'instanceVal'
-                )
-                    return value
-                return undefined
-            }
-        ) as PresentationReference[]
+        this.elementReferenceTree = _.cloneDeepWith(this.originalElementReferenceTree, (value: unknown, key) => {
+            if (
+                key === 'instanceId' ||
+                key === 'instanceSpecification' ||
+                key === 'presentationElement' ||
+                key === 'instanceVal'
+            )
+                return value
+            return undefined
+        }) as PresentationReference[]
     }
 
     public refresh = (): void => {
@@ -163,19 +143,16 @@ export class ReorderService {
             this.viewSvc.getElementReferenceTree(reqOb, contents).then(
                 (elementReferenceTree) => {
                     this.elementReferenceTree = elementReferenceTree
-                    this.originalElementReferenceTree = _.cloneDeepWith(
-                        elementReferenceTree,
-                        (value: unknown, key) => {
-                            if (
-                                key === 'instanceId' ||
-                                key === 'instanceSpecification' ||
-                                key === 'presentationElement' ||
-                                key === 'instanceVal'
-                            )
-                                return value
-                            return undefined
-                        }
-                    ) as PresentationReference[]
+                    this.originalElementReferenceTree = _.cloneDeepWith(elementReferenceTree, (value: unknown, key) => {
+                        if (
+                            key === 'instanceId' ||
+                            key === 'instanceSpecification' ||
+                            key === 'presentationElement' ||
+                            key === 'instanceVal'
+                        )
+                            return value
+                        return undefined
+                    }) as PresentationReference[]
                 },
                 (reason) => {
                     this.elementReferenceTree = []

@@ -48,9 +48,7 @@ const ButtonBarComponent: VeComponentOptions = {
         buttonId: '<',
         minSize: '<',
     },
-    controller: class ButtonBarController
-        implements angular.IComponentController
-    {
+    controller: class ButtonBarController implements angular.IComponentController {
         // Bindings
         private buttonId: string
         private minSize: number = 100
@@ -62,12 +60,7 @@ const ButtonBarComponent: VeComponentOptions = {
         private squished: boolean = false
         private squishButton: BarButton
         private currentHeight: number
-        static $inject = [
-            '$element',
-            'growl',
-            'EventService',
-            'ButtonBarService',
-        ]
+        static $inject = ['$element', 'growl', 'EventService', 'ButtonBarService']
 
         constructor(
             private $element: JQuery<HTMLElement>,
@@ -91,8 +84,7 @@ const ButtonBarComponent: VeComponentOptions = {
 
         configure = (): void => {
             //Setup Squish
-            this.squishButton =
-                this.buttonBarSvc.getButtonBarButton('button-bar-menu')
+            this.squishButton = this.buttonBarSvc.getButtonBarButton('button-bar-menu')
             this.squishButton.dropdown_buttons = this.buttons
             const observed = this.$element.children().get(0)
             const observer = new ResizeObserver((mutations) =>
@@ -107,10 +99,7 @@ const ButtonBarComponent: VeComponentOptions = {
                     if (size[0].inlineSize <= this.minSize && !this.squished) {
                         this.squished = true
                         this.buttons = [this.squishButton]
-                    } else if (
-                        size[0].inlineSize > this.minSize &&
-                        this.squished
-                    ) {
+                    } else if (size[0].inlineSize > this.minSize && this.squished) {
                         this.squished = false
                         this.buttons = this.squishButton.dropdown_buttons
                     }
@@ -129,10 +118,7 @@ const ButtonBarComponent: VeComponentOptions = {
                     clicked: button.id,
                 }
                 //Setup fire button-bar click event
-                this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(
-                    this.bbApi.id,
-                    data
-                )
+                this.eventSvc.$broadcast<veCoreEvents.buttonClicked>(this.bbApi.id, data)
             }
         }
     },

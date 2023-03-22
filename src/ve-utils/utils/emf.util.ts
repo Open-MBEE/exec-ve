@@ -1,9 +1,4 @@
-import {
-    ElementObject,
-    ExpressionObject,
-    PackageObject,
-    ValueObject,
-} from '@ve-types/mms'
+import { ElementObject, ExpressionObject, PackageObject, ValueObject } from '@ve-types/mms'
 
 export class Element implements ElementObject {
     id: string = ''
@@ -129,10 +124,7 @@ export class ValueSpec extends TypedElement implements ValueObject {
     }
 }
 
-export class Expression<T extends ElementObject>
-    extends ValueSpec
-    implements ExpressionObject<T>
-{
+export class Expression<T extends ElementObject> extends ValueSpec implements ExpressionObject<T> {
     operand: T[] = []
     type = 'Expression'
     constructor(elementOb?: ElementObject) {

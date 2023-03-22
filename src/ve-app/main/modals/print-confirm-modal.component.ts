@@ -4,29 +4,14 @@ import _ from 'lodash'
 import { AppUtilsService, DocumentStructure } from '@ve-app/main/services'
 import { UtilsService } from '@ve-utils/application'
 import { AutosaveService } from '@ve-utils/core'
-import {
-    ElementService,
-    ViewService,
-    DocumentMetadata,
-    ProjectService,
-} from '@ve-utils/mms-api-client'
+import { ElementService, ViewService, DocumentMetadata, ProjectService } from '@ve-utils/mms-api-client'
 import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 
 import { veApp } from '@ve-app'
 
 import { VePromise } from '@ve-types/angular'
-import {
-    CommitObject,
-    CommitResponse,
-    RefObject,
-    ViewObject,
-} from '@ve-types/mms'
-import {
-    VeModalComponent,
-    VeModalController,
-    VeModalResolve,
-    VeModalResolveFn,
-} from '@ve-types/view-editor'
+import { CommitObject, CommitResponse, RefObject, ViewObject } from '@ve-types/mms'
+import { VeModalComponent, VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 interface PrintModalResolve extends VeModalResolve {
     print: JQLite
@@ -52,10 +37,7 @@ export interface PrintConfirmResult {
     customCSS?: string
 }
 
-class PrintConfirmModalController
-    extends VeModalControllerImpl<PrintConfirmResult>
-    implements VeModalController
-{
+class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResult> implements VeModalController {
     static $inject = [
         '$filter',
         '$window',
@@ -111,12 +93,7 @@ class PrintConfirmModalController
         this.mode = this.resolve.mode
         this.viewOrDocOb = this.resolve.viewOrDocOb
         this.printElement = this.resolve.print
-        this.action =
-            this.mode === 1
-                ? 'print'
-                : this.mode === 3
-                ? 'Generate PDF'
-                : 'Generate word'
+        this.action = this.mode === 1 ? 'print' : this.mode === 3 ? 'Generate PDF' : 'Generate word'
         this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : ''
         this.customizeDoc.useCustomStyle = false
 
@@ -132,11 +109,10 @@ class PrintConfirmModalController
                 this.customizeDoc.useCustomStyle = true
                 this.customizeDoc.customCSS = this.viewOrDocOb._printCss
             } else {
-                this.customizeDoc.customCSS = this.utilsSvc.getPrintCss(
-                    false,
-                    false,
-                    { numberingDepth: 0, numberingSeparator: '.' }
-                )
+                this.customizeDoc.customCSS = this.utilsSvc.getPrintCss(false, false, {
+                    numberingDepth: 0,
+                    numberingSeparator: '.',
+                })
             }
 
             // Get/Set document header/footer for PDF generation
@@ -162,10 +138,7 @@ class PrintConfirmModalController
                 .then(
                     (metadata: DocumentMetadata) => {
                         let displayTime = 'latest'
-                        let promise: VePromise<
-                            CommitObject | CommitObject[],
-                            CommitResponse
-                        >
+                        let promise: VePromise<CommitObject | CommitObject[], CommitResponse>
                         if (this.refOb.parentCommitId) {
                             promise = this.projectSvc.getCommit(
                                 this.refOb._projectId,
@@ -173,12 +146,7 @@ class PrintConfirmModalController
                                 this.refOb.parentCommitId
                             )
                         } else {
-                            promise = this.projectSvc.getCommits(
-                                this.refOb._projectId,
-                                this.refOb.id,
-                                null,
-                                1
-                            )
+                            promise = this.projectSvc.getCommits(this.refOb._projectId, this.refOb.id, null, 1)
                         }
 
                         promise
@@ -190,10 +158,7 @@ class PrintConfirmModalController
                                     } else {
                                         commit = result
                                     }
-                                    displayTime = this.$filter('date')(
-                                        commit._created,
-                                        'M/d/yy h:mm a'
-                                    )
+                                    displayTime = this.$filter('date')(commit._created, 'M/d/yy h:mm a')
                                 },
                                 (reason) => {
                                     this.growl.error(
@@ -212,24 +177,14 @@ class PrintConfirmModalController
                                     'bottom-left': '',
                                     'bottom-right': 'counter(page)',
                                 }
-                                this.meta = Object.assign(
-                                    metadata,
-                                    defaultMetadata
-                                )
+                                this.meta = Object.assign(metadata, defaultMetadata)
                                 if (this.refOb && this.refOb.type === 'Tag') {
-                                    this.meta['top-right'] =
-                                        this.meta['top-right'] +
-                                        ' ' +
-                                        this.refOb.name
+                                    this.meta['top-right'] = this.meta['top-right'] + ' ' + this.refOb.name
                                 }
                                 if (displayTime === 'latest') {
-                                    displayTime = this.$filter('date')(
-                                        new Date(),
-                                        'M/d/yy h:mm a'
-                                    )
+                                    displayTime = this.$filter('date')(new Date(), 'M/d/yy h:mm a')
                                 }
-                                this.meta['top-right'] =
-                                    this.meta['top-right'] + ' ' + displayTime
+                                this.meta['top-right'] = this.meta['top-right'] + ' ' + displayTime
                             })
                     },
                     (reason) => {
@@ -243,8 +198,7 @@ class PrintConfirmModalController
                     }
                 )
         }
-        this.unsaved =
-            this.autosaveSvc.getAll() && !_.isEmpty(this.autosaveSvc.getAll())
+        this.unsaved = this.autosaveSvc.getAll() && !_.isEmpty(this.autosaveSvc.getAll())
         this.docOption = !this.isDoc && (this.mode === 3 || this.mode === 2)
         this.model = { genTotf: false, landscape: false, htmlTotf: false }
     }
@@ -271,21 +225,12 @@ class PrintConfirmModalController
     }
     public preview(): void {
         if (!this.previewResult) {
-            this.previewResult = this.appUtilsSvc.printOrGenerate(
-                this.viewOrDocOb,
-                3,
-                true,
-                true,
-                false
-            )
-            this.previewResult.tof =
-                this.previewResult.tof + this.previewResult.toe
+            this.previewResult = this.appUtilsSvc.printOrGenerate(this.viewOrDocOb, 3, true, true, false)
+            this.previewResult.tof = this.previewResult.tof + this.previewResult.toe
         }
         const result = this.previewResult
         const htmlArr = [
-            '<html><head><title>' +
-                this.viewOrDocOb.name +
-                '</title><style type="text/css">',
+            '<html><head><title>' + this.viewOrDocOb.name + '</title><style type="text/css">',
             this.customizeDoc.customCSS,
             '</style></head><body style="overflow: auto">',
             result.cover,
@@ -305,9 +250,7 @@ class PrintConfirmModalController
             popupWin.document.write(htmlString)
             popupWin.document.close()
         } else {
-            this.growl.error(
-                'Popup Window Failed to open. Allow popups and try again'
-            )
+            this.growl.error('Popup Window Failed to open. Allow popups and try again')
         }
     }
     public print(): void {
@@ -316,9 +259,7 @@ class PrintConfirmModalController
             model: this.model,
             meta: this.meta,
             customization: this.customizeDoc.useCustomStyle,
-            customCSS: this.customizeDoc.useCustomStyle
-                ? this.customizeDoc.customCSS
-                : null,
+            customCSS: this.customizeDoc.useCustomStyle ? this.customizeDoc.customCSS : null,
         }
         this.modalInstance.close(result)
     }

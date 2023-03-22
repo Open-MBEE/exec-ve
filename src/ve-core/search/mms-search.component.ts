@@ -2,12 +2,7 @@ import { StateService } from '@uirouter/angularjs'
 import _ from 'lodash'
 
 import { UtilsService } from '@ve-utils/application'
-import {
-    CacheService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { CacheService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veCore } from '@ve-core'
@@ -240,10 +235,7 @@ export class SearchController implements angular.IComponentController {
         }
         if (this.mmsOptions.searchField) {
             for (const field of this.fieldTypeList) {
-                if (
-                    this.mmsOptions.searchField === field.label ||
-                    this.mmsOptions.searchField === field.id
-                ) {
+                if (this.mmsOptions.searchField === field.label || this.mmsOptions.searchField === field.id) {
                     this.mainSearch.searchField = field
                     break
                 }
@@ -286,10 +278,7 @@ export class SearchController implements angular.IComponentController {
                         const properties: ElementObject[] = []
                         //TODO might not be elements
                         data.forEach((elt) => {
-                            if (
-                                elt.type === 'Property' &&
-                                elt.ownerId == elem.id
-                            ) {
+                            if (elt.type === 'Property' && elt.ownerId == elem.id) {
                                 properties.push(elt)
                             } else if (elt.type === 'Slot') {
                                 properties.push(elt)
@@ -321,35 +310,22 @@ export class SearchController implements angular.IComponentController {
             const parts = qualifiedName.split('/')
             let result = qualifiedName
             if (parts.length > 7) {
-                result =
-                    parts.slice(0, 4).join('/') +
-                    '/.../' +
-                    parts.slice(parts.length - 3, parts.length).join('/')
+                result = parts.slice(0, 4).join('/') + '/.../' + parts.slice(parts.length - 3, parts.length).join('/')
             }
             return result
         }
     }
 
-    public expandQualifiedName = (
-        $event: JQuery.ClickEvent,
-        qualifiedName: string
-    ): void => {
+    public expandQualifiedName = ($event: JQuery.ClickEvent, qualifiedName: string): void => {
         ;($event.currentTarget as HTMLElement).innerHTML = qualifiedName
     }
 
     public showMoreRelatedViews = (element: SearchObject): void => {
-        element.remainingRelatedDocuments = element.allRelatedDocuments.slice(
-            3,
-            element.allRelatedDocuments.length
-        )
+        element.remainingRelatedDocuments = element.allRelatedDocuments.slice(3, element.allRelatedDocuments.length)
     }
 
     public closeSearch = (): void => {
-        void this.$state.go(
-            'main.project.ref.portal',
-            { search: null, field: null },
-            { reload: true }
-        )
+        void this.$state.go('main.project.ref.portal', { search: null, field: null }, { reload: true })
     }
 
     public advancedSearchHandler = (): void => {
@@ -378,10 +354,7 @@ export class SearchController implements angular.IComponentController {
 
     public getTypeClass = (element: ElementObject): string => {
         // Get Type
-        return this.utilsSvc.getElementTypeClass(
-            element,
-            this.viewSvc.getElementType(element)
-        )
+        return this.utilsSvc.getElementTypeClass(element, this.viewSvc.getElementType(element))
     }
 
     // Filter options
@@ -406,15 +379,9 @@ export class SearchController implements angular.IComponentController {
         if (!this.activeFilter.length) {
             this.filteredSearchResults = this.baseSearchResults
         } else {
-            this.filteredSearchResults = _.filter(
-                this.baseSearchResults,
-                (item) => {
-                    return _.includes(
-                        this.activeFilter,
-                        this.viewSvc.getElementType(item)
-                    )
-                }
-            )
+            this.filteredSearchResults = _.filter(this.baseSearchResults, (item) => {
+                return _.includes(this.activeFilter, this.viewSvc.getElementType(item))
+            })
         }
     }
 
@@ -433,9 +400,7 @@ export class SearchController implements angular.IComponentController {
         this.stringQuery = Array(rowLength + 1).join('(')
         this.stringQuery += this.mainSearch.searchField.label + ':'
         if (this.mainSearch.searchField.id === 'metatype') {
-            this.stringQuery += this.getMetatypeSelection(
-                '#searchMetatypeSelectAdvance'
-            )
+            this.stringQuery += this.getMetatypeSelection('#searchMetatypeSelectAdvance')
         } else {
             this.stringQuery += this.mainSearch.searchText
         }
@@ -447,10 +412,7 @@ export class SearchController implements angular.IComponentController {
                 this.advanceSearchRows[i].searchField.label +
                 ':'
             if (this.advanceSearchRows[i].searchField.id === 'metatype') {
-                this.stringQuery +=
-                    this.getMetatypeSelection(
-                        '#searchMetatypeSelect-' + i.toString()
-                    ) + ')'
+                this.stringQuery += this.getMetatypeSelection('#searchMetatypeSelect-' + i.toString()) + ')'
             } else {
                 this.stringQuery += this.advanceSearchRows[i].searchText + ')'
             }
@@ -495,11 +457,7 @@ export class SearchController implements angular.IComponentController {
             this.currentPage += 1
             this._applyFilters()
         } else {
-            this.search(
-                this.mainSearch,
-                this.currentPage + 1,
-                this.itemsPerPage
-            )
+            this.search(this.mainSearch, this.currentPage + 1, this.itemsPerPage)
         }
         this.$anchorScroll('ve-search-results')
     }
@@ -510,11 +468,7 @@ export class SearchController implements angular.IComponentController {
             this.currentPage -= 1
             this._applyFilters()
         } else {
-            this.search(
-                this.mainSearch,
-                this.currentPage - 1,
-                this.itemsPerPage
-            )
+            this.search(this.mainSearch, this.currentPage - 1, this.itemsPerPage)
         }
     }
 
@@ -537,11 +491,7 @@ export class SearchController implements angular.IComponentController {
      * @param {number} page page number of search results
      * @param {number} numItems number of items to return per page
      */
-    public search = (
-        query: SearchQuery,
-        page: number,
-        numItems: number
-    ): void => {
+    public search = (query: SearchQuery, page: number, numItems: number): void => {
         this.searchLoading = true
         if (!this.embedded) {
             void this.$state.go('.', {
@@ -558,10 +508,7 @@ export class SearchController implements angular.IComponentController {
             projectId: this.mmsProjectId,
             refId: this.refId,
         }
-        const promises: VePromise<
-            SearchResponse<ElementObject>,
-            SearchResponse<ElementObject>
-        >[] = []
+        const promises: VePromise<SearchResponse<ElementObject>, SearchResponse<ElementObject>>[] = []
         for (const queryOb of queryObs) {
             promises.push(this._performSearch(reqOb, queryOb))
         }
@@ -588,9 +535,7 @@ export class SearchController implements angular.IComponentController {
                         this.searchResults = elements
                     }
                     this.combineRelatedViews()
-                    this.maxPages = Math.ceil(
-                        this.totalResults / this.itemsPerPage
-                    )
+                    this.maxPages = Math.ceil(this.totalResults / this.itemsPerPage)
                     this.currentPage = page
                     for (const pg of [...Array(this.maxPages).keys()]) {
                         this.paginationCache[pg] = this.searchResults.slice(
@@ -647,20 +592,16 @@ export class SearchController implements angular.IComponentController {
             deferred.resolve(projList)
         } else {
             // Get project element data to gather mounted project list
-            this.projectSvc
-                .getProjectMounts(this.mmsProjectId, this.refId)
-                .then(
-                    (project) => {
-                        this.getAllMountsAsArray(project, projList)
-                        deferred.resolve(projList)
-                    },
-                    (reason) => {
-                        this.growl.error(
-                            'Problem getting Project Mounts:' + reason.message
-                        )
-                        deferred.resolve(projList)
-                    }
-                )
+            this.projectSvc.getProjectMounts(this.mmsProjectId, this.refId).then(
+                (project) => {
+                    this.getAllMountsAsArray(project, projList)
+                    deferred.resolve(projList)
+                },
+                (reason) => {
+                    this.growl.error('Problem getting Project Mounts:' + reason.message)
+                    deferred.resolve(projList)
+                }
+            )
         }
         return deferred.promise
     }
@@ -671,10 +612,7 @@ export class SearchController implements angular.IComponentController {
      * specified project.
      *
      */
-    public getAllMountsAsArray = (
-        project: ProjectObject,
-        projectsList: ProjectObject[]
-    ): void => {
+    public getAllMountsAsArray = (project: ProjectObject, projectsList: ProjectObject[]): void => {
         projectsList.push(project)
         const mounts = (project as MountObject)._mounts
         if (Array.isArray(mounts) && mounts.length !== 0) {
@@ -738,10 +676,7 @@ export class SearchController implements angular.IComponentController {
             const stereoIds = [
                 this.schemaSvc.getSchema<string>('VIEW_SID', this.schema),
                 this.schemaSvc.getSchema<string>('DOCUMENT_SID', this.schema),
-                ...this.schemaSvc.getSchema<string[]>(
-                    'OTHER_VIEW_SID',
-                    this.schema
-                ),
+                ...this.schemaSvc.getSchema<string[]>('OTHER_VIEW_SID', this.schema),
             ]
             /*If the filter list already contain the view id's do not add them a second time since filtering is done
             client side */
@@ -809,8 +744,7 @@ export class SearchController implements angular.IComponentController {
     ): void => {
         event.preventDefault()
         event.stopPropagation()
-        if (this.mmsOptions.relatedCallback)
-            this.mmsOptions.relatedCallback(doc, view, elem)
+        if (this.mmsOptions.relatedCallback) this.mmsOptions.relatedCallback(doc, view, elem)
     }
 }
 const SearchComponent: VeComponentOptions = {

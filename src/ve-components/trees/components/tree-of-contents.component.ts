@@ -20,17 +20,7 @@ export class TreeOfContentsController extends TreeController {
         rootScopeSvc: RootScopeService,
         eventSvc: EventService
     ) {
-        super(
-            $q,
-            $scope,
-            $timeout,
-            $filter,
-            growl,
-            utilsSvc,
-            treeSvc,
-            rootScopeSvc,
-            eventSvc
-        )
+        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
 
         this.types = ['view', 'section']
         this.id = 'tree-of-contents'
@@ -82,7 +72,4 @@ const TreeOfContentsComponent: VeComponentOptions = {
     controller: TreeOfContentsController,
 }
 
-veComponents.component(
-    TreeOfContentsComponent.selector,
-    TreeOfContentsComponent
-)
+veComponents.component(TreeOfContentsComponent.selector, TreeOfContentsComponent)

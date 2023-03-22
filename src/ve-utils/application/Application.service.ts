@@ -1,8 +1,4 @@
-import {
-    ApiService,
-    CacheService,
-    ProjectService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, CacheService, ProjectService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -57,10 +53,7 @@ export class ApplicationService {
         return this.state
     }
 
-    public copyToClipboard(
-        target: JQuery<HTMLElement>,
-        $event: JQuery.ClickEvent
-    ): VePromise<void, unknown> {
+    public copyToClipboard(target: JQuery<HTMLElement>, $event: JQuery.ClickEvent): VePromise<void, unknown> {
         const deferred = this.$q.defer<void>()
         $event.stopPropagation()
 
@@ -82,12 +75,7 @@ export class ApplicationService {
     ): VePromise<VePreferencesObject, ProjectsResponse> => {
         if (!refId) refId = 'master'
         const deferred = this.$q.defer<VePreferencesObject>()
-        const cacheKey = this.apiSvc.makeCacheKey(
-            { projectId, refId },
-            '',
-            false,
-            'preferences'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'preferences')
         const cached = this.cacheSvc.get<VePreferencesObject>(cacheKey)
         if (cached && cached.pinnedIds && !refresh) {
             deferred.resolve(cached)
@@ -103,9 +91,7 @@ export class ApplicationService {
                         prefs.pinnedIds.push(...ref.pinnedIds)
                     }
                     this.cacheSvc.put<VePreferencesObject>(cacheKey, prefs)
-                    deferred.resolve(
-                        this.cacheSvc.get<VePreferencesObject>(cacheKey)
-                    )
+                    deferred.resolve(this.cacheSvc.get<VePreferencesObject>(cacheKey))
                 },
                 (response) => {
                     deferred.reject(response)
@@ -122,12 +108,7 @@ export class ApplicationService {
         prefs: VePreferencesObject
     ): VePromise<VePreferencesObject, ProjectsResponse> => {
         const deferred = this.$q.defer<VePreferencesObject>()
-        const cacheKey = this.apiSvc.makeCacheKey(
-            { projectId, refId },
-            '',
-            false,
-            'preferences'
-        )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'preferences')
         this.projectSvc.getRef(projectId, refId).then(
             (ref) => {
                 if (prefs.pinnedIds) {

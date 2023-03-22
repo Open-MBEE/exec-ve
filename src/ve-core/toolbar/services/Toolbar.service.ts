@@ -75,18 +75,12 @@ export class ToolbarService {
         this.veConfig = window.__env
         if (this.veConfig.expConfig) {
             for (const ext of Object.keys(this.veConfig.expConfig)) {
-                if (
-                    this.veConfig.expConfig[ext] &&
-                    this.veConfig.expConfig[ext].length > 0
-                ) {
+                if (this.veConfig.expConfig[ext] && this.veConfig.expConfig[ext].length > 0) {
                     for (const tool of this.veConfig.expConfig[ext]) {
                         if (tool.toolButton) {
                             this.registerToolbarButtons(tool.toolButton)
                         }
-                        if (
-                            tool.toolDynamicButton &&
-                            tool.toolDynamicButton.length > 0
-                        ) {
+                        if (tool.toolDynamicButton && tool.toolDynamicButton.length > 0) {
                             this.registerDynamicButtons(tool.toolDynamicButton)
                         }
                     }
@@ -98,12 +92,10 @@ export class ToolbarService {
     public waitForApi = (id: string): VePromise<ToolbarApi, void> => {
         if (!this.toolbars.hasOwnProperty(id)) {
             this.toolbars[id] = {}
-            this.toolbars[id].promise = new this.$q<ToolbarApi, void>(
-                (resolve, reject) => {
-                    this.toolbars[id].resolve = resolve
-                    this.toolbars[id].reject = reject
-                }
-            )
+            this.toolbars[id].promise = new this.$q<ToolbarApi, void>((resolve, reject) => {
+                this.toolbars[id].resolve = resolve
+                this.toolbars[id].reject = reject
+            })
         }
         return this.toolbars[id].promise
     }
@@ -169,9 +161,7 @@ export class ToolbarService {
         }
     }
 
-    public registerToolbarButtons = (
-        buttons: IToolBarButton | IToolBarButton[]
-    ): void => {
+    public registerToolbarButtons = (buttons: IToolBarButton | IToolBarButton[]): void => {
         if (!Array.isArray(buttons)) {
             buttons = [buttons]
         }
@@ -183,9 +173,7 @@ export class ToolbarService {
             }
         }
     }
-    public registerDynamicButtons = (
-        dynamicButtons: IToolBarButton | IToolBarButton[]
-    ): void => {
+    public registerDynamicButtons = (dynamicButtons: IToolBarButton | IToolBarButton[]): void => {
         if (!Array.isArray(dynamicButtons)) {
             dynamicButtons = [dynamicButtons]
         }
@@ -214,9 +202,7 @@ export class ToolbarService {
             if (this.buttons[buttonId].dynamic_ids) {
                 newButton.dynamicButtons = []
                 for (const id of this.buttons[buttonId].dynamic_ids) {
-                    newButton.dynamicButtons.push(
-                        new ToolButton(id, this.getDynamicButton(id))
-                    )
+                    newButton.dynamicButtons.push(new ToolButton(id, this.getDynamicButton(id)))
                 }
             }
             return newButton

@@ -16,10 +16,7 @@ class InsertPeMenuController implements IComponentController {
 
     static $inject = ['PresentationService', 'RootScopeService']
 
-    constructor(
-        private presentationSvc: PresentationService,
-        private rootScopeSvc: RootScopeService
-    ) {}
+    constructor(private presentationSvc: PresentationService, private rootScopeSvc: RootScopeService) {}
     /**
      * @name veComponents.directive:mmsView#addEltAction
      * Add specified element at the defined 'index'
@@ -34,9 +31,7 @@ class InsertPeMenuController implements IComponentController {
 
     public setPeLineVisibility = ($event: JQuery.ClickEvent): void => {
         window.setTimeout(() => {
-            const peContainer = $($event.currentTarget).closest(
-                '.add-pe-button-container'
-            )
+            const peContainer = $($event.currentTarget).closest('.add-pe-button-container')
             if (peContainer.find('.dropdown-menu').css('display') == 'none') {
                 peContainer.find('hr').css('visibility', 'hidden')
             } else {

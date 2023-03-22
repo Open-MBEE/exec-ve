@@ -29,8 +29,7 @@ export class BrandingService {
     private defaultSeparator: string = ' - '
     private defaultLabels: { [key: string]: string } = {
         pi: 'PROPRIETARY: Proprietary Information',
-        export_ctrl:
-            'EXPORT WARNING: No export controlled documents allowed on this server',
+        export_ctrl: 'EXPORT WARNING: No export controlled documents allowed on this server',
         no_public_release: 'Not for Public  Release or Redistribution',
         unclassified: 'CLASSIFICATION: This system is UNCLASSIFIED',
         opensource: 'OpenMBEE View Editor | Licensed under Apache 2.0',
@@ -55,10 +54,7 @@ export class BrandingService {
 
     constructor(private $q: VeQService) {
         if (this.config.customLabels) {
-            this.labels = Object.assign(
-                this.defaultLabels,
-                this.config.customLabels
-            )
+            this.labels = Object.assign(this.defaultLabels, this.config.customLabels)
         }
 
         if (this.config.banner) {
@@ -67,10 +63,7 @@ export class BrandingService {
         this.banner = this.createMessage(this.banner)
 
         if (this.config.loginBanner) {
-            this.loginBanner = Object.assign(
-                this.loginBanner,
-                this.config.loginBanner
-            )
+            this.loginBanner = Object.assign(this.loginBanner, this.config.loginBanner)
         }
         this.loginBanner = this.createMessage(this.loginBanner)
         if (this.config.footer) {
@@ -81,25 +74,16 @@ export class BrandingService {
 
     public createMessage = (brandingStyle: BrandingStyle): BrandingStyle => {
         if (brandingStyle.labels) {
-            const separator: string = brandingStyle.separator
-                ? brandingStyle.separator
-                : this.defaultSeparator
+            const separator: string = brandingStyle.separator ? brandingStyle.separator : this.defaultSeparator
             brandingStyle.message = []
             if (Array.isArray(brandingStyle.labels[0])) {
                 for (const line of brandingStyle.labels) {
                     if (Array.isArray(line)) {
-                        brandingStyle.message.push(
-                            this._getMessage(line, separator)
-                        )
+                        brandingStyle.message.push(this._getMessage(line, separator))
                     }
                 }
             } else {
-                brandingStyle.message.push(
-                    this._getMessage(
-                        brandingStyle.labels as string[],
-                        separator
-                    )
-                )
+                brandingStyle.message.push(this._getMessage(brandingStyle.labels as string[], separator))
             }
         }
         return brandingStyle
@@ -126,9 +110,7 @@ export class BrandingService {
         return msg
     }
 
-    getBanner(
-        params?: ParamsObject
-    ): VePromise<BrandingStyle, ProjectsResponse> {
+    getBanner(params?: ParamsObject): VePromise<BrandingStyle, ProjectsResponse> {
         return this.$q.resolve(this.banner)
     }
 
@@ -136,9 +118,7 @@ export class BrandingService {
         return this.$q.resolve(this.loginBanner)
     }
 
-    getFooter(
-        params?: ParamsObject
-    ): VePromise<BrandingStyle, ProjectsResponse> {
+    getFooter(params?: ParamsObject): VePromise<BrandingStyle, ProjectsResponse> {
         return this.$q.resolve(this.footer)
     }
 }

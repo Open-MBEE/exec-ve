@@ -8,14 +8,7 @@ import { CacheService, ElementService } from '@ve-utils/mms-api-client'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import {
-    DocumentObject,
-    ElementObject,
-    GroupObject,
-    ParamsObject,
-    ProjectObject,
-    RefObject,
-} from '@ve-types/mms'
+import { DocumentObject, ElementObject, GroupObject, ParamsObject, ProjectObject, RefObject } from '@ve-types/mms'
 import { AngularUITree, VeTreeNodeScope } from '@ve-types/tree'
 
 interface ReorderGroupNode {
@@ -47,15 +40,7 @@ class ReorderGroupController implements IComponentController {
 
     treeOptions: AngularUITree.ICallbacks
 
-    static $inject = [
-        '$q',
-        '$scope',
-        '$state',
-        'growl',
-        'ElementService',
-        'CacheService',
-        'TreeService',
-    ]
+    static $inject = ['$q', '$scope', '$state', 'growl', 'ElementService', 'CacheService', 'TreeService']
     private tree: ReorderGroupNode[]
 
     constructor(
@@ -86,16 +71,10 @@ class ReorderGroupController implements IComponentController {
                 this.sortRecursively(children)
                 this.targetId = ''
             },
-            accept: (
-                sourceNodeScope: VeTreeNodeScope,
-                destNodeScope: VeTreeNodeScope,
-                destIndex
-            ): boolean => {
+            accept: (sourceNodeScope: VeTreeNodeScope, destNodeScope: VeTreeNodeScope, destIndex): boolean => {
                 // allow moving to the root or to a group
                 const accept =
-                    destNodeScope.node &&
-                    (destNodeScope.node.type === 'group' ||
-                        destNodeScope.node.type === 'root')
+                    destNodeScope.node && (destNodeScope.node.type === 'group' || destNodeScope.node.type === 'root')
                 if (accept) {
                     if (
                         destNodeScope.$nodeScope &&
@@ -141,9 +120,7 @@ class ReorderGroupController implements IComponentController {
                     return node.data.id === documentOb._groupId
                 })
                 if (parent) {
-                    parent.children.push(
-                        this.createNode(documentOb.name, 'view', [], documentOb)
-                    )
+                    parent.children.push(this.createNode(documentOb.name, 'view', [], documentOb))
                 }
             })
 
@@ -170,9 +147,7 @@ class ReorderGroupController implements IComponentController {
                 return !documentOb._groupId
             })
             .forEach((documentOb) => {
-                this.tree.push(
-                    this.createNode(documentOb.name, 'view', [], documentOb)
-                )
+                this.tree.push(this.createNode(documentOb.name, 'view', [], documentOb))
             })
         return tree
     }
@@ -232,10 +207,7 @@ class ReorderGroupController implements IComponentController {
         const root = this.tree[0]
         root.children.forEach((node) => {
             // handle node change at the root level
-            if (
-                (node.type === 'group' && node.data._parentId) ||
-                (node.type === 'view' && node.data._groupId)
-            ) {
+            if ((node.type === 'group' && node.data._parentId) || (node.type === 'view' && node.data._groupId)) {
                 result.push({
                     node: node,
                     newOwnerId: 'holding_bin_' + this.params.projectId,
@@ -246,16 +218,11 @@ class ReorderGroupController implements IComponentController {
             helper(node, result)
         })
 
-        const helper = (
-            node: ReorderGroupNode,
-            result: ReorderGroupResult[]
-        ): void => {
+        const helper = (node: ReorderGroupNode, result: ReorderGroupResult[]): void => {
             node.children.forEach((childNode) => {
                 if (
-                    (childNode.type === 'group' &&
-                        childNode.data._parentId !== node.data.id) ||
-                    (childNode.type === 'view' &&
-                        childNode.data._groupId !== node.data.id)
+                    (childNode.type === 'group' && childNode.data._parentId !== node.data.id) ||
+                    (childNode.type === 'view' && childNode.data._groupId !== node.data.id)
                 ) {
                     result.push({
                         node: childNode,
@@ -281,10 +248,7 @@ class ReorderGroupController implements IComponentController {
         ])
         results.forEach((result) => {
             // for group or document that is moved to the root, _parentId for "group" and _groupId for "document" need to be set to undefined
-            const newOwnerId =
-                result.newOwnerId.indexOf(this.params.projectId) !== -1
-                    ? undefined
-                    : result.newOwnerId
+            const newOwnerId = result.newOwnerId.indexOf(this.params.projectId) !== -1 ? undefined : result.newOwnerId
 
             if (result.node.type === 'group') {
                 const cacheGroupOb = _.find(listOfGroupInCache, (groupOb) => {
@@ -326,21 +290,10 @@ class ReorderGroupController implements IComponentController {
     public navigateAway = (reload: boolean): void => {
         const curBranch = this.treeSvc.getSelectedBranch()
         if (curBranch) {
-            const documentId =
-                curBranch.type === 'group'
-                    ? 'site_' + curBranch.data.id + '_cover'
-                    : curBranch.data.id
-            void this.$state.go(
-                'main.project.ref.portal.preview',
-                { preview: documentId },
-                { reload: reload }
-            )
+            const documentId = curBranch.type === 'group' ? 'site_' + curBranch.data.id + '_cover' : curBranch.data.id
+            void this.$state.go('main.project.ref.portal.preview', { preview: documentId }, { reload: reload })
         } else {
-            void this.$state.go(
-                'main.project.ref.portal',
-                {},
-                { reload: reload }
-            )
+            void this.$state.go('main.project.ref.portal', {}, { reload: reload })
         }
     }
 }

@@ -31,12 +31,9 @@ const SystemBannerComponent: VeComponentOptions = {
 
         $onInit(): void {
             this.loading = true
-            if (Array.isArray(this.mmsBanner.message))
-                this.bannerMessage = this.mmsBanner.message
+            if (Array.isArray(this.mmsBanner.message)) this.bannerMessage = this.mmsBanner.message
             else this.bannerMessage = [this.mmsBanner.message]
-            this.disabled = this.mmsBanner.disabled
-                ? this.mmsBanner.disabled
-                : false
+            this.disabled = this.mmsBanner.disabled ? this.mmsBanner.disabled : false
             this.loading = false
         }
     },

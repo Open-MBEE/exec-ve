@@ -32,13 +32,7 @@ import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { ResolveService } from '@ve-app/main/services'
 import { BrandingStyle, RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
-import {
-    AuthService,
-    URLService,
-    PermissionCache,
-    ViewService,
-    DocumentMetadata,
-} from '@ve-utils/mms-api-client'
+import { AuthService, URLService, PermissionCache, ViewService, DocumentMetadata } from '@ve-utils/mms-api-client'
 
 import { VePromise } from '@ve-types/angular'
 import {
@@ -100,18 +94,10 @@ veApp.config([
             '$delegate',
             function (
                 $delegate: ({
-                    link?(
-                        scope: angular.IScope,
-                        element: JQLite,
-                        attr: angular.IAttributes
-                    ): void
+                    link?(scope: angular.IScope, element: JQLite, attr: angular.IAttributes): void
                 } & angular.IDirective)[]
             ): {
-                link?(
-                    scope: angular.IScope,
-                    element: JQLite,
-                    attr: angular.IAttributes
-                ): void
+                link?(scope: angular.IScope, element: JQLite, attr: angular.IAttributes): void
             } & angular.IDirective[] {
                 const originalLinkFn = $delegate[0].link
                 $delegate[0].compile = (): angular.IDirectiveLinkFn => {
@@ -162,17 +148,13 @@ veApp.config([
                 resolve: {
                     bannerOb: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<BrandingStyle, ProjectsResponse> => {
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     loginBannerOb: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<BrandingStyle, ProjectsResponse> => {
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getLoginBanner()
                         },
                     ],
@@ -205,9 +187,7 @@ veApp.config([
                 resolve: {
                     token: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<string, CheckAuthResponse> => {
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
                         },
                     ],
@@ -229,33 +209,25 @@ veApp.config([
                 resolve: {
                     token: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<string, CheckAuthResponse> => {
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
                         },
                     ],
                     bannerOb: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<BrandingStyle, ProjectsResponse> => {
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getBanner()
                         },
                     ],
                     loginBannerOb: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<BrandingStyle, ProjectsResponse> => {
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getLoginBanner()
                         },
                     ],
                     orgObs: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<OrgObject[], OrgsResponse> => {
+                        (resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
                             return resolveSvc.getOrgs()
                         },
                     ],
@@ -296,9 +268,7 @@ veApp.config([
                     ],
                     token: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<string, CheckAuthResponse> => {
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
                         },
                     ],
@@ -306,17 +276,12 @@ veApp.config([
                         '$transition$',
                         ($transition$: Transition): boolean => {
                             const options = $transition$.options()
-                            return (
-                                options.reload === true ||
-                                options.reload === 'true'
-                            )
+                            return options.reload === true || options.reload === 'true'
                         },
                     ],
                     bannerOb: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<BrandingStyle, ProjectsResponse> => {
+                        (resolveSvc: ResolveService): VePromise<BrandingStyle, ProjectsResponse> => {
                             return resolveSvc.getBanner()
                         },
                     ],
@@ -345,28 +310,20 @@ veApp.config([
                     orgOb: [
                         'ResolveService',
                         'projectOb',
-                        (
-                            resolveSvc: ResolveService,
-                            projectOb: ProjectObject
-                        ): VePromise<OrgObject, OrgsResponse> => {
+                        (resolveSvc: ResolveService, projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> => {
                             return resolveSvc.getOrg(projectOb)
                         },
                     ],
                     orgObs: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<OrgObject[], OrgsResponse> => {
+                        (resolveSvc: ResolveService): VePromise<OrgObject[], OrgsResponse> => {
                             return resolveSvc.getOrgs()
                         },
                     ],
                     refObs: [
                         'ResolveService',
                         'params',
-                        (
-                            resolveSvc: ResolveService,
-                            params: ParamsObject
-                        ): VePromise<RefObject[], RefsResponse> => {
+                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<RefObject[], RefsResponse> => {
                             return resolveSvc.getRefs(params)
                         },
                     ],
@@ -435,10 +392,7 @@ veApp.config([
                         '$transition$',
                         ($transition$: Transition): boolean => {
                             const options = $transition$.options()
-                            return (
-                                options.reload === true ||
-                                options.reload === 'true'
-                            )
+                            return options.reload === true || options.reload === 'true'
                         },
                     ],
                     projectOb: [
@@ -454,10 +408,7 @@ veApp.config([
                     refOb: [
                         'ResolveService',
                         'params',
-                        (
-                            resolveSvc: ResolveService,
-                            params: ParamsObject
-                        ): VePromise<RefObject, RefsResponse> => {
+                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<RefObject, RefsResponse> => {
                             return resolveSvc.getRef(params)
                         },
                     ],
@@ -482,10 +433,7 @@ veApp.config([
                             params: ParamsObject,
                             refresh: boolean
                         ): VePromise<DocumentObject[]> => {
-                            return resolveSvc.getProjectDocuments(
-                                params,
-                                refresh
-                            )
+                            return resolveSvc.getProjectDocuments(params, refresh)
                         },
                     ],
                     bannerOb: [
@@ -517,10 +465,7 @@ veApp.config([
                             projectOb: ProjectObject,
                             resolveSvc: ResolveService
                         ): VePromise<PermissionCache, PermissionsResponse> => {
-                            return resolveSvc.initializePermissions(
-                                projectOb,
-                                refOb
-                            )
+                            return resolveSvc.initializePermissions(projectOb, refOb)
                         },
                     ],
                 },
@@ -541,12 +486,7 @@ veApp.config([
                             refresh: boolean,
                             resolveSvc: ResolveService
                         ): VePromise<DocumentObject> => {
-                            return resolveSvc.getCoverDocument(
-                                params,
-                                refOb,
-                                projectOb,
-                                refresh
-                            )
+                            return resolveSvc.getCoverDocument(params, refOb, projectOb, refresh)
                         },
                     ],
                     groupOb: [
@@ -564,10 +504,7 @@ veApp.config([
                     rootOb: [
                         'params',
                         'ResolveService',
-                        (
-                            params: ParamsObject,
-                            resolveSvc: ResolveService
-                        ): VePromise<PackageObject> => {
+                        (params: ParamsObject, resolveSvc: ResolveService): VePromise<PackageObject> => {
                             return resolveSvc.getProjectRoot(params)
                         },
                     ],
@@ -673,11 +610,7 @@ veApp.config([
                             refOb: RefObject,
                             refresh: boolean
                         ): VePromise<DocumentObject> => {
-                            return resolveSvc.getPreviewDocument(
-                                params,
-                                refOb,
-                                refresh
-                            )
+                            return resolveSvc.getPreviewDocument(params, refOb, refresh)
                         },
                     ],
                     groupOb: [
@@ -712,10 +645,7 @@ veApp.config([
                     documentObs: [
                         'ResolveService',
                         'params',
-                        (
-                            resolveSvc: ResolveService,
-                            params: ParamsObject
-                        ): VePromise<DocumentObject[]> => {
+                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<DocumentObject[]> => {
                             return resolveSvc.getProjectDocuments(params)
                         },
                     ],
@@ -759,19 +689,13 @@ veApp.config([
                             refresh: boolean,
                             resolveSvc: ResolveService
                         ): VePromise<DocumentObject> => {
-                            return resolveSvc.getProjectDocument(
-                                params,
-                                refresh
-                            )
+                            return resolveSvc.getProjectDocument(params, refresh)
                         },
                     ],
                     docMeta: [
                         'ViewService',
                         'documentOb',
-                        (
-                            viewSvc: ViewService,
-                            documentOb: DocumentObject
-                        ): VePromise<DocumentMetadata> => {
+                        (viewSvc: ViewService, documentOb: DocumentObject): VePromise<DocumentMetadata> => {
                             return viewSvc.getDocumentMetadata({
                                 projectId: documentOb._projectId,
                                 refId: documentOb._refId,
@@ -875,11 +799,7 @@ veApp.config([
                         'ResolveService',
                         'params',
                         'refresh',
-                        (
-                            resolveSvc: ResolveService,
-                            params: ParamsObject,
-                            refresh: boolean
-                        ): VePromise<ViewObject> => {
+                        (resolveSvc: ResolveService, params: ParamsObject, refresh: boolean): VePromise<ViewObject> => {
                             if (params.viewId) {
                                 return resolveSvc.getView(params, refresh)
                             } else {
@@ -950,10 +870,7 @@ veApp.config([
                     documentOb: [
                         'params',
                         'ResolveService',
-                        (
-                            params: ParamsObject,
-                            resolveSvc: ResolveService
-                        ): VePromise<DocumentObject> => {
+                        (params: ParamsObject, resolveSvc: ResolveService): VePromise<DocumentObject> => {
                             return resolveSvc.getProjectDocument(params, true)
                         },
                     ],
@@ -982,20 +899,14 @@ veApp.config([
                     field: [
                         'ResolveService',
                         'params',
-                        (
-                            resolveSvc: ResolveService,
-                            params: ParamsObject
-                        ): string => {
+                        (resolveSvc: ResolveService, params: ParamsObject): string => {
                             return resolveSvc.getField(params)
                         },
                     ],
                     search: [
                         'ResolveService',
                         'params',
-                        (
-                            resolveSvc: ResolveService,
-                            params: ParamsObject
-                        ): string => {
+                        (resolveSvc: ResolveService, params: ParamsObject): string => {
                             return resolveSvc.getSearch(params)
                         },
                     ],
@@ -1021,9 +932,7 @@ veApp.config([
                 resolve: {
                     token: [
                         'ResolveService',
-                        (
-                            resolveSvc: ResolveService
-                        ): VePromise<string, CheckAuthResponse> => {
+                        (resolveSvc: ResolveService): VePromise<string, CheckAuthResponse> => {
                             return resolveSvc.getToken()
                         },
                     ],
@@ -1055,9 +964,7 @@ veApp.config([
             ): IHttpInterceptor {
                 return {
                     request: (config: IRequestConfig): IRequestConfig => {
-                        config.headers = uRLSvc.getAuthorizationHeader(
-                            config.headers
-                        )
+                        config.headers = uRLSvc.getAuthorizationHeader(config.headers)
                         if (!config.timeout) {
                             config.cancel = $q.defer()
                             config.timeout = config.cancel.promise
@@ -1069,18 +976,14 @@ veApp.config([
                     responseError: (
                         rejection: IHttpResponse<any>
                     ): IPromise<IHttpResponse<any>> | IHttpResponse<any> => {
-                        const timeout: IPromise<string> = rejection.config
-                            .timeout as IPromise<string>
+                        const timeout: IPromise<string> = rejection.config.timeout as IPromise<string>
                         if (timeout.state && timeout.state === 'cancelled') {
                             rejection.data = 'cancelled'
                             return $q.when(rejection)
                         }
                         if (rejection.status == 401) {
                             console.log(rejection.config.url)
-                            if (
-                                rejection.config.url ===
-                                uRLSvc.getCheckTokenURL()
-                            ) {
+                            if (rejection.config.url === uRLSvc.getCheckTokenURL()) {
                                 return $q.reject(rejection)
                             } else {
                                 eventSvc.$broadcast('mms.unauthorized')
@@ -1155,20 +1058,9 @@ veApp.run([
                             if (!params.display || params.display === '') {
                                 params.display = 'slideshow'
                             }
-                            resolve(
-                                $state.target(
-                                    'main.project.ref.view.present.' +
-                                        params.display,
-                                    params
-                                )
-                            )
-                        } else if (
-                            $state.includes('*.present.**') &&
-                            !(transition.params() as ParamsObject).display
-                        ) {
-                            const display = transition.$to().name.split('.')[
-                                transition.$to().name.split('.').length
-                            ]
+                            resolve($state.target('main.project.ref.view.present.' + params.display, params))
+                        } else if ($state.includes('*.present.**') && !(transition.params() as ParamsObject).display) {
+                            const display = transition.$to().name.split('.')[transition.$to().name.split('.').length]
                             resolve(
                                 $state.target(transition.$to().name, {
                                     display,
@@ -1207,9 +1099,7 @@ veApp.run([
             ) {
                 if (
                     $uiRouterGlobals.current.name === 'main.login.select' ||
-                    ($uiRouterGlobals.transition &&
-                        $uiRouterGlobals.transition.$to.name ===
-                            'main.login.select')
+                    ($uiRouterGlobals.transition && $uiRouterGlobals.transition.$to.name === 'main.login.select')
                 ) {
                     void $state.go('main.login')
                 }

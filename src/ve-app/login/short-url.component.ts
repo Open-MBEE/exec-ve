@@ -37,12 +37,7 @@ const ShortUrlComponent: VeComponentOptions = {
         spin: boolean = true
         error: string = ''
 
-        static $inject = [
-            '$state',
-            'growl',
-            'ShortUrlService',
-            'RootScopeService',
-        ]
+        static $inject = ['$state', 'growl', 'ShortUrlService', 'RootScopeService']
 
         constructor(
             private $state: StateService,
@@ -58,31 +53,19 @@ const ShortUrlComponent: VeComponentOptions = {
                     (result) => {
                         this.decodedUrl = result
                         if (this.decodedUrl.viewId) {
-                            void this.$state.go(
-                                'main.project.ref.view.present',
-                                this.decodedUrl
-                            )
+                            void this.$state.go('main.project.ref.view.present', this.decodedUrl)
                             return
                         }
                         if (this.decodedUrl.documentId) {
-                            void this.$state.go(
-                                'main.project.ref.view.present',
-                                this.decodedUrl
-                            )
+                            void this.$state.go('main.project.ref.view.present', this.decodedUrl)
                             return
                         }
                         if (this.decodedUrl.refId) {
-                            void this.$state.go(
-                                'main.project.ref.portal',
-                                this.decodedUrl
-                            )
+                            void this.$state.go('main.project.ref.portal', this.decodedUrl)
                             return
                         }
                         if (this.decodedUrl.projectId) {
-                            void this.$state.go(
-                                'main.project.refs',
-                                this.decodedUrl
-                            )
+                            void this.$state.go('main.project.refs', this.decodedUrl)
                             return
                         }
                     },

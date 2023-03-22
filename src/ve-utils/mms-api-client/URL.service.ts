@@ -2,13 +2,7 @@ import { veUtils } from '@ve-utils'
 
 import { VePromiseReason } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
-import {
-    ArtifactsRequest,
-    ElementsRequest,
-    QueryParams,
-    RequestObject,
-    ViewsRequest,
-} from '@ve-types/mms'
+import { ArtifactsRequest, ElementsRequest, QueryParams, RequestObject, ViewsRequest } from '@ve-types/mms'
 
 /**
  * @ngdoc service
@@ -43,14 +37,10 @@ export class URLService {
             this.apiUrl = this.veConfig.apiUrl
         }
         if (!this.apiUrl) {
-            throw new Error(
-                'Unable to find "apiUrl" configuration for MMS. Please check your configuration file.'
-            )
+            throw new Error('Unable to find "apiUrl" configuration for MMS. Please check your configuration file.')
         }
         this.url = new URL(this.apiUrl)
-        this.url.pathname = this.veConfig.basePath
-            ? this.veConfig.basePath
-            : '/'
+        this.url.pathname = this.veConfig.basePath ? this.veConfig.basePath : '/'
 
         this.root = `${this.apiUrl}${this.basePath ? this.basePath : ''}`
         const token = localStorage.getItem('token')
@@ -73,9 +63,7 @@ export class URLService {
         return 'Bearer ' + this.token
     }
 
-    getAuthorizationHeader = (
-        headers: angular.HttpHeaderType
-    ): angular.HttpHeaderType => {
+    getAuthorizationHeader = (headers: angular.HttpHeaderType): angular.HttpHeaderType => {
         if (!this.token) {
             const token = localStorage.getItem('token')
             if (!token) {
@@ -117,12 +105,7 @@ export class URLService {
      */
     isTimestamp = (version?: string): boolean => {
         if (!version) return false
-        else if (
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(
-                version.trim()
-            )
-        )
-            return true
+        else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}[+]?-\d{4}$/.test(version.trim())) return true
         return false
     }
 
@@ -195,12 +178,7 @@ export class URLService {
         return `${this.root}/projects/${projectId}/refs/${refId}`
     }
 
-    getCommitsURL = (
-        projectId: string,
-        refId: string,
-        timestamp?: string,
-        limit?: number
-    ): string => {
+    getCommitsURL = (projectId: string, refId: string, timestamp?: string, limit?: number): string => {
         let r = `${this.root}/projects/${projectId}/refs/${refId}/commits`
         if (timestamp && this.isTimestamp(timestamp)) {
             r = this._addUrlParam({ maxTimestamp: timestamp }, r)
@@ -214,11 +192,7 @@ export class URLService {
         return r
     }
 
-    getCommitUrl = (
-        projectId: string,
-        refId: string,
-        commitId: string
-    ): string => {
+    getCommitUrl = (projectId: string, refId: string, commitId: string): string => {
         return `${this.root}/projects/${projectId}/refs/${refId}/commits/${commitId}`
     }
 
@@ -355,10 +329,7 @@ export class URLService {
      * @param {QueryParams} queryParams provide optional query parameters
      * @returns {string} The post elements url.
      */
-    getElementSearchURL = (
-        reqOb: RequestObject,
-        queryParams?: QueryParams
-    ): string => {
+    getElementSearchURL = (reqOb: RequestObject, queryParams?: QueryParams): string => {
         let r: string
         let urlParams = ''
         if (queryParams) {
@@ -381,14 +352,9 @@ export class URLService {
      * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    getArtifactURL(
-        reqOb: ElementsRequest<string> | ArtifactsRequest<string>,
-        artifactExtension?: string
-    ): string {
+    getArtifactURL(reqOb: ElementsRequest<string> | ArtifactsRequest<string>, artifactExtension?: string): string {
         const ext =
-            artifactExtension !== undefined
-                ? artifactExtension
-                : (reqOb as ArtifactsRequest<string>).artifactExtension
+            artifactExtension !== undefined ? artifactExtension : (reqOb as ArtifactsRequest<string>).artifactExtension
         const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
         return this.addToken(this.addVersion(r, reqOb.commitId))
     }
@@ -402,12 +368,8 @@ export class URLService {
      * @param {string} artifactExtension (optional) string with the desired artifact extension
      * @returns {string} url
      */
-    getArtifactEmbedURL(
-        reqOb: ArtifactsRequest<string>,
-        artifactExtension: string
-    ): string {
-        const ext =
-            artifactExtension !== undefined ? artifactExtension : 'undefined'
+    getArtifactEmbedURL(reqOb: ArtifactsRequest<string>, artifactExtension: string): string {
+        const ext = artifactExtension !== undefined ? artifactExtension : 'undefined'
         const r = `${this.root}/projects/${reqOb.projectId}/refs/${reqOb.refId}/elements/${reqOb.elementId}/${ext}`
         return this.addVersion(r, reqOb.commitId)
     }
@@ -465,9 +427,7 @@ export class URLService {
      *          }
      *      ```
      */
-    handleHttpStatus<T>(
-        response: angular.IHttpResponse<T>
-    ): VePromiseReason<T> {
+    handleHttpStatus<T>(response: angular.IHttpResponse<T>): VePromiseReason<T> {
         const result: VePromiseReason<T> = response
         const data: T = result.data
         if (result.status === 404) result.message = 'Not Found'
@@ -475,8 +435,7 @@ export class URLService {
             if (typeof data === 'string' && data.indexOf('ENOTFOUND') >= 0)
                 result.message = 'Network Error (Please check network)'
             else result.message = 'Server Error'
-        } else if (result.status === 401 || result.status === 403)
-            result.message = 'Permission Error'
+        } else if (result.status === 401 || result.status === 403) result.message = 'Permission Error'
         else if (result.status === 409) result.message = 'Conflict'
         else if (result.status === 400) result.message = 'BadRequestObject'
         else if (result.status === 410) result.message = 'Deleted'

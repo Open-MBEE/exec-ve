@@ -23,13 +23,7 @@ export interface VeExperimentConfig {
 export class ExtensionService {
     extensionTags: string[] = []
     extensionData: unknown[] = []
-    allowedExtensions: string[] = [
-        'present',
-        'transclude',
-        'spec',
-        'insert',
-        'tree-of',
-    ]
+    allowedExtensions: string[] = ['present', 'transclude', 'spec', 'insert', 'tree-of']
 
     public AnnotationType = {
         mmsTranscludeName: 1,
@@ -67,9 +61,7 @@ export class ExtensionService {
             return 'extension-error'
         }
         if (type == 'InstanceSpecification') type = 'section'
-        const tag = _.kebabCase(
-            type.startsWith(extPrefix) ? type : extPrefix + _.capitalize(type)
-        )
+        const tag = _.kebabCase(type.startsWith(extPrefix) ? type : extPrefix + _.capitalize(type))
         if (!this.extensionTags.includes(tag)) {
             // this.growl.error('Unknown Extension type: ' + type)
             return 'extension-error'
@@ -79,10 +71,7 @@ export class ExtensionService {
 
     public getExtensions(extPrefix: string, exclude?: string[]): string[] {
         return this.extensionTags.filter((value) => {
-            return (
-                value.startsWith(_.kebabCase(extPrefix)) &&
-                (exclude ? !exclude.includes(value) : true)
-            )
+            return value.startsWith(_.kebabCase(extPrefix)) && (exclude ? !exclude.includes(value) : true)
         })
     }
 }

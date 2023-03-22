@@ -85,24 +85,16 @@ class NavBarController implements angular.IComponentController {
                     (userData) => {
                         this.user = userData
                         if (this.user.firstName) {
-                            this.userBadge = this.user.firstName
-                                .substring(0, 1)
-                                .toUpperCase()
-                            this.userBadge += this.user.lastName
-                                .substring(0, 1)
-                                .toUpperCase()
+                            this.userBadge = this.user.firstName.substring(0, 1).toUpperCase()
+                            this.userBadge += this.user.lastName.substring(0, 1).toUpperCase()
                         } else {
                             this.userBadge = this.user.username
-                                ? this.user.username
-                                      .substring(0, 2)
-                                      .toUpperCase()
+                                ? this.user.username.substring(0, 2).toUpperCase()
                                 : 'VE'
                         }
                     },
                     () => {
-                        this.userBadge = this.username
-                            .substring(0, 1)
-                            .toUpperCase()
+                        this.userBadge = this.username.substring(0, 1).toUpperCase()
                     }
                 )
             },

@@ -1,11 +1,6 @@
 import $ from 'jquery'
 
-import {
-    IPresentation,
-    Presentation,
-    PresentationService,
-    ViewHtmlService,
-} from '@ve-components/presentations'
+import { IPresentation, Presentation, PresentationService, ViewHtmlService } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { ImageService } from '@ve-utils/application'
@@ -15,10 +10,7 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import {
-    IPresentationComponentOptions,
-    ITableConfig,
-} from '@ve-types/components/presentation'
+import { IPresentationComponentOptions, ITableConfig } from '@ve-types/components/presentation'
 import { PresentTableObject, TableEntryObject } from '@ve-types/mms'
 
 interface TableEvent {
@@ -71,12 +63,7 @@ class PresentTableController extends Presentation implements IPresentation {
     public isAscending: boolean = false
     private showSortReset: boolean = false
     private resetSort: () => void
-    private filterByColumn: (
-        filterTerm,
-        startColNum,
-        endColNum,
-        filterInputBinding
-    ) => void
+    private filterByColumn: (filterTerm, startColNum, endColNum, filterInputBinding) => void
 
     static $inject = [...Presentation.$inject, '$timeout']
 
@@ -134,10 +121,7 @@ class PresentTableController extends Presentation implements IPresentation {
                 this.$captionEl = this.$transcludeEl.find('caption')
                 this.$compile(this.$captionEl)(this.$scope)
                 //Add the search input here (before the TRS, aka the columns/rows)
-                this.tbody = this.$element
-                    .find('.table-wrapper')
-                    .children('table')
-                    .children('tbody')
+                this.tbody = this.$element.find('.table-wrapper').children('table').children('tbody')
                 this.trs = this.tbody.children('tr')
 
                 this.lastIndex = this.trs.length
@@ -192,12 +176,7 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     getContent = (): VePromise<string, string> => {
-        const html = this.viewHtmlSvc.makeHtmlTable(
-            this.table,
-            true,
-            true,
-            this.element
-        )
+        const html = this.viewHtmlSvc.makeHtmlTable(this.table, true, true, this.element)
         return this.$q.resolve(`<div class="table-wrapper">${html}</div>`)
     }
 
@@ -216,17 +195,13 @@ class PresentTableController extends Presentation implements IPresentation {
 
     /** Add Full Table Filter ability **/
     public addFullTableFilter = (trs: JQuery<HTMLElement>): void => {
-        this._fullTableFilterSub = this._addWatcherToFullTableFilterInput(
-            () => {
-                this._fullTableFilter(trs)
-            }
-        )
+        this._fullTableFilterSub = this._addWatcherToFullTableFilterInput(() => {
+            this._fullTableFilter(trs)
+        })
     }
 
     /** Add a watcher to the Full Table Filter Input **/
-    private _addWatcherToFullTableFilterInput = (
-        performFilter: () => void
-    ): Rx.IDisposable => {
+    private _addWatcherToFullTableFilterInput = (performFilter: () => void): Rx.IDisposable => {
         return this.eventSvc.$on('update-search', (data: TableEvent) => {
             if (data.newInputVal !== data.oldInputVal) {
                 performFilter()
@@ -249,10 +224,7 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     /** Display rows that match the filter term **/
-    private _displaySomeRows = (
-        trs: JQuery<HTMLElement>,
-        increaseNumOfRowToShow: () => void
-    ): void => {
+    private _displaySomeRows = (trs: JQuery<HTMLElement>, increaseNumOfRowToShow: () => void): void => {
         const regExp = new RegExp(this._searchTerm, 'i')
         for (let i = 0, numRows = trs.length; i < numRows; i++) {
             const string = $(trs[i]).text()
@@ -279,10 +251,7 @@ class PresentTableController extends Presentation implements IPresentation {
     // vm._resetFullTableFilterInput = _resetFullTableFilterInput;
 
     /** Add column(s)-wise filter ability **/
-    public addColumnsWiseFilter = (
-        tableConfig: ITableConfig,
-        trs: JQuery<HTMLElement>
-    ): void => {
+    public addColumnsWiseFilter = (tableConfig: ITableConfig, trs: JQuery<HTMLElement>): void => {
         this._addWatchersForAllHeaderColumnsInput(tableConfig)
         this.filterByColumn = (
             filterTerm: string,
@@ -291,12 +260,7 @@ class PresentTableController extends Presentation implements IPresentation {
             filterInputBinding: string
         ): void => {
             this._resetFullTableFilterInput(trs)
-            this._storeColumnWiseFilterTerm(
-                filterInputBinding,
-                startColNum,
-                endColNum,
-                filterTerm
-            )
+            this._storeColumnWiseFilterTerm(filterInputBinding, startColNum, endColNum, filterTerm)
             this.numFiltered = 0
             this._displayRowsMatchingAllColumnsFilterTerms(trs, () => {
                 this.numFiltered++
@@ -305,9 +269,7 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     /** Add watchers to all header columns inputs for filtering **/
-    private _addWatchersForAllHeaderColumnsInput = (
-        tableConfig: ITableConfig
-    ): void => {
+    private _addWatchersForAllHeaderColumnsInput = (tableConfig: ITableConfig): void => {
         if (!this.table.header) {
             return
         }
@@ -320,19 +282,11 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     /** Add a watcher to one header column's input for filtering **/
-    private _addWatcherToColumnInput = (
-        filterInputBinding: string,
-        cell: TableEntryObject
-    ): void => {
+    private _addWatcherToColumnInput = (filterInputBinding: string, cell: TableEntryObject): void => {
         this._columnsInputSubs[filterInputBinding] = {
             sub: this.eventSvc.$on(filterInputBinding, (data: TableEvent) => {
                 if (data.newInputVal !== data.oldInputVal) {
-                    this.filterByColumn(
-                        data.newInputVal,
-                        cell.startCol,
-                        cell.endCol,
-                        filterInputBinding
-                    )
+                    this.filterByColumn(data.newInputVal, cell.startCol, cell.endCol, filterInputBinding)
                 }
             }),
             cell: cell,
@@ -344,11 +298,9 @@ class PresentTableController extends Presentation implements IPresentation {
         if (this._searchTerm !== '') {
             this._fullTableFilterSub.dispose()
             this.searchTerm('')
-            this._fullTableFilterSub = this._addWatcherToFullTableFilterInput(
-                () => {
-                    this._fullTableFilter(trs)
-                }
-            )
+            this._fullTableFilterSub = this._addWatcherToFullTableFilterInput(() => {
+                this._fullTableFilter(trs)
+            })
         }
     }
 
@@ -358,21 +310,12 @@ class PresentTableController extends Presentation implements IPresentation {
         increaseNumOfRowToShow: () => void
     ): void => {
         trs.toArray().forEach((row) => {
-            const shouldKeepRow = Object.keys(this._filterTermForColumns).every(
-                (k) => {
-                    const regExp = new RegExp(
-                        this._filterTermForColumns[k].filterTerm,
-                        'i'
-                    )
-                    return this._filterTermForColumns[k].columns.some(
-                        (colNum) => {
-                            return regExp.test(
-                                this._getCellValueForFiltering(row, colNum)
-                            )
-                        }
-                    )
-                }
-            )
+            const shouldKeepRow = Object.keys(this._filterTermForColumns).every((k) => {
+                const regExp = new RegExp(this._filterTermForColumns[k].filterTerm, 'i')
+                return this._filterTermForColumns[k].columns.some((colNum) => {
+                    return regExp.test(this._getCellValueForFiltering(row, colNum))
+                })
+            })
             if (shouldKeepRow) {
                 $(row).show()
                 increaseNumOfRowToShow()
@@ -390,17 +333,9 @@ class PresentTableController extends Presentation implements IPresentation {
         filterTerm: string
     ): void => {
         if (this._filterTermForColumns[filterInputBinding]) {
-            this._updateExistingColumnWiseFilterTerm(
-                filterInputBinding,
-                filterTerm
-            )
+            this._updateExistingColumnWiseFilterTerm(filterInputBinding, filterTerm)
         } else {
-            this._addNewColumnWiseFilterTerm(
-                filterInputBinding,
-                startColNum,
-                endColNum,
-                filterTerm
-            )
+            this._addNewColumnWiseFilterTerm(filterInputBinding, startColNum, endColNum, filterTerm)
         }
     }
 
@@ -413,50 +348,31 @@ class PresentTableController extends Presentation implements IPresentation {
     ): void => {
         this._filterTermForColumns[filterInputBinding] = {
             filterTerm: filterTerm,
-            columns:
-                startColNum === endColNum
-                    ? [startColNum]
-                    : [startColNum, endColNum],
+            columns: startColNum === endColNum ? [startColNum] : [startColNum, endColNum],
         }
     }
 
     /** Update a filter term for a header column with the given filterInputBinding **/
-    private _updateExistingColumnWiseFilterTerm = (
-        filterInputBinding: string,
-        filterTerm: string
-    ): void => {
+    private _updateExistingColumnWiseFilterTerm = (filterInputBinding: string, filterTerm: string): void => {
         this._filterTermForColumns[filterInputBinding].filterTerm = filterTerm
     }
 
     /** Return the content of a cell given a row & columnIndex **/
-    private _getCellValueForFiltering = (
-        row: HTMLElement,
-        columnIndex: number
-    ): string => {
+    private _getCellValueForFiltering = (row: HTMLElement, columnIndex: number): string => {
         const cell = $(row).children('td').eq(columnIndex)
         return cell.text().trim()
     }
 
     /** Clear out filter term(s) for all header's columns that used to be filtered by before **/
     private _resetColumnWiseFilterInputs = (): void => {
-        const listOfFilterInputBindings = Object.keys(
-            this._filterTermForColumns
-        )
+        const listOfFilterInputBindings = Object.keys(this._filterTermForColumns)
         if (listOfFilterInputBindings.length > 0) {
             listOfFilterInputBindings.forEach((filterInputBinding) => {
-                if (
-                    this._filterTermForColumns[filterInputBinding]
-                        .filterTerm !== ''
-                ) {
-                    this.eventSvc.destroy([
-                        this._columnsInputSubs[filterInputBinding].sub,
-                    ])
+                if (this._filterTermForColumns[filterInputBinding].filterTerm !== '') {
+                    this.eventSvc.destroy([this._columnsInputSubs[filterInputBinding].sub])
                 }
                 //$scope[filterInputBinding] = '';
-                this._addWatcherToColumnInput(
-                    filterInputBinding,
-                    this._columnsInputSubs[filterInputBinding].cell
-                )
+                this._addWatcherToColumnInput(filterInputBinding, this._columnsInputSubs[filterInputBinding].cell)
                 delete this._filterTermForColumns[filterInputBinding]
             })
         }
@@ -466,10 +382,7 @@ class PresentTableController extends Presentation implements IPresentation {
     /** Sorting feature **/
 
     /** Add sorting ability **/
-    public addSorting = (
-        trs: JQuery<HTMLElement>,
-        tbody: JQuery<HTMLElement>
-    ): void => {
+    public addSorting = (trs: JQuery<HTMLElement>, tbody: JQuery<HTMLElement>): void => {
         this._addDefaultSortOrder(trs)
         this._addSortingBinding(trs, tbody)
         this._addSortResetBinding(trs, tbody)
@@ -483,10 +396,7 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     /** Used to sort columns(s). Add sort binding to each header columns of the outermost table **/
-    private _addSortingBinding = (
-        trs: JQuery<HTMLElement>,
-        tbody: JQuery<HTMLElement>
-    ): void => {
+    private _addSortingBinding = (trs: JQuery<HTMLElement>, tbody: JQuery<HTMLElement>): void => {
         this.tableConfig.showBindingForSortIcon = -1
 
         this.tableConfig.sortByColumnFn = (sortColumnNum: number): void => {
@@ -508,14 +418,9 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     /** Used to restore the sort order of table's rows **/
-    private _addSortResetBinding = (
-        trs: JQuery<HTMLElement>,
-        tbody: JQuery<HTMLElement>
-    ): void => {
+    private _addSortResetBinding = (trs: JQuery<HTMLElement>, tbody: JQuery<HTMLElement>): void => {
         this.resetSort = (): void => {
-            const sortedRows = trs
-                .toArray()
-                .sort(this._comparatorForSortReset())
+            const sortedRows = trs.toArray().sort(this._comparatorForSortReset())
             this._displaySortedRows(sortedRows, tbody)
 
             this.showSortReset = false
@@ -526,9 +431,7 @@ class PresentTableController extends Presentation implements IPresentation {
     /** A comparator for sorting table's rows. When one of them is null ( null is reserved for non-sortable content
      *  such as  image, list, table ), that content is pushed to the end of the final sorted list regardless of
      *  whether sorting asc or dsc **/
-    private _generalComparator = (
-        columnIndex: number
-    ): ((rowA: HTMLElement, rowB: HTMLElement) => number) => {
+    private _generalComparator = (columnIndex: number): ((rowA: HTMLElement, rowB: HTMLElement) => number) => {
         return (rowA: HTMLElement, rowB: HTMLElement): number => {
             let cellValueA = this._getCellValueForSorting(rowA, columnIndex)
             let cellValueB = this._getCellValueForSorting(rowB, columnIndex)
@@ -548,37 +451,22 @@ class PresentTableController extends Presentation implements IPresentation {
             if (cellValueA !== null && cellValueB !== null) {
                 cellValueA = cellValueA.toLowerCase()
                 cellValueB = cellValueB.toLowerCase()
-                return cellValueA < cellValueB
-                    ? -1
-                    : cellValueA > cellValueB
-                    ? 1
-                    : 0
+                return cellValueA < cellValueB ? -1 : cellValueA > cellValueB ? 1 : 0
             }
         }
     }
 
     /** Return true if and only if all cells' value can be converted to a valid number **/
-    private _areAllCellValidNumber = (
-        rows: HTMLElement[],
-        columnIndex: number
-    ): boolean => {
+    private _areAllCellValidNumber = (rows: HTMLElement[], columnIndex: number): boolean => {
         return rows.every((row): boolean => {
-            return this._isValidNumber(
-                this._getCellValueForSorting(row, columnIndex)
-            )
+            return this._isValidNumber(this._getCellValueForSorting(row, columnIndex))
         })
     }
 
-    private _numericalComparator = (
-        columnIndex: number
-    ): ((rowA: HTMLElement, rowB: HTMLElement) => number) => {
+    private _numericalComparator = (columnIndex: number): ((rowA: HTMLElement, rowB: HTMLElement) => number) => {
         return (rowA: HTMLElement, rowB: HTMLElement) => {
-            const cellValueA = Number(
-                this._getCellValueForSorting(rowA, columnIndex)
-            )
-            const cellValueB = Number(
-                this._getCellValueForSorting(rowB, columnIndex)
-            )
+            const cellValueA = Number(this._getCellValueForSorting(rowA, columnIndex))
+            const cellValueB = Number(this._getCellValueForSorting(rowB, columnIndex))
             return cellValueA - cellValueB
         }
     }
@@ -589,14 +477,9 @@ class PresentTableController extends Presentation implements IPresentation {
 
     /** Get content of a cell given its row and its columnIndex. Return null for a cell that contains non-sortable
      *  content such as image, table, list **/
-    private _getCellValueForSorting = (
-        row: HTMLElement,
-        columnIndex: number
-    ): string => {
+    private _getCellValueForSorting = (row: HTMLElement, columnIndex: number): string => {
         const cell = $(row).children('td').eq(columnIndex)
-        const containerDivContent: JQuery<HTMLElement> = cell
-            .children('div')
-            .contents() as JQuery<HTMLElement>
+        const containerDivContent: JQuery<HTMLElement> = cell.children('div').contents() as JQuery<HTMLElement>
         // if there is no content, think of it as empty string
         if (containerDivContent.length === 0) {
             return ''
@@ -604,17 +487,12 @@ class PresentTableController extends Presentation implements IPresentation {
             return cell.text().trim()
         } else {
             const cf = 'view-cf'
-            const contentTag: string = (
-                containerDivContent.prop('tagName') as object
-            )
-                .toString()
-                .toLowerCase()
+            const contentTag: string = (containerDivContent.prop('tagName') as object).toString().toLowerCase()
             const contentTagAttr = containerDivContent.attr('mms-cf-type')
             if (
                 contentTag === 'img' ||
                 contentTag === 'table' ||
-                (contentTag === cf &&
-                    (contentTagAttr === 'img' || contentTagAttr === 'table'))
+                (contentTag === cf && (contentTagAttr === 'img' || contentTagAttr === 'table'))
             ) {
                 return null
             } else {
@@ -624,27 +502,16 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     /** Display newly sorted rows **/
-    private _displaySortedRows = (
-        sortedRows: HTMLElement[],
-        tbody: JQuery<HTMLElement>
-    ): void => {
+    private _displaySortedRows = (sortedRows: HTMLElement[], tbody: JQuery<HTMLElement>): void => {
         $(sortedRows).detach().appendTo(tbody)
     }
 
     /** This special comparator is used to turn the table's rows into its original sort order **/
     private _comparatorForSortReset = () => {
         return (rowA, rowB): number => {
-            const rowARowNumber = Number(
-                $(rowA).attr(this._rowSortOrderAttrName)
-            )
-            const rowBRowNumber = Number(
-                $(rowB).attr(this._rowSortOrderAttrName)
-            )
-            return rowARowNumber < rowBRowNumber
-                ? -1
-                : rowARowNumber > rowBRowNumber
-                ? 1
-                : 0
+            const rowARowNumber = Number($(rowA).attr(this._rowSortOrderAttrName))
+            const rowBRowNumber = Number($(rowB).attr(this._rowSortOrderAttrName))
+            return rowARowNumber < rowBRowNumber ? -1 : rowARowNumber > rowBRowNumber ? 1 : 0
         }
     }
     /** End of Sorting feature **/
@@ -676,12 +543,8 @@ class PresentTableController extends Presentation implements IPresentation {
                 type: 'text/csv;charset=utf-8;',
             })
 
-            const downloadContainer = angular.element(
-                '<div data-tap-disabled="true"><a></a></div>'
-            )
-            const downloadLink = angular.element(
-                downloadContainer.children()[0]
-            )
+            const downloadContainer = angular.element('<div data-tap-disabled="true"><a></a></div>')
+            const downloadLink = angular.element(downloadContainer.children()[0])
             downloadLink.attr('href', window.URL.createObjectURL(blob))
             downloadLink.attr('download', 'TableData.csv')
             downloadLink.attr('target', '_blank')
@@ -718,16 +581,10 @@ class PresentTableController extends Presentation implements IPresentation {
     }
     public makeFixedHeader = (): void => {
         if (!this.fixedHeaders) {
-            this.$element
-                .find('.table-wrapper')
-                .removeClass('table-fix-head')
-                .css('height', '')
+            this.$element.find('.table-wrapper').removeClass('table-fix-head').css('height', '')
             this._fixedHeadersElem.css('transform', '').css('will-change', '')
             this._fixedHeadersElem = null
-            window.localStorage.setItem(
-                've-table-header-' + this.element.id,
-                'false'
-            )
+            window.localStorage.setItem('ve-table-header-' + this.element.id, 'false')
             return
         }
         this.$element
@@ -738,51 +595,28 @@ class PresentTableController extends Presentation implements IPresentation {
         this._fixedHeadersElem = this.$element.find('thead, caption')
         this._fixedHeadersElem.css('will-change', 'transform') //browser optimization
         this.$element.find('.table-fix-head').on('scroll', this.scroll)
-        window.localStorage.setItem(
-            've-table-header-' + this.element.id,
-            'true'
-        )
+        window.localStorage.setItem('ve-table-header-' + this.element.id, 'true')
     }
 
     public makeFixedColumn = (): void => {
         if (!this.fixedColumns) {
-            this.$element
-                .find('.table-wrapper')
-                .removeClass('table-fix-column')
-                .css('width', '')
-            this._fixedColumnsElem
-                .css('transform', '')
-                .css('will-change', '')
-                .removeClass('table-fixed-cell')
+            this.$element.find('.table-wrapper').removeClass('table-fix-column').css('width', '')
+            this._fixedColumnsElem.css('transform', '').css('will-change', '').removeClass('table-fixed-cell')
             this._fixedColumnsElem = null
-            window.localStorage.setItem(
-                've-table-column-' + this.element.id,
-                'false'
-            )
+            window.localStorage.setItem('ve-table-column-' + this.element.id, 'false')
             return
         }
         this.$element
             .find('.table-wrapper')
             .addClass('table-fix-column')
             .css('width', window.innerWidth - 400)
-        this._fixedColumnsElem = this._findColumnCells(
-            'thead',
-            'th',
-            this.numFixedColumns
-        )
-        this._fixedColumnsElem = this._fixedColumnsElem.add(
-            this._findColumnCells('tbody', 'td', this.numFixedColumns)
-        )
-        this._fixedColumnsElem = this._fixedColumnsElem.add(
-            this.$element.find('.table-fix-column caption')
-        )
+        this._fixedColumnsElem = this._findColumnCells('thead', 'th', this.numFixedColumns)
+        this._fixedColumnsElem = this._fixedColumnsElem.add(this._findColumnCells('tbody', 'td', this.numFixedColumns))
+        this._fixedColumnsElem = this._fixedColumnsElem.add(this.$element.find('.table-fix-column caption'))
         this._fixedColumnsElem.css('will-change', 'transform') //browser optimization
         this._fixedColumnsElem.addClass('table-fixed-cell')
         this.$element.find('.table-fix-column').on('scroll', this.scroll)
-        window.localStorage.setItem(
-            've-table-column-' + this.element.id,
-            this.numFixedColumns.toString()
-        )
+        window.localStorage.setItem('ve-table-column-' + this.element.id, this.numFixedColumns.toString())
     }
 
     public updateFixedColumns = (): void => {
@@ -792,11 +626,7 @@ class PresentTableController extends Presentation implements IPresentation {
         this.makeFixedColumn()
     }
 
-    private _findColumnCells = (
-        bodyTag: string,
-        cellTag: string,
-        n: number
-    ): JQuery<HTMLElement> => {
+    private _findColumnCells = (bodyTag: string, cellTag: string, n: number): JQuery<HTMLElement> => {
         const spanData: boolean[][] = [] //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
         let curRow = 0
         let data = $('<div></div>')
@@ -862,22 +692,12 @@ class PresentTableController extends Presentation implements IPresentation {
                 this.nextIndex = first + 300
                 if (this.nextIndex < this.lastIndex) this.compileTable()
                 else {
-                    if (
-                        window.localStorage.getItem(
-                            've-table-header-' + this.element.id
-                        ) == 'true'
-                    ) {
+                    if (window.localStorage.getItem('ve-table-header-' + this.element.id) == 'true') {
                         this.fixedHeaders = true
                         this.makeFixedHeader()
                     }
-                    const columnFix = window.localStorage.getItem(
-                        've-table-column-' + this.element.id
-                    )
-                    if (
-                        columnFix != 'false' &&
-                        columnFix != null &&
-                        columnFix != 'null'
-                    ) {
+                    const columnFix = window.localStorage.getItem('ve-table-column-' + this.element.id)
+                    if (columnFix != 'false' && columnFix != null && columnFix != 'null') {
                         this.fixedColumns = true
                         this.numFixedColumns = Number.parseInt(columnFix)
                         this.makeFixedColumn()

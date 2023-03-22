@@ -1,10 +1,6 @@
 import { UIRouter } from '@uirouter/angularjs'
 
-import {
-    BrandingService,
-    BrandingStyle,
-    ShortUrlService,
-} from '@ve-utils/application'
+import { BrandingService, BrandingStyle, ShortUrlService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import {
     AuthService,
@@ -73,9 +69,7 @@ export class ResolveService {
         private eventSvc: EventService
     ) {}
 
-    public getBanner(
-        params?: ParamsObject
-    ): VePromise<BrandingStyle, ProjectsResponse> {
+    public getBanner(params?: ParamsObject): VePromise<BrandingStyle, ProjectsResponse> {
         return this.brandingSvc.getBanner(params)
     }
 
@@ -83,9 +77,7 @@ export class ResolveService {
         return this.brandingSvc.getLoginBanner()
     }
 
-    public getFooter(
-        params?: ParamsObject
-    ): VePromise<BrandingStyle, ProjectsResponse> {
+    public getFooter(params?: ParamsObject): VePromise<BrandingStyle, ProjectsResponse> {
         return this.brandingSvc.getFooter(params)
     }
 
@@ -95,11 +87,7 @@ export class ResolveService {
             (data) => {
                 this.uRLSvc.setToken(this.$localStorage.token)
                 deferred.resolve(this.$localStorage.token)
-                this.$cookies.put(
-                    'com.tomsawyer.web.license.user',
-                    data.username,
-                    { path: '/' }
-                )
+                this.$cookies.put('com.tomsawyer.web.license.user', data.username, { path: '/' })
             },
             (rejection) => {
                 deferred.reject(rejection)
@@ -108,9 +96,7 @@ export class ResolveService {
         return deferred.promise
     }
 
-    public getOrg(
-        projectOb: ProjectObject
-    ): VePromise<OrgObject, OrgsResponse> {
+    public getOrg(projectOb: ProjectObject): VePromise<OrgObject, OrgsResponse> {
         const promise = this.projectSvc.getOrg(projectOb.orgId)
         promise.then(
             (result) => {
@@ -136,9 +122,7 @@ export class ResolveService {
         return promise
     }
 
-    public getProject(
-        params: ParamsObject
-    ): VePromise<ProjectObject, ProjectsResponse> {
+    public getProject(params: ParamsObject): VePromise<ProjectObject, ProjectsResponse> {
         const promise = this.projectSvc.getProject(params.projectId)
         promise.then(
             (result) => {
@@ -151,10 +135,7 @@ export class ResolveService {
         return promise
     }
 
-    public getProjects(
-        projectOb: ProjectObject,
-        refresh?: boolean
-    ): VePromise<ProjectObject[], ProjectsResponse> {
+    public getProjects(projectOb: ProjectObject, refresh?: boolean): VePromise<ProjectObject[], ProjectsResponse> {
         const promise = this.projectSvc.getProjects(projectOb.orgId, refresh)
         promise.then(
             (result) => {
@@ -167,15 +148,8 @@ export class ResolveService {
         return promise
     }
 
-    public getProjectMounts(
-        params: ParamsObject,
-        refresh?: boolean
-    ): VePromise<MountObject, ProjectsResponse> {
-        const promise = this.projectSvc.getProjectMounts(
-            params.projectId,
-            params.refId,
-            refresh
-        )
+    public getProjectMounts(params: ParamsObject, refresh?: boolean): VePromise<MountObject, ProjectsResponse> {
+        const promise = this.projectSvc.getProjectMounts(params.projectId, params.refId, refresh)
 
         promise.then(
             (result) => {
@@ -214,15 +188,8 @@ export class ResolveService {
         return promise
     }
 
-    public getGroups(
-        params: ParamsObject,
-        refresh?: boolean
-    ): VePromise<GroupObject[], GroupsResponse> {
-        const promise = this.projectSvc.getGroups(
-            params.projectId,
-            params.refId,
-            refresh
-        )
+    public getGroups(params: ParamsObject, refresh?: boolean): VePromise<GroupObject[], GroupsResponse> {
+        const promise = this.projectSvc.getGroups(params.projectId, params.refId, refresh)
 
         promise.then(
             (result) => {
@@ -235,10 +202,7 @@ export class ResolveService {
         return promise
     }
 
-    public getGroup(
-        groupObs: GroupObject[],
-        documentOb: DocumentObject
-    ): GroupObject {
+    public getGroup(groupObs: GroupObject[], documentOb: DocumentObject): GroupObject {
         let group: GroupObject = null
         if (documentOb) {
             for (let i = 0; i < groupObs.length; i++) {
@@ -307,10 +271,7 @@ export class ResolveService {
                                 )
                                 .then(
                                     (data) => {
-                                        this.eventSvc.resolve(
-                                            'mmsDocument',
-                                            data
-                                        )
+                                        this.eventSvc.resolve('mmsDocument', data)
                                         deferred.resolve(data)
                                     },
                                     (reason2) => {
@@ -369,11 +330,7 @@ export class ResolveService {
         return deferred.promise
     }
 
-    public getPreviewDocument(
-        params: ParamsObject,
-        refOb: RefObject,
-        refresh?: boolean
-    ): VePromise<DocumentObject> {
+    public getPreviewDocument(params: ParamsObject, refOb: RefObject, refresh?: boolean): VePromise<DocumentObject> {
         const deferred = this.$q.defer<DocumentObject>()
         const eid: string = params.preview
         const coverIndex = eid.indexOf('_cover')
@@ -419,18 +376,14 @@ export class ResolveService {
                                             this.viewSvc
                                                 .createView(
                                                     {
-                                                        _projectId:
-                                                            params.projectId,
+                                                        _projectId: params.projectId,
                                                         _refId: params.refId,
                                                         id: groupId,
                                                     },
                                                     {
-                                                        name:
-                                                            groupElement.name +
-                                                            ' Cover Page',
+                                                        name: groupElement.name + ' Cover Page',
                                                         id: eid,
-                                                        _projectId:
-                                                            params.projectId,
+                                                        _projectId: params.projectId,
                                                         _refId: params.refId,
                                                         type: 'Class',
                                                         documentation: viewDoc,
@@ -438,10 +391,7 @@ export class ResolveService {
                                                 )
                                                 .then(
                                                     (data) => {
-                                                        this.eventSvc.resolve(
-                                                            'mmsDocument',
-                                                            data
-                                                        )
+                                                        this.eventSvc.resolve('mmsDocument', data)
                                                         deferred.resolve(data)
                                                     },
                                                     (reason3) => {
@@ -472,10 +422,7 @@ export class ResolveService {
         return deferred.promise
     }
 
-    public getProjectDocument(
-        params: ParamsObject,
-        refresh?: boolean
-    ): VePromise<ViewObject> {
+    public getProjectDocument(params: ParamsObject, refresh?: boolean): VePromise<ViewObject> {
         const promise = this.elementSvc.getElement(
             {
                 projectId: params.projectId,
@@ -497,10 +444,7 @@ export class ResolveService {
         return promise
     }
 
-    public getProjectDocuments(
-        params: ParamsObject,
-        refresh?: boolean
-    ): VePromise<DocumentObject[]> {
+    public getProjectDocuments(params: ParamsObject, refresh?: boolean): VePromise<DocumentObject[]> {
         const promise = this.viewSvc.getProjectDocuments(
             {
                 projectId: params.projectId,
@@ -521,10 +465,7 @@ export class ResolveService {
         return promise
     }
 
-    public getView(
-        params: ParamsObject,
-        refresh?: boolean
-    ): VePromise<ViewObject> {
+    public getView(params: ParamsObject, refresh?: boolean): VePromise<ViewObject> {
         const promise = this.elementSvc.getElement(
             {
                 projectId: params.projectId,

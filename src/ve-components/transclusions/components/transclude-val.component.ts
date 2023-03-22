@@ -2,11 +2,7 @@ import $ from 'jquery'
 
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { SpecTool } from '@ve-components/spec-tools'
-import {
-    ITransclusion,
-    ITransclusionComponentOptions,
-    Transclusion,
-} from '@ve-components/transclusions'
+import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { MathService, UtilsService, ImageService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -47,10 +43,7 @@ import { SlotObject, ValueObject } from '@ve-types/mms'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeValController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeValController extends Transclusion implements ITransclusion {
     //Custom Bindings
     first: boolean
 
@@ -225,11 +218,7 @@ export class TranscludeValController
             if (this.mmsViewCtrl) {
                 this.mmsViewCtrl.transcludeClicked(this.element)
             }
-            if (
-                this.nonEditable &&
-                this.mmsViewCtrl &&
-                this.mmsViewCtrl.isEditable()
-            ) {
+            if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
                 this.growl.warning('Cross Reference is not editable.')
             }
             e.stopPropagation()
@@ -241,9 +230,7 @@ export class TranscludeValController
         }
     }
 
-    public getContent = (
-        preview?
-    ): angular.IPromise<string | HTMLElement[]> => {
+    public getContent = (preview?): angular.IPromise<string | HTMLElement[]> => {
         const deferred = this.$q.defer<string | HTMLElement[]>()
 
         this.isEditing = false
@@ -326,42 +313,19 @@ export class TranscludeValController
         if (this.element.type === 'Slot') {
             id = (this.element as SlotObject).definingFeatureId
         }
-        if (
-            !id ||
-            (this.propertySpec.isEnumeration && this.propertySpec.options)
-        ) {
-            this.componentSvc.startEdit(
-                this,
-                isEditable,
-                this.$element,
-                this.editTemplate,
-                false
-            )
+        if (!id || (this.propertySpec.isEnumeration && this.propertySpec.options)) {
+            this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
             return
         }
         this.componentSvc.getPropertySpec(this.element).then(
             (value) => {
                 this.propertySpec = value
                 this.componentSvc.setupValEditFunctions(this)
-                this.componentSvc.startEdit(
-                    this,
-                    isEditable,
-                    this.$element,
-                    this.editTemplate,
-                    false
-                )
+                this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
             },
             (reason) => {
-                this.componentSvc.startEdit(
-                    this,
-                    isEditable,
-                    this.$element,
-                    this.editTemplate,
-                    false
-                )
-                this.growl.error(
-                    'Failed to get property spec: ' + reason.message
-                )
+                this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
+                this.growl.error('Failed to get property spec: ' + reason.message)
             }
         )
     }

@@ -16,7 +16,4 @@ const PresentEquationComponent: IPresentationComponentOptions = {
     controller: PresentationLite,
 }
 
-veComponents.component(
-    PresentEquationComponent.selector,
-    PresentEquationComponent
-)
+veComponents.component(PresentEquationComponent.selector, PresentEquationComponent)

@@ -77,11 +77,7 @@ export class ToolbarApi {
         if (button.dynamicButtons) {
             let firstButton = true
             button.dynamicButtons.forEach((buttonLoop) => {
-                if (
-                    !this.buttons
-                        .map((button) => button.id)
-                        .includes(buttonLoop.id)
-                ) {
+                if (!this.buttons.map((button) => button.id).includes(buttonLoop.id)) {
                     if (firstButton) {
                         buttonLoop.pullDown = true
                         firstButton = false

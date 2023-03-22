@@ -3,11 +3,7 @@ import { VeModalControllerImpl } from '@ve-utils/modals/ve-modal.controller'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import {
-    VeModalController,
-    VeModalResolve,
-    VeModalResolveFn,
-} from '@ve-types/view-editor'
+import { VeModalController, VeModalResolve, VeModalResolveFn } from '@ve-types/view-editor'
 
 export interface WorkingTimeObject {
     startTime: Date

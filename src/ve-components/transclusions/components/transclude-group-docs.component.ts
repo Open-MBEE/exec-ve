@@ -23,10 +23,7 @@ import { ViewObject } from '@ve-types/mms'
  * @param {string=master} mmsRefId Ref, defaults to master
  * @param {string} mmsProjectId Project Id, if not stated will get from surrounding view
  */
-class TranscludeGroupDocsController
-    extends Transclusion
-    implements ITransclusion
-{
+class TranscludeGroupDocsController extends Transclusion implements ITransclusion {
     template = `<table class="table table-condensed">
     <tr><th>Document(s)</th><!--<th>Last Modified</th><th>Last Modified By</th><th>Created</th>--></tr>
     <tr ng-repeat="doc in $ctrl.docs | orderBy: 'name'">
@@ -125,10 +122,7 @@ class TranscludeGroupDocsController
         const docs: ViewObject[] = []
         const groupId = this.mmsGroupId === '' ? undefined : this.mmsGroupId
         for (let i = 0; i < this.documents.length; i++) {
-            if (
-                (groupId === undefined || groupId === this.projectId) &&
-                !this.documents[i]._groupId
-            ) {
+            if ((groupId === undefined || groupId === this.projectId) && !this.documents[i]._groupId) {
                 docs.push(this.documents[i])
             } else if (this.documents[i]._groupId == this.mmsGroupId) {
                 docs.push(this.documents[i])
@@ -159,7 +153,4 @@ export const TranscludeGroupDocsComponent: VeComponentOptions = {
     controller: TranscludeGroupDocsController,
 }
 
-veComponents.component(
-    TranscludeGroupDocsComponent.selector,
-    TranscludeGroupDocsComponent
-)
+veComponents.component(TranscludeGroupDocsComponent.selector, TranscludeGroupDocsComponent)

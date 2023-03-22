@@ -1,8 +1,4 @@
-import {
-    Diff,
-    IDiff,
-    IDiffComponentOptions,
-} from '@ve-components/diffs/diff.controller'
+import { Diff, IDiff, IDiffComponentOptions } from '@ve-components/diffs/diff.controller'
 
 import { veComponents } from '@ve-components'
 
@@ -16,11 +12,7 @@ class DiffHtmlController extends Diff<string> implements IDiff<string> {
 
     static $inject = Diff.$inject
 
-    constructor(
-        $scope: angular.IScope,
-        $timeout: angular.ITimeoutService,
-        growl: angular.growl.IGrowlService
-    ) {
+    constructor($scope: angular.IScope, $timeout: angular.ITimeoutService, growl: angular.growl.IGrowlService) {
         super($scope, $timeout, growl)
         this.htmlRenderedDiff = window.HtmlRenderedDiff
     }
@@ -49,9 +41,7 @@ class DiffHtmlController extends Diff<string> implements IDiff<string> {
     }
 
     static _preformatHtml(html: string): string {
-        return html
-            .replace(/\r?\n|\r|\t/g, '')
-            .replace('<p class="ng-scope">&nbsp;</p>', '')
+        return html.replace(/\r?\n|\r|\t/g, '').replace('<p class="ng-scope">&nbsp;</p>', '')
     }
 
     private _formatImgDiff = (diffContainer: JQuery<HTMLElement>): void => {

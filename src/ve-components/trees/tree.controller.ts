@@ -146,16 +146,13 @@ export class TreeController implements angular.IComponentController {
 
         this.eventSvc.$init(this)
         this.subs.push(
-            this.eventSvc.binding<boolean>(
-                TreeService.events.UPDATED,
-                (data) => {
-                    if (data) {
-                        this.configure().catch((reason) => {
-                            this.growl.error(TreeService.treeError(reason))
-                        })
-                    }
+            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
+                if (data) {
+                    this.configure().catch((reason) => {
+                        this.growl.error(TreeService.treeError(reason))
+                    })
                 }
-            ),
+            }),
             this.eventSvc.$on<string>(TreeService.events.RELOAD, (data) => {
                 if ((data && this.id === data) || !data) {
                     this.treeSpin = true
@@ -206,19 +203,14 @@ export class TreeController implements angular.IComponentController {
 
         this.treeSvc.defaultIcon = this.icons.iconDefault
         return new this.$q<void>((resolve, reject) => {
-            this.treeSvc
-                .updateRows(this.id, this.types, this.treeRows)
-                .then(() => {
-                    this.treeSpin = false
-                    resolve()
-                }, reject)
+            this.treeSvc.updateRows(this.id, this.types, this.treeRows).then(() => {
+                this.treeSpin = false
+                resolve()
+            }, reject)
         })
     }
 
-    public expandCallback = (
-        branch: TreeBranch,
-        e: JQuery.ClickEvent
-    ): void => {
+    public expandCallback = (branch: TreeBranch, e: JQuery.ClickEvent): void => {
         branch.loading = true
         if (!branch.expanded && this.treeSvc.treeApi.expandCallback) {
             this.treeSvc.treeApi.expandCallback(branch.data.id, branch, false)
@@ -226,9 +218,7 @@ export class TreeController implements angular.IComponentController {
         if (e) {
             e.stopPropagation()
         }
-        const promise = branch.expanded
-            ? this.treeSvc.closeBranch(branch)
-            : this.treeSvc.expandBranch(branch)
+        const promise = branch.expanded ? this.treeSvc.closeBranch(branch) : this.treeSvc.expandBranch(branch)
         promise.then(
             () => {
                 this.configure()

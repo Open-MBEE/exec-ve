@@ -1,1 +1,1 @@
-import "./ngDropdownMultiselect.directive";
+import './ngDropdownMultiselect.directive'

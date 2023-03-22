@@ -2,12 +2,7 @@ import { PresentationService } from '@ve-components/presentations/services/Prese
 import { TreeService } from '@ve-components/trees'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
-import {
-    ElementService,
-    UserService,
-    ViewApi,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ElementService, UserService, ViewApi, ViewService } from '@ve-utils/mms-api-client'
 import { handleChange, onChangesCallback } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
@@ -149,45 +144,27 @@ export class ViewController implements angular.IComponentController {
         this.showEdits = false
 
         this.subs.push(
-            this.eventSvc.binding<boolean>(
-                this.rootScopeSvc.constants.VEELEMENTSON,
-                (data) => {
-                    this.toggleShowElements(data)
-                }
-            ),
-            this.eventSvc.binding<boolean>(
-                this.rootScopeSvc.constants.VECOMMENTSON,
-                (data) => {
-                    this.toggleShowComments(data)
-                }
-            ),
-            this.eventSvc.binding<boolean>(
-                this.rootScopeSvc.constants.VENUMBERINGON,
-                (data) => {
-                    this.showNumbering = data
-                }
-            ),
-            this.eventSvc.binding<boolean>(
-                this.rootScopeSvc.constants.VEEDITMODE,
-                (data) => {
-                    this.toggleShowEdits(data)
-                }
-            )
+            this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VEELEMENTSON, (data) => {
+                this.toggleShowElements(data)
+            }),
+            this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VECOMMENTSON, (data) => {
+                this.toggleShowComments(data)
+            }),
+            this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VENUMBERINGON, (data) => {
+                this.showNumbering = data
+            }),
+            this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VEEDITMODE, (data) => {
+                this.toggleShowEdits(data)
+            })
         )
 
         this.subs.push(
-            this.eventSvc.binding<boolean>(
-                TreeService.events.UPDATED,
-                (data) => {
-                    if (!data) return
-                    if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
-                        this.level =
-                            this.treeSvc.branch2viewNumber[
-                                this.mmsElementId
-                            ].split('.').length
-                    }
+            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
+                if (!data) return
+                if (this.treeSvc.branch2viewNumber[this.mmsElementId]) {
+                    this.level = this.treeSvc.branch2viewNumber[this.mmsElementId].split('.').length
                 }
-            )
+            })
         )
 
         this._changeView(this.mmsElementId, '')
@@ -216,8 +193,7 @@ export class ViewController implements angular.IComponentController {
     }
 
     public transcludeClicked = (elementOb: ElementObject): void => {
-        if (this.mmsViewApi && this.mmsViewApi.elementClicked && elementOb)
-            this.mmsViewApi.elementClicked(elementOb)
+        if (this.mmsViewApi && this.mmsViewApi.elementClicked && elementOb) this.mmsViewApi.elementClicked(elementOb)
     }
 
     public elementTranscluded = (elem: ElementObject, type: string): void => {
@@ -235,8 +211,7 @@ export class ViewController implements angular.IComponentController {
                     )
                 }
             }
-            if (this.mmsViewApi && this.mmsViewApi.elementTranscluded)
-                this.mmsViewApi.elementTranscluded(elem, type)
+            if (this.mmsViewApi && this.mmsViewApi.elementTranscluded) this.mmsViewApi.elementTranscluded(elem, type)
         }
     }
 
@@ -292,26 +267,15 @@ export class ViewController implements angular.IComponentController {
                         this.isSection = true
                     }
                     let operand: ValueObject[] = []
-                    if (
-                        data._contents &&
-                        (data as ViewObject)._contents.operand
-                    ) {
+                    if (data._contents && (data as ViewObject)._contents.operand) {
                         operand = (data as ViewObject)._contents.operand
                     }
-                    if (
-                        data.specification &&
-                        (data as ViewInstanceSpec).specification.operand
-                    ) {
-                        operand = (
-                            data.specification as ExpressionObject<InstanceValueObject>
-                        ).operand
+                    if (data.specification && (data as ViewInstanceSpec).specification.operand) {
+                        operand = (data.specification as ExpressionObject<InstanceValueObject>).operand
                     }
-                    const dups =
-                        this.presentationSvc.checkForDuplicateInstances(operand)
+                    const dups = this.presentationSvc.checkForDuplicateInstances(operand)
                     if (dups.length > 0) {
-                        this.growl.warning(
-                            'There are duplicates in this view, duplicates ignored!'
-                        )
+                        this.growl.warning('There are duplicates in this view, duplicates ignored!')
                     }
 
                     if (
@@ -348,9 +312,7 @@ export class ViewController implements angular.IComponentController {
                     })
                 },
                 (reason) => {
-                    this.growl.error(
-                        `Getting View Error: ${reason.message}: ${this.mmsElementId}`
-                    )
+                    this.growl.error(`Getting View Error: ${reason.message}: ${this.mmsElementId}`)
                 }
             )
             .finally(() => {

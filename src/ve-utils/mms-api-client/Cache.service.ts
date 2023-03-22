@@ -44,10 +44,7 @@ export class CacheService {
      * @param {string} refId The branch/tag id
      * @returns {Object} Value if found, empty array if not found
      */
-    getLatestElements<T extends MmsObject>(
-        projectId: string,
-        refId: string
-    ): T[] {
+    getLatestElements<T extends MmsObject>(projectId: string, refId: string): T[] {
         const latestElements: T[] = []
         for (const key in this.cache) {
             if (!this.cache.hasOwnProperty(key)) {
@@ -63,9 +60,7 @@ export class CacheService {
             ) {
                 const val: T | T[] = this._get<T>(key)
                 if (val) {
-                    Array.isArray(val)
-                        ? latestElements.push(...val)
-                        : latestElements.push(val)
+                    Array.isArray(val) ? latestElements.push(...val) : latestElements.push(val)
                 }
             }
         }
@@ -82,11 +77,7 @@ export class CacheService {
      * @param {boolean} [merge=false] Whether to replace the value or do a merge if value already exists
      * @returns {Object} the original value
      */
-    put<T extends MmsObject | MmsObject[]>(
-        key: string | string[],
-        value: T,
-        merge?: boolean
-    ): T {
+    put<T extends MmsObject | MmsObject[]>(key: string | string[], value: T, merge?: boolean): T {
         const m = typeof merge === 'undefined' ? false : merge
         const realKey = this._makeKey(key)
         const currentValue: T = this.get<T>(realKey, true)
@@ -100,11 +91,7 @@ export class CacheService {
                 ) {
                     return b
                 }
-                if (
-                    Array.isArray(a) &&
-                    Array.isArray(b) &&
-                    b.length < a.length
-                ) {
+                if (Array.isArray(a) && Array.isArray(b) && b.length < a.length) {
                     a.length = 0
                     a.push(...b)
                     return a
@@ -127,15 +114,9 @@ export class CacheService {
      * @param {string | string[]} sourceKey
      * @param {string | string[]} targetKey
      */
-    public link(
-        sourceKey: string | string[],
-        targetKey: string | string[]
-    ): void {
+    public link(sourceKey: string | string[], targetKey: string | string[]): void {
         const realSourceKey: string = this._makeKey(sourceKey)
-        if (
-            this.cache.hasOwnProperty(realSourceKey) &&
-            typeof this.cache[realSourceKey] !== 'string'
-        ) {
+        if (this.cache.hasOwnProperty(realSourceKey) && typeof this.cache[realSourceKey] !== 'string') {
             delete this.cache[realSourceKey]
         }
 

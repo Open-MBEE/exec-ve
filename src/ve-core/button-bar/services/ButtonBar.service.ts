@@ -42,10 +42,7 @@ export class ButtonBarService {
         this.veConfig = window.__env
         if (this.veConfig.expConfig) {
             for (const ext of Object.keys(this.veConfig.expConfig)) {
-                if (
-                    this.veConfig.expConfig[ext] &&
-                    this.veConfig.expConfig[ext].length > 0
-                ) {
+                if (this.veConfig.expConfig[ext] && this.veConfig.expConfig[ext].length > 0) {
                     for (const tool of this.veConfig.expConfig[ext]) {
                         if (tool.barButtons) {
                             this.registerButtons(tool.barButtons)
@@ -59,12 +56,10 @@ export class ButtonBarService {
     public waitForApi = (id: string): VePromise<ButtonBarApi, void> => {
         if (!this.buttonBars.hasOwnProperty(id)) {
             this.buttonBars[id] = {}
-            this.buttonBars[id].promise = new this.$q<ButtonBarApi, void>(
-                (resolve, reject) => {
-                    this.buttonBars[id].resolve = resolve
-                    this.buttonBars[id].reject = reject
-                }
-            )
+            this.buttonBars[id].promise = new this.$q<ButtonBarApi, void>((resolve, reject) => {
+                this.buttonBars[id].resolve = resolve
+                this.buttonBars[id].reject = reject
+            })
         }
         return this.buttonBars[id].promise
     }
@@ -79,11 +74,7 @@ export class ButtonBarService {
         return `${root}_${this.barCounter[root]}`
     }
 
-    public initApi(
-        id: string,
-        init: buttonInitFn,
-        buttons?: IButtonBarButton[]
-    ): ButtonBarApi {
+    public initApi(id: string, init: buttonInitFn, buttons?: IButtonBarButton[]): ButtonBarApi {
         if (!init) {
             return null
         }
@@ -123,25 +114,16 @@ export class ButtonBarService {
         })
     }
 
-    getButtonBarButton = (
-        buttonId: string,
-        ctrl?: EditingToolbar
-    ): BarButton => {
+    getButtonBarButton = (buttonId: string, ctrl?: EditingToolbar): BarButton => {
         if (this.buttons.hasOwnProperty(buttonId)) {
             const newButton = new BarButton(buttonId, this.buttons[buttonId])
             if (this.buttons[buttonId].dropdown) {
                 newButton.dropdown_buttons = []
                 for (const id of this.buttons[buttonId].dropdown.ids) {
-                    newButton.dropdown_buttons.push(
-                        this.getButtonBarButton(id, ctrl)
-                    )
+                    newButton.dropdown_buttons.push(this.getButtonBarButton(id, ctrl))
                 }
             }
-            if (
-                this.buttons[buttonId].api &&
-                ctrl &&
-                ctrl[this.buttons[buttonId].api]
-            ) {
+            if (this.buttons[buttonId].api && ctrl && ctrl[this.buttons[buttonId].api]) {
                 newButton.setAction((event): void => {
                     if (event) event.stopPropagation()
                     ;(ctrl[this.buttons[buttonId].api] as () => void)()
@@ -153,9 +135,7 @@ export class ButtonBarService {
         }
     }
 
-    public registerButtons = (
-        buttons: IButtonBarButton | IButtonBarButton[]
-    ): void => {
+    public registerButtons = (buttons: IButtonBarButton | IButtonBarButton[]): void => {
         if (!Array.isArray(buttons)) {
             buttons = [buttons]
         }

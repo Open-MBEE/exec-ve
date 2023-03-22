@@ -1,10 +1,6 @@
 import _ from 'lodash'
 
-import {
-    TreeService,
-    TreeController,
-    TreeOfAnyComponent,
-} from '@ve-components/trees'
+import { TreeService, TreeController, TreeOfAnyComponent } from '@ve-components/trees'
 import { RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
@@ -29,17 +25,7 @@ class TreeOfFavoritesController extends TreeController {
         rootScopeSvc: RootScopeService,
         eventSvc: EventService
     ) {
-        super(
-            $q,
-            $scope,
-            $timeout,
-            $filter,
-            growl,
-            utilsSvc,
-            treeSvc,
-            rootScopeSvc,
-            eventSvc
-        )
+        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
         this.id = 'table-of-favorites'
         this.types = ['favorite']
         this.title = 'Table of Favorites'
@@ -50,7 +36,4 @@ const TreeOfFavoritesComponent = _.cloneDeep(TreeOfAnyComponent)
 TreeOfFavoritesComponent.selector = 'treeOfFavorites'
 TreeOfFavoritesComponent.controller = TreeOfFavoritesController
 
-veComponents.component(
-    TreeOfFavoritesComponent.selector,
-    TreeOfFavoritesComponent
-)
+veComponents.component(TreeOfFavoritesComponent.selector, TreeOfFavoritesComponent)

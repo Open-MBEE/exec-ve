@@ -7,11 +7,7 @@ import { veComponents } from '@ve-components'
 
 import { VePromiseReason } from '@ve-types/angular'
 import { InsertApi, InsertData, InsertResolve } from '@ve-types/components'
-import {
-    ElementObject,
-    ElementsResponse,
-    TransclusionObject,
-} from '@ve-types/mms'
+import { ElementObject, ElementsResponse, TransclusionObject } from '@ve-types/mms'
 import { VeModalComponent, VeModalController } from '@ve-types/view-editor'
 
 export interface InsertTransclusionData extends InsertData {
@@ -19,10 +15,7 @@ export interface InsertTransclusionData extends InsertData {
 }
 
 class InsertTransclusionModalController
-    extends VeModalControllerImpl<
-        TransclusionObject,
-        InsertResolve<InsertTransclusionData>
-    >
+    extends VeModalControllerImpl<TransclusionObject, InsertResolve<InsertTransclusionData>>
     implements VeModalController
 {
     protected linkTemplate: string = `
@@ -64,8 +57,7 @@ class InsertTransclusionModalController
 `
 
     protected title: string = 'Insert cross reference'
-    protected description: string =
-        'Begin by searching for or creating an element, then click a field to view-cf.'
+    protected description: string = 'Begin by searching for or creating an element, then click a field to view-cf.'
     protected searchExisting: boolean = true
     protected cf: TransclusionObject
     protected element: ElementObject
@@ -80,22 +72,13 @@ class InsertTransclusionModalController
     protected linkText: string
     protected modalBody: JQuery<HTMLElement>
     protected previewEl: JQuery<HTMLElement> = $('<div></div>')
-    protected insertApi: InsertApi<
-        ElementObject,
-        VePromiseReason<ElementsResponse<ElementObject>>
-    >
+    protected insertApi: InsertApi<ElementObject, VePromiseReason<ElementsResponse<ElementObject>>>
     protected insertData: InsertData
     protected projectId: string
     protected refId: string
     protected orgId: string
 
-    static $inject = [
-        '$scope',
-        '$compile',
-        '$element',
-        'growl',
-        'TransclusionService',
-    ]
+    static $inject = ['$scope', '$compile', '$element', 'growl', 'TransclusionService']
 
     constructor(
         private $scope: angular.IScope,
@@ -138,17 +121,9 @@ class InsertTransclusionModalController
         this.oking = true
         this.cf.element = this.element
         if (!this.viewLink) {
-            this.cf.tag = this.transclusionSvc.createTransclusion(
-                this.element,
-                this.cfType,
-                this.nonEditableCheckbox
-            )
+            this.cf.tag = this.transclusionSvc.createTransclusion(this.element, this.cfType, this.nonEditableCheckbox)
         } else {
-            this.cf.tag = this.transclusionSvc.createViewLink(
-                this.element,
-                this.linkType,
-                this.linkText
-            )
+            this.cf.tag = this.transclusionSvc.createViewLink(this.element, this.linkType, this.linkText)
         }
         this.oking = false
         this.modalInstance.close(this.cf)
@@ -184,15 +159,7 @@ class InsertTransclusionModalController
     public toggleRadio = (field: string): void => {
         this.cfType = field
         this.previewEl.empty()
-        this.previewEl.append(
-            $(
-                this.transclusionSvc.createTransclusion(
-                    this.element,
-                    this.cfType,
-                    true
-                )
-            )
-        )
+        this.previewEl.append($(this.transclusionSvc.createTransclusion(this.element, this.cfType, true)))
         this.$compile(this.previewEl)(this.$scope.$new())
         this.modalBody.append(this.previewEl)
     }
@@ -222,7 +189,4 @@ const InsertTransclusionModal: VeModalComponent = {
     controller: InsertTransclusionModalController,
 }
 
-veComponents.component(
-    InsertTransclusionModal.selector,
-    InsertTransclusionModal
-)
+veComponents.component(InsertTransclusionModal.selector, InsertTransclusionModal)

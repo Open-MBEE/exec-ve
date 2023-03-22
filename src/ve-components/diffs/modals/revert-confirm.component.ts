@@ -7,16 +7,8 @@ import { ElementService } from '@ve-utils/mms-api-client'
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import {
-    ConstraintObject,
-    ElementObject,
-    ElementsRequest,
-    SlotObject,
-} from '@ve-types/mms'
-import {
-    VeModalController,
-    VeModalInstanceService,
-} from '@ve-types/view-editor'
+import { ConstraintObject, ElementObject, ElementsRequest, SlotObject } from '@ve-types/mms'
+import { VeModalController, VeModalInstanceService } from '@ve-types/view-editor'
 
 export interface RevertConfirmResolve {
     reqOb: ElementsRequest<string>
@@ -79,25 +71,14 @@ class RevertConfirmController implements VeModalController {
                         _projectId: this.reqOb.projectId,
                         _refId: this.reqOb.refId,
                     }
-                    if (
-                        revertOb.type === 'Property' ||
-                        revertOb.type === 'Port'
-                    ) {
-                        revertOb.defaultValue = _.cloneDeep(
-                            targetOb.defaultValue
-                        )
+                    if (revertOb.type === 'Property' || revertOb.type === 'Port') {
+                        revertOb.defaultValue = _.cloneDeep(targetOb.defaultValue)
                     } else if (revertOb.type === 'Slot') {
-                        ;(revertOb as SlotObject).value = _.cloneDeep(
-                            (targetOb as SlotObject).value
+                        ;(revertOb as SlotObject).value = _.cloneDeep((targetOb as SlotObject).value)
+                    } else if (revertOb.type === 'Constraint' && revertOb.specification) {
+                        ;(revertOb as ConstraintObject).specification = _.cloneDeep(
+                            (targetOb as ConstraintObject).specification
                         )
-                    } else if (
-                        revertOb.type === 'Constraint' &&
-                        revertOb.specification
-                    ) {
-                        ;(revertOb as ConstraintObject).specification =
-                            _.cloneDeep(
-                                (targetOb as ConstraintObject).specification
-                            )
                     }
 
                     this.elementSvc.updateElement(revertOb).then(
@@ -110,17 +91,12 @@ class RevertConfirmController implements VeModalController {
                             this.modalInstance.close()
                         },
                         (reason) => {
-                            this.growl.error(
-                                'Revert not completed - Update Error: ' +
-                                    reason.message
-                            )
+                            this.growl.error('Revert not completed - Update Error: ' + reason.message)
                         }
                     )
                 },
                 (reason) => {
-                    this.growl.error(
-                        'Revert not completed - Error: Target Version not found'
-                    )
+                    this.growl.error('Revert not completed - Error: Target Version not found')
                 }
             )
             .finally(() => {

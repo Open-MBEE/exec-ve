@@ -17,25 +17,16 @@ export class MMSMentionController implements angular.IComponentController {
 
     static $inject = ['MentionService', 'EditorService']
 
-    constructor(
-        private mentionSvc: MentionService,
-        private editorSvc: EditorService
-    ) {}
+    constructor(private mentionSvc: MentionService, private editorSvc: EditorService) {}
 
     $onInit(): void {
-        this.fastCfListing = this.mentionSvc.getFastCfListing(
-            this.mmsProjectId,
-            this.mmsRefId
-        )
+        this.fastCfListing = this.mentionSvc.getFastCfListing(this.mmsProjectId, this.mmsRefId)
         // expose this api on the controller itself so that it can be accessed by codes that use $compile service to construct this directive.
     }
 
     public selectMentionItem($item: ElementObject): void {
         this._createCf($item)
-        this.mentionSvc.handleMentionSelection(
-            this.mmsEditor,
-            this.mmsMentionId
-        )
+        this.mentionSvc.handleMentionSelection(this.mmsEditor, this.mmsMentionId)
     }
 
     private _createCf($item: ElementObject): void {

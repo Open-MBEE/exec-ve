@@ -41,9 +41,7 @@ export interface GroupObject extends PackageObject {
 
 /* View and Presentation Instances */
 export interface ViewInstanceSpec extends InstanceSpecObject {
-    specification?:
-        | ExpressionObject<InstanceValueObject>
-        | LiteralObject<string>
+    specification?: ExpressionObject<InstanceValueObject> | LiteralObject<string>
 }
 
 export interface PresentationReference extends MmsObject {

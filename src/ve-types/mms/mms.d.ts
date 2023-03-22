@@ -66,8 +66,7 @@ export interface CreationRequest<T extends MmsObject> {
     elements: T[]
 }
 
-export interface ElementCreationRequest<T extends ElementObject>
-    extends RequestObject {
+export interface ElementCreationRequest<T extends ElementObject> extends RequestObject {
     elements: T[]
 }
 
@@ -159,8 +158,7 @@ interface RejectedObject<T extends MmsObject> {
     object: T
 }
 
-export interface ElementsResponse<T extends ElementObject>
-    extends BasicResponse<T> {
+export interface ElementsResponse<T extends ElementObject> extends BasicResponse<T> {
     elements: T[]
     deleted?: T[]
 }

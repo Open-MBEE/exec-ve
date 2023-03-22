@@ -40,10 +40,7 @@ import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeNameController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeNameController extends Transclusion implements ITransclusion {
     protected editTemplate: string = `
     <div>
     <form class="input-group" ng-submit="$ctrl.save($event)">
@@ -115,11 +112,7 @@ export class TranscludeNameController
 
             if (!this.mmsViewCtrl) return false
 
-            if (
-                this.nonEditable &&
-                this.mmsViewCtrl &&
-                this.mmsViewCtrl.isEditable()
-            ) {
+            if (this.nonEditable && this.mmsViewCtrl && this.mmsViewCtrl.isEditable()) {
                 this.growl.warning('Cross Reference is not editable.')
             }
             this.mmsViewCtrl.transcludeClicked(this.element)
@@ -127,18 +120,14 @@ export class TranscludeNameController
         })
     }
 
-    public getContent = (
-        preview?
-    ): VePromise<string | HTMLElement[], string> => {
+    public getContent = (preview?): VePromise<string | HTMLElement[], string> => {
         const deferred = this.$q.defer<string>()
         const defaultTemplate =
             '<span ng-if="$ctrl.element.name">{{$ctrl.element.name}}</span><span ng-if="!$ctrl.element.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
         const editTemplate =
             '<span ng-if="$ctrl.edit.name">{{$ctrl.edit.name}}</span><span ng-if="!$ctrl.edit.name" class="no-print placeholder">({{ $ctrl.element.type }})</span>'
         if (preview) {
-            deferred.resolve(
-                '<div class="panel panel-info">' + editTemplate + '</div>'
-            )
+            deferred.resolve('<div class="panel panel-info">' + editTemplate + '</div>')
         } else {
             this.isEditing = false
             deferred.resolve(defaultTemplate)
@@ -169,7 +158,4 @@ export const TranscludeNameComponent: VeComponentOptions = {
     controller: TranscludeNameController,
 }
 
-veComponents.component(
-    TranscludeNameComponent.selector,
-    TranscludeNameComponent
-)
+veComponents.component(TranscludeNameComponent.selector, TranscludeNameComponent)

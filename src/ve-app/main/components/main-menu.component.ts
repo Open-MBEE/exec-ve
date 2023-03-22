@@ -1,15 +1,7 @@
-import {
-    StateService,
-    TransitionService,
-    UIRouterGlobals,
-} from '@uirouter/angularjs'
+import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
 
-import {
-    ApplicationService,
-    RootScopeService,
-    UtilsService,
-} from '@ve-utils/application'
+import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { CacheService } from '@ve-utils/mms-api-client'
 import { onChangesCallback } from '@ve-utils/utils'
@@ -17,14 +9,7 @@ import { onChangesCallback } from '@ve-utils/utils'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import {
-    DocumentObject,
-    GroupObject,
-    ParamsObject,
-    ProjectObject,
-    RefObject,
-    ViewObject,
-} from '@ve-types/mms'
+import { DocumentObject, GroupObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms'
 
 interface BreadcrumbObject {
     name: string
@@ -198,10 +183,7 @@ class MenuController implements IComponentController {
             void this.$timeout(() => {
                 const eltChildren = this.$element.children().children()
                 const eltParent: Element = document.children[0]
-                const eltWidth =
-                    eltParent.clientWidth -
-                    eltChildren[1].scrollWidth -
-                    eltChildren[3].scrollWidth
+                const eltWidth = eltParent.clientWidth - eltChildren[1].scrollWidth - eltChildren[3].scrollWidth
                 const crumbcount = this.breadcrumbs.length
                 const liWidth = (eltWidth * 0.85) / crumbcount
                 this.truncateStyle = {
@@ -245,11 +227,7 @@ class MenuController implements IComponentController {
     }
 
     refsView(): void {
-        void this.$state.go(
-            'main.project.refs',
-            { projectId: this.params.projectId },
-            { reload: true }
-        )
+        void this.$state.go('main.project.refs', { projectId: this.params.projectId }, { reload: true })
     }
 
     checkRefsView(): boolean {
@@ -262,11 +240,7 @@ class MenuController implements IComponentController {
     }
 
     getHrefForRef(branch: RefObject): string {
-        let res =
-            this.applicationSvc.PROJECT_URL_PREFIX +
-            this.params.projectId +
-            '/' +
-            branch.id
+        let res = this.applicationSvc.PROJECT_URL_PREFIX + this.params.projectId + '/' + branch.id
         if (this.params.documentId) {
             res += '/present/' + this.params.documentId
         }

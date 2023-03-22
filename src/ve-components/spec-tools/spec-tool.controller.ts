@@ -19,16 +19,9 @@ import { SpecApi, SpecService } from './services/Spec.service'
 import { VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
 import { EditingApi } from '@ve-types/core/editor'
-import {
-    ElementObject,
-    RefObject,
-    ValueObject,
-    ViewObject,
-} from '@ve-types/mms'
+import { ElementObject, RefObject, ValueObject, ViewObject } from '@ve-types/mms'
 
-export interface ISpecTool
-    extends angular.IComponentController,
-        ComponentController {
+export interface ISpecTool extends angular.IComponentController, ComponentController {
     $scope: ISpecToolScope
     commitId: string
     specType: string
@@ -177,18 +170,11 @@ export class SpecTool implements ISpecTool {
         this.toolbarSvc.waitForApi(this.toolbarId).then(
             (api) => {
                 if (
-                    api.buttons
-                        .map((value) => value.id)
-                        .filter((value) => value === this.specType).length <
-                        1 &&
+                    api.buttons.map((value) => value.id).filter((value) => value === this.specType).length < 1 &&
                     window.__env &&
                     window.__env.enableDebug
                 ) {
-                    console.log(
-                        'Spec View: ' +
-                            this.specType +
-                            'is missing a button definition'
-                    )
+                    console.log('Spec View: ' + this.specType + 'is missing a button definition')
                 }
                 this.configToolbar(api)
             },
@@ -206,9 +192,7 @@ export class SpecTool implements ISpecTool {
                 }
             })
         )
-        this.subs.push(
-            this.eventSvc.binding<boolean>('spec.ready', this.changeElement)
-        )
+        this.subs.push(this.eventSvc.binding<boolean>('spec.ready', this.changeElement))
         //this.subs.push(this.eventSvc.$on(this.specType, this.initCallback))
     }
 
@@ -269,16 +253,14 @@ export class SpecTool implements ISpecTool {
     //Spec Tool Common API
 
     public copyToClipboard($event: JQuery.ClickEvent, selector: string): void {
-        this.applicationSvc
-            .copyToClipboard(this.$element.find<HTMLElement>(selector), $event)
-            .then(
-                () => {
-                    this.growl.info('Copied to clipboard!', { ttl: 2000 })
-                },
-                (err) => {
-                    this.growl.error('Unable to copy: ' + err.message)
-                }
-            )
+        this.applicationSvc.copyToClipboard(this.$element.find<HTMLElement>(selector), $event).then(
+            () => {
+                this.growl.info('Copied to clipboard!', { ttl: 2000 })
+            },
+            (err) => {
+                this.growl.error('Unable to copy: ' + err.message)
+            }
+        )
     }
 
     public cleanupVal(obj: { value: unknown }): void {
@@ -292,10 +274,7 @@ export class SpecTool implements ISpecTool {
             refId: this.element._refId,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-            'element.selected',
-            data
-        )
+        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
     }
 
     public addHtml(value: { value: string }): void {

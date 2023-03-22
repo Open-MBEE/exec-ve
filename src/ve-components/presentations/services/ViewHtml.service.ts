@@ -35,24 +35,13 @@ export class ViewHtmlService {
      * @param {boolean} isSortable table content
      * @returns {string} generated html string
      */
-    public makeHtmlTable = (
-        table: PresentTableObject,
-        isFilterable?: boolean,
-        isSortable?: boolean,
-        pe?
-    ): string => {
-        const result = [
-            '<table class="table-bordered table-condensed ' +
-                (table.style ? table.style : '') +
-                '">',
-        ]
+    public makeHtmlTable = (table: PresentTableObject, isFilterable?: boolean, isSortable?: boolean, pe?): string => {
+        const result = ['<table class="table-bordered table-condensed ' + (table.style ? table.style : '') + '">']
         if (table.colwidths && table.colwidths.length > 0) {
             result.push('<colgroup>')
             for (let i = 0; i < table.colwidths.length; i++) {
                 if (table.colwidths[i]) {
-                    result.push(
-                        '<col style="width: ' + table.colwidths[i] + '">'
-                    )
+                    result.push('<col style="width: ' + table.colwidths[i] + '">')
                 } else {
                     result.push('<col>')
                 }
@@ -71,15 +60,11 @@ export class ViewHtmlService {
                 result.push('<thead>')
             }
 
-            result.push(
-                this.makeTableBody(table.header, true, isFilterable, isSortable)
-            )
+            result.push(this.makeTableBody(table.header, true, isFilterable, isSortable))
             result.push('</thead>')
         }
         if (this.applicationSvc.getState().inDoc && !table.excludeFromList) {
-            result.push(
-                '<caption>Table {{$ctrl.peNumber}}. {{$ctrl.table.title || $ctrl.element.name}}</caption>'
-            )
+            result.push('<caption>Table {{$ctrl.peNumber}}. {{$ctrl.table.title || $ctrl.element.name}}</caption>')
         } else if (table.title) {
             result.push('<caption>' + table.title + '</caption>')
         } //same for caption to control stacking context
@@ -95,11 +80,7 @@ export class ViewHtmlService {
             row.forEach((cell, cellIndex) => {
                 // startCol is always 0 except when row > 0th and on cell === 0th && rowSpan of the previous row's first element is larger than 1
                 // This is the only time when we need to offset the starting colNumber for cells under merged this.column(s)
-                if (
-                    rowIndex !== 0 &&
-                    cellIndex === 0 &&
-                    Number(header[rowIndex - 1][0].rowspan) > 1
-                ) {
+                if (rowIndex !== 0 && cellIndex === 0 && Number(header[rowIndex - 1][0].rowspan) > 1) {
                     startCol = Number(header[rowIndex - 1][0].colspan)
                 }
                 const colSpan = Number(cell.colspan)
@@ -138,9 +119,7 @@ export class ViewHtmlService {
         body.forEach((row) => {
             result.push('<tr>')
             row.forEach((cell) => {
-                result.push(
-                    `<${dtag} colspan="${cell.colspan}" rowspan="${cell.rowspan}">`
-                )
+                result.push(`<${dtag} colspan="${cell.colspan}" rowspan="${cell.rowspan}">`)
                 cell.content.forEach((thing) => {
                     if (isFilterable || isSortable) {
                         result.push('<div ng-style="{display: \'inline\'}">')
@@ -215,15 +194,7 @@ export class ViewHtmlService {
         if (para.nonEditable) {
             attr = ` non-editable="${para.nonEditable.toString()}"`
         }
-        return (
-            '<view-cf mms-cf-type="' +
-            t +
-            '" mms-element-id="' +
-            para.source +
-            '"' +
-            attr +
-            '></view-cf>'
-        )
+        return '<view-cf mms-cf-type="' + t + '" mms-element-id="' + para.source + '"' + attr + '></view-cf>'
     }
 
     public makeHtml = (thing: PresentationInstanceObject): string => {
@@ -234,9 +205,7 @@ export class ViewHtmlService {
         } else if (thing.type === 'List') {
             return this.makeHtmlList(thing as PresentListObject)
         } else if (thing.type === 'Image') {
-            return `<view-cf mms-cf-type="img" mms-element-id="${
-                (thing as PresentImageObject).id
-            }"></view-cf>`
+            return `<view-cf mms-cf-type="img" mms-element-id="${(thing as PresentImageObject).id}"></view-cf>`
         }
     }
 }

@@ -6,10 +6,7 @@ import { veApp } from '@ve-app'
 export class ContentWindowService {
     static $inject = ['RootScopeService', 'EventService']
 
-    constructor(
-        private rootScopeSvc: RootScopeService,
-        private eventSvc: EventService
-    ) {}
+    constructor(private rootScopeSvc: RootScopeService, private eventSvc: EventService) {}
     public toggleLeftPane = (closed): void => {
         if (closed && !this.rootScopeSvc.leftPaneClosed()) {
             this.eventSvc.$broadcast('left-pane.toggle', true)

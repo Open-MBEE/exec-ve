@@ -1,10 +1,6 @@
 import _ from 'lodash'
 
-import {
-    TreeService,
-    TreeController,
-    TreeOfAnyComponent,
-} from '@ve-components/trees'
+import { TreeService, TreeController, TreeOfAnyComponent } from '@ve-components/trees'
 import { RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
@@ -24,17 +20,7 @@ class TreeOfFiguresController extends TreeController {
         rootScopeSvc: RootScopeService,
         eventSvc: EventService
     ) {
-        super(
-            $q,
-            $scope,
-            $timeout,
-            $filter,
-            growl,
-            utilsSvc,
-            treeSvc,
-            rootScopeSvc,
-            eventSvc
-        )
+        super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
         this.id = 'table-of-figures'
         this.types = ['figure']
         this.title = 'Table of Figures'

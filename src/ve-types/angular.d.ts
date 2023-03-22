@@ -17,60 +17,28 @@ export interface VeComponentOptions extends IComponentOptions {
 
 export interface VeQService extends IQService {
     new <T, U = unknown>(
-        resolver: (
-            resolve: IQResolveReject<T>,
-            reject: IQResolveReject<VePromiseReason<U>>
-        ) => any
+        resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseReason<U>>) => any
     ): VePromise<T, U>
-    <T, U>(
-        resolver: (
-            resolve: IQResolveReject<T>,
-            reject: IQResolveReject<VePromiseReason<U>>
-        ) => any
-    ): VePromise<T, U>
+    <T, U>(resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseReason<U>>) => any): VePromise<T, U>
 }
 
 export interface VePromise<T, U = ElementsResponse<T>> extends IPromise<T> {
     then<TResult1 = T, TResult2 = never>(
-        successCallback?:
-            | ((
-                  value: T
-              ) => PromiseLike<never> | PromiseLike<TResult1> | TResult1)
-            | null,
-        errorCallback?:
-            | ((
-                  reason: VePromiseReason<U>
-              ) => PromiseLike<never> | PromiseLike<TResult2> | TResult2)
-            | null,
+        successCallback?: ((value: T) => PromiseLike<never> | PromiseLike<TResult1> | TResult1) | null,
+        errorCallback?: ((reason: VePromiseReason<U>) => PromiseLike<never> | PromiseLike<TResult2> | TResult2) | null,
         notifyCallback?: (state: unknown) => unknown
     ): VePromise<TResult1 | TResult2, U>
     then<TResult1 = T, TResult2 = never>(
-        successCallback?:
-            | ((
-                  value: T
-              ) => PromiseLike<never> | PromiseLike<TResult1> | TResult1)
-            | null,
-        errorCallback?:
-            | ((
-                  reason: VePromiseReason<U>
-              ) => PromiseLike<never> | PromiseLike<TResult2> | TResult2)
-            | null,
+        successCallback?: ((value: T) => PromiseLike<never> | PromiseLike<TResult1> | TResult1) | null,
+        errorCallback?: ((reason: VePromiseReason<U>) => PromiseLike<never> | PromiseLike<TResult2> | TResult2) | null,
         notifyCallback?: (state: unknown) => unknown
     ): VePromise<TResult1 | TResult2, U>
 
     catch<TResult = never>(
-        onRejected?:
-            | ((
-                  reason: VePromiseReason<U>
-              ) => PromiseLike<never> | PromiseLike<TResult> | TResult)
-            | null
+        onRejected?: ((reason: VePromiseReason<U>) => PromiseLike<never> | PromiseLike<TResult> | TResult) | null
     ): VePromise<T | TResult, U>
     catch<TResult = never>(
-        onRejected?:
-            | ((
-                  reason: VePromiseReason<U>
-              ) => VePromise<never> | IPromise<TResult> | TResult)
-            | null
+        onRejected?: ((reason: VePromiseReason<U>) => VePromise<never> | IPromise<TResult> | TResult) | null
     ): VePromise<T | TResult, U>
 }
 

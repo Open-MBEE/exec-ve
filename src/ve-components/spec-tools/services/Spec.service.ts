@@ -171,10 +171,7 @@ export class SpecService implements angular.Injectable<any> {
 
     public getTypeClass = (element: ElementObject): void => {
         // Get Type
-        this.specApi.typeClass = this.utilsSvc.getElementTypeClass(
-            element,
-            this.viewSvc.getElementType(element)
-        )
+        this.specApi.typeClass = this.utilsSvc.getElementTypeClass(element, this.viewSvc.getElementType(element))
     }
 
     public getQualifiedName(element: ElementObject): VePromise<boolean> {
@@ -205,9 +202,7 @@ export class SpecService implements angular.Injectable<any> {
         this.ran = true
         this.lastid = this.specApi.elementId
 
-        this.specApi.extended = !(
-            this.specApi.commitId && this.specApi.commitId !== 'latest'
-        )
+        this.specApi.extended = !(this.specApi.commitId && this.specApi.commitId !== 'latest')
 
         this._updateElement()
     }
@@ -225,16 +220,11 @@ export class SpecService implements angular.Injectable<any> {
                     this.element = data
                     this.values = this.componentSvc.setupValCf(data)
                     promises.push(
-                        this.userSvc
-                            .getUserData(data._modifier)
-                            .then((result) => {
-                                this.modifier = result
-                            })
+                        this.userSvc.getUserData(data._modifier).then((result) => {
+                            this.modifier = result
+                        })
                     )
-                    if (
-                        !this.specApi.commitId ||
-                        this.specApi.commitId === 'latest'
-                    ) {
+                    if (!this.specApi.commitId || this.specApi.commitId === 'latest') {
                         promises.push(
                             this.elementSvc
                                 .search<ViewObject>(reqOb, {
@@ -254,11 +244,9 @@ export class SpecService implements angular.Injectable<any> {
                                         searchResult.length == 1 &&
                                         searchResult[0].id === data.id &&
                                         searchResult[0]._relatedDocuments &&
-                                        searchResult[0]._relatedDocuments
-                                            .length > 0
+                                        searchResult[0]._relatedDocuments.length > 0
                                     ) {
-                                        this.specApi.relatedDocuments =
-                                            searchResult[0]._relatedDocuments
+                                        this.specApi.relatedDocuments = searchResult[0]._relatedDocuments
                                     }
                                 })
                         )
@@ -268,25 +256,17 @@ export class SpecService implements angular.Injectable<any> {
                             elementId: this.specApi.rootId,
                             projectId: this.specApi.projectId,
                             refId: this.specApi.refId,
-                            commitId: this.specApi.commitId
-                                ? this.specApi.commitId
-                                : 'latest',
+                            commitId: this.specApi.commitId ? this.specApi.commitId : 'latest',
                         }
                         promises.push(
-                            this.viewSvc
-                                .getProjectDocument(docReq, 1)
-                                .then((result) => {
-                                    this.document = result
-                                })
+                            this.viewSvc.getProjectDocument(docReq, 1).then((result) => {
+                                this.document = result
+                            })
                         )
                     }
                     if (
-                        (this.specApi.commitId &&
-                            this.specApi.commitId !== 'latest') ||
-                        !this.permissionsSvc.hasBranchEditPermission(
-                            this.specApi.projectId,
-                            this.specApi.refId
-                        ) ||
+                        (this.specApi.commitId && this.specApi.commitId !== 'latest') ||
+                        !this.permissionsSvc.hasBranchEditPermission(this.specApi.projectId, this.specApi.refId) ||
                         this.specApi.refType === 'Tag'
                     ) {
                         this.editable = false
@@ -294,73 +274,50 @@ export class SpecService implements angular.Injectable<any> {
                         this.setEditing(false)
                     } else {
                         promises.push(
-                            this.elementSvc
-                                .getElementForEdit(reqOb)
-                                .then((data) => {
-                                    if (data.id !== this.lastid) return
-                                    this.edit = data
-                                    this.editable = true
-                                    if (!this.getKeepMode())
-                                        this.setEditing(false)
-                                    this.setKeepMode(false)
-                                    if (
-                                        this.edit.type === 'Property' ||
-                                        this.edit.type === 'Port' ||
-                                        this.edit.type === 'Slot'
-                                    ) {
-                                        // Array.isArray(this.specSvc.edit.value)) {
-                                        if (this.edit.defaultValue) {
-                                            this.setEditValues([
-                                                this.edit.defaultValue,
-                                            ])
-                                        } else if (this.edit.value) {
-                                            let values:
-                                                | ValueObject
-                                                | ValueObject[] = (
-                                                this
-                                                    .edit as LiteralObject<ValueObject>
-                                            ).value
-                                            if (!Array.isArray(values)) {
-                                                values = [values]
-                                            }
-                                            this.setEditValues(values)
-                                        } else this.setEditValues([])
-                                        this.componentSvc
-                                            .getPropertySpec(this.element)
-                                            .then(
-                                                (value) => {
-                                                    this.specApi.propSpec.isEnumeration =
-                                                        value.isEnumeration
-                                                    this.specApi.propSpec.isSlot =
-                                                        value.isSlot
-                                                    this.specApi.propSpec.options =
-                                                        value.options
-                                                },
-                                                (reason) => {
-                                                    this.growl.error(
-                                                        'Failed to get property spec: ' +
-                                                            reason.message
-                                                    )
-                                                }
-                                            )
-                                    }
-                                    if (
-                                        this.edit.type === 'Constraint' &&
-                                        this.edit.specification
-                                    ) {
-                                        this.setEditValues([
-                                            this.edit.specification,
-                                        ])
-                                    }
-                                })
+                            this.elementSvc.getElementForEdit(reqOb).then((data) => {
+                                if (data.id !== this.lastid) return
+                                this.edit = data
+                                this.editable = true
+                                if (!this.getKeepMode()) this.setEditing(false)
+                                this.setKeepMode(false)
+                                if (
+                                    this.edit.type === 'Property' ||
+                                    this.edit.type === 'Port' ||
+                                    this.edit.type === 'Slot'
+                                ) {
+                                    // Array.isArray(this.specSvc.edit.value)) {
+                                    if (this.edit.defaultValue) {
+                                        this.setEditValues([this.edit.defaultValue])
+                                    } else if (this.edit.value) {
+                                        let values: ValueObject | ValueObject[] = (
+                                            this.edit as LiteralObject<ValueObject>
+                                        ).value
+                                        if (!Array.isArray(values)) {
+                                            values = [values]
+                                        }
+                                        this.setEditValues(values)
+                                    } else this.setEditValues([])
+                                    this.componentSvc.getPropertySpec(this.element).then(
+                                        (value) => {
+                                            this.specApi.propSpec.isEnumeration = value.isEnumeration
+                                            this.specApi.propSpec.isSlot = value.isSlot
+                                            this.specApi.propSpec.options = value.options
+                                        },
+                                        (reason) => {
+                                            this.growl.error('Failed to get property spec: ' + reason.message)
+                                        }
+                                    )
+                                }
+                                if (this.edit.type === 'Constraint' && this.edit.specification) {
+                                    this.setEditValues([this.edit.specification])
+                                }
+                            })
                         )
                     }
                     promises.push(
-                        this.projectSvc
-                            .getRef(this.specApi.refId, this.specApi.projectId)
-                            .then((result) => {
-                                this.ref = result
-                            })
+                        this.projectSvc.getRef(this.specApi.refId, this.specApi.projectId).then((result) => {
+                            this.ref = result
+                        })
                     )
                     this.getTypeClass(this.element)
                     promises.push(this.getQualifiedName(this.element))
@@ -378,12 +335,9 @@ export class SpecService implements angular.Injectable<any> {
                         this.authSvc.getToken()
 
                     this.$q.allSettled(promises).then(
-                        () =>
-                            this.eventSvc.resolve<boolean>('spec.ready', true),
+                        () => this.eventSvc.resolve<boolean>('spec.ready', true),
                         (reason: VePromiseReason<unknown>) => {
-                            this.growl.error(
-                                'Getting Element Error: ' + reason.message
-                            )
+                            this.growl.error('Getting Element Error: ' + reason.message)
                         }
                     )
                 },
@@ -436,23 +390,14 @@ export class SpecService implements angular.Injectable<any> {
     }
 
     revertEdits = (): void => {
-        this.editValues = this.componentSvc.revertEdits(
-            this.editValues,
-            this.edit
-        )
+        this.editValues = this.componentSvc.revertEdits(this.editValues, this.edit)
     }
 
-    public save = (
-        toolbarId: string,
-        continueEdit: boolean
-    ): VePromise<void, ElementsResponse<ElementObject>> => {
+    public save = (toolbarId: string, continueEdit: boolean): VePromise<void, ElementsResponse<ElementObject>> => {
         const deferred = this.$q.defer<void>()
         this.eventSvc.$broadcast('element-saving', true)
         const saveEdit = this.edit
-        this.componentSvc.clearAutosave(
-            saveEdit._projectId + saveEdit._refId + saveEdit.id,
-            saveEdit.type
-        )
+        this.componentSvc.clearAutosave(saveEdit._projectId + saveEdit._refId + saveEdit.id, saveEdit.type)
         return new this.$q((resolve, reject) => {
             this._save().then(
                 (data) => {
@@ -464,12 +409,7 @@ export class SpecService implements angular.Injectable<any> {
                     }
                     if (continueEdit) return
                     const saveEdit = this.getEdits()
-                    const key =
-                        saveEdit.id +
-                        '|' +
-                        saveEdit._projectId +
-                        '|' +
-                        saveEdit._refId
+                    const key = saveEdit.id + '|' + saveEdit._projectId + '|' + saveEdit._refId
                     this.autosaveSvc.remove(key)
                     if (this.autosaveSvc.openEdits() > 0) {
                         const next = Object.keys(this.autosaveSvc.getAll())[0]
@@ -495,12 +435,7 @@ export class SpecService implements angular.Injectable<any> {
     }
 
     private _save(): VePromise<ElementObject> {
-        return this.componentSvc.save(
-            this.edit,
-            this.editorApi,
-            { element: this.element },
-            false
-        )
+        return this.componentSvc.save(this.edit, this.editorApi, { element: this.element }, false)
     }
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons

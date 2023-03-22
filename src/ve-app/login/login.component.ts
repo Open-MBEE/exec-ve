@@ -1,9 +1,4 @@
-import {
-    StateService,
-    TransitionPromise,
-    UIRouterGlobals,
-    UrlService,
-} from '@uirouter/angularjs'
+import { StateService, TransitionPromise, UIRouterGlobals, UrlService } from '@uirouter/angularjs'
 import angular, { IComponentController, IQService } from 'angular'
 
 import { BrandingStyle, RootScopeService } from '@ve-utils/application'
@@ -13,11 +8,7 @@ import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromiseReason } from '@ve-types/angular'
 import { ParamsObject } from '@ve-types/mms'
-import {
-    VeModalResolveFn,
-    VeModalService,
-    VeModalSettings,
-} from '@ve-types/view-editor'
+import { VeModalResolveFn, VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 const LoginComponent: VeComponentOptions = {
     selector: 'login',
@@ -86,23 +77,14 @@ const LoginComponent: VeComponentOptions = {
             }
         }
 
-        login(credentials: {
-            password: string
-            username: string
-        }): angular.IPromise<TransitionPromise> {
+        login(credentials: { password: string; username: string }): angular.IPromise<TransitionPromise> {
             const deferred = this.$q.defer<TransitionPromise>()
             this.spin = true
-            if (
-                !credentials ||
-                !credentials.password ||
-                !credentials.username
-            ) {
+            if (!credentials || !credentials.password || !credentials.username) {
                 let message = 'Missing: '
-                message +=
-                    !credentials || !credentials.username ? 'Username' : ''
+                message += !credentials || !credentials.username ? 'Username' : ''
                 message += !credentials ? ' and ' : ''
-                message +=
-                    !credentials || !credentials.password ? 'Password' : ''
+                message += !credentials || !credentials.password ? 'Password' : ''
                 this.growl.error(message)
             } else {
                 const credentialsJSON = {

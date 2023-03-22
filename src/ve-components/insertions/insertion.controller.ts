@@ -3,23 +3,13 @@ import _ from 'lodash'
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { InsertionService } from '@ve-components/insertions'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import {
-    ApiService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertApi, InsertData } from '@ve-types/components'
 import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms'
-import {
-    VeModalService,
-    VeModalSettings,
-    veSearchCallback,
-    VeSearchOptions,
-} from '@ve-types/view-editor'
+import { VeModalService, VeModalSettings, veSearchCallback, VeSearchOptions } from '@ve-types/view-editor'
 
 /**
  * @name veComponents/Insertion
@@ -123,10 +113,7 @@ export class Insertion<
         }
         this.oking = true
 
-        this.ownerId =
-            this.parentData && this.parentData.id
-                ? this.parentData.id
-                : 'holding_bin_' + this.projectId
+        this.ownerId = this.parentData && this.parentData.id ? this.parentData.id : 'holding_bin_' + this.projectId
 
         this.create()
             .then((data) => {
@@ -157,9 +144,7 @@ export class Insertion<
                 },
             },
         }
-        const instance = this.$uibModal.open<LoginModalResolveFn, boolean>(
-            settings
-        )
+        const instance = this.$uibModal.open<LoginModalResolveFn, boolean>(settings)
         instance.result.then(this.loginCb, () => {
             this.addReject({
                 status: 666,
@@ -174,9 +159,7 @@ export class Insertion<
         this.insertApi.resolve(data)
     }
 
-    protected addReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(
-        reason: V
-    ): void => {
+    protected addReject = <V extends VePromiseReason<BasicResponse<MmsObject>>>(reason: V): void => {
         this.fail(reason)
         if (!this.continue) {
             this.insertApi.reject(reason)
@@ -192,11 +175,7 @@ export class Insertion<
         if (reason.status === 401) {
             this.reLogin()
         } else {
-            this.growl.error(
-                `Create ${_.upperCase(this.insertData.type)} Error: ${
-                    reason.message
-                }`
-            )
+            this.growl.error(`Create ${_.upperCase(this.insertData.type)} Error: ${reason.message}`)
         }
     }
 
@@ -214,10 +193,7 @@ export class Insertion<
      * @param {ElementObject} data
      * @param {string} property
      */
-    public callback: veSearchCallback<U> = (
-        data: U,
-        property?: string
-    ): void => {
+    public callback: veSearchCallback<U> = (data: U, property?: string): void => {
         if (this.oking) {
             this.growl.info('Please wait...')
             return

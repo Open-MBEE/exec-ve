@@ -1,29 +1,15 @@
 import { IPane } from '@openmbee/pane-layout'
 import { IPaneManagerService } from '@openmbee/pane-layout/lib/PaneManagerService'
-import {
-    StateService,
-    TransitionService,
-    UIRouterGlobals,
-} from '@uirouter/angularjs'
+import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs'
 
 import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService } from '@ve-app/main/services'
 import { TreeService } from '@ve-components/trees'
-import {
-    ButtonBarApi,
-    ButtonBarService,
-    ButtonWrapEvent,
-} from '@ve-core/button-bar'
+import { ButtonBarApi, ButtonBarService, ButtonWrapEvent } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
-import {
-    ApiService,
-    ElementService,
-    PermissionsService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, PermissionsService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veApp } from '@ve-app'
@@ -151,81 +137,56 @@ class LeftPaneController implements angular.IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.binding(
-                this.rootScopeSvc.constants.LEFTPANECLOSED,
-                (paneClosed) => {
-                    if (paneClosed !== this.$pane.closed) {
-                        this.$pane.toggle()
-                    }
+            this.eventSvc.binding(this.rootScopeSvc.constants.LEFTPANECLOSED, (paneClosed) => {
+                if (paneClosed !== this.$pane.closed) {
+                    this.$pane.toggle()
                 }
-            )
+            })
         )
 
         // Start listening to change events
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>(
-                'view.selected',
-                this.changeData
-            ),
-            this.eventSvc.$on<veAppEvents.viewDeletedData>(
-                'view.deleted',
-                (data) => {
-                    let goto = '^.currentState'
-                    let documentId = this.treeApi.rootId
-                    let viewId: string
-                    if (this.$state.includes('**.portal.**')) {
-                        if (data.parentBranch) {
-                            documentId = data.parentBranch.data.id
-                        } else {
-                            goto = 'main.project.ref.portal'
-                            documentId = null
-                        }
-                    } else if (this.$state.includes('**.present.**')) {
-                        if (data.prevBranch) {
-                            viewId = data.prevBranch.viewId
-                                ? data.prevBranch.viewId
-                                : data.prevBranch.data.id
-                        } else if (data.parentBranch) {
-                            viewId = data.parentBranch.viewId
-                                ? data.parentBranch.viewId
-                                : data.parentBranch.data.id
-                        }
+            this.eventSvc.$on<veAppEvents.elementSelectedData>('view.selected', this.changeData),
+            this.eventSvc.$on<veAppEvents.viewDeletedData>('view.deleted', (data) => {
+                let goto = '^.currentState'
+                let documentId = this.treeApi.rootId
+                let viewId: string
+                if (this.$state.includes('**.portal.**')) {
+                    if (data.parentBranch) {
+                        documentId = data.parentBranch.data.id
+                    } else {
+                        goto = 'main.project.ref.portal'
+                        documentId = null
                     }
-                    void this.$state.go(goto, {
-                        documentId,
-                        viewId,
-                        search: undefined,
-                    })
+                } else if (this.$state.includes('**.present.**')) {
+                    if (data.prevBranch) {
+                        viewId = data.prevBranch.viewId ? data.prevBranch.viewId : data.prevBranch.data.id
+                    } else if (data.parentBranch) {
+                        viewId = data.parentBranch.viewId ? data.parentBranch.viewId : data.parentBranch.data.id
+                    }
                 }
-            )
+                void this.$state.go(goto, {
+                    documentId,
+                    viewId,
+                    search: undefined,
+                })
+            })
         )
 
         this.subs.push(
             this.eventSvc.$on('tree.ready', () => {
                 if (!this.bbApi) {
-                    this.bbApi = this.buttonBarSvc.initApi(
-                        this.buttonId,
-                        this.bbInit,
-                        left_default_buttons
-                    )
+                    this.bbApi = this.buttonBarSvc.initApi(this.buttonId, this.bbInit, left_default_buttons)
                     this.subs.push(
-                        this.eventSvc.$on(
-                            this.bbApi.WRAP_EVENT,
-                            (data: ButtonWrapEvent) => {
-                                if (data.oldSize != data.newSize) {
-                                    const treeOptions =
-                                        $('.tree-options').outerHeight()
-                                    const buttonSize =
-                                        $('.tree-view-buttons').outerHeight()
-                                    const calcSize = Math.round(
-                                        treeOptions + buttonSize
-                                    )
-                                    this.headerSize =
-                                        calcSize.toString(10) + 'px'
-                                    this.$scope.$apply()
-                                }
+                        this.eventSvc.$on(this.bbApi.WRAP_EVENT, (data: ButtonWrapEvent) => {
+                            if (data.oldSize != data.newSize) {
+                                const treeOptions = $('.tree-options').outerHeight()
+                                const buttonSize = $('.tree-view-buttons').outerHeight()
+                                const calcSize = Math.round(treeOptions + buttonSize)
+                                this.headerSize = calcSize.toString(10) + 'px'
+                                this.$scope.$apply()
                             }
-                        )
+                        })
                     )
                 }
             })
@@ -235,40 +196,29 @@ class LeftPaneController implements angular.IComponentController {
             (api) => {
                 this.bbApi = api
                 this.subs.push(
-                    this.eventSvc.$on<veCoreEvents.buttonClicked>(
-                        this.buttonId,
-                        (data) => {
-                            switch (data.clicked) {
-                                case 'tree-reorder-view': {
-                                    this.bbApi.toggleButton(
-                                        'tree-full-document',
-                                        false
-                                    )
-                                    void this.$state.go(
-                                        'main.project.ref.view.reorder',
-                                        {
-                                            search: undefined,
-                                        }
-                                    )
-                                    break
-                                }
-                                case 'tree-reorder-group': {
-                                    void this.$state.go(
-                                        'main.project.ref.groupReorder'
-                                    )
-                                    break
-                                }
-                                case 'tree-full-document': {
-                                    this.fullDocMode()
-                                    break
-                                }
-                                case 'tree-refresh': {
-                                    this.reloadData()
-                                    break
-                                }
+                    this.eventSvc.$on<veCoreEvents.buttonClicked>(this.buttonId, (data) => {
+                        switch (data.clicked) {
+                            case 'tree-reorder-view': {
+                                this.bbApi.toggleButton('tree-full-document', false)
+                                void this.$state.go('main.project.ref.view.reorder', {
+                                    search: undefined,
+                                })
+                                break
+                            }
+                            case 'tree-reorder-group': {
+                                void this.$state.go('main.project.ref.groupReorder')
+                                break
+                            }
+                            case 'tree-full-document': {
+                                this.fullDocMode()
+                                break
+                            }
+                            case 'tree-refresh': {
+                                this.reloadData()
+                                break
                             }
                         }
-                    )
+                    })
                 )
             },
             (reason) => {
@@ -287,44 +237,24 @@ class LeftPaneController implements angular.IComponentController {
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-expand'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-collapse'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-add'))
-        api.setPermission(
-            'tree-add',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
+        api.setPermission('tree-add', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-delete'))
-        api.setPermission(
-            'tree-delete',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
+        api.setPermission('tree-delete', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
         api.setPermission(
             'tree-add.group',
-            this.permissionsSvc.hasProjectEditPermission(
-                this.treeSvc.treeApi.projectId
-            )
+            this.permissionsSvc.hasProjectEditPermission(this.treeSvc.treeApi.projectId)
         )
-        api.setPermission(
-            'tree-add.document',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
+        api.setPermission('tree-add.document', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
 
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('tree-reorder-group')
-        )
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-group'))
         api.setPermission(
             'tree-reorder-group',
-            this.permissionsSvc.hasProjectEditPermission(
-                this.treeSvc.treeApi.projectId
-            )
+            this.permissionsSvc.hasProjectEditPermission(this.treeSvc.treeApi.projectId)
         )
-        api.setPermission(
-            'tree-add.view',
-            this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable
-        )
+        api.setPermission('tree-add.view', this.treeSvc.treeApi.refType !== 'Tag' && this.treeSvc.treeEditable)
 
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-reorder-view'))
-        api.addButton(
-            this.buttonBarSvc.getButtonBarButton('tree-full-document')
-        )
+        api.addButton(this.buttonBarSvc.getButtonBarButton('tree-full-document'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('tree-show-pe'))
         api.setPermission('tree-reorder-view', this.treeSvc.treeEditable)
         if (this.rootScopeSvc.veFullDocMode()) {
@@ -339,18 +269,12 @@ class LeftPaneController implements angular.IComponentController {
     changeData = (data: veAppEvents.elementSelectedData): void => {
         //If the transitioning state detects a refresh, it will let us know to regenerate the tree
         if (data.refresh) this.treeSvc.processedRoot = ''
-        const rootId =
-            !data.rootId && data.elementId.endsWith('_cover')
-                ? data.projectId + '_pm'
-                : data.rootId
+        const rootId = !data.rootId && data.elementId.endsWith('_cover') ? data.projectId + '_pm' : data.rootId
         const elementId = data.elementId
         const refId = data.refId
         const projectId = data.projectId
         const commitId = data.commitId ? data.commitId : null
-        if (
-            (rootId && this.treeSvc.processedRoot !== rootId && rootId != '') ||
-            !this.treeApi
-        ) {
+        if ((rootId && this.treeSvc.processedRoot !== rootId && rootId != '') || !this.treeApi) {
             new this.$q<string, RefsResponse>((resolve, reject) => {
                 if (
                     !this.treeApi ||
@@ -379,78 +303,53 @@ class LeftPaneController implements angular.IComponentController {
                     this.treeApi.onDblClick = this.treeDblClickCallback
 
                     this.treeSvc.treeApi = this.treeApi
-                    this.treeSvc.treeEditable =
-                        this.permissionsSvc.hasBranchEditPermission(
-                            this.mmsProject.id,
-                            this.mmsRef.id
-                        )
-
-                    this.treeApi.sectionNumbering =
-                        this.$state.includes('**.present.**')
-                    this.treeApi.expandLevel = this.$state.includes(
-                        '**.present.**'
+                    this.treeSvc.treeEditable = this.permissionsSvc.hasBranchEditPermission(
+                        this.mmsProject.id,
+                        this.mmsRef.id
                     )
+
+                    this.treeApi.sectionNumbering = this.$state.includes('**.present.**')
+                    this.treeApi.expandLevel = this.$state.includes('**.present.**')
                         ? 3
                         : this.$state.includes('**.portal.**')
                         ? 0
                         : 1
                     this.treeApi.sort = !this.$state.includes('**.present.**')
 
-                    new this.$q<ElementObject, ElementsResponse<ElementObject>>(
-                        (resolve, reject) => {
-                            if (this.$state.includes('**.present.**')) {
-                                const reqOb: ElementsRequest<string> = {
-                                    elementId: this.treeApi.rootId,
-                                    refId: this.treeApi.refId,
-                                    projectId: this.treeApi.projectId,
-                                }
-                                this.elementSvc
-                                    .getElement<ViewObject>(reqOb)
-                                    .then((root) => {
-                                        if (
-                                            this.apiSvc.isDocument(root) &&
-                                            this.$state.includes(
-                                                '**.present.**'
-                                            )
-                                        ) {
-                                            this.viewSvc
-                                                .getDocumentMetadata({
-                                                    elementId: root.id,
-                                                    refId: root._refId,
-                                                    projectId: root._projectId,
-                                                })
-                                                .then((result) => {
-                                                    this.treeApi.numberingDepth =
-                                                        result.numberingDepth
-                                                    this.treeApi.numberingSeparator =
-                                                        result.numberingSeparator
-                                                    this.treeApi.startChapter =
-                                                        (root as DocumentObject)
-                                                            ._startChapter
-                                                            ? (
-                                                                  root as DocumentObject
-                                                              )._startChapter
-                                                            : 1
-
-                                                    if (
-                                                        !(
-                                                            root as DocumentObject
-                                                        )._childViews
-                                                    )
-                                                        (
-                                                            root as DocumentObject
-                                                        )._childViews = []
-                                                    resolve(root)
-                                                }, reject)
-                                        } else {
-                                            resolve(root)
-                                        }
-                                    }, reject)
-                            } else {
-                                resolve(null)
+                    new this.$q<ElementObject, ElementsResponse<ElementObject>>((resolve, reject) => {
+                        if (this.$state.includes('**.present.**')) {
+                            const reqOb: ElementsRequest<string> = {
+                                elementId: this.treeApi.rootId,
+                                refId: this.treeApi.refId,
+                                projectId: this.treeApi.projectId,
                             }
+                            this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
+                                if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
+                                    this.viewSvc
+                                        .getDocumentMetadata({
+                                            elementId: root.id,
+                                            refId: root._refId,
+                                            projectId: root._projectId,
+                                        })
+                                        .then((result) => {
+                                            this.treeApi.numberingDepth = result.numberingDepth
+                                            this.treeApi.numberingSeparator = result.numberingSeparator
+                                            this.treeApi.startChapter = (root as DocumentObject)._startChapter
+                                                ? (root as DocumentObject)._startChapter
+                                                : 1
+
+                                            if (!(root as DocumentObject)._childViews)
+                                                (root as DocumentObject)._childViews = []
+                                            resolve(root)
+                                        }, reject)
+                                } else {
+                                    resolve(root)
+                                }
+                            }, reject)
+                        } else {
+                            resolve(null)
                         }
-                    ).then(
+                    }).then(
                         (root) => {
                             this.treeApi.elementId = elementId
                             this.treeSvc.changeRoots(root).catch((reason) => {
@@ -499,8 +398,7 @@ class LeftPaneController implements angular.IComponentController {
                 })
             }
         } else if (this.$state.includes('**.present.**')) {
-            const viewId =
-                branch.type !== 'view' ? branch.viewId : branch.data.id
+            const viewId = branch.type !== 'view' ? branch.viewId : branch.data.id
 
             // If clicked on a PE send the element.selected event for Tool Pane
             if (!(branch.type === 'view' || branch.type === 'section')) {
@@ -510,14 +408,10 @@ class LeftPaneController implements angular.IComponentController {
                     refId: branch.data._refId,
                     commitId: 'latest',
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-                    'element.selected',
-                    data
-                )
+                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
             }
             void this.$state.go(
-                'main.project.ref.view.present.' +
-                    (this.$uiRouterGlobals.params as ParamsObject).display,
+                'main.project.ref.view.present.' + (this.$uiRouterGlobals.params as ParamsObject).display,
                 {
                     viewId,
                     search: undefined,
@@ -530,8 +424,7 @@ class LeftPaneController implements angular.IComponentController {
         if (this.$state.includes('**.portal.**')) {
             if (branch.type === 'view' || branch.type === 'snapshot') {
                 void this.$state.go(
-                    'main.project.ref.view.present.' +
-                        (this.$uiRouterGlobals.params as ParamsObject).display,
+                    'main.project.ref.view.present.' + (this.$uiRouterGlobals.params as ParamsObject).display,
                     {
                         documentId: branch.data.id,
                         search: undefined,
@@ -573,10 +466,7 @@ class LeftPaneController implements angular.IComponentController {
             refType: this.treeApi.refType,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>(
-            'view.selected',
-            data
-        )
+        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
         const finished = this.eventSvc.$on('tree.ready', () => {
             this.bbApi.toggleButtonSpinner('tree-refresh')
             finished.dispose()

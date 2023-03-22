@@ -2,12 +2,7 @@ import flatpickr from 'flatpickr'
 
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import {
-    ApiService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
@@ -105,23 +100,15 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             id: this.apiSvc.createUniqueId(),
             parentCommitId: null,
         }
-        if (this.insertData.parentRefId)
-            refObj.parentRefId = this.insertData.parentRefId
+        if (this.insertData.parentRefId) refObj.parentRefId = this.insertData.parentRefId
         if (!this.lastCommit || this.type === 'Tag') {
             // Make call to history?maxTimestamp to get closest commit id to branch off
 
-            const ts = this.$filter('date')(
-                this.timestamp,
-                'yyyy-MM-ddTHH:mm:ss.sssZ'
-            )
-            this.projectSvc
-                .getCommits(refObj.parentRefId, this.projectId, ts)
-                .then((commits: CommitObject[]) => {
-                    refObj.parentCommitId = commits[0].id
-                    deferred.resolve(
-                        this.projectSvc.createRef(refObj, this.projectId)
-                    )
-                }, this.addReject)
+            const ts = this.$filter('date')(this.timestamp, 'yyyy-MM-ddTHH:mm:ss.sssZ')
+            this.projectSvc.getCommits(refObj.parentRefId, this.projectId, ts).then((commits: CommitObject[]) => {
+                refObj.parentCommitId = commits[0].id
+                deferred.resolve(this.projectSvc.createRef(refObj, this.projectId))
+            }, this.addReject)
         } else {
             return this.projectSvc.createRef(refObj, this.projectId)
         }
@@ -131,9 +118,7 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
     public resolve = (data: RefObject): void => {
         this.growl.success(this.type + ' is being created')
         if (this.type === 'Tag') {
-            this.growl.info(
-                'Please wait for a completion email prior to viewing of the tag.'
-            )
+            this.growl.info('Please wait for a completion email prior to viewing of the tag.')
         }
         this.insertApi.resolve(data)
     }

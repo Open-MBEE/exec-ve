@@ -20,10 +20,7 @@ export class FullDocumentApi {
         private growl: angular.growl.IGrowlService
     ) {}
 
-    public handleClickOnBranch = (
-        viewId: string,
-        callback: () => void
-    ): boolean => {
+    public handleClickOnBranch = (viewId: string, callback: () => void): boolean => {
         const isViewLoadedBefore = this._loadViewsUntilViewWith(viewId) // load some views if necessary
         if (isViewLoadedBefore) {
             callback()
@@ -44,15 +41,12 @@ export class FullDocumentApi {
         } else {
             let handler: angular.IPromise<unknown>
             if (!this._loadingRemainingViewsMessage) {
-                this._loadingRemainingViewsMessage = this.growl.info(
-                    'Loading more views!',
-                    {
-                        ttl: -1,
-                        onclose: () => {
-                            delete this._loadingRemainingViewsMessage
-                        },
-                    }
-                )
+                this._loadingRemainingViewsMessage = this.growl.info('Loading more views!', {
+                    ttl: -1,
+                    onclose: () => {
+                        delete this._loadingRemainingViewsMessage
+                    },
+                })
             }
             if (!this._isLoadingRemaingViews) {
                 this._isLoadingRemaingViews = true
@@ -61,10 +55,7 @@ export class FullDocumentApi {
                     if (nextIndex >= this.viewsBuffer.length) {
                         nextIndex = this.viewsBuffer.length - 1
                     }
-                    this._pushNewViewsToBuffer(
-                        this.viewsBuffer.length,
-                        nextIndex
-                    )
+                    this._pushNewViewsToBuffer(this.viewsBuffer.length, nextIndex)
                     if (nextIndex === this.viewsBuffer.length - 1) {
                         this.$interval.cancel(handler)
                         this._waitTillAfterDigestCycle(() => {
@@ -82,10 +73,7 @@ export class FullDocumentApi {
     }
 
     public handleDocumentScrolling = (): boolean => {
-        return this._pushNewViewsToBuffer(
-            this.viewsBuffer.length,
-            this.viewsBuffer.length
-        )
+        return this._pushNewViewsToBuffer(this.viewsBuffer.length, this.viewsBuffer.length)
     }
 
     public addInitialViews = (isScrollbarVisible: () => boolean): void => {
@@ -96,23 +84,16 @@ export class FullDocumentApi {
         this._incrementallyAddViewTillScroll(destroyMessage, isScrollbarVisible)
     }
 
-    public handleViewAdd = (
-        view: ViewData,
-        prevSiblingViewId: string
-    ): void => {
+    public handleViewAdd = (view: ViewData, prevSiblingViewId: string): void => {
         // load the new view into the original views right after its sibling
         const siblingIndex = this._findViewFromOriginalViews(prevSiblingViewId)
         this.viewsBuffer.splice(siblingIndex + 1, 0, view)
 
         // load the new view into the viewsBuffer
-        const siblingIndexFromLoadedViews =
-            this._findViewFromLoadedViews(prevSiblingViewId)
+        const siblingIndexFromLoadedViews = this._findViewFromLoadedViews(prevSiblingViewId)
         if (siblingIndexFromLoadedViews === -1) {
             // load all views up until the sibling view plus the new view
-            this._pushNewViewsToBuffer(
-                this.viewsBuffer.length,
-                siblingIndex + 1
-            )
+            this._pushNewViewsToBuffer(this.viewsBuffer.length, siblingIndex + 1)
         } else {
             // load the new view right after its sibling
             this._addNewViewToBufferAt(siblingIndexFromLoadedViews + 1)
@@ -130,19 +111,10 @@ export class FullDocumentApi {
         this.viewsBuffer.splice(index, 0, this.viewsBuffer[index])
     }
 
-    private _pushNewViewsToBuffer = (
-        startIndex: number,
-        endIndex: number
-    ): boolean => {
+    private _pushNewViewsToBuffer = (startIndex: number, endIndex: number): boolean => {
         let isLoadedBefore = true
-        if (
-            startIndex < this.viewsBuffer.length &&
-            endIndex < this.viewsBuffer.length
-        ) {
-            Array.prototype.push.apply(
-                this.viewsBuffer,
-                this.viewsBuffer.slice(startIndex, endIndex + 1)
-            )
+        if (startIndex < this.viewsBuffer.length && endIndex < this.viewsBuffer.length) {
+            Array.prototype.push.apply(this.viewsBuffer, this.viewsBuffer.slice(startIndex, endIndex + 1))
             isLoadedBefore = false
             if (endIndex === this.viewsBuffer.length - 1) {
                 this._waitTillAfterDigestCycle(() => {
@@ -166,31 +138,19 @@ export class FullDocumentApi {
         return isViewLoadedBefore
     }
 
-    private _incrementallyAddViewTillScroll = (
-        callback: () => void,
-        isScrollbarVisible: () => boolean
-    ): void => {
-        const isNoMoreToLoad = this._pushNewViewsToBuffer(
-            this.viewsBuffer.length,
-            this.viewsBuffer.length
-        )
+    private _incrementallyAddViewTillScroll = (callback: () => void, isScrollbarVisible: () => boolean): void => {
+        const isNoMoreToLoad = this._pushNewViewsToBuffer(this.viewsBuffer.length, this.viewsBuffer.length)
         this._waitTillAfterDigestCycle(() => {
             const isScrollBarVisible = isScrollbarVisible()
             if (isScrollBarVisible || isNoMoreToLoad) {
                 callback()
             } else {
-                this._incrementallyAddViewTillScroll(
-                    callback,
-                    isScrollbarVisible
-                )
+                this._incrementallyAddViewTillScroll(callback, isScrollbarVisible)
             }
         })
     }
 
-    private _getAllViewsStartingAt(
-        branch: TreeBranch,
-        results: string[]
-    ): void {
+    private _getAllViewsStartingAt(branch: TreeBranch, results: string[]): void {
         if (branch.type === 'view') {
             results.push(branch.data.id)
             branch.children.forEach((childBranch) => {
@@ -199,10 +159,7 @@ export class FullDocumentApi {
         }
     }
 
-    private _deleteViewsFrom(
-        viewListToDeleteFrom: ViewData[],
-        viewIdsToDelete: string[]
-    ): void {
+    private _deleteViewsFrom(viewListToDeleteFrom: ViewData[], viewIdsToDelete: string[]): void {
         _.remove(viewListToDeleteFrom, (view: ViewData) => {
             return viewIdsToDelete.indexOf(view.id) !== -1
         })
@@ -242,12 +199,7 @@ export class FullDocumentService {
     ) {}
 
     get(): FullDocumentApi {
-        return new FullDocumentApi(
-            this.$timeout,
-            this.$interval,
-            this.$http,
-            this.growl
-        )
+        return new FullDocumentApi(this.$timeout, this.$interval, this.$http, this.growl)
     }
 }
 

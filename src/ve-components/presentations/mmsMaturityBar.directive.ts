@@ -14,11 +14,7 @@ function mmsMaturityBar($window) {
     const mmsMaturityBarLink = (scope, element, attrs) => {
         const d3 = $window.d3
 
-        const svgContainer = d3
-            .select(element[0])
-            .append('svg')
-            .attr('width', 520)
-            .attr('height', 70)
+        const svgContainer = d3.select(element[0]).append('svg').attr('width', 520).attr('height', 70)
         let colorRect
 
         if (scope.state == 'Identified') {

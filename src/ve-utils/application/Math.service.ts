@@ -14,17 +14,11 @@ export class MathService {
                 if (!Array.isArray(element)) {
                     element = [element]
                 }
-                ;(
-                    this.mathJax.typesetPromise as (
-                        elements: HTMLElement[]
-                    ) => Promise<void>
-                )(element).catch((err: { message: string }) =>
-                    console.log(`Typeset failed: ${err.message}`)
+                ;(this.mathJax.typesetPromise as (elements: HTMLElement[]) => Promise<void>)(element).catch(
+                    (err: { message: string }) => console.log(`Typeset failed: ${err.message}`)
                 )
             })
-            .catch((err: { message: string }) =>
-                console.log(`Typeset failed: ${err.message}`)
-            )
+            .catch((err: { message: string }) => console.log(`Typeset failed: ${err.message}`))
         return this.promise
     }
 }

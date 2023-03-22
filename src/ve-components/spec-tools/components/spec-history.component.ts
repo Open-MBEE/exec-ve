@@ -107,17 +107,14 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
             (data) => {
                 this.historyVer = 'latest'
                 this.compareCommit.history = data
-                this.compareCommit.commitSelected =
-                    this.compareCommit.history[0]
+                this.compareCommit.commitSelected = this.compareCommit.history[0]
                 this.baseCommit.history = data
                 this.getRefs()
                     .then(() => {
                         if (data.length > 1) {
-                            this.baseCommit.commitSelected =
-                                this.compareCommit.history[1]
+                            this.baseCommit.commitSelected = this.compareCommit.history[1]
                         } else if (data.length > 0) {
-                            this.baseCommit.commitSelected =
-                                this.compareCommit.history[0]
+                            this.baseCommit.commitSelected = this.compareCommit.history[0]
                         } else {
                             this.baseCommit.commitSelected = '--- none ---'
                         }
@@ -128,9 +125,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
                     })
             },
             (reason) => {
-                this.growl.error(
-                    `Unable to get Element History - ${reason.message}`
-                )
+                this.growl.error(`Unable to get Element History - ${reason.message}`)
             }
         )
     }
@@ -177,8 +172,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
                     (data) => {
                         this.baseCommit.history = data
                         if (data.length > 0) {
-                            this.baseCommit.commitSelected =
-                                this.baseCommit.history[0]
+                            this.baseCommit.commitSelected = this.baseCommit.history[0]
                         }
                         this.disableRevert = this._isSame()
                     },

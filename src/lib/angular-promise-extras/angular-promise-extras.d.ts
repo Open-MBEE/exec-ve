@@ -168,14 +168,7 @@ declare module 'angular' {
                 PromiseValue<T5>,
                 PromiseValue<T6>
             ],
-            [
-                PromiseValue<T1>,
-                PromiseValue<T2>,
-                PromiseValue<T3>,
-                PromiseValue<T4>,
-                PromiseValue<T5>,
-                PromiseValue<T6>
-            ]
+            [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>, PromiseValue<T4>, PromiseValue<T5>, PromiseValue<T6>]
         >
         allSettled<T1, T2, T3, T4, T5>(
             values: [
@@ -186,58 +179,24 @@ declare module 'angular' {
                 T5 | VePromise<T5, T5>
             ]
         ): VePromise<
-            [
-                PromiseValue<T1>,
-                PromiseValue<T2>,
-                PromiseValue<T3>,
-                PromiseValue<T4>,
-                PromiseValue<T5>
-            ],
-            [
-                PromiseValue<T1>,
-                PromiseValue<T2>,
-                PromiseValue<T3>,
-                PromiseValue<T4>,
-                PromiseValue<T5>
-            ]
+            [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>, PromiseValue<T4>, PromiseValue<T5>],
+            [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>, PromiseValue<T4>, PromiseValue<T5>]
         >
         allSettled<T1, T2, T3, T4>(
-            values: [
-                T1 | VePromise<T1, T1>,
-                T2 | VePromise<T2, T2>,
-                T3 | VePromise<T3, T3>,
-                T4 | VePromise<T4, T4>
-            ]
+            values: [T1 | VePromise<T1, T1>, T2 | VePromise<T2, T2>, T3 | VePromise<T3, T3>, T4 | VePromise<T4, T4>]
         ): VePromise<
-            [
-                PromiseValue<T1>,
-                PromiseValue<T2>,
-                PromiseValue<T3>,
-                PromiseValue<T4>
-            ],
-            [
-                PromiseValue<T1>,
-                PromiseValue<T2>,
-                PromiseValue<T3>,
-                PromiseValue<T4>
-            ]
+            [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>, PromiseValue<T4>],
+            [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>, PromiseValue<T4>]
         >
         allSettled<T1, T2, T3>(
-            values: [
-                T1 | VePromise<T1, T1>,
-                T2 | VePromise<T2, T2>,
-                T3 | VePromise<T3, T3>
-            ]
+            values: [T1 | VePromise<T1, T1>, T2 | VePromise<T2, T2>, T3 | VePromise<T3, T3>]
         ): VePromise<
             [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>],
             [PromiseValue<T1>, PromiseValue<T2>, PromiseValue<T3>]
         >
         allSettled<T1, T2>(
             values: [T1 | VePromise<T1, T1>, T2 | VePromise<T2, T2>]
-        ): VePromise<
-            [PromiseValue<T1>, PromiseValue<T2>],
-            [PromiseValue<T1>, PromiseValue<T2>]
-        >
+        ): VePromise<[PromiseValue<T1>, PromiseValue<T2>], [PromiseValue<T1>, PromiseValue<T2>]>
         // tslint:enable:max-line-length
 
         allSettled<TAll>(

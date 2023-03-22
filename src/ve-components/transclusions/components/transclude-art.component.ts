@@ -1,9 +1,5 @@
 import { ExtensionService, ComponentService } from '@ve-components/services'
-import {
-    Transclusion,
-    ITransclusion,
-    ITransclusionComponentOptions,
-} from '@ve-components/transclusions'
+import { Transclusion, ITransclusion, ITransclusionComponentOptions } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
 import { UtilsService, MathService, ImageService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -48,10 +44,7 @@ import { VePromise, VeQService } from '@ve-types/angular'
  * @param {bool} mmsWatchId set to true to not destroy element ID watcher
  * @param {boolean=false} nonEditable can edit inline or not
  */
-export class TranscludeArtController
-    extends Transclusion
-    implements ITransclusion
-{
+export class TranscludeArtController extends Transclusion implements ITransclusion {
     //Custom Bindings
     mmsArtExt: string
 
@@ -106,24 +99,19 @@ export class TranscludeArtController
         this.artExt = this.mmsArtExt
 
         this.$element.on('click', (e) => {
-            if (this.mmsViewCtrl)
-                this.mmsViewCtrl.transcludeClicked(this.element)
+            if (this.mmsViewCtrl) this.mmsViewCtrl.transcludeClicked(this.element)
 
             e.stopPropagation()
         })
     }
 
-    public getContent = (
-        preview?: boolean
-    ): VePromise<string | HTMLElement[], string> => {
+    public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {
         const artifacts = this.element._artifacts
         if (artifacts !== undefined) {
             const allExt = artifacts.map((a) => a.extension)
             let includeExt = allExt
             if (this.artExt !== '' || this.artExt !== undefined) {
-                includeExt = this.artExt
-                    .split(',')
-                    .filter((a) => allExt.includes(a))
+                includeExt = this.artExt.split(',').filter((a) => allExt.includes(a))
             }
             const reqOb = {
                 elementId: this.mmsElementId,

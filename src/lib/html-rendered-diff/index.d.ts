@@ -4,10 +4,7 @@ export interface HtmlRenderedDiff {
     generateDiff(originalHtml, modifiedHtml): string
     _findNode(nodeToFind, sourceNode): boolean | { at: number; foundIn: any }
     _deepCopyProperties(fromHere: unknown, toHere: unknown): boolean
-    _containsAllowedProps(properties: {
-        attributes?: { [key: string]: string }
-        [key: string]: unknown
-    }): boolean
+    _containsAllowedProps(properties: { attributes?: { [key: string]: string }; [key: string]: unknown }): boolean
     _hasFurtherChanges(nodeToPatch: VNode, allNodesRequiredToPatch: VNode[])
     _getNodesNeedPatching(patches: VPatch[]): VNode[]
     _applyVNodePatch(virtualPatch: VPatch, originalTree): void

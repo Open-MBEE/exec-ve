@@ -41,9 +41,7 @@ const AboutModalComponent: VeComponentOptions = {
         constructor(private apiSvc: ApiService) {}
 
         $onInit(): void {
-            this.veV = window.__env.version
-                ? window.__env.version
-                : 'No Version Specified'
+            this.veV = window.__env.version ? window.__env.version : 'No Version Specified'
             this.mmsV = 'Loading...'
 
             this.apiSvc.getMmsVersion().then(
@@ -51,8 +49,7 @@ const AboutModalComponent: VeComponentOptions = {
                     this.mmsV = data
                 },
                 (reason) => {
-                    this.mmsV =
-                        'Could not retrieve due to failure: ' + reason.message
+                    this.mmsV = 'Could not retrieve due to failure: ' + reason.message
                 }
             )
         }

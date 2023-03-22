@@ -1,23 +1,14 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
-import {
-    ApiService,
-    ElementService,
-    ProjectService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { InsertData } from '@ve-types/components'
-import {
-    InstanceValueObject,
-    ViewCreationRequest,
-    ViewInstanceSpec,
-} from '@ve-types/mms'
+import { InstanceValueObject, ViewCreationRequest, ViewInstanceSpec } from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
 import { VeModalService } from '@ve-types/view-editor'
 
@@ -77,77 +68,31 @@ class InsertPeController extends Insertion<InsertPresentationData> {
         } = {}
         if (this.type === 'Table') {
             filters.classifierIds = [
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'TableT',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Table',
-                    this.schema
-                ),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'TableT', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Table', this.schema),
             ]
         } else if (this.type === 'List') {
             filters.classifierIds = [
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'ListT',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'List',
-                    this.schema
-                ),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'ListT', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'List', this.schema),
             ]
         } else if (this.type === 'Image') {
             filters.classifierIds = [
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'ImageT',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Image',
-                    this.schema
-                ),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'ImageT', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Image', this.schema),
             ]
         } else if (this.type === 'Paragraph') {
             filters.classifierIds = [
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'ParagraphT',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Paragraph',
-                    this.schema
-                ),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'ParagraphT', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Paragraph', this.schema),
             ]
         } else if (this.type === 'Section') {
             filters.classifierIds = [
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'SectionT',
-                    this.schema
-                ),
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    'Section',
-                    this.schema
-                ),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'SectionT', this.schema),
+                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Section', this.schema),
             ]
         } else {
-            filters.classifierIds = [
-                this.schemaSvc.getValue(
-                    'TYPE_TO_CLASSIFIER_ID',
-                    this.type,
-                    this.schema
-                ),
-            ]
+            filters.classifierIds = [this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', this.type, this.schema)]
         }
         return filters
     }
@@ -158,9 +103,7 @@ class InsertPeController extends Insertion<InsertPresentationData> {
         this.growl.success(this.type + ' is being created')
     }
 
-    public addExisting = (
-        elementOb: ViewInstanceSpec
-    ): VePromise<ViewInstanceSpec> => {
+    public addExisting = (elementOb: ViewInstanceSpec): VePromise<ViewInstanceSpec> => {
         const instanceVal: InstanceValueObject = {
             id: this.apiSvc.createUniqueId(),
             instanceId: elementOb.id,
@@ -173,11 +116,7 @@ class InsertPeController extends Insertion<InsertPresentationData> {
             projectId: this.projectId,
             refId: this.refId,
         }
-        return this.viewSvc.InsertToViewOrSection(
-            viewReqOb,
-            instanceVal,
-            this.insertData.addPeIndex
-        )
+        return this.viewSvc.InsertToViewOrSection(viewReqOb, instanceVal, this.insertData.addPeIndex)
     }
 
     public create = (): VePromise<ViewInstanceSpec> => {

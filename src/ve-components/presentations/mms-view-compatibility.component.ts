@@ -3,6 +3,4 @@ import { ViewComponent } from '@ve-components/presentations/view.component'
 
 import { veComponents } from '@ve-components'
 
-veComponents
-    .component('mmsViewLink', ViewLinkComponent)
-    .component('mmsView', ViewComponent)
+veComponents.component('mmsViewLink', ViewLinkComponent).component('mmsView', ViewComponent)
