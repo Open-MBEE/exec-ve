@@ -224,6 +224,7 @@ export class SpecService implements angular.Injectable<any> {
                             this.modifier = result
                         })
                     )
+                    /* no more related docs search supported
                     if (!this.specApi.commitId || this.specApi.commitId === 'latest') {
                         promises.push(
                             this.elementSvc
@@ -251,6 +252,7 @@ export class SpecService implements angular.Injectable<any> {
                                 })
                         )
                     }
+                    */
                     if (this.specApi.rootId) {
                         const docReq: ElementsRequest<string> = {
                             elementId: this.specApi.rootId,
@@ -280,6 +282,7 @@ export class SpecService implements angular.Injectable<any> {
                                 this.editable = true
                                 if (!this.getKeepMode()) this.setEditing(false)
                                 this.setKeepMode(false)
+                                /* not needed because of transclude val?
                                 if (
                                     this.edit.type === 'Property' ||
                                     this.edit.type === 'Port' ||
@@ -311,6 +314,7 @@ export class SpecService implements angular.Injectable<any> {
                                 if (this.edit.type === 'Constraint' && this.edit.specification) {
                                     this.setEditValues([this.edit.specification])
                                 }
+                                */
                             })
                         )
                     }

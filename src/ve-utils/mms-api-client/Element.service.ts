@@ -452,6 +452,23 @@ export class ElementService {
         if (ob._childViews && !elementOb._childViews) {
             delete ob._childViews
         }
+        if (ob.type.includes('TaggedValue') && ob.value && ob.value.length > 0) {
+            // make sure value array only has the value
+            let newvalues = []
+            for (let val of ob.value) {
+                if (ob.type === 'ElementTaggedValue') {
+                    newvalues.push(val.elementId)
+                } else {
+                    newvalues.push({value: val.value})
+                }
+            }
+            if (ob.type === 'ElementTaggedValue') {
+                ob.valueIds = newvalues
+                delete ob.value
+            } else {
+                ob.value = newvalues
+            }
+        }
         delete ob._commitId
         return ob
         /*
@@ -1070,7 +1087,7 @@ export class ElementService {
     }
 
     private _getInProgress<T extends ElementObject, U = ElementsResponse<T>>(key: string): VePromise<T | T[], U> {
-        if (this._isInProgress(key)) return this.inProgressElements[key] as VePromise<T | T[], U>
+        if (this._isInProgress(key)) return this.inProgressElements[key] as unknown as VePromise<T | T[], U>
         else return
     }
 
