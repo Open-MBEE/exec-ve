@@ -190,6 +190,7 @@ export class Presentation
                 )
             )
         }
+        this.config()
     }
 
     $postLink(): void {
