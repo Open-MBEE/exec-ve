@@ -220,8 +220,6 @@ class ViewTreesController implements IComponentController {
                         }
                         case 'tree-show-pe': {
                             this.show[_.camelCase(this.currentTree)].pe = !this.show[_.camelCase(this.currentTree)].pe
-                            this.bbApi.toggleButton('tree-show-pe', this.show[_.camelCase(this.currentTree)].pe)
-                            this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree)
                             break
                         }
                     }

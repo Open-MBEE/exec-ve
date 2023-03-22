@@ -68,6 +68,10 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
 <i ng-show="$ctrl.treeSpin" class="tree-spinner fa fa-spin fa-spinner"></i>
     
 `,
+    bindings: {
+        toolbarId: '@',
+        buttonId: '@',
+    },
     controller: TreeOfDocumentsController,
 }
 
