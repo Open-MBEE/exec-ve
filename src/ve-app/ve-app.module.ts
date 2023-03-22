@@ -13,6 +13,8 @@ import uiRouter, {
     UIRouter,
     UIRouterGlobals,
     UIRouterPlugin,
+    UrlParts,
+    UrlService,
 } from '@uirouter/angularjs'
 import angular, {
     IHttpInterceptor,
@@ -154,6 +156,7 @@ veApp.config([
                     next: {
                         type: 'query',
                         squash: true,
+                        raw: true,
                     },
                 },
                 resolve: {
@@ -191,6 +194,7 @@ veApp.config([
                         component: 'login',
                         bindings: {
                             mmsLoginBanner: 'loginBannerOb',
+                            mmsParams: 'paramsOb',
                         },
                     },
                 },
@@ -1109,7 +1113,7 @@ veApp.run([
     '$interval',
     '$location',
     '$uibModal',
-    '$uiRouter',
+    '$urlService',
     '$uiRouterGlobals',
     '$state',
     '$transitions',
@@ -1122,7 +1126,7 @@ veApp.run([
         $interval: IIntervalService,
         $location: ILocationService,
         $uibModal: VeModalService,
-        $uiRouter: UIRouter,
+        $urlService: UrlService,
         $uiRouterGlobals: UIRouterGlobals,
         $state: StateService,
         $transitions: TransitionService,
@@ -1132,23 +1136,22 @@ veApp.run([
     ): void {
         rootScopeSvc.loginModalOpen(false)
         $transitions.onBefore({}, (transition: Transition) => {
-            if (
-                $uiRouterGlobals.current.name === 'main.login' ||
-                transition.$to().name === 'main.login' ||
-                rootScopeSvc.loginModalOpen()
-            ) {
+            const to = transition.$to().name
+            const params: ParamsObject = transition.params()
+            if (to === 'main.login' || rootScopeSvc.loginModalOpen()) {
+                if (params.next) {
+                    $urlService.url(params.next, true)
+                }
                 return
             }
             return new Promise((resolve) => {
                 authSvc.checkLogin().then(
                     () => {
-                        const to = transition.$to().name
                         if (to === 'main') {
                             resolve($state.target('main.login.select'))
                         } else if (to === 'main.project.ref') {
                             resolve($state.target('main.project.ref.portal'))
                         } else if (to === 'main.project.ref.view.present') {
-                            const params: ParamsObject = transition.params()
                             if (!params.display || params.display === '') {
                                 params.display = 'slideshow'
                             }
@@ -1181,19 +1184,11 @@ veApp.run([
                                 pendingReq.cancel.resolve('cancelled')
                             }
                         })
-                        if (transition.$to().name !== 'main') {
-                            rootScopeSvc.veRedirect({
-                                toState: transition.to(),
-                                toParams: transition.params(),
+                        resolve(
+                            $state.target('main.login', {
+                                next: $urlService.url(),
                             })
-                            resolve(
-                                $state.target('main.login', {
-                                    next: transition.to().url,
-                                })
-                            )
-                        } else {
-                            resolve($state.target('main.login'))
-                        }
+                        )
                     }
                 )
             })
@@ -1256,24 +1251,22 @@ veApp.run([
         )
 
         // Check if user is logged in, if so redirect to select page otherwise go to login if the url isn't mapped
-        // $uiRouter.urlService.rules.otherwise(
-        //     (match, url: UrlParts | undefined) => {
-        //         void authSvc.checkLogin().then((checkLogin) => {
-        //             if (checkLogin) {
-        //                 if ($location.url().includes('workspace')) {
-        //                     rootScopeSvc.veRedirectFromOld(true)
-        //                     rootScopeSvc.veCrushUrl($location.path())
-        //                     void $state.go('main.login.redirect')
-        //                 } else {
-        //                     rootScopeSvc.veRedirectFromOld(false)
-        //                     void $state.go('main.login.select')
-        //                 }
-        //             } else {
-        //                 void $state.go('main.login')
-        //             }
-        //         })
-        //     }
-        //)
+        $urlService.rules.otherwise((match, url: UrlParts | undefined) => {
+            void authSvc.checkLogin().then((checkLogin) => {
+                if (checkLogin) {
+                    if ($location.url().includes('workspace')) {
+                        rootScopeSvc.veRedirectFromOld(true)
+                        rootScopeSvc.veCrushUrl($location.path())
+                        void $state.go('main.login.redirect')
+                    } else {
+                        rootScopeSvc.veRedirectFromOld(false)
+                        void $state.go('main.login.select')
+                    }
+                } else {
+                    void $state.go('main.login')
+                }
+            })
+        })
     },
 ])
 

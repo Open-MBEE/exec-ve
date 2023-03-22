@@ -59,7 +59,7 @@ export class ButtonBarService {
     public waitForApi = (id: string): VePromise<ButtonBarApi, void> => {
         if (!this.buttonBars.hasOwnProperty(id)) {
             this.buttonBars[id] = {}
-            this.buttonBars[id].promise = new this.$q<ButtonBarApi>(
+            this.buttonBars[id].promise = new this.$q<ButtonBarApi, void>(
                 (resolve, reject) => {
                     this.buttonBars[id].resolve = resolve
                     this.buttonBars[id].reject = reject

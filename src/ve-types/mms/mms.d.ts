@@ -112,6 +112,7 @@ export interface ParamsObject {
     '#'?: string
     display?: string
     preview?: string
+    next?: string
     [param: string]: string
 }
 

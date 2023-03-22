@@ -351,7 +351,6 @@ class MainController implements IComponentController {
             //             (trans.params() as ParamsObject).documentId
             //         )
             // }
-
             if (this.$state.includes('main.project.ref.view.present')) {
                 this.applicationSvc.getState().inDoc = true
                 this.applicationSvc.getState().currentDoc = (
@@ -372,7 +371,7 @@ class MainController implements IComponentController {
                 const display = trans.$to().name.split('.')[
                     trans.$to().name.split('.').length
                 ]
-                void this.$state.target(trans.$to().name, { display })
+                void this.$state.go(trans.$to().name, { display })
             }
             if (
                 this.$state.includes('main.project.ref') &&

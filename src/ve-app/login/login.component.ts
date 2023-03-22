@@ -2,6 +2,7 @@ import {
     StateService,
     TransitionPromise,
     UIRouterGlobals,
+    UrlService,
 } from '@uirouter/angularjs'
 import angular, { IComponentController, IQService } from 'angular'
 
@@ -11,6 +12,7 @@ import { AuthService } from '@ve-utils/mms-api-client'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VePromiseReason } from '@ve-types/angular'
+import { ParamsObject } from '@ve-types/mms'
 import {
     VeModalResolveFn,
     VeModalService,
@@ -43,12 +45,13 @@ const LoginComponent: VeComponentOptions = {
 `,
     bindings: {
         mmsLoginBanner: '<',
-        paramsOb: '<',
+        mmsParams: '<',
     },
     controller: class LoginController implements IComponentController {
         static $inject = [
             '$q',
             '$state',
+            '$urlService',
             '$uiRouterGlobals',
             '$uibModal',
             'growl',
@@ -59,11 +62,14 @@ const LoginComponent: VeComponentOptions = {
         public spin: boolean = false
         loginBanner: BrandingStyle
 
+        //Bindings
+        private mmsParams: ParamsObject
         private mmsLoginBanner: BrandingStyle
 
         constructor(
             private $q: IQService,
             private $state: StateService,
+            private $urlService: UrlService,
             private $uiRouterGlobals: UIRouterGlobals,
             private $uibModal: VeModalService,
             private growl: angular.growl.IGrowlService,
@@ -115,6 +121,8 @@ const LoginComponent: VeComponentOptions = {
                                     reload: true,
                                 })
                             )
+                        } else if (this.mmsParams.next) {
+                            this.$urlService.url(this.mmsParams.next, true)
                         } else {
                             this.$state
                                 .go('main.login.select', {

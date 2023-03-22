@@ -33,7 +33,7 @@ export class TreeService {
         iconDefault: 'fa-solid fa-file fa-fw',
     }
 
-    public defaultSectionTypes = ['view', 'section']
+    public defaultSectionTypes = ['group', 'view', 'section']
 
     public loading: boolean
 
@@ -140,8 +140,10 @@ export class TreeService {
         return new this.$q<TreeBranch[], unknown>((resolve, reject) => {
             const rootNodes: TreeBranch[] = []
             const data2Node: { [key: string]: TreeBranch } = {}
+            // create flat map for each element
             elementObs.forEach((elementOb) => {
-                data2Node[elementOb[idKey] as string] = {
+                const elementId: string = elementOb[idKey] as string
+                data2Node[elementId] = {
                     label: elementOb.name,
                     type: type,
                     data: elementOb,
@@ -152,32 +154,26 @@ export class TreeService {
 
             // make second pass to associate data to parent nodes
             elementObs.forEach((elementOb) => {
-                if (data2Node[elementOb[idKey] as string].type === 'group') {
-                    data2Node[elementOb[idKey] as string].loading = false
-                }
+                const parentId: string = elementOb[parentKey] as string
+                const elementId: string = elementOb[idKey] as string
+
                 // If there's an element in data2Node whose key matches the 'parent' value in the array element
                 // add the array element to the children array of the matched data2Node element
-                if (
-                    elementOb[parentKey] &&
-                    data2Node[elementOb[parentKey] as string]
-                ) {
-                    //bad data!
-                    data2Node[elementOb[parentKey] as string].children.push(
-                        data2Node[elementOb[idKey] as string]
-                    )
+                if (parentId && data2Node[parentId]) {
+                    data2Node[parentId].children.push(data2Node[elementId])
                 } else {
                     // If there's not an element in data2Node whose key matches the 'parent' value in the array element
                     // it's a "root node" and so it should be pushed to the root nodes array along with its children
 
-                    rootNodes.push(data2Node[elementOb[idKey] as string])
+                    rootNodes.push(data2Node[elementId])
                 }
             })
 
             //apply level2 function if available
             if (level2_Func) {
                 elementObs.forEach((elementOb) => {
-                    const level1_parentNode =
-                        data2Node[elementOb[idKey] as string]
+                    const elementId: string = elementOb[idKey] as string
+                    const level1_parentNode = data2Node[elementId]
                     level2_Func(elementOb, level1_parentNode).catch(reject)
                 })
             }
@@ -772,131 +768,125 @@ export class TreeService {
                 })
             }
 
-            const sectionTypes = this.defaultSectionTypes
-
-            const addBranchData = (
-                level: number,
-                section: string[],
-                branch: TreeBranch,
-                visible: boolean,
-                peNums: { [type: string]: number }
-            ): void => {
-                if (!branch.uid) branch.uid = `${Math.random()}`
-                if (typeof branch.expanded === 'undefined')
-                    branch.expanded = level <= this.treeApi.expandLevel
-                branch.expandable =
-                    branch.children && branch.children.length > 0
-                branch.favorite = false
-
-                let number = ''
-                if (section) number = section.join('.')
-
-                // Handle numbering of non-section types
-                if (!sectionTypes.includes(branch.type)) {
-                    if (!peNums[branch.type]) peNums[branch.type] = 0
-                    peNums[branch.type]++
-                    if (
-                        this.treeApi.numberingDepth === 0 &&
-                        !sectionTypes.includes(branch.type)
-                    ) {
-                        number = peNums[branch.type].toString(10)
-                    } else if (section.length >= this.treeApi.numberingDepth) {
-                        number = `${section
-                            .slice(0, this.treeApi.numberingDepth)
-                            .join('.')}${this.treeApi.numberingSeparator}${
-                            peNums[branch.type]
-                        }`
-                    } else {
-                        const sectionCopy = [...section]
-                        while (
-                            sectionCopy.length < this.treeApi.numberingDepth
-                        ) {
-                            sectionCopy.push('0')
-                        }
-                        number = `${sectionCopy.join('.')}${
-                            this.treeApi.numberingSeparator
-                        }${peNums[branch.type]}`
-                    }
-                }
-                if (
-                    branch.data &&
-                    branch.data.id &&
-                    this.treeApi.sectionNumbering
-                ) {
-                    this.branch2viewNumber[branch.data.id] = number
-                    branch.data._veNumber = number
-                }
-                if (branch.children) {
-                    let alpha = false
-                    if (this.treeApi.sort) {
-                        branch.children.sort(this._treeSortFunction)
-                    }
-                    let j = this.treeApi.startChapter
-                    if (j === null || j === undefined || level != 1) {
-                        j = 1
-                    }
-                    branch.children.forEach((child) => {
-                        child.parent_uid = branch.uid
-                        const child_visible = visible && branch.expanded
-                        if (!sectionTypes.includes(child.type)) {
-                            addBranchData(level + 1, section, child, child_visible, peNums )
-                        } else {
-                            if (this.treeApi.sectionNumbering) {
-                                if (child.data._isAppendix) {
-                                    alpha = true
-                                    j = 0
-                                }
-                                const nextSection = [
-                                    ...section,
-                                    alpha
-                                        ? String.fromCharCode(j + 65)
-                                        : j.toString(10),
-                                ]
-                                if (
-                                    nextSection.length <=
-                                    this.treeApi.numberingDepth
-                                ) {
-                                    peNums = {}
-                                }
-                                addBranchData(
-                                    level + 1,
-                                    nextSection,
-                                    child,
-                                    child_visible,
-                                    peNums
-                                )
-                            } else {
-                                addBranchData(
-                                    level + 1,
-                                    [],
-                                    child,
-                                    child_visible,
-                                    peNums
-                                )
-                            }
-                            j++
-                        }
-                    })
-
-                    if (this.treeApi.sort) {
-                        this.treeData.sort(this._treeSortFunction)
-                    }
-
-                    if (
-                        !this.treeApi.expandLevel &&
-                        this.treeApi.expandLevel !== 0
-                    )
-                        this.treeApi.expandLevel = 1
-                }
-                branch.loading = false
-            }
             this.treeData.forEach((branch) => {
-                addBranchData(1, [], branch, true, {})
+                this._addBranchData(1, [], branch, true, {})
             })
+
             this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, true)
             this.eventSvc.$broadcast('tree.ready')
             resolve()
         })
+    }
+
+    private _addBranchData = (
+        level: number,
+        section: string[],
+        branch: TreeBranch,
+        visible: boolean,
+        peNums: { [type: string]: number }
+    ): void => {
+        if (!branch.uid) branch.uid = `${Math.random()}`
+        if (typeof branch.expanded === 'undefined')
+            branch.expanded = level <= this.treeApi.expandLevel
+        branch.expandable = branch.children && branch.children.length > 0
+        branch.favorite = false
+
+        let number = ''
+        if (section) number = section.join('.')
+
+        // Handle numbering of non-section types
+        if (!this.defaultSectionTypes.includes(branch.type)) {
+            if (!peNums[branch.type]) peNums[branch.type] = 0
+            peNums[branch.type]++
+            if (
+                this.treeApi.numberingDepth === 0 &&
+                !this.defaultSectionTypes.includes(branch.type)
+            ) {
+                number = peNums[branch.type].toString(10)
+            } else if (section.length >= this.treeApi.numberingDepth) {
+                number = `${section
+                    .slice(0, this.treeApi.numberingDepth)
+                    .join('.')}${this.treeApi.numberingSeparator}${
+                    peNums[branch.type]
+                }`
+            } else {
+                const sectionCopy = [...section]
+                while (sectionCopy.length < this.treeApi.numberingDepth) {
+                    sectionCopy.push('0')
+                }
+                number = `${sectionCopy.join('.')}${
+                    this.treeApi.numberingSeparator
+                }${peNums[branch.type]}`
+            }
+        }
+        if (branch.data && branch.data.id && this.treeApi.sectionNumbering) {
+            this.branch2viewNumber[branch.data.id] = number
+            branch.data._veNumber = number
+        }
+        if (branch.children) {
+            let alpha = false
+            if (this.treeApi.sort) {
+                branch.children.sort(this._treeSortFunction)
+            }
+            let j = this.treeApi.startChapter
+            if (j === null || j === undefined || level != 1) {
+                j = 1
+            }
+            branch.children.forEach((child) => {
+                child.parent_uid = branch.uid
+                const child_visible = visible && branch.expanded
+                if (!this.defaultSectionTypes.includes(child.type)) {
+                    this._addBranchData(
+                        level + 1,
+                        section,
+                        child,
+                        child_visible,
+                        peNums
+                    )
+                } else {
+                    if (this.treeApi.sectionNumbering) {
+                        if (child.data._isAppendix) {
+                            alpha = true
+                            j = 0
+                        }
+                        const nextSection = [
+                            ...section,
+                            alpha
+                                ? String.fromCharCode(j + 65)
+                                : j.toString(10),
+                        ]
+                        if (nextSection.length <= this.treeApi.numberingDepth) {
+                            peNums = {}
+                        }
+                        this._addBranchData(
+                            level + 1,
+                            nextSection,
+                            child,
+                            child_visible,
+                            peNums
+                        )
+                    } else {
+                        this._addBranchData(
+                            level + 1,
+                            [],
+                            child,
+                            child_visible,
+                            peNums
+                        )
+                    }
+                    j++
+                }
+            })
+
+            if (this.treeApi.sort) {
+                this.treeData.sort(this._treeSortFunction)
+            }
+
+            if (!this.treeApi.expandLevel && this.treeApi.expandLevel !== 0)
+                this.treeApi.expandLevel = 1
+        }
+        branch.loading = false
+        this.eventSvc.resolve<boolean>(TreeService.events.UPDATED, false)
     }
 
     public updateRows = (
@@ -920,7 +910,8 @@ export class TreeService {
                 for (let i = 0; i < branch.children.length; i++) {
                     if (
                         types.includes('all') ||
-                        types.includes(branch.children[i].type)
+                        types.includes(branch.children[i].type) ||
+                        (types.includes('favorite') && branch.favorite)
                     ) {
                         visibleChild = true
                         break
@@ -941,26 +932,27 @@ export class TreeService {
                 }
 
                 if (
-                    (!types.includes('all') && !types.includes(branch.type)) ||
-                    (types.includes('favorite') && !branch.favorite)
-                )
-                    visible = false
-                const treeRow = {
-                    level,
-                    section:
-                        number &&
-                        !number.includes('undefined') &&
-                        !number.includes('NaN')
-                            ? number
-                            : '',
-                    branch,
-                    label: branch.label,
-                    visibleChild,
-                    visible,
-                    typeIcon,
-                    children: branch.children,
+                    types.includes('all') ||
+                    types.includes(branch.type) ||
+                    (types.includes('favorite') && branch.favorite)
+                ) {
+                    const treeRow = {
+                        level,
+                        section:
+                            number &&
+                            !number.includes('undefined') &&
+                            !number.includes('NaN')
+                                ? number
+                                : '',
+                        branch,
+                        label: branch.label,
+                        visibleChild,
+                        visible,
+                        typeIcon,
+                        children: branch.children,
+                    }
+                    treeRows.push(treeRow)
                 }
-                treeRows.push(treeRow)
 
                 //Work on children
                 if (branch.children) {
@@ -1172,7 +1164,9 @@ export class TreeService {
 
     changeElement = (): VePromise<void, unknown> => {
         if (this.treeApi.elementId === this.processedFocus)
-            return new this.$q<void, unknown>((resolve, reject) => {resolve()})
+            return new this.$q<void, unknown>((resolve, reject) => {
+                resolve()
+            })
 
         this.processedFocus = this.treeApi.elementId
         return new this.$q<void, unknown>((resolve, reject) => {
@@ -1238,6 +1232,7 @@ export class TreeService {
                                 children: [],
                             })
                         }
+                        this._onTreeDataChange().catch(reject)
                         resolve()
                     },
                     (reason) => {
@@ -1374,14 +1369,17 @@ export class TreeService {
                                         this.viewSvc.getTreeType(instance) !==
                                         'none'
                                     ) {
-                                        const otherTreeNode = {
+                                        const otherTreeNode: TreeBranch = {
                                             label: instance.name,
                                             type: this.viewSvc.getTreeType(
                                                 instance
                                             ),
-                                            viewId: viewNode.data.id,
                                             data: instance,
                                             children: [],
+                                        }
+                                        if (otherTreeNode.type !== 'view') {
+                                            otherTreeNode.viewId =
+                                                viewNode.data.id
                                         }
                                         parentNode.children.unshift(
                                             otherTreeNode

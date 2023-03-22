@@ -372,7 +372,7 @@ class FullDocumentController implements IComponentController {
 
     $postLink(): void {
         // Send view to kick off tree compilation
-        const data = {
+        const data: veAppEvents.elementSelectedData = {
             rootOb: this.$state.includes('**.portal.**')
                 ? this.mmsProject.id
                 : this.mmsDocument.id,
