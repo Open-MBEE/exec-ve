@@ -20,6 +20,7 @@ import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { CommitObject, ElementsRequest, RefObject } from '@ve-types/mms'
+import {veAppEvents} from "@ve-app/events";
 
 /**
  * @ngdoc component
@@ -50,6 +51,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
     historyVer: string
     compareCommit: Commit
     disableRevert: boolean
+    keepCommitSelected: boolean = false
 
     static $inject = [...SpecTool.$inject, 'DiffMergeService']
 
@@ -94,15 +96,25 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
 
     initCallback = (): void => {
         if (!this.projectId || !this.refId) return
-        this.gettingHistory = true
+
         const reqOb: ElementsRequest<string> = {
             elementId: this.element.id,
             projectId: this.projectId,
             refId: this.refId,
         }
-        // this.elementSvc.getElement(reqOb, 2, false).then((data) => {
-        //     this.element = data;
-        // })
+        if (!this.baseCommit)
+            this.baseCommit = {
+                ref: null,
+                history: null,
+                commitSelected: null,
+                isOpen: false,
+                refIsOpen: false
+            }
+        if (this.keepCommitSelected) {
+            this.keepCommitSelected = false
+            return
+        }
+        this.gettingHistory = true
         this.elementSvc.getElementHistory(reqOb, 2, true).then(
             (data) => {
                 this.historyVer = 'latest'
@@ -154,6 +166,14 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
         this.compareCommit.commitSelected = version
         this.historyVer = this.compareCommit.commitSelected.id
         this.compareCommit.isOpen = !this.compareCommit.isOpen
+        const data = {
+            elementId: this.element.id,
+            projectId: this.element._projectId,
+            refId: this.element._refId,
+            commitId: this.historyVer,
+        }
+        this.keepCommitSelected = true
+        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
     }
 
     getElementHistoryByRef = (ref?: RefObject): void => {
@@ -332,7 +352,7 @@ const SpecHistoryComponent: VeComponentOptions = {
                        mms-compare-commit-id="{{$ctrl.compareCommit.commitSelected.id}}">
         </transclude-attr-diff>
 
-        <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
+        <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.includes('TaggedValue')">
             <h2 class="prop-title">Property Value</h2>
             <span class="prop">
                 <transclude-attr-diff mms-attr="val"

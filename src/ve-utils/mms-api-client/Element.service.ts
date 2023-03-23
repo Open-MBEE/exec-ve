@@ -948,6 +948,7 @@ export class ElementService {
     }
 
     public getElementQualifiedName(reqOb: ElementsRequest<string>): VePromise<string, string> {
+        // TODO this only gets the latest version - would need to walk the element owner gets manually for a commit
         const deferred = this.$q.defer<string>()
         const queryOb = {
             params: {

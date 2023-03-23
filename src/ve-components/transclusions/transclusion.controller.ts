@@ -338,11 +338,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     }
 
     protected changeAction: onChangesCallback<string> = (newVal, oldVal, firstChange) => {
-        if (this.clearWatch || !newVal || !this.mmsProjectId || firstChange) {
+        if (!newVal || !this.mmsProjectId || firstChange || newVal === oldVal) {
             return
-        }
-        if (!this.mmsWatchId && newVal) {
-            this.clearWatch = true
         }
         if (this.checkCircular) {
             if (this.componentSvc.hasCircularReference(this, this.mmsElementId, 'doc')) {
