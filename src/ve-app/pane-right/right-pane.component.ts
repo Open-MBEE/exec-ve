@@ -114,9 +114,9 @@ class RightPaneController implements IComponentController {
         this.subs.push(
             this.eventSvc.$on<veAppEvents.elementUpdatedData>('element.updated', (data) => {
                 if (
-                    data.elementId === this.specApi.elementId &&
-                    data.projectId === this.specApi.projectId &&
-                    data.refId === this.specApi.refId &&
+                    data.element.id === this.specApi.elementId &&
+                    data.element._projectId === this.specApi.projectId &&
+                    data.element._refId === this.specApi.refId &&
                     !data.continueEdit
                 ) {
                     this.eventSvc.resolve<boolean>('spec.ready', false)
