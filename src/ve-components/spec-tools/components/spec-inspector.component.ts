@@ -148,13 +148,14 @@ const SpecInspectorComponent: VeComponentOptions = {
         <h1 class="prop element-title" ng-class="{'ve-error': $ctrl.mmsDisplayOldSpec}"><span class="{{ $ctrl.elementTypeClass }}"></span>{{$ctrl.element.name}}</h1>
         <span class="elem-updated-wrapper">Last modified {{$ctrl.element._modified | date:'M/d/yy h:mm a'}} by <b ng-if="$ctrl.modifier.email != undefined">{{ $ctrl.modifier.email }}</b><b ng-if="$ctrl.modifier.email == undefined">{{ $ctrl.modifier }}</b></span>
 
-        <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
+        <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.includes('TaggedValue')">
             <h2 class="prop-title spec-view-value-heading">Property Value</h2>
-            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}" non-editable="true"></transclude-val>
+            <transclude-val mms-element-id="{{$ctrl.element.id}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}" non-editable="true"></transclude-val>
             
             <h2 class="prop-title spec-view-value-heading">Property Type</h2>
-            <span class="prop" ng-if="$ctrl.element.type === 'Property'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.typeId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.typeId)"></transclude-name></span>
-            <span class="prop" ng-if="$ctrl.element.type === 'Slot'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.definingFeatureId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.definingFeatureId)"></transclude-name></span>
+            <span class="prop" ng-if="$ctrl.element.type === 'Property'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.typeId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.typeId)"></transclude-name></span>
+            <span class="prop" ng-if="$ctrl.element.type === 'Slot'"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.definingFeatureId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.definingFeatureId)"></transclude-name></span>
+            <span class="prop" ng-if="$ctrl.element.type.includes('TaggedValue')"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element.tagDefinitionId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" click-handler="$ctrl.propertyTypeClicked($ctrl.element.tagDefinitionId)"></transclude-name></span>
         </div>
 
         <div ng-if="$ctrl.element.type === 'Generalization' || $ctrl.element.type === 'Dependency'">
