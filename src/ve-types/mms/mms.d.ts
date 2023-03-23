@@ -1,4 +1,3 @@
-import { VePromiseReason } from '@ve-types/angular'
 import {
     CommitObject,
     ElementObject,
@@ -161,11 +160,6 @@ interface RejectedObject<T extends MmsObject> {
 export interface ElementsResponse<T extends ElementObject> extends BasicResponse<T> {
     elements: T[]
     deleted?: T[]
-}
-
-export interface BulkResponse<T> {
-    failedRequests: VePromiseReason<T>[]
-    successfulRequests: VePromiseReason<T>[]
 }
 
 export interface PermissionsResponse extends BasicResponse<PermissionsObject> {

@@ -1,11 +1,11 @@
-import { ApiService, CacheService, ProjectService } from '@ve-utils/mms-api-client'
+import { ApiService, CacheService, ElementService, ProjectService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
 import { BrandingStyle } from './Branding.service'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import { ProjectsResponse, RefObject } from '@ve-types/mms'
+import { ElementObject } from '@ve-types/mms'
 /**
  * @ngdoc service
  * @name veUtils/ApplicationService
@@ -16,13 +16,10 @@ import { ProjectsResponse, RefObject } from '@ve-types/mms'
  * creating unique IDs, etc...
  */
 
-export interface VePreferencesObject {
-    pinnedIds?: string[]
-}
-
-export interface VeRefObject extends RefObject {
-    pinnedIds?: string[]
+export interface ProjectSettingsObject extends ElementObject {
+    pinnedIds?: { [key: string]: string[] }
     banner?: BrandingStyle
+    footer?: BrandingStyle
 }
 
 export interface VeApplicationState {
@@ -40,11 +37,12 @@ export class ApplicationService {
 
     public PROJECT_URL_PREFIX = '#/projects/'
 
-    static $inject = ['$q', 'ProjectService', 'ApiService', 'CacheService']
+    static $inject = ['$q', 'ProjectService', 'ElementService', 'ApiService', 'CacheService']
 
     constructor(
         private $q: VeQService,
         private projectSvc: ProjectService,
+        private elementSvc: ElementService,
         private apiSvc: ApiService,
         private cacheSvc: CacheService
     ) {}
@@ -68,70 +66,87 @@ export class ApplicationService {
         return deferred.promise
     }
 
-    public getPins = (
-        projectId: string,
-        refId?: string,
-        refresh?: boolean
-    ): VePromise<VePreferencesObject, ProjectsResponse> => {
+    public getSettings = (projectId: string, refId?: string, refresh?: boolean): VePromise<ProjectSettingsObject> => {
         if (!refId) refId = 'master'
-        const deferred = this.$q.defer<VePreferencesObject>()
-        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'preferences')
-        const cached = this.cacheSvc.get<VePreferencesObject>(cacheKey)
-        if (cached && cached.pinnedIds && !refresh) {
-            deferred.resolve(cached)
-        } else {
-            let prefs: VePreferencesObject = {}
-            if (cached && !refresh) {
-                prefs = cached
-            }
-            prefs.pinnedIds = []
-            this.projectSvc.getRef(projectId, refId, refresh).then(
-                (ref: VeRefObject) => {
-                    if (ref.pinnedIds) {
-                        prefs.pinnedIds.push(...ref.pinnedIds)
-                    }
-                    this.cacheSvc.put<VePreferencesObject>(cacheKey, prefs)
-                    deferred.resolve(this.cacheSvc.get<VePreferencesObject>(cacheKey))
-                },
-                (response) => {
-                    deferred.reject(response)
-                }
-            )
+        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '_hidden_' + projectId + '_settings', false)
+        const cached = this.cacheSvc.get<ProjectSettingsObject>(cacheKey)
+        if (cached && !refresh) {
+            return this.$q.resolve(cached)
         }
-
-        return deferred.promise
+        return new this.$q<ProjectSettingsObject>((resolve, reject) => {
+            this.elementSvc
+                .getElement<ProjectSettingsObject>({
+                    projectId,
+                    refId,
+                    elementId: '_hidden_' + projectId + '_settings',
+                })
+                .then((result) => {
+                    if (result === null) {
+                        this.updateSettings(projectId, refId, null).then(resolve, reject)
+                    } else resolve(result)
+                }, reject)
+        })
     }
 
-    public updatePins = (
+    public createSettings = (
         projectId: string,
         refId: string,
-        prefs: VePreferencesObject
-    ): VePromise<VePreferencesObject, ProjectsResponse> => {
-        const deferred = this.$q.defer<VePreferencesObject>()
-        const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'preferences')
-        this.projectSvc.getRef(projectId, refId).then(
-            (ref) => {
-                if (prefs.pinnedIds) {
-                    ref.pinnedIds = prefs.pinnedIds
-                    this.projectSvc.updateRef(ref, projectId).then(
-                        (result: VeRefObject) => {
-                            prefs.pinnedIds = result.pinnedIds
-                            this.cacheSvc.put(cacheKey, prefs)
-                            deferred.resolve(this.cacheSvc.get(cacheKey))
-                        },
-                        (reason) => {
-                            deferred.reject(reason)
-                        }
-                    )
-                } else {
-                    deferred.resolve(prefs)
-                }
-            },
-            (reason) => {
-                deferred.reject(reason)
+        settingsOb?: ProjectSettingsObject
+    ): VePromise<ProjectSettingsObject> => {
+        if (!settingsOb) {
+            settingsOb = {
+                id: '_hidden_' + projectId + '_settings',
+                name: 'View Editor Project Settings',
+                _projectId: projectId,
+                _refId: refId,
+                ownerId: 'holding_bin_' + projectId,
+                type: 'Class',
             }
-        )
-        return deferred.promise
+        }
+        return this.elementSvc.createElement<ProjectSettingsObject>({
+            elementId: '_hidden_' + projectId + '_settings',
+            projectId,
+            refId,
+            elements: [settingsOb],
+        })
+    }
+
+    public updateSettings = (
+        projectId: string,
+        refId: string,
+        settingsOb: ProjectSettingsObject
+    ): VePromise<ProjectSettingsObject> => {
+        return new this.$q<ProjectSettingsObject>((resolve, reject) => {
+            this.elementSvc
+                .getElement<ProjectSettingsObject>({
+                    projectId,
+                    refId,
+                    elementId: '_hidden_' + projectId + '_settings',
+                })
+                .then((result) => {
+                    if (!result) {
+                        this.createSettings(projectId, refId, settingsOb).then(resolve, reject)
+                        return
+                    }
+
+                    if (
+                        settingsOb.pinnedIds &&
+                        Object.keys(result.pinnedIds).length > 0 &&
+                        Object.keys(settingsOb.pinnedIds).length > 0
+                    ) {
+                        Object.keys(settingsOb.pinnedIds).forEach((username) => {
+                            if (result.pinnedIds[username]) {
+                                const newIds = [
+                                    ...new Set([...result.pinnedIds[username], ...settingsOb.pinnedIds[username]]),
+                                ]
+                                settingsOb.pinnedIds[username].length = 0
+                                settingsOb.pinnedIds[username].push(...newIds)
+                            }
+                        })
+                    }
+                    this.elementSvc.updateElement<ProjectSettingsObject>(settingsOb).then(resolve, reject)
+                }, reject)
+        })
     }
 }
 
