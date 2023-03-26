@@ -246,7 +246,7 @@ export class SpecTool implements ISpecTool {
         this.document = this.specSvc.getDocument()
         this.values = this.specSvc.getValues()
         this.ref = this.specSvc.getRef()
-
+        this.elementDataLink = this.specApi.dataLink
         this.initCallback()
     }
 

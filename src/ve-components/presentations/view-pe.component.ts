@@ -108,10 +108,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
             .then(
                 (instanceSpec) => {
                     this.instanceSpec = instanceSpec
-                    this.viewSvc.getPresentationInstanceObject(instanceSpec).then(
-                        (presentationElem) => {
-                            this.presentationElem = presentationElem
-
+                    this.presentationElem = this.viewSvc.getPresentationInstanceObject(instanceSpec)
                             this.presentationElemLoading = false
                             //Init PeNumber
                             if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
@@ -161,11 +158,7 @@ export class ViewPresentationElemController implements angular.IComponentControl
                         (reason) => {
                             this._error(reqOb, reason)
                         }
-                    )
-                },
-                (reason) => {
-                    this._error(reqOb, reason)
-                }
+
             )
             .finally(() => {
                 this.$element.removeClass('isLoading')

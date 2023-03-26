@@ -1279,32 +1279,32 @@ export class ViewService {
      */
     public getPresentationInstanceObject = (
         instanceSpec: InstanceSpecObject
-    ): VePromise<PresentationInstanceObject | ElementObject> => {
-        return new this.$q((resolve, reject) => {
+    ): PresentationInstanceObject | InstanceSpecObject => {
             const instanceSpecSpec: ValueObject = instanceSpec.specification
             if (!instanceSpecSpec) {
-                return reject({
-                    status: 500,
-                    message: 'missing specification',
-                })
+                return {
+                    type: 'Paragraph',
+                    sourceType: 'text',
+                    text: ''
+                }
             }
             const type = instanceSpecSpec.type
 
             if (type === 'LiteralString') {
                 // If it is an Opaque List, Paragraph, Table, Image, List:
                 const jsonString = (instanceSpecSpec as LiteralObject<string>).value
-                return resolve(JSON.parse(jsonString) as PresentationInstanceObject)
+                return JSON.parse(jsonString) as PresentationInstanceObject
             } else if (type === 'Expression') {
                 // If it is a Opaque Section, or a Expression:
                 // If it is a Opaque Section then we want the instanceSpec:
                 if (this.isSection(instanceSpec)) {
-                    return resolve(instanceSpec)
+                    return instanceSpec
                 } else {
                     //??
-                    return resolve(instanceSpecSpec)
+                    return instanceSpecSpec
                 }
             }
-        })
+
     }
 
     /**
@@ -1347,6 +1347,7 @@ export class ViewService {
         const presentationRef: PresentationReference = {
             instanceId: instanceVal.instanceId,
             sectionElements: [],
+            instanceVal: instanceVal,
             isOpaque: false,
         }
 
@@ -1361,7 +1362,7 @@ export class ViewService {
                     this.schemaSvc
                         .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
                         .indexOf(instanceSpecification.classifierIds[0]) >= 0
-
+                presentationRef.presentationElement = this.getPresentationInstanceObject(instanceSpecification)
                 if (this.isSection(instanceSpecification)) {
                     this.getElementReferenceTree(req, instanceSpecification.specification).then(
                         (sectionElementReferenceTree) => {

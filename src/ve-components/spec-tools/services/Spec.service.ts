@@ -3,6 +3,7 @@ import { ToolbarService } from '@ve-core/toolbar'
 import { UtilsService } from '@ve-utils/application'
 import { AutosaveService, EventService } from '@ve-utils/core'
 import {
+    ApiService,
     AuthService,
     ElementService,
     PermissionsService,
@@ -21,10 +22,10 @@ import {
     ElementObject,
     ElementsRequest,
     ElementsResponse,
-    LiteralObject,
     RefObject,
     UserObject,
     ValueObject,
+    ViewInstanceSpec,
     ViewObject,
 } from '@ve-types/mms'
 
@@ -41,6 +42,7 @@ export interface SpecApi extends ElementsRequest<string> {
 
 export class SpecService implements angular.Injectable<any> {
     private element: ElementObject
+    private view: ViewObject | ViewInstanceSpec
     private document: DocumentObject
     private modifier: UserObject
     private ref: RefObject
@@ -74,6 +76,7 @@ export class SpecService implements angular.Injectable<any> {
         'UserService',
         'PermissionsService',
         'UtilsService',
+        'ApiService'
     ]
     private ran: boolean
     private lastid: string
@@ -93,7 +96,8 @@ export class SpecService implements angular.Injectable<any> {
         private authSvc: AuthService,
         private userSvc: UserService,
         private permissionsSvc: PermissionsService,
-        private utilsSvc: UtilsService
+        private utilsSvc: UtilsService,
+        private apiSvc: ApiService
     ) {}
 
     /**
@@ -157,6 +161,10 @@ export class SpecService implements angular.Injectable<any> {
         return this.document
     }
 
+    public getView = (): ElementObject => {
+        return this.view
+    }
+
     public getModifier = (): UserObject => {
         return this.modifier
     }
@@ -218,6 +226,9 @@ export class SpecService implements angular.Injectable<any> {
                         return
                     }
                     this.element = data
+                    if (this.apiSvc.isView(data) || this.viewSvc.isSection(data)) {
+                        this.view = data
+                    }
                     this.values = this.componentSvc.setupValCf(data)
                     promises.push(
                         this.userSvc.getUserData(data._modifier).then((result) => {

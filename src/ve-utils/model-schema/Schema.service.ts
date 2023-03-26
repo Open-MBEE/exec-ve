@@ -62,7 +62,7 @@ export class SchemaService {
     getMap = <T>(name: string, schemaName?: string, sourceId?: string): T => {
         const schema: Schema = this._getSchema(schemaName, sourceId)
         if (schema.map && schema.map[name]) {
-            return schema.schema[name] as T
+            return schema.map[name] as T
         } else {
             this._schemaError(name, schemaName)
             return null
