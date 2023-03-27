@@ -1,6 +1,7 @@
 import { TreeService } from '@ve-components/trees'
 import { RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
+import { handleChange } from '@ve-utils/utils'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree'
@@ -95,9 +96,9 @@ import { TreeBranch, TreeIcons, TreeRow } from '@ve-types/tree'
  */
 export class TreeController implements angular.IComponentController {
     //Bindings
+    toolbarId: string
+    buttonId: string
     showPe: boolean
-    toolbarId: boolean
-    buttonId: boolean
 
     public init: boolean = false
 
@@ -148,7 +149,7 @@ export class TreeController implements angular.IComponentController {
         this.subs.push(
             this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
                 if (data) {
-                    this.configure().catch((reason) => {
+                    this.update().catch((reason) => {
                         this.growl.error(TreeService.treeError(reason))
                     })
                 }
@@ -156,7 +157,7 @@ export class TreeController implements angular.IComponentController {
             this.eventSvc.$on<string>(TreeService.events.RELOAD, (data) => {
                 if ((data && this.id === data) || !data) {
                     this.treeSpin = true
-                    this.configure().catch((reason) => {
+                    this.update().catch((reason) => {
                         this.growl.error(TreeService.treeError(reason))
                     })
                 }
@@ -164,7 +165,7 @@ export class TreeController implements angular.IComponentController {
         )
 
         if (this.treeSvc.isTreeReady()) {
-            this.configure().catch((reason) => {
+            this.update().catch((reason) => {
                 this.growl.error(TreeService.treeError(reason))
             })
         }
@@ -188,12 +189,24 @@ export class TreeController implements angular.IComponentController {
         // )
     }
 
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
+        handleChange(
+            onChangesObj,
+            'showPe',
+            () => {
+                this.update().catch((reason) => {
+                    this.growl.error(TreeService.treeError(reason))
+                })
+            },
+            true
+        )
+    }
+
     $onDestroy(): void {
         this.eventSvc.destroy(this.subs)
     }
 
-    configure(): VePromise<void, unknown> {
-        this.treeSpin = true
+    update(): VePromise<void, unknown> {
         this.treeRows = []
         this.setPeVisibility()
         this.preConfig()
@@ -221,7 +234,7 @@ export class TreeController implements angular.IComponentController {
         const promise = branch.expanded ? this.treeSvc.closeBranch(branch) : this.treeSvc.expandBranch(branch)
         promise.then(
             () => {
-                this.configure()
+                this.update()
                     .catch((reason) => {
                         this.growl.error(TreeService.treeError(reason))
                     })
@@ -320,4 +333,9 @@ export const TreeOfAnyComponent: VeComponentOptions = {
 <i ng-show="$ctrl.treeSpin" class="tree-spinner fa fa-spin fa-spinner"></i>
     
 `,
+    bindings: {
+        toolbarId: '@',
+        buttonId: '@',
+        showPe: '<',
+    },
 }

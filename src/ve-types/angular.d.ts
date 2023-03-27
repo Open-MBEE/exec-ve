@@ -16,7 +16,7 @@ export interface VeComponentOptions extends IComponentOptions {
 }
 
 export interface VeQService extends IQService {
-    new <T, U = unknown>(
+    new <T, U = ElementsResponse<T>>(
         resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseReason<U>>) => any
     ): VePromise<T, U>
     <T, U>(resolver: (resolve: IQResolveReject<T>, reject: IQResolveReject<VePromiseReason<U>>) => any): VePromise<T, U>
@@ -42,9 +42,9 @@ export interface VePromise<T, U = ElementsResponse<T>> extends IPromise<T> {
     ): VePromise<T | TResult, U>
 }
 
-export interface VePromisesResponse<T> {
-    failedRequests: VePromiseReason<T>[]
-    successfulRequests: VePromiseReason<T>[]
+export interface VePromisesResponse<T, U = ElementsResponse<T>> {
+    failedRequests?: VePromiseReason<U>[]
+    successfulRequests?: T[]
 }
 
 export interface VeNgModelController<T> extends INgModelController {
