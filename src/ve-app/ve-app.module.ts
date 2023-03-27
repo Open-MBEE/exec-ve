@@ -38,6 +38,7 @@ import { VePromise } from '@ve-types/angular'
 import {
     CheckAuthResponse,
     DocumentObject,
+    GenericResponse,
     GroupObject,
     GroupsResponse,
     MountObject,
@@ -432,7 +433,7 @@ veApp.config([
                             resolveSvc: ResolveService,
                             params: ParamsObject,
                             refresh: boolean
-                        ): VePromise<DocumentObject[]> => {
+                        ): VePromise<DocumentObject[], GenericResponse<DocumentObject>> => {
                             return resolveSvc.getProjectDocuments(params, refresh)
                         },
                     ],
@@ -645,7 +646,10 @@ veApp.config([
                     documentObs: [
                         'ResolveService',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<DocumentObject[]> => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): VePromise<DocumentObject[], GenericResponse<DocumentObject>> => {
                             return resolveSvc.getProjectDocuments(params)
                         },
                     ],

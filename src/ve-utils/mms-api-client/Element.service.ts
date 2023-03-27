@@ -108,14 +108,13 @@ export class ElementService extends BaseApiService {
             console.log('foo')
         }
         const url = this.uRLSvc.getElementURL(reqOb)
-        const key = url
         // if it's in the this.inProgress queue get it immediately
-        if (this._isInProgress(key)) {
+        if (this._isInProgress(url)) {
             //change to change priority if it's already in the queue
-            this.httpSvc.ping(key, weight)
+            this.httpSvc.ping(url, weight)
         } else {
             this._addInProgress(
-                key,
+                url,
                 new this.$q<T>((resolve, reject) => {
                     const cached: T = this.cacheSvc.get<T>(requestCacheKey)
                     if (cached && !refresh) {
@@ -144,7 +143,7 @@ export class ElementService extends BaseApiService {
                                 message: 'Server Error: empty response',
                             }) //TODO
                         }
-                        this._removeInProgress(key)
+                        this._removeInProgress(url)
                     }
                     const errorCallback: httpCallback<ElementsResponse<T>> = (response) => {
                         const data = response.data
@@ -153,14 +152,19 @@ export class ElementService extends BaseApiService {
                             reason.recentVersionOfElement = data.deleted[0]
                             this.cacheDeletedElement(reqOb, data.deleted[0])
                         }
-                        reject(reason)
-                        this._removeInProgress(key)
+                        if (allowEmpty && response.status == 404) {
+                            resolve(null)
+                        } else {
+                            reject(reason)
+                        }
+
+                        this._removeInProgress(url)
                     }
                     this.httpSvc.get<ElementsResponse<T>>(url, successCallback, errorCallback, weight)
                 })
             )
         }
-        return this._getInProgress(key) as VePromise<T>
+        return this._getInProgress(url) as VePromise<T>
     }
 
     /**

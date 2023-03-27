@@ -61,6 +61,10 @@ export interface ElementsRequest<T> extends RequestObject {
     elementId: T
 }
 
+export interface UsersRequest extends RequestObject {
+    username: string
+}
+
 export interface CreationRequest<T extends MmsObject> {
     elements: T[]
 }

@@ -1,10 +1,10 @@
 import { TreeService, TreeController } from '@ve-components/trees'
-import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application'
+import { ApplicationService, RootScopeService, UserSettingsObject, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { TreeBranch } from '@ve-types/tree'
 
 class TreeOfDocumentsController extends TreeController {
@@ -37,8 +37,32 @@ class TreeOfDocumentsController extends TreeController {
 
     toggleFavorite($event: JQuery.ClickEvent, branch: TreeBranch): void {
         $event.stopPropagation()
-        branch.favorite = !branch.favorite
-        this.eventSvc.$broadcast(TreeService.events.RELOAD, 'table-of-favorites')
+        let promise: VePromise<UserSettingsObject>
+        if (!branch.favorite) {
+            promise = this.applicationSvc.addPins(
+                this.applicationSvc.getState().user,
+                this.treeSvc.treeApi.projectId,
+                this.treeSvc.treeApi.refId,
+                [branch.data.id]
+            )
+        } else {
+            promise = this.applicationSvc.removePins(
+                this.applicationSvc.getState().user,
+                this.treeSvc.treeApi.projectId,
+                this.treeSvc.treeApi.refId,
+                [branch.data.id]
+            )
+        }
+
+        promise.then(
+            () => {
+                branch.favorite = !branch.favorite
+                this.eventSvc.$broadcast(TreeService.events.RELOAD, 'table-of-favorites')
+            },
+            (reason) => {
+                this.growl.error(reason.message)
+            }
+        )
     }
 }
 

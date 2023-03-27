@@ -5,7 +5,7 @@ import { veUtils } from '@ve-utils'
 import { BrandingStyle } from './Branding.service'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
+import { ElementObject, UsersRequest } from '@ve-types/mms'
 /**
  * @ngdoc service
  * @name veUtils/ApplicationService
@@ -17,9 +17,12 @@ import { ElementObject } from '@ve-types/mms'
  */
 
 export interface ProjectSettingsObject extends ElementObject {
-    pinned?: { [key: string]: string[] }
     banner?: BrandingStyle
     footer?: BrandingStyle
+}
+
+export interface UserSettingsObject extends ElementObject {
+    pinned?: string[]
 }
 
 export interface VeApplicationState {
@@ -68,6 +71,57 @@ export class ApplicationService {
         return deferred.promise
     }
 
+    public getUserSettings = (
+        reqOb: UsersRequest,
+        refresh?: boolean,
+        weight?: number
+    ): VePromise<UserSettingsObject> => {
+        const cacheKey = this.apiSvc.makeCacheKey(reqOb, '_hidden_' + reqOb.username + '_ve_settings', false)
+        const cached = this.cacheSvc.get<UserSettingsObject>(cacheKey)
+        if (cached && !refresh) {
+            return this.$q.resolve(cached)
+        }
+        return new this.$q<UserSettingsObject>((resolve, reject) => {
+            this.elementSvc
+                .getElement<UserSettingsObject>(
+                    {
+                        projectId: reqOb.projectId,
+                        refId: reqOb.refId,
+                        elementId: '_hidden_' + reqOb.username + '_settings',
+                    },
+                    weight,
+                    refresh,
+                    true
+                )
+                .then((result) => {
+                    if (result === null) {
+                        this.elementSvc
+                            .createElement<UserSettingsObject>({
+                                projectId: reqOb.projectId,
+                                refId: reqOb.refId,
+                                elements: [
+                                    {
+                                        id: '_hidden_' + reqOb.username + '_settings',
+                                        name: 'View Editor' + reqOb.username + 'Project Settings',
+                                        _projectId: reqOb.projectId,
+                                        _refId: reqOb.refId,
+                                        type: 'Class',
+                                    },
+                                ],
+                            })
+                            .then(resolve, reject)
+                    } else resolve(result)
+                }, reject)
+        })
+    }
+
+    public updateUserSettings = (
+        reqOb: UsersRequest,
+        settingsOb: UserSettingsObject
+    ): VePromise<UserSettingsObject> => {
+        return this.elementSvc.updateElement<UserSettingsObject>(settingsOb)
+    }
+
     public getSettings = (
         projectId: string,
         refId?: string,
@@ -89,7 +143,8 @@ export class ApplicationService {
                         elementId: '_hidden_' + projectId + '_settings',
                     },
                     weight,
-                    refresh
+                    refresh,
+                    true
                 )
                 .then((result) => {
                     if (result === null) {
@@ -121,58 +176,43 @@ export class ApplicationService {
         })
     }
 
-    public updateSettings = (
-        projectId: string,
-        refId: string,
-        settingsOb: ProjectSettingsObject
-    ): VePromise<ProjectSettingsObject> => {
-        return new this.$q<ProjectSettingsObject>((resolve, reject) => {
-            this.elementSvc
-                .getElement<ProjectSettingsObject>(
-                    {
-                        projectId,
-                        refId,
-                        elementId: '_hidden_' + projectId + '_settings',
-                    },
-                    1,
-                    true
-                )
-                .then((result) => {
-                    if (!result) {
-                        this.createSettings(projectId, refId, settingsOb).then(resolve, reject)
-                        return
-                    }
-
-                    if (
-                        settingsOb.pinned &&
-                        Object.keys(result.pinned).length > 0 &&
-                        Object.keys(settingsOb.pinned).length > 0
-                    ) {
-                        Object.keys(settingsOb.pinned).forEach((username) => {
-                            if (result.pinned[username]) {
-                                const newIds = [
-                                    ...new Set([...result.pinned[username], ...settingsOb.pinned[username]]),
-                                ]
-                                settingsOb.pinned[username].length = 0
-                                settingsOb.pinned[username].push(...newIds)
-                            }
-                        })
-                    }
-                    this.elementSvc.updateElement<ProjectSettingsObject>(settingsOb).then(resolve, reject)
-                }, reject)
+    addPins(username: string, projectId: string, refId: string, pinned: string[]): VePromise<UserSettingsObject> {
+        return new this.$q((resolve, reject) => {
+            this.getUserSettings({ username, projectId, refId }).then((result) => {
+                if (result.pinned) {
+                    pinned = [...new Set([...result.pinned, ...pinned])]
+                }
+                this.elementSvc
+                    .updateElement<UserSettingsObject>({
+                        id: result.id,
+                        _refId: result._refId,
+                        _projectId: result._projectId,
+                        pinned,
+                    })
+                    .then(resolve, reject)
+            }, reject)
         })
     }
 
-    //     addPin(username: string, projectId: string,
-    //            refId: string, pinIds: string[]) => {
-    //     if (result.pinned[username]) {
-    //     const newIds = [
-    //         ...new Set([...result.pinned[username], ...settingsOb.pinned[username]]),
-    //     ]
-    //     settingsOb.pinned[username].length = 0
-    //     settingsOb.pinned[username].push(...newIds)
-    // }
-    //     }
+    removePins(username: string, projectId: string, refId: string, unpinned: string[]): VePromise<UserSettingsObject> {
+        return new this.$q((resolve, reject) => {
+            this.getUserSettings({ username, projectId, refId }).then((response) => {
+                if (response.pinned) {
+                    const pinned = response.pinned.filter((pin) => {
+                        return unpinned.includes(pin)
+                    })
+                    this.elementSvc
+                        .updateElement<UserSettingsObject>({
+                            id: response.id,
+                            _refId: response._refId,
+                            _projectId: response._projectId,
+                            pinned,
+                        })
+                        .then(resolve, reject)
+                } else resolve(response)
+            }, reject)
+        })
+    }
 }
 
 veUtils.service('ApplicationService', ApplicationService)

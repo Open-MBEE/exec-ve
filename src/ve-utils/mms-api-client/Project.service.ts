@@ -619,7 +619,7 @@ export class ProjectService extends BaseApiService {
     ): VePromise<GroupObject[], GroupsResponse> {
         const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '', false, 'groups')
         const url = this.uRLSvc.getGroupsURL(projectId, refId)
-        if (this._isInProgress(url)) {
+        if (!this._isInProgress(url)) {
             this._addInProgress(
                 url,
                 new this.$q<GroupObject[], GroupsResponse>((resolve, reject) => {

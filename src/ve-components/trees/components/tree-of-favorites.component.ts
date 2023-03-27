@@ -32,25 +32,6 @@ class TreeOfFavoritesController extends TreeController {
         this.types = ['favorite']
         this.title = 'Table of Favorites'
     }
-    protected preConfig = (): void => {
-        this.applicationSvc.getSettings(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId).then(
-            (projectSettings) => {
-                if (projectSettings.pinned && projectSettings.pinned[this.applicationSvc.getState().user]) {
-                    const favorites = projectSettings.pinned[this.applicationSvc.getState().user]
-                    this.treeSvc
-                        .forEachBranch((branch) => {
-                            branch.favorite = favorites.includes(branch.data.id)
-                        })
-                        .catch((reason) => {
-                            this.growl.error('Error setting favorites')
-                        })
-                }
-            },
-            (reason) => {
-                this.growl.error('Error getting project settings')
-            }
-        )
-    }
 }
 
 const TreeOfFavoritesComponent: VeComponentOptions = {
