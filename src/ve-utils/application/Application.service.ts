@@ -163,16 +163,16 @@ export class ApplicationService {
         })
     }
 
-    addPin(username: string, projectId: string,
-           refId: string, pinIds: string[]) => {
-    if (result.pinned[username]) {
-    const newIds = [
-        ...new Set([...result.pinned[username], ...settingsOb.pinned[username]]),
-    ]
-    settingsOb.pinned[username].length = 0
-    settingsOb.pinned[username].push(...newIds)
-}
-    }
+    //     addPin(username: string, projectId: string,
+    //            refId: string, pinIds: string[]) => {
+    //     if (result.pinned[username]) {
+    //     const newIds = [
+    //         ...new Set([...result.pinned[username], ...settingsOb.pinned[username]]),
+    //     ]
+    //     settingsOb.pinned[username].length = 0
+    //     settingsOb.pinned[username].push(...newIds)
+    // }
+    //     }
 }
 
 veUtils.service('ApplicationService', ApplicationService)
