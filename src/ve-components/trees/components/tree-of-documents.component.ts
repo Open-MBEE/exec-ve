@@ -1,13 +1,14 @@
 import { TreeService, TreeController } from '@ve-components/trees'
-import { RootScopeService, UtilsService } from '@ve-utils/application'
+import { ApplicationService, RootScopeService, UserSettingsObject, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
 import { TreeBranch } from '@ve-types/tree'
 
 class TreeOfDocumentsController extends TreeController {
+    static $inject = [...TreeController.$inject, 'ApplicationService']
     constructor(
         $q: VeQService,
         $scope: angular.IScope,
@@ -17,7 +18,8 @@ class TreeOfDocumentsController extends TreeController {
         utilsSvc: UtilsService,
         treeSvc: TreeService,
         rootScopeSvc: RootScopeService,
-        eventSvc: EventService
+        eventSvc: EventService,
+        private applicationSvc: ApplicationService
     ) {
         super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
         this.id = 'tree-of-documents'
@@ -33,8 +35,34 @@ class TreeOfDocumentsController extends TreeController {
         }
     }
 
-    toggleFavorite(branch: TreeBranch): void {
-        branch.favorite = !branch.favorite
+    toggleFavorite($event: JQuery.ClickEvent, branch: TreeBranch): void {
+        $event.stopPropagation()
+        let promise: VePromise<UserSettingsObject>
+        if (!branch.favorite) {
+            promise = this.applicationSvc.addPins(
+                this.applicationSvc.getState().user,
+                this.treeSvc.treeApi.projectId,
+                this.treeSvc.treeApi.refId,
+                [branch.data.id]
+            )
+        } else {
+            promise = this.applicationSvc.removePins(
+                this.applicationSvc.getState().user,
+                this.treeSvc.treeApi.projectId,
+                this.treeSvc.treeApi.refId,
+                [branch.data.id]
+            )
+        }
+
+        promise.then(
+            () => {
+                branch.favorite = !branch.favorite
+                this.eventSvc.$broadcast(TreeService.events.RELOAD, 'table-of-favorites')
+            },
+            (reason) => {
+                this.growl.error(reason.message)
+            }
+        )
     }
 }
 
@@ -57,8 +85,8 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
                         <i ng-hide="row.branch.loading" class="indented tree-icon {{row.typeIcon}}" ></i>
                         <i ng-show="row.branch.loading" class="indented tree-icon fa-solid fa-spinner fa-spin"></i>
                         <span class="indented tree-label" ng-class="{'active-text': row.branch.selected}">{{row.section}} {{row.branch.data.name}}</span>
-                        <i ng-show="showFavs && row.branch.favorite" class="fa-solid fa-star" ng-click="$ctrl.toggleFavorite(row.branch)"></i>
-                        <i ng-show="showFavs && !row.branch.favorite" class="fa-regular fa-star" ng-click="$ctrl.toggleFavorite(row.branch)"></i>
+                        <i ng-show="showFavs && row.branch.favorite" class="fa-solid fa-star" ng-click="$ctrl.toggleFavorite($event, row.branch)"></i>
+                        <i ng-show="showFavs && !row.branch.favorite" class="fa-regular fa-star" ng-click="$ctrl.toggleFavorite($event, row.branch)"></i>
                     </div>
                 </div>
             </div>
@@ -68,6 +96,10 @@ const TreeOfDocumentsComponent: VeComponentOptions = {
 <i ng-show="$ctrl.treeSpin" class="tree-spinner fa fa-spin fa-spinner"></i>
     
 `,
+    bindings: {
+        toolbarId: '@',
+        buttonId: '@',
+    },
     controller: TreeOfDocumentsController,
 }
 

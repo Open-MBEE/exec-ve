@@ -18,6 +18,7 @@ import { VePromise, VeQService } from '@ve-types/angular'
 import {
     CheckAuthResponse,
     DocumentObject,
+    GenericResponse,
     GroupObject,
     GroupsResponse,
     MountObject,
@@ -189,17 +190,17 @@ export class ResolveService {
     }
 
     public getGroups(params: ParamsObject, refresh?: boolean): VePromise<GroupObject[], GroupsResponse> {
-        const promise = this.projectSvc.getGroups(params.projectId, params.refId, refresh)
-
-        promise.then(
-            (result) => {
-                this.eventSvc.resolve('mmsGroups', result)
-            },
-            (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
-            }
-        )
-        return promise
+        return this.$q<GroupObject[], GroupsResponse>((resolve, reject) => {
+            this.projectSvc.getGroups(params.projectId, params.refId, refresh).then(
+                (result) => {
+                    resolve(result)
+                    this.eventSvc.resolve('mmsGroups', result)
+                },
+                (reason) => {
+                    reject(reason)
+                }
+            )
+        })
     }
 
     public getGroup(groupObs: GroupObject[], documentOb: DocumentObject): GroupObject {
@@ -444,25 +445,30 @@ export class ResolveService {
         return promise
     }
 
-    public getProjectDocuments(params: ParamsObject, refresh?: boolean): VePromise<DocumentObject[]> {
-        const promise = this.viewSvc.getProjectDocuments(
-            {
-                projectId: params.projectId,
-                refId: params.refId,
-            },
-            2,
-            refresh
-        )
-
-        promise.then(
-            (result) => {
-                this.eventSvc.resolve('mmsDocuments', result)
-            },
-            (reason) => {
-                this.growl.error('Resolve Error: ' + reason.message)
-            }
-        )
-        return promise
+    public getProjectDocuments(
+        params: ParamsObject,
+        refresh?: boolean
+    ): VePromise<DocumentObject[], GenericResponse<DocumentObject>> {
+        return new this.$q((resolve, reject) => {
+            this.viewSvc
+                .getProjectDocuments(
+                    {
+                        projectId: params.projectId,
+                        refId: params.refId,
+                    },
+                    2,
+                    refresh
+                )
+                .then(
+                    (result) => {
+                        resolve(result)
+                        this.eventSvc.resolve('mmsDocuments', result)
+                    },
+                    (reason) => {
+                        reject(reason)
+                    }
+                )
+        })
     }
 
     public getView(params: ParamsObject, refresh?: boolean): VePromise<ViewObject> {

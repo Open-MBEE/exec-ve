@@ -2,7 +2,15 @@ import { veUtils } from '@ve-utils'
 
 import { VePromiseReason } from '@ve-types/angular'
 import { VeConfig } from '@ve-types/config'
-import { ArtifactsRequest, ElementsRequest, QueryParams, RequestObject, ViewsRequest } from '@ve-types/mms'
+import {
+    ArtifactsRequest,
+    BasicResponse,
+    ElementsRequest,
+    MmsObject,
+    QueryParams,
+    RequestObject,
+    ViewsRequest,
+} from '@ve-types/mms'
 
 /**
  * @ngdoc service
@@ -413,11 +421,8 @@ export class URLService {
      * of http error. The arguments are the same as angular's $http error
      * callback
      *
-     * @param {Object} data The http response
-     * @param {number} status Http return status
-     * @param {Object} header Http return header
-     * @param {Object} config Http config
-     * @param {Object} deferred A deferred object that would be rejected
+     * @param {Object} response The http response
+
      *      with this object based on the http status:
      *      ```
      *          {
@@ -427,9 +432,11 @@ export class URLService {
      *          }
      *      ```
      */
-    handleHttpStatus<T>(response: angular.IHttpResponse<T>): VePromiseReason<T> {
-        const result: VePromiseReason<T> = response
-        const data: T = result.data
+    handleHttpStatus<T extends MmsObject, U = BasicResponse<T>>(
+        response: angular.IHttpResponse<U>
+    ): VePromiseReason<U> {
+        const result: VePromiseReason<U> = response
+        const data: U = result.data
         if (result.status === 404) result.message = 'Not Found'
         else if (result.status === 500) {
             if (typeof data === 'string' && data.indexOf('ENOTFOUND') >= 0)

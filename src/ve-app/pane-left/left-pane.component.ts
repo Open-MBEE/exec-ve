@@ -217,6 +217,9 @@ class LeftPaneController implements angular.IComponentController {
                                 this.reloadData()
                                 break
                             }
+                            case 'tree-show-pe': {
+                                this.bbApi.toggleButton('tree-show-pe')
+                            }
                         }
                     })
                 )

@@ -6,9 +6,8 @@ import { veComponents } from '@ve-components'
 
 import { SpecService } from './Spec.service'
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VePromise, VePromisesResponse, VeQService } from '@ve-types/angular'
 import {
-    BulkResponse,
     ElementObject,
     ElementsRequest,
     ExpressionObject,
@@ -34,7 +33,7 @@ export class ReorderService {
         private specSvc: SpecService
     ) {}
 
-    public save(): VePromise<ElementObject[], BulkResponse<ElementObject>> {
+    public save(): VePromise<ElementObject[], VePromisesResponse<ElementObject>> {
         const elementObsToUpdate: ElementObject[] = []
         const updateSectionElementOrder = (elementReference: PresentationReference): void => {
             const sectionEdit: ViewInstanceSpec = {

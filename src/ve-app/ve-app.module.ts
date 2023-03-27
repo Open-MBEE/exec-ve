@@ -30,7 +30,7 @@ import angular, {
 
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { ResolveService } from '@ve-app/main/services'
-import { BrandingStyle, RootScopeService } from '@ve-utils/application'
+import { ApplicationService, BrandingStyle, RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { AuthService, URLService, PermissionCache, ViewService, DocumentMetadata } from '@ve-utils/mms-api-client'
 
@@ -38,6 +38,7 @@ import { VePromise } from '@ve-types/angular'
 import {
     CheckAuthResponse,
     DocumentObject,
+    GenericResponse,
     GroupObject,
     GroupsResponse,
     MountObject,
@@ -432,7 +433,7 @@ veApp.config([
                             resolveSvc: ResolveService,
                             params: ParamsObject,
                             refresh: boolean
-                        ): VePromise<DocumentObject[]> => {
+                        ): VePromise<DocumentObject[], GenericResponse<DocumentObject>> => {
                             return resolveSvc.getProjectDocuments(params, refresh)
                         },
                     ],
@@ -645,7 +646,10 @@ veApp.config([
                     documentObs: [
                         'ResolveService',
                         'params',
-                        (resolveSvc: ResolveService, params: ParamsObject): VePromise<DocumentObject[]> => {
+                        (
+                            resolveSvc: ResolveService,
+                            params: ParamsObject
+                        ): VePromise<DocumentObject[], GenericResponse<DocumentObject>> => {
                             return resolveSvc.getProjectDocuments(params)
                         },
                     ],
@@ -1023,6 +1027,7 @@ veApp.run([
     'RootScopeService',
     'AuthService',
     'EventService',
+    'ApplicationService',
     function (
         $q: IQService,
         $http: IHttpService,
@@ -1035,7 +1040,8 @@ veApp.run([
         $transitions: TransitionService,
         rootScopeSvc: RootScopeService,
         authSvc: AuthService,
-        eventSvc: EventService
+        eventSvc: EventService,
+        applicationSvc: ApplicationService
     ): void {
         rootScopeSvc.loginModalOpen(false)
         $transitions.onBefore({}, (transition: Transition) => {
@@ -1049,7 +1055,8 @@ veApp.run([
             }
             return new Promise((resolve) => {
                 authSvc.checkLogin().then(
-                    () => {
+                    (data) => {
+                        applicationSvc.getState().user = data.username
                         if (to === 'main') {
                             resolve($state.target('main.login.select'))
                         } else if (to === 'main.project.ref') {
