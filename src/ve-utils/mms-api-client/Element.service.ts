@@ -19,6 +19,7 @@ import {
     RejectedObject,
     RequestObject,
     SearchResponse,
+    TaggedValueObject,
 } from '@ve-types/mms'
 
 /**
@@ -461,14 +462,14 @@ export class ElementService extends BaseApiService {
         if (ob._childViews && !elementOb._childViews) {
             delete ob._childViews
         }
-        if (ob.type.includes('TaggedValue') && ob.value && ob.value.length > 0) {
+        if (ob.type && ob.type.endsWith('TaggedValue') && ob.value && (ob as TaggedValueObject).value.length > 0) {
             // make sure value array only has the value
-            let newvalues = []
-            for (let val of ob.value) {
+            const newvalues = []
+            for (const val of (ob as TaggedValueObject).value) {
                 if (ob.type === 'ElementTaggedValue') {
                     newvalues.push(val.elementId)
                 } else {
-                    newvalues.push({value: val.value})
+                    newvalues.push({ value: val.value })
                 }
             }
             if (ob.type === 'ElementTaggedValue') {
