@@ -17,7 +17,7 @@ import { ElementObject } from '@ve-types/mms'
  */
 
 export interface ProjectSettingsObject extends ElementObject {
-    pinnedIds?: { [key: string]: string[] }
+    pinned?: { [key: string]: string[] }
     banner?: BrandingStyle
     footer?: BrandingStyle
 }
@@ -26,6 +26,7 @@ export interface VeApplicationState {
     inDoc: boolean
     fullDoc: boolean
     currentDoc: string
+    user: string
 }
 
 export class ApplicationService {
@@ -33,6 +34,7 @@ export class ApplicationService {
         inDoc: false,
         fullDoc: false,
         currentDoc: null,
+        user: null,
     }
 
     public PROJECT_URL_PREFIX = '#/projects/'
@@ -66,7 +68,12 @@ export class ApplicationService {
         return deferred.promise
     }
 
-    public getSettings = (projectId: string, refId?: string, refresh?: boolean): VePromise<ProjectSettingsObject> => {
+    public getSettings = (
+        projectId: string,
+        refId?: string,
+        refresh?: boolean,
+        weight?: number
+    ): VePromise<ProjectSettingsObject> => {
         if (!refId) refId = 'master'
         const cacheKey = this.apiSvc.makeCacheKey({ projectId, refId }, '_hidden_' + projectId + '_settings', false)
         const cached = this.cacheSvc.get<ProjectSettingsObject>(cacheKey)
@@ -75,14 +82,18 @@ export class ApplicationService {
         }
         return new this.$q<ProjectSettingsObject>((resolve, reject) => {
             this.elementSvc
-                .getElement<ProjectSettingsObject>({
-                    projectId,
-                    refId,
-                    elementId: '_hidden_' + projectId + '_settings',
-                })
+                .getElement<ProjectSettingsObject>(
+                    {
+                        projectId,
+                        refId,
+                        elementId: '_hidden_' + projectId + '_settings',
+                    },
+                    weight,
+                    refresh
+                )
                 .then((result) => {
                     if (result === null) {
-                        this.updateSettings(projectId, refId, null).then(resolve, reject)
+                        this.createSettings(projectId, refId, null).then(resolve, reject)
                     } else resolve(result)
                 }, reject)
         })
@@ -99,7 +110,6 @@ export class ApplicationService {
                 name: 'View Editor Project Settings',
                 _projectId: projectId,
                 _refId: refId,
-                ownerId: 'holding_bin_' + projectId,
                 type: 'Class',
             }
         }
@@ -118,11 +128,15 @@ export class ApplicationService {
     ): VePromise<ProjectSettingsObject> => {
         return new this.$q<ProjectSettingsObject>((resolve, reject) => {
             this.elementSvc
-                .getElement<ProjectSettingsObject>({
-                    projectId,
-                    refId,
-                    elementId: '_hidden_' + projectId + '_settings',
-                })
+                .getElement<ProjectSettingsObject>(
+                    {
+                        projectId,
+                        refId,
+                        elementId: '_hidden_' + projectId + '_settings',
+                    },
+                    1,
+                    true
+                )
                 .then((result) => {
                     if (!result) {
                         this.createSettings(projectId, refId, settingsOb).then(resolve, reject)
@@ -130,23 +144,34 @@ export class ApplicationService {
                     }
 
                     if (
-                        settingsOb.pinnedIds &&
-                        Object.keys(result.pinnedIds).length > 0 &&
-                        Object.keys(settingsOb.pinnedIds).length > 0
+                        settingsOb.pinned &&
+                        Object.keys(result.pinned).length > 0 &&
+                        Object.keys(settingsOb.pinned).length > 0
                     ) {
-                        Object.keys(settingsOb.pinnedIds).forEach((username) => {
-                            if (result.pinnedIds[username]) {
+                        Object.keys(settingsOb.pinned).forEach((username) => {
+                            if (result.pinned[username]) {
                                 const newIds = [
-                                    ...new Set([...result.pinnedIds[username], ...settingsOb.pinnedIds[username]]),
+                                    ...new Set([...result.pinned[username], ...settingsOb.pinned[username]]),
                                 ]
-                                settingsOb.pinnedIds[username].length = 0
-                                settingsOb.pinnedIds[username].push(...newIds)
+                                settingsOb.pinned[username].length = 0
+                                settingsOb.pinned[username].push(...newIds)
                             }
                         })
                     }
                     this.elementSvc.updateElement<ProjectSettingsObject>(settingsOb).then(resolve, reject)
                 }, reject)
         })
+    }
+
+    addPin(username: string, projectId: string,
+           refId: string, pinIds: string[]) => {
+    if (result.pinned[username]) {
+    const newIds = [
+        ...new Set([...result.pinned[username], ...settingsOb.pinned[username]]),
+    ]
+    settingsOb.pinned[username].length = 0
+    settingsOb.pinned[username].push(...newIds)
+}
     }
 }
 

@@ -1,12 +1,12 @@
 import _ from 'lodash'
 
 import { ApiService, CacheService, httpCallback, HttpService, URLService } from '@ve-utils/mms-api-client'
+import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 
 import { veUtils } from '@ve-utils'
 
 import { VePromise, VePromiseReason, VePromisesResponse, VeQService } from '@ve-types/angular'
 import {
-    BasicResponse,
     CommitObject,
     CommitResponse,
     ElementCreationRequest,
@@ -14,7 +14,6 @@ import {
     ElementsRequest,
     ElementsResponse,
     GenericResponse,
-    MmsObject,
     QueryObject,
     QueryParams,
     RejectedObject,
@@ -33,11 +32,7 @@ import {
  * @requires HttpService
  * * An element CRUD service with additional convenience methods for managing edits.
  */
-export class ElementService {
-    private inProgressElements: {
-        [key: string]: VePromise<MmsObject | MmsObject[], BasicResponse<MmsObject>>
-    } = {}
-
+export class ElementService extends BaseApiService {
     static $inject = ['$q', '$http', 'URLService', 'ApiService', 'CacheService', 'HttpService']
 
     constructor(
@@ -47,7 +42,9 @@ export class ElementService {
         private apiSvc: ApiService,
         private cacheSvc: CacheService,
         private httpSvc: HttpService
-    ) {}
+    ) {
+        super()
+    }
 
     /**
      * @name veUtils/ElementService#getElement
@@ -113,56 +110,56 @@ export class ElementService {
         const url = this.uRLSvc.getElementURL(reqOb)
         const key = url
         // if it's in the this.inProgress queue get it immediately
-        if (this.inProgressElements && this.inProgressElements.hasOwnProperty(key)) {
+        if (this._isInProgress(key)) {
             //change to change priority if it's already in the queue
             this.httpSvc.ping(key, weight)
-            return this.inProgressElements[key] as VePromise<T>
-        }
-        this._addInProgress(
-            key,
-            new this.$q<T>((resolve, reject) => {
-                const cached: T = this.cacheSvc.get<T>(requestCacheKey)
-                if (cached && !refresh) {
-                    return resolve(cached)
-                }
-                const deletedRequestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
-                deletedRequestCacheKey.push('deleted')
-                const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey)
-                if (deleted) {
-                    reject({
-                        status: 410,
-                        recentVersionOfElement: deleted,
-                        message: 'Deleted',
-                    })
-                    return
-                }
-                const successCallback: httpCallback<ElementsResponse<T>> = (response) => {
-                    const data = response.data
-                    if (Array.isArray(data.elements) && data.elements.length > 0) {
-                        resolve(this.cacheElement<T>(reqOb, data.elements[0]))
-                    } else if (allowEmpty) {
-                        resolve(null)
-                    } else {
+        } else {
+            this._addInProgress(
+                key,
+                new this.$q<T>((resolve, reject) => {
+                    const cached: T = this.cacheSvc.get<T>(requestCacheKey)
+                    if (cached && !refresh) {
+                        return resolve(cached)
+                    }
+                    const deletedRequestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
+                    deletedRequestCacheKey.push('deleted')
+                    const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey)
+                    if (deleted) {
                         reject({
-                            status: 500,
-                            message: 'Server Error: empty response',
-                        }) //TODO
+                            status: 410,
+                            recentVersionOfElement: deleted,
+                            message: 'Deleted',
+                        })
+                        return
                     }
-                    delete this.inProgressElements[key]
-                }
-                const errorCallback: httpCallback<ElementsResponse<T>> = (response) => {
-                    const data = response.data
-                    const reason = this.uRLSvc.handleHttpStatus(response)
-                    if (data && data.deleted && data.deleted.length > 0 && data.deleted[0].id === reqOb.elementId) {
-                        reason.recentVersionOfElement = data.deleted[0]
-                        this.cacheDeletedElement(reqOb, data.deleted[0])
+                    const successCallback: httpCallback<ElementsResponse<T>> = (response) => {
+                        const data = response.data
+                        if (Array.isArray(data.elements) && data.elements.length > 0) {
+                            resolve(this.cacheElement<T>(reqOb, data.elements[0]))
+                        } else if (allowEmpty) {
+                            resolve(null)
+                        } else {
+                            reject({
+                                status: 500,
+                                message: 'Server Error: empty response',
+                            }) //TODO
+                        }
+                        this._removeInProgress(key)
                     }
-                    reject(reason)
-                    delete this.inProgressElements[key]
-                }
-                this.httpSvc.get<ElementsResponse<T>>(url, successCallback, errorCallback, weight)
-            })
-        )
+                    const errorCallback: httpCallback<ElementsResponse<T>> = (response) => {
+                        const data = response.data
+                        const reason = this.uRLSvc.handleHttpStatus(response)
+                        if (data && data.deleted && data.deleted.length > 0 && data.deleted[0].id === reqOb.elementId) {
+                            reason.recentVersionOfElement = data.deleted[0]
+                            this.cacheDeletedElement(reqOb, data.deleted[0])
+                        }
+                        reject(reason)
+                        this._removeInProgress(key)
+                    }
+                    this.httpSvc.get<ElementsResponse<T>>(url, successCallback, errorCallback, weight)
+                })
+            )
+        }
         return this._getInProgress(key) as VePromise<T>
     }
 
@@ -312,31 +309,34 @@ export class ElementService {
     ): VePromise<T> {
         this.apiSvc.normalize(reqOb)
         const requestCacheKey = this.getElementKey(reqOb, reqOb.elementId, true)
-        const key = this.uRLSvc.getElementURL(reqOb) + 'edit'
-        const inProgress = this._getInProgress<T>(key)
-        if (inProgress != null) {
-            return inProgress as VePromise<T>
-        }
-        this.inProgressElements[key] = new this.$q<T>((resolve, reject) => {
-            const cached = this.cacheSvc.get<T>(requestCacheKey)
-            if (cached && !refresh) {
-                return resolve(cached)
-            }
-            this.getElement<T>(reqOb, weight, refresh)
-                .then(
-                    (result) => {
-                        const copy = _.cloneDeep(result)
-                        resolve(this.cacheElement(reqOb, copy, true))
-                    },
-                    (reason) => {
-                        reject(reason)
+        const url = this.uRLSvc.getElementURL(reqOb) + 'edit'
+        if (!this._isInProgress(url)) {
+            this._addInProgress(
+                url,
+                new this.$q<T>((resolve, reject) => {
+                    const cached = this.cacheSvc.get<T>(requestCacheKey)
+                    if (cached && !refresh) {
+                        resolve(cached)
+                        this._removeInProgress(url)
+                        return
                     }
-                )
-                .finally(() => {
-                    delete this.inProgressElements[key]
+                    this.getElement<T>(reqOb, weight, refresh)
+                        .then(
+                            (result) => {
+                                const copy = _.cloneDeep(result)
+                                resolve(this.cacheElement(reqOb, copy, true))
+                            },
+                            (reason) => {
+                                reject(reason)
+                            }
+                        )
+                        .finally(() => {
+                            this._removeInProgress(url)
+                        })
                 })
-        })
-        return this.inProgressElements[key] as VePromise<T>
+            )
+        }
+        return this._getInProgress<T>(url) as VePromise<T>
     }
 
     /**
@@ -380,9 +380,8 @@ export class ElementService {
         refresh?: boolean
     ): VePromise<T[], GenericResponse<T>> {
         this.apiSvc.normalize(reqOb)
-        if (this.inProgressElements.hasOwnProperty(url)) {
+        if (this._isInProgress(url)) {
             this.httpSvc.ping(url, weight)
-            return this._getInProgress<T, GenericResponse<T>>(url) as VePromise<T[], GenericResponse<T>>
         } else {
             const requestCacheKey = this.getElementKey(reqOb, jsonKey)
             this._addInProgress(
@@ -390,7 +389,9 @@ export class ElementService {
                 new this.$q<T[], GenericResponse<T>>((resolve, reject) => {
                     const cached = this.cacheSvc.get<T[]>(requestCacheKey)
                     if (cached && !refresh) {
-                        return resolve(cached)
+                        resolve(cached)
+                        this._removeInProgress(url)
+                        return
                     }
                     this.httpSvc.get<GenericResponse<T>>(
                         url,
@@ -405,12 +406,13 @@ export class ElementService {
                                 }
                                 results.push(this.cacheElement(reqOb, element))
                             }
-                            this._removeInProgress(url)
                             resolve(results)
+                            this._removeInProgress(url)
+                            return
                         },
                         (response: angular.IHttpResponse<GenericResponse<T>>) => {
-                            this._removeInProgress(url)
                             reject(this.uRLSvc.handleHttpStatus(response))
+                            this._removeInProgress(url)
                         },
                         weight
                     )
@@ -615,21 +617,21 @@ export class ElementService {
      *      update is successful and will be rejected with an object with the following format:
      *      {failedRequests: list of rejection reasons, successfulRequests: array of updated elements }
      */
-    updateElements(
-        elementObs: ElementObject[],
+    updateElements<T extends ElementObject>(
+        elementObs: T[],
         returnChildViews?: boolean
-    ): VePromise<ElementObject[], VePromisesResponse<ElementObject>> {
-        return new this.$q<ElementObject[], VePromisesResponse<ElementObject>>((resolve, reject) => {
+    ): VePromise<T[], VePromisesResponse<T>> {
+        return new this.$q<T[], VePromisesResponse<T>>((resolve, reject) => {
             if (this._validate(elementObs)) {
                 const postElements = elementObs.map((elementOb) => {
-                    return this.fillInElement(elementOb)
+                    return this.fillInElement(elementOb) as T
                 })
 
                 const groupOfElements = this._groupElementsByProjectIdAndRefId(postElements)
-                const promises: VePromise<ElementObject[]>[] = []
+                const promises: VePromise<T[], ElementsResponse<T>>[] = []
 
                 Object.keys(groupOfElements).forEach((key) => {
-                    promises.push(this._bulkUpdate(groupOfElements[key], returnChildViews))
+                    promises.push(this._bulkUpdate<T>(groupOfElements[key], returnChildViews))
                 })
 
                 // responses is an array of response corresponding to both successful and failed requests with the following format
@@ -653,13 +655,13 @@ export class ElementService {
                         resolve(successValues)
                     } else {
                         // some requests failed
-                        const rejectionReasons: VePromiseReason<ElementObject>[] = responses
+                        const rejectionReasons: VePromiseReason<ElementsResponse<T>>[] = responses
                             .filter((response) => {
                                 return response.state === 'rejected'
                             })
                             .map((response): unknown => {
-                                return response.reason as VePromiseReason<ElementObject>
-                            }) as VePromiseReason<ElementObject>[]
+                                return response.reason as VePromiseReason<ElementsResponse<T>>
+                            }) as VePromiseReason<ElementsResponse<T>>[]
 
                         // since we could have multiple failed requests when having some successful requests,
                         // reject with the following format so that the client can deal with them at a granular level if
@@ -675,7 +677,7 @@ export class ElementService {
                     }
                 }, reject)
             } else {
-                const response: VePromiseReason<VePromisesResponse<ElementObject>> = {
+                const response: VePromiseReason<VePromisesResponse<T>> = {
                     status: 400,
                     message: 'Some of the elements do not have id, _projectId, _refId',
                     data: {},
@@ -892,31 +894,32 @@ export class ElementService {
     ): VePromise<CommitObject[], CommitResponse> {
         this.apiSvc.normalize(reqOb)
 
-        const key = this.uRLSvc.getElementHistoryURL(reqOb)
-        if (this._isInProgress(key)) {
-            return this._getInProgress(key) as VePromise<CommitObject[], CommitResponse>
-        }
-        const requestCacheKey: string[] = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'history')
-        this._addInProgress<CommitObject[], CommitResponse>(
-            key,
-            new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
-                if (this.cacheSvc.exists(requestCacheKey) && !update) {
-                    resolve(this.cacheSvc.get(requestCacheKey))
-                }
-                this.$http.get(this.uRLSvc.getElementHistoryURL(reqOb)).then(
-                    (response: angular.IHttpResponse<CommitResponse>) => {
-                        this.cacheSvc.put<CommitObject[]>(requestCacheKey, response.data.commits, true)
-                        resolve(this.cacheSvc.get<CommitObject[]>(requestCacheKey))
-                        this._removeInProgress(key)
-                    },
-                    (response: angular.IHttpResponse<CommitResponse>) => {
-                        this.apiSvc.handleErrorCallback(response, reject)
-                        this._removeInProgress(key)
+        const url = this.uRLSvc.getElementHistoryURL(reqOb)
+        if (!this._isInProgress(url)) {
+            const requestCacheKey: string[] = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'history')
+            this._addInProgress<CommitObject[], CommitResponse>(
+                url,
+                new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
+                    if (this.cacheSvc.exists(requestCacheKey) && !update) {
+                        resolve(this.cacheSvc.get(requestCacheKey))
+                        this._removeInProgress(url)
+                        return
                     }
-                )
-            })
-        )
-        return this._getInProgress(key) as VePromise<CommitObject[], CommitResponse>
+                    this.$http.get(this.uRLSvc.getElementHistoryURL(reqOb)).then(
+                        (response: angular.IHttpResponse<CommitResponse>) => {
+                            this.cacheSvc.put<CommitObject[]>(requestCacheKey, response.data.commits, true)
+                            resolve(this.cacheSvc.get<CommitObject[]>(requestCacheKey))
+                            this._removeInProgress(url)
+                        },
+                        (response: angular.IHttpResponse<CommitResponse>) => {
+                            this.apiSvc.handleErrorCallback(response, reject)
+                            this._removeInProgress(url)
+                        }
+                    )
+                })
+            )
+        }
+        return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>
     }
 
     public getElementKey(reqOb: RequestObject, id: string, edit?: boolean): string[] {
@@ -955,11 +958,7 @@ export class ElementService {
         })
     }
 
-    public reset = (): void => {
-        this.inProgressElements = {}
-    }
-
-    private _groupElementsByProjectIdAndRefId(elementObs: ElementObject[]): _.Dictionary<ElementObject[]> {
+    private _groupElementsByProjectIdAndRefId<T extends ElementObject>(elementObs: T[]): _.Dictionary<T[]> {
         return _.groupBy(elementObs, (element) => {
             return element._projectId + '|' + element._refId
         })
@@ -1059,26 +1058,6 @@ export class ElementService {
         } else {
         }
         resolve(results)
-    }
-
-    private _isInProgress = (key: string): boolean => {
-        return this.inProgressElements.hasOwnProperty(key)
-    }
-
-    private _getInProgress<T extends ElementObject, U = BasicResponse<T>>(key: string): VePromise<T | T[], U> {
-        if (this._isInProgress(key)) return this.inProgressElements[key] as VePromise<T | T[], U>
-        else return
-    }
-
-    private _addInProgress<T extends MmsObject, U = BasicResponse<T>>(
-        key: string,
-        promise: VePromise<T | T[], U>
-    ): void {
-        this.inProgressElements[key] = promise as VePromise<MmsObject | MmsObject[], BasicResponse<MmsObject>>
-    }
-
-    private _removeInProgress = (key: string): void => {
-        delete this.inProgressElements[key]
     }
 }
 

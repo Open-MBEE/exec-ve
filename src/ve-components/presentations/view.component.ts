@@ -297,7 +297,7 @@ export class ViewController implements angular.IComponentController {
                         )
                         return
                     }
-                    this.viewSvc.getViewDatas(this.reqOb, 1).finally(() => {
+                    this.viewSvc.getViewElements(this.reqOb, 1).finally(() => {
                         this.view = data
                         this.modified = data._modified
                         this.userSvc.getUserData(data._modifier).then(

@@ -30,7 +30,7 @@ import angular, {
 
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { ResolveService } from '@ve-app/main/services'
-import { BrandingStyle, RootScopeService } from '@ve-utils/application'
+import { ApplicationService, BrandingStyle, RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { AuthService, URLService, PermissionCache, ViewService, DocumentMetadata } from '@ve-utils/mms-api-client'
 
@@ -1023,6 +1023,7 @@ veApp.run([
     'RootScopeService',
     'AuthService',
     'EventService',
+    'ApplicationService',
     function (
         $q: IQService,
         $http: IHttpService,
@@ -1035,7 +1036,8 @@ veApp.run([
         $transitions: TransitionService,
         rootScopeSvc: RootScopeService,
         authSvc: AuthService,
-        eventSvc: EventService
+        eventSvc: EventService,
+        applicationSvc: ApplicationService
     ): void {
         rootScopeSvc.loginModalOpen(false)
         $transitions.onBefore({}, (transition: Transition) => {
@@ -1049,7 +1051,8 @@ veApp.run([
             }
             return new Promise((resolve) => {
                 authSvc.checkLogin().then(
-                    () => {
+                    (data) => {
+                        applicationSvc.getState().user = data.username
                         if (to === 'main') {
                             resolve($state.target('main.login.select'))
                         } else if (to === 'main.project.ref') {

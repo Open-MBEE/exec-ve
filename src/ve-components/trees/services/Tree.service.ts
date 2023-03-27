@@ -808,11 +808,7 @@ export class TreeService {
                 else aggr = '-' + aggr.toLowerCase()
 
                 for (let i = 0; i < branch.children.length; i++) {
-                    if (
-                        types.includes('all') ||
-                        types.includes(branch.children[i].type) ||
-                        (types.includes('favorite') && branch.favorite)
-                    ) {
+                    if (types.includes('all') || types.includes(branch.children[i].type)) {
                         visibleChild = true
                         break
                     }

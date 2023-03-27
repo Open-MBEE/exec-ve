@@ -42,8 +42,8 @@ export interface VePromise<T, U = ElementsResponse<T>> extends IPromise<T> {
     ): VePromise<T | TResult, U>
 }
 
-export interface VePromisesResponse<T> {
-    failedRequests?: VePromiseReason<T>[]
+export interface VePromisesResponse<T, U = ElementsResponse<T>> {
+    failedRequests?: VePromiseReason<U>[]
     successfulRequests?: T[]
 }
 

@@ -1,5 +1,5 @@
 import { TreeService, TreeController } from '@ve-components/trees'
-import { RootScopeService, UtilsService } from '@ve-utils/application'
+import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
 import { veComponents } from '@ve-components'
@@ -12,6 +12,9 @@ class TreeOfFavoritesController extends TreeController {
         iconCollapse: 'fa-solid fa-caret-right fa-lg fa-fw',
         iconDefault: 'fa-solid fa-star fa-fw',
     }
+
+    static $inject = [...TreeController.$inject, 'ApplicationService']
+
     constructor(
         $q: VeQService,
         $scope: angular.IScope,
@@ -21,12 +24,32 @@ class TreeOfFavoritesController extends TreeController {
         utilsSvc: UtilsService,
         treeSvc: TreeService,
         rootScopeSvc: RootScopeService,
-        eventSvc: EventService
+        eventSvc: EventService,
+        private applicationSvc: ApplicationService
     ) {
         super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
         this.id = 'table-of-favorites'
         this.types = ['favorite']
         this.title = 'Table of Favorites'
+    }
+    protected preConfig = (): void => {
+        this.applicationSvc.getSettings(this.treeSvc.treeApi.projectId, this.treeSvc.treeApi.refId).then(
+            (projectSettings) => {
+                if (projectSettings.pinned && projectSettings.pinned[this.applicationSvc.getState().user]) {
+                    const favorites = projectSettings.pinned[this.applicationSvc.getState().user]
+                    this.treeSvc
+                        .forEachBranch((branch) => {
+                            branch.favorite = favorites.includes(branch.data.id)
+                        })
+                        .catch((reason) => {
+                            this.growl.error('Error setting favorites')
+                        })
+                }
+            },
+            (reason) => {
+                this.growl.error('Error getting project settings')
+            }
+        )
     }
 }
 

@@ -1,5 +1,5 @@
 import { TreeService, TreeController } from '@ve-components/trees'
-import { RootScopeService, UtilsService } from '@ve-utils/application'
+import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
 import { veComponents } from '@ve-components'
@@ -8,6 +8,7 @@ import { VeComponentOptions, VeQService } from '@ve-types/angular'
 import { TreeBranch } from '@ve-types/tree'
 
 class TreeOfDocumentsController extends TreeController {
+    static $inject = [...TreeController.$inject, 'ApplicationService']
     constructor(
         $q: VeQService,
         $scope: angular.IScope,
@@ -17,7 +18,8 @@ class TreeOfDocumentsController extends TreeController {
         utilsSvc: UtilsService,
         treeSvc: TreeService,
         rootScopeSvc: RootScopeService,
-        eventSvc: EventService
+        eventSvc: EventService,
+        private applicationSvc: ApplicationService
     ) {
         super($q, $scope, $timeout, $filter, growl, utilsSvc, treeSvc, rootScopeSvc, eventSvc)
         this.id = 'tree-of-documents'
