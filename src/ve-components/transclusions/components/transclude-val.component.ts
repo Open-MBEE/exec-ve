@@ -12,7 +12,8 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { PropertySpec, veComponents } from '@ve-components'
 
 import { VeQService } from '@ve-types/angular'
-import { SlotObject, ValueObject } from '@ve-types/mms'
+import {SlotObject, TaggedValueObject, ValueObject} from '@ve-types/mms'
+import {presentations_buttons} from "@ve-components/presentations/presentations-buttons.config";
 
 /**
  * @ngdoc component
@@ -64,8 +65,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     <span ng-switch-when="LiteralBoolean">{{::value.value}}</span>
     <span ng-switch-when="LiteralReal">{{::value.value | veRealNum}}</span>
     <span ng-switch-when="LiteralUnlimitedNatural">{{::value.value}}</span>
-    <span ng-switch-when="ElementValue"><transclude-name no-click="true" mms-element-id="{{::value.elementId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}"></transclude-name></span>
-    <span ng-switch-when="InstanceValue"><transclude-name no-click="true" mms-element-id="{{::value.instanceId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}"></transclude-name></span>
+    <span ng-switch-when="ElementValue"><transclude-name no-click="true" mms-element-id="{{::value.elementId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}"></transclude-name></span>
+    <span ng-switch-when="InstanceValue"><transclude-name no-click="true" mms-element-id="{{::value.instanceId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}"></transclude-name></span>
     <span ng-switch-when="OpaqueExpression">{{::value.body[0]}}</span>
     <span ng-switch-default>{{$ctrl.first ? $ctrl.values : value}}</span>
 </span>
@@ -77,8 +78,8 @@ export class TranscludeValController extends Transclusion implements ITransclusi
         <span ng-switch-when="LiteralBoolean">{{value.value}}</span>
         <span ng-switch-when="LiteralReal">{{value.value | veRealNum}}</span>
         <span ng-switch-when="LiteralUnlimitedNatural">{{value.value}}</span>
-        <span ng-switch-when="ElementValue"><transclude-name no-click="true" mms-element-id="{{::value.elementId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}"></transclude-name></span>
-        <span ng-switch-when="InstanceValue"><transclude-name no-click="true" mms-element-id="{{::value.instanceId}}" mms-element-id="{{::value.elementId}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" mms-commit-id="{{$ctrl.mmsCommitId}}"></transclude-name></span>
+        <span ng-switch-when="ElementValue"><transclude-name no-click="true" mms-element-id="{{::value.elementId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}"></transclude-name></span>
+        <span ng-switch-when="InstanceValue"><transclude-name no-click="true" mms-element-id="{{::value.instanceId}}" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" mms-commit-id="{{$ctrl.element._commitId}}"></transclude-name></span>
         <span ng-switch-when="OpaqueExpression">{{value.body[0]}}</span>
         <span ng-switch-default>{{value}}</span>
     </span>
@@ -92,7 +93,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             <button-bar class="transclude-panel-toolbar" button-id="$ctrl.bbId"></button-bar>
         </div>
     </div>
-    <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
+    <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.includes('TaggedValue')">
         <h2 class="prop-title spec-view-value-heading">Property Value</h2>
         <div ng-if="!$ctrl.propertySpec.isEnumeration">
             <div ng-if="$ctrl.editValues.length == 0">
@@ -135,15 +136,19 @@ export class TranscludeValController extends Transclusion implements ITransclusi
                 </div>
                 <div ng-switch-default>Editing not supported for now</div>
             </div>
-            <div ng-if="$ctrl.propertySpec.editValues.length != 0 && $ctrl.propertySpec.isSlot">
+            <div ng-if="$ctrl.editValues.length != 0 && ($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue)">
                 <button class="btn btn-sm btn-default" ng-click="$ctrl.addValue(editValues[0].type)">Add</button>
             </div>
         </div>
-        <div ng-if="$ctrl.propertySpec.isEnumeration" ng-repeat="val in $ctrl.editValues">
+        <div ng-if="$ctrl.propertySpec.isEnumeration && $ctrl.propertySpec.isSlot" ng-repeat="val in $ctrl.editValues">
             <select ng-model="val.instanceId" ng-options="el.id as el.name for el in $ctrl.propertySpec.options">
             </select><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
         </div>
-        <div ng-if="($ctrl.propertySpec.isSlot || $ctrl.editValues.length == 0) && $ctrl.propertySpec.isEnumeration">
+        <div ng-if="$ctrl.propertySpec.isEnumeration && $ctrl.propertySpec.isTaggedValue" ng-repeat="val in $ctrl.editValues">
+            <select ng-model="val.elementId" ng-options="el.id as el.name for el in $ctrl.propertySpec.options">
+            </select><a ng-if="!$first" ng-click="$ctrl.removeVal($index)"><i class="fa fa-close"></i></a>
+        </div>
+        <div ng-if="($ctrl.propertySpec.isSlot || $ctrl.propertySpec.isTaggedValue || $ctrl.editValues.length == 0) && $ctrl.propertySpec.isEnumeration">
             <button class="btn btn-sm btn-default" ng-click="$ctrl.addEnumerationValue()">Add</button>
         </div>
     </div>
@@ -209,6 +214,9 @@ export class TranscludeValController extends Transclusion implements ITransclusi
 
     $onInit(): void {
         super.$onInit()
+        this.bbId = this.buttonBarSvc.generateBarId(`${this.mmsElementId}_${this.cfType}`)
+        this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, presentations_buttons)
+
         this.$element.on('click', (e) => {
             if (this.noClick) return
 
@@ -223,7 +231,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             }
             e.stopPropagation()
         })
-
+        this.componentSvc.setupValEditFunctions(this)
         //Custom Start Edit functions
         this.startEdit = (): void => {
             this._startEdit(this.editable())
@@ -309,18 +317,13 @@ export class TranscludeValController extends Transclusion implements ITransclusi
     }
 
     private _startEdit = (isEditable: boolean): void => {
-        let id = this.element.typeId
-        if (this.element.type === 'Slot') {
-            id = (this.element as SlotObject).definingFeatureId
-        }
-        if (!id || (this.propertySpec.isEnumeration && this.propertySpec.options)) {
+        if (this.propertySpec) {
             this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
             return
         }
         this.componentSvc.getPropertySpec(this.element).then(
             (value) => {
                 this.propertySpec = value
-                this.componentSvc.setupValEditFunctions(this)
                 this.componentSvc.startEdit(this, isEditable, this.$element, this.editTemplate, false)
             },
             (reason) => {

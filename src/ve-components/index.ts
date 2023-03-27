@@ -34,4 +34,5 @@ export interface PropertySpec {
     options?: ElementObject[]
     isEnumeration?: boolean
     isSlot?: boolean
+    isTaggedValue?: boolean
 }

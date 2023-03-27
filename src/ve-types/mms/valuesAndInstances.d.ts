@@ -11,6 +11,9 @@ export interface LiteralObject<T> extends ValueObject {
 export interface InstanceValueObject extends ValueObject {
     instanceId?: string
 }
+export interface ElementValueObject extends ValueObject {
+    elementId?: string
+}
 export interface ExpressionObject<T extends ValueObject = ValueObject> extends ValueObject {
     operand?: T[]
 }
@@ -28,4 +31,12 @@ export interface InstanceSpecObject extends ElementObject {
 
 export interface SlotObject extends LiteralObject<LiteralObject<unknown>[]> {
     definingFeatureId: string
+}
+
+export interface TaggedValueObject extends LiteralObject<LiteralObject<unknown>[]> {
+    tagDefinitionId: string
+}
+
+export interface ElementTaggedValueObject extends TaggedValueObject {
+    valueIds: string[]
 }

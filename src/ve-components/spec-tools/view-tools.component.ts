@@ -382,7 +382,7 @@ class ToolsController implements angular.IComponentController {
         const tag = this.extensionSvc.getTagByType('spec', id)
         const toolId: string = _.camelCase(id)
         const newTool: JQuery = $(
-            '<div id="' + toolId + '" class="container-fluid" ng-show="$ctrl.show.' + toolId + '"></div>'
+            '<div id="' + toolId + '" class="container-fluid" ng-if="$ctrl.show.' + toolId + '"></div>'
         )
         if (tag === 'extensionError') {
             this.errorType = this.currentTool.replace('spec-', '')

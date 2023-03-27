@@ -461,6 +461,23 @@ export class ElementService extends BaseApiService {
         if (ob._childViews && !elementOb._childViews) {
             delete ob._childViews
         }
+        if (ob.type.includes('TaggedValue') && ob.value && ob.value.length > 0) {
+            // make sure value array only has the value
+            let newvalues = []
+            for (let val of ob.value) {
+                if (ob.type === 'ElementTaggedValue') {
+                    newvalues.push(val.elementId)
+                } else {
+                    newvalues.push({value: val.value})
+                }
+            }
+            if (ob.type === 'ElementTaggedValue') {
+                ob.valueIds = newvalues
+                delete ob.value
+            } else {
+                ob.value = newvalues
+            }
+        }
         delete ob._commitId
         return ob
         /*
@@ -931,6 +948,7 @@ export class ElementService extends BaseApiService {
     }
 
     public getElementQualifiedName(reqOb: ElementsRequest<string>): VePromise<string, SearchResponse<ElementObject>> {
+        // TODO this only gets the latest version - would need to walk the element owner gets manually for a commit
         return new this.$q<string, SearchResponse<ElementObject>>((resolve, reject) => {
             const queryOb = {
                 params: {
@@ -1059,7 +1077,6 @@ export class ElementService extends BaseApiService {
                     console.log(e.object.id)
                 }
             })
-        } else {
         }
         resolve(results)
     }

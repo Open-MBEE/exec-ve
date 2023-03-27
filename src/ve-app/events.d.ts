@@ -1,4 +1,4 @@
-import { ElementsRequest } from '@ve-types/mms'
+import {ElementObject, ElementsRequest} from '@ve-types/mms'
 import { TreeBranch } from '@ve-types/tree'
 
 export namespace veAppEvents {
@@ -21,7 +21,8 @@ export namespace veAppEvents {
         refresh?: boolean
     }
 
-    interface elementUpdatedData extends elementSelectedData {
+    interface elementUpdatedData {
+        element: ElementObject
         continueEdit?: boolean
     }
 }

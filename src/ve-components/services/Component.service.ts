@@ -28,10 +28,13 @@ import {
     ElementObject,
     ElementsRequest,
     ElementsResponse,
+    ElementTaggedValueObject,
+    ElementValueObject,
     ExpressionObject,
     InstanceValueObject,
     LiteralObject,
     SlotObject,
+    TaggedValueObject,
     ValueObject,
     ViewObject,
 } from '@ve-types/mms'
@@ -190,14 +193,24 @@ export class ComponentService {
         ctrl.addValueType = 'LiteralString'
 
         ctrl.addEnumerationValue = (): void => {
-            const newValueSpec: InstanceValueObject = new ValueSpec({
+            let newValueSpec: InstanceValueObject | ElementValueObject = new ValueSpec({
                 type: 'InstanceValue',
                 instanceId: ctrl.propertySpec.options[0],
                 _projectId: ctrl.mmsProjectId,
                 _refId: ctrl.mmsRefId,
                 id: this.apiSvc.createUniqueId(),
-                ownerId: ctrl.element.id,
+                ownerId: ctrl.element.id
             })
+            if (ctrl.propertySpec.isTaggedValue) {
+                newValueSpec = new ValueSpec({
+                    type: 'ElementValue',
+                    elementId: ctrl.propertySpec.options[0],
+                    _projectId: ctrl.mmsProjectId,
+                    _refId: ctrl.mmsRefId,
+                    id: this.apiSvc.createUniqueId(),
+                    ownerId: ctrl.element.id
+                })
+            }
             ctrl.editValues.push(newValueSpec)
             if (ctrl.element.type == 'Property' || ctrl.element.type == 'Port') {
                 ctrl.edit.defaultValue = newValueSpec
@@ -225,6 +238,24 @@ export class ComponentService {
         }
         if (elementOb.type === 'Expression') {
             return (elementOb as ExpressionObject<ValueObject>).operand
+        }
+        let i = elementOb.type.indexOf('TaggedValue')
+        if (i > 0) {
+            let spoofType = ''
+            let type = elementOb.type.slice(0, i)
+            if (type === 'Element') {
+                spoofType = 'ElementValue'
+                elementOb.value = []
+                for (let val of (elementOb as ElementTaggedValueObject).valueIds) {
+                    elementOb.value.push({type: spoofType, elementId: val})
+                }
+            } else {
+                spoofType = `Literal${type}`
+                for (let val of (elementOb as TaggedValueObject).value) {
+                    val.type = spoofType
+                }
+            }
+            return (elementOb as TaggedValueObject).value
         }
     }
 
@@ -424,13 +455,18 @@ export class ComponentService {
                 projectId: elementOb._projectId,
                 refId: elementOb._refId,
             }
-            this.elementSvc.getOwnedElements(reqOb).then(
+            const query = {
+                params: {
+                    ownerId: elementOb.id
+                }
+            }
+            this.elementSvc.search<ElementObject>(reqOb, query).then(
                 (val) => {
                     const newArray: ElementObject[] = []
                     // Filter for enumeration type
-                    for (let i = 0; i < val.length; i++) {
-                        if (val[i].type === 'EnumerationLiteral') {
-                            newArray.push(val[i])
+                    for (let i = 0; i < val.elements.length; i++) {
+                        if (val.elements[i].type === 'EnumerationLiteral') {
+                            newArray.push(val.elements[i])
                         }
                     }
                     newArray.sort((a, b) => {
@@ -455,19 +491,20 @@ export class ComponentService {
         const deferred = this.$q.defer<PropertySpec>()
         let id: string = elementOb.typeId
         let isSlot = false
-        let isEnum = false
+        let isEnumeration = false
+        let isTaggedValue = false
         let options: ElementObject[] = []
         if (elementOb.type === 'Slot') {
             isSlot = true
             id = (elementOb as SlotObject).definingFeatureId
         }
+        if (elementOb.type.includes('TaggedValue')) {
+            isTaggedValue = true
+            id = (elementOb as TaggedValueObject).tagDefinitionId
+        }
         if (!id) {
             //no property type, will not be enum
-            deferred.resolve({
-                options: options,
-                isEnumeration: isEnum,
-                isSlot: isSlot,
-            })
+            deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
             return deferred.promise
         }
         // Get defining feature or type info
@@ -478,62 +515,40 @@ export class ComponentService {
         }
         this.elementSvc.getElement(reqOb).then(
             (value) => {
-                if (isSlot) {
+                if (isSlot || isTaggedValue) {
                     if (!value.typeId) {
-                        deferred.resolve({
-                            options: options,
-                            isEnumeration: isEnum,
-                            isSlot: isSlot,
-                        })
+                        deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
                         return
                     }
-                    //if it is a slot
+                    //if it is a slot or tagged value check if the definition type is enumeration
                     reqOb.elementId = value.typeId
-                    this.elementSvc
-                        .getElement(reqOb) //this gets tyep of defining feature
-                        .then(
+                    this.elementSvc.getElement(reqOb).then(
                             (val) => {
                                 this.isEnumeration(val).then(
                                     (enumValue: PropertySpec) => {
                                         if (enumValue.isEnumeration) {
-                                            isEnum = enumValue.isEnumeration
+                                            isEnumeration = enumValue.isEnumeration
                                             options = enumValue.options
                                         }
-                                        deferred.resolve({
-                                            options: options,
-                                            isEnumeration: isEnum,
-                                            isSlot: isSlot,
-                                        })
+                                        deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
                                     },
                                     () => {
-                                        deferred.resolve({
-                                            options: options,
-                                            isEnumeration: isEnum,
-                                            isSlot: isSlot,
-                                        })
+                                        deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
                                     }
                                 )
                             },
                             () => {
-                                deferred.resolve({
-                                    options: options,
-                                    isEnumeration: isEnum,
-                                    isSlot: isSlot,
-                                })
+                                deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
                             }
                         )
                 } else {
                     this.isEnumeration(value).then(
                         (enumValue) => {
                             if (enumValue.isEnumeration) {
-                                isEnum = enumValue.isEnumeration
+                                isEnumeration = enumValue.isEnumeration
                                 options = enumValue.options
                             }
-                            deferred.resolve({
-                                options: options,
-                                isEnumeration: isEnum,
-                                isSlot: isSlot,
-                            })
+                            deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
                         },
                         (reason) => {
                             deferred.reject(reason)
@@ -542,11 +557,7 @@ export class ComponentService {
                 }
             },
             (reason) => {
-                deferred.resolve({
-                    options: options,
-                    isEnumeration: isEnum,
-                    isSlot: isSlot,
-                })
+                deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
             }
         )
         return deferred.promise
@@ -606,6 +617,10 @@ export class ComponentService {
                     } else if (data.type === 'Slot') {
                         if (Array.isArray(data.value)) {
                             ctrl.editValues = (data as SlotObject).value
+                        }
+                    } else if (data.type.includes('TaggedValue')) {
+                        if (Array.isArray(data.value)) {
+                            ctrl.editValues = (data as TaggedValueObject).value
                         }
                     } else if (data.type === 'Constraint' && data.specification) {
                         ctrl.editValues = [(data as ConstraintObject).specification]
