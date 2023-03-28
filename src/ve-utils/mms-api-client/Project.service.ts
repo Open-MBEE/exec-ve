@@ -425,7 +425,9 @@ export class ProjectService extends BaseApiService {
                             (response: angular.IHttpResponse<RefsResponse>) => {
                                 this.apiSvc.handleErrorCallback(response, reject)
                             }
-                        )
+                        ).finally(() => {
+                            this._removeInProgress(url)
+                        })
                     }
                 })
             )

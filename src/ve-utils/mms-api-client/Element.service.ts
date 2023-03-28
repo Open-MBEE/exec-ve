@@ -119,6 +119,7 @@ export class ElementService extends BaseApiService {
                 new this.$q<T>((resolve, reject) => {
                     const cached: T = this.cacheSvc.get<T>(requestCacheKey)
                     if (cached && !refresh) {
+                        this._removeInProgress(url)
                         return resolve(cached)
                     }
                     const deletedRequestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
@@ -130,6 +131,7 @@ export class ElementService extends BaseApiService {
                             recentVersionOfElement: deleted,
                             message: 'Deleted',
                         })
+                        this._removeInProgress(url)
                         return
                     }
                     const successCallback: httpCallback<ElementsResponse<T>> = (response) => {

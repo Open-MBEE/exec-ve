@@ -17,9 +17,8 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VePromise, VePromisesResponse, VeQService } from '@ve-types/angular'
 import {
-    BulkResponse,
     ElementObject,
     ElementsRequest,
     ExpressionObject,
@@ -171,7 +170,7 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         }
     }
 
-    treeSave(): VePromise<ElementObject[], BulkResponse<ElementObject>> {
+    treeSave(): VePromise<ElementObject[], VePromisesResponse<ElementObject>> {
         const elementObsToUpdate: ElementObject[] = []
         const updateSectionElementOrder = (elementReference: PresentationReference): void => {
             const sectionEdit: ViewInstanceSpec = {

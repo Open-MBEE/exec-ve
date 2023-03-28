@@ -145,7 +145,7 @@ export class ViewService extends BaseApiService {
         const key = this.apiSvc.makeCacheKey(reqOb, '', false, 'views')
         const inProgKey = key.join('-')
         if (!this._isInProgress(inProgKey)) {
-            this._addInProgress(
+            this._addInProgress<ViewObject>(
                 inProgKey,
                 new this.$q((resolve, reject) => {
                     const cached = this.cacheSvc.get<ViewObject[]>(key)
@@ -204,15 +204,15 @@ export class ViewService extends BaseApiService {
      *      it's displayed, except for the editables)
      * @returns {Promise} The promise will be resolved with array of element objects.
      */
-    public getViewElements(reqOb: ElementsRequest<string>, weight: number, update?: boolean): VePromise<ViewObject[]> {
+    public getViewElements(reqOb: ElementsRequest<string>, weight: number, update?: boolean): VePromise<ElementObject[]> {
         this.apiSvc.normalize(reqOb)
         const key = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'viewElements').join('-')
         if (!this._isInProgress(key)) {
-            this._addInProgress(
+            this._addInProgress<ElementObject>(
                 key,
                 new this.$q((resolve, reject) => {
                     const requestCacheKey = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId)
-                    const cached = this.cacheSvc.get<ViewObject[]>(requestCacheKey)
+                    const cached = this.cacheSvc.get<ElementObject[]>(requestCacheKey)
                     if (cached && !update) {
                         resolve(cached)
                         this._removeInProgress(key)
@@ -285,7 +285,7 @@ export class ViewService extends BaseApiService {
                 })
             )
         }
-        return this._getInProgress(key) as VePromise<ViewObject[]>
+        return this._getInProgress(key) as VePromise<ElementObject[]>
     }
 
     public collectTableSources(table: PresentTableObject): string[] {

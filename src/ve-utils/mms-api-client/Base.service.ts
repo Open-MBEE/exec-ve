@@ -11,7 +11,7 @@ export class BaseApiService {
     }
 
     protected _getInProgress<T extends MmsObject, U = BasicResponse<T>>(key: string): VePromise<T | T[], U> {
-        if (this._isInProgress(key)) return this.inProgress[key] as VePromise<T | T[], U>
+        if (this._isInProgress(key)) return this.inProgress[key] as unknown as VePromise<T | T[], U>
         else return
     }
 
@@ -19,7 +19,7 @@ export class BaseApiService {
         key: string,
         promise: VePromise<T | T[], U>
     ): void {
-        this.inProgress[key] = promise as VePromise<MmsObject | MmsObject[], BasicResponse<MmsObject>>
+        this.inProgress[key] = promise as unknown as VePromise<MmsObject | MmsObject[], BasicResponse<MmsObject>>
     }
 
     protected _removeInProgress = (key: string): void => {
