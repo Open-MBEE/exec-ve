@@ -111,7 +111,7 @@ class InsertElementController extends Insertion<InsertData> {
 // Defines scope variables for html template and how to handle user click
 // Also defines options for search interfaces -- see mmsSearch.js for more info
 const InsertComponent: VeComponentOptions = {
-    selector: 'insertGeneric',
+    selector: 'insertElement',
     template: `
 <div class="modal-body">
     <div class="ve-light-tabs modal-top-tabs" ng-show="!$ctrl.viewLink">

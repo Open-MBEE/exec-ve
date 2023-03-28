@@ -8,7 +8,7 @@ import { veComponents } from '@ve-components'
 import { VeComponentOptions } from '@ve-types/angular'
 import { ViewObject } from '@ve-types/mms'
 
-class InsertPeMenuController implements IComponentController {
+class AddPeMenuController implements IComponentController {
     // Bindings
     private mmsView: ViewObject
 
@@ -42,7 +42,7 @@ class InsertPeMenuController implements IComponentController {
 }
 
 const InsertPeMenuComponent: VeComponentOptions = {
-    selector: 'insertPeMenu',
+    selector: 'addPeMenu',
     template: `
     <div class="mms-add-pe-button" ng-mouseover="$ctrl.setPeLineVisibility($event);" ng-mouseleave="$ctrl.setPeLineVisibility($event);">
     <span class="center btn-group dropdown" uib-dropdown>
@@ -89,7 +89,7 @@ const InsertPeMenuComponent: VeComponentOptions = {
         mmsView: '<',
         index: '<',
     },
-    controller: InsertPeMenuController,
+    controller: AddPeMenuController,
 }
 
 veComponents.component(InsertPeMenuComponent.selector, InsertPeMenuComponent)

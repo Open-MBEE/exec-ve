@@ -251,7 +251,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
 
         if (this.editTemplate) {
             this.save = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
+                if (e) e.stopPropagation()
                 this.componentSvc.saveAction(this, this.$element, false)
             }
 
