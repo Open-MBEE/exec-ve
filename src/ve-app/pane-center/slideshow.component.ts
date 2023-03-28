@@ -158,18 +158,16 @@ class SlideshowController implements angular.IComponentController {
                         'show-elements',
                         this.rootScopeSvc.veElementsOn(!this.rootScopeSvc.veElementsOn())
                     )
-
                     if (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode()) {
-                        this.eventSvc.$broadcast('show-edits', false)
+                        this.bbApi.toggleButton('show-edits', false)
+                        this.rootScopeSvc.veEditMode(false)
                     }
                     return
                 } else if (data.clicked === 'show-edits') {
                     this.bbApi.toggleButton('show-edits', this.rootScopeSvc.veEditMode(!this.rootScopeSvc.veEditMode()))
-                    if (
-                        (this.rootScopeSvc.veElementsOn() && !this.rootScopeSvc.veEditMode()) ||
-                        (!this.rootScopeSvc.veElementsOn() && this.rootScopeSvc.veEditMode())
-                    ) {
-                        this.eventSvc.$broadcast('show-elements', this.rootScopeSvc.veEditMode())
+                    if (this.rootScopeSvc.veElementsOn() !== this.rootScopeSvc.veEditMode()) {
+                        this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode())
+                        this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode())
                     }
                     return
                 } else if (data.clicked === 'center-previous') {

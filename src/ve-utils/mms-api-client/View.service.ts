@@ -204,7 +204,11 @@ export class ViewService extends BaseApiService {
      *      it's displayed, except for the editables)
      * @returns {Promise} The promise will be resolved with array of element objects.
      */
-    public getViewElements(reqOb: ElementsRequest<string>, weight: number, update?: boolean): VePromise<ElementObject[]> {
+    public getViewElements(
+        reqOb: ElementsRequest<string>,
+        weight: number,
+        update?: boolean
+    ): VePromise<ElementObject[]> {
         this.apiSvc.normalize(reqOb)
         const key = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'viewElements').join('-')
         if (!this._isInProgress(key)) {
@@ -527,7 +531,7 @@ export class ViewService extends BaseApiService {
     }
 
     /**
-     * @name ViewService#InsertToViewOrSection
+     * @name ViewService#insertToViewOrSection
      * This updates a view or section to include a new element, the new element must be a child
      * of an existing element in the view
      *
@@ -538,7 +542,7 @@ export class ViewService extends BaseApiService {
      * @returns {IPromise<ViewObject>} The promise would be resolved with updated view or section object
      */
 
-    public InsertToViewOrSection(
+    public insertToViewOrSection(
         reqOb: ViewCreationRequest,
         instanceValOb: InstanceValueObject,
         addPeIndex: number
@@ -1317,31 +1321,30 @@ export class ViewService extends BaseApiService {
     public getPresentationInstanceObject = (
         instanceSpec: InstanceSpecObject
     ): PresentationInstanceObject | InstanceSpecObject => {
-            const instanceSpecSpec: ValueObject = instanceSpec.specification
-            if (!instanceSpecSpec) {
-                return {
-                    type: 'Paragraph',
-                    sourceType: 'text',
-                    text: ''
-                }
+        const instanceSpecSpec: ValueObject = instanceSpec.specification
+        if (!instanceSpecSpec) {
+            return {
+                type: 'Paragraph',
+                sourceType: 'text',
+                text: '',
             }
-            const type = instanceSpecSpec.type
+        }
+        const type = instanceSpecSpec.type
 
-            if (type === 'LiteralString') {
-                // If it is an Opaque List, Paragraph, Table, Image, List:
-                const jsonString = (instanceSpecSpec as LiteralObject<string>).value
-                return JSON.parse(jsonString) as PresentationInstanceObject
-            } else if (type === 'Expression') {
-                // If it is a Opaque Section, or a Expression:
-                // If it is a Opaque Section then we want the instanceSpec:
-                if (this.isSection(instanceSpec)) {
-                    return instanceSpec
-                } else {
-                    //??
-                    return instanceSpecSpec
-                }
+        if (type === 'LiteralString') {
+            // If it is an Opaque List, Paragraph, Table, Image, List:
+            const jsonString = (instanceSpecSpec as LiteralObject<string>).value
+            return JSON.parse(jsonString) as PresentationInstanceObject
+        } else if (type === 'Expression') {
+            // If it is a Opaque Section, or a Expression:
+            // If it is a Opaque Section then we want the instanceSpec:
+            if (this.isSection(instanceSpec)) {
+                return instanceSpec
+            } else {
+                //??
+                return instanceSpecSpec
             }
-
+        }
     }
 
     /**

@@ -173,7 +173,7 @@ class InsertViewController extends Insertion<InsertViewData> {
 }
 
 const InsertViewComponent: VeComponentOptions = {
-    selector: 'addView',
+    selector: 'insertView',
     template: `
     <div>
     <div class="modal-header">
@@ -222,7 +222,7 @@ const InsertViewComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        InsertData: '<',
+        insertData: '<',
         insertApi: '<',
         mmsProjectId: '@',
         mmsRefId: '@',

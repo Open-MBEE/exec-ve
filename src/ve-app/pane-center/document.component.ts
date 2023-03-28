@@ -183,7 +183,7 @@ class FullDocumentController implements IComponentController {
                             'show-comments',
                             this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn())
                         )
-                        return
+                        break
 
                     case 'show-elements':
                         this.bbApi.toggleButton(
@@ -194,7 +194,7 @@ class FullDocumentController implements IComponentController {
                             this.bbApi.toggleButton('show-edits', false)
                             this.rootScopeSvc.veEditMode(false)
                         }
-                        return
+                        break
 
                     case 'show-edits':
                         this.bbApi.toggleButton(
@@ -205,7 +205,7 @@ class FullDocumentController implements IComponentController {
                             this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode())
                             this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode())
                         }
-
+                        break
                     case 'convert-pdf':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             this.appUtilsSvc
@@ -221,7 +221,7 @@ class FullDocumentController implements IComponentController {
                                     }
                                 )
                         })
-
+                        break
                     case 'print':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             void this.appUtilsSvc.printModal(
@@ -232,7 +232,7 @@ class FullDocumentController implements IComponentController {
                                 1
                             )
                         })
-
+                        break
                     case 'word':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             this.appUtilsSvc
@@ -248,11 +248,13 @@ class FullDocumentController implements IComponentController {
                                     }
                                 )
                         })
+                        break
 
                     case 'tabletocsv':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             this.appUtilsSvc.tableToCsv(angular.element('#print-div'), true)
                         })
+                        break
 
                     case 'refresh-numbering':
                         this.fullDocumentApi.loadRemainingViews(() => {
@@ -262,6 +264,7 @@ class FullDocumentController implements IComponentController {
                                 }
                             })
                         })
+                        break
                 }
             })
         )

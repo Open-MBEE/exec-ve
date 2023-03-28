@@ -199,7 +199,7 @@ export class ComponentService {
                 _projectId: ctrl.mmsProjectId,
                 _refId: ctrl.mmsRefId,
                 id: this.apiSvc.createUniqueId(),
-                ownerId: ctrl.element.id
+                ownerId: ctrl.element.id,
             })
             if (ctrl.propertySpec.isTaggedValue) {
                 newValueSpec = new ValueSpec({
@@ -208,7 +208,7 @@ export class ComponentService {
                     _projectId: ctrl.mmsProjectId,
                     _refId: ctrl.mmsRefId,
                     id: this.apiSvc.createUniqueId(),
-                    ownerId: ctrl.element.id
+                    ownerId: ctrl.element.id,
                 })
             }
             ctrl.editValues.push(newValueSpec)
@@ -239,19 +239,25 @@ export class ComponentService {
         if (elementOb.type === 'Expression') {
             return (elementOb as ExpressionObject<ValueObject>).operand
         }
-        let i = elementOb.type.indexOf('TaggedValue')
+        const i = elementOb.type.indexOf('TaggedValue')
         if (i > 0) {
             let spoofType = ''
-            let type = elementOb.type.slice(0, i)
+            const type = elementOb.type.slice(0, i)
             if (type === 'Element') {
                 spoofType = 'ElementValue'
                 elementOb.value = []
-                for (let val of (elementOb as ElementTaggedValueObject).valueIds) {
-                    elementOb.value.push({type: spoofType, elementId: val})
+                for (const [index, val] of (elementOb as ElementTaggedValueObject).valueIds.entries()) {
+                    ;(elementOb as ElementTaggedValueObject).value.push({
+                        id: `${elementOb.id}-slotvalue-${index}-elementvalue`,
+                        type: spoofType,
+                        elementId: val,
+                        _projectId: elementOb._projectId,
+                        _refId: elementOb._refId,
+                    } as ElementValueObject)
                 }
             } else {
                 spoofType = `Literal${type}`
-                for (let val of (elementOb as TaggedValueObject).value) {
+                for (const val of (elementOb as TaggedValueObject).value) {
                     val.type = spoofType
                 }
             }
@@ -457,8 +463,8 @@ export class ComponentService {
             }
             const query = {
                 params: {
-                    ownerId: elementOb.id
-                }
+                    ownerId: elementOb.id,
+                },
             }
             this.elementSvc.search<ElementObject>(reqOb, query).then(
                 (val) => {
@@ -504,7 +510,7 @@ export class ComponentService {
         }
         if (!id) {
             //no property type, will not be enum
-            deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
+            deferred.resolve({ options, isEnumeration, isSlot, isTaggedValue })
             return deferred.promise
         }
         // Get defining feature or type info
@@ -517,30 +523,30 @@ export class ComponentService {
             (value) => {
                 if (isSlot || isTaggedValue) {
                     if (!value.typeId) {
-                        deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
+                        deferred.resolve({ options, isEnumeration, isSlot, isTaggedValue })
                         return
                     }
                     //if it is a slot or tagged value check if the definition type is enumeration
                     reqOb.elementId = value.typeId
                     this.elementSvc.getElement(reqOb).then(
-                            (val) => {
-                                this.isEnumeration(val).then(
-                                    (enumValue: PropertySpec) => {
-                                        if (enumValue.isEnumeration) {
-                                            isEnumeration = enumValue.isEnumeration
-                                            options = enumValue.options
-                                        }
-                                        deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
-                                    },
-                                    () => {
-                                        deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
+                        (val) => {
+                            this.isEnumeration(val).then(
+                                (enumValue: PropertySpec) => {
+                                    if (enumValue.isEnumeration) {
+                                        isEnumeration = enumValue.isEnumeration
+                                        options = enumValue.options
                                     }
-                                )
-                            },
-                            () => {
-                                deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
-                            }
-                        )
+                                    deferred.resolve({ options, isEnumeration, isSlot, isTaggedValue })
+                                },
+                                () => {
+                                    deferred.resolve({ options, isEnumeration, isSlot, isTaggedValue })
+                                }
+                            )
+                        },
+                        () => {
+                            deferred.resolve({ options, isEnumeration, isSlot, isTaggedValue })
+                        }
+                    )
                 } else {
                     this.isEnumeration(value).then(
                         (enumValue) => {
@@ -548,7 +554,7 @@ export class ComponentService {
                                 isEnumeration = enumValue.isEnumeration
                                 options = enumValue.options
                             }
-                            deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
+                            deferred.resolve({ options, isEnumeration, isSlot, isTaggedValue })
                         },
                         (reason) => {
                             deferred.reject(reason)
@@ -557,7 +563,7 @@ export class ComponentService {
                 }
             },
             (reason) => {
-                deferred.resolve({options, isEnumeration, isSlot, isTaggedValue})
+                deferred.resolve({ options, isEnumeration, isSlot, isTaggedValue })
             }
         )
         return deferred.promise
@@ -598,68 +604,74 @@ export class ComponentService {
             ctrl.commitId === 'latest' &&
             this.permissionsSvc.hasBranchEditPermission(ctrl.element._projectId, ctrl.element._refId)
         ) {
+            ctrl.editLoading = true
             const elementOb = ctrl.element
             const reqOb = {
                 elementId: elementOb.id,
                 projectId: elementOb._projectId,
                 refId: elementOb._refId,
             }
-            this.elementSvc.getElementForEdit(reqOb).then(
-                (data) => {
-                    ctrl.isEditing = true
-                    ctrl.inPreviewMode = false
-                    ctrl.edit = data
+            this.elementSvc
+                .getElementForEdit(reqOb)
+                .then(
+                    (data) => {
+                        ctrl.isEditing = true
+                        ctrl.inPreviewMode = false
+                        ctrl.edit = data
 
-                    if (data.type === 'Property' || data.type === 'Port') {
-                        if (ctrl.edit.defaultValue) {
-                            ctrl.editValues = [ctrl.edit.defaultValue]
+                        if (data.type === 'Property' || data.type === 'Port') {
+                            if (ctrl.edit.defaultValue) {
+                                ctrl.editValues = [ctrl.edit.defaultValue]
+                            }
+                        } else if (data.type === 'Slot') {
+                            if (Array.isArray(data.value)) {
+                                ctrl.editValues = (data as SlotObject).value
+                            }
+                        } else if (data.type.includes('TaggedValue')) {
+                            if (Array.isArray(data.value)) {
+                                ctrl.editValues = (data as TaggedValueObject).value
+                            }
+                        } else if (data.type === 'Constraint' && data.specification) {
+                            ctrl.editValues = [(data as ConstraintObject).specification]
                         }
-                    } else if (data.type === 'Slot') {
-                        if (Array.isArray(data.value)) {
-                            ctrl.editValues = (data as SlotObject).value
+                        if (!ctrl.editValues) {
+                            ctrl.editValues = []
                         }
-                    } else if (data.type.includes('TaggedValue')) {
-                        if (Array.isArray(data.value)) {
-                            ctrl.editValues = (data as TaggedValueObject).value
-                        }
-                    } else if (data.type === 'Constraint' && data.specification) {
-                        ctrl.editValues = [(data as ConstraintObject).specification]
-                    }
-                    if (!ctrl.editValues) {
-                        ctrl.editValues = []
-                    }
-                    /*
+                        /*
                 if (ctrl.isEnumeration && ctrl.editValues.length === 0) {
                     ctrl.editValues.push({type: 'InstanceValue', instanceId: null});
                 }
                 */
-                    if (template) {
-                        domElement.empty()
-                        let transcludeEl: JQuery<HTMLElement>
-                        if (typeof template === 'string') {
-                            transcludeEl = $(template)
-                        } else {
-                            this.growl.error('Editing is not supported for Injected Templates!')
-                            return
+                        if (template) {
+                            domElement.empty()
+                            let transcludeEl: JQuery<HTMLElement>
+                            if (typeof template === 'string') {
+                                transcludeEl = $(template)
+                            } else {
+                                this.growl.error('Editing is not supported for Injected Templates!')
+                                return
+                            }
+                            domElement.append(transcludeEl)
+                            this.$compile(transcludeEl)(ctrl.$scope)
                         }
-                        domElement.append(transcludeEl)
-                        this.$compile(transcludeEl)(ctrl.$scope)
+                        if (!ctrl.skipBroadcast) {
+                            // Broadcast message for the toolCtrl:
+                            this.eventSvc.$broadcast('presentationElem.edit', ctrl.edit)
+                        } else {
+                            ctrl.skipBroadcast = false
+                        }
+                        if (!doNotScroll) {
+                            this._scrollToElement(domElement)
+                        }
+                    },
+                    (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
+                        reason.type = 'error'
+                        this.handleError(reason)
                     }
-                    if (!ctrl.skipBroadcast) {
-                        // Broadcast message for the toolCtrl:
-                        this.eventSvc.$broadcast('presentationElem.edit', ctrl.edit)
-                    } else {
-                        ctrl.skipBroadcast = false
-                    }
-                    if (!doNotScroll) {
-                        this._scrollToElement(domElement)
-                    }
-                },
-                (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
-                    reason.type = 'error'
-                    this.handleError(reason)
-                }
-            )
+                )
+                .finally(() => {
+                    ctrl.editLoading = false
+                })
 
             this.elementSvc.isCacheOutdated(ctrl.element).then(
                 (data) => {

@@ -150,6 +150,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     public isEditing: boolean = false
     public inPreviewMode: boolean
     public elementSaving: boolean = false
+    public editLoading: boolean = false
     public skipBroadcast: boolean
     protected clearWatch: boolean = false
 
@@ -258,8 +259,8 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                 this.componentSvc.saveAction(this, this.$element, true)
             }
 
-            this.cancel = (e: JQuery.ClickEvent): void => {
-                e.stopPropagation()
+            this.cancel = (e?: JQuery.ClickEvent): void => {
+                if (e) e.stopPropagation()
                 this.componentSvc.cancelAction(this, this.recompile, this.$element)
             }
 

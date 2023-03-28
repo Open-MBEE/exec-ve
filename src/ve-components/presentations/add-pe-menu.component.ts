@@ -42,7 +42,7 @@ class InsertPeMenuController implements IComponentController {
 }
 
 const InsertPeMenuComponent: VeComponentOptions = {
-    selector: 'addPeMenu',
+    selector: 'insertPeMenu',
     template: `
     <div class="mms-add-pe-button" ng-mouseover="$ctrl.setPeLineVisibility($event);" ng-mouseleave="$ctrl.setPeLineVisibility($event);">
     <span class="center btn-group dropdown" uib-dropdown>

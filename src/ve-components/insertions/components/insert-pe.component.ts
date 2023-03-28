@@ -116,7 +116,7 @@ class InsertPeController extends Insertion<InsertPresentationData> {
             projectId: this.projectId,
             refId: this.refId,
         }
-        return this.viewSvc.InsertToViewOrSection(viewReqOb, instanceVal, this.insertData.addPeIndex)
+        return this.viewSvc.insertToViewOrSection(viewReqOb, instanceVal, this.insertData.addPeIndex)
     }
 
     public create = (): VePromise<ViewInstanceSpec> => {
@@ -130,7 +130,7 @@ class InsertPeController extends Insertion<InsertPresentationData> {
 }
 
 const InsertPeComponent: VeComponentOptions = {
-    selector: 'addPe',
+    selector: 'insertPe',
     template: `
     <div>
     <div class="modal-header">
@@ -169,7 +169,7 @@ const InsertPeComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        InsertData: '<',
+        insertData: '<',
         insertApi: '<',
         mmsProjectId: '@',
         mmsRefId: '@',

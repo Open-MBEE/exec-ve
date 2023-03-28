@@ -69,7 +69,7 @@ class InsertController extends VeModalControllerImpl<MmsObject> implements VeMod
         }
         const newPe = $('<div></div>')
         $(newPe).append(
-            `<${tag} insert-data="$ctrl.InsertData" insert-api="$ctrl.InsertApi" 
+            `<${tag} insert-data="$ctrl.insertData" insert-api="$ctrl.insertApi" 
                 mms-project-id="{{$ctrl.projectId}}" ${this.refId ? `mms-ref-id="{{$ctrl.refId}}" ` : ''}${
                 this.orgId ? 'mms-org-id="{{$ctrl.orgId}}" ' : ''
             }></${tag}>`
@@ -89,7 +89,7 @@ const InsertElementModalComponent: VeModalComponent = {
     <div>
     <div class="modal-header">
         <h4 class="{{ $ctrl.addType | lowercase }}-type-icon">Create New or Add a {{$ctrl.type}}</h4>
-        <h4 ng-show="$ctrl.InsertData.parentTitle">From {{ $ctrl.InsertData.parentTitle }}</h4>
+        <h4 ng-show="$ctrl.insertData.parentTitle">From {{ $ctrl.insertData.parentTitle }}</h4>
     </div>
 </div>
 `,

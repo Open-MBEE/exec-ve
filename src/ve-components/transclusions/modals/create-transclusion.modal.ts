@@ -136,7 +136,7 @@ class InsertTransclusionModalController
     public makeNewOrChoose = (): void => {
         this.modalBody.empty()
         this.modalBody.append(
-            '<insert-element insert-data="::$ctrl.InsertData" insert-api="$ctrl.InsertApi" mms-project-id="{{$ctrl.projectId}}" ' +
+            '<insert-element insert-data="::$ctrl.insertData" insert-api="$ctrl.insertApi" mms-project-id="{{$ctrl.projectId}}" ' +
                 this.refId
                 ? 'mms-ref-id="{{$ctrl.refId}}" '
                 : '' + this.orgId
