@@ -248,9 +248,7 @@ class SpecHistoryController extends SpecTool implements ISpecTool {
 const SpecHistoryComponent: VeComponentOptions = {
     selector: 'specHistory',
     template: `
-    <h4 class="right-pane-title">Element History
-    <span ng-show="$ctrl.gettingHistory"><i class="fa fa-spin fa-spinner"></i></span>
-</h4>
+    <h4 ng-show="$ctrl.gettingHistory"><i class="fa fa-spin fa-spinner"></i></h4>
 <div style="margin-bottom:6px;">
     <input type="checkbox" style="margin-right:4px;" ng-model="ModelData.ShowDiffPrototype" ng-disabled="$ctrl.disableCompare">Compare versions
 </div>

@@ -1,12 +1,10 @@
 //Exports
 export * from './services/Spec.service'
-export * from './services/Reorder.service'
 
 export * from './spec-tool.controller'
 
 //Services
 import './services/Spec.service'
-import './services/Reorder.service'
 //Core Components
 import './view-tools.component'
 //Default Extensions

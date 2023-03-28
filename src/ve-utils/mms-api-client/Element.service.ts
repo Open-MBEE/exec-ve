@@ -109,62 +109,64 @@ export class ElementService extends BaseApiService {
             console.log('foo')
         }
         const url = this.uRLSvc.getElementURL(reqOb)
+        const cached: T = this.cacheSvc.get<T>(requestCacheKey)
         // if it's in the this.inProgress queue get it immediately
         if (this._isInProgress(url)) {
             //change to change priority if it's already in the queue
             this.httpSvc.ping(url, weight)
-        } else {
-            this._addInProgress(
-                url,
-                new this.$q<T>((resolve, reject) => {
-                    const cached: T = this.cacheSvc.get<T>(requestCacheKey)
-                    if (cached && !refresh) {
-                        return resolve(cached)
-                    }
-                    const deletedRequestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
-                    deletedRequestCacheKey.push('deleted')
-                    const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey)
-                    if (deleted) {
-                        reject({
-                            status: 410,
-                            recentVersionOfElement: deleted,
-                            message: 'Deleted',
-                        })
-                        return
-                    }
-                    const successCallback: httpCallback<ElementsResponse<T>> = (response) => {
-                        const data = response.data
-                        if (Array.isArray(data.elements) && data.elements.length > 0) {
-                            resolve(this.cacheElement<T>(reqOb, data.elements[0]))
-                        } else if (allowEmpty) {
-                            resolve(null)
-                        } else {
-                            reject({
-                                status: 500,
-                                message: 'Server Error: empty response',
-                            }) //TODO
-                        }
-                        this._removeInProgress(url)
-                    }
-                    const errorCallback: httpCallback<ElementsResponse<T>> = (response) => {
-                        const data = response.data
-                        const reason = this.uRLSvc.handleHttpStatus(response)
-                        if (data && data.deleted && data.deleted.length > 0 && data.deleted[0].id === reqOb.elementId) {
-                            reason.recentVersionOfElement = data.deleted[0]
-                            this.cacheDeletedElement(reqOb, data.deleted[0])
-                        }
-                        if (allowEmpty && response.status == 404) {
-                            resolve(null)
-                        } else {
-                            reject(reason)
-                        }
-
-                        this._removeInProgress(url)
-                    }
-                    this.httpSvc.get<ElementsResponse<T>>(url, successCallback, errorCallback, weight)
-                })
-            )
+            return this._getInProgress(url) as VePromise<T>
         }
+        const deletedRequestCacheKey = this.getElementKey(reqOb, reqOb.elementId)
+        deletedRequestCacheKey.push('deleted')
+        const deleted = this.cacheSvc.get<ElementObject>(deletedRequestCacheKey)
+        if (deleted && !refresh) {
+            return new this.$q<T>((resolve, reject) => {
+                return reject({
+                    status: 410,
+                    recentVersionOfElement: deleted,
+                    message: 'Deleted',
+                })
+            })
+        }
+        if (cached && !refresh) {
+            return new this.$q<T>((resolve, reject) => {
+                return resolve(cached)
+            })
+        }
+        this._addInProgress(
+            url,
+            new this.$q<T>((resolve, reject) => {
+                const successCallback: httpCallback<ElementsResponse<T>> = (response) => {
+                    const data = response.data
+                    this._removeInProgress(url)
+                    if (Array.isArray(data.elements) && data.elements.length > 0) {
+                        resolve(this.cacheElement<T>(reqOb, data.elements[0]))
+                    } else if (allowEmpty) {
+                        resolve(null)
+                    } else {
+                        reject({
+                            status: 500,
+                            message: 'Server Error: empty response',
+                        }) //TODO
+                    }
+                }
+                const errorCallback: httpCallback<ElementsResponse<T>> = (response) => {
+                    const data = response.data
+                    const reason = this.uRLSvc.handleHttpStatus(response)
+                    this._removeInProgress(url)
+                    if (data && data.deleted && data.deleted.length > 0 && data.deleted[0].id === reqOb.elementId) {
+                        reason.recentVersionOfElement = data.deleted[0]
+                        this.cacheDeletedElement(reqOb, data.deleted[0])
+                    }
+                    if (allowEmpty && response.status == 404) {
+                        resolve(null)
+                    } else {
+                        reject(reason)
+                    }
+                }
+                this.httpSvc.get<ElementsResponse<T>>(url, successCallback, errorCallback, weight)
+            })
+        )
         return this._getInProgress(url) as VePromise<T>
     }
 
@@ -315,16 +317,19 @@ export class ElementService extends BaseApiService {
         this.apiSvc.normalize(reqOb)
         const requestCacheKey = this.getElementKey(reqOb, reqOb.elementId, true)
         const url = this.uRLSvc.getElementURL(reqOb) + 'edit'
+        if (this._isInProgress(url)) {
+            return this._getInProgress(url) as VePromise<T>
+        }
+        const cached = this.cacheSvc.get<T>(requestCacheKey)
+        if (cached && !refresh) {
+            return new this.$q<T>((resolve, reject) => {
+                return resolve(cached)
+            })
+        }
         if (!this._isInProgress(url)) {
             this._addInProgress(
                 url,
                 new this.$q<T>((resolve, reject) => {
-                    const cached = this.cacheSvc.get<T>(requestCacheKey)
-                    if (cached && !refresh) {
-                        resolve(cached)
-                        this._removeInProgress(url)
-                        return
-                    }
                     this.getElement<T>(reqOb, weight, refresh)
                         .then(
                             (result) => {
@@ -354,6 +359,7 @@ export class ElementService extends BaseApiService {
      * @returns {Promise} The promise will be resolved with an array of
      * element objects
      */
+    // TODO this doesn't work, need to use search
     getOwnedElements(
         reqOb: ElementsRequest<string>,
         weight?: number,
@@ -385,45 +391,45 @@ export class ElementService extends BaseApiService {
         refresh?: boolean
     ): VePromise<T[], GenericResponse<T>> {
         this.apiSvc.normalize(reqOb)
+        const requestCacheKey = this.getElementKey(reqOb, jsonKey)
         if (this._isInProgress(url)) {
             this.httpSvc.ping(url, weight)
-        } else {
-            const requestCacheKey = this.getElementKey(reqOb, jsonKey)
-            this._addInProgress(
-                url,
-                new this.$q<T[], GenericResponse<T>>((resolve, reject) => {
-                    const cached = this.cacheSvc.get<T[]>(requestCacheKey)
-                    if (cached && !refresh) {
-                        resolve(cached)
-                        this._removeInProgress(url)
-                        return
-                    }
-                    this.httpSvc.get<GenericResponse<T>>(
-                        url,
-                        (response) => {
-                            const results: T[] = []
-                            const elements: T[] = response.data[jsonKey]
-                            for (let i = 0; i < elements.length; i++) {
-                                const element = elements[i]
-                                if (!element) {
-                                    //check for possible null
-                                    continue
-                                }
-                                results.push(this.cacheElement(reqOb, element))
-                            }
-                            resolve(results)
-                            this._removeInProgress(url)
-                            return
-                        },
-                        (response: angular.IHttpResponse<GenericResponse<T>>) => {
-                            reject(this.uRLSvc.handleHttpStatus(response))
-                            this._removeInProgress(url)
-                        },
-                        weight
-                    )
-                })
-            )
+            return this._getInProgress(url) as VePromise<T[], GenericResponse<T>>
         }
+        const cached = this.cacheSvc.get<T[]>(requestCacheKey)
+        if (cached && !refresh) {
+            return new this.$q<T[], GenericResponse<T>>((resolve, reject) => {
+                return resolve(cached)
+            })
+        }
+        this._addInProgress(
+            url,
+            new this.$q<T[], GenericResponse<T>>((resolve, reject) => {
+                this.httpSvc.get<GenericResponse<T>>(
+                    url,
+                    (response) => {
+                        const results: T[] = []
+                        const elements: T[] = response.data[jsonKey]
+                        for (let i = 0; i < elements.length; i++) {
+                            const element = elements[i]
+                            if (!element) {
+                                //check for possible null
+                                continue
+                            }
+                            results.push(this.cacheElement(reqOb, element))
+                        }
+                        this._removeInProgress(url)
+                        resolve(results)
+                        return
+                    },
+                    (response: angular.IHttpResponse<GenericResponse<T>>) => {
+                        this._removeInProgress(url)
+                        reject(this.uRLSvc.handleHttpStatus(response))
+                    },
+                    weight
+                )
+            })
+        )
         return this._getInProgress<T, GenericResponse<T>>(url) as VePromise<T[], GenericResponse<T>>
     }
 
@@ -915,32 +921,32 @@ export class ElementService extends BaseApiService {
         update?: boolean
     ): VePromise<CommitObject[], CommitResponse> {
         this.apiSvc.normalize(reqOb)
-
         const url = this.uRLSvc.getElementHistoryURL(reqOb)
-        if (!this._isInProgress(url)) {
-            const requestCacheKey: string[] = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'history')
-            this._addInProgress<CommitObject[], CommitResponse>(
-                url,
-                new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
-                    if (this.cacheSvc.exists(requestCacheKey) && !update) {
-                        resolve(this.cacheSvc.get(requestCacheKey))
-                        this._removeInProgress(url)
-                        return
-                    }
-                    this.$http.get(this.uRLSvc.getElementHistoryURL(reqOb)).then(
-                        (response: angular.IHttpResponse<CommitResponse>) => {
-                            this.cacheSvc.put<CommitObject[]>(requestCacheKey, response.data.commits, true)
-                            resolve(this.cacheSvc.get<CommitObject[]>(requestCacheKey))
-                            this._removeInProgress(url)
-                        },
-                        (response: angular.IHttpResponse<CommitResponse>) => {
-                            this.apiSvc.handleErrorCallback(response, reject)
-                            this._removeInProgress(url)
-                        }
-                    )
-                })
-            )
+        if (this._isInProgress(url)) {
+            return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>
         }
+        const requestCacheKey: string[] = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'history')
+        if (this.cacheSvc.exists(requestCacheKey) && !update) {
+            return new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
+                return resolve(this.cacheSvc.get(requestCacheKey))
+            })
+        }
+        this._addInProgress<CommitObject[], CommitResponse>(
+            url,
+            new this.$q<CommitObject[], CommitResponse>((resolve, reject) => {
+                this.$http.get(this.uRLSvc.getElementHistoryURL(reqOb)).then(
+                    (response: angular.IHttpResponse<CommitResponse>) => {
+                        this.cacheSvc.put<CommitObject[]>(requestCacheKey, response.data.commits, true)
+                        this._removeInProgress(url)
+                        resolve(this.cacheSvc.get<CommitObject[]>(requestCacheKey))
+                    },
+                    (response: angular.IHttpResponse<CommitResponse>) => {
+                        this._removeInProgress(url)
+                        this.apiSvc.handleErrorCallback(response, reject)
+                    }
+                )
+            })
+        )
         return this._getInProgress(url) as VePromise<CommitObject[], CommitResponse>
     }
 

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 import { ComponentService } from '@ve-components/services'
-import { SpecService, SpecTool, ISpecTool, ReorderService } from '@ve-components/spec-tools'
+import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
 import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
@@ -17,8 +17,16 @@ import {
 
 import { veComponents } from '@ve-components'
 
-import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import { PresentationReference, ViewInstanceSpec, ViewObject } from '@ve-types/mms'
+import { VeComponentOptions, VePromise, VePromisesResponse, VeQService } from '@ve-types/angular'
+import {
+    ElementObject,
+    ElementsRequest,
+    ExpressionObject,
+    InstanceValueObject,
+    PresentationReference,
+    ViewInstanceSpec,
+    ViewObject
+} from '@ve-types/mms'
 
 /**
  * @ngdoc directive
@@ -37,12 +45,12 @@ import { PresentationReference, ViewInstanceSpec, ViewObject } from '@ve-types/m
 class SpecReorderController extends SpecTool implements ISpecTool {
     private treeOptions: object
 
-    private elementReferenceTree: PresentationReference[]
-    private originalElementReferenceTree: PresentationReference[]
+    private elementReferenceTree: PresentationReference[] = []
+    private originalElementReferenceTree: PresentationReference[] = []
     public view: ViewObject | ViewInstanceSpec
-
-    static $inject = [...SpecTool.$inject, 'ReorderService']
     reorderable: boolean
+
+    viewSaving: boolean
 
     constructor(
         $q: VeQService,
@@ -60,7 +68,6 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
-        private reorderSvc: ReorderService
     ) {
         super(
             $q,
@@ -83,11 +90,8 @@ class SpecReorderController extends SpecTool implements ISpecTool {
         this.specTitle = 'Reorder Spec'
     }
 
-    config = (): void => {
-        this.reorderSvc.view = this.view = this.element
-        this.reorderSvc.refresh()
-        this.elementReferenceTree = this.reorderSvc.elementReferenceTree
-        this.originalElementReferenceTree = this.reorderSvc.originalElementReferenceTree
+    $onInit(): void {
+        super.$onInit()
         this.treeOptions = {
             accept: (sourceNodeScope: SpecTool, destNodeScope: SpecTool, destIndex: number): boolean => {
                 if (sourceNodeScope.element.isOpaque) return false
@@ -95,26 +99,13 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                 return !!this.viewSvc.isSection(destNodeScope.element as ViewInstanceSpec)
             },
         }
-
-        this.subs.push(
-            this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, (data) => {
-                if (data.id === 'spec-reorder') this.specSvc.setEditing(true)
-            })
-        )
-
-        let viewSaving = false
-        this.subs.push(
-            this.eventSvc.$on('spec-reorder.refresh', () => {
-                this.reorderSvc.refresh()
-            })
-        )
         this.subs.push(
             this.eventSvc.$on('spec-reorder.save', () => {
-                if (viewSaving) {
+                if (this.viewSaving) {
                     this.growl.info('Please Wait...')
                     return
                 }
-                viewSaving = true
+                this.viewSaving = true
                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                     (api) => {
                         api.toggleButtonSpinner('spec-reorder.save')
@@ -123,10 +114,11 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                         this.growl.error(ToolbarService.error(reason))
                     }
                 )
-                this.reorderSvc.save().then(
-                    () => {
-                        viewSaving = false
-                        this.reorderSvc.refresh()
+                this.treeSave().then(
+                    (elements) => {
+                        this.viewSaving = false
+                        //this.refresh()
+                        //TODO reset orig
                         this.growl.success('Save Successful')
                         this.toolbarSvc.waitForApi(this.toolbarId).then(
                             (api) => {
@@ -136,11 +128,18 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                                 this.growl.error(ToolbarService.error(reason))
                             }
                         )
-                        this.eventSvc.$broadcast('spec-reorder.saved', this.specApi.elementId)
+                        const saved = elements.filter((val) => val.id === this.view.id)
+                        if (saved.length > 0) {
+                            this.eventSvc.$broadcast('element.updated', {element: saved[0]})
+                        }
+                        this.eventSvc.$broadcast('spec-reorder.saved', this.view.id)
+                        this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
+                            id: 'spec-inspector',
+                        })
                     },
                     (response) => {
-                        this.reorderSvc.refresh()
-                        viewSaving = false
+                        this.refresh()
+                        this.viewSaving = false
                         const reason = response.data.failedRequests[0]
                         this.growl.error(reason.message)
                         this.toolbarSvc.waitForApi(this.toolbarId).then(
@@ -153,35 +152,149 @@ class SpecReorderController extends SpecTool implements ISpecTool {
                         )
                     }
                 )
-                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
-                    id: 'spec-inspector',
-                })
+
             })
         )
         this.subs.push(
             this.eventSvc.$on('spec-reorder.cancel', () => {
-                this.specSvc.setEditing(false)
-                this.reorderSvc.refresh()
-                this.eventSvc.resolve<veCoreEvents.toolbarClicked>(this.toolbarId, {
-                    id: 'spec-inspector',
-                })
-                //this.('element');
+                this.revert()
             })
         )
     }
 
     initCallback = (): void => {
-        this.reorderSvc.view = this.view = this.element
-        if (this.view.type === 'View' || this.viewSvc.isSection(this.view)) {
+        if (this.apiSvc.isView(this.specSvc.getView()) || this.viewSvc.isSection(this.specSvc.getView())) {
+            this.view = this.specSvc.getView()
             this.reorderable = true
-            this.reorderSvc.refresh()
-        } else {
-            this.reorderable = false
+            this.refresh()
         }
     }
 
-    public getEditing(): boolean {
-        return this.specSvc.getEditing()
+    treeSave(): VePromise<ElementObject[], VePromisesResponse<ElementObject>> {
+        const elementObsToUpdate: ElementObject[] = []
+        const updateSectionElementOrder = (elementReference: PresentationReference): void => {
+            const sectionEdit: ViewInstanceSpec = {
+                id: elementReference.instanceId,
+                //_modified: elementReference.instanceSpecification._modified,
+                _projectId: elementReference.instanceSpecification._projectId,
+                _refId: elementReference.instanceSpecification._refId,
+                type: elementReference.instanceSpecification.type,
+                specification: _.cloneDeep(elementReference.instanceSpecification.specification),
+            }
+            //sectionEdit.specialization = _.cloneDeep(elementReference.instanceSpecification.specialization);
+            const operand: InstanceValueObject[] = (sectionEdit.specification.operand = [])
+
+            if (!elementReference.instanceSpecification.specification) {
+                this.growl.error('Malformed Reference Tree; Aborting')
+            }
+            const origOperand = (
+                elementReference.instanceSpecification.specification as ExpressionObject<InstanceValueObject>
+            ).operand
+            elementReference.sectionElements.forEach((sectionElement, index) => {
+                operand.push(sectionElement.instanceVal)
+                if (sectionElement.sectionElements.length > 0) updateSectionElementOrder(sectionElement)
+            })
+
+            if (!_.isEqual(operand, origOperand)) {
+                elementObsToUpdate.push(sectionEdit)
+            }
+        }
+
+        const deferred = this.$q.defer<ElementObject[]>()
+        if (this.elementReferenceTree.length === 0) {
+            deferred.reject({
+                type: 'error',
+                message: 'View specs were not initialized properly or is empty.',
+            })
+            return deferred.promise
+        }
+        const viewEdit: ViewInstanceSpec | ViewObject = {
+            id: this.view.id,
+            //_modified: this.view._modified,
+            _projectId: this.view._projectId,
+            _refId: this.view._refId,
+            type: this.view.type,
+        }
+        if (this.view._contents) {
+            viewEdit._contents = _.cloneDeep(this.view._contents)
+        }
+        if (this.view.specification) {
+            viewEdit.specification = _.cloneDeep((this.view as ViewInstanceSpec).specification)
+        }
+        const specs: ExpressionObject = viewEdit._contents || viewEdit.specification
+        const origSpecs: ExpressionObject = this.view._contents || this.view.specification
+            // Update the View edit object on Save
+            if (specs.operand) {
+                specs.operand = []
+                this.elementReferenceTree.forEach((elementRef) => {
+                    specs.operand.push(elementRef.instanceVal)
+                })
+                if (specs && !_.isEqual(specs.operand, origSpecs.operand)) {
+                    elementObsToUpdate.push(viewEdit)
+                }
+            }
+            // Recurse
+            this.elementReferenceTree.forEach((elementReference) => {
+                if (elementReference.sectionElements && elementReference.sectionElements.length > 0) {
+                    updateSectionElementOrder(elementReference)
+                }
+            })
+
+
+        return this.elementSvc.updateElements(elementObsToUpdate, false)
+    }
+
+    revert = (): void => {
+        this.elementReferenceTree = _.cloneDeepWith(this.originalElementReferenceTree, (value: unknown, key) => {
+            if (
+                key === 'instanceId' ||
+                key === 'instanceSpecification' ||
+                key === 'presentationElement' ||
+                key === 'instanceVal'
+            )
+                return value
+            return undefined
+        }) as PresentationReference[]
+    }
+
+    refresh = () => {
+        let contents: ExpressionObject<InstanceValueObject> = null
+        if (this.view._contents) {
+            contents = (this.view as ViewObject)._contents
+        }
+        if (this.view.specification) {
+            contents = (this.view as ViewInstanceSpec).specification
+        }
+        const reqOb: ElementsRequest<string> = {
+            elementId: this.specSvc.specApi.elementId,
+            projectId: this.specSvc.specApi.projectId,
+            refId: this.specSvc.specApi.refId,
+            commitId: this.specSvc.specApi.commitId,
+        }
+        if (contents) {
+            this.viewSvc.getElementReferenceTree(reqOb, contents).then(
+                (elementReferenceTree) => {
+                    this.elementReferenceTree = elementReferenceTree
+                    this.originalElementReferenceTree = _.cloneDeepWith(elementReferenceTree, (value: unknown, key) => {
+                        if (
+                            key === 'instanceId' ||
+                            key === 'instanceSpecification' ||
+                            key === 'presentationElement' ||
+                            key === 'instanceVal'
+                        )
+                            return value
+                        return undefined
+                    }) as PresentationReference[]
+                },
+                (reason) => {
+                    this.elementReferenceTree = []
+                    this.originalElementReferenceTree = []
+                }
+            )
+        } else {
+            this.elementReferenceTree = []
+            this.originalElementReferenceTree = []
+        }
     }
 }
 
@@ -190,7 +303,7 @@ const SpecReorderComponent: VeComponentOptions = {
     template: `
     <!-- Nested node template -->
 <script type="text/ng-template" id="nodes_renderer2.html">
-    <div ui-tree-handle data-nodrag="{{$ctrl.specReorderApi.view.isOpaque ? 'true' : 'false'}}"
+    <div ui-tree-handle data-nodrag="{{element.isOpaque ? 'true' : 'false'}}"
          ng-class="{ 'grab' : !element.isOpaque, 'no-grab': element.isOpaque }"
          title="{{element.isOpaque ? 'Docgen element is not reorderable' : ''}}">
         
@@ -202,14 +315,12 @@ const SpecReorderComponent: VeComponentOptions = {
     </ol>
 </script>
 <div class="container-tree-reorder">
-    <h4 class="right-pane-title">Reorder specs</h4>
-    <hr class="right-title-divider">
     <div ng-show="!$ctrl.elementReferenceTree || $ctrl.elementReferenceTree.length == 0">View specs loading or unavailable
     </div>
-    <div ng-show="elementReferenceTree && elementReferenceTree.length > 0"><b>Bold</b> view specs are reorderable</div>
-    <div class="well" ui-tree="treeOptions">
-        <ol ui-tree-nodes class="root" ng-model="elementReferenceTree">
-            <li ng-repeat="element in elementReferenceTree" ui-tree-node ng-include="'nodes_renderer2.html'"></li>
+    <div ng-show="$ctrl.elementReferenceTree && $ctrl.elementReferenceTree.length > 0"><b>Bold</b> view specs are reorderable</div>
+    <div class="well" ui-tree="$ctrl.treeOptions">
+        <ol ui-tree-nodes class="root" ng-model="$ctrl.elementReferenceTree">
+            <li ng-repeat="element in $ctrl.elementReferenceTree" ui-tree-node ng-include="'nodes_renderer2.html'"></li>
         </ol>
     </div>
 </div>
