@@ -211,84 +211,82 @@ export class ViewService extends BaseApiService {
     ): VePromise<ElementObject[]> {
         this.apiSvc.normalize(reqOb)
         const key = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId, false, 'viewElements').join('-')
-        if (!this._isInProgress(key)) {
-            this._addInProgress<ElementObject>(
-                key,
-                new this.$q((resolve, reject) => {
-                    const requestCacheKey = this.apiSvc.makeCacheKey(reqOb, reqOb.elementId)
-                    const cached = this.cacheSvc.get<ElementObject[]>(requestCacheKey)
-                    if (cached && !update) {
-                        resolve(cached)
-                        this._removeInProgress(key)
-                    } else {
-                        this.elementSvc.getElement(reqOb, weight, update).then(
-                            (viewOrInstance: ViewObject | ViewInstanceSpec) => {
-                                const toGet: string[] = []
-                                let results: ElementObject[] = []
-                                if (viewOrInstance.type === 'Class') {
-                                    const view: ViewObject = viewOrInstance as ViewObject
-                                    if (view._displayedElementIds) {
-                                        const displayed: string[] = view._displayedElementIds
-                                        if (Array.isArray(displayed) && displayed.length > 0) {
-                                            toGet.push(...displayed)
-                                        }
+        if (this._isInProgress(key)) {
+            return this._getInProgress(key) as VePromise<ElementObject[]>
+        }
+        const cached = this.cacheSvc.get<ElementObject[]>(key)
+        if (cached && !update) {
+            return this.$q.resolve(cached)
+        }
+        this._addInProgress<ElementObject>(
+            key,
+            new this.$q((resolve, reject) => {
+                this.elementSvc.getElement(reqOb, weight, update).then(
+                    (viewOrInstance: ViewObject | ViewInstanceSpec) => {
+                        const toGet: string[] = []
+                        let results: ElementObject[] = []
+                        if (viewOrInstance.type === 'Class') {
+                            const view: ViewObject = viewOrInstance as ViewObject
+                            if (view._displayedElementIds) {
+                                const displayed: string[] = view._displayedElementIds
+                                if (Array.isArray(displayed) && displayed.length > 0) {
+                                    toGet.push(...displayed)
+                                }
+                            }
+                            if (view._contents && view._contents.operand) {
+                                const contents = view._contents.operand
+                                for (let i = 0; i < contents.length; i++) {
+                                    if (contents[i] && contents[i].instanceId) {
+                                        toGet.push(contents[i].instanceId)
                                     }
-                                    if (view._contents && view._contents.operand) {
-                                        const contents = view._contents.operand
-                                        for (let i = 0; i < contents.length; i++) {
-                                            if (contents[i] && contents[i].instanceId) {
-                                                toGet.push(contents[i].instanceId)
-                                            }
-                                        }
-                                    }
-                                } else if (viewOrInstance.type === 'InstanceSpecification') {
-                                    const view = viewOrInstance as ViewInstanceSpec
-                                    if (view.specification) {
-                                        if (view.specification.operand) {
-                                            const specContents = view.specification.operand as InstanceValueObject[]
-                                            for (let j = 0; j < specContents.length; j++) {
-                                                if (specContents[j] && specContents[j].instanceId) {
-                                                    toGet.push(specContents[j].instanceId)
-                                                }
-                                            }
-                                        }
-                                        if (
-                                            this.isTable(view) &&
-                                            view.specification &&
-                                            view.specification.value &&
-                                            typeof view.specification.value === 'string'
-                                        ) {
-                                            const tableJson: PresentTableObject = JSON.parse(
-                                                view.specification.value
-                                            ) as PresentTableObject
-                                            if (tableJson.body) {
-                                                toGet.push(...this.collectTableSources(tableJson))
-                                            }
+                                }
+                            }
+                        } else if (viewOrInstance.type === 'InstanceSpecification') {
+                            const view = viewOrInstance as ViewInstanceSpec
+                            if (view.specification) {
+                                if (view.specification.operand) {
+                                    const specContents = view.specification.operand as InstanceValueObject[]
+                                    for (let j = 0; j < specContents.length; j++) {
+                                        if (specContents[j] && specContents[j].instanceId) {
+                                            toGet.push(specContents[j].instanceId)
                                         }
                                     }
                                 }
-
-                                const toGetReqOb: ElementsRequest<string[]> = Object.assign(reqOb, { elementId: toGet })
-                                this.elementSvc
-                                    .getElements(toGetReqOb, weight, update)
-                                    .then((data) => {
-                                        results = data
-                                    })
-                                    .finally(() => {
-                                        this.cacheSvc.put(requestCacheKey, results)
-                                        resolve(results)
-                                        this._removeInProgress(key)
-                                    })
-                            },
-                            (reason) => {
-                                reject(reason)
-                                this._removeInProgress(key)
+                                if (
+                                    this.isTable(view) &&
+                                    view.specification &&
+                                    view.specification.value &&
+                                    typeof view.specification.value === 'string'
+                                ) {
+                                    const tableJson: PresentTableObject = JSON.parse(
+                                        view.specification.value
+                                    ) as PresentTableObject
+                                    if (tableJson.body) {
+                                        toGet.push(...this.collectTableSources(tableJson))
+                                    }
+                                }
                             }
-                        )
+                        }
+
+                        const toGetReqOb: ElementsRequest<string[]> = Object.assign(reqOb, { elementId: toGet })
+                        this.elementSvc
+                            .getElements(toGetReqOb, weight, update)
+                            .then((data) => {
+                                results = data
+                            })
+                            .finally(() => {
+                                this.cacheSvc.put(key, results)
+                                this._removeInProgress(key)
+                                resolve(results)
+                            })
+                    },
+                    (reason) => {
+                        this._removeInProgress(key)
+                        reject(reason)
                     }
-                })
-            )
-        }
+                )
+            })
+        )
         return this._getInProgress(key) as VePromise<ElementObject[]>
     }
 

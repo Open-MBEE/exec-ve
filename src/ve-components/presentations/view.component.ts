@@ -277,7 +277,9 @@ export class ViewController implements angular.IComponentController {
                     if (dups.length > 0) {
                         this.growl.warning('There are duplicates in this view, duplicates ignored!')
                     }
-
+                    if (data._veNumber) {
+                        this.level = data._veNumber.split('.').length;
+                    }
                     if (
                         //data._numElements && data._numElements > 5000 &&
                         this.mmsCommitId &&

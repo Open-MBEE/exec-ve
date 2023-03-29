@@ -413,13 +413,16 @@ class LeftPaneController implements angular.IComponentController {
                 }
                 this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
             }
-            void this.$state.go(
-                'main.project.ref.view.present.' + (this.$uiRouterGlobals.params as ParamsObject).display,
-                {
-                    viewId,
-                    search: undefined,
-                }
-            )
+            if (this.rootScopeSvc.veFullDocMode()) {
+                this.eventSvc.$broadcast<string>('view.scroll', viewId)
+            } else {
+                void this.$state.go(
+                    'main.project.ref.view.present.' + (this.$uiRouterGlobals.params as ParamsObject).display,
+                    {
+                        viewId,
+                        search: undefined,
+                    })
+            }
         }
     }
 
