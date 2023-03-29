@@ -195,7 +195,7 @@ class RefsController {
             type: itemType,
             parentRefId: '',
             parentTitle: '',
-            addType: 'item',
+            insertType: 'ref',
             lastCommit: true,
         }
         const branch = this.refSelected

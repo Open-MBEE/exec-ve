@@ -107,7 +107,7 @@ export class SpecTool implements ISpecTool {
 
     protected ran = false
     protected lastid = null //race condition check
-    protected gettingSpec = false
+    protected gettingSpec = true
     protected isSlot: boolean = false
     public element: ElementObject
     public document: ViewObject
@@ -187,6 +187,7 @@ export class SpecTool implements ISpecTool {
 
         this.subs.push(
             this.eventSvc.$on('element.selected', () => {
+                this.gettingSpec = true
                 if (this.edit && this.editorApi.save) {
                     void this.editorApi.save()
                 }
@@ -248,6 +249,7 @@ export class SpecTool implements ISpecTool {
         this.ref = this.specSvc.getRef()
         this.elementDataLink = this.specApi.dataLink
         this.initCallback()
+        this.gettingSpec = false
     }
 
     //Spec Tool Common API

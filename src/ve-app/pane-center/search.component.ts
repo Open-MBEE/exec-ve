@@ -31,6 +31,7 @@ class SearchController {
         this.searchContentLoading = false
 
         this.contentWindowSvc.toggleLeftPane(true)
+        this.rootScopeSvc.veHideLeft(true)
 
         this.searchOptions = {
             emptyDocTxt: 'This field is empty.',

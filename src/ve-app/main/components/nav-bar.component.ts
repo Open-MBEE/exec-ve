@@ -76,7 +76,7 @@ class NavBarController implements angular.IComponentController {
         this.ref = this.mmsRef
         this.org = this.mmsOrg
 
-        this.showSearch = this.$state.includes('**.search.**')
+        this.showSearch = !this.$state.includes('**.search.**')
 
         void this.authSvc.checkLogin().then(
             (data) => {

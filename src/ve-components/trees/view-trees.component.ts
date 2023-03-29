@@ -243,7 +243,7 @@ class ViewTreesController implements IComponentController {
     insert(itemType: string): VePromise<void, string> {
         const deferred = this.$q.defer<void>()
         this.insertData = {
-            addType: 'item',
+            insertType: 'view',
             type: itemType,
             newViewAggr: 'shared',
             parentBranch: null,

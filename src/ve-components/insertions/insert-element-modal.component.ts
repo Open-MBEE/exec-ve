@@ -20,7 +20,7 @@ class InsertController extends VeModalControllerImpl<MmsObject> implements VeMod
     private projectId: string
     private refId: string
     private orgId: string
-    private addType: string
+    private insertType: string
     private type: string
 
     private $componentEl: JQuery<HTMLElement>
@@ -42,7 +42,7 @@ class InsertController extends VeModalControllerImpl<MmsObject> implements VeMod
     $onInit(): void {
         this.insertData = this.resolve.getInsertData
 
-        this.addType = this.insertData.addType
+        this.insertType = this.insertData.insertType
         this.projectId = this.resolve.getProjectId
         this.refId = this.resolve.getRefId ? this.resolve.getRefId : 'master'
         this.orgId = this.resolve.getOrgId ? this.resolve.getOrgId : null
@@ -63,7 +63,7 @@ class InsertController extends VeModalControllerImpl<MmsObject> implements VeMod
     }
 
     public recompile = (): void => {
-        let tag = this.extensionSvc.getTagByType('add', this.type)
+        let tag = this.extensionSvc.getTagByType('insert', this.insertType)
         if (tag === 'extension-error') {
             tag = 'insert-element'
         }
@@ -88,7 +88,7 @@ const InsertElementModalComponent: VeModalComponent = {
     template: `
     <div>
     <div class="modal-header">
-        <h4 class="{{ $ctrl.addType | lowercase }}-type-icon">Create New or Add a {{$ctrl.type}}</h4>
+        <h4 class="{{ $ctrl.insertType | lowercase }}-type-icon">Create New or Add a {{$ctrl.type}}</h4>
         <h4 ng-show="$ctrl.insertData.parentTitle">From {{ $ctrl.insertData.parentTitle }}</h4>
     </div>
 </div>

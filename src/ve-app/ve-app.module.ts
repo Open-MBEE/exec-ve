@@ -929,6 +929,20 @@ veApp.config([
                     'pane-center@main': {
                         component: 'search',
                     },
+                    'pane-right@main': {
+                        component: 'rightPane',
+                        bindings: {
+                            mmsRef: 'refOb',
+                            mmsRoot: 'documentOb',
+                        },
+                    },
+                    'toolbar-right@main': {
+                        component: 'rightToolbar',
+                        bindings: {
+                            mmsRef: 'refOb',
+                            mmsRoot: 'documentOb',
+                        },
+                    },
                 },
             })
             .state('main.share', {

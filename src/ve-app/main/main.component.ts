@@ -57,6 +57,8 @@ class MainController implements IComponentController {
     readonly veConfig: VeConfig
 
     private hidePanes: boolean = false
+    private hideRight: boolean = false
+    private hideLeft: boolean = false
     showManageRefs: boolean = false
     showLogin: boolean = true
     mmsWorkingTime: WorkingTimeObject
@@ -113,6 +115,18 @@ class MainController implements IComponentController {
         this.subs.push(
             this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDEPANES, (value: boolean) => {
                 this.hidePanes = value
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDELEFT, (value: boolean) => {
+                this.hideLeft = value
+            })
+        )
+
+        this.subs.push(
+            this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDERIGHT, (value: boolean) => {
+                this.hideRight = value
             })
         )
 
@@ -374,23 +388,27 @@ const MainComponent: VeComponentOptions = {
         <ui-view name="banner-bottom"></ui-view>
         <div ng-hide="$ctrl.hidePanes">
             <ng-pane pane-id="main" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="ng-pane" id="main-pane">
-                <ng-pane pane-id="left-toolbar" pane-anchor="west" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
-                    <ui-view name="toolbar-left"></ui-view>
-                </ng-pane>
-                <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.paneClosed">
-                    <ui-view name="pane-left" class="container-pane-left"></ui-view>
-                </ng-pane>
-                <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
-                    <ui-view name="toolbar-right"></ui-view>
-                </ng-pane>
-                <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="content-pane">
-                    <ng-pane pane-id="right" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="true" class="pane-right">
-                        <ui-view name="pane-right"></ui-view>
+                <div ng-hide="$ctrl.hideLeft">
+                    <ng-pane pane-id="left-toolbar" pane-anchor="west" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
+                        <ui-view name="toolbar-left"></ui-view>
                     </ng-pane>
+                    <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.paneClosed">
+                        <ui-view name="pane-left" class="container-pane-left"></ui-view>
+                    </ng-pane>
+                </div>
+                <div ng-hide="$ctrl.hideRight">
+                    <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
+                        <ui-view name="toolbar-right"></ui-view>
+                    </ng-pane>
+                </div>
+                <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="content-pane">
+                    <div ng-hide="$ctrl.hideRight">
+                        <ng-pane pane-id="right" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="true" class="pane-right">
+                            <ui-view name="pane-right"></ui-view>
+                        </ng-pane>
+                    </div>
                     <ng-pane pane-id="center" pane-anchor="center" class="pane-center" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
-                        <ui-view name="pane-center">
-                           
-                        </ui-view>
+                        <ui-view name="pane-center"></ui-view>
                     </ng-pane>
                 </ng-pane>
             </ng-pane>
