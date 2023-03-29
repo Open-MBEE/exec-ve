@@ -371,11 +371,8 @@ class FullDocumentController implements IComponentController {
             //if (viewId === this.processed) return
             //this.processed = viewId
             this.fullDocumentApi.handleClickOnBranch(viewId, () => {
-                this.$location.hash(viewId) //this is causing a state change, transition will be canceled
-                this.$anchorScroll()
+                document.getElementById(viewId).scrollIntoView(true)
             })
-        } else {
-            //this.growl.error('Invalid Scroll Target')
         }
     }
 
