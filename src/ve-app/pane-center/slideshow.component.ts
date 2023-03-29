@@ -1,4 +1,5 @@
-import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
+import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs'
+import { Transition } from '@uirouter/core'
 
 import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService, ResolveService } from '@ve-app/main/services'
@@ -28,7 +29,7 @@ import {
  * Note: This controller is intended for navigating between 'views' and 'sections' only. If you wish to navigate between
  * other tree object types you will need to create a new one or modify this one to be more generic.
  */
-class SlideshowController implements angular.IComponentController {
+class SlideshowController implements angular.IComponentController, Ng1Controller {
     //Bindings
     mmsParams: ParamsObject
     mmsProject: ProjectObject
@@ -202,35 +203,15 @@ class SlideshowController implements angular.IComponentController {
                     return
                 } else if (data.clicked === 'convert-pdf') {
                     if (this.isPageLoading()) return
-                    this.appUtilsSvc
-                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 3)
-                        .then(
-                            (ob) => {},
-                            (reason) => {}
-                        )
+                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 3)
                     return
                 } else if (data.clicked === 'print') {
                     if (this.isPageLoading()) return
-                    void this.appUtilsSvc
-                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 1)
-                        .catch((reason?) => {
-                            if (reason) {
-                                this.growl.error('Print Error:' + reason.message)
-                            } else {
-                                this.growl.info('Print Cancelled', {
-                                    ttl: 1000,
-                                })
-                            }
-                        })
+                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 1)
                     return
                 } else if (data.clicked === 'word') {
                     if (this.isPageLoading()) return
-                    this.appUtilsSvc
-                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 2)
-                        .then(
-                            (ob) => {},
-                            (reason?) => {}
-                        )
+                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 2)
                     return
                 } else if (data.clicked === 'tabletocsv') {
                     if (this.isPageLoading()) return
@@ -247,15 +228,25 @@ class SlideshowController implements angular.IComponentController {
         )
     }
 
-    initView = (): void => {
+    uiOnParamsChanged(newValues: ParamsObject, $transition$: Transition): void {
+        if (newValues.viewId !== this.viewId) this.initView(newValues.viewId)
+    }
+    uiCanExit(transition: Transition): HookResult {
+        //Do nothing
+    }
+
+    initView = (viewId?: string): void => {
         this.rootScopeSvc.veViewContentLoading(true)
 
-        if (this.mmsView || this.mmsDocument) {
+        if (!viewId && (this.mmsView || this.mmsDocument)) {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
-            this.rootScopeSvc.veViewContentLoading(false)
+        } else if (viewId) {
+            this.viewId = viewId
         } else {
             return
         }
+
+        this.rootScopeSvc.veViewContentLoading(false)
 
         this.vidLink = false //whether to have go to document link
         if (

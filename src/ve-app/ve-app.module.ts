@@ -783,6 +783,7 @@ veApp.config([
                         value: null,
                         squash: true,
                         raw: true,
+                        dynamic: true,
                     },
                     display: {
                         inherit: true,
@@ -890,9 +891,9 @@ veApp.config([
             })
 
             .state('main.project.ref.search', {
-                url: '/search?search&field',
+                url: '/keywords?search&field',
                 params: {
-                    search: {
+                    keywords: {
                         dynamic: true,
                     },
                     field: {
@@ -1061,7 +1062,7 @@ veApp.run([
         $transitions.onBefore({}, (transition: Transition) => {
             const from = transition.$from().name
             const to = transition.$to().name
-            if (from === to && from === 'main.project.ref.view.present.document'){
+            if (from === to && from === 'main.project.ref.view.present.document') {
                 return false
             }
             const params: ParamsObject = transition.params()

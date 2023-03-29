@@ -202,7 +202,7 @@ export class SearchController implements angular.IComponentController {
             this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, search_default_buttons)
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 this.bbApi.toggleButton(data.clicked)
-                this.filterSearchResults(data.type)
+                this.filterSearchResults(this.buttonBarSvc.getButtonDefinition(data.clicked).type)
             })
         }
         this.refId = this.mmsRefId ? this.mmsRefId : 'master'
