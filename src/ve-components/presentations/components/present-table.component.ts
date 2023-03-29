@@ -479,7 +479,7 @@ class PresentTableController extends Presentation implements IPresentation {
      *  content such as image, table, list **/
     private _getCellValueForSorting = (row: HTMLElement, columnIndex: number): string => {
         const cell = $(row).children('td').eq(columnIndex)
-        const containerDivContent: JQuery<HTMLElement> = cell.children('div').contents() as JQuery<HTMLElement>
+        const containerDivContent = cell.children('div').contents()
         // if there is no content, think of it as empty string
         if (containerDivContent.length === 0) {
             return ''
@@ -721,7 +721,7 @@ const PresentTableComponent: IPresentationComponentOptions = {
     <label class="btn btn-sm table-button column-input-label" ng-show="fixedColumns">Columns to Freeze <input type="text" ng-show="$ctrl.fixedColumns" size="3" class="column-input" ng-model="$ctrl.numFixedColumns" /></label> 
     <button class="btn btn-sm btn-default table-button" ng-show="fixedColumns" ng-click="$ctrl.updateFixedColumns()">Update</button> 
     <button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="$ctrl.resetSort()">Reset Sort</button>
-    <span class = "ve-show-filter" ng-show="$ctrl.showFilter">
+    <span class="ve-show-filter" ng-show="$ctrl.showFilter">
         <form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model="$ctrl.searchTerm" ng-model-options="$ctrl.ngModelOptions"></form>
         <span class = "ve-filter-status">Showing <strong>{{$ctrl.numFiltered}}</strong> of <strong>{{$ctrl.numTotal}}</strong> Rows: </span>
     </span>

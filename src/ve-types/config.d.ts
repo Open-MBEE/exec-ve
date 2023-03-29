@@ -3,6 +3,7 @@ import { VeExperimentConfig, VeExperimentDescriptor } from '@ve-components/servi
 export interface VeConfig {
     version?: string
     apiUrl: string
+    printUrl: string
     basePath: string
     enableDebug?: boolean
     customLabels?: { [key: string]: string }

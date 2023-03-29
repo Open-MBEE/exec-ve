@@ -105,8 +105,8 @@ export class ViewPresentationElemController implements angular.IComponentControl
         }
         this.elementSvc
             .getElement(reqOb, 1)
-            .then(
-                (instanceSpec) => {
+            .then((instanceSpec) => {
+                this.viewSvc.getViewElements(reqOb, 1).finally(() => {
                     this.instanceSpec = instanceSpec
                     this.presentationElem = this.viewSvc.getPresentationInstanceObject(instanceSpec)
                             this.presentationElemLoading = false
@@ -154,11 +154,10 @@ export class ViewPresentationElemController implements angular.IComponentControl
                                     }
                                 })
                             )
-                        },
+                })},
                         (reason) => {
                             this._error(reqOb, reason)
                         }
-
             )
             .finally(() => {
                 this.$element.removeClass('isLoading')

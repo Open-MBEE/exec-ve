@@ -69,7 +69,7 @@ export const pane_center_buttons: IButtonBarButton[] = [
         button_content: 'Export',
         toggle: true,
         dropdown: {
-            ids: ['convert_pdf', 'word', 'tabletocsv'],
+            ids: ['convert-pdf', 'word', 'tabletocsv'],
             icon: 'fa-solid fa-caret-down',
             toggle_icon: 'fa-solid fa-caret-up',
         },

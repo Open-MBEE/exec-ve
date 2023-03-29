@@ -211,14 +211,8 @@ class FullDocumentController implements IComponentController {
                             this.appUtilsSvc
                                 .printModal(angular.element('#print-div'), this.mmsDocument, this.mmsRef, true, 3)
                                 .then(
-                                    (ob) => {
-                                        this.growl.info('Exporting as PDF file. Please wait for a completion email.', {
-                                            ttl: -1,
-                                        })
-                                    },
-                                    (reason) => {
-                                        this.growl.error('Exporting as PDF file Failed: ' + reason.message)
-                                    }
+                                    (ob) => {},
+                                    (reason) => {}
                                 )
                         })
                         break
@@ -238,14 +232,8 @@ class FullDocumentController implements IComponentController {
                             this.appUtilsSvc
                                 .printModal(angular.element('#print-div'), this.mmsDocument, this.mmsRef, true, 2)
                                 .then(
-                                    (ob) => {
-                                        this.growl.info('Exporting as Word file. Please wait for a completion email.', {
-                                            ttl: -1,
-                                        })
-                                    },
-                                    (reason) => {
-                                        this.growl.error('Exporting as Word file Failed: ' + reason.message)
-                                    }
+                                    (ob) => {},
+                                    (reason) => {}
                                 )
                         })
                         break

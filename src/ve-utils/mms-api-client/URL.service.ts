@@ -145,8 +145,8 @@ export class URLService {
      * @param {string} refId id of the ref
      * @returns {string} The url
      */
-    getExportHtmlUrl = (projectId: string, refId: string): string => {
-        return `${this.root}/projects/${projectId}/refs/${refId}/convert`
+    getExportHtmlUrl = (): string => {
+        return this.veConfig.printUrl
     }
 
     getAuthenticationUrl = (): string => {

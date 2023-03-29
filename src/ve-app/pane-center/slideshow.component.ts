@@ -205,14 +205,8 @@ class SlideshowController implements angular.IComponentController {
                     this.appUtilsSvc
                         .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 3)
                         .then(
-                            (ob) => {
-                                this.growl.info('Exporting as PDF file. Please wait for a completion email.', {
-                                    ttl: -1,
-                                })
-                            },
-                            (reason) => {
-                                this.growl.error('Exporting as PDF file Failed: ' + reason.message)
-                            }
+                            (ob) => {},
+                            (reason) => {}
                         )
                     return
                 } else if (data.clicked === 'print') {
@@ -234,20 +228,8 @@ class SlideshowController implements angular.IComponentController {
                     this.appUtilsSvc
                         .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 2)
                         .then(
-                            (ob) => {
-                                this.growl.info('Exporting as Word file. Please wait for a completion email.', {
-                                    ttl: -1,
-                                })
-                            },
-                            (reason?) => {
-                                if (reason) {
-                                    this.growl.error('Exporting as Word file Failed: ' + reason.message)
-                                } else {
-                                    this.growl.info('Export Cancelled', {
-                                        ttl: 1000,
-                                    })
-                                }
-                            }
+                            (ob) => {},
+                            (reason?) => {}
                         )
                     return
                 } else if (data.clicked === 'tabletocsv') {
