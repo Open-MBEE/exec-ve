@@ -176,6 +176,9 @@ class FullDocumentController implements IComponentController {
         )
 
         this.subs.push(
+            this.eventSvc.$on<string>('view.scroll', (viewId) => {
+                this._scroll(viewId)
+            }),
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 switch (data.clicked) {
                     case 'show-comments':
@@ -183,7 +186,7 @@ class FullDocumentController implements IComponentController {
                             'show-comments',
                             this.rootScopeSvc.veCommentsOn(!this.rootScopeSvc.veCommentsOn())
                         )
-                        return
+                        break
 
                     case 'show-elements':
                         this.bbApi.toggleButton(
@@ -194,7 +197,7 @@ class FullDocumentController implements IComponentController {
                             this.bbApi.toggleButton('show-edits', false)
                             this.rootScopeSvc.veEditMode(false)
                         }
-                        return
+                        break
 
                     case 'show-edits':
                         this.bbApi.toggleButton(
@@ -205,23 +208,17 @@ class FullDocumentController implements IComponentController {
                             this.bbApi.toggleButton('show-elements', this.rootScopeSvc.veEditMode())
                             this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode())
                         }
-
+                        break
                     case 'convert-pdf':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             this.appUtilsSvc
                                 .printModal(angular.element('#print-div'), this.mmsDocument, this.mmsRef, true, 3)
                                 .then(
-                                    (ob) => {
-                                        this.growl.info('Exporting as PDF file. Please wait for a completion email.', {
-                                            ttl: -1,
-                                        })
-                                    },
-                                    (reason) => {
-                                        this.growl.error('Exporting as PDF file Failed: ' + reason.message)
-                                    }
+                                    (ob) => {},
+                                    (reason) => {}
                                 )
                         })
-
+                        break
                     case 'print':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             void this.appUtilsSvc.printModal(
@@ -232,27 +229,23 @@ class FullDocumentController implements IComponentController {
                                 1
                             )
                         })
-
+                        break
                     case 'word':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             this.appUtilsSvc
                                 .printModal(angular.element('#print-div'), this.mmsDocument, this.mmsRef, true, 2)
                                 .then(
-                                    (ob) => {
-                                        this.growl.info('Exporting as Word file. Please wait for a completion email.', {
-                                            ttl: -1,
-                                        })
-                                    },
-                                    (reason) => {
-                                        this.growl.error('Exporting as Word file Failed: ' + reason.message)
-                                    }
+                                    (ob) => {},
+                                    (reason) => {}
                                 )
                         })
+                        break
 
                     case 'tabletocsv':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             this.appUtilsSvc.tableToCsv(angular.element('#print-div'), true)
                         })
+                        break
 
                     case 'refresh-numbering':
                         this.fullDocumentApi.loadRemainingViews(() => {
@@ -262,6 +255,7 @@ class FullDocumentController implements IComponentController {
                                 }
                             })
                         })
+                        break
                 }
             })
         )
@@ -363,7 +357,7 @@ class FullDocumentController implements IComponentController {
     }
 
     private _scroll = (viewId: string): void => {
-        if (this.view2Node[viewId]) {
+        if (this.view2Children[viewId]) {
             const data = {
                 rootId: this.$state.includes('**.portal.**') ? null : this.mmsDocument.id,
                 elementId: viewId,
@@ -373,15 +367,12 @@ class FullDocumentController implements IComponentController {
                 refType: this.mmsRef.type,
             }
 
-            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
-            if (viewId === this.processed) return
-            this.processed = viewId
+            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+            //if (viewId === this.processed) return
+            //this.processed = viewId
             this.fullDocumentApi.handleClickOnBranch(viewId, () => {
-                this.$location.hash(viewId)
-                this.$anchorScroll()
+                document.getElementById(viewId).scrollIntoView(true)
             })
-        } else {
-            this.growl.error('Invalid Scroll Target')
         }
     }
 

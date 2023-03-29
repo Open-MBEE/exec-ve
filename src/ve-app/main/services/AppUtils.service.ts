@@ -264,6 +264,7 @@ Save CSV</button></div>
                     if (result.tof != '') htmlArr.push(result.tof)
                     htmlArr.push(result.contents, '</body></html>')
                     const htmlString = htmlArr.join('')
+                    this.growl.info('Generating, please wait...', {ttl: -1})
                     this.utilsSvc
                         .exportHtmlAs(mode, {
                             htmlString: htmlString,
@@ -274,9 +275,11 @@ Save CSV</button></div>
                         })
                         .then(
                             () => {
+                                this.growl.success('File Downloaded', {ttl: -1})
                                 deferred.resolve()
                             },
                             (reason) => {
+                                this.growl.error('Generation Failed')
                                 deferred.reject(reason)
                             }
                         )
@@ -336,14 +339,14 @@ Save CSV</button></div>
         const absurl = this.$location.absUrl()
         const prefix = protocol + ':// hostname' + (port == 80 || port == 443 ? '' : `:${port}`)
         const mmsIndex = absurl.indexOf('index.html')
-        let toc = this.utilsSvc.makeHtmlTOC(this.treeSvc.getTreeRows('treeOfContents')[0].branch)
+        let toc = this.utilsSvc.makeHtmlTOC(this.treeSvc.getTreeData()[0])
 
         // Conver to proper links for word/pdf
         this.utilsSvc.convertViewLinks(printElementCopy)
 
         // Get correct table/image numbering based on doc hierarchy
         const tableAndFigTOC = this.utilsSvc.makeTablesAndFiguresTOC(
-            this.treeSvc.getTreeRows('treeOfContents')[0].branch,
+            this.treeSvc.getTreeData()[0],
             printElementCopy,
             false,
             htmlTotf
@@ -387,8 +390,8 @@ Save CSV</button></div>
         }
         // Remove all empty paragraphs
         printElementCopy.find('p:empty').remove()
-        printElementCopy.find('p').each(() => {
-            const $this = $(this)
+        printElementCopy.find('p').each((index, element) => {
+            const $this = $(element)
             if ($this.html().replace(/\s|&nbsp;/g, '').length === 0) {
                 $this.remove()
             }

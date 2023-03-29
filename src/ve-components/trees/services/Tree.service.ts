@@ -103,8 +103,8 @@ export class TreeService {
         return this.treeData.length > 0
     }
 
-    public getTreeRows = (id: string): TreeRow[] => {
-        return this.rows[id]
+    public getTreeData = (): TreeBranch[] => {
+        return this.treeData
     }
     //
     // public setTreeApi = (treeOptions: TreeOptions): void => {

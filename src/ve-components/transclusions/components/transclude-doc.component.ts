@@ -57,7 +57,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
                 <span ng-if="$ctrl.isDirectChildOfPresentationElement"><input type="text" class="form-control" ng-model="$ctrl.edit.name"/></span>
             </div></form>
         </h3>
-        <div class="btn-group pull-right">
+        <div class="btn-group pull-right" ng-hide="$ctrl.editLoading">
             <button-bar class="transclude-panel-toolbar" button-id="$ctrl.bbId"></button-bar>
         </div>
     </div>
@@ -153,6 +153,11 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
                 this.editorType = this.presentationElem.type
             }
         }
+    }
+
+    $onDestroy(): void {
+        super.$onDestroy()
+        this.buttonBarSvc.destroy(this.bbId)
     }
 
     public getContent = (preview?: boolean): VePromise<string | HTMLElement[], string> => {

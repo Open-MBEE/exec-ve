@@ -82,7 +82,7 @@ class InsertCommentController extends Insertion<InsertData> {
 }
 
 const InsertCommentComponent: VeComponentOptions = {
-    selector: 'addComment',
+    selector: 'insertComment',
     template: `
     <div class="modal-header">
     <h4>Insert a comment</h4>
@@ -105,7 +105,7 @@ const InsertCommentComponent: VeComponentOptions = {
 </div> 
 `,
     bindings: {
-        InsertData: '<',
+        insertData: '<',
         insertApi: '<',
         mmsProjectId: '@',
         mmsRefId: '@',

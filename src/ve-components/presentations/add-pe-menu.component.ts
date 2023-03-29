@@ -8,7 +8,7 @@ import { veComponents } from '@ve-components'
 import { VeComponentOptions } from '@ve-types/angular'
 import { ViewObject } from '@ve-types/mms'
 
-class InsertPeMenuController implements IComponentController {
+class AddPeMenuController implements IComponentController {
     // Bindings
     private mmsView: ViewObject
 
@@ -89,7 +89,7 @@ const InsertPeMenuComponent: VeComponentOptions = {
         mmsView: '<',
         index: '<',
     },
-    controller: InsertPeMenuController,
+    controller: AddPeMenuController,
 }
 
 veComponents.component(InsertPeMenuComponent.selector, InsertPeMenuComponent)

@@ -95,7 +95,7 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
         this.printElement = this.resolve.print
         this.action = this.mode === 1 ? 'print' : this.mode === 3 ? 'Generate PDF' : 'Generate word'
         this.label = this.mode === 3 ? 'PDF' : this.mode === 2 ? 'Word' : ''
-        this.customizeDoc.useCustomStyle = false
+        this.customizeDoc = { useCustomStyle: false, customCSS: '' }
 
         if (this.printElement.find('.ve-error').length > 0) {
             this.hasError = true
@@ -146,7 +146,7 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
                                 this.refOb.parentCommitId
                             )
                         } else {
-                            promise = this.projectSvc.getCommits(this.refOb._projectId, this.refOb.id, null, 1)
+                            promise = this.projectSvc.getCommits(this.refOb.id, this.refOb._projectId, null, 1)
                         }
 
                         promise
@@ -292,10 +292,10 @@ const PrintConfirmModalComponent: VeModalComponent = {
     </p>
     <p ng-if="$ctrl.mode !== 1">
      <span ng-if="$ctrl.type === 'VIEW'">
-      Click on {{$ctrl.action | uppercase}} to generate a {{$ctrl.label}} of this view (it will not include table of contents or cover pages). You will receive an email with subject line "HTML to {{$ctrl.label}} generation completed" with a link to the generated {{label | uppercase}}. If you want the full document instead, please click on GO TO FULL DOCUMENT.
+      Click on {{$ctrl.action | uppercase}} to generate a {{$ctrl.label}} of this view (it will not include table of contents or cover pages). If you want the full document instead, please click on GO TO FULL DOCUMENT.
      </span>
      <span ng-if="$ctrl.type === 'DOCUMENT'">
-      Please wait until the full document appears in this pane before continuing. You will receive an email with subject line "HTML to {{$ctrl.label}} generation completed" with a link to the generated {{$ctrl.label}}.
+      Please wait until the full document appears in this pane before continuing.
      </span>
     </p>
     <p ng-if="$ctrl.type == 'DOCUMENT' && $ctrl.mode === 3">

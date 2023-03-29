@@ -125,7 +125,7 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
 }
 
 const InsertRefComponent: VeComponentOptions = {
-    selector: 'addRef',
+    selector: 'insertRef',
     template: `
     <div>
     <div class="modal-header">
@@ -192,7 +192,7 @@ const InsertRefComponent: VeComponentOptions = {
 </div>
 `,
     bindings: {
-        InsertData: '<',
+        insertData: '<',
         insertApi: '<',
         mmsProjectId: '@',
         mmsRefId: '@',

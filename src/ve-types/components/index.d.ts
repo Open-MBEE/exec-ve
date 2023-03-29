@@ -14,6 +14,7 @@ export interface ComponentController {
     instanceSpec?: ElementObject
     instanceVal?: InstanceValueObject
     elementSaving: boolean
+    editLoading?: boolean
     bbApi?: ButtonBarApi
     editorApi?: EditingApi
     specApi?: SpecApi
