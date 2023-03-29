@@ -176,6 +176,9 @@ class FullDocumentController implements IComponentController {
         )
 
         this.subs.push(
+            this.eventSvc.$on<string>('view.scroll', (viewId) => {
+                this._scroll(viewId)
+            }),
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 switch (data.clicked) {
                     case 'show-comments':
@@ -354,7 +357,7 @@ class FullDocumentController implements IComponentController {
     }
 
     private _scroll = (viewId: string): void => {
-        if (this.view2Node[viewId]) {
+        if (this.view2Children[viewId]) {
             const data = {
                 rootId: this.$state.includes('**.portal.**') ? null : this.mmsDocument.id,
                 elementId: viewId,
@@ -364,15 +367,15 @@ class FullDocumentController implements IComponentController {
                 refType: this.mmsRef.type,
             }
 
-            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
-            if (viewId === this.processed) return
-            this.processed = viewId
+            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+            //if (viewId === this.processed) return
+            //this.processed = viewId
             this.fullDocumentApi.handleClickOnBranch(viewId, () => {
-                this.$location.hash(viewId)
+                this.$location.hash(viewId) //this is causing a state change, transition will be canceled
                 this.$anchorScroll()
             })
         } else {
-            this.growl.error('Invalid Scroll Target')
+            //this.growl.error('Invalid Scroll Target')
         }
     }
 
