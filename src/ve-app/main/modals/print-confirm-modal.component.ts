@@ -146,7 +146,7 @@ class PrintConfirmModalController extends VeModalControllerImpl<PrintConfirmResu
                                 this.refOb.parentCommitId
                             )
                         } else {
-                            promise = this.projectSvc.getCommits(this.refOb._projectId, this.refOb.id, null, 1)
+                            promise = this.projectSvc.getCommits(this.refOb.id, this.refOb._projectId, null, 1)
                         }
 
                         promise
