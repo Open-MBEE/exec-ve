@@ -1,5 +1,6 @@
 {
-  "apiUrl": "http://localhost:8080",
+  "apiUrl": "https://cae-mms.jpl.nasa.gov",
+  "printUrl": "https://sswe-mms4-docconvert.jpl.nasa.gov/convert",
   "basePath": "",
   "enableDebug": true,
   "customLabels": {
