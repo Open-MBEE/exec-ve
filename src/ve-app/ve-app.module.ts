@@ -1060,11 +1060,7 @@ veApp.run([
     ): void {
         rootScopeSvc.loginModalOpen(false)
         $transitions.onBefore({}, (transition: Transition) => {
-            const from = transition.$from().name
             const to = transition.$to().name
-            if (from === to && from === 'main.project.ref.view.present.document') {
-                return false
-            }
             const params: ParamsObject = transition.params()
             if (to === 'main.login' || rootScopeSvc.loginModalOpen()) {
                 if (params.next) {
