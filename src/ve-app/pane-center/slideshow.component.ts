@@ -61,7 +61,8 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     shortUrl: string
     viewApi: ViewApi
     number: string
-    public viewId: string
+    private viewId: string
+    private params: ParamsObject
 
     static $inject = [
         '$q',
@@ -114,7 +115,9 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     ) {}
 
     $onInit(): void {
+        this.params = this.mmsParams
         this.rootScopeSvc.veFullDocMode(false)
+        this.rootScopeSvc.veHideLeft(false)
         this.eventSvc.$init(this)
 
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons)
@@ -229,19 +232,21 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     }
 
     uiOnParamsChanged(newValues: ParamsObject, $transition$: Transition): void {
-        if (newValues.viewId !== this.viewId) this.initView(newValues.viewId)
+        if (newValues.viewId && newValues.viewId !== this.params.viewId)
+            this.initView($transition$.params() as ParamsObject)
     }
     uiCanExit(transition: Transition): HookResult {
         //Do nothing
     }
 
-    initView = (viewId?: string): void => {
+    initView = (params?: ParamsObject): void => {
         this.rootScopeSvc.veViewContentLoading(true)
 
-        if (!viewId && (this.mmsView || this.mmsDocument)) {
+        if (params) {
+            this.params = params
+            this.viewId = params.viewId
+        } else if (this.mmsDocument || this.mmsView) {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
-        } else if (viewId) {
-            this.viewId = viewId
         } else {
             return
         }
@@ -259,10 +264,10 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
 
         this.shortUrl = this.shortUrlSvc.getShortUrl({
             orgId: this.mmsProject.orgId,
-            documentId: this.mmsParams.documentId ? this.mmsParams.documentId : '',
-            viewId: this.mmsParams.viewId && !this.mmsParams.documentId.endsWith('_cover') ? this.mmsParams.viewId : '',
-            projectId: this.mmsParams.projectId,
-            refId: this.mmsParams.refId,
+            documentId: this.params.documentId ? this.params.documentId : '',
+            viewId: this.params.viewId && !this.params.documentId.endsWith('_cover') ? this.params.viewId : '',
+            projectId: this.params.projectId,
+            refId: this.params.refId,
         })
 
         if (this.$state.includes('main.project.ref')) {
@@ -449,8 +454,8 @@ const SlideshowComponent: VeComponentOptions = {
                         , Last Commented {{$ctrl.comments.lastCommented | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.comments.lastCommentedBy}}</b></span>
                 </div>
                 <div id="print-div" ng-show="$ctrl.viewId">
-                    <view mms-element-id="{{$ctrl.viewId}}" mms-commit-id="{{$ctrl.mmsParams.commitId ? $ctrl.mmsParams.commitId : 'latest'}}"
-                              mms-project-id="{{$ctrl.mmsParams.projectId}}" mms-ref-id="{{$ctrl.mmsParams.refId}}"
+                    <view mms-element-id="{{$ctrl.viewId}}" mms-commit-id="{{$ctrl.params.commitId ? $ctrl.params.commitId : 'latest'}}"
+                              mms-project-id="{{$ctrl.mmsProject.id}}" mms-ref-id="{{$ctrl.mmsRef.id}}"
                                 mms-link="$ctrl.vidLink" mms-view-api="$ctrl.viewApi" mms-number="{{$ctrl.number}}"></view>
                 </div>
             </div>

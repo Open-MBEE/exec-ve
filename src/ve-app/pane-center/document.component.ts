@@ -110,9 +110,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
 
     $onInit(): void {
         this.rootScopeSvc.veFullDocMode(true)
-        this.rootScopeSvc.veCommentsOn(false)
-        this.rootScopeSvc.veEditMode(false)
-        this.rootScopeSvc.veElementsOn(false)
+        this.rootScopeSvc.veHideLeft(false)
         this.rootScopeSvc.veNumberingOn(true)
         this.eventSvc.$init(this)
 

@@ -123,7 +123,7 @@ class InsertPeController extends Insertion<InsertPresentationData> {
         return this.viewSvc.createInstanceSpecification(
             this.insertData.viewOrSectionOb,
             this.type,
-            this.newItem.name,
+            this.name,
             this.insertData.addPeIndex
         )
     }

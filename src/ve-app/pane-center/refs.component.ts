@@ -340,7 +340,7 @@ const RefsComponent: VeComponentOptions = {
     <div class="container-fluid ve-no-panes">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
-            <a class="back-to-docs" ui-sref="main.project.ref.portal({refId: $ctrl.fromParams.id, search: undefined})"
+            <a class="back-to-docs" ui-sref="main.project.ref.portal({refId: $ctrl.fromParams.id, keywords: undefined})"
                ui-sref-opts="{reload:true}">Back to Project Documents ({{$ctrl.fromParams.name}})</a>
             <h1 class="panel-title">Manage Project branches/tags</h1>
             <div class="panel panel-default">
@@ -380,7 +380,7 @@ const RefsComponent: VeComponentOptions = {
                         <dl class="dl-horizontal ve-light-panels-detail-content">
                             <dt></dt>
                             <dd ng-hide="$ctrl.refSelected.status === 'creating'" class="link-section">
-                                <a ui-sref="main.project.ref.portal({refId: $ctrl.refSelected.id, search: undefined})" ui-sref-opts="{reload:true}">Project Documents</a>
+                                <a ui-sref="main.project.ref.portal({refId: $ctrl.refSelected.id, keywords: undefined})" ui-sref-opts="{reload:true}">Project Documents</a>
                             </dd>
                             <dd ng-show="$ctrl.refSelected.status === 'creating'" class="link-section">
                                 <span uib-tooltip-html="$ctrl.htmlTooltip" tooltip-placement="top" tooltip-trigger="mouseenter"

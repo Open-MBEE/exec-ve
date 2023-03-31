@@ -157,8 +157,8 @@ class NavBarController implements angular.IComponentController {
         } else {
             this.searchClass = 'fa fa-spin fa-spinner'
             void this.$state.go('main.project.ref.search', {
-                search: searchText,
-                field: 'all',
+                keywords: searchText,
+                field: 'name',
             })
         }
     }

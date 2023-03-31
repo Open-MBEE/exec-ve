@@ -264,7 +264,7 @@ Save CSV</button></div>
                     if (result.tof != '') htmlArr.push(result.tof)
                     htmlArr.push(result.contents, '</body></html>')
                     const htmlString = htmlArr.join('')
-                    this.growl.info('Generating, please wait...', {ttl: -1})
+                    this.growl.info('Generating, please wait...', { ttl: -1 })
                     this.utilsSvc
                         .exportHtmlAs(mode, {
                             htmlString: htmlString,
@@ -275,7 +275,7 @@ Save CSV</button></div>
                         })
                         .then(
                             () => {
-                                this.growl.success('File Downloaded', {ttl: -1})
+                                this.growl.success('File Downloaded', { ttl: -1 })
                                 deferred.resolve()
                             },
                             (reason) => {
@@ -285,8 +285,9 @@ Save CSV</button></div>
                         )
                 }
             } else {
-                this.eventSvc.$broadcast('tree-full-document', {
-                    search: undefined,
+                void this.$state.go('main.project.ref.view.present.document', {
+                    display: 'document',
+                    keywords: undefined,
                 })
                 deferred.reject({ message: 'User Cancelled' })
             }

@@ -57,8 +57,11 @@ class MainController implements IComponentController {
     readonly veConfig: VeConfig
 
     private hidePanes: boolean = false
+    private closePanes: boolean = false
     private hideRight: boolean = false
+    private closeRight: boolean = false
     private hideLeft: boolean = false
+    private closeLeft: boolean = false
     showManageRefs: boolean = false
     showLogin: boolean = true
     mmsWorkingTime: WorkingTimeObject
@@ -121,12 +124,18 @@ class MainController implements IComponentController {
         this.subs.push(
             this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDELEFT, (value: boolean) => {
                 this.hideLeft = value
+                if (value) {
+                    this.closeLeft = true
+                }
             })
         )
 
         this.subs.push(
             this.eventSvc.binding(this.rootScopeSvc.constants.VEHIDERIGHT, (value: boolean) => {
                 this.hideRight = value
+                if (value) {
+                    this.closeRight = true
+                }
             })
         )
 
@@ -212,25 +221,22 @@ class MainController implements IComponentController {
             this.rootScopeSvc.veViewContentLoading(true)
             this.httpSvc.transformQueue()
             this.rootScopeSvc.veStateChanging(true)
-
-            // if (from.split('.').length >= to.split('.').length) {
-            //     console.log(
-            //         trans.router.viewService._pluginapi._activeViewConfigs()
-            //     )
-            //     //Code to prune inactive previous leaf configs
-            //     //console.log(
-            //     trans.router.viewService._pluginapi
-            //         ._activeViewConfigs()
-            //         .filter((vc) => {
-            //             return from === vc.viewDecl.$context.name
-            //         })
-            //         .forEach((value) => {
-            //             trans.router.viewService.deactivateViewConfig(value)
-            //         })
-            //     console.log(
-            //         trans.router.viewService._pluginapi._activeViewConfigs()
-            //     )
-            // }
+            const from = trans.from().name
+            const to = trans.to().name
+            if (from.split('.').length >= to.split('.').length) {
+                console.log(trans.router.viewService._pluginapi._activeViewConfigs())
+                //Code to prune inactive previous leaf configs
+                //console.log(
+                trans.router.viewService._pluginapi
+                    ._activeViewConfigs()
+                    .filter((vc) => {
+                        return from === vc.viewDecl.$context.name
+                    })
+                    .forEach((value) => {
+                        trans.router.viewService.deactivateViewConfig(value)
+                    })
+                console.log(trans.router.viewService._pluginapi._activeViewConfigs())
+            }
         })
 
         this.$transitions.onError({}, (trans: Transition) => {
@@ -387,26 +393,20 @@ const MainComponent: VeComponentOptions = {
         <ui-view name="menu"></ui-view>
         <ui-view name="banner-bottom"></ui-view>
         <div ng-hide="$ctrl.hidePanes">
-            <ng-pane pane-id="main" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="ng-pane" id="main-pane">
-                <div ng-hide="$ctrl.hideLeft">
-                    <ng-pane pane-id="left-toolbar" pane-anchor="west" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
-                        <ui-view name="toolbar-left"></ui-view>
+            <ng-pane pane-id="main" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="ng-pane" id="main-pane" parent-ctrl="$ctrl">
+                <ng-pane pane-id="left-toolbar" pane-anchor="west" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed">
+                    <ui-view name="toolbar-left"></ui-view>
+                </ng-pane>
+                <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.closeLeft" ng-hide="$ctrl.hideLeft">
+                    <ui-view name="pane-left" class="container-pane-left"></ui-view>
+                </ng-pane>
+                <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-no-toggle="true" parent-ctrl="$ctrl" pane-closed="$ctrl.paneClosed" ng-hide="$ctrl.hideRight">
+                    <ui-view name="toolbar-right"></ui-view>
+                </ng-pane>
+                <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.hidePanes" class="content-pane" parent-ctrl="$ctrl">
+                    <ng-pane pane-id="right" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="$ctrl.closeRight" class="pane-right" ng-hide="$ctrl.hideRight">
+                        <ui-view name="pane-right"></ui-view>
                     </ng-pane>
-                    <ng-pane pane-id="left" pane-anchor="west" pane-size="20%" pane-handle="13" pane-min="20px" class="west-pane" pane-closed="$ctrl.paneClosed">
-                        <ui-view name="pane-left" class="container-pane-left"></ui-view>
-                    </ng-pane>
-                </div>
-                <div ng-hide="$ctrl.hideRight">
-                    <ng-pane pane-id="right-toolbar" pane-anchor="east" pane-size="41px" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
-                        <ui-view name="toolbar-right"></ui-view>
-                    </ng-pane>
-                </div>
-                <ng-pane pane-id="content" pane-anchor="center" pane-closed="$ctrl.paneClosed" class="content-pane">
-                    <div ng-hide="$ctrl.hideRight">
-                        <ng-pane pane-id="right" pane-anchor="east" pane-size="30%" pane-handle="14" pane-closed="true" class="pane-right">
-                            <ui-view name="pane-right"></ui-view>
-                        </ng-pane>
-                    </div>
                     <ng-pane pane-id="center" pane-anchor="center" class="pane-center" pane-closed="$ctrl.paneClosed" pane-no-toggle="true">
                         <ui-view name="pane-center"></ui-view>
                     </ng-pane>

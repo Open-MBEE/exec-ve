@@ -88,7 +88,7 @@ class SelectModalController implements VeModalController {
                         orgId: this.orgId,
                         projectId: this.projectId,
                         refId: 'master',
-                        search: undefined,
+                        keywords: undefined,
                     })
                     .finally(() => {
                         this.spin = false

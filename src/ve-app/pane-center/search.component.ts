@@ -8,12 +8,11 @@ import { EventService } from '@ve-utils/core'
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { ElementObject } from '@ve-types/mms'
+import { ElementObject, ParamsObject } from '@ve-types/mms'
 import { VeSearchOptions } from '@ve-types/view-editor'
 
 class SearchController {
-    search: string
-    field: string
+    params: ParamsObject
 
     searchContentLoading: boolean = true
     searchOptions: VeSearchOptions
@@ -35,8 +34,8 @@ class SearchController {
 
         this.searchOptions = {
             emptyDocTxt: 'This field is empty.',
-            searchInput: this.search,
-            searchField: this.field,
+            searchInput: this.params.keywords ? this.params.keywords : '',
+            searchField: this.params.field ? this.params.field : 'name',
             getProperties: true,
             closeable: true,
             callback: (elementOb: ElementObject): void => {
@@ -57,7 +56,7 @@ class SearchController {
                     documentId: doc.id,
                     viewId: view.id,
                     refId: doc._refId,
-                    search: undefined,
+                    keywords: undefined,
                 })
             },
         }
@@ -78,7 +77,7 @@ const SearchComponent: VeComponentOptions = {
 `,
     bindings: {
         params: '<',
-        search: '<',
+        keywords: '<',
         field: '<',
     },
     controller: SearchController,

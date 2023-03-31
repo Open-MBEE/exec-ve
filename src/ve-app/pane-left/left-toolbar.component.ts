@@ -63,14 +63,17 @@ const LeftToolbarComponent: VeComponentOptions = {
 
         $onInit(): void {
             this.eventSvc.$init(this)
-
+            let initialState: string
+            if (this.mmsRoot) {
+                initialState = this.$state.includes('**.portal.**') ? 'tree-of-documents' : 'tree-of-contents'
+            }
             this.toolbarSvc.initApi(
                 this.toolbarId,
                 this.tbInit,
                 this,
                 left_default_toolbar,
                 left_dynamic_toolbar,
-                this.$state.includes('**.portal.**') ? 'tree-of-documents' : 'tree-of-contents'
+                initialState
             )
         }
 
@@ -80,32 +83,28 @@ const LeftToolbarComponent: VeComponentOptions = {
         }
 
         tbInit = (tbApi: ToolbarApi): void => {
-            const trees = this.extensionSvc.getExtensions('treeOf')
-            for (const tree of trees) {
-                const button = this.toolbarSvc.getToolbarButton(tree)
-                tbApi.addButton(button)
-                if (button.enabledFor) {
-                    button.active = false
-                    for (const enableState of button.enabledFor) {
-                        if (this.$state.includes(enableState)) {
-                            button.active = true
-                            break
+            if (this.mmsRoot) {
+                const trees = this.extensionSvc.getExtensions('treeOf')
+                for (const tree of trees) {
+                    const button = this.toolbarSvc.getToolbarButton(tree)
+                    tbApi.addButton(button)
+                    if (button.enabledFor) {
+                        button.active = false
+                        for (const enableState of button.enabledFor) {
+                            if (this.$state.includes(enableState)) {
+                                button.active = true
+                                break
+                            }
                         }
                     }
-                }
-                if (button.disabledFor) {
-                    for (const disableState of button.disabledFor) {
-                        if (this.$state.includes(disableState)) {
-                            button.active = false
-                            break
+                    if (button.disabledFor) {
+                        for (const disableState of button.disabledFor) {
+                            if (this.$state.includes(disableState)) {
+                                button.active = false
+                                break
+                            }
                         }
                     }
-                }
-                if (!button.permission) {
-                    button.permission =
-                        this.mmsRef &&
-                        this.mmsRef.type === 'Branch' &&
-                        this.permissionsSvc.hasBranchEditPermission(this.mmsRef._projectId, this.mmsRef.id)
                 }
             }
         }
