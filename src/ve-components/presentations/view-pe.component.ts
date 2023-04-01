@@ -114,16 +114,6 @@ export class ViewPresentationElemController implements angular.IComponentControl
                             if (this.treeSvc.branch2viewNumber[this.instanceSpec.id]) {
                                 this.peNumber = this.treeSvc.branch2viewNumber[this.instanceSpec.id]
                             }
-                            const hash = this.$location.hash()
-                            if (hash === instanceSpec.id) {
-                                void this.$timeout(
-                                    () => {
-                                        this.$anchorScroll()
-                                    },
-                                    1000,
-                                    false
-                                )
-                            }
                             if (this.viewCtrl) {
                                 this.viewCtrl.elementTranscluded(instanceSpec, this.presentationElem.type)
                             }
