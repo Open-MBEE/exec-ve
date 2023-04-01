@@ -326,7 +326,7 @@ export class ApiService {
      * @returns {string} unique SysML element ID
      */
     public createUniqueId = (): string => {
-        return `ve-${this.getVeVersion().replace('.', '-')}-${this.createUUID()}`
+        return `ve-${this.getVeVersion().replace(/\./g, '-')}-${this.createUUID()}`
     }
 
     /**

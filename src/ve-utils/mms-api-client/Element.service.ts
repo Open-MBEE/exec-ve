@@ -244,11 +244,11 @@ export class ElementService extends BaseApiService {
         const requestCacheKey = this.getElementKey(reqOb, result.id, edit)
         const origResultCommit = result._commitId
         if (reqOb.commitId === 'latest') {
-            const resultCommitCopy: RequestObject = this.apiSvc.makeRequestObject(_.clone<ElementObject>(result))
+            const resultCommitCopy: T = _.cloneDeep<T>(result)
             result._commitId = 'latest' //so realCacheKey is right later
-            const commitCacheKey = this.apiSvc.makeCacheKey(resultCommitCopy, result.id) //save historic element
+            const commitCacheKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(resultCommitCopy), result.id) //save historic element
             if (!edit) {
-                this.cacheSvc.put(commitCacheKey, result, true)
+                this.cacheSvc.put(commitCacheKey, resultCommitCopy, true)
             }
         }
         const resultReqOb = this.apiSvc.makeRequestObject(result)

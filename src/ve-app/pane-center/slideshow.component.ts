@@ -273,7 +273,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         if (this.$state.includes('main.project.ref')) {
             const data = {
                 rootId: this.$state.includes('**.portal.**') ? this.mmsProject.id : this.mmsDocument.id,
-                elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
+                elementId: this.viewId,
                 commitId: 'latest',
                 projectId: this.mmsProject.id,
                 refId: this.mmsRef.id,

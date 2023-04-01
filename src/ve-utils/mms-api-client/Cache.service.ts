@@ -13,8 +13,8 @@ export class CacheService {
         const realKey: string = this._makeKey(key)
         const result: T = this._get<T>(realKey)
 
-        if (noCopy) return result
-        else return _.cloneDeep(result)
+        return result
+        //else return _.cloneDeep(result)
     }
 
     private _get = <T>(realKey: string): T => {
@@ -80,14 +80,12 @@ export class CacheService {
     put<T extends MmsObject | MmsObject[]>(key: string | string[], value: T, merge?: boolean): T {
         const m = typeof merge === 'undefined' ? false : merge
         const realKey = this._makeKey(key)
-        const currentValue: T = this.get<T>(realKey, true)
+        let currentValue: T = this.get<T>(realKey, true)
         if (currentValue && m) {
-            _.mergeWith(currentValue, value, (a: T, b: T, id: string) => {
+            _.mergeWith(currentValue, value, (a: any, b: any, id: string) => {
                 if (
                     (id === '_contents' || id === 'specification') &&
-                    b &&
-                    !Array.isArray(b) &&
-                    b.type === 'Expression'
+                    b && b.type === 'Expression'
                 ) {
                     return b
                 }
@@ -103,8 +101,9 @@ export class CacheService {
             })
         } else {
             this.cache[realKey] = value
+            currentValue = value
         }
-        return value
+        return currentValue
     }
 
     /**
