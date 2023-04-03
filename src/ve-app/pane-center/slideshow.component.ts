@@ -118,6 +118,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         this.params = this.mmsParams
         this.rootScopeSvc.veFullDocMode(false)
         this.rootScopeSvc.veHideLeft(false)
+        this.rootScopeSvc.veHideRight(false)
         this.eventSvc.$init(this)
 
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons)

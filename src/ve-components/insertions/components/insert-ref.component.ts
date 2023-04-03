@@ -90,17 +90,16 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
     }
 
     public create = (): VePromise<RefObject, RefsResponse> => {
-        const deferred = this.$q.defer<RefObject>()
         const refObj: RefObject = {
             name: this.newItem.name,
             type: this.type,
             _projectId: this.projectId,
             description: this.newItem.description,
-            permission: this.newItem.permission,
             id: this.apiSvc.createUniqueId(),
-            parentCommitId: null,
+            //parentCommitId: null
         }
         if (this.insertData.parentRefId) refObj.parentRefId = this.insertData.parentRefId
+        /*
         if (!this.lastCommit || this.type === 'Tag') {
             // Make call to history?maxTimestamp to get closest commit id to branch off
 
@@ -110,9 +109,9 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
                 deferred.resolve(this.projectSvc.createRef(refObj, this.projectId))
             }, this.addReject)
         } else {
+        */
             return this.projectSvc.createRef(refObj, this.projectId)
-        }
-        return deferred.promise
+        //}
     }
 
     public resolve = (data: RefObject): void => {
@@ -152,6 +151,7 @@ const InsertRefComponent: VeComponentOptions = {
                 <label>Description</label>
                 <textarea class="form-control" ng-model="$ctrl.newItem.description"></textarea>
             </div>
+            <!--
             <div class="form-group" ng-if="$ctrl.type === 'Branch'">
                 <label>Permission</label>
                 <br />
@@ -159,6 +159,7 @@ const InsertRefComponent: VeComponentOptions = {
                 <br />
                 <input ng-model="$ctrl.newItem.permission" value="write" type="radio"> Write
             </div>  
+            
             <div class="form-group" ng-if="$ctrl.type === 'Tag' || $ctrl.type === 'Branch'">
                 <label>Point in History</label>
                 <form>
@@ -180,6 +181,7 @@ const InsertRefComponent: VeComponentOptions = {
                     </div>
                 </form>
             </div>
+            -->
         </div>
     </div>
     
