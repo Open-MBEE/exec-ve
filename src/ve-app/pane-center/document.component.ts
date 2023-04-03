@@ -284,7 +284,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     $postLink(): void {
         // Send view to kick off tree compilation
         const data: veAppEvents.elementSelectedData = {
-            rootOb: this.$state.includes('**.portal.**') ? this.mmsProject.id : this.mmsDocument.id,
+            rootId: this.mmsDocument.id,
             elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
             commitId: 'latest',
             projectId: this.mmsProject.id,
