@@ -151,7 +151,7 @@ class MenuController implements IComponentController {
                     name: this.child.name,
                     id: this.child.id,
                     type: 'group',
-                    link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', search: undefined})",
+                    link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
                 })
                 if (this.child._parentId) {
                     parentId = (this.child as GroupObject)._parentId
@@ -161,7 +161,7 @@ class MenuController implements IComponentController {
                     name: this.child.name,
                     id: this.child.id,
                     type: 'doc',
-                    link: 'main.project.ref.view.present({documentId: breadcrumb.id, search: undefined})',
+                    link: 'main.project.ref.view.present({documentId: breadcrumb.id, keywords: undefined})',
                 })
                 if (this.child._groupId) {
                     parentId = (this.child as DocumentObject)._groupId
@@ -174,7 +174,7 @@ class MenuController implements IComponentController {
                         name: this.groupsMap[id].name,
                         id: id,
                         type: 'group',
-                        link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', search: undefined})",
+                        link: "main.project.ref.portal.preview({preview: 'site_' + breadcrumb.id + '_cover', keywords: undefined})",
                     })
                     parentId = this.groupsMap[id].parentId
                 }
@@ -205,7 +205,7 @@ class MenuController implements IComponentController {
                 {
                     projectId: project.id,
                     refId: 'master',
-                    search: undefined,
+                    keywords: undefined,
                 },
                 { reload: true }
             )
@@ -219,7 +219,7 @@ class MenuController implements IComponentController {
                 {
                     projectId: ref._projectId,
                     refId: ref.id,
-                    search: undefined,
+                    keywords: undefined,
                 },
                 { reload: true }
             )
@@ -249,6 +249,13 @@ class MenuController implements IComponentController {
         }
         return res
     }
+
+    goHome(): void {
+        void this.$state.go('main.project.ref.portal', {
+            field: undefined,
+            keywords: undefined,
+        })
+    }
 }
 
 const MainMenuComponent: VeComponentOptions = {
@@ -271,8 +278,7 @@ const MainMenuComponent: VeComponentOptions = {
     <div ng-hide="$ctrl.spin" class="breadcrumbs">
         <ul>
             <li ng-style="truncateStyle">
-                <a class="back-to-proj" ui-sref="main.project.ref.portal({refId: $ctrl.currentBranch ? $ctrl.currentRef.id : 'master', search: undefined})"
-                    uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
+                <a type="button" class="back-to-proj" ng-click="$ctrl.goHome()" uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa-solid fa-home fa-1x" aria-hidden="true"></i>
                 </a>
             </li>

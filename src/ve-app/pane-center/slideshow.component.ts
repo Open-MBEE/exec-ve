@@ -1,4 +1,5 @@
-import { StateService, UIRouterGlobals } from '@uirouter/angularjs'
+import { HookResult, Ng1Controller, StateService, UIRouterGlobals } from '@uirouter/angularjs'
+import { Transition } from '@uirouter/core'
 
 import { veAppEvents } from '@ve-app/events'
 import { AppUtilsService, ResolveService } from '@ve-app/main/services'
@@ -28,7 +29,7 @@ import {
  * Note: This controller is intended for navigating between 'views' and 'sections' only. If you wish to navigate between
  * other tree object types you will need to create a new one or modify this one to be more generic.
  */
-class SlideshowController implements angular.IComponentController {
+class SlideshowController implements angular.IComponentController, Ng1Controller {
     //Bindings
     mmsParams: ParamsObject
     mmsProject: ProjectObject
@@ -60,7 +61,8 @@ class SlideshowController implements angular.IComponentController {
     shortUrl: string
     viewApi: ViewApi
     number: string
-    public viewId: string
+    private viewId: string
+    private params: ParamsObject
 
     static $inject = [
         '$q',
@@ -113,7 +115,9 @@ class SlideshowController implements angular.IComponentController {
     ) {}
 
     $onInit(): void {
+        this.params = this.mmsParams
         this.rootScopeSvc.veFullDocMode(false)
+        this.rootScopeSvc.veHideLeft(false)
         this.eventSvc.$init(this)
 
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, pane_center_buttons)
@@ -202,35 +206,15 @@ class SlideshowController implements angular.IComponentController {
                     return
                 } else if (data.clicked === 'convert-pdf') {
                     if (this.isPageLoading()) return
-                    this.appUtilsSvc
-                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 3)
-                        .then(
-                            (ob) => {},
-                            (reason) => {}
-                        )
+                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 3)
                     return
                 } else if (data.clicked === 'print') {
                     if (this.isPageLoading()) return
-                    void this.appUtilsSvc
-                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 1)
-                        .catch((reason?) => {
-                            if (reason) {
-                                this.growl.error('Print Error:' + reason.message)
-                            } else {
-                                this.growl.info('Print Cancelled', {
-                                    ttl: 1000,
-                                })
-                            }
-                        })
+                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 1)
                     return
                 } else if (data.clicked === 'word') {
                     if (this.isPageLoading()) return
-                    this.appUtilsSvc
-                        .printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 2)
-                        .then(
-                            (ob) => {},
-                            (reason?) => {}
-                        )
+                    void this.appUtilsSvc.printModal(angular.element('#print-div'), this.mmsView, this.mmsRef, false, 2)
                     return
                 } else if (data.clicked === 'tabletocsv') {
                     if (this.isPageLoading()) return
@@ -247,15 +231,27 @@ class SlideshowController implements angular.IComponentController {
         )
     }
 
-    initView = (): void => {
+    uiOnParamsChanged(newValues: ParamsObject, $transition$: Transition): void {
+        if (newValues.viewId && newValues.viewId !== this.params.viewId)
+            this.initView($transition$.params() as ParamsObject)
+    }
+    uiCanExit(transition: Transition): HookResult {
+        //Do nothing
+    }
+
+    initView = (params?: ParamsObject): void => {
         this.rootScopeSvc.veViewContentLoading(true)
 
-        if (this.mmsView || this.mmsDocument) {
+        if (params) {
+            this.params = params
+            this.viewId = params.viewId
+        } else if (this.mmsDocument || this.mmsView) {
             this.viewId = this.mmsView ? this.mmsView.id : this.mmsDocument.id
-            this.rootScopeSvc.veViewContentLoading(false)
         } else {
             return
         }
+
+        this.rootScopeSvc.veViewContentLoading(false)
 
         this.vidLink = false //whether to have go to document link
         if (
@@ -268,16 +264,16 @@ class SlideshowController implements angular.IComponentController {
 
         this.shortUrl = this.shortUrlSvc.getShortUrl({
             orgId: this.mmsProject.orgId,
-            documentId: this.mmsParams.documentId ? this.mmsParams.documentId : '',
-            viewId: this.mmsParams.viewId && !this.mmsParams.documentId.endsWith('_cover') ? this.mmsParams.viewId : '',
-            projectId: this.mmsParams.projectId,
-            refId: this.mmsParams.refId,
+            documentId: this.params.documentId ? this.params.documentId : '',
+            viewId: this.params.viewId && !this.params.documentId.endsWith('_cover') ? this.params.viewId : '',
+            projectId: this.params.projectId,
+            refId: this.params.refId,
         })
 
         if (this.$state.includes('main.project.ref')) {
             const data = {
                 rootId: this.$state.includes('**.portal.**') ? this.mmsProject.id : this.mmsDocument.id,
-                elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
+                elementId: this.viewId,
                 commitId: 'latest',
                 projectId: this.mmsProject.id,
                 refId: this.mmsRef.id,
@@ -458,8 +454,8 @@ const SlideshowComponent: VeComponentOptions = {
                         , Last Commented {{$ctrl.comments.lastCommented | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.comments.lastCommentedBy}}</b></span>
                 </div>
                 <div id="print-div" ng-show="$ctrl.viewId">
-                    <view mms-element-id="{{$ctrl.viewId}}" mms-commit-id="{{$ctrl.mmsParams.commitId ? $ctrl.mmsParams.commitId : 'latest'}}"
-                              mms-project-id="{{$ctrl.mmsParams.projectId}}" mms-ref-id="{{$ctrl.mmsParams.refId}}"
+                    <view mms-element-id="{{$ctrl.viewId}}" mms-commit-id="{{$ctrl.params.commitId ? $ctrl.params.commitId : 'latest'}}"
+                              mms-project-id="{{$ctrl.mmsProject.id}}" mms-ref-id="{{$ctrl.mmsRef.id}}"
                                 mms-link="$ctrl.vidLink" mms-view-api="$ctrl.viewApi" mms-number="{{$ctrl.number}}"></view>
                 </div>
             </div>

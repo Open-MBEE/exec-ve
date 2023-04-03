@@ -14,7 +14,7 @@ export interface InsertTransclusionData extends InsertData {
     viewLink: boolean
 }
 
-class InsertTransclusionModalController
+class CreateTransclusionModalController
     extends VeModalControllerImpl<TransclusionObject, InsertResolve<InsertTransclusionData>>
     implements VeModalController
 {
@@ -165,11 +165,11 @@ class InsertTransclusionModalController
     }
 }
 
-// Component for inserting cross reference
+// Component for inserting cross-reference
 // Defines scope variables for html template and how to handle user click
 // Also defines options for search interfaces -- see mmsSearch.js for more info
-const InsertTransclusionModal: VeModalComponent = {
-    selector: 'insertTransclusionModal',
+const CreateTransclusionModal: VeModalComponent = {
+    selector: 'createTransclusionModal',
     template: `
     <div>
     <div class="modal-header">
@@ -177,8 +177,8 @@ const InsertTransclusionModal: VeModalComponent = {
     </div>
     <div class="modal-body"></div>
     <div class="modal-footer">
-        <button class="btn btn-primary" ng-show="$ctrl.element" type="button" ng-click="choose()">Create {{$ctrl.viewLink ? 'Link': 'view-cf'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-show="$ctrl.element" type="button" ng-click="$ctrl.choose()">Create {{$ctrl.viewLink ? 'Link': 'view-cf'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
+        <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
     </div>
 </div>
 `,
@@ -186,7 +186,7 @@ const InsertTransclusionModal: VeModalComponent = {
         modalInstance: '<',
         resolve: '<',
     },
-    controller: InsertTransclusionModalController,
+    controller: CreateTransclusionModalController,
 }
 
-veComponents.component(InsertTransclusionModal.selector, InsertTransclusionModal)
+veComponents.component(CreateTransclusionModal.selector, CreateTransclusionModal)

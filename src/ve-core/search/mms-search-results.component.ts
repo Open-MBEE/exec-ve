@@ -13,6 +13,8 @@ export class MmsSearchResultsController implements IComponentController {
 
     //Bindings
     private elem: ElementObject
+
+    $onChanges
 }
 const MmsSearchResultsComponent: VeComponentOptions = {
     selector: 'mmsSearchResults',
@@ -46,7 +48,7 @@ const MmsSearchResultsComponent: VeComponentOptions = {
     <div class="elem-documentation">
         <a ng-show="$ctrl.elem.documentation" ng-bind-html="$ctrl.elem.documentation | limitTo:270" ng-click="$ctrl.$search.userResultClick($ctrl.elem, 'doc')"></a><span class="ellipses">{{$ctrl.elem.documentation.length > 270 ? ' ...' : ''}}</span>
         <span><a ng-show="!$ctrl.elem.documentation" ng-click="$ctrl.$search.userResultClick($ctrl.elem, 'doc')">
-          {{emptyDocTxt}}
+          {{$ctrl.$search.emptyDocTxt}}
           </a></span>
     </div>
 </div>

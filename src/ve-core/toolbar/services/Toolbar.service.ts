@@ -138,18 +138,20 @@ export class ToolbarService {
         init(api)
         this.toolbars[id].api = api
 
-        let inspect: IToolBarButton
-        if (initialSelection) {
-            inspect = this.getToolbarButton(initialSelection)
-        } else {
-            inspect = api.buttons[0]
-        }
+        if (api.buttons.length > 0) {
+            let inspect: IToolBarButton
+            if (initialSelection) {
+                inspect = this.getToolbarButton(initialSelection)
+            } else {
+                inspect = api.buttons[0]
+            }
 
-        //Initialize Toolbar Clicked Subject
-        this.eventSvc.resolve<veCoreEvents.toolbarClicked>(id, {
-            id: inspect.id,
-            title: inspect.tooltip,
-        })
+            //Initialize Toolbar Clicked Subject
+            this.eventSvc.resolve<veCoreEvents.toolbarClicked>(id, {
+                id: inspect.id,
+                title: inspect.tooltip,
+            })
+        }
 
         this.toolbars[id].resolve(api)
         return api

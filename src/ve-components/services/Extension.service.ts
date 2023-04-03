@@ -61,6 +61,7 @@ export class ExtensionService {
             return 'extension-error'
         }
         if (type == 'InstanceSpecification') type = 'section'
+        if (type == 'ImageT') type = 'figure'
         const tag = _.kebabCase(type.startsWith(extPrefix) ? type : extPrefix + _.capitalize(type))
         if (!this.extensionTags.includes(tag)) {
             // this.growl.error('Unknown Extension type: ' + type)

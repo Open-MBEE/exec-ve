@@ -45,7 +45,7 @@ export class Insertion<
     projectId: string
     refId: string
     orgId: string
-    addType: string
+    insertType: string
     newItem: U
 
     static $inject = [
@@ -91,7 +91,7 @@ export class Insertion<
     public parentData: ElementObject = {} as ElementObject
 
     $onInit(): void {
-        this.addType = this.insertData.addType
+        this.insertType = this.insertData.insertType
         this.projectId = this.mmsProjectId
         this.refId = this.mmsRefId ? this.mmsRefId : ''
         this.orgId = this.mmsOrgId
@@ -235,6 +235,6 @@ export class Insertion<
      * @return {VePromise<U>}
      */
     public addExisting = (existingOb: U, property?: string): VePromise<U> => {
-        return this.$q.resolve<U>(null as U)
+        return this.$q.resolve<U>(existingOb)
     }
 }

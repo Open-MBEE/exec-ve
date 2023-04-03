@@ -74,14 +74,15 @@ const ToolBarComponent: VeComponentOptions = {
             this.toolbarSvc.waitForApi(this.toolbarId).then(
                 (api) => {
                     this.buttons = api.buttons
-
-                    //Binding to catch all "clicks" on tb and execute select function
-                    this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, (data) => {
-                        this.toolbarSvc.waitForApi(this.toolbarId).then(
-                            (api) => api.select(data.id),
-                            (reason) => this.growl.error(ToolbarService.error(reason))
-                        )
-                    })
+                    if (this.buttons.length > 0) {
+                        //Binding to catch all "clicks" on tb and execute select function
+                        this.eventSvc.binding<veCoreEvents.toolbarClicked>(this.toolbarId, (data) => {
+                            this.toolbarSvc.waitForApi(this.toolbarId).then(
+                                (api) => api.select(data.id),
+                                (reason) => this.growl.error(ToolbarService.error(reason))
+                            )
+                        })
+                    }
                 },
                 (reason) => {
                     this.growl.error(reason.message)

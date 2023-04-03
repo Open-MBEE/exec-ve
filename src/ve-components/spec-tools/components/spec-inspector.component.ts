@@ -139,9 +139,12 @@ const SpecInspectorComponent: VeComponentOptions = {
     template: `
 <!-- HTML for view mode -->
 <div class="reading">
-    <p class="text-center" ng-show="$ctrl.gettingSpec"><i class="fa fa-3x fa-spin fa-spinner"></i></p>
-
-    <div ng-hide="$ctrl.gettingSpec">
+    <div class="text-center" >
+      <i ng-show="$ctrl.gettingSpec && $ctrl.element" class="fa fa-3x fa-spin fa-spinner"></i>
+      <span class="placeholder" ng-show="!$ctrl.element"><i class="fa fa-info-circle"></i><em> No Element Selected</em></span></p>
+  </div>
+    
+    <div ng-hide="$ctrl.gettingSpec && !$ctrl.element">
         <div class="text-warning" ng-if="$ctrl.mmsDisplayOldSpec">
             <b> Element not found:</b> displaying last found spec
         </div>

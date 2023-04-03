@@ -793,7 +793,7 @@ export class ViewService extends BaseApiService {
             }
             const keyValue: ValueObject = viewOrSectionOb[key] as ValueObject
             let cloneValue: ValueObject
-            if (keyValue) {
+            if (!keyValue) {
                 cloneValue = new ValueSpec({
                     operand: [],
                     type: 'Expression',

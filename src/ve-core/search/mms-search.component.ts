@@ -1,7 +1,11 @@
 import { StateService } from '@uirouter/angularjs'
 import _ from 'lodash'
 
+import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
+import { veCoreEvents } from '@ve-core/events'
+import { search_default_buttons } from '@ve-core/search/mms-search-buttons.config'
 import { UtilsService } from '@ve-utils/application'
+import { EventService } from '@ve-utils/core'
 import { CacheService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -71,6 +75,7 @@ export class SearchController implements angular.IComponentController {
     protected filteredSearchResults: ElementObject[] = []
     protected showFilterOptions: boolean
     protected searchLoading: boolean = false
+    protected firstSearch: boolean = true
     protected mainSearch: SearchQuery = {
         searchText: '',
         searchField: {
@@ -152,18 +157,8 @@ export class SearchController implements angular.IComponentController {
         onDeselectAll(ob): void
     }
 
-    protected filterOptions = [
-        { display: 'Documents', icon: null, type: 'Document' },
-        // { display: "Sections/Views", icon: null, type: "View", "Section" },
-        { display: 'Text', icon: 'pe-type-paragraph', type: 'Paragraph' },
-        { display: 'Tables', icon: 'pe-type-table', type: 'Table' },
-        { display: 'Images', icon: 'pe-type-image', type: 'Image' },
-        { display: 'Equations', icon: 'pe-type-equation', type: 'Equation' },
-        { display: 'Comments', icon: 'pe-type-comment', type: 'Comment' },
-        { display: 'Sections', icon: 'pe-type-section', type: 'Section' },
-        { display: 'Views', icon: 'pe-type-view', type: 'View' },
-        { display: 'Requirements', icon: 'pe-type-req', type: 'Requirement' },
-    ]
+    bbId: string
+    bbApi: ButtonBarApi
     private filterList: QueryObject[] = []
 
     private schema = 'cameo'
@@ -175,11 +170,13 @@ export class SearchController implements angular.IComponentController {
         '$state',
         'growl',
         'CacheService',
+        'EventService',
         'ElementService',
         'ProjectService',
         'UtilsService',
         'ViewService',
         'SchemaService',
+        'ButtonBarService',
     ]
 
     constructor(
@@ -189,15 +186,25 @@ export class SearchController implements angular.IComponentController {
         private $state: StateService,
         private growl: angular.growl.IGrowlService,
         private cacheSvc: CacheService,
+        private eventSvc: EventService,
         private elementSvc: ElementService,
         private projectSvc: ProjectService,
         private utilsSvc: UtilsService,
         private viewSvc: ViewService,
-        private schemaSvc: SchemaService
+        private schemaSvc: SchemaService,
+        private buttonBarSvc: ButtonBarService
     ) {}
 
     $onInit(): void {
         this.showFilterOptions = !this.mmsOptions.hideFilterOptions
+        if (this.showFilterOptions) {
+            this.bbId = this.buttonBarSvc.generateBarId('mms-search')
+            this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, search_default_buttons)
+            this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
+                this.bbApi.toggleButton(data.clicked)
+                this.filterSearchResults(this.buttonBarSvc.getButtonDefinition(data.clicked).type)
+            })
+        }
         this.refId = this.mmsRefId ? this.mmsRefId : 'master'
 
         // Set functions
@@ -305,6 +312,18 @@ export class SearchController implements angular.IComponentController {
         })
     }
 
+    bbInit = (api: ButtonBarApi): void => {
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-document'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-paragraph'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-table'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-image'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-equation'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-comment'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-section'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-view'))
+        api.addButton(this.buttonBarSvc.getButtonBarButton('search-filter-req'))
+    }
+
     public qualifiedNameFormatter = (qualifiedName: string): string => {
         if (qualifiedName) {
             const parts = qualifiedName.split('/')
@@ -372,16 +391,20 @@ export class SearchController implements angular.IComponentController {
         } else {
             this.activeFilter.push(type)
         }
-        this._applyFilters()
+        this._applyFiltersAndPaginate()
     }
 
-    private _applyFilters = (): void => {
+    private _applyFiltersAndPaginate = (): void => {
         if (!this.activeFilter.length) {
-            this.filteredSearchResults = this.baseSearchResults
+            this.filteredSearchResults = this.searchResults
         } else {
             this.filteredSearchResults = _.filter(this.baseSearchResults, (item) => {
                 return _.includes(this.activeFilter, this.viewSvc.getElementType(item))
             })
+        }
+        this.maxPages = Math.ceil(this.filteredSearchResults.length / this.itemsPerPage)
+        for (const pg of [...Array(this.maxPages).keys()]) {
+            this.paginationCache[pg] = this.searchResults.slice(pg * this.itemsPerPage, (pg + 1) * this.itemsPerPage)
         }
     }
 
@@ -451,34 +474,11 @@ export class SearchController implements angular.IComponentController {
         this.advancedSearchResults = !this.advancedSearchResults
     }
 
-    public nextPage = (): void => {
-        if (this.paginationCache[this.currentPage + 1]) {
-            this.baseSearchResults = this.paginationCache[this.currentPage + 1]
-            this.currentPage += 1
-            this._applyFilters()
+    public pageChanged = (): void => {
+        if (this.paginationCache[this.currentPage]) {
+            this.baseSearchResults = this.paginationCache[this.currentPage]
         } else {
-            this.search(this.mainSearch, this.currentPage + 1, this.itemsPerPage)
-        }
-        this.$anchorScroll('ve-search-results')
-    }
-
-    public prevPage = (): void => {
-        if (this.paginationCache[this.currentPage - 1]) {
-            this.baseSearchResults = this.paginationCache[this.currentPage - 1]
-            this.currentPage -= 1
-            this._applyFilters()
-        } else {
-            this.search(this.mainSearch, this.currentPage - 1, this.itemsPerPage)
-        }
-    }
-
-    public goTo = (page: number): void => {
-        if (this.paginationCache[page]) {
-            this.baseSearchResults = this.paginationCache[page]
-            this.currentPage = page
-            this._applyFilters()
-        } else {
-            this.search(this.mainSearch, page, this.itemsPerPage)
+            this.search(this.mainSearch, this.currentPage, this.itemsPerPage)
         }
     }
 
@@ -535,20 +535,14 @@ export class SearchController implements angular.IComponentController {
                         this.searchResults = elements
                     }
                     this.combineRelatedViews()
-                    this.maxPages = Math.ceil(this.totalResults / this.itemsPerPage)
                     this.currentPage = page
-                    for (const pg of [...Array(this.maxPages).keys()]) {
-                        this.paginationCache[pg] = this.searchResults.slice(
-                            pg * this.itemsPerPage,
-                            (pg + 1) * this.itemsPerPage
-                        )
-                    }
+                    this._applyFiltersAndPaginate()
                     this.baseSearchResults = this.paginationCache[page]
                     if (this.advanceSearch) {
                         // scope.advanceSearch = !scope.advanceSearch;
                         this.advancedSearchResults = true
                     }
-                    this._applyFilters()
+
                     // scope.refineOptions = findRefineOptions(baseSearchResults);
                 },
                 (reason) => {
@@ -557,6 +551,7 @@ export class SearchController implements angular.IComponentController {
             )
             .finally(() => {
                 this.searchLoading = false
+                this.firstSearch = false
             })
     }
 
@@ -746,6 +741,10 @@ export class SearchController implements angular.IComponentController {
         event.stopPropagation()
         if (this.mmsOptions.relatedCallback) this.mmsOptions.relatedCallback(doc, view, elem)
     }
+
+    private toggleDocs(): void {
+        this.docsviews.selected = !this.docsviews.selected
+    }
 }
 const SearchComponent: VeComponentOptions = {
     selector: 'mmsSearch',
@@ -889,14 +888,14 @@ const SearchComponent: VeComponentOptions = {
 <!--                <i class="fa fa-plus"></i>&nbsp;Add Row-->
 <!--            </a>-->
             <div class="advanced-views-docs">
-                <input type="checkbox" ng-model="$ctrl.docsviews.selected"> Search for Views and Documents
+                <input type="checkbox" ng-model="$ctrl.docsviews.selected"> <span ng-click="$ctrl.toggleDocs">Search for Views and Documents</span>
             </div>
         </div>
-        <span class="close-button-container">
-            <a class="close-button" ng-if="$ctrl.mmsOptions.closeable" ui-sref="main.project.ref.portal({search: undefined, field: undefined})" ui-sref-opts="{ inherit: true }">
-                <i tooltip-placement="left" uib-tooltip="Close Search"  class="fa fa-times"></i>
-            </a>
-        </span>
+<!--        <span class="close-button-container">-->
+<!--            <a class="close-button" ng-if="$ctrl.mmsOptions.closeable" ui-sref="main.project.ref.portal({search: undefined, field: undefined})" ui-sref-opts="{ inherit: true }">-->
+<!--                <i tooltip-placement="left" uib-tooltip="Close Search"  class="fa fa-times"></i>-->
+<!--            </a>-->
+<!--        </span>-->
 
         <!-- <div ng-show="advancedSearchResults" class="mms-search-input"> -->
             <!-- advanced search query input disabled -->
@@ -916,34 +915,30 @@ const SearchComponent: VeComponentOptions = {
             </div>
         </div> -->
     </div> 
-    <div id="ve-search-results" class="misc-form-field results-count" ng-hide="$ctrl.searchLoading || _.isEmpty($ctrl.paginationCache)">
+    
+    <div id="ve-search-results" class="misc-form-field results-count" ng-hide="($ctrl.searchLoading || _.isEmpty($ctrl.paginationCache)) && !$ctrl.firstSearch">
         <div class="ve-search-filter" ng-hide="!$ctrl.showFilterOptions">
             <span class="label-for-filter ve-secondary-text">FILTER: </span>
             <div class="btn-group btn-group-sm" role="group"  aria-label="mms-search-results-filter">
-                <button type="button" ng-repeat="item in $ctrl.filterOptions" ng-click="$ctrl.filterSearchResults(item.type)"
-                title="Filter {{item.display}}" class="btn ve-btn-group-default {{item.icon}}"
-                ng-class="{'active': $ctrl.getActiveFilterClass(item.type)}">{{item.display}}</button>
+                <button-bar button-id="$ctrl.bbId" class="bordered-button-bar"></button-bar>
             </div>
         </div>
     
-        <div class="ve-secondary-text">Showing <b>{{$ctrl.searchResults.length}}</b> <!--of {{searchResults.length}} -->search results. (Page {{$ctrl.currentPage + 1}})</div>
+        <div class="ve-secondary-text">Showing items <b>{{$ctrl.currentPage * $ctrl.itemsPerPage + 1}} - {{$ctrl.currentPage * $ctrl.itemsPerPage + $ctrl.itemsPerPage}}</b> of {{$ctrl.searchResults.length}}. (Page {{$ctrl.currentPage + 1}} of {{$ctrl.maxPages}})</div>
     </div>
-    <div class="container-fluid search-nav " ng-show="$ctrl.searchResults.length > 0">
-    <div class="btn-group btn-group-sm pull-right" role="navigation">
-        <button ng-show="$ctrl.currentPage > 0" class="btn btn-secondary " ng-click="$ctrl.prevPage()">&lt; Prev</button>
-        <button ng-show="$ctrl.searchResults.length > 0 && $ctrl.currentPage < $ctrl.maxPages" class="btn btn-secondary pull-right" ng-click="$ctrl.nextPage()"><span class="btn-text">Next &gt;</span></button>
-    </div>
+    <div class="container-fluid search-nav-top" ng-show="$ctrl.searchResults.length > 0">
+    <ul uib-pagination max-size="10" boundary-link-numbers="true" total-items="$ctrl.searchResults.length" items-per-page="$ctrl.itemsPerPage" ng-model="$ctrl.currentPage" ng-change="$ctrl.pageChanged()"></ul>
         
     </div>
 
 
     <div class="search-results" ng-show="$ctrl.searchResults.length > 0">
         <div class="elem-wrapper" ng-repeat="elem in $ctrl.filteredSearchResults">
-            <mms-search-results mms-element="::elem"></mms-search-results>
+            <mms-search-results mms-element="elem"></mms-search-results>
         </div>    
     </div>
-    
-    <div class="container-no-results container-fluid" ng-show="(!$ctrl.searchResults || $ctrl.searchResults.length === 0) && !$ctrl.searchLoading">
+    <i class="pane-center-spinner fa fa-5x fa-spinner fa-spin" ng-show="$ctrl.searchLoading"></i>
+    <div class="container-no-results container-fluid" ng-show="(!$ctrl.searchResults || $ctrl.searchResults.length === 0) && !$ctrl.searchLoading && !ctrl.firstSearch">
         <h3>No Results Found.</h3>
     </div>
     

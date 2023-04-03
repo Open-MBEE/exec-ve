@@ -32,7 +32,8 @@ export const right_default_toolbar: IToolBarButton[] = [
         tooltip: 'Edit Element',
         spinner: false,
         dynamic_ids: ['spec-editor.save', 'spec-editor.saveC', 'spec-editor.saveall', 'spec-editor.cancel'],
-        enabledFor: ['main.project.ref'],
+        enabledFor: ['**.portal.**', '**.present.**'],
+        disabledFor: ['main.project.ref.search'],
     },
     {
         id: 'spec-reorder',
@@ -44,6 +45,7 @@ export const right_default_toolbar: IToolBarButton[] = [
         spinner: false,
         dynamic_ids: ['spec-reorder.save', 'spec-reorder.cancel'],
         enabledFor: ['**.portal.**', '**.present.**'],
+        disabledFor: ['main.project.ref.search'],
     },
     {
         id: 'spec-ref-list',

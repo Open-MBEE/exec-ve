@@ -123,7 +123,7 @@ class InsertPeController extends Insertion<InsertPresentationData> {
         return this.viewSvc.createInstanceSpecification(
             this.insertData.viewOrSectionOb,
             this.type,
-            this.newItem.name,
+            this.name,
             this.insertData.addPeIndex
         )
     }
@@ -134,7 +134,7 @@ const InsertPeComponent: VeComponentOptions = {
     template: `
     <div>
     <div class="modal-header">
-        <h4 class="pe-type-{{$ctrl.type}}" ng-if="$ctrl.addType == 'pe'">Add {{$ctrl.type | lowercase}}</h4>
+        <h4 class="pe-type-{{$ctrl.type}}" ng-if="$ctrl.insertType == 'pe'">Add {{$ctrl.type | lowercase}}</h4>
     </div>
 
     <div class="modal-body">

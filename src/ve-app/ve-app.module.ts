@@ -783,6 +783,7 @@ veApp.config([
                         value: null,
                         squash: true,
                         raw: true,
+                        dynamic: true,
                     },
                     display: {
                         inherit: true,
@@ -843,30 +844,6 @@ veApp.config([
                     },
                 },
             })
-            // .state('main.project.ref.view.present', {
-            //     url: '?viewId',
-            //     resolve: {
-            //         params: [
-            //             '$transition$',
-            //             ($transition$: Transition): ParamsObject => {
-            //                 return $transition$.params()
-            //             },
-            //         ],
-            //     },
-            //     views: {
-            //         'pane-center@main': {
-            //             component: 'slideshow',
-            //             bindings: {
-            //                 mmsParams: 'params',
-            //                 mmsProject: 'projectOb',
-            //                 mmsRef: 'refOb',
-            //                 mmsGroup: 'groupOb',
-            //                 mmsDocument: 'documentOb',
-            //                 mmsView: 'viewOb',
-            //             },
-            //         },
-            //     },
-            // })
             .state('main.project.ref.view.reorder', {
                 url: '/order',
 
@@ -890,9 +867,9 @@ veApp.config([
             })
 
             .state('main.project.ref.search', {
-                url: '/search?search&field',
+                url: '/search?keywords&field',
                 params: {
-                    search: {
+                    keywords: {
                         dynamic: true,
                     },
                     field: {
@@ -900,18 +877,10 @@ veApp.config([
                     },
                 },
                 resolve: {
-                    field: [
-                        'ResolveService',
-                        'params',
-                        (resolveSvc: ResolveService, params: ParamsObject): string => {
-                            return resolveSvc.getField(params)
-                        },
-                    ],
-                    search: [
-                        'ResolveService',
-                        'params',
-                        (resolveSvc: ResolveService, params: ParamsObject): string => {
-                            return resolveSvc.getSearch(params)
+                    paramsOb: [
+                        '$transition$',
+                        ($transition$: Transition): ParamsObject => {
+                            return $transition$.params()
                         },
                     ],
                 },
@@ -928,6 +897,29 @@ veApp.config([
                     },
                     'pane-center@main': {
                         component: 'search',
+                        bindings: {
+                            params: 'paramsOb',
+                        },
+                    },
+                    'pane-right@main': {
+                        component: 'rightPane',
+                        bindings: {
+                            mmsRef: 'refOb',
+                            mmsRoot: 'documentOb',
+                        },
+                    },
+                    'toolbar-right@main': {
+                        component: 'rightToolbar',
+                        bindings: {
+                            mmsRef: 'refOb',
+                            mmsRoot: 'documentOb',
+                        },
+                    },
+                    'toolbar-left@main': {
+                        component: 'leftToolbar',
+                        bindings: {
+                            //Init an empty toolbar for style reasons
+                        },
                     },
                 },
             })

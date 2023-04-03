@@ -1,5 +1,6 @@
 import { IPaneScrollApi } from '@openmbee/pane-layout/lib/components/ng-pane'
-import { StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs'
+import { HookResult, Ng1Controller, StateService, TransitionService, UIRouterGlobals } from '@uirouter/angularjs'
+import { Transition } from '@uirouter/core'
 import angular, { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
@@ -17,10 +18,10 @@ import { PermissionsService, ViewData, ViewService, URLService } from '@ve-utils
 import { veApp } from '@ve-app'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
-import { DocumentObject, ElementObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms'
+import { DocumentObject, ElementObject, ParamsObject, ProjectObject, RefObject, ViewObject } from '@ve-types/mms'
 import { TreeBranch, View2NodeMap } from '@ve-types/tree'
 
-class FullDocumentController implements IComponentController {
+class FullDocumentController implements IComponentController, Ng1Controller {
     //Bindings
     public mmsView: ViewObject
     public mmsDocument: DocumentObject
@@ -109,9 +110,7 @@ class FullDocumentController implements IComponentController {
 
     $onInit(): void {
         this.rootScopeSvc.veFullDocMode(true)
-        this.rootScopeSvc.veCommentsOn(false)
-        this.rootScopeSvc.veEditMode(false)
-        this.rootScopeSvc.veElementsOn(false)
+        this.rootScopeSvc.veHideLeft(false)
         this.rootScopeSvc.veNumberingOn(true)
         this.eventSvc.$init(this)
 
@@ -176,9 +175,9 @@ class FullDocumentController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on<string>('view.scroll', (viewId) => {
-                this._scroll(viewId)
-            }),
+            // this.eventSvc.$on<string>('view.scroll', (viewId) => {
+            //     this._scroll(viewId)
+            // }),
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 switch (data.clicked) {
                     case 'show-comments':
@@ -211,12 +210,13 @@ class FullDocumentController implements IComponentController {
                         break
                     case 'convert-pdf':
                         this.fullDocumentApi.loadRemainingViews(() => {
-                            this.appUtilsSvc
-                                .printModal(angular.element('#print-div'), this.mmsDocument, this.mmsRef, true, 3)
-                                .then(
-                                    (ob) => {},
-                                    (reason) => {}
-                                )
+                            void this.appUtilsSvc.printModal(
+                                angular.element('#print-div'),
+                                this.mmsDocument,
+                                this.mmsRef,
+                                true,
+                                3
+                            )
                         })
                         break
                     case 'print':
@@ -232,12 +232,13 @@ class FullDocumentController implements IComponentController {
                         break
                     case 'word':
                         this.fullDocumentApi.loadRemainingViews(() => {
-                            this.appUtilsSvc
-                                .printModal(angular.element('#print-div'), this.mmsDocument, this.mmsRef, true, 2)
-                                .then(
-                                    (ob) => {},
-                                    (reason) => {}
-                                )
+                            void this.appUtilsSvc.printModal(
+                                angular.element('#print-div'),
+                                this.mmsDocument,
+                                this.mmsRef,
+                                true,
+                                2
+                            )
                         })
                         break
 
@@ -304,6 +305,12 @@ class FullDocumentController implements IComponentController {
         }
     }
 
+    uiOnParamsChanged(newValues: ParamsObject, $transition$: Transition): void {
+        if (newValues.viewId !== this.processed) this._scroll(newValues.viewId)
+    }
+    uiCanExit(transition: Transition): HookResult {
+        //Do nothing
+    }
     public bbInit = (api: ButtonBarApi): void => {
         if (
             this.mmsDocument &&
@@ -368,8 +375,8 @@ class FullDocumentController implements IComponentController {
             }
 
             this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
-            //if (viewId === this.processed) return
-            //this.processed = viewId
+            if (viewId === this.processed) return
+            this.processed = viewId
             this.fullDocumentApi.handleClickOnBranch(viewId, () => {
                 document.getElementById(viewId).scrollIntoView(true)
             })

@@ -64,7 +64,7 @@ export class PresentationService {
             resolve: {
                 getInsertData: (): InsertPresentationData => {
                     return {
-                        addType: 'pe',
+                        insertType: 'pe',
                         type,
                         viewOrSectionOb,
                         addPeIndex: $ctrl.addPeIndex,

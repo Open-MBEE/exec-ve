@@ -76,7 +76,7 @@ class NavBarController implements angular.IComponentController {
         this.ref = this.mmsRef
         this.org = this.mmsOrg
 
-        this.showSearch = this.$state.includes('**.search.**')
+        this.showSearch = !this.$state.includes('**.search.**')
 
         void this.authSvc.checkLogin().then(
             (data) => {
@@ -157,8 +157,8 @@ class NavBarController implements angular.IComponentController {
         } else {
             this.searchClass = 'fa fa-spin fa-spinner'
             void this.$state.go('main.project.ref.search', {
-                search: searchText,
-                field: 'all',
+                keywords: searchText,
+                field: 'name',
             })
         }
     }

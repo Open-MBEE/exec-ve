@@ -21,6 +21,7 @@ export interface IButtonBarButton {
     api?: string
     enabledFor?: string[]
     disabledFor?: string[]
+    type?: string
 }
 export interface buttonActionFn {
     (event?: JQuery.ClickEvent): void

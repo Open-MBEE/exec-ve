@@ -521,13 +521,13 @@ export class EditorController implements angular.IComponentController {
 
     public transcludeCallback = (ed: CKEDITOR.editor): void => {
         const tSettings: VeModalSettings<InsertResolveFn<InsertTransclusionData>> = {
-            component: 'transcludeModal',
+            component: 'createTransclusionModal',
             resolve: {
                 getInsertData: (): InsertTransclusionData => {
                     return {
                         type: 'Transclusion',
                         viewLink: false,
-                        addType: 'text',
+                        insertType: 'transclusion',
                     }
                 },
                 getProjectId: () => {
@@ -561,13 +561,13 @@ export class EditorController implements angular.IComponentController {
 
     public viewLinkCallback = (ed: CKEDITOR.editor): void => {
         const tSettings: VeModalSettings<InsertResolveFn<InsertTransclusionData>> = {
-            component: 'transcludeModal',
+            component: 'createTransclusionModal',
             resolve: {
                 getInsertData: (): InsertTransclusionData => {
                     return {
                         type: 'ViewLink',
                         viewLink: true,
-                        addType: 'text',
+                        insertType: 'transclusion',
                     }
                 },
                 getProjectId: () => {
@@ -601,7 +601,7 @@ export class EditorController implements angular.IComponentController {
                 getInsertData: (): InsertData => {
                     return {
                         type: 'Comment',
-                        addType: 'item',
+                        insertType: 'comment',
                     }
                 },
                 getProjectId: () => {

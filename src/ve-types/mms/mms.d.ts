@@ -108,7 +108,7 @@ export interface ParamsObject {
     viewId?: string
     documentId?: string
     shortUrl?: string
-    search?: string
+    keywords?: string
     field?: string
     fromLogin?: boolean
     '#'?: string

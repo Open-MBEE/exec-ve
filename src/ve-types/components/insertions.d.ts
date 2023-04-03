@@ -19,7 +19,7 @@ export interface InsertResolve<T extends InsertData> extends VeModalResolve {
 
 export interface InsertData {
     type: string
-    addType: string
+    insertType: string
     noPublish?: boolean
     parentTitle?: string
 }

@@ -135,6 +135,13 @@ export class ButtonBarService {
         }
     }
 
+    getButtonDefinition = (buttonId: string): IButtonBarButton => {
+        if (this.buttons.hasOwnProperty(buttonId)) {
+            return this.buttons[buttonId]
+        }
+        return null
+    }
+
     public registerButtons = (buttons: IButtonBarButton | IButtonBarButton[]): void => {
         if (!Array.isArray(buttons)) {
             buttons = [buttons]

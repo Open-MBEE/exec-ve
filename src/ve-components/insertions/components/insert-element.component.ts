@@ -107,7 +107,7 @@ class InsertElementController extends Insertion<InsertData> {
     }
 }
 
-// Component for inserting cross reference
+// Component for inserting cross-reference
 // Defines scope variables for html template and how to handle user click
 // Also defines options for search interfaces -- see mmsSearch.js for more info
 const InsertComponent: VeComponentOptions = {

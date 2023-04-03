@@ -25,6 +25,8 @@ export class RootScopeService {
         VEELEMENTSON: 've-elements-on',
         VEEDITMODE: 've-edit-mode',
         VEHIDEPANES: 've-hide-panes',
+        VEHIDERIGHT: 've-hide-right',
+        VEHIDELEFT: 've-hide-left',
         VESHOWLOGIN: 've-show-login',
         TREESHOWPE: 'tree-show-pe',
         TREEINITIALSELECTION: 'tree-initialSelection',
@@ -54,6 +56,8 @@ export class RootScopeService {
         this.veElementsOn()
         this.veEditMode()
         this.veHidePanes()
+        this.veHideLeft()
+        this.veHideRight()
     }
 
     loginModalOpen(value?: boolean | undefined): boolean {
@@ -120,6 +124,14 @@ export class RootScopeService {
 
     veHidePanes(value?: boolean | undefined): boolean {
         return this.sessionSvc.accessor(this.constants.VEHIDEPANES, value, false)
+    }
+
+    veHideLeft(value?: boolean | undefined): boolean {
+        return this.sessionSvc.accessor(this.constants.VEHIDELEFT, value, false)
+    }
+
+    veHideRight(value?: boolean | undefined): boolean {
+        return this.sessionSvc.accessor(this.constants.VEHIDERIGHT, value, false)
     }
 
     veShowLogin(value?: boolean | undefined): boolean {
