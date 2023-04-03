@@ -49,6 +49,7 @@ export class TreeService {
     static events = {
         UPDATED: 'tree.updated',
         RELOAD: 'tree.reload',
+        FILTER: 'tree.filter'
     }
 
     static MetaTypes = [

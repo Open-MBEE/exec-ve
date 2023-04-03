@@ -56,6 +56,8 @@ class LeftPaneController implements angular.IComponentController {
     buttonId: string = 'tree-button-bar'
 
     schema = 'cameo'
+    filterInputPlaceholder = 'Filter'
+    treeFilter = ''
 
     static $inject = [
         '$q',
@@ -442,6 +444,10 @@ class LeftPaneController implements angular.IComponentController {
         }
     }
 
+    filterInputChangeHandler = (): void => {
+        this.eventSvc.$broadcast<string>(TreeService.events.FILTER, this.treeFilter)
+    }
+
     public fullDocMode = (): void => {
         let display = ''
         this.bbApi.toggleButton(
@@ -492,19 +498,9 @@ const LeftPaneComponent: VeComponentOptions = {
                 <button-bar button-id="$ctrl.buttonId"></button-bar>
             </div>
             <div class="tree-options">
-                <button ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" uib-popover-template="'filterTemplate.html'" 
-                  popover-title="Filter Tree" popover-placement="right-bottom" popover-append-to-body="true" 
-                  popover-trigger="'outsideClick'" type="button" class="btn btn-tools btn-sm">
-                    <i class="fa-solid fa-filter fa-2x"></i>
-                </button>
-                <script type="text/ng-template" id="filterTemplate.html">
-                      <input ng-show="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
-                        ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
-                        ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
-                </script>
                 <input ng-hide="$ctrl.$pane.targetSize < $ctrl.squishSize" class="ve-plain-input" ng-model-options="{debounce: 1000}"
-                    ng-model="$ctrl.treeSearch" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
-                    ng-change="$ctrl.searchInputChangeHandler();" style="flex:2">
+                    ng-model="$ctrl.treeFilter" type="text" placeholder="{{$ctrl.filterInputPlaceholder}}"
+                    ng-change="$ctrl.filterInputChangeHandler();" style="flex:2">
             </div>
         </div>
     </ng-pane>
