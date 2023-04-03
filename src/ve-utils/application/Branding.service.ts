@@ -11,7 +11,6 @@ export interface BrandingStyle {
     background?: string
     color?: string
     disabled: boolean
-    exactText?: boolean
 }
 
 // export interface BannerStyle extends BrandingStyle {
@@ -49,7 +48,17 @@ export class BrandingService {
         labels: ['pi', 'no_public_release'],
         disabled: false,
     }
-
+    loginWarning: BrandingStyle = {
+        disabled: false,
+        message: [
+            'By accessing and using this information system, you acknowledge and consent to the following:',
+            '',
+            'This service is funded by the United States Government and operated by the',
+            'California Institute of Technology in support of ongoing U.S. Government programs and activities.',
+            'If you are not authorized to access this system, disconnect now. Users of this system have no expectation',
+            'of privacy. By continuing, you consent to your keystrokes and data content being monitored.',
+        ],
+    }
     static $inject = ['$q']
 
     constructor(private $q: VeQService) {
@@ -60,19 +69,23 @@ export class BrandingService {
         if (this.config.banner) {
             this.banner = Object.assign(this.banner, this.config.banner)
         }
-        this.banner = this.createMessage(this.banner)
+        this.createMessage(this.banner)
 
         if (this.config.loginBanner) {
             this.loginBanner = Object.assign(this.loginBanner, this.config.loginBanner)
         }
-        this.loginBanner = this.createMessage(this.loginBanner)
+        this.createMessage(this.loginBanner)
         if (this.config.footer) {
             this.footer = Object.assign(this.footer, this.config.footer)
         }
-        this.footer = this.createMessage(this.footer)
+        this.createMessage(this.footer)
+        if (this.config.loginWarning) {
+            this.loginWarning = Object.assign(this.loginWarning, this.config.loginWarning)
+        }
+        this.createMessage(this.loginWarning)
     }
 
-    public createMessage = (brandingStyle: BrandingStyle): BrandingStyle => {
+    public createMessage = (brandingStyle: BrandingStyle): void => {
         if (brandingStyle.labels) {
             const separator: string = brandingStyle.separator ? brandingStyle.separator : this.defaultSeparator
             brandingStyle.message = []
@@ -86,7 +99,6 @@ export class BrandingService {
                 brandingStyle.message.push(this._getMessage(brandingStyle.labels as string[], separator))
             }
         }
-        return brandingStyle
     }
 
     private _getMessage = (labels: string[], separator?: string): string => {

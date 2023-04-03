@@ -1,4 +1,5 @@
 import { VeExperimentConfig, VeExperimentDescriptor } from '@ve-components/services'
+import { BrandingStyle } from '@ve-utils/application'
 
 export interface VeConfig {
     version?: string
@@ -7,29 +8,10 @@ export interface VeConfig {
     basePath: string
     enableDebug?: boolean
     customLabels?: { [key: string]: string }
-    loginBanner?: {
-        labels: string[][]
-        separator?: string
-        background?: string
-        color?: string
-        disabled?: boolean
-    }
-    banner?: {
-        message: string | string[]
-        separator?: string
-        background?: string
-        color?: string
-        top?: boolean
-        bottom?: boolean
-        disabled?: boolean
-    }
-    footer?: {
-        message: string | string[]
-        separator?: string
-        background?: string
-        color?: string
-        disabled?: boolean
-    }
+    loginBanner?: BrandingStyle
+    loginWarning?: BrandingStyle
+    banner?: BrandingStyle
+    footer?: BrandingStyle
     loginTimeout?: number
     experimental?: VeExperimentDescriptor[]
     expConfig?: VeExperimentConfig
