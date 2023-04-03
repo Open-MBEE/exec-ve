@@ -1,7 +1,7 @@
 import { StateService, TransitionPromise, UIRouterGlobals, UrlService } from '@uirouter/angularjs'
 import angular, { IComponentController, IQService } from 'angular'
 
-import { BrandingStyle, RootScopeService } from '@ve-utils/application'
+import { BrandingService, BrandingStyle, RootScopeService } from '@ve-utils/application'
 import { AuthService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
@@ -48,6 +48,7 @@ const LoginComponent: VeComponentOptions = {
             'growl',
             'AuthService',
             'RootScopeService',
+            'BrandingService',
         ]
 
         public spin: boolean = false
@@ -65,7 +66,8 @@ const LoginComponent: VeComponentOptions = {
             private $uibModal: VeModalService,
             private growl: angular.growl.IGrowlService,
             private authSvc: AuthService,
-            private rootScopeSvc: RootScopeService
+            private rootScopeSvc: RootScopeService,
+            private brandingSvc: BrandingService
         ) {}
 
         $onInit(): void {
@@ -128,6 +130,14 @@ const LoginComponent: VeComponentOptions = {
         warning(): void {
             const settings: VeModalSettings<VeModalResolveFn> = {
                 component: 'loginWarningModal',
+                backdrop: 'static',
+                keyboard: false,
+                windowTopClass: 'modal-center-override',
+                resolve: {
+                    loginWarning: () => {
+                        return this.brandingSvc.loginWarning
+                    },
+                },
             }
             this.$uibModal.open<VeModalResolveFn, boolean>(settings)
         }

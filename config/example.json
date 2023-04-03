@@ -15,6 +15,11 @@
     "background": "#0D47A1",
     "color": "#e8e8e8"
   },
+  "loginWarning": {
+    "message": [
+      "By accessing and using this information system, you acknowledge and consent to the following: If you are not authorized to access this system, disconnect now. Users of this system have no expectation, of privacy. By continuing, you consent to your keystrokes and data content being monitored."
+    ]
+  },
   "banner": {
     "labels": ["pi"]
   },
