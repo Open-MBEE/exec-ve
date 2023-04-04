@@ -41,7 +41,7 @@ class PresentTableController extends Presentation implements IPresentation {
     /** Full Table Filter **/
     public _fullTableFilterSub: Rx.IDisposable
 
-    private _searchTerm: string = ''
+    private searchTerm: string = ''
     private numFiltered: number
 
     /** Column Filter **/
@@ -114,11 +114,11 @@ class PresentTableController extends Presentation implements IPresentation {
 
                 this.$element.append(this.$transcludeEl)
                 this.nextIndex = 0
-                this.$tHeadEl = this.$transcludeEl.find('thead')
+                this.$tHeadEl = this.$element.find('thead')
                 this.$compile(this.$tHeadEl)(this.$scope)
-                this.$searchEl = this.$element.children().eq(0)
-                this.$compile(this.$searchEl)(this.$scope)
-                this.$captionEl = this.$transcludeEl.find('caption')
+                this.$searchEl = this.$element.children('div').eq(0)
+                //this.$compile(this.$searchEl)(this.$scope) //already compiled due to template
+                this.$captionEl = this.$element.find('caption')
                 this.$compile(this.$captionEl)(this.$scope)
                 //Add the search input here (before the TRS, aka the columns/rows)
                 this.tbody = this.$element.find('.table-wrapper').children('table').children('tbody')
@@ -128,7 +128,6 @@ class PresentTableController extends Presentation implements IPresentation {
                 this.numFiltered = this.lastIndex
                 this.numTotal = this.lastIndex
 
-                this.addFullTableFilter(this.trs)
                 this.addColumnsWiseFilter(this.tableConfig, this.trs)
                 this.addSorting(this.trs, this.tbody)
 
@@ -180,44 +179,15 @@ class PresentTableController extends Presentation implements IPresentation {
         return this.$q.resolve(`<div class="table-wrapper">${html}</div>`)
     }
 
-    /** Full Table Filter **/
-    public searchTerm = (newTerm: string): string => {
-        this.eventSvc.$broadcast('update-search', {
-            newInputVal: newTerm,
-            oldInputVal: this._searchTerm,
-        })
-        if (newTerm != this._searchTerm) {
-            return (this._searchTerm = newTerm)
-        } else {
-            return this._searchTerm
-        }
-    }
-
-    /** Add Full Table Filter ability **/
-    public addFullTableFilter = (trs: JQuery<HTMLElement>): void => {
-        this._fullTableFilterSub = this._addWatcherToFullTableFilterInput(() => {
-            this._fullTableFilter(trs)
-        })
-    }
-
-    /** Add a watcher to the Full Table Filter Input **/
-    private _addWatcherToFullTableFilterInput = (performFilter: () => void): Rx.IDisposable => {
-        return this.eventSvc.$on('update-search', (data: TableEvent) => {
-            if (data.newInputVal !== data.oldInputVal) {
-                performFilter()
-            }
-        })
-    }
-
     /** Filter rows by search term **/
-    private _fullTableFilter = (trs: JQuery<HTMLElement>): void => {
+    private fullTableFilter = (): void => {
         this._resetColumnWiseFilterInputs()
-        if (this._searchTerm === '') {
-            this.numFiltered = trs.length
-            trs.show()
+        if (this.searchTerm === '') {
+            this.numFiltered = this.trs.length
+            this.trs.show()
         } else {
             this.numFiltered = 0
-            this._displaySomeRows(trs, () => {
+            this._displaySomeRows(this.trs, () => {
                 this.numFiltered++
             })
         }
@@ -225,7 +195,7 @@ class PresentTableController extends Presentation implements IPresentation {
 
     /** Display rows that match the filter term **/
     private _displaySomeRows = (trs: JQuery<HTMLElement>, increaseNumOfRowToShow: () => void): void => {
-        const regExp = new RegExp(this._searchTerm, 'i')
+        const regExp = new RegExp(this.searchTerm, 'i')
         for (let i = 0, numRows = trs.length; i < numRows; i++) {
             const string = $(trs[i]).text()
             if (regExp.test(string)) {
@@ -238,18 +208,6 @@ class PresentTableController extends Presentation implements IPresentation {
     }
     /** End of Full Table Filter **/
 
-    /** Column(s)-Wise Filter **/
-    // vm.addColumnsWiseFilter = addColumnsWiseFilter;
-    // vm._addWatchersForAllHeaderColumnsInput = _addWatchersForAllHeaderColumnsInput;
-    // vm._addWatcherToColumnInput = _addWatcherToColumnInput;
-    // vm._displayRowsMatchingAllColumnsFilterTerms = _displayRowsMatchingAllColumnsFilterTerms;
-    // vm._storeColumnWiseFilterTerm = _storeColumnWiseFilterTerm;
-    // vm._addNewColumnWiseFilterTerm = _addNewColumnWiseFilterTerm;
-    // vm._updateExistingColumnWiseFilterTerm = _updateExistingColumnWiseFilterTerm;
-    // vm._getCellValueForFiltering = _getCellValueForFiltering;
-    // vm._resetColumnWiseFilterInputs = _resetColumnWiseFilterInputs;
-    // vm._resetFullTableFilterInput = _resetFullTableFilterInput;
-
     /** Add column(s)-wise filter ability **/
     public addColumnsWiseFilter = (tableConfig: ITableConfig, trs: JQuery<HTMLElement>): void => {
         this._addWatchersForAllHeaderColumnsInput(tableConfig)
@@ -259,7 +217,7 @@ class PresentTableController extends Presentation implements IPresentation {
             endColNum: number,
             filterInputBinding: string
         ): void => {
-            this._resetFullTableFilterInput(trs)
+            this.searchTerm = ''
             this._storeColumnWiseFilterTerm(filterInputBinding, startColNum, endColNum, filterTerm)
             this.numFiltered = 0
             this._displayRowsMatchingAllColumnsFilterTerms(trs, () => {
@@ -290,17 +248,6 @@ class PresentTableController extends Presentation implements IPresentation {
                 }
             }),
             cell: cell,
-        }
-    }
-
-    /** Clear out the filter term from the Full Table Filter input **/
-    private _resetFullTableFilterInput = (trs: JQuery<HTMLElement>): void => {
-        if (this._searchTerm !== '') {
-            this._fullTableFilterSub.dispose()
-            this.searchTerm('')
-            this._fullTableFilterSub = this._addWatcherToFullTableFilterInput(() => {
-                this._fullTableFilter(trs)
-            })
         }
     }
 
@@ -560,23 +507,18 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     public scroll = (): void => {
-        if (this.fixedColumns) {
-            this._fixedColumnsElem.css('transform', (index: number) => {
-                const element = this._fixedColumnsElem[index]
-                return `translateX(${element.scrollLeft}px)`
-            })
+        if (this._fixedColumnsElem) {
+            const scroll = this.$element.find('.table-fix-column').scrollLeft()
+            this._fixedColumnsElem.css('transform',`translateX(${scroll}px)`)
         }
-        if (this.fixedHeaders) {
-            this._fixedHeadersElem.css('transform', (index: number) => {
-                const element = this._fixedColumnsElem[index]
-                return `translateY(${element.scrollTop}px)`
-            })
+        if (this._fixedHeadersElem) {
+            const scroll = this.$element.find('.table-fix-head').scrollTop()
+            this._fixedHeadersElem.css('transform', `translateY(${scroll}px)`)
         }
         if (this._fixedHeadersElem && this._fixedColumnsElem) {
-            this.$captionEl.css('transform', (index: number) => {
-                const element = this._fixedColumnsElem[index]
-                return `translate(${element.scrollLeft}px, ${element.scrollTop}px)`
-            })
+            const scrollX = this.$element.find('.table-fix-column').scrollLeft()
+            const scrollY = this.$element.find('.table-fix-head').scrollTop()
+            this.$captionEl.css('transform', `translate(${scrollX}px, ${scrollY}px)`)
         }
     }
     public makeFixedHeader = (): void => {
@@ -629,57 +571,51 @@ class PresentTableController extends Presentation implements IPresentation {
     private _findColumnCells = (bodyTag: string, cellTag: string, n: number): JQuery<HTMLElement> => {
         const spanData: boolean[][] = [] //if spanData[curRow][curCol] is true that means that 'cell' should be "" due to merged cell
         let curRow = 0
-        let data = $('<div></div>')
-        $(this.$element)
-            .find('.table-fix-column table')
-            .children(bodyTag)
-            .children('tr')
+        let data = $()
+        $(this.$element).find('.table-fix-column table').children(bodyTag).children('tr')
             .each((index, element) => {
                 let curCol = 0
-                $(element)
-                    .children(cellTag)
-                    .each((index, element) => {
-                        while (spanData[curRow] && spanData[curRow][curCol]) {
-                            curCol++
-                        }
-                        if (curCol >= n) {
-                            return
-                        }
-                        data = data.add($(element))
-                        const rowstring = $(element).attr('rowspan')
-                        let rowspan = 0
-                        if (rowstring) {
-                            rowspan = parseInt(rowstring)
-                            if (rowspan > 1) {
-                                for (let i = 1; i < rowspan; i++) {
-                                    if (!spanData[curRow + i]) {
-                                        spanData[curRow + i] = []
-
-                                        spanData[curRow + i][curCol] = true
-                                    }
+                $(element).children(cellTag).each((index, element) => {
+                    while (spanData[curRow] && spanData[curRow][curCol]) {
+                        curCol++
+                    }
+                    if (curCol >= n) {
+                        return
+                    }
+                    data = data.add($(element))
+                    const rowstring = $(element).attr('rowspan')
+                    let rowspan = 0
+                    if (rowstring) {
+                        rowspan = parseInt(rowstring)
+                        if (rowspan > 1) {
+                            for (let i = 1; i < rowspan; i++) {
+                                if (!spanData[curRow + i]) {
+                                    spanData[curRow + i] = []
                                 }
+                                spanData[curRow + i][curCol] = true
                             }
-                            const colstring = $(element).attr('colspan')
-                            if (!colstring) {
-                                curCol++
-                                return
-                            }
-                            let colspan = parseInt(colstring)
-                            while (colspan > 1) {
-                                curCol++
-                                colspan--
-                                if (rowspan > 1) {
-                                    for (let j = 1; j < rowspan; j++) {
-                                        spanData[curRow + j][curCol] = true
-                                    }
-                                }
-                            }
-                            curCol++
                         }
-                    })
+                    }
+                    const colstring = $(element).attr('colspan')
+                    if (!colstring) {
+                        curCol++
+                        return
+                    }
+                    let colspan = parseInt(colstring)
+                    while (colspan > 1) {
+                        curCol++
+                        colspan--
+                        if (rowspan > 1) {
+                            for (let j = 1; j < rowspan; j++) {
+                                spanData[curRow + j][curCol] = true
+                            }
+                        }
+                    }
+                    curCol++
+                })
                 curRow++
             })
-        return data
+            return data
     }
 
     private compileTable(): void {
@@ -718,12 +654,12 @@ const PresentTableComponent: IPresentationComponentOptions = {
     <button class="btn btn-sm filter-table-button btn-default" ng-click="$ctrl.showFilter = !$ctrl.showFilter">Filter table</button> 
     <label class="btn btn-sm btn-default table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="$ctrl.fixedHeaders" ng-change="$ctrl.makeFixedHeader()" /> Freeze Headers</label> 
     <label class="btn btn-sm btn-default table-button"><input type="checkbox" class="fixed-header-checkbox" ng-model="$ctrl.fixedColumns" ng-change="$ctrl.makeFixedColumn()" /> Freeze Columns</label> 
-    <label class="btn btn-sm table-button column-input-label" ng-show="fixedColumns">Columns to Freeze <input type="text" ng-show="$ctrl.fixedColumns" size="3" class="column-input" ng-model="$ctrl.numFixedColumns" /></label> 
-    <button class="btn btn-sm btn-default table-button" ng-show="fixedColumns" ng-click="$ctrl.updateFixedColumns()">Update</button> 
-    <button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="showSortReset" ng-click="$ctrl.resetSort()">Reset Sort</button>
+    <label class="btn btn-sm table-button column-input-label" ng-show="$ctrl.fixedColumns">Columns to Freeze <input type="text" ng-show="$ctrl.fixedColumns" size="3" class="column-input" ng-model="$ctrl.numFixedColumns" /></label> 
+    <button class="btn btn-sm btn-default table-button" ng-show="$ctrl.fixedColumns" ng-click="$ctrl.updateFixedColumns()">Update</button> 
+    <button class="btn btn-sm reset-sort-button btn-default reset-sort-fade" ng-show="$ctrl.showSortReset" ng-click="$ctrl.resetSort()">Reset Sort</button>
     <span class="ve-show-filter" ng-show="$ctrl.showFilter">
-        <form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model="$ctrl.searchTerm" ng-model-options="$ctrl.ngModelOptions"></form>
-        <span class = "ve-filter-status">Showing <strong>{{$ctrl.numFiltered}}</strong> of <strong>{{$ctrl.numTotal}}</strong> Rows: </span>
+        <form style="display: inline" class="ve-filter-table-form"><input type="text" size="75" placeholder="Filter table" ng-model="$ctrl.searchTerm" ng-model-options="$ctrl.ngModelOptions" ng-change="$ctrl.fullTableFilter()"></form>
+        <span class="ve-filter-status">Showing <strong>{{$ctrl.numFiltered}}</strong> of <strong>{{$ctrl.numTotal}}</strong> Rows: </span>
     </span>
 </div>          
 `,
