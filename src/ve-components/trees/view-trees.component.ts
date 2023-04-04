@@ -612,54 +612,11 @@ class ViewTreesController implements IComponentController {
         })
     }
 
-    searchInputChangeHandler = (): void => {
-        if (this.treeSearch === '') {
-            this.treeSvc.collapseAll().then(
-                () => {
-                    this.treeSvc.expandPathToSelectedBranch().then(
-                        () => {
-                            this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree)
-                        },
-                        (reason) => {
-                            this.growl.error(TreeService.treeError(reason))
-                        }
-                    )
-                },
-                (reason) => {
-                    this.growl.error(TreeService.treeError(reason))
-                }
-            )
-        } else {
-            // expand all branches so that the filter works correctly
-            this.treeSvc.expandAll().then(
-                () => {
-                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.currentTree)
-                },
-                (reason) => {
-                    this.growl.error(TreeService.treeError(reason))
-                }
-            )
-        }
-    }
-
     private changeTree = (data: { id: string; category?: string; title?: string }): void => {
         if (!this.currentTree) {
             this.currentTree = ''
         }
         if (this.currentTree !== data.id) {
-            switch (this.treesCategory) {
-                case 'present': {
-                    this.filterInputPlaceholder = 'Filter document contents'
-                    break
-                }
-                case 'portal': {
-                    this.filterInputPlaceholder = 'Filter groups/docs'
-                    break
-                }
-                default: {
-                    this.filterInputPlaceholder = 'Filter tree data'
-                }
-            }
             if (this.currentTree !== '') {
                 this.show[_.camelCase(this.currentTree)].tree = false
             }

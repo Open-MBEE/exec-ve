@@ -164,7 +164,35 @@ export class TreeController implements angular.IComponentController {
                 }
             }),
             this.eventSvc.$on<string>(TreeService.events.FILTER, (data) => {
-                this.filter = data
+                if (data === '') {
+                    this.treeSvc.collapseAll().then(
+                        () => {
+                            this.treeSvc.expandPathToSelectedBranch().then(
+                                () => {
+                                    this.eventSvc.$broadcast(TreeService.events.RELOAD, this.id)
+                                    this.filter = data
+                                },
+                                (reason) => {
+                                    this.growl.error(TreeService.treeError(reason))
+                                }
+                            )
+                        },
+                        (reason) => {
+                            this.growl.error(TreeService.treeError(reason))
+                        }
+                    )
+                } else {
+                    // expand all branches so that the filter works correctly
+                    this.treeSvc.expandAll().then(
+                        () => {
+                            this.eventSvc.$broadcast(TreeService.events.RELOAD, this.id)
+                            this.filter = data
+                        },
+                        (reason) => {
+                            this.growl.error(TreeService.treeError(reason))
+                        }
+                    )
+                }
             })
         )
 
