@@ -132,12 +132,12 @@ export class ViewHtmlService {
                     if (isHeader) {
                         if (isSortable && Number(cell.colspan) === 1) {
                             result.push(
-                                `<span ng-click="$ctrl.tableConfig.sortByColumnFn(${cell.startCol})" ng-class="getSortIconClass(${cell.startCol})"></span>`
+                                `<span ng-click="$ctrl.sortByColumnFn(${cell.startCol})" ng-class="$ctrl.getSortIconClass(${cell.startCol})"></span>`
                             )
                         }
                         if (isFilterable) {
                             result.push(
-                                `<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column" ng-show="showFilter" ng-model-options="{debounce: ${this.tableConfig.filterDebounceRate}}" ng-model="${this.tableConfig.filterTermColumnPrefixBinding}${cell.startCol}${cell.endCol}">`
+                                `<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column" ng-show="showFilter" ng-model-options="$ctrl.ngModelOptions" ng-model="$ctrl.filterTermForColumn.${cell.startCol}${cell.endCol}">`
                             )
                         }
                     }

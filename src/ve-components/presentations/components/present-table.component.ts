@@ -37,9 +37,9 @@ class PresentTableController extends Presentation implements IPresentation {
     private tbody: JQuery<HTMLElement>
     private lastIndex: number
     private numTotal: number
+    private sortColumnNum: number
 
     /** Full Table Filter **/
-    public _fullTableFilterSub: Rx.IDisposable
 
     private searchTerm: string = ''
     private numFiltered: number
@@ -57,12 +57,12 @@ class PresentTableController extends Presentation implements IPresentation {
     private _filterTermForColumns: {
         [filterTermForColumn: string]: { filterTerm: string; columns: number[] }
     } = {}
+    private filterTermForColumn: {[cols: string]: string} = {}
 
     /** Variables for Sorting Functions **/
     private _rowSortOrderAttrName = 'data-original-row-num'
     public isAscending: boolean = false
     private showSortReset: boolean = false
-    private resetSort: () => void
     private filterByColumn: (filterTerm, startColNum, endColNum, filterInputBinding) => void
 
     static $inject = [...Presentation.$inject, '$timeout']
@@ -128,7 +128,7 @@ class PresentTableController extends Presentation implements IPresentation {
                 this.numFiltered = this.lastIndex
                 this.numTotal = this.lastIndex
 
-                this.addColumnsWiseFilter(this.tableConfig, this.trs)
+                //this.addColumnsWiseFilter(this.tableConfig, this.trs)
                 this.addSorting(this.trs, this.tbody)
 
                 this.compileTable()
@@ -167,9 +167,9 @@ class PresentTableController extends Presentation implements IPresentation {
         }
 
         this.table = this.peObject as PresentTableObject
-        this.tableConfig = this.viewHtmlSvc.tableConfig
+        this.sortColumnNum = -1
         this.ngModelOptions = {
-            debounce: this.tableConfig.filterDebounceRate,
+            debounce: 300,
             getterSetter: true,
         }
     }
@@ -331,8 +331,6 @@ class PresentTableController extends Presentation implements IPresentation {
     /** Add sorting ability **/
     public addSorting = (trs: JQuery<HTMLElement>, tbody: JQuery<HTMLElement>): void => {
         this._addDefaultSortOrder(trs)
-        this._addSortingBinding(trs, tbody)
-        this._addSortResetBinding(trs, tbody)
     }
 
     /** Remember the original row number for each row. Used to restore sort order **/
@@ -343,38 +341,30 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     /** Used to sort columns(s). Add sort binding to each header columns of the outermost table **/
-    private _addSortingBinding = (trs: JQuery<HTMLElement>, tbody: JQuery<HTMLElement>): void => {
-        this.tableConfig.showBindingForSortIcon = -1
 
-        this.tableConfig.sortByColumnFn = (sortColumnNum: number): void => {
-            this.tableConfig.showBindingForSortIcon = sortColumnNum
-            const rows = trs.toArray()
-            let sortedRows = this._areAllCellValidNumber(rows, sortColumnNum)
-                ? rows.sort(this._numericalComparator(sortColumnNum))
-                : rows.sort(this._generalComparator(sortColumnNum))
+    private sortByColumnFn = (sortColumnNum: number): void => {
+        this.sortColumnNum = sortColumnNum
+        const rows = this.trs.toArray()
+        let sortedRows = this._areAllCellValidNumber(rows, sortColumnNum)
+            ? rows.sort(this._numericalComparator(sortColumnNum))
+            : rows.sort(this._generalComparator(sortColumnNum))
 
-            this.isAscending = !this.isAscending
+        this.isAscending = !this.isAscending
 
-            if (!this.isAscending) {
-                sortedRows = sortedRows.reverse()
-            }
-
-            this._displaySortedRows(sortedRows, tbody)
-            this.showSortReset = true
+        if (!this.isAscending) {
+            sortedRows = sortedRows.reverse()
         }
-    }
 
+        this._displaySortedRows(sortedRows, this.tbody)
+        this.showSortReset = true
+    }
     /** Used to restore the sort order of table's rows **/
-    private _addSortResetBinding = (trs: JQuery<HTMLElement>, tbody: JQuery<HTMLElement>): void => {
-        this.resetSort = (): void => {
-            const sortedRows = trs.toArray().sort(this._comparatorForSortReset())
-            this._displaySortedRows(sortedRows, tbody)
-
-            this.showSortReset = false
-            this.tableConfig.showBindingForSortIcon = -1
-        }
+    private resetSort = () => {
+        let sortedRows = this.trs.toArray().sort(this._comparatorForSortReset())
+        this._displaySortedRows(sortedRows, this.tbody)
+        this.showSortReset = false
+        this.sortColumnNum = -1
     }
-
     /** A comparator for sorting table's rows. When one of them is null ( null is reserved for non-sortable content
      *  such as  image, list, table ), that content is pushed to the end of the final sorted list regardless of
      *  whether sorting asc or dsc **/
@@ -466,7 +456,7 @@ class PresentTableController extends Presentation implements IPresentation {
     /** Begin Linking Functions **/
 
     public getSortIconClass = (cellColumn): string[] => {
-        const sortingColumnNumber = this.tableConfig.showBindingForSortIcon
+        const sortingColumnNumber = this.sortColumnNum
         if (sortingColumnNumber !== cellColumn) {
             return ['fa', 'fa-sort', 'sort-default']
         } else {
