@@ -1,7 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-const Visualizer = window['ui-router-visualizer'].Visualizer as {
-    new (router: UIRouter, options?: any): UIRouterPlugin
-}
 
 import ngPane from '@openmbee/pane-layout'
 import uiRouter, {
@@ -12,7 +9,6 @@ import uiRouter, {
     TransitionService,
     UIRouter,
     UIRouterGlobals,
-    UIRouterPlugin,
     UrlParts,
     UrlService,
 } from '@uirouter/angularjs'
@@ -27,6 +23,7 @@ import angular, {
     IQService,
     IRequestConfig,
 } from 'angular'
+import { Visualizer } from 'ui-router-visualizer'
 
 import { LoginModalResolveFn } from '@ve-app/main/modals/login-modal.component'
 import { ResolveService } from '@ve-app/main/services'
@@ -1177,7 +1174,9 @@ veApp.run([
     '$uiRouter',
     '$trace',
     ($uiRouter: UIRouter, $trace: Trace): void => {
-        const pluginInstance = $uiRouter.plugin(Visualizer)
-        $trace.enable('TRANSITION')
+        if (window.__env.enableDebug) {
+            const pluginInstance = $uiRouter.plugin(Visualizer)
+            $trace.enable('TRANSITION')
+        }
     },
 ])
