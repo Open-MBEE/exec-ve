@@ -748,6 +748,7 @@ veApp.config([
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
                             mmsRoot: 'documentOb',
+                            mmsDocument: 'documentOb'
                         },
                     },
                     'banner-bottom@main': {
