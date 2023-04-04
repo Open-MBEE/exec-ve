@@ -1041,7 +1041,7 @@ export class TreeService {
                 this._onTreeDataChange().then(resolve, reject)
             else {
                 this.forEachBranch((b): void => {
-                    if (b.data.id === this.treeApi.elementId) {
+                    if (b.data.id === this.treeApi.elementId || this.treeApi.elementId === `site_${b.data.id}_cover`) {
                         this.selectBranch(b, true).then(
                             () => {
                                 this._onTreeDataChange().then(resolve, reject)
