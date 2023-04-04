@@ -19,6 +19,8 @@ import 'angular-sanitize'
 import 'angular-ui-tree'
 import '@openmbee/pane-layout'
 
+import 'ui-router-visualizer'
+
 import 'angulartics'
 import 'angulartics-piwik'
 
