@@ -63,7 +63,6 @@ class PresentTableController extends Presentation implements IPresentation {
     private _rowSortOrderAttrName = 'data-original-row-num'
     public isAscending: boolean = false
     private showSortReset: boolean = false
-    private filterByColumn: (filterTerm, startColNum, endColNum, filterInputBinding) => void
 
     static $inject = [...Presentation.$inject, '$timeout']
 
@@ -103,7 +102,12 @@ class PresentTableController extends Presentation implements IPresentation {
     recompile = (): void => {
         this.isEditing = false
         this.inPreviewMode = false
-
+        this.$element.on('click', (e) => {
+            const tag = (e.target as unknown as Element).tagName
+            if (tag === 'INPUT' || tag === 'LABEL' || tag === 'BUTTON') {
+                e.stopPropagation()
+            }
+        })
         this.setNumber()
         this.getContent().then(
             (result) => {
@@ -209,46 +213,15 @@ class PresentTableController extends Presentation implements IPresentation {
     /** End of Full Table Filter **/
 
     /** Add column(s)-wise filter ability **/
-    public addColumnsWiseFilter = (tableConfig: ITableConfig, trs: JQuery<HTMLElement>): void => {
-        this._addWatchersForAllHeaderColumnsInput(tableConfig)
-        this.filterByColumn = (
-            filterTerm: string,
-            startColNum: number,
-            endColNum: number,
-            filterInputBinding: string
-        ): void => {
-            this.searchTerm = ''
-            this._storeColumnWiseFilterTerm(filterInputBinding, startColNum, endColNum, filterTerm)
-            this.numFiltered = 0
-            this._displayRowsMatchingAllColumnsFilterTerms(trs, () => {
-                this.numFiltered++
-            })
-        }
-    }
-
-    /** Add watchers to all header columns inputs for filtering **/
-    private _addWatchersForAllHeaderColumnsInput = (tableConfig: ITableConfig): void => {
-        if (!this.table.header) {
-            return
-        }
-        this.table.header.forEach((headerRow) => {
-            headerRow.forEach((cell) => {
-                const filterInputBinding = `${tableConfig.filterTermColumnPrefixBinding}-${cell.startCol}${cell.endCol}`
-                this._addWatcherToColumnInput(filterInputBinding, cell)
-            })
+    private filterByColumn = (startColNum: number, endColNum: number): void => {
+        this.searchTerm = ''
+        const filterTerm =  this.filterTermForColumn[`filter${startColNum}${endColNum}`]
+        const filterInputBinding = `columnFilter${startColNum}${endColNum}`
+        this._storeColumnWiseFilterTerm(filterInputBinding, startColNum, endColNum, filterTerm)
+        this.numFiltered = 0
+        this._displayRowsMatchingAllColumnsFilterTerms(this.trs, () => {
+            this.numFiltered++
         })
-    }
-
-    /** Add a watcher to one header column's input for filtering **/
-    private _addWatcherToColumnInput = (filterInputBinding: string, cell: TableEntryObject): void => {
-        this._columnsInputSubs[filterInputBinding] = {
-            sub: this.eventSvc.$on(filterInputBinding, (data: TableEvent) => {
-                if (data.newInputVal !== data.oldInputVal) {
-                    this.filterByColumn(data.newInputVal, cell.startCol, cell.endCol, filterInputBinding)
-                }
-            }),
-            cell: cell,
-        }
     }
 
     /** Only show the rows that has contents matching all currently outstanding filter terms **/
@@ -315,14 +288,12 @@ class PresentTableController extends Presentation implements IPresentation {
         const listOfFilterInputBindings = Object.keys(this._filterTermForColumns)
         if (listOfFilterInputBindings.length > 0) {
             listOfFilterInputBindings.forEach((filterInputBinding) => {
-                if (this._filterTermForColumns[filterInputBinding].filterTerm !== '') {
-                    this.eventSvc.destroy([this._columnsInputSubs[filterInputBinding].sub])
-                }
-                //$scope[filterInputBinding] = '';
-                this._addWatcherToColumnInput(filterInputBinding, this._columnsInputSubs[filterInputBinding].cell)
                 delete this._filterTermForColumns[filterInputBinding]
             })
         }
+        Object.keys(this.filterTermForColumn).forEach((key) => {
+            this.filterTermForColumn[key] = ''
+        })
     }
     /** End of Column(s)-Wise Filter **/
 
@@ -342,8 +313,9 @@ class PresentTableController extends Presentation implements IPresentation {
 
     /** Used to sort columns(s). Add sort binding to each header columns of the outermost table **/
 
-    private sortByColumnFn = (sortColumnNum: number): void => {
+    private sortByColumnFn = (event: Event, sortColumnNum: number): void => {
         this.sortColumnNum = sortColumnNum
+        event.stopPropagation()
         const rows = this.trs.toArray()
         let sortedRows = this._areAllCellValidNumber(rows, sortColumnNum)
             ? rows.sort(this._numericalComparator(sortColumnNum))
