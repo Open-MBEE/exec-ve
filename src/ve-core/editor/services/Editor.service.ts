@@ -1,13 +1,10 @@
 import { veCore } from '@ve-core'
 
 export class EditorService {
+    public generatedIds: number = 0
     public focusOnEditorAfterAddingWidgetTag(editor: CKEDITOR.editor): void {
         const element = editor.widgets.focused.element.getParent()
-        const range = editor.createRange()
-        if (range) {
-            range.moveToClosestEditablePosition(element, true)
-            range.select()
-        }
+        editor.focusManager.focus(element)
     }
 }
 

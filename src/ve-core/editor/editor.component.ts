@@ -1,5 +1,5 @@
 import $ from 'jquery'
-import _ from 'lodash'
+import _, { DebouncedFunc } from 'lodash'
 
 import { InsertTransclusionData } from '@ve-components/transclusions'
 import { MentionService } from '@ve-core/editor'
@@ -9,11 +9,13 @@ import { ApiService, CacheService, ElementService, URLService, ViewService } fro
 
 import { veCore } from '@ve-core'
 
+import eventDataTypes = CKEDITOR.eventDataTypes
+
 import { VeComponentOptions, VeNgModelController, VeQService } from '@ve-types/angular'
 import { InsertData, InsertResolveFn } from '@ve-types/components'
 import { VeConfig } from '@ve-types/config'
 import { EditingApi } from '@ve-types/core/editor'
-import { ElementObject, ElementsResponse } from '@ve-types/mms'
+import { ElementObject, ElementsResponse, TransclusionObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 /**
@@ -46,6 +48,7 @@ export class EditorController implements angular.IComponentController {
     private ckEditor = window.CKEDITOR
 
     private ngModelCtrl: VeNgModelController<string>
+    private ngModel: string
 
     mmsProjectId: string
     mmsRefId: string
@@ -62,20 +65,57 @@ export class EditorController implements angular.IComponentController {
               groups?: string[] | undefined
           }
     >
+
+    private stylesToolbar = {
+        name: 'styles',
+        items: ['Styles', /*'Format',*/ 'FontSize', 'TextColor', 'BGColor'],
+    }
+    private basicStylesToolbar = {
+        name: 'basicstyles',
+        items: ['Bold', 'Italic', 'Underline', 'mmsExtraFormat'],
+    }
+    private clipboardToolbar = { name: 'clipboard', items: ['Undo', 'Redo'] }
+    private justifyToolbar = {
+        name: 'paragraph',
+        items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
+    }
+    private editingToolbar = { name: 'editing', items: ['Find', 'Replace'] }
+    private linksToolbar = { name: 'links', items: ['Link', 'Unlink', '-'] }
+    private imageToolbar = { name: 'image', items: ['Image', 'Iframe'] }
+    private listToolbar = {
+        name: 'list',
+        items: ['NumberedList', 'BulletedList', 'Outdent', 'Indent'],
+    }
+    private equationToolbar = {
+        name: 'equation',
+        items: ['Mathjax', 'SpecialChar'],
+    }
+    private sourceToolbar = {
+        name: 'source',
+        items: ['Maximize', 'Sourcedialog'],
+    }
+    private combinedToolbar = {
+        name: 'combined',
+        items: [
+            'Mmscf',
+            'Mmsvlink',
+            'Table',
+            'Image',
+            'Iframe',
+            'Mathjax',
+            'SpecialChar',
+            'Mmscomment',
+            'mmsExtraFeature',
+        ],
+    }
+    private extrasToolbar = { name: 'extras', items: ['mmsExtraFeature'] }
+
     protected $transcludeEl: JQuery<HTMLElement>
     protected id: string
-    private generatedIds: number = 0
+    protected init: boolean = false
+
     private instance: CKEDITOR.editor = null
-    private deb: _.DebouncedFunc<(e) => void> = _.debounce((e) => {
-        this.update().then(
-            () => {
-                /**/
-            },
-            () => {
-                this.growl.error('Error saving editor content')
-            }
-        )
-    }, 1000)
+    private deb: DebouncedFunc<(e) => void>
 
     private tokenStr: RegExp = new RegExp('([?&]token=[a-zA-Z0-9.]*)')
 
@@ -134,58 +174,306 @@ export class EditorController implements angular.IComponentController {
         private mentionSvc: MentionService,
         private editorSvc: EditorService,
         private imageSvc: ImageService
-    ) {}
-    //depends on angular bootstrap
+    ) {
+        this.deb = _.debounce((e) => {
+            this.update().then(
+                () => {
+                    /**/
+                },
+                () => {
+                    this.growl.error('Error saving editor content')
+                }
+            )
+        }, 1000)
+    }
 
-    $onInit(): void {
-        this.id = `mmsCkEditor${this.generatedIds++}`
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
+        if (onChangesObj.ngModel && !this.init) {
+            this.init = true
+            this.id = `mmsCkEditor${this.editorSvc.generatedIds++}`
+            this.startEditor()
+        }
+    }
 
-        // Formatting editor toolbar
-        const stylesToolbar = {
-            name: 'styles',
-            items: ['Styles', /*'Format',*/ 'FontSize', 'TextColor', 'BGColor'],
+    $onDestroy(): void {
+        if (!this.instance) {
+            this.instance = this.ckEditor.instances[this.id]
         }
-        const basicStylesToolbar = {
-            name: 'basicstyles',
-            items: ['Bold', 'Italic', 'Underline', 'mmsExtraFormat'],
+        this.mentionSvc.removeAllMentionForEditor(this.instance)
+        if (this.instance) {
+            this.instance.destroy()
+            this.instance = null
         }
-        const clipboardToolbar = { name: 'clipboard', items: ['Undo', 'Redo'] }
-        const justifyToolbar = {
-            name: 'paragraph',
-            items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight'],
-        }
-        const editingToolbar = { name: 'editing', items: ['Find', 'Replace'] }
-        const linksToolbar = { name: 'links', items: ['Link', 'Unlink', '-'] }
-        const imageToolbar = { name: 'image', items: ['Image', 'Iframe'] }
-        const listToolbar = {
-            name: 'list',
-            items: ['NumberedList', 'BulletedList', 'Outdent', 'Indent'],
-        }
-        const equationToolbar = {
-            name: 'equation',
-            items: ['Mathjax', 'SpecialChar'],
-        }
-        const sourceToolbar = {
-            name: 'source',
-            items: ['Maximize', 'Sourcedialog'],
-        }
-        const combinedToolbar = {
-            name: 'combined',
-            items: [
-                'Mmscf',
-                'Mmsvlink',
-                'Table',
-                'Image',
-                'Iframe',
-                'Mathjax',
-                'SpecialChar',
-                'Mmscomment',
-                'mmsExtraFeature',
-            ],
-        }
-        const extrasToolbar = { name: 'extras', items: ['mmsExtraFeature'] }
-        // var tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-']};
+    }
 
+    public startEditor(): void {
+        // Initialize ckeditor and set event handlers
+        this.$element.empty()
+        this.$transcludeEl = $(`<textarea id="${this.id}"></textarea>`)
+        this.$transcludeEl.val(this.ngModel)
+
+        this.$element.append(this.$transcludeEl)
+        this.$compile(this.$transcludeEl)(this.$scope)
+
+        this.instance = this.ckEditor.replace(this.id, {
+            mmscf: { callbackModalFnc: this.transcludeCallback },
+            mmscomment: { callbackModalFnc: this.commentCallback },
+            mmsvlink: { callbackModalFnc: this.viewLinkCallback },
+            mmsreset: { callback: this.mmsResetCallback },
+            contentsCss: `${this.ckEditor.basePath}contents.css`,
+            toolbar: this.getToolbar(),
+        })
+        if (this.autosaveKey) {
+            // Configuration for autosave plugin
+            this.instance.config.autosave = {
+                SaveKey: this.autosaveKey,
+                delay: 5,
+                NotOlderThen: 7200, // 5 days in minutes
+                enableAutosave: true,
+            }
+        } else {
+            this.instance.config.autosave = { enableAutosave: false }
+        }
+        this._waitForEditor(() => {
+            // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
+
+            this._addInlineMention()
+
+            if (this.mmsEditorApi) {
+                this.mmsEditorApi.save = (): angular.IPromise<boolean> => {
+                    return this.update()
+                }
+                this.mmsEditorApi.cancel = (): angular.IPromise<boolean> => {
+                    return this.update()
+                }
+            }
+            addCkeditorHtmlFilterRule(this.instance)
+            this._addContextMenuItems(this.instance)
+            highlightActiveEditor(this.instance)
+        })
+
+        const highlightActiveEditor = (instance: CKEDITOR.editor): void => {
+            const activeEditorClass = 'actieditor'
+            $('transclude-doc').children('div').removeClass(activeEditorClass)
+            $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
+
+            instance.on('focus', () => {
+                $('transclude-doc').children('div').removeClass(activeEditorClass)
+                $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
+            })
+        }
+
+        const addCkeditorHtmlFilterRule = (instance: CKEDITOR.editor): void => {
+            instance.dataProcessor.htmlFilter.addRules({
+                elements: {
+                    $: (element: CKEDITOR.htmlParser.element) => {
+                        if (element.name === 'script') {
+                            element.remove()
+                            return
+                        }
+
+                        if (
+                            element.name.startsWith('transclude-') ||
+                            element.name.startsWith('present-') ||
+                            element.name.startsWith('view')
+                        ) {
+                            if (
+                                element.name !== 'view-link' &&
+                                element.name !== 'transclusion' &&
+                                element.name !== 'transclude-group-docs' &&
+                                element.name !== 'transclude-diff-attr' &&
+                                element.name !== 'transclude-value-link'
+                            ) {
+                                element.replaceWithChildren()
+                                return
+                            }
+                        }
+
+                        const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
+                            return attrKey.startsWith('ng-')
+                        })
+                        attributesToDelete.forEach((attrToDelete) => {
+                            delete element.attributes[attrToDelete]
+                        })
+                    },
+                },
+            })
+            instance.dataProcessor.htmlFilter.addRules({
+                elements: {
+                    // Removes the token from the export src to prevent saving of token to server
+                    $: (element: CKEDITOR.htmlParser.element) => {
+                        element
+                            .find((el: CKEDITOR.htmlParser.element) => {
+                                return (
+                                    el.name == 'img' &&
+                                    el.attributes['data-cke-saved-src'] &&
+                                    el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
+                                )
+                            }, true)
+                            .forEach((el: CKEDITOR.htmlParser.element) => {
+                                el.attributes['data-cke-saved-src'] = this.imageSvc.fixImgUrl(
+                                    el.attributes['data-cke-saved-src'],
+                                    false
+                                )
+                                // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                            })
+                    },
+                },
+            })
+            instance.dataProcessor.dataFilter.addRules({
+                elements: {
+                    $: (element: CKEDITOR.htmlParser.element) => {
+                        if (element.name === 'script') {
+                            element.remove()
+                            return
+                        }
+
+                        if (
+                            element.name.startsWith('transclude-') ||
+                            element.name.startsWith('present-') ||
+                            element.name.startsWith('view')
+                        ) {
+                            if (
+                                element.name !== 'view-link' &&
+                                element.name !== 'transclude-group-docs' &&
+                                element.name !== 'transclude-diff-merge-attr' &&
+                                element.name !== 'mms-value-link'
+                            ) {
+                                element.replaceWithChildren()
+                                return
+                            }
+                        }
+
+                        const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
+                            return attrKey.startsWith('ng-')
+                        })
+                        attributesToDelete.forEach((attrToDelete) => {
+                            delete element.attributes[attrToDelete]
+                        })
+                    },
+                },
+            })
+            instance.dataProcessor.dataFilter.addRules({
+                elements: {
+                    // Adds the token to img's in the editor environment to allow images to be displayed while editor
+                    $: (element: CKEDITOR.htmlParser.element) => {
+                        element
+                            .find((el: CKEDITOR.htmlParser.element) => {
+                                return (
+                                    el.name == 'img' &&
+                                    el.attributes['data-cke-saved-src'] &&
+                                    (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1 ||
+                                        el.attributes['data-cke-saved-src'].indexOf('http') < 0)
+                                )
+                            }, true)
+                            .forEach((el: CKEDITOR.htmlParser.element) => {
+                                el.attributes['src'] = this.imageSvc.fixImgUrl(
+                                    el.attributes['data-cke-saved-src'],
+                                    true
+                                )
+                                // el.attributes['src'] = el.attributes['data-cke-saved-src'];
+                            })
+                    },
+                },
+            })
+        }
+
+        this.instance.on('init', () => {
+            this._waitForEditor(() => {
+                this.ngModelCtrl.$setPristine()
+            })
+        })
+
+        this.instance.on('change', (e) => this._waitForEditor(this.deb, e))
+        this.instance.on('afterCommandExec', (e) => this._waitForEditor(this.deb, e))
+        this.instance.on('resize', (e) => this._waitForEditor(this.deb, e))
+        this.instance.on('destroy', (e) => this._waitForEditor(this.deb, e))
+        this.instance.on('blur', () =>
+            this._waitForEditor(() => {
+                this.instance.focusManager.blur()
+            })
+        )
+        this.instance.on(
+            'key',
+            (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.key>) =>
+                this._waitForEditor((evt) => this._keyHandler(evt), e),
+            null,
+            null,
+            31
+        ) //priority is after indent list plugin's event handler
+
+        this.instance.on('fileUploadRequest', (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) =>
+            this._waitForEditor((evt) => {
+                const fileLoader = evt.data.fileLoader
+                const formData = new FormData()
+                const xhr = fileLoader.xhr
+
+                xhr.open(
+                    'POST',
+                    this.uRLSvc.getPutArtifactsURL({
+                        projectId: this.mmsProjectId,
+                        refId: this.mmsRefId,
+                        elementId: this.apiSvc.createUniqueId().replace('MMS', 'VE'),
+                    }),
+                    true
+                )
+                //xhr.withCredentials = true;
+                xhr.setRequestHeader('Authorization', this.uRLSvc.getAuthorizationHeaderValue())
+                formData.append('file', fileLoader.file, fileLoader.fileName)
+                if (fileLoader.fileName) {
+                    formData.append('name', fileLoader.fileName)
+                }
+
+                fileLoader.xhr.send(formData)
+
+                // Prevented the default behavior.
+                evt.stop()
+            }, e)
+        )
+        this.instance.on('fileUploadResponse', (e: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
+            this._waitForEditor((evt) => {
+                // Prevent the default response handler.
+                evt.stop()
+
+                // Get XHR and response.
+                const data = evt.data
+                const xhr = data.fileLoader.xhr
+                const response: ElementsResponse<ElementObject> = JSON.parse(
+                    xhr.response as string
+                ) as ElementsResponse<ElementObject>
+
+                if (
+                    !response.elements ||
+                    response.elements.length == 0 ||
+                    !response.elements[0]._artifacts ||
+                    response.elements[0]._artifacts.length == 0
+                ) {
+                    // An error occurred during upload.
+                    //data.message = response[ 1 ];
+                    evt.cancel()
+                } else {
+                    //TODO does this need to be smarter?
+                    const element = response.elements[0]
+                    data.url = this.uRLSvc.getArtifactURL({
+                        projectId: element._projectId,
+                        refId: element._refId,
+                        elementId: element.id,
+                        artifactExtension: element._artifacts[0].extension,
+                    })
+                }
+            }, e)
+        })
+    }
+
+    public getToolbar(): Array<
+        | string
+        | string[]
+        | {
+              name: string
+              items?: string[] | undefined
+              groups?: string[] | undefined
+          }
+    > {
         let thisToolbar: Array<
             | string
             | string[]
@@ -195,331 +483,46 @@ export class EditorController implements angular.IComponentController {
                   groups?: string[] | undefined
               }
         > = [
-            stylesToolbar,
-            basicStylesToolbar,
-            justifyToolbar,
-            listToolbar,
-            linksToolbar,
-            combinedToolbar,
-            clipboardToolbar,
-            editingToolbar,
-            sourceToolbar,
+            this.stylesToolbar,
+            this.basicStylesToolbar,
+            this.justifyToolbar,
+            this.listToolbar,
+            this.linksToolbar,
+            this.combinedToolbar,
+            this.clipboardToolbar,
+            this.editingToolbar,
+            this.sourceToolbar,
         ]
         switch (this.mmsEditorType) {
             case 'TableT':
                 //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
                 break
             case 'ListT':
-                // TODO: Figure out why this doesnt work in typescript or how to make it work
                 thisToolbar = [
-                    stylesToolbar,
-                    basicStylesToolbar,
-                    justifyToolbar,
-                    listToolbar,
-                    linksToolbar,
-                    equationToolbar,
-                    extrasToolbar,
-                    clipboardToolbar,
-                    editingToolbar,
-                    sourceToolbar,
+                    this.stylesToolbar,
+                    this.basicStylesToolbar,
+                    this.justifyToolbar,
+                    this.listToolbar,
+                    this.linksToolbar,
+                    this.equationToolbar,
+                    this.extrasToolbar,
+                    this.clipboardToolbar,
+                    this.editingToolbar,
+                    this.sourceToolbar,
                 ]
                 break
             case 'Equation':
-                thisToolbar = [justifyToolbar, equationToolbar, sourceToolbar]
+                thisToolbar = [this.justifyToolbar, this.equationToolbar, this.sourceToolbar]
                 break
             case 'Figure':
             case 'ImageT':
-                thisToolbar = [justifyToolbar, imageToolbar, sourceToolbar]
+                thisToolbar = [this.justifyToolbar, this.imageToolbar, this.sourceToolbar]
                 break
         }
-        this.toolbar = thisToolbar
-    }
-    $postLink(): void {
-        this.$timeout(
-            () => {
-                // Initialize ckeditor and set event handlers
-                this.$element.empty()
-                this.$transcludeEl = $('<textarea id="' + this.id + '"></textarea>')
-                this.$transcludeEl.val(this.ngModelCtrl.$modelValue)
-
-                this.$element.append(this.$transcludeEl)
-                this.$compile(this.$transcludeEl)(this.$scope)
-                this.instance = this.ckEditor.replace(this.id, {
-                    mmscf: { callbackModalFnc: this.transcludeCallback },
-                    mmscomment: { callbackModalFnc: this.commentCallback },
-                    mmsvlink: { callbackModalFnc: this.viewLinkCallback },
-                    mmsreset: { callback: this.mmsResetCallback },
-                    contentsCss: `${this.ckEditor.basePath}contents.css`,
-                    toolbar: this.toolbar,
-                })
-                // Enable Autosave plugin only when provided with unique identifier (autosaveKey)
-                if (this.autosaveKey) {
-                    // Configuration for autosave plugin
-                    this.instance.config.autosave = {
-                        SaveKey: this.autosaveKey,
-                        delay: 5,
-                        NotOlderThen: 7200, // 5 days in minutes
-                        enableAutosave: true,
-                    }
-                } else {
-                    this.instance.config.autosave = { enableAutosave: false }
-                }
-
-                this.instance.on('instanceReady', () => {
-                    addCkeditorHtmlFilterRule(this.instance)
-                    this._addContextMenuItems(this.instance)
-                    highlightActiveEditor(this.instance)
-                })
-
-                this.instance.on(
-                    'toHtml',
-                    () => {
-                        this.instance.dataProcessor.dataFilter.addRules({
-                            elements: {
-                                // Adds the token to img's in the editor environment to allow images to be displayed while editor
-                                $: (element: CKEDITOR.htmlParser.element) => {
-                                    element
-                                        .find((el: CKEDITOR.htmlParser.element) => {
-                                            return (
-                                                el.name == 'img' &&
-                                                el.attributes['data-cke-saved-src'] &&
-                                                (el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) >
-                                                    -1 ||
-                                                    el.attributes['data-cke-saved-src'].indexOf('http') < 0)
-                                            )
-                                        }, true)
-                                        .forEach((el: CKEDITOR.htmlParser.element) => {
-                                            el.attributes['src'] = this.imageSvc.fixImgUrl(
-                                                el.attributes['data-cke-saved-src'],
-                                                true
-                                            )
-                                            // el.attributes['src'] = el.attributes['data-cke-saved-src'];
-                                        })
-                                },
-                            },
-                        })
-                    },
-                    null,
-                    null,
-                    9
-                )
-
-                this.instance.on('getData', () => {
-                    this.instance.dataProcessor.htmlFilter.addRules({
-                        elements: {
-                            // Removes the token from the export src to prevent saving of token to server
-                            $: (element: CKEDITOR.htmlParser.element) => {
-                                element
-                                    .find((el: CKEDITOR.htmlParser.element) => {
-                                        return (
-                                            el.name == 'img' &&
-                                            el.attributes['data-cke-saved-src'] &&
-                                            el.attributes['data-cke-saved-src'].indexOf(this.veConfig.apiUrl) > -1
-                                        )
-                                    }, true)
-                                    .forEach((el: CKEDITOR.htmlParser.element) => {
-                                        el.attributes['data-cke-saved-src'] = this.imageSvc.fixImgUrl(
-                                            el.attributes['data-cke-saved-src'],
-                                            false
-                                        )
-                                        // el.attributes['src'] = el.attributes['data-cke-saved-src'];
-                                    })
-                            },
-                        },
-                    })
-                })
-
-                const highlightActiveEditor = (instance: CKEDITOR.editor): void => {
-                    const activeEditorClass = 'actieditor'
-                    $('transclude-doc').children('div').removeClass(activeEditorClass)
-                    $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
-
-                    instance.on('focus', () => {
-                        $('transclude-doc').children('div').removeClass(activeEditorClass)
-                        $(instance.element.$).closest('transclude-doc').children('div').addClass(activeEditorClass)
-                    })
-                }
-
-                const addCkeditorHtmlFilterRule = (instance: CKEDITOR.editor): void => {
-                    instance.dataProcessor.htmlFilter.addRules({
-                        elements: {
-                            $: (element: CKEDITOR.htmlParser.element) => {
-                                if (element.name === 'script') {
-                                    element.remove()
-                                    return
-                                }
-
-                                if (
-                                    element.name.startsWith('transclude-') ||
-                                    element.name.startsWith('present-') ||
-                                    element.name.startsWith('view')
-                                ) {
-                                    if (
-                                        element.name !== 'view-link' &&
-                                        element.name !== 'transclusion' &&
-                                        element.name !== 'transclude-group-docs' &&
-                                        element.name !== 'transclude-diff-attr' &&
-                                        element.name !== 'transclude-value-link'
-                                    ) {
-                                        element.replaceWithChildren()
-                                        return
-                                    }
-                                }
-
-                                const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
-                                    return attrKey.startsWith('ng-')
-                                })
-                                attributesToDelete.forEach((attrToDelete) => {
-                                    delete element.attributes[attrToDelete]
-                                })
-                            },
-                        },
-                    })
-                    instance.dataProcessor.dataFilter.addRules({
-                        elements: {
-                            $: (element: CKEDITOR.htmlParser.element) => {
-                                if (element.name === 'script') {
-                                    element.remove()
-                                    return
-                                }
-
-                                if (
-                                    element.name.startsWith('transclude-') ||
-                                    element.name.startsWith('present-') ||
-                                    element.name.startsWith('view')
-                                ) {
-                                    if (
-                                        element.name !== 'view-link' &&
-                                        element.name !== 'transclude-group-docs' &&
-                                        element.name !== 'transclude-diff-merge-attr' &&
-                                        element.name !== 'mms-value-link'
-                                    ) {
-                                        element.replaceWithChildren()
-                                        return
-                                    }
-                                }
-
-                                const attributesToDelete = Object.keys(element.attributes).filter((attrKey) => {
-                                    return attrKey.startsWith('ng-')
-                                })
-                                attributesToDelete.forEach((attrToDelete) => {
-                                    delete element.attributes[attrToDelete]
-                                })
-                            },
-                        },
-                    })
-                }
-
-                this.instance.on('init', (args) => {
-                    this.ngModelCtrl.$setPristine()
-                })
-
-                this.instance.on('change', this.deb)
-                this.instance.on('afterCommandExec', this.deb)
-                this.instance.on('resize', this.deb)
-                this.instance.on('destroy', this.deb)
-                this.instance.on('blur', (e) => {
-                    this.instance.focusManager.blur()
-                })
-                this.instance.on('key', this._keyHandler, null, null, 31) //priority is after indent list plugin's event handler
-
-                this._addInlineMention()
-
-                if (this.mmsEditorApi) {
-                    this.mmsEditorApi.save = (): angular.IPromise<boolean> => {
-                        return this.update()
-                    }
-                    this.mmsEditorApi.cancel = (): angular.IPromise<boolean> => {
-                        return this.update()
-                    }
-                }
-                this.instance.on(
-                    'fileUploadRequest',
-                    (evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
-                        const fileLoader = evt.data.fileLoader
-                        const formData = new FormData()
-                        const xhr = fileLoader.xhr
-
-                        xhr.open(
-                            'POST',
-                            this.uRLSvc.getPutArtifactsURL({
-                                projectId: this.mmsProjectId,
-                                refId: this.mmsRefId,
-                                elementId: this.apiSvc.createUniqueId().replace('MMS', 'VE'),
-                            }),
-                            true
-                        )
-                        //xhr.withCredentials = true;
-                        xhr.setRequestHeader('Authorization', this.uRLSvc.getAuthorizationHeaderValue())
-                        formData.append('file', fileLoader.file, fileLoader.fileName)
-                        if (fileLoader.fileName) {
-                            formData.append('name', fileLoader.fileName)
-                        }
-
-                        fileLoader.xhr.send(formData)
-
-                        // Prevented the default behavior.
-                        evt.stop()
-                    }
-                )
-                this.instance.on(
-                    'fileUploadResponse',
-                    (evt: CKEDITOR.eventInfo<CKEDITOR.editor.events.fileUploadRequest>) => {
-                        // Prevent the default response handler.
-                        evt.stop()
-
-                        // Get XHR and response.
-                        const data = evt.data
-                        const xhr = data.fileLoader.xhr
-                        const response: ElementsResponse<ElementObject> = JSON.parse(
-                            xhr.response as string
-                        ) as ElementsResponse<ElementObject>
-
-                        if (
-                            !response.elements ||
-                            response.elements.length == 0 ||
-                            !response.elements[0]._artifacts ||
-                            response.elements[0]._artifacts.length == 0
-                        ) {
-                            // An error occurred during upload.
-                            //data.message = response[ 1 ];
-                            evt.cancel()
-                        } else {
-                            //TODO does this need to be smarter?
-                            const element = response.elements[0]
-                            data.url = this.uRLSvc.getArtifactURL({
-                                projectId: element._projectId,
-                                refId: element._refId,
-                                elementId: element.id,
-                                artifactExtension: element._artifacts[0].extension,
-                            })
-                        }
-                    }
-                )
-            },
-            0,
-            false
-        ).then(
-            () => {
-                /* Do Nothing */
-            },
-            () => {
-                /* Do Nothing */
-            }
-        )
+        return thisToolbar
     }
 
-    $onDestroy(): void {
-        if (!this.instance) {
-            this.instance = this.ckEditor.instances[this.id]
-        } else {
-            this.mentionSvc.removeAllMentionForEditor(this.instance)
-            this.instance.destroy()
-            this.instance = null
-        }
-    }
-
-    public transcludeCallback = (ed: CKEDITOR.editor): void => {
+    public transcludeCallback = (editor: CKEDITOR.editor): void => {
         const tSettings: VeModalSettings<InsertResolveFn<InsertTransclusionData>> = {
             component: 'createTransclusionModal',
             resolve: {
@@ -542,14 +545,13 @@ export class EditorController implements angular.IComponentController {
             },
             size: 'lg',
         }
-        const tInstance = this.$uibModal.open<InsertResolveFn<InsertTransclusionData>, string>(tSettings)
+        const tInstance = this.$uibModal.open<InsertResolveFn<InsertTransclusionData>, TransclusionObject>(tSettings)
         tInstance.result.then(
             (result) => {
-                this._addWidgetTag(ed, result)
+                this._addWidgetTag(result.tag, editor)
             },
             () => {
-                const focusManager: CKEDITOR.focusManager = new this.ckEditor.focusManager(ed)
-                focusManager.focus()
+                editor.focus()
             }
         )
     }
@@ -559,7 +561,7 @@ export class EditorController implements angular.IComponentController {
     // If user selects name or doc, link will be to first related doc
     // Also defines options for search interfaces -- see mmsSearch.js for more info
 
-    public viewLinkCallback = (ed: CKEDITOR.editor): void => {
+    public viewLinkCallback = (editor: CKEDITOR.editor): void => {
         const tSettings: VeModalSettings<InsertResolveFn<InsertTransclusionData>> = {
             component: 'createTransclusionModal',
             resolve: {
@@ -582,19 +584,18 @@ export class EditorController implements angular.IComponentController {
             },
             size: 'lg',
         }
-        const tInstance = this.$uibModal.open<InsertResolveFn<InsertTransclusionData>, string>(tSettings)
+        const tInstance = this.$uibModal.open<InsertResolveFn<InsertTransclusionData>, TransclusionObject>(tSettings)
         tInstance.result.then(
             (result) => {
-                this._addWidgetTag(ed, result)
+                this._addWidgetTag(result.tag, editor)
             },
             () => {
-                const focusManager: CKEDITOR.focusManager = new this.ckEditor.focusManager(ed)
-                focusManager.focus()
+                editor.focus()
             }
         )
     }
 
-    public commentCallback = (ed: CKEDITOR.editor): void => {
+    public commentCallback = (editor: CKEDITOR.editor): void => {
         const cSettings: VeModalSettings<InsertResolveFn<InsertData>> = {
             component: 'insertElementModal',
             resolve: {
@@ -625,10 +626,16 @@ export class EditorController implements angular.IComponentController {
                     '">comment:' +
                     data._creator +
                     '</view-cf>'
-                this._addWidgetTag(ed, tag)
+                this._addWidgetTag(tag, editor)
             },
             (reason) => {
-                this.growl.error('Comment Error: ' + reason.message)
+                if (reason && reason.status !== 444) {
+                    this.growl.warning(`Error adding Comment: ${reason.message}`)
+                } else {
+                    this.growl.info('Commenting Cancelled', {
+                        ttl: 1000,
+                    })
+                }
             }
         )
     }
@@ -693,7 +700,7 @@ export class EditorController implements angular.IComponentController {
         return this.$q.resolve<boolean>(true)
     }
 
-    private _addWidgetTag = (editor: CKEDITOR.editor, tag: string): void => {
+    private _addWidgetTag = (tag: string, editor: CKEDITOR.editor): void => {
         editor.insertHtml(tag)
         this.editorSvc.focusOnEditorAfterAddingWidgetTag(editor)
     }
@@ -791,15 +798,30 @@ export class EditorController implements angular.IComponentController {
         })
         editor.setKeystroke(this.ckEditor.CTRL + 75, 'formatAsCode')
     }
+
+    private _waitForEditor<T extends CKEDITOR.eventInfo<eventDataTypes>>(fn: (e?: T) => void, evt?: T): void {
+        if (this.instance.status === 'loaded') fn()
+        else {
+            new this.$q((resolve) => {
+                this.instance.on('loaded', () => {
+                    fn(evt)
+                    resolve()
+                })
+            }).catch((reason) => {
+                this.growl.error('CKEditor Error: ' + reason.message)
+            })
+        }
+    }
 }
 
 const EditorComponent: VeComponentOptions = {
     selector: 'editor',
-    template: `<textarea id="{{$ctrl.id}}"></textarea>`,
+    template: `<div></div>`,
     require: {
         ngModelCtrl: '^ngModel',
     },
     bindings: {
+        ngModel: '<',
         mmsElementId: '<',
         mmsProjectId: '@',
         mmsRefId: '@',

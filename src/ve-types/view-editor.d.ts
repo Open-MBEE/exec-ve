@@ -14,6 +14,7 @@ export interface VeSearchOptions<T extends MmsObject = ElementObject> {
     searchResult?: T[]
     searchField?: string
     closeable: boolean
+    closeCallback?(): void
     searchInput?: string
     hideFilterOptions?: boolean
     callback?: veSearchCallback

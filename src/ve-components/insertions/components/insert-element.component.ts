@@ -115,6 +115,11 @@ const InsertComponent: VeComponentOptions = {
     template: `
 <div class="modal-body">
     <div class="ve-light-tabs modal-top-tabs" ng-show="!$ctrl.viewLink">
+        <span class="close-button-container">
+            <a class="close-button"  ng-click="$ctrl.cancel()">
+                <i tooltip-placement="left" uib-tooltip="Close Insert Dialog"  class="fa fa-times"></i>
+            </a>
+        </span>
         <ul class="nav nav-tabs">
             <li class="uib-tab nav-item tab-item" ng-class="{'active': !$ctrl.searchExisting}">
                 <a class="nav-link" ng-click="$ctrl.searchExisting = false"><i class="fa fa-plus"></i>Create New</a>
@@ -131,7 +136,7 @@ const InsertComponent: VeComponentOptions = {
             {{$ctrl.description}}
         </div>
 
-        <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></mms-search>
+        <mms-search mms-options="$ctrl.searchOptions" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" embedded="true"></mms-search>
     </div>
 
     <!-- Create New Panel -->
@@ -143,7 +148,7 @@ const InsertComponent: VeComponentOptions = {
             </div>
             <div class="form-group">
                 <label class="label-documentation">Documentation</label>
-                <editor ng-model="$ctrl.newItem.documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
+                <editor ng-model="$ctrl.newItem.documentation" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>
@@ -162,7 +167,7 @@ const InsertComponent: VeComponentOptions = {
     </div>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" ng-show="!$ctrl.searchExisting" type="button" ng-click="$ctrl.create()">Create or Select<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
+    <button class="btn btn-primary" ng-show="!$ctrl.searchExisting" type="button" ng-click="$ctrl.ok()">Create<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
     <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
 `,

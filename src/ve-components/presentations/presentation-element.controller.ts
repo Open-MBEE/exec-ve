@@ -56,6 +56,9 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
     public instanceVal: InstanceValueObject
     protected presentationElem: PresentationInstanceObject | ElementObject
     protected isDirectChildOfPresentationElement: boolean
+    instanceSpec: ElementObject
+    editorApi: EditingApi
+    values: ValueObject[]
 
     public number: string
     public level: number
@@ -109,10 +112,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
     ) {
         super()
     }
-
-    instanceSpec?: ElementObject
-    editorApi?: EditingApi
-    values?: unknown[]
 
     /**
      * @listens element.updated

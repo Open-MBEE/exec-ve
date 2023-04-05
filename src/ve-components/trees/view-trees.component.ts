@@ -412,8 +412,14 @@ class ViewTreesController implements IComponentController {
                     }
                 )
             },
-            () => {
-                console.log('Uncaught Error')
+            (reason) => {
+                if (reason && reason.status !== 444) {
+                    this.growl.warning(`Error adding View: ${reason.message}`)
+                } else {
+                    this.growl.info('View Insert Cancelled', {
+                        ttl: 1000,
+                    })
+                }
             }
         )
     }

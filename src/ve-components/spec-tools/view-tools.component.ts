@@ -12,6 +12,7 @@ import { veComponents } from '@ve-components'
 import { SpecApi, SpecService } from './services/Spec.service'
 
 import { VeComponentOptions, VeQService } from '@ve-types/angular'
+import { ComponentController } from '@ve-types/components'
 import { ElementObject } from '@ve-types/mms'
 import { VeModalService } from '@ve-types/view-editor'
 
@@ -83,7 +84,7 @@ import { VeModalService } from '@ve-types/view-editor'
  *      element spec for it would be shown, this will not use mms services to get the element
  */
 
-class ToolsController implements angular.IComponentController {
+class ToolsController implements ComponentController {
     //Bindings
     toolsCategory: string
 
@@ -92,11 +93,16 @@ class ToolsController implements angular.IComponentController {
     projectId: string
     refId: string
     commitId: string
+    edit: ElementObject
+    element: ElementObject
+    inPreviewMode: boolean
+    isEditing: boolean
+    skipBroadcast: boolean
 
     subs: Rx.IDisposable[]
     currentTool: string
     currentTitle: string
-    private specApi: SpecApi
+    specApi: SpecApi
     show: {
         [key: string]: boolean
     } = {}
@@ -135,7 +141,7 @@ class ToolsController implements angular.IComponentController {
         private $q: VeQService,
         private $timeout: angular.ITimeoutService,
         private $compile: angular.ICompileService,
-        private $scope: angular.IScope,
+        public $scope: angular.IScope,
         private $element: JQuery,
         private $uibModal: VeModalService,
         private hotkeys: angular.hotkeys.HotkeysProvider,

@@ -8,6 +8,7 @@ import { SchemaService } from '@ve-utils/model-schema'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { InsertApi, InsertData } from '@ve-types/components'
+import { EditingApi } from '@ve-types/core/editor'
 import { BasicResponse, ElementObject, MmsObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings, veSearchCallback, VeSearchOptions } from '@ve-types/view-editor'
 
@@ -38,6 +39,7 @@ export class Insertion<
     public name: string
     public ownerId: string
     public searchOptions: VeSearchOptions<U> = null
+    public editorApi: EditingApi = {}
     type: string
     createForm: boolean = true
     oking: boolean = false
@@ -99,10 +101,12 @@ export class Insertion<
 
         this.searchOptions = {
             callback: this.callback,
+            searchField: 'name',
             itemsPerPage: 200,
             filterQueryList: [this.queryFilter],
             hideFilterOptions: true,
-            closeable: false,
+            closeable: true,
+            closeCallback: this.cancel,
         }
     }
 
@@ -115,11 +119,19 @@ export class Insertion<
 
         this.ownerId = this.parentData && this.parentData.id ? this.parentData.id : 'holding_bin_' + this.projectId
 
-        this.create()
-            .then((data) => {
-                this.addResolve(data, 'created')
-            }, this.addReject)
-            .finally(this.addFinally)
+        let promise: VePromise<unknown>
+        if (this.editorApi && this.editorApi.save) {
+            promise = this.editorApi.save()
+        } else {
+            promise = this.$q.resolve()
+        }
+        promise.then(() => {
+            this.create()
+                .then((data) => {
+                    this.addResolve(data, 'created')
+                }, this.addReject)
+                .finally(this.addFinally)
+        }, this.addReject)
     }
 
     public loginCb = (result?: boolean): void => {
@@ -204,6 +216,12 @@ export class Insertion<
                 this.addResolve(finalData, 'added')
             }, this.addReject)
             .finally(this.addFinally)
+    }
+
+    public cancel = (): void => {
+        if (this.insertApi.reject) {
+            this.insertApi.reject({ status: 444, message: 'User cancelled request' })
+        }
     }
     /**
      *

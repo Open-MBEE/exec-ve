@@ -269,7 +269,7 @@ class RefsController {
                 }
             },
             (reason?) => {
-                if (reason) {
+                if (reason && reason.status !== 444) {
                     this.growl.error('Ref Creation Error:' + reason.message)
                 } else {
                     this.growl.info('Ref Creation Cancelled', {

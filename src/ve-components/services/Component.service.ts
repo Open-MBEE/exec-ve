@@ -282,17 +282,11 @@ export class ComponentService {
     public save<T extends ElementObject>(
         edit: T,
         editorApi: EditingApi,
-        ctrl: { element: T; values?: ValueObject[] },
+        ctrl: ComponentController<T>,
         continueEdit: boolean
     ): VePromise<T> {
         const deferred = this.$q.defer<T>()
-        const saveFn: () => VePromise<boolean> = (): VePromise<boolean> => {
-            if (editorApi && editorApi.save) {
-                return editorApi.save()
-            }
-            return this.$q.resolve<boolean>(true)
-        }
-        saveFn().then(
+        this.updateEditor(ctrl).then(
             (success) => {
                 if (!success) {
                     this.handleError({
@@ -784,13 +778,13 @@ export class ComponentService {
         if (ctrl.bbApi) {
             ctrl.bbApi.toggleButtonSpinner('presentation-element-cancel')
         }
-        const cancelFn: () => VePromise<boolean> = (): VePromise<boolean> => {
-            if (ctrl.editorApi && ctrl.editorApi.cancel) {
-                return ctrl.editorApi.cancel()
-            }
-            return this.$q.resolve<boolean>(true)
-        }
-        cancelFn().then(
+        // const cancelFn: () => VePromise<boolean> = (): VePromise<boolean> => {
+        //     if (ctrl.editorApi && ctrl.editorApi.cancel) {
+        //         return ctrl.editorApi.cancel()
+        //     }
+        //     return this.$q.resolve<boolean>(true)
+        // }
+        this.updateEditor(ctrl).then(
             (success) => {
                 // Only need to confirm the cancellation if edits have been made:
                 if (!success) {
@@ -828,6 +822,13 @@ export class ComponentService {
                 })
             }
         )
+    }
+
+    public updateEditor(ctrl: ComponentController): VePromise<boolean> {
+        if (ctrl.editorOptions && ctrl.editorOptions.callback) {
+            return ctrl.editorOptions.callback()
+        }
+        return this.$q.resolve<boolean>(true)
     }
 
     public deleteEditModal(deleteOb: { type: string; element: ElementObject }): VeModalInstanceService<string> {

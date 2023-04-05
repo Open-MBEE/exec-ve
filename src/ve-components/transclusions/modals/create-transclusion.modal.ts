@@ -37,7 +37,8 @@ class CreateTransclusionModalController
 `
     protected transclusionTemplate: string = `
     <div>
-    <label>Property to view-cf</label><span class="star-mandatory">*</span>
+    <hr/>
+    <label>Property to Transclude</label><span class="star-mandatory">*</span>
     <div class="radio radio-with-label">
         <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('name')">Name</label><br>
         <label><input type="radio" name="optradio" value="true" ng-click="$ctrl.toggleRadio('doc')">Documentation</label>
@@ -51,13 +52,27 @@ class CreateTransclusionModalController
 `
     protected targetTemplate: string = `
     <div>
-    <label>Target Element</label><span class="star-mandatory">*</span>
-    <div>{{$ctrl.element.name}}</div><button class="btn btn-block btn-primary" ng-click="$ctrl.makeNewOrChoose()">Select or Create</button>
-</div>    
+    <label>Target Element</label><span class="star-mandatory">*</span><i class="fa fa-question-circle" uib-tooltip="{{$ctrl.description}}" tooltip-placement="bottom"></i>
+    <div class="transclude-target block">
+        <span ng-show="$ctrl.element" uib-popover-template="'insertTemplate'" popover-popup-close-delay="500" popover-placement="right" popover-title="Select Target" class="outline">
+            {{$ctrl.element.name}}: <span class="placeholder">({{$ctrl.element.id}})</span>
+        </span>
+        <span ng-hide="$ctrl.element" ng-hide="$ctrl.element" uib-popover-template="'insertTemplate'" popover-popup-close-delay="500" popover-placement="right" popover-title="Select Target" class="outline placeholder">
+            (No Target)
+        </span>
+        
+    </div>
+    <hr/>
+  <p class="help-block pull-left"><i>Fields marked with <span class="star-mandatory">*</span> are required</i></p>
+
+<script type="text/ng-template" id="insertTemplate">
+    <button class="btn btn-xs btn-primary" ng-click="$ctrl.insert()">Select or Create Target</button>
+</script>
+</div>
 `
 
-    protected title: string = 'Insert cross reference'
-    protected description: string = 'Begin by searching for or creating an element, then click a field to view-cf.'
+    protected title: string = 'Insert Cross Reference'
+    protected description: string = 'Begin by searching for or creating an element, then click a field to Transclude.'
     protected searchExisting: boolean = true
     protected cf: TransclusionObject
     protected element: ElementObject
@@ -70,13 +85,20 @@ class CreateTransclusionModalController
     protected cfType: string
     protected linkType: number
     protected linkText: string
-    protected modalBody: JQuery<HTMLElement>
-    protected previewEl: JQuery<HTMLElement> = $('<div></div>')
+
     protected insertApi: InsertApi<ElementObject, VePromiseReason<ElementsResponse<ElementObject>>>
     protected insertData: InsertData
+    protected inserting: boolean = false
     protected projectId: string
     protected refId: string
     protected orgId: string
+
+    protected $modalBody: JQuery<HTMLElement>
+    protected $previewEl: JQuery<HTMLElement> = $('<div></div>')
+    private $insert: JQuery<HTMLElement>
+    private $target: JQuery<HTMLElement>
+    private $transclusion: JQuery<HTMLElement>
+    private $link: JQuery<HTMLElement>
 
     static $inject = ['$scope', '$compile', '$element', 'growl', 'TransclusionService']
 
@@ -95,16 +117,21 @@ class CreateTransclusionModalController
         this.refId = this.resolve.getRefId ? this.resolve.getRefId : 'master'
         this.orgId = this.resolve.getOrgId ? this.resolve.getOrgId : null
 
-        this.modalBody = this.$element.find('modal-body')
+        this.$modalBody = this.$element.find('.modal-body')
         this.viewLink = this.resolve.getInsertData.viewLink
         this.insertApi = {
             resolve: (result): void => {
                 this.element = result
+                this.inserting = false
                 this.selectOptions()
             },
             reject: (reason): void => {
-                this.growl.error(reason.message)
+                if (reason.status !== 444) {
+                    this.growl.error(reason.message)
+                }
                 this.element = null
+                this.inserting = false
+                this.select()
             },
         }
         this.insertData = this.resolve.getInsertData
@@ -114,7 +141,14 @@ class CreateTransclusionModalController
     }
 
     $postLink(): void {
-        this.modalBody.append($(this.targetTemplate))
+        this.select()
+    }
+
+    public select = (): void => {
+        this.$modalBody.empty()
+        this.$target = $(this.targetTemplate)
+        this.$modalBody.append(this.$target)
+        this.$compile(this.$target)(this.$scope)
     }
 
     public choose = (): void => {
@@ -133,35 +167,42 @@ class CreateTransclusionModalController
         this.modalInstance.dismiss()
     }
 
-    public makeNewOrChoose = (): void => {
-        this.modalBody.empty()
-        this.modalBody.append(
-            '<insert-element insert-data="::$ctrl.insertData" insert-api="$ctrl.insertApi" mms-project-id="{{$ctrl.projectId}}" ' +
-                this.refId
-                ? 'mms-ref-id="{{$ctrl.refId}}" '
-                : '' + this.orgId
-                ? 'mms-org-id="{{$ctrl.orgId}}" '
-                : '' + '</insert-element>'
-        )
-        this.$compile(this.modalBody)(this.$scope.$new())
+    public insert = (): void => {
+        this.$modalBody.empty()
+        this.$insert = $(`<insert-element 
+                        insert-data="$ctrl.insertData" 
+                        insert-api="$ctrl.insertApi" 
+                        mms-project-id="{{$ctrl.projectId}}" 
+                        ${this.refId ? 'mms-ref-id="{{$ctrl.refId}}" ' : ''}
+                        ${this.orgId ? 'mms-org-id="{{$ctrl.orgId}}" ' : ''} 
+                    </insert-element>`)
+        this.$modalBody.append(this.$insert)
+        this.$compile(this.$insert)(this.$scope.$new())
+        this.inserting = true
     }
 
     public selectOptions = (): void => {
-        this.modalBody.empty()
-        this.modalBody.append(this.targetTemplate)
+        this.$modalBody.empty()
+        this.$modalBody.append(this.$target)
         if (this.viewLink) {
-            this.modalBody.append(this.linkTemplate)
+            this.$link = $(this.linkTemplate)
+            this.$modalBody.append(this.$link)
         } else {
-            this.modalBody.append(this.transclusionTemplate)
+            this.$transclusion = $(this.transclusionTemplate)
+            this.$modalBody.append(this.transclusionTemplate)
         }
+        this.$compile(this.$modalBody)(this.$scope)
     }
 
     public toggleRadio = (field: string): void => {
         this.cfType = field
-        this.previewEl.empty()
-        this.previewEl.append($(this.transclusionSvc.createTransclusion(this.element, this.cfType, true)))
-        this.$compile(this.previewEl)(this.$scope.$new())
-        this.modalBody.append(this.previewEl)
+        this.$previewEl.empty()
+        this.$previewEl.append($('<h4>Preview:</h4>'))
+        this.$previewEl.append(
+            $(`<p>${this.transclusionSvc.createTransclusion(this.element, this.cfType, true, true)}</p>`)
+        )
+        this.$compile(this.$previewEl)(this.$scope.$new())
+        this.$modalBody.append(this.$previewEl)
     }
 }
 
@@ -173,11 +214,13 @@ const CreateTransclusionModal: VeModalComponent = {
     template: `
     <div>
     <div class="modal-header">
-        <h4>Insert {{$ctrl.viewLink ? 'Link': 'view-cf'}}</h4>
+        <h4>Insert {{$ctrl.viewLink ? 'View Link': 'Cross Reference'}}</h4>
     </div>
     <div class="modal-body"></div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-show="$ctrl.element" type="button" ng-click="$ctrl.choose()">Create {{$ctrl.viewLink ? 'Link': 'view-cf'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
+    <div class="modal-footer" ng-hide="$ctrl.inserting">
+        <div uib-tooltip="{{ !$ctrl.element ? 'Select all required fields to insert a' : 'Create'}}{{ $ctrl.viewLink ? ' Link': ' Transclusion' }}" popup-placement="top-left">
+          <button class="btn btn-primary" ng-disabled="!$ctrl.element && !$ctrl." type="button" ng-click="$ctrl.choose()">Create {{$ctrl.viewLink ? 'Link': 'Transclusion'}}<i ng-show="$ctrl.oking" class="fa fa-spin fa-spinner"></i></button>
+        </div>
         <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
     </div>
 </div>

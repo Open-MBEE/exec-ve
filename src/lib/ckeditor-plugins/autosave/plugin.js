@@ -22,14 +22,11 @@ CKEDITOR.MmsAutosavePlugin = (function () {
             }
 
             // Look for autosave from config.js - this is a bit redundant but necessary
-            editor.config.autosave =
-                'autosave' in editor.config ? editor.config.autosave : {}
+            editor.config.autosave = 'autosave' in editor.config ? editor.config.autosave : {}
 
             // Prepare temp vars for constructing local storage SaveKey name
             var _saveKeyPrefix =
-                    'saveKeyPrefix' in editor.config.autosave
-                        ? editor.config.autosave.saveKeyPrefix
-                        : 'autosave',
+                    'saveKeyPrefix' in editor.config.autosave ? editor.config.autosave.saveKeyPrefix : 'autosave',
                 _saveKeyIgnoreProto =
                     'saveKeyIgnoreProtocol' in editor.config.autosave
                         ? editor.config.autosave.saveKeyIgnoreProtocol
@@ -38,21 +35,13 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                     ? window.location.href.replace(/https?:\/\//, '')
                     : window.location.href,
                 _saveKeyDelimiter =
-                    'saveKeyDelimiter' in editor.config.autosave
-                        ? editor.config.autosave.saveKeyDelimiter
-                        : '_',
+                    'saveKeyDelimiter' in editor.config.autosave ? editor.config.autosave.saveKeyDelimiter : '_',
                 _saveKeyAttribute =
-                    'saveKeyAttribute' in editor.config.autosave
-                        ? editor.config.autosave.saveKeyAttribute
-                        : 'name'
+                    'saveKeyAttribute' in editor.config.autosave ? editor.config.autosave.saveKeyAttribute : 'name'
 
             if ('saveKeyIgnoreParams' in editor.config.autosave) {
                 $(editor.config.autosave.saveKeyIgnoreParams).each(function () {
-                    _saveKeyUrl = autosaveRemoveUrlParam(
-                        this,
-                        null,
-                        _saveKeyUrl
-                    )
+                    _saveKeyUrl = autosaveRemoveUrlParam(this, null, _saveKeyUrl)
                 })
             }
 
@@ -60,8 +49,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
             var defaultConfig = {
                 delay: 10,
                 messageType: 'notification',
-                saveDetectionSelectors:
-                    "a[href^='javascript:__doPostBack'][id*='Save'],a[id*='Cancel']",
+                saveDetectionSelectors: "a[href^='javascript:__doPostBack'][id*='Save'],a[id*='Cancel']",
                 saveOnDestroy: false,
                 NotOlderThen: 1440,
                 SaveKey:
@@ -69,29 +57,20 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                     _saveKeyDelimiter +
                     _saveKeyUrl +
                     _saveKeyDelimiter +
-                    $(document.getElementById('#' + editor.name)).attr(
-                        _saveKeyAttribute
-                    ),
+                    $(document.getElementById('#' + editor.name)).attr(_saveKeyAttribute),
                 diffType: 'sideBySide',
                 autoLoad: false,
             }
 
             // Extend CKEDITOR config and lang  - config also available at loadPlugin()
-            var config = CKEDITOR.tools.extend(
-                defaultConfig,
-                editor.config.autosave || {},
-                true
-            )
+            var config = CKEDITOR.tools.extend(defaultConfig, editor.config.autosave || {}, true)
 
             if (editor.plugins.wordcount && config.messageType == 'statusbar') {
                 config.messageType = 'notification'
             }
 
             CKEDITOR.document.appendStyleSheet(
-                CKEDITOR.getUrl(
-                    CKEDITOR.plugins.getPath('autosave') +
-                        'css/autosave.min.css'
-                )
+                CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'css/autosave.min.css')
             )
 
             editor.on(
@@ -129,10 +108,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                         )
                     } else {
                         CKEDITOR.scriptLoader.load(
-                            CKEDITOR.getUrl(
-                                CKEDITOR.plugins.getPath('autosave') +
-                                    'js/extensions.min.js'
-                            ),
+                            CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'js/extensions.min.js'),
                             function () {
                                 loadPlugin(editor, config)
                             }
@@ -148,18 +124,11 @@ CKEDITOR.MmsAutosavePlugin = (function () {
 
     function loadPlugin(editorInstance, config) {
         CKEDITOR.scriptLoader.load(
-            CKEDITOR.getUrl(
-                CKEDITOR.plugins.getPath('autosave') + 'js/extensions.min.js'
-            ),
+            CKEDITOR.getUrl(CKEDITOR.plugins.getPath('autosave') + 'js/extensions.min.js'),
             function () {
                 GenerateAutoSaveDialog(editorInstance, config, config.SaveKey)
 
-                CheckForAutoSavedContent(
-                    editorInstance,
-                    config,
-                    config.SaveKey,
-                    config.NotOlderThen
-                )
+                CheckForAutoSavedContent(editorInstance, config, config.SaveKey, config.NotOlderThen)
             }
         )
 
@@ -182,7 +151,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
         return 'cke_autoSaveMessage_' + editorInstance.name
     }
 
-    var startTimer = (configAutosave, editorInstance) => {
+    const startTimer = (configAutosave, editorInstance) => {
         if (editorInstance.config.autosave_timeOutId == null) {
             var delay = configAutosave.delay != null ? configAutosave.delay : 10
             editorInstance.config.autosave_timeOutId = setTimeout(function () {
@@ -190,7 +159,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
             }, delay * 1000)
         }
     }
-    ;(configAutosave, editorInstance) => {
+    const onTimer = (configAutosave, editorInstance) => {
         if (editorInstance.checkDirty() || editorInstance.plugins.bbcode) {
             var editor = editorInstance,
                 autoSaveKey =
@@ -199,9 +168,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                         : 'autosave_' +
                           window.location +
                           '_' +
-                          $(document.getElementById('#' + editor.name)).attr(
-                              'name'
-                          )
+                          $(document.getElementById('#' + editor.name)).attr('name')
 
             SaveData(autoSaveKey, editor, configAutosave)
 
@@ -256,22 +223,12 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                                 id: 'diffType',
                                 label: editorInstance.lang.autosave.diffType,
                                 items: [
-                                    [
-                                        editorInstance.lang.autosave.sideBySide,
-                                        'sideBySide',
-                                    ],
-                                    [
-                                        editorInstance.lang.autosave.inline,
-                                        'inline',
-                                    ],
+                                    [editorInstance.lang.autosave.sideBySide, 'sideBySide'],
+                                    [editorInstance.lang.autosave.inline, 'inline'],
                                 ],
                                 default: config.diffType,
                                 onClick: function () {
-                                    RenderDiff(
-                                        this._.dialog,
-                                        editorInstance,
-                                        autoSaveKey
-                                    )
+                                    RenderDiff(this._.dialog, editorInstance, autoSaveKey)
                                 },
                             },
                             {
@@ -290,10 +247,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                         class: 'cke_dialog_ui_button_ok cke_dialog_autosave_ok',
                         onClick: function (evt) {
                             var dialog = evt.data.dialog
-                            if (
-                                dialog.fire('ok', { hide: true }).hide !== false
-                            )
-                                dialog.hide()
+                            if (dialog.fire('ok', { hide: true }).hide !== false) dialog.hide()
                         },
                     },
                     {
@@ -303,11 +257,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                         class: 'cke_dialog_ui_button_cancel',
                         onClick: function (evt) {
                             var dialog = evt.data.dialog
-                            if (
-                                dialog.fire('cancel', { hide: true }).hide !==
-                                false
-                            )
-                                dialog.hide()
+                            if (dialog.fire('cancel', { hide: true }).hide !== false) dialog.hide()
                         },
                     },
                 ],
@@ -315,12 +265,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
         })
     }
 
-    function CheckForAutoSavedContent(
-        editorInstance,
-        config,
-        autoSaveKey,
-        notOlderThen
-    ) {
+    function CheckForAutoSavedContent(editorInstance, config, autoSaveKey, notOlderThen) {
         // Checks If there is data available and load it
         if (localStorage.getItem(autoSaveKey)) {
             var jsonSavedContent = LoadData(autoSaveKey)
@@ -337,12 +282,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
             }
 
             // Ignore if autosaved content is older then x minutes
-            if (
-                moment(new Date()).diff(
-                    new Date(autoSavedContentDate),
-                    'minutes'
-                ) > notOlderThen
-            ) {
+            if (moment(new Date()).diff(new Date(autoSavedContentDate), 'minutes') > notOlderThen) {
                 RemoveStorage(autoSaveKey, editorInstance)
 
                 return
@@ -354,39 +294,26 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                     RemoveStorage(autoSaveKey, editorInstance)
                 }
             } else {
-                var confirmMessage =
-                    editorInstance.lang.autosave.loadSavedContent.replace(
-                        '{0}',
-                        moment(autoSavedContentDate)
-                            .locale(editorInstance.config.language)
-                            .format(editorInstance.lang.autosave.dateFormat)
-                    )
-
-                _handleAutosaveConfirmationDialog(
-                    confirmMessage,
-                    editorInstance,
-                    autoSaveKey
+                var confirmMessage = editorInstance.lang.autosave.loadSavedContent.replace(
+                    '{0}',
+                    moment(autoSavedContentDate)
+                        .locale(editorInstance.config.language)
+                        .format(editorInstance.lang.autosave.dateFormat)
                 )
+
+                _handleAutosaveConfirmationDialog(confirmMessage, editorInstance, autoSaveKey)
             }
         }
     }
 
-    function _handleAutosaveConfirmationDialog(
-        confirmMessage,
-        editorInstance,
-        autoSaveKey
-    ) {
+    function _handleAutosaveConfirmationDialog(confirmMessage, editorInstance, autoSaveKey) {
         var autosaveModalId = 'autosaveModal'
         var autosaveMessageId = 'autosaveMessage'
         var autosaveModal = $('#' + autosaveModalId)
         if (autosaveModal.length) {
             autosaveModal.find('#' + autosaveMessageId).html(confirmMessage)
         } else {
-            var dialogDom = _createDialogDom(
-                confirmMessage,
-                autosaveModalId,
-                autosaveMessageId
-            )
+            var dialogDom = _createDialogDom(confirmMessage, autosaveModalId, autosaveMessageId)
             dialogDom.appendTo('body')
             autosaveModal = $('#' + autosaveModalId)
         }
@@ -435,9 +362,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
     }
 
     function LoadData(autoSaveKey) {
-        var compressedJSON = LZString.decompressFromUTF16(
-            localStorage.getItem(autoSaveKey)
-        )
+        var compressedJSON = LZString.decompressFromUTF16(localStorage.getItem(autoSaveKey))
         return JSON.parse(compressedJSON)
     }
 
@@ -500,12 +425,8 @@ CKEDITOR.MmsAutosavePlugin = (function () {
             position: 'absolute',
         })
         autosavePopupElement.css({
-            left:
-                editorElement.outerWidth(true) -
-                autosavePopupElement.outerWidth(true),
-            top:
-                editorElement.outerHeight(true) -
-                autosavePopupElement.outerHeight(true),
+            left: editorElement.outerWidth(true) - autosavePopupElement.outerWidth(true),
+            top: editorElement.outerHeight(true) - autosavePopupElement.outerHeight(true),
         })
     }
 
@@ -534,23 +455,15 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                         baseTextLines: base,
                         newTextLines: newtxt,
                         opcodes: opcodes,
-                        baseTextName:
-                            editorInstance.lang.autosave.loadedContent,
+                        baseTextName: editorInstance.lang.autosave.loadedContent,
                         newTextName:
                             editorInstance.lang.autosave.autoSavedContent +
                             moment(jsonSavedContent.saveTime)
                                 .locale(editorInstance.config.language)
-                                .format(
-                                    editorInstance.lang.autosave.dateFormat
-                                ) +
+                                .format(editorInstance.lang.autosave.dateFormat) +
                             "'",
                         contextSize: 3,
-                        viewType:
-                            dialog
-                                .getContentElement('general', 'diffType')
-                                .getValue() == 'inline'
-                                ? 1
-                                : 0,
+                        viewType: dialog.getContentElement('general', 'diffType').getValue() == 'inline' ? 1 : 0,
                     }).outerHTML +
                     '</div>'
             )
@@ -628,19 +541,9 @@ CKEDITOR.MmsAutosavePlugin = (function () {
         })
     }
 
-    function _getAllExpiredAutosave(
-        listOfAutosave,
-        minutesTillExpired,
-        currentDate,
-        moment
-    ) {
+    function _getAllExpiredAutosave(listOfAutosave, minutesTillExpired, currentDate, moment) {
         return listOfAutosave.filter(function (autosave) {
-            return (
-                moment(currentDate).diff(
-                    new Date(autosave.value.saveTime),
-                    'minutes'
-                ) > minutesTillExpired
-            )
+            return moment(currentDate).diff(new Date(autosave.value.saveTime), 'minutes') > minutesTillExpired
         })
     }
 
@@ -649,9 +552,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
             .map(function (autosaveKey) {
                 return {
                     key: autosaveKey,
-                    value: LZString.decompressFromUTF16(
-                        localStorage.getItem(autosaveKey)
-                    ),
+                    value: LZString.decompressFromUTF16(localStorage.getItem(autosaveKey)),
                 }
             })
             .map(_jsonParse)
@@ -660,19 +561,9 @@ CKEDITOR.MmsAutosavePlugin = (function () {
             })
     }
 
-    function _clearExpiredLocalStorageContents(
-        localStorage,
-        moment,
-        LZString,
-        minutesTillExpired
-    ) {
+    function _clearExpiredLocalStorageContents(localStorage, moment, LZString, minutesTillExpired) {
         var listOfAutosave = _getAllAutosave(localStorage, LZString)
-        var listOfExpiredAutosave = _getAllExpiredAutosave(
-            listOfAutosave,
-            minutesTillExpired,
-            new Date(),
-            moment
-        )
+        var listOfExpiredAutosave = _getAllExpiredAutosave(listOfAutosave, minutesTillExpired, new Date(), moment)
         _removeAllExpiredAutosave(localStorage, listOfExpiredAutosave)
     }
 
@@ -692,12 +583,7 @@ CKEDITOR.MmsAutosavePlugin = (function () {
                 // need to use "customHelpers" at the front. If not, jasmine's spy wont work on this function
                 // since it will be "_clearExpiredLocalStorageContents" in this local scope and not "_clearExpiredLocalStorageContents"
                 // on "customHelpers" object where the spy is set
-                customHelpers._clearExpiredLocalStorageContents(
-                    localStorage,
-                    moment,
-                    LZString,
-                    minutesTillExpired
-                )
+                customHelpers._clearExpiredLocalStorageContents(localStorage, moment, LZString, minutesTillExpired)
                 try {
                     localStorage.setItem(autosaveKey, compressedJSON)
                 } catch (e) {

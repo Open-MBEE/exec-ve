@@ -99,7 +99,13 @@ export class PresentationService {
                 )
             },
             (reason) => {
-                this.growl.warning(`Error adding PE: ${reason.message}`)
+                if (reason && reason.status !== 444) {
+                    this.growl.warning(`Error adding PE: ${reason.message}`)
+                } else {
+                    this.growl.info('PE Insert Cancelled', {
+                        ttl: 1000,
+                    })
+                }
             }
         )
     }
