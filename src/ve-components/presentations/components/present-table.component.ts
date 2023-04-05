@@ -12,6 +12,7 @@ import { veComponents } from '@ve-components'
 import { VePromise, VeQService } from '@ve-types/angular'
 import { IPresentationComponentOptions, ITableConfig } from '@ve-types/components/presentation'
 import { PresentTableObject, TableEntryObject } from '@ve-types/mms'
+import { Table2CSVService } from "@ve-components/presentations/services/Table2CSV.service";
 
 interface TableEvent {
     newInputVal: string
@@ -441,10 +442,10 @@ class PresentTableController extends Presentation implements IPresentation {
     }
 
     makeCsv = (): void => {
-        const csvString: string | boolean = this.$element
+         let el = this.$element
             .find('.table-wrapper')
             .children('table')
-            .table2CSV({ delivery: 'value' })
+        const csvString: string | boolean = Table2CSVService.export(el, {delivery: 'value'})
         // var bom = "\xEF\xBB\xBF"; //just for excel
         if (typeof csvString === 'string') {
             const bom2 = '\uFEFF' //just for excel
