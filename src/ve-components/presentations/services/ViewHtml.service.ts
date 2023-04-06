@@ -126,18 +126,23 @@ export class ViewHtmlService {
                     } else {
                         result.push('<div>')
                     }
-
-                    result.push(this.makeHtml(thing))
+                    let thingString = this.makeHtml(thing)
+                    if (thing.type === 'Paragraph') {
+                        if ((isFilterable || isSortable) && thing.sourceType === 'text' && dtag === 'th') {
+                            thingString = thingString.replace('<p>', '<p ng-style="{display: \'inline\'}">')
+                        }
+                    }
+                    result.push(thingString)
                     result.push('</div>')
                     if (isHeader) {
                         if (isSortable && Number(cell.colspan) === 1) {
                             result.push(
-                                `<span ng-click="$ctrl.tableConfig.sortByColumnFn(${cell.startCol})" ng-class="getSortIconClass(${cell.startCol})"></span>`
+                                `<span ng-click="$ctrl.sortByColumnFn($event, ${cell.startCol})" ng-class="$ctrl.getSortIconClass(${cell.startCol})"></span>`
                             )
                         }
                         if (isFilterable) {
                             result.push(
-                                `<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column" ng-show="showFilter" ng-model-options="{debounce: ${this.tableConfig.filterDebounceRate}}" ng-model="${this.tableConfig.filterTermColumnPrefixBinding}${cell.startCol}${cell.endCol}">`
+                                `<input class="no-print ve-plain-input filter-input" type="text" placeholder="Filter column" ng-show="$ctrl.showFilter" ng-model-options="$ctrl.ngModelOptions" ng-change="$ctrl.filterByColumn(${cell.startCol}, ${cell.endCol})" ng-model="$ctrl.filterTermForColumn.filter${cell.startCol}${cell.endCol}">`
                             )
                         }
                     }

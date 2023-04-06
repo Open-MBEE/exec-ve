@@ -40,7 +40,7 @@ const TreeOfFavoritesComponent: VeComponentOptions = {
     template: `
 <div>
     <ul class="nav nav-list nav-pills nav-stacked abn-tree">
-        <li ng-repeat="row in $ctrl.treeRows track by row.branch.uid" ng-show="$ctrl.treeFilter(row, $ctrl.options.search)"
+        <li ng-repeat="row in $ctrl.treeRows track by row.branch.uid" ng-show="$ctrl.treeFilter(row, $ctrl.filter)"
             ng-class="" class="abn-tree-row level-1">
             <div class="arrow" ng-click="$ctrl.userClicksBranch(row.branch)" ng-dblclick="$ctrl.userDblClicksBranch(row.branch)" ng-class="{'active-text': row.branch.selected}" id="tree-branch-{{row.branch.data.id}}">
                 <div class="shaft" ng-class="{'shaft-selected': row.branch.selected, 'shaft-hidden': !row.branch.selected}">
