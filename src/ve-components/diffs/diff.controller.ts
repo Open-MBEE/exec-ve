@@ -10,9 +10,6 @@ export interface IDiff<T> {
 
 export interface IDiffComponentOptions extends VeComponentOptions {
     bindings: {
-        baseContent: '<'
-        comparedContent: '<'
-        attr?: '<'
         diffCallback?: '&'
         [key: string]: string
     }

@@ -4,7 +4,14 @@ import { veComponents } from '@ve-components'
 
 import { HtmlRenderedDiff } from '../../../lib/html-rendered-diff'
 
-class DiffHtmlController extends Diff<string> implements IDiff<string> {
+class DiffHtmlController {
+
+    //bindings
+    private base: string
+    private compare: string
+    private diffCallback: () => void
+
+    //local
     private htmlRenderedDiff: HtmlRenderedDiff
     htmlDiffIdPrefix: string = 'html-diff-'
     htmlDiffId: string
@@ -12,19 +19,19 @@ class DiffHtmlController extends Diff<string> implements IDiff<string> {
 
     static $inject = Diff.$inject
 
-    constructor($scope: angular.IScope, $timeout: angular.ITimeoutService, growl: angular.growl.IGrowlService) {
-        super($scope, $timeout, growl)
+    constructor(private  $scope: angular.IScope, private $timeout: angular.ITimeoutService, private growl: angular.growl.IGrowlService) {
         this.htmlRenderedDiff = window.HtmlRenderedDiff
     }
 
     $onInit(): void {
         this.htmlDiffId = `${this.htmlDiffIdPrefix}${this.$scope.$id}`
+        this.performDiff()
     }
 
     protected performDiff = (): void => {
         this.diffResult = this.htmlRenderedDiff.generateDiff(
-            DiffHtmlController._preformatHtml(this.baseContent),
-            DiffHtmlController._preformatHtml(this.comparedContent)
+            DiffHtmlController._preformatHtml(this.base),
+            DiffHtmlController._preformatHtml(this.compare)
         )
         this.$timeout(() => {
             const diffContainer = $('#' + this.htmlDiffId)
@@ -83,9 +90,8 @@ const DiffHtmlComponent: IDiffComponentOptions = {
     <i class="fa fa-spin fa-spinner" ng-show="$ctrl.spin"></i>
 `,
     bindings: {
-        baseContent: '<',
-        comparedContent: '<',
-        attr: '<',
+        base: '<mmsBaseHtml',
+        compare: '<mmsComparedHtml',
         diffCallback: '&',
     },
     controller: DiffHtmlController,

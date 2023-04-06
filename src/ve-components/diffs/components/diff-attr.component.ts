@@ -4,7 +4,7 @@ import { Diff, IDiff, IDiffComponentOptions } from '@ve-components/diffs/diff.co
 import { ViewController } from '@ve-components/presentations'
 import { ExtensionService } from '@ve-components/services'
 import { ElementService } from '@ve-utils/mms-api-client'
-import { handleChange } from '@ve-utils/utils'
+import {handleChange, onChangesCallback} from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
@@ -35,9 +35,11 @@ import { ElementObject, ElementsRequest, RequestObject } from '@ve-types/mms'
  * @param {string=latest} compareCommitId Compare commit id, default is latest
  */
 
-class DiffAttrController extends Diff<string> implements IDiff<string> {
+class DiffAttrController {
     //Bindings
-
+    attr: string
+    elementId: string
+    compareElementId: string
     projectId: string
     compareProjectId: string
 
@@ -61,18 +63,18 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
     comparedElementHtml: string
     message: string
 
-    static $inject = [...Diff.$inject, 'ElementService', 'ExtensionService', '$compile', '$q']
+    static $inject = [...Diff.$inject, 'ElementService', 'ExtensionService', '$compile', '$q', '$interval']
 
     constructor(
-        $scope: angular.IScope,
-        $timeout: angular.ITimeoutService,
-        growl: angular.growl.IGrowlService,
+        private $scope: angular.IScope,
+        private $timeout: angular.ITimeoutService,
+        private growl: angular.growl.IGrowlService,
         private elementSvc: ElementService,
         private extensionSvc: ExtensionService,
         private $compile: angular.ICompileService,
-        private $q: VeQService
+        private $q: VeQService,
+        private $interval: angular.IIntervalService
     ) {
-        super($scope, $timeout, growl)
     }
 
     $onInit(): void {
@@ -80,11 +82,13 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
     }
 
     $postLink(): void {
-        this.changeAction(this.baseContent, '', false)
+        this.performDiff()
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject): void {
-        super.$onChanges(onChangesObj)
+        //handleChange(onChangesObj, 'baseContent', this.changeAction)
+        //handleChange(onChangesObj, 'comparedContent', this.changeAction)
+        //handleChange(onChangesObj, 'elementId', this.changeAction)
         handleChange(onChangesObj, 'commitId', this.changeAction)
         handleChange(onChangesObj, 'compareCommitId', this.changeAction)
     }
@@ -93,6 +97,12 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
         this.diffLoading = false
     }
 
+    protected changeAction = (newVal, oldVal, firstChange): void  => {
+        if (!newVal || firstChange) {
+            return
+        }
+        if (oldVal !== newVal) this.performDiff()
+    }
     protected performDiff = (): void => {
         if (this.attr && this.extensionSvc.getTagByType('transclude', this.attr) !== 'extension-error') {
             this.getDiff().then(
@@ -169,8 +179,8 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
         const baseCommitId = this.commitId || 'latest'
         const compareCommitId = this.compareCommitId || 'latest'
 
-        const baseElementId = this.baseContent
-        const compareElementId = this.comparedContent || baseElementId
+        const baseElementId = this.elementId
+        const compareElementId = this.compareElementId || baseElementId
         const baseReqOb: ElementsRequest<string> = {
             elementId: baseElementId,
             projectId: baseProjectId,
@@ -196,13 +206,12 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
     protected _createElement = (
         type: string,
         reqOb: ElementsRequest<string>,
-        callback: () => void
     ): JQuery<HTMLElement> => {
         const ignoreMathjaxAutoFormatting = type === 'doc' || type === 'val' || type === 'com'
         const html =
             '<view-cf ' +
             (ignoreMathjaxAutoFormatting ? 'mms-generate-for-diff="mmsGenerateForDiff" ' : '') +
-            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{commitId}}" mms-callback="callback()"></view-cf>'
+            'mms-cf-type="{{type}}" mms-element-id="{{mmsElementId}}" mms-project-id="{{mmsProjectId}}" mms-ref-id="{{mmsRefId}}" mms-commit-id="{{commitId}}"></view-cf>'
         const newScope = Object.assign(this.$scope.$new(), {
             type: type,
             mmsElementId: reqOb.elementId,
@@ -210,17 +219,12 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
             mmsRefId: reqOb.refId,
             commitId: reqOb.commitId,
             mmsGenerateForDiff: true,
-            callback: callback,
         })
         return this.$compile(html)(newScope)
     }
 
     protected _fullyRender = (data: ElementObject): VePromise<string> => {
         const deferred = this.$q.defer<string>()
-        const renderCallback = (): void => {
-            const baseHtml = element.html()
-            deferred.resolve(baseHtml)
-        }
         const element = this._createElement(
             this.attr,
             {
@@ -228,9 +232,15 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
                 projectId: data._projectId,
                 refId: data._refId,
                 commitId: data._commitId,
-            },
-            renderCallback
+            }
         )
+        const handler = this.$interval(() => {
+            const baseHtml = element.html()
+            if (!baseHtml.includes('(loading...)')) {
+                this.$interval.cancel(handler)
+                deferred.resolve(baseHtml)
+            }
+        }, 10)
 
         return deferred.promise
     }
@@ -256,26 +266,26 @@ class DiffAttrController extends Diff<string> implements IDiff<string> {
 }
 
 const DiffAttrComponent: IDiffComponentOptions = {
-    selector: 'diffAttr',
+    selector: 'mmsDiffAttr',
     bindings: {
-        baseContent: '<',
-        comparedContent: '<',
-        attr: '<',
-        projectId: '@',
-        compareProjectId: '@',
-        refId: '@',
-        compareRefId: '@',
-        commitId: '@',
-        compareCommitId: '@',
+        elementId: '@mmsBaseElementId',
+        comparedElementId: '@mmsCompareElementId',
+        attr: '@mmsAttr',
+        projectId: '@mmsBaseProjectId',
+        compareProjectId: '@mmsCompareProjectId',
+        refId: '@mmsBaseRefId',
+        compareRefId: '@mmsCompareRefId',
+        commitId: '@mmsBaseCommitId',
+        compareCommitId: '@mmsCompareCommitId',
     },
     template: `
-    <span ng-show="$ctrl.diffLoading">
+  <!--  <span ng-show="$ctrl.diffLoading">
     <i class="fa fa-spin fa-spinner"></i>
 </span>
-<span ng-hide="$ctrl.diffLoading">
+<span ng-hide="$ctrl.diffLoading"> -->
     <span class="text-info" ng-if="$ctrl.message"><i class="fa fa-info-circle"></i>{{$ctrl.message}}</span>
-    <diff-html ng-if="$ctrl.baseElementHtml !== 'undefined' && $ctrl.comparedElementHtml !== 'undefined'" mms-base-html="$ctrl.baseElementHtml" mms-compared-html="$ctrl.comparedElementHtml" mms-diff-finish="$ctrl.diffFinish"></diff-html>
-</span>
+    <diff-html ng-if="$ctrl.baseElementHtml !== undefined && $ctrl.comparedElementHtml !== undefined" mms-base-html="$ctrl.baseElementHtml" mms-compared-html="$ctrl.comparedElementHtml" mms-diff-finish="$ctrl.diffFinish"></diff-html>
+<!-- </span> -->
 `,
     controller: DiffAttrController,
     require: {
