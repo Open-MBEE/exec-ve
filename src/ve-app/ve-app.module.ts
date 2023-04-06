@@ -356,20 +356,6 @@ veApp.config([
                     },
                 },
             })
-            .state('main.project.refs', {
-                url: '/refs',
-                views: {
-                    'pane-center@main': {
-                        component: 'refs',
-                        bindings: {
-                            mmsOrg: 'orgOb',
-                            mmsProject: 'projectOb',
-                            mmsRef: 'refOb',
-                            mmsRefs: 'refObs',
-                        },
-                    },
-                },
-            })
             .state('main.project.ref', {
                 // equivalent to old sites and documents page
                 url: '/:refId',
@@ -466,6 +452,33 @@ veApp.config([
                             return resolveSvc.initializePermissions(projectOb, refOb)
                         },
                     ],
+                },
+            })
+            .state('main.project.ref.refs', {
+                // manage refs given a current ref context
+                url: '/refs',
+                views: {
+                    'pane-center@main': {
+                        component: 'refs',
+                        bindings: {
+                            mmsOrg: 'orgOb',
+                            mmsProject: 'projectOb',
+                            mmsRefs: 'refObs',
+                            mmsRef: 'refOb'
+                        },
+                    },
+                    'toolbar-right@main': {
+                        component: 'rightToolbar',
+                        bindings: {
+                            //Init an empty toolbar for style reasons
+                        },
+                    },
+                    'toolbar-left@main': {
+                        component: 'leftToolbar',
+                        bindings: {
+                            //Init an empty toolbar for style reasons
+                        },
+                    },
                 },
             })
             .state('main.project.ref.portal', {
@@ -732,6 +745,7 @@ veApp.config([
                             mmsRef: 'refOb',
                             mmsRefs: 'refObs',
                             mmsRoot: 'documentOb',
+                            mmsDocument: 'documentOb'
                         },
                     },
                     'banner-bottom@main': {

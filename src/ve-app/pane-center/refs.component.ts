@@ -41,9 +41,9 @@ class RefsController {
     public subs: Rx.IDisposable[]
 
     //Bindings
-    mmsRef: VePromise<RefObject, RefsResponse>
-    mmsRefs: VePromise<RefObject[], RefsResponse>
-    mmsProject: VePromise<ProjectObject, ProjectsResponse>
+    mmsRefs: RefObject[]
+    mmsProject: ProjectObject
+    mmsRef: RefObject
 
     //Local
     public refManageView: boolean
@@ -55,11 +55,9 @@ class RefsController {
     refs: RefObject[]
     branches: RefObject[]
     tags: RefObject[]
-    activeTab
     refSelected: RefObject
     search
     view
-    fromParams
     htmlTooltip: string
 
     constructor(
@@ -82,83 +80,36 @@ class RefsController {
     ) {}
 
     $onInit(): void {
-        this.isLoading = true
         this.eventSvc.$init(this)
 
         this.contentWindowSvc.toggleLeftPane(true)
-
+        this.rootScopeSvc.veHideLeft(true)
+        this.rootScopeSvc.veHideRight(true)
         this.refManageView = true
         this.refData = []
         this.bbApi = {}
         this.buttons = []
-        this.activeTab = 0
-        this.refSelected = null
+        this.refSelected = this.mmsRef
         this.search = null
         this.view = null
-        this.fromParams = {}
 
-        const promises: VePromise<unknown, unknown>[] = []
-        promises.push(this.mmsProject, this.mmsRef)
-
-        this.mmsRefs.then(
-            (refs) => {
-                this.refs = refs
-                this.branches = refs.filter((ref) => {
-                    return ref.type === 'Branch'
-                })
-                this.tags = refs.filter((ref) => {
-                    return ref.type === 'Tag'
-                })
-
-                if (_.isEmpty(this.mmsRef)) {
-                    this.selectMasterDefault()
-                } else {
-                    this.mmsRef.then(
-                        (ref) => {
-                            this.fromParams = ref
-                            this.refSelected = ref
-                        },
-                        (reason) => {
-                            console.log('Menu Error: ' + reason.message)
-                        }
-                    )
-                }
-            },
-            (reason) => {
-                console.log('Menu Error: ' + reason.message)
-            }
-        )
-        this.mmsProject.then(
-            (project) => {
-                this.project = project
-            },
-            (reason) => {
-                console.log('Menu Error: ' + reason.message)
-            }
-        )
-
-        this.$q.allSettled(promises).finally(() => {
-            this.isLoading = false
+        this.refs = this.mmsRefs
+        this.branches = this.refs.filter((ref) => {
+            return ref.type === 'Branch'
         })
+        this.tags = this.refs.filter((ref) => {
+            return ref.type === 'Tag'
+        })
+
+        this.project = this.mmsProject
 
         this.htmlTooltip = this.$sce.trustAsHtml('Branch temporarily unavailable during duplication.') as string
 
-        this.subs.push(
-            this.eventSvc.$on<ParamsObject>('fromParamChange', (fromParams) => {
-                const index = _.findIndex(this.refs, {
-                    name: fromParams.refId,
-                })
-                if (index > -1) {
-                    this.fromParams = this.refs[index]
-                }
-            })
-        )
     }
 
     selectMasterDefault = (): void => {
         const masterIndex = _.findIndex(this.refs, { name: 'master' })
         if (masterIndex > -1) {
-            this.fromParams = this.refs[masterIndex]
             this.refSelected = this.refs[masterIndex]
         }
     }
@@ -246,26 +197,12 @@ class RefsController {
         })
         instance.result.then(
             (data) => {
-                //TODO add load handling once mms returns status
-                const tag: RefObject[] = []
-                for (let i = 0; i < this.refs.length; i++) {
-                    if (this.refs[i].type === 'Tag') tag.push(this.refs[i])
-                }
-                this.tags = tag
-
-                const branches: RefObject[] = []
-                for (let j = 0; j < this.refs.length; j++) {
-                    if (this.refs[j].type === 'Branch') branches.push(this.refs[j])
-                }
-                this.branches = branches
                 if (data.type === 'Branch') {
                     this.branches.push(data)
                     this.refSelected = data
-                    this.activeTab = 0
                 } else {
                     this.tags.push(data)
                     this.refSelected = data
-                    this.activeTab = 1
                 }
             },
             (reason?) => {
@@ -314,7 +251,6 @@ class RefsController {
                 if (this.refSelected.type === 'Branch') {
                     index = this.branches.indexOf(this.refSelected)
                     this.branches.splice(index, 1)
-                    this.selectMasterDefault()
                 } else if (this.refSelected.type === 'Tag') {
                     index = this.tags.indexOf(this.refSelected)
                     this.tags.splice(index, 1)
@@ -340,8 +276,8 @@ const RefsComponent: VeComponentOptions = {
     <div class="container-fluid ve-no-panes">
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
-            <a class="back-to-docs" ui-sref="main.project.ref.portal({refId: $ctrl.fromParams.id, keywords: undefined})"
-               ui-sref-opts="{reload:true}">Back to Project Documents ({{$ctrl.fromParams.name}})</a>
+            <a class="back-to-docs" ui-sref="main.project.ref.portal({refId: $ctrl.mmsRef.id, keywords: undefined})"
+               ui-sref-opts="{reload:true}">Back to Project Documents ({{$ctrl.mmsRef.name}})</a>
             <h1 class="panel-title">Manage Project branches/tags</h1>
             <div class="panel panel-default">
                 <div class="panel-body no-padding-panel">
@@ -364,16 +300,16 @@ const RefsComponent: VeComponentOptions = {
                                 ng-class="{'selected': tag.id === $ctrl.refSelected.id}">
                                 <a>{{ tag.name }}</a>
                             </li>
-                            <li ng-if="!tags.length" class="ve-secondary-text">No Tags</li>
+                            <li ng-if="!$ctrl.tags.length" class="ve-secondary-text">No Tags</li>
                         </ul>
                     </div>
                     <div class="col-md-8 ve-light-panels-detail" ng-show="$ctrl.refSelected">
                         <div class="panels-detail-title clearfix">
                             <h3 class="{{$ctrl.refSelected.type}}-icon">{{$ctrl.refSelected.name}}</h3>
                             <div class="ref-button-options" style="float:right">
-                            <button class="btn btn-default" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.deleteRef()" ng-if="$ctrl.refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
-                            <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addTag()"><i class="fa fa-plus"></i> Tag</button>
-                            <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addBranch()"><i class="fa fa-plus"></i> Branch</button>
+                            <button class="btn btn-default" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.deleteRef($event)" ng-if="$ctrl.refSelected.id != 'master'"><i class="fa fa-trash"></i> Delete</button>
+                            <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addTag($event)"><i class="fa fa-plus"></i> Tag</button>
+                            <button class="btn btn-primary" ng-disabled="$ctrl.isLoading && $ctrl.refSelected.status === 'creating'" type="button" ng-click="$ctrl.addBranch($event)"><i class="fa fa-plus"></i> Branch</button>
                             </div>
                             <!-- <button-bar button-api="bbApi"></button-bar> -->
                         </div>
@@ -398,12 +334,11 @@ const RefsComponent: VeComponentOptions = {
                             <dd>{{$ctrl.refSelected._created}}</dd>
                             <dt>Creator</dt>
                             <dd>{{$ctrl.refSelected._creator}}</dd>
-                            <!-- <dt>Last Modified</dt>
-                            <dd>{{refSelected._modified}}</dd> -->
-                            <dt>Modifier</dt>
-                            <dd>{{$ctrl.refSelected._modifier}}</dd>
+                           
                             <dt>Parent Ref</dt>
                             <dd>{{$ctrl.refSelected.parentRefId}}</dd>
+                            <dt>Parent Commit</dt>
+                            <dd>{{$ctrl.refSelected.parentCommitId}}</dd>
                             </span>
                         </dl>
                     </div>

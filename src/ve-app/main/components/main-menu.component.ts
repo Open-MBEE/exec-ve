@@ -36,6 +36,7 @@ class MenuController implements IComponentController {
     groups: GroupObject[]
     projects: ProjectObject[]
     refs: RefObject[]
+    tags: RefObject[]
     document: DocumentObject
     view: ViewObject
     groupsMap: {
@@ -84,6 +85,7 @@ class MenuController implements IComponentController {
         this.eventSvc.$init(this)
         this.projects = this.mmsProjects
         this.groups = this.mmsGroups
+        this.refs = this.mmsRefs
         if (this.mmsProject && !this.currentProject) {
             this.currentProject = this.mmsProject.name
         }
@@ -95,7 +97,9 @@ class MenuController implements IComponentController {
                 this.currentTag = this.mmsRef.name
             }
         }
-
+        this.tags = this.mmsRefs.filter((ref) => {
+            return ref.type === 'Tag'
+        })
         this.updateGroups()
 
         this.$transitions.onSuccess({}, () => {
@@ -138,7 +142,7 @@ class MenuController implements IComponentController {
         }
 
         // Check for Refs View, Skip the rest if it is
-        if (this.$state.includes('main.project.refs')) {
+        if (this.$state.includes('main.project.ref.refs')) {
             this.isRefsView = true
             return
         }
@@ -182,7 +186,7 @@ class MenuController implements IComponentController {
             this.breadcrumbs = this.crumbs.reverse()
             void this.$timeout(() => {
                 const eltChildren = this.$element.children().children()
-                const eltParent: Element = document.children[0]
+                const eltParent = this.$element.parent()[0]
                 const eltWidth = eltParent.clientWidth - eltChildren[1].scrollWidth - eltChildren[3].scrollWidth
                 const crumbcount = this.breadcrumbs.length
                 const liWidth = (eltWidth * 0.85) / crumbcount
@@ -227,27 +231,7 @@ class MenuController implements IComponentController {
     }
 
     refsView(): void {
-        void this.$state.go('main.project.refs', { projectId: this.params.projectId }, { reload: true })
-    }
-
-    checkRefsView(): boolean {
-        return this.$state.includes('refs')
-    }
-
-    getHrefForProject(project: ProjectObject): string {
-        const refId = project._refId || 'master'
-        return this.applicationSvc.PROJECT_URL_PREFIX + project.id + '/' + refId
-    }
-
-    getHrefForRef(branch: RefObject): string {
-        let res = this.applicationSvc.PROJECT_URL_PREFIX + this.params.projectId + '/' + branch.id
-        if (this.params.documentId) {
-            res += '/present/' + this.params.documentId
-        }
-        if (this.params.viewId) {
-            res += '?viewId=' + this.params.viewId
-        }
-        return res
+        void this.$state.go('main.project.ref.refs', { projectId: this.params.projectId, refId: this.params.refId }, { reload: true })
     }
 
     goHome(): void {
@@ -262,7 +246,7 @@ const MainMenuComponent: VeComponentOptions = {
     selector: 'mainMenu',
     template: `
     <nav class="project-level-header navbar navbar-inverse navbar-fixed-top block" role="navigation">
-    <i ng-show="$ctrl.spin" class="fa fa-spin fa-spinner nav-spin"></i>
+    <i ng-show="$ctrl.spin && !$ctrl.isRefsView" class="fa fa-spin fa-spinner nav-spin"></i>
     <div class="btn-group ve-dark-dropdown-nav pull-left" uib-dropdown keyboard-nav>
         <button type="button" class="dropdown-toggle" uib-dropdown-toggle>
             <span class="label-dropdown">Project:&nbsp;</span><span class="selected-dropdown">{{ $ctrl.currentProject }}</span>
@@ -275,14 +259,14 @@ const MainMenuComponent: VeComponentOptions = {
             </li>
         </ul>
     </div>
-    <div ng-hide="$ctrl.spin" class="breadcrumbs">
+    <div ng-hide="$ctrl.spin || $ctrl.isRefsView" class="breadcrumbs">
         <ul>
-            <li ng-style="truncateStyle">
+            <li ng-style="$ctrl.truncateStyle">
                 <a type="button" class="back-to-proj" ng-click="$ctrl.goHome()" uib-tooltip="{{ $ctrl.currentProject }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i class="fa-solid fa-home fa-1x" aria-hidden="true"></i>
                 </a>
             </li>
-            <li ng-style="truncateStyle" ng-show="!$ctrl.isRefsView" ng-repeat="breadcrumb in $ctrl.breadcrumbs track by $index">
+            <li ng-style="$ctrl.truncateStyle" ng-show="!$ctrl.isRefsView" ng-repeat="breadcrumb in $ctrl.breadcrumbs track by $index">
                 <span><i class="fa-solid fa-angle-right"></i></span>
                 <a ui-sref="{{ breadcrumb.link }}" uib-tooltip="{{ breadcrumb.name }}" tooltip-trigger="mouseenter" tooltip-popup-delay="100" tooltip-placement="bottom">
                     <i ng-class="{'fa-solid fa-file': $last && breadcrumb.type === 'doc'}" aria-hidden="true"></i>{{ breadcrumb.name }}
@@ -314,17 +298,17 @@ const MainMenuComponent: VeComponentOptions = {
                             ng-class="{'checked-list-item': branch.name === $ctrl.currentBranch, 'branch-disabled': branch.status == 'creating'}"
                             is-open="false" tooltip-placement="left" uib-tooltip-html="$ctrl.htmlTooltip"
                             tooltip-append-to-body="branch.status == 'creating'" tooltip-enable="branch.status == 'creating'">
-                            <a ng-href="{{$ctrl.getHrefForRef(branch);}}" ng-style="{display: 'block'}"> {{ branch.name }} </a>
+                            <a  ng-style="{display: 'block'}"> {{ branch.name }} </a>
                         </li>
                     </uib-tab>
                     <uib-tab index="1" classes="tab-item" heading="Tags">
-                        <li ng-if="tags.length" ng-repeat="tag in $ctrl.mmsRefs | orderBy:'name' | filter:{name:refFilter, type: 'Tag' }" ng-click="$ctrl.updateRef(tag)"
+                        <li ng-repeat="tag in $ctrl.mmsRefs | orderBy:'name' | filter:{name:refFilter, type: 'Tag' }" ng-click="$ctrl.updateRef(tag)"
                             ng-class="{'checked-list-item': tag.name === $ctrl.currentTag, 'branch-disabled': tag.status == 'creating'}"
                             is-open="false" tooltip-placement="left" uib-tooltip-html="$ctrl.htmlTooltip"
                             tooltip-append-to-body="tag.status == 'creating'" tooltip-enable="tag.status == 'creating'">
-                            <a ng-href="{{$ctrl.getHrefForRef(tag);}}" ng-style="{display: 'block'}"> {{ tag.name }} </a>
+                            <a  ng-style="{display: 'block'}"> {{ tag.name }} </a>
                         </li>
-                        <li ng-if="!$ctrl.mmsTags.length" class="ve-secondary">No Tags</li>
+                        <li ng-if="!$ctrl.tags.length" class="ve-secondary">No Tags</li>
                     </uib-tab>
                 </uib-tabset>
             </ul>

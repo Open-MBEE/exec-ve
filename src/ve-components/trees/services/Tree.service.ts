@@ -49,6 +49,7 @@ export class TreeService {
     static events = {
         UPDATED: 'tree.updated',
         RELOAD: 'tree.reload',
+        FILTER: 'tree.filter'
     }
 
     static MetaTypes = [
@@ -401,6 +402,7 @@ export class TreeService {
                 if (Array.isArray(siblings)) {
                     const i = siblings.indexOf(branch)
                     if (i < siblings.length - 1) resolve(siblings[i + 1])
+                    else reject()
                 }
             }, reject)
         })
@@ -416,7 +418,7 @@ export class TreeService {
             this.getSiblings(branch).then((siblings) => {
                 if (Array.isArray(siblings)) {
                     const i = siblings.indexOf(branch)
-                    if (i < siblings.length - 1) resolve(siblings[i - 1])
+                    if (i > 0) resolve(siblings[i - 1])
                     else reject()
                 }
             }, reject)
@@ -465,11 +467,15 @@ export class TreeService {
             if (!branch) branch = this.selectedBranch
             if (branch) {
                 const next = this.getFirstChild(branch)
-                if (next) resolve(next)
-                else {
+                if (next) {
+                    if (types && types.includes(next.type))
+                        resolve(next)
+                    else
+                        this.getNextBranch(next, types).then(resolve, reject)
+                } else {
                     this.getClosestAncestorNextSibling(branch).then((nextSib) => {
                         if (types && !types.includes(nextSib.type)) {
-                            this.getNextBranch(nextSib).then(resolve, reject)
+                            this.getNextBranch(nextSib, types).then(resolve, reject)
                         } else {
                             resolve(nextSib)
                         }
@@ -1035,7 +1041,7 @@ export class TreeService {
                 this._onTreeDataChange().then(resolve, reject)
             else {
                 this.forEachBranch((b): void => {
-                    if (b.data.id === this.treeApi.elementId) {
+                    if (b.data.id === this.treeApi.elementId || this.treeApi.elementId === `site_${b.data.id}_cover`) {
                         this.selectBranch(b, true).then(
                             () => {
                                 this._onTreeDataChange().then(resolve, reject)
