@@ -3,6 +3,7 @@ import { Diff, IDiff, IDiffComponentOptions } from '@ve-components/diffs/diff.co
 import { veComponents } from '@ve-components'
 
 import { HtmlRenderedDiff } from '../../../lib/html-rendered-diff'
+import {handleChange} from "@ve-utils/utils";
 
 class DiffHtmlController {
 
@@ -28,6 +29,10 @@ class DiffHtmlController {
         this.performDiff()
     }
 
+    $onChanges(onChangesObj: angular.IOnChangesObject): void {
+        handleChange(onChangesObj, 'base', this.performDiff)
+        handleChange(onChangesObj, 'compare', this.performDiff)
+    }
     protected performDiff = (): void => {
         this.diffResult = this.htmlRenderedDiff.generateDiff(
             DiffHtmlController._preformatHtml(this.base),

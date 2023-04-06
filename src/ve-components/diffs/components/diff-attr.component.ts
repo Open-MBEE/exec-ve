@@ -86,9 +86,6 @@ class DiffAttrController {
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject): void {
-        //handleChange(onChangesObj, 'baseContent', this.changeAction)
-        //handleChange(onChangesObj, 'comparedContent', this.changeAction)
-        //handleChange(onChangesObj, 'elementId', this.changeAction)
         handleChange(onChangesObj, 'commitId', this.changeAction)
         handleChange(onChangesObj, 'compareCommitId', this.changeAction)
     }
@@ -275,8 +272,8 @@ const DiffAttrComponent: IDiffComponentOptions = {
         compareProjectId: '@mmsCompareProjectId',
         refId: '@mmsBaseRefId',
         compareRefId: '@mmsCompareRefId',
-        commitId: '@mmsBaseCommitId',
-        compareCommitId: '@mmsCompareCommitId',
+        commitId: '<mmsBaseCommitId',
+        compareCommitId: '<mmsCompareCommitId',
     },
     template: `
   <!--  <span ng-show="$ctrl.diffLoading">

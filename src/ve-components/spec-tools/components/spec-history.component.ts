@@ -256,7 +256,7 @@ const SpecHistoryComponent: VeComponentOptions = {
 <div style="position:relative;">
     <div ng-if="$ctrl.ModelData.ShowDiffPrototype" class="inline-diff-buttons fade-in-out">
         <span class="inline-btn-label">Before:</span>
-        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="$ctrl.baseCommit.isOpen" auto-close="outsideClick" style="flex:2" ng-hide="disableRevert">
+        <div class="btn-group ve-light-dropdown" uib-dropdown keyboard-nav is-open="$ctrl.baseCommit.isOpen" auto-close="outsideClick" style="flex:2" ng-hide="$ctrl.disableRevert">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
                 {{$ctrl.baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.baseCommit.commitSelected._creator}}</b><span ng-if="$ctrl.baseCommit.commitSelected.id === $ctrl.baseCommit.history[0].id"> (Latest)</span>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
@@ -300,7 +300,7 @@ const SpecHistoryComponent: VeComponentOptions = {
         <span class="inline-btn-label fade-in-out" ng-show="$ctrl.ModelData.ShowDiffPrototype">After:</span>
         <div class="btn-group ve-light-dropdown" ng-class="{'flex-grow-shrink': $ctrl.ModelData.ShowDiffPrototype}" uib-dropdown keyboard-nav is-open="$ctrl.compareCommit.isOpen" auto-close="outsideClick" style="flex:2">
             <button class="dropdown-toggle" type="button" uib-dropdown-toggle>
-                <span>{{$ctrl.compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.ompareCommit.commitSelected._creator}}</b></span>
+                <span>{{$ctrl.compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}} by <b>{{$ctrl.compareCommit.commitSelected._creator}}</b></span>
                 <span ng-if="$ctrl.compareCommit.commitSelected.id === $ctrl.compareCommit.history[0].id"> (Latest)</span>
                 <i class="fa fa-caret-down" aria-hidden="true"></i>
             </button>
@@ -332,10 +332,10 @@ const SpecHistoryComponent: VeComponentOptions = {
             <mms-diff-attr mms-attr="name"
                            mms-base-project-id="{{$ctrl.projectId}}"
                            mms-base-ref-id="{{$ctrl.baseCommit.ref.id}}"
-                           mms-base-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"
+                           mms-base-commit-id="$ctrl.baseCommit.commitSelected.id"
                            mms-base-element-id="{{$ctrl.element.id}}"
                            mms-compare-ref-id="{{$ctrl.refId}}"
-                           mms-compare-commit-id="{{$ctrl.compareCommit.commitSelected.id}}">
+                           mms-compare-commit-id="$ctrl.compareCommit.commitSelected.id">
             </mms-diff-attr>
         </h1>
 
@@ -343,10 +343,10 @@ const SpecHistoryComponent: VeComponentOptions = {
         <mms-diff-attr mms-attr="doc"
                        mms-base-project-id="{{$ctrl.projectId}}"
                        mms-base-ref-id="{{$ctrl.baseCommit.ref.id}}"
-                       mms-base-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"
+                       mms-base-commit-id="$ctrl.baseCommit.commitSelected.id"
                        mms-base-element-id="{{$ctrl.element.id}}"
                        mms-compare-ref-id="{{$ctrl.refId}}"
-                       mms-compare-commit-id="{{$ctrl.compareCommit.commitSelected.id}}">
+                       mms-compare-commit-id="$ctrl.compareCommit.commitSelected.id">
         </mms-diff-attr>
 
         <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.includes('TaggedValue')">
@@ -355,10 +355,10 @@ const SpecHistoryComponent: VeComponentOptions = {
                 <mms-diff-attr mms-attr="val"
                                mms-base-project-id="{{$ctrl.projectId}}"
                                mms-base-ref-id="{{$ctrl.baseCommit.ref.id}}"
-                               mms-base-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"
+                               mms-base-commit-id="$ctrl.baseCommit.commitSelected.id"
                                mms-base-element-id="{{$ctrl.element.id}}"
                                mms-compare-ref-id="{{$ctrl.refId}}"
-                               mms-compare-commit-id="{{$ctrl.compareCommit.commitSelected.id}}">
+                               mms-compare-commit-id="$ctrl.compareCommit.commitSelected.id">
                 </mms-diff-attr>
             </span>
         </div>
