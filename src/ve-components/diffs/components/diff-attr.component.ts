@@ -4,7 +4,7 @@ import { Diff, IDiff, IDiffComponentOptions } from '@ve-components/diffs/diff.co
 import { ViewController } from '@ve-components/presentations'
 import { ExtensionService } from '@ve-components/services'
 import { ElementService } from '@ve-utils/mms-api-client'
-import {handleChange, onChangesCallback} from '@ve-utils/utils'
+import { handleChange } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
