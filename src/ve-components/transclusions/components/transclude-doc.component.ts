@@ -10,6 +10,7 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions, VePromise, VeQService } from '@ve-types/angular'
+import {PresentTextObject} from "@ve-types/mms";
 
 /**
  * @ngdoc component
@@ -124,23 +125,6 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         })
 
         if (this.mmsViewPresentationElemCtrl) {
-            this.delete = (): void => {
-                this.componentSvc.deleteAction(this, this.bbApi, this.mmsViewPresentationElemCtrl.getParentSection())
-            }
-
-            this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
-            this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
-            this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
-            const auto = [
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Image', this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Paragraph', this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'List', this.schema),
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Table', this.schema),
-            ]
-
-            if (auto.indexOf(this.instanceSpec.classifierIds[0]) >= 0)
-                //do not allow model generated to be deleted
-                this.isDirectChildOfPresentationElement = false
             if (this.isDirectChildOfPresentationElement) {
                 this.panelTitle = this.instanceSpec.name
                 this.panelType = this.presentationElem.type //this is hack for fake table/list/equation until we get actual editors

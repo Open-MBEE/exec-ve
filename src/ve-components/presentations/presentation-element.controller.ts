@@ -144,15 +144,12 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
             this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
             this.view = this.mmsViewCtrl.getView()
-            this.isDirectChildOfPresentationElement = this.componentSvc.isDirectChildOfPresentationElementFunc(
-                this.$element,
-                this.mmsViewCtrl
-            )
-            if (
-                this.element.classifierIds[0] ===
-                this.schemaSvc.getValue('TYPE_TO_CLASSIFIER_ID', 'Section', this.schema)
-            )
-                this.isDirectChildOfPresentationElement = false
+            const isOpaque = this.instanceSpec.classifierIds &&
+                this.instanceSpec.classifierIds.length > 0 &&
+                this.schemaSvc
+                    .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
+                    .indexOf(this.instanceSpec.classifierIds[0]) >= 0
+            this.isDirectChildOfPresentationElement = !isOpaque
         }
 
         if (this.commitId === 'latest') {
