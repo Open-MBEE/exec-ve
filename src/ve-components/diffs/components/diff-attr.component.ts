@@ -1,6 +1,5 @@
 import _ from 'lodash'
 
-import { Diff, IDiff, IDiffComponentOptions } from '@ve-components/diffs/diff.controller'
 import { ViewController } from '@ve-components/presentations'
 import { ExtensionService } from '@ve-components/services'
 import { ElementService } from '@ve-utils/mms-api-client'
@@ -8,7 +7,7 @@ import { handleChange } from '@ve-utils/utils'
 
 import { veComponents } from '@ve-components'
 
-import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
+import {VeComponentOptions, VePromise, VePromiseReason, VeQService} from '@ve-types/angular'
 import { ElementObject, ElementsRequest, RequestObject } from '@ve-types/mms'
 
 /**
@@ -63,7 +62,7 @@ class DiffAttrController {
     comparedElementHtml: string
     message: string
 
-    static $inject = [...Diff.$inject, 'ElementService', 'ExtensionService', '$compile', '$q', '$interval']
+    static $inject = ['$scope', '$timeout', 'growl', 'ElementService', 'ExtensionService', '$compile', '$q', '$interval']
 
     constructor(
         private $scope: angular.IScope,
@@ -262,7 +261,7 @@ class DiffAttrController {
     }
 }
 
-const DiffAttrComponent: IDiffComponentOptions = {
+const DiffAttrComponent: VeComponentOptions = {
     selector: 'mmsDiffAttr',
     bindings: {
         elementId: '@mmsBaseElementId',
@@ -281,7 +280,7 @@ const DiffAttrComponent: IDiffComponentOptions = {
 </span>
 <span ng-hide="$ctrl.diffLoading"> -->
     <span class="text-info" ng-if="$ctrl.message"><i class="fa fa-info-circle"></i>{{$ctrl.message}}</span>
-    <diff-html ng-if="$ctrl.baseElementHtml !== undefined && $ctrl.comparedElementHtml !== undefined" mms-base-html="$ctrl.baseElementHtml" mms-compared-html="$ctrl.comparedElementHtml" mms-diff-finish="$ctrl.diffFinish"></diff-html>
+    <diff-html ng-if="$ctrl.baseElementHtml !== undefined && $ctrl.comparedElementHtml !== undefined" base="$ctrl.baseElementHtml" compare="$ctrl.comparedElementHtml" diff-callback="$ctrl.diffFinish"></diff-html>
 <!-- </span> -->
 `,
     controller: DiffAttrController,
