@@ -37,7 +37,7 @@ class PresentSectionController extends Presentation implements angular.IComponen
         <div ng-class="{'panel-body' : $ctrl.isEditing}">
             <add-pe-menu mms-view="$ctrl.section" index="-1" class="add-pe-button-container no-print"></add-pe-menu>
             <div ng-repeat="instanceVal in $ctrl.section.specification.operand track by instanceVal.instanceId">
-                <view-pe mms-instance-val="instanceVal"></view-pe>
+                <view-pe mms-instance-val="instanceVal" mms-parent-section="$ctrl.section"></view-pe>
                 <add-pe-menu mms-view="$ctrl.section" index="$index" class="add-pe-button-container no-print"></add-pe-menu>
             </div>
         </div>
