@@ -407,45 +407,24 @@ export class SpecService implements angular.Injectable<any> {
         this.editValues = this.componentSvc.revertEdits(this.editValues, this.edit)
     }
 
-    // public save = (toolbarId: string, continueEdit: boolean): VePromise<void, ElementsResponse<ElementObject>> => {
-    //     this.eventSvc.$broadcast('element-saving', true)
-    //     const saveEdit = this.edit
-    //     this.componentSvc.clearAutosave(saveEdit._projectId + saveEdit._refId + saveEdit.id, saveEdit.type)
-    //     return new this.$q((resolve, reject) => {
-    //         this._save().then(
-    //             (data) => {
-    //                 this.eventSvc.$broadcast('element-saving', false)
-    //                 if (!data) {
-    //                     this.growl.info('Save Skipped (No Changes)')
-    //                 } else {
-    //                     this.growl.success('Save Successful')
-    //                 }
-    //                 if (continueEdit) return
-    //                 const saveEdit = this.getEdits()
-    //                 const key = saveEdit.id + '|' + saveEdit._projectId + '|' + saveEdit._refId
-    //                 this.autosaveSvc.remove(key)
-    //                 if (this.autosaveSvc.openEdits() > 0) {
-    //                     const next = Object.keys(this.autosaveSvc.getAll())[0]
-    //                     const id = next.split('|')
-    //                     this.tracker.etrackerSelected = next
-    //                     this.keepMode()
-    //                     this.specApi.elementId = id[0]
-    //                     this.specApi.projectId = id[1]
-    //                     this.specApi.refId = id[2]
-    //                     this.specApi.commitId = 'latest'
-    //                 } else {
-    //                     this.setEditing(false)
-    //                     this.cleanUpSaveAll(toolbarId)
-    //                 }
-    //                 resolve()
-    //             },
-    //             (reason) => {
-    //                 this.eventSvc.$broadcast('element-saving', false)
-    //                 reject(reason)
-    //             }
-    //         )
-    //     })
-    // }
+    // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
+    public cleanUpSaveAll = (toolbarId: string): void => {
+        this.toolbarSvc.waitForApi(toolbarId).then(
+            (api) => {
+                if (this.autosaveSvc.openEdits() > 0) {
+                    api.setPermission('spec-editor.saveall', true)
+                    api.setIcon('spec-editor', 'fa-edit-asterisk')
+                } else {
+                    api.setPermission('spec-editor.saveall', false)
+                    api.setIcon('spec-editor', 'fa-edit')
+                }
+            },
+            (reason) => {
+                this.growl.error(ToolbarService.error(reason))
+            }
+        )
+    }
+    //
 
     private _save(): VePromise<ElementObject> {
         //TODO value edits don't save because they're handled by transclude val

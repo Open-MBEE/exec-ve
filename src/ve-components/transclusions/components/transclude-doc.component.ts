@@ -62,7 +62,7 @@ export class TranscludeDocController extends Transclusion implements ITransclusi
         </div>
     </div>
     <div class="panel-body no-padding-panel">
-        <editor ng-model="$ctrl.edit.documentation" mms-editor-type="{{$ctrl.editorType}}" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></editor>
+        <editor ng-model="$ctrl.edit.documentation" mms-editor-type="{{$ctrl.editorType}}" editor-id="$ctrl.editorApi" mms-project-id="{{$ctrl.element._projectId}}" mms-ref-id="{{$ctrl.element._refId}}" autosave-key="{{$ctrl.element._projectId + $ctrl.element._refId + $ctrl.element.id}}"></editor>
     </div>
 </div>
 `

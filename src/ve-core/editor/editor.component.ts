@@ -56,16 +56,6 @@ export class EditorController implements angular.IComponentController {
     private autosaveKey: string
     private mmsEditorApi: EditingApi
 
-    private toolbar: Array<
-        | string
-        | string[]
-        | {
-              name: string
-              items?: string[] | undefined
-              groups?: string[] | undefined
-          }
-    >
-
     private stylesToolbar = {
         name: 'styles',
         items: ['Styles', /*'Format',*/ 'FontSize', 'TextColor', 'BGColor'],
@@ -176,21 +166,17 @@ export class EditorController implements angular.IComponentController {
         private imageSvc: ImageService
     ) {
         this.deb = _.debounce((e) => {
-            this.update().then(
-                () => {
-                    /**/
-                },
-                () => {
-                    this.growl.error('Error saving editor content')
-                }
-            )
+            this.update().catch(() => {
+                this.growl.error('Error saving editor content')
+            })
         }, 1000)
     }
 
     $onChanges(onChangesObj: angular.IOnChangesObject): void {
         if (onChangesObj.ngModel && !this.init) {
             this.init = true
-            this.id = `mmsCkEditor${this.editorSvc.generatedIds++}`
+            this.editorSvc.add(this.autosaveKey)
+            this.id = this.editorSvc.getId(this.autosaveKey)
             this.startEditor()
         }
     }
@@ -208,6 +194,7 @@ export class EditorController implements angular.IComponentController {
 
     public startEditor(): void {
         // Initialize ckeditor and set event handlers
+        if (this.ckEditor.instances[this.id]) return
         this.$element.empty()
         this.$transcludeEl = $(`<textarea id="${this.id}"></textarea>`)
         this.$transcludeEl.val(this.ngModel)
@@ -387,7 +374,7 @@ export class EditorController implements angular.IComponentController {
         this.instance.on('change', (e) => this._waitForEditor(this.deb, e))
         this.instance.on('afterCommandExec', (e) => this._waitForEditor(this.deb, e))
         this.instance.on('resize', (e) => this._waitForEditor(this.deb, e))
-        this.instance.on('destroy', (e) => this._waitForEditor(this.deb, e))
+        this.instance.on('beforeDestroy', (e) => this._waitForEditor(this.deb, e))
         this.instance.on('blur', () =>
             this._waitForEditor(() => {
                 this.instance.focusManager.blur()

@@ -10,7 +10,6 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { veComponents } from '@ve-components'
 
 import { VePromise, VeQService } from '@ve-types/angular'
-import { ComponentController } from '@ve-types/components'
 import { IPresentationComponentOptions } from '@ve-types/components/presentation'
 import { PresentContentObject } from '@ve-types/mms'
 
@@ -28,7 +27,7 @@ const ViewPlotComponent: IPresentationComponentOptions = {
         element: '<',
         peNumber: '<',
     },
-    controller: class ViewPlotController extends Presentation implements ComponentController {
+    controller: class ViewPlotController extends Presentation {
         public plot: PresentPlotObject
         public plotConfig: PresentPlotObject
 

@@ -79,8 +79,6 @@ class PresentSectionController extends Presentation {
         this.section = this.element
 
         this.$element.on('click', (e) => {
-            //should not do anything if section is not an instancespec
-            if (this.startEdit) this.startEdit()
             if (this.view && this.mmsViewPresentationElemCtrl) this.mmsViewCtrl.transcludeClicked(this.section) //show instance spec if clicked
             e.stopPropagation()
         })

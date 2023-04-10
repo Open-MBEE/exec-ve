@@ -207,6 +207,25 @@ class RightPaneController implements IComponentController {
             }
         )
     }
+
+    public etrackerChange = (): void => {
+        this.specSvc.keepMode()
+        const id = this.specSvc.tracker.etrackerSelected
+        if (!id) return
+        const info = id.split('|')
+        this.specApi.elementId = info[0]
+        this.specApi.projectId = info[1]
+        this.specApi.refId = info[2]
+        this.specApi.commitId = 'latest'
+        this.toolbarSvc.waitForApi(this.toolbarId).then(
+            (api) => {
+                api.setPermission('spec-editor', true)
+            },
+            (reason) => {
+                this.growl.error(ToolbarService.error(reason))
+            }
+        )
+    }
 }
 
 const RightPaneComponent: VeComponentOptions = {

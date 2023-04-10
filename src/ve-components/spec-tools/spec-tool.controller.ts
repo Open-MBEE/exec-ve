@@ -16,7 +16,7 @@ import {
 
 import { SpecApi, SpecService } from './services/Spec.service'
 
-import { VePromise, VeQService } from '@ve-types/angular'
+import { VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
 import { EditingApi } from '@ve-types/core/editor'
 import { ElementObject, RefObject, ValueObject, ViewObject } from '@ve-types/mms'
@@ -293,9 +293,9 @@ export class SpecTool implements ISpecTool {
      *      or force save. If the user decides to discord or merge, type will be info even though
      *      the original save failed. Error means an actual error occured.
      */
-    public save(): VePromise<ElementObject> {
-        return this.componentSvc.save(this.edit, this.editorApi, this, false)
-    }
+    // public save(): VePromise<ElementObject> {
+    //     return this.componentSvc.save(this.edit, this.editorApi, this, false)
+    // }
 
     public hasHtml = (s: string): boolean => {
         return this.componentSvc.hasHtml(s)

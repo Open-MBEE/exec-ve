@@ -6,6 +6,7 @@ import { ViewController } from '@ve-components/presentations/view.component'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import { SpecTool } from '@ve-components/spec-tools'
 import { ButtonBarApi, ButtonBarService, IButtonBarButton } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
 import { ImageService, MathService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
@@ -200,6 +201,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         '$element',
         'growl',
         'ComponentService',
+        'EditorService',
         'ElementService',
         'UtilsService',
         'SchemaService',
@@ -217,6 +219,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         protected $element: JQuery<HTMLElement>,
         protected growl: angular.growl.IGrowlService,
         protected componentSvc: ComponentService,
+        protected editorSvc: EditorService,
         protected elementSvc: ElementService,
         protected utilsSvc: UtilsService,
         protected schemaSvc: SchemaService,
@@ -252,24 +255,25 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         if (this.editTemplate) {
             this.save = (e: JQuery.ClickEvent): void => {
                 if (e) e.stopPropagation()
-                this.componentSvc.saveAction(this, this.$element, false)
+                this.editorSvc.saveAction(this, this.$element, false)
             }
 
             this.saveC = (): void => {
-                this.componentSvc.saveAction(this, this.$element, true)
+                this.editorSvc.saveAction(this, this.$element, true)
             }
 
             this.cancel = (e?: JQuery.ClickEvent): void => {
                 if (e) e.stopPropagation()
-                this.componentSvc.cancelAction(this, this.recompile, this.$element)
+                this.editorSvc.cancelAction(this, this.recompile, this.$element)
             }
 
             this.startEdit = (): void => {
-                this.componentSvc.startEdit(this, this.editable(), this.$element, this.editTemplate, false)
+                //TODO: Add editor id creation and propagation
+                this.editorSvc.startEdit(this, this.editable(), this.$element, this.editTemplate, false)
             }
 
             this.preview = (): void => {
-                this.componentSvc.previewAction(this, this.recompile, this.$element)
+                this.editorSvc.previewAction(this, this.recompile, this.$element)
             }
         }
     }

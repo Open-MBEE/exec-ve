@@ -10,13 +10,11 @@ import { SchemaService } from '@ve-utils/model-schema'
 
 import { VePromise, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
-import { EditingApi, EditingToolbar } from '@ve-types/core/editor'
 import {
     ElementObject,
     InstanceSpecObject,
     InstanceValueObject,
     PresentationInstanceObject,
-    ValueObject,
     ViewObject,
 } from '@ve-types/mms'
 
@@ -32,7 +30,7 @@ export class PresentationLite {
     public peNumber: string
 }
 
-export class Presentation extends PresentationLite implements IPresentation, EditingToolbar {
+export class Presentation extends PresentationLite {
     //Bindings
     protected mmsProjectId: string
     protected mmsRefId: string
@@ -46,8 +44,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
 
     //Common
     //public element: ElementObject;
-    public edit: InstanceSpecObject
-    public editValues: ValueObject[]
     protected $transcludeEl: JQuery<HTMLElement>
     public view: ViewObject
     public projectId: string
@@ -56,27 +52,9 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
     public instanceVal: InstanceValueObject
     protected presentationElem: PresentationInstanceObject | ElementObject
     protected isDirectChildOfPresentationElement: boolean
-    instanceSpec: ElementObject
-    editorApi: EditingApi
-    values: ValueObject[]
 
     public number: string
     public level: number
-    public isEditing: boolean
-    public skipBroadcast: boolean
-    public inPreviewMode: boolean
-    public cleanUp
-    public elementSaving: boolean
-
-    //Default Toolbar Api
-    /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
-    cancel(e?): void {}
-    delete(e?): void {}
-    preview(e?): void {}
-    save(e?): void {}
-    saveC(e?): void {}
-    startEdit(e?): void {}
-    /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/no-unused-vars */
 
     private schema = 'cameo'
 
@@ -136,10 +114,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
         this.commitId = commitId ? commitId : 'latest'
 
         if (this.mmsViewCtrl && this.mmsViewPresentationElemCtrl) {
-            this.isEditing = false
-            this.inPreviewMode = false
-            this.elementSaving = false
-            this.cleanUp = false
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
             this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
             this.view = this.mmsViewCtrl.getView()
@@ -206,9 +180,6 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
      * This function is automatically triggered by the "element.updated" event.
      */
     protected recompile = (): void => {
-        this.isEditing = false
-        this.inPreviewMode = false
-
         this.setNumber()
         this.getContent().then(
             (result) => {

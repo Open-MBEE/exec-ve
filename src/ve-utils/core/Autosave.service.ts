@@ -5,7 +5,8 @@ import { EventService } from './Event.service'
 import { ElementObject } from '@ve-types/mms'
 
 export class AutosaveService {
-    private edits: { [key: string]: ElementObject } = {}
+    private edits: { [autosaveKey: string]: ElementObject } = {}
+
     public EVENT = 've-edits'
 
     static $inject = ['EventService']
@@ -42,6 +43,18 @@ export class AutosaveService {
         const keys = Object.keys(this.edits)
         for (let i = 0; i < keys.length; i++) {
             delete this.edits[keys[i]]
+        }
+    }
+
+    public clearAutosave = (autosaveKey: string, elementType: string): void => {
+        if (elementType === 'Slot') {
+            Object.keys(window.localStorage).forEach((key) => {
+                if (key.indexOf(autosaveKey) !== -1) {
+                    window.localStorage.removeItem(key)
+                }
+            })
+        } else {
+            window.localStorage.removeItem(autosaveKey)
         }
     }
 }
