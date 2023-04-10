@@ -143,6 +143,7 @@ export class Presentation extends PresentationLite implements IPresentation, Edi
             this.cleanUp = false
             this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
             this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
+            this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
             this.view = this.mmsViewCtrl.getView()
             const isOpaque = this.instanceSpec.classifierIds &&
                 this.instanceSpec.classifierIds.length > 0 &&
