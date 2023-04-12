@@ -19,7 +19,7 @@ import {
     ElementObject,
     InstanceSpecObject,
     InstanceValueObject,
-    PresentationInstanceObject,
+    PresentationInstanceObject, PresentTextObject,
     ValueObject,
     ViewObject,
 } from '@ve-types/mms'
@@ -239,16 +239,26 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         if (this.mmsViewCtrl) {
             this.view = this.mmsViewCtrl.getView()
             this.editable = this.mmsViewCtrl.isEditable
-            this.isDirectChildOfPresentationElement = this.componentSvc.isDirectChildOfPresentationElementFunc(
-                this.$element,
-                this.mmsViewCtrl
-            )
         }
-
         if (this.mmsSpecEditorCtrl && this.mmsSpecEditorCtrl.specApi.elementId === this.mmsElementId) {
             this.editable = (): boolean => this.mmsSpecEditorCtrl.specSvc.editable
         }
-
+        if (this.mmsViewPresentationElemCtrl) {
+            this.delete = (): void => {
+                this.componentSvc.deleteAction(this, this.bbApi, this.mmsViewPresentationElemCtrl.getParentSection())
+            }
+            this.instanceSpec = this.mmsViewPresentationElemCtrl.getInstanceSpec()
+            this.instanceVal = this.mmsViewPresentationElemCtrl.getInstanceVal()
+            this.presentationElem = this.mmsViewPresentationElemCtrl.getPresentationElement()
+            const isOpaque = this.instanceSpec.classifierIds &&
+                this.instanceSpec.classifierIds.length > 0 &&
+                this.schemaSvc
+                    .getMap<string[]>('OPAQUE_CLASSIFIERS', this.schema)
+                    .indexOf(this.instanceSpec.classifierIds[0]) >= 0
+            if (!isOpaque && this.mmsElementId === (this.presentationElem as PresentTextObject).source && this.mmsElementId === this.instanceSpec.id) {
+                this.isDirectChildOfPresentationElement = true
+            }
+        }
         if (this.editTemplate) {
             this.save = (e: JQuery.ClickEvent): void => {
                 if (e) e.stopPropagation()
