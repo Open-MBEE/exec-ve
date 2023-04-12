@@ -10,7 +10,7 @@ const PresentImageComponent: IPresentationComponentOptions = {
     <figure>
     <view-cf mms-cf-type="img" mms-element-id="{{$ctrl.peObject.id}}"></view-cf>
     <figcaption>
-        <span ng-if="!$ctrl.peObject.excludeFromList">Figure {{$ctrl.peNumber}}. 
+        <span ng-if="!$ctrl.peObject.excludeFromList">Figure {{$ctrl.element._veNumber}}. 
         </span>{{$ctrl.peObject.title || $ctrl.element.name}}
     </figcaption>
 </figure>

@@ -385,7 +385,7 @@ export const ViewComponent: VeComponentOptions = {
     <div id="{{$ctrl.mmsElementId}}" ng-class="{landscape: $ctrl.view._printLandscape}">
     <div ng-if="!$ctrl.noTitle">
         <h1 class="view-title h{{$ctrl.level}}">
-            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> 
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.view._veNumber}}</span> 
             <transclude-name mms-element-id="{{$ctrl.view.id}}" mms-project-id="{{$ctrl.view._projectId}}" mms-ref-id="{{$ctrl.view._refId}}" mms-watch-id="true"></transclude-name>
         </h1>
         <div ng-if="$ctrl.mmsLink" class="view-title">

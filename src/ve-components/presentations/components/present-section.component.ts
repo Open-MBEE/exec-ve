@@ -22,7 +22,7 @@ class PresentSectionController extends Presentation implements angular.IComponen
  <div ng-if="$ctrl.section.specification">
     <div ng-show="!$ctrl.isEditing">
         <h1 class="section-title h{{$ctrl.level}}">
-            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.number}}</span> {{$ctrl.section.name}}
+            <span class="ve-view-number" ng-show="$ctrl.showNumbering">{{$ctrl.section._veNumber}}</span> {{$ctrl.section.name}}
         </h1>
     </div>
     <div ng-class="{'panel panel-default' : $ctrl.isEditing}">
