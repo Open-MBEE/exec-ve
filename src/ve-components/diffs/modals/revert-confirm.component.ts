@@ -126,7 +126,7 @@ const RevertConfirmComponent: VeComponentOptions = {
     <b>{{$ctrl.revertData.compareCommit.commitSelected._creator}} - {{$ctrl.revertData.compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> on {{$ctrl.revertData.compareCommit.ref.type}}: <b>{{$ctrl.revertData.compareCommit.ref.name}}</b>
     to 
     <b>{{$ctrl.revertData.baseCommit.commitSelected._creator}} - {{$ctrl.revertData.baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b>
-    on {{$ctrl.revertData.baseCommit.re.type}}: <b>{{$ctrl.revertData.baseCommit.ref.name}}</b>.</p>
+    on {{$ctrl.revertData.baseCommit.ref.type}}: <b>{{$ctrl.revertData.baseCommit.ref.name}}</b>.</p>
     <p>This will create a new version under your username on <b>{{$ctrl.revertData.compareCommit.ref.name}}.</b></p>
     <p>Cross reference contents will NOT be reverted.</p>
 
