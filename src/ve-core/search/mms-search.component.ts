@@ -5,8 +5,8 @@ import { ButtonBarApi, ButtonBarService } from '@ve-core/button-bar'
 import { veCoreEvents } from '@ve-core/events'
 import { search_default_buttons } from '@ve-core/search/mms-search-buttons.config'
 import { UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
-import { CacheService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
+import { CacheService, EventService } from '@ve-utils/core'
+import { ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
 import { veCore } from '@ve-core'
@@ -23,8 +23,6 @@ import {
     ViewObject,
 } from '@ve-types/mms'
 import { VeSearchOptions } from '@ve-types/view-editor'
-
-//veCore.directive('mmsSearch', ['$window', '$anchorScroll', 'CacheService', 'ElementService', 'ProjectService', 'UtilsService', 'ViewService', 'growl', '$templateCache', '$timeout', mmsSearch]);
 
 export interface SearchQuery {
     searchText: string

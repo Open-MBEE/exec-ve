@@ -4,7 +4,7 @@ import { ComponentService } from '@ve-components/services'
 import { SpecService, SpecTool, ISpecTool } from '@ve-components/spec-tools'
 import { ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import {
     URLService,
     ElementService,
@@ -86,7 +86,7 @@ import { VeComponentOptions, VeQService } from '@ve-types/angular'
  */
 
 class SpecEditorController extends SpecTool implements ISpecTool {
-    static $inject = [...SpecTool.$inject, 'AutosaveService']
+    static $inject = [...SpecTool.$inject, 'EditService']
 
     constructor(
         $q: VeQService,
@@ -104,7 +104,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
         eventSvc: EventService,
         specSvc: SpecService,
         toolbarSvc: ToolbarService,
-        private autosaveSvc: AutosaveService
+        private autosaveSvc: EditService
     ) {
         super(
             $q,

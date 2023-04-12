@@ -1,6 +1,6 @@
 import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
 import { SaveConflictResolveFn } from '@ve-components/diffs'
-import { AutosaveService } from '@ve-utils/core'
+import { EditService } from '@ve-utils/core'
 
 import { veCore } from '@ve-core'
 
@@ -9,7 +9,7 @@ import { ElementObject } from '@ve-types/mms'
 import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 export class EditDialogService {
-    constructor(private $q: VeQService, private $uibModal: VeModalService, private autosaveSvc: AutosaveService) {}
+    constructor(private $q: VeQService, private $uibModal: VeModalService, private autosaveSvc: EditService) {}
 
     saveConflictDialog<T extends ElementObject>(latest: T): VeModalInstanceService<string> {
         return this.$uibModal.open<SaveConflictResolveFn<T>, string>({

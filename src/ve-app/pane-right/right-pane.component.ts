@@ -7,7 +7,7 @@ import { veAppEvents } from '@ve-app/events'
 import { SpecApi, SpecService } from '@ve-components/spec-tools'
 import { ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { ElementService, PermissionsService, ProjectService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
@@ -52,7 +52,7 @@ class RightPaneController implements IComponentController {
         'PermissionsService',
         'RootScopeService',
         'EventService',
-        'AutosaveService',
+        'EditService',
         'ToolbarService',
         'SpecService',
     ]
@@ -72,7 +72,7 @@ class RightPaneController implements IComponentController {
         private permissionsSvc: PermissionsService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
         private toolbarSvc: ToolbarService,
         private specSvc: SpecService
     ) {}

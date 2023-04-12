@@ -1,4 +1,4 @@
-import { CacheService } from '@ve-utils/mms-api-client/Cache.service'
+import { CacheService } from '@ve-utils/core'
 import { URLService } from '@ve-utils/mms-api-client/URL.service'
 
 import { veUtils } from '@ve-utils'

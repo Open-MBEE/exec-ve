@@ -1,7 +1,8 @@
 import { UtilsService } from '@ve-utils/application/Utils.service'
-import { CacheService, ElementService, URLService } from '@ve-utils/mms-api-client'
+import { ElementService, URLService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
+import { CacheService } from '@ve-utils/core'
 
 export class PlotService {
     constructor(

@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 import { veUtils } from '@ve-utils'
 
-import { MmsObject } from '@ve-types/mms'
+import { ElementObject, MmsObject } from '@ve-types/mms'
 
 export class CacheService {
     public cache: { [key: string]: string | unknown | unknown[] } = {}
@@ -67,7 +67,6 @@ export class CacheService {
         return latestElements
     }
 
-    type
     /**
      * @name CacheService#put
      * Put value into cache
@@ -82,17 +81,14 @@ export class CacheService {
         const realKey = this._makeKey(key)
         let currentValue: T = this.get<T>(realKey, true)
         if (currentValue && m) {
-            _.mergeWith(currentValue, value, (a: any, b: any, id: string) => {
-                if (
-                    (id === '_contents' || id === 'specification') &&
-                    b && b.type === 'Expression'
-                ) {
+            _.mergeWith(currentValue, value, (a: unknown, b: unknown, id: string) => {
+                if ((id === '_contents' || id === 'specification') && b && (b as ElementObject).type === 'Expression') {
                     return b
                 }
                 if (Array.isArray(a) && Array.isArray(b) && b.length < a.length) {
                     a.length = 0
-                    a.push(...b)
-                    return a
+                    a.push(...(b as unknown[]))
+                    return a as unknown[]
                 }
                 if (id === '_displayedElementIds' && b) {
                     return b

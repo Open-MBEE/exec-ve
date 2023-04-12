@@ -6,7 +6,7 @@ import { EditDialogService } from '@ve-core/editor/services/EditDialog.service'
 import { veCoreEvents } from '@ve-core/events'
 import { IToolBarButton, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { ElementService, ProjectService, PermissionsService } from '@ve-utils/mms-api-client'
 
 import { veComponents } from '@ve-components'
@@ -133,7 +133,7 @@ class ToolsController implements ComponentController {
         'PermissionsService',
         'RootScopeService',
         'EventService',
-        'AutosaveService',
+        'EditService',
         'EditorService',
         'EditDialogService',
         'ToolbarService',
@@ -156,7 +156,7 @@ class ToolsController implements ComponentController {
         private permissionsSvc: PermissionsService,
         private rootScopeSvc: RootScopeService,
         private eventSvc: EventService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
         private editorSvc: EditorService,
         private editdialogSvc: EditDialogService,
         private toolbarSvc: ToolbarService,
@@ -292,7 +292,7 @@ class ToolsController implements ComponentController {
                         this.specSvc.cleanUpSaveAll(this.toolbarId)
                     }
                 }
-                if (this.specSvc.hasEdits()) {
+                if (this.editorSvc.hasEdits(this.edit)) {
                     const ve_edit: ElementObject = this.specSvc.getEdits()
                     const deleteOb = {
                         type: ve_edit.type,

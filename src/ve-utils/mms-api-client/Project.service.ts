@@ -1,4 +1,4 @@
-import { ApiService, CacheService, ElementService, URLService } from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, URLService } from '@ve-utils/mms-api-client'
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 
 import { veUtils } from '@ve-utils'
@@ -18,6 +18,7 @@ import {
     RefObject,
     RefsResponse,
 } from '@ve-types/mms'
+import { CacheService } from '@ve-utils/core'
 
 /**
  * @ngdoc service
@@ -417,17 +418,20 @@ export class ProjectService extends BaseApiService {
                         this._removeInProgress(url)
                         resolve(cached)
                     } else {
-                        this.$http.get<RefsResponse>(url).then(
-                            (response) => {
-                                this.cacheSvc.put<RefObject>(cacheKey, response.data.refs[0])
-                                resolve(this.cacheSvc.get<RefObject>(cacheKey))
-                            },
-                            (response: angular.IHttpResponse<RefsResponse>) => {
-                                this.apiSvc.handleErrorCallback(response, reject)
-                            }
-                        ).finally(() => {
-                            this._removeInProgress(url)
-                        })
+                        this.$http
+                            .get<RefsResponse>(url)
+                            .then(
+                                (response) => {
+                                    this.cacheSvc.put<RefObject>(cacheKey, response.data.refs[0])
+                                    resolve(this.cacheSvc.get<RefObject>(cacheKey))
+                                },
+                                (response: angular.IHttpResponse<RefsResponse>) => {
+                                    this.apiSvc.handleErrorCallback(response, reject)
+                                }
+                            )
+                            .finally(() => {
+                                this._removeInProgress(url)
+                            })
                     }
                 })
             )

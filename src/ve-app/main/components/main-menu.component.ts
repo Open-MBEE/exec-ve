@@ -3,7 +3,6 @@ import angular, { IComponentController } from 'angular'
 
 import { ApplicationService, RootScopeService, UtilsService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
-import { CacheService } from '@ve-utils/mms-api-client'
 import { onChangesCallback } from '@ve-utils/utils'
 
 import { veApp } from '@ve-app'
@@ -60,7 +59,6 @@ class MenuController implements IComponentController {
         '$timeout',
         '$element',
         'ApplicationService',
-        'CacheService',
         'UtilsService',
         'RootScopeService',
         'EventService',
@@ -73,7 +71,6 @@ class MenuController implements IComponentController {
         private $timeout: angular.ITimeoutService,
         private $element: JQuery<HTMLElement>,
         private applicationSvc: ApplicationService,
-        private cacheSvc: CacheService,
         private utilsSvc: UtilsService,
         private rootScopeSvc: RootScopeService,
         public eventSvc: EventService
@@ -231,7 +228,11 @@ class MenuController implements IComponentController {
     }
 
     refsView(): void {
-        void this.$state.go('main.project.ref.refs', { projectId: this.params.projectId, refId: this.params.refId }, { reload: true })
+        void this.$state.go(
+            'main.project.ref.refs',
+            { projectId: this.params.projectId, refId: this.params.refId },
+            { reload: true }
+        )
     }
 
     goHome(): void {

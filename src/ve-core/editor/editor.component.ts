@@ -5,16 +5,15 @@ import { InsertTransclusionData } from '@ve-components/transclusions'
 import { MentionService } from '@ve-core/editor'
 import { EditorService } from '@ve-core/editor/services/Editor.service'
 import { ImageService } from '@ve-utils/application'
-import { ApiService, CacheService, ElementService, URLService, ViewService } from '@ve-utils/mms-api-client'
+import { ApiService, ElementService, URLService, ViewService } from '@ve-utils/mms-api-client'
 
 import { veCore } from '@ve-core'
 
 import eventDataTypes = CKEDITOR.eventDataTypes
 
-import { VeComponentOptions, VeNgModelController, VeQService } from '@ve-types/angular'
+import { VeComponentOptions, VeNgModelController, VePromise, VeQService } from '@ve-types/angular'
 import { InsertData, InsertResolveFn } from '@ve-types/components'
 import { VeConfig } from '@ve-types/config'
-import { EditingApi } from '@ve-types/core/editor'
 import { ElementObject, ElementsResponse, TransclusionObject } from '@ve-types/mms'
 import { VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
@@ -54,7 +53,6 @@ export class EditorController implements angular.IComponentController {
     mmsRefId: string
     private mmsEditorType: string
     private autosaveKey: string
-    private mmsEditorApi: EditingApi
 
     private stylesToolbar = {
         name: 'styles',
@@ -98,6 +96,8 @@ export class EditorController implements angular.IComponentController {
             'mmsExtraFeature',
         ],
     }
+    private tableEquationToolbar = { name: 'tableEquation', items: ['Table', 'Mathjax', 'SpecialChar', '-'] }
+
     private extrasToolbar = { name: 'extras', items: ['mmsExtraFeature'] }
 
     protected $transcludeEl: JQuery<HTMLElement>
@@ -118,7 +118,6 @@ export class EditorController implements angular.IComponentController {
         '$scope',
         '$uibModal',
         'growl',
-        'CacheService',
         'ElementService',
         'ApiService',
         'ViewService',
@@ -138,7 +137,6 @@ export class EditorController implements angular.IComponentController {
      * @param {angular.ITimeoutService} $timeout
      * @param {angular.IScope} $scope
      * @param {angular.growl.IGrowlService} growl
-     * @param {CacheService} cacheSvc
      * @param {ElementService} elementSvc
      * @param {ApiService} apiSvc
      * @param {ViewService} viewSvc
@@ -156,7 +154,6 @@ export class EditorController implements angular.IComponentController {
         private $scope: angular.IScope,
         private $uibModal: VeModalService,
         private growl: angular.growl.IGrowlService,
-        private cacheSvc: CacheService,
         private elementSvc: ElementService,
         private apiSvc: ApiService,
         private viewSvc: ViewService,
@@ -175,21 +172,15 @@ export class EditorController implements angular.IComponentController {
     $onChanges(onChangesObj: angular.IOnChangesObject): void {
         if (onChangesObj.ngModel && !this.init) {
             this.init = true
-            this.editorSvc.add(this.autosaveKey)
-            this.id = this.editorSvc.getId(this.autosaveKey)
+
+            this.id = this.editorSvc.createId(this.autosaveKey + '-' + this.mmsEditorType)
+            this.editorSvc.add(this.autosaveKey, this.id, this)
             this.startEditor()
         }
     }
 
     $onDestroy(): void {
-        if (!this.instance) {
-            this.instance = this.ckEditor.instances[this.id]
-        }
-        this.mentionSvc.removeAllMentionForEditor(this.instance)
-        if (this.instance) {
-            this.instance.destroy()
-            this.instance = null
-        }
+        this.editorSvc.remove(this.autosaveKey, this.id)
     }
 
     public startEditor(): void {
@@ -226,14 +217,6 @@ export class EditorController implements angular.IComponentController {
 
             this._addInlineMention()
 
-            if (this.mmsEditorApi) {
-                this.mmsEditorApi.save = (): angular.IPromise<boolean> => {
-                    return this.update()
-                }
-                this.mmsEditorApi.cancel = (): angular.IPromise<boolean> => {
-                    return this.update()
-                }
-            }
             addCkeditorHtmlFilterRule(this.instance)
             this._addContextMenuItems(this.instance)
             highlightActiveEditor(this.instance)
@@ -481,9 +464,19 @@ export class EditorController implements angular.IComponentController {
             this.sourceToolbar,
         ]
         switch (this.mmsEditorType) {
-            case 'TableT':
-                //thisToolbar = [stylesToolbar, basicStylesToolbar, justifyToolbar, linksToolbar, tableEquationToolbar, dropdownToolbar, clipboardToolbar, editingToolbar, sourceToolbar];
-                break
+            // case 'TableT':
+            //     thisToolbar = [
+            //         this.stylesToolbar,
+            //         this.basicStylesToolbar,
+            //         this.justifyToolbar,
+            //         this.linksToolbar,
+            //         this.tableEquationToolbar,
+            //         dropdownToolbar,
+            //         this.clipboardToolbar,
+            //         this.editingToolbar,
+            //         this.sourceToolbar,
+            //     ]
+            //     break
             case 'ListT':
                 thisToolbar = [
                     this.stylesToolbar,
@@ -632,36 +625,24 @@ export class EditorController implements angular.IComponentController {
             const value = node.$
             const transclusionObject = angular.element(value)
             const transclusionId = transclusionObject.attr('mms-element-id')
-            const transclusionKey = this.apiSvc.makeCacheKey(
-                {
-                    projectId: this.mmsProjectId,
-                    refId: this.mmsRefId,
-                },
-                transclusionId,
-                false
-            )
-            const inCache: ElementObject = this.cacheSvc.get<ElementObject>(transclusionKey)
-            if (inCache) {
-                transclusionObject.html(`[cf:${inCache.name}${typeString}`)
-            } else {
-                //TODO create Utils function to handle request objects
-                const reqOb = {
-                    elementId: transclusionId,
-                    projectId: this.mmsProjectId,
-                    refId: this.mmsRefId,
-                }
-                this.elementSvc.getElement(reqOb, 2).then(
-                    (data) => {
-                        transclusionObject.html('[cf:' + data.name + typeString)
-                    },
-                    (reason) => {
-                        let error: string
-                        if (reason.status === 410) error = 'deleted'
-                        if (reason.status === 404) error = 'not found'
-                        transclusionObject.html('[cf:' + error + typeString)
-                    }
-                )
+
+            //TODO create Utils function to handle request objects
+            const reqOb = {
+                elementId: transclusionId,
+                projectId: this.mmsProjectId,
+                refId: this.mmsRefId,
             }
+            this.elementSvc.getElement(reqOb, 2).then(
+                (data) => {
+                    transclusionObject.html('[cf:' + data.name + typeString)
+                },
+                (reason) => {
+                    let error: string
+                    if (reason.status === 410) error = 'deleted'
+                    if (reason.status === 404) error = 'not found'
+                    transclusionObject.html('[cf:' + error + typeString)
+                }
+            )
         })
     }
 
@@ -681,10 +662,22 @@ export class EditorController implements angular.IComponentController {
         )
     }
 
-    public update = (): angular.IPromise<boolean> => {
+    public update = (): VePromise<void, string> => {
         // getData() returns CKEditor's processed/clean HTML content.
-        if (this.instance) this.ngModelCtrl.$setViewValue(this.instance.getData())
-        return this.$q.resolve<boolean>(true)
+        return new this.$q((resolve, reject) => {
+            if (this.instance) {
+                try {
+                    this.ngModelCtrl.$setViewValue(this.instance.getData())
+                } catch (e) {
+                    reject({
+                        status: 500,
+                        message: 'Error updating editor data',
+                        data: this.id,
+                    })
+                }
+            }
+            resolve()
+        })
     }
 
     private _addWidgetTag = (tag: string, editor: CKEDITOR.editor): void => {
@@ -814,7 +807,7 @@ const EditorComponent: VeComponentOptions = {
         mmsRefId: '@',
         autosaveKey: '@',
         mmsEditorType: '@',
-        mmsEditorApi: '<?',
+        field: '<',
     },
     controller: EditorController,
 }

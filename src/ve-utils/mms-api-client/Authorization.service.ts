@@ -1,12 +1,5 @@
-import { AutosaveService, SessionService } from '@ve-utils/core'
-import {
-    CacheService,
-    ElementService,
-    HttpService,
-    ProjectService,
-    URLService,
-    ViewService,
-} from '@ve-utils/mms-api-client'
+import { CacheService, EditService, SessionService } from '@ve-utils/core'
+import { ElementService, HttpService, ProjectService, URLService, ViewService } from '@ve-utils/mms-api-client'
 
 import { veUtils } from '@ve-utils'
 
@@ -37,7 +30,7 @@ export class AuthService {
         'ViewService',
         'ProjectService',
         'SessionService',
-        'AutosaveService',
+        'EditService',
     ]
     constructor(
         private $q: VeQService,
@@ -49,7 +42,7 @@ export class AuthService {
         private viewSvc: ViewService,
         private projectSvc: ProjectService,
         private sessionSvc: SessionService,
-        private autosaveSvc: AutosaveService
+        private autosaveSvc: EditService
     ) {
         this.token = localStorage.getItem('token')
     }

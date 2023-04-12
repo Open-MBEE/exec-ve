@@ -1,7 +1,7 @@
 import { ComponentService } from '@ve-components/services'
 import { ToolbarService } from '@ve-core/toolbar'
 import { UtilsService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import {
     ApiService,
     AuthService,
@@ -68,7 +68,7 @@ export class SpecService implements angular.Injectable<any> {
         'ViewService',
         'EventService',
         'ToolbarService',
-        'AutosaveService',
+        'EditService',
         'ComponentService',
         'URLService',
         'AuthService',
@@ -89,7 +89,7 @@ export class SpecService implements angular.Injectable<any> {
         private viewSvc: ViewService,
         private eventSvc: EventService,
         private toolbarSvc: ToolbarService,
-        private autosaveSvc: AutosaveService,
+        private autosaveSvc: EditService,
         private componentSvc: ComponentService,
         private uRLSvc: URLService,
         private authSvc: AuthService,
@@ -362,18 +362,6 @@ export class SpecService implements angular.Injectable<any> {
             .finally(() => {
                 this.gettingSpec = false
             })
-    }
-
-    /**
-     * @name Spec.service:SpecApi#hasEdits
-     * whether editor object has changes compared to base element,
-     * currently compares name, doc, property values, if element is not
-     * editable, returns false
-     *
-     * @return {boolean} has changes or not
-     */
-    public hasEdits = (): boolean => {
-        return this.componentSvc.hasEdits(this.edit)
     }
 
     public setEditValues<T extends ValueObject>(values: T[]): void {

@@ -139,6 +139,7 @@ export class Presentation extends PresentationLite {
                         elementOb._refId === this.element._refId &&
                         !continueEdit
                     ) {
+                        this.element = elementOb
                         this.recompile()
                     }
                 })

@@ -5,7 +5,7 @@ import Rx from 'rx-lite'
 import { ExtensionService } from '@ve-components/services'
 import { IToolBarButton, ToolbarApi, ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
-import { AutosaveService, EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { PermissionsService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
@@ -29,7 +29,7 @@ const LeftToolbarComponent: VeComponentOptions = {
             '$state',
             'ExtensionService',
             'PermissionsService',
-            'AutosaveService',
+            'EditService',
             'EventService',
             'ToolbarService',
             'RootScopeService',
@@ -53,7 +53,7 @@ const LeftToolbarComponent: VeComponentOptions = {
             public $state: StateService,
             public extensionSvc: ExtensionService,
             private permissionsSvc: PermissionsService,
-            private autosaveSvc: AutosaveService,
+            private autosaveSvc: EditService,
             private eventSvc: EventService,
             private toolbarSvc: ToolbarService,
             private rootScopeSvc: RootScopeService

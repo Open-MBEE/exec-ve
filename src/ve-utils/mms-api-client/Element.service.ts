@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-import { ApiService, CacheService, httpCallback, HttpService, URLService } from '@ve-utils/mms-api-client'
+import { ApiService, httpCallback, HttpService, URLService } from '@ve-utils/mms-api-client'
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 
 import { veUtils } from '@ve-utils'
@@ -21,6 +21,7 @@ import {
     SearchResponse,
     TaggedValueObject,
 } from '@ve-types/mms'
+import { CacheService, EditService } from '@ve-utils/core'
 
 /**
  * @ngdoc service
@@ -34,14 +35,15 @@ import {
  * * An element CRUD service with additional convenience methods for managing edits.
  */
 export class ElementService extends BaseApiService {
-    static $inject = ['$q', '$http', 'URLService', 'ApiService', 'CacheService', 'HttpService']
+    static $inject = ['$q', '$http', 'CacheService', 'EditService', 'URLService', 'ApiService', 'HttpService']
 
     constructor(
         private $q: VeQService,
         private $http: angular.IHttpService,
+        private cacheSvc: CacheService,
+        private editSvc: EditService,
         private uRLSvc: URLService,
         private apiSvc: ApiService,
-        private cacheSvc: CacheService,
         private httpSvc: HttpService
     ) {
         super()
@@ -309,19 +311,15 @@ export class ElementService extends BaseApiService {
      *      references to the same object. This object can be edited without
      *      affecting the same element object that's used for displays
      */
-    getElementForEdit<T extends ElementObject>(
-        reqOb: ElementsRequest<string>,
-        weight?: number,
-        refresh?: boolean
-    ): VePromise<T> {
+    getElementForEdit<T extends ElementObject>(reqOb: ElementsRequest<string>, weight?: number): VePromise<T> {
         this.apiSvc.normalize(reqOb)
         const requestCacheKey = this.getElementKey(reqOb, reqOb.elementId, true)
         const url = this.uRLSvc.getElementURL(reqOb) + 'edit'
         if (this._isInProgress(url)) {
             return this._getInProgress(url) as VePromise<T>
         }
-        const cached = this.cacheSvc.get<T>(requestCacheKey)
-        if (cached && !refresh) {
+        const cached = this.editSvc.get<T>(requestCacheKey)
+        if (cached) {
             return new this.$q<T>((resolve, reject) => {
                 return resolve(cached)
             })
@@ -330,7 +328,7 @@ export class ElementService extends BaseApiService {
             this._addInProgress(
                 url,
                 new this.$q<T>((resolve, reject) => {
-                    this.getElement<T>(reqOb, weight, refresh)
+                    this.getElement<T>(reqOb, weight, false)
                         .then(
                             (result) => {
                                 const copy = _.cloneDeep(result)
@@ -952,6 +950,12 @@ export class ElementService extends BaseApiService {
 
     public getElementKey(reqOb: RequestObject, id: string, edit?: boolean): string[] {
         return this.apiSvc.makeCacheKey(reqOb, id, edit)
+    }
+
+    public getElementRequest(elementOb: ElementObject): ElementsRequest<string> {
+        const req = this.apiSvc.makeRequestObject(elementOb)
+        ;(req as ElementsRequest<string>).elementId = elementOb.id
+        return req as ElementsRequest<string>
     }
 
     public getElementQualifiedName(reqOb: ElementsRequest<string>): VePromise<string, SearchResponse<ElementObject>> {

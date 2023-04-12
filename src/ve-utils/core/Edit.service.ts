@@ -4,8 +4,8 @@ import { EventService } from './Event.service'
 
 import { ElementObject } from '@ve-types/mms'
 
-export class AutosaveService {
-    private edits: { [autosaveKey: string]: ElementObject } = {}
+export class EditService {
+    private edits: { [editKey: string]: ElementObject } = {}
 
     public EVENT = 've-edits'
 
@@ -17,7 +17,8 @@ export class AutosaveService {
         this.eventSvc.$broadcast(this.EVENT)
     }
 
-    get<T extends ElementObject>(key: string): T {
+    get<T extends ElementObject>(key: string | string[]): T {
+        key = this._makeKey(key)
         return this.edits[key] as T
     }
 
@@ -29,15 +30,19 @@ export class AutosaveService {
         return Object.keys(this.edits).length
     }
 
-    addOrUpdate = (key: string, value: ElementObject): void => {
+    addOrUpdate = (key: string | string[], value: ElementObject): void => {
+        key = this._makeKey(key)
         this.edits[key] = value
         this.trigger()
     }
 
-    remove = (key: string): void => {
+    remove = (key: string | string[]): void => {
+        key = this._makeKey(key)
         delete this.edits[key]
         this.trigger()
     }
+
+    // getKey<T extends ElementObject>(): string {}
 
     reset = (): void => {
         const keys = Object.keys(this.edits)
@@ -57,6 +62,13 @@ export class AutosaveService {
             window.localStorage.removeItem(autosaveKey)
         }
     }
-}
 
-veUtils.service('AutosaveService', AutosaveService)
+    private _makeKey(keys: string | string[]): string {
+        if (Array.isArray(keys)) {
+            return keys.join('|')
+        } else {
+            return keys
+        }
+    }
+}
+veUtils.service('EditService', EditService)

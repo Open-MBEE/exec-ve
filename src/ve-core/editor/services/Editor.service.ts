@@ -2,30 +2,23 @@ import $ from 'jquery'
 import _ from 'lodash'
 
 import { ButtonBarApi } from '@ve-core/button-bar'
+import { EditorController } from '@ve-core/editor/editor.component'
 import { EditDialogService } from '@ve-core/editor/services/EditDialog.service'
 import { ToolbarService } from '@ve-core/toolbar'
-import { AutosaveService, EventService } from '@ve-utils/core'
-import { ApiService, CacheService, ElementService, PermissionsService, ViewService } from '@ve-utils/mms-api-client'
+import { CacheService, EditService, EventService } from '@ve-utils/core'
+import { ApiService, ElementService, PermissionsService, ViewService } from '@ve-utils/mms-api-client'
 import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 
 import { veCore } from '@ve-core'
 
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
-import {
-    ConstraintObject,
-    ElementObject,
-    ElementsResponse,
-    SlotObject,
-    TaggedValueObject,
-    ValueObject,
-    ViewObject,
-} from '@ve-types/mms'
+import { ConstraintObject, ElementObject, ElementsResponse, SlotObject, ValueObject, ViewObject } from '@ve-types/mms'
 
 export class EditorService {
     public generatedIds: number = 0
     private ckEditor = window.CKEDITOR
-    private edit2editor: { [autosaveKey: string]: string }
+    private edit2editor: { [autosaveKey: string]: { [editorId: string]: EditorController } }
     public savingAll: boolean = false
 
     constructor(
@@ -40,50 +33,60 @@ export class EditorService {
         private toolbarSvc: ToolbarService,
         private editdialogSvc: EditDialogService,
         private eventSvc: EventService,
-        private autosaveSvc: AutosaveService
+        private autosaveSvc: EditService
     ) {}
 
-    public get(autosaveKey: string): CKEDITOR.editor {
-        if (this.edit2editor[autosaveKey]) return this.ckEditor.instances[this.edit2editor[autosaveKey]]
+    public get(autosaveKey: string): { [editorId: string]: EditorController } {
+        return this.edit2editor[autosaveKey]
     }
 
-    public getData(autosaveKey: string): string {
-        if (this.edit2editor[autosaveKey]) return this.ckEditor.instances[autosaveKey].getData()
+    public updateAllData(autosaveKey: string): VePromise<void, string> {
+        return new this.$q<void, string>((resolve, reject) => {
+            if (this.edit2editor[autosaveKey]) {
+                const promises: VePromise<void, string>[] = []
+                for (const id of Object.keys(this.edit2editor[autosaveKey])) {
+                    promises.push(this.edit2editor[autosaveKey][id].update())
+                }
+                this.$q.all(promises).then(resolve, reject)
+            } else {
+                reject({ status: 500, message: 'No editors present to update from' })
+            }
+        })
     }
 
-    public add(autosaveKey: string, editorId: string): void {
-        this.edit2editor[autosaveKey] = editorId
+    public add(autosaveKey: string, editorId: string, ctrl: EditorController): void {
+        if (!this.edit2editor[autosaveKey]) this.edit2editor[autosaveKey] = {}
+        this.edit2editor[autosaveKey][editorId] = ctrl
     }
 
-    public remove(autosaveKey: string): void {
-        if (this.edit2editor[autosaveKey]) this.ckEditor.instances[this.edit2editor[autosaveKey]].destroy()
-        this.edit2editor[autosaveKey]
+    public remove(autosaveKey: string, editorId: string): void {
+        if (this.edit2editor[autosaveKey] && this.edit2editor[autosaveKey][editorId]) {
+            this.ckEditor.instances[editorId].destroy()
+            delete this.edit2editor[autosaveKey][editorId]
+            if (Object.keys(this.edit2editor[autosaveKey]).length === 0) {
+                delete this.edit2editor[autosaveKey]
+            }
+        }
     }
 
-    public getId(autosaveKey: string, field?: string): string {
+    public createId(autosaveKey: string, field?: string): string {
         let id = autosaveKey
         if (field) id = `${id}-${field}`
-        if (this.ckEditor.instances[id]) id = `${id}-${this.generatedIds++}`
+        if (Object.keys(this.ckEditor.instances)) id = `${id}-${this.generatedIds++}`
 
         return id
-    }
-    public getAll(): { [autosaveKey: string]: CKEDITOR.editor } {
-        return this.ckEditor.instances
     }
     public focusOnEditorAfterAddingWidgetTag(editor: CKEDITOR.editor): void {
         const element = editor.widgets.focused.element.getParent()
         editor.focusManager.focus(element)
     }
 
-    public save = (
-        saveEdit: ElementObject,
-        continueEdit: boolean
-    ): VePromise<void, ElementsResponse<ElementObject>> => {
+    public save = (autosaveKey: string, continueEdit: boolean): VePromise<void, ElementsResponse<ElementObject>> => {
         this.eventSvc.$broadcast('element-saving', true)
         const autoSaveKey = saveEdit._projectId + saveEdit._refId + saveEdit.id
         this.autosaveSvc.clearAutosave(autoSaveKey, saveEdit.type)
         return new this.$q((resolve, reject) => {
-            this.save2(autoSaveKey).then(
+            this._save(autoSaveKey, continueEdit).then(
                 (data) => {
                     this.eventSvc.$broadcast('element-saving', false)
                     if (!data) {
@@ -137,9 +140,7 @@ export class EditorService {
      * @name Utils#save
      * save edited element
      *
-     * @param {ElementObject} edit the edit object to save
-     * @param {EditingApi} [editorApi=null] optional editor api
-     * @param {ComponentController} ctrl angular scope that has common functions
+     * @param {string} editKey The autosave key that points to the object being saved
      * @param continueEdit
      * @return {Promise} promise would be resolved with updated element if save is successful.
      *      For unsuccessful saves, it will be rejected with an object with type and message.
@@ -147,82 +148,75 @@ export class EditorService {
      *      or force save. If the user decides to discord or merge, type will be info even though
      *      the original save failed. Error means an actual error occurred.
      */
-    public save2<T extends ElementObject>(editKey: string, continueEdit: boolean): VePromise<T> {
-        const deferred = this.$q.defer<T>()
-        this.updateEditor(ctrl).then(
-            (success) => {
-                if (!success) {
-                    this.handleError({
-                        message: 'Problem Saving from Editor',
-                        type: 'warning',
+    private _save<T extends ElementObject>(editKey: string, continueEdit?: boolean): VePromise<T> {
+        return new this.$q<T>((resolve, reject) => {
+            this.updateAllData(editKey).then(
+                () => {
+                    const edit = this.autosaveSvc.get(editKey)
+                    this.elementSvc.updateElement(edit, false, true).then(
+                        (element: T) => {
+                            resolve(element)
+                            const data = {
+                                element: element,
+                                continueEdit: continueEdit ? continueEdit : false,
+                            }
+                            this.eventSvc.$broadcast('element.updated', data)
+                            if (continueEdit) return
+                            this.autosaveSvc.remove(editKey)
+                        },
+                        (reason: VePromiseReason<ElementsResponse<T>>) => {
+                            if (reason.status === 409) {
+                                const latest = reason.data.elements[0]
+                                this.editdialogSvc.saveConflictDialog(latest).result.then(
+                                    (data) => {
+                                        const choice = data
+                                        if (choice === 'ok') {
+                                            const reqOb = {
+                                                elementId: latest.id,
+                                                projectId: latest._projectId,
+                                                refId: latest._refId,
+                                                commitId: 'latest',
+                                            }
+                                            this.elementSvc.cacheElement(reqOb, latest, true)
+                                            this.elementSvc.cacheElement(reqOb, latest, false)
+                                        } else if (choice === 'force') {
+                                            edit._modified = latest._modified
+                                            this._save<T>(editKey, continueEdit).then(
+                                                (resolved) => {
+                                                    resolve(resolved)
+                                                },
+                                                (error) => {
+                                                    reject(error)
+                                                }
+                                            )
+                                        } else {
+                                            reject({ status: 444, type: 'info', message: 'Save cancelled!' })
+                                        }
+                                    },
+                                    () => {
+                                        reject({
+                                            status: 500,
+                                            message: 'An error occurred. Please try your request again',
+                                            type: 'error',
+                                        })
+                                    }
+                                )
+                            } else {
+                                reason.type = 'error'
+                                reject(reason)
+                            }
+                        }
+                    )
+                },
+                () => {
+                    reject({
+                        status: 500,
+                        message: 'Error Saving from Editor; Please Retry',
+                        type: 'error',
                     })
                 }
-                this.elementSvc.updateElement(edit, false, true).then(
-                    (element: T) => {
-                        deferred.resolve(element)
-
-                        ctrl.values = this.valueSvc.setupValCf(ctrl.element)
-                        const data = {
-                            element: element,
-                            continueEdit: continueEdit ? continueEdit : false,
-                        }
-                        this.eventSvc.$broadcast('element.updated', data)
-                        if (continueEdit) return
-                        const key = edit.id + '|' + edit._projectId + '|' + edit._refId
-                        this.autosaveSvc.remove(key)
-                    },
-                    (reason: VePromiseReason<ElementsResponse<T>>) => {
-                        if (reason.status === 409) {
-                            const latest = reason.data.elements[0]
-                            const instance = this.editdialogSvc.saveConflictDialog(latest).result.then(
-                                (data) => {
-                                    const choice = data
-                                    if (choice === 'ok') {
-                                        const reqOb = {
-                                            elementId: latest.id,
-                                            projectId: latest._projectId,
-                                            refId: latest._refId,
-                                            commitId: 'latest',
-                                        }
-                                        this.elementSvc.cacheElement(reqOb, latest, true)
-                                        this.elementSvc.cacheElement(reqOb, latest, false)
-                                    } else if (choice === 'force') {
-                                        edit._modified = latest._modified
-                                        this.save2(edit, editorApi, ctrl, continueEdit).then(
-                                            (resolved) => {
-                                                deferred.resolve(resolved)
-                                            },
-                                            (error) => {
-                                                deferred.reject(error)
-                                            }
-                                        )
-                                    } else {
-                                        deferred.reject({ type: 'cancel' })
-                                    }
-                                },
-                                () => {
-                                    this.handleError({
-                                        message: 'An error occurred. Please try your request again',
-                                        type: 'error',
-                                    })
-                                }
-                            )
-                        } else {
-                            reason.type = 'error'
-                            deferred.reject(reason)
-                        }
-                    }
-                )
-            },
-            () => {
-                this.handleError({
-                    message: 'Error Saving from Editor; Please Retry',
-                    type: 'error',
-                })
-            }
-        )
-
-        return deferred.promise
+            )
+        })
     }
 
     /**
@@ -236,25 +230,30 @@ export class EditorService {
      */
     public hasEdits = (editOb: ElementObject): boolean => {
         editOb._commitId = 'latest'
-        const cachedKey = this.apiSvc.makeCacheKey(this.apiSvc.makeRequestObject(editOb), editOb.id, false)
-        const elementOb: ElementObject = this.cacheSvc.get<ElementObject>(cachedKey)
-        if (editOb.name !== elementOb.name) {
-            return true
-        }
-        if (editOb.documentation !== elementOb.documentation) {
-            return true
-        }
-        if (
-            (editOb.type === 'Property' || editOb.type === 'Port') &&
-            !_.isEqual(editOb.defaultValue, elementOb.defaultValue)
-        ) {
-            return true
-        } else if (editOb.type === 'Slot' && !_.isEqual(editOb.value, elementOb.value)) {
-            return true
-        } else if (editOb.type === 'Constraint' && !_.isEqual(editOb.specification, elementOb.specification)) {
-            return true
-        }
-        return false
+        this.elementSvc.getElement<ElementObject>(this.elementSvc.getElementRequest(editOb)).then(
+            (elementOb) => {
+                if (editOb.name !== elementOb.name) {
+                    return true
+                }
+                if (editOb.documentation !== elementOb.documentation) {
+                    return true
+                }
+                if (
+                    (editOb.type === 'Property' || editOb.type === 'Port') &&
+                    !_.isEqual(editOb.defaultValue, elementOb.defaultValue)
+                ) {
+                    return true
+                } else if (editOb.type === 'Slot' && !_.isEqual(editOb.value, elementOb.value)) {
+                    return true
+                } else if (editOb.type === 'Constraint' && !_.isEqual(editOb.specification, elementOb.specification)) {
+                    return true
+                }
+                return false
+            },
+            () => {
+                return false
+            }
+        )
     }
 
     /**
@@ -298,126 +297,6 @@ export class EditorService {
     }
 
     /**
-     * @name Utils#startEdit     * called by transcludes and section, adds the editor frame
-     * uses these in the scope:
-     *   element - element object for the element to edit (for sections it's the instance spec)
-     *   isEditing - boolean
-     *   commitId - calculated commit id
-     *   isEnumeration - boolean
-     *   recompileScope - child scope of directive scope
-     *   skipBroadcast - boolean (whether to broadcast presentationElem.edit for keeping track of open edits)
-     * sets these in the scope:
-     *   edit - editable element object
-     *   isEditing - true
-     *   inPreviewMode - false
-     *   editValues - array of editable values (for element that are of type Property, Slot, Port, Constraint)
-     *
-     * @param {ComponentController} ctrl scope of the transclude directives or view section directive
-     * @param editCtrl
-     * @param {object} domElement dom of the directive, jquery wrapped
-     * @param {string} template template to compile
-     * @param {boolean} doNotScroll whether to scroll to element
-     */
-    public startEdit(
-        ctrl: ComponentController,
-        isEditable: boolean,
-        domElement: JQuery<HTMLElement>,
-        template: string | angular.Injectable<(...args: any[]) => string>,
-        doNotScroll
-    ): void {
-        if (
-            isEditable &&
-            !ctrl.isEditing &&
-            ctrl.element &&
-            ctrl.commitId === 'latest' &&
-            this.permissionsSvc.hasBranchEditPermission(ctrl.element._projectId, ctrl.element._refId)
-        ) {
-            ctrl.editLoading = true
-            const elementOb = ctrl.element
-            const reqOb = {
-                elementId: elementOb.id,
-                projectId: elementOb._projectId,
-                refId: elementOb._refId,
-            }
-            this.elementSvc
-                .getElementForEdit(reqOb)
-                .then(
-                    (data) => {
-                        ctrl.isEditing = true
-                        ctrl.inPreviewMode = false
-                        ctrl.edit = data
-
-                        if (data.type === 'Property' || data.type === 'Port') {
-                            if (ctrl.edit.defaultValue) {
-                                ctrl.editValues = [ctrl.edit.defaultValue]
-                            }
-                        } else if (data.type === 'Slot') {
-                            if (Array.isArray(data.value)) {
-                                ctrl.editValues = (data as SlotObject).value
-                            }
-                        } else if (data.type.includes('TaggedValue')) {
-                            if (Array.isArray(data.value)) {
-                                ctrl.editValues = (data as TaggedValueObject).value
-                            }
-                        } else if (data.type === 'Constraint' && data.specification) {
-                            ctrl.editValues = [(data as ConstraintObject).specification]
-                        }
-                        if (!ctrl.editValues) {
-                            ctrl.editValues = []
-                        }
-                        /*
-            if (ctrl.isEnumeration && ctrl.editValues.length === 0) {
-                ctrl.editValues.push({type: 'InstanceValue', instanceId: null});
-            }
-            */
-                        if (template) {
-                            domElement.empty()
-                            let transcludeEl: JQuery<HTMLElement>
-                            if (typeof template === 'string') {
-                                transcludeEl = $(template)
-                            } else {
-                                this.growl.error('Editing is not supported for Injected Templates!')
-                                return
-                            }
-                            domElement.append(transcludeEl)
-                            this.$compile(transcludeEl)(ctrl.$scope)
-                        }
-                        if (!ctrl.skipBroadcast) {
-                            // Broadcast message for the toolCtrl:
-                            this.eventSvc.$broadcast('presentationElem.edit', ctrl.edit)
-                        } else {
-                            ctrl.skipBroadcast = false
-                        }
-                        if (!doNotScroll) {
-                            this._scrollToElement(domElement)
-                        }
-                    },
-                    (reason: VePromiseReason<ElementsResponse<ElementObject>>) => {
-                        reason.type = 'error'
-                        this.handleError(reason)
-                    }
-                )
-                .finally(() => {
-                    ctrl.editLoading = false
-                })
-
-            this.elementSvc.isCacheOutdated(ctrl.element).then(
-                (data) => {
-                    if (data.status && data.server._modified > data.cache._modified) {
-                        this.handleError({
-                            message: 'This element has been updated on the server',
-                            type: 'warning',
-                        })
-                    }
-                },
-                (reason) => {
-                    this.handleError(reason)
-                }
-            )
-        }
-    }
-
-    /**
      * @name Utils#saveAction     * called by transcludes and section, saves edited element
      * uses these in the scope:
      *   element - element object for the element to edit (for sections it's the instance spec)
@@ -447,34 +326,6 @@ export class EditorService {
 
         ctrl.elementSaving = true
         this.save2(ctrl.edit, ctrl.editorApi, ctrl, continueEdit)
-            .then(
-                (data) => {
-                    ctrl.elementSaving = false
-                    if (!continueEdit) {
-                        ctrl.isEditing = false
-                        this.eventSvc.$broadcast('presentationElem.save', ctrl.edit)
-                    }
-                    if (!data) {
-                        this.growl.info('Save Skipped (No Changes)')
-                    } else {
-                        this.growl.success('Save Successful')
-                    }
-                    //scrollToElement(domElement);
-                },
-                (reason) => {
-                    ctrl.elementSaving = false
-                    this.handleError(reason)
-                }
-            )
-            .finally(() => {
-                if (ctrl.bbApi) {
-                    if (!continueEdit) {
-                        ctrl.bbApi.toggleButtonSpinner('presentation-element-save')
-                    } else {
-                        ctrl.bbApi.toggleButtonSpinner('presentation-element-saveC')
-                    }
-                }
-            })
     }
 
     /**
@@ -650,10 +501,10 @@ export class EditorService {
         }
         ctrl.isEditing = false
         ctrl.elementSaving = false
-        this._scrollToElement(domElement)
+        this.scrollToElement(domElement)
     }
 
-    private _scrollToElement = (domElement: JQuery): void => {
+    public scrollToElement = (domElement: JQuery): void => {
         this.$timeout(
             () => {
                 const el = domElement[0]
