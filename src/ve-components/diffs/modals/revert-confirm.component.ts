@@ -7,7 +7,7 @@ import { ElementService } from '@ve-utils/mms-api-client'
 import { veComponents } from '@ve-components'
 
 import { VeComponentOptions } from '@ve-types/angular'
-import { ConstraintObject, ElementObject, ElementsRequest, SlotObject } from '@ve-types/mms'
+import {ConstraintObject, ElementObject, ElementsRequest, ElementTaggedValueObject, SlotObject} from '@ve-types/mms'
 import { VeModalController, VeModalInstanceService } from '@ve-types/view-editor'
 
 export interface RevertConfirmResolve {
@@ -32,6 +32,7 @@ class RevertConfirmController implements VeModalController {
     public oking
     revertData: CompareData
     reqOb: ElementsRequest<string>
+    element: ElementObject
 
     static $inject = ['growl', 'ElementService', 'EventService']
 
@@ -44,6 +45,9 @@ class RevertConfirmController implements VeModalController {
     $onInit(): void {
         this.revertData = this.resolve.revertData
         this.reqOb = this.resolve.reqOb
+        this.elementSvc.getElement(this.reqOb).then((el) => {
+            this.element = el
+        })
     }
 
     ok(): void {
@@ -73,7 +77,9 @@ class RevertConfirmController implements VeModalController {
                     }
                     if (revertOb.type === 'Property' || revertOb.type === 'Port') {
                         revertOb.defaultValue = _.cloneDeep(targetOb.defaultValue)
-                    } else if (revertOb.type === 'Slot') {
+                    } else if (revertOb.type === 'ElementTaggedValue') {
+                        (revertOb as ElementTaggedValueObject).valueIds = _.cloneDeep((targetOb as ElementTaggedValueObject).valueIds)
+                    } else if (revertOb.type === 'Slot' || revertOb.type.endsWith('TaggedValue')) {
                         ;(revertOb as SlotObject).value = _.cloneDeep((targetOb as SlotObject).value)
                     } else if (revertOb.type === 'Constraint' && revertOb.specification) {
                         ;(revertOb as ConstraintObject).specification = _.cloneDeep(
@@ -117,39 +123,37 @@ const RevertConfirmComponent: VeComponentOptions = {
 
 <div class="modal-body revert-dialogue">
     <p>Revert documentation, name, and value of this element from 
-    <b>{{$ctrl.compareCommit.commitSelected._creator}} - {{$ctrl.compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> on {{$ctrl.compareCommit.ref.type}}: <b>{{$ctrl.compareCommit.ref.name}}</b>
+    <b>{{$ctrl.revertData.compareCommit.commitSelected._creator}} - {{$ctrl.revertData.compareCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b> on {{$ctrl.revertData.compareCommit.ref.type}}: <b>{{$ctrl.revertData.compareCommit.ref.name}}</b>
     to 
-    <b>{{$ctrl.baseCommit.commitSelected._creator}} - {{$ctrl.baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b>
-    on {{$ctrl.baseCommit.refSelected.type}}: <b>{{$ctrl.baseCommit.refSelected.name}}</b>.</p>
-    <p>This will create a new version under your user name on <b>{{$ctrl.compareCommit.ref.name}}.</b></p>
+    <b>{{$ctrl.revertData.baseCommit.commitSelected._creator}} - {{$ctrl.revertData.baseCommit.commitSelected._created | date:'M/d/yy h:mm a'}}</b>
+    on {{$ctrl.revertData.baseCommit.ref.type}}: <b>{{$ctrl.revertData.baseCommit.ref.name}}</b>.</p>
+    <p>This will create a new version under your username on <b>{{$ctrl.revertData.compareCommit.ref.name}}.</b></p>
     <p>Cross reference contents will NOT be reverted.</p>
 
     <h3>Preview Element</h3>
     <div class="element-preview-box">
         <h1 class="prop element-title">
-            <view-cf mms-cf-type="name" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></view-cf>
+            <view-cf mms-cf-type="name" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
         </h1>
         <h2 class="prop-title spec-view-doc-heading">Documentation</h2>
-        <p ng-show="!$ctrl.showDocHTML" class="doc-text">
-            <view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></view-cf>
+        <p class="doc-text">
+            <view-cf mms-cf-type="doc" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
         </p>
-        <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot'">
+        <div ng-if="$ctrl.element.type === 'Property' || $ctrl.element.type === 'Port' || $ctrl.element.type === 'Slot' || $ctrl.element.type.endsWith('TaggedValue')">
         <h2 class="prop-title">Property Value</h2>
         <span class="prop">
-            <view-cf mms-cf-type="val" mms-element-id="{{$ctrl.elementId}}" mms-project-id="{{$ctrl.projectId}}" mms-ref-id="{{$ctrl.baseCommit.refSelected.id}}" mms-commit-id="{{$ctrl.baseCommit.commitSelected.id}}"></view-cf>
+            <view-cf mms-cf-type="val" mms-element-id="{{$ctrl.reqOb.elementId}}" mms-project-id="{{$ctrl.reqOb.projectId}}" mms-ref-id="{{$ctrl.revertData.baseCommit.ref.id}}" mms-commit-id="{{$ctrl.revertData.baseCommit.commitSelected.id}}"></view-cf>
         </span></div>
     </div>
 </div>
 
 <div class="modal-footer">
-    <button class="btn btn-warning " ng-click="ok()">Revert</button>
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-warning " ng-click="$ctrl.ok()">Revert</button>
+    <button class="btn btn-default" ng-click="$ctrl.cancel()">Cancel</button>
 </div>
   
 `,
     bindings: {
-        close: '<',
-        dismiss: '<',
         modalInstance: '<',
         resolve: '<',
     },
