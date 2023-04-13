@@ -209,6 +209,12 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                             this.rootScopeSvc.veElementsOn(this.rootScopeSvc.veEditMode())
                         }
                         break
+                    case 'show-numbering':
+                        this.bbApi.toggleButton(
+                            'show-numbering',
+                            this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
+                        )
+                        break
                     case 'convert-pdf':
                         this.fullDocumentApi.loadRemainingViews(() => {
                             void this.appUtilsSvc.printModal(
@@ -337,7 +343,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
         api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.toggleButton('show-numbering', !this.rootScopeSvc.veNumberingOn())
+        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('refresh-numbering'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('print'))
         api.addButton(this.buttonBarSvc.getButtonBarButton('export'))

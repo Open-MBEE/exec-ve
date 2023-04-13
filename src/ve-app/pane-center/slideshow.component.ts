@@ -155,7 +155,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                 } else if (data.clicked === 'show-numbering') {
                     this.bbApi.toggleButton(
                         'show-numbering',
-                        !this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
+                        this.rootScopeSvc.veNumberingOn(!this.rootScopeSvc.veNumberingOn())
                     )
                     return
                 } else if (data.clicked === 'show-elements') {
@@ -286,7 +286,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
 
         this.contentWindowSvc.toggleLeftPane(false)
 
-        this.rootScopeSvc.veNumberingOn(false)
+        this.rootScopeSvc.veNumberingOn(true)
 
         // Share URL button settings
         this.dynamicPopover = this.shortUrlSvc.dynamicPopover
@@ -328,7 +328,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-comments'))
         api.toggleButton('show-comments', this.rootScopeSvc.veCommentsOn())
         api.addButton(this.buttonBarSvc.getButtonBarButton('show-numbering'))
-        api.toggleButton('show-numbering', !this.rootScopeSvc.veNumberingOn())
+        api.toggleButton('show-numbering', this.rootScopeSvc.veNumberingOn())
 
         // Set hotkeys for toolbar
         this.hotkeys

@@ -1,7 +1,7 @@
 import { Presentation, ViewHtmlService, PresentationService } from '@ve-components/presentations'
 import { ComponentService, ExtensionService } from '@ve-components/services'
 import {ButtonBarApi, ButtonBarService} from '@ve-core/button-bar'
-import { ImageService } from '@ve-utils/application'
+import {ImageService, RootScopeService} from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -17,7 +17,7 @@ class PresentSectionController extends Presentation implements angular.IComponen
     section: ViewInstanceSpec
     public bbApi: ButtonBarApi
     public bbId: string
-
+    showNumbering: boolean
     defaultTemplate = `
  <div ng-if="$ctrl.section.specification">
     <div ng-show="!$ctrl.isEditing">
@@ -45,7 +45,7 @@ class PresentSectionController extends Presentation implements angular.IComponen
 </div>
 `
 
-    static $inject = Presentation.$inject
+    static $inject = [...Presentation.$inject, 'RootScopeService']
     constructor(
         $q: VeQService,
         $element: JQuery<HTMLElement>,
@@ -59,7 +59,8 @@ class PresentSectionController extends Presentation implements angular.IComponen
         eventSvc: EventService,
         imageSvc: ImageService,
         buttonBarSvc: ButtonBarService,
-        extensionSvc: ExtensionService
+        extensionSvc: ExtensionService,
+        private rootScopeSvc: RootScopeService
     ) {
         super(
             $q,
@@ -101,7 +102,7 @@ class PresentSectionController extends Presentation implements angular.IComponen
     $onInit(): void {
         super.$onInit()
         this.section = this.element
-
+        this.showNumbering = this.rootScopeSvc.veNumberingOn()
         this.bbId = this.buttonBarSvc.generateBarId(`${this.section.id}_section`)
         this.bbApi = this.buttonBarSvc.initApi(this.bbId, this.bbInit, presentations_buttons)
 
@@ -120,6 +121,10 @@ class PresentSectionController extends Presentation implements angular.IComponen
                 this.growl.warning('There are duplicates in this section, duplicates ignored!')
             }
         }
+
+        this.subs.push(this.eventSvc.binding<boolean>(this.rootScopeSvc.constants.VENUMBERINGON, (data) => {
+            this.showNumbering = data
+        }))
     }
 
     protected getContent = (): VePromise<string, string> => {
