@@ -18,7 +18,7 @@ import { ElementObject, RefObject } from '@ve-types/mms'
 /* Classes */
 const LeftToolbarComponent: VeComponentOptions = {
     selector: 'leftToolbar', //toolbar-component
-    template: `<tool-bar toolbar-id="{{$ctrl.toolbarId}}" pane-toggle="$ctrl.paneToggle"/>`,
+    template: `<tool-bar toolbar-id="{{$ctrl.toolbarId}}" anchor="'left'" pane-toggle="$ctrl.paneToggle"/>`,
     bindings: {
         mmsRef: '<',
         mmsRoot: '<',

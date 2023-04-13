@@ -121,10 +121,11 @@ export class TranscludeImgController extends Transclusion implements ITransclusi
                     }
                 })
             this.svg = this.artifacts.filter((a) => a.ext === 'svg')
-            this.png = this.artifacts.filter((a) => a.ext === 'png')
+            //this.png = this.artifacts.filter((a) => a.ext === 'png')
         }
         const result =
-            '<img class="mms-svg" ng-src="{{$ctrl.svg[0].url}}" alt="{{$ctrl.element.name}}"><img class="mms-png" ng-src="{{$ctrl.png[0].url}}"  alt="{{$ctrl.element.name}}"/>'
+            '<img class="mms-svg" ng-src="{{$ctrl.svg[0].url}}" alt="{{$ctrl.element.name}}"/>' +
+            '<!--<img class="mms-png" ng-src="{{$ctrl.png[0].url}}"  alt="{{$ctrl.element.name}}"/>-->'
         return this.$q.resolve(result)
     }
 }
