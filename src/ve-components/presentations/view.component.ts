@@ -90,7 +90,7 @@ export class ViewController implements angular.IComponentController {
         'RootScopeService',
     ]
     private showEdits: boolean
-    private modified: Date
+    private modified: string
     private modifier: UserObject
     private view: ViewObject
     private reqOb: ElementsRequest<string> = {

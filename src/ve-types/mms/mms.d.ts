@@ -27,7 +27,7 @@ export interface CommitObject extends MmsObject {
     _creator?: string
     added?: CommitChangeElement[]
     _docId?: string
-    _created?: Date
+    _created?: string
     comment?: null
     source?: null
     id: string

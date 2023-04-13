@@ -40,7 +40,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
     fullDocumentApi: FullDocumentApi
     viewContentLoading: boolean
     buttons: IButtonBarButton[] = []
-    latestElement: Date
+    latestElement: string = ''
     scrollApi: IPaneScrollApi
     views: ViewData[] = []
     view2Children: { [key: string]: string[] } = {}

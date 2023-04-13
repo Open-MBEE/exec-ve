@@ -48,7 +48,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
     bars: string[] = []
     comments: {
         count: number
-        lastCommented: Date
+        lastCommented: string
         lastCommentedBy: string
         map: object
     } = {
