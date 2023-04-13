@@ -511,7 +511,7 @@ const DocumentComponent: VeComponentOptions = {
     selector: 'document',
     template: `
     <div>
-    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="36px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
+    <ng-pane pane-id="center-toolbar" pane-closed="false" pane-anchor="north" pane-size="46px" pane-no-toggle="true" pane-no-scroll="true" parent-ctrl="$ctrl">
         <div class="pane-center-toolbar">
             <div class="share-link">
                 <button type="button" class="btn btn-tools btn-sm share-url" uib-tooltip="Share Page" tooltip-placement="bottom" tooltip-popup-delay="100"

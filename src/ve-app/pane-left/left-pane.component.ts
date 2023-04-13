@@ -351,6 +351,9 @@ class LeftPaneController implements angular.IComponentController {
                                             resolve(root)
                                         }, reject)
                                 } else {*/
+                                    this.treeApi.numberingDepth = 0
+                                    this.treeApi.numberingSeparator = '.'
+                                    this.treeApi.startChapter = 1
                                     resolve(root)
                                 //}
                             }, reject)
