@@ -52,6 +52,7 @@ export class EditorController implements angular.IComponentController {
     mmsProjectId: string
     mmsRefId: string
     private mmsEditorType: string
+    private mmsEditingField: 'name' | 'value' | 'documentation'
     private autosaveKey: string
 
     private stylesToolbar = {
@@ -173,7 +174,7 @@ export class EditorController implements angular.IComponentController {
         if (onChangesObj.ngModel && !this.init) {
             this.init = true
 
-            this.id = this.editorSvc.createId(this.autosaveKey + '-' + this.mmsEditorType)
+            this.id = this.editorSvc.createId(this.autosaveKey, this.mmsEditingField)
             this.editorSvc.add(this.autosaveKey, this.id, this)
             this.startEditor()
         }
@@ -807,6 +808,7 @@ const EditorComponent: VeComponentOptions = {
         mmsRefId: '@',
         autosaveKey: '@',
         mmsEditorType: '@',
+        mmsEditingField: '@',
         field: '<',
     },
     controller: EditorController,

@@ -61,7 +61,7 @@ export class ApiService {
         return deferred.promise
     }
 
-    public getVeVersion = () => {
+    public getVeVersion = (): string => {
         return this.veConfig.version
     }
 

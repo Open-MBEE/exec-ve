@@ -1,6 +1,7 @@
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { SearchFilter } from '@ve-core/search/mms-search.component'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
+import { EditService } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -37,7 +38,8 @@ class InsertPeController extends Insertion<InsertPresentationData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: InsertionService
+        utils: InsertionService,
+        editSvc: EditService
     ) {
         super(
             $scope,
@@ -53,7 +55,8 @@ class InsertPeController extends Insertion<InsertPresentationData> {
             applicationSvc,
             utilsSvc,
             apiSvc,
-            utils
+            utils,
+            editSvc
         )
     }
 

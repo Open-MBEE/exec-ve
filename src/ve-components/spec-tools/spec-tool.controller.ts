@@ -1,7 +1,7 @@
 import { IPaneScope } from '@openmbee/pane-layout'
 
-import { veAppEvents } from '@ve-app/events'
 import { ComponentService } from '@ve-components/services'
+import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService, ToolbarApi } from '@ve-core/toolbar'
 import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
@@ -276,7 +276,7 @@ export class SpecTool implements ISpecTool {
             refId: this.element._refId,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
     }
 
     public addHtml(value: { value: string }): void {

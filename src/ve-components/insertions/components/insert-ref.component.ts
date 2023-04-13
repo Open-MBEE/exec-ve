@@ -2,6 +2,7 @@ import flatpickr from 'flatpickr'
 
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
+import { EditService } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -41,7 +42,7 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
         utilsSvc: UtilsService,
         apiSvc: ApiService,
         utils: InsertionService,
-        private $filter: angular.IFilterService
+        editSvc: EditService
     ) {
         super(
             $scope,
@@ -57,7 +58,8 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             applicationSvc,
             utilsSvc,
             apiSvc,
-            utils
+            utils,
+            editSvc
         )
     }
 
@@ -67,7 +69,7 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
         this.lastCommit = this.insertData.lastCommit
         this.now = new Date()
         this.timestamp = this.now
-        this.newItem = {
+        this.createItem = {
             id: this.apiSvc.createUniqueId(),
             _projectId: this.projectId,
             type: this.type,
@@ -91,10 +93,10 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
 
     public create = (): VePromise<RefObject, RefsResponse> => {
         const refObj: RefObject = {
-            name: this.newItem.name,
+            name: this.createItem.name,
             type: this.type,
             _projectId: this.projectId,
-            description: this.newItem.description,
+            description: this.createItem.description,
             id: this.apiSvc.createUniqueId(),
             //parentCommitId: null
         }
@@ -110,7 +112,7 @@ class InsertRefController extends Insertion<InsertRefData, RefObject> {
             }, this.addReject)
         } else {
         */
-            return this.projectSvc.createRef(refObj, this.projectId)
+        return this.projectSvc.createRef(refObj, this.projectId)
         //}
     }
 
@@ -141,7 +143,7 @@ const InsertRefComponent: VeComponentOptions = {
             <div class="comment-modal-input" ng-show="$ctrl.createForm">
                 <div class="form-group">
                     <label>Name:</label>
-                    <input class="form-control" ng-model="$ctrl.newItem.name" type="text"
+                    <input class="form-control" ng-model="$ctrl.createItem.name" type="text"
                         ng-keyup="$event.keyCode == 13 ? $ctrl.ok() : null" placeholder="Type a name for your {{$ctrl.type | lowercase}} here" autofocus>
                 </div>
             </div>
@@ -149,15 +151,15 @@ const InsertRefComponent: VeComponentOptions = {
         <div class="modal-body ve-new-ref" ng-show="$ctrl.createForm && ($ctrl.type === 'Tag' || $ctrl.type === 'Branch')">
             <div class="form-group">
                 <label>Description</label>
-                <textarea class="form-control" ng-model="$ctrl.newItem.description"></textarea>
+                <textarea class="form-control" ng-model="$ctrl.createItem.description"></textarea>
             </div>
             <!--
             <div class="form-group" ng-if="$ctrl.type === 'Branch'">
                 <label>Permission</label>
                 <br />
-                <input ng-model="$ctrl.newItem.permission" value="read" type="radio"> Read
+                <input ng-model="$ctrl.createItem.permission" value="read" type="radio"> Read
                 <br />
-                <input ng-model="$ctrl.newItem.permission" value="write" type="radio"> Write
+                <input ng-model="$ctrl.createItem.permission" value="write" type="radio"> Write
             </div>  
             
             <div class="form-group" ng-if="$ctrl.type === 'Tag' || $ctrl.type === 'Branch'">

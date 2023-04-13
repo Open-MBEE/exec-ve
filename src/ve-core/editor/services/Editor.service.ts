@@ -1,6 +1,8 @@
 import $ from 'jquery'
 import _ from 'lodash'
 
+import { ConfirmDeleteModalResolveFn } from '@ve-app/main/modals/confirm-delete-modal.component'
+import { SaveConflictResolveFn } from '@ve-components/diffs'
 import { ButtonBarApi } from '@ve-core/button-bar'
 import { EditorController } from '@ve-core/editor/editor.component'
 import { EditDialogService } from '@ve-core/editor/services/EditDialog.service'
@@ -14,6 +16,7 @@ import { veCore } from '@ve-core'
 import { VePromise, VePromiseReason, VeQService } from '@ve-types/angular'
 import { ComponentController } from '@ve-types/components'
 import { ConstraintObject, ElementObject, ElementsResponse, SlotObject, ValueObject, ViewObject } from '@ve-types/mms'
+import { VeModalInstanceService, VeModalService, VeModalSettings } from '@ve-types/view-editor'
 
 export class EditorService {
     public generatedIds: number = 0
@@ -21,8 +24,27 @@ export class EditorService {
     private edit2editor: { [autosaveKey: string]: { [editorId: string]: EditorController } }
     public savingAll: boolean = false
 
+    static $inject = [
+        '$q',
+        '$timeout',
+        '$uibModal',
+        'growl',
+        'ApiService',
+        'CacheService',
+        'PermissionsService',
+        'ElementService',
+        'ValueService',
+        'ViewService',
+        'ToolbarService',
+        'EditdialogService',
+        'EventService',
+        'EditService',
+    ]
+
     constructor(
         private $q: VeQService,
+        private $timeout: angular.ITimeoutService,
+        private $uibModal: VeModalService,
         private growl: angular.growl.IGrowlService,
         private apiSvc: ApiService,
         private cacheSvc: CacheService,
@@ -33,19 +55,20 @@ export class EditorService {
         private toolbarSvc: ToolbarService,
         private editdialogSvc: EditDialogService,
         private eventSvc: EventService,
-        private autosaveSvc: EditService
+        private editSvc: EditService
     ) {}
 
     public get(autosaveKey: string): { [editorId: string]: EditorController } {
         return this.edit2editor[autosaveKey]
     }
 
-    public updateAllData(autosaveKey: string): VePromise<void, string> {
+    public updateAllData(editKey: string | string[]): VePromise<void, string> {
+        const key: string = this.editSvc.makeKey(editKey)
         return new this.$q<void, string>((resolve, reject) => {
-            if (this.edit2editor[autosaveKey]) {
+            if (this.edit2editor[key]) {
                 const promises: VePromise<void, string>[] = []
-                for (const id of Object.keys(this.edit2editor[autosaveKey])) {
-                    promises.push(this.edit2editor[autosaveKey][id].update())
+                for (const id of Object.keys(this.edit2editor[key])) {
+                    promises.push(this.edit2editor[key][id].update())
                 }
                 this.$q.all(promises).then(resolve, reject)
             } else {
@@ -69,11 +92,11 @@ export class EditorService {
         }
     }
 
-    public createId(autosaveKey: string, field?: string): string {
-        let id = autosaveKey
-        if (field) id = `${id}-${field}`
-        if (Object.keys(this.ckEditor.instances)) id = `${id}-${this.generatedIds++}`
-
+    public createId(editKey?: string, field?: string): string {
+        let id = ''
+        if (editKey) id = `${editKey}|${field}`
+        else id = `mmsCKEditor${this.generatedIds++}`
+        if (Object.keys(this.ckEditor.instances).includes(id)) id = `mmsCKEditor${this.generatedIds++}`
         return id
     }
     public focusOnEditorAfterAddingWidgetTag(editor: CKEDITOR.editor): void {
@@ -81,12 +104,14 @@ export class EditorService {
         editor.focusManager.focus(element)
     }
 
-    public save = (autosaveKey: string, continueEdit: boolean): VePromise<void, ElementsResponse<ElementObject>> => {
+    public save = (
+        editKey: string | string[],
+        continueEdit: boolean
+    ): VePromise<void, ElementsResponse<ElementObject>> => {
         this.eventSvc.$broadcast('element-saving', true)
-        const autoSaveKey = saveEdit._projectId + saveEdit._refId + saveEdit.id
-        this.autosaveSvc.clearAutosave(autoSaveKey, saveEdit.type)
+
         return new this.$q((resolve, reject) => {
-            this._save(autoSaveKey, continueEdit).then(
+            this._save(editKey, continueEdit).then(
                 (data) => {
                     this.eventSvc.$broadcast('element-saving', false)
                     if (!data) {
@@ -110,29 +135,33 @@ export class EditorService {
             this.growl.info('Please wait...')
             return this.$q.resolve()
         }
-        if (this.autosaveSvc.openEdits() === 0) {
+        if (this.editSvc.openEdits() === 0) {
             this.growl.info('Nothing to save')
             return this.$q.resolve()
         }
 
-        Object.values(this.autosaveSvc.getAll()).forEach((ve_edit: ElementObject) => {
-            this.autosaveSvc.clearAutosave(ve_edit._projectId + ve_edit._refId + ve_edit.id, ve_edit.type)
-        })
-
         this.savingAll = true
         return new this.$q((resolve, reject) => {
-            this.elementSvc.updateElements(Object.values(this.autosaveSvc.getAll())).then((responses) => {
-                responses.forEach((elementOb) => {
-                    this.autosaveSvc.remove(elementOb.id + '|' + elementOb._projectId + '|' + elementOb._refId)
-                    const data = {
-                        element: elementOb,
-                        continueEdit: false,
-                    }
-                    this.eventSvc.$broadcast('element.updated', data)
-                })
-                this.growl.success('Save All Successful')
-                resolve()
-            }, reject)
+            this.elementSvc
+                .updateElements(
+                    Object.values(this.editSvc.getAll()).map((editOb) => {
+                        return editOb.edit
+                    })
+                )
+                .then((responses) => {
+                    responses.forEach((elementOb) => {
+                        const editKey = this.elementSvc.getElementKey(elementOb)
+                        this.editSvc.clearAutosave(editKey)
+                        this.editSvc.remove(editKey)
+                        const data = {
+                            element: elementOb,
+                            continueEdit: false,
+                        }
+                        this.eventSvc.$broadcast('element.updated', data)
+                    })
+                    this.growl.success('Save All Successful')
+                    resolve()
+                }, reject)
         })
     }
 
@@ -148,11 +177,12 @@ export class EditorService {
      *      or force save. If the user decides to discord or merge, type will be info even though
      *      the original save failed. Error means an actual error occurred.
      */
-    private _save<T extends ElementObject>(editKey: string, continueEdit?: boolean): VePromise<T> {
+    private _save<T extends ElementObject>(editKey: string | string[], continueEdit?: boolean): VePromise<T> {
         return new this.$q<T>((resolve, reject) => {
             this.updateAllData(editKey).then(
                 () => {
-                    const edit = this.autosaveSvc.get(editKey)
+                    this.editSvc.clearAutosave(editKey)
+                    const edit = this.editSvc.get<T>(editKey).edit
                     this.elementSvc.updateElement(edit, false, true).then(
                         (element: T) => {
                             resolve(element)
@@ -162,12 +192,12 @@ export class EditorService {
                             }
                             this.eventSvc.$broadcast('element.updated', data)
                             if (continueEdit) return
-                            this.autosaveSvc.remove(editKey)
+                            this.editSvc.remove(editKey)
                         },
                         (reason: VePromiseReason<ElementsResponse<T>>) => {
                             if (reason.status === 409) {
                                 const latest = reason.data.elements[0]
-                                this.editdialogSvc.saveConflictDialog(latest).result.then(
+                                this.saveConflictDialog(latest).result.then(
                                     (data) => {
                                         const choice = data
                                         if (choice === 'ok') {
@@ -177,8 +207,8 @@ export class EditorService {
                                                 refId: latest._refId,
                                                 commitId: 'latest',
                                             }
-                                            this.elementSvc.cacheElement(reqOb, latest, true)
-                                            this.elementSvc.cacheElement(reqOb, latest, false)
+                                            this.elementSvc.openEdit(latest)
+                                            this.elementSvc.cacheElement(reqOb, latest)
                                         } else if (choice === 'force') {
                                             edit._modified = latest._modified
                                             this._save<T>(editKey, continueEdit).then(
@@ -226,34 +256,47 @@ export class EditorService {
      * editable, returns false
      *
      * @param {object} editOb edit object
+     * @param {'name' | 'value' | 'documentation'} field specific field you are interested in checking for edits
      * @return {boolean} has changes or not
      */
-    public hasEdits = (editOb: ElementObject): boolean => {
+    public hasEdits = (
+        editOb: ElementObject,
+        field?: 'name' | 'value' | 'documentation'
+    ): VePromise<boolean, ElementsResponse<ElementObject>> => {
         editOb._commitId = 'latest'
-        this.elementSvc.getElement<ElementObject>(this.elementSvc.getElementRequest(editOb)).then(
-            (elementOb) => {
-                if (editOb.name !== elementOb.name) {
-                    return true
+        return new this.$q<boolean, ElementsResponse<ElementObject>>((resolve) => {
+            this.elementSvc.getElement<ElementObject>(this.elementSvc.getElementRequest(editOb)).then(
+                (elementOb) => {
+                    if ((!field || field === 'name') && editOb.name !== elementOb.name) {
+                        resolve(true)
+                    }
+                    if ((!field || field === 'documentation') && editOb.documentation !== elementOb.documentation) {
+                        resolve(true)
+                    }
+                    if (!field || field === 'value') {
+                        if (
+                            (editOb.type === 'Property' || editOb.type === 'Port') &&
+                            !_.isEqual(editOb.defaultValue, elementOb.defaultValue)
+                        ) {
+                            resolve(true)
+                        } else if (editOb.type === 'Slot' && !_.isEqual(editOb.value, elementOb.value)) {
+                            resolve(true)
+                        } else if (editOb.type.endsWith('TaggedValue') && !_.isEqual(editOb.value, elementOb.value)) {
+                            resolve(true)
+                        } else if (
+                            editOb.type === 'Constraint' &&
+                            !_.isEqual(editOb.specification, elementOb.specification)
+                        ) {
+                            resolve(true)
+                        }
+                    }
+                    resolve(false)
+                },
+                () => {
+                    resolve(false)
                 }
-                if (editOb.documentation !== elementOb.documentation) {
-                    return true
-                }
-                if (
-                    (editOb.type === 'Property' || editOb.type === 'Port') &&
-                    !_.isEqual(editOb.defaultValue, elementOb.defaultValue)
-                ) {
-                    return true
-                } else if (editOb.type === 'Slot' && !_.isEqual(editOb.value, elementOb.value)) {
-                    return true
-                } else if (editOb.type === 'Constraint' && !_.isEqual(editOb.specification, elementOb.specification)) {
-                    return true
-                }
-                return false
-            },
-            () => {
-                return false
-            }
-        )
+            )
+        })
     }
 
     /**
@@ -294,38 +337,6 @@ export class EditorService {
         if (reason.type === 'info') this.growl.info(reason.message)
         else if (reason.type === 'warning') this.growl.warning(reason.message)
         else if (reason.type === 'error') this.growl.error(reason.message)
-    }
-
-    /**
-     * @name Utils#saveAction     * called by transcludes and section, saves edited element
-     * uses these in the scope:
-     *   element - element object for the element to edit (for sections it's the instance spec)
-     *   elementSaving - boolean
-     *   isEditing - boolean
-     *   bbApi - button bar api - handles spinny
-     * sets these in the scope:
-     *   elementSaving - boolean
-     *
-     * @param {ComponentController} ctrl
-     * @param {object} domElement dom of the directive, jquery wrapped
-     * @param {boolean} continueEdit save and continue
-     */
-    public saveAction = (ctrl: ComponentController, domElement: JQuery, continueEdit: boolean): void => {
-        if (ctrl.elementSaving) {
-            this.growl.info('Please Wait...')
-            return
-        }
-        this.autosaveSvc.clearAutosave(ctrl.element._projectId + ctrl.element._refId + ctrl.element.id, ctrl.edit.type)
-        if (ctrl.bbApi) {
-            if (!continueEdit) {
-                ctrl.bbApi.toggleButtonSpinner('presentation-element-save')
-            } else {
-                ctrl.bbApi.toggleButtonSpinner('presentation-element-saveC')
-            }
-        }
-
-        ctrl.elementSaving = true
-        this.save2(ctrl.edit, ctrl.editorApi, ctrl, continueEdit)
     }
 
     /**
@@ -383,8 +394,7 @@ export class EditorService {
                         type: ctrl.edit.type,
                         element: ctrl.element,
                     }
-                    this.editdialogSvc
-                        .deleteEditModal(deleteOb)
+                    this.deleteEditModal(deleteOb)
                         .result.then(() => {
                             cancelCleanUp()
                         })
@@ -424,8 +434,7 @@ export class EditorService {
 
         bbApi.toggleButtonSpinner('presentation-element-delete')
 
-        this.editdialogSvc
-            .deleteConfirmModal(ctrl.edit, ctrl.element)
+        this.deleteConfirmModal(ctrl.edit, ctrl.element)
             .result.then(() => {
                 const viewOrSec = section ? section : ctrl.view
                 const reqOb = {
@@ -521,6 +530,60 @@ export class EditorService {
                 /**/
             }
         )
+    }
+
+    saveConflictDialog<T extends ElementObject>(latest: T): VeModalInstanceService<string> {
+        return this.$uibModal.open<SaveConflictResolveFn<T>, string>({
+            component: 'saveConflict',
+            size: 'lg',
+            resolve: {
+                latest: () => {
+                    return latest
+                },
+            },
+        })
+    }
+
+    public deleteEditModal(deleteOb: { type: string; element: ElementObject }): VeModalInstanceService<string> {
+        const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
+            component: 'confirmDeleteModal',
+            resolve: {
+                getName: () => {
+                    return `${deleteOb.type} ${deleteOb.element.id}`
+                },
+                getType: () => {
+                    return 'edit'
+                },
+                finalize: () => {
+                    return () => {
+                        this.editSvc.clearAutosave(this.elementSvc.getElementKey(deleteOb.element))
+                        return this.$q.resolve()
+                    }
+                },
+            },
+        }
+        return this.$uibModal.open<ConfirmDeleteModalResolveFn, string>(settings)
+    }
+
+    public deleteConfirmModal(edit: ElementObject, element: ElementObject): VeModalInstanceService<void> {
+        const settings: VeModalSettings<ConfirmDeleteModalResolveFn> = {
+            component: 'confirmDeleteModal',
+            resolve: {
+                getType: () => {
+                    return edit.type ? edit.type : 'element'
+                },
+                getName: () => {
+                    return edit.name ? edit.name : 'Element'
+                },
+                finalize: () => {
+                    return () => {
+                        this.editSvc.clearAutosave(this.elementSvc.getElementKey(element))
+                        return this.$q.resolve()
+                    }
+                },
+            },
+        }
+        return this.$uibModal.open<ConfirmDeleteModalResolveFn, void>(settings)
     }
 }
 

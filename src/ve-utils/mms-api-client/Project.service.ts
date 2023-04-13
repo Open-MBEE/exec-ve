@@ -1,3 +1,4 @@
+import { CacheService } from '@ve-utils/core'
 import { ApiService, ElementService, URLService } from '@ve-utils/mms-api-client'
 import { BaseApiService } from '@ve-utils/mms-api-client/Base.service'
 
@@ -18,7 +19,6 @@ import {
     RefObject,
     RefsResponse,
 } from '@ve-types/mms'
-import { CacheService } from '@ve-utils/core'
 
 /**
  * @ngdoc service
@@ -655,7 +655,7 @@ export class ProjectService extends BaseApiService {
                                     for (let i = 0; i < response.data.groups.length; i++) {
                                         let group: GroupObject = response.data.groups[i]
                                         reqOb.elementId = group.id
-                                        group = this.elementSvc.cacheElement(reqOb, group, false)
+                                        group = this.elementSvc.cacheElement(reqOb, group)
                                         this.cacheSvc.put(['group', projectId, refId, group.id], group, true)
                                         groups.push(
                                             this.cacheSvc.get<GroupObject>(['group', projectId, refId, group.id])

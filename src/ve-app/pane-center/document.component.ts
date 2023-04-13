@@ -283,7 +283,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
 
     $postLink(): void {
         // Send view to kick off tree compilation
-        const data: veAppEvents.elementSelectedData = {
+        const data: veCoreEvents.elementSelectedData = {
             rootId: this.mmsDocument.id,
             elementId: this.mmsView ? this.mmsView.id : this.mmsDocument.id,
             commitId: 'latest',
@@ -293,7 +293,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             refresh: this.$uiRouterGlobals.transition.$from().name === '',
         }
 
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data)
         this.fullDocumentApi = this.fullDocumentSvc.get()
         this.views = this.fullDocumentApi.viewsBuffer
         this._createViews()
@@ -375,7 +375,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
                 refType: this.mmsRef.type,
             }
 
-            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
             if (viewId === this.processed) return
             this.processed = viewId
             this.fullDocumentApi.handleClickOnBranch(viewId, () => {
@@ -436,7 +436,7 @@ class FullDocumentController implements IComponentController, Ng1Controller {
             refId: elementOb._refId,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
     }
 
     private _buildViewData = (vId: string, curSec: string): ViewData => {

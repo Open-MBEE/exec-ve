@@ -12,8 +12,8 @@ import { SchemaService } from '@ve-utils/model-schema'
 import { PropertySpec, veComponents } from '@ve-components'
 
 import { VeQService } from '@ve-types/angular'
-import {SlotObject, TaggedValueObject, ValueObject} from '@ve-types/mms'
-import {presentations_buttons} from "@ve-components/presentations/presentations-buttons.config";
+import { SlotObject, TaggedValueObject, ValueObject } from '@ve-types/mms'
+import { presentations_buttons } from '@ve-components/presentations/presentations-buttons.config'
 
 /**
  * @ngdoc component
@@ -207,7 +207,7 @@ export class TranscludeValController extends Transclusion implements ITransclusi
             imageSvc
         )
         this.cfType = 'val'
-        this.cfTitle = 'values'
+        this.cfTitle = 'Value'
         this.cfKind = 'Value'
         this.checkCircular = false
     }

@@ -1,7 +1,7 @@
 import { StateService } from '@uirouter/angularjs'
 
-import { veAppEvents } from '@ve-app/events'
 import { ContentWindowService } from '@ve-app/pane-center/services/ContentWindow.service'
+import { veCoreEvents } from '@ve-core/events'
 import { RootScopeService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 
@@ -45,7 +45,7 @@ class SearchController {
                     refId: elementOb._refId,
                     commitId: 'latest',
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
                 if (typeof this.rootScopeSvc.rightPaneClosed() === 'boolean' && this.rootScopeSvc.rightPaneClosed())
                     this.eventSvc.$broadcast('right-pane.toggle', false)
             },

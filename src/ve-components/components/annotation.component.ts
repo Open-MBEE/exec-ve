@@ -1,5 +1,5 @@
-import { veAppEvents } from '@ve-app/events'
 import { ExtensionService } from '@ve-components/services'
+import { veCoreEvents } from '@ve-core/events'
 import { ApplicationService } from '@ve-utils/application'
 import { EventService } from '@ve-utils/core'
 import { SchemaService } from '@ve-utils/model-schema'
@@ -48,7 +48,7 @@ class AnnotationController implements angular.IComponentController {
                     commitId: this.mmsRecentElement._commitId,
                     displayOldSpec: true,
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
             }
         })
 

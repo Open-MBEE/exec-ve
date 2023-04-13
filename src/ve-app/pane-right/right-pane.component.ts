@@ -3,11 +3,11 @@ import { StateService } from '@uirouter/angularjs'
 import angular, { IComponentController } from 'angular'
 import Rx from 'rx-lite'
 
-import { veAppEvents } from '@ve-app/events'
 import { SpecApi, SpecService } from '@ve-components/spec-tools'
+import { veCoreEvents } from '@ve-core/events'
 import { ToolbarService } from '@ve-core/toolbar'
 import { RootScopeService } from '@ve-utils/application'
-import { EditService, EventService } from '@ve-utils/core'
+import { EditObject, EditService, EventService } from '@ve-utils/core'
 import { ElementService, PermissionsService, ProjectService } from '@ve-utils/mms-api-client'
 
 import { veApp } from '@ve-app'
@@ -30,7 +30,7 @@ class RightPaneController implements IComponentController {
 
     private specApi: SpecApi
     private openEdits: number
-    private edits: { [id: string]: ElementObject }
+    private edits: { [id: string]: EditObject }
 
     private $pane: IPane
     private $tools: JQuery<HTMLElement>
@@ -106,13 +106,13 @@ class RightPaneController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>('element.selected', (data) => {
+            this.eventSvc.$on<veCoreEvents.elementSelectedData>('element.selected', (data) => {
                 this.changeAction(data)
             })
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementUpdatedData>('element.updated', (data) => {
+            this.eventSvc.$on<veCoreEvents.elementUpdatedData>('element.updated', (data) => {
                 if (
                     data.element.id === this.specApi.elementId &&
                     data.element._projectId === this.specApi.projectId &&
@@ -126,7 +126,7 @@ class RightPaneController implements IComponentController {
         )
 
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>('view.selected', (data) => {
+            this.eventSvc.$on<veCoreEvents.elementSelectedData>('view.selected', (data) => {
                 this.changeAction(data)
             })
         )
@@ -149,7 +149,7 @@ class RightPaneController implements IComponentController {
         this.eventSvc.$destroy(this.subs)
     }
 
-    changeAction = (data: veAppEvents.elementSelectedData): void => {
+    changeAction = (data: veCoreEvents.elementSelectedData): void => {
         this.eventSvc.resolve<boolean>('spec.ready', false)
         const elementId = data.elementId
         const refId = data.refId

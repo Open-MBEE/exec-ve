@@ -1278,7 +1278,7 @@ export class ViewService extends BaseApiService {
         weight: number,
         refresh?: boolean
     ): VePromise<DocumentObject> {
-        const cacheKey = this.elementSvc.getElementKey(reqOb, reqOb.elementId)
+        const cacheKey = this.elementSvc.getRequestKey(reqOb, reqOb.elementId)
         const inProgKey = cacheKey.join('-')
         if (!this._isInProgress(inProgKey)) {
             this._addInProgress(

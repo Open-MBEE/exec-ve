@@ -1,4 +1,5 @@
 import { ComponentService } from '@ve-components/services'
+import { EditorService } from '@ve-core/editor'
 import { ToolbarService } from '@ve-core/toolbar'
 import { UtilsService } from '@ve-utils/application'
 import { EditService, EventService } from '@ve-utils/core'
@@ -12,6 +13,7 @@ import {
     UserService,
     ViewService,
 } from '@ve-utils/mms-api-client'
+import { ValueService } from '@ve-utils/mms-api-client/Value.service'
 
 import { PropertySpec, veComponents } from '@ve-components'
 
@@ -76,6 +78,8 @@ export class SpecService implements angular.Injectable<any> {
         'PermissionsService',
         'UtilsService',
         'ApiService',
+        'ValueService',
+        'EditorService',
     ]
     private ran: boolean
     private lastid: string
@@ -96,7 +100,9 @@ export class SpecService implements angular.Injectable<any> {
         private userSvc: UserService,
         private permissionsSvc: PermissionsService,
         private utilsSvc: UtilsService,
-        private apiSvc: ApiService
+        private apiSvc: ApiService,
+        private valueSvc: ValueService,
+        private editorSvc: EditorService
     ) {}
 
     /**
@@ -228,7 +234,7 @@ export class SpecService implements angular.Injectable<any> {
                     if (this.apiSvc.isView(data) || this.viewSvc.isSection(data)) {
                         this.view = data
                     }
-                    this.values = this.componentSvc.setupValCf(data)
+                    this.values = this.valueSvc.setupValCf(data)
                     promises.push(
                         this.userSvc.getUserData(data._modifier).then((result) => {
                             this.modifier = result
@@ -287,8 +293,9 @@ export class SpecService implements angular.Injectable<any> {
                     } else {
                         promises.push(
                             this.elementSvc.getElementForEdit(reqOb).then((data) => {
-                                if (data.id !== this.lastid) return
-                                this.edit = data
+                                if (data.edit.id !== this.lastid) return
+                                this.edit = data.edit
+                                this.editValues = data.editValues
                                 this.editable = true
                                 if (!this.getKeepMode()) this.setEditing(false)
                                 this.setKeepMode(false)
@@ -364,11 +371,6 @@ export class SpecService implements angular.Injectable<any> {
             })
     }
 
-    public setEditValues<T extends ValueObject>(values: T[]): void {
-        this.editValues.length = 0
-        this.editValues.push(...values)
-    }
-
     public setKeepMode = (value?: boolean): void => {
         if (value === undefined) {
             this.keepMode()
@@ -392,11 +394,11 @@ export class SpecService implements angular.Injectable<any> {
     }
 
     revertEdits = (): void => {
-        this.editValues = this.componentSvc.revertEdits(this.editValues, this.edit)
+        this.editValues = this.editorSvc.revertEdits(this.editValues, this.edit)
     }
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
-    public cleanUpSaveAll = (toolbarId: string): void => {
+    public toggleSave = (toolbarId: string): void => {
         this.toolbarSvc.waitForApi(toolbarId).then(
             (api) => {
                 if (this.autosaveSvc.openEdits() > 0) {
@@ -413,11 +415,6 @@ export class SpecService implements angular.Injectable<any> {
         )
     }
     //
-
-    private _save(): VePromise<ElementObject> {
-        //TODO value edits don't save because they're handled by transclude val
-        return this.componentSvc.save(this.edit, this.editorApi, { element: this.element }, false)
-    }
 
     // Check edit count and toggle appropriate save all and edit/edit-asterisk buttons
     // public cleanUpSaveAll = (toolbarId: string): void => {

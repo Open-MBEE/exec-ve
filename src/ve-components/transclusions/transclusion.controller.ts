@@ -28,6 +28,7 @@ import {
     ValueObject,
     ViewObject,
 } from '@ve-types/mms'
+import { veCoreEvents } from "@ve-core/events";
 
 export interface ITransclusion extends angular.IComponentController, ComponentController {
     $scope: TranscludeScope
@@ -138,6 +139,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     //Customizers
     public cfType: string
     protected cfTitle: string
+    protected cfField: 'name' | 'value' | 'documentation'
     protected cfKind: string
     protected checkCircular: boolean
 
@@ -151,14 +153,13 @@ export class Transclusion implements ITransclusion, EditingToolbar {
     protected projectId: string
     protected refId: string
 
-    public editorApi: EditingApi = {}
     public isEditing: boolean = false
     public inPreviewMode: boolean = false
     public elementSaving: boolean = false
     public editLoading: boolean = false
     public skipBroadcast: boolean
-    protected clearWatch: boolean = false
 
+    public editKey: string | string[]
     public edit: ElementObject
     public editValues: ValueObject[]
     public element: ElementObject
@@ -224,7 +225,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
         protected growl: angular.growl.IGrowlService,
         protected componentSvc: ComponentService,
         protected editorSvc: EditorService,
-        protected autosaveSvc: EditService,
+        protected editSvc: EditService,
         protected elementSvc: ElementService,
         protected utilsSvc: UtilsService,
         protected schemaSvc: SchemaService,
@@ -384,7 +385,7 @@ export class Transclusion implements ITransclusion, EditingToolbar {
 
                     if (this.commitId === 'latest') {
                         this.subs.push(
-                            this.eventSvc.$on(
+                            this.eventSvc.$on<veCoreEvents.elementUpdatedData>(
                                 'element.updated',
                                 (data: { element: ElementObject; continueEdit: boolean }) => {
                                     const elementOb = data.element
@@ -446,42 +447,10 @@ export class Transclusion implements ITransclusion, EditingToolbar {
      * @param {String} transcludeType name, documentation, or value
      */
     private _reopenUnsaved = (): boolean => {
-        let unsavedEdits: { [p: string]: ElementObject } = {}
-        if (this.autosaveSvc.openEdits() > 0) {
-            unsavedEdits = this.autosaveSvc.getAll()
-        }
-        const key = this.element.id + '|' + this.element._projectId + '|' + this.element._refId
-        const thisEdits = unsavedEdits[key]
-        if (!thisEdits || this.commitId !== 'latest') {
-            return
-        }
-        if (this.cfTitle.toLowerCase() === 'value') {
-            if (this.element.type === 'Property' || this.element.type === 'Port') {
-                if (
-                    this.element.defaultValue.value !== thisEdits.defaultValue.value ||
-                    this.element.defaultValue.instanceId !== thisEdits.defaultValue.instanceId
-                ) {
-                    return true
-                }
-            } else if (this.element.type === 'Slot') {
-                const valList1 = (thisEdits as SlotObject).value
-                const valList2 = (this.element as SlotObject).value
-
-                // Check if the lists' lengths are the same
-                if (valList1.length !== valList2.length) {
-                    return true
-                } else {
-                    for (let j = 0; j < valList1.length; j++) {
-                        if (
-                            valList1[j].value !== valList2[j].value ||
-                            valList1[j].instanceId !== valList2[j].instanceId
-                        ) {
-                            return true
-                        }
-                    }
-                }
-            }
-        } else return this.element[this.cfTitle.toLowerCase()] !== thisEdits[this.cfTitle.toLowerCase()]
+        const key = this.elementSvc.getElementKey(this.element, true)
+        const edit = this.editSvc.get(key)
+        if
+        return ((edit && this.editorSvc.hasEdits(edit, this.cfField)) || this.commitId !== 'latest')
     }
 
     /**
@@ -514,26 +483,9 @@ export class Transclusion implements ITransclusion, EditingToolbar {
                     (data) => {
                         this.isEditing = true
                         this.inPreviewMode = false
-                        this.edit = data
-
-                        if (data.type === 'Property' || data.type === 'Port') {
-                            if (this.edit.defaultValue) {
-                                this.editValues = [this.edit.defaultValue]
-                            }
-                        } else if (data.type === 'Slot') {
-                            if (Array.isArray(data.value)) {
-                                this.editValues = (data as SlotObject).value
-                            }
-                        } else if (data.type.includes('TaggedValue')) {
-                            if (Array.isArray(data.value)) {
-                                this.editValues = (data as TaggedValueObject).value
-                            }
-                        } else if (data.type === 'Constraint' && data.specification) {
-                            this.editValues = [(data as ConstraintObject).specification]
-                        }
-                        if (!this.editValues) {
-                            this.editValues = []
-                        }
+                        this.edit = data.edit
+                        this.editValues = data.editValues
+                        this.editKey = data.key
 
                         this.$element.empty()
                         this.$transcludeEl = $(this.editTemplate)
@@ -575,24 +527,24 @@ export class Transclusion implements ITransclusion, EditingToolbar {
             this.growl.info('Please Wait...')
             return
         }
-        // this.autosaveSvc.clearAutosave(ctrl.element._projectId + ctrl.element._refId + ctrl.element.id, ctrl.edit.type)
-        if (ctrl.bbApi) {
+        // this.editSvc.clearAutosave(ctrl.element._projectId + ctrl.element._refId + ctrl.element.id, ctrl.edit.type)
+        if (this.bbApi) {
             if (!continueEdit) {
-                ctrl.bbApi.toggleButtonSpinner('presentation-element-save')
+                this.bbApi.toggleButtonSpinner('presentation-element-save')
             } else {
-                ctrl.bbApi.toggleButtonSpinner('presentation-element-saveC')
+                this.bbApi.toggleButtonSpinner('presentation-element-saveC')
             }
         }
 
-        ctrl.elementSaving = true
+        this.elementSaving = true
 
         this.editorSvc
-            .save()
+            .save(this.editKey, continueEdit)
             .then(
                 (data) => {
-                    ctrl.elementSaving = false
+                    this.elementSaving = false
                     if (!continueEdit) {
-                        ctrl.isEditing = false
+                        this.isEditing = false
                         this.eventSvc.$broadcast('presentationElem.save', ctrl.edit)
                     }
                     if (!data) {

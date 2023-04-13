@@ -148,7 +148,7 @@ class LeftPaneController implements angular.IComponentController {
 
         // Start listening to change events
         this.subs.push(
-            this.eventSvc.$on<veAppEvents.elementSelectedData>('view.selected', this.changeData),
+            this.eventSvc.$on<veCoreEvents.elementSelectedData>('view.selected', this.changeData),
             this.eventSvc.$on<veAppEvents.viewDeletedData>('view.deleted', (data) => {
                 let goto = '^.currentState'
                 let documentId = this.treeApi.rootId
@@ -271,7 +271,7 @@ class LeftPaneController implements angular.IComponentController {
         })
     }
 
-    changeData = (data: veAppEvents.elementSelectedData): void => {
+    changeData = (data: veCoreEvents.elementSelectedData): void => {
         //If the transitioning state detects a refresh, it will let us know to regenerate the tree
         if (data.refresh) this.treeSvc.processedRoot = ''
         const rootId = !data.rootId && data.elementId.endsWith('_cover') ? data.projectId + '_pm' : data.rootId
@@ -413,7 +413,7 @@ class LeftPaneController implements angular.IComponentController {
                     refId: branch.data._refId,
                     commitId: 'latest',
                 }
-                this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+                this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
             }
 
             void this.$state.go(
@@ -468,7 +468,7 @@ class LeftPaneController implements angular.IComponentController {
     reloadData = (): void => {
         this.bbApi.toggleButtonSpinner('tree-refresh')
         this.treeSvc.processedRoot = ''
-        const data: veAppEvents.elementSelectedData = {
+        const data: veCoreEvents.elementSelectedData = {
             rootId: this.treeApi.rootId,
             elementId: this.treeApi.elementId,
             projectId: this.treeApi.projectId,
@@ -476,7 +476,7 @@ class LeftPaneController implements angular.IComponentController {
             refType: this.treeApi.refType,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data)
         const finished = this.eventSvc.$on('tree.ready', () => {
             this.bbApi.toggleButtonSpinner('tree-refresh')
             finished.dispose()

@@ -4,12 +4,13 @@
 // <h2 class="prop-title">Target</h2>
 //     <span class="prop"><transclude-name mms-watch-id="true" mms-element-id="{{$ctrl.element._targetIds[0]}}" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}"></transclude-name></span>
 // </div>
-import { veAppEvents } from '@ve-app/events'
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { ITransclusion, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
+import { veCoreEvents } from '@ve-core/events'
 import { MathService, UtilsService, ImageService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -36,6 +37,8 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
+        editorSvc: EditorService,
+        editSvc: EditService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
@@ -52,6 +55,8 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
             $element,
             growl,
             componentSvc,
+            editorSvc,
+            editSvc,
             elementSvc,
             utilsSvc,
             schemaSvc,
@@ -79,7 +84,7 @@ export class TranscludeAttrController extends Transclusion implements ITransclus
                 refId: this.element._refId,
                 commitId: 'latest',
             }
-            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
         })
     }
 

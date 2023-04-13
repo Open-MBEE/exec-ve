@@ -281,7 +281,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                 refType: this.mmsRef.type,
                 refresh: this.$uiRouterGlobals.transition.from().name === '',
             }
-            this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('view.selected', data)
+            this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('view.selected', data)
         }
 
         this.contentWindowSvc.toggleLeftPane(false)
@@ -414,7 +414,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
             refId: elementOb._refId,
             commitId: 'latest',
         }
-        this.eventSvc.$broadcast<veAppEvents.elementSelectedData>('element.selected', data)
+        this.eventSvc.$broadcast<veCoreEvents.elementSelectedData>('element.selected', data)
     }
 
     public isPageLoading = (): boolean => {

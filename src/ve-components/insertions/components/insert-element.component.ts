@@ -2,6 +2,7 @@ import _ from 'lodash'
 
 import { Insertion, InsertionService } from '@ve-components/insertions'
 import { ApplicationService, UtilsService } from '@ve-utils/application'
+import { EditService } from '@ve-utils/core'
 import { ApiService, ElementService, ProjectService, ViewService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 import { Class } from '@ve-utils/utils'
@@ -38,7 +39,8 @@ class InsertElementController extends Insertion<InsertData> {
         applicationSvc: ApplicationService,
         utilsSvc: UtilsService,
         apiSvc: ApiService,
-        utils: InsertionService
+        utils: InsertionService,
+        editSvc: EditService
     ) {
         super(
             $scope,
@@ -54,12 +56,24 @@ class InsertElementController extends Insertion<InsertData> {
             applicationSvc,
             utilsSvc,
             apiSvc,
-            utils
+            utils,
+            editSvc
         )
     }
 
     public $onInit(): void {
         super.$onInit()
+        this.createItem = {
+            id: `${this.apiSvc.createUniqueId()}_temp`,
+            _projectId: this.mmsProjectId,
+            _refId: this.mmsRefId,
+            ownerId: 'holding_bin_' + this.mmsProjectId,
+            name: '',
+            documentation: '',
+            type: 'Class',
+            _appliedStereotypeIds: [],
+        }
+        this.editItem = this.elementSvc.openEdit(this.createItem)
         this.description = 'Search for an existing element before you ' + this.parentAction
 
         this.searchOptions.getProperties = true
@@ -67,33 +81,33 @@ class InsertElementController extends Insertion<InsertData> {
     }
 
     public create = (): VePromise<ElementObject> => {
-        if (!this.newItem.name) {
+        if (!this.createItem.name) {
             this.growl.error('Error: A name for your new element is required.')
             return this.$q.reject({ status: 422 })
         }
-        const createObj: ElementObject = {
-            id: this.apiSvc.createUniqueId(),
-            _projectId: this.mmsProjectId,
-            _refId: this.mmsRefId,
-            ownerId: 'holding_bin_' + this.mmsProjectId,
-            name: this.newItem.name,
-            documentation: this.newItem.documentation,
-            type: 'Class',
-            _appliedStereotypeIds: [],
-        }
-        const toCreate: ElementObject = new Class(createObj)
+
+        this.createItem.id = this.createItem.id.replace('_temp', '')
+
+        const toCreate: ElementObject = new Class(this.createItem)
         const reqOb: ElementCreationRequest<ElementObject> = {
             elements: [toCreate],
             elementId: toCreate.id,
             projectId: this.mmsProjectId,
             refId: this.mmsRefId,
         }
-
+        let promise: VePromise<ElementObject>
         if (!this.insertData.noPublish) {
-            return this.elementSvc.createElement(reqOb)
+            promise = this.elementSvc.createElement(reqOb)
         } else {
-            return this.$q.resolve(createObj)
+            promise = this.$q.resolve(this.createItem)
         }
+
+        promise.finally(() => {
+            this.editSvc.remove(this.editItem.key)
+            this.editSvc.clearAutosave(this.editItem.key)
+        })
+
+        return promise
     }
 
     public fail = <V extends VePromiseReason<MmsObject>>(reason: V): void => {
@@ -144,11 +158,11 @@ const InsertComponent: VeComponentOptions = {
         <form>
             <div class="form-group">
                 <label>Name </label><span class="star-mandatory">*</span>
-                <input class="form-control" type="text" ng-model="$ctrl.newItem.name" placeholder="Name your new element" autofocus/>
+                <input class="form-control" type="text" ng-model="$ctrl.createItem.name" placeholder="Name your new element" autofocus/>
             </div>
             <div class="form-group">
                 <label class="label-documentation">Documentation</label>
-                <editor ng-model="$ctrl.newItem.documentation" mms-editor-api="$ctrl.editorApi" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
+                <editor ng-model="$ctrl.createItem.documentation" mms-editor-field="documentation" mms-project-id="{{$ctrl.mmsProjectId}}" mms-ref-id="{{$ctrl.mmsRefId}}" class="textarea-transclude-modal"></editor>
             </div>
             <div class="form-group" ng-show="$ctrl.createType === 2">
                 <label>Value</label>

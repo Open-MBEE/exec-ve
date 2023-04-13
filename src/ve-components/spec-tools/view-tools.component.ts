@@ -177,15 +177,13 @@ class ToolsController implements ComponentController {
 
         this.subs.push(
             this.eventSvc.$on('presentationElem.edit', (editOb: ElementObject) => {
-                const key = `${editOb.id}|${editOb._projectId}|${editOb._refId}`
-                this.autosaveSvc.addOrUpdate(key, editOb)
-                this.specSvc.cleanUpSaveAll(this.toolbarId)
+                this.specSvc.toogleSave(this.toolbarId)
             })
         )
 
         this.subs.push(
             this.eventSvc.$on('presentationElem.save', (editOb: ElementObject) => {
-                this.cleanUpEdit(editOb, true)
+                this.specSvc.toogleSave(this.toolbarId)
             })
         )
 
@@ -243,16 +241,12 @@ class ToolsController implements ComponentController {
                                 this.toolbarSvc.waitForApi(this.toolbarId).then(
                                     (api) => {
                                         api.toggleButtonSpinner('spec-editor.saveall')
-                                        if (this.autosaveSvc.openEdits() === 0) {
-                                            api.setIcon('spec-editor', 'fa-edit')
-                                            api.setPermission('spec-editor.saveall', false)
-                                        }
+                                        this.specSvc.toggleSave(this.toolbarId)
                                     },
                                     (reason) => {
                                         this.growl.error(ToolbarService.error(reason))
                                     }
                                 )
-                                this.specSvc.cleanUpSaveAll(this.toolbarId)
                             })
 
                         this.specSvc.setEditing(false)
@@ -371,11 +365,7 @@ class ToolsController implements ComponentController {
     // }
 
     public cleanUpEdit = (editOb: ElementObject, cleanAll?: boolean): void => {
-        if (!this.editorSvc.hasEdits(editOb) || cleanAll) {
-            const key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId
-            this.autosaveSvc.remove(key)
-            this.specSvc.cleanUpSaveAll(this.toolbarId)
-        }
+        this.specSvc.cleanUpSaveAll(this.toolbarId)
     }
 
     public save = (continueEdit: boolean): void => {

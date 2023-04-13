@@ -142,7 +142,7 @@ class SpecEditorController extends SpecTool implements ISpecTool {
             const key = editOb.id + '|' + editOb._projectId + '|' + editOb._refId
             this.specSvc.tracker.etrackerSelected = key
             this.autosaveSvc.addOrUpdate(key, editOb)
-            this.specSvc.cleanUpSaveAll(this.toolbarId)
+            this.specSvc.toggleSave(this.toolbarId)
             this.elementSvc.isCacheOutdated(editOb).then(
                 (data) => {
                     const server = data.server ? data.server._modified : new Date()

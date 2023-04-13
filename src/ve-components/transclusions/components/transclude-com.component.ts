@@ -1,8 +1,9 @@
 import { ExtensionService, ComponentService } from '@ve-components/services'
 import { ITransclusion, ITransclusionComponentOptions, Transclusion } from '@ve-components/transclusions'
 import { ButtonBarService } from '@ve-core/button-bar'
+import { EditorService } from '@ve-core/editor'
 import { ImageService, MathService, UtilsService } from '@ve-utils/application'
-import { EventService } from '@ve-utils/core'
+import { EditService, EventService } from '@ve-utils/core'
 import { ElementService } from '@ve-utils/mms-api-client'
 import { SchemaService } from '@ve-utils/model-schema'
 
@@ -65,6 +66,8 @@ export class TranscludeComController extends Transclusion implements ITransclusi
         $element: JQuery<HTMLElement>,
         growl: angular.growl.IGrowlService,
         componentSvc: ComponentService,
+        editorSvc: EditorService,
+        editSvc: EditService,
         elementSvc: ElementService,
         utilsSvc: UtilsService,
         schemaSvc: SchemaService,
@@ -81,6 +84,8 @@ export class TranscludeComController extends Transclusion implements ITransclusi
             $element,
             growl,
             componentSvc,
+            editorSvc,
+            editSvc,
             elementSvc,
             utilsSvc,
             schemaSvc,
