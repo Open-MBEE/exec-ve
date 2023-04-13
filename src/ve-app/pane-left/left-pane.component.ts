@@ -330,7 +330,9 @@ class LeftPaneController implements angular.IComponentController {
                                 projectId: this.treeApi.projectId,
                             }
                             this.elementSvc.getElement<ViewObject>(reqOb).then((root) => {
-                                if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
+                                // TODO this call is taking a long time that keeps the tree from being visible, need
+                                // to see if it can be moved to a resolve or faster
+                                /*if (this.apiSvc.isDocument(root) && this.$state.includes('**.present.**')) {
                                     this.viewSvc
                                         .getDocumentMetadata({
                                             elementId: root.id,
@@ -348,9 +350,9 @@ class LeftPaneController implements angular.IComponentController {
                                                 (root as DocumentObject)._childViews = []
                                             resolve(root)
                                         }, reject)
-                                } else {
+                                } else {*/
                                     resolve(root)
-                                }
+                                //}
                             }, reject)
                         } else {
                             resolve(null)
