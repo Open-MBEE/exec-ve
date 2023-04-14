@@ -222,10 +222,7 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
                     this.appUtilsSvc.tableToCsv(angular.element('#print-div'), false)
                     return
                 } else if (data.clicked === 'refresh-numbering') {
-                    if (this.isPageLoading()) return
-                    if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
-                        this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
-                    }
+                    // TODO
                     return
                 }
             })
