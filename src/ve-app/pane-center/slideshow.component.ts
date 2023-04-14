@@ -134,16 +134,6 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
 
         this.initView()
 
-        //Subscribe to Tree Updated Subject
-        this.subs.push(
-            this.eventSvc.binding<boolean>(TreeService.events.UPDATED, (data) => {
-                if (!data) return
-                if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
-                    this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
-                }
-            })
-        )
-
         this.subs.push(
             this.eventSvc.$on<veCoreEvents.buttonClicked>(this.bbId, (data) => {
                 if (data.clicked === 'show-comments') {
@@ -291,9 +281,6 @@ class SlideshowController implements angular.IComponentController, Ng1Controller
         this.viewApi = {
             elementClicked: this.elementClicked,
             elementTranscluded: this.elementTranscluded,
-        }
-        if (this.mmsView && this.treeSvc.branch2viewNumber[this.mmsView.id]) {
-            this.number = this.treeSvc.branch2viewNumber[this.mmsView.id]
         }
     }
 
